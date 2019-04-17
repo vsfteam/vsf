@@ -1,0 +1,12 @@
+--create .\Out\demo.lib
+.\out\vsf_eda.o
+.\out\vsf_evtq_array.o
+.\out\vsf_evtq_list.o
+.\out\vsf_thread.o
+.\out\vsf_task.o
+.\out\vsf_list.o
+.\out\vsf_pool.o
+.\out\signal.o
+.\out\vsf_pbuf.o
+.\out\vsf_simple_task.o
+.\out\vsf_simple_bmevt.o

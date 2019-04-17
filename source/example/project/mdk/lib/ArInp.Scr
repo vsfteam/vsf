@@ -1,0 +1,15 @@
+--create .\lib\vsf_kernel.lib
+.\lib\vsf_eda.o
+.\lib\vsf_os.o
+.\lib\vsf_evtq_array.o
+.\lib\vsf_evtq_list.o
+.\lib\vsf_thread.o
+.\lib\vsf_task.o
+.\lib\vsf_list.o
+.\lib\vsf_pool.o
+.\lib\vsf_heap.o
+.\lib\signal.o
+.\lib\vsf_pbuf.o
+.\lib\vsf_simple_task.o
+.\lib\vsf_simple_bmevt.o
+.\lib\vsf_shell.o
