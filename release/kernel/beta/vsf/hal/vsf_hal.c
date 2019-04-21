@@ -16,12 +16,77 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+#include "hal/vsf_hal.h"
 
 #include "./arch/vsf_arch.h"
 #include "./driver/driver.h"
 
 /*============================ MACROS ========================================*/
+
+#define implement_endian_func(__bitlen)                                         \
+WEAK uint_fast##__bitlen##_t cpu_to_le##__bitlen##p(uint_fast##__bitlen##_t *p) \
+{                                                                               \
+    return cpu_to_le##__bitlen(*p);                                             \
+}                                                                               \
+WEAK uint_fast##__bitlen##_t cpu_to_be##__bitlen##p(uint_fast##__bitlen##_t *p) \
+{                                                                               \
+    return cpu_to_be##__bitlen(*p);                                             \
+}                                                                               \
+WEAK uint_fast##__bitlen##_t le##__bitlen##_to_cpup(uint_fast##__bitlen##_t *p) \
+{                                                                               \
+    return le##__bitlen##_to_cpu(*p);                                           \
+}                                                                               \
+WEAK uint_fast##__bitlen##_t be##__bitlen##_to_cpup(uint_fast##__bitlen##_t *p) \
+{                                                                               \
+    return be##__bitlen##_to_cpu(*p);                                           \
+}                                                                               \
+WEAK void cpu_to_le##__bitlen##s(uint_fast##__bitlen##_t *p)                    \
+{                                                                               \
+    *p = cpu_to_le##__bitlen(*p);                                               \
+}                                                                               \
+WEAK void cpu_to_be##__bitlen##s(uint_fast##__bitlen##_t *p)                    \
+{                                                                               \
+    *p = cpu_to_be##__bitlen(*p);                                               \
+}                                                                               \
+WEAK void le##__bitlen##_to_cpus(uint_fast##__bitlen##_t *p)                    \
+{                                                                               \
+    *p = le##__bitlen##_to_cpu(*p);                                             \
+}                                                                               \
+WEAK void be##__bitlen##_to_cpus(uint_fast##__bitlen##_t *p)                    \
+{                                                                               \
+    *p = be##__bitlen##_to_cpu(*p);                                             \
+}                                                                               \
+WEAK uint_fast##__bitlen##_t get_unaligned_##__bitlen(const void *p)            \
+{                                                                               \
+    struct PACKED __packed_##__bitlen_t {                                       \
+        uint##__bitlen##_t __v;                                                 \
+    } *__p = (struct __packed_##__bitlen_t *)p;                                 \
+    return __p->__v;                                                            \
+}                                                                               \
+WEAK uint_fast##__bitlen##_t get_unaligned_le##__bitlen(const void *p)          \
+{                                                                               \
+    return cpu_to_le##__bitlen(get_unaligned_##__bitlen(p));                    \
+}                                                                               \
+WEAK uint_fast##__bitlen##_t get_unaligned_be##__bitlen(const void *p)          \
+{                                                                               \
+    return cpu_to_be##__bitlen(get_unaligned_##__bitlen(p));                    \
+}                                                                               \
+WEAK void put_unaligned_##__bitlen(uint_fast##__bitlen##_t val, void *p)        \
+{                                                                               \
+    struct PACKED __packed_##__bitlen_t {                                       \
+        uint##__bitlen##_t __v;                                                 \
+    } *__p = (struct __packed_##__bitlen_t *)p;                                 \
+    __p->__v = val;                                                             \
+}                                                                               \
+WEAK void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t val, void *p)      \
+{                                                                               \
+    put_unaligned_##__bitlen(cpu_to_le##__bitlen(val), p);                      \
+}                                                                               \
+WEAK void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)      \
+{                                                                               \
+    put_unaligned_##__bitlen(cpu_to_be##__bitlen(val), p);                      \
+}
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -52,22 +117,37 @@ WEAK uint_fast64_t bswap_64(uint_fast64_t value64)
     return (bswap_32(value64) << 16) | bswap_32(value64 >> 16);
 }
 
+implement_endian_func(16)
+implement_endian_func(32)
+implement_endian_func(64)
+
 WEAK bool driver_init(void) 
 {
     return true;
 }
 
-/*! \note initialize hardware abstract layer
+/*! \note initialize level 0/1 hardware abstract layer
  *  \param none
- *  \retval true hal initialization succeeded.
- *  \retval false hal initialization failed
- */
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */  
 bool vsf_hal_init( void )
 {
     if (!vsf_arch_init() || !driver_init()) {
         return false;
     }
 
+    return true;
+}
+
+/*! \note initialize level 2 hardware abstract layer
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */  
+WEAK bool vsf_hal_advance_init(void)
+{
+    //! level 2 hal init
     return true;
 }
 

@@ -186,7 +186,7 @@ def_simple_class(vsf_eda_t) {
             uint8_t         flag;
         };
     )
-};
+}ALIGN(4);
 //! @}
 
 #if VSF_CFG_TIMER_EN == ENABLED
@@ -200,7 +200,7 @@ def_simple_class(vsf_teda_t) {
         vsf_dlist_node_t    timer_node;
         uint32_t            due;
     )
-};
+}ALIGN(4);
 //! @}
 
 #if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
@@ -215,7 +215,7 @@ def_simple_class(vsf_callback_timer_t) {
         vsf_dlist_node_t timer_node;
         uint32_t due;
     )
-};
+}ALIGN(4);
 //! @}
 #endif
 #endif
@@ -223,6 +223,7 @@ def_simple_class(vsf_callback_timer_t) {
 #if VSF_CFG_SYNC_EN == ENABLED
 //! \name sync
 //! @{
+
 def_simple_class(vsf_sync_t) {
 
     private_member(
@@ -243,7 +244,7 @@ def_simple_class(vsf_sync_t) {
 
         vsf_dlist_t         pending_list;
     )
-};
+}ALIGN(4);
 //! @}
 
 //! \name sync_with_owner
@@ -255,7 +256,7 @@ def_simple_class(vsf_sync_owner_t) {
     private_member(
         vsf_eda_t           *eda_owner;
     )
-};
+}ALIGN(4);
 //! @}
 
 #ifndef __VSF_BITMAP_EVT_DEFINED__
@@ -282,7 +283,7 @@ def_simple_class(vsf_bmpevt_adapter_t) {
     private_member(
         vsf_bmpevt_t                    *bmpevt_host;
     )
-};
+}ALIGN(4);
 //! @}
 
 //! \name bmpevt_adapter_eda
@@ -294,7 +295,7 @@ def_simple_class(vsf_bmpevt_adapter_eda_t) {
     private_member(
         vsf_eda_t           eda;
     )
-};
+}ALIGN(4);
 //! @}
 
 //! \name bmpevt_pender
@@ -309,7 +310,7 @@ def_simple_class(vsf_bmpevt_pender_t) {
     private_member(
         vsf_eda_t           *eda_pending;
     )
-};
+}ALIGN(4);
 //! @}
 
 //! \name bmpevt
@@ -338,7 +339,7 @@ def_simple_class(vsf_bmpevt_t) {
             uint8_t                 flag;
         };
     )
-};
+}ALIGN(4);
 //! @}
 
 //! \name queue
@@ -350,7 +351,7 @@ def_simple_class(vsf_queue_t) {
     private_member(
         vsf_slist_queue_t   msgq;
     )
-};
+}ALIGN(4);
 //! @}
 
 // IPC
@@ -374,14 +375,14 @@ typedef vsf_sync_owner_t    vsf_mutex_t;
 struct vsf_bmpevt_adapter_sync_t {
     implement(vsf_bmpevt_adapter_eda_t)
     vsf_sync_t *sync;
-};
+}ALIGN(4);
 typedef struct vsf_bmpevt_adapter_sync_t vsf_bmpevt_adapter_sync_t;
 
 struct vsf_bmpevt_adapter_bmpevt_t {
     implement(vsf_bmpevt_adapter_eda_t)
     vsf_bmpevt_t *bmpevt;
     vsf_bmpevt_pender_t pender;
-};
+}ALIGN(4);
 typedef struct vsf_bmpevt_adapter_bmpevt_t vsf_bmpevt_adapter_bmpevt_t;
 #endif
 

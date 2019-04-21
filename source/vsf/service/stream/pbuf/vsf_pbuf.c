@@ -181,7 +181,7 @@ void *vsf_pbuf_buffer_get(vsf_pbuf_t *ptObj)
 }
 
 
-uint_fast16_t vsf_pbuf_buffer_write( vsf_pbuf_t *ptObj, 
+int_fast32_t vsf_pbuf_buffer_write( vsf_pbuf_t *ptObj, 
                             const void *psrc, 
                             int_fast32_t nSize, 
                             uint_fast32_t offsite)
@@ -189,7 +189,7 @@ uint_fast16_t vsf_pbuf_buffer_write( vsf_pbuf_t *ptObj,
     ASSERT(NULL != ptObj && NULL != psrc);
     
     class_internal(ptObj, ptThis, vsf_pbuf_t);
-    uint_fast16_t hwWrittenSize = 0;
+    int_fast32_t nWrittenSize = -1;
     do {
         if (0 == nSize) {
             break;
@@ -227,22 +227,22 @@ uint_fast16_t vsf_pbuf_buffer_write( vsf_pbuf_t *ptObj,
         }
         
         this.u24Size = nSize + offsite;
-        hwWrittenSize = nSize;
+        nWrittenSize = nSize;
     } while(false);
     
-    return hwWrittenSize;
+    return nWrittenSize;
 }
 
-vsf_mem_t vsf_pbuf_buffer_read( vsf_pbuf_t *ptObj, 
+int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *ptObj, 
                                 void *psrc, 
                                 int_fast32_t nSize, 
                                 uint_fast32_t wOffset)
 {
     class_internal(ptObj, ptThis, vsf_pbuf_t);
     ASSERT(NULL != ptObj && NULL != psrc);
-    uint8_t *pbuffer = NULL;
-    vsf_mem_t tResult = {0};
-    
+    //uint8_t *pbuffer = NULL;
+    //vsf_mem_t tResult = {.nSize = -1,};
+    int_fast32_t nReadSize = -1;
     do {
         if (0 == nSize) {
             break;
@@ -272,28 +272,30 @@ vsf_mem_t vsf_pbuf_buffer_read( vsf_pbuf_t *ptObj,
             if (nSize < 0) {
                 break;
             }
-            pbuffer = psrc;
+            //pbuffer = psrc;
 
         } else 
 #endif
-        if (nSize <= max_size) {
-            pbuffer = (uint8_t *)vsf_pbuf_buffer_get(ptObj) + wOffset;
-        } else {
-            nSize = max_size;
-            memcpy(psrc, pbuffer + wOffset, nSize);
-            pbuffer = psrc;
+        {
+        //if (nSize <= max_size) {
+        //    pbuffer = (uint8_t *)vsf_pbuf_buffer_get(ptObj) + wOffset;
+        //} else {
+            nSize = min(nSize, max_size);
+            memcpy(psrc, this.pchBuffer + wOffset, nSize);
+            //pbuffer = psrc;
+        //}
         }
         
-        tResult.pchBuffer = pbuffer;
-        tResult.nSize = nSize;
+        //tResult.pchBuffer = pbuffer;
+        nReadSize = nSize;
         
     } while(false);
     
-    return tResult;
+    return nReadSize;
 }
 
 
-void vsf_pbuf_size_set(vsf_pbuf_t *ptObj, uint_fast16_t nSize)
+void vsf_pbuf_size_set(vsf_pbuf_t *ptObj, int_fast32_t nSize)
 {
     class_internal(ptObj, ptThis, vsf_pbuf_t);
     ASSERT(NULL != ptObj);
@@ -305,7 +307,7 @@ void vsf_pbuf_size_set(vsf_pbuf_t *ptObj, uint_fast16_t nSize)
     this.u24Size = min(nSize, this.u24BlockSize);
 }
 
-uint_fast16_t vsf_pbuf_capacity_get(vsf_pbuf_t *ptObj)
+int_fast32_t vsf_pbuf_capacity_get(vsf_pbuf_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_pbuf_t);
     ASSERT(NULL != ptObj);
@@ -313,7 +315,7 @@ uint_fast16_t vsf_pbuf_capacity_get(vsf_pbuf_t *ptObj)
     return this.u24BlockSize;
 }
 
-uint_fast16_t vsf_pbuf_size_get(vsf_pbuf_t *ptObj)
+int_fast32_t vsf_pbuf_size_get(vsf_pbuf_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_pbuf_t);
     ASSERT(NULL != ptObj);

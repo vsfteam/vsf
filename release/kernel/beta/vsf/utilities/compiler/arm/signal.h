@@ -213,6 +213,24 @@ Output:
             __CODE_REGION_SIMPLE((__REGION_ADDR), __VA_ARGS__)
 
 
+
+#define vsf_protect_t                   uint_fast32_t
+#define vsf_protect_interrupt()         GET_GLOBAL_INTERRUPT_STATE()
+#define vsf_unprotect_interrupt(__state)SET_GLOBAL_INTERRUPT_STATE(__state)
+#define vsf_protect_none()              0
+#define vsf_unprotect_none(__state)     UNUSED_PARAM(__state)
+
+#define __vsf_protect(__type)           vsf_protect_##__type
+#define __vsf_unprotect(__type)         vsf_unprotect_##__type
+#define vsf_protect(__type)             __vsf_protect(__type)
+#define vsf_unprotect(__type)           __vsf_unprotect(__type)
+#define vsf_protect_region(__type, ...)                                         \
+    do {                                                                        \
+        vsf_protect_t __state = vsf_protect(__type)();                          \
+        __VA_ARGS__;                                                            \
+        vsf_unprotect(__type)(__state);                                         \
+    } while (0);
+
 /*============================ TYPES =========================================*/
 typedef volatile bool locker_t;
 

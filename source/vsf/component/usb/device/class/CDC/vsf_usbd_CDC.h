@@ -35,6 +35,11 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USBD_CFG_STREAM_EN != ENABLED
+#   error "CDC need VSF_USBD_CFG_STREAM_EN!!!"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

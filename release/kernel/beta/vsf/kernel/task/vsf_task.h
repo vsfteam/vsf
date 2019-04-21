@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
 
-
+#include "service/vsf_service.h"
 #include "../vsf_eda.h"
 #include "./vsf_pt.h"
 #include "./vsf_thread.h"
@@ -30,6 +30,24 @@
 #if VSF_USE_KERNEL_TASK_MODE == ENABLED
 
 /*============================ MACROS ========================================*/
+/*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
+ *!        definition and there is NO ANY OTHER module-interface-header file 
+ *!        included in this file
+ */
+#define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
+   
+#if     defined(__VSF_TASK_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT
+#   undef __VSF_TASK_CLASS_IMPLEMENT
+#elif   defined(__VSF_TASK_CLASS_INHERIT)
+#   define __PLOOC_CLASS_INHERIT
+#   undef __VSF_TASK_CLASS_INHERIT
+#endif   
+
+#include "utilities/ooc_class.h"
+
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __implement_vsf_task(__NAME)                                            \
@@ -136,7 +154,7 @@ typedef fsm_rt_t vsf_task_entry_t(void *pthis, vsf_evt_t evt);
 typedef struct vsf_task_stack_frame_t vsf_task_stack_frame_t;
 
 struct vsf_task_stack_frame_t {
-    implement(vsf_slist_t)
+    implement(vsf_slist_node_t)
     vsf_task_entry_t    *fnEntry;
     void                *pTarget;
 };
@@ -145,8 +163,32 @@ declare_vsf_pool(vsf_task_stack_frame_pool)
 
 def_vsf_pool(vsf_task_stack_frame_pool, vsf_task_stack_frame_t)
 
+declare_class(vsf_task_t)
 
-#include "./__class_task.h"
+def_class(vsf_task_t, 
+    which(
+#if VSF_CFG_TIMER_EN == ENABLED
+        implement(vsf_teda_t)
+#else
+        implement(vsf_eda_t)
+#endif
+    ),
+    
+    private_member(
+        union {
+            vsf_task_stack_frame_t *frame_ptr;
+            vsf_slist_t             list;
+        }stack;
+        
+        vsf_pool(vsf_task_stack_frame_pool) *pstack_frame_pool;
+        int8_t task_return_state;           /* for holding fsm_rt_t value */
+        uint8_t call_depth;
+        uint8_t max_call_depth;             /* for debug purpose */
+    )
+)
+
+end_def_class(vsf_task_t)
+
 
 typedef struct {
     vsf_task_entry_t                        *fnEntry;

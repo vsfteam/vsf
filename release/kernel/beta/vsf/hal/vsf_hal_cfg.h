@@ -22,7 +22,7 @@
 #ifndef __VSF_HAL_CFG_H__
 #define __VSF_HAL_CFG_H__
 
-//! all hal modules uses this configuation file
+//! all hal modules use this configuation file
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/

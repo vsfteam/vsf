@@ -587,21 +587,32 @@ void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
 #if VSF_USE_USB_DEVICE == ENABLED
 void usrapp_usbd_connect(void *param)
 {
-    vsf_usbd_dev_t *dev = (vsf_usbd_dev_t *)param;
-    vsf_usbd_connect(dev);
+    vsf_usbd_connect((vsf_usbd_dev_t *)param);
 }
 #endif
 
+static uint_fast32_t count = 0;
 #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
 implement_vsf_thread(user_task_t) 
 {
-    uint_fast32_t count = 0;
     while (1) {
         
 #if VSF_USE_TRACE == ENABLED
         vsf_delay(500);
-        vsf_trace(VSF_TRACE_INFO, "test info [%d]" VSF_TRACE_CFG_LINEEND, count++);
+        //vsf_trace(VSF_TRACE_INFO, "test info [%d]" VSF_TRACE_CFG_LINEEND, count++);
 #endif
+    }
+}
+#else
+static void usrapp_heartbeat_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case VSF_EVT_TIMER:
+        vsf_trace(VSF_TRACE_INFO, "test info [%d]" VSF_TRACE_CFG_LINEEND, count++);
+        // fall through
+    case VSF_EVT_INIT:
+        vsf_teda_set_timer(500);
+        break;
     }
 }
 #endif
@@ -643,7 +654,7 @@ int main(void)
             .rx_stream = (vsf_stream_t *)&usrapp.usbd.cdc.stream[0].rx,
             .tx_stream = (vsf_stream_t *)&usrapp.usbd.cdc.stream[0].tx,
         #elif   VSF_USE_SERVICE_STREAM == ENABLED
-            .ptRX = &usrapp.usbd.cdc.stream[0].tx.RX,
+            .ptRX = &usrapp.usbd.cdc.stream[0].tx.RX,   //! echo
             .ptTX = &usrapp.usbd.cdc.stream[0].tx.TX,
         #   if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
             .hwpbufPoolReserve = 0xFF,          //! mark as privileged user
@@ -697,6 +708,11 @@ int main(void)
         static NO_INIT user_task_t __user_task;
         init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
     } while(0);
+#else
+    do {
+        static vsf_teda_t teda = { .evthandler = usrapp_heartbeat_evthandler };
+        vsf_teda_init(&teda, vsf_priority_0, false);
+    } while (0);
 #endif
 
     return 0;

@@ -19,21 +19,22 @@
 #define __UTILITIES_COMMUNICATE_H__
 
 /*============================ INCLUDES ======================================*/
-#include "ooc.h"
+#include "./3rd-party/PLOOC/plooc.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 //! \name stream
 //! @{
-typedef struct {
+typedef struct vsf_mem_t vsf_mem_t;
+struct vsf_mem_t {
     union {
         uint8_t *pchBuffer;         //!< stream buffer
         uint8_t *pchSrc;
         void *pObj;
     };
     int_fast32_t nSize;            //!< stream size
-} vsf_mem_t;
+};
 //! @}
 
 

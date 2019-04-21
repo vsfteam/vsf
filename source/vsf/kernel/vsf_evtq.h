@@ -28,7 +28,7 @@ struct vsf_evtq_ctx_t {
     vsf_eda_t *eda;
     vsf_evt_t evt;
     void *msg;
-};
+}ALIGN(4);
 typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
 
 #if VSF_CFG_PREMPT_EN == ENABLED
@@ -41,7 +41,7 @@ typedef struct vsf_evtq_t vsf_evtq_t;
 struct vsf_evtq_t {
     vsf_dlist_t rdy_list;
     vsf_evtq_ctx_t cur;
-};
+}ALIGN(4);
 
 struct vsf_evt_node_t {
     implement(vsf_slist_node_t)
@@ -55,7 +55,7 @@ struct vsf_evt_node_t {
         void *msg;
     };
 #endif
-};
+}ALIGN(4);
 
 #else
 
@@ -71,7 +71,7 @@ struct vsf_evt_node_t {
         void *msg;
     };
 #endif
-};
+}ALIGN(4);
 
 struct vsf_evtq_t {
     vsf_evt_node_t *node;
@@ -81,7 +81,7 @@ struct vsf_evtq_t {
     uint8_t head;
     uint8_t tail;
     vsf_evtq_ctx_t cur;
-};
+}ALIGN(4);
 
 #endif
 #endif

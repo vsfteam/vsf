@@ -51,6 +51,152 @@
 #define VSF_USBD_DESC_STRING(__LANID, __INDEX, __DESC, __SIZE)                  \
     {USB_DT_STRING, (__INDEX), (__LANID), (__SIZE), (uint8_t*)(__DESC)}
 
+
+
+#if defined(VSF_USBD_CFG_DRV_LV0)
+#   undef VSF_USBD_CFG_DRV_INTERFACE
+#   undef VSF_USBD_DRV_PREPARE
+#   define VSF_USBD_DRV_PREPARE(__dev)
+
+#   define vsf_usbd_drv_func_name(__header, __func) TPASTE3(__header, _, __func)
+
+// lv0 API used as usbd driver
+#   define vsf_usbd_drv_init(__cfg)                                             \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, init)                      \
+            (&VSF_USBD_CFG_DRV_OBJ, (__cfg))
+
+#   define vsf_usbd_drv_fini()                                                  \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, fini)                      \
+            (&VSF_USBD_CFG_DRV_OBJ)
+
+#   define vsf_usbd_drv_reset()                                                 \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, reset)                     \
+            (&VSF_USBD_CFG_DRV_OBJ)
+
+#   define vsf_usbd_drv_connect()                                               \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, connect)                   \
+            (&VSF_USBD_CFG_DRV_OBJ)
+
+#   define vsf_usbd_drv_disconnect()                                            \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, disconnect)                \
+            (&VSF_USBD_CFG_DRV_OBJ)
+
+#   define vsf_usbd_drv_wakeup()                                                \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, wakeup)                    \
+            (&VSF_USBD_CFG_DRV_OBJ)
+
+#   define vsf_usbd_drv_set_address(__addr)                                     \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, set_address)               \
+            (&VSF_USBD_CFG_DRV_OBJ, (__addr))
+
+#   define vsf_usbd_drv_get_setup(__request)                                    \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, get_setup)                 \
+            (&VSF_USBD_CFG_DRV_OBJ, (uint8_t *)(__request))
+
+#   define vsf_usbd_drv_ep_add(__addr, __attr, __size)                          \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_add)                    \
+            (&VSF_USBD_CFG_DRV_OBJ, (__addr), (__attr), (__size))
+
+#   define vsf_usbd_drv_ep_is_dma                                               \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_is_dma)
+
+#   define vsf_usbd_drv_ep_number                                               \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_number)
+
+#   define vsf_usbd_drv_ep_get_size(__ep)                                       \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_get_size)               \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
+
+#   define vsf_usbd_drv_ep_is_stalled(__ep)                                     \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_is_stalled)             \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
+
+#   define vsf_usbd_drv_ep_set_stall(__ep)                                      \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_set_stall)              \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
+
+#   define vsf_usbd_drv_ep_clear_stall(__ep)                                    \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_clear_stall)            \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
+
+#   define vsf_usbd_drv_ep_read_buffer(__ep, __buf, __size)                     \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_read_buffer)            \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep), (__buf), (__size))
+
+#   define vsf_usbd_drv_ep_write_buffer(__ep, __buf, __size)                    \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_write_buffer)           \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep), (__buf), (__size))
+
+#   define vsf_usbd_drv_ep_get_data_size(__ep)                                  \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_get_data_size)          \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
+
+#   define vsf_usbd_drv_ep_set_data_size(__ep, __size)                          \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_set_data_size)          \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep), (__size))
+
+#   define vsf_usbd_drv_ep_enable_out(__ep)                                     \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_enable_OUT)             \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
+
+#elif defined(VSF_USBD_CFG_DRV_LV1)
+#   undef VSF_USBD_CFG_DRV_INTERFACE
+// lv1 API used as usbd driver
+#   error "not implemented now!!!"
+
+#   define vsf_usbd_drv_init(__cfg)
+#   define vsf_usbd_drv_fini()
+#   define vsf_usbd_drv_reset()
+#   define vsf_usbd_drv_connect()
+#   define vsf_usbd_drv_disconnect()
+#   define vsf_usbd_drv_wakeup()
+#   define vsf_usbd_drv_set_address(__addr)
+#   define vsf_usbd_drv_get_setup(__request)
+#   define vsf_usbd_drv_ep_add(__addr, __attr, __size)
+
+#   define vsf_usbd_drv_ep_is_dma
+#   define vsf_usbd_drv_ep_num
+#   define vsf_usbd_drv_ep_get_size(__ep)
+#   define vsf_usbd_drv_ep_is_stalled(__ep)
+#   define vsf_usbd_drv_ep_set_stall(__ep)
+#   define vsf_usbd_drv_ep_clear_stall(__ep)
+#   define vsf_usbd_drv_ep_read_buffer(__ep, __buf, __size)
+#   define vsf_usbd_drv_ep_write_buffer(__ep, __buf, __size)
+#   define vsf_usbd_drv_ep_get_data_size(__ep)
+#   define vsf_usbd_drv_ep_set_data_size(__ep, __size)
+#   define vsf_usbd_drv_ep_enable_out(__ep)
+
+#else
+#   define VSF_USBD_CFG_DRV_INTERFACE
+// interface-based API used as usbd driver
+#   undef VSF_USBD_DRV_PREPARE
+#   define VSF_USBD_DRV_PREPARE(__dev)                                          \
+         const i_usb_dc_t *__drv = (__dev)->drv;
+
+#   define vsf_usbd_drv_init(__cfg)                     __drv->Init((__cfg))
+#   define vsf_usbd_drv_fini()                          __drv->Fini()
+#   define vsf_usbd_drv_reset()                         __drv->Reset()
+#   define vsf_usbd_drv_connect()                       __drv->Connect()
+#   define vsf_usbd_drv_disconnect()                    __drv->Disconnect()
+#   define vsf_usbd_drv_wakeup()                        __drv->Wakeup()
+#   define vsf_usbd_drv_set_address(__addr)             __drv->SetAddress((__addr))
+#   define vsf_usbd_drv_get_setup(__request)            __drv->GetSetup((uint8_t *)(__request))
+#   define vsf_usbd_drv_ep_add(__addr, __attr, __size)  __drv->Ep.Add((__addr), (__attr), (__size))
+
+#   define vsf_usbd_drv_ep_is_dma                       __drv->Ep.IsDMA
+#   define vsf_usbd_drv_ep_number                       __drv->Ep.Number
+#   define vsf_usbd_drv_ep_get_size(__ep)               __drv->Ep.GetSize((__ep))
+#   define vsf_usbd_drv_ep_is_stalled(__ep)             __drv->Ep.IsStalled((__ep))
+#   define vsf_usbd_drv_ep_set_stall(__ep)              __drv->Ep.SetStall((__ep))
+#   define vsf_usbd_drv_ep_clear_stall(__ep)            __drv->Ep.ClearStall((__ep))
+#   define vsf_usbd_drv_ep_read_buffer(__ep, __buf, __size)     __drv->Ep.ReadBuffer((__ep), (__buf), (__size))
+#   define vsf_usbd_drv_ep_write_buffer(__ep, __buf, __size)    __drv->Ep.WriteBuffer((__ep), (__buf), (__size))
+#   define vsf_usbd_drv_ep_get_data_size(__ep)          __drv->Ep.GetDataSize((__ep))
+#   define vsf_usbd_drv_ep_set_data_size(__ep, __size)  __drv->Ep.SetDataSize((__ep), (__size))
+#   define vsf_usbd_drv_ep_enable_out(__ep)             __drv->Ep.EnableOUT((__ep))
+
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -135,6 +281,7 @@ def_simple_class(vsf_usbd_ifs_t) {
 
     private_member(
         uint8_t alternate_setting;
+        bool is_inited;
     )
 };
 
@@ -169,8 +316,9 @@ def_simple_class(vsf_usbd_dev_t) {
         vsf_usbd_desc_t *desc;
 
         void *tag;
-
+#ifdef VSF_USBD_CFG_DRV_INTERFACE
         const i_usb_dc_t *drv;
+#endif
     )
 
     protected_member(
@@ -189,6 +337,7 @@ def_simple_class(vsf_usbd_dev_t) {
     )
 };
 
+#if VSF_USBD_CFG_STREAM_EN == ENABLED
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 declare_simple_class(vsf_usbd_ep_stream_t)
 def_simple_class(vsf_usbd_ep_stream_t) {
@@ -231,6 +380,7 @@ def_class(vsf_usbd_ep_stream_t,
 end_def_class(vsf_usbd_ep_stream_src_t)
 
 #endif
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -251,12 +401,12 @@ extern vsf_usbd_ifs_t * vsf_usbd_get_ifs(vsf_usbd_dev_t *dev, uint_fast8_t ifs_n
 extern vsf_err_t vsf_usbd_ep_recv(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans);
 extern vsf_err_t vsf_usbd_ep_send(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans);
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-extern vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *stream);
-extern vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *stream);
+#if VSF_USBD_CFG_STREAM_EN == ENABLED
+extern vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *);
+extern vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *);
 
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_SERVICE_STREAM == ENABLED
 
 extern 
 void vsf_usbd_ep_stream_init(   vsf_usbd_ep_stream_t *obj, 
@@ -265,9 +415,10 @@ void vsf_usbd_ep_stream_init(   vsf_usbd_ep_stream_t *obj,
 extern 
 void vsf_usbd_ep_stream_connect_dev(vsf_usbd_ep_stream_t *obj, 
                                     vsf_usbd_dev_t *dev);
-#endif
+#endif      // VSF_USE_SERVICE_STREAM
+#endif      // VSF_USBD_CFG_STREAM_EN
 
-#endif
+#endif      // VSF_USBD_IMPLEMENT || VSF_USBD_INHERIT
 
 #undef VSF_USBD_IMPLEMENT
 #undef VSF_USBD_INHERIT

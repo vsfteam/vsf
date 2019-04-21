@@ -34,7 +34,7 @@ typedef uint_fast8_t vsf_sched_lock_status_t;
         {                                                                       \
             vsf_sched_lock_status_t lock_status = vsf_sched_lock();             \
             __VA_ARGS__;                                                        \
-             vsf_sched_unlock(lock_status);                                     \
+            vsf_sched_unlock(lock_status);                                     \
         }                                                                       \
 
 #   define vsf_sched_safe()             code_region(&VSF_SCHED_SAFE_CODE_REGION)
@@ -42,6 +42,7 @@ typedef uint_fast8_t vsf_sched_lock_status_t;
 
 #   define __vsf_interrupt_safe(...)    __SAFE_ATOM_CODE(__VA_ARGS__)
 #   define vsf_interrupt_safe(...)      SAFE_ATOM_CODE(__VA_ARGS__)
+#   define vsf_sched_safe_exit()        vsf_sched_unlock(lock_status)
 #else
 #   define vsf_sched_lock()             0
 #   define vsf_sched_unlock(level)      UNUSED_PARAM(level)
@@ -49,26 +50,11 @@ typedef uint_fast8_t vsf_sched_lock_status_t;
 #   define __vsf_sched_safe(...)        __VA_ARGS__
 #   define vsf_interrupt_safe(...)      __VA_ARGS__
 #   define __vsf_interrupt_safe(...)    __VA_ARGS__
+#   define vsf_sched_safe_exit()
 #endif
 
-#define vsf_protect_t                   uint_fast32_t
 #define vsf_protect_scheduler()         vsf_sched_lock()
 #define vsf_unprotect_scheduler(__state)vsf_sched_unlock((vsf_sched_lock_status_t)(__state))
-#define vsf_protect_interrupt()         vsf_get_interrupt()
-#define vsf_unprotect_interrupt(__state)vsf_set_interrupt((istate_t)(__state))
-#define vsf_protect_none()              0
-#define vsf_unprotect_none(__state)     UNUSED_PARAM(__state)
-
-#define __vsf_protect(__type)           vsf_protect_##__type
-#define __vsf_unprotect(__type)         vsf_unprotect_##__type
-#define vsf_protect(__type)             __vsf_protect(__type)
-#define vsf_unprotect(__type)           __vsf_unprotect(__type)
-#define vsf_protect_region(__type, ...)                                         \
-    do {                                                                        \
-        vsf_protect_t __state = vsf_protect(__type)();                          \
-        __VA_ARGS__;                                                            \
-        vsf_unprotect(__type)(__state);                                         \
-    } while (0);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

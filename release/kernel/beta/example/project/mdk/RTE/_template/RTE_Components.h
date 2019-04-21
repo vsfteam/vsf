@@ -1,6 +1,6 @@
 
 /*
- * Auto generated Run-Time-Environment Component Configuration File
+ * Auto generated Run-Time-Environment Configuration File
  *      *** Do not modify ! ***
  *
  * Project: 'Blinky' 
@@ -16,9 +16,12 @@
  */
 #define CMSIS_device_header "CMSDK_CM7_SP.h"
 
+/*  Keil.ARM Compiler::Compiler:Event Recorder:DAP:1.4.0 */
 #define RTE_Compiler_EventRecorder
           #define RTE_Compiler_EventRecorder_DAP
+/*  Keil.ARM Compiler::Compiler:I/O:STDOUT:User:1.2.0 */
 #define RTE_Compiler_IO_STDOUT          /* Compiler I/O: STDOUT */
           #define RTE_Compiler_IO_STDOUT_User     /* Compiler I/O: STDOUT User */
+
 
 #endif /* RTE_COMPONENTS_H */

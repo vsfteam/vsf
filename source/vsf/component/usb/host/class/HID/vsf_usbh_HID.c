@@ -31,20 +31,20 @@
 
 struct usb_hid_class_descriptor_t
 {
-	uint8_t bDescriptorType;
-	uint16_t wDescriptorLength;
+    uint8_t bDescriptorType;
+    uint16_t wDescriptorLength;
 } PACKED;
 typedef struct usb_hid_class_descriptor_t usb_hid_class_descriptor_t;
 
 struct usb_hid_descriptor_t
 {
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint16_t bcdHID;
-	uint8_t bCountryCode;
-	uint8_t bNumDescriptors;
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint16_t bcdHID;
+    uint8_t bCountryCode;
+    uint8_t bNumDescriptors;
 
-	usb_hid_class_descriptor_t desc[1];
+    usb_hid_class_descriptor_t desc[1];
 } PACKED;
 typedef struct usb_hid_descriptor_t usb_hid_descriptor_t;
 
@@ -78,7 +78,7 @@ static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_MESSAGE:
-        hid->use_as__vsf_eda_t.evthandler = hid->user_evthandler;
+        hid->evthandler = hid->user_evthandler;
         hid->ep0 = &dev->ep0;
         vsf_eda_post_evt(eda, VSF_EVT_INIT);
         break;
@@ -97,9 +97,9 @@ void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     uint_fast8_t epaddr;
 
     if (VSF_ERR_NONE != vsf_usbh_get_extra_descriptor((uint8_t *)desc_ifs,
-			parser_alt->desc_size, USB_DT_HID, (void **)&desc_hid)) {
-		return NULL;
-	}
+            parser_alt->desc_size, USB_DT_HID, (void **)&desc_hid)) {
+        return NULL;
+    }
 
     hid = VSF_USBH_MALLOC(obj_size);
     if (NULL == hid) {
@@ -125,18 +125,18 @@ void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         desc_ep = (struct usb_endpoint_desc_t *)((uint32_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
 
-	hid->usbh = usbh;
-	hid->dev = dev;
-	hid->ifs = ifs;
-	hid->desc_len = desc_hid->desc[0].wDescriptorLength;
+    hid->usbh = usbh;
+    hid->dev = dev;
+    hid->ifs = ifs;
+    hid->desc_len = desc_hid->desc[0].wDescriptorLength;
 
-	hid->use_as__vsf_eda_t.evthandler = vsf_usbh_hid_evthandler;
+    hid->evthandler = vsf_usbh_hid_evthandler;
     vsf_eda_init(&hid->use_as__vsf_eda_t, vsf_priority_inherit, false);
 
-	return hid;
+    return hid;
 free_all:
-	VSF_USBH_FREE(hid);
-	return NULL;
+    VSF_USBH_FREE(hid);
+    return NULL;
 }
 
 void vsf_usbh_hid_disconnect(vsf_usbh_hid_eda_t *hid)
@@ -144,7 +144,7 @@ void vsf_usbh_hid_disconnect(vsf_usbh_hid_eda_t *hid)
     vsf_usbh_t *usbh = hid->usbh;
     vsf_usbh_free_urb(usbh, &hid->urb_in);
     vsf_usbh_free_urb(usbh, &hid->urb_out);
-	vsf_eda_fini(&hid->use_as__vsf_eda_t);
+    vsf_eda_fini(&hid->use_as__vsf_eda_t);
 }
 
 static vsf_err_t vsf_usbh_hid_submit_urb(vsf_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_t *urb)
@@ -165,6 +165,62 @@ static vsf_err_t vsf_usbh_hid_submit_urb(vsf_usbh_hid_eda_t *hid, uint8_t *buffe
     }
 
     return vsf_usbh_submit_urb(hid->usbh, urb);
+}
+
+vsf_err_t __vsf_usbh_hid_send_report_req_imp(vsf_usbh_hid_base_t *hid, uint_fast16_t type_id,
+        uint8_t *report, uint_fast16_t report_len)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x09,
+        .wValue          =  type_id,
+        .wIndex          =  0,
+        .wLength         =  report_len,
+    };
+	if (report != NULL) {
+		vsf_usbh_urb_set_buffer(&hid->ep0->urb, report, report_len);
+	}
+    return vsf_usbh_control_msg(hid->usbh, hid->dev, &req);
+}
+
+vsf_err_t __vsf_usbh_hid_recv_report_req_imp(vsf_usbh_hid_base_t *hid, uint_fast16_t type_id,
+		uint8_t *report, uint_fast16_t report_len)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x01,
+        .wValue          =  type_id,
+        .wIndex          =  0,
+        .wLength         =  report_len,
+    };
+    if (report != NULL) {
+		vsf_usbh_urb_set_buffer(&hid->ep0->urb, report, report_len);
+	} else if (report_len > 0) {
+        vsf_usbh_urb_alloc_buffer(&hid->ep0->urb, report_len);
+    }
+    return vsf_usbh_control_msg(hid->usbh, hid->dev, &req);
+}
+
+vsf_err_t __vsf_usbh_hid_set_idle_imp(vsf_usbh_hid_base_t *hid, uint_fast8_t id, uint_fast8_t duration)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x0A,
+        .wValue          =  (id << 0) | (duration << 8),
+        .wIndex          =  hid->ifs->no,
+        .wLength         =  0,
+    };
+    return vsf_usbh_control_msg(hid->usbh, hid->dev, &req);
+}
+
+uint8_t * __vsf_usbh_hid_get_tx_report_imp(vsf_usbh_hid_eda_t *hid)
+{
+    return vsf_usbh_urb_peek_buffer(&hid->urb_out);
+}
+
+uint8_t * __vsf_usbh_hid_get_rx_report_imp(vsf_usbh_hid_eda_t *hid)
+{
+    return vsf_usbh_urb_peek_buffer(&hid->urb_in);
 }
 
 vsf_err_t __vsf_usbh_hid_send_report_imp(vsf_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size)
@@ -245,15 +301,15 @@ static void vsf_usbh_hid_input_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 {
     vsf_usbh_hid_input_t *hid = param;
     vsf_usbh_hid_disconnect(&hid->use_as__vsf_usbh_hid_eda_t);
-	vsf_hid_free_dev(&hid->use_as__vsf_hid_dev_t);
-	VSF_USBH_FREE(hid);
+    vsf_hid_free_dev(&hid->use_as__vsf_hid_dev_t);
+    VSF_USBH_FREE(hid);
 }
 
 static const vsf_usbh_dev_id_t vsf_usbh_hid_input_dev_id[] = {
-	{
+    {
         .match_int_class = true,
-		.bInterfaceClass = USB_CLASS_HID,
-	},
+        .bInterfaceClass = USB_CLASS_HID,
+    },
 };
 
 const vsf_usbh_class_drv_t vsf_usbh_hid_drv = {

@@ -31,10 +31,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum vsf_usbd_HID_EVT_t
-{
-    VSF_USBD_HID_EVT_TIMER4MS = VSF_EVT_USER + 0,
-    VSF_USBD_HID_EVT_INREPORT = VSF_EVT_USER + 1,
+enum vsf_usbd_HID_EVT_t {
+    VSF_USBD_HID_EVT_INREPORT = VSF_EVT_USER + 0,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -110,16 +108,16 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_usbd_HID_on_report(hid, report);
             goto process_in_report;
         } else /* if (trans == &hid->transact_out) */ {
-            const i_usb_dc_t *drv = dev->drv;
+            VSF_USBD_DRV_PREPARE(dev);
             uint_fast8_t ep_out = hid->ep_out;
-            uint_fast16_t ep_size = drv->Ep.GetSize(ep_out);
-            uint_fast16_t pkg_size = drv->Ep.GetDataSize(ep_out);
+            uint_fast16_t ep_size = vsf_usbd_drv_ep_get_size(ep_out);
+            uint_fast16_t pkg_size = vsf_usbd_drv_ep_get_data_size(ep_out);
             uint8_t report_id = 0;
 
             switch (hid->output_state) {
             case HID_OUTPUT_STATE_WAIT:
                 if (hid->has_report_id) {
-                    drv->Ep.ReadBuffer(ep_out, &report_id, 1);
+                    vsf_usbd_drv_ep_read_buffer(ep_out, &report_id, 1);
                 }
                 report = vsf_usbd_HID_find_report(hid, USB_HID_REPORT_OUTPUT, report_id);
                 if ((NULL == report) || (pkg_size > report->mem.nSize)) {
@@ -132,7 +130,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
                 do {
                     uint_fast8_t offset = hid->has_report_id ? 1 : 0;
-                    drv->Ep.ReadBuffer(ep_out, &report->mem.pchBuffer[offset], pkg_size - offset);
+                    vsf_usbd_drv_ep_read_buffer(ep_out, &report->mem.pchBuffer[offset], pkg_size - offset);
                 } while (0);
 
                 if (pkg_size < report->mem.nSize) {
@@ -152,7 +150,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     return;
                 }
 
-                drv->Ep.ReadBuffer(ep_out, report->mem.pchBuffer + hid->pos_out, pkg_size);
+                vsf_usbd_drv_ep_read_buffer(ep_out, report->mem.pchBuffer + hid->pos_out, pkg_size);
                 hid->pos_out += pkg_size;
                 if (hid->pos_out >= report->mem.nSize) {
                     hid->pos_out = 0;
@@ -163,7 +161,8 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         }
         break;
-    case VSF_USBD_HID_EVT_TIMER4MS:
+    case VSF_EVT_TIMER:
+        vsf_teda_set_timer(4);
         for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
             report = &hid->reports[i];
             if ((report->type == USB_HID_REPORT_INPUT) && (report->idle != 0)) {
@@ -219,6 +218,12 @@ static vsf_err_t vsf_usbd_HID_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
     hid->dev = dev;
     hid->teda.evthandler = vsf_usbd_HID_evthandler;
     return vsf_teda_init(&hid->teda, vsf_priority_inherit, false);
+}
+
+static vsf_err_t vsf_usbh_HID_fini(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+{
+    vsf_usbd_HID_t *hid = (vsf_usbd_HID_t *)ifs->class_param;
+    return vsf_teda_fini(&hid->teda);
 }
 
 static vsf_usbd_desc_t * vsf_usbd_HID_get_desc(vsf_usbd_dev_t *dev,
@@ -339,6 +344,7 @@ const vsf_usbd_class_op_t vsf_usbd_HID = {
     .request_prepare =  vsf_usbd_HID_request_prepare,
     .request_process =  vsf_usbd_HID_request_process,
     .init =             vsf_usbd_HID_init,
+    .fini =             vsf_usbh_HID_fini,
 };
 
 #endif      // VSF_USE_USB_DEVICE

@@ -50,6 +50,10 @@
 #include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpd.h"
 #include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpc.h"
 
+#ifdef VSF_CFG_USER_HEADER
+#   include VSF_CFG_USER_HEADER
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef vsf_log_info

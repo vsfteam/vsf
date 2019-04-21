@@ -82,8 +82,7 @@ void vsf_usbd_CDC_data_connect(vsf_usbd_CDC_t *cdc)
     }
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED
-
-
+     vsf_usbd_ep_recv_stream(&cdc->stream.use_as__vsf_usbd_ep_stream_t);
 #endif
 }
 

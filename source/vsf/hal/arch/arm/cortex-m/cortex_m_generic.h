@@ -26,13 +26,46 @@
 #define __LITTLE_ENDIAN             1
 #define __BYTE_ORDER                __LITTLE_ENDIAN
 
+#if __ARM_ARCH == 6
+#   ifndef VSF_ARCH_PRI_NUM
+#       define VSF_ARCH_PRI_NUM         4
+#       undef  VSF_ARCH_PRI_BIT         
+#       define VSF_ARCH_PRI_BIT         2
+#   endif
+
+#   ifndef VSF_ARCH_PRI_BIT
+#       define VSF_ARCH_PRI_BIT         2
+#   endif
+#elif __ARM_ARCH >= 7
+#   ifndef VSF_ARCH_PRI_NUM
+#       define VSF_ARCH_PRI_NUM         256
+#       undef  VSF_ARCH_PRI_BIT         
+#       define VSF_ARCH_PRI_BIT         8
+#   endif
+
+#   ifndef VSF_ARCH_PRI_BIT
+#       define VSF_ARCH_PRI_BIT         8
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
+            __vsf_arch_prio_index_##__N = (__N),
+
+enum {
+    MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
+};
+
+#define __VSF_ARCH_PRI(__N, __BIT)                                              \
+            VSF_ARCH_PRIO_##__N =                                               \
+                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)           \
+                    << (8- (__BIT))) & 0xFF,
+
 enum vsf_arch_priority_t {
     VSF_ARCH_PRIO_IVALID    = -1,
-    VSF_ARCH_PRIO_0         = 0xFF,
-    VSF_ARCH_PRIO_1         = 0xFE,
+    MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 };
 typedef enum vsf_arch_priority_t vsf_arch_priority_t;
 

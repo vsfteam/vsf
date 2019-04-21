@@ -23,7 +23,7 @@
 /*============================ TYPES =========================================*/
 declare_vsf_thread(user_task_t)
 
-def_vsf_thread(user_task_t, 1024,
+def_vsf_thread(user_task_t, 512,
 
     features_used(
         mem_sharable( using_grouped_evt; )

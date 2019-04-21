@@ -31,8 +31,8 @@
 
 /*============================ MACROS ========================================*/
 
-#define M480_USBD_HS_EPNUM              14
-#define M480_USBD_HS_ISDMA              false
+#define m480_usbd_hs_ep_number          14
+#define m480_usbd_hs_ep_is_dma          false
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

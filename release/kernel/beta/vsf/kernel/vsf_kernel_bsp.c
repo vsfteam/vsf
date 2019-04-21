@@ -103,7 +103,7 @@ ROOT void __post_vsf_kernel_init(void)
     __main_thread.pentry = (vsf_thread_entry_t *)main;
     __main_thread.pstack = __main_stack;
     __main_thread.stack_size = stack_size;
-    vsf_thread_start(&__main_thread, vsf_priority_inherit);
+    vsf_thread_start((vsf_thread_t *)&__main_thread, vsf_priority_inherit);
 #else
     main();
 #endif

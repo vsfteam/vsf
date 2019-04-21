@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.32.3.20186</state>
+                    <state>8.32.2.19370</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -4389,6 +4389,7 @@
                     <name>CCDefines</name>
                     <state>__Nuvoton__</state>
                     <state>__M484__</state>
+                    <state>__OOC_DEBUG__</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -7281,6 +7282,9 @@
             <data />
         </settings>
     </configuration>
+    <mfc_discard>
+        <configuration>usbh_m484</configuration>
+    </mfc_discard>
     <group>
         <name>usrapp</name>
         <excluded>
@@ -7724,10 +7728,6 @@
         </group>
         <group>
             <name>hal</name>
-            <excluded>
-                <configuration>kernel_lib_armv7m_full_size</configuration>
-                <configuration>kernel_lib_armv6m_full_size</configuration>
-            </excluded>
             <group>
                 <name>arch</name>
                 <group>
@@ -7773,6 +7773,7 @@
             <group>
                 <name>driver</name>
                 <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
                     <configuration>kernel_lib_armv6m_full_size</configuration>
                 </excluded>
                 <group>
@@ -8030,6 +8031,21 @@
                             <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\M480\device.h</name>
                         </file>
                     </group>
+                    <group>
+                        <name>NuConsole</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole_Config.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole_stream.c</name>
+                        </file>
+                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\driver.h</name>
                     </file>
@@ -8274,6 +8290,10 @@
             <name>service</name>
             <group>
                 <name>dynarr</name>
+                <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
+                    <configuration>kernel_lib_armv6m_full_size</configuration>
+                </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\dynarr\vsf_dynarr.c</name>
                 </file>
@@ -8283,6 +8303,10 @@
             </group>
             <group>
                 <name>dynstack</name>
+                <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
+                    <configuration>kernel_lib_armv6m_full_size</configuration>
+                </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\dynstack\vsf_dynstack.c</name>
                 </file>
@@ -8301,6 +8325,10 @@
             </group>
             <group>
                 <name>json</name>
+                <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
+                    <configuration>kernel_lib_armv6m_full_size</configuration>
+                </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\json\vsf_json.c</name>
                 </file>
@@ -8319,6 +8347,10 @@
             </group>
             <group>
                 <name>stream</name>
+                <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
+                    <configuration>kernel_lib_armv6m_full_size</configuration>
+                </excluded>
                 <group>
                     <name>pbuf</name>
                     <file>
@@ -8352,9 +8384,31 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream.h</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_base.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_base.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_reader.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_reader.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_writer.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_writer.h</name>
+                </file>
             </group>
             <group>
                 <name>trace</name>
+                <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
+                    <configuration>kernel_lib_armv6m_full_size</configuration>
+                </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\trace\vsf_trace.c</name>
                 </file>
@@ -8364,6 +8418,10 @@
             </group>
             <group>
                 <name>vsfstream</name>
+                <excluded>
+                    <configuration>kernel_lib_armv7m_full_size</configuration>
+                    <configuration>kernel_lib_armv6m_full_size</configuration>
+                </excluded>
                 <group>
                     <name>fifo_stream</name>
                     <file>
@@ -8478,6 +8536,7 @@
     <file>
         <name>$PROJ_DIR$\kernel_lib_armv7m\Exe\vsf_kernel_armv7m_size.a</name>
         <excluded>
+            <configuration>kernel_lib_armv6m_full_size</configuration>
             <configuration>usbh_m484</configuration>
             <configuration>WinnerMicro_W600</configuration>
             <configuration>aio_m484</configuration>

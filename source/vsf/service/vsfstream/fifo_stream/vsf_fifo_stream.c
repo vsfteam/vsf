@@ -198,8 +198,7 @@ static uint_fast32_t vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, ui
     return vsf_fifo_read(&fifo_stream->use_as__vsf_fifo_t, buf, size);
 }
 
-const vsf_stream_op_t vsf_fifo_stream_op =
-{
+const vsf_stream_op_t vsf_fifo_stream_op = {
     .init               = vsf_fifo_stream_init,
     .fini               = vsf_fifo_stream_init,
     .write              = vsf_fifo_stream_write,

@@ -28,6 +28,10 @@ struct __vsf_cm_t {
     struct {
         vsf_swi_hanler_t *handler;
         void *pparam;
+#if __ARM_ARCH == 6
+        bool enabled;
+        bool sw_pending_bit;
+#endif
     } pendsv;
 };
 typedef struct __vsf_cm_t __vsf_cm_t;
@@ -36,6 +40,8 @@ typedef struct __vsf_cm_t __vsf_cm_t;
 /*============================ LOCAL VARIABLES ===============================*/
 
 static __vsf_cm_t __vsf_cm;
+
+
 
 /*============================ PROTOTYPES ====================================*/
 extern void vsf_systimer_evthandler(void);
@@ -81,19 +87,31 @@ WEAK void vsf_drv_swi_trigger(uint_fast8_t idx) {}
 vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
         vsf_swi_hanler_t *handler, void *pparam)
 {
+
+    volatile uint32_t *shpr = (volatile uint32_t *)
+                                                #if __CORTEX_M == 7
+                                                    SCB->SHPR;
+                                                #else
+                                                    SCB->SHP;
+                                                #endif
     if (0 == idx) {
         __vsf_cm.pendsv.handler = handler;
         __vsf_cm.pendsv.pparam = pparam;
-#if __CORTEX_M == 7
-        SCB->SHPR[10] = priority;
-#else
-        SCB->SHP[10] = priority;
+#if __ARM_ARCH == 6
+        __vsf_cm.pendsv.enabled = true;
+        __vsf_cm.pendsv.sw_pending_bit = 0;
 #endif
+        //shpr[10] = priority;
+        uint32_t temp = shpr[3];
+        ((uint8_t *)&temp)[2] = priority; 
+        shpr[3] = temp;
         return VSF_ERR_NONE;
     } else {
         return vsf_drv_swi_init(idx - 1, priority, handler, pparam);
     }
 }
+
+
 
 /*! \brief trigger a software interrupt
  *! \param idx the index of the software interrupt
@@ -101,7 +119,17 @@ vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
 void vsf_swi_trigger(uint_fast8_t idx)
 {
     if (0 == idx) {
+    #if __ARM_ARCH >= 7
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+    #elif __ARM_ARCH == 6
+        __SAFE_ATOM_CODE(
+            if (__vsf_cm.pendsv.enabled) {
+                SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+            } else {
+                __vsf_cm.pendsv.sw_pending_bit = 1;
+            }
+        )
+    #endif
     } else {
         vsf_drv_swi_trigger(idx - 1);
     }
@@ -109,9 +137,31 @@ void vsf_swi_trigger(uint_fast8_t idx)
 
 istate_t vsf_set_base_priority(istate_t priority)
 {
+#if __ARM_ARCH >= 7
     istate_t origlevel = __get_BASEPRI();
     __set_BASEPRI(priority);
     return origlevel;
+#elif __ARM_ARCH == 6
+    static istate_t __basepri = 0x100;
+    
+    istate_t origlevel = __basepri;
+    __SAFE_ATOM_CODE(
+        if (priority == VSF_ARCH_PRIO_0) {
+            //! lock sched
+            __vsf_cm.pendsv.enabled = false;
+            __vsf_cm.pendsv.sw_pending_bit = 0;
+        } else if (0x100 == priority) {
+            //! unload sched
+            __vsf_cm.pendsv.enabled = true;
+            if (__vsf_cm.pendsv.sw_pending_bit) {
+                __vsf_cm.pendsv.sw_pending_bit = 0;
+                SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+            }
+        }
+        __basepri = priority;
+    )
+    return origlevel;
+#endif
 }
 
 

@@ -97,7 +97,7 @@ void usrapp_log_info(const char *fmt, ...)
             vsf_sched_safe_exit();
             return;
         }
-        vsf_pbuf_size_reset(ptBlock);
+        //vsf_pbuf_size_reset(ptBlock);
     )
 
     do {

@@ -42,11 +42,29 @@
             __vsf_usbh_hid_recv_report_imp(                                     \
                 (vsf_usbh_hid_eda_t *)(__hid), (__buffer), (__size))
 
+#define vsf_usbh_hid_get_rx_report(__hid)                                       \
+            __vsf_usbh_hid_get_rx_report_imp((vsf_usbh_hid_eda_t *)(__hid))
+#define vsf_usbh_hid_get_tx_report(__hid)                                       \
+            __vsf_usbh_hid_get_tx_report_imp((vsf_usbh_hid_eda_t *)(__hid))
+
+#define vsf_usbh_hid_set_idle(__hid, __id, __duration)                      	\
+            __vsf_usbh_hid_set_idle_imp(                                    	\
+                (vsf_usbh_hid_base_t *)(__hid), (__id), (__duration))
+
+#define vsf_usbh_hid_send_report_req(__hid, __type_id, __report, __report_len)  \
+            __vsf_usbh_hid_send_report_req_imp(                                 \
+                (vsf_usbh_hid_base_t *)(__hid), (__type_id), (__report), (__report_len))
+
+#define vsf_usbh_hid_recv_report_req(__hid, __type_id, __report, __report_len)  \
+            __vsf_usbh_hid_recv_report_req_imp(                                 \
+                (vsf_usbh_hid_base_t *)(__hid), (__type_id), (__report), (__report_len))
+
 /*============================ TYPES =========================================*/
 
 #if defined(VSF_USBH_HID_INHERIT) || defined(VSF_USBH_HID_IMPLEMENT)
 declare_simple_class(vsf_usbh_hid_base_t)
 declare_simple_class(vsf_usbh_hid_eda_t)
+declare_simple_class(vsf_usbh_hid_teda_t)
 
 def_simple_class(vsf_usbh_hid_base_t) {
 
@@ -57,11 +75,13 @@ def_simple_class(vsf_usbh_hid_base_t) {
         };
     )
 
-    private_member(
+    protected_member(
         vsf_usbh_t *usbh;
         vsf_usbh_dev_t *dev;
         vsf_usbh_ifs_t *ifs;
+    )
 
+    private_member(
         vsf_usbh_urb_t urb_in;
         vsf_usbh_urb_t urb_out;
 
@@ -72,6 +92,11 @@ def_simple_class(vsf_usbh_hid_base_t) {
 def_simple_class(vsf_usbh_hid_eda_t) {
     implement(vsf_usbh_hid_base_t)
     implement(vsf_eda_t)
+};
+
+def_simple_class(vsf_usbh_hid_teda_t) {
+    implement(vsf_usbh_hid_base_t)
+    implement(vsf_teda_t)
 };
 #endif
 
@@ -86,8 +111,15 @@ extern void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             vsf_usbh_ifs_parser_t *parser_ifs, uint_fast32_t obj_size);
 extern void vsf_usbh_hid_disconnect(vsf_usbh_hid_eda_t *hid);
 
+extern uint8_t * __vsf_usbh_hid_get_tx_report_imp(vsf_usbh_hid_eda_t *hid);
+extern uint8_t * __vsf_usbh_hid_get_rx_report_imp(vsf_usbh_hid_eda_t *hid);
+
 extern vsf_err_t __vsf_usbh_hid_send_report_imp(vsf_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
 extern vsf_err_t __vsf_usbh_hid_recv_report_imp(vsf_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
+extern vsf_err_t __vsf_usbh_hid_recv_report_req_imp(vsf_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
+extern vsf_err_t __vsf_usbh_hid_send_report_req_imp(vsf_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
+
+extern vsf_err_t __vsf_usbh_hid_set_idle_imp(vsf_usbh_hid_base_t *hid, uint_fast8_t id, uint_fast8_t duration);
 #endif
 
 #undef VSF_USBH_HID_IMPLEMENT

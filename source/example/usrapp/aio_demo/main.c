@@ -65,6 +65,13 @@ struct usrapp_t {
     } tcpip;
 
     struct {
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+        vsf_stream_t stream;
+#elif VSF_USE_SERVICE_STREAM == ENABLED
+#endif
+    } debug;
+
+    struct {
         struct {
             vsf_usbd_CDCACM_t param[2];
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -360,6 +367,10 @@ static usrapp_t usrapp = {
         .hid.drv                = &vsf_usbh_hid_drv,
     },
 
+    .debug.stream               = {
+        .op                     = &vsf_nu_console_stream_op,
+    },
+
     .usbd                       = {
         .cdc.param[0]           = {
             .ep = {
@@ -546,7 +557,10 @@ void vsf_hid_report(uint_fast16_t generic_usage, vsf_hid_event_t *event)
 int main(void)
 {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx.use_as__vsf_stream_t);
+//    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx.use_as__vsf_stream_t);
+
+    vsf_stream_init(&usrapp.debug.stream);
+    vsf_trace_init(&usrapp.debug.stream);
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 #endif
 

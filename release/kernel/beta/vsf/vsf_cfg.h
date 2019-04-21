@@ -39,16 +39,13 @@
 #include "utilities/compiler.h"
 
 /* minimal OO support for interface definie only, no class support */
-#include "utilities/ooc.h"
+#include "utilities/3rd-party/PLOOC/plooc.h"
 
 /* definition for communication pipe and memory block */
 #include "utilities/communicate.h"       
 
 /* template for abstraction data type */
 #include "utilities/template/template.h"
-
-/* pbuf support */
-#include "utilities/stream_block/stream_block.h"
 
 
 /*============================ MACROS ========================================*/
@@ -60,7 +57,6 @@
 /*----------------------------------------------------------------------------*
  * DO NOT MODIFY ANYTHING BELOW                                               *
  *----------------------------------------------------------------------------*/
-#define VSF_OS_EVTQ_POOL_SIZE                   16
 #define VSF_CFG_SYNC_EN                     ENABLED
 #define VSF_CFG_PREMPT_EN                   ENABLED
 #define VSF_CFG_DYNAMIC_PRIOTIRY_EN         ENABLED

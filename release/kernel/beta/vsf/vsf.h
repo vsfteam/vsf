@@ -24,13 +24,12 @@
 /*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
 #include "hal/vsf_hal.h"
-
+#include "service/vsf_service.h"
 #include "kernel/vsf_kernel.h"
 
-#include "component/usb/host/vsf_usbh.h"
-#include "component/usb/host/hcd/ohci/vsf_ohci.h"
-#include "component/usb/host/class/HUB/vsf_usbh_HUB.h"
-#include "component/usb/host/class/libusb/vsf_usbh_libusb.h"
+#ifdef VSF_CFG_USER_HEADER
+#   include VSF_CFG_USER_HEADER
+#endif
 
 /*============================ MACROS ========================================*/
 

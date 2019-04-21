@@ -439,7 +439,6 @@ int main(void)
 #endif
 
 
-
 #if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
     while (1) {
         wait_for_all(   &__user_grouped_evts, 

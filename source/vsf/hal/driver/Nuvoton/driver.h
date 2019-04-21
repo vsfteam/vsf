@@ -36,6 +36,18 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+
+#include "service/vsfstream/vsfstream.h"
+extern const vsf_stream_op_t vsf_nu_console_stream_op;
+
+#elif VSF_USE_SERVICE_STREAM == ENABLED
+
+
+
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

@@ -70,7 +70,7 @@
         declare_vsf_task(__NAME)                                            
         
 #define declare_fsm(__NAME)         __declare_fsm(__NAME)
-#define declare_simple_fsm(__NAME)  __declare_fsm(__NAME)
+#define declare_simple_fsm(__NAME)  declare_fsm(__NAME)
 
 /*! \brief extern fsm initialisation function and provide function prototye 
            as <__NAME>_fn, E.g
@@ -117,6 +117,9 @@
 
 #define call_fsm(__NAME, __FSM )                                                \
             vsf_task_call_sub(__NAME, __FSM)                                 
+
+#define call_simple_fsm(__NAME, __FSM )                                         \
+            call_fsm(__NAME, __FSM)
 
 #define __state(__STATE, ...)                                                   \
             case __STATE:                                                       \
@@ -168,10 +171,13 @@
         __NAME##_init(__FSM __VA_ARGS__)
 
 #define init_simple_fsm(__NAME, __FSM, ...)                                     \
-        __NAME##_init(__FSM __VA_ARGS__)
+        init_fsm(__FSM __VA_ARGS__)
 
 #define start_fsm(__NAME, __FSM, __PRI, ...)                                    \
             init_vsf_task(__NAME, (__FSM), (__PRI), __VA_ARGS__)
+
+#define start_simple_fsm(__NAME, __FSM, __PRI, ...)                             \
+            start_fsm(__NAME, (__FSM), (__PRI), __VA_ARGS__)
 
 #define __implement_fsm_ex(__NAME, __TYPE)                                      \
     fsm_rt_t vsf_task_func(__NAME)( fsm(__TYPE) *ptThis, vsf_evt_t evt )        \

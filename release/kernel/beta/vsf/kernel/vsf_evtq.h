@@ -25,9 +25,9 @@
 /*============================ TYPES =========================================*/
 
 struct vsf_evtq_ctx_t {
-    vsf_eda_t *peda;
+    vsf_eda_t *eda;
     vsf_evt_t evt;
-    void *pmsg;
+    void *msg;
 };
 typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
 
@@ -44,15 +44,15 @@ struct vsf_evtq_t {
 };
 
 struct vsf_evt_node_t {
-    implement(vsf_slist_t)
+    implement(vsf_slist_node_t)
 
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
     vsf_evt_t evt;
-    void *pmsg;
+    void *msg;
 #else
     union {
         uint32_t value;
-        void *pmsg;
+        void *msg;
     };
 #endif
 };
@@ -60,21 +60,21 @@ struct vsf_evt_node_t {
 #else
 
 struct vsf_evt_node_t {
-    vsf_eda_t *peda;
+    vsf_eda_t *eda;
 
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
     vsf_evt_t evt;
-    void *pmsg;
+    void *msg;
 #else
     union {
         uint32_t value;
-        void *pmsg;
+        void *msg;
     };
 #endif
 };
 
 struct vsf_evtq_t {
-    vsf_evt_node_t *pnode;
+    vsf_evt_node_t *node;
     uint8_t bitsize;
 
     // private
@@ -90,15 +90,15 @@ struct vsf_evtq_t {
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_CFG_PREMPT_EN == ENABLED
-extern void vsf_evtq_on_eda_init(vsf_eda_t *pobj);
-extern void vsf_evtq_on_eda_fini(vsf_eda_t *peda);
+extern void vsf_evtq_on_eda_init(vsf_eda_t *eda);
+extern void vsf_evtq_on_eda_fini(vsf_eda_t *eda);
 
 extern vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis);
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
-extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *peda, vsf_evt_t evt, void *pmsg);
+extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *eda, vsf_evt_t evt, void *msg);
 #endif
-extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *peda, vsf_evt_t evt);
-extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *peda, void *pmsg);
+extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
+extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis);
 #endif
 

@@ -91,8 +91,8 @@ static void         usb_dc##__N##_irq(void);
                 .GetMicroFrameNo= &usb_dc##__N##_get_mframe_number,             \
                 .GetSetup       = &usb_dc##__N##_get_setup,                     \
                                                                                 \
-                .Ep.Number      = USB_DC##__N##_EPNUM,                          \
-                .Ep.IsDMA       = USB_DC##__N##_ISDMA,                          \
+                .Ep.Number      = USB_DC##__N##_EP_NUMBER,                      \
+                .Ep.IsDMA       = USB_DC##__N##_EP_IS_DMA,                      \
                 .Ep.Add         = &usb_dc##__N##_ep_add,                        \
                 .Ep.GetSize     = &usb_dc##__N##_ep_get_size,                   \
                 .Ep.SetStall    = &usb_dc##__N##_ep_set_stall,                  \

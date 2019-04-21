@@ -83,7 +83,7 @@ struct vsf_kernel_resource_t {
         uint16_t                                  frame_cnt;
     }task_stack;
 #endif
-};
+}ALIGN(4);
 
 typedef struct vsf_kernel_resource_t vsf_kernel_resource_t;
 /*============================ GLOBAL VARIABLES ==============================*/

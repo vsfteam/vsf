@@ -46,13 +46,13 @@ def_simple_class(vsf_dynarr_table_t) {
 
 def_simple_class(vsf_dynarr_t) {
 
-	public_member(
+    public_member(
         uint16_t item_size;
         uint8_t item_num_per_buf_bitlen;
         uint8_t buf_num_per_table_bitlen;
     )
 
-	private_member(
+    private_member(
         vsf_slist_t table_list;
         uint32_t length;
     )
@@ -67,4 +67,4 @@ extern uint_fast32_t vsf_dynarr_get_size(vsf_dynarr_t *dynarr);
 extern vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size);
 extern void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos);
 
-#endif	// __VSF_DYNARR_H__
+#endif      // __VSF_DYNARR_H__

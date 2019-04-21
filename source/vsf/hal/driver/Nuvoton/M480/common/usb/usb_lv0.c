@@ -24,6 +24,17 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#if VSF_USE_USB_HOST == ENABLED
+#define __USB_HC_IMPLEMENT(__N, __TYPE)                                         \
+static const m480_##__TYPE##_const_t __USB_HC##__N_const = { USB_HC##__N##_CONFIG };\
+m480_##__TYPE##_t USB_HC##__N = { .index = __N, .param = &__USB_HC##__N_const };\
+ROOT void USB_HC##__N##_IRQHandler(void)                                        \
+{                                                                               \
+    if (USB_HC##__N.callback.irq_handler != NULL) {                             \
+        USB_HC##__N.callback.irq_handler(USB_HC##__N.callback.param);           \
+    }                                                                           \
+}
+#else
 #define __USB_HC_IMPLEMENT(__N, __TYPE)                                         \
 static const m480_##__TYPE##_const_t __USB_HC##__N_const = { USB_HC##__N##_CONFIG };\
 m480_##__TYPE##_t USB_HC##__N = { .index = __N, .param = &__USB_HC##__N_const };\
@@ -33,6 +44,7 @@ void USB_HC##__N##_IRQHandler(void)                                             
         USB_HC##__N.callback.irq_handler(USB_HC##__N.callback.param);           \
     }                                                                           \
 }
+#endif
 
 #define _USB_HC_IMPLEMENT(__N, __TYPE)      __USB_HC_IMPLEMENT(__N, __TYPE)
 #define USB_HC_IMPLEMENT(__N, __VALUE)      _USB_HC_IMPLEMENT(__N, USB_HC##__N##_TYPE)
@@ -52,7 +64,15 @@ void USB_HC##__N##_IRQHandler(void)                                             
 
 
 
-
+#if VSF_USE_USB_DEVICE == ENABLED
+#define __USB_DC_IMPLEMENT(__N, __TYPE)                                         \
+static const m480_##__TYPE##_const_t __USB_DC##__N_const = { USB_DC##__N##_CONFIG };\
+m480_##__TYPE##_t USB_DC##__N = { .index = __N, .param = &__USB_DC##__N_const}; \
+ROOT void USB_DC##__N##_IRQHandler(void)                                        \
+{                                                                               \
+    m480_##__TYPE##_irq(&USB_DC##__N);                                          \
+}
+#else
 #define __USB_DC_IMPLEMENT(__N, __TYPE)                                         \
 static const m480_##__TYPE##_const_t __USB_DC##__N_const = { USB_DC##__N##_CONFIG };\
 m480_##__TYPE##_t USB_DC##__N = { .index = __N, .param = &__USB_DC##__N_const}; \
@@ -60,6 +80,7 @@ void USB_DC##__N##_IRQHandler(void)                                             
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
+#endif
 
 #define _USB_DC_IMPLEMENT(__N, __TYPE)      __USB_DC_IMPLEMENT(__N, __TYPE)
 #define USB_DC_IMPLEMENT(__N, __VALUE)      _USB_DC_IMPLEMENT(__N, USB_DC##__N##_TYPE)

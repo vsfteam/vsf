@@ -146,7 +146,7 @@
 #   define VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY             "kernel/vsf_os.h"
 #endif
 
-#define VSF_USE_SERVICE_STREAM              ENABLED
+#define VSF_USE_SERVICE_STREAM              DISABLED
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

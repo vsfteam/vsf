@@ -370,6 +370,6 @@ __attribute__((always_inline)) static inline void ____set_PRIMASK(uint32_t priMa
 /*============================ INCLUDES ======================================*/
 
 //! \brief for interrupt 
-#include ".\signal.h"
+#include "./signal.h"
 
 #endif

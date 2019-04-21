@@ -67,8 +67,8 @@
 #define USB_DC_COUNT                1
 #define USB_DC0_TYPE                usbd_hs
 #define USB_DC0_IRQHandler          USBD20_IRQHandler
-#define USB_DC0_EPNUM               M480_USBD_HS_EPNUM
-#define USB_DC0_ISDMA               M480_USBD_HS_ISDMA
+#define USB_DC0_EP_NUMBER           m480_usbd_hs_ep_number
+#define USB_DC0_EP_IS_DMA           m480_usbd_hs_ep_is_dma
 #define USB_DC0_CONFIG                                                          \
     .reg                = HSUSBD,                                               \
     .ahbclk             = AHBCLK_USBD_idx,                                      \

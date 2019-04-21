@@ -421,6 +421,7 @@ extern void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
 extern bool vsf_usbh_urb_is_valid(vsf_usbh_urb_t *urb);
 extern bool vsf_usbh_urb_is_alloced(vsf_usbh_urb_t *urb);
+extern vsf_usbh_eppipe_t vsf_usbh_urb_get_pipe(vsf_usbh_urb_t *urb);
 extern vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb_t *urb);
 extern void vsf_usbh_free_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb);
 extern void * vsf_usbh_urb_alloc_buffer(vsf_usbh_urb_t *urb, uint_fast16_t size);

@@ -85,7 +85,7 @@ static int_fast8_t m480_usbd_hs_get_idx(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
     }
 
     reg = m480_usbd_hs_get_reg(usbd_hs);
-    for (int_fast8_t cfg, idx = 0; idx < (M480_USBD_HS_EPNUM - 2); idx++) {
+    for (int_fast8_t cfg, idx = 0; idx < (m480_usbd_hs_ep_number - 2); idx++) {
         cfg = M480_USBD_EP_REG(idx, EP[0].EPCFG);
         if (cfg & USB_EP_CFG_VALID) {
             cfg = ((cfg & 0xF0) >> 4) | ((cfg & 0x08) << 4);
@@ -106,7 +106,7 @@ static int_fast8_t m480_usbd_hs_get_free_idx(m480_usbd_hs_t *usbd_hs, uint_fast8
     }
 
     reg = m480_usbd_hs_get_reg(usbd_hs);
-    for (int_fast8_t cfg, idx = 0; idx < (M480_USBD_HS_EPNUM - 2); idx++) {
+    for (int_fast8_t cfg, idx = 0; idx < (m480_usbd_hs_ep_number - 2); idx++) {
         cfg = M480_USBD_EP_REG(idx, EP[0].EPCFG);
         if (!(cfg & USB_EP_CFG_VALID)) {
             return idx + 2;
@@ -189,7 +189,7 @@ void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
 {
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
     usbd_hs->ep_buf_ptr = 0x1000;
-    for (uint_fast8_t i = 0; i < (M480_USBD_HS_EPNUM - 2); i++) {
+    for (uint_fast8_t i = 0; i < (m480_usbd_hs_ep_number - 2); i++) {
         M480_USBD_EP_REG(i, EP[0].EPCFG) = 0;
         M480_USBD_EP_REG(i, EP[0].EPINTEN) = 0;
     }
@@ -599,7 +599,7 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
 
     // EP interrupt
     if (gstatus & (~3)) {
-        for (uint_fast8_t ep, idx = 0; idx < M480_USBD_HS_EPNUM - 2; idx++) {
+        for (uint_fast8_t ep, idx = 0; idx < m480_usbd_hs_ep_number - 2; idx++) {
             ep = M480_USBD_EP_REG(idx, EP[0].EPCFG);
             if (!(ep & USB_EP_CFG_VALID)) {
                 continue;

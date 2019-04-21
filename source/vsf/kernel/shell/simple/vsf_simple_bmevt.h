@@ -76,9 +76,9 @@
 
 #   define add_sync_adapter(__SYNC, __MSK, ...)                                 \
     &((vsf_bmpevt_adapter_sync_t){                                              \
-            .psync = (__SYNC),                                                  \
+            .sync = (__SYNC),                                                   \
             .mask = (__MSK),                                                    \
-            .pop = &vsf_eda_bmpevt_adapter_sync_op,                             \
+            .op = &vsf_eda_bmpevt_adapter_sync_op,                              \
             __VA_ARGS__                                                         \
         }.use_as__vsf_bmpevt_adapter_eda_t.use_as__vsf_bmpevt_adapter_t)
 

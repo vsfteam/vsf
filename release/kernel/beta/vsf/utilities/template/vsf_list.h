@@ -32,36 +32,51 @@
  * Single Chain List internal macro                                            *
  *-----------------------------------------------------------------------------*/
 
-#define __vsf_slist_is_empty(plist)             (NULL == (plist)->pnext)
+#define __vsf_slist_is_empty(__plist)                                           \
+            (NULL == ((vsf_slist_t *)(__plist))->head)
 
-#define __vsf_slist_set_next(__plist, __pnode_nxt)                              \
+#define __vsf_slist_set_next(__pnode, __pitem_nxt)                              \
     do {                                                                        \
-        ((vsf_slist_t *)(__plist))->pnext = (vsf_slist_t *)(__pnode_nxt);       \
+        ((vsf_slist_node_t *)(__pnode))->next = (__pitem_nxt);                  \
     } while (0)
 
-#define __vsf_slist_ref_next(__plist, __pitem_ref)                              \
+#define __vsf_slist_ref_next(__pnode, __pitem_ref)                              \
     do {                                                                        \
-        (*(vsf_slist_t **)&(__pitem_ref)) = ((vsf_slist_t *)(__plist))->pnext;  \
+        (*(void **)&(__pitem_ref)) = (((vsf_slist_node_t *)(__pnode))->next);   \
     } while (0)
 
-#define __vsf_slist_insert_after(__pnode, __pitem, __member)                    \
+#define __vsf_slist_insert_next(__host_type, __member, __pnode, __pitem)        \
     do {                                                                        \
-        vsf_slist_t *plist = &((__pnode)->__member);                            \
-        __vsf_slist_set_next(&((__pitem)->__member), ((plist)->pnext));         \
-        __vsf_slist_set_next(plist, (__pitem));                                 \
+        __vsf_slist_set_next(&((__pitem)->__member), ((__pnode)->next));        \
+        __vsf_slist_set_next((__pnode), (__pitem));                             \
+    } while (0)
+
+#define __vsf_slist_remove_next_unsafe(__host_type, __member, __pnode, __pitem_ref)\
+    do {                                                                        \
+        __vsf_slist_ref_next((__pnode), (__pitem_ref));                         \
+        __vsf_slist_set_next((__pnode),                                         \
+                ((__host_type *)(__pitem_ref))->__member.next);                 \
+    } while (0)
+
+#define __vsf_slist_insert_after(   __host_type,/* type of the host object */   \
+                                    __member,   /* the name of the list */      \
+                                    __pitem,    /* current item address */      \
+                                    __pitem_new)/* new item address */          \
+    do {                                                                        \
+        vsf_slist_node_t *node = &((__pitem)->__member);                        \
+        __vsf_slist_insert_next(__host_type, __member, node, (__pitem_new));    \
     } while (0)
 
 #define __vsf_slist_remove_after(   __host_type, /* type of the host object */  \
                                     __member,    /* the name of the list */     \
-                                    __pnode,     /* current node address */     \
+                                    __pitem,     /* current item address */     \
                                     __pitem_ref) /* pointer of host type*/      \
     do {                                                                        \
-        vsf_slist_t *plist = &((__pnode)->__member);                            \
-        __vsf_slist_ref_next(plist, (__pitem_ref));                             \
-        if (NULL != plist->pnext) {                                             \
+        vsf_slist_node_t *node = &((__pitem)->__member);                        \
+        __vsf_slist_ref_next(node, (__pitem_ref));                              \
+        if (NULL != node->next) {                                               \
             __vsf_slist_set_next(                                               \
-                plist,                                                          \
-                ((__host_type *)(plist->pnext))->__member.pnext);               \
+                node, ((__host_type *)(node->next))->__member.next);            \
             __vsf_slist_set_next(&((__pitem_ref)->__member), NULL);             \
         }                                                                       \
     } while (0)
@@ -75,58 +90,66 @@
                                 ...)          /* how to find insert point */    \
     do {                                                                        \
         vsf_slist_init_node(__host_type, __member, __pitem);                    \
-        vsf_slist_t *plist_item = (__plist);                                    \
-        for (; plist_item->pnext != NULL;){                                     \
-            __host_type *_ = (__host_type *)(plist_item->pnext);                \
+        vsf_slist_node_t *node_item = (vsf_slist_node_t *)(__plist);            \
+        for (; node_item->next != NULL;){                                       \
+            __host_type *_ = (__host_type *)(node_item->next);                  \
             /* ptarget might be modified by user, so save a copy */             \
-            __host_type *pnode_tmp = ptarget;                                   \
+            __host_type *node_tmp = ptarget;                                    \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
             if (__VA_ARGS__) {                                                  \
-                __vsf_slist_add_item(                                           \
-                    __host_type, __member, plist_item, (__pitem));              \
+                __vsf_slist_insert_next(                                        \
+                    __host_type, __member, node_item, (__pitem));               \
                 break;                                                          \
             }                                                                   \
-            plist_item = &(pnode_tmp->__member);                                \
+            node_item = &(node_tmp->__member);                                  \
         }                                                                       \
-        if (NULL == plist_item->pnext) {                                        \
-            __vsf_slist_add_item(                                               \
-                    __host_type, __member, plist_item, (__pitem));              \
+        if (NULL == node_item->next) {                                          \
+            __vsf_slist_insert_next(                                            \
+                    __host_type, __member, node_item, (__pitem));               \
             break;                                                              \
         }                                                                       \
     } while (0)
+
+#define __vsf_slist_foreach_unsafe(                                             \
+                            __host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __plist)    /* the address of the list */           \
+    for (__host_type *_ = (__plist)->head; _ != NULL; _ = _->__member.next)
+
+#define __vsf_slist_foreach_next_unsafe(                                        \
+                            __host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __plist)    /* the address of the list */           \
+    for (__host_type *_ = (__plist)->head, *__ = _ ? _->__member.next : NULL;   \
+            _ != NULL;                                                          \
+            _ = __, __ = _ ? _->__member.next : NULL)
+            
 
 #define __vsf_slist_foreach(__host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem)    /* the pointer name, e.g. ptarget */    \
     for (__host_type                    /* loop initialisation */               \
-            *__pitem = (__host_type *)(__plist)->pnext,                         \
+            *__pitem = (__host_type *)(__plist)->head,                          \
             *_ = __pitem,                                                       \
-            *pnext = __pitem                                                    \
+            *next = __pitem                                                     \
                 ?   (__host_type *)                                             \
-                        ((__host_type *)((__plist)->pnext))->__member.pnext     \
+                        ((__host_type *)((__plist)->head))->__member.next       \
                 :   NULL;                                                       \
             __pitem != NULL;            /* loop condition */                    \
-            _ = __pitem = pnext, pnext = __pitem                                \
+            _ = __pitem = next, next = __pitem                                  \
                 ?   (__host_type *)                                             \
-                        ((__host_type *)((__plist)->pnext))->__member.pnext     \
+                       ((__host_type *)((__plist)->head))->__member.next        \
                 :   NULL)               /* prepare for next iteration */
 
 #define __vsf_slist_discard_head(__host_type, __member, __plist)                \
-            if (NULL != (__plist)->pnext) {                                     \
-                __host_type *pitem = (__host_type *)((__plist)->pnext);         \
+            if (NULL != (__plist)->head) {                                      \
+                __host_type *item = (__host_type *)((__plist)->head);           \
                 __vsf_slist_set_next(                                           \
                         (__plist),                                              \
-                        ((__host_type *)((__plist)->pnext))->__member.pnext);   \
-                pitem->__member.pnext = NULL;                                   \
+                        ((__host_type *)((__plist)->head))->__member.next);     \
+                item->__member.next = NULL;                                     \
             }
-
-#define __vsf_slist_add_item(__host_type, __member, __plist, __pitem)           \
-    do {                                                                        \
-        __vsf_slist_set_next(&((__pitem)->__member), ((__plist)->pnext));       \
-        __vsf_slist_set_next((__plist), (__pitem));                             \
-    } while(0)
-
 
 
 #define __vsf_slist_queue_init(__pqueue)                                        \
@@ -137,10 +160,10 @@
 
 #define __vsf_slist_queue_enqueue(__host_type, __member, __pqueue, __pitem)     \
     do {                                                                        \
-        __host_type * __pitem_tail = (__host_type *)((__pqueue)->tail.pnext);   \
+        __host_type * item_tail = (__host_type *)((__pqueue)->tail.next);       \
         __vsf_slist_set_next(&((__pqueue)->tail), (__pitem));                   \
-        if (__pitem_tail != NULL)                                               \
-            __vsf_slist_set_next(&__pitem_tail->__member, (__pitem));           \
+        if (item_tail != NULL)                                                  \
+            __vsf_slist_set_next(&item_tail->__member, (__pitem));              \
         else                                                                    \
             __vsf_slist_set_next(&((__pqueue)->head), (__pitem));               \
     } while (0)
@@ -151,11 +174,24 @@
         if (NULL != (__pitem_ref)) {                                            \
             __vsf_slist_set_next(                                               \
                 &((__pqueue)->head),                                            \
-                (__pitem_ref)->__member.pnext);                                 \
+                (__pitem_ref)->__member.next);                                  \
             if (__vsf_slist_is_empty(&((__pqueue)->head)))                      \
                 __vsf_slist_set_next(&((__pqueue)->tail), NULL);                \
             __vsf_slist_set_next(&((__pitem_ref)->__member), NULL);             \
         }                                                                       \
+    } while (0)
+
+#define __vsf_slist_queue_peek(__host_type, __member, __pqueue, __pitem_ref)    \
+        __vsf_slist_ref_next(&((__pqueue)->head), (__pitem_ref));               
+
+
+#define __vsf_slist_queue_add_to_head(__host_type, __member, __pqueue, __pitem) \
+    do {                                                                        \
+        __host_type * item_head = (__host_type *)((__pqueue)->head.next);       \
+        __vsf_slist_set_next(&(__pitem)->__member, item_head);                  \
+        __vsf_slist_set_next(&((__pqueue)->head), (__pitem));                   \
+        if (NULL == item_head)                                                  \
+            __vsf_slist_set_next(&((__pqueue)->tail), (__pitem));               \
     } while (0)
 
 /*-----------------------------------------------------------------------------*
@@ -164,11 +200,13 @@
 
 #define __vsf_dlist_init(__plist)                                               \
     do {                                                                        \
-        (__plist)->phead = (__plist)->ptail = NULL;                             \
+        (__plist)->head = (__plist)->tail = NULL;                               \
     } while (0)
 
 #define __vsf_dlist_init_node(__pnode)                                          \
-            __vsf_dlist_init(__pnode)
+    do {                                                                        \
+        (__pnode)->next = (__pnode)->prev = NULL;                               \
+    } while (0)
 
 #define __vsf_dlist_get_host(__host_type, __member, __pnode)                    \
             container_of((__pnode), __host_type, __member)
@@ -176,10 +214,10 @@
 #define __vsf_dlist_get_host_safe(__host_type, __member, __pnode)               \
             safe_container_of((__pnode), __host_type, __member)
 
-#define __vsf_dlist_is_empty(__plist)       ((__plist)->pnext == NULL)
+#define __vsf_dlist_is_empty(__plist)       ((__plist)->head == NULL)
 
 #define __vsf_dlist_is_in(__plist, __pnode)                                     \
-            __vsf_dlist_is_in_internal((__plist), (__pnode))
+            __vsf_dlist_is_in_imp((__plist), (__pnode))
 
 #define __vsf_dlist_ref(__host_type, __member, __pnode, __pitem_ref)            \
     do {                                                                        \
@@ -194,55 +232,55 @@
     } while (0)
 
 #define __vsf_dlist_add_to_head(__host_type, __member, __plist, __pitem)        \
-            __vsf_dlist_add_to_head_internal((__plist), &((__pitem)->__member))
+            __vsf_dlist_add_to_head_imp((__plist), &((__pitem)->__member))
 
 #define __vsf_dlist_add_to_tail(__host_type, __member, __plist, __pitem)        \
-            __vsf_dlist_add_to_tail_internal((__plist), &((__pitem)->__member))
+            __vsf_dlist_add_to_tail_imp((__plist), &((__pitem)->__member))
 
 #define __vsf_dlist_peek_next(__host_type, __member, __pitem, __pitem_ref)      \
     do {                                                                        \
-        vsf_dlist_t *pnode = (__pitem)->__member.pnext;                         \
-        __vsf_dlist_ref_safe(__host_type, __member, (pnode), (__pitem_ref));    \
+        vsf_dlist_node_t *node = (__pitem)->__member.next;                      \
+        __vsf_dlist_ref_safe(__host_type, __member, node, (__pitem_ref));       \
     } while (0)
 
 #define __vsf_dlist_peek_head(__host_type, __member, __plist, __pitem_ref)      \
     do {                                                                        \
-        vsf_dlist_t *pnode = (__plist)->pnext;                                  \
-        __vsf_dlist_ref_safe(__host_type, __member, (pnode), (__pitem_ref));    \
+        vsf_dlist_node_t *node = (__plist)->head;                               \
+        __vsf_dlist_ref_safe(__host_type, __member, node, (__pitem_ref));       \
     } while (0)
 
 #define __vsf_dlist_remove_head(__host_type, __member, __plist, __pitem_ref)    \
     do {                                                                        \
-        vsf_dlist_t *pnode = __vsf_dlist_remove_head_internal(__plist);         \
-        __vsf_dlist_ref_safe(__host_type, __member, (pnode), (__pitem_ref));    \
+        vsf_dlist_node_t *node = __vsf_dlist_remove_head_imp(__plist);          \
+        __vsf_dlist_ref_safe(__host_type, __member, node, (__pitem_ref));       \
     } while (0)
 
 #define __vsf_dlist_remove_tail(__host_type, __member, __plist, __pitem_ref)    \
     do {                                                                        \
-        vsf_dlist_t *pnode = __vsf_dlist_remove_tail_internal(__plist);         \
-        __vsf_dlist_ref_safe(__host_type, __member, (pnode), (__pitem_ref));    \
+        vsf_dlist_t *node = __vsf_dlist_remove_tail_imp(__plist);               \
+        __vsf_dlist_ref_safe(__host_type, __member, node, (__pitem_ref));       \
     } while (0)
 
 #define __vsf_dlist_insert_after(                                               \
                 __host_type, __member, __plist, __pitem_prv, __pitem)           \
-            __vsf_dlist_insert_after_internal(                                  \
+            __vsf_dlist_insert_after_imp(                                       \
                 (__plist), &((__pitem_prv)->__member), &((__pitem)->__member))
 
 #define __vsf_dlist_insert_before(                                              \
                 __host_type, __member, __plist, __pitem_nxt, __pitem)           \
-            __vsf_dlist_insert_before_internal(                                 \
+            __vsf_dlist_insert_before_imp(                                      \
                 (__plist), &((__pitem_nxt)->__member), &((__pitem)->__member))
 
 #define __vsf_dlist_remove(__host_type, __member, __plist, __pitem)             \
-            __vsf_dlist_remove_internal((__plist), &((__pitem)->__member))
+            __vsf_dlist_remove_imp((__plist), &((__pitem)->__member))
 
 #define __vsf_dlist_remove_after(                                               \
                 __host_type, __member, __plist, __pnode, __pitem_ref)           \
     do {                                                                        \
-        vsf_dlist_t *__pnode_nxt = (__pnode)->pnext;                            \
-        if (__pnode_nxt != NULL) {                                              \
-            __vsf_dlist_remove(__host_type, __member, __plist, __pnode_nxt);    \
-            __vsf_dlist_ref(__host_type, __member, (__pnode_nxt), (__pitem_ref));\
+        vsf_dlist_node_t *node_nxt = (__pnode)->next;                           \
+        if (node_nxt != NULL) {                                                 \
+            __vsf_dlist_remove(__host_type, __member, __plist, node_nxt);       \
+            __vsf_dlist_ref(__host_type, __member, node_nxt, (__pitem_ref));    \
         } else {                                                                \
             (*(__host_type **)&(__pitem_ref)) = NULL;                           \
         }                                                                       \
@@ -251,10 +289,10 @@
 #define __vsf_dlist_remove_before(                                              \
                 __host_type, __member, __plist, __pnode, __pitem_ref)           \
     do {                                                                        \
-        vsf_dlist_t *__pnode_prv = (__pnode)->pprev;                            \
-        if (__pitem_prv != NULL) {                                              \
-            __vsf_dlist_remove(__host_type, __member, __plist, __pitem_prv);    \
-            __vsf_dlist_ref(__host_type, __member, (__pnode_prv), (__pitem_ref));\
+        vsf_dlist_node_t *node_prv = (__pnode)->prev;                           \
+        if (node_prv != NULL) {                                                 \
+            __vsf_dlist_remove(__host_type, __member, __plist, node_prv);       \
+            __vsf_dlist_ref(__host_type, __member, (node_prv), (__pitem_ref));  \
         } else {                                                                \
             (*(__host_type **)&(__pitem_ref)) = NULL;                           \
         }                                                                       \
@@ -267,19 +305,19 @@
                                 ...)          /* how to find insert point */    \
     do {                                                                        \
         vsf_dlist_init_node(__host_type, __member, __pitem);                    \
-        vsf_dlist_t *plist_item = (__plist);                                    \
-        for (; plist_item->pnext != NULL;){                                     \
+        vsf_dlist_node_t *node_item = (vsf_dlist_node_t *)(__plist);            \
+        for (; node_item->next != NULL;){                                       \
             __host_type *ptarget =                                              \
-                __vsf_dlist_get_host(__host_type, __member, plist_item->pnext); \
+                __vsf_dlist_get_host(__host_type, __member, node_item->next);   \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
             if (__VA_ARGS__) {                                                  \
-                __vsf_dlist_insert_before_internal(                             \
-                    (__plist), plist_item->pnext, &((__pitem)->__member));      \
+                __vsf_dlist_insert_before_imp(                                  \
+                    (__plist), node_item->next, &((__pitem)->__member));        \
                 break;                                                          \
             }                                                                   \
-            plist_item = plist_item->pnext;                                     \
+            node_item = node_item->next;                                        \
         }                                                                       \
-        if (NULL == plist_item->pnext) {                                        \
+        if (NULL == node_item->next) {                                          \
             __vsf_dlist_add_to_tail(                                            \
                     __host_type, __member, __plist, (__pitem));                 \
         }                                                                       \
@@ -299,53 +337,94 @@
 #define vsf_slist_is_empty(__plist)         /* the address of the list */       \
             __vsf_slist_is_empty(__plist)
 
+#define vsf_slist_set_next( __host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __pnode,    /* the reference node */                \
+                            __pitem)    /* the address of the target item */    \
+            __vsf_slist_set_next((__pnode), (__pitem))
+
+#define vsf_slist_get_length(   __host_type,/* the type of the host type */     \
+                                __member,   /* the member name of the list */   \
+                                __plist)    /* the address of the list */       \
+            __vsf_slist_get_length_imp(                                         \
+                (__plist), offset_of(__host_type, __member))
+
+#define vsf_slist_remove_tail(  __host_type,/* the type of the host type */     \
+                                __member,   /* the member name of the list */   \
+                                __plist)    /* the address of the list */       \
+            __vsf_slist_remove_tail_imp(                                        \
+                (__plist), offset_of(__host_type, __member))
+
+#define vsf_slist_get_item_by_index(                                            \
+                                __host_type,/* the type of the host type */     \
+                                __member,   /* the member name of the list */   \
+                                __plist,    /* the address of the list */       \
+                                __index)    /* index of the item in list */     \
+            __vsf_slist_get_item_by_index_imp(                                  \
+                (__plist), (__index), offset_of(__host_type, __member))
+
+#define vsf_slist_get_index(    __host_type,/* the type of the host type */     \
+                                __member,   /* the member name of the list */   \
+                                __plist,    /* the address of the list */       \
+                                __pitem)    /* the address of the target item */\
+            __vsf_slist_get_index_imp(                                          \
+                (__plist), (__pitem), offset_of(__host_type, __member))
+
+#define vsf_slist_append(   __host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __plist,    /* the address of the list */           \
+                            __pitem)    /* the address of the target item */    \
+            __vsf_slist_append_imp(                                             \
+                (__plist), (__pitem), offset_of(__host_type, __member))
+
+#define vsf_slist_get_index(__host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __plist,    /* the address of the list */           \
+                            __pitem)    /* the address of the target item */    \
+            __vsf_slist_get_index_imp(                                          \
+                (__plist), (__pitem), offset_of(__host_type, __member))
+
 #define vsf_slist_is_in(    __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem)    /* the address of the target item */    \
-        (   vsf_slist_get_idx(                                                  \
+        (   vsf_slist_get_index(                                                \
                 (__plist), (__pitem), offset_of(__host_type, __member))         \
         >   0)
 
-#define vsf_slist_init_node(__host_type,    /* the type of the host type */     \
-                            __member,       /* the member name of the list */   \
-                            __pitem)        /* the address of the target item */\
+#define vsf_slist_init_node(__host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __pitem)    /* the address of the target item */    \
             __vsf_slist_set_next(&((__pitem)->__member), NULL)
 
-#define vsf_slist_add_item( __host_type,    /* the type of the host type */     \
-                            __member,       /* the member name of the list */   \
-                            __plist,        /* the address of the list */       \
-                            __pitem)        /* the address of the target item */\
-            __vsf_slist_add_item(__host_type, __member, (__plist), (__pitem))
+#define vsf_slist_remove(   __host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list*/        \
+                            __plist,    /* the address of the list */           \
+                            __pitem)    /* the address of the target item */    \
+            __vsf_slist_remove_imp(                                             \
+                (__plist), (__pitem), offset_of(__host_type, __member))
 
-#define vsf_slist_remove_current_item(                                          \
-                                __host_type,/* the type of the host type */     \
-                                __member,   /* the member name of the list*/    \
-                                __plist,    /* the address of the list */       \
-                                __pitem_ref)/* the pointer of host type */      \
-                vsf_slist_remove_head(                                          \
-                    __host_type, __member, __plist, __pitem_ref)
-
-#define vsf_slist_insert(       __host_type,/* the type of the host type */     \
-                                __member,   /* the member name of the list */   \
-                                __plist,    /* the address of the list */       \
-                                __pitem,    /* the address of the target item */\
-                                ...)        /* when( condition expression ) */  \
+#define vsf_slist_insert(   __host_type,/* the type of the host type */         \
+                            __member,   /* the member name of the list */       \
+                            __plist,    /* the address of the list */           \
+                            __pitem,    /* the address of the target item */    \
+                            ...)        /* when( condition expression ) */      \
             __vsf_slist_insert(                                                 \
                 __host_type, __member, (__plist), (__pitem), __VA_ARGS__)
 
 #define vsf_slist_remove_after( __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list*/    \
-                                __plist,    /* the address of the list */       \
+                                __pitem,    /* the address of current item */   \
                                 __pitem_ref)/* the pointer of host type */      \
             __vsf_slist_remove_after(                                           \
-                __host_type, __member, (__pnode), (__pitem_ref))
+                __host_type, __member, (__pitem), (__pitem_ref))
 
 #define vsf_slist_insert_after( __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list*/    \
-                                __pnode,    /* the reference node */            \
-                                __pitem)    /* the address of the target item */\
-            __vsf_slist_insert_after((__pnode), (__pitem), __member)
+                                __pitem,    /* the address of current item */   \
+                                __pitem_new)/* the address of new item */       \
+            __vsf_slist_insert_after(                                           \
+                __host_type, __member, (__pitem), (__pitem_new))
 
 //! @}
 
@@ -374,12 +453,21 @@
                                 __member,   /* the member name of the list */   \
                                 __plist,    /* the address of the list */       \
                                 __pitem)    /* the address of the target item */\
-            __vsf_slist_add_item(__host_type, __member, (__plist), (__pitem))
+            __vsf_slist_insert_next(                                            \
+                __host_type, __member, (vsf_slist_node_t *)(__plist), (__pitem))
 
 #define vsf_slist_discard_head( __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __plist)    /* the address of the list */       \
             __vsf_slist_discard_head(__host_type, __member, (__plist))
+
+#define vsf_slist_remove_from_head_unsafe(                                      \
+                                    __host_type,/* the type of the host type */ \
+                                    __member,   /* the member name of the list*/\
+                                    __plist,    /* the address of the list */   \
+                                    __pitem_ref)/* the pointer of host type */  \
+            __vsf_slist_remove_next_unsafe(                                     \
+                __host_type, __member, (vsf_slist_node_t *)(__plist), (__pitem_ref))
 
 #define vsf_slist_remove_from_head( __host_type,/* the type of the host type */ \
                                     __member,   /* the member name of the list*/\
@@ -388,13 +476,13 @@
     do {                                                                        \
         vsf_slist_peek_next(__host_type, __member, (__plist), (__pitem_ref));   \
         vsf_slist_discard_head(__host_type, __member, (__plist));               \
-    } while(0)
+    } while (0)
 
 #define vsf_slist_peek_next(__host_type,    /* the type of the host type */     \
                             __member,       /* the member name of the list */   \
-                            __plist,        /* the address of the list */       \
+                            __pnode,        /* the reference node */            \
                             __pitem_ref)    /* the pointer of host type */      \
-            __vsf_slist_ref_next((__plist), (__pitem_ref))
+            __vsf_slist_ref_next((__pnode), (__pitem_ref))
 //! @}
 
 //! \name list enumeration access
@@ -403,7 +491,7 @@
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem)    /* the pointer name, e.g. ptarget */    \
-            __vsf_slist_foreach(__host_type, __member, (__plist), __pitem )
+            __vsf_slist_foreach(__host_type, __member, (__plist), __pitem)
 //! @}
 
 
@@ -415,10 +503,10 @@
 #define vsf_slist_queue_init(__pqueue)                                          \
             __vsf_slist_queue_init((__pqueue))
 
-#define vsf_slist_queue_enqueue(__host_type,/* the type of the host type */     \
-                                __member,   /* the member name of the list*/    \
-                                __pqueue,   /* the address of the queue */      \
-                                __pitem)    /* the address of the target item */\
+#define vsf_slist_queue_enqueue(    __host_type,/* the type of the host type */ \
+                                    __member,   /* the member name of the list*/\
+                                    __pqueue,   /* the address of the queue */  \
+                                    __pitem)    /* the address of the target item */\
             __vsf_slist_queue_enqueue(                                          \
                     __host_type, __member, (__pqueue), (__pitem))
 
@@ -428,6 +516,20 @@
                                     __pitem_ref)/* the pointer of host type */  \
             __vsf_slist_queue_dequeue(                                          \
                     __host_type, __member, (__pqueue), (__pitem_ref))
+
+#define vsf_slist_queue_peek(       __host_type,/* the type of the host type */ \
+                                    __member,   /* the member name of the list*/\
+                                    __pqueue,   /* the address of the queue */  \
+                                    __pitem_ref)/* the pointer of host type */  \
+            __vsf_slist_queue_peek(                                             \
+                    __host_type, __member, (__pqueue), (__pitem_ref))
+
+#define vsf_slist_queue_add_to_head(__host_type,/* the type of the host type */ \
+                                    __member,   /* the member name of the list*/\
+                                    __pqueue,   /* the address of the queue */  \
+                                    __pitem)    /* the address of the target item */\
+            __vsf_slist_queue_add_to_head(                                      \
+                    __host_type, __member, (__pqueue), (__pitem))
 //! @}
 
 /*-----------------------------------------------------------------------------*
@@ -560,7 +662,7 @@ NULL<---|backward|<-----|backward|<----------
                                 __plist,    /* the address of the list */       \
                                 __pitem_ref)/* the pointer of host type */      \
             __vsf_dlist_ref_safe(                                               \
-                    __host_type, __member, (__plist)->pnext, (__pitem_ref))
+                    __host_type, __member, (__plist)->head, (__pitem_ref))
 
 #define vsf_dlist_queue_enqueue(__host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list*/    \
@@ -583,32 +685,36 @@ NULL<---|backward|<-----|backward|<----------
 //! \name single list item
 //! @{
 struct vsf_slist_t {
-    void *pnext;                        /*!< pointer for the next */
+    void *head;                         /*!< pointer for the next */
 };
 typedef struct vsf_slist_t vsf_slist_t;
+
+struct vsf_slist_node_t {
+    void *next;                         /*!< pointer for the next */
+};
+typedef struct vsf_slist_node_t vsf_slist_node_t;
 //! @}
 
 //! \name dual-way linked list item
 //! @{
 struct vsf_dlist_t {
-    union {
-        struct vsf_dlist_t *pnext;      /*!< slist node in forward list */
-        struct vsf_dlist_t *phead;      /*!< pointer for the head */
-    };
-    union {
-        struct vsf_dlist_t *pprev;      /*!< slist node in backward list */
-        struct vsf_dlist_t *ptail;      /*!< pointer for the tail */
-    };
+    struct vsf_dlist_node_t *head;      /*!< pointer for the head */
+    struct vsf_dlist_node_t *tail;      /*!< pointer for the tail */
 };
 typedef struct vsf_dlist_t vsf_dlist_t;
-typedef struct vsf_dlist_t vsf_dlist_node_t;
+
+struct vsf_dlist_node_t {
+    struct vsf_dlist_node_t *next;      /*!< slist node in forward list */
+    struct vsf_dlist_node_t *prev;      /*!< slist node in backward list */
+};
+typedef struct vsf_dlist_node_t vsf_dlist_node_t;
 //! @}
 
 //! \name single list queue header
 //! @{
 struct vsf_slist_queue_t {
-    vsf_slist_t head;                   /*!< pointer for the queue head */
-    vsf_slist_t tail;                   /*!< pointer for the queue tail */
+    vsf_slist_node_t head;              /*!< pointer for the queue head */
+    vsf_slist_node_t tail;              /*!< pointer for the queue tail */
 };
 typedef struct vsf_slist_queue_t vsf_slist_queue_t;
 //! @}
@@ -621,73 +727,75 @@ typedef struct vsf_slist_queue_t vsf_slist_queue_t;
  *! \param list_offset  the list offset in byte within a host type
  *! \return the length of the list, -1 means illegal input
  */
-extern int_fast32_t vsf_slist_get_length(vsf_slist_t *pthis, size_t list_offset);
-
-/*! \brief get the specified node with a given index from the target list
- *! \param pthis        address of the target list
- *! \param index        index number of the wanted node
- *! \param list_offset  the list offset in byte within a host type
- *! \retval NULL        Illegal input 
- *! \retval !NULL       the address of the wanted node
- */
-extern void * vsf_slist_get_node(   vsf_slist_t *pthis, 
-                                    int_fast32_t index, 
+extern uint_fast16_t __vsf_slist_get_length_imp(
+                                    vsf_slist_t *pthis,
                                     size_t list_offset);
 
-/*! \brief find the index number of a given node from the target list 
+/*! \brief get the specified item with a given index from the target list
  *! \param pthis        address of the target list
- *! \param pnode        address of the target node
+ *! \param index        index number of the wanted item
  *! \param list_offset  the list offset in byte within a host type
- *! \return the index number, (-1) means illegal input or the node doesn't exist
+ *! \retval NULL        Illegal input 
+ *! \retval !NULL       the address of the wanted item
  */
-extern int_fast32_t vsf_slist_get_index(    vsf_slist_t *pthis, 
-                                            void *pnode,
+extern void * __vsf_slist_get_item_by_index_imp(
+                                    vsf_slist_t *pthis, 
+                                    uint_fast16_t index, 
+                                    size_t list_offset);
+
+/*! \brief find the index number of a given item from the target list 
+ *! \param pthis        address of the target list
+ *! \param item         address of the target item
+ *! \param list_offset  the list offset in byte within a host type
+ *! \return the index number, (-1) means illegal input or the item doesn't exist
+ */
+extern int_fast16_t __vsf_slist_get_index_imp(  vsf_slist_t *pthis,
+                                                void *item,
+                                                size_t list_offset);
+
+/*! \brief remove a item from the target list
+ *! \param pthis        address of the target list
+ *! \param item         address of the target item
+ *! \param list_offset  the list offset in byte within a host type
+ *! \retval NULL        Illegal input 
+ *! \retval !NULL       the address of the removed item
+ */
+extern void * __vsf_slist_remove_imp(   vsf_slist_t *pthis,
+                                        void *item,
+                                        size_t list_offset);
+
+/*! \brief append a item from the target list
+ *! \param pthis        address of the target list
+ *! \param item         address of the target item
+ *! \param list_offset  the list offset in byte within a host type
+ *! \retval NULL        Illegal input 
+ *! \retval !NULL       the address of the appended item
+ */
+extern void * __vsf_slist_append_imp(   vsf_slist_t *pthis,
+                                        void *item,
+                                        size_t list_offset);
+
+extern void * __vsf_slist_remove_tail_imp(  vsf_slist_t *pthis,
                                             size_t list_offset);
 
-/*! \brief remove a node from the target list
- *! \param pthis        address of the target list
- *! \param pnode        address of the target node
- *! \param list_offset  the list offset in byte within a host type
- *! \retval NULL        Illegal input 
- *! \retval !NULL       the address of the removed node
- */
-extern void * vsf_slist_remove( vsf_slist_t *pthis, 
-                                void *pnode, 
-                                size_t list_offset);
+extern bool __vsf_dlist_is_in_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node);
 
-/*! \brief remove a node from the target list
- *! \param pthis        address of the target list
- *! \param pnode        address of the target node
- *! \param list_offset  the list offset in byte within a host type
- *! \retval NULL        Illegal input 
- *! \retval !NULL       the address of the appended node
- */
-extern void * vsf_slist_append(   vsf_slist_t *pthis, 
-                                void *pnode, 
-                                size_t list_offset);
-
-extern bool __vsf_dlist_is_in_internal(         vsf_dlist_t *plist,
-                                                vsf_dlist_node_t *pnode);
-
-extern void __vsf_dlist_add_to_head_internal(   vsf_dlist_t *plist, 
-                                                vsf_dlist_node_t *pnode);
+extern void __vsf_dlist_add_to_head_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node);
                                                 
-extern void __vsf_dlist_add_to_tail_internal(   vsf_dlist_t *plist, 
-                                                vsf_dlist_node_t *pnode);
-                                                
-extern vsf_dlist_node_t *__vsf_dlist_remove_head_internal(vsf_dlist_t *plist);
+extern void __vsf_dlist_add_to_tail_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node);
 
-extern vsf_dlist_node_t *__vsf_dlist_remove_tail_internal(vsf_dlist_t *plist);
+extern vsf_dlist_node_t *__vsf_dlist_remove_head_imp(vsf_dlist_t *pthis);
 
-extern void __vsf_dlist_insert_after_internal(  vsf_dlist_t *plist, 
-                                                vsf_dlist_node_t *pnode_prv, 
-                                                vsf_dlist_node_t *pnode);
+extern vsf_dlist_node_t *__vsf_dlist_remove_tail_imp(vsf_dlist_t *pthis);
+
+extern void __vsf_dlist_insert_after_imp(   vsf_dlist_t *pthis,
+                                            vsf_dlist_node_t *node_prv,
+                                            vsf_dlist_node_t *node);
                                                 
-extern void __vsf_dlist_insert_before_internal( vsf_dlist_t *plist, 
-                                                vsf_dlist_node_t *pnode_nxt, 
-                                                vsf_dlist_node_t *pnode);
+extern void __vsf_dlist_insert_before_imp(  vsf_dlist_t *pthis,
+                                            vsf_dlist_node_t *node_nxt,
+                                            vsf_dlist_node_t *node);
                                                 
-extern void __vsf_dlist_remove_internal(        vsf_dlist_t *plist, 
-                                                vsf_dlist_node_t *pnode);
+extern void __vsf_dlist_remove_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node);
 
 #endif

@@ -22,7 +22,7 @@
 #include "hal/vsf_hal_cfg.h"
 
 #include "./arch/vsf_arch.h"
-#include "./driver/driver.h"
+//#include "./driver/driver.h"
 
 /* \note: never include interface.h here, individual device drivers might 
  *        include it their own driver header files.  
@@ -31,7 +31,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if __VSF_HAL_CFG_BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __BIG_ENDIAN
 #   define cpu_to_le16 bswap_16
 #   define cpu_to_le32 bswap_32
 #   define cpu_to_le64 bswap_64
@@ -59,23 +59,50 @@
 #   define be64_to_cpu bswap_64
 #endif
 
+#define declare_endian_func(__bitlen)                                           \
+extern uint_fast##__bitlen##_t cpu_to_le##__bitlen##p(uint_fast##__bitlen##_t *);\
+extern uint_fast##__bitlen##_t cpu_to_be##__bitlen##p(uint_fast##__bitlen##_t *);\
+extern uint_fast##__bitlen##_t le##__bitlen##_to_cpup(uint_fast##__bitlen##_t *);\
+extern uint_fast##__bitlen##_t be##__bitlen##_to_cpup(uint_fast##__bitlen##_t *);\
+extern void cpu_to_le##__bitlen##s(uint_fast##__bitlen##_t *);                  \
+extern void cpu_to_be##__bitlen##s(uint_fast##__bitlen##_t *);                  \
+extern void le##__bitlen##_to_cpus(uint_fast##__bitlen##_t *);                  \
+extern void be##__bitlen##_to_cpus(uint_fast##__bitlen##_t *);                  \
+extern uint_fast##__bitlen##_t get_unaligned_##__bitlen(const void *);          \
+extern uint_fast##__bitlen##_t get_unaligned_le##__bitlen(const void *);        \
+extern uint_fast##__bitlen##_t get_unaligned_be##__bitlen(const void *);        \
+extern void put_unaligned_##__bitlen(uint_fast##__bitlen##_t, void *);          \
+extern void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t, void *);        \
+extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint_fast16_t bswap_8(uint_fast16_t value8);
-extern uint_fast16_t bswap_16(uint_fast16_t value16);
-extern uint_fast32_t bswap_32(uint_fast32_t value32);
-extern uint_fast64_t bswap_64(uint_fast64_t value64);
+extern uint_fast16_t bswap_8(uint_fast16_t);
+extern uint_fast16_t bswap_16(uint_fast16_t);
+extern uint_fast32_t bswap_32(uint_fast32_t);
+extern uint_fast64_t bswap_64(uint_fast64_t);
 
-/*! \note initialize hardware abstract layer
+declare_endian_func(16)
+declare_endian_func(32)
+declare_endian_func(64)
+
+/*! \note initialize level 0/1 hardware abstract layer
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */  
 extern bool vsf_hal_init( void );
+
+/*! \note initialize level 2 hardware abstract layer
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */  
+extern bool vsf_hal_advance_init(void);
 
 #endif
 /* EOF */

@@ -1233,7 +1233,6 @@ SECTION(".text.vsf.kernel.teda")
 vsf_err_t vsf_teda_init(vsf_teda_t *pthis, vsf_priority_t priority, bool is_stack_owner)
 {
     ASSERT(pthis != NULL);
-    vsf_teda_cancel_timer(pthis);
     return vsf_eda_init(&pthis->use_as__vsf_eda_t, priority, is_stack_owner);
 }
 

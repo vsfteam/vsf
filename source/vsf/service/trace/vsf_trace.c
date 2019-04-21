@@ -53,6 +53,8 @@ static vsf_trace_t __vsf_trace;
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 NO_INIT static vsf_stream_writer_t __vsf_trace;
 #endif
+
+#if VSF_TRACE_CFG_COLOR_EN == ENABLED
 static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
     [VSF_TRACE_NONE]    = "",
     [VSF_TRACE_ERROR]   = "\033[1;31m",
@@ -60,6 +62,7 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
     [VSF_TRACE_WARNING] = "\033[1;33m",
     [VSF_TRACE_DEBUG]   = "\033[1;34m",
 };
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -71,9 +74,10 @@ static void vsf_trace_output_string(const char *str);
 
 static void vsf_trace_set_level(vsf_trace_level_t level)
 {
+#if VSF_TRACE_CFG_COLOR_EN == ENABLED
     ASSERT(level < dimof(__vsf_trace_color));
-
     vsf_trace_output_string((char *)__vsf_trace_color[level]);
+#endif
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -161,7 +165,7 @@ static void vsf_trace_arg(const char *format, va_list *arg)
     vsf_pbuf_t *block = NULL; 
     __vsf_sched_safe(
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-        vsf_stream_tx_t *tx = vsf_stream_src_get_tx(&__vsf_trace);
+        vsf_stream_tx_t *tx = vsf_stream_src_get_tx(&__vsf_trace.use_as__vsf_stream_src_t);
         if (!tx->piMethod->GetStatus(tx).IsOpen) {
             vsf_sched_safe_exit();
             return;
@@ -175,7 +179,7 @@ static void vsf_trace_arg(const char *format, va_list *arg)
             vsf_sched_safe_exit();
             return;
         }
-        vsf_pbuf_size_reset(block);
+        //vsf_pbuf_size_reset(block);
     )
     
 

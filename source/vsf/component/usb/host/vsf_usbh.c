@@ -87,6 +87,15 @@ bool vsf_usbh_urb_is_alloced(vsf_usbh_urb_t *urb)
     return !urb->pipe.is_pipe && (urb->urb_hcd != NULL);
 }
 
+vsf_usbh_eppipe_t vsf_usbh_urb_get_pipe(vsf_usbh_urb_t *urb)
+{
+    if (urb->pipe.is_pipe) {
+        return urb->pipe;
+    } else {
+        return urb->urb_hcd->pipe;
+    }
+}
+
 static void vsf_usbh_urb_reset_buffer(vsf_usbh_hcd_urb_t *urb_hcd)
 {
     urb_hcd->buffer = NULL;
