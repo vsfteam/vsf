@@ -8,8 +8,8 @@
 *.browse
 *.linf
 *.pbw
-example/project/iar/.metadata/.lock
-example/project/iar/.metadata/.log
+source/example/project/iar/.metadata/.lock
+source/example/project/iar/.metadata/.log
 *.version
 *.tree
 *.resources
@@ -45,5 +45,6 @@ Backup*
 source/example/project/iar/.metadata/.lock
 *.elf
 *.elf
-*.a
 *.sim
+source/example/project/iar/kernel_lib/*.a
+source/example/project/iar/kernel_lib_armv7m/Exe/*.a
