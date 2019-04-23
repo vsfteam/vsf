@@ -27,8 +27,7 @@
 //#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
 //#define ASSERT(...)
 
-//! for test only ...
-#define VSF_GET_MAIN_CLK()              (25000000)
+
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -36,6 +35,11 @@
 
 //! \name kernel resource configuration
 //! @{
+
+//  <o>System Frequency                     <32768-0xFFFFFFFF>
+//  <i>Please specify the system frequency here.
+#define SYSTEM_FREQ                         25000000
+
 
 //  <h> Kernel Resource Configuration
 

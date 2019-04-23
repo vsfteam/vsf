@@ -375,14 +375,14 @@ typedef vsf_sync_owner_t    vsf_mutex_t;
 struct vsf_bmpevt_adapter_sync_t {
     implement(vsf_bmpevt_adapter_eda_t)
     vsf_sync_t *sync;
-};
+}ALIGN(4);
 typedef struct vsf_bmpevt_adapter_sync_t vsf_bmpevt_adapter_sync_t;
 
 struct vsf_bmpevt_adapter_bmpevt_t {
     implement(vsf_bmpevt_adapter_eda_t)
     vsf_bmpevt_t *bmpevt;
     vsf_bmpevt_pender_t pender;
-};
+}ALIGN(4);
 typedef struct vsf_bmpevt_adapter_bmpevt_t vsf_bmpevt_adapter_bmpevt_t;
 #endif
 

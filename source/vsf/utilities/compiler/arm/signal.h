@@ -91,6 +91,7 @@ Output:
 //! \brief The safe ATOM code section macro
 #define SAFE_ATOM_CODE()        code_region(&DEFAULT_CODE_REGION_ATOM_CODE)
 
+         
 #define __SAFE_ATOM_CODE(...)                                                   \
         {                                                                       \
             istate_t tState = DISABLE_GLOBAL_INTERRUPT();                       \
@@ -99,8 +100,15 @@ Output:
         }
     
 
+
 //! \brief Exit from the safe atom operations
-#define EXIT_SAFE_ATOM_CODE()           SET_GLOBAL_INTERRUPT_STATE(tState)   
+#define EXIT_SAFE_ATOM_CODE()           SET_GLOBAL_INTERRUPT_STATE(tState)  
+
+ 
+#define exit_safe_atom_code()           EXIT_SAFE_ATOM_CODE()
+#define safe_atom_code()                SAFE_ATOM_CODE()
+#define __safe_atom_code(...)           __SAFE_ATOM_CODE(__VA_ARGS__)
+
 
 //! \name ES_LOCKER value
 //! @{
@@ -219,6 +227,9 @@ Output:
 #define vsf_unprotect_interrupt(__state)SET_GLOBAL_INTERRUPT_STATE(__state)
 #define vsf_protect_none()              0
 #define vsf_unprotect_none(__state)     UNUSED_PARAM(__state)
+
+#define vsf_protect_int()               vsf_protect_interrupt()
+#define vsf_unprotect_int(...)          vsf_unprotect_interrupt(__VA_ARGS__)
 
 #define __vsf_protect(__type)           vsf_protect_##__type
 #define __vsf_unprotect(__type)         vsf_unprotect_##__type

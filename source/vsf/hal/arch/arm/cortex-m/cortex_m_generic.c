@@ -60,6 +60,11 @@ ROOT void PendSV_Handler(void)
     }
 }
 
+WEAK uint32_t vsf_arch_req___sys_freq___from_usr(void)
+{
+    return VSF_GET_MAIN_CLK();
+}
+
 /*! \brief initialise SysTick to generate a system timer
  *! \param frequency the target frequency in Hz
  *! \return initialization result in vsf_err_t 
@@ -70,7 +75,7 @@ vsf_err_t vsf_systimer_init(uint32_t frequency)
         ENABLE_SYSTICK              |
         SYSTICK_SOURCE_SYSCLK       |
         ENABLE_SYSTICK_INTERRUPT,
-        (VSF_GET_MAIN_CLK() / frequency)
+        (vsf_arch_req___sys_freq___from_usr() / frequency)
     );
 
     return VSF_ERR_NONE;

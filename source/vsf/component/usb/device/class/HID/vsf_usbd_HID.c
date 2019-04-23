@@ -45,7 +45,7 @@ static vsf_usbd_HID_report_t * vsf_usbd_HID_find_report(
 {
     ASSERT(hid != NULL);
 
-    for(uint_fast8_t i = 0; i < hid->num_of_report; i++) {
+    for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
         if ((hid->reports[i].type == type) && (hid->reports[i].id == id)) {
             return &hid->reports[i];
         }
@@ -78,8 +78,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vsf_usbd_HID_report_t *report;
     vsf_usbd_trans_t *trans;
 
-    switch (evt)
-    {
+    switch (evt) {
     case VSF_EVT_INIT:
         if (hid->ep_out != 0) {
             trans = &hid->transact_out;
@@ -93,7 +92,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         hid->pos_out = 0;
         hid->output_state = HID_OUTPUT_STATE_WAIT;
         hid->busy = false;
-        for(uint_fast8_t i = 0; i < hid->num_of_report; i++) {
+        for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
             report = &hid->reports[i];
             report->idle_cnt = 0;
         }
@@ -296,7 +295,7 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
             return VSF_ERR_FAIL;
         }
 
-        for(uint_fast8_t i = 0; i < hid->num_of_report; i++) {
+        for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
             if (    (hid->reports[i].type == USB_HID_REPORT_INPUT)
                 &&  ((0 == id) || (hid->reports[i].id == id))) {
                 hid->reports[i].idle = request->wValue >> 8;

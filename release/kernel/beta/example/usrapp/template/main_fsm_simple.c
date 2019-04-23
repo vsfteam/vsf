@@ -172,8 +172,8 @@ implement_fsm(user_task_b_t)
 
 static void system_init(void)
 {
-    extern void uart_config(void);
-    uart_config();
+    extern void stdout_init(void);
+    stdout_init();
 }
 
 int main(void)

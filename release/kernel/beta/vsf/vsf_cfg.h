@@ -53,6 +53,9 @@
 #ifndef Hz
 #   define Hz                                   ul
 #endif
+#ifndef MHz
+#   define MHz                                  *1000000ul
+#endif
 
 /*----------------------------------------------------------------------------*
  * DO NOT MODIFY ANYTHING BELOW                                               *

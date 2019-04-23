@@ -31,9 +31,14 @@
         struct {__VA_ARGS__} static TPASTE2(__local_cb, __LINE__),              \
             *ptThis = &TPASTE2(__local_cb, __LINE__);
 
-#define features_used(...)                      __VA_ARGS__
-#define mem_sharable(...)                       union {__VA_ARGS__};
-#define mem_nonsharable(...)                    __VA_ARGS__
+#define features_used(...)              __VA_ARGS__
+
+#if __IS_COMPILER_IAR__
+#   define mem_sharable(...)            union {uint8_t zzzz___; __VA_ARGS__};
+#else
+#   define mem_sharable(...)            union {__VA_ARGS__};
+#endif
+#define mem_nonsharable(...)            __VA_ARGS__
 
 
 

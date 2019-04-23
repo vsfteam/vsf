@@ -43,7 +43,7 @@
 /*============================ PROTOTYPES ====================================*/
 extern void __vsf_main_entry(void);
 extern int main(void);
-
+ROOT
 const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 {
 
@@ -109,6 +109,36 @@ ROOT void __post_vsf_kernel_init(void)
 #endif
 }
 
+
+uint32_t vsf_arch_req___sys_freq___from_usr(void)
+{
+    return SYSTEM_FREQ;
+}
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+__asm(".global __use_no_semihosting\n\t");
+__asm(".global __ARM_use_no_argv\n\t");
+
+
+void _sys_exit(int ch)
+{
+    while(1);
+}
+
+
+void _ttywrch(int ch)
+{
+    
+}
+
+#include <rt_sys.h>
+
+FILEHANDLE $Sub$$_sys_open(const char *name, int openmode)
+{
+    return 0;
+}
+
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 /*----------------------------------------------------------------------------*

@@ -54,7 +54,10 @@ typedef uint_fast8_t vsf_sched_lock_status_t;
 #endif
 
 #define vsf_protect_scheduler()         vsf_sched_lock()
-#define vsf_unprotect_scheduler(__state)vsf_sched_unlock((vsf_sched_lock_status_t)(__state))
+#define vsf_unprotect_scheduler(__state)                                        \
+            vsf_sched_unlock((vsf_sched_lock_status_t)(__state))
+#define vsf_protect_sched()             vsf_protect_scheduler()
+#define vsf_unprotect_sched(...)        vsf_unprotect_scheduler(__VA_ARGS__)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -83,7 +86,7 @@ struct vsf_kernel_resource_t {
         uint16_t                                  frame_cnt;
     }task_stack;
 #endif
-};
+}ALIGN(4);
 
 typedef struct vsf_kernel_resource_t vsf_kernel_resource_t;
 /*============================ GLOBAL VARIABLES ==============================*/

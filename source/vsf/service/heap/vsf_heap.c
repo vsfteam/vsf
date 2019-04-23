@@ -34,6 +34,10 @@
 #   define VSF_HEAP_MCB_MAGIC               0x1ea01ea0
 #endif
 
+#ifndef VSF_HEAP_CFG_FREELIST_NUM
+#   define VSF_HEAP_CFG_FREELIST_NUM        1
+#endif
+
 #ifndef VSF_HEAP_CFG_PROTECT_LEVEL
 /*! \note   By default, the driver tries to make all APIs interrupt-safe,
  *!
@@ -74,7 +78,7 @@ struct __vsf_heap_mcb_t {
 typedef struct __vsf_heap_mcb_t __vsf_heap_mcb_t;
 
 struct __vsf_heap_t {
-    vsf_dlist_t freelist[1];
+    vsf_dlist_t freelist[VSF_HEAP_CFG_FREELIST_NUM];
     vsf_dlist_t terminator;
 };
 typedef struct __vsf_heap_t __vsf_heap_t;
@@ -96,10 +100,15 @@ static NO_INIT __vsf_heap_t __vsf_heap;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+WEAK vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
+{
+	return &__vsf_heap.freelist[0];
+}
+
 // MUST NOT return NULL;
 static vsf_dlist_t * __vsf_heap_get_freelist(uint_fast32_t size)
 {
-    return &__vsf_heap.freelist[0];
+	return vsf_heap_get_freelist(&__vsf_heap.freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
 }
 
 void vsf_heap_init(void)

@@ -47,8 +47,8 @@
 #define vsf_usbh_hid_get_tx_report(__hid)                                       \
             __vsf_usbh_hid_get_tx_report_imp((vsf_usbh_hid_eda_t *)(__hid))
 
-#define vsf_usbh_hid_set_idle(__hid, __id, __duration)                      	\
-            __vsf_usbh_hid_set_idle_imp(                                    	\
+#define vsf_usbh_hid_set_idle(__hid, __id, __duration)                          \
+            __vsf_usbh_hid_set_idle_imp(                                        \
                 (vsf_usbh_hid_base_t *)(__hid), (__id), (__duration))
 
 #define vsf_usbh_hid_send_report_req(__hid, __type_id, __report, __report_len)  \
@@ -61,7 +61,6 @@
 
 /*============================ TYPES =========================================*/
 
-#if defined(VSF_USBH_HID_INHERIT) || defined(VSF_USBH_HID_IMPLEMENT)
 declare_simple_class(vsf_usbh_hid_base_t)
 declare_simple_class(vsf_usbh_hid_eda_t)
 declare_simple_class(vsf_usbh_hid_teda_t)
@@ -98,7 +97,6 @@ def_simple_class(vsf_usbh_hid_teda_t) {
     implement(vsf_usbh_hid_base_t)
     implement(vsf_teda_t)
 };
-#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

@@ -1163,11 +1163,11 @@
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsisDspLib</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GRuntimeLibThreads</name>
@@ -1341,11 +1341,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--enum_is_int</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -1394,6 +1394,7 @@
                     <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2127,7 +2128,7 @@
                 </option>
                 <option>
                     <name>OGCoreOrChip</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GRuntimeLibSelect</name>
@@ -2200,11 +2201,11 @@
                 <option>
                     <name>GBECoreSlave</name>
                     <version>27</version>
-                    <state>41</state>
+                    <state>38</state>
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsisDspLib</name>
@@ -2217,7 +2218,7 @@
                 <option>
                     <name>CoreVariant</name>
                     <version>27</version>
-                    <state>41</state>
+                    <state>38</state>
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
@@ -2240,7 +2241,7 @@
                 <option>
                     <name>GFPUCoreSlave2</name>
                     <version>27</version>
-                    <state>41</state>
+                    <state>38</state>
                 </option>
                 <option>
                     <name>OGCMSISPackSelectDevice</name>
@@ -2281,7 +2282,7 @@
                 </option>
                 <option>
                     <name>DSPExtension</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>TrustZone</name>
@@ -2436,6 +2437,7 @@
                     <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -3169,7 +3171,7 @@
                 </option>
                 <option>
                     <name>OGCoreOrChip</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GRuntimeLibSelect</name>
@@ -3246,7 +3248,7 @@
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsisDspLib</name>
@@ -3478,6 +3480,7 @@
                     <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -4288,11 +4291,11 @@
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsisDspLib</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GRuntimeLibThreads</name>
@@ -4516,6 +4519,7 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\usrapp\usbh_demo</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -5326,11 +5330,11 @@
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsisDspLib</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GRuntimeLibThreads</name>
@@ -5553,6 +5557,7 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\usrapp\w600_demo</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -6308,7 +6313,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.32.3.20186</state>
+                    <state>8.32.2.19370</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -6363,11 +6368,11 @@
                 </option>
                 <option>
                     <name>OGUseCmsis</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGUseCmsisDspLib</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GRuntimeLibThreads</name>
@@ -6592,6 +6597,7 @@
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -8534,12 +8540,12 @@
         </file>
     </group>
     <file>
-        <name>$PROJ_DIR$\kernel_lib_armv7m\Exe\vsf_kernel_armv7m_size.a</name>
+        <name>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv6m_full_size.a</name>
         <excluded>
-            <configuration>kernel_lib_armv6m_full_size</configuration>
-            <configuration>usbh_m484</configuration>
-            <configuration>WinnerMicro_W600</configuration>
-            <configuration>aio_m484</configuration>
+            <configuration>kernel_template_cm7</configuration>
         </excluded>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</name>
     </file>
 </project>

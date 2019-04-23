@@ -352,7 +352,11 @@ implement_vsf_task(bmevt_demo_t)
 
 #endif
 
-
+static void system_init(void)
+{
+    extern void stdout_init(void);
+    stdout_init();
+}
 
 int main(void)
 {
@@ -364,8 +368,7 @@ int main(void)
         )
     )
 
-    extern void uart_config(void);
-    uart_config();
+    system_init();
 
 #if VSF_CFG_SYNC_EN == ENABLED
     // initialize adapter

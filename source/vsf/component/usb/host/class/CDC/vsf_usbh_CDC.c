@@ -45,7 +45,6 @@ void vsf_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_usbh_cdc_t *pthis = container_of(eda, vsf_usbh_cdc_t, eda);
     vsf_usbh_t *usbh = pthis->usbh;
-    vsf_usbh_hcd_urb_t *urb_hcd;
     vsf_usbh_urb_t *urb;
 
     switch (evt) {
@@ -59,30 +58,33 @@ void vsf_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_MESSAGE:
-        urb_hcd = vsf_eda_get_cur_msg();
-        if (urb_hcd == pthis->urb_evt.urb_hcd) {
-            urb = &pthis->urb_evt;
-            if (vsf_usbh_urb_get_status(urb) != URB_OK) {
-                goto failed;
-            } else if (pthis->evthandler != NULL) {
-                pthis->evthandler(pthis, VSF_USBH_CDC_ON_EVENT, NULL);
-                if (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, urb)) {
+        do {
+            vsf_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
+            vsf_usbh_eppipe_t pipe = vsf_usbh_urb_get_pipe(&urb);
+
+            if (USB_ENDPOINT_XFER_INT == pipe.type) {
+                if (vsf_usbh_urb_get_status(&urb) != URB_OK) {
                     goto failed;
+                } else if (pthis->evthandler != NULL) {
+                    pthis->evthandler(pthis, VSF_USBH_CDC_ON_EVENT, NULL);
+                    if (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &urb)) {
+                        goto failed;
+                    }
+                }
+            } else /* if (USB_ENDPOINT_XFER_BULK == pipe.type) */ {
+                if (pipe.dir_in1out0) {
+                    if (pthis->evthandler != NULL) {
+                        pthis->evthandler(pthis, VSF_USBH_CDC_ON_RX, (void *)&urb);
+                    }
+                } else {
+                    if (pthis->evthandler != NULL) {
+                        pthis->evthandler(pthis, VSF_USBH_CDC_ON_TX, (void *)&urb);
+                    }
                 }
             }
-        } else if (urb_hcd == pthis->urb_rx.urb_hcd) {
-            urb = &pthis->urb_rx;
-            if (pthis->evthandler != NULL) {
-                pthis->evthandler(pthis, VSF_USBH_CDC_ON_RX, (void *)urb);
-            }
-        } else if (urb_hcd == pthis->urb_tx.urb_hcd) {
-            urb = &pthis->urb_tx;
-            if (pthis->evthandler != NULL) {
-                pthis->evthandler(pthis, VSF_USBH_CDC_ON_TX, (void *)urb);
-            }
-        }
+        } while (0);
         break;
-    };
+    }
 
     return;
 failed:

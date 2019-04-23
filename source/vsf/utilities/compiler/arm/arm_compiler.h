@@ -19,13 +19,18 @@
 #define __USE_ARM_COMPILER_H__
 
 /*============================ INCLUDES ======================================*/
+#include "vsf_app_cfg.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <cmsis_compiler.h>
 
+#ifndef VSF_UTILITIES_REQ___CMSIS_HEADER_FILE__FROM_USR
+#include "cmsis_compiler.h"
+#else
+#include VSF_UTILITIES_REQ___CMSIS_HEADER_FILE__FROM_USR
+#endif
 
 //! \name The macros to identify the compiler
 //! @{
@@ -61,14 +66,14 @@
 #ifdef __IS_COMPILER_LLVM__
 #   undef  __IS_COMPILER_LLVM__
 #endif
-#if defined(__clang__)
+#if defined(__clang__) && !__IS_COMPILER_ARM_COMPILER_6__
 #   define __IS_COMPILER_LLVM__                1
 #else
 //! \note for gcc
 #ifdef __IS_COMPILER_GCC__
 #   undef __IS_COMPILER_GCC__
 #endif
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !(__IS_COMPILER_ARM_COMPILER_6__ || __IS_COMPILER_LLVM__)
 #   define __IS_COMPILER_GCC__                 1
 #endif
 //! @}

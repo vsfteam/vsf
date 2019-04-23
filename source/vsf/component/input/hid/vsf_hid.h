@@ -19,6 +19,11 @@
 #define __VSF_HID_H__
 
 /*============================ INCLUDES ======================================*/
+
+#include "../vsf_input_cfg.h"
+
+#if VSF_INPUT_CFG_HID_EN == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #define HID_USAGE_PAGE_GENERIC      0x01
@@ -105,18 +110,19 @@ struct vsf_hid_report_t {
 };
 typedef struct vsf_hid_report_t vsf_hid_report_t;
 
-struct vsf_hid_dev_t {
+struct vsf_input_hid_t {
     vsf_slist_t report_list;
     bool report_has_id;
 };
-typedef struct vsf_hid_dev_t vsf_hid_dev_t;
+typedef struct vsf_input_hid_t vsf_input_hid_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_hid_parse_report(vsf_hid_dev_t *dev, uint8_t *buf, uint_fast32_t len);
-extern void vsf_hid_process_input(vsf_hid_dev_t *dev, uint8_t *buf, uint_fast32_t len);
-extern uint_fast32_t vsf_hid_get_max_input_size(vsf_hid_dev_t *dev);
-extern void vsf_hid_free_dev(vsf_hid_dev_t *dev);
+extern uint_fast32_t vsf_hid_parse_desc(vsf_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t desc_len);
+extern void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len);
+extern void vsf_hid_new_dev(vsf_input_hid_t *dev);
+extern void vsf_hid_free_dev(vsf_input_hid_t *dev);
 
+#endif      // VSF_INPUT_CFG_HID_EN
 #endif      // __VSF_HID_H__

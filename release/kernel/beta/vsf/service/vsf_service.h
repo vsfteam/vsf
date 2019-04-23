@@ -25,7 +25,6 @@
 #include "./pool/vsf_pool.h"
 #include "./stream/vsf_stream.h"
 #include "./vsfstream/vsfstream.h"
-
 #include "./trace/vsf_trace.h"
 
 /*============================ MACROS ========================================*/
