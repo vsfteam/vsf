@@ -62,4 +62,8 @@ void SystemInit (void)
 #endif
 
   SystemCoreClock = SYSTEM_CLOCK;
+      
+
+    extern void stdout_init(void);
+    stdout_init();
 }

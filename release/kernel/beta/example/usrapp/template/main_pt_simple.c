@@ -130,7 +130,6 @@ int main(void)
     do {
         static NO_INIT user_pt_task_t __user_task;
         __user_task.psem = &user_sem;
-        __user_task.chState = 0;
         init_vsf_pt(user_pt_task_t, &__user_task, vsf_priority_inherit);
     } while(0);
 

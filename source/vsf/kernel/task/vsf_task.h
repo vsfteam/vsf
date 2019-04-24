@@ -89,6 +89,7 @@
                 .priority = (__PRI),                                            \
                 __VA_ARGS__                                                     \
             };                                                                  \
+            (__TASK)->chState = 0;                                              \
             vsf_task_start(&((__TASK)->use_as__vsf_task_t), &cfg);              \
         } while(0)
 #define init_vsf_task(__NAME, __TASK, __PRI, ...)                               \

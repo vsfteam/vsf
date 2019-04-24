@@ -126,9 +126,9 @@ void _sys_exit(int ch)
 }
 
 
-void _ttywrch(int ch)
+WEAK void _ttywrch(int ch)
 {
-    
+
 }
 
 #include <rt_sys.h>

@@ -24,6 +24,15 @@
 #include "./vsf_input_cfg.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_INPUT_ITEM(__id, __bitoffset, __bitlen, __is_signed)                \
+            {                                                                   \
+                .id = (__id),                                                   \
+                .offset = (__bitoffset),                                        \
+                .bitlen = (__bitlen),                                           \
+                .is_signed = (__is_signed),                                     \
+            }
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -49,7 +58,6 @@ typedef union vsf_input_value_t vsf_input_value_t;
 struct vsf_input_parser_t {
     vsf_input_item_info_t *info;
     uint8_t num;
-    uint8_t idx;
 
     vsf_input_value_t pre;
     vsf_input_value_t cur;

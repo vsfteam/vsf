@@ -144,7 +144,7 @@ void vsf_heap_add(uint8_t *heap, uint_fast32_t size)
     unaligned_size = __vsf_heap_calc_unaligned_size(heap, VSF_HEAP_CFG_MCB_ALIGN);
     heap += unaligned_size;
     size = (size - unaligned_size) & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
-    offset = size - sizeof(__vsf_heap_mcb_t);
+    offset = (size - sizeof(__vsf_heap_mcb_t))  & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
 
     ASSERT(     !(size >> (VSF_HEAP_CFG_MCB_ALIGN_BIT + 16))
             &&  (size > 2 * sizeof(__vsf_heap_mcb_t)));
