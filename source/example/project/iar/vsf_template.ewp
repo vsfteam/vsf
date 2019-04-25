@@ -7499,6 +7499,15 @@
                         <name>$PROJ_DIR$\..\..\..\vsf\component\input\hid\vsf_hid.h</name>
                     </file>
                 </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\input\vsf_input.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\input\vsf_input.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\input\vsf_input_cfg.h</name>
+                </file>
             </group>
             <group>
                 <name>tcpip</name>

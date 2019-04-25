@@ -110,7 +110,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
     pthread->pret = &ret;
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
-            vsf_arch_set_stack((uint_fast32_t)(&pthread->pstack[pthread->stack_size]));
+            vsf_arch_set_stack((uint_fast32_t)(&pthread->pstack[(pthread->stack_size>>3)]));
             __vsf_thread_entry();
             vsf_thread_ret();
         } else {

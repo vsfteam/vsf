@@ -375,7 +375,7 @@ void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
     }
 
     size = (size + 3) & ~3;
-    while (!vsf_slist_is_empty(freelist)) {
+    while (!vsf_dlist_is_empty(freelist)) {
         buffer = __vsf_heap_freelist_malloc(freelist, size, alignment);
         if (buffer != NULL) {
             return buffer;

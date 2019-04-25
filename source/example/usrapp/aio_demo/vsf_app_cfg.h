@@ -146,6 +146,7 @@
 //  </h>
 //! @}
 
+#define VSF_INPUT_CFG_HID_EN                ENABLED
 
 #define VSF_USE_USB_HOST                    ENABLED
 #define VSF_USE_USB_HOST_HUB                ENABLED
