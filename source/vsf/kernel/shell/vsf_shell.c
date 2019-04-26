@@ -89,6 +89,9 @@ const struct {
     .is_support_dynamic_priority =  (VSF_CFG_DYNAMIC_PRIOTIRY_EN ? (true) : false),
     .evt_queue_count =              VSF_OS_EVTQ_NUM - 1,
     .evt_queue_bit_size =           VSF_OS_EVTQ_BITSIZE - 1,
+
+    .Major =                        0,
+    .Minor =                        0x91,
 };
 
 /*============================ IMPLEMENTATION ================================*/

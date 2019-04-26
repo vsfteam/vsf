@@ -117,9 +117,7 @@ static vsf_evtq_ctx_t * vsf_evtq_get_cur_ctx(void)
 SECTION(".text.vsf.kernel.__vsf_evtq_post_do")
 static void __vsf_evtq_post_do(vsf_eda_t *pthis, uint_fast32_t value)
 {
-    vsf_eda_t *eda_old = __vsf_eda.cur.eda;
-    vsf_evt_t evt_old = __vsf_eda.cur.evt;
-    void *msg_old = __vsf_eda.cur.msg;
+    vsf_evtq_ctx_t ctx_old = __vsf_eda.cur;
 
     __vsf_eda.cur.eda = pthis;
     if (value & 1) {
@@ -130,9 +128,7 @@ static void __vsf_evtq_post_do(vsf_eda_t *pthis, uint_fast32_t value)
         __vsf_eda.cur.msg = (void *)value;
     }
     __vsf_dispatch_evt(pthis, __vsf_eda.cur.evt);
-    __vsf_eda.cur.eda = eda_old;
-    __vsf_eda.cur.evt = evt_old;
-    __vsf_eda.cur.msg = msg_old;
+    __vsf_eda.cur = ctx_old;
 }
 
 SECTION(".text.vsf.kernel.__vsf_evtq_post")

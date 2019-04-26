@@ -48,9 +48,16 @@ extern void vsf_systimer_evthandler(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
+WEAK bool on_arch_systimer_tick_evt(void)
+{
+    return true;
+}
+
 ROOT void SysTick_Handler(void)
 {
-    vsf_systimer_evthandler();
+    if (on_arch_systimer_tick_evt()) {
+        vsf_systimer_evthandler();
+    }
 }
 
 ROOT void PendSV_Handler(void)

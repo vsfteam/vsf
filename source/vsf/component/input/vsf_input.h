@@ -27,10 +27,10 @@
 
 #define VSF_INPUT_ITEM(__id, __bitoffset, __bitlen, __is_signed)                \
             {                                                                   \
-                .id = (__id),                                                   \
-                .offset = (__bitoffset),                                        \
-                .bitlen = (__bitlen),                                           \
-                .is_signed = (__is_signed),                                     \
+                .id         = (__id),                                           \
+                .offset     = (__bitoffset),                                    \
+                .bitlen     = (__bitlen),                                       \
+                .is_signed  = (__is_signed),                                    \
             }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -70,6 +70,8 @@ typedef struct vsf_input_parser_t vsf_input_parser_t;
 
 extern uint_fast32_t vsf_input_buf_get_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
 extern void vsf_input_buf_set_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len, uint_fast32_t value);
+extern void vsf_input_buf_clear(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
+extern void vsf_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
 
 extern vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
 

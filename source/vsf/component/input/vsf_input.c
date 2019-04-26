@@ -28,6 +28,40 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+void vsf_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
+{
+    uint_fast8_t bitlen, bitpos, bytepos, mask, result_len = 0;
+
+    while (result_len < len) {
+        bytepos = offset >> 3;
+        bitpos = offset & 7;
+        bitlen = min(len - result_len, 8 - bitpos);
+        mask = (1 << bitlen) - 1;
+
+        buf[bytepos] |= ((~0UL >> result_len) & mask) << bitpos;
+
+        offset += bitlen;
+        result_len += bitlen;
+    }
+}
+
+void vsf_input_buf_clear(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
+{
+    uint_fast8_t bitlen, bitpos, bytepos, mask, result_len = 0;
+
+    while (result_len < len) {
+        bytepos = offset >> 3;
+        bitpos = offset & 7;
+        bitlen = min(len - result_len, 8 - bitpos);
+        mask = (1 << bitlen) - 1;
+
+        buf[bytepos] &= ~(((~0UL >> result_len) & mask) << bitpos);
+
+        offset += bitlen;
+        result_len += bitlen;
+    }
+}
+
 uint_fast32_t vsf_input_buf_get_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
 {
     uint_fast8_t bitlen, bitpos, bytepos, mask, result_len = 0;
@@ -56,7 +90,7 @@ void vsf_input_buf_set_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len
         bitpos = offset & 7;
         bitlen = min(len - result_len, 8 - bitpos);
         mask = (1 << bitlen) - 1;
-        
+
         buf[bytepos] &= ~(((~0UL >> result_len) & mask) << bitpos);
         buf[bytepos] |= ((value >> result_len) & mask) << bitpos;
 
@@ -79,7 +113,7 @@ vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre
             parser->pre.valu32 = pre_value;
             return info;
         }
-        parser++;
+        info--;
     }
     return NULL;
 }
