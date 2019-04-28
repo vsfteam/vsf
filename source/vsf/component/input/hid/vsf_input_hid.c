@@ -83,14 +83,17 @@ typedef struct hid_desc_t hid_desc_t;
 
 WEAK void vsf_hid_on_new_dev(vsf_input_hid_t *dev)
 {
+    vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
 }
 
 WEAK void vsf_hid_on_free_dev(vsf_input_hid_t *dev)
 {
+    vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
 }
 
-WEAK void vsf_hid_on_report_input(vsf_input_hid_t *dev, uint_fast16_t generic_usage, vsf_hid_event_t *event)
+WEAK void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
 {
+    vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vsf_input_evt_t);
 }
 
 static vsf_hid_report_t * vsf_hid_get_report(vsf_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
@@ -410,6 +413,7 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
     bool reported = false;
     int_fast16_t id = dev->report_has_id ? *buf++ : -1;
     int_fast32_t i;
+    uint_fast16_t usage_page, usage_id;
 
     __vsf_slist_foreach_unsafe(vsf_hid_report_t, report_node, &dev->report_list) {
         if ((_->type == HID_ITEM_INPUT) && (_->id == id)) {
@@ -427,6 +431,8 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
         memset(report->value, 0, len);
     }
 
+    event.duration = vsf_input_update_timestamp(&dev->timestamp);
+    event.dev = dev;
     __vsf_slist_foreach_unsafe(vsf_hid_usage_t, usage_node, &report->usage_list) {
         for (i = 0; i < _->report_count; ++i) {
             /* get usage value */
@@ -435,22 +441,24 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
 
             /* compare and process */
             if (cur_value != (HID_USAGE_IS_REL(_) ? 0 : pre_value)) {
-                event.usage_page = _->usage_page;
-                event.usage_id = HID_USAGE_IS_VAR(_) ? (_->usage_min + i) :
+                usage_page = _->usage_page;
+                usage_id = HID_USAGE_IS_VAR(_) ? (_->usage_min + i) :
                         (cur_value ? (uint16_t)cur_value : (uint16_t)pre_value);
-                event.pre_value = pre_value;
-                event.cur_value = cur_value;
+                event.id = (uint64_t)report->generic_usage | ((uint64_t)usage_page << 16) | ((uint64_t)usage_id << 32);
+                event.pre.valu32 = pre_value;
+                event.cur.valu32 = cur_value;
                 event.usage = _;
 
                 reported = true;
-                vsf_hid_on_report_input(dev, report->generic_usage, &event);
+                vsf_hid_on_report_input(&event);
             }
         }
     }
 
     // just report input process end if changed reportted
     if (reported) {
-        vsf_hid_on_report_input(dev, report->generic_usage, NULL);
+        event.id = 0;
+        vsf_hid_on_report_input(&event);
     }
     memcpy(report->value, buf, len);
 }

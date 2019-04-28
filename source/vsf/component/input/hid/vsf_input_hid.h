@@ -24,6 +24,8 @@
 
 #if VSF_INPUT_CFG_HID_EN == ENABLED
 
+#include "../vsf_input_get_type.h"
+
 /*============================ MACROS ========================================*/
 
 #define HID_USAGE_PAGE_GENERIC      0x01
@@ -63,14 +65,22 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define HID_USAGE_IS_CONST(usage)   ((usage)->data_flag & 1)
-#define HID_USAGE_IS_DATA(usage)    !HID_USAGE_IS_CONST(usage)
-#define HID_USAGE_IS_VAR(usage)     ((usage)->data_flag & 2)
-#define HID_USAGE_IS_ARRAY(usage)   !HID_USAGE_IS_VAR(usate)
-#define HID_USAGE_IS_REL(usage)     ((usage)->data_flag & 4)
-#define HID_USAGE_IS_ABS(usage)     !HID_USAGE_IS_REL(usage)
+#define HID_USAGE_IS_CONST(__usage) ((__usage)->data_flag & 1)
+#define HID_USAGE_IS_DATA(__usage)  !HID_USAGE_IS_CONST(__usage)
+#define HID_USAGE_IS_VAR(__usage)   ((__usage)->data_flag & 2)
+#define HID_USAGE_IS_ARRAY(__usage) !HID_USAGE_IS_VAR(__usage)
+#define HID_USAGE_IS_REL(__usage)   ((__usage)->data_flag & 4)
+#define HID_USAGE_IS_ABS(__usage)   !HID_USAGE_IS_REL(__usage)
+
+#define HID_GET_GENERIC_USAGE(__id) ((__id >> 0) & 0xFFFF)
+#define HID_GET_USAGE_PAGE(__id)    ((__id >> 16) & 0xFFFF)
+#define HID_GET_USAGE_ID(__id)      ((__id >> 32) & 0xFFFF)
 
 /*============================ TYPES =========================================*/
+
+enum {
+    VSF_INPUT_TYPE_HID = VSF_INPUT_USER_TYPE,
+};
 
 struct vsf_hid_usage_t {
     implement_ex(vsf_slist_node_t, usage_node)
@@ -89,10 +99,7 @@ struct vsf_hid_usage_t {
 typedef struct vsf_hid_usage_t vsf_hid_usage_t;
 
 struct vsf_hid_event_t {
-    uint16_t usage_page;
-    uint16_t usage_id;
-    int32_t pre_value;
-    int32_t cur_value;
+    implement(vsf_input_evt_t)
     vsf_hid_usage_t *usage;
 };
 typedef struct vsf_hid_event_t vsf_hid_event_t;
@@ -112,6 +119,7 @@ typedef struct vsf_hid_report_t vsf_hid_report_t;
 
 struct vsf_input_hid_t {
     vsf_slist_t report_list;
+    vsf_input_timestamp_t timestamp;
     bool report_has_id;
 };
 typedef struct vsf_input_hid_t vsf_input_hid_t;

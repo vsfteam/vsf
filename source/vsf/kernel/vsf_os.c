@@ -249,7 +249,7 @@ void __vsf_main_entry(void)
     vsf_evtq_t *pevtq = &__vsf_os.evt_queue[0];
     for (uint_fast8_t i = 0; i < VSF_OS_EVTQ_NUM; i++, pevtq++) {
 #ifdef VSF_CFG_EVTQ_ARRAY
-        pevtq->pnode = __vsf_os.nodes[i];
+        pevtq->node = __vsf_os.nodes[i];
         pevtq->bitsize = VSF_OS_EVTQ_BITSIZE;
 #endif
         vsf_evtq_init(pevtq);

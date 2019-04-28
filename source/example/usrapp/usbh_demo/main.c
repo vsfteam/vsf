@@ -85,6 +85,13 @@ struct usrapp_t {
             }stream[2];
 #endif
         } cdc;
+/*
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+        struct {
+            vsf_stream_t stream;      
+        }debug;
+#endif
+*/
         vsf_usbd_ifs_t ifs[4]; 
         vsf_usbd_cfg_t config[1];
         vsf_usbd_dev_t dev;
@@ -599,7 +606,7 @@ implement_vsf_thread(user_task_t)
         
 #if VSF_USE_TRACE == ENABLED
         vsf_delay(500);
-        //vsf_trace(VSF_TRACE_INFO, "test info [%d]" VSF_TRACE_CFG_LINEEND, count++);
+        vsf_trace(VSF_TRACE_INFO, "test info [%d]" VSF_TRACE_CFG_LINEEND, count++);
 #endif
     }
 }
@@ -696,12 +703,9 @@ int main(void)
 #endif
 
 #if VSF_USE_TRACE == ENABLED
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx.use_as__vsf_stream_t);
-#elif VSF_USE_SERVICE_STREAM == ENABLED
-    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx.TX);
+    vsf_trace_init(NULL);
 #endif
-#endif
+    
 
 #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
     do {

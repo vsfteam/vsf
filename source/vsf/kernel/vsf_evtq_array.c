@@ -34,15 +34,15 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
 extern vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq);
+
+SECTION(".text.vsf.kernel.eda")
 extern void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt);
-extern vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *pobj, vsf_priority_t priority);
 
 extern vsf_evtq_t *__vsf_os_evtq_get(vsf_priority_t priority);
-extern vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_priority_t priority);
 extern vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis);
 extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis);
-extern vsf_priority_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis);
 
 /*============================ IMPLEMENTATION ================================*/
 

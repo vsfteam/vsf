@@ -117,3 +117,28 @@ vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre
     }
     return NULL;
 }
+
+WEAK void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt)
+{
+    vsf_input_on_evt(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vsf_input_evt_t);
+}
+
+WEAK void vsf_input_on_new_dev(vsf_input_type_t type, void *dev)
+{
+}
+
+WEAK void vsf_input_on_free_dev(vsf_input_type_t type, void *dev)
+{
+}
+
+WEAK void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt)
+{
+}
+
+uint_fast32_t vsf_input_update_timestamp(vsf_input_timestamp_t *timestamp)
+{
+    vsf_input_timestamp_t cur = vsf_timer_get_tick();
+    uint_fast32_t duration = *timestamp > 0 ? vsf_timer_get_duration(*timestamp, cur) : 0;
+    *timestamp = cur;
+    return duration;
+}

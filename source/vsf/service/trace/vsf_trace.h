@@ -28,7 +28,8 @@
 #endif
 
 #if VSF_USE_TRACE == ENABLED
-#include <stdarg.h>
+#   include <stdarg.h>
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -55,7 +56,16 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
 #define vsf_trace_print_mem(...)    vsf_trace_buffer(__VA_ARGS__)
+
+#if VSF_USE_TRACE == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#       define vsf_trace_init(__ADDR)  __vsf_trace_init((vsf_stream_t *)(__ADDR))
+#   elif VSF_USE_SERVICE_STREAM == ENABLED
+#       define vsf_trace_init(__ADDR)  __vsf_trace_init((vsf_stream_tx_t *)(__ADDR))
+#   endif
+#endif
 
 /*============================ TYPES =========================================*/
 
@@ -72,10 +82,12 @@ typedef enum vsf_trace_level_t vsf_trace_level_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#if VSF_USE_TRACE == ENABLED
+
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-extern void vsf_trace_init(vsf_stream_t *stream);
+extern void __vsf_trace_init(vsf_stream_t *stream);
 #elif VSF_USE_SERVICE_STREAM == ENABLED
-extern void vsf_trace_init(vsf_stream_tx_t *ptTX);
+extern void __vsf_trace_init(vsf_stream_tx_t *ptTX);
 #endif
 extern void vsf_trace_fini(void);
 
@@ -97,6 +109,7 @@ extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 //#   define vsf_trace_printb(...)
 #   define vsf_trace(...)
 #   define vsf_trace_buffer(...)
+#   define vsf_trace_string(...)
 #endif
 
 

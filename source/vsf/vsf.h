@@ -29,7 +29,7 @@
 #include "kernel/vsf_kernel.h"
 
 #include "component/input/vsf_input.h"
-#include "component/input/hid/vsf_hid.h"
+#include "component/input/hid/vsf_input_hid.h"
 
 #include "component/usb/host/vsf_usbh.h"
 #include "component/usb/host/hcd/ohci/vsf_ohci.h"

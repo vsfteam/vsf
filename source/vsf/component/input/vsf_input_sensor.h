@@ -15,44 +15,77 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
+
+
+#ifndef __VSF_INPUT_SENSOR_H__
+#define __VSF_INPUT_SENSOR_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+#include "./vsf_input_cfg.h"
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED || VSF_USE_SERVICE_STREAM == ENABLED
-#include "service/vsf_service.h"
-#endif
-
-#undef VSF_DRIVER_HEADER
-
-#if     defined(__M484__)
-#   define  VSF_DRIVER_HEADER       "./M480/M484/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_DRIVER_HEADER
+#include "./vsf_input_get_type.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_SENSOR(__id, __subid, __bitlen)                                     \
+            {                                                                   \
+                .id     = (__id),                                               \
+                .subid  = (__subid),                                            \
+                .bitlen = (__bitlen),                                           \
+            }
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+enum {
+    VSF_INPUT_TYPE_SENSOR = VSF_INPUT_USER_TYPE,
+};
+
+enum vsf_sensor_id_t {
+    SENSOR_ID_ACC,
+    SENSOR_ID_GYRO,
+    SENSOR_ID_MAG,
+
+    SENSOR_ID_USER,
+};
+typedef enum vsf_sensor_id_t vsf_sensor_id_t;
+
+enum vsf_sensor_subid_t {
+    SENSOR_SUBID_X,
+    SENSOR_SUBID_Y,
+    SENSOR_SUBID_Z,
+
+    SENSOR_SUBID_PITCH,
+    SENSOR_SUBID_YAW,
+    SENSOR_SUBID_ROLL,
+
+    SENSOR_SUBID_USER,
+};
+typedef enum vsf_sensor_subid_t vsf_sensor_subid_t;
+
+struct vsf_sensor_item_info_t {
+    vsf_sensor_id_t id;
+    vsf_sensor_subid_t subid;
+    uint8_t bitlen;
+};
+typedef struct vsf_sensor_item_info_t vsf_sensor_item_info_t;
+
+struct vsf_sensor_desc_t {
+    uint8_t item_num;
+    vsf_sensor_item_info_t *item_info;
+};
+typedef struct vsf_sensor_desc_t vsf_sensor_desc_t;
+
+struct vsf_sensor_evt_t {
+    implement(vsf_input_evt_t)
+    vsf_sensor_desc_t desc;
+    void *data;
+};
+typedef struct vsf_sensor_evt_t vsf_sensor_evt_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#define VSF_DEBUG_STREAM_TX     VSF_DEBUG_STREAM
-#define VSF_DEBUG_STREAM_RX     VSF_DEBUG_STREAM
-
-extern vsf_stream_t  VSF_DEBUG_STREAM;
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
-extern const vsf_stream_tx_t VSF_DEBUG_STREAM_TX;
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
 
 #endif
 /* EOF */

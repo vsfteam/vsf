@@ -7493,10 +7493,10 @@
                 <group>
                     <name>hid</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\hid\vsf_hid.c</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\hid\vsf_input_hid.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\hid\vsf_hid.h</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\hid\vsf_input_hid.h</name>
                     </file>
                 </group>
                 <file>

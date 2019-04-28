@@ -210,9 +210,7 @@ vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *ptObj,
     }
 
     //! write stream
-    this.ptTX->piMethod->Send(this.ptTX, ptOldBlock);
-    
-    return VSF_ERR_NONE;
+    return this.ptTX->piMethod->Send(this.ptTX, ptOldBlock);
 }
 
 /*----------------------------------------------------------------------------*

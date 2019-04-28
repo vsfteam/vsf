@@ -63,14 +63,13 @@ struct usrapp_t {
             vsfip_dhcpd_t dhcpd;
         };
     } tcpip;
-
+/*
     struct {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         vsf_stream_t stream;
-#elif VSF_USE_SERVICE_STREAM == ENABLED
 #endif
     } debug;
-
+*/
     struct {
         struct {
             vsf_usbd_CDCACM_t param[2];
@@ -366,11 +365,11 @@ static usrapp_t usrapp = {
         .bthci.drv              = &vsf_usbh_bthci_drv,
         .hid.drv                = &vsf_usbh_hid_drv,
     },
-
+/*
     .debug.stream               = {
         .op                     = &vsf_nu_console_stream_op,
     },
-
+*/
     .usbd                       = {
         .cdc.param[0]           = {
             .ep = {
@@ -546,11 +545,12 @@ vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
     return VSF_ERR_FAIL;
 }
 
-void vsf_hid_report(uint_fast16_t generic_usage, vsf_hid_event_t *event)
+void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
 {
-    if (event != NULL) {
+    if (hid_evt->id != 0) {
         vsf_trace(VSF_TRACE_DEBUG, "hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
-            generic_usage, event->usage_page, event->usage_id, event->pre_value, event->cur_value);
+            HID_GET_GENERIC_USAGE(hid_evt->id), HID_GET_USAGE_PAGE(hid_evt->id),
+            HID_GET_USAGE_ID(hid_evt->id), hid_evt->pre, hid_evt->cur);
     }
 }
 
@@ -559,8 +559,8 @@ int main(void)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 //    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx.use_as__vsf_stream_t);
 
-    vsf_stream_init(&usrapp.debug.stream);
-    vsf_trace_init(&usrapp.debug.stream);
+    //vsf_stream_init(&usrapp.debug.stream);
+    vsf_trace_init(NULL);
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 #endif
 
