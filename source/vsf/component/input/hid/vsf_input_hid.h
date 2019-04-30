@@ -72,9 +72,9 @@
 #define HID_USAGE_IS_REL(__usage)   ((__usage)->data_flag & 4)
 #define HID_USAGE_IS_ABS(__usage)   !HID_USAGE_IS_REL(__usage)
 
-#define HID_GET_GENERIC_USAGE(__id) ((__id >> 0) & 0xFFFF)
-#define HID_GET_USAGE_PAGE(__id)    ((__id >> 16) & 0xFFFF)
-#define HID_GET_USAGE_ID(__id)      ((__id >> 32) & 0xFFFF)
+#define HID_GET_GENERIC_USAGE(__id) (((__id) >> 0) & 0xFFFF)
+#define HID_GET_USAGE_PAGE(__id)    (((__id) >> 16) & 0xFFFF)
+#define HID_GET_USAGE_ID(__id)      (((__id) >> 32) & 0xFFFF)
 
 /*============================ TYPES =========================================*/
 

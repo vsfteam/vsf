@@ -183,10 +183,9 @@ vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb
 
 void vsf_usbh_free_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb)
 {
-    ASSERT(     (usbh != NULL) && (urb != NULL)
-            &&  (urb->urb_hcd != NULL));
+    ASSERT((usbh != NULL) && (urb != NULL));
 
-    if (!urb->pipe.is_pipe) {
+    if (vsf_usbh_urb_is_alloced(urb)) {
         vsf_usbh_eppipe_t pipe = urb->urb_hcd->pipe;
         vsf_usbh_urb_free_buffer(urb);
         usbh->drv->free_urb(&usbh->use_as__vsf_usbh_hcd_t, urb->urb_hcd);
