@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HID == ENABLED
 
 #if     defined(VSF_USBH_HID_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -123,5 +123,5 @@ extern vsf_err_t __vsf_usbh_hid_set_idle_imp(vsf_usbh_hid_base_t *hid, uint_fast
 #undef VSF_USBH_HID_IMPLEMENT
 #undef VSF_USBH_HID_IMHERIT
 
-#endif      // VSF_USE_USB_HOST
+#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_HID
 #endif      // __VSF_USBH_HID_H__

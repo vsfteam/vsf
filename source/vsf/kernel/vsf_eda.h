@@ -81,6 +81,8 @@
 
 /*============================ TYPES =========================================*/
 
+typedef vsf_sys_tmr_cnt_t     vsf_timer_type_t;
+
 enum {
     VSF_EVT_INVALID = -1,               //!< compatible with fsm_rt_err
     VSF_EVT_CPL = 0,                    //!< compatible with fsm_rt_cpl
@@ -198,7 +200,7 @@ def_simple_class(vsf_teda_t) {
     )
     private_member(
         vsf_dlist_node_t    timer_node;
-        uint32_t            due;
+        vsf_timer_type_t    due;
     )
 }ALIGN(4);
 //! @}
@@ -213,7 +215,7 @@ def_simple_class(vsf_callback_timer_t) {
     )
     private_member(
         vsf_dlist_node_t timer_node;
-        uint32_t due;
+        vsf_timer_type_t due;
     )
 }ALIGN(4);
 //! @}
@@ -391,13 +393,13 @@ typedef struct vsf_bmpevt_adapter_bmpevt_t vsf_bmpevt_adapter_bmpevt_t;
 
 #if VSF_CFG_TIMER_EN == ENABLED
 SECTION(".text.vsf.kernel.teda")
-extern uint_fast32_t vsf_timer_get_tick(void);
+extern vsf_timer_type_t vsf_timer_get_tick(void);
 
 SECTION(".text.vsf.kernel.vsf_timer_get_duration")
-extern uint_fast32_t vsf_timer_get_duration(uint_fast32_t from_time, uint_fast32_t to_time);
+extern uint_fast32_t vsf_timer_get_duration(vsf_timer_type_t from_time, vsf_timer_type_t to_time);
 
 SECTION(".text.vsf.kernel.vsf_timer_get_elapsed")
-extern uint_fast32_t vsf_timer_get_elapsed(uint_fast32_t from_time);
+extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_type_t from_time);
 
 #endif
 SECTION(".text.vsf.kernel.eda")

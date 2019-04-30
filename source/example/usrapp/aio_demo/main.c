@@ -545,6 +545,27 @@ vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
     return VSF_ERR_FAIL;
 }
 
+#if 1
+void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
+{
+    switch (type) {
+    case VSF_INPUT_TYPE_HID:
+        if (event != NULL) {
+            vsf_hid_event_t *hid_evt = (vsf_hid_event_t *)event;
+            if (hid_evt->id != 0) {
+                vsf_trace(VSF_TRACE_DEBUG, "hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
+                    HID_GET_GENERIC_USAGE(hid_evt->id), HID_GET_USAGE_PAGE(hid_evt->id),
+                    HID_GET_USAGE_ID(hid_evt->id), hid_evt->pre, hid_evt->cur);
+            }
+        }
+        break;
+    case VSF_INPUT_TYPE_SENSOR:
+        break;
+    default:
+        break;
+    }
+}
+#else
 void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
 {
     if (hid_evt->id != 0) {
@@ -553,6 +574,7 @@ void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
             HID_GET_USAGE_ID(hid_evt->id), hid_evt->pre, hid_evt->cur);
     }
 }
+#endif
 
 int main(void)
 {

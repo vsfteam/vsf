@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_CDC == ENABLED
 
 #define VSF_USBH_IMPLEMENT_CLASS
 #define VSF_USBH_CDC_IMPLEMENT

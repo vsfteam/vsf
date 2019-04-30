@@ -197,6 +197,14 @@
 
 #endif
 
+#if defined(VSF_USBD_IMPLEMENT) || defined(VSF_USBD_INHERIT)
+#   if VSF_USBD_CFG_USE_EDA == ENABLED
+#       define vsf_usbd_class_priority                  vsf_priority_inherit
+#   else
+#       define vsf_usbd_class_priority                  vsf_priority_0
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

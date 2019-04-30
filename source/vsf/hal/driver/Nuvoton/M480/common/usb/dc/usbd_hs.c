@@ -146,6 +146,7 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
         reg->OPER = HSUSBD_OPER_HISPDEN_Msk;
         break;
     default:
+        ASSERT(false);
         return VSF_ERR_NOT_SUPPORT;
     }
 

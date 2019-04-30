@@ -33,6 +33,9 @@ struct __vsf_cm_t {
         bool sw_pending_bit;
 #endif
     } pendsv;
+    struct {
+        vsf_sys_tmr_cnt_t tick;
+    } systimer;
 };
 typedef struct __vsf_cm_t __vsf_cm_t;
 
@@ -55,6 +58,7 @@ WEAK bool on_arch_systimer_tick_evt(void)
 
 ROOT void SysTick_Handler(void)
 {
+    __vsf_cm.systimer.tick++;
     if (on_arch_systimer_tick_evt()) {
         vsf_systimer_evthandler();
     }
@@ -86,6 +90,15 @@ vsf_err_t vsf_systimer_init(uint32_t frequency)
     );
 
     return VSF_ERR_NONE;
+}
+
+void vsf_systimer_set(vsf_sys_tmr_cnt_t due)
+{
+}
+
+vsf_sys_tmr_cnt_t vsf_systimer_get(void)
+{
+    return __vsf_cm.systimer.tick;
 }
 
 WEAK vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
@@ -158,11 +171,11 @@ istate_t vsf_set_base_priority(istate_t priority)
     
     istate_t origlevel = __basepri;
     __SAFE_ATOM_CODE(
-        if (priority == VSF_ARCH_PRIO_0) {
+        if (priority <= VSF_ARCH_PRIO_0) {
             //! lock sched
             __vsf_cm.pendsv.enabled = false;
             __vsf_cm.pendsv.sw_pending_bit = 0;
-        } else if (0x100 == priority) {
+        } else /*if (0x100 == priority)*/ {
             //! unload sched
             __vsf_cm.pendsv.enabled = true;
             if (__vsf_cm.pendsv.sw_pending_bit) {

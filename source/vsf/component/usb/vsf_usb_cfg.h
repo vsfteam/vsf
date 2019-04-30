@@ -30,6 +30,11 @@
 #   define VSF_USBD_CFG_STREAM_EN       ENABLED
 #endif
 
+#if VSF_USE_USB_HOST_ECM == ENABLED
+#   undef VSF_USE_USB_HOST_CDC
+#   define VSF_USE_USB_HOST_CDC         ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

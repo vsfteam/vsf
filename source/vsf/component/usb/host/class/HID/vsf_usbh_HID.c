@@ -69,8 +69,7 @@ static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         if (VSF_ERR_NONE != vsf_eda_crit_enter(&dev->ep0.crit, -1)) {
-            vsf_usbh_remove_interface(hid->usbh, dev, hid->ifs);
-            return;
+            break;
         }
         // fall through
     case VSF_EVT_SYNC:
@@ -353,4 +352,4 @@ const vsf_usbh_class_drv_t vsf_usbh_hid_drv = {
     .disconnect = vsf_usbh_hid_input_disconnect,
 };
 
-#endif      // VSF_USE_USB_HOST
+#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_HID

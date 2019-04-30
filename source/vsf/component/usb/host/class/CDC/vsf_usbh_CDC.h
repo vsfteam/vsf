@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_CDC == ENABLED
 
 #include "../../../common/class/CDC/vsf_usb_CDC.h"
 
@@ -89,5 +89,5 @@ extern vsf_err_t vsf_usbh_cdc_rx(vsf_usbh_cdc_t *pthis, vsf_mem_t *mem);
 #undef VSF_USBH_CDC_IMPLEMENT
 #undef VSF_USBH_CDC_IMHERIT
 
-#endif      // VSF_USE_USB_HOST
+#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_CDC
 #endif      // __VSF_USBH_CDC_H__

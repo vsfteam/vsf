@@ -111,11 +111,6 @@ static vsf_dlist_t * __vsf_heap_get_freelist(uint_fast32_t size)
 	return vsf_heap_get_freelist(&__vsf_heap.freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
 }
 
-void vsf_heap_init(void)
-{
-    memset(&__vsf_heap, 0, sizeof(__vsf_heap));
-}
-
 static void __vsf_heap_mcb_init(__vsf_heap_mcb_t *mcb)
 {
     memset(mcb, 0, sizeof(*mcb));
@@ -131,38 +126,6 @@ static uint_fast32_t __vsf_heap_calc_unaligned_size(void *buffer, uint_fast32_t 
         unaligned_size = alignment - unaligned_size;
     }
     return unaligned_size;
-}
-
-void vsf_heap_add(uint8_t *heap, uint_fast32_t size)
-{
-    uint_fast32_t unaligned_size;
-    uint_fast32_t offset;
-    __vsf_heap_mcb_t *mcb;
-
-    ASSERT(heap != NULL);
-
-    unaligned_size = __vsf_heap_calc_unaligned_size(heap, VSF_HEAP_CFG_MCB_ALIGN);
-    heap += unaligned_size;
-    size = (size - unaligned_size) & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
-    offset = (size - sizeof(__vsf_heap_mcb_t))  & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
-
-    ASSERT(     !(size >> (VSF_HEAP_CFG_MCB_ALIGN_BIT + 16))
-            &&  (size > 2 * sizeof(__vsf_heap_mcb_t)));
-
-    mcb = (__vsf_heap_mcb_t *)((uint8_t *)heap + offset);
-    offset >>= VSF_HEAP_CFG_MCB_ALIGN_BIT;
-    __vsf_heap_mcb_init(mcb);
-    mcb->linear.prev = offset;
-
-    mcb = (__vsf_heap_mcb_t *)heap;
-    __vsf_heap_mcb_init(mcb);
-    mcb->linear.next = offset;
-
-    vsf_protect_t state = vsf_heap_protect();
-        vsf_dlist_add_to_tail(  __vsf_heap_mcb_t, list,
-                                __vsf_heap_get_freelist(offset),
-                                mcb);
-    vsf_heap_unprotect(state);
 }
 
 static void __vsf_heap_mcb_set_next(__vsf_heap_mcb_t *mcb, __vsf_heap_mcb_t *mcb_next)
@@ -233,24 +196,24 @@ static void * __vsf_heap_mcb_malloc(__vsf_heap_mcb_t *mcb, uint_fast32_t size,
 #if VSF_HEAP_CFG_MCB_MAGIC_ENABLED == ENABLED
     ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
-    uint_fast32_t mcb_size = __vsf_mcb_get_size(mcb);
+    uint_fast32_t buffer_size = __vsf_mcb_get_size(mcb);
     uint8_t *buffer = (uint8_t *)&mcb[1];
     uint_fast32_t unaligned_size;
 
-    mcb_size -= sizeof(__vsf_heap_mcb_t);
+    buffer_size -= sizeof(__vsf_heap_mcb_t);
     if (alignment) {
         unaligned_size = __vsf_heap_calc_unaligned_size(buffer, alignment);
         if (unaligned_size) {
         fix_alignment:
-            if (mcb_size < unaligned_size) {
+            if (buffer_size < unaligned_size) {
                 return NULL;
             }
             buffer += unaligned_size;
-            mcb_size -= unaligned_size;
+            buffer_size -= unaligned_size;
         }
     }
 
-    if (mcb_size >= size) {
+    if (buffer_size >= size) {
         __vsf_heap_mcb_t *mcb_new;
         uint_fast32_t margin_size, temp_size;
 
@@ -273,15 +236,15 @@ static void * __vsf_heap_mcb_malloc(__vsf_heap_mcb_t *mcb, uint_fast32_t size,
         __vsf_heap_mcb_init(mcb_new);
         mcb_new->linear.prev = temp_size;
         mcb_new->linear.next =
-            ((buffer - (uint8_t *)mcb_new) + mcb_size) >> VSF_HEAP_CFG_MCB_ALIGN_BIT;
+            ((buffer - (uint8_t *)mcb_new) + buffer_size) >> VSF_HEAP_CFG_MCB_ALIGN_BIT;
         mcb = __vsf_heap_mcb_get_next(mcb_new);
         mcb->linear.prev = mcb_new->linear.next;
 
-        margin_size = mcb_size - size;
-        if (margin_size > sizeof(__vsf_heap_mcb_t)) {
-            uint_fast32_t addr = (uint_fast32_t)buffer + size;
-            addr += VSF_HEAP_CFG_MCB_ALIGN - 1;
-            addr &= ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
+        uint_fast32_t addr = (uint_fast32_t)buffer + size;
+        addr += VSF_HEAP_CFG_MCB_ALIGN - 1;
+        addr &= ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
+        margin_size = buffer_size - (addr - (uint_fast32_t)buffer);
+        if(margin_size > sizeof(__vsf_heap_mcb_t)) {
             mcb = (__vsf_heap_mcb_t *)addr;
             __vsf_heap_mcb_init(mcb);
 
@@ -363,6 +326,44 @@ static void * __vsf_heap_freelist_malloc(vsf_dlist_t *plist, uint_fast32_t size,
         }
     vsf_heap_unprotect(state);
     return buffer;
+}
+
+void vsf_heap_init(void)
+{
+    memset(&__vsf_heap, 0, sizeof(__vsf_heap));
+}
+
+void vsf_heap_add(uint8_t *heap, uint_fast32_t size)
+{
+    uint_fast32_t unaligned_size;
+    uint_fast32_t offset;
+    __vsf_heap_mcb_t *mcb;
+
+    ASSERT(heap != NULL);
+
+    unaligned_size = __vsf_heap_calc_unaligned_size(heap, VSF_HEAP_CFG_MCB_ALIGN);
+    heap += unaligned_size;
+    size = (size - unaligned_size) & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
+    offset = (size - sizeof(__vsf_heap_mcb_t)) & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
+
+    ASSERT(     !(size >> (VSF_HEAP_CFG_MCB_ALIGN_BIT + 16))
+            &&  (size > 2 * sizeof(__vsf_heap_mcb_t)));
+
+    mcb = (__vsf_heap_mcb_t *)((uint8_t *)heap + offset);
+    offset >>= VSF_HEAP_CFG_MCB_ALIGN_BIT;
+    __vsf_heap_mcb_init(mcb);
+    mcb->linear.prev = offset;
+
+    mcb = (__vsf_heap_mcb_t *)heap;
+    __vsf_heap_mcb_init(mcb);
+    mcb->linear.next = offset;
+
+    vsf_protect_t state = vsf_heap_protect();
+        offset <<= VSF_HEAP_CFG_MCB_ALIGN_BIT;
+        vsf_dlist_add_to_tail(  __vsf_heap_mcb_t, list,
+                                __vsf_heap_get_freelist(offset),
+                                mcb);
+    vsf_heap_unprotect(state);
 }
 
 void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)

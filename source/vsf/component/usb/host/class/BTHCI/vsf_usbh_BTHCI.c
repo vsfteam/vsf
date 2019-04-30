@@ -401,4 +401,4 @@ vsf_err_t vsf_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t
     return vsf_usbh_submit_urb_ex(usbh, urb, flags, &bthci->eda);
 }
 
-#endif      // VSF_USE_USB_HOST
+#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_BTHCI

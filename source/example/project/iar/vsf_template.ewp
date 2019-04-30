@@ -8300,6 +8300,12 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_os.h</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_timq.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_timq_dlist.h</name>
+            </file>
         </group>
         <group>
             <name>service</name>

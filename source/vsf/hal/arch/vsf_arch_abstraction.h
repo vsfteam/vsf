@@ -50,6 +50,8 @@ typedef void vsf_swi_hanler_t(void *p);
  *! \return initialization result in vsf_err_t 
  */
 extern vsf_err_t vsf_systimer_init(uint32_t frequency);
+extern vsf_sys_tmr_cnt_t vsf_systimer_get(void);
+extern void vsf_systimer_set(vsf_sys_tmr_cnt_t tick);
 
 /*! \brief initialise a software interrupt
  *! \param idx the index of the software interrupt
