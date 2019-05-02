@@ -1104,15 +1104,15 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
         switch (ohci->state) {
         case OHCI_HCD_STATE_INIT:
             if (regs->cmdstatus & OHCI_HCR) {
-                vsf_teda_set_timer(1);
+                vsf_teda_set_timer_ms(1);
             } else {
                 ohci->hc_control = OHCI_USB_RESET;
-                vsf_teda_set_timer(100);
+                vsf_teda_set_timer_ms(100);
                 ohci->state++;
             }
             break;
         case OHCI_HCD_STATE_DELAY:
-            vsf_teda_set_timer(ohci_start(ohci));
+            vsf_teda_set_timer_ms(ohci_start(ohci));
             ohci->state++;
             break;
         case OHCI_HCD_STATE_READY:

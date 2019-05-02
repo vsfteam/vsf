@@ -161,7 +161,7 @@ implement_fsm(user_task_b_t)
         
         state(DELAY){
             vsf_task_wait_until(
-                vsf_delay(10000){                                               //!< wait 10s
+                vsf_delay_ms(10000){                                            //!< wait 10s
                     vsf_sem_post(this.psem);                                    //!< post a semaphore
                     reset_fsm();                                                //!< reset fsm
                 }
@@ -202,7 +202,7 @@ int main(void)
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay(10000);
+        vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
 #else

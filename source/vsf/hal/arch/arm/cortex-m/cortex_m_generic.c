@@ -34,7 +34,10 @@ struct __vsf_cm_t {
 #endif
     } pendsv;
     struct {
-        vsf_sys_tmr_cnt_t tick;
+        vsf_systimer_cnt_t tick;
+        vsf_systimer_cnt_t unit;
+        vsf_systimer_cnt_t max_tick_per_round;
+        uint32_t           tick_freq;
     } systimer;
 };
 typedef struct __vsf_cm_t __vsf_cm_t;
@@ -42,25 +45,50 @@ typedef struct __vsf_cm_t __vsf_cm_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __vsf_cm_t __vsf_cm;
-
-
+NO_INIT static __vsf_cm_t __vsf_cm;
 
 /*============================ PROTOTYPES ====================================*/
-extern void vsf_systimer_evthandler(void);
+extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK bool on_arch_systimer_tick_evt(void)
+WEAK bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
 {
+    UNUSED_PARAM(tick);
     return true;
+}
+
+static vsf_systimer_cnt_t __vsf_systimer_update(void)
+{
+    vsf_systimer_cnt_t tick;
+   
+    tick = vsf_systimer_get();
+    __vsf_cm.systimer.tick = tick;
+    return tick;
+}
+
+static void __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
+{
+    ASSERT(0 != tick_cnt);
+    vsf_systick_set_reload(tick_cnt * __vsf_cm.systimer.unit);
+    vsf_systick_clear_count();  //! force a reload
+    vsf_systick_enable();       //! clear systick flag
+}
+
+WEAK void vsf_systimer_set_idle(void)
+{   
+    __SAFE_ATOM_CODE(
+        __vsf_systimer_update();
+        __vsf_systimer_set_target(__vsf_cm.systimer.max_tick_per_round);
+    )
 }
 
 ROOT void SysTick_Handler(void)
 {
-    __vsf_cm.systimer.tick++;
-    if (on_arch_systimer_tick_evt()) {
-        vsf_systimer_evthandler();
+    __vsf_systimer_update();
+    vsf_systimer_cnt_t tick = __vsf_cm.systimer.tick;
+    if (on_arch_systimer_tick_evt(tick)) {
+        vsf_systimer_evthandler(tick);
     }
 }
 
@@ -71,35 +99,92 @@ ROOT void PendSV_Handler(void)
     }
 }
 
-WEAK uint32_t vsf_arch_req___sys_freq___from_usr(void)
+WEAK uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
     return VSF_GET_MAIN_CLK();
 }
 
 /*! \brief initialise SysTick to generate a system timer
- *! \param frequency the target frequency in Hz
+ *! \param frequency the target tick frequency in Hz
  *! \return initialization result in vsf_err_t 
  */
-vsf_err_t vsf_systimer_init(uint32_t frequency)
+WEAK vsf_err_t vsf_systimer_init(uint32_t tick_res)
 {
+    memset(&__vsf_cm, 0, sizeof(__vsf_cm));
+
+    //! calculate the cycle count of 1 tick
+    __vsf_cm.systimer.unit = vsf_arch_req___systimer_freq___from_usr() / tick_res;
+    __vsf_cm.systimer.tick_freq = tick_res;
+    __vsf_cm.systimer.max_tick_per_round = (0x01000000ul / __vsf_cm.systimer.unit) - 1;
+    
     vsf_systick_cfg (
         ENABLE_SYSTICK              |
         SYSTICK_SOURCE_SYSCLK       |
         ENABLE_SYSTICK_INTERRUPT,
-        (vsf_arch_req___sys_freq___from_usr() / frequency)
+        __vsf_cm.systimer.max_tick_per_round * __vsf_cm.systimer.unit
     );
 
     return VSF_ERR_NONE;
 }
 
-void vsf_systimer_set(vsf_sys_tmr_cnt_t due)
+
+WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
 {
+    vsf_systimer_cnt_t ticks;
+    SAFE_ATOM_CODE(){
+        ticks = (SYSTICK_RVR - vsf_systick_get_count());
+        if (vsf_systick_is_match()) {
+            ticks += SYSTICK_RVR;
+        }
+        ticks /= __vsf_cm.systimer.unit;
+        ticks += __vsf_cm.systimer.tick;
+    }
+    return ticks;
 }
 
-vsf_sys_tmr_cnt_t vsf_systimer_get(void)
+WEAK void vsf_systimer_set(vsf_systimer_cnt_t due)
 {
-    return __vsf_cm.systimer.tick;
+    //vsf_systimer_cnt_t unit = __vsf_cm.systimer.unit;
+    vsf_systimer_cnt_t max_tick_per_round = __vsf_cm.systimer.max_tick_per_round;
+
+    SAFE_ATOM_CODE(){
+        vsf_systimer_cnt_t current = __vsf_systimer_update();
+        vsf_systick_disable();
+        vsf_systimer_cnt_t tick_cnt;
+        /*
+        if (due < current) {
+            tick_cnt = 0xFFFFFFFF - current + due + 1;
+        } else {
+            tick_cnt = due - current;
+        }
+        */
+        tick_cnt = due - current;
+        tick_cnt = min(max_tick_per_round, tick_cnt);
+        __vsf_systimer_set_target(tick_cnt);
+    }
 }
+
+WEAK bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+{
+    return (__vsf_cm.systimer.tick >= due);
+}
+
+
+
+WEAK vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+{
+    return ((uint64_t)  ((uint64_t)time_us 
+                            * (uint64_t)__vsf_cm.systimer.tick_freq) 
+                        / 1000000ul);
+}
+
+WEAK vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+{
+    return ((uint64_t)  ((uint64_t)time_ms 
+                            * (uint64_t)__vsf_cm.systimer.tick_freq) 
+                        / 1000ul);
+}
+
 
 WEAK vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
         vsf_swi_hanler_t *handler, void *pparam) { return VSF_ERR_FAIL; }

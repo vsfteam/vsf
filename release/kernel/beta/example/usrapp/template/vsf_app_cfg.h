@@ -25,7 +25,7 @@
 /*============================ MACROS ========================================*/
 
 //#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define ASSERT(...)
 
 
 
@@ -36,11 +36,13 @@
 //! \name kernel resource configuration
 //! @{
 
-//  <o>System Frequency                     <32768-0xFFFFFFFF>
+//  <o>System Frequency (Hz)                     <32768-0xFFFFFFFF>
 //  <i>Please specify the system frequency here.
-#define SYSTEM_FREQ                         25000000
+#define SYSTEM_FREQ                         25000000ul
 
-
+//  <o>System Timer Frequency (Hz)/ Tick Resolution         <32768-0xFFFFFFFF>
+//  <i>Please specify the system timer frequency here. The frequency determins the period of 1 systmer timer tick. For example, 1000 means tick resolution is 1ms. 1000000 means tick resolution is us.
+#define VSF_SYSTIMER_RESOLUTION             1000000ul
 //  <h> Kernel Resource Configuration
 
 //      <h> Kernal event-driven system configuration

@@ -213,7 +213,7 @@ static implement_vsf_task(timer_example_t)
             }
         }
     case VSF_EVT_INIT:
-        vsf_teda_set_timer(delay);
+        vsf_teda_set_timer_ms(delay);
         break;
 	}
 
@@ -255,7 +255,7 @@ implement_vsf_thread(user_task_t)
 
     while (1) {
 #if VSF_CFG_TIMER_EN
-        vsf_delay(1000);
+        vsf_delay_ms(1000);
 #endif
         printf("user_thread post user sem:\r\n");
 #if VSF_CFG_SYNC_EN
@@ -275,13 +275,13 @@ static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
     vsf_pt_begin();
     
     vsf_pt_wait_until(
-        wait_for_one(this.pgroup_evts, this.mask, -1){
+        wait_for_one(this.pgroup_evts, this.mask){
             printf("get sem in pt slave thread\r\n");
         } 
     );
 
     vsf_pt_wait_until(
-        vsf_sem_pend(&user_sem, 100){
+        vsf_sem_pend_timeout_ms(&user_sem, 2000){
             printf("get user sem in pt slave thread\r\n");
         }
         on_sem_timeout() {
@@ -308,13 +308,13 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
             }
     
         vsf_pt_wait_until(
-            wait_for_one(this.pgroup_evts, this.mask, -1){
+            wait_for_one(this.pgroup_evts, this.mask){
                 printf("get sem in pt master thread\r\n");
             }
         );
         
         vsf_pt_wait_until(
-            vsf_sem_pend(&user_sem, 100){
+            vsf_sem_pend_timeout_ms(&user_sem, 2000){
                 printf("get user sem in pt master thread\r\n");
             }
             on_sem_timeout() {
@@ -324,7 +324,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
         
         printf("delay start...\r\n");
         vsf_pt_wait_until(
-            vsf_delay(2000) {
+            vsf_delay_ms(2000) {
                 printf("delay completed...\r\n");
             }
         );
@@ -337,7 +337,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
 implement_vsf_task(bmevt_demo_t)
 {
     vsf_task_wait_until(
-        wait_for_one(&__user_grouped_evts, timer4_evt_msk, -1){
+        wait_for_one(&__user_grouped_evts, timer4_evt_msk){
             printf("get timer 4 in eda task\r\n");
             return fsm_rt_yield;         //! do this again
         }
@@ -369,8 +369,6 @@ int main(void)
     class_simple_demo_init(&class_simple_demo, 1, 2);
     class_simple_demo_get_param(&class_simple_demo);
     class_simple_demo_get_base_param(&class_simple_demo);
-
-
 
     extern void stdout_init(void);
     stdout_init();
@@ -442,8 +440,7 @@ int main(void)
 #if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
     while (1) {
         wait_for_all(   &__user_grouped_evts, 
-                        all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk,
-                        -1) {
+                        all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk) {
             //! when all the grouped events are set
             reset_grouped_evts( &__user_grouped_evts, 
                                 all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk);
@@ -453,7 +450,7 @@ int main(void)
             printf("\r\n============== barrier timeout ============: \r\n");
         }
 
-        vsf_delay(1000);
+        vsf_delay_ms(1000);
     }
 #endif
 

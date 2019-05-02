@@ -206,12 +206,15 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     USB_PORT_FEAT_POWER);
             break;
         case HUB_STAT_ENUM_WAIT_PORT_POWER_ON:
-            vsf_teda_set_timer(hub->desc_hub.bPwrOn2PwrGood * 2);
+            if (0 == hub->desc_hub.bPwrOn2PwrGood) {
+                hub->desc_hub.bPwrOn2PwrGood = 1;   // use a minimum delay
+            }
+            vsf_teda_set_timer_ms(hub->desc_hub.bPwrOn2PwrGood * 2);
             break;
         case HUB_STAT_RESET_CHILD_WAIT_PORT_RESET:
             // delay 20ms after port reset
         case HUB_STAT_RESET_CHILD_WAIT_PORT_CLEAR_RESET:
-            vsf_teda_set_timer(20);
+            vsf_teda_set_timer_ms(20);
             break;
         case HUB_STAT_RESET_CHILD_WAIT_GET_PORT_STATUS:
             // check port status after reset
@@ -220,7 +223,7 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 if (hub->is_child_connecting) {
                     // reset child while connecting
                     hub->state = HUB_STAT_CONNECT_WAIT_PORT_RESET_STABLE;
-                    vsf_teda_set_timer(200);
+                    vsf_teda_set_timer_ms(200);
                     retain_state = true;
                 } else {
                     // reset child while scanning
@@ -232,7 +235,7 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 
             } else {
                 // delay 200ms for next retry
-                vsf_teda_set_timer(200);
+                vsf_teda_set_timer_ms(200);
             }
             break;
         case HUB_STAT_SCAN_WAIT_GET_PORT_STATUS:
@@ -274,7 +277,7 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 } else {
                     // sleed 200ms for next scan round
                     hub->is_waiting_next_round = true;
-                    vsf_teda_set_timer(200);
+                    vsf_teda_set_timer_ms(200);
                 }
             }
             break;
@@ -300,9 +303,9 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 // child connected
                 hub->is_child_connecting = true;
                 if (hub->hub_portsts.wPortStatus & USB_PORT_STAT_LOW_SPEED) {
-                    vsf_teda_set_timer(200);
+                    vsf_teda_set_timer_ms(200);
                 } else {
-                    vsf_teda_set_timer(10);
+                    vsf_teda_set_timer_ms(10);
                 }
             }
             break;
@@ -361,7 +364,7 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case HUB_STAT_CONNECT_WAIT_PORT_RESET_STABLE:
             // wait for new_dev free
             if (hub->usbh->dev_new != NULL) {
-                vsf_teda_set_timer(200);
+                vsf_teda_set_timer_ms(200);
                 retain_state = true;
             } else {
                 vsf_usbh_dev_t *dev_new = vsf_usbh_alloc_device(hub->usbh);

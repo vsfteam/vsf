@@ -43,7 +43,12 @@
 
 
 #if VSF_CFG_TIMER_EN == ENABLED
-#   define vsf_delay(__MS)     if (VSF_EVT_TIMER == __vsf_delay(__MS))
+#   define vsf_delay(__TICK)                                                    \
+    if (VSF_EVT_TIMER == __vsf_delay(__TICK))
+#   define vsf_delay_ms(__MS)                                                   \
+    if (VSF_EVT_TIMER == __vsf_delay(vsf_systimer_ms_to_tick(__MS)))
+#   define vsf_delay_us(__US)                                                   \
+    if (VSF_EVT_TIMER == __vsf_delay(vsf_systimer_us_to_tick(__US)))
 #endif
 
 
@@ -54,11 +59,30 @@
             vsf_eda_sync_init((__psem), (__cnt), 0x7FFF | VSF_SYNC_AUTO_RST)
 #   define vsf_sem_post(__psem)            vsf_eda_sem_post((__psem))
             
-#   define vsf_sem_pend(__psem, __timeout)                                      \
+#   define vsf_sem_pend_timeout(__psem, __timeout)                              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_sem_pend((__psem),                           \
                     (__timeout)), reason == VSF_SYNC_GET))
+
+#   define vsf_sem_pend(__psem)                                                 \
+            for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
+                    reason == VSF_SYNC_CANCEL;)                                 \
+                if ((reason =__vsf_sem_pend((__psem),                           \
+                    (-1)), reason == VSF_SYNC_GET))
+                    
+#   define vsf_sem_pend_timeout_ms(__psem, __timeout)                           \
+            for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
+                    reason == VSF_SYNC_CANCEL;)                                 \
+                if ((reason =__vsf_sem_pend((__psem),                           \
+                    vsf_systimer_ms_to_tick(__timeout)), reason == VSF_SYNC_GET))
+
+#   define vsf_sem_pend_timeout_us(__psem, __timeout)                           \
+            for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
+                    reason == VSF_SYNC_CANCEL;)                                 \
+                if ((reason =__vsf_sem_pend((__psem),                           \
+                    vsf_systimer_us_to_tick(__timeout)), reason == VSF_SYNC_GET))
+
 #   define on_sem_timeout()                                                     \
                 else if (VSF_SYNC_TIMEOUT == reason)
 #endif

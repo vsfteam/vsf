@@ -463,7 +463,7 @@ static void vsfip_netif_arpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             goto failed;
         }
         // wait for reply with timeout
-        vsf_teda_set_timer(VSFIP_CFG_ARP_TIMEOUT);
+        vsf_teda_set_timer_ms(VSFIP_CFG_ARP_TIMEOUT);
         break;
     case VSF_EVT_TIMER:
     failed:

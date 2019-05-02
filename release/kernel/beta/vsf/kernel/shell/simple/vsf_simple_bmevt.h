@@ -101,7 +101,7 @@
         __grouped_evts_adapter(__NAME, (__INDEX))
 
 
-#   define wait_for_all(__group, __msk, __timeout)                              \
+#   define wait_for_all_timeout(__group, __msk, __timeout)                      \
             this.pender.mask = (__msk);                                         \
             this.pender.operator = VSF_BMPEVT_AND;                              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
@@ -110,8 +110,21 @@
                                                     (vsf_bmpevt_pender_t *)     \
                                                     &this.pender, (__timeout)), \
                                                     reason == VSF_SYNC_GET))
-   
-#   define wait_for_any(__group, __msk, __timeout)                              \
+
+#   define wait_for_all_timeout_ms(__group, __msk, __timeout)                   \
+            wait_for_all_timeout(   __group,                                    \
+                                    (__msk),                                    \
+                                    vsf_systimer_ms_to_tick(__timeout))
+
+#   define wait_for_all_timeout_us(__group, __msk, __timeout)                   \
+            wait_for_all_timeout(   __group,                                    \
+                                    (__msk),                                    \
+                                    vsf_systimer_us_to_tick(__timeout))
+
+#   define wait_for_all(__group, __msk)                                         \
+            wait_for_all_timeout( __group, (__msk), -1)
+
+#   define wait_for_any_timeout(__group, __msk, __timeout)                      \
             this.pender.mask = (__msk);                                         \
             this.pender.operator = VSF_BMPEVT_OR;                               \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
@@ -120,12 +133,34 @@
                                                     (vsf_bmpevt_pender_t *)     \
                                                     &this.pender, (__timeout)), \
                                                     reason == VSF_SYNC_GET))
-                                                    
+
+#   define wait_for_any_timeout_ms(__group, __msk, __timeout)                   \
+            wait_for_any_timeout(   __group,                                    \
+                                    (__msk),                                    \
+                                    vsf_systimer_ms_to_tick(__timeout))
+
+#   define wait_for_any_timeout_us(__group, __msk, __timeout)                   \
+            wait_for_any_timeout(   __group,                                    \
+                                    (__msk),                                    \
+                                    vsf_systimer_us_to_tick(__timeout))
+
+#   define wait_for_any(__group, __msk)                                         \
+            wait_for_any_timeout( __group, (__msk), -1)
+
 #   define on_bmevt_timeout()                                                   \
                 else if (VSF_SYNC_TIMEOUT == reason)
                         
-#   define wait_for_one(__group, __msk, __timeout)                              \
-            wait_for_any((__group), (__msk), (__timeout))
+#   define wait_for_one(__group, __msk)                                         \
+            wait_for_any((__group), (__msk))
+        
+#   define wait_for_one_timeout(__group, __msk, __timeout)                      \
+            wait_for_any_timeout((__group), (__msk), (__timeout))
+        
+#   define wait_for_one_timeout_ms(__group, __msk, __timeout)                   \
+            wait_for_any_timeout_ms((__group), (__msk), (__timeout))
+        
+#   define wait_for_one_timeout_us(__group, __msk, __timeout)                   \
+            wait_for_any_timeout_us((__group), (__msk), (__timeout))
         
 #   define reset_grouped_evts(__group, __msk)                                   \
             vsf_bmpevt_reset((__group),(__msk))

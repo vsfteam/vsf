@@ -19,15 +19,8 @@
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
-
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
-#error In order to run this demo, please set VSF_OS_RUN_MAIN_AS_THREAD to ENABLED
-#endif
-
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
 
 #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
 declare_vsf_thread(user_task_t)
@@ -62,7 +55,7 @@ end_def_grouped_evts(user_grouped_evts_t)
 
 #if VSF_USE_KERNEL_PT_MODE == ENABLED
 
-declare_vsf_pt(user_pt_bmpevt_demo_slave_t)
+declare_vsf_pt(user_pt_bmpevt_demo_slave_t);
 declare_vsf_pt(user_pt_bmpevt_demo_thread_t);
 
 def_vsf_pt(user_pt_bmpevt_demo_slave_t,
@@ -94,7 +87,7 @@ def_vsf_pt(user_pt_bmpevt_demo_thread_t,
 #endif
 
 struct user_msg_t {
-    implement(vsf_slist_t);
+    implement(vsf_slist_node_t);
     int index;
 };
 typedef struct user_msg_t user_msg_t;
@@ -124,9 +117,6 @@ declare_vsf_task(msg_queue_example_t)
 def_vsf_task(msg_queue_example_t)
 
 #endif
-
-//static NO_INIT class_demo_t class_demo;
-//static NO_INIT class_simple_demo_t class_simple_demo;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -166,23 +156,23 @@ implement_vsf_pool( user_msg_pool_t, user_msg_t)
 static implement_vsf_task(msg_queue_example_t)
 {
     vsf_sync_reason_t reason;
-    vsf_slist_t *plist;
+    vsf_slist_node_t *pnode;
     user_msg_t *pmsg;
 
     switch (evt) {
     case VSF_EVT_INIT:
         recv_again:
-        if (!vsf_eda_queue_recv(&user_msgq, &plist, -1)) {
+        if (!vsf_eda_queue_recv(&user_msgq, &pnode, -1)) {
             goto msg_rcvd;
         }
         break;
 //    case VSF_EVT_TIMER:
     case VSF_EVT_SYNC:
     case VSF_EVT_SYNC_CANCEL:
-        reason = vsf_eda_queue_get_reason(&user_msgq, evt, &plist);
+        reason = vsf_eda_queue_get_reason(&user_msgq, evt, &pnode);
         if (reason == VSF_SYNC_GET) {
         msg_rcvd:
-            pmsg = (user_msg_t *)plist;
+            pmsg = (user_msg_t *)pnode;
             printf("msg receviced from %d\r\n", pmsg->index);
             VSF_POOL_FREE(user_msg_pool_t, &user_msg_pool, pmsg);
             goto recv_again;
@@ -212,12 +202,12 @@ static implement_vsf_task(timer_example_t)
         pmsg = VSF_POOL_ALLOC(user_msg_pool_t, &user_msg_pool);
         if (pmsg != NULL) {
             pmsg->index = index;
-            if (vsf_eda_queue_send(&user_msgq, &pmsg->use_as__vsf_slist_t)) {
+            if (vsf_eda_queue_send(&user_msgq, &pmsg->use_as__vsf_slist_node_t)) {
                 VSF_POOL_FREE(user_msg_pool_t, &user_msg_pool, pmsg);
             }
         }
     case VSF_EVT_INIT:
-        vsf_teda_set_timer(delay);
+        vsf_teda_set_timer_ms(delay);
         break;
 	}
 
@@ -259,7 +249,7 @@ implement_vsf_thread(user_task_t)
 
     while (1) {
 #if VSF_CFG_TIMER_EN
-        vsf_delay(1000);
+        vsf_delay_ms(1000);
 #endif
         printf("user_thread post user sem:\r\n");
 #if VSF_CFG_SYNC_EN
@@ -279,13 +269,13 @@ static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
     vsf_pt_begin();
     
     vsf_pt_wait_until(
-        wait_for_one(this.pgroup_evts, this.mask, -1){
+        wait_for_one(this.pgroup_evts, this.mask){
             printf("get sem in pt slave thread\r\n");
         } 
     );
 
     vsf_pt_wait_until(
-        vsf_sem_pend(&user_sem, 100){
+        vsf_sem_pend_timeout_ms(&user_sem, 2000){
             printf("get user sem in pt slave thread\r\n");
         }
         on_sem_timeout() {
@@ -312,13 +302,13 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
             }
     
         vsf_pt_wait_until(
-            wait_for_one(this.pgroup_evts, this.mask, -1){
+            wait_for_one(this.pgroup_evts, this.mask){
                 printf("get sem in pt master thread\r\n");
             }
         );
         
         vsf_pt_wait_until(
-            vsf_sem_pend(&user_sem, 100){
+            vsf_sem_pend_timeout_ms(&user_sem, 2000){
                 printf("get user sem in pt master thread\r\n");
             }
             on_sem_timeout() {
@@ -328,7 +318,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
         
         printf("delay start...\r\n");
         vsf_pt_wait_until(
-            vsf_delay(2000) {
+            vsf_delay_ms(2000) {
                 printf("delay completed...\r\n");
             }
         );
@@ -341,7 +331,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
 implement_vsf_task(bmevt_demo_t)
 {
     vsf_task_wait_until(
-        wait_for_one(&__user_grouped_evts, timer4_evt_msk, -1){
+        wait_for_one(&__user_grouped_evts, timer4_evt_msk){
             printf("get timer 4 in eda task\r\n");
             return fsm_rt_yield;         //! do this again
         }
@@ -352,11 +342,7 @@ implement_vsf_task(bmevt_demo_t)
 
 #endif
 
-static void system_init(void)
-{
-    extern void stdout_init(void);
-    stdout_init();
-}
+
 
 int main(void)
 {
@@ -368,7 +354,8 @@ int main(void)
         )
     )
 
-    system_init();
+    extern void stdout_init(void);
+    stdout_init();
 
 #if VSF_CFG_SYNC_EN == ENABLED
     // initialize adapter
@@ -434,12 +421,10 @@ int main(void)
 #endif
 
 
-
 #if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
     while (1) {
         wait_for_all(   &__user_grouped_evts, 
-                        all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk,
-                        -1) {
+                        all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk) {
             //! when all the grouped events are set
             reset_grouped_evts( &__user_grouped_evts, 
                                 all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk);
@@ -449,7 +434,7 @@ int main(void)
             printf("\r\n============== barrier timeout ============: \r\n");
         }
 
-        vsf_delay(1000);
+        vsf_delay_ms(1000);
     }
 #endif
 

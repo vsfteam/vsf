@@ -900,7 +900,7 @@ static void vsf_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_usbh_hub_reset_dev(dev);
             goto check_device_reset;
         case VSF_USBH_PROBE_WAIT_SET_ADDRESS:
-            vsf_teda_set_timer(10);
+            vsf_teda_set_timer_ms(10);
             break;
         case VSF_USBH_PROBE_WAIT_FULL_DEVICE_DESC:
             parser->desc_device = vsf_usbh_urb_take_buffer(urb);
@@ -949,7 +949,7 @@ static void vsf_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case VSF_USBH_PROBE_WAIT_DEVICE_RESET:
         check_device_reset:
             if (vsf_usbh_hub_dev_is_reset(dev)) {
-                vsf_teda_set_timer(20);
+                vsf_teda_set_timer_ms(20);
                 return;
             } else {
                 // set address

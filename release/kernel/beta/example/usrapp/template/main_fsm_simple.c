@@ -111,8 +111,7 @@ implement_fsm(user_task_t)
 
     state(WAIT_FOR_SEM) {
         vsf_task_wait_until(
-            vsf_sem_pend(this.psem, -1){                                        //!< wait for semaphore forever
-                
+            vsf_sem_pend(this.psem){                                            //!< wait for semaphore forever
                 init_fsm(user_sub_task_t, &this.print_task, args(this.cnt));    //!< init sub fsm
                 transfer_to(CALL_SUB_TO_PRINT);                                 //!< tranfer to next state
             }
@@ -161,7 +160,7 @@ implement_fsm(user_task_b_t)
         
         state(DELAY){
             vsf_task_wait_until(
-                vsf_delay(10000){                                               //!< wait 10s
+                vsf_delay_ms(10000){                                               //!< wait 10s
                     vsf_sem_post(this.psem);                                    //!< post a semaphore
                     reset_fsm();                                                //!< reset fsm
                 }
@@ -202,7 +201,7 @@ int main(void)
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay(10000);
+        vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
 #else

@@ -20,8 +20,8 @@
 #include "vsf_arch_abstraction.h"
 
 /*============================ MACROS ========================================*/
-#ifndef VSF_SYSTIMER_FREQUENCY
-#   define VSF_SYSTIMER_FREQUENCY       (1000)    /*! using default 1KHz */
+#ifndef VSF_SYSTIMER_RESOLUTION
+#   define VSF_SYSTIMER_RESOLUTION       (1000000)    /*! using default 1us */
 #endif
 
 
@@ -33,7 +33,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-WEAK void vsf_systimer_evthandler(void) {}
+WEAK void vsf_systimer_evthandler(vsf_systimer_cnt_t tick) {}
 
 /*! \note initialize architecture specific service 
  *  \param none
@@ -43,7 +43,7 @@ WEAK void vsf_systimer_evthandler(void) {}
 bool vsf_arch_init(void)
 {
     /* initalize system timer with given frequency */
-    vsf_systimer_init(VSF_SYSTIMER_FREQUENCY);
+    vsf_systimer_init(VSF_SYSTIMER_RESOLUTION);
 
     return true;
 }

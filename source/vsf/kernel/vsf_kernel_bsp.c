@@ -118,20 +118,20 @@ __asm(".global __use_no_semihosting\n\t");
 __asm(".global __ARM_use_no_argv\n\t");
 
 
-void _sys_exit(int ch)
+WEAK void _sys_exit(int ch)
 {
     while(1);
 }
 
 
-void _ttywrch(int ch)
+WEAK void _ttywrch(int ch)
 {
     
 }
 
 #include <rt_sys.h>
 
-FILEHANDLE $Sub$$_sys_open(const char *name, int openmode)
+WEAK FILEHANDLE $Sub$$_sys_open(const char *name, int openmode)
 {
     return 0;
 }

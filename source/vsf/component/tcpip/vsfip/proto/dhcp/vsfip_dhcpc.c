@@ -202,7 +202,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsfip_udp_async_send(dhcpc->so, &dhcpc->sockaddr, dhcpc->outbuffer);
         dhcpc->so->remote_sockaddr.addr.addr32 = VSFIP_IPADDR_ANY;
 
-        vsf_teda_set_timer(VSFIP_CFG_DHCPC_TIMEOUT + VSFIP_ARP_MAXDELAY);
+        vsf_teda_set_timer_ms(VSFIP_CFG_DHCPC_TIMEOUT + VSFIP_ARP_MAXDELAY);
         break;
     case VSFIP_DHCP_EVT_SEND_REQUEST:
     dhcp_request:
@@ -217,7 +217,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsfip_udp_async_send(dhcpc->so, &dhcpc->sockaddr, dhcpc->outbuffer);
         dhcpc->so->remote_sockaddr.addr.addr32 = VSFIP_IPADDR_ANY;
 
-        vsf_teda_set_timer(VSFIP_CFG_DHCPC_TIMEOUT + VSFIP_ARP_MAXDELAY);
+        vsf_teda_set_timer_ms(VSFIP_CFG_DHCPC_TIMEOUT + VSFIP_ARP_MAXDELAY);
         break;
     case VSFIP_DHCP_EVT_READY:
         vsf_teda_cancel_timer(NULL);
@@ -231,7 +231,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         netif->dns[1] = dhcpc->dns[1];
 
         // timer out for resume
-//      vsf_teda_set_timer(2000);
+//      vsf_teda_set_timer_ms(2000);
         goto cleanup;
         break;
     case VSF_EVT_TIMER:

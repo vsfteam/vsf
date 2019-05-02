@@ -618,7 +618,7 @@ static void usrapp_heartbeat_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsf_trace(VSF_TRACE_INFO, "test info [%d]" VSF_TRACE_CFG_LINEEND, count++);
         // fall through
     case VSF_EVT_INIT:
-        vsf_teda_set_timer(500);
+        vsf_teda_set_timer_ms(500);
         break;
     }
 }

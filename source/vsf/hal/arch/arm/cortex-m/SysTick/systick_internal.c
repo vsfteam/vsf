@@ -34,7 +34,7 @@
  */
 
 #ifndef __SYSTICK_ATOM_CODE
-#   define __SYSTICK_ATOM_CODE  SAFE_ATOM_CODE
+#   define __SYSTICK_ATOM_CODE  __SAFE_ATOM_CODE
 #endif
 
 /*============================ TYPES =========================================*/
@@ -126,9 +126,9 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
     vsf_systick_set_reload(cfg_ptr->reload_value);
     vsf_systick_clear_count();
 
-    __SYSTICK_ATOM_CODE (){
+    __SYSTICK_ATOM_CODE (
         SYSTICK_CSR = cfg_ptr->mode;
-    }
+    )
 
     return true;
 }
@@ -148,7 +148,9 @@ bool vsf_systick_enable(void)
  */
 bool vsf_systick_disable(void)
 {
-    SYSTICK_CSR &= ~(1ul);
+    __SYSTICK_ATOM_CODE(
+        SYSTICK_CSR &= ~ENABLE_SYSTICK;
+    )
     return true;
 }
 
@@ -161,12 +163,12 @@ bool vsf_systick_is_match(void)
 {
     bool bResult;
 
-    __SYSTICK_ATOM_CODE() {
+    __SYSTICK_ATOM_CODE(
         bResult = ARM_SYSTICK.SYST_CSR.Value & SYSTICK_CSR_COUNTFLAG_MSK;
         if (bResult) {
             ARM_SYSTICK.SYST_CSR.Value |= SYSTICK_CSR_COUNTFLAG_MSK;
         }
-    }
+    )
     return bResult;
 }
 

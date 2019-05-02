@@ -670,6 +670,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</FilePath>
             </File>
+            <File>
+              <FileName>vsf_arch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\vsf_arch.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1455,6 +1460,11 @@
                 </CommonProperty>
                 <FileArmAds/>
               </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_arch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\vsf_arch.c</FilePath>
             </File>
           </Files>
         </Group>

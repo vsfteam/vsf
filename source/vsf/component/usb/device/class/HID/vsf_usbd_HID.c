@@ -97,7 +97,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             report->idle_cnt = 0;
         }
 
-        vsf_teda_set_timer(4);
+        vsf_teda_set_timer_ms(4);
         break;
     case VSF_EVT_MESSAGE:
         trans = vsf_eda_get_cur_msg();
@@ -161,7 +161,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_TIMER:
-        vsf_teda_set_timer(4);
+        vsf_teda_set_timer_ms(4);
         for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
             report = &hid->reports[i];
             if ((report->type == USB_HID_REPORT_INPUT) && (report->idle != 0)) {

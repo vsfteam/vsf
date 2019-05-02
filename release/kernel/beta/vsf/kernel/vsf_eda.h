@@ -81,6 +81,8 @@
 
 /*============================ TYPES =========================================*/
 
+typedef vsf_systimer_cnt_t     vsf_timer_tick_t;
+
 enum {
     VSF_EVT_INVALID = -1,               //!< compatible with fsm_rt_err
     VSF_EVT_CPL = 0,                    //!< compatible with fsm_rt_cpl
@@ -186,21 +188,21 @@ def_simple_class(vsf_eda_t) {
             uint8_t         flag;
         };
     )
-}ALIGN(4);
+};
 //! @}
 
 #if VSF_CFG_TIMER_EN == ENABLED
 //! \name timed eda
 //! @{
-def_simple_class(vsf_teda_t) {
+def_simple_class(vsf_teda_t)  {
     which(
         implement(vsf_eda_t)
     )
     private_member(
         vsf_dlist_node_t    timer_node;
-        uint32_t            due;
-    )
-}ALIGN(4);
+        vsf_timer_tick_t    due ;
+    );
+};
 //! @}
 
 #if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
@@ -213,7 +215,7 @@ def_simple_class(vsf_callback_timer_t) {
     )
     private_member(
         vsf_dlist_node_t timer_node;
-        uint32_t due;
+        vsf_timer_tick_t due;
     )
 }ALIGN(4);
 //! @}
@@ -244,7 +246,7 @@ def_simple_class(vsf_sync_t) {
 
         vsf_dlist_t         pending_list;
     )
-}ALIGN(4);
+};
 //! @}
 
 //! \name sync_with_owner
@@ -256,7 +258,7 @@ def_simple_class(vsf_sync_owner_t) {
     private_member(
         vsf_eda_t           *eda_owner;
     )
-}ALIGN(4);
+};
 //! @}
 
 #ifndef __VSF_BITMAP_EVT_DEFINED__
@@ -283,7 +285,7 @@ def_simple_class(vsf_bmpevt_adapter_t) {
     private_member(
         vsf_bmpevt_t                    *bmpevt_host;
     )
-}ALIGN(4);
+};
 //! @}
 
 //! \name bmpevt_adapter_eda
@@ -295,7 +297,7 @@ def_simple_class(vsf_bmpevt_adapter_eda_t) {
     private_member(
         vsf_eda_t           eda;
     )
-}ALIGN(4);
+};
 //! @}
 
 //! \name bmpevt_pender
@@ -310,7 +312,7 @@ def_simple_class(vsf_bmpevt_pender_t) {
     private_member(
         vsf_eda_t           *eda_pending;
     )
-}ALIGN(4);
+};
 //! @}
 
 //! \name bmpevt
@@ -339,7 +341,7 @@ def_simple_class(vsf_bmpevt_t) {
             uint8_t                 flag;
         };
     )
-}ALIGN(4);
+};
 //! @}
 
 //! \name queue
@@ -351,7 +353,7 @@ def_simple_class(vsf_queue_t) {
     private_member(
         vsf_slist_queue_t   msgq;
     )
-}ALIGN(4);
+};
 //! @}
 
 // IPC
@@ -391,13 +393,13 @@ typedef struct vsf_bmpevt_adapter_bmpevt_t vsf_bmpevt_adapter_bmpevt_t;
 
 #if VSF_CFG_TIMER_EN == ENABLED
 SECTION(".text.vsf.kernel.teda")
-extern uint_fast32_t vsf_timer_get_tick(void);
+extern vsf_timer_tick_t vsf_timer_get_tick(void);
 
 SECTION(".text.vsf.kernel.vsf_timer_get_duration")
-extern uint_fast32_t vsf_timer_get_duration(uint_fast32_t from_time, uint_fast32_t to_time);
+extern uint_fast32_t vsf_timer_get_duration(vsf_timer_tick_t from_time, vsf_timer_tick_t to_time);
 
 SECTION(".text.vsf.kernel.vsf_timer_get_elapsed")
-extern uint_fast32_t vsf_timer_get_elapsed(uint_fast32_t from_time);
+extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
 
 #endif
 SECTION(".text.vsf.kernel.eda")
@@ -431,6 +433,12 @@ extern vsf_err_t vsf_teda_fini(vsf_teda_t *pthis);
 
 SECTION(".text.vsf.kernel.teda")
 extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);
+
+SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
+extern vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms);
+
+SECTION(".text.vsf.kernel.vsf_teda_set_timer_us")
+extern vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us);
 
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 extern vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis);

@@ -48,7 +48,7 @@ implement_vsf_thread(user_task_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_sem_pend(this.psem, -1);        //! wait for semaphore forever
+        vsf_sem_pend(this.psem);        //! wait for semaphore forever
         printf("receive semaphore from main...[%08x]\r\n", cnt++);
     }
 }
@@ -85,7 +85,7 @@ int main(void)
     
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay(10000);
+        vsf_delay_ms(1000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
     

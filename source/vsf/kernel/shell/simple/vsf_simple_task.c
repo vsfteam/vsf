@@ -41,20 +41,22 @@ extern void vsf_eda_polling_state_set(vsf_eda_t *peda, bool state);
 
 #if VSF_CFG_TIMER_EN == ENABLED
 SECTION("text.vsf.kernel.__vsf_delay")
-vsf_evt_t __vsf_delay(uint_fast32_t ms)
+vsf_evt_t __vsf_delay(uint_fast32_t tick)
 {
     vsf_evt_t result = VSF_EVT_INVALID;
     enum {
         VSF_APP_STATE_SET_TIMER = 0,
         VSF_APP_STATE_WAIT_TIMER_EVT,
     };
-
+    if (0 == tick) {
+        return VSF_EVT_TIMER;
+    }
     vsf_teda_t *pteda = (vsf_teda_t *)vsf_eda_get_cur();
     ASSERT(NULL != pteda);
 
 #   if VSF_USE_KERNEL_THREAD_MODE == ENABLED
     if (vsf_eda_is_stack_owner(&(pteda->use_as__vsf_eda_t))) {
-        vsf_thread_delay(ms);
+        vsf_thread_delay(tick);
         result = vsf_eda_get_cur_evt();
     } else 
 #   endif
@@ -68,7 +70,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t ms)
             }
         } else  {
             /*VSF_APP_STATE_SET_TIMER*/
-            vsf_teda_set_timer(ms);
+            vsf_teda_set_timer(tick);
             vsf_eda_polling_state_set(  &(pteda->use_as__vsf_eda_t),
                                         (bool)VSF_APP_STATE_WAIT_TIMER_EVT);
         }
@@ -76,6 +78,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t ms)
     
     return result;
 }
+
 #endif
 
 SECTION("text.vsf.kernel.__vsf_sem_pend")

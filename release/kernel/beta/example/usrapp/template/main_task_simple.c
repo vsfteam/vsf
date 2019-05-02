@@ -106,7 +106,7 @@ implement_vsf_task(user_task_t)
              *        )
              */
             vsf_task_wait_until(
-                vsf_sem_pend(this.psem, -1){                                    //!< wait for semaphore forever
+                vsf_sem_pend(this.psem){                                        //!< wait for semaphore forever
                     this.print_task.cnt = this.cnt;                             //!< passing parameter
                     this.state = CALL_SUB_TO_PRINT;                             //!< tranfer to next state
                 }
@@ -139,7 +139,7 @@ implement_vsf_task(user_task_b_t)
             //break;
         case DELAY:
             vsf_task_wait_until(
-                vsf_delay(10000){                                               //!< wait 10s
+                vsf_delay_ms(10000){                                               //!< wait 10s
                     vsf_sem_post(this.psem);                                    //!< post a semaphore
                     USER_TASK_RESET_FSM();                                      //!< reset fsm
                 }
@@ -181,7 +181,7 @@ int main(void)
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay(10000);
+        vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
 #else

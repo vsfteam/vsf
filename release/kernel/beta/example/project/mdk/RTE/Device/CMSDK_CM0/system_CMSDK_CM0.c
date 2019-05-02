@@ -57,7 +57,4 @@ void SystemCoreClockUpdate (void)
 void SystemInit (void)
 {
     SystemCoreClock = SYSTEM_CLOCK;
-  
-    extern void stdout_init(void);
-    stdout_init();
 }

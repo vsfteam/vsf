@@ -71,7 +71,7 @@ private implement_vsf_pt(user_pt_task_t)
     this.cnt = 0;
     while(1) {
         vsf_pt_wait_until(
-                vsf_sem_pend(this.psem, -1);                                    //!< wait for semaphore forever
+                vsf_sem_pend(this.psem);                                        //!< wait for semaphore forever
             );
             
         this.print_task.cnt = this.cnt;                                         //!< Pass parameter
@@ -96,7 +96,7 @@ private implement_vsf_pt(user_pt_task_b_t)
         printf("hello world! \r\n");
         
         vsf_pt_wait_until(
-            vsf_delay(10000){               //!< wait 10s
+            vsf_delay_ms(10000){               //!< wait 10s
                 vsf_sem_post(this.psem);    //!< post a semaphore
             }
         );
@@ -136,7 +136,7 @@ int main(void)
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay(10000);
+        vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
 #else
