@@ -171,8 +171,7 @@ implement_fsm(user_task_b_t)
 
 static void system_init(void)
 {
-    extern void stdout_init(void);
-    stdout_init();
+    vsf_stdio_init();
 }
 
 int main(void)

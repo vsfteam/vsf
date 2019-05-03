@@ -139,7 +139,9 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
  */
 bool vsf_systick_enable(void)
 {
-    SYSTICK_CSR |= 0x01;
+    __SYSTICK_ATOM_CODE(
+        SYSTICK_CSR |= ENABLE_SYSTICK;
+    )
     return true;
 }
 /*!\brief enable

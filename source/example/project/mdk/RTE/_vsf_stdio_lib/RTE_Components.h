@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'Blinky' 
- * Target:  'demo_armv7-m' 
+ * Target:  'vsf_stdio_lib' 
  */
 
 #ifndef RTE_COMPONENTS_H
@@ -14,7 +14,7 @@
 /*
  * Define the Device Header File: 
  */
-#define CMSIS_device_header "CMSDK_CM3.h"
+#define CMSIS_device_header "ARMCM0.h"
 
 
 

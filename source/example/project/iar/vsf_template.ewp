@@ -8498,10 +8498,23 @@
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\arm_compiler.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\retarget_io.c</name>
+                    <excluded>
+                        <configuration>kernel_lib_armv7m_full_size</configuration>
+                        <configuration>kernel_lib_armv6m_full_size</configuration>
+                    </excluded>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\signal.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\signal.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</name>
+                    <excluded>
+                        <configuration>aio_m484</configuration>
+                    </excluded>
                 </file>
             </group>
             <group>

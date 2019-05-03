@@ -354,8 +354,7 @@ int main(void)
         )
     )
 
-    extern void stdout_init(void);
-    stdout_init();
+    vsf_stdio_init();
 
 #if VSF_CFG_SYNC_EN == ENABLED
     // initialize adapter

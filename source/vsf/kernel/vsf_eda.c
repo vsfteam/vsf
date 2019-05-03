@@ -1049,6 +1049,20 @@ static void vsf_teda_timer_enqueue(vsf_teda_t *pthis, vsf_timer_tick_t due)
     vsf_sched_unlock(lock_status);
 }
 
+static void vsf_timer_wakeup(void)
+{
+    if (!__vsf_eda.timer.processing) {
+        __vsf_eda.timer.processing = true;
+#if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
+        if (vsf_eda_post_evt(&__vsf_eda.timer.teda.use_as__vsf_eda_t, VSF_EVT_TIMER)) {
+#else
+        if (vsf_eda_post_evt(&__vsf_eda.timer.eda, VSF_EVT_TIMER)) {
+#endif
+            __vsf_eda.timer.processing = false;
+        }
+    }
+}
+
 static void vsf_timer_update(void)
 {
     vsf_teda_t *teda;
@@ -1058,7 +1072,9 @@ static void vsf_timer_update(void)
             vsf_systimer_set_idle();
         } else if (teda->due != __vsf_eda.timer.pre_tick) {
             __vsf_eda.timer.pre_tick = teda->due;
-            vsf_systimer_set(teda->due);
+            if (!vsf_systimer_set(teda->due)) {
+                vsf_timer_wakeup();
+            }
         }
     vsf_sched_unlock(lock_status);
 }
@@ -1126,10 +1142,10 @@ static void __vsf_timer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_timq_peek(&__vsf_eda.timer.timq, teda);
         }
         vsf_sched_unlock(origlevel);
+        __vsf_eda.timer.processing = false;
         if (timed) {
             vsf_timer_update();
         }
-        __vsf_eda.timer.processing = false;
         break;
     }
 }
@@ -1138,16 +1154,7 @@ static void __vsf_timer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 {
     UNUSED_PARAM(tick);
-    if (!__vsf_eda.timer.processing) {
-        __vsf_eda.timer.processing = true;
-#if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
-        if (vsf_eda_post_evt(&__vsf_eda.timer.teda.use_as__vsf_eda_t, VSF_EVT_TIMER)) {
-#else
-        if (vsf_eda_post_evt(&__vsf_eda.timer.eda, VSF_EVT_TIMER)) {
-#endif
-            __vsf_eda.timer.processing = false;
-        }
-    }
+    vsf_timer_wakeup();
 }
 
 SECTION(".text.vsf.kernel.teda")
@@ -1161,15 +1168,15 @@ vsf_err_t vsf_timer_init(void)
 
 #if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
     __vsf_eda.timer.teda.evthandler = __vsf_timer_evthandler;
-    return vsf_eda_init(&__vsf_eda.timer.teda.use_as__vsf_eda_t, vsf_priority_inherit, false);
+    return vsf_eda_init(&__vsf_eda.timer.teda.use_as__vsf_eda_t, vsf_priority_highest, false);
 #else
     __vsf_eda.timer.eda.evthandler = __vsf_timer_evthandler;
-    return vsf_eda_init(&__vsf_eda.timer.eda, vsf_priority_inherit, false);
+    return vsf_eda_init(&__vsf_eda.timer.eda, vsf_priority_highest, false);
 #endif
 }
 
 #if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
-SECTION(".text.vsf.kernel.teda")
+SECTION(".text.vsf.kernel.vsf_callback_timer_add")
 vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick)
 {
     vsf_timer_tick_t due = tick + vsf_timer_get_tick();
@@ -1188,6 +1195,20 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
         }
     vsf_sched_unlock(lock_status);
     return VSF_ERR_NONE;
+}
+
+SECTION(".text.vsf.kernel.vsf_callback_timer_add_ms")
+vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
+{
+    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
+    return vsf_callback_timer_add(timer, tick);
+}
+
+SECTION(".text.vsf.kernel.vsf_callback_timer_add_us")
+vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t us)
+{
+    vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
+    return vsf_callback_timer_add(timer, tick);
 }
 #endif
 

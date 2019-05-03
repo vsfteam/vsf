@@ -115,26 +115,11 @@ ROOT void __post_vsf_kernel_init(void)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 __asm(".global __use_no_semihosting\n\t");
+
+#ifndef __MICROLIB
 __asm(".global __ARM_use_no_argv\n\t");
+#endif
 
-
-WEAK void _sys_exit(int ch)
-{
-    while(1);
-}
-
-
-WEAK void _ttywrch(int ch)
-{
-    
-}
-
-#include <rt_sys.h>
-
-WEAK FILEHANDLE $Sub$$_sys_open(const char *name, int openmode)
-{
-    return 0;
-}
 
 #endif
 

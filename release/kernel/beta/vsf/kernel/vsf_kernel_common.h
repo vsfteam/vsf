@@ -32,6 +32,7 @@
 enum vsf_priority_t {
     vsf_priority_inherit = -1,
     MREPEAT(VSF_OS_EVTQ_SWI_NUM, __VSF_SWI_PRIO_INIT, NULL)
+    vsf_priority_highest = VSF_OS_EVTQ_SWI_NUM - 1,
 };
 typedef enum vsf_priority_t vsf_priority_t;
 

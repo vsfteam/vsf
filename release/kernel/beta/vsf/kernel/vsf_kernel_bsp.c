@@ -118,26 +118,10 @@ uint32_t vsf_arch_req___systimer_freq___from_usr(void)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 __asm(".global __use_no_semihosting\n\t");
+
+#ifndef __MICROLIB
 __asm(".global __ARM_use_no_argv\n\t");
-
-
-WEAK void _sys_exit(int ch)
-{
-    while(1);
-}
-
-
-WEAK void _ttywrch(int ch)
-{
-    
-}
-
-#include <rt_sys.h>
-
-WEAK FILEHANDLE $Sub$$_sys_open(const char *name, int openmode)
-{
-    return 0;
-}
+#endif
 
 #endif
 

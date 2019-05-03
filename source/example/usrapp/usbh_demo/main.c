@@ -699,7 +699,7 @@ int main(void)
 
     usrapp.usbd.timer.param = &usrapp.usbd.dev;
     usrapp.usbd.timer.on_timer = usrapp_usbd_connect;
-    vsf_callback_timer_add(&usrapp.usbd.timer, 200);
+    vsf_callback_timer_add_ms(&usrapp.usbd.timer, 200);
 #endif
 
 #if VSF_USE_TRACE == ENABLED

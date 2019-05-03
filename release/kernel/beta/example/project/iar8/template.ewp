@@ -2139,6 +2139,9 @@
                         <configuration>template_armv6_m</configuration>
                     </excluded>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</name>
+                </file>
             </group>
             <group>
                 <name>shell</name>

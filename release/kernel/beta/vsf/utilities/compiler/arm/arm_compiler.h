@@ -377,4 +377,7 @@ __attribute__((always_inline)) static inline void ____set_PRIMASK(uint32_t priMa
 //! \brief for interrupt 
 #include "./signal.h"
 
+/*============================ PROTOTYPES ====================================*/
+extern void vsf_stdio_init(void);
+
 #endif

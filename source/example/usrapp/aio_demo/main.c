@@ -521,7 +521,7 @@ void usrapp_on_timer(void *param)
     } else {
         vsf_trace(VSF_TRACE_INFO, "heartbeat: [%d]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
     }
-    vsf_callback_timer_add(&usrapp.poll_timer, 1000);
+    vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
 }
 
 #include "btstack_event.h"
@@ -604,7 +604,7 @@ int main(void)
     vsf_usbd_disconnect(&usrapp.usbd.dev);
 
     usrapp.poll_timer.on_timer = usrapp_on_timer;
-    vsf_callback_timer_add(&usrapp.poll_timer, 200);
+    vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);
 
     return 0;
 }

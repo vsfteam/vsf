@@ -432,7 +432,7 @@ SECTION(".text.vsf.kernel.teda")
 extern vsf_err_t vsf_teda_fini(vsf_teda_t *pthis);
 
 SECTION(".text.vsf.kernel.teda")
-extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);
+extern vsf_err_t vsf_teda_set_timer(vsf_systimer_cnt_t tick);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
 extern vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms);
@@ -444,8 +444,14 @@ SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 extern vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis);
 
 #if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
-SECTION(".text.vsf.kernel.teda")
-vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick);
+SECTION(".text.vsf.kernel.vsf_callback_timer_add")
+vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_cnt_t tick);
+
+SECTION(".text.vsf.kernel.vsf_callback_timer_add_ms")
+vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms);
+
+SECTION(".text.vsf.kernel.vsf_callback_timer_add_us")
+vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t us);
 #endif
 #endif
 

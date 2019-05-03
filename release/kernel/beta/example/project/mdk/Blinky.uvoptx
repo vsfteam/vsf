@@ -689,12 +689,12 @@
     <File>
       <GroupNumber>5</GroupNumber>
       <FileNumber>18</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <FileType>4</FileType>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\retarget_io.c</PathWithFileName>
-      <FilenameWithoutPath>retarget_io.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</PathWithFileName>
+      <FilenameWithoutPath>vsf_stdio_lib.a</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

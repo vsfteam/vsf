@@ -1,15 +1,2 @@
---create .\lib\vsf_kernel.lib
-.\lib\vsf_eda.o
-.\lib\vsf_os.o
-.\lib\vsf_evtq_array.o
-.\lib\vsf_evtq_list.o
-.\lib\vsf_thread.o
-.\lib\vsf_task.o
-.\lib\vsf_list.o
-.\lib\vsf_bitmap.o
-.\lib\signal.o
-.\lib\vsf_simple_task.o
-.\lib\vsf_simple_bmevt.o
-.\lib\vsf_shell.o
-.\lib\vsf_pool.o
-.\lib\vsf_service.o
+--create .\lib\vsf_stdio_lib.lib
+.\lib\retarget_io.o

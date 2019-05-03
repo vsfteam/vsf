@@ -248,11 +248,11 @@ implement_vsf_thread(user_task_t)
         NULL,
         (i_code_region_t *)&__example_code_region,
     };
-
+/*
     code_region(&user_region){
         printf("\tbody\r\n");
     }
-
+*/
     while (1) {
 #if VSF_CFG_TIMER_EN
         vsf_delay_ms(1000);
@@ -370,9 +370,8 @@ int main(void)
     class_simple_demo_get_param(&class_simple_demo);
     class_simple_demo_get_base_param(&class_simple_demo);
 
-    extern void stdout_init(void);
-    stdout_init();
-
+    vsf_stdio_init();
+    
 #if VSF_CFG_SYNC_EN == ENABLED
     // initialize adapter
     do {

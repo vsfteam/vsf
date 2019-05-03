@@ -20,6 +20,7 @@
 #include "hal/arch/vsf_arch_abstraction.h"
 #include "systick/systick.h"
 #include "hal/driver/driver.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -67,12 +68,19 @@ static vsf_systimer_cnt_t __vsf_systimer_update(void)
     return tick;
 }
 
-static void __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
+static bool __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
 {
-    ASSERT(0 != tick_cnt);
-    vsf_systick_set_reload(tick_cnt * __vsf_cm.systimer.unit);
+    if (0 == tick_cnt) {
+        return false;
+    }
+    tick_cnt *= __vsf_cm.systimer.unit;
+    
+    vsf_systick_disable();       //! clear systick flag
+    vsf_systick_set_reload(tick_cnt);
+    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;    //!< clear pending bit
     vsf_systick_clear_count();  //! force a reload
     vsf_systick_enable();       //! clear systick flag
+    return true;
 }
 
 WEAK void vsf_systimer_set_idle(void)
@@ -116,7 +124,7 @@ WEAK vsf_err_t vsf_systimer_init(uint32_t tick_res)
     __vsf_cm.systimer.unit = vsf_arch_req___systimer_freq___from_usr() / tick_res;
     __vsf_cm.systimer.tick_freq = tick_res;
     __vsf_cm.systimer.max_tick_per_round = (0x01000000ul / __vsf_cm.systimer.unit) - 1;
-    
+
     vsf_systick_cfg (
         ENABLE_SYSTICK              |
         SYSTICK_SOURCE_SYSCLK       |
@@ -142,14 +150,15 @@ WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
     return ticks;
 }
 
-WEAK void vsf_systimer_set(vsf_systimer_cnt_t due)
+WEAK bool vsf_systimer_set(vsf_systimer_cnt_t due)
 {
+    bool result = false;
     //vsf_systimer_cnt_t unit = __vsf_cm.systimer.unit;
     vsf_systimer_cnt_t max_tick_per_round = __vsf_cm.systimer.max_tick_per_round;
 
     SAFE_ATOM_CODE(){
         vsf_systimer_cnt_t current = __vsf_systimer_update();
-        vsf_systick_disable();
+        //vsf_systick_disable();
         vsf_systimer_cnt_t tick_cnt;
         /*
         if (due < current) {
@@ -158,10 +167,14 @@ WEAK void vsf_systimer_set(vsf_systimer_cnt_t due)
             tick_cnt = due - current;
         }
         */
-        tick_cnt = due - current;
-        tick_cnt = min(max_tick_per_round, tick_cnt);
-        __vsf_systimer_set_target(tick_cnt);
+        if (due > current) {
+            tick_cnt = due - current;
+            tick_cnt = min(max_tick_per_round, tick_cnt);
+            result = __vsf_systimer_set_target(tick_cnt);
+        }
     }
+    
+    return result;
 }
 
 WEAK bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
