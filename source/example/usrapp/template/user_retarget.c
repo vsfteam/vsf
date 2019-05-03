@@ -16,7 +16,7 @@
  ****************************************************************************/
 #include "vsf.h"
 #include "Device.h"
-
+#include <stdio.h>
 void uart_config(void)
 {
 #if defined(IOTKIT_SECURE_UART0)
@@ -68,6 +68,37 @@ int stdout_putchar(char txchar)
 #else
 #error No defined USART
 #endif
+}
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+
+void _ttywrch(int ch)
+{
+    extern int stdout_putchar(char txchar);
+    stdout_putchar(ch);
+}
+
+#endif
+
+/**
+   Writes the character specified by c (converted to an unsigned char) to
+   the output stream pointed to by stream, at the position indicated by the
+   associated file position indicator (if defined), and advances the
+   indicator appropriately. If the file position indicator is not defined,
+   the character is appended to the output stream.
+ 
+  \param[in] c       Character
+  \param[in] stream  Stream handle
+ 
+  \return    The character written. If a write error occurs, the error
+             indicator is set and fputc returns EOF.
+*/
+int fputc (int c, FILE * stream) {
+#if (!defined(RTE_Compiler_IO_STDOUT) && !defined(RTE_Compiler_IO_STDERR))
+  (void)c;
+  (void)stream;
+#endif
+    return (stdout_putchar(c));
 }
 
 #if __IS_COMPILER_IAR__

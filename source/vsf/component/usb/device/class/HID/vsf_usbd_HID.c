@@ -62,6 +62,11 @@ static void vsf_usbd_HID_on_report(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *r
     }
 }
 
+bool vsf_usbh_HID_IN_report_can_update(vsf_usbd_HID_report_t *report)
+{
+    return !report->changed;
+}
+
 vsf_err_t vsf_usbd_HID_IN_report_changed(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *report)
 {
     report->changed = true;

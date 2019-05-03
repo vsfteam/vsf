@@ -15,7 +15,7 @@ LR_IROM1 0x00000000 0x00400000  {    ; load region size_region
         * (+RW)
         * (+ZI)
     }
-    RW_IRAM_NO_INIT +0 UNINIT 0x01000000 {
+    RW_IRAM_NO_INIT +0 UNINIT  {
       * (.bss.noinit)
     }
     

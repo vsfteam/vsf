@@ -215,7 +215,7 @@ vsf_err_t vsf_task_start(vsf_task_t *ptask, vsf_task_cfg_t *pcfg)
     class_internal(ptask, ptThis, vsf_task_t);
     
     memset(ptask, 0, sizeof(vsf_task_t));
-    
+
     if (NULL == pcfg->pframe_pool) {
         //! use default frame pool
         this.pstack_frame_pool = &__default_frame_pool; 

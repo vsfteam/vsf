@@ -114,6 +114,7 @@ extern const vsf_usbd_class_op_t vsf_usbd_HID;
 
 /*============================ PROTOTYPES ====================================*/
 
+extern bool vsf_usbh_HID_IN_report_can_update(vsf_usbd_HID_report_t *report);
 extern vsf_err_t vsf_usbd_HID_IN_report_changed(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *report);
 
 #endif      // VSF_USE_USB_DEVICE

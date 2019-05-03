@@ -17,8 +17,8 @@
  *                                                                           *
  ****************************************************************************/
  
-//#ifndef __PLOOC_CLASS_H__           /* deliberately comment this out! */
-//#define __PLOOC_CLASS_H__           /* deliberately comment this out! */
+#ifndef __PLOOC_CLASS_H__           /* deliberately comment this out! */
+#define __PLOOC_CLASS_H__           /* deliberately comment this out! */
 
  
 /******************************************************************************
@@ -77,6 +77,9 @@
 #   define PLOOC_PACKED         __attribute__((packed))
 #endif
 
+#ifndef PLOOC_ALIGNOF
+#   define PLOOC_ALIGNOF(...)   __alignof__(__VA_ARGS__)
+#endif
 
 //! @{
 #ifndef PLOOC_CONNECT2
@@ -89,6 +92,31 @@
 #   define PLOOC_CONNECT4( a, b, c, d)          __PLOOC_CONNECT4( a, b, c, d)
 #endif
 //! @}
+
+#define PLOOC_ALIGNOF_STRUCT(...)       PLOOC_ALIGNOF(struct {__VA_ARGS__})
+#define PLOOC_SIZEOF_STRUCT(...)        sizeof(struct {__VA_ARGS__})
+
+#   define PLOOC_VISIBLE(...)                                                   \
+        struct  {                                                               \
+            __VA_ARGS__                                                         \
+        }PLOOC_ALIGN(PLOOC_ALIGNOF_STRUCT(__VA_ARGS__));
+
+#   if  !defined (__PLOOC_CLASS_USE_NO_STRUCT_MASK__)
+        
+#       define PLOOC_INVISIBLE(...)                                             \
+        uint8_t PLOOC_CONNECT4(_,__LINE__,__COUNTER__,_chMask)                  \
+                [PLOOC_SIZEOF_STRUCT(__VA_ARGS__)]                              \
+                PLOOC_ALIGN(PLOOC_ALIGNOF_STRUCT(__VA_ARGS__));
+
+#   else
+#       define PLOOC_INVISIBLE(...)                                             \
+            struct {                                                            \
+                __VA_ARGS__                                                     \
+            }   PLOOC_CONNECT3(zzz_, __LINE__,__COUNTER__)                      \
+                PLOOC_ALIGN(PLOOC_ALIGNOF_STRUCT(__VA_ARGS__));
+#   endif   /* __PLOOC_CLASS_USE_NO_STRUCT_MASK__ */
+
+#endif
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -106,5 +134,3 @@
 #undef __PLOOC_CLASS_USE_SIMPLE_TEMPLATE__
 #undef __PLOOC_CLASS_IMPLEMENT
 #undef __PLOOC_CLASS_INHERIT
-
-//#endif                                /* deliberately comment this out! */

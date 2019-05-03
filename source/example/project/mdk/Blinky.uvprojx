@@ -188,7 +188,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-fms-extensions -Wno-empty-body -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
-              <Define>_MSC_VER __ARM__ __MPS2__</Define>
+              <Define>_MSC_VER __ARM__ __MPS2__ __OOC_DEBUG__</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
             </VariousControls>
@@ -432,54 +432,6 @@
               <FilePath>..\..\usrapp\template\ooc_demo\class_simple_demo.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>main_fsm_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_fsm_simple.c</FilePath>
@@ -533,6 +485,54 @@
                     </VariousControls>
                   </Cads>
                 </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -693,73 +693,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>vsf/kernel/utilities</GroupName>
+          <GroupName>vsf/kernel/utilities/3rd-party/PLOOC</GroupName>
           <Files>
             <File>
-              <FileName>vsf_kernel_pool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FileName>plooc_class_strict.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_pool.h</FileName>
+              <FileName>plooc_class_simple.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h</FilePath>
             </File>
             <File>
-              <FileName>__class_kernel_pool.h</FileName>
+              <FileName>plooc_class.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\__class_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h</FilePath>
+            </File>
+            <File>
+              <FileName>plooc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\README.md</FilePath>
             </File>
           </Files>
         </Group>
@@ -1328,35 +1287,6 @@
               <FilePath>..\..\usrapp\template\ooc_demo\class_simple_demo.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>main_fsm_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_fsm_simple.c</FilePath>
@@ -1411,6 +1341,35 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -2116,73 +2075,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>vsf/kernel/utilities</GroupName>
+          <GroupName>vsf/kernel/utilities/3rd-party/PLOOC</GroupName>
           <Files>
             <File>
-              <FileName>vsf_kernel_pool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FileName>plooc_class_strict.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_pool.h</FileName>
+              <FileName>plooc_class_simple.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h</FilePath>
             </File>
             <File>
-              <FileName>__class_kernel_pool.h</FileName>
+              <FileName>plooc_class.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\__class_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h</FilePath>
+            </File>
+            <File>
+              <FileName>plooc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\README.md</FilePath>
             </File>
           </Files>
         </Group>
@@ -3215,9 +3133,9 @@
               <FilePath>..\..\usrapp\template\ooc_demo\class_simple_demo.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
+              <FileName>main_fsm_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_fsm_simple.c</FilePath>
             </File>
             <File>
               <FileName>vsf_kernel_armv6m_full_size.a</FileName>
@@ -3225,9 +3143,9 @@
               <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
             </File>
             <File>
-              <FileName>main_fsm_simple.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\usrapp\template\main_fsm_simple.c</FilePath>
+              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -3576,73 +3494,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>vsf/kernel/utilities</GroupName>
+          <GroupName>vsf/kernel/utilities/3rd-party/PLOOC</GroupName>
           <Files>
             <File>
-              <FileName>vsf_kernel_pool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FileName>plooc_class_strict.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_pool.h</FileName>
+              <FileName>plooc_class_simple.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h</FilePath>
             </File>
             <File>
-              <FileName>__class_kernel_pool.h</FileName>
+              <FileName>plooc_class.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\__class_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h</FilePath>
+            </File>
+            <File>
+              <FileName>plooc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\README.md</FilePath>
             </File>
           </Files>
         </Group>
@@ -4280,54 +4157,6 @@
               <FilePath>..\..\usrapp\template\ooc_demo\class_simple_demo.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>main_fsm_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_fsm_simple.c</FilePath>
@@ -4381,6 +4210,54 @@
                     </VariousControls>
                   </Cads>
                 </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -4541,73 +4418,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>vsf/kernel/utilities</GroupName>
+          <GroupName>vsf/kernel/utilities/3rd-party/PLOOC</GroupName>
           <Files>
             <File>
-              <FileName>vsf_kernel_pool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FileName>plooc_class_strict.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_pool.h</FileName>
+              <FileName>plooc_class_simple.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h</FilePath>
             </File>
             <File>
-              <FileName>__class_kernel_pool.h</FileName>
+              <FileName>plooc_class.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\__class_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h</FilePath>
+            </File>
+            <File>
+              <FileName>plooc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\README.md</FilePath>
             </File>
           </Files>
         </Group>
@@ -5176,35 +5012,6 @@
               <FilePath>..\..\usrapp\template\ooc_demo\class_simple_demo.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
-            </File>
-            <File>
               <FileName>main_fsm_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_fsm_simple.c</FilePath>
@@ -5258,6 +5065,35 @@
                     </VariousControls>
                   </Cads>
                 </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -5880,73 +5716,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>vsf/kernel/utilities</GroupName>
+          <GroupName>vsf/kernel/utilities/3rd-party/PLOOC</GroupName>
           <Files>
             <File>
-              <FileName>vsf_kernel_pool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
+              <FileName>plooc_class_strict.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_pool.h</FileName>
+              <FileName>plooc_class_simple.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\vsf_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h</FilePath>
             </File>
             <File>
-              <FileName>__class_kernel_pool.h</FileName>
+              <FileName>plooc_class.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\kernel\utilities\__class_kernel_pool.h</FilePath>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h</FilePath>
+            </File>
+            <File>
+              <FileName>plooc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h</FilePath>
+            </File>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\utilities\3rd-party\PLOOC\README.md</FilePath>
             </File>
           </Files>
         </Group>

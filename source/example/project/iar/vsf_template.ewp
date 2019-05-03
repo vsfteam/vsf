@@ -8558,9 +8558,15 @@
         <name>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv6m_full_size.a</name>
         <excluded>
             <configuration>kernel_template_cm7</configuration>
+            <configuration>kernel_lib_armv7m_full_size</configuration>
+            <configuration>kernel_lib_armv6m_full_size</configuration>
         </excluded>
     </file>
     <file>
         <name>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</name>
+        <excluded>
+            <configuration>kernel_lib_armv7m_full_size</configuration>
+            <configuration>kernel_lib_armv6m_full_size</configuration>
+        </excluded>
     </file>
 </project>
