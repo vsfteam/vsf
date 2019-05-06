@@ -8502,6 +8502,7 @@
                     <excluded>
                         <configuration>kernel_lib_armv7m_full_size</configuration>
                         <configuration>kernel_lib_armv6m_full_size</configuration>
+                        <configuration>usbh_m484</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -8513,6 +8514,8 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</name>
                     <excluded>
+                        <configuration>kernel_lib_armv7m_full_size</configuration>
+                        <configuration>kernel_lib_armv6m_full_size</configuration>
                         <configuration>aio_m484</configuration>
                     </excluded>
                 </file>

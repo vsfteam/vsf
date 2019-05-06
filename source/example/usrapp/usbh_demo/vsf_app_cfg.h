@@ -150,6 +150,7 @@
 
 #define VSF_USE_USB_HOST                                ENABLED
 #define VSF_USE_USB_HOST_HUB                            ENABLED
+#define VSF_USE_USB_HOST_ECM                            ENABLED
 #define VSF_USE_USB_HOST_HCD_OHCI                       ENABLED
 
 #define VSF_USE_USB_DEVICE                              ENABLED

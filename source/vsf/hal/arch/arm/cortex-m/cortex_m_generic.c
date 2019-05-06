@@ -75,11 +75,11 @@ static bool __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
     }
     tick_cnt *= __vsf_cm.systimer.unit;
     
-    vsf_systick_disable();       //! clear systick flag
+    vsf_systick_disable();
     vsf_systick_set_reload(tick_cnt);
     SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;    //!< clear pending bit
-    vsf_systick_clear_count();  //! force a reload
-    vsf_systick_enable();       //! clear systick flag
+    vsf_systick_clear_count();              //!< force a reload
+    vsf_systick_enable();
     return true;
 }
 
@@ -138,14 +138,21 @@ WEAK vsf_err_t vsf_systimer_init(uint32_t tick_res)
 
 WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
 {
-    vsf_systimer_cnt_t ticks;
+    vsf_systimer_cnt_t ticks = 0;
+    bool auto_update = false;
     SAFE_ATOM_CODE(){
-        ticks = (SYSTICK_RVR - vsf_systick_get_count());
-        if (vsf_systick_is_match()) {
+        if (vsf_systick_disable()) {       //!< the match bit will be cleared
             ticks += SYSTICK_RVR;
+            auto_update = true;
         }
+        ticks += (SYSTICK_RVR - vsf_systick_get_count());
+        vsf_systick_enable();
         ticks /= __vsf_cm.systimer.unit;
         ticks += __vsf_cm.systimer.tick;
+        if (auto_update) {
+            __vsf_cm.systimer.tick = ticks;
+        }
+        
     }
     return ticks;
 }
@@ -196,6 +203,16 @@ WEAK vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
     return ((uint64_t)  ((uint64_t)time_ms 
                             * (uint64_t)__vsf_cm.systimer.tick_freq) 
                         / 1000ul);
+}
+
+WEAK uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+{
+    return tick / __vsf_cm.systimer.unit;
+}
+
+WEAK uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+{
+    return vsf_systimer_tick_to_us(tick) / 1000;
 }
 
 

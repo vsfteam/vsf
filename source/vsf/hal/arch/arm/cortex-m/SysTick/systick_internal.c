@@ -139,10 +139,12 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
  */
 bool vsf_systick_enable(void)
 {
+    uint_fast32_t wTemp;
     __SYSTICK_ATOM_CODE(
-        SYSTICK_CSR |= ENABLE_SYSTICK;
+        wTemp = SYSTICK_CSR;
+        SYSTICK_CSR = wTemp | ENABLE_SYSTICK;
     )
-    return true;
+    return wTemp & SYSTICK_CSR_COUNTFLAG_MSK;
 }
 /*!\brief enable
  *! \param void
@@ -150,10 +152,12 @@ bool vsf_systick_enable(void)
  */
 bool vsf_systick_disable(void)
 {
+    uint_fast32_t wTemp;
     __SYSTICK_ATOM_CODE(
-        SYSTICK_CSR &= ~ENABLE_SYSTICK;
+        wTemp = SYSTICK_CSR;
+        SYSTICK_CSR = wTemp &~ ENABLE_SYSTICK;
     )
-    return true;
+    return wTemp & SYSTICK_CSR_COUNTFLAG_MSK;
 }
 
 /*! \brief check compare match event
@@ -163,15 +167,7 @@ bool vsf_systick_disable(void)
  */
 bool vsf_systick_is_match(void)
 {
-    bool bResult;
-
-    __SYSTICK_ATOM_CODE(
-        bResult = ARM_SYSTICK.SYST_CSR.Value & SYSTICK_CSR_COUNTFLAG_MSK;
-        if (bResult) {
-            ARM_SYSTICK.SYST_CSR.Value |= SYSTICK_CSR_COUNTFLAG_MSK;
-        }
-    )
-    return bResult;
+    return SYSTICK_CSR & SYSTICK_CSR_COUNTFLAG_MSK;
 }
 
 

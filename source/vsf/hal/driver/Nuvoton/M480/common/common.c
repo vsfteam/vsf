@@ -142,11 +142,16 @@ void vsf_drv_swi_trigger(uint_fast8_t idx)
 // USB PHY configuration
 void m480_enable_usbphy(m480_usbphy_t phy, m480_usbphy_role_t role)
 {
-    SYS->USBPHY = (SYS->USBPHY & (0xFFFF << (16 - phy)))
+    bool state = m480_reg_unlock();
+        SYS->USBPHY = (SYS->USBPHY & (0xFFFF << (16 - phy)))
                 | ((SYS_USBPHY_USBEN_Msk | role) << phy)
                 | SYS_USBPHY_SBO_Msk;
-    for (int i=0; i < 0x2000; i++); 
-	SYS->USBPHY |= SYS_USBPHY_HSUSBACT_Msk;
+    m480_reg_lock(state);
+
+    if (phy == M480_USBPHY_HS) {
+        for (volatile int i=0; i < 0x1000; i++); 
+        SYS->USBPHY |= SYS_USBPHY_HSUSBACT_Msk;
+    }
 }
 
 void m480_disable_usbphy(m480_usbphy_t phy)

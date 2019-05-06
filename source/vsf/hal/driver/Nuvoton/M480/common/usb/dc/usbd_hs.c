@@ -122,11 +122,7 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
     usbd_hs->callback.evt_handler = cfg->evt_handler;
     usbd_hs->callback.param = cfg->param;
 
-    // TODO: configure according to usbd_hs->param->phy
-    SYS->USBPHY &= ~SYS_USBPHY_HSUSBROLE_Msk;
-    SYS->USBPHY = (SYS->USBPHY & ~(SYS_USBPHY_HSUSBROLE_Msk | SYS_USBPHY_HSUSBACT_Msk)) | SYS_USBPHY_HSUSBEN_Msk;
-    for (volatile int i = 0; i < 0x1000; i++);
-    SYS->USBPHY |= SYS_USBPHY_HSUSBACT_Msk;
+    m480_enable_usbphy(M480_USBPHY_HS, M480_USBPHY_DEV);
 
     // TODO: use pm to config clock
     CLK->AHBCLK |= CLK_AHBCLK_HSUSBDCKEN_Msk;

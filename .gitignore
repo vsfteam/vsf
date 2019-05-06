@@ -48,3 +48,4 @@ source/example/project/iar/.metadata/.lock
 *.sim
 source/example/project/iar/kernel_lib/*.a
 source/example/project/iar/kernel_lib_armv7m/Exe/*.a
+*.reggroups
