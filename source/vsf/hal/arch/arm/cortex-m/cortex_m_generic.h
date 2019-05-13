@@ -26,7 +26,7 @@
 #define __LITTLE_ENDIAN             1
 #define __BYTE_ORDER                __LITTLE_ENDIAN
 
-#if __ARM_ARCH == 6
+#if __ARM_ARCH == 6 || __TARGET_ARCH_6_M == 1 || __TARGET_ARCH_6S_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
 #       define VSF_ARCH_PRI_NUM         4
 #       undef  VSF_ARCH_PRI_BIT         
@@ -36,7 +36,7 @@
 #   ifndef VSF_ARCH_PRI_BIT
 #       define VSF_ARCH_PRI_BIT         2
 #   endif
-#elif __ARM_ARCH >= 7
+#elif __ARM_ARCH >= 7 || __TARGET_ARCH_7_M == 1 || __TARGET_ARCH_7E_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
 #       define VSF_ARCH_PRI_NUM         256
 #       undef  VSF_ARCH_PRI_BIT         
@@ -82,15 +82,27 @@ static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
 
 static ALWAYS_INLINE void vsf_arch_set_pc(uint32_t pc)
 {
+#if __IS_COMPILER_ARM_COMPILER_5__
+    register uint32_t temp __asm("pc");
+    temp = pc;
+#else
     __asm__("MOV pc, %0" : :"r"(pc));
+#endif
 }
 
 static ALWAYS_INLINE uint32_t vsf_arch_get_lr(void)
 {
+
     uint32_t reg;
+#if __IS_COMPILER_ARM_COMPILER_5__
+    register uint32_t temp __asm("lr");
+    reg = temp;
+#else
     __asm__("MOV %0, lr" : "=r"(reg));
+#endif
     return reg;
 }
 
 #endif
 /* EOF */
+

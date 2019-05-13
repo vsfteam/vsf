@@ -36,6 +36,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef TCPIP_CFG_HOSTNAME
+#   define TCPIP_CFG_HOSTNAME           "vsfip"
+#endif
+
 #ifndef VSFIP_CFG_NETIF_HEADLEN
 #   warning "VSFIP_CFG_NETIF_HEADLEN not defined, use 64 by default"
 #   define VSFIP_CFG_NETIF_HEADLEN      64
@@ -49,9 +53,6 @@
 #endif
 #ifndef VSFIP_CFG_TCP_PORT
 #   define VSFIP_CFG_TCP_PORT           40000
-#endif
-#ifndef VSFIP_CFG_HOSTNAME
-#   define VSFIP_CFG_HOSTNAME           "vsfip"
 #endif
 #ifndef VSFIP_CFG_MTU
 #   define VSFIP_CFG_MTU                1500

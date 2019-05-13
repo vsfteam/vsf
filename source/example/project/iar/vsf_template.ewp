@@ -300,11 +300,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--enum_is_int</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -4469,11 +4469,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--enum_is_int</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -6597,6 +6597,9 @@
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\include</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\include\ipv4</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
@@ -7312,6 +7315,9 @@
                 <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\lwipopts.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\main.c</name>
             </file>
             <file>
@@ -7484,6 +7490,195 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c</name>
                             </file>
+                        </group>
+                    </group>
+                </group>
+                <group>
+                    <name>lwip</name>
+                    <group>
+                        <name>1.4.1</name>
+                        <group>
+                            <name>port</name>
+                            <group>
+                                <name>arch</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\cc.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\perf.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\sys_arch.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\sys_arch.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\lwip_netdrv_adapter.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\lwip_netdrv_adapter.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\lwippools.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>raw</name>
+                            <group>
+                                <name>src</name>
+                                <group>
+                                    <name>api</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\api_lib.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\api_msg.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\err.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\netbuf.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\netdb.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\netifapi.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\sockets.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\tcpip.c</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>core</name>
+                                    <group>
+                                        <name>ipv4</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\autoip.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\icmp.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\igmp.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\inet.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\inet_chksum.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\ip.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\ip_addr.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\ip_frag.c</name>
+                                        </file>
+                                    </group>
+                                    <group>
+                                        <name>ipv6</name>
+                                        <excluded>
+                                            <configuration>aio_m484</configuration>
+                                        </excluded>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\icmp6.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\inet6.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\ip6.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\ip6_addr.c</name>
+                                        </file>
+                                    </group>
+                                    <group>
+                                        <name>snmp</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\asn1_dec.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\asn1_enc.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\mib2.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\mib_structs.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\msg_in.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\msg_out.c</name>
+                                        </file>
+                                    </group>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\def.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\dhcp.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\dns.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\init.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\mem.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\memp.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\netif.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\pbuf.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\raw.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\stats.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\sys.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\tcp.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\tcp_in.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\tcp_out.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\timers.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\udp.c</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>netif</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\netif\etharp.c</name>
+                                    </file>
+                                </group>
+                            </group>
                         </group>
                     </group>
                 </group>
@@ -7807,6 +8002,12 @@
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\arm\driver.h</name>
                     </file>
+                </group>
+                <group>
+                    <name>common</name>
+                    <group>
+                        <name>usart</name>
+                    </group>
                 </group>
                 <group>
                     <name>Nuvoton</name>
@@ -8188,10 +8389,16 @@
                     <configuration>kernel_lib_armv6m_full_size</configuration>
                 </excluded>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\hal\interface\vsf_interface_common.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\hal\interface\vsf_interface_io.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\hal\interface\vsf_interface_pm.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\hal\interface\vsf_interface_usart.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\hal\interface\vsf_interface_usb.h</name>
@@ -8500,6 +8707,7 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\retarget_io.c</name>
                     <excluded>
+                        <configuration>arm_mps2_m7</configuration>
                         <configuration>kernel_lib_armv7m_full_size</configuration>
                         <configuration>kernel_lib_armv6m_full_size</configuration>
                         <configuration>usbh_m484</configuration>

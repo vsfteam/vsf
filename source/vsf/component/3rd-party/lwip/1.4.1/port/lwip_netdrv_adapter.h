@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSFIP_NETDRV_ADAPTER_H__
-#define __VSFIP_NETDRV_ADAPTER_H__
+#ifndef __LWIP_NETDRV_ADAPTER_H__
+#define __LWIP_NETDRV_ADAPTER_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -30,7 +30,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
+extern void lwip_netif_set_netdrv(struct netif *netif, vsf_netdrv_t *netdrv)
 
 #endif      // VSF_USE_TCPIP
-#endif      // __VSFIP_NETDRV_ADAPTER_H__
+#endif      // __LWIP_NETDRV_ADAPTER_H__

@@ -115,11 +115,11 @@
 //      <h> Main Function
 //          <o>Main Stack Size              <128-65536:8>
 //          <i>When main function is configured as a thread, this option controls the size of the stack.
-//#define VSF_OS_MAIN_STACK_SIZE              2048
+#define VSF_OS_MAIN_STACK_SIZE              2048
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_RUN_MAIN_AS_THREAD           DISABLED
+#define VSF_OS_RUN_MAIN_AS_THREAD           ENABLED
 //          </c>
 //      </h>
 //      <h> Shell Configuration

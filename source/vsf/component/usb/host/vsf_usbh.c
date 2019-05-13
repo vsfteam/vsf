@@ -55,26 +55,41 @@ WEAK void vsf_usbh_on_remove_interface(vsf_usbh_ifs_t *ifs)
     vsf_trace(VSF_TRACE_INFO, "%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
 }
 
-static uint_fast32_t vsf_usbh_get_pipe(vsf_usbh_dev_t *dev,
+static vsf_usbh_eppipe_t vsf_usbh_get_pipe(vsf_usbh_dev_t *dev,
             uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size)
 {
     uint_fast8_t direction = endpoint & USB_ENDPOINT_DIR_MASK;
+    vsf_usbh_eppipe_t pipe;
 
     endpoint &= 0x0F;
-    return 1|   (size << 2)             /* 10-bit size */
-            |   (endpoint << 12)        /* 4-bit endpoint */
-            |   (type << 16)            /* 2-bit type */
-            |   (dev->speed << 18)      /* 2-bit speed */
-            |   (dev->devnum << 20)     /* 7-bit address */
-            |   (direction << 20);      /* 1-bit direction */
+    pipe.value =   1|   (size << 2)             /* 10-bit size */
+                    |   (endpoint << 12)        /* 4-bit endpoint */
+                    |   (type << 16)            /* 2-bit type */
+                    |   (dev->speed << 18)      /* 2-bit speed */
+                    |   (dev->devnum << 20)     /* 7-bit address */
+                    |   (direction << 20);      /* 1-bit direction */
+    return pipe;
+}
+
+vsf_usbh_eppipe_t vsf_usbh_get_pipe_from_ep_desc(vsf_usbh_dev_t *dev,
+            struct usb_endpoint_desc_t *desc_ep)
+{
+    return vsf_usbh_get_pipe(dev, desc_ep->bEndpointAddress,
+            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize_Lo));
+}
+
+void vsf_usbh_urb_prepare_by_pipe(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
+            vsf_usbh_eppipe_t pipe)
+{
+    ASSERT((urb != NULL) && (dev != NULL));
+    urb->pipe = pipe;
 }
 
 void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
     ASSERT((urb != NULL) && (dev != NULL) && (desc_ep != NULL));
-    urb->pipe.value = vsf_usbh_get_pipe(dev, desc_ep->bEndpointAddress,
-            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize_Lo));
+    urb->pipe = vsf_usbh_get_pipe_from_ep_desc(dev, desc_ep);
 }
 
 bool vsf_usbh_urb_is_valid(vsf_usbh_urb_t *urb)
@@ -558,7 +573,7 @@ static vsf_usbh_urb_t * vsf_usbh_control_msg_common(vsf_usbh_t *usbh, vsf_usbh_d
     vsf_usbh_hcd_urb_t *urb_hcd = urb->urb_hcd;
 
     if (!dev->is_ep0_rdy) {
-        urb->pipe.value = vsf_usbh_get_pipe(dev, 0, USB_ENDPOINT_XFER_CONTROL, 64);
+        urb->pipe = vsf_usbh_get_pipe(dev, 0, USB_ENDPOINT_XFER_CONTROL, 64);
         vsf_err_t err = vsf_usbh_alloc_urb(usbh, dev, urb);
         if (err != VSF_ERR_NONE) { return NULL; }
         urb_hcd = dev->ep0.urb.urb_hcd;

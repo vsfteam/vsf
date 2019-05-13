@@ -68,6 +68,7 @@ typedef struct vsfip_arp_entry_t vsfip_arp_entry_t;
 
 struct vsfip_netif_op_t {
     vsf_err_t (*header)(vsfip_netbuf_t *netbuf, vsfip_netif_proto_t proto, const vsfip_macaddr_t *dest);
+    bool (*can_output)(vsfip_netif_t *netif);
     vsf_err_t (*output)(vsfip_netbuf_t *netbuf);
     void (*input)(vsfip_netbuf_t *netbuf);
     bool (*routable)(vsfip_netif_t *netif, const vsfip_ipaddr_t *dest_addr);
@@ -116,10 +117,12 @@ def_simple_class(vsfip_netif_t) {
     } dhcp;
 };
 
+/*============================ INCLUDES ======================================*/
+#include "./vsfip_netdrv_adapter.h"
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
 extern vsf_err_t vsfip_netif_init(vsfip_netif_t *netif);
 extern void vsfip_netif_fini(vsfip_netif_t *netif);
 

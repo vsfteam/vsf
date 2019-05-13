@@ -77,7 +77,7 @@ static void vsfip_netdrv_adapter_free_buf(void *netbuf)
     vsfip_netbuf_deref((vsfip_netbuf_t *)netbuf);
 }
 
-const vsf_netdrv_adapter_t vsfip_netdrv_adapter = {
+static const vsf_netdrv_adapter_t vsfip_netdrv_adapter = {
     .on_connect     = vsfip_netdrv_adapter_on_connect,
     .on_disconnect  = vsfip_netdrv_adapter_on_disconnect,
 
@@ -89,5 +89,12 @@ const vsf_netdrv_adapter_t vsfip_netdrv_adapter = {
     .on_outputted   = vsfip_netdrv_adapter_on_outputted,
     .on_inputted    = vsfip_netdrv_adapter_on_inputted,
 };
+
+void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv)
+{
+    netif->netdrv = netdrv;
+    netdrv->netif = netif;
+    netdrv->adapter = &vsfip_netdrv_adapter;
+}
 
 #endif      // VSF_USE_TCPIP

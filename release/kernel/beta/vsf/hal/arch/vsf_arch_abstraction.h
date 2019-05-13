@@ -22,10 +22,12 @@
 #include "hal/vsf_hal_cfg.h"
 
 #if !defined(VSF_ARCH_HEADER)
-# if      defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'M'
+# if      (defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'M') || __TARGET_PROFILE_M
 #   define VSF_ARCH_HEADER      "./arm/cortex-m/cortex_m_generic.h"
-# elif    defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'A'
-#   define VSF_ARCH_HEADER      "./arm/cortex-m/cortex_a_generic.h"
+# elif    defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'A' || __TARGET_PROFILE_A
+#   define VSF_ARCH_HEADER      "./arm/cortex-m/cortex_m_generic.h"
+# elif    defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'R' || __TARGET_PROFILE_R
+#   define VSF_ARCH_HEADER      "./arm/cortex-m/cortex_r_generic.h"
 # elif   defined(__CPU_PC__) && __IS_COMPILER_MSVC__
 #   define  VSF_ARCH_HEADER     "./pc/win32/win32_generic.h"
 # else

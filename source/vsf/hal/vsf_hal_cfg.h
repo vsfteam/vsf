@@ -26,6 +26,14 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+#ifndef VSF_HAL_CFG_USE_STREAM
+#   define VSF_HAL_CFG_USE_STREAM       VSF_USE_SERVICE_STREAM
+#endif
+
+#ifndef VSF_HAL_CFG_USE_VSFSTREAM
+#   define VSF_HAL_CFG_USE_VSFSTREAM    VSF_USE_SERVICE_VSFSTREAM
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

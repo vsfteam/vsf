@@ -27,11 +27,9 @@
    
 #if     defined(__VSF_EDA_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
-#   undef __VSF_EDA_CLASS_IMPLEMENT
 #elif   defined(__VSF_EDA_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
-#   undef __VSF_EDA_CLASS_INHERIT
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
@@ -42,11 +40,13 @@
 #define VSF_SYNC_MANUAL_RST             0x8000
 #define VSF_SYNC_HAS_OWNER              0x8000
 
+#define VSF_SYNC_MAX                    0x7FFF
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 // SEMAPHORE
 #define vsf_eda_sem_init(__psem, __cnt)                                         \
-            vsf_eda_sync_init((__psem), (__cnt), 0x7FFF | VSF_SYNC_AUTO_RST)
+            vsf_eda_sync_init((__psem), (__cnt), VSF_SYNC_MAX | VSF_SYNC_AUTO_RST)
 #define vsf_eda_sem_post(__psem)            vsf_eda_sync_increase((__psem))
 #define vsf_eda_sem_pend(__psem, __timeout) vsf_eda_sync_decrease((__psem), (__timeout))
 
@@ -138,7 +138,7 @@ def_simple_class(vsf_eda_t) {
         //uint16_t                app_state;
     )
 
-    private_member(
+    protected_member(
     #if VSF_CFG_SYNC_EN == ENABLED
         vsf_dlist_node_t    pending_node;
     #endif
@@ -225,10 +225,9 @@ def_simple_class(vsf_callback_timer_t) {
 #if VSF_CFG_SYNC_EN == ENABLED
 //! \name sync
 //! @{
-
 def_simple_class(vsf_sync_t) {
 
-    private_member(
+    protected_member(
         union {
             struct {
                 uint16_t    cur         : 15;
@@ -344,17 +343,51 @@ def_simple_class(vsf_bmpevt_t) {
 };
 //! @}
 
+#if VSF_CFG_QUEUE_EN == ENABLED
+struct vsf_queue_op_t {
+    bool (*enqueue)(vsf_queue_t *pthis, void *node);
+    bool (*dequeue)(vsf_queue_t *pthis, void **node);
+};
+typedef struct vsf_queue_op_t vsf_queue_op_t;
+
 //! \name queue
 //! @{
 def_simple_class(vsf_queue_t) {
-    which(
+    union {
         implement(vsf_sync_t)
+#if VSF_CFG_QUEUE_MULTI_TX_EN == ENABLED
+            
+        protected_member(
+            union {
+                uint16_t        __cur_value;
+            };
+            union {
+                struct {
+                    uint16_t    __max         : 15;
+                    uint16_t    tx_processing : 1;
+                };
+                uint16_t        __max_value;
+            };
+        )
+#else
+        protected_member(
+            uint16_t            __cur_value;
+            uint16_t            __max_value;
+            vsf_eda_t           *eda_tx;
+        )
+#endif
+    };
+
+    public_member(
+        vsf_queue_op_t  op;
     )
-    private_member(
-        vsf_slist_queue_t   msgq;
+
+    protected_member(
+        vsf_eda_t *eda_rx;
     )
 };
 //! @}
+#endif
 
 // IPC
 enum vsf_sync_reason_t {
@@ -520,15 +553,27 @@ SECTION(".text.vsf.kernel.vsf_eda_queue_init")
 extern vsf_err_t vsf_eda_queue_init(vsf_queue_t *pthis, uint_fast16_t max);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send")
-extern vsf_err_t vsf_eda_queue_send(vsf_queue_t *pthis, vsf_slist_node_t *node);
+extern vsf_err_t vsf_eda_queue_send(vsf_queue_t *pthis, void *node, int_fast32_t timeout);
+
+SECTION(".text.vsf.kernel.vsf_eda_queue_send_ex")
+extern vsf_err_t vsf_eda_queue_send_ex(vsf_queue_t *pthis, void *node, int_fast32_t timeout, vsf_eda_t *eda);
+
+SECTION(".text.vsf.kernel.vsf_eda_queue_send_get_reason")
+extern vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, void *node);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv")
-extern vsf_err_t vsf_eda_queue_recv(vsf_queue_t *pthis, vsf_slist_node_t **node, int_fast32_t timeout);
+extern vsf_err_t vsf_eda_queue_recv(vsf_queue_t *pthis, void **node, int_fast32_t timeout);
 
-SECTION(".text.vsf.kernel.vsf_eda_queue_get_reason")
-extern vsf_sync_reason_t vsf_eda_queue_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, vsf_slist_node_t **node);
+SECTION(".text.vsf.kernel.vsf_eda_queue_recv_ex")
+extern vsf_err_t vsf_eda_queue_recv_ex(vsf_queue_t *pthis, void **node, int_fast32_t timeout, vsf_eda_t *eda);
+
+SECTION(".text.vsf.kernel.vsf_eda_queue_recv_get_reason")
+extern vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, void **node);
 #endif      // VSF_CFG_QUEUE_EN
+
 
 #endif      // VSF_CFG_SYNC_EN
 
+#undef __VSF_EDA_CLASS_INHERIT
+#undef __VSF_EDA_CLASS_IMPLEMENT
 #endif      // __VSF_EDA_H__

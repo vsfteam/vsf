@@ -42,8 +42,8 @@ struct vsf_netlink_op_t {
     vsf_err_t (*init)(vsf_netdrv_t *netdrv);
     vsf_err_t (*fini)(vsf_netdrv_t *netdrv);
 
-    vsf_err_t (*output)(vsf_netdrv_t *netdrv);
-    vsf_err_t (*input)(vsf_netdrv_t *netdrv);
+    bool (*can_output)(vsf_netdrv_t *netdrv);
+    vsf_err_t (*output)(vsf_netdrv_t *netdrv, void *netbuf);
 };
 typedef struct vsf_netlink_op_t vsf_netlink_op_t;
 
@@ -89,6 +89,7 @@ def_simple_class(vsf_netdrv_t) {
 #endif
         void *netif;
         const vsf_netdrv_adapter_t *adapter;
+        vsf_eda_t *eda_pending;
     )
 
 #if defined(VSF_NETDRV_IMPLEMENT) || defined(VSF_NETDRV_INHERIT_NETLINK)
@@ -98,8 +99,6 @@ def_simple_class(vsf_netdrv_t) {
 #endif
         void *netlink_param;
         const vsf_netlink_op_t *netlink_op;
-
-        void *netbuf_rx, *netbuf_tx;
     )
 };
 
@@ -118,13 +117,15 @@ extern vsf_err_t vsf_netdrv_connect(vsf_netdrv_t *netdrv);
 extern void vsf_netdrv_disconnect(vsf_netdrv_t *netdrv);
 extern bool vsf_netdrv_is_connected(vsf_netdrv_t *netdrv);
 extern void * vsf_netdrv_read_buf(vsf_netdrv_t *netdrv, void *netbuf, vsf_mem_t *mem);
-extern void vsf_netdrv_on_outputted(vsf_netdrv_t *netdrv, int_fast32_t size);
-extern void vsf_netdrv_on_inputted(vsf_netdrv_t *netdrv, int_fast32_t size);
+extern void * vsf_netdrv_alloc_buf(vsf_netdrv_t *netdrv);
+extern void vsf_netdrv_on_outputted(vsf_netdrv_t *netdrv, void *netbuf, int_fast32_t size);
+extern void vsf_netdrv_on_inputted(vsf_netdrv_t *netdrv, void *netbuf, int_fast32_t size);
 #endif
 
 #if defined(VSF_NETDRV_IMPLEMENT) || defined(VSF_NETDRV_INHERIT_NETIF)
 extern vsf_err_t vsf_netdrv_init(vsf_netdrv_t *netdrv);
 extern vsf_err_t vsf_netdrv_fini(vsf_netdrv_t *netdrv);
+extern bool vsf_netdrv_can_output(vsf_netdrv_t *netdrv);
 extern vsf_err_t vsf_netdrv_output(vsf_netdrv_t *netdrv, void *netbuf);
 #endif
 

@@ -41,11 +41,11 @@ const i_stream_writer_t  VSF_STREAM_WRITER = {
         .Send =         &vsf_stream_writer_send_pbuf,
     }, 
 
-    .Stream = {
-        .Write =        &vsf_stream_writer_write,
-        .WriteByte =    &vsf_stream_writer_write_byte,
-        .Flush =        &vsf_stream_writer_flush,
-    },
+
+    .Write =            &vsf_stream_writer_write,
+    .WriteByte =        &vsf_stream_writer_write_byte,
+    .Flush =            &vsf_stream_writer_flush,
+ 
 };
 
 

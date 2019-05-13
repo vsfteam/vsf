@@ -38,52 +38,41 @@ WEAK void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv) {}
 WEAK void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv) {}
 WEAK void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv) {}
 
-void vsf_netdrv_on_outputted(vsf_netdrv_t *netdrv, int_fast32_t size)
+void vsf_netdrv_on_outputted(vsf_netdrv_t *netdrv, void *netbuf, int_fast32_t size)
 {
     ASSERT(netdrv != NULL);
-    if (netdrv->netbuf_tx != NULL) {
-        void *netbuf_tx = netdrv->netbuf_tx;
-        netdrv->netbuf_tx = NULL;
 
-        if (netdrv->is_connected) {
-            vsf_err_t err = size < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE;
-            netdrv->adapter->on_outputted(netdrv->netif, netbuf_tx, err);
-        } else {
-            netdrv->adapter->free_buf(netbuf_tx);
-        }
+    if (netdrv->is_connected) {
+        vsf_err_t err = size < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE;
+        netdrv->adapter->on_outputted(netdrv->netif, netbuf, err);
+    } else {
+        netdrv->adapter->free_buf(netbuf);
     }
 }
 
-void vsf_netdrv_on_inputted(vsf_netdrv_t *netdrv, int_fast32_t size)
+void vsf_netdrv_on_inputted(vsf_netdrv_t *netdrv, void *netbuf, int_fast32_t size)
 {
     ASSERT(netdrv != NULL);
-    if (netdrv->netbuf_rx != NULL) {
-        void *netbuf_rx = netdrv->netbuf_rx;
-        netdrv->netbuf_rx = NULL;
 
-        if ((size > 0) && netdrv->is_connected) {
-            netdrv->adapter->on_inputted(netdrv->netif, netbuf_rx, (uint32_t)size);
-        } else {
-            netdrv->adapter->free_buf(netbuf_rx);
-        }
+    if ((size > 0) && netdrv->is_connected) {
+        netdrv->adapter->on_inputted(netdrv->netif, netbuf, (uint32_t)size);
+    } else {
+        netdrv->adapter->free_buf(netbuf);
     }
+}
 
-    if (netdrv->is_connected && !netdrv->netbuf_rx) {
-        netdrv->netbuf_rx = netdrv->adapter->alloc_buf(netdrv->netif, netdrv->mac_header_size + netdrv->mtu);
-        if (netdrv->netbuf_rx != NULL) {
-            netdrv->netlink_op->input(netdrv);
-        }
+void * vsf_netdrv_alloc_buf(vsf_netdrv_t *netdrv)
+{
+    if (netdrv->is_connected) {
+        return netdrv->adapter->alloc_buf(netdrv->netif, netdrv->mac_header_size + netdrv->mtu);
     }
+    return NULL;
 }
 
 vsf_err_t vsf_netdrv_init(vsf_netdrv_t *netdrv)
 {
     ASSERT(netdrv != NULL);
-    vsf_err_t err = netdrv->netlink_op->init(netdrv);
-    if (!err && !netdrv->netbuf_rx) {
-        vsf_netdrv_on_inputted(netdrv, VSF_ERR_NONE);
-    }
-    return err;
+    return netdrv->netlink_op->init(netdrv);
 }
 
 vsf_err_t vsf_netdrv_fini(vsf_netdrv_t *netdrv)
@@ -139,13 +128,17 @@ bool vsf_netdrv_is_connected(vsf_netdrv_t *netdrv)
     return netdrv->is_connected;
 }
 
+bool vsf_netdrv_can_output(vsf_netdrv_t *netdrv)
+{
+    return netdrv->netlink_op->can_output(netdrv);
+}
+
 vsf_err_t vsf_netdrv_output(vsf_netdrv_t *netdrv, void *netbuf)
 {
     ASSERT((netdrv != NULL) && (netbuf != NULL));
     vsf_err_t err = VSF_ERR_FAIL;
-    if (netdrv->is_connected && !netdrv->netbuf_tx) {
-        netdrv->netbuf_tx = netbuf;
-        err = netdrv->netlink_op->output(netdrv);
+    if (netdrv->is_connected) {
+        err = netdrv->netlink_op->output(netdrv, netbuf);
     }
 
     if (err) {

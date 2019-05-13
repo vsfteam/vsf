@@ -9,6 +9,7 @@
  * Copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 
+#include "vsf.h"
 #include "NuConsole.h"
 #include <string.h>
 
@@ -16,7 +17,7 @@
 	#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-NUCONSOLE_INFOBLOCK NuConsole_InfoBlock;
+NUCONSOLE_INFOBLOCK NuConsole_InfoBlock __AT_ADDR(0x20000000);
 
 static uint8_t g_acTxBuffer[NUCOSOLE_TX_BUFFER_SIZE];
 static uint8_t g_acRxBuffer[NUCOSOLE_RX_BUFFER_SIZE];

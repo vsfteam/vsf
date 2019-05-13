@@ -70,6 +70,11 @@ static vsf_err_t vsfip_eth_header(vsfip_netbuf_t *netbuf,
     return VSF_ERR_NONE;
 }
 
+static bool vsfip_eth_can_output(vsfip_netif_t *netif)
+{
+    return vsf_netdrv_can_output(netif->netdrv);
+}
+
 static vsf_err_t vsfip_eth_output(vsfip_netbuf_t *netbuf)
 {
     vsfip_netif_t *netif = netbuf->netif;
@@ -104,6 +109,7 @@ static void vsfip_eth_input(vsfip_netbuf_t *netbuf)
 const vsfip_netif_op_t vsfip_eth_op = {
     .header     = vsfip_eth_header,
     .input      = vsfip_eth_input,
+    .can_output = vsfip_eth_can_output,
     .output     = vsfip_eth_output,
     .routable   = vsfip_eth_routable,
 };

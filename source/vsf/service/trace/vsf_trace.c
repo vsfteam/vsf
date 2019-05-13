@@ -234,7 +234,7 @@ void vsf_trace_buffer(  vsf_trace_level_t level,
 
     vsf_trace_set_level(level);
     if (len > 0) {
-        const char map[16] = "0123456789ABCDEF";
+        static const char map[16] = "0123456789ABCDEF";
         // line format 16 data max:
         //    XXXXXXXX: XXXXXXXX XXXXXXXX ....  | CHAR.....\r\n\0
         //              9 * 16                 3   4 * 16   3

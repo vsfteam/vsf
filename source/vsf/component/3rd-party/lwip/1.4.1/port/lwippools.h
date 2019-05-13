@@ -15,22 +15,14 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSFIP_NETDRV_ADAPTER_H__
-#define __VSFIP_NETDRV_ADAPTER_H__
+#ifndef __LWIPPOOLS_H__
+#define __LWIPPOOLS_H__
 
 /*============================ INCLUDES ======================================*/
-
-#include "component/tcpip/vsf_tcpip_cfg.h"
-
-#if VSF_USE_TCPIP == ENABLED
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
-
-#endif      // VSF_USE_TCPIP
-#endif      // __VSFIP_NETDRV_ADAPTER_H__
+#endif	// __LWIPPOOLS_H__

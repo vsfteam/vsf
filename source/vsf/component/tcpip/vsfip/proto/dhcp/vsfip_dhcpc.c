@@ -90,9 +90,9 @@ static vsf_err_t vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
                                 sizeof(requestlist), requestlist);
     } while (0);
 
-#ifdef VSFIP_CFG_HOSTNAME
+#ifdef TCPIP_CFG_HOSTNAME
     vsfip_dhcp_append_opt(netbuf, &dhcpc->optlen, DHCP_OPT_HOSTNAME,
-            sizeof(VSFIP_CFG_HOSTNAME) - 1, (uint8_t *)VSFIP_CFG_HOSTNAME);
+            sizeof(TCPIP_CFG_HOSTNAME) - 1, (uint8_t *)TCPIP_CFG_HOSTNAME);
 #endif
 
     return VSF_ERR_NONE;

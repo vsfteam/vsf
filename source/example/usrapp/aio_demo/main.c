@@ -579,6 +579,8 @@ void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
 }
 #endif
 
+#include "lwip/init.h"
+
 int main(void)
 {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -602,6 +604,8 @@ int main(void)
 
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);
+
+    lwip_init();
 
     usrapp.poll_timer.on_timer = usrapp_on_timer;
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);

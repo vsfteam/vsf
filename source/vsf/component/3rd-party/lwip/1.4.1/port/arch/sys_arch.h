@@ -15,22 +15,46 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSFIP_NETDRV_ADAPTER_H__
-#define __VSFIP_NETDRV_ADAPTER_H__
+#ifndef __LWIP_SYS_ARCH_H__
+#define __LWIP_SYS_ARCH_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/tcpip/vsf_tcpip_cfg.h"
-
-#if VSF_USE_TCPIP == ENABLED
+#include "vsf.h"
+#include "lwipopts.h"
 
 /*============================ MACROS ========================================*/
+
+#if !NO_SYS
+#   if VSF_USE_KERNEL_THREAD_MODE != ENABLED
+#       error "VSF_USE_KERNEL_THREAD_MODE must be enabled for SYS mode of lwip"
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if !NO_SYS
+
+struct sys_mbox_t {
+    implement(vsf_queue_t)
+    uint16_t head;
+    uint16_t tail;
+    void **queue;
+};
+typedef struct sys_mbox_t sys_mbox_t;
+typedef vsf_sem_t sys_sem_t;
+typedef vsf_mutex_t sys_mutex_t;
+
+#if SYS_LIGHTWEIGHT_PROT
+typedef vsf_protect_t sys_prot_t;
+#endif
+
+typedef vsf_thread_t * sys_thread_t;
+
+#endif      // NO_SYS
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
-
-#endif      // VSF_USE_TCPIP
-#endif      // __VSFIP_NETDRV_ADAPTER_H__
+#endif	// __LWIP_SYS_ARCH_H__

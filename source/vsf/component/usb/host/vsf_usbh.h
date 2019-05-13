@@ -417,6 +417,10 @@ void vsf_usbh_hcd_urb_free_buffer(vsf_usbh_hcd_urb_t *urb_hcd);
 
 #if defined(VSF_USBH_IMPLEMENT) || defined(VSF_USBH_IMPLEMENT_CLASS)
 // APIs to be called by class drivers
+extern vsf_usbh_eppipe_t vsf_usbh_get_pipe_from_ep_desc(vsf_usbh_dev_t *dev,
+            struct usb_endpoint_desc_t *desc_ep);
+extern void vsf_usbh_urb_prepare_by_pipe(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
+            vsf_usbh_eppipe_t pipe);
 extern void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
 extern bool vsf_usbh_urb_is_valid(vsf_usbh_urb_t *urb);

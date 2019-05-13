@@ -128,9 +128,9 @@ static void vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
                     netif->ip4addr.size, netif->ip4addr.addr_buf);
         vsfip_dhcp_append_opt(netbuf, &dhcpd->optlen, DHCP_OPT_DNSSERVER,
                     netif->ip4addr.size, netif->ip4addr.addr_buf);
-#ifdef VSFIP_CFG_HOSTNAME
+#ifdef TCPIP_CFG_HOSTNAME
         vsfip_dhcp_append_opt(netbuf, &dhcpd->optlen, DHCP_OPT_HOSTNAME,
-                    sizeof(VSFIP_CFG_HOSTNAME) - 1, (uint8_t *)VSFIP_CFG_HOSTNAME);
+                    sizeof(TCPIP_CFG_HOSTNAME) - 1, (uint8_t *)TCPIP_CFG_HOSTNAME);
 #endif
 #ifdef VSFIP_CFG_DOMAIN
         vsfip_dhcp_append_opt(netbuf, &dhcpd->optlen, DHCP_OPT_DOMAIN,

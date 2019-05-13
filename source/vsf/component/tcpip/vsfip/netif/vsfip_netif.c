@@ -106,6 +106,10 @@ static void vsfip_netif_output_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 	switch (evt) {
 	case VSFIP_NETIF_EVT_OUTPUTTED:
 	case VSF_EVT_INIT:
+    wait_next:
+        if (!netif->op->can_output(netif)) {
+            break;
+        }
 		if (VSF_ERR_NONE != vsf_eda_sem_pend(&netif->output_sem, -1)) {
 			break;
         }
@@ -119,15 +123,8 @@ static void vsfip_netif_output_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (netbuf != NULL) {
             netif->op->output(netbuf);
         }
-		break;
+        goto wait_next;
 	}
-}
-
-void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv)
-{
-    netif->netdrv = netdrv;
-    netdrv->netif = netif;
-    netdrv->adapter = &vsfip_netdrv_adapter;
 }
 
 vsf_err_t vsfip_netif_init(vsfip_netif_t *netif)
