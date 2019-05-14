@@ -106,12 +106,7 @@ private implement_vsf_pt(user_pt_task_b_t)
 }
 #endif
 
-static void system_init(void)
-{
-    vsf_stdio_init();
-}
-
-int main(void)
+void vsf_kernel_pt_simple_demo(void)
 {
     static_task_instance(
         features_used(
@@ -120,15 +115,18 @@ int main(void)
         )
     )
     
-    system_init();
-    
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
     do {
         static NO_INIT user_pt_task_t __user_task;
+#if __IS_COMPILER_ARM_COMPILER_5__
+        __user_task.use_as__task_cb_user_pt_task_t.psem = &user_sem;
+#else
         __user_task.psem = &user_sem;
+#endif
+        
         init_vsf_pt(user_pt_task_t, &__user_task, vsf_priority_inherit);
     } while(0);
 
@@ -152,3 +150,16 @@ int main(void)
     return 0;
 #endif
 }
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_pt_simple_demo();
+    
+    while(1);
+}
+
+#endif
+

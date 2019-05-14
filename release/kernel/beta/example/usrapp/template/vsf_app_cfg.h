@@ -27,7 +27,7 @@
 //#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
 #define ASSERT(...)
 
-
+#define VSF_PROJ_CFG_USE_CUBE               DISABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 

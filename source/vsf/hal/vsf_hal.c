@@ -121,7 +121,7 @@ implement_endian_func(16)
 implement_endian_func(32)
 implement_endian_func(64)
 
-WEAK bool driver_init(void) 
+WEAK bool vsf_driver_init(void) 
 {
     return true;
 }
@@ -133,7 +133,7 @@ WEAK bool driver_init(void)
  */  
 bool vsf_hal_init( void )
 {
-    if (!vsf_arch_init() || !driver_init()) {
+    if (!vsf_arch_init() || !vsf_driver_init()) {
         return false;
     }
 

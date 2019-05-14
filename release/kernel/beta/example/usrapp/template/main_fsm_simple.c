@@ -24,21 +24,21 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-declare_fsm(user_task_t)
-declare_fsm(user_sub_task_t)
+declare_fsm(user_fsm_task_t)
+declare_fsm(user_fsm_sub_task_t)
 
-def_fsm(user_sub_task_t,
+def_fsm(user_fsm_sub_task_t,
     def_params(
         uint32_t cnt;
     ));
 
 
-def_fsm(user_task_t,
+def_fsm(user_fsm_task_t,
     def_params(
         vsf_sem_t *psem;
         uint32_t cnt;
         
-        vsf_task(user_sub_task_t) print_task;
+        vsf_task(user_fsm_sub_task_t) print_task;
     ));
     
 #if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
@@ -57,7 +57,7 @@ static NO_INIT vsf_sem_t user_sem;
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_initialiser(user_sub_task_t,
+fsm_initialiser(user_fsm_sub_task_t,
     args(
         uint8_t chCount
     ))
@@ -66,7 +66,7 @@ fsm_initialiser(user_sub_task_t,
     )
 
 
-implement_fsm(user_sub_task_t) 
+implement_fsm(user_fsm_sub_task_t) 
     def_states(PRINT_INFO);
     
     body(                                                                       
@@ -83,7 +83,7 @@ implement_fsm(user_sub_task_t)
 
 
 
-fsm_initialiser(user_task_t,
+fsm_initialiser(user_fsm_task_t,
     args(
         vsf_sem_t *ptSEM
     ))
@@ -97,7 +97,7 @@ fsm_initialiser(user_task_t,
  * Example of unprotected fsm                                                 *
  * NOTE: you can debug content between body_begin() and body_end()            *
  *----------------------------------------------------------------------------*/
-implement_fsm(user_task_t) 
+implement_fsm(user_fsm_task_t) 
 {
     def_states(WAIT_FOR_SEM, CALL_SUB_TO_PRINT);
     
@@ -112,14 +112,14 @@ implement_fsm(user_task_t)
     state(WAIT_FOR_SEM) {
         vsf_task_wait_until(
             vsf_sem_pend(this.psem){                                            //!< wait for semaphore forever
-                init_fsm(user_sub_task_t, &this.print_task, args(this.cnt));    //!< init sub fsm
+                init_fsm(user_fsm_sub_task_t, &this.print_task, args(this.cnt));//!< init sub fsm
                 transfer_to(CALL_SUB_TO_PRINT);                                 //!< tranfer to next state
             }
         );
     }
     
     state(CALL_SUB_TO_PRINT) {
-        if (fsm_rt_cpl == call_fsm(user_sub_task_t, &this.print_task)) {
+        if (fsm_rt_cpl == call_fsm(user_fsm_sub_task_t, &this.print_task)) {
             //! fsm complete
             this.cnt = this.print_task.cnt;                                     //!< read param value
             reset_fsm();
@@ -169,12 +169,8 @@ implement_fsm(user_task_b_t)
     )
 #endif
 
-static void system_init(void)
-{
-    vsf_stdio_init();
-}
 
-int main(void)
+void vsf_kernel_fsm_simple_demo(void)
 {
     static_task_instance(
         features_used(
@@ -183,18 +179,16 @@ int main(void)
         )
     )
     
-    system_init();
-    
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
     do {
-        static NO_INIT user_task_t __user_task;
-        init_fsm(user_task_t, 
-                ref_obj_as(__user_task, fsm(user_task_t)), 
+        static NO_INIT user_fsm_task_t __user_task;
+        init_fsm(user_fsm_task_t, 
+                ref_obj_as(__user_task, fsm(user_fsm_task_t)), 
                 args(&user_sem));
-        start_fsm(user_task_t, &__user_task, vsf_priority_0);
+        start_fsm(user_fsm_task_t, &__user_task, vsf_priority_0);
     } while(0);
 
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
@@ -220,3 +214,16 @@ int main(void)
     return 0;
 #endif
 }
+
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_fsm_simple_demo();
+    
+    while(1);
+}
+
+#endif

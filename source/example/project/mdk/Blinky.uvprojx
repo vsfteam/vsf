@@ -535,6 +535,11 @@
                 <FileArmAds/>
               </FileOption>
             </File>
+            <File>
+              <FileName>vsf_kernel_armv7em_full_size.a</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7em_full_size.a</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -920,7 +925,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>template_armv7-m</TargetName>
+      <TargetName>template_armv7-m_ac6</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
@@ -1428,6 +1433,49 @@
               <FileName>vsf_kernel_armv7m_full_size.a</FileName>
               <FileType>4</FileType>
               <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv7em_full_size.a</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7em_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Aads>
+                    <interw>2</interw>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <thumb>2</thumb>
+                    <SplitLS>2</SplitLS>
+                    <SwStkChk>2</SwStkChk>
+                    <NoWarn>2</NoWarn>
+                    <uSurpInc>2</uSurpInc>
+                    <useXO>2</useXO>
+                    <uClangAs>2</uClangAs>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Aads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -3176,6 +3224,11 @@
               <FileType>4</FileType>
               <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
             </File>
+            <File>
+              <FileName>vsf_kernel_armv7em_full_size.a</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7em_full_size.a</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4347,6 +4400,11 @@
                 <FileArmAds/>
               </FileOption>
             </File>
+            <File>
+              <FileName>vsf_kernel_armv7em_full_size.a</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7em_full_size.a</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5239,6 +5297,49 @@
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
                 <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_kernel_armv7em_full_size.a</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7em_full_size.a</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Aads>
+                    <interw>2</interw>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <thumb>2</thumb>
+                    <SplitLS>2</SplitLS>
+                    <SwStkChk>2</SwStkChk>
+                    <NoWarn>2</NoWarn>
+                    <uSurpInc>2</uSurpInc>
+                    <useXO>2</useXO>
+                    <uClangAs>2</uClangAs>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Aads>
+                </FileArmAds>
               </FileOption>
             </File>
           </Files>
@@ -6904,6 +7005,11 @@
               <FileType>4</FileType>
               <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
             </File>
+            <File>
+              <FileName>vsf_kernel_armv7em_full_size.a</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7em_full_size.a</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8336,7 +8442,7 @@
           <targetInfo name="demo_armv7-m"/>
           <targetInfo name="kernel_lib"/>
           <targetInfo name="template_armv6-m"/>
-          <targetInfo name="template_armv7-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
           <targetInfo excluded="1" name="vsf_stdio_lib" versionMatchMode=""/>
         </targetInfos>
       </component>
@@ -8347,7 +8453,7 @@
           <targetInfo name="demo_armv7-m"/>
           <targetInfo name="kernel_lib"/>
           <targetInfo name="template_armv6-m"/>
-          <targetInfo name="template_armv7-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM0 CMSIS">
@@ -8361,7 +8467,7 @@
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
           <targetInfo name="demo_armv7-m"/>
-          <targetInfo name="template_armv7-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM7 CMSIS">
@@ -8405,7 +8511,7 @@
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
           <targetInfo name="demo_armv7-m"/>
-          <targetInfo name="template_armv7-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </file>
       <file attr="config" category="source" condition="ARMCC" name="Device\CMSDK_CM3\Source\ARM\startup_CMSDK_CM3.s" version="1.0.0">
@@ -8414,7 +8520,7 @@
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
           <targetInfo name="demo_armv7-m"/>
-          <targetInfo name="template_armv7-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </file>
       <file attr="config" category="source" name="Device\CMSDK_CM3\Source\system_CMSDK_CM3.c" version="1.0.0">
@@ -8423,7 +8529,7 @@
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
           <targetInfo name="demo_armv7-m"/>
-          <targetInfo name="template_armv7-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </file>
       <file attr="config" category="header" name="CMSIS\Config\RTE_Device.h" version="0.0.0">

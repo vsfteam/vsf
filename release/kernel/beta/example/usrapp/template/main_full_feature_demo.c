@@ -110,14 +110,6 @@ def_vsf_task(timer_example_t)
 
 #endif
 
-#if VSF_CFG_QUEUE_EN == ENABLED
-
-declare_vsf_task(msg_queue_example_t)
-
-def_vsf_task(msg_queue_example_t)
-
-#endif
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -145,45 +137,6 @@ static NO_INIT user_grouped_evts_t __user_grouped_evts;
 
 #endif
 
-#if VSF_CFG_QUEUE_EN == ENABLED
-vsf_pool(user_msg_pool_t) user_msg_pool;
-static NO_INIT vsf_queue_t user_msgq;
-
-static NO_INIT msg_queue_example_t __msg_queue_example_receiver;
-
-implement_vsf_pool( user_msg_pool_t, user_msg_t)
-
-static implement_vsf_task(msg_queue_example_t)
-{
-    vsf_sync_reason_t reason;
-    vsf_slist_node_t *pnode;
-    user_msg_t *pmsg;
-
-    switch (evt) {
-    case VSF_EVT_INIT:
-        recv_again:
-        if (!vsf_eda_queue_recv(&user_msgq, &pnode, -1)) {
-            goto msg_rcvd;
-        }
-        break;
-//    case VSF_EVT_TIMER:
-    case VSF_EVT_SYNC:
-    case VSF_EVT_SYNC_CANCEL:
-        reason = vsf_eda_queue_get_reason(&user_msgq, evt, &pnode);
-        if (reason == VSF_SYNC_GET) {
-        msg_rcvd:
-            pmsg = (user_msg_t *)pnode;
-            printf("msg receviced from %d\r\n", pmsg->index);
-            VSF_POOL_FREE(user_msg_pool_t, &user_msg_pool, pmsg);
-            goto recv_again;
-        }
-    }
-    
-
-    return fsm_rt_wait_for_evt;
-}
-#endif
-
 #if VSF_CFG_TIMER_EN == ENABLED
 
 static implement_vsf_task(timer_example_t)
@@ -199,13 +152,6 @@ static implement_vsf_task(timer_example_t)
 #if VSF_CFG_BMPEVT_EN == ENABLED
         set_grouped_evts( &__user_grouped_evts,  1 << (index + timer0_evt_idx));
 #endif
-        pmsg = VSF_POOL_ALLOC(user_msg_pool_t, &user_msg_pool);
-        if (pmsg != NULL) {
-            pmsg->index = index;
-            if (vsf_eda_queue_send(&user_msgq, &pmsg->use_as__vsf_slist_node_t)) {
-                VSF_POOL_FREE(user_msg_pool_t, &user_msg_pool, pmsg);
-            }
-        }
     case VSF_EVT_INIT:
         vsf_teda_set_timer_ms(delay);
         break;
@@ -242,11 +188,11 @@ implement_vsf_thread(user_task_t)
         NULL,
         (i_code_region_t *)&__example_code_region,
     };
-
+/*
     code_region(&user_region){
         printf("\tbody\r\n");
     }
-
+*/
     while (1) {
 #if VSF_CFG_TIMER_EN
         vsf_delay_ms(1000);
@@ -344,7 +290,7 @@ implement_vsf_task(bmevt_demo_t)
 
 
 
-int main(void)
+void vsf_kernel_full_feature_demo(void)
 {
     static_task_instance(
         features_used(
@@ -353,9 +299,7 @@ int main(void)
             )
         )
     )
-
-    vsf_stdio_init();
-
+    
 #if VSF_CFG_SYNC_EN == ENABLED
     // initialize adapter
     do {
@@ -367,37 +311,25 @@ int main(void)
         init_vsf_task(bmevt_demo_t, &__bmevt_demo, vsf_priority_0);
 #       if VSF_USE_KERNEL_PT_MODE == ENABLED
         do {
+        #if __IS_COMPILER_ARM_COMPILER_5__
+            static user_pt_bmpevt_demo_thread_t __pt_demo = {
+                .use_as__task_cb_user_pt_bmpevt_demo_thread_t = {
+                    .mask = timer4_evt_msk,
+                    .pgroup_evts = &__user_grouped_evts,
+                },
+            };
+        #else
             static user_pt_bmpevt_demo_thread_t __pt_demo = {
                 .mask = timer4_evt_msk,
                 .pgroup_evts = &__user_grouped_evts,
             };
+        #endif
             init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_priority_inherit);
         } while(0);
 #       endif
 #   endif
     } while(0);
 #endif
-
-    do {
-        VSF_POOL_INIT(  user_msg_pool_t, 
-                        &user_msg_pool, 
-                        16, 
-                        &user_msgq, 
-                        (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION);
-        vsf_eda_queue_init(&user_msgq, 4);
-        
-        init_vsf_task(  msg_queue_example_t, 
-                        &__msg_queue_example_receiver, 
-                        vsf_priority_inherit);
-        /*
-        user_msg_receiver.evthandler = user_msg_receiver_evthandler;
-    #if VSF_CFG_EVTQ_EN == ENABLED
-        user_msg_receiver.on_terminate = NULL;
-    #endif
-        vsf_eda_init(&user_msg_receiver, vsf_priority_inherit, false);
-        */
-        
-    } while(0);
     
 #if VSF_CFG_TIMER_EN == ENABLED
     for (int i = 0; i < dimof(__timer_example); i++) {
@@ -413,7 +345,7 @@ int main(void)
     do {
         static NO_INIT user_task_t __user_task;
 #   if VSF_CFG_SYNC_EN == ENABLED
-        __user_task.psem = &user_sem;
+        __user_task.use_as__vsf_thread_user_task_t_t.psem = &user_sem;
 #   endif
         init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
     } while(0);
@@ -438,5 +370,19 @@ int main(void)
 #endif
 
 }
+
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_full_feature_demo();
+    
+    while(1);
+}
+
+#endif
+
 
 /* EOF */

@@ -102,7 +102,7 @@ typedef enum m480_pllsrc_t m480_pllsrc_t;
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-bool driver_init(void)
+bool vsf_driver_init(void)
 {
     // test only, remove later
     uint32_t temp32;

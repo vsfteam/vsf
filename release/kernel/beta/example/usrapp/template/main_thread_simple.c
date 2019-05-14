@@ -21,9 +21,9 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-declare_vsf_thread(user_task_t)
+declare_vsf_thread(user_thread_t)
 
-def_vsf_thread(user_task_t, 512,
+def_vsf_thread(user_thread_t, 512,
 
     features_used(
         mem_sharable( using_grouped_evt; )
@@ -44,7 +44,7 @@ static NO_INIT vsf_sem_t user_sem;
 #error In order to run this demo, please set VSF_OS_RUN_MAIN_AS_THREAD to ENABLED
 #endif
 
-implement_vsf_thread(user_task_t) 
+implement_vsf_thread(user_thread_t) 
 {
     uint32_t cnt = 0;
     while (1) {
@@ -54,13 +54,7 @@ implement_vsf_thread(user_task_t)
 }
 
 
-
-static void system_init(void)
-{
-    vsf_stdio_init();
-}
-
-int main(void)
+void vsf_kernel_thread_simple_demo(void)
 {
     static_task_instance(
         features_used(
@@ -69,16 +63,18 @@ int main(void)
         )
     )
     
-    system_init();
-    
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
     do {
-        static NO_INIT user_task_t __user_task;
+        static NO_INIT user_thread_t __user_task;
+#if __IS_COMPILER_ARM_COMPILER_5__
+        __user_task.use_as__vsf_thread_user_thread_t_t.psem = &user_sem;
+#else
         __user_task.psem = &user_sem;
-        init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
+#endif
+        init_vsf_thread(user_thread_t, &__user_task, vsf_priority_0);
     } while(0);
 
     
@@ -89,3 +85,15 @@ int main(void)
     }
     
 }
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_thread_simple_demo();
+    
+    while(1);
+}
+
+#endif

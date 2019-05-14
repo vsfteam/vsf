@@ -173,7 +173,7 @@ static vsf_err_t vsf_usbh_ecm_netlink_output(vsf_netdrv_t *netdrv, void *netbuf)
     if ((netbuf = vsf_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL) {
         uint_fast16_t pos = 0;
         do {
-            ASSERT((mem.nSize + post) <= sizeof(ocb->buffer));
+            ASSERT((mem.nSize + pos) <= sizeof(ocb->buffer));
             memcpy(&ocb->buffer[pos], mem.pchBuffer, mem.nSize);
             pos += mem.nSize;
         } while ((netbuf = vsf_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL);

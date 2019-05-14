@@ -68,7 +68,7 @@
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-extern bool driver_init(void);
+extern bool vsf_driver_init(void);
 
 #endif
 /* EOF */

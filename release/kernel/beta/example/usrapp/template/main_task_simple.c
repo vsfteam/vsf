@@ -33,12 +33,13 @@ def_vsf_task(user_task_t,
     def_params(
         vsf_sem_t *psem;
         uint32_t cnt;
-        uint8_t state;
         
         vsf_task(user_sub_task_t) print_task;
         
     ));
-    
+                                                       
+
+
 #if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
 declare_vsf_task(user_task_b_t)
 def_vsf_task(user_task_b_t,
@@ -61,7 +62,7 @@ implement_vsf_task(user_sub_task_t)
 }
 
 
-#define USER_TASK_RESET_FSM()   do { this.state = 0;} while(0)
+#define USER_TASK_RESET_FSM()   do { this.chState = 0;} while(0)
 
 implement_vsf_task(user_task_t) 
 {
@@ -70,11 +71,11 @@ implement_vsf_task(user_task_t)
         CALL_SUB_TO_PRINT,
     };
     on_vsf_task_init() {
-        this.state = 0;
+        this.chState = 0;
         this.cnt = 0;
     }
 
-    switch (this.state) {
+    switch (this.chState) {
         case WAIT_FOR_SEM:
             /*! \note IMPORTANT!!!!!
              *        For anything you want to wait, which is coming from vsf 
@@ -108,7 +109,7 @@ implement_vsf_task(user_task_t)
             vsf_task_wait_until(
                 vsf_sem_pend(this.psem){                                        //!< wait for semaphore forever
                     this.print_task.cnt = this.cnt;                             //!< passing parameter
-                    this.state = CALL_SUB_TO_PRINT;                             //!< tranfer to next state
+                    this.chState = CALL_SUB_TO_PRINT;                             //!< tranfer to next state
                 }
             );
             break;
@@ -151,12 +152,7 @@ implement_vsf_task(user_task_b_t)
 }
 #endif
 
-static void system_init(void)
-{
-    vsf_stdio_init();
-}
-
-int main(void)
+void vsf_kernel_task_simple_demo(void)
 {
     static_task_instance(
         features_used(
@@ -165,15 +161,18 @@ int main(void)
         )
     )
     
-    system_init();
-    
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
     do {
         static NO_INIT user_task_t __user_task;
+        
+#if __IS_COMPILER_ARM_COMPILER_5__
+        __user_task.use_as__task_cb_user_task_t.psem = &user_sem;
+#else
         __user_task.psem = &user_sem;
+#endif
         init_vsf_task(user_task_t, &__user_task, vsf_priority_0);
     } while(0);
 
@@ -197,3 +196,15 @@ int main(void)
     return 0;
 #endif
 }
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_task_simple_demo();
+    
+    while(1);
+}
+
+#endif

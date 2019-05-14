@@ -71,11 +71,14 @@
                                                 vsf_priority_t priority)        \
             {                                                                   \
                 ASSERT(NULL != ptask);                                          \
-                ptask->pentry = (vsf_thread_entry_t *)                          \
+                vsf_thread_t *pthis =                                           \
+                    &(ptask->use_as__vsf_thread_##__NAME##_t                    \
+                        .use_as__vsf_thread_t);                                 \
+                pthis->pentry = (vsf_thread_entry_t *)                          \
                                     &vsf_thread_##__NAME##_entry;               \
-                ptask->pstack = ptask->stack;                                   \
-                ptask->stack_size = sizeof(ptask->stack);                       \
-                vsf_thread_start(&(ptask->use_as__vsf_thread_t), priority);     \
+                pthis->pstack = ptask->stack;                                   \
+                pthis->stack_size = sizeof(ptask->stack);                       \
+                vsf_thread_start(pthis, priority);                              \
             }                                                                   \
             static void vsf_thread_##__NAME##_entry(                            \
                         vsf_thread_##__NAME##_t *ptThis)

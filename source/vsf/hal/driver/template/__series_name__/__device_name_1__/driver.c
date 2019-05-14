@@ -32,7 +32,7 @@
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-bool driver_init(void)
+bool vsf_driver_init(void)
 {  
 
     return true;
