@@ -35,11 +35,25 @@ typedef uint32_t    u32_t;
 typedef int32_t     s32_t;
 typedef u32_t       mem_ptr_t;
 
+#ifdef LWIP_DEBUG
+
+#define U16_F       "hu"
+#define S16_F       "hd"
+#define X16_F       "hx"
+#define U32_F       "lu"
+#define S32_F       "ld"
+#define X32_F       "lx"
+#define SZT_F       "uz"
+
+#define lwip_trace(format ...) vsf_trace(VSF_TRACE_DEBUG, format)
+
 /* Plaform specific diagnostic output */
-#define LWIP_PLATFORM_DIAG(__str)                                               \
+#define LWIP_PLATFORM_DIAG(...)                                                 \
         do {                                                                    \
-            vsf_trace_string(VSF_TRACE_DEBUG, __str);                           \
+            lwip_trace __VA_ARGS__;                                             \
         } while (0)
+
+#endif      // LWIP_DEBUG
 
 #define LWIP_PLATFORM_ASSERT(__str)                                             \
         do {                                                                    \

@@ -37,6 +37,8 @@
 //! for test only ...
 #define VSF_GET_MAIN_CLK()              (192000000)
 
+#define VSF_CFG_EDA_ON_TERMINATOR_EN    ENABLED
+
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
 //http://www.keil.com/support/man/docs/uv4/uv4_ut_configwizard.htm

@@ -73,6 +73,16 @@ extern vsf_priority_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis);
 /*============================ IMPLEMENTATION ================================*/
 
 SECTION(".text.vsf.kernel.eda")
+void vsf_eda_on_terminate(vsf_eda_t *pthis)
+{
+#if VSF_CFG_EDA_ON_TERMINATOR_EN == ENABLED
+    if (pthis->on_terminate != NULL) {
+        pthis->on_terminate(pthis);
+    }
+#endif
+}
+
+SECTION(".text.vsf.kernel.eda")
 void vsf_kernel_init(void)
 {
     memset(&__vsf_eda, 0, sizeof(__vsf_eda));
@@ -163,7 +173,10 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *pthis, uint_fast32_t value)
 }
 
 void vsf_evtq_on_eda_init(vsf_eda_t *pthis) {}
-void vsf_evtq_on_eda_fini(vsf_eda_t *pthis) {}
+void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
+{
+    vsf_eda_on_terminate(pthis);
+}
 
 SECTION(".text.vsf.kernel.vsf_evtq_post_evt")
 vsf_err_t vsf_evtq_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
@@ -359,7 +372,7 @@ static vsf_err_t __vsf_eda_sync_remove_eda(vsf_sync_t *sync, vsf_eda_t *eda)
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t evt)
+static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t evt, bool dequeue_eda)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     vsf_sync_reason_t reason;
@@ -371,7 +384,6 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
         if (eda->is_sync_got) {
             return VSF_SYNC_PENDING;
         }
-        __vsf_eda_sync_remove_eda(sync, eda);
         reason = VSF_SYNC_TIMEOUT;
     } else {
         vsf_teda_cancel_timer((vsf_teda_t *)eda);
@@ -383,6 +395,9 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
         } else if (evt == VSF_EVT_SYNC_CANCEL) {
             reason = VSF_SYNC_CANCEL;
         }
+    }
+    if (dequeue_eda) {
+        __vsf_eda_sync_remove_eda(sync, eda);
     }
     eda->is_limitted = false;
     return reason;
@@ -549,7 +564,7 @@ void vsf_eda_sync_cancel(vsf_sync_t *pthis)
 SECTION(".text.vsf.kernel.vsf_eda_sync_get_reason")
 vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *pthis, vsf_evt_t evt)
 {
-    return __vsf_eda_sync_get_reason(pthis, evt);
+    return __vsf_eda_sync_get_reason(pthis, evt, true);
 }
 
 #if VSF_CFG_BMPEVT_EN == ENABLED
@@ -1058,7 +1073,7 @@ SECTION(".text.vsf.kernel.vsf_eda_queue_send_get_reason")
 vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, void *node)
 {
     vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
-    vsf_sync_reason_t reason = __vsf_eda_sync_get_reason(sync, evt);
+    vsf_sync_reason_t reason = vsf_eda_sync_get_reason(sync, evt);
 
     vsf_protect_t origlevel = vsf_protect_sched();
     if (VSF_SYNC_GET == reason) {
@@ -1124,7 +1139,7 @@ SECTION(".text.vsf.kernel.vsf_eda_queue_recv_get_reason")
 vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, void **node)
 {
     vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
-    vsf_sync_reason_t reason = __vsf_eda_sync_get_reason(sync, evt);
+    vsf_sync_reason_t reason = __vsf_eda_sync_get_reason(sync, evt, false);
 
     vsf_protect_t origlevel = vsf_protect_sched();
     if (VSF_SYNC_GET == reason) {
@@ -1132,6 +1147,8 @@ vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_queue_t *pthis, vsf_evt_t ev
         sync->cur_value--;
         __vsf_eda_queue_notify(pthis, true, origlevel);
         return reason;
+    } else if (VSF_SYNC_TIMEOUT == reason) {
+        pthis->eda_rx = NULL;
     }
     vsf_unprotect_sched(origlevel);
     return reason;

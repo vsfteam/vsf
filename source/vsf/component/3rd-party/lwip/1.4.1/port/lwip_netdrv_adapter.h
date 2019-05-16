@@ -24,13 +24,16 @@
 
 #if VSF_USE_TCPIP == ENABLED
 
+#include "lwip/netif.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void lwip_netif_set_netdrv(struct netif *netif, vsf_netdrv_t *netdrv)
+extern void lwip_netif_set_netdrv(struct netif *netif, vsf_netdrv_t *netdrv);
+extern vsf_netdrv_t * lwip_netif_get_netdrv(struct netif *netif);
 
 #endif      // VSF_USE_TCPIP
 #endif      // __LWIP_NETDRV_ADAPTER_H__

@@ -100,8 +100,11 @@ ROOT void __post_vsf_kernel_init(void)
     uint_fast32_t stack_size = sizeof(__main_stack) & ~0x07;
     ASSERT(stack_size >= 64);
     
-    __main_thread.pentry = (vsf_thread_entry_t *)main;
-    __main_thread.pstack = __main_stack;
+#if VSF_CFG_EDA_ON_TERMINATOR_EN == ENABLED
+    __main_thread.on_terminate = NULL;
+#endif
+    __main_thread.entry = (vsf_thread_entry_t *)main;
+    __main_thread.stack = __main_stack;
     __main_thread.stack_size = stack_size;
     vsf_thread_start((vsf_thread_t *)&__main_thread, vsf_priority_inherit);
 #else

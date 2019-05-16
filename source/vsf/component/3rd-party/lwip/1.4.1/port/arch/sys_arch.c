@@ -26,8 +26,22 @@
 #include "lwip/sys.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_CFG_EDA_ON_TERMINATOR_EN != ENABLED
+#   error "VSF_CFG_EDA_ON_TERMINATOR_EN is required"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+struct vsf_rtos_thread_t {
+    implement(vsf_thread_t)
+
+    void *arg;
+    lwip_thread_fn fn;
+};
+typedef struct vsf_rtos_thread_t vsf_rtos_thread_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -51,6 +65,38 @@ u32_t sys_now(void)
     return vsf_systimer_tick_to_ms(vsf_timer_get_tick());
 }
 #else
+
+// thread
+static void vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
+{
+    vsf_heap_free(eda);
+}
+
+static void vsf_rtos_thread_entry(vsf_thread_t *thread)
+{
+    sys_thread_t sys_thread = (sys_thread_t)thread;
+    sys_thread->fn(sys_thread->arg);
+}
+
+sys_thread_t sys_thread_new(const char *name, lwip_thread_fn fn, void *arg, int stacksize, int prio)
+{
+    sys_thread_t thread;
+    uint_fast32_t thread_size = (sizeof(*thread) + 7) & ~7;
+
+    thread = vsf_heap_malloc(thread_size + ((stacksize + 7) & ~7));
+    if (NULL == thread) {
+        return NULL;
+    }
+
+    thread->on_terminate = vsf_rtos_thread_on_terminate;
+    thread->entry = vsf_rtos_thread_entry;
+    thread->stack = (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7);
+    thread->stack_size = stacksize;
+    thread->arg = arg;
+    thread->fn = fn;
+    vsf_thread_start(&thread->use_as__vsf_thread_t, prio);
+    return thread;
+}
 
 // sem
 err_t sys_sem_new(sys_sem_t *sem, u8_t count)
@@ -94,6 +140,7 @@ u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
 // mutex
 err_t sys_mutex_new(sys_mutex_t *mutex)
 {
+    vsf_eda_mutex_init(mutex);
     return ERR_OK;
 }
 
@@ -104,7 +151,6 @@ void sys_mutex_free(sys_mutex_t *mutex)
 
 void sys_mutex_lock(sys_mutex_t *mutex)
 {
-    vsf_eda_mutex_init(mutex);
     vsf_thread_mutex_enter(mutex, -1);
 }
 
@@ -177,7 +223,7 @@ void sys_mbox_free(sys_mbox_t *mbox)
 
 int sys_mbox_valid(sys_mbox_t *mbox)
 {
-    return mbox->queue == NULL ? 1 : 0;
+    return mbox->queue != NULL ? 1 : 0;
 }
 
 void sys_mbox_set_invalid(sys_mbox_t *mbox)

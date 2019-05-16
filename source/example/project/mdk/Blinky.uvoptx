@@ -1861,7 +1861,7 @@
 
   <Group>
     <GroupName>vsf/kernel/utilities/3rd-party/PLOOC</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2165,7 +2165,7 @@
 
   <Group>
     <GroupName>vsf/service/pool</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

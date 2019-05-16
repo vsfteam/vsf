@@ -50,7 +50,7 @@ typedef vsf_mutex_t sys_mutex_t;
 typedef vsf_protect_t sys_prot_t;
 #endif
 
-typedef vsf_thread_t * sys_thread_t;
+typedef struct vsf_rtos_thread_t * sys_thread_t;
 
 #endif      // NO_SYS
 

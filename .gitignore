@@ -49,3 +49,12 @@ source/example/project/iar/.metadata/.lock
 source/example/project/iar/kernel_lib/*.a
 source/example/project/iar/kernel_lib_armv7m/Exe/*.a
 *.reggroups
+*.crf
+*.crf
+release/kernel/beta/example/project/mdk/Out/system_cmsdk_cm3.txt
+release/kernel/beta/example/project/mdk/Out/system_cmsdk_cm0.txt
+release/kernel/beta/example/project/mdk/Out/main_thread_simple.txt
+release/kernel/beta/example/project/mdk/Out/user_retarget_1.txt
+release/kernel/beta/example/project/mdk/Out/vsf_arch_1.txt
+release/kernel/beta/example/project/mdk/Out/vsf_kernel_bsp_1.txt
+release/kernel/beta/example/project/mdk/Out/main_thread_simple.txt

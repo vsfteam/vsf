@@ -424,6 +424,9 @@ typedef struct vsf_bmpevt_adapter_bmpevt_t vsf_bmpevt_adapter_bmpevt_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+SECTION(".text.vsf.kernel.eda")
+void vsf_eda_on_terminate(vsf_eda_t *eda);
+
 #if VSF_CFG_TIMER_EN == ENABLED
 SECTION(".text.vsf.kernel.teda")
 extern vsf_timer_tick_t vsf_timer_get_tick(void);

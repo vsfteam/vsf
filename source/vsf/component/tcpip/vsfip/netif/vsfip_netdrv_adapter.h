@@ -31,6 +31,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
+extern vsf_netdrv_t * vsfip_netif_get_netdrv(vsfip_netif_t *netif);
 
 #endif      // VSF_USE_TCPIP
 #endif      // __VSFIP_NETDRV_ADAPTER_H__

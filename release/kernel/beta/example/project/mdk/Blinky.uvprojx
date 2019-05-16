@@ -338,7 +338,7 @@
               <MiscControls>-fms-extensions -Wno-empty-body -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>_MSC_VER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
+              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -380,13 +380,18 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>source</GroupName>
+          <GroupName>app_cfg</GroupName>
           <Files>
             <File>
               <FileName>vsf_app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source</GroupName>
+          <Files>
             <File>
               <FileName>main_full_feature_demo.c</FileName>
               <FileType>1</FileType>
@@ -677,7 +682,7 @@
             </File>
             <File>
               <FileName>vsf_kernel_armv7em_full_size.a</FileName>
-              <FileType>2</FileType>
+              <FileType>4</FileType>
               <FilePath>..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -696,26 +701,7 @@
                   <IncludeLibraryModules></IncludeLibraryModules>
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <uClangAs>2</uClangAs>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -1172,7 +1158,7 @@
               <MiscControls>-fms-extensions -Wno-empty-body -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>_MSC_VER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
+              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1214,13 +1200,18 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>source</GroupName>
+          <GroupName>app_cfg</GroupName>
           <Files>
             <File>
               <FileName>vsf_app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source</GroupName>
+          <Files>
             <File>
               <FileName>main_full_feature_demo.c</FileName>
               <FileType>1</FileType>
@@ -1511,7 +1502,7 @@
             </File>
             <File>
               <FileName>vsf_kernel_armv7em_full_size.a</FileName>
-              <FileType>2</FileType>
+              <FileType>4</FileType>
               <FilePath>..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -1530,26 +1521,7 @@
                   <IncludeLibraryModules></IncludeLibraryModules>
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <uClangAs>2</uClangAs>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -2006,7 +1978,7 @@
               <MiscControls>--diag_suppress=64,1,381,177 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
+              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2048,13 +2020,18 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>source</GroupName>
+          <GroupName>app_cfg</GroupName>
           <Files>
             <File>
               <FileName>vsf_app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source</GroupName>
+          <Files>
             <File>
               <FileName>main_full_feature_demo.c</FileName>
               <FileType>1</FileType>
@@ -2345,7 +2322,7 @@
             </File>
             <File>
               <FileName>vsf_kernel_armv7em_full_size.a</FileName>
-              <FileType>2</FileType>
+              <FileType>4</FileType>
               <FilePath>..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -2364,26 +2341,7 @@
                   <IncludeLibraryModules></IncludeLibraryModules>
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <uClangAs>2</uClangAs>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -2840,7 +2798,7 @@
               <MiscControls>--diag_suppress=64,1,381,177 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
+              <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2882,13 +2840,18 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>source</GroupName>
+          <GroupName>app_cfg</GroupName>
           <Files>
             <File>
               <FileName>vsf_app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>source</GroupName>
+          <Files>
             <File>
               <FileName>main_full_feature_demo.c</FileName>
               <FileType>1</FileType>
@@ -3179,7 +3142,7 @@
             </File>
             <File>
               <FileName>vsf_kernel_armv7em_full_size.a</FileName>
-              <FileType>2</FileType>
+              <FileType>4</FileType>
               <FilePath>..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -3198,26 +3161,7 @@
                   <IncludeLibraryModules></IncludeLibraryModules>
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
-                <FileArmAds>
-                  <Aads>
-                    <interw>2</interw>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <thumb>2</thumb>
-                    <SplitLS>2</SplitLS>
-                    <SwStkChk>2</SwStkChk>
-                    <NoWarn>2</NoWarn>
-                    <uSurpInc>2</uSurpInc>
-                    <useXO>2</useXO>
-                    <uClangAs>2</uClangAs>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Aads>
-                </FileArmAds>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>

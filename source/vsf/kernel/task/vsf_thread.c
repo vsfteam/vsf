@@ -42,23 +42,23 @@ vsf_thread_t *vsf_thread_get_cur(void)
 SECTION("text.vsf.kernel.vsf_thread_ret")
 void vsf_thread_ret(void)
 {
-    vsf_thread_t *pthread_obj = vsf_thread_get_cur();
-    class_internal(pthread_obj, pthread, vsf_thread_t);
-    ASSERT(pthread != NULL);
-    longjmp(*(pthread)->pret, 0);
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
+    ASSERT(thread != NULL);
+    longjmp(*(thread)->ret, 0);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_wait")
 vsf_evt_t vsf_thread_wait(void)
 {
-    vsf_thread_t *pthread_obj = vsf_thread_get_cur();
-    class_internal(pthread_obj, pthread, vsf_thread_t);
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
     vsf_evt_t curevt;
     jmp_buf pos;
 
-    ASSERT(pthread != NULL);
-    pthread->pos = &pos;
-    curevt = setjmp(*pthread->pos);
+    ASSERT(thread != NULL);
+    thread->pos = &pos;
+    curevt = setjmp(*thread->pos);
     //pthread_obj->current_evt = curevt;
     if (!curevt) {
         vsf_thread_ret();
@@ -69,14 +69,14 @@ vsf_evt_t vsf_thread_wait(void)
 SECTION("text.vsf.kernel.vsf_thread_wfe")
 void vsf_thread_wfe(vsf_evt_t evt)
 {
-    vsf_thread_t *pthread_obj = vsf_thread_get_cur();
-    class_internal(pthread_obj, pthread, vsf_thread_t);
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
     vsf_evt_t curevt;
     jmp_buf pos;
 
-    ASSERT(pthread != NULL);
-    pthread->pos = &pos;
-    curevt = setjmp(*pthread->pos);
+    ASSERT(thread != NULL);
+    thread->pos = &pos;
+    curevt = setjmp(*thread->pos);
     //pthread_obj->current_evt = curevt;
     if (!curevt || (curevt != evt)) {
         vsf_thread_ret();
@@ -84,45 +84,48 @@ void vsf_thread_wfe(vsf_evt_t evt)
 }
 
 SECTION("text.vsf.kernel.vsf_thread_sendevt")
-void vsf_thread_sendevt(vsf_thread_t *pthread, vsf_evt_t evt)
+void vsf_thread_sendevt(vsf_thread_t *thread, vsf_evt_t evt)
 {
-    ASSERT(pthread != NULL);
-    class_internal(pthread, pthis, vsf_thread_t)
+    ASSERT(thread != NULL);
+    class_internal(thread, pthis, vsf_thread_t)
     vsf_eda_post_evt(&pthis->use_as__vsf_eda_t, evt);
 }
 
 SECTION("text.vsf.kernel.vsf_thread")
-static void __vsf_thread_entry(void)
+NO_INLINE static void __vsf_thread_entry(vsf_thread_t *thread)
 {
-    vsf_thread_t *pthread_obj = vsf_thread_get_cur();
-    class_internal(pthread_obj, pthread, vsf_thread_t);
-    pthread->pentry(pthread);
+    thread->entry(thread);
 }
 
 SECTION("text.vsf.kernel.vsf_thread")
-static void __vsf_thread_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
+static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    class_internal((vsf_thread_t *)peda, pthread, vsf_thread_t);
+    class_internal((vsf_thread_t *)eda, thread, vsf_thread_t);
     jmp_buf ret;
 
-    ASSERT(pthread != NULL);
+    ASSERT(thread != NULL);
 
-    pthread->pret = &ret;
+    thread->ret = &ret;
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
-            vsf_arch_set_stack((uint_fast32_t)(&pthread->pstack[(pthread->stack_size>>3)]));
-            __vsf_thread_entry();
+            vsf_arch_set_stack((uint_fast32_t)(&thread->stack[(thread->stack_size>>3)]));
+            __vsf_thread_entry((vsf_thread_t *)thread);
+#if VSF_CFG_TIMER_EN
+            vsf_teda_fini((vsf_teda_t *)eda);
+#else
+            vsf_eda_fini(eda);
+#endif
             vsf_thread_ret();
         } else {
-            longjmp(*pthread->pos, evt);
+            longjmp(*thread->pos, evt);
         }
     }
 }
 
 SECTION("text.vsf.kernel.vsf_thread")
-vsf_err_t vsf_thread_start(vsf_thread_t *pthread, vsf_priority_t priority)
+vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_priority_t priority)
 {
-    class_internal(pthread, pthis, vsf_thread_t)
+    class_internal(thread, pthis, vsf_thread_t)
     ASSERT(pthis != NULL);
     pthis->evthandler = __vsf_thread_evthandler;
 #if VSF_CFG_TIMER_EN
@@ -144,65 +147,65 @@ void vsf_thread_delay(uint_fast32_t tick)
 #if VSF_CFG_SYNC_EN
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *psync, int_fast32_t time_out)
+static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32_t time_out)
 {
     vsf_err_t err;
     vsf_sync_reason_t reason;
 
-    err = vsf_eda_sync_decrease(psync, time_out);
+    err = vsf_eda_sync_decrease(sync, time_out);
     if (!err) { return VSF_SYNC_GET; }
     else if (err < 0) { return VSF_SYNC_FAIL; }
     //else {
         do {
-            reason = vsf_eda_sync_get_reason(psync, vsf_thread_wait());
+            reason = vsf_eda_sync_get_reason(sync, vsf_thread_wait());
         } while (reason == VSF_SYNC_PENDING);
         return reason;
     //}
 }
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *pmtx, int_fast32_t timeout)
+vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, int_fast32_t timeout)
 {
-    return __vsf_thread_wait_for_sync(&pmtx->use_as__vsf_sync_t, timeout);
+    return __vsf_thread_wait_for_sync(&mtx->use_as__vsf_sync_t, timeout);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *psem, int_fast32_t timeout)
+vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, int_fast32_t timeout)
 {
-    return __vsf_thread_wait_for_sync(psem, timeout);
+    return __vsf_thread_wait_for_sync(sem, timeout);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *pmtx)
+vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx)
 {
-    return vsf_eda_mutex_leave(pmtx);
+    return vsf_eda_mutex_leave(mtx);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_sem_post")
-vsf_err_t vsf_thread_sem_post(vsf_sem_t *psem)
+vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem)
 {
-    return vsf_eda_sem_post(psem);
+    return vsf_eda_sem_post(sem);
 }
 
 #if VSF_CFG_BMPEVT_EN
 
 SECTION("text.vsf.kernel.vsf_thread_bmpevt_pend")
 vsf_sync_reason_t vsf_thread_bmpevt_pend(
-                    vsf_bmpevt_t *pbmpevt,
-                    vsf_bmpevt_pender_t *ppender,
+                    vsf_bmpevt_t *bmpevt,
+                    vsf_bmpevt_pender_t *pender,
                     int_fast32_t timeout)
 {
     vsf_sync_reason_t reason;
     vsf_err_t err;
     vsf_evt_t evt;
 
-    err = vsf_eda_bmpevt_pend(pbmpevt, ppender, timeout);
+    err = vsf_eda_bmpevt_pend(bmpevt, pender, timeout);
     if (!err) { return VSF_SYNC_GET; }
     else if (err < 0) { return VSF_SYNC_FAIL; }
     else {
         while (1) {
             evt = vsf_thread_wait();
-            reason = vsf_eda_bmpevt_poll(pbmpevt, ppender, evt);
+            reason = vsf_eda_bmpevt_poll(bmpevt, pender, evt);
             if (reason != VSF_SYNC_PENDING) {
                 return reason;
             }

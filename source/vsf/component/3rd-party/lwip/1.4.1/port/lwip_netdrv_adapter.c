@@ -47,7 +47,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-extern err_t ethernetif_init(struct netif *netif);
+
 WEAK void lwip_request__addr__from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gateway)
 {
 }
@@ -61,10 +61,20 @@ static err_t ethernetif_low_level_output(struct netif *netif, struct pbuf *p)
     pbuf_header(p, -ETH_PAD_SIZE); /* drop the padding word */
 #endif
 
-    netdrv->eda_pending = vsf_eda_get_cur();
-    vsf_netdrv_output(netdrv, p);
-    vsf_thread_wfe(VSF_EVT_USER);
+    pbuf_ref(p);
 
+    vsf_protect_t orig = vsf_protect_sched();
+    if (!vsf_netdrv_can_output(netdrv)) {
+        vsf_eda_t *eda = vsf_eda_get_cur();
+        ASSERT((netdrv->eda_pending != NULL) && vsf_eda_is_stack_owner(eda));
+        netdrv->eda_pending = eda;
+        vsf_unprotect_sched(orig);
+        vsf_thread_wfe(VSF_EVT_USER);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+
+    vsf_netdrv_output(netdrv, p);
     return ERR_OK;
 }
 
@@ -88,6 +98,9 @@ err_t ethernetif_init(struct netif *netif)
      */
     NETIF_INIT_SNMP(netif, snmp_ifType_ethernet_csmacd, LINK_SPEED_OF_YOUR_NETIF_IN_BPS);
 
+    netif->name[0] = 'X';
+    netif->name[1] = 'X';
+
     /* We directly use etharp_output() here to save a function call.
      * You can instead declare your own function an call etharp_output()
      * from it if you have to do some checks before sending (e.g. if link
@@ -95,13 +108,13 @@ err_t ethernetif_init(struct netif *netif)
     netif->output = etharp_output;
     netif->linkoutput = ethernetif_low_level_output;
 
+    /* initialize the hardware */
+    vsf_netdrv_init(netdrv);
+
     netif->hwaddr_len = netdrv->macaddr.size;
     memcpy(netif->hwaddr, netdrv->macaddr.addr_buf, netif->hwaddr_len);
     netif->mtu = netdrv->mtu;
     netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP;
-
-    /* initialize the hardware */
-    vsf_netdrv_init(netdrv);
 
     return ERR_OK;
 }
@@ -109,10 +122,13 @@ err_t ethernetif_init(struct netif *netif)
 // adapter
 static vsf_err_t lwip_netdrv_adapter_on_connect(void *netif)
 {
-    ip_addr_t ipaddr, netmask, gateway;
+    struct netif *lwip_netif = netif;
+    ip_addr_t ipaddr = { .addr = 0 }, netmask = { .addr = 0 }, gateway = { .addr = 0 };
+
     lwip_request__addr__from_user(&ipaddr, &netmask, &gateway);
-    netif_add((struct netif *)netif, &ipaddr, &netmask, &gateway, NULL,
+    netif_add(lwip_netif, &ipaddr, &netmask, &gateway, lwip_netif->state,
               ethernetif_init, tcpip_input);
+    netif_set_default(lwip_netif);
     return VSF_ERR_NONE;
 }
 
@@ -129,6 +145,7 @@ static void lwip_netdrv_adapter_on_outputted(void *netif, void *netbuf, vsf_err_
 #if ETH_PAD_SIZE
     pbuf_header((struct pbuf *)netbuf, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
+    pbuf_free((struct pbuf *)netbuf);
     LINK_STATS_INC(link.xmit);
 
     vsf_eda_t *eda = netdrv->eda_pending;
@@ -230,6 +247,11 @@ void lwip_netif_set_netdrv(struct netif *netif, vsf_netdrv_t *netdrv)
     netif->state = netdrv;
     netdrv->netif = (void *)netif;
     netdrv->adapter = &lwip_netdrv_adapter;
+}
+
+vsf_netdrv_t * lwip_netif_get_netdrv(struct netif *netif)
+{
+    return (vsf_netdrv_t *)netif->state;
 }
 
 #endif      // VSF_USE_TCPIP

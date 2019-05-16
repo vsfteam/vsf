@@ -32,6 +32,12 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+#define LWIP_DEBUG
+//#define IP_DEBUG                        LWIP_DBG_ON
+//#define TCP_DEBUG                       LWIP_DBG_ON
+//#define UDP_DEBUG                       LWIP_DBG_ON
+#define DHCP_DEBUG                      LWIP_DBG_ON
+
 #define LWIP_PROVIDE_ERRNO              1
 #define SYS_LIGHTWEIGHT_PROT            1
 #define NO_SYS                          0
@@ -41,8 +47,10 @@
 #define MEM_USE_POOLS                   0
 #define MEM_USE_POOLS_TRY_BIGGER_POOL   0
 #define MEMP_USE_CUSTOM_POOLS           0
+#define PBUF_POOL_BUFSIZE               LWIP_MEM_ALIGN_SIZE(1514)
 
 #define LWIP_DHCP                       1
+#define LWIP_ARP                        1
 #define LWIP_DNS                        1
 
 #define TCPIP_THREAD_STACKSIZE          (8 * 1024)

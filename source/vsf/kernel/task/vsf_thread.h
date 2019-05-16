@@ -56,10 +56,10 @@
                 __VA_ARGS__                                                     \
             };                                                                  \
             struct __NAME {                                                     \
-                uint64_t    stack[((__STACK)+7)/8];                             \
+                uint64_t    stack_arr[((__STACK)+7)/8];                         \
                 implement(vsf_thread_##__NAME##_t);                             \
             }ALIGN(8);                                                          \
-            extern void vsf_thread_##__NAME##_start(__NAME *ptask,              \
+            extern void vsf_thread_##__NAME##_start(__NAME *task,               \
                                                     vsf_priority_t priority);       
 #define def_vsf_thread(__NAME, __STACK, ...)                                    \
             __def_vsf_thread(__NAME, __STACK, __VA_ARGS__)
@@ -67,17 +67,17 @@
 #define __implement_vsf_thread(__NAME)                                          \
             static void vsf_thread_##__NAME##_entry(                            \
                         vsf_thread_##__NAME##_t *ptTthis);                      \
-            void vsf_thread_##__NAME##_start(   __NAME *ptask,                  \
+            void vsf_thread_##__NAME##_start(   __NAME *task,                   \
                                                 vsf_priority_t priority)        \
             {                                                                   \
-                ASSERT(NULL != ptask);                                          \
+                ASSERT(NULL != task);                                           \
                 vsf_thread_t *pthis =                                           \
-                    &(ptask->use_as__vsf_thread_##__NAME##_t                    \
+                    &(task->use_as__vsf_thread_##__NAME##_t                     \
                         .use_as__vsf_thread_t);                                 \
-                pthis->pentry = (vsf_thread_entry_t *)                          \
+                pthis->entry = (vsf_thread_entry_t *)                           \
                                     &vsf_thread_##__NAME##_entry;               \
-                pthis->pstack = ptask->stack;                                   \
-                pthis->stack_size = sizeof(ptask->stack);                       \
+                pthis->stack = task->stack;                                     \
+                pthis->stack_size = sizeof(task->stack);                        \
                 vsf_thread_start(pthis, priority);                              \
             }                                                                   \
             static void vsf_thread_##__NAME##_entry(                            \
@@ -96,7 +96,7 @@
 
 declare_class(vsf_thread_t)
 
-typedef void vsf_thread_entry_t(void *p);
+typedef void vsf_thread_entry_t(vsf_thread_t *thread);
 
 //! \name thread
 //! @{
@@ -111,14 +111,14 @@ def_class(vsf_thread_t,
 
     public_member(
         // you can add public member here
-        vsf_thread_entry_t  *pentry;
+        vsf_thread_entry_t  *entry;
         uint16_t            stack_size;
-        uint64_t            *pstack;                //!< stack must be 8byte aligned
+        uint64_t            *stack;                 //!< stack must be 8byte aligned
     ),
 
     private_member(
         jmp_buf         *pos;
-        jmp_buf         *pret;
+        jmp_buf         *ret;
     )
 )
 end_def_class(vsf_thread_t)
@@ -152,22 +152,22 @@ extern void vsf_thread_delay(uint_fast32_t ms);
 
 #if VSF_CFG_SYNC_EN
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-extern vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *pmtx, int_fast32_t timeout);
+extern vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, int_fast32_t timeout);
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-extern vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *pmtx);
+extern vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
 
 SECTION("text.vsf.kernel.vsf_thread_sem_post")
-extern vsf_err_t vsf_thread_sem_post(vsf_sem_t *psem);
+extern vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem);
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
-extern vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *psem, int_fast32_t timeout);
+extern vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, int_fast32_t timeout);
 
 #   if VSF_CFG_BMPEVT_EN
 SECTION("text.vsf.kernel.vsf_thread_bmpevt_pend")
 extern vsf_sync_reason_t vsf_thread_bmpevt_pend(
-                    vsf_bmpevt_t *pbmpevt,
-                    vsf_bmpevt_pender_t *ppender,
+                    vsf_bmpevt_t *bmpevt,
+                    vsf_bmpevt_pender_t *pender,
                     int_fast32_t timeout);
 #   endif
 #endif

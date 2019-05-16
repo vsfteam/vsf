@@ -21,9 +21,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "component/3rd-party/lwip/1.4.1/port/lwip_netdrv_adapter.h"
+
 /*============================ MACROS ========================================*/
 
-#define GENERATE_HEX(value)                TPASTE2(0x, value)
+#define VSF_CFG_VSFIP_EN                DISABLED
+
+#define GENERATE_HEX(value)             TPASTE2(0x, value)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -57,11 +61,15 @@ struct usrapp_t {
 
     struct {
         bool inited;
+#if VSF_CFG_VSFIP_EN == ENABLED
         vsfip_netif_t netif;
         union {
             vsfip_dhcpc_t dhcpc;
             vsfip_dhcpd_t dhcpd;
         };
+#else
+        struct netif netif;
+#endif
     } tcpip;
 /*
     struct {
@@ -451,6 +459,7 @@ static usrapp_t usrapp = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_CFG_VSFIP_EN == ENABLED
 vsfip_socket_t * vsfip_mem_socket_get(void)
 {
     return vsf_heap_malloc(sizeof(vsfip_socket_t));
@@ -477,7 +486,7 @@ void vsfip_mem_netbuf_free(vsfip_netbuf_t *netbuf)
 
 void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv)
 {
-    if (usrapp.tcpip.inited && (usrapp.tcpip.netif.netdrv == netdrv)) {
+    if (usrapp.tcpip.inited && (netdrv == vsfip_netif_get_netdrv(&usrapp.tcpip.netif))) {
         vsfip_dhcpc_stop(&usrapp.tcpip.dhcpc);
     }
 }
@@ -490,7 +499,7 @@ void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv)
 
 void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv)
 {
-    if (usrapp.tcpip.inited && (usrapp.tcpip.netif.netdrv == netdrv)) {
+    if (usrapp.tcpip.inited && (netdrv == vsfip_netif_get_netdrv(&usrapp.tcpip.netif))) {
         vsfip_dhcpc_start(&usrapp.tcpip.netif, &usrapp.tcpip.dhcpc);
     }
 }
@@ -512,6 +521,44 @@ void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
         usrapp.tcpip.inited = false;
     vsf_unprotect_scheduler(origlevel);
 }
+#else
+void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv)
+{
+    if (usrapp.tcpip.inited && (netdrv == lwip_netif_get_netdrv(&usrapp.tcpip.netif))) {
+        dhcp_stop(&usrapp.tcpip.netif);
+    }
+}
+
+void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv)
+{
+    lwip_netif_set_netdrv(&usrapp.tcpip.netif, netdrv);
+}
+
+void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv)
+{
+    if (usrapp.tcpip.inited && (netdrv == lwip_netif_get_netdrv(&usrapp.tcpip.netif))) {
+        dhcp_start(&usrapp.tcpip.netif);
+    }
+}
+
+void vsf_pnp_on_netdrv_new(vsf_netdrv_t *netdrv)
+{
+    vsf_protect_t origlevel = vsf_protect_scheduler();
+        if (usrapp.tcpip.inited) {
+            vsf_unprotect_scheduler(origlevel);
+            return;
+        }
+        usrapp.tcpip.inited = true;
+    vsf_unprotect_scheduler(origlevel);
+}
+
+void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
+{
+    vsf_protect_t origlevel = vsf_protect_scheduler();
+        usrapp.tcpip.inited = false;
+    vsf_unprotect_scheduler(origlevel);
+}
+#endif
 
 void usrapp_on_timer(void *param)
 {
@@ -605,7 +652,9 @@ int main(void)
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);
 
-    lwip_init();
+#if VSF_CFG_VSFIP_EN != ENABLED
+    tcpip_init(NULL, NULL);
+#endif
 
     usrapp.poll_timer.on_timer = usrapp_on_timer;
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);

@@ -132,7 +132,7 @@ def_simple_class(vsf_eda_t) {
     public_member(
         // you can add public member here
         vsf_eda_evthandler_t    evthandler;
-    #ifdef VSF_CFG_EVTQ_EN
+    #ifdef VSF_CFG_EDA_ON_TERMINATOR_EN
         vsf_eda_on_terminate_t  on_terminate;
     #endif
         //uint16_t                app_state;

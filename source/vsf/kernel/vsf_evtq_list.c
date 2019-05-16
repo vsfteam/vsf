@@ -34,6 +34,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+extern void vsf_eda_on_terminate(vsf_eda_t *pthis);
+
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
 extern vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq);
 
@@ -128,9 +132,7 @@ void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
         __vsf_os_free_evt_node(node);
     }
 
-    if (pthis->on_terminate != NULL) {
-        pthis->on_terminate(pthis);
-    }
+    vsf_eda_on_terminate(pthis);
 }
 
 vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
@@ -260,6 +262,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                     &pthis->rdy_list,
                     eda);
             }
+            pthis->cur.eda = NULL;
 
             if (!eda->is_to_exit) {
                 if (eda->is_new_prio) {

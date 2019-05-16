@@ -34,6 +34,9 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+SECTION(".text.vsf.kernel.eda")
+extern void vsf_eda_on_terminate(vsf_eda_t *pthis);
+
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
 extern vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq);
 
@@ -55,8 +58,8 @@ static bool __vsf_eda_terminate(vsf_eda_t *pthis)
     ASSERT(pthis != NULL);
 
     terminate = !pthis->evt_cnt;
-    if (terminate && (pthis->on_terminate != NULL)) {
-        pthis->on_terminate(pthis);
+    if (terminate) {
+        vsf_eda_on_terminate(pthis);
     }
     return terminate;
 }
@@ -183,6 +186,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                 pthis->cur.msg = NULL;
                 eda->evt_cnt--;
             }
+            pthis->cur.eda = NULL;
 
             if (eda->is_to_exit) {
                 __vsf_eda_terminate(eda);

@@ -45,7 +45,7 @@ def_interface(i_heap_t)
     void *(*MallocAligned)  (uint_fast32_t size, uint_fast32_t alignment);
     void *(*Malloc)         (uint_fast32_t size);
     void (*Free)            (void *buffer);
-end_def_interface(i_pool_t)
+end_def_interface(i_heap_t)
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/

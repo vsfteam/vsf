@@ -97,4 +97,9 @@ void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv)
     netdrv->adapter = &vsfip_netdrv_adapter;
 }
 
+vsf_netdrv_t * vsfip_netif_get_netdrv(vsfip_netif_t *netif)
+{
+    return netif->netdrv;
+}
+
 #endif      // VSF_USE_TCPIP
