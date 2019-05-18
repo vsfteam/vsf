@@ -146,9 +146,9 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
 }
 
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
-static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, vsf_evt_t evt, void *msg)
+static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, vsf_evt_t evt, void *msg, bool force)
 #else
-static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value)
+static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force)
 #endif
 {
     vsf_evt_node_t *node;
@@ -172,7 +172,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value)
 #endif
 
     orig = vsf_disable_interrupt();
-    if (eda->is_limitted && eda->is_ready) {
+    if (eda->is_limitted && eda->is_ready && !force) {
         vsf_set_interrupt(orig);
         __vsf_os_free_evt_node(node);
         return VSF_ERR_FAIL;
@@ -192,21 +192,26 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value)
     return err;
 }
 
-vsf_err_t vsf_evtq_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
+vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force)
 {
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
-    return __vsf_evtq_post(pthis, evt, NULL);
+    return __vsf_evtq_post(pthis, evt, NULL, force);
 #else
-    return __vsf_evtq_post(pthis, (uint32_t)((evt << 1) | 1));
+    return __vsf_evtq_post(pthis, (uint32_t)((evt << 1) | 1), force);
 #endif
+}
+
+vsf_err_t vsf_evtq_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
+{
+    return vsf_evtq_post_evt_ex(pthis, evt, false);
 }
 
 vsf_err_t vsf_evtq_post_msg(vsf_eda_t *pthis, void *msg)
 {
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
-    return __vsf_evtq_post(pthis, VSF_EVT_MESSAGE, msg);
+    return __vsf_evtq_post(pthis, VSF_EVT_MESSAGE, msg, false);
 #else
-    return __vsf_evtq_post(pthis, (uint32_t)msg);
+    return __vsf_evtq_post(pthis, (uint32_t)msg, false);
 #endif
 }
 

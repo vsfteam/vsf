@@ -1,21 +1,19 @@
-/***************************************************************************
- *   Copyright (C) 2009 - 2010 by Simon Qian <SimonQian@SimonQian.com>     *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
 
@@ -27,13 +25,8 @@
 #define VSF_USBD_CDC_IMPLEMENT
 #include "vsf.h"
 
-
 /*============================ MACROS ========================================*/
-#undef this
-#define this        (*obj)
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -42,20 +35,20 @@
 
 static vsf_err_t vsf_usbd_CDC_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_CDC_t *obj = (vsf_usbd_CDC_t *)ifs->class_param;
+    vsf_usbd_CDC_t *pthis = (vsf_usbd_CDC_t *)ifs->class_param;
 
-    ASSERT(obj != NULL);
+    ASSERT(pthis != NULL);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    this.stream.tx.dev  = dev;
-    this.stream.tx.ep   = this.ep.in;
-    this.stream.tx.zlp  = true;
-    this.stream.rx.dev  = dev;
-    this.stream.rx.ep   = this.ep.out;
-    this.stream.rx.zlp  = false;
+    pthis->stream.tx.dev  = dev;
+    pthis->stream.tx.ep   = pthis->ep.in;
+    pthis->stream.tx.zlp  = true;
+    pthis->stream.rx.dev  = dev;
+    pthis->stream.rx.ep   = pthis->ep.out;
+    pthis->stream.rx.zlp  = false;
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 
     
-    vsf_usbd_ep_stream_connect_dev(&this.stream.use_as__vsf_usbd_ep_stream_t, dev);
+    vsf_usbd_ep_stream_connect_dev(&pthis->stream.use_as__vsf_usbd_ep_stream_t, dev);
     /*
     this.stream.dev = dev;
     this.stream.rx_trans.ep = this.ep.out;
@@ -68,7 +61,6 @@ static vsf_err_t vsf_usbd_CDC_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs
     return VSF_ERR_NONE;
 }
 
-WEAK //!< this weak for debug purpose only 
 void vsf_usbd_CDC_data_connect(vsf_usbd_CDC_t *cdc)
 {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED

@@ -132,7 +132,7 @@ def_simple_class(vsf_eda_t) {
     public_member(
         // you can add public member here
         vsf_eda_evthandler_t    evthandler;
-    #ifdef VSF_CFG_EDA_ON_TERMINATOR_EN
+    #ifdef VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE
         vsf_eda_on_terminate_t  on_terminate;
     #endif
         //uint16_t                app_state;
@@ -166,7 +166,7 @@ def_simple_class(vsf_eda_t) {
     #   endif
             uint8_t         is_to_exit      : 1;
     #else
-        uint16_t            evt_pending;
+        uint32_t            evt_pending;
         union {
             struct {
                 uint8_t     is_processing   : 1;
@@ -200,24 +200,23 @@ def_simple_class(vsf_teda_t)  {
     )
     private_member(
         vsf_dlist_node_t    timer_node;
-        vsf_timer_tick_t    due ;
+        vsf_timer_tick_t    due;
     );
 };
 //! @}
 
-#if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
 //! \name callback_timer
 //! @{
 def_simple_class(vsf_callback_timer_t) {
     public_member(
-        void *param;
-        void (*on_timer)(void *param);
+        void (*on_timer)(vsf_callback_timer_t *timer);
     )
     private_member(
         vsf_dlist_node_t timer_node;
         vsf_timer_tick_t due;
     )
-}ALIGN(4);
+};
 //! @}
 #endif
 #endif
@@ -476,7 +475,7 @@ extern vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us);
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 extern vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis);
 
-#if VSF_CFG_CALLBACK_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_add")
 vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick);
 

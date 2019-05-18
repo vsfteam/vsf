@@ -76,8 +76,8 @@
                         .use_as__vsf_thread_t);                                 \
                 pthis->entry = (vsf_thread_entry_t *)                           \
                                     &vsf_thread_##__NAME##_entry;               \
-                pthis->stack = task->stack;                                     \
-                pthis->stack_size = sizeof(task->stack);                        \
+                pthis->stack = task->stack_arr;                                 \
+                pthis->stack_size = sizeof(task->stack_arr);                    \
                 vsf_thread_start(pthis, priority);                              \
             }                                                                   \
             static void vsf_thread_##__NAME##_entry(                            \
@@ -147,7 +147,7 @@ extern void vsf_thread_sendevt(vsf_thread_t *thread, vsf_evt_t evt);
 
 #if VSF_CFG_TIMER_EN
 SECTION("text.vsf.kernel.vsf_thread_delay")
-extern void vsf_thread_delay(uint_fast32_t ms);
+extern void vsf_thread_delay(uint_fast32_t tick);
 #endif
 
 #if VSF_CFG_SYNC_EN

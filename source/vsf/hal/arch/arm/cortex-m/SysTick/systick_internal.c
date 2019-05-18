@@ -95,7 +95,7 @@ void vsf_systick_clear_count(void);
  *! \param void
  *! \retval bool
  */
-bool vsf_systick_enable(void);
+void vsf_systick_enable(void);
 
 /*!\brief enable
  *! \param void
@@ -112,6 +112,7 @@ bool vsf_systick_is_match(void);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
+static volatile uint32_t s_wCSRBuffer = 0;
 /*============================ IMPLEMENTATION ================================*/
 /*!\brief init SysTick Timer
  *! \param void
@@ -127,6 +128,7 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
     vsf_systick_clear_count();
 
     __SYSTICK_ATOM_CODE (
+        s_wCSRBuffer = cfg_ptr->mode;
         SYSTICK_CSR = cfg_ptr->mode;
     )
 
@@ -135,16 +137,14 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
 
 /*!\brief enable
  *! \param void
- *! \retval bool
+ *! \retval none
  */
-bool vsf_systick_enable(void)
+void vsf_systick_enable(void)
 {
-    uint_fast32_t wTemp;
     __SYSTICK_ATOM_CODE(
-        wTemp = SYSTICK_CSR;
-        SYSTICK_CSR = wTemp | ENABLE_SYSTICK;
+        s_wCSRBuffer |= ENABLE_SYSTICK;
+        SYSTICK_CSR = s_wCSRBuffer;
     )
-    return wTemp & SYSTICK_CSR_COUNTFLAG_MSK;
 }
 /*!\brief enable
  *! \param void
@@ -154,8 +154,9 @@ bool vsf_systick_disable(void)
 {
     uint_fast32_t wTemp;
     __SYSTICK_ATOM_CODE(
-        wTemp = SYSTICK_CSR;
-        SYSTICK_CSR = wTemp &~ ENABLE_SYSTICK;
+        s_wCSRBuffer &= ~ENABLE_SYSTICK;
+        SYSTICK_CSR = s_wCSRBuffer;
+        wTemp = SYSTICK_CSR;            //! read to clear COUNTFLAG
     )
     return wTemp & SYSTICK_CSR_COUNTFLAG_MSK;
 }

@@ -15,69 +15,29 @@
  *                                                                           *
  ****************************************************************************/
 
-
-//! \note Top Level Configuration 
-
-#ifndef __VSF_H__
-#define __VSF_H__
+#ifndef __VSF_USB_UVC_H__
+#define __VSF_USB_UVC_H__
 
 /*============================ INCLUDES ======================================*/
-#include "vsf_cfg.h"
-#include "service/vsf_service.h"
-#include "hal/vsf_hal.h"
-
-#include "kernel/vsf_kernel.h"
-
-#include "component/av/vsfav.h"
-
-#include "component/input/vsf_input.h"
-#include "component/input/hid/vsf_input_hid.h"
-
-#include "component/usb/host/vsf_usbh.h"
-#include "component/usb/host/hcd/ohci/vsf_ohci.h"
-#include "component/usb/host/class/HUB/vsf_usbh_HUB.h"
-#include "component/usb/host/class/libusb/vsf_usbh_libusb.h"
-#include "component/usb/host/class/CDC/vsf_usbh_CDC.h"
-#include "component/usb/host/class/CDC/vsf_usbh_CDCECM.h"
-#include "component/usb/host/class/BTHCI/vsf_usbh_BTHCI.h"
-#include "component/usb/host/class/HID/vsf_usbh_HID.h"
-
-#include "component/usb/device/vsf_usbd.h"
-#include "component/usb/device/class/CDC/vsf_usbd_CDC.h"
-#include "component/usb/device/class/CDC/vsf_usbd_CDCACM.h"
-#include "component/usb/device/class/HID/vsf_usbd_HID.h"
-#include "component/usb/device/class/UVC/vsf_usbd_UVC.h"
-
-#include "component/tcpip/netdrv/vsf_netdrv.h"
-#include "component/tcpip/vsfip/vsfip.h"
-#include "component/tcpip/vsfip/netif/eth/vsfip_eth.h"
-#include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpd.h"
-#include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpc.h"
-
-#ifdef VSF_CFG_USER_HEADER
-#   include VSF_CFG_USER_HEADER
-#endif
-
 /*============================ MACROS ========================================*/
-
-#ifndef vsf_log_info
-#   define vsf_log_info(...)
-#endif
-
-#ifndef vsf_log_warning
-#   define vsf_log_warning(...)
-#endif
-
-#ifndef vsf_log_debug
-#   define vsf_log_debug(...)
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+enum usb_UVC_req_t {
+    USB_UVCREQ_CUR      = 1,
+    USB_UVCREQ_MIN      = 2,
+    USB_UVCREQ_MAX      = 3,
+    USB_UVCREQ_RES      = 4,
+    USB_UVCREQ_LEN      = 5,
+    USB_UVCREQ_INFO     = 6,
+    USB_UVCREQ_DEF      = 7,
+    USB_UVCREQ_ALL      = 0x10,
+    USB_UVCREQ_SET      = 0x00,
+    USB_UVCREQ_GET      = 0x80,
+};
+typedef enum usb_UVC_req_t usb_UVC_req_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
-/* EOF */
+#endif    // __VSFUSB_UVC_H__

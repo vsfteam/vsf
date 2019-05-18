@@ -15,69 +15,29 @@
  *                                                                           *
  ****************************************************************************/
 
-
-//! \note Top Level Configuration 
-
-#ifndef __VSF_H__
-#define __VSF_H__
+#ifndef __VSFAV_H__
+#define __VSFAV_H__
 
 /*============================ INCLUDES ======================================*/
-#include "vsf_cfg.h"
-#include "service/vsf_service.h"
-#include "hal/vsf_hal.h"
-
-#include "kernel/vsf_kernel.h"
-
-#include "component/av/vsfav.h"
-
-#include "component/input/vsf_input.h"
-#include "component/input/hid/vsf_input_hid.h"
-
-#include "component/usb/host/vsf_usbh.h"
-#include "component/usb/host/hcd/ohci/vsf_ohci.h"
-#include "component/usb/host/class/HUB/vsf_usbh_HUB.h"
-#include "component/usb/host/class/libusb/vsf_usbh_libusb.h"
-#include "component/usb/host/class/CDC/vsf_usbh_CDC.h"
-#include "component/usb/host/class/CDC/vsf_usbh_CDCECM.h"
-#include "component/usb/host/class/BTHCI/vsf_usbh_BTHCI.h"
-#include "component/usb/host/class/HID/vsf_usbh_HID.h"
-
-#include "component/usb/device/vsf_usbd.h"
-#include "component/usb/device/class/CDC/vsf_usbd_CDC.h"
-#include "component/usb/device/class/CDC/vsf_usbd_CDCACM.h"
-#include "component/usb/device/class/HID/vsf_usbd_HID.h"
-#include "component/usb/device/class/UVC/vsf_usbd_UVC.h"
-
-#include "component/tcpip/netdrv/vsf_netdrv.h"
-#include "component/tcpip/vsfip/vsfip.h"
-#include "component/tcpip/vsfip/netif/eth/vsfip_eth.h"
-#include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpd.h"
-#include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpc.h"
-
-#ifdef VSF_CFG_USER_HEADER
-#   include VSF_CFG_USER_HEADER
-#endif
-
 /*============================ MACROS ========================================*/
-
-#ifndef vsf_log_info
-#   define vsf_log_info(...)
-#endif
-
-#ifndef vsf_log_warning
-#   define vsf_log_warning(...)
-#endif
-
-#ifndef vsf_log_debug
-#   define vsf_log_debug(...)
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+struct vsfav_control_value_t {
+    union {
+        void *pbuf;
+        uint8_t uval8;
+        int8_t ival8;
+        uint16_t uval16;
+        int16_t ival16;
+        uint32_t uval32;
+        int32_t ival32;
+        bool enable;
+    };
+};
+typedef struct vsfav_control_value_t vsfav_control_value_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
-/* EOF */
+#endif      // __VSFAV_H__

@@ -27,8 +27,8 @@
 
 /*============================ MACROS ========================================*/
 
-#if VSF_CFG_EDA_ON_TERMINATOR_EN != ENABLED
-#   error "VSF_CFG_EDA_ON_TERMINATOR_EN is required"
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

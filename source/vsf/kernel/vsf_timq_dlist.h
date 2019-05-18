@@ -54,6 +54,12 @@
 
 #define vsf_callback_timq_init(__queue)     vsf_dlist_init(__queue)
 
+#define vsf_callback_timq_enqueue(__queue, __timer)                             \
+        vsf_dlist_queue_enqueue(                                                \
+                vsf_callback_timer_t, timer_node,                               \
+                (__queue),                                                      \
+                (__timer))
+
 #define vsf_callback_timq_insert(__queue, __timer)                              \
         vsf_dlist_insert(                                                       \
                 vsf_callback_timer_t, timer_node,                               \

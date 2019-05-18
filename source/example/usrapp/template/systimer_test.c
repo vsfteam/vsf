@@ -16,40 +16,69 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
-#include "./systick_internal.h"
+
+#include "vsf.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-//! \name systick struct
-//! @{
-def_interface(systick_t)
-    bool            (*Init)(systick_cfg_t *);       //!< initialize the systick
-    void            (*Enable)(void);                //!< enable
-    bool            (*Disable)(void);               //!< disable
-    bool            (*IsMatch)(void);
-    u32_property_t  Counter;
-    void            (*Reset)(void);                 //!< clear count register
-    systick_reg_t   *const RegPage;                 //!< register page
-end_def_interface(systick_t)
-//! @}
-/*============================ PROTOTYPES ====================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-//! \brief define the SysTick
-const systick_t SYSTICK = {
-    
-    &vsf_systick_init,                              //!< initialize the SysTick
-    &vsf_systick_enable,
-    &vsf_systick_disable,
-    &vsf_systick_is_match,
-    {
-        &vsf_systick_set_reload,                    //!< set reload value
-        &vsf_systick_get_count,                     //!< get count value
-    },
-    &vsf_systick_clear_count,                       //!< clear count value
-    ((systick_reg_t *)(SYSTICK_BASE_ADDRESS)),      //!< register page
-};
+/*
+struct usrapp_const_t {
+    struct {
+        vsf_ohci_param_t ohci_param;
+    } usbh;
 
+    struct {
+        uint8_t dev_desc[18];
+        uint8_t config_desc[75 + 66];
+        uint8_t str_lanid[4];
+        uint8_t str_vendor[20];
+        uint8_t str_product[14];
+        uint8_t str_cdc[14];
+        uint8_t str_cdc2[16];
+        vsf_usbd_desc_t std_desc[7];
+    } usbd;
+};
+typedef struct usrapp_const_t usrapp_const_t;
+*/
+struct usrapp_t {
+    vsf_callback_timer_t poll_timer;
+    vsf_callback_timer_t one_tick_timer;
+};
+typedef struct usrapp_t usrapp_t;
+
+/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static usrapp_t usrapp;
+
+/*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+void usrapp_on_timer(vsf_callback_timer_t *param)
+{
+    printf( "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
+    vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
+}
+
+static void one_tick_timer_callback(vsf_callback_timer_t *p)
+{
+    vsf_callback_timer_add(&usrapp.one_tick_timer, 1);
+}
+
+int main(void)
+{
+    vsf_stdio_init();
+
+    usrapp.poll_timer.on_timer = usrapp_on_timer;
+    vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
+
+    usrapp.one_tick_timer.on_timer = one_tick_timer_callback;
+    vsf_callback_timer_add(&usrapp.one_tick_timer, 1);
+    //while(1);
+    return 0;
+}
+
+/* EOF */

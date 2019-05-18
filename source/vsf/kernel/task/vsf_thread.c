@@ -92,9 +92,18 @@ void vsf_thread_sendevt(vsf_thread_t *thread, vsf_evt_t evt)
 }
 
 SECTION("text.vsf.kernel.vsf_thread")
-NO_INLINE static void __vsf_thread_entry(vsf_thread_t *thread)
+static void __vsf_thread_entry(void)
 {
-    thread->entry(thread);
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
+    thread->entry(thread_obj);
+
+#if VSF_CFG_TIMER_EN
+    vsf_teda_fini((vsf_teda_t *)thread_obj);
+#else
+    vsf_eda_fini((vsf_eda_t *)thread_obj);
+#endif
+		longjmp(*(thread)->ret, 0);
 }
 
 SECTION("text.vsf.kernel.vsf_thread")
@@ -109,13 +118,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
             vsf_arch_set_stack((uint_fast32_t)(&thread->stack[(thread->stack_size>>3)]));
-            __vsf_thread_entry((vsf_thread_t *)thread);
-#if VSF_CFG_TIMER_EN
-            vsf_teda_fini((vsf_teda_t *)eda);
-#else
-            vsf_eda_fini(eda);
-#endif
-            vsf_thread_ret();
+            __vsf_thread_entry();
         } else {
             longjmp(*thread->pos, evt);
         }

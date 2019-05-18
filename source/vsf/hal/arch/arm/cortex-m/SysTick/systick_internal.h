@@ -93,9 +93,9 @@ extern bool vsf_systick_set_reload(uint32_t value);
 extern void vsf_systick_clear_count(void);
 /*!\brief enable
  *! \param void
- *! \retval bool
+ *! \retval none
  */
-extern bool vsf_systick_enable(void);
+extern void vsf_systick_enable(void);
 
 /*!\brief enable
  *! \param void

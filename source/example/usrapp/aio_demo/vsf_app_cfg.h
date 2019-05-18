@@ -32,12 +32,12 @@
 
 #define VSF_HEAP_CFG_MCB_MAGIC_ENABLED  ENABLED
 
-#define VSF_CFG_CALLBACK_TIMER_EN       ENABLED
+#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
 //! for test only ...
 #define VSF_GET_MAIN_CLK()              (192000000)
 
-#define VSF_CFG_EDA_ON_TERMINATOR_EN    ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 

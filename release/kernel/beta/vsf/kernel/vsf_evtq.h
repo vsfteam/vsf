@@ -97,6 +97,7 @@ extern vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis);
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
 extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *eda, vsf_evt_t evt, void *msg);
 #endif
+extern vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *eda, vsf_evt_t evt, bool force);
 extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis);

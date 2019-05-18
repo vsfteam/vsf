@@ -40,7 +40,8 @@ const struct {
             uint8_t    is_support_task                 : 1;
             uint8_t    is_support_thread               : 1;
             uint8_t    is_support_simple_shell         : 1;
-            uint8_t                                    : 4;     //!< reserved
+            uint8_t    is_support_callback_timer       : 1;
+            uint8_t                                    : 3;     //!< reserved
         };
         uint8_t Task;
     };
@@ -58,12 +59,13 @@ const struct {
     union {
         struct {
             uint8_t    is_support_dynamic_priority     : 1;
+            uint8_t    is_support_on_terminate         : 1;
+            uint8_t                                    : 1;
             uint8_t    evt_queue_bit_size              : 5;     //!< 1~32
-            uint8_t    evt_queue_count                 : 2;     //!< 1~4
         };
         uint8_t EDA;
     };
-    uint8_t                                             : 8;    //!< reserved
+    uint8_t                                            : 8;     //!< reserved
     union {
         struct {
             uint16_t    ClientID;
@@ -81,13 +83,16 @@ const struct {
     .is_support_task =              (VSF_USE_KERNEL_TASK_MODE ? (true) : false),
     .is_support_thread =            (VSF_USE_KERNEL_THREAD_MODE ? (true) : false),
     .is_support_simple_shell =      (VSF_USE_SIMPLE_SHELL ? (true) : false),
+    .is_support_callback_timer =    (VSF_KERNEL_CFG_CALLBACK_TIMER ? true : false),
+
+
     .is_support_sync =              (VSF_CFG_SYNC_EN ? (true) : false),
     .is_support_bmpevt =            (VSF_CFG_BMPEVT_EN ? (true) : false),
     .is_support_premption =         (VSF_CFG_PREMPT_EN ? (true) : false),
     .is_support_msg_queue =         (VSF_CFG_QUEUE_EN ? (true) : false),
     
     .is_support_dynamic_priority =  (VSF_CFG_DYNAMIC_PRIOTIRY_EN ? (true) : false),
-    .evt_queue_count =              VSF_OS_EVTQ_NUM - 1,
+    .is_support_on_terminate =      (VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE ? true : false),
     .evt_queue_bit_size =           VSF_OS_EVTQ_BITSIZE - 1,
 
     .Major =                        0,

@@ -89,6 +89,10 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
     return &res;
 }
 
+uint32_t vsf_arch_req___systimer_freq___from_usr(void)
+{
+    return SYSTEM_FREQ;
+}
 
 ROOT void __post_vsf_kernel_init(void)
 {
@@ -100,7 +104,7 @@ ROOT void __post_vsf_kernel_init(void)
     uint_fast32_t stack_size = sizeof(__main_stack) & ~0x07;
     ASSERT(stack_size >= 64);
     
-#if VSF_CFG_EDA_ON_TERMINATOR_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     __main_thread.on_terminate = NULL;
 #endif
     __main_thread.entry = (vsf_thread_entry_t *)main;

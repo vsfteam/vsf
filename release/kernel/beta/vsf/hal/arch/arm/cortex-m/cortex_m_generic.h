@@ -105,3 +105,4 @@ static ALWAYS_INLINE uint32_t vsf_arch_get_lr(void)
 
 #endif
 /* EOF */
+

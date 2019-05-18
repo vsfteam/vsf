@@ -44,7 +44,7 @@ static btstack_vsf_t __btstack_vsf;
 
 static uint32_t btstack_run_loop_vsf_get_time_ms(void)
 {
-    return vsf_timer_get_tick();
+    return vsf_systimer_tick_to_ms(vsf_timer_get_tick());
 }
 
 static void btstack_run_loop_vsf_set_timer(btstack_timer_source_t *ts, uint32_t timeout_in_ms)
@@ -84,7 +84,7 @@ static void btstack_run_loop_vsf_dump_timer(void)
     }
 }
 
-static void btstack_run_loop_vsf_on_timer(void *param)
+static void btstack_run_loop_vsf_on_timer(vsf_callback_timer_t *timer)
 {
     uint32_t now = btstack_run_loop_vsf_get_time_ms();
     while (__btstack_vsf.timers) {
@@ -95,7 +95,7 @@ static void btstack_run_loop_vsf_on_timer(void *param)
         btstack_run_loop_vsf_remove_timer(ts);
         ts->process(ts);
     }
-    vsf_callback_timer_add(&__btstack_vsf.callback_timer, 1);
+    vsf_callback_timer_add_ms(timer, 1);
 }
 
 static void btstack_run_loop_vsf_init(void)
@@ -103,7 +103,7 @@ static void btstack_run_loop_vsf_init(void)
     memset(&__btstack_vsf, 0, sizeof(__btstack_vsf));
 
     __btstack_vsf.callback_timer.on_timer = btstack_run_loop_vsf_on_timer;
-    vsf_callback_timer_add(&__btstack_vsf.callback_timer, 1);
+    vsf_callback_timer_add_ms(&__btstack_vsf.callback_timer, 1);
 }
 
 static const btstack_run_loop_t btstack_run_loop_vsf =

@@ -78,7 +78,7 @@ typedef struct {
 //! @{
 def_interface(systick_t)
     bool            (*Init)(systick_cfg_t *);       //!< initialize the systick
-    bool            (*Enable)(void);                //!< enable
+    void            (*Enable)(void);                //!< enable
     bool            (*Disable)(void);               //!< disable
     bool            (*IsMatch)(void);               //!< check whether a overflow happened 
     u32_property_t  Counter;                        //!< get or set the counter

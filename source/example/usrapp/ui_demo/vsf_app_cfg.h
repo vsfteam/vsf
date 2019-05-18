@@ -24,15 +24,20 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
-#define ASSERT(...)
+#define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
+//#define ASSERT(...)
+
+#define APP_CFG_USBD_VID                A7A8
+#define APP_CFG_USBD_PID                2348
+
+#define VSF_HEAP_CFG_MCB_MAGIC_ENABLED  ENABLED
+
+#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
 //! for test only ...
-#define VSF_GET_MAIN_CLK()              (20000000)
+#define VSF_GET_MAIN_CLK()              (192000000)
 
-#define SYSTEM_FREQ                     25000000ul
-
-#define VSF_SYSTIMER_RESOLUTION         1000000
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -112,7 +117,7 @@
 //      <h> Main Function
 //          <o>Main Stack Size              <128-65536:8>
 //          <i>When main function is configured as a thread, this option controls the size of the stack.
-#define VSF_OS_MAIN_STACK_SIZE               2048
+#define VSF_OS_MAIN_STACK_SIZE              2048
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
@@ -143,18 +148,53 @@
 //  </h>
 //! @}
 
-#ifndef __VSF_LIB__
-#   define VSF_POOL_CFG_PROTECT_LEVEL          scheduler
-#   define VSF_POOL_CFG_ATOM_ACCESS(...)                                        \
-            vsf_protect_region(VSF_POOL_CFG_PROTECT_LEVEL, __VA_ARGS__)
-#   define VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY             "kernel/vsf_os.h"
-#endif
+#define VSF_INPUT_CFG_HID_EN                ENABLED
+
+#define VSF_USE_USB_HOST                    ENABLED
+#define VSF_USE_USB_HOST_HUB                ENABLED
+#define VSF_USE_USB_HOST_ECM                ENABLED
+#define VSF_USE_USB_HOST_HID                ENABLED
+#define VSF_USE_USB_HOST_BTHCI              ENABLED
+#define VSF_USE_USB_HOST_HCD_OHCI           ENABLED
+
+#define VSF_USE_USB_DEVICE                  ENABLED
+
+#define VSF_USE_TCPIP                       ENABLED
+#define VSFIP_CFG_NETIF_HEADLEN             64
+
+#define VSF_USE_TRACE                       ENABLED
+
+#define VSFVM_CFG_RUNTIME_EN                ENABLED
+#define VSFVM_CFG_COMPILER_EN               ENABLED
+#define VSFVM_LEXER_DEBUG_EN                DISABLED
+#define VSFVM_PARSER_DEBUG_EN               DISABLED
+#define VSFVM_COMPILER_DEBUG_EN             DISABLED
+#define VSFVM_RUNTIME_DEBUG_EN              DISABLED
+
+#define VSF_USE_PBUF                        ENABLED
+#define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT    DISABLED
+
 
 #define VSF_USE_SERVICE_STREAM              DISABLED
+#define VSF_USE_SERVICE_VSFSTREAM           ENABLED
 
-#define VSF_KERNEL_CFG_CALLBACK_TIMER       ENABLED
+#if VSF_USE_SERVICE_STREAM == ENABLED
+#define VSF_SERVICE_CFG_INSERTION                                               \
+    extern vsf_pbuf_pool_t  g_tGenericPBUFPool;
+//#define VSF_SERVICE_CFG_DEPENDENCY      
 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE ENABLED
+enum {
+    VSF_PBUF_ADAPTER_CDC_SRC = 1,
+};
+
+#define VSF_PBUF_ADAPTERS                                                       \
+        {                                                                       \
+            .ptTarget = &g_tGenericPBUFPool,                                    \
+            .ID = VSF_PBUF_ADAPTER_CDC_SRC,                                     \
+            .piMethods = &VSF_PBUF_ADAPTER_METHODS_STREAM_SRC,                  \
+        }
+#endif
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

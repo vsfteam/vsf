@@ -21,11 +21,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "component/3rd-party/lwip/1.4.1/port/lwip_netdrv_adapter.h"
-
 /*============================ MACROS ========================================*/
-
-#define VSF_CFG_VSFIP_EN                DISABLED
 
 #define GENERATE_HEX(value)             TPASTE2(0x, value)
 
@@ -43,41 +39,13 @@ struct usrapp_const_t {
         uint8_t str_lanid[4];
         uint8_t str_vendor[20];
         uint8_t str_product[14];
-        uint8_t str_cdc[14];
-        uint8_t str_cdc2[16];
-        vsf_usbd_desc_t std_desc[7];
+        uint8_t str_uvc[14];
+        vsf_usbd_desc_t std_desc[6];
     } usbd;
 };
 typedef struct usrapp_const_t usrapp_const_t;
 
 struct usrapp_t {
-    struct {
-        vsf_usbh_t host;
-        vsf_usbh_class_t hub;
-        vsf_usbh_class_t ecm;
-        vsf_usbh_class_t bthci;
-        vsf_usbh_class_t hid;
-    } usbh;
-
-    struct {
-        bool inited;
-#if VSF_CFG_VSFIP_EN == ENABLED
-        vsfip_netif_t netif;
-        union {
-            vsfip_dhcpc_t dhcpc;
-            vsfip_dhcpd_t dhcpd;
-        };
-#else
-        struct netif netif;
-#endif
-    } tcpip;
-/*
-    struct {
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-        vsf_stream_t stream;
-#endif
-    } debug;
-*/
     struct {
         struct {
             vsf_usbd_CDCACM_t param[2];
@@ -341,15 +309,10 @@ static const usrapp_const_t usrapp_const = {
             USB_DT_STRING,
             'V', 0, 'S', 0, 'F', 0, 'A', 0, 'I', 0, 'O', 0,
         },
-        .str_cdc                = {
+        .str_uvc                = {
             14,
             USB_DT_STRING,
             'V', 0, 'S', 0, 'F', 0, 'C', 0, 'D', 0, 'C', 0,
-        },
-        .str_cdc2               = {
-            16,
-            USB_DT_STRING,
-            'V', 0, 'S', 0, 'F', 0, 'C', 0, 'D', 0, 'C', 0, '2', 0,
         },
         .std_desc               = {
             VSF_USBD_DESC_DEVICE(0, usrapp_const.usbd.dev_desc, sizeof(usrapp_const.usbd.dev_desc)),
@@ -357,27 +320,12 @@ static const usrapp_const_t usrapp_const = {
             VSF_USBD_DESC_STRING(0, 0, usrapp_const.usbd.str_lanid, sizeof(usrapp_const.usbd.str_lanid)),
             VSF_USBD_DESC_STRING(0x0409, 1, usrapp_const.usbd.str_vendor, sizeof(usrapp_const.usbd.str_vendor)),
             VSF_USBD_DESC_STRING(0x0409, 2, usrapp_const.usbd.str_product, sizeof(usrapp_const.usbd.str_product)),
-            VSF_USBD_DESC_STRING(0x0409, 4, usrapp_const.usbd.str_cdc, sizeof(usrapp_const.usbd.str_cdc)),
-            VSF_USBD_DESC_STRING(0x0409, 5, usrapp_const.usbd.str_cdc2, sizeof(usrapp_const.usbd.str_cdc2)),
+            VSF_USBD_DESC_STRING(0x0409, 4, usrapp_const.usbd.str_uvc, sizeof(usrapp_const.usbd.str_uvc)),
         },
     },
 };
 
 static usrapp_t usrapp = {
-    .usbh                       = {
-        .host.drv               = &vsf_ohci_drv,
-        .host.param             = (void *)&usrapp_const.usbh.ohci_param,
-
-        .hub.drv                = &vsf_usbh_hub_drv,
-        .ecm.drv                = &vsf_usbh_ecm_drv,
-        .bthci.drv              = &vsf_usbh_bthci_drv,
-        .hid.drv                = &vsf_usbh_hid_drv,
-    },
-/*
-    .debug.stream               = {
-        .op                     = &vsf_nu_console_stream_op,
-    },
-*/
     .usbd                       = {
         .cdc.param[0]           = {
             .ep = {
@@ -459,181 +407,20 @@ static usrapp_t usrapp = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_CFG_VSFIP_EN == ENABLED
-vsfip_socket_t * vsfip_mem_socket_get(void)
-{
-    return vsf_heap_malloc(sizeof(vsfip_socket_t));
-}
-
-void vsfip_mem_socket_free(vsfip_socket_t *socket)
-{
-    vsf_heap_free(socket);
-}
-
-vsfip_netbuf_t * vsfip_mem_netbuf_get(uint_fast32_t size)
-{
-    vsfip_netbuf_t *netbuf = vsf_heap_malloc(sizeof(*netbuf) + size);
-    if (netbuf != NULL) {
-        netbuf->buffer = (uint8_t *)&netbuf[1];
-    }
-    return netbuf;
-}
-
-void vsfip_mem_netbuf_free(vsfip_netbuf_t *netbuf)
-{
-    vsf_heap_free(netbuf);
-}
-
-void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv)
-{
-    if (usrapp.tcpip.inited && (netdrv == vsfip_netif_get_netdrv(&usrapp.tcpip.netif))) {
-        vsfip_dhcpc_stop(&usrapp.tcpip.dhcpc);
-    }
-}
-
-void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv)
-{
-    usrapp.tcpip.netif.op = &vsfip_eth_op;
-    vsfip_netif_set_netdrv(&usrapp.tcpip.netif, netdrv);
-}
-
-void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv)
-{
-    if (usrapp.tcpip.inited && (netdrv == vsfip_netif_get_netdrv(&usrapp.tcpip.netif))) {
-        vsfip_dhcpc_start(&usrapp.tcpip.netif, &usrapp.tcpip.dhcpc);
-    }
-}
-
-void vsf_pnp_on_netdrv_new(vsf_netdrv_t *netdrv)
-{
-    vsf_protect_t origlevel = vsf_protect_scheduler();
-        if (usrapp.tcpip.inited) {
-            vsf_unprotect_scheduler(origlevel);
-            return;
-        }
-        usrapp.tcpip.inited = true;
-    vsf_unprotect_scheduler(origlevel);
-}
-
-void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
-{
-    vsf_protect_t origlevel = vsf_protect_scheduler();
-        usrapp.tcpip.inited = false;
-    vsf_unprotect_scheduler(origlevel);
-}
-#else
-void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv)
-{
-    if (usrapp.tcpip.inited && (netdrv == lwip_netif_get_netdrv(&usrapp.tcpip.netif))) {
-        dhcp_stop(&usrapp.tcpip.netif);
-    }
-}
-
-void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv)
-{
-    lwip_netif_set_netdrv(&usrapp.tcpip.netif, netdrv);
-}
-
-void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv)
-{
-    if (usrapp.tcpip.inited && (netdrv == lwip_netif_get_netdrv(&usrapp.tcpip.netif))) {
-        dhcp_start(&usrapp.tcpip.netif);
-    }
-}
-
-void vsf_pnp_on_netdrv_new(vsf_netdrv_t *netdrv)
-{
-    vsf_protect_t origlevel = vsf_protect_scheduler();
-        if (usrapp.tcpip.inited) {
-            vsf_unprotect_scheduler(origlevel);
-            return;
-        }
-        usrapp.tcpip.inited = true;
-    vsf_unprotect_scheduler(origlevel);
-}
-
-void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
-{
-    vsf_protect_t origlevel = vsf_protect_scheduler();
-        usrapp.tcpip.inited = false;
-    vsf_unprotect_scheduler(origlevel);
-}
-#endif
-
-void usrapp_on_timer(vsf_callback_timer_t *timer)
+void usrapp_on_timer(void *param)
 {
     if (!usrapp.usbd.is_connected) {
         usrapp.usbd.is_connected = true;
         vsf_usbd_connect(&usrapp.usbd.dev);
     } else {
-        vsf_trace(VSF_TRACE_INFO, "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
+        vsf_trace(VSF_TRACE_INFO, "heartbeat: [%d]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
     }
-    vsf_callback_timer_add_ms(timer, 1000);
+    vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
 }
-
-#include "btstack_event.h"
-#include "btstack_run_loop.h"
-#include "btstack_memory.h"
-#include "hci.h"
-#include "btstack_chipset_csr.h"
-#include "component/3rd-party/btstack/port/btstack_run_loop_vsf.h"
-
-int btstack_main(int argc, const char * argv[]);
-vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
-{
-	if ((id->idVendor == 0x0A12) && (id->idProduct == 0x0001)) {
-		btstack_memory_init();
-		btstack_run_loop_init(btstack_run_loop_vsf_get_instance());
-		hci_init(hci_transport_usb_instance(), dev);
-		hci_set_chipset(btstack_chipset_csr_instance());
-		btstack_main(0, NULL);
-        return VSF_ERR_NONE;
-	}
-    return VSF_ERR_FAIL;
-}
-
-static void usrapp_trace_hid(vsf_hid_event_t *hid_evt)
-{
-    if (hid_evt->id != 0) {
-        uint_fast16_t generic_usage, usage_page, usage_id;
-
-        generic_usage = HID_GET_GENERIC_USAGE(hid_evt->id);
-        usage_page = HID_GET_USAGE_PAGE(hid_evt->id);
-        usage_id = HID_GET_USAGE_ID(hid_evt->id);
-
-        vsf_trace(VSF_TRACE_DEBUG, "hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
-            generic_usage, usage_page, usage_id, hid_evt->pre, hid_evt->cur);
-    }
-}
-
-#if 1
-void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
-{
-    switch (type) {
-    case VSF_INPUT_TYPE_HID:
-        usrapp_trace_hid((vsf_hid_event_t *)event);
-        break;
-    case VSF_INPUT_TYPE_SENSOR:
-        break;
-    default:
-        break;
-    }
-}
-#else
-void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
-{
-    usrapp_trace_hid(hid_evt);
-}
-#endif
-
-#include "lwip/init.h"
 
 int main(void)
 {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-//    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx.use_as__vsf_stream_t);
-
-    //vsf_stream_init(&usrapp.debug.stream);
     vsf_trace_init(NULL);
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 #endif
@@ -641,20 +428,8 @@ int main(void)
     vsf_heap_init();
     vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
 
-    vsf_ohci_init();
-    vsf_usbh_init(&usrapp.usbh.host);
-    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hub);
-    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.ecm);
-    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.bthci);
-    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hid);
-
-
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);
-
-#if VSF_CFG_VSFIP_EN != ENABLED
-    tcpip_init(NULL, NULL);
-#endif
 
     usrapp.poll_timer.on_timer = usrapp_on_timer;
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);

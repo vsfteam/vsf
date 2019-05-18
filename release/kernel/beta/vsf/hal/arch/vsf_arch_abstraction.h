@@ -58,6 +58,8 @@ extern void vsf_systimer_set_idle(void);
 extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 extern vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
 extern bool vsf_systimer_is_due(vsf_systimer_cnt_t due);
+extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
+extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
 
 /*! \brief initialise a software interrupt
  *! \param idx the index of the software interrupt

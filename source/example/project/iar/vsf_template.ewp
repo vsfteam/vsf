@@ -6329,7 +6329,7 @@
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
@@ -6508,7 +6508,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>pe301,pe128,pe381,Pe188,Pe1866,Pa082</state>
+                    <state>pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -8365,6 +8365,12 @@
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\main.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\systimer_test.c</name>
+                <excluded>
+                    <configuration>aio_m484</configuration>
+                </excluded>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\vsf_app_cfg.h</name>
             </file>
         </group>
@@ -8401,6 +8407,21 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\template\vsf_app_cfg.h</name>
+            </file>
+        </group>
+        <group>
+            <name>ui_demo</name>
+            <excluded>
+                <configuration>arm_mps2_m7</configuration>
+                <configuration>kernel_template_cm7</configuration>
+                <configuration>usbh_m484</configuration>
+                <configuration>aio_m484</configuration>
+            </excluded>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\ui_demo\main.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\ui_demo\vsf_app_cfg.h</name>
             </file>
         </group>
         <group>
@@ -8729,7 +8750,21 @@
                 </group>
             </group>
             <group>
+                <name>av</name>
+                <excluded>
+                    <configuration>arm_mps2_m7</configuration>
+                    <configuration>kernel_template_cm7</configuration>
+                </excluded>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\av\vsfav.h</name>
+                </file>
+            </group>
+            <group>
                 <name>input</name>
+                <excluded>
+                    <configuration>arm_mps2_m7</configuration>
+                    <configuration>kernel_template_cm7</configuration>
+                </excluded>
                 <group>
                     <name>hid</name>
                     <file>
@@ -8751,6 +8786,10 @@
             </group>
             <group>
                 <name>tcpip</name>
+                <excluded>
+                    <configuration>arm_mps2_m7</configuration>
+                    <configuration>kernel_template_cm7</configuration>
+                </excluded>
                 <group>
                     <name>netdrv</name>
                     <file>
@@ -8849,6 +8888,12 @@
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_HID.h</name>
                             </file>
                         </group>
+                        <group>
+                            <name>UVC</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h</name>
+                            </file>
+                        </group>
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\usb_ch11.h</name>
@@ -8889,6 +8934,15 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>UVC</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\device\class\UVC\vsf_usbd_UVC.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\device\class\UVC\vsf_usbd_UVC.h</name>
                             </file>
                         </group>
                     </group>
@@ -9783,6 +9837,7 @@
                     <excluded>
                         <configuration>kernel_lib_armv7m_full_size</configuration>
                         <configuration>kernel_lib_armv6m_full_size</configuration>
+                        <configuration>WinnerMicro_W600</configuration>
                         <configuration>aio_m484</configuration>
                         <configuration>kernel_lib_armv7em_full_size</configuration>
                     </excluded>

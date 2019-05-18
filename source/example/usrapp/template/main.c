@@ -222,7 +222,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
     
     vsf_pt_wait_until(
         wait_for_one(this.pgroup_evts, this.mask){
-            printf("get sem in pt slave thread\r\n");
+            printf("get timer4_evt in pt slave thread\r\n");
         } 
     );
 
@@ -255,7 +255,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
     
         vsf_pt_wait_until(
             wait_for_one(this.pgroup_evts, this.mask){
-                printf("get sem in pt master thread\r\n");
+                printf("get timer4_evt in pt master thread\r\n");
             }
         );
         

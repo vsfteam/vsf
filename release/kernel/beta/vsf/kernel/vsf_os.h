@@ -45,7 +45,7 @@ typedef uint_fast8_t vsf_sched_lock_status_t;
 #   define vsf_sched_safe_exit()        vsf_sched_unlock(lock_status)
 #else
 #   define vsf_sched_lock()             0
-#   define vsf_sched_unlock(level)      UNUSED_PARAM(level)
+#   define vsf_sched_unlock(level)      
 #   define vsf_sched_safe(...)          __VA_ARGS__
 #   define __vsf_sched_safe(...)        __VA_ARGS__
 #   define vsf_interrupt_safe(...)      __VA_ARGS__

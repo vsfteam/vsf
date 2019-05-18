@@ -33,7 +33,7 @@
 #define VSF_HEAP_CFG_MCB_MAGIC_ENABLED  ENABLED
 #define VSF_HEAP_CFG_TRACE_CNT          1024
 
-#define VSF_CFG_CALLBACK_TIMER_EN       ENABLED
+#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
 //! for test only ...
 #define VSF_GET_MAIN_CLK()              (192000000)

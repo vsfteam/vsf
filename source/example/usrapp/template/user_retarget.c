@@ -69,6 +69,9 @@ int vsf_stdout_putchar(char txchar)
 #elif defined(CMSDK_UART0)
     while(CMSDK_UART0->STATE & CMSDK_UART_STATE_TXBF_Msk);
     CMSDK_UART0->DATA = (uint32_t)txchar;
+    
+    (*(volatile uint32_t *)0x41000000) = txchar;
+    
     return (int) txchar;
 #else
 #error No defined USART

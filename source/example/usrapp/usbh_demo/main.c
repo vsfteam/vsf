@@ -592,9 +592,9 @@ void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
 #endif
 
 #if VSF_USE_USB_DEVICE == ENABLED
-void usrapp_usbd_connect(void *param)
+void usrapp_usbd_connect(vsf_callback_timer_t *timer)
 {
-    vsf_usbd_connect((vsf_usbd_dev_t *)param);
+    vsf_usbd_connect(&usrapp.usbd.dev);
 }
 #endif
 
@@ -697,7 +697,6 @@ int main(void)
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);
 
-    usrapp.usbd.timer.param = &usrapp.usbd.dev;
     usrapp.usbd.timer.on_timer = usrapp_usbd_connect;
     vsf_callback_timer_add_ms(&usrapp.usbd.timer, 200);
 #endif
