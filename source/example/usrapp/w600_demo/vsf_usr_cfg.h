@@ -24,10 +24,11 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
-#define ASSERT(...)
+#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
+//#define ASSERT(...)
 
-#define VSF_PROJ_CFG_USE_CUBE               DISABLED
+//! for test only ...
+#define VSF_GET_MAIN_CLK()              (160000000)
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -36,19 +37,16 @@
 //! \name kernel resource configuration
 //! @{
 
-//  <o>System Frequency (Hz)                     <32768-0xFFFFFFFF>
-//  <i>Please specify the system frequency here.
-#define SYSTEM_FREQ                         25000000ul
-
-//  <o>System Timer Frequency (Hz)/ Tick Resolution         <32768-0xFFFFFFFF>
-//  <i>Please specify the system timer frequency here. The frequency determins the period of 1 systmer timer tick. For example, 1000 means tick resolution is 1ms. 1000000 means tick resolution is us.
-#define VSF_SYSTIMER_RESOLUTION             1000000ul
 //  <h> Kernel Resource Configuration
 
 //      <h> Kernal event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
 #define VSF_OS_EVTQ_POOL_SIZE               16
+
+//          <o>Event Bits <4-8>
+//          <i>Simon, please add description here...
+#define VSF_OS_EVTQ_BITSIZE                 4
 
 //          <o>The number of event queues   <1-4>
 //          <i>Simon, please add description here...
@@ -70,19 +68,69 @@
 //! \name kernel feature configuration
 //! @{
 //  <h> Kernel Feature Configuration
+//      <c1>Enable Inter-task synchronisation (vsf_sync_t)
+//      <i>Simon, please add description here...
+#define VSF_CFG_SYNC_EN                     ENABLED
+//      </c>
+
+//      <h> Schedule Policy 
+//          <c1>Enable Preemption
+//          <i>Simon, please add description here...
+#define VSF_CFG_PREMPT_EN                   ENABLED
+//          </c>
+
+//          <c1>Enable Dynamic Task Priority
+//          <i>Simon, please add description here...
+#define VSF_CFG_DYNAMIC_PRIOTIRY_EN         ENABLED
+//          </c>
+//      </h>
+
+//      <c1>Enable Timer-integrated tasks (vsf_teda_t)
+//      <i>Simon, please add description here...
+#define VSF_CFG_TIMER_EN                    ENABLED
+//      </c>
+
+//      <c1>Enable message queue support
+//      <i>Simon, please add description here...
+#define VSF_CFG_QUEUE_EN                    ENABLED
+//      </c>
+
+//      <c1>Enable Bitmap Event support
+//      <i>Simon, please add description here...
+#define VSF_CFG_BMPEVT_EN                   ENABLED
+//      </c>
+
+//      <c1>Enable kernel tracing
+//      <i>Simon, please add description here...
+//#define VSF_CFG_EVT_TRACE_EN                ENABLED
+//      </c>
 
 //      <h> Main Function
 //          <o>Main Stack Size              <128-65536:8>
 //          <i>When main function is configured as a thread, this option controls the size of the stack.
-#define VSF_OS_MAIN_STACK_SIZE               1024
+//#define VSF_OS_MAIN_STACK_SIZE               2048
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-//#define VSF_OS_RUN_MAIN_AS_THREAD           ENABLED
+#define VSF_OS_RUN_MAIN_AS_THREAD           DISABLED
+//          </c>
+//      </h>
+//      <h> Shell Configuration
+//          <c1>Enable default VSF simple shell
+//          <i>The default VSF simple shell provides an simple, easy and unified way to use kernel resources
+#define VSF_USE_SIMPLE_SHELL                ENABLED
 //          </c>
 //      </h>
 
 //      <h> Task Form Configuration
+//          <c1>Enable the VSF Co-oprative task support
+//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
+#define VSF_USE_KERNEL_TASK_MODE            ENABLED
+//          </c>
+//          <c1>Enable the RTOS thread support
+//          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
+#define VSF_USE_KERNEL_THREAD_MODE          ENABLED
+//          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack
 #define VSF_USE_KERNEL_PT_MODE              ENABLED
@@ -90,9 +138,6 @@
 //      </h>
 //  </h>
 //! @}
-
-
-
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

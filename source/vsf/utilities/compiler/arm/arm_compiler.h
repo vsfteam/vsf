@@ -19,7 +19,7 @@
 #define __USE_ARM_COMPILER_H__
 
 /*============================ INCLUDES ======================================*/
-#include "vsf_app_cfg.h"
+#include "vsf_cfg.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>

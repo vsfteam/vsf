@@ -105,7 +105,11 @@ ROOT void __post_vsf_kernel_init(void)
     ASSERT(stack_size >= 64);
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    __main_thread.on_terminate = NULL;
+#   if __IS_COMPILER_ARM_COMPILER_5__
+        __main_thread.use_as__vsf_teda_t.use_as__vsf_eda_t.on_terminate = NULL;
+#   else
+        __main_thread.on_terminate = NULL;
+#   endif
 #endif
     __main_thread.entry = (vsf_thread_entry_t *)main;
     __main_thread.stack = __main_stack;

@@ -32,7 +32,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_eda_yield()         vsf_eda_post_evt(peda, VSF_EVT_NONE);
+#define vsf_eda_yield()         vsf_eda_post_evt(peda, VSF_EVT_YIELD);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

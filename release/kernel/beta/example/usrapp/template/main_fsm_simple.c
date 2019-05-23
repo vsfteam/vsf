@@ -46,7 +46,7 @@ declare_fsm(user_task_b_t)
 def_fsm(user_task_b_t,
     def_params(
         vsf_sem_t *psem;
-        uint8_t state;
+        uint8_t cnt;
     ));
 #endif
 
@@ -76,7 +76,7 @@ implement_fsm(user_fsm_sub_task_t)
         )
         
         state(PRINT_INFO) {
-            printf("receive semaphore from main...[%08x]\r\n", this.cnt++);
+            printf("receive semaphore...[%08x]\r\n", this.cnt++);
             fsm_cpl();
         }
     )
@@ -139,6 +139,7 @@ fsm_initialiser(user_task_b_t,
     ))
     init_body(
         this.psem = ptSEM;
+        this.cnt = 0;
     )
 
 /*----------------------------------------------------------------------------*
@@ -154,7 +155,7 @@ implement_fsm(user_task_b_t)
         )
         
         state(PRINT){
-            printf("hello world! \r\n");
+            printf("post semaphore...   [%08x]\r\n", this.cnt++);
             update_state_to(DELAY);                                             //!< transfer to DELAY without yielding...
         }
         
@@ -171,29 +172,21 @@ implement_fsm(user_task_b_t)
 
 
 void vsf_kernel_fsm_simple_demo(void)
-{
-    static_task_instance(
-        features_used(
-            mem_sharable( )
-            mem_nonsharable( )
-        )
-    )
-    
+{   
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
-    do {
+    {
         static NO_INIT user_fsm_task_t __user_task;
-        init_fsm(user_fsm_task_t, 
-                ref_obj_as(__user_task, fsm(user_fsm_task_t)), 
-                args(&user_sem));
+        init_fsm(user_fsm_task_t, &(__user_task.param), args(&user_sem));
         start_fsm(user_fsm_task_t, &__user_task, vsf_priority_0);
-    } while(0);
+    };
 
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    uint32_t cnt = 0;
     while(1) {
-        printf("hello world! \r\n");
+        printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
@@ -203,15 +196,11 @@ void vsf_kernel_fsm_simple_demo(void)
 
 
     //! start a user task b
-    do {
+    {
         static NO_INIT user_task_b_t __user_task_b;
-        init_fsm(user_task_b_t, 
-                ref_obj_as(__user_task_b, fsm(user_task_b_t)), 
-                args(&user_sem));
+        init_fsm(user_task_b_t, &(__user_task_b.param), args(&user_sem));
         start_fsm(user_task_b_t, &__user_task_b, vsf_priority_0);
-    } while(0);
-    
-    return 0;
+    };
 #endif
 }
 
@@ -219,11 +208,25 @@ void vsf_kernel_fsm_simple_demo(void)
 #if VSF_PROJ_CFG_USE_CUBE != ENABLED
 int main(void)
 {
+    static_task_instance(
+        features_used(
+            mem_sharable( )
+            mem_nonsharable( )
+        )
+    )
+
     vsf_stdio_init();
     
     vsf_kernel_fsm_simple_demo();
     
-    while(1);
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_delay_ms(1000);
+    }
+#else
+    return 0;
+#endif
 }
 
 #endif

@@ -42,6 +42,7 @@ def_vsf_pt(user_pt_task_t,
 declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
+        uint32_t cnt;
         vsf_sem_t *psem;
     ));
 #endif
@@ -56,7 +57,7 @@ private implement_vsf_pt(user_pt_sub_task_t)
 {
     vsf_pt_begin();
    
-    printf("receive semaphore from main...[%08x]\r\n", this.cnt++);
+    printf("receive semaphore...[%08x]\r\n", this.cnt++);
      
     vsf_pt_end();
 }
@@ -93,7 +94,7 @@ private implement_vsf_pt(user_pt_task_b_t)
     vsf_pt_begin();
     
     while(1) {
-        printf("hello world! \r\n");
+        printf("post semaphore...   [%08x]\r\n", this.cnt++);
         
         vsf_pt_wait_until(
             vsf_delay_ms(10000){               //!< wait 10s
@@ -107,32 +108,21 @@ private implement_vsf_pt(user_pt_task_b_t)
 #endif
 
 void vsf_kernel_pt_simple_demo(void)
-{
-    static_task_instance(
-        features_used(
-            mem_sharable( )
-            mem_nonsharable( )
-        )
-    )
-    
+{  
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
-    do {
+    {
         static NO_INIT user_pt_task_t __user_task;
-#if __IS_COMPILER_ARM_COMPILER_5__
-        __user_task.use_as__task_cb_user_pt_task_t.psem = &user_sem;
-#else
-        __user_task.psem = &user_sem;
-#endif
-        
+        __user_task.param.psem = &user_sem;
         init_vsf_pt(user_pt_task_t, &__user_task, vsf_priority_inherit);
-    } while(0);
+    };
 
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    uint32_t cnt = 0;
     while(1) {
-        printf("hello world! \r\n");
+        printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
@@ -140,25 +130,37 @@ void vsf_kernel_pt_simple_demo(void)
     //! in this case, we only use main to initialise vsf_tasks
 
     //! start a user task b
-    do {
-        static NO_INIT user_pt_task_b_t __user_task_b;
-        __user_task_b.psem = &user_sem;
-        __user_task_b.chState = 0;
-        init_vsf_pt(user_pt_task_b_t, &__user_task_b, vsf_priority_inherit);
-    } while(0);
-    
-    return 0;
+    {
+        static NO_INIT user_pt_task_b_t __user_pt_task_b;
+        __user_pt_task_b.param.psem = &user_sem;
+        __user_pt_task_b.param.cnt = 0;
+        init_vsf_task(user_pt_task_b_t, &__user_pt_task_b, vsf_priority_0);
+    }
 #endif
 }
 
 #if VSF_PROJ_CFG_USE_CUBE != ENABLED
 int main(void)
 {
+    static_task_instance(
+        features_used(
+            mem_sharable( )
+            mem_nonsharable( )
+        )
+    )
+
     vsf_stdio_init();
     
     vsf_kernel_pt_simple_demo();
     
-    while(1);
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_delay_ms(1000);
+    }
+#else
+    return 0;
+#endif
 }
 
 #endif

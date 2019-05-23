@@ -21,12 +21,25 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-declare_vsf_thread(user_thread_t)
+declare_vsf_thread(user_thread_a_t)
 
-def_vsf_thread(user_thread_t, 512,
+def_vsf_thread(user_thread_a_t, 512,
 
     features_used(
-        mem_sharable( using_grouped_evt; )
+        mem_sharable( )
+        mem_nonsharable( )
+    )
+    
+    def_params(
+        vsf_sem_t *psem;
+    ));
+
+declare_vsf_thread(user_thread_b_t)
+
+def_vsf_thread(user_thread_b_t, 512,
+
+    features_used(
+        mem_sharable( )
         mem_nonsharable( )
     )
     
@@ -40,21 +53,50 @@ static NO_INIT vsf_sem_t user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
-#error In order to run this demo, please set VSF_OS_RUN_MAIN_AS_THREAD to ENABLED
-#endif
 
-implement_vsf_thread(user_thread_t) 
+void vsf_kernel_thread_simple_demo(void)
+{    
+    //! initialise semaphore
+    vsf_sem_init(&user_sem, 0); 
+    
+    //! start the user task a
+    {
+        static NO_INIT user_thread_a_t __user_task_a;
+        __user_task_a.param.psem = &user_sem;
+        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_priority_0);
+    }
+    
+    //! start the user task b
+    {
+        static NO_INIT user_thread_b_t __user_task_b;
+        __user_task_b.param.psem = &user_sem;
+        init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_priority_0);
+    }
+}
+
+implement_vsf_thread(user_thread_a_t) 
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_sem_pend(this.psem);        //! wait for semaphore forever
-        printf("receive semaphore from main...[%08x]\r\n", cnt++);
+        vsf_delay_ms(1000);
+        printf("post semaphore...     [%08x]\r\n", cnt++);
+        vsf_sem_post(this.psem);            //!< post a semaphore
+    }
+}
+
+implement_vsf_thread(user_thread_b_t) 
+{
+    uint32_t cnt = 0;
+    while (1) {
+        vsf_sem_pend(this.psem);            //! wait for semaphore forever
+        printf("receive semaphore...[%08x]\r\n", cnt++);
     }
 }
 
 
-void vsf_kernel_thread_simple_demo(void)
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
 {
     static_task_instance(
         features_used(
@@ -62,38 +104,19 @@ void vsf_kernel_thread_simple_demo(void)
             mem_nonsharable( )
         )
     )
-    
-    //! initialise semaphore
-    vsf_sem_init(&user_sem, 0); 
-    
-    //! start a user task
-    do {
-        static NO_INIT user_thread_t __user_task;
-#if __IS_COMPILER_ARM_COMPILER_5__
-        __user_task.use_as__vsf_thread_user_thread_t_t.psem = &user_sem;
-#else
-        __user_task.psem = &user_sem;
-#endif
-        init_vsf_thread(user_thread_t, &__user_task, vsf_priority_0);
-    } while(0);
 
-    
-    while(1) {
-        printf("hello world! \r\n");
-        vsf_delay_ms(1000);
-        vsf_sem_post(&user_sem);            //!< post a semaphore
-    }
-    
-}
-
-#if VSF_PROJ_CFG_USE_CUBE != ENABLED
-int main(void)
-{
     vsf_stdio_init();
     
     vsf_kernel_thread_simple_demo();
     
-    while(1);
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_delay_ms(1000);
+    }
+#else
+    return 0;
+#endif
 }
 
 #endif

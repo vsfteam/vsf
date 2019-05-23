@@ -110,8 +110,6 @@ ROOT void __post_vsf_kernel_init(void)
 #   else
         __main_thread.on_terminate = NULL;
 #   endif
-
-    
 #endif
     __main_thread.entry = (vsf_thread_entry_t *)main;
     __main_thread.stack = __main_stack;

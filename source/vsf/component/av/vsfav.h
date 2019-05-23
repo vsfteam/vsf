@@ -25,7 +25,7 @@
 
 struct vsfav_control_value_t {
     union {
-        void *pbuf;
+        void *buffer;
         uint8_t uval8;
         int8_t ival8;
         uint16_t uval16;

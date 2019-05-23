@@ -34,10 +34,10 @@
 
 #define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
-//! for test only ...
-#define VSF_GET_MAIN_CLK()              (192000000)
+#define SYSTEM_FREQ                     (192000000ul)
 
 #define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
+#define VSF_USBD_UVC_TRACE_EN           ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 

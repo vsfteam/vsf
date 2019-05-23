@@ -85,8 +85,8 @@ typedef vsf_systimer_cnt_t     vsf_timer_tick_t;
 
 enum {
     VSF_EVT_INVALID = -1,               //!< compatible with fsm_rt_err
-    VSF_EVT_CPL = 0,                    //!< compatible with fsm_rt_cpl
-    VSF_EVT_NONE = 1,                   //!< compatible with fsm_rt_on_going
+    VSF_EVT_NONE = 0,                   //!< compatible with fsm_rt_cpl
+    VSF_EVT_YIELD = 1,                  //!< compatible with fsm_rt_on_going
     
     VSF_EVT_SYSTEM = 0x100,
     VSF_EVT_DUMMY = VSF_EVT_SYSTEM + 0,

@@ -8371,7 +8371,7 @@
                 </excluded>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\vsf_app_cfg.h</name>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\vsf_usr_cfg.h</name>
             </file>
         </group>
         <group>
@@ -8406,7 +8406,7 @@
                 <name>$PROJ_DIR$\..\..\usrapp\template\user_retarget.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\template\vsf_app_cfg.h</name>
+                <name>$PROJ_DIR$\..\..\usrapp\template\vsf_usr_cfg.h</name>
             </file>
         </group>
         <group>
@@ -8421,7 +8421,7 @@
                 <name>$PROJ_DIR$\..\..\usrapp\ui_demo\main.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\ui_demo\vsf_app_cfg.h</name>
+                <name>$PROJ_DIR$\..\..\usrapp\ui_demo\vsf_usr_cfg.h</name>
             </file>
         </group>
         <group>
@@ -8442,7 +8442,7 @@
                 <name>$PROJ_DIR$\..\..\usrapp\usbh_demo\main.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\usbh_demo\vsf_app_cfg.h</name>
+                <name>$PROJ_DIR$\..\..\usrapp\usbh_demo\vsf_usr_cfg.h</name>
             </file>
         </group>
         <group>
@@ -8457,7 +8457,7 @@
                 <name>$PROJ_DIR$\..\..\usrapp\w600_demo\main.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\w600_demo\vsf_app_cfg.h</name>
+                <name>$PROJ_DIR$\..\..\usrapp\w600_demo\vsf_usr_cfg.h</name>
             </file>
         </group>
     </group>

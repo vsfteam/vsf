@@ -19,6 +19,9 @@
 #define __VSF_USB_UVC_H__
 
 /*============================ INCLUDES ======================================*/
+
+#include "utilities/compiler.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -36,6 +39,43 @@ enum usb_UVC_req_t {
     USB_UVCREQ_GET      = 0x80,
 };
 typedef enum usb_UVC_req_t usb_UVC_req_t;
+
+// Stream Controls
+struct usb_UVC_vs_t {
+    uint16_t bmHint;
+    uint8_t bFormatIndex;
+    uint8_t bFrameIndex;
+    uint32_t dwFrameInterval;
+    uint16_t wKeyFrameRate;
+    uint16_t wPFrameRate;
+    uint16_t wCompQuality;
+    uint16_t wCompWindowSize;
+    uint16_t wDelay;
+    uint32_t dwMaxVideoFrameSize;
+    uint32_t dwMaxPayloadTransferSize;
+    uint32_t dwClockFrequency;
+    uint8_t bmFramingInfo;
+    uint8_t bPreferedVersion;
+    uint8_t bMinVersion;
+    uint8_t bMaxVersion;
+    uint8_t bUsage;
+    uint8_t bBitDepthLuma;
+    uint8_t bmSettings;
+    uint8_t bMaxNumberOfFramesPlus1;
+    uint16_t bmRateControlModes;
+    uint64_t bmLayoutPerStream;
+} PACKED;
+typedef struct usb_UVC_vs_t usb_UVC_vs_t;
+
+// Camera Terminal
+struct usb_UVC_ct_roi_t {
+    uint16_t wROI_Top;
+    uint16_t wROI_Left;
+    uint16_t wROI_Bottom;
+    uint16_t wROI_Right;
+    uint16_t bmAutoControls;
+} PACKED;
+typedef struct usb_UVC_ct_roi_t usb_UVC_ct_roi_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -45,7 +45,7 @@ declare_vsf_task(user_task_b_t)
 def_vsf_task(user_task_b_t,
     def_params(
         vsf_sem_t *psem;
-        uint8_t state;
+        uint32_t cnt;
     ));
 #endif
 
@@ -57,7 +57,7 @@ static NO_INIT vsf_sem_t user_sem;
 
 implement_vsf_task(user_sub_task_t) 
 {
-    printf("receive semaphore from main...[%08x]\r\n", this.cnt++);
+    printf("receive semaphore...[%08x]\r\n", this.cnt++);
     return fsm_rt_cpl;                  //!< return to caller
 }
 
@@ -71,7 +71,6 @@ implement_vsf_task(user_task_t)
         CALL_SUB_TO_PRINT,
     };
     on_vsf_task_init() {
-        this.chState = 0;
         this.cnt = 0;
     }
 
@@ -133,10 +132,10 @@ implement_vsf_task(user_task_b_t)
         DELAY,
     };
     
-    switch(this.state) {
+    switch(this.chState) {
         case PRINT:
-            printf("hello world! \r\n");
-            this.state = DELAY;
+            printf("post semaphore...   [%08x]\r\n", this.cnt++);
+            this.chState = DELAY;
             //break;
         case DELAY:
             vsf_task_wait_until(
@@ -153,6 +152,39 @@ implement_vsf_task(user_task_b_t)
 #endif
 
 void vsf_kernel_task_simple_demo(void)
+{   
+    //! initialise semaphore
+    vsf_sem_init(&user_sem, 0); 
+    
+    //! start a user task
+    {
+        static NO_INIT user_task_t __user_task;
+        __user_task.param.psem = &user_sem;
+        init_vsf_task(user_task_t, &__user_task, vsf_priority_0);
+    }
+
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    uint32_t cnt = 0;
+    while(1) {
+        printf("post semaphore...   [%08x]\r\n", cnt++);
+        vsf_delay_ms(10000);
+        vsf_sem_post(&user_sem);            //!< post a semaphore
+    }
+#else
+    //! in this case, we only use main to initialise vsf_tasks
+
+    //! start a user task b
+    {
+        static NO_INIT user_task_b_t __user_task_b;
+        __user_task_b.param.psem = &user_sem;
+        __user_task_b.param.cnt = 0;
+        init_vsf_task(user_task_b_t, &__user_task_b, vsf_priority_0);
+    }
+#endif
+}
+
+#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+int main(void)
 {
     static_task_instance(
         features_used(
@@ -161,50 +193,18 @@ void vsf_kernel_task_simple_demo(void)
         )
     )
     
-    //! initialise semaphore
-    vsf_sem_init(&user_sem, 0); 
-    
-    //! start a user task
-    do {
-        static NO_INIT user_task_t __user_task;
-        
-#if __IS_COMPILER_ARM_COMPILER_5__
-        __user_task.use_as__task_cb_user_task_t.psem = &user_sem;
-#else
-        __user_task.psem = &user_sem;
-#endif
-        init_vsf_task(user_task_t, &__user_task, vsf_priority_0);
-    } while(0);
-
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
-    while(1) {
-        printf("hello world! \r\n");
-        vsf_delay_ms(10000);
-        vsf_sem_post(&user_sem);            //!< post a semaphore
-    }
-#else
-    //! in this case, we only use main to initialise vsf_tasks
-
-    //! start a user task b
-    do {
-        static NO_INIT user_task_b_t __user_task_b;
-        __user_task_b.psem = &user_sem;
-        __user_task_b.state = 0;
-        init_vsf_task(user_task_b_t, &__user_task_b, vsf_priority_0);
-    } while(0);
-    
-    return 0;
-#endif
-}
-
-#if VSF_PROJ_CFG_USE_CUBE != ENABLED
-int main(void)
-{
     vsf_stdio_init();
     
     vsf_kernel_task_simple_demo();
     
-    while(1);
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_delay_ms(1000);
+    }
+#else
+    return 0;
+#endif
 }
 
 #endif

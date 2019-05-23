@@ -20,6 +20,10 @@
 #include "../../common.h"
 #include "./usbd_hs.h"
 
+#if VSF_HAL_USBD_TRACE_EN == ENABLED
+#include "./service/trace/vsf_trace.h"
+#endif
+
 /*============================ MACROS ========================================*/
 
 // CEPCTL
@@ -473,6 +477,12 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
     } else {
         idx -= 2;
         M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
+#if VSF_HAL_USBD_TRACE_EN == ENABLED
+        vsf_trace(0, "set ep%d DATSIZE to %d.\r\n", idx, size);
+        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
+                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
+                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
+#endif
     }
     return VSF_ERR_NONE;
 }
@@ -502,6 +512,12 @@ vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep,
         for (uint_fast16_t i = 0; i < size; i++) {
             M480_USBD_EP_REG8(idx, EP[0].EPDAT_BYTE) = buffer[i];
         }
+#if VSF_HAL_USBD_TRACE_EN == ENABLED
+        vsf_trace(0, "write ep%d buffer.\r\n", idx);
+        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
+                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
+                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
+#endif
     }
     return VSF_ERR_NONE;
 }
@@ -609,7 +625,17 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
 
                 if (status & HSUSBD_EPINTSTS_TXPKIF_Msk) {
                     M480_USBD_EP_REG(idx, EP[0].EPINTSTS) = HSUSBD_EPINTSTS_TXPKIF_Msk;
-                    m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
+
+#if VSF_HAL_USBD_TRACE_EN == ENABLED
+                    vsf_trace(0, "ep%d txpkif interrupt.\r\n", idx);
+                    vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
+                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
+                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
+#endif
+                    // TODO: BUG on ISO EP, will receive TCPKIF even if no data is sent
+                    if (0 == M480_USBD_EP_REG(idx, EP[0].EPDATCNT)) {
+                        m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
+                    }
                 }
                 if (status & HSUSBD_EPINTSTS_RXPKIF_Msk) {
                     M480_USBD_EP_REG(idx, EP[0].EPINTEN) &= ~HSUSBD_EPINTEN_RXPKIEN_Msk;

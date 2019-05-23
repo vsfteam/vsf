@@ -41,7 +41,6 @@ declare_simple_class(vsf_usbd_UVC_t)
 typedef struct vsf_usbd_UVC_control_t vsf_usbd_UVC_control_t;
 
 struct vsf_usbd_UVC_control_info_t {
-    uint8_t entity;
     uint8_t selector;
     uint16_t size;
 
@@ -58,22 +57,33 @@ struct vsf_usbd_UVC_control_t {
     vsfav_control_value_t cur;
 };
 
+struct vsf_usbd_UVC_entity_t {
+    uint8_t id;
+    uint8_t control_num;
+    vsf_usbd_UVC_control_t *control;
+};
+typedef struct vsf_usbd_UVC_entity_t vsf_usbd_UVC_entity_t;
+
 def_simple_class(vsf_usbd_UVC_t) {
 
     public_member(
         uint8_t ep_in;
-        uint8_t ep_out;
         uint16_t control_num;
 
-        vsf_usbd_UVC_control_t *control;
+        uint8_t entity_num;
+        vsf_usbd_UVC_entity_t *entity;
+
         vsf_usbd_desc_t *desc;
 //        vsf_stream_t *video_stream;
     )
 
     private_member(
-        vsf_usbd_trans_t trans_in, trans_out;
+        vsf_usbd_trans_t trans_in;
         vsf_usbd_dev_t *dev;
         vsf_usbd_ifs_t *ifs;
+#if VSF_USBD_UVC_TRACE_EN == ENABLED
+        uint_fast32_t cur_size;
+#endif
     )
 };
 
@@ -83,6 +93,8 @@ extern const vsf_usbd_class_op_t vsf_usbd_UVC_control_class;
 extern const vsf_usbd_class_op_t vsf_usbd_UVC_stream_class;
 
 /*============================ PROTOTYPES ====================================*/
+
+extern vsf_err_t vsf_usbd_UVC_send_frame(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size);
 
 #endif      // VSF_USE_USB_DEVICE
 #endif      // __VSF_USBD_UVC_H__
