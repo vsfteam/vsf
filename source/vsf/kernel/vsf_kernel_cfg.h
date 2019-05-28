@@ -58,6 +58,10 @@
 #   endif
 #endif
 
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE  ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

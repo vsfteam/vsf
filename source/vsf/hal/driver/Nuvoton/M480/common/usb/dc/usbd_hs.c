@@ -19,7 +19,7 @@
 
 #include "../../common.h"
 #include "./usbd_hs.h"
-
+//#define VSF_HAL_USBD_TRACE_EN           ENABLED
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
 #include "./service/trace/vsf_trace.h"
 #endif
@@ -190,6 +190,9 @@ void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
 {
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
     usbd_hs->ep_buf_ptr = 0x1000;
+    usbd_hs->ep_tx_mask = 0;
+    usbd_hs->reply_status_OUT = false;
+    usbd_hs->setup_status_IN = false;
     for (uint_fast8_t i = 0; i < (m480_usbd_hs_ep_number - 2); i++) {
         M480_USBD_EP_REG(i, EP[0].EPCFG) = 0;
         M480_USBD_EP_REG(i, EP[0].EPINTEN) = 0;
@@ -420,8 +423,18 @@ vsf_err_t m480_usbd_hs_ep_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, 
 		}
     } else {
         idx -= 2;
-        for (uint_fast16_t i = 0; i < size; i++) {
-            buffer[i] = M480_USBD_EP_REG8(idx, EP[0].EPDAT_BYTE);
+        // EPJ - EPL has BUG in DWORD read
+        if ((idx < 8) && !((uint32_t)buffer & 0x03)) {
+            while (size > 4) {
+                *(uint32_t *)buffer = M480_USBD_EP_REG(idx, EP[0].EPDAT);
+                size -= 4;
+                buffer += 4;
+            }
+        }
+        while (size > 0) {
+            *buffer = M480_USBD_EP_REG8(idx, EP[0].EPDAT_BYTE);
+            size -= 1;
+            buffer += 1;
         }
     }
     return VSF_ERR_NONE;
@@ -476,12 +489,15 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
         }
     } else {
         idx -= 2;
-        M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
+        vsf_protect_t orig = vsf_protect_interrupt();
+            M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
+            usbd_hs->ep_tx_mask |= 1 << idx;
+        vsf_unprotect_interrupt(orig);
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
         vsf_trace(0, "set ep%d DATSIZE to %d.\r\n", idx, size);
-        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
-                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
-                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
+//        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
+//                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
+//                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
 #endif
     }
     return VSF_ERR_NONE;
@@ -509,14 +525,28 @@ vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep,
         }
     } else {
         idx -= 2;
-        for (uint_fast16_t i = 0; i < size; i++) {
-            M480_USBD_EP_REG8(idx, EP[0].EPDAT_BYTE) = buffer[i];
+
+#if VSF_HAL_USBD_TRACE_EN == ENABLED
+        vsf_trace(0, "write ep%d buffer %d bytes.\r\n", idx, size);
+#endif
+
+        // EPJ - EPL has BUG in DWORD write
+        if ((idx < 8) && !((uint32_t)buffer & 0x03)) {
+            while (size > 4) {
+                M480_USBD_EP_REG(idx, EP[0].EPDAT) = *(uint32_t *)buffer;
+                size -= 4;
+                buffer += 4;
+            }
+        }
+        while (size > 0) {
+            M480_USBD_EP_REG8(idx, EP[0].EPDAT_BYTE) = *buffer;
+            size -= 1;
+            buffer += 1;
         }
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
-        vsf_trace(0, "write ep%d buffer.\r\n", idx);
-        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
-                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
-                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
+//        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
+//                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
+//                              M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
 #endif
     }
     return VSF_ERR_NONE;
@@ -627,13 +657,16 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
                     M480_USBD_EP_REG(idx, EP[0].EPINTSTS) = HSUSBD_EPINTSTS_TXPKIF_Msk;
 
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
-                    vsf_trace(0, "ep%d txpkif interrupt.\r\n", idx);
-                    vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
+                    vsf_trace(0, "%ctxpkif%d: EPTXCNT=%d,EPDATCNT=%d\r\n",
+                              (usbd_hs->ep_tx_mask & (1 << idx)) ? ' ' : '*',
+                              idx,
                               M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
                               M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
 #endif
                     // TODO: BUG on ISO EP, will receive TCPKIF even if no data is sent
-                    if (0 == M480_USBD_EP_REG(idx, EP[0].EPDATCNT)) {
+                    if (    (0 == M480_USBD_EP_REG(idx, EP[0].EPDATCNT))
+                        &&  (usbd_hs->ep_tx_mask & (1 << idx))) {
+                        usbd_hs->ep_tx_mask &= ~(1 << idx);
                         m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
                     }
                 }

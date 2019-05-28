@@ -96,7 +96,7 @@ WEAK void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
 }
 
-vsf_err_t vsf_usbd_UVC_send_frame(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size)
+vsf_err_t vsf_usbd_UVC_send_packet(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size)
 {
     vsf_usbd_trans_t *trans = &uvc->trans_in;
 

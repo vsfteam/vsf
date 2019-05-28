@@ -50,6 +50,7 @@ struct m480_usbd_hs_t {
     bool setup_status_IN;
     bool reply_status_OUT;
     uint16_t ep_buf_ptr;
+    uint16_t ep_tx_mask;
 
     struct {
         usb_dc_evt_handler_t evt_handler;

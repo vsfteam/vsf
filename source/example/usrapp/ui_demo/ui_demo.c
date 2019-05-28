@@ -16,30 +16,39 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "vsf.h"
+
+#include "component/3rd-party/littlevgl/5.3/raw/lvgl/lvgl.h"
+#include "lv_conf.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_t {
-    uint8_t heap[0x1000];
-};
-typedef struct usrapp_t usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static usrapp_t usrapp;
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-int main(void)
+static void lv_refr_task(void * param)
 {
-    //vsf_heap_init();
-    //vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
-    return 0;
+    static lv_coord_t y;
+    lv_obj_t *label1 = (lv_obj_t *)param;
+
+    y = (y + 10) % LV_VER_RES;
+  
+    lv_obj_set_y(label1, y);
+}
+
+void lvgl_create_demo(void)
+{
+    lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
+    /*Modify the Label's text*/
+    lv_label_set_text(label1, "Hello world!");
+    /* Align the Label to the center
+    * NULL means align on parent (which is the screen now)
+    * 0, 0 at the end means an x, y offset after alignment*/
+    lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
+
+    lv_task_create(lv_refr_task, 100, LV_TASK_PRIO_LOWEST, label1);
 }
 
 /* EOF */

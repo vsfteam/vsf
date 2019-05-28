@@ -55,7 +55,7 @@ struct usrapp_t {
     vsf_usbh_class_t usbh_libusb;
     vsf_usbh_class_t usbh_ecm;
     uint8_t dev_count;
-    uint8_t heap[0x4000];
+    //uint8_t heap[0x4000];
 
     struct {
         bool inited;
@@ -627,8 +627,8 @@ static void usrapp_heartbeat_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 int main(void)
 {
 #if VSF_USE_USB_HOST == ENABLED
-    vsf_heap_init();
-    vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
+    //vsf_heap_init();
+    //vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
 
     app_led_init();
 
@@ -702,7 +702,17 @@ int main(void)
 #endif
 
 #if VSF_USE_TRACE == ENABLED
+#   if 0
+#       if      VSF_USE_SERVICE_VSFSTREAM == ENABLED
+    vsf_trace_init(&usrapp.usbd.cdc.stream[0].tx);
+#       elif    VSF_USE_SERVICE_STREAM == ENABLED
+    vsf_trace_init(&(usrapp.usbd.cdc.stream[0].tx.TX));
+#       else
     vsf_trace_init(NULL);
+#       endif
+#   else
+    vsf_trace_init(NULL);
+#   endif
 #endif
     
 

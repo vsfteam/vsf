@@ -33,6 +33,8 @@
 #define VSF_HEAP_CFG_MCB_MAGIC_ENABLED  ENABLED
 #define VSF_HEAP_CFG_TRACE_CNT          1024
 
+#define VSF_HEAP_SIZE                   0x4000
+
 #define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
 #define SYSTEM_FREQ                     (192000000ul)

@@ -311,19 +311,12 @@ void vsf_kernel_full_feature_demo(void)
         init_vsf_task(bmevt_demo_t, &__bmevt_demo, vsf_priority_0);
 #       if VSF_USE_KERNEL_PT_MODE == ENABLED
         do {
-        #if __IS_COMPILER_ARM_COMPILER_5__
             static user_pt_bmpevt_demo_thread_t __pt_demo = {
-                .use_as__task_cb_user_pt_bmpevt_demo_thread_t = {
+                .param = {
                     .mask = timer4_evt_msk,
                     .pgroup_evts = &__user_grouped_evts,
                 },
             };
-        #else
-            static user_pt_bmpevt_demo_thread_t __pt_demo = {
-                .mask = timer4_evt_msk,
-                .pgroup_evts = &__user_grouped_evts,
-            };
-        #endif
             init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_priority_inherit);
         } while(0);
 #       endif
@@ -345,7 +338,7 @@ void vsf_kernel_full_feature_demo(void)
     do {
         static NO_INIT user_task_t __user_task;
 #   if VSF_CFG_SYNC_EN == ENABLED
-        __user_task.use_as__vsf_thread_user_task_t_t.psem = &user_sem;
+        __user_task.param.psem = &user_sem;
 #   endif
         init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
     } while(0);

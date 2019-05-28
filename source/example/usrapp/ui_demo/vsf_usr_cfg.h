@@ -36,6 +36,8 @@
 
 #define SYSTEM_FREQ                     (192000000ul)
 
+#define VSF_HEAP_SIZE                   0x800
+
 #define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
 #define VSF_USBD_UVC_TRACE_EN           ENABLED
 
@@ -121,7 +123,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_RUN_MAIN_AS_THREAD           ENABLED
+#define VSF_OS_RUN_MAIN_AS_THREAD           DISABLED
 //          </c>
 //      </h>
 //      <h> Shell Configuration

@@ -91,12 +91,19 @@ extern void vsf_kernel_init(void);
     vsf_kernel_init();
 
 #ifdef VSF_CFG_EVTQ_LIST
-    do {                                                                
-        vsf_pool_cfg_t cfg = {
+    do {                        
+        /*
+        static const vsf_pool_cfg_t cfg = {
             &__vsf_os,
             (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
         };                             
-        vsf_evt_node_pool_pool_init((&__vsf_os.node_pool), &cfg);                                  
+        vsf_evt_node_pool_pool_init((&__vsf_os.node_pool), (vsf_pool_cfg_t *)&cfg); 
+        */
+        VSF_POOL_PREPARE(vsf_evt_node_pool, (&__vsf_os.node_pool),
+            .pTarget = &__vsf_os,
+            .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
+        );
+
         vsf_pool_add_buffer(  (vsf_pool_t *)(&__vsf_os.node_pool),               
                             __vsf_os.res_ptr->evt_queue.nodes_buf_ptr,                                  
                             __vsf_os.res_ptr->evt_queue.node_cnt 

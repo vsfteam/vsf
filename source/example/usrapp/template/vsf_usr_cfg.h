@@ -34,6 +34,8 @@
 
 #define VSF_SYSTIMER_RESOLUTION         1000000
 
+#define VSF_HEAP_SIZE                   4096
+
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
 //http://www.keil.com/support/man/docs/uv4/uv4_ut_configwizard.htm
@@ -65,7 +67,6 @@
 //      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 
 #define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
 //  </h>
-
 
 //! @}
 

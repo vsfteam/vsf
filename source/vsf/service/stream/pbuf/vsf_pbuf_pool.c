@@ -41,9 +41,12 @@ static vsf_pbuf_t * __vsf_stream_src_pbuf_free(void *pObj, vsf_pbuf_t *ptBlock)
     return NULL;
 };
                                                                             
-void vsf_pbuf_pool_init(vsf_pbuf_pool_t *pthis, vsf_pool_cfg_t *pcfg)           
+void vsf_pbuf_pool_init(vsf_pbuf_pool_t *pthis,  
+                        uint32_t wItemSize, 
+                        uint_fast16_t hwAlign, 
+                        vsf_pool_cfg_t *pcfg)           
 {                                                                               
-    vsf_pool_init((vsf_pool_t *)pthis, pcfg);                                   
+    vsf_pool_init((vsf_pool_t *)pthis, wItemSize, hwAlign, pcfg);                                   
 }                                                                               
                                                                             
 bool vsf_pbuf_pool_add_buffer(  vsf_pbuf_pool_t *pthis, 

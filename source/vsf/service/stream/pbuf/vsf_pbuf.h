@@ -39,6 +39,16 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+#if     defined(VSF_POOL_CFG_SUPPORT_USER_OBJECT) \
+    &&  VSF_POOL_CFG_SUPPORT_USER_OBJECT != ENABLED
+#   error vsf_pbuf_t depends on a feature from vsf_pool_t which is not enabled. \
+1) if vsf_pool_t is compiled with the source code, please set macro \
+VSF_POOL_CFG_SUPPORT_USER_OBJECT to ENABLED.\
+2) if vsf_pool_t is includeded in some library, please add the source code of \
+vsf_pool_t into your project and follow the step 1). 
+#endif
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 #define __BLOCK_FREE_TO(__N, __NUM)            VSF_PBUF_FREE_TO_##__N = __N+1,
  

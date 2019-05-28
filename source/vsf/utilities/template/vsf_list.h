@@ -93,8 +93,8 @@
         vsf_slist_node_t *node_item = (vsf_slist_node_t *)(__plist);            \
         for (; node_item->next != NULL;){                                       \
             __host_type *_ = (__host_type *)(node_item->next);                  \
-            /* ptarget might be modified by user, so save a copy */             \
-            __host_type *node_tmp = ptarget;                                    \
+            /* '_' might be modified by user, so save a copy */                 \
+            __host_type *node_tmp = _;                                          \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
             if (__VA_ARGS__) {                                                  \
                 __vsf_slist_insert_next(                                        \

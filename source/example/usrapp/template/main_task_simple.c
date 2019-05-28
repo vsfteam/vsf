@@ -166,8 +166,8 @@ void vsf_kernel_task_simple_demo(void)
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
-        vsf_delay_ms(10000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
+        vsf_delay_ms(10000);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
 #else

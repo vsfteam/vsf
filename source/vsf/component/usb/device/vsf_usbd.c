@@ -716,7 +716,7 @@ static void vsf_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
         {
             uint_fast8_t ep = value | USB_DIR_IN;
             vsf_usbd_trans_t *trans = vsf_usbd_get_trans(dev, ep);
-            if (NULL == trans) { return; }
+            ASSERT(trans != NULL);
 
             if (trans->nSize) {
                 vsf_usbd_ep_send_imp(dev, trans);
@@ -732,7 +732,7 @@ static void vsf_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
         {
             uint_fast8_t ep = value | USB_DIR_OUT;
             vsf_usbd_trans_t *trans = vsf_usbd_get_trans(dev, ep);
-            if (NULL == trans) { return; }
+            ASSERT(trans != NULL);
 
             if (!trans->pchBuffer) {
                 vsf_usbd_trans_finish(dev, trans);

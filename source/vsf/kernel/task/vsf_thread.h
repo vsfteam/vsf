@@ -57,7 +57,7 @@
             };                                                                  \
             struct __NAME {                                                     \
                 uint64_t    stack_arr[((__STACK)+7)/8];                         \
-                implement_ex(vsf_thread_##__NAME##_t, param);                    \
+                implement_ex(vsf_thread_##__NAME##_t, param);                   \
             }ALIGN(8);                                                          \
             extern void vsf_thread_##__NAME##_start(__NAME *task,               \
                                                     vsf_priority_t priority);       

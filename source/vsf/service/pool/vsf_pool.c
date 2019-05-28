@@ -37,7 +37,7 @@
  *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h
  */
 #   define VSF_POOL_CFG_ATOM_ACCESS(...)                                        \
-        code_region_simple(this.pregion, __VA_ARGS__)
+        code_region_simple(this.ptRegion, __VA_ARGS__)
 
 #elif defined(VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY)
 #       include VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY
@@ -63,61 +63,98 @@ const i_pool_t VSF_POOL = {
     .Allocate =     &vsf_pool_alloc,
     .Free =         &vsf_pool_free,
     .Count =        &vsf_pool_get_count,
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
     .Tag = {
         .Get =      &vsf_pool_get_tag,
         .Set =      &vsf_pool_set_tag,
     }
+#endif
 };
 
 
 /*============================ LOCAL VARIABLES ===============================*/
+#if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
+
+static struct {
+    vsf_slist_t tPoolList;
+    uint16_t    hwPoolCount;
+} s_tPoolStatisticChain = {0};
+
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 /*! \brief initialise target pool
  *! \param ptThis address of the target pool
- *! \param pcfg configurations
+ *! \param ptCFG configurations
  *! \return none
  */
-void vsf_pool_init(vsf_pool_t *pobj, vsf_pool_cfg_t *pcfg)
+void vsf_pool_init( vsf_pool_t *ptObj, 
+                    uint32_t wItemSize, 
+                    uint_fast16_t hwAlign, 
+                    vsf_pool_cfg_t *ptCFG)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
+    class_internal(ptObj, ptThis, vsf_pool_t);
     ASSERT(ptThis != NULL);
 
-    memset(pobj, 0, sizeof(vsf_pool_t));
+    memset(ptObj, 0, sizeof(vsf_pool_t));
 
 #if defined(__VSF_POOL_USE_DEFAULT_ATOM_ACCESS)
-    if (NULL == pcfg) {
-        this.pregion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
+    if (NULL == ptCFG) {
+        this.ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
     } else {
-        this.ptag = pcfg->ptarget;
-        if (NULL == pcfg->pregion) {
-            this.pregion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
+        this.pTarget = ptCFG->pTarget;
+        if (NULL == ptCFG->ptRegion) {
+            this.ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
         } else {
-            this.pregion = pcfg->pregion;
+            this.ptRegion = ptCFG->ptRegion;
         }
     }
 #else
-    this.ptag = pcfg->ptarget;
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
+    this.pTarget = ptCFG->pTarget;
+#endif
 #endif
 
-    vsf_slist_init(&this.free_list);
+#if VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED
+    this.wItemSize = wItemSize;
+    this.hwAlign = hwAlign;
+#endif
+
+#if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
+    this.Statistic.pchPoolName = ptCFG->pchPoolName;
+    //! add pool to the pool list
+    {
+        s_tPoolStatisticChain.hwPoolCount++;
+        
+        vsf_slist_insert(class(vsf_pool_t),
+                         Statistic.use_as__vsf_slist_node_t,
+                         &(s_tPoolStatisticChain.tPoolList),
+                         ptThis,
+                        (   (this.Statistic.hwAlign >= _->Statistic.hwAlign) 
+                        &&  (this.Statistic.wItemSize >= _->Statistic.wItemSize)));
+                        
+    }
+#endif
+
+    vsf_slist_init(&this.tFreeList);
 }
 
 /*! \brief add memory to pool 
- *! \param ptThis        address of the target pool
- *! \param pbuffer      address of the target memory
- *! \param buffer_size  the size of the target memory
- *! \param item_size    memory block size of the pool
+ *! \param ptThis       address of the target pool
+ *! \param pBuffer      address of the target memory
+ *! \param wBufferSize  the size of the target memory
+ *! \param wItemSize    memory block size of the pool
  *! \retval false       the buffer size is too small or invalid parameters
  *! \retval true        buffer is added 
  */
 bool vsf_pool_add_buffer(   vsf_pool_t *ptThis, 
-                            void *pbuffer, 
-                            uint32_t buffer_size,
-                            uint32_t item_size)
+                            void *pBuffer, 
+                            uint32_t wBufferSize,
+                            uint32_t wItemSize)
 {
-    return vsf_pool_add_buffer_ex(ptThis, pbuffer, buffer_size, item_size, NULL);
+    return vsf_pool_add_buffer_ex(ptThis, pBuffer, wBufferSize, wItemSize, NULL);
 }
 
 
@@ -126,75 +163,84 @@ bool vsf_pool_add_buffer(   vsf_pool_t *ptThis,
  *! \retval NULL    the pool is empty
  *! \retval !NULL   address of the allocated memory block
  */
-void *vsf_pool_alloc(vsf_pool_t *pobj)
+void *vsf_pool_alloc(vsf_pool_t *ptObj)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
-    __vsf_pool_node_t *pnode = NULL;
+    class_internal(ptObj, ptThis, vsf_pool_t);
+    __vsf_pool_node_t *ptNode = NULL;
 
     ASSERT(ptThis != NULL);
 
     VSF_POOL_CFG_ATOM_ACCESS(
         /* verify it again for safe */
-        if (!vsf_slist_is_empty(&this.free_list)) {
+        if (!vsf_slist_is_empty(&this.tFreeList)) {
             vsf_slist_stack_pop(__vsf_pool_node_t, 
                                 node,
-                                &this.free_list, 
-                                pnode);
-            this.count--;
+                                &this.tFreeList, 
+                                ptNode);
+            this.hwFree--;
+#if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
+            this.hwUsed++;
+#endif
         }       
     )
 
-    return (void *)pnode;
+    return (void *)ptNode;
 }
 
-static void __vsf_pool_add_item(vsf_pool_t *pobj, void *pitem)
+static void __vsf_pool_add_item(vsf_pool_t *ptObj, void *pitem)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
-    __vsf_pool_node_t *pnode = (__vsf_pool_node_t *)pitem;
+    class_internal(ptObj, ptThis, vsf_pool_t);
+    __vsf_pool_node_t *ptNode = (__vsf_pool_node_t *)pitem;
 
     VSF_POOL_CFG_ATOM_ACCESS(
-        vsf_slist_stack_push(__vsf_pool_node_t, node, &this.free_list, pnode);
-        this.count++;
+        vsf_slist_stack_push(__vsf_pool_node_t, node, &this.tFreeList, ptNode);
+        this.hwFree++;
     )
 }
 
 /*! \brief add memory to pool 
- *! \param ptThis            address of the target pool
- *! \param pbuffer          address of the target memory
- *! \param buffer_size      the size of the target memory
- *! \param item_size        memory block size of the pool
- *! \param fnhandler_init   block initialisation handler
+ *! \param ptThis           address of the target pool
+ *! \param pBuffer          address of the target memory
+ *! \param wBufferSize      the size of the target memory
+ *! \param wItemSize        memory block size of the pool
+ *! \param fnItemInit       block initialisation handler
  *! \retval false           the buffer size is too small or invalid parameters
  *! \retval true            buffer is added 
  */
-bool vsf_pool_add_buffer_ex(    vsf_pool_t *pobj, 
-                                void *pbuffer, 
-                                uint32_t buffer_size,
-                                uint32_t item_size, 
-                                vsf_pool_item_init_evt_handler_t *fnhandler_init)
+bool vsf_pool_add_buffer_ex(    vsf_pool_t *ptObj, 
+                                void *pBuffer, 
+                                uint32_t wBufferSize,
+                                uint32_t wItemSize, 
+                                vsf_pool_item_init_evt_handler_t *fnItemInit)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
-    __vsf_pool_node_t *pnode;
+    class_internal(ptObj, ptThis, vsf_pool_t);
+    __vsf_pool_node_t *ptNode;
 
     ASSERT(     (ptThis != NULL) 
-            &&  (pbuffer != NULL));
+            &&  (pBuffer != NULL));
 
     /* Allowing multiple-layers of Pool management */
-    if (    (item_size < sizeof(__vsf_pool_node_t))
-        ||  (buffer_size < item_size)) {
+    if (    (wItemSize < sizeof(__vsf_pool_node_t))
+        ||  (wBufferSize < wItemSize)) {
         return false;
     }
 
-    pnode = (__vsf_pool_node_t *)pbuffer;
+    ptNode = (__vsf_pool_node_t *)pBuffer;
     do {
-        __vsf_pool_add_item((vsf_pool_t *)ptThis, pnode);
+        __vsf_pool_add_item((vsf_pool_t *)ptThis, ptNode);
 
-        if (fnhandler_init != NULL) {
-            (*fnhandler_init)(this.ptag, pnode, item_size);
+    #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
+        if (fnItemInit != NULL) {
+            (*fnItemInit)(this.pTarget, ptNode, wItemSize);
         }
-        pnode = (__vsf_pool_node_t *)((uint8_t *)pnode + item_size);
-        buffer_size -= item_size;
-    } while (buffer_size >= item_size);
+    #else
+        if (fnItemInit != NULL) {
+            (*fnItemInit)(NULL, ptNode, wItemSize);
+        }
+    #endif
+        ptNode = (__vsf_pool_node_t *)((uint8_t *)ptNode + wItemSize);
+        wBufferSize -= wItemSize;
+    } while (wBufferSize >= wItemSize);
 
     return true;
 }
@@ -202,14 +248,20 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *pobj,
 
 /*! \brief return a memory block to the target pool
  *! \param ptThis    address of the target pool
- *! \param pitem    target memory block
+ *! \param pItem    target memory block
  *! \return none
  */
-void vsf_pool_free(vsf_pool_t *ptThis, void *pitem)
+void vsf_pool_free(vsf_pool_t *ptObj, void *pItem)
 {
-    ASSERT((ptThis != NULL) && (pitem != NULL));
+    
+    class_internal(ptObj, ptThis, vsf_pool_t);
+    ASSERT((ptObj != NULL) && (pItem != NULL));
 
-    __vsf_pool_add_item(ptThis, pitem);
+    VSF_POOL_CFG_ATOM_ACCESS(
+        __vsf_pool_add_item(ptObj, pItem);
+        this.hwUsed--;
+    )
+
 }
 
 SECTION("text.vsf.utilities.vsf_pool_get_count")
@@ -217,12 +269,12 @@ SECTION("text.vsf.utilities.vsf_pool_get_count")
  *! \param ptThis    address of the target pool
  *! \return the number of memory blocks
  */
-uint_fast16_t vsf_pool_get_count(vsf_pool_t *pobj)
+uint_fast16_t vsf_pool_get_count(vsf_pool_t *ptObj)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
+    class_internal(ptObj, ptThis, vsf_pool_t);
     ASSERT(ptThis != NULL);
 
-    return this.count;
+    return this.hwFree;
 }
 
 SECTION("text.vsf.utilities.vsf_pool_get_tag")
@@ -230,12 +282,16 @@ SECTION("text.vsf.utilities.vsf_pool_get_tag")
  *! \param ptThis    address of the target pool
  *! \return the address of the object
  */
-void *vsf_pool_get_tag(vsf_pool_t *pobj)
+void *vsf_pool_get_tag(vsf_pool_t *ptObj)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
+    class_internal(ptObj, ptThis, vsf_pool_t);
     ASSERT(ptThis != NULL);
 
-    return this.ptag;
+    return this.pTarget;
+#else
+    return NULL;
+#endif
 }
 
 SECTION("text.vsf.utilities.vsf_pool_set_tag")
@@ -243,13 +299,17 @@ SECTION("text.vsf.utilities.vsf_pool_set_tag")
  *! \param ptThis    address of the target pool
  *! \return the address of the object
  */
-void *vsf_pool_set_tag(vsf_pool_t *pobj, void *ptag)
+void *vsf_pool_set_tag(vsf_pool_t *ptObj, void *pTarget)
 {
-    class_internal(pobj, ptThis, vsf_pool_t);
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
+    class_internal(ptObj, ptThis, vsf_pool_t);
     ASSERT(ptThis != NULL);
-    this.ptag = ptag;
+    this.pTarget = pTarget;
 
-    return this.ptag;
+    return this.pTarget;
+#else
+    return NULL;
+#endif
 }
 
 SECTION("text.vsf.utilities.vsf_pool_get_region")
@@ -257,13 +317,13 @@ SECTION("text.vsf.utilities.vsf_pool_get_region")
  *! \param ptThis    address of the target pool
  *! \return the address of the code region
  */
-code_region_t *vsf_pool_get_region(vsf_pool_t *pobj)
+code_region_t *vsf_pool_get_region(vsf_pool_t *ptObj)
 {
 #if defined(__VSF_POOL_USE_DEFAULT_ATOM_ACCESS)
-    class_internal(pobj, ptThis, vsf_pool_t);
+    class_internal(ptObj, ptThis, vsf_pool_t);
     ASSERT(ptThis != NULL);
 
-    return this.pregion;
+    return this.ptRegion;
 #else
     return NULL;
 #endif

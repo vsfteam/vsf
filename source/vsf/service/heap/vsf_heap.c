@@ -18,11 +18,12 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-//! todo: remove this dependency
-#include "kernel/vsf_os.h"
-
 #include "vsf_heap.h"
 
+#if VSF_USE_HEAP == ENABLED
+#if defined(VSF_HEAP_CFG_ATOM_ACCESS_DEPENDENCY)
+#   include VSF_HEAP_CFG_ATOM_ACCESS_DEPENDENCY
+#endif
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HEAP_CFG_MCB_ALIGN_BIT
@@ -37,6 +38,8 @@
 #ifndef VSF_HEAP_CFG_FREELIST_NUM
 #   define VSF_HEAP_CFG_FREELIST_NUM        1
 #endif
+
+
 
 #ifndef VSF_HEAP_CFG_PROTECT_LEVEL
 /*! \note   By default, the driver tries to make all APIs interrupt-safe,
@@ -338,8 +341,10 @@ void vsf_heap_add(uint8_t *heap, uint_fast32_t size)
     uint_fast32_t unaligned_size;
     uint_fast32_t offset;
     __vsf_heap_mcb_t *mcb;
-
-    ASSERT(heap != NULL);
+    if (NULL == heap || 0 == size) {
+        return ;
+    }
+    //ASSERT(heap != NULL);
 
     unaligned_size = __vsf_heap_calc_unaligned_size(heap, VSF_HEAP_CFG_MCB_ALIGN);
     heap += unaligned_size;
@@ -364,6 +369,11 @@ void vsf_heap_add(uint8_t *heap, uint_fast32_t size)
                                 __vsf_heap_get_freelist(offset),
                                 mcb);
     vsf_heap_unprotect(state);
+}
+
+void vsf_heap_add_memory(vsf_mem_t mem)
+{
+    vsf_heap_add(mem.pchSrc, mem.nSize);
 }
 
 void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
@@ -463,3 +473,5 @@ bool vsf_heap_partial_free(void *buffer, uint_fast32_t pos, uint_fast32_t size)
     vsf_heap_free((void *)((uint32_t)mcb_free + sizeof(__vsf_heap_mcb_t)));
     return true;
 }
+
+#endif

@@ -294,7 +294,7 @@ implement_vsf_task(bmevt_demo_t)
 
 #endif
 
-
+#include <stdlib.h>
 
 int main(void)
 {

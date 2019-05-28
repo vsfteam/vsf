@@ -81,11 +81,15 @@
             const vsf_pbuf_adapter_t *pAdatper =                                \
                     vsf_pbuf_adapter_get(__ID);                                 \
             vsf_pool_cfg_t tCFG = {                                             \
-                .ptarget = (void *)pAdatper,                                    \
+                .pTarget = (void *)pAdatper,                                    \
+                .pchPoolName = #__NAME,                                         \
                 __VA_ARGS__                                                     \
             };                                                                  \
                                                                                 \
-            vsf_pbuf_pool_init( &((__POOL)->use_as__vsf_pbuf_pool_t), &tCFG);   \
+            vsf_pbuf_pool_init( &((__POOL)->use_as__vsf_pbuf_pool_t),           \
+                                sizeof(vsf_pool_block(__NAME)),                 \
+                                __alignof__(vsf_pool_block(__NAME)),            \
+                                &tCFG);                                         \
             vsf_pbuf_pool_add_buffer(   &((__POOL)->use_as__vsf_pbuf_pool_t),   \
                                         s_t##__NAME##DataBuffer,                \
                                         sizeof(s_t##__NAME##DataBuffer),        \
@@ -129,8 +133,11 @@ struct vsf_pbuf_pool_t {
 extern const i_pbuf_methods_t VSF_PBUF_ADAPTER_METHODS_STREAM_SRC;
 
 /*============================ PROTOTYPES ====================================*/
-
-extern void vsf_pbuf_pool_init(vsf_pbuf_pool_t *, vsf_pool_cfg_t *);         
+extern 
+void vsf_pbuf_pool_init(vsf_pbuf_pool_t *pthis,  
+                        uint32_t wItemSize, 
+                        uint_fast16_t hwAlign, 
+                        vsf_pool_cfg_t *pcfg);         
 
 extern 
 bool vsf_pbuf_pool_add_buffer(  vsf_pbuf_pool_t *pthis, 

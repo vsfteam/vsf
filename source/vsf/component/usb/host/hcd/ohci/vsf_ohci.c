@@ -1427,11 +1427,18 @@ error:
 
 void vsf_ohci_init(void)
 {
+    /*
     vsf_pool_cfg_t cfg = {
         NULL,
         (code_region_t *)&DEFAULT_CODE_REGION_NONE,
     };
     ohci_td_pool_pool_init(&__vsf_ohci_td_pool, &cfg);
+    */
+    VSF_POOL_PREPARE(ohci_td_pool, &__vsf_ohci_td_pool,
+        .pTarget = NULL,
+        .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE,
+    );
+
 #if VSF_OHCI_CFG_MAX_TD_NUM
     void *td_buffer = VSF_USBH_MALLOC_ALIGNED(
             sizeof(ohci_td_t) * VSF_OHCI_CFG_MAX_TD_NUM, 32);

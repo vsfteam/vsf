@@ -94,7 +94,7 @@ extern const vsf_usbd_class_op_t vsf_usbd_UVC_stream_class;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_usbd_UVC_send_frame(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size);
+extern vsf_err_t vsf_usbd_UVC_send_packet(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size);
 
 #endif      // VSF_USE_USB_DEVICE
 #endif      // __VSF_USBD_UVC_H__

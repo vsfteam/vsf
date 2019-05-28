@@ -34,6 +34,8 @@
 
 #define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
+#define VSF_HEAP_SIZE                   0x8000
+
 #define SYSTEM_FREQ                     (192000000ul)
 
 #define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED

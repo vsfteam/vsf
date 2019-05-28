@@ -30,6 +30,8 @@
 //! for test only ...
 #define VSF_GET_MAIN_CLK()              (160000000)
 
+#define VSF_HEAP_SIZE                   0x1000
+
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
 //http://www.keil.com/support/man/docs/uv4/uv4_ut_configwizard.htm

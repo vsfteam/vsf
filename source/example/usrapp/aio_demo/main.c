@@ -98,7 +98,7 @@ struct usrapp_t {
     } usbd;
 
     vsf_callback_timer_t poll_timer;
-    uint8_t heap[0x8000];
+    //uint8_t heap[0x8000];
 };
 typedef struct usrapp_t usrapp_t;
 
@@ -638,8 +638,8 @@ int main(void)
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 #endif
 
-    vsf_heap_init();
-    vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
+    //vsf_heap_init();
+    //vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
 
     vsf_ohci_init();
     vsf_usbh_init(&usrapp.usbh.host);
