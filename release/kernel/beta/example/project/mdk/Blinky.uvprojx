@@ -380,12 +380,17 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_cfg</GroupName>
+          <GroupName>configuration</GroupName>
           <Files>
             <File>
-              <FileName>vsf_app_cfg.h</FileName>
+              <FileName>app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\app_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_usr_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_usr_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1200,12 +1205,17 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_cfg</GroupName>
+          <GroupName>configuration</GroupName>
           <Files>
             <File>
-              <FileName>vsf_app_cfg.h</FileName>
+              <FileName>app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\app_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_usr_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_usr_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2020,12 +2030,17 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_cfg</GroupName>
+          <GroupName>configuration</GroupName>
           <Files>
             <File>
-              <FileName>vsf_app_cfg.h</FileName>
+              <FileName>app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\app_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_usr_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_usr_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2840,12 +2855,17 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>app_cfg</GroupName>
+          <GroupName>configuration</GroupName>
           <Files>
             <File>
-              <FileName>vsf_app_cfg.h</FileName>
+              <FileName>app_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\usrapp\template\app_cfg\vsf_app_cfg.h</FilePath>
+              <FilePath>..\..\usrapp\template\app_cfg\app_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_usr_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\usrapp\template\app_cfg\vsf_usr_cfg.h</FilePath>
             </File>
           </Files>
         </Group>

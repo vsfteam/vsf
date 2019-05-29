@@ -121,7 +121,7 @@ ROOT void __post_vsf_kernel_init(void)
 }
 
 #if VSF_USE_HEAP == ENABLED
-WEAK vsf_mem_t vsf_service_require___heap_memory_buffer__from_user(void)
+WEAK vsf_mem_t vsf_service_req___heap_memory_buffer__from_usr(void)
 {
 #ifndef VSF_HEAP_SIZE
 #   warning \

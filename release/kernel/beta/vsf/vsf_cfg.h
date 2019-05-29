@@ -32,7 +32,7 @@
 
 /*============================ INCLUDES ======================================*/
 /* do not modify this */
-#include "vsf_app_cfg.h"
+#include "vsf_usr_cfg.h"
 
 
 /* compiler abstraction, supports GCC, IAR, Arm Compiler 5, Arm Compiler 6 */

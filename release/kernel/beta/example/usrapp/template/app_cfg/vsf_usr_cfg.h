@@ -16,10 +16,10 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level VSF Configuration 
 
-#ifndef __TOP_APP_CFG_H__
-#define __TOP_APP_CFG_H__
+#ifndef __TOP_VSF_USR_CFG_H__
+#define __TOP_VSF_USR_CFG_H__
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/

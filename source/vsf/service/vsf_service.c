@@ -41,7 +41,7 @@ VSF_SERVICE_CFG_INSERTION
 /*============================ PROTOTYPES ====================================*/
 
 //! user must implement this interface
-extern vsf_mem_t vsf_service_require___heap_memory_buffer__from_user(void);
+extern vsf_mem_t vsf_service_req___heap_memory_buffer__from_usr(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -49,7 +49,7 @@ WEAK void vsf_service_init(void)
 {
 #if VSF_USE_HEAP == ENABLED
     vsf_heap_init();
-    vsf_heap_add_memory(vsf_service_require___heap_memory_buffer__from_user());
+    vsf_heap_add_memory(vsf_service_req___heap_memory_buffer__from_usr());
 #endif
 
 #if VSF_USE_PBUF == ENABLED && (                                                \
