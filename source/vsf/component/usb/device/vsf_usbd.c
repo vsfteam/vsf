@@ -28,9 +28,6 @@
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
-#undef this
-#define this        (*obj)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -140,6 +137,21 @@ vsf_err_t vsf_usbd_ep_send(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans)
         vsf_slist_add_to_head(vsf_usbd_trans_t, node, &dev->trans_list, trans);
     }
     return err;
+}
+
+void vsf_usbd_cfg_fini(vsf_usbd_dev_t *dev)
+{
+    vsf_usbd_cfg_t *config = vsf_usbd_get_cur_cfg(dev);
+
+    vsf_usbd_ifs_t *ifs = config->ifs;
+    for (uint_fast8_t i = 0; i < config->num_of_ifs; i++, ifs++) {
+        if (ifs->is_inited) {
+            ifs->is_inited = false;
+            if (ifs->class_op->fini != NULL) {
+                ifs->class_op->fini(dev, ifs);
+            }
+        }
+    }
 }
 
 // standard request handlers
@@ -421,6 +433,7 @@ static vsf_err_t vsf_usbd_stdctrl_process(vsf_usbd_dev_t *dev)
                 if (config_idx < 0) {
                     return VSF_ERR_FAIL;
                 }
+                vsf_usbd_cfg_fini(dev);
                 dev->configuration = (uint8_t)config_idx;
                 config = &dev->config[dev->configuration];
 
@@ -643,6 +656,7 @@ static void vsf_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 }
             }
 
+            vsf_usbd_cfg_fini(dev);
             dev->configured = false;
             dev->configuration = 0;
             dev->feature = 0;
@@ -746,6 +760,7 @@ static void vsf_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 trans->cur += pkg_size;
                 trans->nSize -= pkg_size;
 
+                // TODO: check trans->zlp
                 if ((trans->nSize > 0) && (pkg_size == ep_size)) {
                     vsf_usbd_drv_ep_enable_out(ep);
                 } else {
@@ -836,13 +851,14 @@ void vsf_usbd_init(vsf_usbd_dev_t *dev)
 #endif
 }
 
+// TODO: check fini and re-init
 void vsf_usbd_fini(vsf_usbd_dev_t *dev)
 {
     ASSERT(dev != NULL);
     VSF_USBD_DRV_PREPARE(dev);
 
-    vsf_usbd_drv_fini();
     vsf_usbd_drv_disconnect();
+    vsf_usbd_drv_fini();
     vsf_usbd_notify_user(dev, USB_ON_FINI, NULL);
 }
 
@@ -966,33 +982,33 @@ vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *stream_ep)
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 
-static vsf_err_t __vsf_usbd_ep_rcv_pbuf(vsf_usbd_ep_stream_t *obj)
+static vsf_err_t __vsf_usbd_ep_rcv_pbuf(vsf_usbd_ep_stream_t *pthis)
 {
     vsf_err_t result = VSF_ERR_NOT_READY;
-    VSF_USBD_DRV_PREPARE(this.dev);
+    VSF_USBD_DRV_PREPARE(pthis->dev);
 
     do {
-        if (NULL == this.dev) {
+        if (NULL == pthis->dev) {
             break ;
         }
 
-        this.rx_current = vsf_stream_src_new_pbuf(  
-            &this.use_as__vsf_stream_src_t, 
+        pthis->rx_current = vsf_stream_src_new_pbuf(  
+            &pthis->use_as__vsf_stream_src_t, 
             //!//! require a big enough pbuf
-            vsf_usbd_drv_ep_get_size(this.rx_trans.ep),        
+            vsf_usbd_drv_ep_get_size(pthis->rx_trans.ep),        
             -1);
 
-        if (NULL == this.rx_current) {
+        if (NULL == pthis->rx_current) {
             result = VSF_ERR_NOT_ENOUGH_RESOURCES;
             break;
         }
 
-        vsf_usbd_trans_t *trans = &this.rx_trans;
-        trans->param = obj;
+        vsf_usbd_trans_t *trans = &pthis->rx_trans;
+        trans->param = pthis;
         
-        trans->pchSrc = vsf_pbuf_buffer_get(this.rx_current);
-        trans->nSize = vsf_pbuf_size_get(this.rx_current);
-        vsf_usbd_ep_recv(this.dev, trans);
+        trans->pchSrc = vsf_pbuf_buffer_get(pthis->rx_current);
+        trans->nSize = vsf_pbuf_size_get(pthis->rx_current);
+        vsf_usbd_ep_recv(pthis->dev, trans);
         result = VSF_ERR_NONE;
     } while(0);
     return result;
@@ -1000,36 +1016,36 @@ static vsf_err_t __vsf_usbd_ep_rcv_pbuf(vsf_usbd_ep_stream_t *obj)
 
 
 
-static vsf_err_t vsf_usbd_on_ep_rcv(vsf_usbd_ep_stream_t *obj)
+static vsf_err_t vsf_usbd_on_ep_rcv(vsf_usbd_ep_stream_t *pthis)
 {
     vsf_err_t result;// = VSF_ERR_NOT_READY;
     vsf_pbuf_t *pbuf;
     uint_fast16_t ep_left_size;
-    VSF_USBD_DRV_PREPARE(this.dev);
+    VSF_USBD_DRV_PREPARE(pthis->dev);
 
     __SAFE_ATOM_CODE(                   //! this protection might not be necessary
-        pbuf = this.rx_current;
-        this.rx_current = NULL;
+        pbuf = pthis->rx_current;
+        pthis->rx_current = NULL;
         if (pbuf != NULL) {
-            ep_left_size = this.rx_trans.nSize;
+            ep_left_size = pthis->rx_trans.nSize;
         }
-        result = __vsf_usbd_ep_rcv_pbuf(obj);    //! start next rcv
+        result = __vsf_usbd_ep_rcv_pbuf(pthis);    //! start next rcv
     )
     if (NULL != pbuf) {
         vsf_pbuf_size_set(  pbuf, 
-                            vsf_usbd_drv_ep_get_size(this.rx_trans.ep) - ep_left_size);
-        vsf_stream_src_send_pbuf(&this.use_as__vsf_stream_src_t, pbuf);
+                            vsf_usbd_drv_ep_get_size(pthis->rx_trans.ep) - ep_left_size);
+        vsf_stream_src_send_pbuf(&pthis->use_as__vsf_stream_src_t, pbuf);
     }
 
     return result;
 }
 
-vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *obj)
+vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *pthis)
 {
     vsf_err_t result = VSF_ERR_NOT_READY;
     __SAFE_ATOM_CODE(
-        if (NULL == this.rx_current) {
-            result = vsf_usbd_on_ep_rcv(obj);
+        if (NULL == pthis->rx_current) {
+            result = vsf_usbd_on_ep_rcv(pthis);
         }
     )
 
@@ -1038,31 +1054,31 @@ vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *obj)
 
 static void vsf_usbd_ep_on_stream_rx_finish(void *param)
 {
-    vsf_usbd_ep_stream_t *obj = (vsf_usbd_ep_stream_t *)param;
+    vsf_usbd_ep_stream_t *pthis = (vsf_usbd_ep_stream_t *)param;
 
-    vsf_usbd_on_ep_rcv(obj);
+    vsf_usbd_on_ep_rcv(pthis);
 }
 
-static vsf_err_t __vsf_usbd_ep_send_pbuf(vsf_usbd_ep_stream_t *obj)
+static vsf_err_t __vsf_usbd_ep_send_pbuf(vsf_usbd_ep_stream_t *pthis)
 {
     vsf_err_t result = VSF_ERR_NOT_READY;
     do {
-        if (NULL == this.dev) {
+        if (NULL == pthis->dev) {
             break ;
         }
-        this.tx_current = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
-        if (NULL == this.tx_current) {
+        pthis->tx_current = vsf_stream_usr_fetch_pbuf(&pthis->use_as__vsf_stream_usr_t);
+        if (NULL == pthis->tx_current) {
             result = VSF_ERR_NOT_ENOUGH_RESOURCES;
             break;
         }
 
-        vsf_usbd_trans_t *trans = &this.tx_trans;
-        trans->param = obj;
+        vsf_usbd_trans_t *trans = &pthis->tx_trans;
+        trans->param = pthis;
         
-        trans->pchSrc = vsf_pbuf_buffer_get(this.tx_current);
-        trans->nSize = vsf_pbuf_size_get(this.tx_current);
+        trans->pchSrc = vsf_pbuf_buffer_get(pthis->tx_current);
+        trans->nSize = vsf_pbuf_size_get(pthis->tx_current);
 
-        vsf_usbd_ep_send(this.dev, trans);
+        vsf_usbd_ep_send(pthis->dev, trans);
         result = VSF_ERR_NONE;
     } while(0);
     return result;
@@ -1070,14 +1086,14 @@ static vsf_err_t __vsf_usbd_ep_send_pbuf(vsf_usbd_ep_stream_t *obj)
 
 static void vsf_usbd_ep_on_stream_tx_finish(void *param)
 {
-    vsf_usbd_ep_stream_t *obj = (vsf_usbd_ep_stream_t *)param;
+    vsf_usbd_ep_stream_t *pthis = (vsf_usbd_ep_stream_t *)param;
 
     vsf_pbuf_t *ptBuff;
 
     __SAFE_ATOM_CODE(
-        ptBuff = this.tx_current;
-        this.tx_current = NULL;
-        __vsf_usbd_ep_send_pbuf(obj);
+        ptBuff = pthis->tx_current;
+        pthis->tx_current = NULL;
+        __vsf_usbd_ep_send_pbuf(pthis);
     )
 
     vsf_pbuf_free(ptBuff);       //! free old pbuf
@@ -1085,14 +1101,14 @@ static void vsf_usbd_ep_on_stream_tx_finish(void *param)
 
 
 
-vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *obj)
+vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *pthis)
 {
     vsf_err_t result = VSF_ERR_NOT_READY;
-    ASSERT(NULL != obj);
+    ASSERT(NULL != pthis);
 
     __SAFE_ATOM_CODE(
-        if (NULL == this.tx_current) {
-            result = __vsf_usbd_ep_send_pbuf(obj);
+        if (NULL == pthis->tx_current) {
+            result = __vsf_usbd_ep_send_pbuf(pthis);
         }
     )
     return result;
@@ -1102,46 +1118,46 @@ static void __vsf_usbd_on_data_ready_event( void *pTarget,
                                             vsf_stream_rx_t *ptRX, 
                                             vsf_stream_status_t tStatus)
 {
-    vsf_usbd_ep_stream_t *obj = (vsf_usbd_ep_stream_t *)pTarget;
-    vsf_usbd_ep_send_stream(obj);
+    vsf_usbd_ep_stream_t *pthis = (vsf_usbd_ep_stream_t *)pTarget;
+    vsf_usbd_ep_send_stream(pthis);
 }
 
-void vsf_usbd_ep_stream_init(   vsf_usbd_ep_stream_t *obj, 
+void vsf_usbd_ep_stream_init(   vsf_usbd_ep_stream_t *pthis, 
                                 vsf_usbd_ep_stream_cfg_t *cfg)
 {
-    ASSERT(NULL != obj);
-    this.tx_trans.on_finish = vsf_usbd_ep_on_stream_tx_finish;
-    this.rx_trans.on_finish = vsf_usbd_ep_on_stream_rx_finish;
-    this.tx_current = NULL;
-    this.rx_current = NULL;
+    ASSERT(NULL != pthis);
+    pthis->tx_trans.on_finish = vsf_usbd_ep_on_stream_tx_finish;
+    pthis->rx_trans.on_finish = vsf_usbd_ep_on_stream_rx_finish;
+    pthis->tx_current = NULL;
+    pthis->rx_current = NULL;
 
-    this.rx_trans.ep = cfg->rx_ep;
-    this.rx_trans.zlp = false;
-    this.tx_trans.ep = cfg->tx_ep;
-    this.tx_trans.zlp = true;
-    this.dev = NULL;
+    pthis->rx_trans.ep = cfg->rx_ep;
+    pthis->rx_trans.zlp = false;
+    pthis->tx_trans.ep = cfg->tx_ep;
+    pthis->tx_trans.zlp = true;
+    pthis->dev = NULL;
 
     //! access protected member of vsf_stream_usr_t
-    with_protected(vsf_stream_usr_t, &this.use_as__vsf_stream_usr_t, {
+    with_protected(vsf_stream_usr_t, &pthis->use_as__vsf_stream_usr_t, {
         if (NULL != _->ptRX) {
             //! register data rdy event handler
             _->ptRX->piMethod->DataReadyEvent.Register(
                 _->ptRX,
-                (vsf_stream_dat_rdy_evt_t){__vsf_usbd_on_data_ready_event, obj});
+                (vsf_stream_dat_rdy_evt_t){__vsf_usbd_on_data_ready_event, pthis});
         }
     });
 
-   
+    
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-    vsf_stream_usr_open(&(this.use_as__vsf_stream_usr_t));
+    vsf_stream_usr_open(&(pthis->use_as__vsf_stream_usr_t));
 #endif
 }
 
-void vsf_usbd_ep_stream_connect_dev(vsf_usbd_ep_stream_t *obj, vsf_usbd_dev_t *dev)
+void vsf_usbd_ep_stream_connect_dev(vsf_usbd_ep_stream_t *pthis, vsf_usbd_dev_t *dev)
 {
-    ASSERT(NULL != obj);
-    this.dev = dev;
-    vsf_usbd_ep_send_stream(obj);
+    ASSERT(NULL != pthis);
+    pthis->dev = dev;
+    vsf_usbd_ep_send_stream(pthis);
 }
 
 #endif      // VSF_USE_SERVICE_STREAM || VSF_USE_SERVICE_VSFSTREAM

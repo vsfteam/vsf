@@ -104,11 +104,16 @@ extern void vsf_kernel_init(void);
             .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
         );
 
+        if  (   (NULL == __vsf_os.res_ptr->evt_queue.nodes_buf_ptr)
+            ||  (0 == __vsf_os.res_ptr->evt_queue.node_cnt)) {
+            break;
+        }
         vsf_pool_add_buffer(  (vsf_pool_t *)(&__vsf_os.node_pool),               
                             __vsf_os.res_ptr->evt_queue.nodes_buf_ptr,                                  
                             __vsf_os.res_ptr->evt_queue.node_cnt 
                                 * sizeof(vsf_pool_block(vsf_evt_node_pool)),                       
-                            sizeof(vsf_evt_node_pool_pool_item_t));              
+                            sizeof(vsf_evt_node_pool_pool_item_t));  
+                            
     } while(0);
 #endif
 

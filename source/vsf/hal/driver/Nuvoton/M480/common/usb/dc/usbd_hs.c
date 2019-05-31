@@ -134,8 +134,9 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
     reg->PHYCTL |= HSUSBD_PHYCTL_PHYEN_Msk;
     while (1) {
         reg->EP[0ul].EPMPS = 0x20ul;
-        if (reg->EP[0ul].EPMPS == 0x20ul) 
+        if (reg->EP[0ul].EPMPS == 0x20ul) {
             break;
+        }
     }
 
     switch (cfg->speed) {

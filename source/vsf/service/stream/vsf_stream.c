@@ -35,11 +35,16 @@
 void vsf_service_stream_init(void)
 {
 #if VSF_STREAM_CFG_GENERAL_PBUF_POOL == ENABLED
+
+#   if defined(GENERAL_PBUF_POOL_BLOCK_COUNT)
     //! initialise pbuf pool
     init_pbuf_pool( general_pbuf_pool_t, 
                     &g_tGeneralPBUFPool,
                     0,   
                     GENERAL_PBUF_POOL_BLOCK_COUNT);
+#   else
+    prepare_pbuf_pool( general_pbuf_pool_t, &g_tGeneralPBUFPool, 0);
+#   endif
 #endif
 }
 

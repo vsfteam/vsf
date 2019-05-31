@@ -26,6 +26,9 @@
 #include "./pbuf/vsf_pbuf.h"
 
 /*============================ MACROS ========================================*/
+#undef  this
+#define this    (*ptThis)
+
 #ifndef GENERAL_PBUF_POLL_PRIV_USER_COUNT
 #   define GENERAL_PBUF_POLL_PRIV_USER_COUNT    0
 #endif

@@ -30,10 +30,10 @@
 #define __vsf_pt_begin()    enum {                                              \
                                 count_offset = __COUNTER__ + 1,                 \
                             };                                                  \
-                            switch (this.chState) {                             \
+                            switch (ptThis->chState) {                          \
                                 case __COUNTER__ - count_offset:
                                         
-#define __vsf_pt_entry()        this.chState =                                  \
+#define __vsf_pt_entry()        ptThis->chState =                               \
                                     (__COUNTER__ - count_offset + 1) >> 1;      \
                                 case (__COUNTER__ - count_offset) >> 1:
                                         

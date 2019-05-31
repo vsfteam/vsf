@@ -4431,7 +4431,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>pe301,pe128,pe381,Pe188,Pe1866,Pa082</state>
+                    <state>Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -6508,7 +6508,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state>Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>

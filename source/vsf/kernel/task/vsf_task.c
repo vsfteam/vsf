@@ -202,7 +202,9 @@ void vsf_task_init( vsf_pool_block(vsf_task_stack_frame_pool) *frame_buf_ptr,
             .pTarget = NULL, 
             .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
         );
-
+        if (NULL == frame_buf_ptr || 0 == count) {
+            break;
+        }
         vsf_pool_add_buffer(  
             (vsf_pool_t *)(&__default_frame_pool),               
             frame_buf_ptr,                                  

@@ -530,7 +530,7 @@ vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, int_fast32_t timeout, vsf_
                 vsf_eda_t, pending_node,
                 &pthis->pending_list,
                 eda,
-                ptarget->cur_priority >= eda->cur_priority);
+                _->cur_priority >= eda->cur_priority);
             __vsf_eda_set_timeout(eda, timeout);
         } else
 #endif

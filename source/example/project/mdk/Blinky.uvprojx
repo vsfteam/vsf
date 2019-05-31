@@ -327,7 +327,7 @@
             <uC99>1</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
-            <v6Lang>3</v6Lang>
+            <v6Lang>4</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
@@ -795,6 +795,11 @@
               <FileName>vsf_fsm.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2234,6 +2239,11 @@
               <FileName>vsf_fsm.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -3724,6 +3734,11 @@
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
             </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4805,6 +4820,11 @@
               <FileName>vsf_fsm.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -6243,6 +6263,11 @@
               <FileName>vsf_fsm.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -7870,6 +7895,11 @@
               <FileName>vsf_fsm.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
             </File>
           </Files>
         </Group>

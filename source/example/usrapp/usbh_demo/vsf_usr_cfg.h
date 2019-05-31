@@ -51,7 +51,7 @@
 //      <h> Kernal event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_POOL_SIZE               16
+//#define VSF_OS_EVTQ_POOL_SIZE               16
 
 //          <o>Event Bits <4-8>
 //          <i>Simon, please add description here...
@@ -68,7 +68,7 @@
 
 //      <o>The default vsf_task_t stack frame pool size <1-65535>
 //      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 
-#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
+//#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
 //  </h>
 
 
@@ -170,7 +170,7 @@
 #define VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION      DISABLED
 #define VSF_STREAM_CFG_GENERAL_PBUF_POOL                ENABLED
 #define GENERAL_PBUF_POOL_BLOCK_SIZE                    64
-#define GENERAL_PBUF_POOL_BLOCK_COUNT                   16
+//#define GENERAL_PBUF_POOL_BLOCK_COUNT                   16
 #define GENERAL_PBUF_POLL_PRIV_USER_COUNT               2
 
 #define VSF_USE_SERVICE_STREAM                          ENABLED

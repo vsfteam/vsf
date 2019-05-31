@@ -72,7 +72,7 @@
             {                                                                   \
                 ASSERT(NULL != task);                                           \
                 vsf_thread_t *pthis =                                           \
-                    &(task->param.use_as__vsf_thread_t);                         \
+                    &(task->param.use_as__vsf_thread_t);                        \
                 pthis->entry = (vsf_thread_entry_t *)                           \
                                     &vsf_thread_##__NAME##_entry;               \
                 pthis->stack = task->stack_arr;                                 \

@@ -99,6 +99,27 @@
 #define init_pbuf_pool(__NAME, __POOL, __ID, __COUNT, ...)                      \
         __init_pbuf_pool(__NAME, (__POOL), (__ID), (__COUNT), __VA_ARGS__)
 
+#define __prepare_pbuf_pool(__NAME, __POOL, __ID, ...)                          \
+        do {                                                                    \
+            const vsf_pbuf_adapter_t *pAdatper =                                \
+                    vsf_pbuf_adapter_get(__ID);                                 \
+            vsf_pool_cfg_t tCFG = {                                             \
+                .pTarget = (void *)pAdatper,                                    \
+                .pchPoolName = #__NAME,                                         \
+                .fnItemInit = &vsf_pbuf_pool_item_init_event_handler,           \
+                __VA_ARGS__                                                     \
+            };                                                                  \
+                                                                                \
+            vsf_pbuf_pool_init( &((__POOL)->use_as__vsf_pbuf_pool_t),           \
+                                sizeof(vsf_pool_block(__NAME)),                 \
+                                __alignof__(vsf_pool_block(__NAME)),            \
+                                &tCFG);                                         \
+        } while(0)
+
+#define prepare_pbuf_pool(__NAME, __POOL, __ID, ...)                            \
+        __prepare_pbuf_pool(__NAME, (__POOL), (__ID), __VA_ARGS__)
+
+
 #define def_pbuf_pool(__NAME, __SIZE, ...)                                      \
         __def_pbuf_pool(__NAME, (__SIZE), __VA_ARGS__)
 

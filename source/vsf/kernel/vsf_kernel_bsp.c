@@ -29,10 +29,6 @@
 #   define VSF_OS_EVTQ_SWI_NUM                  2
 #endif
 
-#ifndef VSF_TASK_DEFAULT_FRAME_POOL_SIZE
-#   define VSF_TASK_DEFAULT_FRAME_POOL_SIZE     8
-#endif
-
 #define __VSF_OS_EVTQ_SWI_PRIO_INIT(__index, __unused)                          \
     VSF_ARCH_PRIO_##__index,
 
@@ -52,13 +48,14 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
         MREPEAT(VSF_OS_EVTQ_SWI_NUM, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
     
-#   if defined(VSF_CFG_EVTQ_LIST)
+#   if defined(VSF_CFG_EVTQ_LIST) && defined(VSF_OS_EVTQ_POOL_SIZE)
     static NO_INIT vsf_pool_block(vsf_evt_node_pool)    
         __evt_node_buffer[VSF_OS_EVTQ_POOL_SIZE];    
 #   endif
 #endif
 
-#if VSF_USE_KERNEL_TASK_MODE == ENABLED
+#if     VSF_USE_KERNEL_TASK_MODE == ENABLED \
+    &&  defined(VSF_TASK_DEFAULT_FRAME_POOL_SIZE)
     static NO_INIT vsf_pool_block(vsf_task_stack_frame_pool) 
         __vsf_task_frame_buffer[VSF_TASK_DEFAULT_FRAME_POOL_SIZE];
 #endif
@@ -69,7 +66,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
             .os_priorities_ptr = __vsf_os_priority,
             .priority_cnt = UBOUND(__vsf_os_priority),
         },
-#   if defined(VSF_CFG_EVTQ_LIST)
+#   if defined(VSF_CFG_EVTQ_LIST) && defined(VSF_OS_EVTQ_POOL_SIZE)
         .evt_queue = {
             .nodes_buf_ptr = __evt_node_buffer,
             .node_cnt = UBOUND(__evt_node_buffer),
@@ -77,7 +74,8 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #   endif
 #endif
 
-#if VSF_USE_KERNEL_TASK_MODE == ENABLED
+#if     VSF_USE_KERNEL_TASK_MODE == ENABLED \
+    &&  defined(VSF_TASK_DEFAULT_FRAME_POOL_SIZE)
         .task_stack = {
             .frame_buf_ptr = __vsf_task_frame_buffer,
             .frame_cnt = UBOUND(__vsf_task_frame_buffer),

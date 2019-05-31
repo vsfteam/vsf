@@ -323,7 +323,6 @@ def_simple_class(vsf_usbd_dev_t) {
         vsf_usbd_cfg_t *config;
         vsf_usbd_desc_t *desc;
 
-        void *tag;
 #ifdef VSF_USBD_CFG_DRV_INTERFACE
         const i_usb_dc_t *drv;
 #endif

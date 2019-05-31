@@ -21,8 +21,12 @@
 
 #include "service/vsf_service_cfg.h"
 #include "vsf_pool.h"  
+#include <stdlib.h>
 
 /*============================ MACROS ========================================*/
+
+#undef  this
+#define this    (*ptThis)
 
 #ifndef VSF_POOL_CFG_ATOM_ACCESS
 
@@ -119,7 +123,11 @@ void vsf_pool_init( vsf_pool_t *ptObj,
 
 #if VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED
     this.wItemSize = wItemSize;
-    this.hwAlign = hwAlign;
+    if (0 == hwAlign) {
+        hwAlign = sizeof(uint_fast8_t);
+    } 
+    this.u15Align = hwAlign;
+    this.fnItemInit = ptCFG->fnItemInit;
 #endif
 
 #if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
@@ -132,7 +140,7 @@ void vsf_pool_init( vsf_pool_t *ptObj,
                          Statistic.use_as__vsf_slist_node_t,
                          &(s_tPoolStatisticChain.tPoolList),
                          ptThis,
-                        (   (this.Statistic.hwAlign >= _->Statistic.hwAlign) 
+                        (   (this.Statistic.u15Align >= _->Statistic.u15Align) 
                         &&  (this.Statistic.wItemSize >= _->Statistic.wItemSize)));
                         
     }
@@ -157,6 +165,30 @@ bool vsf_pool_add_buffer(   vsf_pool_t *ptThis,
     return vsf_pool_add_buffer_ex(ptThis, pBuffer, wBufferSize, wItemSize, NULL);
 }
 
+#if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
+WEAK bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *ptObj)
+{
+    /*! \note return true will let the vsf_pool try again. Usually we can use 
+     *        this function to print out the heap and pool usage info. You can 
+     *        also use this function to allocate more resources to either pool 
+     *        or heap and ask vsf pool to try again.
+     */
+    return false;
+}
+
+WEAK void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
+{
+    /*! \note if vsf_heap is enabled in your project, this function will be 
+     *        replaced by the function with the same name in vsf_heap. Otherwise
+     *        the posix_memalign will be used by default. You can also implement
+     *        this function by yourself
+     */     
+    void *pMemory = NULL;
+    posix_memalign(&pMemory, wSize, wAlign);
+    return pMemory;
+}
+
+#endif
 
 /*! \brief try to fetch a memory block from the target pool
  *! \param ptThis    address of the target pool
@@ -170,6 +202,7 @@ void *vsf_pool_alloc(vsf_pool_t *ptObj)
 
     ASSERT(ptThis != NULL);
 
+
     VSF_POOL_CFG_ATOM_ACCESS(
         /* verify it again for safe */
         if (!vsf_slist_is_empty(&this.tFreeList)) {
@@ -181,7 +214,30 @@ void *vsf_pool_alloc(vsf_pool_t *ptObj)
 #if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
             this.hwUsed++;
 #endif
-        }       
+        } 
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
+        else if (!this.Statistic.IsNoFeedOnHeap) {
+            bool bRetry = false;
+            do {
+                //! feed on heap
+                ptNode = vsf_heap_malloc_aligned(this.wItemSize, this.Statistic.u15Align);
+                if (NULL != ptNode) {
+                #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
+                    if (this.fnItemInit != NULL) {
+                        (*(this.fnItemInit))(this.pTarget, ptNode, this.wItemSize);
+                    }
+                #else
+                    if (this.fnItemInit != NULL) {
+                        (*(this.fnItemInit))(NULL, ptNode, this.wItemSize);
+                    }
+                #endif
+                    this.hwUsed++;
+                } else {
+                    bRetry = vsf_plug_in_on_failed_to_feed_pool_on_heap(ptObj);
+                }
+            } while(bRetry);
+        }
+#endif
     )
 
     return (void *)ptNode;
@@ -224,7 +280,11 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *ptObj,
         ||  (wBufferSize < wItemSize)) {
         return false;
     }
-
+    
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
+    this.Statistic.IsNoFeedOnHeap = true;
+#endif
+    
     ptNode = (__vsf_pool_node_t *)pBuffer;
     do {
         __vsf_pool_add_item((vsf_pool_t *)ptThis, ptNode);

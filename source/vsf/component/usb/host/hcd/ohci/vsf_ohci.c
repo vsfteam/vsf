@@ -30,11 +30,11 @@
 /*******************************************************
  * OHCI config
  *******************************************************/
-
+/*
 #ifndef VSF_OHCI_CFG_MAX_TD_NUM
 #define VSF_OHCI_CFG_MAX_TD_NUM 0
 #endif
-
+*/
 /*******************************************************
  * OHCI registers
  *******************************************************/
@@ -363,18 +363,6 @@ static NO_INIT vsf_pool(ohci_td_pool) __vsf_ohci_td_pool;
 static ohci_td_t *ohci_td_alloc(void)
 {
     ohci_td_t *td = VSF_POOL_ALLOC(ohci_td_pool, &__vsf_ohci_td_pool);
-#if VSF_OHCI_CFG_MAX_TD_NUM == 0
-    if (!td) {
-        td = VSF_USBH_MALLOC_ALIGNED(8 * sizeof(ohci_td_t), 32);
-        if (td != NULL) {
-            VSF_POOL_ADD_BUFFER(    ohci_td_pool,
-                                    &__vsf_ohci_td_pool,
-                                    td,
-                                    8 * sizeof(ohci_td_t));
-            return ohci_td_alloc();
-        }
-    }
-#endif
     if (td != NULL) {
         memset(td, 0, sizeof(*td));
     }
@@ -1434,18 +1422,26 @@ void vsf_ohci_init(void)
     };
     ohci_td_pool_pool_init(&__vsf_ohci_td_pool, &cfg);
     */
-    VSF_POOL_PREPARE(ohci_td_pool, &__vsf_ohci_td_pool,
+
+
+#if defined(VSF_OHCI_CFG_MAX_TD_NUM)
+    VSF_POOL_INIT_EX(ohci_td_pool, &__vsf_ohci_td_pool, VSF_OHCI_CFG_MAX_TD_NUM, 32,
+        .pTarget = NULL,
+        .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE, 
+    );
+#else
+    VSF_POOL_PREPARE_EX(ohci_td_pool, &__vsf_ohci_td_pool, 32,
         .pTarget = NULL,
         .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE,
     );
-
-#if VSF_OHCI_CFG_MAX_TD_NUM
+/*
     void *td_buffer = VSF_USBH_MALLOC_ALIGNED(
             sizeof(ohci_td_t) * VSF_OHCI_CFG_MAX_TD_NUM, 32);
     VSF_POOL_ADD_BUFFER(    ohci_td_pool,
                             &__vsf_ohci_td_pool,
                             td_buffer,
                             VSF_OHCI_CFG_MAX_TD_NUM * sizeof(ohci_td_t));
+*/
 #endif
 }
 

@@ -50,9 +50,7 @@
 #ifndef GENERAL_PBUF_POOL_BLOCK_SIZE
 #   define GENERAL_PBUF_POOL_BLOCK_SIZE        64
 #endif
-#ifndef GENERAL_PBUF_POOL_BLOCK_COUNT
-#   define GENERAL_PBUF_POOL_BLOCK_COUNT       16
-#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 declare_pbuf_pool(general_pbuf_pool_t)

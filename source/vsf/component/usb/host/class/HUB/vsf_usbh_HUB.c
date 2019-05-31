@@ -462,13 +462,14 @@ const vsf_usbh_class_drv_t vsf_usbh_hub_drv = {
 bool vsf_usbh_hub_dev_is_reset(vsf_usbh_dev_t *dev)
 {
     vsf_usbh_dev_t *dev_hub;
-    vsf_usbh_hub_t *hub;
 
     ASSERT(dev != NULL);
     dev_hub = dev->dev_parent;
-    hub = hub_dev_gethub(dev_hub);
-
-    return (hub->reset_mask & (1 << dev->index)) != 0;
+    if (dev_hub != NULL) {
+        vsf_usbh_hub_t *hub = hub_dev_gethub(dev_hub);
+        return (hub->reset_mask & (1 << dev->index)) != 0;
+    }
+    return false;
 }
 
 vsf_err_t vsf_usbh_hub_reset_dev(vsf_usbh_dev_t *dev)

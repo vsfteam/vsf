@@ -27,7 +27,17 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USBD_CFG_STREAM_EN
-#   define VSF_USBD_CFG_STREAM_EN       ENABLED
+#   if VSF_USE_SERVICE_STREAM == ENABLED || VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#       define VSF_USBD_CFG_STREAM_EN   ENABLED
+#   else
+#       define VSF_USBD_CFG_STREAM_EN   DISABLED
+#   endif
+#endif
+
+#if     (VSF_USBD_CFG_STREAM_EN == ENABLED)                                     \
+    &&  (VSF_USE_SERVICE_STREAM != ENABLED)                                     \
+    &&  (VSF_USE_SERVICE_VSFSTREAM != ENABLED)
+#   error "VSF_USE_SERVICE_STREAM or VSF_USE_SERVICE_VSFSTREAM must be enabled to use VSF_USBD_CFG_STREAM_EN"
 #endif
 
 #if VSF_USE_USB_HOST_ECM == ENABLED
