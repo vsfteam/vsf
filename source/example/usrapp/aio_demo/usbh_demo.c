@@ -14,63 +14,63 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
-#include <stdio.h>
-#include <stdarg.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usrapp_t {
-    bool is_usbd_connected;
-    vsf_callback_timer_t poll_timer;
+struct usbh_demo_const_t {
+    struct {
+        vsf_ohci_param_t ohci_param;
+    } usbh;
 };
-typedef struct usrapp_t usrapp_t;
+typedef struct usbh_demo_const_t usbh_demo_const_t;
+
+struct usbh_demo_t {
+    struct {
+        vsf_usbh_t host;
+        vsf_usbh_class_t hub;
+        vsf_usbh_class_t ecm;
+        vsf_usbh_class_t bthci;
+        vsf_usbh_class_t hid;
+    } usbh;
+};
+typedef struct usbh_demo_t usbh_demo_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static usrapp_t usrapp;
+static const usbh_demo_const_t usbh_demo_const = {
+    .usbh.ohci_param        = {
+        .hc                 = (vsf_usb_hc_t *)&USB_HC0,
+        .priority           = 0xFF,
+    },
+};
+
+static usbh_demo_t usbh_demo = {
+    .usbh                       = {
+        .host.drv               = &vsf_ohci_drv,
+        .host.param             = (void *)&usbh_demo_const.usbh.ohci_param,
+
+        .hub.drv                = &vsf_usbh_hub_drv,
+        .ecm.drv                = &vsf_usbh_ecm_drv,
+        .bthci.drv              = &vsf_usbh_bthci_drv,
+        .hid.drv                = &vsf_usbh_hid_drv,
+    },
+};
 
 /*============================ PROTOTYPES ====================================*/
-
-extern void usbh_demo_start(void);
-extern void usbd_demo_start(void);
-extern void usbd_demo_connect(void);
-extern void tcpip_demo_start(void);
-extern void input_demo_start(void);
-extern void eda_sub_demo_start(void);
-
 /*============================ IMPLEMENTATION ================================*/
 
-void usrapp_on_timer(vsf_callback_timer_t *timer)
+void usbh_demo_start(void)
 {
-    if (!usrapp.is_usbd_connected) {
-        usrapp.is_usbd_connected = true;
-        usbd_demo_connect();
-    } else {
-        vsf_trace(VSF_TRACE_INFO, "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
-    }
-    vsf_callback_timer_add_ms(timer, 1000);
+    vsf_ohci_init();
+    vsf_usbh_init(&usbh_demo.usbh.host);
+    vsf_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.hub);
+    vsf_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.ecm);
+    vsf_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.bthci);
+    vsf_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.hid);
 }
-
-int main(void)
-{
-    vsf_trace_init(NULL);
-
-    usbh_demo_start();
-    tcpip_demo_start();
-    usbd_demo_start();
-    input_demo_start();
-    eda_sub_demo_start();
-
-    usrapp.poll_timer.on_timer = usrapp_on_timer;
-    vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);
-    return 0;
-}
-
-/* EOF */

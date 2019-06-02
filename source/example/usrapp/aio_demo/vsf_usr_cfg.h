@@ -40,6 +40,11 @@
 
 #define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
 
+#define VSF_CFG_EDA_FRAME_POOL_EN       ENABLED
+#define VSF_CFG_EDA_FRAME_POOL_COUNT    8
+#define VSF_CFG_EDA_NESTING_EN          ENABLED
+#define VSF_CFG_EDA_FSM_EN              ENABLED
+
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
 //http://www.keil.com/support/man/docs/uv4/uv4_ut_configwizard.htm

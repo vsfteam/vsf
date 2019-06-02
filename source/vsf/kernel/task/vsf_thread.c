@@ -103,7 +103,7 @@ static void __vsf_thread_entry(void)
 #else
     vsf_eda_fini((vsf_eda_t *)thread_obj);
 #endif
-		longjmp(*(thread)->ret, 0);
+    longjmp(*(thread)->ret, 0);
 }
 
 SECTION("text.vsf.kernel.vsf_thread")

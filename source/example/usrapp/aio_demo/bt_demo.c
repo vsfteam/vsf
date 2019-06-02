@@ -14,63 +14,35 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
-#include <stdio.h>
-#include <stdarg.h>
+
+#include "btstack_event.h"
+#include "btstack_run_loop.h"
+#include "btstack_memory.h"
+#include "hci.h"
+#include "btstack_chipset_csr.h"
+#include "component/3rd-party/btstack/port/btstack_run_loop_vsf.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_t {
-    bool is_usbd_connected;
-    vsf_callback_timer_t poll_timer;
-};
-typedef struct usrapp_t usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static usrapp_t usrapp;
-
 /*============================ PROTOTYPES ====================================*/
-
-extern void usbh_demo_start(void);
-extern void usbd_demo_start(void);
-extern void usbd_demo_connect(void);
-extern void tcpip_demo_start(void);
-extern void input_demo_start(void);
-extern void eda_sub_demo_start(void);
-
 /*============================ IMPLEMENTATION ================================*/
 
-void usrapp_on_timer(vsf_callback_timer_t *timer)
+int btstack_main(int argc, const char * argv[]);
+vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
 {
-    if (!usrapp.is_usbd_connected) {
-        usrapp.is_usbd_connected = true;
-        usbd_demo_connect();
-    } else {
-        vsf_trace(VSF_TRACE_INFO, "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
-    }
-    vsf_callback_timer_add_ms(timer, 1000);
+	if ((id->idVendor == 0x0A12) && (id->idProduct == 0x0001)) {
+		btstack_memory_init();
+		btstack_run_loop_init(btstack_run_loop_vsf_get_instance());
+		hci_init(hci_transport_usb_instance(), dev);
+		hci_set_chipset(btstack_chipset_csr_instance());
+		btstack_main(0, NULL);
+        return VSF_ERR_NONE;
+	}
+    return VSF_ERR_FAIL;
 }
-
-int main(void)
-{
-    vsf_trace_init(NULL);
-
-    usbh_demo_start();
-    tcpip_demo_start();
-    usbd_demo_start();
-    input_demo_start();
-    eda_sub_demo_start();
-
-    usrapp.poll_timer.on_timer = usrapp_on_timer;
-    vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);
-    return 0;
-}
-
-/* EOF */

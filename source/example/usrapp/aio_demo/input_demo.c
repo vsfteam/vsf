@@ -14,63 +14,52 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
-#include <stdio.h>
-#include <stdarg.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_t {
-    bool is_usbd_connected;
-    vsf_callback_timer_t poll_timer;
-};
-typedef struct usrapp_t usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static usrapp_t usrapp;
-
 /*============================ PROTOTYPES ====================================*/
-
-extern void usbh_demo_start(void);
-extern void usbd_demo_start(void);
-extern void usbd_demo_connect(void);
-extern void tcpip_demo_start(void);
-extern void input_demo_start(void);
-extern void eda_sub_demo_start(void);
-
 /*============================ IMPLEMENTATION ================================*/
 
-void usrapp_on_timer(vsf_callback_timer_t *timer)
+static void input_demo_trace_hid(vsf_hid_event_t *hid_evt)
 {
-    if (!usrapp.is_usbd_connected) {
-        usrapp.is_usbd_connected = true;
-        usbd_demo_connect();
-    } else {
-        vsf_trace(VSF_TRACE_INFO, "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
+    if (hid_evt->id != 0) {
+        uint_fast16_t generic_usage, usage_page, usage_id;
+
+        generic_usage = HID_GET_GENERIC_USAGE(hid_evt->id);
+        usage_page = HID_GET_USAGE_PAGE(hid_evt->id);
+        usage_id = HID_GET_USAGE_ID(hid_evt->id);
+
+        vsf_trace(VSF_TRACE_DEBUG, "hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
+            generic_usage, usage_page, usage_id, hid_evt->pre, hid_evt->cur);
     }
-    vsf_callback_timer_add_ms(timer, 1000);
 }
 
-int main(void)
+#if 1
+void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
 {
-    vsf_trace_init(NULL);
-
-    usbh_demo_start();
-    tcpip_demo_start();
-    usbd_demo_start();
-    input_demo_start();
-    eda_sub_demo_start();
-
-    usrapp.poll_timer.on_timer = usrapp_on_timer;
-    vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);
-    return 0;
+    switch (type) {
+    case VSF_INPUT_TYPE_HID:
+        input_demo_trace_hid((vsf_hid_event_t *)event);
+        break;
+    case VSF_INPUT_TYPE_SENSOR:
+        break;
+    default:
+        break;
+    }
 }
+#else
+void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
+{
+    input_demo_trace_hid(hid_evt);
+}
+#endif
 
-/* EOF */
+void input_demo_start(void)
+{
+}

@@ -8351,10 +8351,19 @@
                 <configuration>aio_m484</configuration>
             </excluded>
             <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\bt_demo.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\btstack_config.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\eda_sub_demo.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\input_demo.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\lwipopts.h</name>
@@ -8367,6 +8376,15 @@
                 <excluded>
                     <configuration>aio_m484</configuration>
                 </excluded>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\tcpip_demo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\usbd_demo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\usbh_demo.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\vsf_usr_cfg.h</name>

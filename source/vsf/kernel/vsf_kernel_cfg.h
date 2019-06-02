@@ -39,6 +39,13 @@
 #ifndef VSF_CFG_TIMER_EN
 #   define VSF_CFG_TIMER_EN                 ENABLED
 #endif
+#ifndef VSF_CFG_EDA_NESTING_EN
+#   define VSF_CFG_EDA_NESTING_EN           ENABLED
+#endif
+#if VSF_CFG_EDA_NESTING_EN == ENABLED
+#   undef VSF_CFG_EDA_FRAME_POOL_EN
+#   define VSF_CFG_EDA_FRAME_POOL_EN        ENABLED
+#endif
 
 #if VSF_CFG_PREMPT_EN == ENABLED
 #   ifndef VSF_CFG_DYNAMIC_PRIOTIRY_EN
