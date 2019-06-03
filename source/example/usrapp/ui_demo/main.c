@@ -497,11 +497,13 @@ extern void lvgl_create_demo(void);
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef UVC_DEMO
+#if USE_LV_LOG
 static void lvgl_printf(lv_log_level_t level, const char *file, uint32_t line,  const char *dsc)
 {
     static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error"};
     vsf_trace(VSF_TRACE_DEBUG, "%s: %s \t(%s #%d)\r\n", lvl_prefix[level], dsc,  file, line);
 }
+#endif
 
 static void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t *color)
 {
@@ -599,7 +601,9 @@ static void usrapp_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         buffer[0] = 2;
         buffer[1] = 1;
 
+#if USE_LV_LOG
         lv_log_register_print(lvgl_printf);
+#endif
         lv_init();
 
         lv_disp_drv_init(&usrapp.ui.disp_drv);
@@ -717,9 +721,6 @@ int main(void)
 {
     vsf_trace_init(NULL);
 
-    //vsf_heap_init();
-    //vsf_heap_add(usrapp.heap, sizeof(usrapp.heap));
-
     usrapp.usbd.uvc.stream.probe_commit = usrapp_const.usbd.uvc.stream.probe_commit;
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);
@@ -728,7 +729,10 @@ int main(void)
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);
 
 #if !defined(UVC_DEMO) && !defined(UVC_FRAME_BUFFER)
+
+#if USE_LV_LOG
     lv_log_register_print(lvgl_printf);
+#endif
     lv_init();
 
     lv_disp_drv_init(&usrapp.ui.disp_drv);

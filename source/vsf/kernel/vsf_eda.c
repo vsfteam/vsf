@@ -375,14 +375,18 @@ void vsf_eda_return(void)
 
     frame = pthis->frame;
     if (frame != NULL) {
+#if VSF_CFG_EDA_FSM_EN == ENABLED
         if (!frame->is_fsm) {
+#endif
             vsf_eda_frame_t *frame_caller = vsf_eda_peek((vsf_slist_t *)frame);
             if (NULL == frame_caller) {
                 pthis->is_nested = false;
                 pthis->evthandler = frame->evthandler;
                 vsf_eda_free_frame(frame);
             }
+#if VSF_CFG_EDA_FSM_EN == ENABLED
         }
+#endif
         vsf_eda_yield();
     }
 }

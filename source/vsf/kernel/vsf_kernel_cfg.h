@@ -42,6 +42,17 @@
 #ifndef VSF_CFG_EDA_NESTING_EN
 #   define VSF_CFG_EDA_NESTING_EN           ENABLED
 #endif
+#ifndef VSF_CFG_EDA_FSM_EN
+#   define VSF_CFG_EDA_FSM_EN               ENABLED
+#endif
+
+#if VSF_CFG_EDA_FSM_EN == ENABLED
+#   if VSF_CFG_EDA_NESTING_EN != ENABLED
+#       warning "VSF_CFG_EDA_FSM_EN need VSF_CFG_EDA_NESTING_EN, enable by default"
+#       define VSF_CFG_EDA_NESTING_EN       ENABLED
+#   endif
+#endif
+
 #if VSF_CFG_EDA_NESTING_EN == ENABLED
 #   undef VSF_CFG_EDA_FRAME_POOL_EN
 #   define VSF_CFG_EDA_FRAME_POOL_EN        ENABLED
