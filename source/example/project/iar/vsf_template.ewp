@@ -3347,7 +3347,7 @@
                 <debug>1</debug>
                 <option>
                     <name>CCDefines</name>
-                    <state>CMSDK_CM7</state>
+                    <state>CMSDK_CM0</state>
                     <state>__MPS2__</state>
                     <state>__ARM__</state>
                     <state>__VSF_LIB__</state>
@@ -3475,7 +3475,7 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM7\Include</state>
+                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM0\Include</state>
                     <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
                     <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
@@ -10124,9 +10124,6 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\kernel\task\vsf_pt.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\kernel\task\vsf_task.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\kernel\task\vsf_task.h</name>

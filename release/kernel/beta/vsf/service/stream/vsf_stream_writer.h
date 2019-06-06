@@ -81,14 +81,14 @@ def_interface(i_stream_writer_t)
                                         vsf_pbuf_t *ptOldBlock);
     }Block;
 
-    struct {
-        bool            (*WriteByte)(   vsf_stream_writer_t *ptObj, 
+
+    bool                (*WriteByte)(   vsf_stream_writer_t *ptObj, 
                                         uint_fast8_t chByte);
-        int_fast32_t    (*Write)    (   vsf_stream_writer_t *ptObj,
+    int_fast32_t        (*Write)    (   vsf_stream_writer_t *ptObj,
                                         uint8_t *pchBuffer,
                                         uint_fast16_t hwSize);
-        fsm_rt_t        (*Flush)    (   vsf_stream_writer_t *ptObj);
-    }Stream;
+    fsm_rt_t            (*Flush)    (   vsf_stream_writer_t *ptObj);
+
 end_def_interface(i_stream_writer_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/

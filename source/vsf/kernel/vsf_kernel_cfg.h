@@ -23,39 +23,40 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 #ifndef VSF_CFG_SYNC_EN
-#   define VSF_CFG_SYNC_EN                  ENABLED
+#   define VSF_CFG_SYNC_EN                      ENABLED
 #endif
 #if VSF_CFG_SYNC_EN == ENABLED
 #   ifndef VSF_CFG_BMPEVT_EN
-#       define VSF_CFG_BMPEVT_EN            ENABLED
+#       define VSF_CFG_BMPEVT_EN                ENABLED
 #   endif
 #   ifndef VSF_CFG_QUEUE_EN
-#       define VSF_CFG_QUEUE_EN             ENABLED
+#       define VSF_CFG_QUEUE_EN                 ENABLED
 #   endif
 #endif
 #ifndef VSF_CFG_PREMPT_EN
-#   define VSF_CFG_PREMPT_EN                ENABLED
+#   define VSF_CFG_PREMPT_EN                    ENABLED
 #endif
 #ifndef VSF_CFG_TIMER_EN
-#   define VSF_CFG_TIMER_EN                 ENABLED
-#endif
-#ifndef VSF_CFG_EDA_NESTING_EN
-#   define VSF_CFG_EDA_NESTING_EN           ENABLED
-#endif
-#ifndef VSF_CFG_EDA_FSM_EN
-#   define VSF_CFG_EDA_FSM_EN               ENABLED
+#   define VSF_CFG_TIMER_EN                     ENABLED
 #endif
 
-#if VSF_CFG_EDA_FSM_EN == ENABLED
-#   if VSF_CFG_EDA_NESTING_EN != ENABLED
-#       warning "VSF_CFG_EDA_FSM_EN need VSF_CFG_EDA_NESTING_EN, enable by default"
-#       define VSF_CFG_EDA_NESTING_EN       ENABLED
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL  ENABLED
+#endif
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_FSM
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_FSM       ENABLED
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
+#       warning "VSF_KERNEL_CFG_EDA_SUPPORT_FSM need VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL, enable by default"
+#       define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL       ENABLED
 #   endif
 #endif
 
-#if VSF_CFG_EDA_NESTING_EN == ENABLED
-#   undef VSF_CFG_EDA_FRAME_POOL_EN
-#   define VSF_CFG_EDA_FRAME_POOL_EN        ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   undef VSF_KERNEL_CFG_EDA_FRAME_POOL
+#   define VSF_KERNEL_CFG_EDA_FRAME_POOL        ENABLED
 #endif
 
 #if VSF_CFG_PREMPT_EN == ENABLED

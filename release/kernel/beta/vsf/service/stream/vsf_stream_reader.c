@@ -25,6 +25,10 @@
 #include "./vsf_stream_reader.h"
 
 /*============================ MACROS ========================================*/
+#undef  this
+#define this        (*ptThis)
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -41,10 +45,9 @@ const i_stream_reader_t  VSF_STREAM_READER = {
     .Block = {
         .Fetch =        &vsf_stream_reader_fetch_pbuf,
     },
-    .Stream = {
-        .Read =         &vsf_stream_reader_read,
-        .ReadByte =     &vsf_stream_reader_read_byte,
-    },
+    .Read =             &vsf_stream_reader_read,
+    .ReadByte =         &vsf_stream_reader_read_byte,
+
 };
 
 /*============================ IMPLEMENTATION ================================*/

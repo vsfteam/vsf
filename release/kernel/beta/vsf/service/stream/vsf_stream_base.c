@@ -26,6 +26,9 @@
 #include "./pbuf/vsf_pbuf.h"
 
 /*============================ MACROS ========================================*/
+#undef  this
+#define this    (*ptThis)
+
 #ifndef GENERAL_PBUF_POLL_PRIV_USER_COUNT
 #   define GENERAL_PBUF_POLL_PRIV_USER_COUNT    0
 #endif
@@ -210,9 +213,7 @@ vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *ptObj,
     }
 
     //! write stream
-    this.ptTX->piMethod->Send(this.ptTX, ptOldBlock);
-    
-    return VSF_ERR_NONE;
+    return this.ptTX->piMethod->Send(this.ptTX, ptOldBlock);
 }
 
 /*----------------------------------------------------------------------------*

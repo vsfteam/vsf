@@ -132,6 +132,7 @@ typedef enum {
     fsm_rt_yield        = 1,
     fsm_rt_wait_for_obj = 2,     //!< fsm wait for object
     fsm_rt_wait_for_evt = 2,    
+    fsm_rt_wfe          = 2,
     fsm_rt_asyn         = 3,     //!< fsm asynchronose complete, you can check it later.
 } fsm_rt_t;
 //! @}

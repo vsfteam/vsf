@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2017 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 #ifndef __SIMPLE_FSM_H__
 #define __SIMPLE_FSM_H__
 
@@ -24,6 +41,7 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #ifndef this
 #   define this    (*ptThis)
 #endif
@@ -43,6 +61,7 @@
 
 #define __def_fsm(__FSM_TYPE, ...)                                              \
         def_vsf_task(__FSM_TYPE,                                                \
+            uint8_t chState;                                                    \
             __VA_ARGS__);                                           
         
 #define def_fsm(__NAME, ...)                                                    \
@@ -116,7 +135,7 @@
 //! @}
 
 #define call_fsm(__NAME, __FSM )                                                \
-            vsf_task_call_sub(__NAME, __FSM)                                 
+            vsf_call_task(__NAME, __FSM)                                 
 
 #define call_simple_fsm(__NAME, __FSM )                                         \
             call_fsm(__NAME, __FSM)
@@ -180,8 +199,9 @@
             start_fsm(__NAME, (__FSM), (__PRI), __VA_ARGS__)
 
 #define __implement_fsm_ex(__NAME, __TYPE)                                      \
-    fsm_rt_t vsf_task_func(__NAME)( fsm(__TYPE) *ptThis, vsf_evt_t evt )        \
+    implement_vsf_task(__NAME)                                                  \
     {                                                                           \
+        vsf_task_begin();                                                       \
         if (NULL == ptThis) {                                                   \
             return fsm_rt_err;                                                  \
         }                                               
@@ -196,7 +216,7 @@
             return fsm_rt_err;                                                  \
         }                                                                       \
                                                                                 \
-        return fsm_rt_on_going;                                                 \
+        vsf_task_end();                                                         \
     }
 
 #define body(...)               __body(__VA_ARGS__)
@@ -211,8 +231,7 @@
                 default:                                                        \
                 return fsm_rt_err;                                              \
             }                                                                   \
-        }                                                                       \
-        return fsm_rt_on_going;                                                 
+        }vsf_task_end()
     
         
 /*! \note Debug Support: You can use body_begin() together with body_end()
@@ -293,6 +312,6 @@ typedef enum {
 /*============================ PROTOTYPES ====================================*/
 
 
-
+#endif
 
 #endif

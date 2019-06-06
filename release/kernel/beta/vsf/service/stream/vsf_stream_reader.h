@@ -80,13 +80,11 @@ def_interface(i_stream_reader_t)
         vsf_pbuf_t *    (*Fetch)   (vsf_stream_reader_t *ptObj);
     }Block;
 
-    struct {
-        bool            (*ReadByte)(vsf_stream_reader_t *ptObj, 
-                                    uint8_t *pchByte);
-        int_fast32_t    (*Read)    (vsf_stream_reader_t *ptObj,
-                                    uint8_t *pchBuffer,
-                                    uint_fast16_t hwSize);
-    }Stream;
+    bool            (*ReadByte)(vsf_stream_reader_t *ptObj, 
+                                uint8_t *pchByte);
+    int_fast32_t    (*Read)    (vsf_stream_reader_t *ptObj,
+                                uint8_t *pchBuffer,
+                                uint_fast16_t hwSize);
 end_def_interface(i_stream_reader_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/

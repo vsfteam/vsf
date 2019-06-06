@@ -66,8 +66,8 @@
 //      <i>Simon, please add description here...
 #define VSF_OS_EVTQ_SWI_NUM                 1
 
-//      <o>The default vsf_task_t stack frame pool size <1-65535>
-//      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 
+//      <o>The default eda stack frame pool size <1-65535>
+//      <i>The default eda stack frame pool is shared among all eda tasks.
 //#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
 //  </h>
 
@@ -93,6 +93,11 @@
 #define VSF_CFG_DYNAMIC_PRIOTIRY_EN         ENABLED
 //          </c>
 //      </h>
+
+//      <c1>Enable eda to call other edas
+//      <i>If this feature is enabled, eda is capable to call other eda based tasks, i.e. pure-eda, vsf_task, vsf_pt, simple_fsm and etc.
+#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL ENABLED
+//      </c>
 
 //      <c1>Enable Timer-integrated tasks (vsf_teda_t)
 //      <i>Simon, please add description here...
@@ -134,7 +139,7 @@
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
 //          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
-#define VSF_USE_KERNEL_TASK_MODE            ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM            ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
@@ -142,7 +147,7 @@
 //          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack
-#define VSF_USE_KERNEL_PT_MODE              ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_PT              ENABLED
 //          </c>
 //      </h>
 //  </h>

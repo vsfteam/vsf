@@ -15,38 +15,48 @@
  *                                                                           *
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
-#include "app_cfg.h"
 #include "vsf.h"
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-declare_vsf_task(user_task_t)
+declare_vsf_pt(user_pt_task_t)
+declare_vsf_pt(user_pt_sub_t)
 declare_vsf_task(user_sub_task_t)
+
+def_vsf_pt(user_pt_sub_t,
+    def_params(
+        uint32_t cnt;
+    ));
 
 def_vsf_task(user_sub_task_t,
     def_params(
+        /*! \note when you want to use fsm_rt_asyn, you need a dedicated chState
+         *        rather than using vsf_task_state by default.
+         */
+        uint8_t chState;        
         uint32_t cnt;
     ));
 
-def_vsf_task(user_task_t,
+def_vsf_pt(user_pt_task_t,
     def_params(
         vsf_sem_t *psem;
         uint32_t cnt;
         
-        vsf_task(user_sub_task_t) print_task;
-        
+        vsf_pt(user_pt_sub_t)       print_task;
+        vsf_task(user_sub_task_t)   progress_task;
     ));
-                                                       
+    
 
 
+    
 #if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
-declare_vsf_task(user_task_b_t)
-def_vsf_task(user_task_b_t,
+declare_vsf_pt(user_pt_task_b_t)
+def_vsf_pt(user_pt_task_b_t,
     def_params(
-        vsf_sem_t *psem;
         uint32_t cnt;
+        vsf_sem_t *psem;
     ));
 #endif
 
@@ -56,86 +66,108 @@ static NO_INIT vsf_sem_t user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-implement_vsf_task(user_sub_task_t) 
+
+
+private implement_vsf_pt(user_pt_sub_t) 
 {
-    vsf_task_begin();
+    vsf_pt_begin();
+   
     printf("receive semaphore...[%08x]\r\n", this.cnt++);
-    return fsm_rt_cpl;                  //!< return to caller
-    vsf_task_end();
+     
+    vsf_pt_end();
 }
 
+#define RESET_FSM()     do {this.chState = 0;} while(0)
 
-#define USER_TASK_RESET_FSM()   do { vsf_task_state = 0;} while(0)
-
-implement_vsf_task(user_task_t) 
+private implement_vsf_task(user_sub_task_t)
 {
     vsf_task_begin();
     enum {
-        WAIT_FOR_SEM = 0,
-        CALL_SUB_TO_PRINT,
+        START,
+        PRINT_PROGRESS,
     };
     
-    on_vsf_task_init() {
-        this.cnt = 0;
-    }
-
-    switch (vsf_task_state) {
-        case WAIT_FOR_SEM:    
-            vsf_task_wait_until(vsf_sem_pend(this.psem));                       //!< wait for semaphore forever                                                                                  
-            this.print_task.cnt = this.cnt;                                     //!< passing parameter
-            vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< tranfer to next state
-            
-            break;
-        case CALL_SUB_TO_PRINT:
-            if (fsm_rt_cpl == vsf_call_task(user_sub_task_t, 
-                                            &this.print_task)) {
-                //! task complete
-                this.cnt = this.print_task.cnt;                                 //!< read param value
-                USER_TASK_RESET_FSM();                                          //!< reset fsm
+    /*! \note when you want to use fsm_rt_asyn, you need a dedicated chState
+     *        rather than using vsf_task_state by default.
+     */
+    switch (this.chState) {
+        case START:
+            this.cnt = 0;
+            this.chState = PRINT_PROGRESS;
+            printf("\r\n[");
+            //break;
+        case PRINT_PROGRESS:
+            if (this.cnt >= 100) {
+                printf("]\r\n");
+                RESET_FSM();
+                return fsm_rt_cpl;
+            }
+            printf(".");
+            this.cnt += 5;
+            if (0 == (this.cnt % 25)) {
+                return fsm_rt_asyn;
             }
             break;
     }
+    
     vsf_task_end();
+}
+
+private implement_vsf_pt(user_pt_task_t) 
+{
+    vsf_pt_begin();
+
+    this.cnt = 0;
+    while(1) {
+        vsf_pt_wait_until(vsf_sem_pend(this.psem));
+
+        this.print_task.cnt = this.cnt;                                         //!< Pass parameter
+        vsf_call_pt(user_pt_sub_t, &this.print_task);
+        
+        this.progress_task.chState = 0;
+        do {
+            fsm_rt_t ret;
+            vsf_pt_call_task(user_sub_task_t, &this.progress_task, &ret);
+            if (fsm_rt_cpl == ret) {
+                break;
+            } /* else if (fsm_rt_asyn == ret ) */
+            printf("%2d%%", this.progress_task.cnt);
+        } while(true);
+        
+        
+        //! pt call complete
+        this.cnt = this.print_task.cnt;                                         //!< read parameter
+    }
+
+    vsf_pt_end();
 }
 
 #if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
-implement_vsf_task(user_task_b_t) 
+private implement_vsf_pt(user_pt_task_b_t) 
 {
-    vsf_task_begin();
-    enum {
-        DELAY = 0,
-        PRINT,
-    };
+    vsf_pt_begin();
     
-    switch(vsf_task_state) {
-        case DELAY:
-            vsf_task_wait_until( vsf_delay_ms(10000));                          //!< wait 10s
-            vsf_task_state = PRINT;
-            //break;
-            
-        case PRINT:
-            printf("post semaphore...   [%08x]\r\n", this.cnt++);
-            vsf_sem_post(this.psem);                                            //!< post a semaphore
-            USER_TASK_RESET_FSM();                                              //!< reset fsm
-            break;
-        
+    while(1) {
+        vsf_pt_wait_until( vsf_delay_ms(10000) );                               //!< wait 10s
+        printf("post semaphore...   [%08x]\r\n", this.cnt++);
+        vsf_sem_post(this.psem);                                                //!< post a semaphore
     }
     
-    vsf_task_end();
+    vsf_pt_end();
 }
 #endif
 
-void vsf_kernel_task_simple_demo(void)
-{   
+void vsf_kernel_pt_simple_demo(void)
+{  
     //! initialise semaphore
     vsf_sem_init(&user_sem, 0); 
     
     //! start a user task
     {
-        static NO_INIT user_task_t __user_task;
-        __user_task.param.psem = &user_sem;
-        init_vsf_task(user_task_t, &__user_task, vsf_priority_0);
-    }
+        static NO_INIT user_pt_task_t __user_pt;
+        __user_pt.param.psem = &user_sem;
+        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_priority_inherit);
+    };
 
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
@@ -149,10 +181,10 @@ void vsf_kernel_task_simple_demo(void)
 
     //! start a user task b
     {
-        static NO_INIT user_task_b_t __user_task_b;
-        __user_task_b.param.psem = &user_sem;
-        __user_task_b.param.cnt = 0;
-        init_vsf_task(user_task_b_t, &__user_task_b, vsf_priority_0);
+        static NO_INIT user_pt_task_b_t __user_pt_task_b;
+        __user_pt_task_b.param.psem = &user_sem;
+        __user_pt_task_b.param.cnt = 0;
+        init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_priority_0);
     }
 #endif
 }
@@ -166,10 +198,10 @@ int main(void)
             mem_nonsharable( )
         )
     )
-    
+
     vsf_stdio_init();
     
-    vsf_kernel_task_simple_demo();
+    vsf_kernel_pt_simple_demo();
     
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
@@ -182,3 +214,4 @@ int main(void)
 }
 
 #endif
+

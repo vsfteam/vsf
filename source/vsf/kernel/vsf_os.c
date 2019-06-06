@@ -61,7 +61,12 @@ typedef struct __vsf_os_t __vsf_os_t;
 static NO_INIT __vsf_os_t __vsf_os;
 /*============================ PROTOTYPES ====================================*/
 SECTION(".text.vsf.kernel.eda")
-extern void vsf_kernel_init(void);
+#if VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+void vsf_kernel_init(   vsf_pool_block(vsf_eda_frame_pool) *frame_buf_ptr,
+                        uint_fast16_t count);
+#else
+void vsf_kernel_init(void);
+#endif
 
 SECTION(".text.vsf.kernel.teda")
 extern vsf_err_t vsf_timer_init(void);
@@ -87,18 +92,15 @@ void vsf_kernel_os_init(void)
     __vsf_os.res_ptr = vsf_kernel_get_resource_on_init();
     ASSERT(NULL != __vsf_os.res_ptr);
 
-extern void vsf_kernel_init(void);
+#if VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+    vsf_kernel_init(__vsf_os.res_ptr->frame_stack.frame_buf_ptr, 
+                    __vsf_os.res_ptr->frame_stack.frame_cnt);
+#else
     vsf_kernel_init();
+#endif
 
 #ifdef VSF_CFG_EVTQ_LIST
     do {                        
-        /*
-        static const vsf_pool_cfg_t cfg = {
-            &__vsf_os,
-            (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
-        };                             
-        vsf_evt_node_pool_pool_init((&__vsf_os.node_pool), (vsf_pool_cfg_t *)&cfg); 
-        */
         VSF_POOL_PREPARE(vsf_evt_node_pool, (&__vsf_os.node_pool),
             .pTarget = &__vsf_os,
             .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
@@ -108,20 +110,14 @@ extern void vsf_kernel_init(void);
             ||  (0 == __vsf_os.res_ptr->evt_queue.node_cnt)) {
             break;
         }
-        vsf_pool_add_buffer(  (vsf_pool_t *)(&__vsf_os.node_pool),               
+        VSF_POOL_ADD_BUFFER(vsf_evt_node_pool,
+                            (&__vsf_os.node_pool),               
                             __vsf_os.res_ptr->evt_queue.nodes_buf_ptr,                                  
                             __vsf_os.res_ptr->evt_queue.node_cnt 
-                                * sizeof(vsf_pool_block(vsf_evt_node_pool)),                       
-                            sizeof(vsf_evt_node_pool_pool_item_t));  
+                                * sizeof(vsf_pool_block(vsf_evt_node_pool)));  
                             
     } while(0);
 #endif
-
-#if VSF_USE_KERNEL_TASK_MODE == ENABLED
-    vsf_task_init(  __vsf_os.res_ptr->task_stack.frame_buf_ptr, 
-                    __vsf_os.res_ptr->task_stack.frame_cnt);
-#endif
-
 }
 
 #ifdef VSF_CFG_EVTQ_EN
@@ -275,9 +271,9 @@ void __vsf_main_entry(void)
 #if VSF_CFG_TIMER_EN
         vsf_timer_init();
 #endif
-    vsf_hal_advance_init();
+        vsf_hal_advance_init();
 
-    __post_vsf_kernel_init();
+        __post_vsf_kernel_init();
 
 #ifdef VSF_CFG_EVTQ_EN
         __vsf_set_cur_evtq(NULL);

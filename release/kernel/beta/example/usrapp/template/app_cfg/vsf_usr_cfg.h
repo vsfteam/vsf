@@ -48,7 +48,7 @@
 //      <h> Kernal event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_POOL_SIZE               16
+//#define VSF_OS_EVTQ_POOL_SIZE               16
 
 //          <o>The number of event queues   <1-4>
 //          <i>Simon, please add description here...
@@ -59,9 +59,13 @@
 //      <i>Simon, please add description here...
 #define VSF_OS_EVTQ_SWI_NUM                 1
 
-//      <o>The default vsf_task_t stack frame pool size <1-65535>
-//      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 
-#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
+//      <o>The default eda stack frame pool size <1-65535>
+//      <i>The default eda stack frame pool is shared among all eda tasks. 
+//#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
+
+//      <o>The heap size                    <256-0xFFFFFFFF>
+//      <i>Specify the vsf heap size
+#define VSF_HEAP_SIZE                       8192
 //  </h>
 
 
@@ -79,13 +83,6 @@
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
 //#define VSF_OS_RUN_MAIN_AS_THREAD           ENABLED
-//          </c>
-//      </h>
-
-//      <h> Task Form Configuration
-//          <c1>Enable the protoThread support
-//          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack
-#define VSF_USE_KERNEL_PT_MODE              ENABLED
 //          </c>
 //      </h>
 //  </h>

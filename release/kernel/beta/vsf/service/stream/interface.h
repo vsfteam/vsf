@@ -55,12 +55,13 @@ struct vsf_stream_dat_drn_evt_t
 
 union vsf_stream_status_t {
     struct {
-        uint32_t u14Count                   : 13;
+        uint32_t u14Count                   : 12;
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
         uint32_t IsOpen                     : 1;
     #else
         uint32_t                            : 1;
     #endif
+        uint32_t IsDataFull                 : 1;
         uint32_t IsDataReady                : 1;
         uint32_t IsDataDrain                : 1;
         uint32_t u8DataReadyThreshold       : 8;

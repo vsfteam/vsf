@@ -57,71 +57,44 @@ static NO_INIT vsf_sem_t user_sem;
 
 implement_vsf_task(user_sub_task_t) 
 {
+    vsf_task_begin();
     printf("receive semaphore...[%08x]\r\n", this.cnt++);
     return fsm_rt_cpl;                  //!< return to caller
+    vsf_task_end();
 }
 
 
-#define USER_TASK_RESET_FSM()   do { this.chState = 0;} while(0)
+#define USER_TASK_RESET_FSM()   do { vsf_task_state = 0;} while(0)
 
 implement_vsf_task(user_task_t) 
 {
+    vsf_task_begin();
     enum {
         WAIT_FOR_SEM = 0,
         CALL_SUB_TO_PRINT,
     };
+    
     on_vsf_task_init() {
         this.cnt = 0;
     }
 
-    switch (this.chState) {
-        case WAIT_FOR_SEM:
-            /*! \note IMPORTANT!!!!!
-             *        For anything you want to wait, which is coming from vsf 
-             *        system, please use vsf_task_wait_until().
-             *        Those includue: VSF_EVT_XXXXX, sempahore, mutex and etc.
-             *        
-             *        - For VSF_EVT_XXXX, please use:
-             *        vsf_task_wait_until(
-             *            on_vsf_task_evt(VSF_EVT_XXXXX) {
-             *                //! when the target VSF_EVT_XXXX arrived
-             *                ...
-             *            }
-             *        )
-             *        - For sempahore, please use:
-             *        vsf_task_wait_until(
-             *            vsf_sem_pend(...) {
-             *                //! when the semaphore is acquired
-             *                ...
-             *            }on_sem_timeout() {
-             *                //! when timeout
-             *            }
-             *        )
-             *        - For time, please use:
-             *        vsf_task_wait_until(
-             *            vsf_delay(...) {
-             *                //! when timeout
-             *                ...
-             *            )
-             *        )
-             */
-            vsf_task_wait_until(
-                vsf_sem_pend(this.psem){                                        //!< wait for semaphore forever
-                    this.print_task.cnt = this.cnt;                             //!< passing parameter
-                    this.chState = CALL_SUB_TO_PRINT;                             //!< tranfer to next state
-                }
-            );
+    switch (vsf_task_state) {
+        case WAIT_FOR_SEM:    
+            vsf_task_wait_until(vsf_sem_pend(this.psem));                       //!< wait for semaphore forever                                                                                  
+            this.print_task.cnt = this.cnt;                                     //!< passing parameter
+            vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< tranfer to next state
+            
             break;
         case CALL_SUB_TO_PRINT:
-            if (fsm_rt_cpl == 
-                vsf_task_call_sub(user_sub_task_t, &this.print_task)) {
+            if (fsm_rt_cpl == vsf_call_task(user_sub_task_t, 
+                                            &this.print_task)) {
                 //! task complete
                 this.cnt = this.print_task.cnt;                                 //!< read param value
                 USER_TASK_RESET_FSM();                                          //!< reset fsm
             }
             break;
     }
-    return fsm_rt_on_going;
+    vsf_task_end();
 }
 
 #if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED

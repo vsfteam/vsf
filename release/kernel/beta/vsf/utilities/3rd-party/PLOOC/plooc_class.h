@@ -39,15 +39,16 @@
  */
 
 /*============================ MACROS ========================================*/
-#ifndef this
-#   define this         (*ptThis)
-#endif
-#ifndef base
-#   define base         (*ptBase)
-#endif
-#ifndef target
-#   define target       (*ptTarget)
-#endif
+/*!\ node if you want your code more "elegent", say you want to use "this" with 
+ *        "." rather than a pointer with "->", you can add following macros to
+ *        your code, assuming the variable name of the object pointer is "ptThis".
+ *        If your object pointer has a different name, please feel free to change
+ *        the macro by yourself
+ 
+#undef this
+#define this         (*ptThis)
+
+*/
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

@@ -63,7 +63,8 @@
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_sem_pend((__psem),                           \
-                    (__timeout)), reason == VSF_SYNC_GET))
+                    (__timeout)),                                               \
+                    (reason == VSF_SYNC_GET || reason = VSF_SYNC_TIMEOUT)))
 
 #   define vsf_sem_pend(__psem)                                                 \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
@@ -75,16 +76,18 @@
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_sem_pend((__psem),                           \
-                    vsf_systimer_ms_to_tick(__timeout)), reason == VSF_SYNC_GET))
+                    vsf_systimer_ms_to_tick(__timeout)),                        \
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_sem_pend_timeout_us(__psem, __timeout)                           \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
                 if ((reason =__vsf_sem_pend((__psem),                           \
-                    vsf_systimer_us_to_tick(__timeout)), reason == VSF_SYNC_GET))
+                    vsf_systimer_us_to_tick(__timeout)),                        \
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 #   define on_sem_timeout()                                                     \
-                else if (VSF_SYNC_TIMEOUT == reason)
+                if (VSF_SYNC_TIMEOUT == vsf_eda_get_cur_evt())
 #endif
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

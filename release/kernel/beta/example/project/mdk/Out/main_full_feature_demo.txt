@@ -5,16 +5,16 @@
                           AREA ||i.__code_region_example_on_enter||, CODE, READONLY, ALIGN=2
 
                   __code_region_example_on_enter PROC
-;;;165    
-;;;166    static void __code_region_example_on_enter(void *pObj, void *pLocal)
+;;;169    
+;;;170    static void __code_region_example_on_enter(void *pObj, void *pLocal)
 000000  b510              PUSH     {r4,lr}
-;;;167    {
-;;;168        printf("-------enter-------\r\n");
+;;;171    {
+;;;172        printf("-------enter-------\r\n");
 000002  a002              ADR      r0,|L1.12|
 000004  f7fffffe          BL       __2printf
-;;;169    }
+;;;173    }
 000008  bd10              POP      {r4,pc}
-;;;170    
+;;;174    
                           ENDP
 
 00000a  0000              DCW      0x0000
@@ -31,16 +31,16 @@
                           AREA ||i.__code_region_example_on_leave||, CODE, READONLY, ALIGN=2
 
                   __code_region_example_on_leave PROC
-;;;170    
-;;;171    static void __code_region_example_on_leave(void *pObj,void *pLocal)
+;;;174    
+;;;175    static void __code_region_example_on_leave(void *pObj,void *pLocal)
 000000  b510              PUSH     {r4,lr}
-;;;172    {
-;;;173        printf("-------leave-------\r\n");
+;;;176    {
+;;;177        printf("-------leave-------\r\n");
 000002  a002              ADR      r0,|L2.12|
 000004  f7fffffe          BL       __2printf
-;;;174    }
+;;;178    }
 000008  bd10              POP      {r4,pc}
-;;;175    
+;;;179    
                           ENDP
 
 00000a  0000              DCW      0x0000
@@ -54,296 +54,579 @@
 000022  00                DCB      0
 000023  00                DCB      0
 
-                          AREA ||i.main||, CODE, READONLY, ALIGN=1
+                          AREA ||i.main||, CODE, READONLY, ALIGN=2
 
                   main PROC
-;;;368    #if VSF_PROJ_CFG_USE_CUBE != ENABLED
-;;;369    int main(void)
-000000  f7fffffe          BL       vsf_stdio_init
-;;;370    {
-;;;371        vsf_stdio_init();
-;;;372        
-;;;373        vsf_kernel_full_feature_demo();
-000004  f7fffffe          BL       vsf_kernel_full_feature_demo
-;;;374        
-;;;375        while(1);
-;;;376    }
-;;;377    
-                          ENDP
-
-
-                          AREA ||i.vsf_kernel_full_feature_demo||, CODE, READONLY, ALIGN=2
-
-                  vsf_kernel_full_feature_demo PROC
-;;;292    
-;;;293    void vsf_kernel_full_feature_demo(void)
+;;;281    
+;;;282    int main(void)
 000000  b51f              PUSH     {r0-r4,lr}
-;;;294    {
-;;;295        static_task_instance(
-;;;296            features_used(
-;;;297                mem_sharable( using_grouped_evt; )
-;;;298                mem_nonsharable(
-;;;299                )
-;;;300            )
-;;;301        )
-;;;302        
-;;;303    #if VSF_CFG_SYNC_EN == ENABLED
-;;;304        // initialize adapter
-;;;305        do {
-;;;306            vsf_sem_init(&user_sem, 0);
-000002  4a33              LDR      r2,|L4.208|
-000004  2100              MOVS     r1,#0
-000006  4833              LDR      r0,|L4.212|
-000008  f7fffffe          BL       vsf_eda_sync_init
-;;;307    
-;;;308    #   if VSF_CFG_BMPEVT_EN == ENABLED
-;;;309            init_grouped_evts(user_grouped_evts_t, &__user_grouped_evts, timer4_evt_msk);
-00000c  4831              LDR      r0,|L4.212|
-00000e  2310              MOVS     r3,#0x10
-000010  2201              MOVS     r2,#1
-000012  4931              LDR      r1,|L4.216|
-000014  3068              ADDS     r0,r0,#0x68
-000016  f7fffffe          BL       grouped_evts_init
-;;;310    
-;;;311            init_vsf_task(bmevt_demo_t, &__bmevt_demo, vsf_priority_0);
-00001a  4e30              LDR      r6,|L4.220|
-00001c  466c              MOV      r4,sp
-00001e  ce0f              LDM      r6!,{r0-r3}
-000020  c40f              STM      r4!,{r0-r3}
-000022  482c              LDR      r0,|L4.212|
-000024  2500              MOVS     r5,#0
-000026  3050              ADDS     r0,r0,#0x50
-000028  7205              STRB     r5,[r0,#8]
-00002a  4669              MOV      r1,sp
-00002c  3840              SUBS     r0,r0,#0x40
-00002e  3e10              SUBS     r6,r6,#0x10
-000030  f7fffffe          BL       vsf_task_start
-000034  3610              ADDS     r6,r6,#0x10
-000036  ce0f              LDM      r6!,{r0-r3}
-000038  466c              MOV      r4,sp
-00003a  c40f              STM      r4!,{r0-r3}
-;;;312    #       if VSF_USE_KERNEL_PT_MODE == ENABLED
-;;;313            do {
-;;;314                static user_pt_bmpevt_demo_thread_t __pt_demo = {
-;;;315                    .param = {
-;;;316                        .mask = timer4_evt_msk,
-;;;317                        .pgroup_evts = &__user_grouped_evts,
-;;;318                    },
-;;;319                };
-;;;320                init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_priority_inherit);
-00003c  4826              LDR      r0,|L4.216|
-00003e  4669              MOV      r1,sp
-000040  3048              ADDS     r0,r0,#0x48
-000042  7205              STRB     r5,[r0,#8]
-000044  3840              SUBS     r0,r0,#0x40
-000046  3e20              SUBS     r6,r6,#0x20
-000048  f7fffffe          BL       vsf_task_start
-;;;321            } while(0);
-;;;322    #       endif
-;;;323    #   endif
-;;;324        } while(0);
+;;;283    {
+;;;284        static_task_instance(
+;;;285            features_used(
+;;;286                mem_sharable( using_grouped_evt; )
+;;;287                mem_nonsharable(
+;;;288                )
+;;;289            )
+;;;290        )
+;;;291    
+;;;292        vsf_stdio_init();
+000002  f7fffffe          BL       vsf_stdio_init
+;;;293        
+;;;294    #if VSF_CFG_SYNC_EN == ENABLED
+;;;295        // initialize adapter
+;;;296        do {
+;;;297            vsf_sem_init(&user_sem, 0);
+000006  4a33              LDR      r2,|L3.212|
+000008  2100              MOVS     r1,#0
+00000a  4833              LDR      r0,|L3.216|
+00000c  f7fffffe          BL       vsf_eda_sync_init
+;;;298    
+;;;299    #   if VSF_CFG_BMPEVT_EN == ENABLED
+;;;300            init_grouped_evts(user_grouped_evts_t, &__user_grouped_evts, timer4_evt_msk);
+000010  4831              LDR      r0,|L3.216|
+000012  2310              MOVS     r3,#0x10
+000014  2201              MOVS     r2,#1
+000016  4931              LDR      r1,|L3.220|
+000018  3060              ADDS     r0,r0,#0x60
+00001a  f7fffffe          BL       grouped_evts_init
+;;;301    
+;;;302            init_vsf_task(bmevt_demo_t, &__bmevt_demo, vsf_priority_0);
+00001e  4d30              LDR      r5,|L3.224|
+000020  466c              MOV      r4,sp
+000022  cd0f              LDM      r5!,{r0-r3}
+000024  c40f              STM      r4!,{r0-r3}
+000026  482c              LDR      r0,|L3.216|
+000028  4669              MOV      r1,sp
+00002a  3010              ADDS     r0,r0,#0x10
+00002c  3d10              SUBS     r5,r5,#0x10
+00002e  f7fffffe          BL       vsf_teda_init_ex
+000032  3510              ADDS     r5,r5,#0x10
+000034  cd0f              LDM      r5!,{r0-r3}
+000036  466c              MOV      r4,sp
+000038  c40f              STM      r4!,{r0-r3}
+;;;303    #       if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
+;;;304            do {
+;;;305                static user_pt_bmpevt_demo_thread_t __pt_demo = {
+;;;306                    .param = {
+;;;307                        .mask = timer4_evt_msk,
+;;;308                        .pgroup_evts = &__user_grouped_evts,
+;;;309                    },
+;;;310                };
+;;;311                init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_priority_inherit);
+00003a  4828              LDR      r0,|L3.220|
+00003c  4669              MOV      r1,sp
+00003e  3008              ADDS     r0,r0,#8
+000040  3d20              SUBS     r5,r5,#0x20
+000042  f7fffffe          BL       vsf_teda_init_ex
+;;;312            } while(0);
+;;;313    #       endif
+;;;314    #   endif
+;;;315        } while(0);
+;;;316    #endif
+;;;317        
+;;;318    #if VSF_CFG_TIMER_EN == ENABLED
+;;;319        for (int i = 0; i < dimof(__timer_example); i++) {
+;;;320            init_vsf_task(  timer_example_t,                        //!< vst_task type
+000046  4e27              LDR      r6,|L3.228|
+000048  2400              MOVS     r4,#0                 ;319
+                  |L3.74|
+00004a  6aea              LDR      r2,[r5,#0x2c]  ; <Data6>
+00004c  6a69              LDR      r1,[r5,#0x24]  ; <Data6>
+00004e  6a28              LDR      r0,[r5,#0x20]  ; <Data6>
+000050  9000              STR      r0,[sp,#0]
+000052  01a0              LSLS     r0,r4,#6
+000054  9101              STR      r1,[sp,#4]
+000056  1980              ADDS     r0,r0,r6
+000058  9203              STR      r2,[sp,#0xc]
+00005a  4669              MOV      r1,sp
+00005c  9002              STR      r0,[sp,#8]
+00005e  f7fffffe          BL       vsf_teda_init_ex
+000062  1c64              ADDS     r4,r4,#1
+000064  2c05              CMP      r4,#5                 ;319
+000066  d3f0              BCC      |L3.74|
+;;;321                            &__timer_example[i],                    //!< vsf_task object
+;;;322                            vsf_priority_0,                         //!< priority
+;;;323                            .target = &__timer_example[i]);         //!< target object (pthis)
+;;;324        }
 ;;;325    #endif
-;;;326        
-;;;327    #if VSF_CFG_TIMER_EN == ENABLED
-;;;328        for (int i = 0; i < dimof(__timer_example); i++) {
-;;;329            init_vsf_task(  timer_example_t,            //!< vst_task type
-00004c  4f24              LDR      r7,|L4.224|
-00004e  2400              MOVS     r4,#0                 ;328
-                  |L4.80|
-000050  6af2              LDR      r2,[r6,#0x2c]  ; <Data5>
-000052  6a71              LDR      r1,[r6,#0x24]  ; <Data5>
-000054  6a30              LDR      r0,[r6,#0x20]  ; <Data5>
-000056  9000              STR      r0,[sp,#0]
-000058  2050              MOVS     r0,#0x50
-00005a  4360              MULS     r0,r4,r0
-00005c  9101              STR      r1,[sp,#4]
-00005e  19c0              ADDS     r0,r0,r7
-000060  9203              STR      r2,[sp,#0xc]
-000062  2148              MOVS     r1,#0x48
-000064  9002              STR      r0,[sp,#8]
-000066  540d              STRB     r5,[r1,r0]
-000068  4669              MOV      r1,sp
-00006a  f7fffffe          BL       vsf_task_start
-00006e  1c64              ADDS     r4,r4,#1
-000070  2c05              CMP      r4,#5                 ;328
-000072  d3ed              BCC      |L4.80|
-;;;330                            &__timer_example[i],        //!< vsf_task object
-;;;331                            vsf_priority_0,             //!< priority
-;;;332                            &__timer_example[i]);       //!< target object (pthis)
-;;;333        }
-;;;334    #endif
-;;;335    
-;;;336    
-;;;337    #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
-;;;338        do {
-;;;339            static NO_INIT user_task_t __user_task;
-;;;340    #   if VSF_CFG_SYNC_EN == ENABLED
-;;;341            __user_task.param.psem = &user_sem;
-000074  491a              LDR      r1,|L4.224|
-000076  4817              LDR      r0,|L4.212|
-000078  3960              SUBS     r1,r1,#0x60
-;;;342    #   endif
-;;;343            init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
-00007a  65c8              STR      r0,[r1,#0x5c]  ; __user_task
-00007c  2100              MOVS     r1,#0
-00007e  4819              LDR      r0,|L4.228|
-000080  f7fffffe          BL       vsf_thread_user_task_t_start
-000084  2601              MOVS     r6,#1                 ;309
-;;;344        } while(0);
-;;;345    #endif
-;;;346    
-;;;347    
-;;;348    #if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
-;;;349        while (1) {
-;;;350            wait_for_all(   &__user_grouped_evts, 
-000086  272f              MOVS     r7,#0x2f
-000088  4c13              LDR      r4,|L4.216|
-00008a  1eb5              SUBS     r5,r6,#2
-                  |L4.140|
-00008c  6860              LDR      r0,[r4,#4]  ; ptThis
-00008e  6007              STR      r7,[r0,#0]
-000090  7106              STRB     r6,[r0,#4]
-                  |L4.146|
-000092  4810              LDR      r0,|L4.212|
-000094  462a              MOV      r2,r5
-000096  3068              ADDS     r0,r0,#0x68
-000098  6861              LDR      r1,[r4,#4]  ; ptThis
-00009a  f7fffffe          BL       vsf_bmpevt_wait_for
-00009e  2803              CMP      r0,#3
-0000a0  d00a              BEQ      |L4.184|
-;;;351                            all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk) {
-;;;352                //! when all the grouped events are set
-;;;353                reset_grouped_evts( &__user_grouped_evts, 
-;;;354                                    all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk);
-;;;355                printf("\r\n--------------barrier--------------: \r\n");
-;;;356            } on_bmevt_timeout() {
-0000a2  2801              CMP      r0,#1
-0000a4  d00f              BEQ      |L4.198|
-0000a6  2804              CMP      r0,#4                 ;350
-0000a8  d0f3              BEQ      |L4.146|
-                  |L4.170|
-;;;357                //! when timeout happened
-;;;358                printf("\r\n============== barrier timeout ============: \r\n");
-;;;359            }
+;;;326    
+;;;327    
+;;;328    #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+;;;329        do {
+;;;330            static NO_INIT user_task_t __user_task;
+;;;331    #   if VSF_CFG_SYNC_EN == ENABLED
+;;;332            __user_task.param.psem = &user_sem;
+000068  491e              LDR      r1,|L3.228|
+00006a  481b              LDR      r0,|L3.216|
+00006c  3968              SUBS     r1,r1,#0x68
+;;;333    #   endif
+;;;334            init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
+00006e  6648              STR      r0,[r1,#0x64]  ; __user_task
+000070  2100              MOVS     r1,#0
+000072  481d              LDR      r0,|L3.232|
+000074  f7fffffe          BL       vsf_thread_user_task_t_start
+;;;335        } while(0);
+;;;336    #endif
+;;;337    
+;;;338    
+;;;339    #if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
+;;;340        while (1) {
+;;;341            wait_for_all_timeout_ms(    &__user_grouped_evts, 
+000078  4d18              LDR      r5,|L3.220|
+00007a  4e1c              LDR      r6,|L3.236|
+00007c  2701              MOVS     r7,#1                 ;300
+                  |L3.126|
+00007e  6868              LDR      r0,[r5,#4]  ; ptThis
+000080  212f              MOVS     r1,#0x2f
+000082  6001              STR      r1,[r0,#0]
+000084  7107              STRB     r7,[r0,#4]
+                  |L3.134|
+000086  4630              MOV      r0,r6
+000088  f7fffffe          BL       vsf_systimer_ms_to_tick
+00008c  4602              MOV      r2,r0
+00008e  4812              LDR      r0,|L3.216|
+000090  6869              LDR      r1,[r5,#4]  ; ptThis
+000092  3060              ADDS     r0,r0,#0x60
+000094  f7fffffe          BL       vsf_bmpevt_wait_for
+000098  4604              MOV      r4,r0
+00009a  2803              CMP      r0,#3
+00009c  d001              BEQ      |L3.162|
+00009e  2c01              CMP      r4,#1
+0000a0  d10e              BNE      |L3.192|
+                  |L3.162|
+;;;342                                        all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk,
+;;;343                                        200000) {
+;;;344                //! when all the grouped events are set
+;;;345                reset_grouped_evts( &__user_grouped_evts, 
+0000a2  480d              LDR      r0,|L3.216|
+0000a4  212f              MOVS     r1,#0x2f
+0000a6  3060              ADDS     r0,r0,#0x60
+0000a8  f7fffffe          BL       vsf_eda_bmpevt_reset
+;;;346                                    all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk);
+;;;347                printf("\r\n--------------barrier--------------: \r\n");
+0000ac  a010              ADR      r0,|L3.240|
+0000ae  f7fffffe          BL       __2printf
+;;;348                
+;;;349                on_bmevt_timeout() {
+0000b2  f7fffffe          BL       vsf_eda_get_cur_evt
+0000b6  2801              CMP      r0,#1
+0000b8  d102              BNE      |L3.192|
+;;;350                    //! when timeout happened
+;;;351                    printf("\r\n============== barrier timeout ============: \r\n");
+0000ba  a018              ADR      r0,|L3.284|
+0000bc  f7fffffe          BL       __2printf
+                  |L3.192|
+0000c0  2c04              CMP      r4,#4                 ;341
+0000c2  d0e0              BEQ      |L3.134|
+;;;352                }
+;;;353            }
+;;;354    
+;;;355            vsf_delay_ms(1000);
+0000c4  207d              MOVS     r0,#0x7d
+0000c6  00c0              LSLS     r0,r0,#3
+0000c8  f7fffffe          BL       vsf_systimer_ms_to_tick
+0000cc  f7fffffe          BL       __vsf_delay
+0000d0  e7d5              B        |L3.126|
+;;;356        }
+;;;357    #endif
+;;;358    
+;;;359    }
 ;;;360    
-;;;361            vsf_delay_ms(1000);
-0000aa  207d              MOVS     r0,#0x7d
-0000ac  00c0              LSLS     r0,r0,#3
-0000ae  f7fffffe          BL       vsf_systimer_ms_to_tick
-0000b2  f7fffffe          BL       __vsf_delay
-0000b6  e7e9              B        |L4.140|
-                  |L4.184|
-0000b8  4806              LDR      r0,|L4.212|
-0000ba  212f              MOVS     r1,#0x2f              ;353
-0000bc  3068              ADDS     r0,r0,#0x68           ;353
-0000be  f7fffffe          BL       vsf_eda_bmpevt_reset
-0000c2  a009              ADR      r0,|L4.232|
-0000c4  e000              B        |L4.200|
-                  |L4.198|
-0000c6  a013              ADR      r0,|L4.276|
-                  |L4.200|
-0000c8  f7fffffe          BL       __2printf
-0000cc  e7ed              B        |L4.170|
-;;;362        }
-;;;363    #endif
-;;;364    
-;;;365    }
-;;;366    
                           ENDP
 
-0000ce  0000              DCW      0x0000
-                  |L4.208|
+0000d2  0000              DCW      0x0000
+                  |L3.212|
                           DCD      0x00007fff
-                  |L4.212|
-                          DCD      ||.bss.noinit||+0x5f0
-                  |L4.216|
-                          DCD      ||area_number.18||
-                  |L4.220|
-                          DCD      ||area_number.16||
-                  |L4.224|
-                          DCD      ||.bss.noinit||+0x460
-                  |L4.228|
+                  |L3.216|
+                          DCD      ||.bss.noinit||+0x5a8
+                  |L3.220|
+                          DCD      ||area_number.17||
+                  |L3.224|
+                          DCD      ||area_number.15||
+                  |L3.228|
+                          DCD      ||.bss.noinit||+0x468
+                  |L3.232|
                           DCD      ||.bss.noinit||
-                  |L4.232|
-0000e8  0d0a2d2d          DCB      "\r\n--------------barrier--------------: \r\n",0
-0000ec  2d2d2d2d
-0000f0  2d2d2d2d
+                  |L3.236|
+                          DCD      0x00030d40
+                  |L3.240|
+0000f0  0d0a2d2d          DCB      "\r\n--------------barrier--------------: \r\n",0
 0000f4  2d2d2d2d
-0000f8  62617272
-0000fc  6965722d
-000100  2d2d2d2d
-000104  2d2d2d2d
+0000f8  2d2d2d2d
+0000fc  2d2d2d2d
+000100  62617272
+000104  6965722d
 000108  2d2d2d2d
-00010c  2d3a200d
-000110  0a00    
-000112  00                DCB      0
-000113  00                DCB      0
-                  |L4.276|
-000114  0d0a3d3d          DCB      "\r\n============== barrier timeout ============: \r\n",0
-000118  3d3d3d3d
-00011c  3d3d3d3d
+00010c  2d2d2d2d
+000110  2d2d2d2d
+000114  2d3a200d
+000118  0a00    
+00011a  00                DCB      0
+00011b  00                DCB      0
+                  |L3.284|
+00011c  0d0a3d3d          DCB      "\r\n============== barrier timeout ============: \r\n",0
 000120  3d3d3d3d
-000124  20626172
-000128  72696572
-00012c  2074696d
-000130  656f7574
-000134  203d3d3d
-000138  3d3d3d3d
-00013c  3d3d3d3d
-000140  3d3a200d
-000144  0a00    
-000146  00                DCB      0
-000147  00                DCB      0
+000124  3d3d3d3d
+000128  3d3d3d3d
+00012c  20626172
+000130  72696572
+000134  2074696d
+000138  656f7574
+00013c  203d3d3d
+000140  3d3d3d3d
+000144  3d3d3d3d
+000148  3d3a200d
+00014c  0a00    
+00014e  00                DCB      0
+00014f  00                DCB      0
+
+                          AREA ||i.vsf_pt_func_user_pt_bmpevt_demo_slave_t||, CODE, READONLY, ALIGN=2
+
+                  vsf_pt_func_user_pt_bmpevt_demo_slave_t PROC
+;;;216    
+;;;217    static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
+000000  b510              PUSH     {r4,lr}
+000002  4604              MOV      r4,r0
+;;;218    {
+;;;219        vsf_pt_begin();
+000004  68c1              LDR      r1,[r0,#0xc]
+000006  7a00              LDRB     r0,[r0,#8]
+000008  3408              ADDS     r4,r4,#8              ;217
+00000a  2800              CMP      r0,#0
+00000c  d004              BEQ      |L4.24|
+00000e  2801              CMP      r0,#1
+000010  d004              BEQ      |L4.28|
+000012  2802              CMP      r0,#2
+000014  d127              BNE      |L4.102|
+000016  e013              B        |L4.64|
+                  |L4.24|
+;;;220        
+;;;221        vsf_pt_wait_until( wait_for_one(this.pgroup_evts, this.mask) );
+000018  2001              MOVS     r0,#1
+00001a  7020              STRB     r0,[r4,#0]
+                  |L4.28|
+00001c  6908              LDR      r0,[r1,#0x10]
+00001e  6008              STR      r0,[r1,#0]
+000020  2000              MOVS     r0,#0
+000022  7108              STRB     r0,[r1,#4]
+000024  2200              MOVS     r2,#0
+000026  43d2              MVNS     r2,r2
+000028  68c8              LDR      r0,[r1,#0xc]
+00002a  f7fffffe          BL       vsf_bmpevt_wait_for
+00002e  2803              CMP      r0,#3
+000030  d001              BEQ      |L4.54|
+000032  2801              CMP      r0,#1
+000034  d119              BNE      |L4.106|
+                  |L4.54|
+;;;222        printf("get timer4_evt in pt slave thread\r\n");
+000036  a00e              ADR      r0,|L4.112|
+000038  f7fffffe          BL       __2printf
+;;;223            
+;;;224        vsf_pt_wait_until( vsf_sem_pend_timeout_ms(&user_sem, 2000) );
+00003c  2002              MOVS     r0,#2
+00003e  7020              STRB     r0,[r4,#0]
+                  |L4.64|
+000040  207d              MOVS     r0,#0x7d
+000042  0100              LSLS     r0,r0,#4
+000044  f7fffffe          BL       vsf_systimer_ms_to_tick
+000048  4601              MOV      r1,r0
+00004a  4812              LDR      r0,|L4.148|
+00004c  f7fffffe          BL       __vsf_sem_pend
+000050  2803              CMP      r0,#3
+000052  d001              BEQ      |L4.88|
+000054  2801              CMP      r0,#1
+000056  d108              BNE      |L4.106|
+                  |L4.88|
+;;;225            on_sem_timeout() {
+000058  f7fffffe          BL       vsf_eda_get_cur_evt
+00005c  2801              CMP      r0,#1
+00005e  d005              BEQ      |L4.108|
+;;;226                printf("get user sem TIMEOUT pt slave thread\r\n");
+;;;227            } else {
+;;;228                printf("get user sem in pt slave thread\r\n");
+000060  a00d              ADR      r0,|L4.152|
+                  |L4.98|
+000062  f7fffffe          BL       __2printf
+                  |L4.102|
+;;;229            }
+;;;230    
+;;;231        vsf_pt_end();
+000066  f7fffffe          BL       vsf_eda_return
+                  |L4.106|
+;;;232    }
+00006a  bd10              POP      {r4,pc}
+                  |L4.108|
+00006c  a013              ADR      r0,|L4.188|
+00006e  e7f8              B        |L4.98|
+;;;233    
+                          ENDP
+
+                  |L4.112|
+000070  67657420          DCB      "get timer4_evt in pt slave thread\r\n",0
+000074  74696d65
+000078  72345f65
+00007c  76742069
+000080  6e207074
+000084  20736c61
+000088  76652074
+00008c  68726561
+000090  640d0a00
+                  |L4.148|
+                          DCD      ||.bss.noinit||+0x5a8
+                  |L4.152|
+000098  67657420          DCB      "get user sem in pt slave thread\r\n",0
+00009c  75736572
+0000a0  2073656d
+0000a4  20696e20
+0000a8  70742073
+0000ac  6c617665
+0000b0  20746872
+0000b4  6561640d
+0000b8  0a00    
+0000ba  00                DCB      0
+0000bb  00                DCB      0
+                  |L4.188|
+0000bc  67657420          DCB      "get user sem TIMEOUT pt slave thread\r\n",0
+0000c0  75736572
+0000c4  2073656d
+0000c8  2054494d
+0000cc  454f5554
+0000d0  20707420
+0000d4  736c6176
+0000d8  65207468
+0000dc  72656164
+0000e0  0d0a00  
+0000e3  00                DCB      0
+
+                          AREA ||i.vsf_pt_func_user_pt_bmpevt_demo_thread_t||, CODE, READONLY, ALIGN=2
+
+                  vsf_pt_func_user_pt_bmpevt_demo_thread_t PROC
+;;;235    
+;;;236    static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
+000000  b570              PUSH     {r4-r6,lr}
+000002  4605              MOV      r5,r0
+;;;237    {
+;;;238        vsf_pt_begin();
+000004  68c4              LDR      r4,[r0,#0xc]
+000006  7a00              LDRB     r0,[r0,#8]
+;;;239    
+;;;240        while (1) {
+;;;241        
+;;;242            this.slave.mask = this.mask;
+;;;243            this.slave.pgroup_evts = this.pgroup_evts;
+;;;244            vsf_call_pt(user_pt_bmpevt_demo_slave_t, &this.slave);
+;;;245        
+;;;246            vsf_pt_wait_until( wait_for_one(this.pgroup_evts, this.mask) );
+;;;247            printf("get timer4_evt in pt master thread\r\n");
+;;;248                
+;;;249            
+;;;250            vsf_pt_wait_until( vsf_sem_pend_timeout_ms(&user_sem, 2000) );
+000008  267d              MOVS     r6,#0x7d
+00000a  3508              ADDS     r5,r5,#8              ;236
+00000c  0136              LSLS     r6,r6,#4
+00000e  0003              MOVS     r3,r0                 ;238
+000010  f7fffffe          BL       __ARM_common_switch8
+000014  06040a14          DCB      0x06,0x04,0x0a,0x14
+000018  1629404e          DCB      0x16,0x29,0x40,0x4e
+                  |L5.28|
+00001c  6920              LDR      r0,[r4,#0x10]         ;242
+00001e  6260              STR      r0,[r4,#0x24]         ;243
+000020  68e0              LDR      r0,[r4,#0xc]          ;243
+000022  6220              STR      r0,[r4,#0x20]         ;244
+000024  2001              MOVS     r0,#1                 ;244
+000026  7028              STRB     r0,[r5,#0]            ;244
+000028  4621              MOV      r1,r4                 ;244
+00002a  3114              ADDS     r1,r1,#0x14           ;244
+00002c  4822              LDR      r0,|L5.184|
+00002e  f7fffffe          BL       vsf_eda_call_eda
+000032  2800              CMP      r0,#0                 ;244
+000034  d101              BNE      |L5.58|
+000036  2002              MOVS     r0,#2                 ;244
+000038  7028              STRB     r0,[r5,#0]            ;244
+                  |L5.58|
+;;;251                on_sem_timeout() {
+;;;252                    printf("get user sem TIMEOUT pt master thread\r\n");
+;;;253                } else {
+;;;254                    printf("get user sem in pt master thread\r\n");
+;;;255                }
+;;;256            
+;;;257            
+;;;258            printf("delay start...\r\n");
+;;;259            vsf_pt_wait_until( vsf_delay_ms(2000) ); 
+;;;260            printf("delay completed...\r\n");
+;;;261                
+;;;262        }
+;;;263    
+;;;264        vsf_pt_end();
+;;;265    }
+00003a  bd70              POP      {r4-r6,pc}
+00003c  2003              MOVS     r0,#3                 ;246
+00003e  7028              STRB     r0,[r5,#0]            ;246
+000040  6920              LDR      r0,[r4,#0x10]         ;246
+000042  6020              STR      r0,[r4,#0]            ;246
+000044  2000              MOVS     r0,#0                 ;246
+000046  7120              STRB     r0,[r4,#4]            ;246
+000048  2200              MOVS     r2,#0                 ;246
+00004a  43d2              MVNS     r2,r2                 ;246
+00004c  4621              MOV      r1,r4                 ;246
+00004e  68e0              LDR      r0,[r4,#0xc]          ;246
+000050  f7fffffe          BL       vsf_bmpevt_wait_for
+000054  2803              CMP      r0,#3                 ;246
+000056  d001              BEQ      |L5.92|
+000058  2801              CMP      r0,#1                 ;246
+00005a  d1ee              BNE      |L5.58|
+                  |L5.92|
+00005c  a017              ADR      r0,|L5.188|
+00005e  f7fffffe          BL       __2printf
+000062  2004              MOVS     r0,#4                 ;250
+000064  7028              STRB     r0,[r5,#0]            ;250
+000066  4630              MOV      r0,r6                 ;250
+000068  f7fffffe          BL       vsf_systimer_ms_to_tick
+00006c  4601              MOV      r1,r0                 ;250
+00006e  481d              LDR      r0,|L5.228|
+000070  f7fffffe          BL       __vsf_sem_pend
+000074  2803              CMP      r0,#3                 ;250
+000076  d001              BEQ      |L5.124|
+000078  2801              CMP      r0,#1                 ;250
+00007a  d1de              BNE      |L5.58|
+                  |L5.124|
+00007c  f7fffffe          BL       vsf_eda_get_cur_evt
+000080  2801              CMP      r0,#1                 ;251
+000082  d013              BEQ      |L5.172|
+000084  a018              ADR      r0,|L5.232|
+                  |L5.134|
+000086  f7fffffe          BL       __2printf
+00008a  a020              ADR      r0,|L5.268|
+00008c  f7fffffe          BL       __2printf
+000090  2005              MOVS     r0,#5                 ;259
+000092  7028              STRB     r0,[r5,#0]            ;259
+000094  4630              MOV      r0,r6                 ;259
+000096  f7fffffe          BL       vsf_systimer_ms_to_tick
+00009a  f7fffffe          BL       __vsf_delay
+00009e  1fc1              SUBS     r1,r0,#7              ;259
+0000a0  39fe              SUBS     r1,r1,#0xfe           ;259
+0000a2  d1ca              BNE      |L5.58|
+0000a4  a01e              ADR      r0,|L5.288|
+0000a6  f7fffffe          BL       __2printf
+0000aa  e7b7              B        |L5.28|
+                  |L5.172|
+0000ac  a022              ADR      r0,|L5.312|
+0000ae  e7ea              B        |L5.134|
+0000b0  f7fffffe          BL       vsf_eda_return
+0000b4  bd70              POP      {r4-r6,pc}
+;;;266    #endif
+                          ENDP
+
+0000b6  0000              DCW      0x0000
+                  |L5.184|
+                          DCD      vsf_pt_func_user_pt_bmpevt_demo_slave_t
+                  |L5.188|
+0000bc  67657420          DCB      "get timer4_evt in pt master thread\r\n",0
+0000c0  74696d65
+0000c4  72345f65
+0000c8  76742069
+0000cc  6e207074
+0000d0  206d6173
+0000d4  74657220
+0000d8  74687265
+0000dc  61640d0a
+0000e0  00      
+0000e1  00                DCB      0
+0000e2  00                DCB      0
+0000e3  00                DCB      0
+                  |L5.228|
+                          DCD      ||.bss.noinit||+0x5a8
+                  |L5.232|
+0000e8  67657420          DCB      "get user sem in pt master thread\r\n",0
+0000ec  75736572
+0000f0  2073656d
+0000f4  20696e20
+0000f8  7074206d
+0000fc  61737465
+000100  72207468
+000104  72656164
+000108  0d0a00  
+00010b  00                DCB      0
+                  |L5.268|
+00010c  64656c61          DCB      "delay start...\r\n",0
+000110  79207374
+000114  6172742e
+000118  2e2e0d0a
+00011c  00      
+00011d  00                DCB      0
+00011e  00                DCB      0
+00011f  00                DCB      0
+                  |L5.288|
+000120  64656c61          DCB      "delay completed...\r\n",0
+000124  7920636f
+000128  6d706c65
+00012c  7465642e
+000130  2e2e0d0a
+000134  00      
+000135  00                DCB      0
+000136  00                DCB      0
+000137  00                DCB      0
+                  |L5.312|
+000138  67657420          DCB      "get user sem TIMEOUT pt master thread\r\n",0
+00013c  75736572
+000140  2073656d
+000144  2054494d
+000148  454f5554
+00014c  20707420
+000150  6d617374
+000154  65722074
+000158  68726561
+00015c  640d0a00
 
                           AREA ||i.vsf_task_func_bmevt_demo_t||, CODE, READONLY, ALIGN=2
 
                   vsf_task_func_bmevt_demo_t PROC
-;;;276    
-;;;277    implement_vsf_task(bmevt_demo_t)
+;;;267    
+;;;268    implement_vsf_task(bmevt_demo_t)
 000000  b510              PUSH     {r4,lr}
-;;;278    {
-;;;279        vsf_task_wait_until(
-000002  2110              MOVS     r1,#0x10
-000004  6041              STR      r1,[r0,#4]
-000006  2100              MOVS     r1,#0
-000008  7201              STRB     r1,[r0,#8]
-00000a  1e4a              SUBS     r2,r1,#1
-00000c  1d01              ADDS     r1,r0,#4
-00000e  4806              LDR      r0,|L5.40|
+;;;269    {
+;;;270        vsf_task_begin();
+;;;271        
+;;;272        vsf_task_wait_until( wait_for_one(&__user_grouped_evts, timer4_evt_msk));
+000002  68c1              LDR      r1,[r0,#0xc]
+000004  2010              MOVS     r0,#0x10
+000006  6008              STR      r0,[r1,#0]
+000008  2000              MOVS     r0,#0
+00000a  7108              STRB     r0,[r1,#4]
+00000c  1e42              SUBS     r2,r0,#1
+00000e  4807              LDR      r0,|L6.44|
 000010  f7fffffe          BL       vsf_bmpevt_wait_for
 000014  2803              CMP      r0,#3
-000016  d001              BEQ      |L5.28|
-000018  2002              MOVS     r0,#2
-;;;280            wait_for_one(&__user_grouped_evts, timer4_evt_msk){
-;;;281                printf("get timer 4 in eda task\r\n");
-;;;282                return fsm_rt_yield;         //! do this again
-;;;283            }
-;;;284        );
-;;;285        
-;;;286        return fsm_rt_wait_for_evt;
-;;;287    }
-00001a  bd10              POP      {r4,pc}
-                  |L5.28|
-00001c  a003              ADR      r0,|L5.44|
-00001e  f7fffffe          BL       __2printf
-000022  2001              MOVS     r0,#1                 ;279
-000024  bd10              POP      {r4,pc}
-;;;288    
+000016  d003              BEQ      |L6.32|
+000018  2801              CMP      r0,#1
+00001a  d001              BEQ      |L6.32|
+00001c  2002              MOVS     r0,#2
+;;;273        printf("get timer 4 in eda task\r\n");
+;;;274    
+;;;275        vsf_task_end();
+;;;276    }
+00001e  bd10              POP      {r4,pc}
+                  |L6.32|
+000020  a003              ADR      r0,|L6.48|
+000022  f7fffffe          BL       __2printf
+000026  2001              MOVS     r0,#1                 ;275
+000028  bd10              POP      {r4,pc}
+;;;277    
                           ENDP
 
-000026  0000              DCW      0x0000
-                  |L5.40|
-                          DCD      ||.bss.noinit||+0x658
-                  |L5.44|
-00002c  67657420          DCB      "get timer 4 in eda task\r\n",0
-000030  74696d65
-000034  72203420
-000038  696e2065
-00003c  64612074
-000040  61736b0d
-000044  0a00    
-000046  00                DCB      0
-000047  00                DCB      0
+00002a  0000              DCW      0x0000
+                  |L6.44|
+                          DCD      ||.bss.noinit||+0x608
+                  |L6.48|
+000030  67657420          DCB      "get timer 4 in eda task\r\n",0
+000034  74696d65
+000038  72203420
+00003c  696e2065
+000040  64612074
+000044  61736b0d
+000048  0a00    
+00004a  00                DCB      0
+00004b  00                DCB      0
 
                           AREA ||i.vsf_task_func_timer_example_t||, CODE, READONLY, ALIGN=2
 
@@ -351,435 +634,119 @@
                           REQUIRE _printf_d
                           REQUIRE _printf_int_dec
                   vsf_task_func_timer_example_t PROC
-;;;141    
-;;;142    static implement_vsf_task(timer_example_t)
+;;;142    
+;;;143    static implement_vsf_task(timer_example_t)
 000000  b570              PUSH     {r4-r6,lr}
-;;;143    {
-000002  460e              MOV      r6,r1
-;;;144    
-;;;145        int index = (timer_example_t *)ptThis - __timer_example;
-000004  490e              LDR      r1,|L6.64|
-000006  1a40              SUBS     r0,r0,r1
-000008  2150              MOVS     r1,#0x50
-00000a  f7fffffe          BL       __aeabi_idivmod
-00000e  4604              MOV      r4,r0
-;;;146        int delay = 2000 * (1 + index);
-000010  1c45              ADDS     r5,r0,#1
-000012  207d              MOVS     r0,#0x7d
-000014  0100              LSLS     r0,r0,#4
-000016  4345              MULS     r5,r0,r5
-000018  3eff              SUBS     r6,r6,#0xff
-00001a  1eb6              SUBS     r6,r6,#2
-;;;147        user_msg_t *pmsg;
-;;;148    
-;;;149    	switch (evt) {
-00001c  d00a              BEQ      |L6.52|
-00001e  2e04              CMP      r6,#4
-000020  d10b              BNE      |L6.58|
-;;;150        case VSF_EVT_TIMER:
-;;;151            printf("%d: timer post\r\n ", index);
-000022  4621              MOV      r1,r4
-000024  a007              ADR      r0,|L6.68|
-000026  f7fffffe          BL       __2printf
-;;;152    #if VSF_CFG_BMPEVT_EN == ENABLED
-;;;153            set_grouped_evts( &__user_grouped_evts,  1 << (index + timer0_evt_idx));
-00002a  2101              MOVS     r1,#1
-00002c  40a1              LSLS     r1,r1,r4
-00002e  480a              LDR      r0,|L6.88|
-000030  f7fffffe          BL       vsf_eda_bmpevt_set
-                  |L6.52|
-;;;154    #endif
-;;;155        case VSF_EVT_INIT:
-;;;156            vsf_teda_set_timer_ms(delay);
-000034  4628              MOV      r0,r5
-000036  f7fffffe          BL       vsf_teda_set_timer_ms
-                  |L6.58|
-;;;157            break;
-;;;158    	}
-;;;159    
-;;;160        return fsm_rt_wait_for_evt;
-00003a  2002              MOVS     r0,#2
-;;;161    }
-00003c  bd70              POP      {r4-r6,pc}
-;;;162    #endif
-                          ENDP
-
-00003e  0000              DCW      0x0000
-                  |L6.64|
-                          DCD      ||.bss.noinit||+0x460
-                  |L6.68|
-000044  25643a20          DCB      "%d: timer post\r\n ",0
-000048  74696d65
-00004c  7220706f
-000050  73740d0a
-000054  2000    
-000056  00                DCB      0
-000057  00                DCB      0
-                  |L6.88|
-                          DCD      ||.bss.noinit||+0x658
-
-                          AREA ||i.vsf_task_func_user_pt_bmpevt_demo_slave_t||, CODE, READONLY, ALIGN=2
-
-                  vsf_task_func_user_pt_bmpevt_demo_slave_t PROC
-;;;212    
-;;;213    static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
-000000  b510              PUSH     {r4,lr}
-;;;214    {
-000002  4604              MOV      r4,r0
-;;;215        vsf_pt_begin();
-000004  7800              LDRB     r0,[r0,#0]
-000006  2800              CMP      r0,#0
-000008  d004              BEQ      |L7.20|
-00000a  2801              CMP      r0,#1
-00000c  d004              BEQ      |L7.24|
-00000e  2802              CMP      r0,#2
-000010  d126              BNE      |L7.96|
-000012  e012              B        |L7.58|
-                  |L7.20|
-;;;216        
-;;;217        vsf_pt_wait_until(
-000014  2001              MOVS     r0,#1
-000016  7020              STRB     r0,[r4,#0]
-                  |L7.24|
-000018  6960              LDR      r0,[r4,#0x14]
-00001a  6060              STR      r0,[r4,#4]
-00001c  2000              MOVS     r0,#0
-00001e  7220              STRB     r0,[r4,#8]
-000020  2200              MOVS     r2,#0
-000022  43d2              MVNS     r2,r2
-000024  1d21              ADDS     r1,r4,#4
-000026  6920              LDR      r0,[r4,#0x10]
-000028  f7fffffe          BL       vsf_bmpevt_wait_for
-00002c  2803              CMP      r0,#3
-00002e  d110              BNE      |L7.82|
-000030  a00c              ADR      r0,|L7.100|
-000032  f7fffffe          BL       __2printf
-;;;218            wait_for_one(this.pgroup_evts, this.mask){
-;;;219                printf("get sem in pt slave thread\r\n");
-;;;220            } 
-;;;221        );
-;;;222    
-;;;223        vsf_pt_wait_until(
+000002  68c0              LDR      r0,[r0,#0xc]
+;;;144    {
+;;;145        vsf_task_begin();
+;;;146        
+;;;147        int index = (timer_example_t *)ptThis - __timer_example;
+000004  4a0d              LDR      r2,|L7.60|
+;;;148        int delay = 2000 * (1 + index);
+000006  39ff              SUBS     r1,r1,#0xff
+000008  1a80              SUBS     r0,r0,r2              ;147
+00000a  1184              ASRS     r4,r0,#6              ;147
+00000c  227d              MOVS     r2,#0x7d
+00000e  1c60              ADDS     r0,r4,#1
+000010  0112              LSLS     r2,r2,#4
+000012  4350              MULS     r0,r2,r0
+000014  4605              MOV      r5,r0
+000016  1e89              SUBS     r1,r1,#2
+000018  d00a              BEQ      |L7.48|
+;;;149        user_msg_t *pmsg;
+;;;150    
+;;;151    	switch (evt) {
+00001a  2904              CMP      r1,#4
+00001c  d10b              BNE      |L7.54|
+;;;152        case VSF_EVT_TIMER:
+;;;153            printf("%d: timer post\r\n ", index);
+00001e  4621              MOV      r1,r4
+000020  a007              ADR      r0,|L7.64|
+000022  f7fffffe          BL       __2printf
+;;;154    #if VSF_CFG_BMPEVT_EN == ENABLED
+;;;155            set_grouped_evts( &__user_grouped_evts,  1 << (index + timer0_evt_idx));
+000026  2101              MOVS     r1,#1
+000028  40a1              LSLS     r1,r1,r4
+00002a  480a              LDR      r0,|L7.84|
+00002c  f7fffffe          BL       vsf_eda_bmpevt_set
+                  |L7.48|
+;;;156    #endif
+;;;157        case VSF_EVT_INIT:
+;;;158            vsf_teda_set_timer_ms(delay);
+000030  4628              MOV      r0,r5
+000032  f7fffffe          BL       vsf_teda_set_timer_ms
+                  |L7.54|
+;;;159            break;
+;;;160    	}
+;;;161        
+;;;162        return fsm_rt_wait_for_evt;
 000036  2002              MOVS     r0,#2
-000038  7020              STRB     r0,[r4,#0]
-                  |L7.58|
-00003a  207d              MOVS     r0,#0x7d
-00003c  0100              LSLS     r0,r0,#4
-00003e  f7fffffe          BL       vsf_systimer_ms_to_tick
-000042  4601              MOV      r1,r0
-000044  480f              LDR      r0,|L7.132|
-000046  f7fffffe          BL       __vsf_sem_pend
-00004a  2803              CMP      r0,#3
-00004c  d003              BEQ      |L7.86|
-00004e  2801              CMP      r0,#1
-000050  d003              BEQ      |L7.90|
-                  |L7.82|
-000052  2002              MOVS     r0,#2
-;;;224            vsf_sem_pend_timeout_ms(&user_sem, 2000){
-;;;225                printf("get user sem in pt slave thread\r\n");
-;;;226            }
-;;;227            on_sem_timeout() {
-;;;228                printf("get user sem TIMEOUT pt slave thread\r\n");
-;;;229            }
-;;;230        );
-;;;231    
-;;;232        vsf_pt_end();
-;;;233    }
-000054  bd10              POP      {r4,pc}
-                  |L7.86|
-000056  a00c              ADR      r0,|L7.136|
-000058  e000              B        |L7.92|
-                  |L7.90|
-00005a  a014              ADR      r0,|L7.172|
-                  |L7.92|
-00005c  f7fffffe          BL       __2printf
-                  |L7.96|
-000060  2000              MOVS     r0,#0                 ;232
-000062  bd10              POP      {r4,pc}
-;;;234    
+;;;163        
+;;;164        vsf_task_end();
+;;;165    }
+000038  bd70              POP      {r4-r6,pc}
+;;;166    #endif
                           ENDP
 
-                  |L7.100|
-000064  67657420          DCB      "get sem in pt slave thread\r\n",0
-000068  73656d20
-00006c  696e2070
-000070  7420736c
-000074  61766520
-000078  74687265
-00007c  61640d0a
-000080  00      
-000081  00                DCB      0
-000082  00                DCB      0
-000083  00                DCB      0
-                  |L7.132|
-                          DCD      ||.bss.noinit||+0x5f0
-                  |L7.136|
-000088  67657420          DCB      "get user sem in pt slave thread\r\n",0
-00008c  75736572
-000090  2073656d
-000094  20696e20
-000098  70742073
-00009c  6c617665
-0000a0  20746872
-0000a4  6561640d
-0000a8  0a00    
-0000aa  00                DCB      0
-0000ab  00                DCB      0
-                  |L7.172|
-0000ac  67657420          DCB      "get user sem TIMEOUT pt slave thread\r\n",0
-0000b0  75736572
-0000b4  2073656d
-0000b8  2054494d
-0000bc  454f5554
-0000c0  20707420
-0000c4  736c6176
-0000c8  65207468
-0000cc  72656164
-0000d0  0d0a00  
-0000d3  00                DCB      0
-
-                          AREA ||i.vsf_task_func_user_pt_bmpevt_demo_thread_t||, CODE, READONLY, ALIGN=2
-
-                  vsf_task_func_user_pt_bmpevt_demo_thread_t PROC
-;;;236    
-;;;237    static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
-000000  b570              PUSH     {r4-r6,lr}
-;;;238    {
-000002  4604              MOV      r4,r0
-;;;239        vsf_pt_begin();
-000004  7800              LDRB     r0,[r0,#0]
-;;;240    
-;;;241        while (1) {
-;;;242        
-;;;243            this.slave.mask = this.mask;
-;;;244            this.slave.pgroup_evts = this.pgroup_evts;
-;;;245            vsf_pt_call(user_pt_bmpevt_demo_slave_t, &this.slave);
-;;;246                vsf_pt_on_call_return(fsm_rt_err) {
-;;;247                    printf("error detected\r\n");
-;;;248                }
-;;;249        
-;;;250            vsf_pt_wait_until(
-;;;251                wait_for_one(this.pgroup_evts, this.mask){
-;;;252                    printf("get sem in pt master thread\r\n");
-;;;253                }
-;;;254            );
-;;;255            
-;;;256            vsf_pt_wait_until(
-000006  267d              MOVS     r6,#0x7d
-000008  2500              MOVS     r5,#0                 ;239
-00000a  0136              LSLS     r6,r6,#4
-00000c  0003              MOVS     r3,r0                 ;239
-00000e  f7fffffe          BL       __ARM_common_switch8
-000012  0504              DCB      0x05,0x04
-000014  0b1c2c42          DCB      0x0b,0x1c,0x2c,0x42
-000018  5000              DCB      0x50,0x00
-                  |L8.26|
-00001a  6960              LDR      r0,[r4,#0x14]         ;243
-00001c  62e0              STR      r0,[r4,#0x2c]         ;244
-00001e  6920              LDR      r0,[r4,#0x10]         ;244
-000020  62a0              STR      r0,[r4,#0x28]         ;245
-000022  7625              STRB     r5,[r4,#0x18]         ;245
-000024  2001              MOVS     r0,#1                 ;245
-000026  7020              STRB     r0,[r4,#0]            ;245
-000028  4621              MOV      r1,r4                 ;245
-00002a  2201              MOVS     r2,#1                 ;245
-00002c  3118              ADDS     r1,r1,#0x18           ;245
-00002e  4822              LDR      r0,|L8.184|
-000030  f7fffffe          BL       vsf_task_branch
-000034  2801              CMP      r0,#1                 ;245
-000036  d037              BEQ      |L8.168|
-000038  2800              CMP      r0,#0                 ;245
-00003a  d004              BEQ      |L8.70|
-00003c  1c40              ADDS     r0,r0,#1              ;245
-00003e  d102              BNE      |L8.70|
-000040  a01e              ADR      r0,|L8.188|
-000042  f7fffffe          BL       __2printf
-                  |L8.70|
-000046  2002              MOVS     r0,#2                 ;250
-000048  7020              STRB     r0,[r4,#0]            ;250
-00004a  6960              LDR      r0,[r4,#0x14]         ;250
-00004c  6060              STR      r0,[r4,#4]            ;250
-00004e  7225              STRB     r5,[r4,#8]            ;250
-000050  2200              MOVS     r2,#0                 ;250
-000052  43d2              MVNS     r2,r2                 ;250
-000054  1d21              ADDS     r1,r4,#4              ;250
-000056  6920              LDR      r0,[r4,#0x10]         ;250
-000058  f7fffffe          BL       vsf_bmpevt_wait_for
-00005c  2803              CMP      r0,#3                 ;250
-00005e  d122              BNE      |L8.166|
-000060  a01b              ADR      r0,|L8.208|
-000062  f7fffffe          BL       __2printf
-000066  2003              MOVS     r0,#3
-000068  7020              STRB     r0,[r4,#0]
-00006a  4630              MOV      r0,r6
-00006c  f7fffffe          BL       vsf_systimer_ms_to_tick
-000070  4601              MOV      r1,r0
-000072  481f              LDR      r0,|L8.240|
-000074  f7fffffe          BL       __vsf_sem_pend
-000078  2803              CMP      r0,#3
-00007a  d002              BEQ      |L8.130|
-00007c  2801              CMP      r0,#1
-00007e  d002              BEQ      |L8.134|
-000080  e011              B        |L8.166|
-                  |L8.130|
-000082  a01c              ADR      r0,|L8.244|
-000084  e000              B        |L8.136|
-                  |L8.134|
-000086  a024              ADR      r0,|L8.280|
-                  |L8.136|
-000088  f7fffffe          BL       __2printf
-;;;257                vsf_sem_pend_timeout_ms(&user_sem, 2000){
-;;;258                    printf("get user sem in pt master thread\r\n");
-;;;259                }
-;;;260                on_sem_timeout() {
-;;;261                    printf("get user sem TIMEOUT pt master thread\r\n");
-;;;262                }
-;;;263            );
-;;;264            
-;;;265            printf("delay start...\r\n");
-00008c  a02c              ADR      r0,|L8.320|
-00008e  f7fffffe          BL       __2printf
-;;;266            vsf_pt_wait_until(
-000092  2004              MOVS     r0,#4
-000094  7020              STRB     r0,[r4,#0]
-000096  4630              MOV      r0,r6
-000098  f7fffffe          BL       vsf_systimer_ms_to_tick
-00009c  f7fffffe          BL       __vsf_delay
-0000a0  1fc1              SUBS     r1,r0,#7
-0000a2  39fe              SUBS     r1,r1,#0xfe
-0000a4  d001              BEQ      |L8.170|
-                  |L8.166|
-0000a6  2002              MOVS     r0,#2
-                  |L8.168|
-;;;267                vsf_delay_ms(2000) {
-;;;268                    printf("delay completed...\r\n");
-;;;269                }
-;;;270            );
-;;;271        }
-;;;272    
-;;;273        vsf_pt_end();
-;;;274    }
-0000a8  bd70              POP      {r4-r6,pc}
-                  |L8.170|
-0000aa  a02a              ADR      r0,|L8.340|
-0000ac  f7fffffe          BL       __2printf
-0000b0  e7b3              B        |L8.26|
-0000b2  2000              MOVS     r0,#0                 ;273
-0000b4  bd70              POP      {r4-r6,pc}
-;;;275    #endif
-                          ENDP
-
-0000b6  0000              DCW      0x0000
-                  |L8.184|
-                          DCD      vsf_task_func_user_pt_bmpevt_demo_slave_t
-                  |L8.188|
-0000bc  6572726f          DCB      "error detected\r\n",0
-0000c0  72206465
-0000c4  74656374
-0000c8  65640d0a
-0000cc  00      
-0000cd  00                DCB      0
-0000ce  00                DCB      0
-0000cf  00                DCB      0
-                  |L8.208|
-0000d0  67657420          DCB      "get sem in pt master thread\r\n",0
-0000d4  73656d20
-0000d8  696e2070
-0000dc  74206d61
-0000e0  73746572
-0000e4  20746872
-0000e8  6561640d
-0000ec  0a00    
-0000ee  00                DCB      0
-0000ef  00                DCB      0
-                  |L8.240|
-                          DCD      ||.bss.noinit||+0x5f0
-                  |L8.244|
-0000f4  67657420          DCB      "get user sem in pt master thread\r\n",0
-0000f8  75736572
-0000fc  2073656d
-000100  20696e20
-000104  7074206d
-000108  61737465
-00010c  72207468
-000110  72656164
-000114  0d0a00  
-000117  00                DCB      0
-                  |L8.280|
-000118  67657420          DCB      "get user sem TIMEOUT pt master thread\r\n",0
-00011c  75736572
-000120  2073656d
-000124  2054494d
-000128  454f5554
-00012c  20707420
-000130  6d617374
-000134  65722074
-000138  68726561
-00013c  640d0a00
-                  |L8.320|
-000140  64656c61          DCB      "delay start...\r\n",0
-000144  79207374
-000148  6172742e
-00014c  2e2e0d0a
-000150  00      
-000151  00                DCB      0
-000152  00                DCB      0
-000153  00                DCB      0
-                  |L8.340|
-000154  64656c61          DCB      "delay completed...\r\n",0
-000158  7920636f
-00015c  6d706c65
-000160  7465642e
-000164  2e2e0d0a
-000168  00      
-000169  00                DCB      0
-00016a  00                DCB      0
-00016b  00                DCB      0
+00003a  0000              DCW      0x0000
+                  |L7.60|
+                          DCD      ||.bss.noinit||+0x468
+                  |L7.64|
+000040  25643a20          DCB      "%d: timer post\r\n ",0
+000044  74696d65
+000048  7220706f
+00004c  73740d0a
+000050  2000    
+000052  00                DCB      0
+000053  00                DCB      0
+                  |L7.84|
+                          DCD      ||.bss.noinit||+0x608
 
                           AREA ||i.vsf_thread_user_task_t_entry||, CODE, READONLY, ALIGN=2
 
                   vsf_thread_user_task_t_entry PROC
-;;;182    #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
-;;;183    implement_vsf_thread(user_task_t) 
+;;;186    #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+;;;187    implement_vsf_thread(user_task_t) 
 000000  257d              MOVS     r5,#0x7d
-;;;184    {
+;;;188    {
 000002  4604              MOV      r4,r0
-;;;185    
-;;;186        /*! you can define your own code region and use them */
-;;;187        static const code_region_t user_region = {
-;;;188            NULL,
-;;;189            (i_code_region_t *)&__example_code_region,
-;;;190        };
-;;;191    /*
-;;;192        code_region(&user_region){
-;;;193            printf("\tbody\r\n");
-;;;194        }
-;;;195    */
-;;;196        while (1) {
-;;;197    #if VSF_CFG_TIMER_EN
-;;;198            vsf_delay_ms(1000);
+;;;189    
+;;;190        /*! you can define your own code region and use them */
+;;;191        static const code_region_t user_region = {
+;;;192            NULL,
+;;;193            (i_code_region_t *)&__example_code_region,
+;;;194        };
+;;;195    /*
+;;;196        code_region(&user_region){
+;;;197            printf("\tbody\r\n");
+;;;198        }
+;;;199    */
+;;;200        while (1) {
+;;;201    #if VSF_CFG_TIMER_EN
+;;;202            vsf_delay_ms(1000);
 000004  00ed              LSLS     r5,r5,#3
-                  |L9.6|
+                  |L8.6|
 000006  4628              MOV      r0,r5
 000008  f7fffffe          BL       vsf_systimer_ms_to_tick
 00000c  f7fffffe          BL       __vsf_delay
-;;;199    #endif
-;;;200            printf("user_thread post user sem:\r\n");
-000010  a003              ADR      r0,|L9.32|
-000012  f7fffffe          BL       __2printf
-;;;201    #if VSF_CFG_SYNC_EN
-;;;202            vsf_sem_post(this.psem);
-000016  6de0              LDR      r0,[r4,#0x5c]
-000018  f7fffffe          BL       vsf_eda_sync_increase
-00001c  e7f3              B        |L9.6|
 ;;;203    #endif
-;;;204        }
-;;;205    }
-;;;206    #endif
+;;;204            printf("user_thread post user sem:\r\n");
+000010  a003              ADR      r0,|L8.32|
+000012  f7fffffe          BL       __2printf
+;;;205    #if VSF_CFG_SYNC_EN
+;;;206            vsf_sem_post(this.psem);
+000016  6e60              LDR      r0,[r4,#0x64]
+000018  f7fffffe          BL       vsf_eda_sync_increase
+00001c  e7f3              B        |L8.6|
+;;;207    #endif
+;;;208        }
+;;;209    }
+;;;210    #endif
                           ENDP
 
 00001e  0000              DCW      0x0000
-                  |L9.32|
+                  |L8.32|
 000020  75736572          DCB      "user_thread post user sem:\r\n",0
 000024  5f746872
 000028  65616420
@@ -795,23 +762,25 @@
                           AREA ||i.vsf_thread_user_task_t_start||, CODE, READONLY, ALIGN=2
 
                   vsf_thread_user_task_t_start PROC
-;;;182    #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
-;;;183    implement_vsf_thread(user_task_t) 
+;;;186    #if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+;;;187    implement_vsf_thread(user_task_t) 
 000000  b510              PUSH     {r4,lr}
 000002  2301              MOVS     r3,#1
 000004  4602              MOV      r2,r0
 000006  029b              LSLS     r3,r3,#10
 000008  18c0              ADDS     r0,r0,r3
-00000a  4c03              LDR      r4,|L10.24|
-00000c  6384              STR      r4,[r0,#0x38]
-00000e  6402              STR      r2,[r0,#0x40]
-000010  8783              STRH     r3,[r0,#0x3c]
-000012  f7fffffe          BL       vsf_thread_start
-000016  bd10              POP      {r4,pc}
-;;;184    {
+00000a  4c04              LDR      r4,|L9.28|
+00000c  6404              STR      r4,[r0,#0x40]
+00000e  6482              STR      r2,[r0,#0x48]
+000010  2244              MOVS     r2,#0x44
+000012  5213              STRH     r3,[r2,r0]
+000014  f7fffffe          BL       vsf_thread_start
+000018  bd10              POP      {r4,pc}
+;;;188    {
                           ENDP
 
-                  |L10.24|
+00001a  0000              DCW      0x0000
+                  |L9.28|
                           DCD      vsf_thread_user_task_t_entry
 
                           AREA ||.bss||, DATA, NOINIT, ALIGN=2
@@ -822,13 +791,13 @@
                           AREA ||.bss.noinit||, DATA, NOINIT, ALIGN=3
 
                   __user_task
-                          %        1120
+                          %        1128
                   __timer_example
-                          %        400
+                          %        320
                   user_sem
                           %        16
                   __bmevt_demo
-                          %        88
+                          %        80
                   __user_grouped_evts
                           %        28
 
@@ -839,21 +808,21 @@
                           DCD      __code_region_example_on_enter
                           DCD      __code_region_example_on_leave
 
-                          AREA ||area_number.16||, DATA, READONLY, ALIGN=2
+                          AREA ||area_number.15||, DATA, READONLY, ALIGN=2
 
-                          EXPORTAS ||area_number.16||, ||.constdata||
+                          EXPORTAS ||area_number.15||, ||.constdata||
                           DCD      vsf_task_func_bmevt_demo_t
                           DCD      0x00000000
-                          DCD      0x00000000
-                          DCD      0x00000000
-                          DCD      vsf_task_func_user_pt_bmpevt_demo_thread_t
+                          DCD      __bmevt_demo+0x40
+00000c  01000000          DCB      0x01,0x00,0x00,0x00
+                          DCD      vsf_pt_func_user_pt_bmpevt_demo_thread_t
                           DCD      0xffffffff
-                          DCD      0x00000000
-                          DCD      0x00000000
+                          DCD      __pt_demo+0x40
+00001c  00000000          DCB      0x00,0x00,0x00,0x00
                           DCD      vsf_task_func_timer_example_t
                           DCD      0x00000000
                           DCD      0x00000000
-                          DCD      0x00000000
+00002c  01000000          DCB      0x01,0x00,0x00,0x00
 
                           AREA ||.data||, DATA, ALIGN=2
 
@@ -861,12 +830,12 @@
                           DCD      vsf_eda_bmpevt_adapter_sync_op
                           DCD      0x00000020
                           DCD      0x00000000
-                          %        36
+                          %        44
                           DCD      user_sem
 
-                          AREA ||area_number.18||, DATA, ALIGN=3
+                          AREA ||area_number.17||, DATA, ALIGN=3
 
-                          EXPORTAS ||area_number.18||, ||.data||
+                          EXPORTAS ||area_number.17||, ||.data||
                   __adapters_of_user_grouped_evts_t
                           DCD      ||<Data1>||
                   ptThis
@@ -874,17 +843,15 @@
                   __pt_demo
                           DCD      0x00000000
                           DCD      0x00000000
-                          %        28
+                          %        36
                           DCD      0x00000000
-                          %        28
+                          %        16
                           DCD      0x00000000
-000050  00000000          DCB      0x00,0x00,0x00,0x00
-                          DCD      0x00000000
-000058  00000000          DCB      0x00,0x00,0x00,0x00
+00004c  00000000          DCB      0x00,0x00,0x00,0x00
                           DCD      0x00000000
                           DCD      __user_grouped_evts
                           DCD      0x00000010
-                          %        24
+                          %        20
 
                           AREA ||i.__ARM_common_switch8||, COMGROUP=__ARM_common_switch8, CODE, READONLY, ALIGN=1
 
@@ -895,9 +862,9 @@
 000006  7825              LDRB     r5,[r4,#0]
 000008  1c64              ADDS     r4,r4,#1
 00000a  42ab              CMP      r3,r5
-00000c  d200              BCS      |L67.16|
+00000c  d200              BCS      |L61.16|
 00000e  461d              MOV      r5,r3
-                  |L67.16|
+                  |L61.16|
 000010  5d63              LDRB     r3,[r4,r5]
 000012  005b              LSLS     r3,r3,#1
 000014  18e3              ADDS     r3,r4,r3

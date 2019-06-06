@@ -26,6 +26,9 @@
 
 
 /*============================ MACROS ========================================*/
+#undef  this
+#define this    (*ptThis)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -378,6 +381,7 @@ void vsf_pbuf_pool_item_init_event_handler( void *ptTarget,
                                             void *pbuf, 
                                             uint_fast32_t nSize)
 {
+    ASSERT(NULL != ptTarget);
     vsf_pbuf_cfg_t cfg = {
         NULL,                   //!< use the rest memory of the block as buffer
         nSize,                   //!< total block nSize

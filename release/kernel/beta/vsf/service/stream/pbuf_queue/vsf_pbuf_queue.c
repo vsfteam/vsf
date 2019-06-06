@@ -24,6 +24,9 @@
 
 
 /*============================ MACROS ========================================*/
+#undef  this
+#define this    (*ptThis)
+
 #ifndef VSF_PBUF_QUEUE_CFG_RAISE_DAVL_EVT_ONCE 
 #   if  VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
 #       define VSF_PBUF_QUEUE_CFG_RAISE_DAVL_EVT_ONCE   ENABLED

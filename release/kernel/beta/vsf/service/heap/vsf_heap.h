@@ -22,7 +22,11 @@
 #include "service/vsf_service_cfg.h"
 
 /*============================ MACROS ========================================*/
+#ifndef VSF_USE_HEAP
+#   define VSF_USE_HEAP     ENABLED     //!< enable vsf_heap_t by default
+#endif
 
+#if VSF_USE_HEAP == ENABLED
 #if 0
 /*! \brief free a target memory which belongs to a bigger memory chunk previouly 
  *!        allocated from the heap
@@ -42,10 +46,11 @@
 def_interface(i_heap_t)
     void (*Init)            (void);
     void (*Add)             (uint8_t *heap, uint_fast32_t size);
+    void (*AddMemory)       (vsf_mem_t mem);
     void *(*MallocAligned)  (uint_fast32_t size, uint_fast32_t alignment);
     void *(*Malloc)         (uint_fast32_t size);
     void (*Free)            (void *buffer);
-end_def_interface(i_pool_t)
+end_def_interface(i_heap_t)
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -56,6 +61,7 @@ extern const i_heap_t VSF_HEAP;
 
 extern void vsf_heap_init(void);
 extern void vsf_heap_add(uint8_t *heap, uint_fast32_t size);
+extern void vsf_heap_add_memory(vsf_mem_t mem);
 extern void *vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
 extern void *vsf_heap_malloc(uint_fast32_t size);
 extern void vsf_heap_free(void *buffer);
@@ -71,4 +77,5 @@ extern bool vsf_heap_partial_free(  void *buffer,
                                     uint_fast32_t pos, 
                                     uint_fast32_t size);
 
+#endif
 #endif

@@ -39,12 +39,22 @@ VSF_SERVICE_CFG_INSERTION
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+//! user must implement this interface
+extern vsf_mem_t vsf_service_req___heap_memory_buffer__from_usr(void);
+
 /*============================ IMPLEMENTATION ================================*/
 
 WEAK void vsf_service_init(void)
 {
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_HEAP == ENABLED
+    vsf_heap_init();
+    vsf_heap_add_memory(vsf_service_req___heap_memory_buffer__from_usr());
+#endif
 
+#if VSF_USE_PBUF == ENABLED && (                                                \
+            VSF_STREAM_CFG_GENERAL_PBUF_POOL == ENABLED                         \
+        ||  defined(VSF_PBUF_ADAPTERS))
 
 #   ifndef VSF_PBUF_ADAPTERS
 #       define VSF_PBUF_ADAPTERS
@@ -61,7 +71,9 @@ WEAK void vsf_service_init(void)
 
         vsf_adapter_register(c_tpbufAdapters, UBOUND(c_tpbufAdapters));
     } while(0);
+#endif
 
+#if VSF_USE_SERVICE_STREAM == ENABLED
     //! initialise pbuf pool
     vsf_service_stream_init();
 #endif

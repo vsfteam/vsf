@@ -20,6 +20,7 @@
 #include "service/vsf_service_cfg.h"
 
 #if VSF_USE_TRACE == ENABLED
+#include "hal/vsf_hal.h"
 
 //! todo: remove this dependency
 #include "kernel/vsf_os.h"
@@ -93,8 +94,12 @@ static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
     return ret;
 }
 
-void vsf_trace_init(vsf_stream_t *stream)
+void __vsf_trace_init(vsf_stream_t *stream)
 {
+    if (NULL == stream) {
+        stream = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX;
+    }
+
     __vsf_trace.stream = stream;
     if (stream) {
         vsf_stream_connect_tx(stream);
@@ -123,9 +128,13 @@ static void vsf_trace_arg(const char *format, va_list *arg)
 }
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED
-void vsf_trace_init(vsf_stream_tx_t *ptTX)
+void __vsf_trace_init(vsf_stream_tx_t *ptTX)
 {
-    ASSERT(NULL != ptTX);
+    if (NULL == ptTX) {
+        ptTX = (vsf_stream_tx_t *)&VSF_DEBUG_STREAM_TX;
+    } 
+
+    //ASSERT(NULL != ptTX);
     
     //! initialise stream source
     do {
@@ -225,7 +234,7 @@ void vsf_trace_buffer(  vsf_trace_level_t level,
 
     vsf_trace_set_level(level);
     if (len > 0) {
-        const char map[16] = "0123456789ABCDEF";
+        static const char map[16] = "0123456789ABCDEF";
         // line format 16 data max:
         //    XXXXXXXX: XXXXXXXX XXXXXXXX ....  | CHAR.....\r\n\0
         //              9 * 16                 3   4 * 16   3

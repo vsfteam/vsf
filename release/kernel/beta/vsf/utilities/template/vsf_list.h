@@ -90,22 +90,20 @@
                                 ...)          /* how to find insert point */    \
     do {                                                                        \
         vsf_slist_init_node(__host_type, __member, __pitem);                    \
-        vsf_slist_node_t *node_item = (vsf_slist_node_t *)(__plist);            \
-        for (; node_item->next != NULL;){                                       \
-            __host_type *_ = (__host_type *)(node_item->next);                  \
-            /* ptarget might be modified by user, so save a copy */             \
-            __host_type *node_tmp = ptarget;                                    \
+        vsf_slist_node_t *__ = (vsf_slist_node_t *)(__plist);                   \
+        for (; __->next != NULL;){                                              \
+            const __host_type * const _ = (__host_type *)(__->next);            \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
             if (__VA_ARGS__) {                                                  \
                 __vsf_slist_insert_next(                                        \
-                    __host_type, __member, node_item, (__pitem));               \
+                    __host_type, __member, __, (__pitem));                      \
                 break;                                                          \
             }                                                                   \
-            node_item = &(node_tmp->__member);                                  \
+            __ = (vsf_slist_node_t *)&(_->__member);                            \
         }                                                                       \
-        if (NULL == node_item->next) {                                          \
+        if (NULL == __->next) {                                                 \
             __vsf_slist_insert_next(                                            \
-                    __host_type, __member, node_item, (__pitem));               \
+                    __host_type, __member, __, (__pitem));                      \
             break;                                                              \
         }                                                                       \
     } while (0)
@@ -305,19 +303,19 @@
                                 ...)          /* how to find insert point */    \
     do {                                                                        \
         vsf_dlist_init_node(__host_type, __member, __pitem);                    \
-        vsf_dlist_node_t *node_item = (vsf_dlist_node_t *)(__plist);            \
-        for (; node_item->next != NULL;){                                       \
-            __host_type *ptarget =                                              \
-                __vsf_dlist_get_host(__host_type, __member, node_item->next);   \
+        vsf_dlist_node_t *__ = (vsf_dlist_node_t *)(__plist);                   \
+        for (; __->next != NULL;){                                              \
+            const __host_type * const _ =                                       \
+                __vsf_dlist_get_host(__host_type, __member, __->next);          \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
             if (__VA_ARGS__) {                                                  \
                 __vsf_dlist_insert_before_imp(                                  \
-                    (__plist), node_item->next, &((__pitem)->__member));        \
+                    (__plist), __->next, &((__pitem)->__member));               \
                 break;                                                          \
             }                                                                   \
-            node_item = node_item->next;                                        \
+            __ = __->next;                                                      \
         }                                                                       \
-        if (NULL == node_item->next) {                                          \
+        if (NULL == __->next) {                                                 \
             __vsf_dlist_add_to_tail(                                            \
                     __host_type, __member, __plist, (__pitem));                 \
         }                                                                       \

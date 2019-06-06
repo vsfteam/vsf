@@ -108,10 +108,11 @@
             this.pender.operator = VSF_BMPEVT_AND;                              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
-                if ((reason = vsf_bmpevt_wait_for(  (__group),                  \
-                                                    (vsf_bmpevt_pender_t *)     \
-                                                    &this.pender, (__timeout)), \
-                                                    reason == VSF_SYNC_GET))
+                if ((reason = vsf_bmpevt_wait_for(                              \
+                    (__group),                                                  \
+                    (vsf_bmpevt_pender_t *)                                     \
+                    &this.pender, (__timeout)),                                 \
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 #   define wait_for_all_timeout_ms(__group, __msk, __timeout)                   \
             wait_for_all_timeout(   __group,                                    \
@@ -131,10 +132,11 @@
             this.pender.operator = VSF_BMPEVT_OR;                               \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
-                if ((reason = vsf_bmpevt_wait_for(  (__group),                  \
-                                                    (vsf_bmpevt_pender_t *)     \
-                                                    &this.pender, (__timeout)), \
-                                                    reason == VSF_SYNC_GET))
+                if ((reason = vsf_bmpevt_wait_for(                              \
+                    (__group),                                                  \
+                    (vsf_bmpevt_pender_t *)                                     \
+                    &this.pender, (__timeout)),                                 \
+                    (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 
 #   define wait_for_any_timeout_ms(__group, __msk, __timeout)                   \
             wait_for_any_timeout(   __group,                                    \
@@ -150,7 +152,7 @@
             wait_for_any_timeout( __group, (__msk), -1)
 
 #   define on_bmevt_timeout()                                                   \
-                else if (VSF_SYNC_TIMEOUT == reason)
+                if (VSF_SYNC_TIMEOUT == vsf_eda_get_cur_evt())
                         
 #   define wait_for_one(__group, __msk)                                         \
             wait_for_any((__group), (__msk))

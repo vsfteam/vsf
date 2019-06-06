@@ -74,6 +74,10 @@ If you have any questions or suggestions, please feel free to let us know.
 ### Update Log
 ---
 
+- \[05/30/2019\] Minor Update, version 4.12
+    - remove "this", "target" and "base" to prevent naming pollution.
+    - remove PLOOC_ALIGN from top-level class definition to prevent inconsistent compiler interpretation towards this alignment decroration. 
+
 - \[05/02/2019\] Efficiency improve, version 4.11
     - Use \_\_alignof\_\_ to improve the code efficiency when dealing with masked structure
     - Use PLOOC_INVISIABLE and PLOOC_VISIBLE in both simple and strict version

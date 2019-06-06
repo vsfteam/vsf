@@ -26,6 +26,14 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED && VSF_USE_HEAP != ENABLED
+#   warning [DEPENDENCY WARNING]\
+The Feature VSF_POOL_CFG_FEED_ON_HEAP is enabled but VSF_USE_HEAP is disabled.\
+The VSF_USE_HEAP will be forced to ENABLED here to provide required services
+#   undef VSF_USE_HEAP
+#   define VSF_USE_HEAP     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -229,13 +229,6 @@ WEAK void vsf_drv_swi_trigger(uint_fast8_t idx) {}
 vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
         vsf_swi_hanler_t *handler, void *pparam)
 {
-
-    volatile uint32_t *shpr = (volatile uint32_t *)
-                                                #if __CORTEX_M == 7
-                                                    SCB->SHPR;
-                                                #else
-                                                    SCB->SHP;
-                                                #endif
     if (0 == idx) {
         __vsf_cm.pendsv.handler = handler;
         __vsf_cm.pendsv.pparam = pparam;
@@ -243,10 +236,7 @@ vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
         __vsf_cm.pendsv.enabled = true;
         __vsf_cm.pendsv.sw_pending_bit = 0;
 #endif
-        //shpr[10] = priority;
-        uint32_t temp = shpr[3];
-        ((uint8_t *)&temp)[2] = priority; 
-        shpr[3] = temp;
+        NVIC_SetPriority(PendSV_IRQn, priority);
         return VSF_ERR_NONE;
     } else {
         return vsf_drv_swi_init(idx - 1, priority, handler, pparam);

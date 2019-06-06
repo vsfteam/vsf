@@ -90,7 +90,7 @@ implement_vsf_thread(user_thread_b_t)
     uint32_t cnt = 0;
     while (1) {
         vsf_sem_pend(this.psem);            //! wait for semaphore forever
-        printf("receive semaphore...[%08x]\r\n", cnt++);
+        printf("receive semaphore...  [%08x]\r\n", cnt++);
     }
 }
 

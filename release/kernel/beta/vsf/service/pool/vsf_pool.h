@@ -46,7 +46,22 @@
 
         // 5. Initialization user pool with size, attached object and code region .
         //    the attached object and code region can be omitted.
-        VSF_POOL_INIT(xxxx_pool, &__xxxx_pool, 8);
+
+        //    VSF_POOL_INIT(xxxx_pool, &__xxxx_pool, 8);
+
+        //    if you haven't decided the number of item inside the pool, you can
+        //    replies on the so-called "feed-on-heap" feature.
+
+        //    VSF_POOL_PREPARE(xxxx_pool, &__xxxx_pool);
+
+        //    you just need to use either one of these two APIs mentioned above.
+        //    A tyipcal code example taking advantage of those two APIs is:
+
+    #ifndef XXXX_POOL_ITEM_NUM
+        VSF_POOL_PREPARE(xxxx_pool, &__xxxx_pool);
+    #else
+        VSF_POOL_INIT(xxxx_pool, &__xxxx_pool, XXXX_POOL_ITEM_NUM);
+    #endif
 
         ......
 
@@ -104,6 +119,9 @@
         implement(vsf_pool_t)                                                   \
     };                                                                          \
     extern void __name##_pool_init(__name##_pool_t *, vsf_pool_cfg_t *);        \
+SECTION(".text." #__name "_pool_init_ex")                                       \
+    extern void __name##_pool_init_ex(                                          \
+        __name##_pool_t *, uint_fast16_t, vsf_pool_cfg_t *);                    \
     extern bool __name##_pool_add_buffer(                                       \
         __name##_pool_t *, void *, uint_fast32_t );                             \
     extern __type *__name##_pool_alloc(__name##_pool_t *);                      \
@@ -126,64 +144,76 @@ SECTION(".text." #__name "_pool_set_target")                                    
 
 #define __implement_vsf_pool(__name, __type)                                    \
 WEAK                                                                            \
-void __name##_pool_init(__name##_pool_t *pthis, vsf_pool_cfg_t *pcfg)           \
+void __name##_pool_init(__name##_pool_t *ptThis, vsf_pool_cfg_t *ptCFG)         \
 {                                                                               \
-    vsf_pool_init((vsf_pool_t *)pthis, pcfg);                                   \
+    vsf_pool_init(  &(ptThis->use_as__vsf_pool_t),                              \
+                    sizeof(__type),                                             \
+                    __alignof__(__type),                                        \
+                    ptCFG);                                                     \
+}                                                                               \
+void __name##_pool_init_ex( __name##_pool_t *ptThis,                            \
+                            uint_fast16_t hwAlign,                              \
+                            vsf_pool_cfg_t *ptCFG)                              \
+{                                                                               \
+    vsf_pool_init(  &(ptThis->use_as__vsf_pool_t),                              \
+                    sizeof(__type),                                             \
+                    max(hwAlign,__alignof__(__type)),                           \
+                    ptCFG);                                                     \
 }                                                                               \
 WEAK                                                                            \
 bool __name##_pool_add_buffer(                                                  \
-    __name##_pool_t *pthis, void *ptBuffer, uint_fast32_t wSize)                \
+    __name##_pool_t *ptThis, void *ptBuffer, uint_fast32_t wSize)               \
 {                                                                               \
-    return vsf_pool_add_buffer((vsf_pool_t *)pthis, ptBuffer,                   \
+    return vsf_pool_add_buffer((vsf_pool_t *)ptThis, ptBuffer,                  \
                             wSize, sizeof(__name##_pool_item_t));               \
 }                                                                               \
 WEAK                                                                            \
 SECTION(".text." #__name "_pool_add_buffer_ex")                                 \
 bool __name##_pool_add_buffer_ex(                                               \
-        __name##_pool_t *pthis,                                                 \
+        __name##_pool_t *ptThis,                                                \
         void *ptBuffer,                                                         \
         uint_fast32_t wSize,                                                    \
         vsf_pool_item_init_evt_handler_t *fnHandler)                            \
 {                                                                               \
     return vsf_pool_add_buffer_ex(                                              \
-                                    (vsf_pool_t *)pthis, ptBuffer,              \
+                                    (vsf_pool_t *)ptThis, ptBuffer,             \
                                     wSize,                                      \
                                     sizeof(__name##_pool_item_t),               \
                                     fnHandler );                                \
 }                                                                               \
 WEAK                                                                            \
-__type *__name##_pool_alloc(__name##_pool_t *pthis)                             \
+__type *__name##_pool_alloc(__name##_pool_t *ptThis)                            \
 {                                                                               \
-    return (__type *)vsf_pool_alloc((vsf_pool_t *)pthis);                       \
+    return (__type *)vsf_pool_alloc((vsf_pool_t *)ptThis);                      \
 }                                                                               \
 WEAK                                                                            \
-void __name##_pool_free(__name##_pool_t *pthis, __type *ptItem)                 \
+void __name##_pool_free(__name##_pool_t *ptThis, __type *ptItem)                \
 {                                                                               \
-    vsf_pool_free((vsf_pool_t *)pthis, (void *)ptItem);                         \
+    vsf_pool_free((vsf_pool_t *)ptThis, (void *)ptItem);                        \
 }                                                                               \
 WEAK                                                                            \
 SECTION(".text." #__name "_get_pool_item_count")                                \
-uint_fast32_t __name##_get_pool_item_count(__name##_pool_t *pthis)              \
+uint_fast32_t __name##_get_pool_item_count(__name##_pool_t *ptThis)             \
 {                                                                               \
-    return vsf_pool_get_count((vsf_pool_t *)pthis);                             \
+    return vsf_pool_get_count((vsf_pool_t *)ptThis);                            \
 }                                                                               \
 WEAK                                                                            \
 SECTION(".text." #__name "_pool_get_region")                                    \
-code_region_t *__name##_pool_get_region(__name##_pool_t *pthis)                 \
+code_region_t *__name##_pool_get_region(__name##_pool_t *ptThis)                \
 {                                                                               \
-    return vsf_pool_get_region((vsf_pool_t *)pthis);                            \
+    return vsf_pool_get_region((vsf_pool_t *)ptThis);                           \
 }                                                                               \
 WEAK                                                                            \
 SECTION(".text." #__name "_pool_get_target")                                    \
-void *__name##_pool_get_target(__name##_pool_t *pthis)                          \
+void *__name##_pool_get_target(__name##_pool_t *ptThis)                         \
 {                                                                               \
-    return vsf_pool_get_tag((vsf_pool_t *)pthis);                               \
+    return vsf_pool_get_tag((vsf_pool_t *)ptThis);                              \
 }                                                                               \
 WEAK                                                                            \
 SECTION(".text." #__name "_pool_set_target")                                    \
-void *__name##_pool_set_target(__name##_pool_t *pthis, void *ptag)              \
+void *__name##_pool_set_target(__name##_pool_t *ptThis, void *pTarget)          \
 {                                                                               \
-    return vsf_pool_set_tag((vsf_pool_t *)pthis, ptag);                         \
+    return vsf_pool_set_tag((vsf_pool_t *)ptThis, pTarget);                     \
 }
 
 
@@ -201,7 +231,7 @@ void *__name##_pool_set_target(__name##_pool_t *pthis, void *ptag)              
                      __type)            /* the type of the pool */              \
             __def_vsf_pool(__name, __type)
 
-#define implement_vsf_pool(__name,            /* the name of the pool */        \
+#define implement_vsf_pool(__name,      /* the name of the pool */              \
                      __type)            /* the type of the pool */              \
             __implement_vsf_pool(__name, __type)
 
@@ -212,8 +242,11 @@ void *__name##_pool_set_target(__name##_pool_t *pthis, void *ptag)              
                       ...)              /* the address of an attached object */ \
                                         /* the address of the code region obj */\
             do {                                                                \
-                vsf_pool_cfg_t cfg = {__VA_ARGS__};                             \
-                __NAME##_pool_init((__VSF_POOL), &cfg);                         \
+                vsf_pool_cfg_t tCFG = {                                         \
+                    .pchPoolName = #__NAME,                                     \
+                    __VA_ARGS__                                                 \
+                };                                                              \
+                __NAME##_pool_init((__VSF_POOL), &tCFG);                        \
                 static NO_INIT __NAME##_pool_item_t s_tBuffer[__SIZE];          \
                 vsf_pool_add_buffer(  (vsf_pool_t *)(__VSF_POOL),               \
                                     s_tBuffer,                                  \
@@ -226,8 +259,44 @@ void *__name##_pool_set_target(__name##_pool_t *pthis, void *ptag)              
                       ...)              /* the address of an attached object */ \
                                         /* the address of the code region obj */\
             do {                                                                \
-                vsf_pool_cfg_t cfg = {__VA_ARGS__};                             \
-                __NAME##_pool_init((__VSF_POOL), &cfg);                         \
+                vsf_pool_cfg_t tCFG = {                                         \
+                    .pchPoolName = (const uint8_t *)#__NAME,                    \
+                    __VA_ARGS__                                                 \
+                };                                                              \
+                __NAME##_pool_init((__VSF_POOL), &tCFG);                        \
+            } while(0)
+
+#define VSF_POOL_INIT_EX(__NAME,        /* the name of the pool */              \
+                      __VSF_POOL,       /* the address of the pool */           \
+                      __SIZE,           /* the total size of the pool */        \
+                      __ALIGN,          /* the item alignment */                \
+                      ...)              /* the address of an attached object */ \
+                                        /* the address of the code region obj */\
+            do {                                                                \
+                vsf_pool_cfg_t tCFG = {                                         \
+                    .pchPoolName = #__NAME,                                     \
+                    __VA_ARGS__                                                 \
+                };                                                              \
+                __NAME##_pool_init_ex((__VSF_POOL), (__ALIGN), &tCFG);          \
+                static NO_INIT __NAME##_pool_item_t                             \
+                    s_tBuffer[__SIZE] ALIGN((__ALIGN));                         \
+                vsf_pool_add_buffer(  (vsf_pool_t *)(__VSF_POOL),               \
+                                    s_tBuffer,                                  \
+                                    sizeof(s_tBuffer),                          \
+                                    sizeof(__NAME##_pool_item_t));              \
+            } while(0) 
+
+#define VSF_POOL_PREPARE_EX(__NAME,           /* the name of the pool */        \
+                      __VSF_POOL,       /* the address of the pool */           \
+                      __ALIGN,          /* the item alignment */                \
+                      ...)              /* the address of an attached object */ \
+                                        /* the address of the code region obj */\
+            do {                                                                \
+                vsf_pool_cfg_t tCFG = {                                         \
+                    .pchPoolName = (const uint8_t *)#__NAME,                    \
+                    __VA_ARGS__                                                 \
+                };                                                              \
+                __NAME##_pool_init_ex((__VSF_POOL), (__ALIGN), &tCFG);          \
             } while(0)
 
 #define VSF_POOL_ADD_BUFFER(__NAME,     /* the name of the pool */              \
@@ -262,6 +331,7 @@ void *__name##_pool_set_target(__name##_pool_t *pthis, void *ptag)              
                            __VSF_POOL)   /* the address of the pool */          \
             __NAME##_pool_get_region((__VSF_POOL))
 
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
 #define VSF_POOL_GET_TAG(__NAME,        /* the name of the pool */              \
                          __VSF_POOL)    /* the address of the pool */           \
             __NAME##_pool_get_target((__VSF_POOL))
@@ -270,11 +340,46 @@ void *__name##_pool_set_target(__name##_pool_t *pthis, void *ptag)              
                          __VSF_POOL,    /* the address of the pool */           \
                          __TARGET)      /* the address of the target */         \
             __NAME##_pool_set_target((__VSF_POOL), (__TARGET))
+#endif
 //! @}
+
+
+/*! \note Enable Statistic mode by default */
+#ifndef VSF_POOL_CFG_STATISTIC_MODE
+#   define  VSF_POOL_CFG_STATISTIC_MODE     ENABLED
+#endif
+
+#ifndef VSF_POOL_CFG_FEED_ON_HEAP
+#   define VSF_POOL_CFG_FEED_ON_HEAP        ENABLED
+#endif
+
+#ifndef VSF_POOL_CFG_SUPPORT_USER_OBJECT
+#   define VSF_POOL_CFG_SUPPORT_USER_OBJECT ENABLED
+#endif
 
 /*============================ TYPES =========================================*/
 
 declare_class(vsf_pool_t)
+
+typedef
+void
+vsf_pool_item_init_evt_handler_t(   void *pTarget, 
+                                    void *pItem, 
+                                    uint_fast32_t wItemSize);
+
+
+#if     VSF_POOL_CFG_STATISTIC_MODE == ENABLED                                  \
+    ||  VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED 
+typedef struct vsf_pool_info_t{
+#   if  VSF_POOL_CFG_STATISTIC_MODE == ENABLED
+    implement(vsf_slist_node_t)
+    const uint8_t *pchPoolName;
+#   endif
+    uint32_t wItemSize;
+    uint16_t u15Align           : 15;
+    uint16_t IsNoFeedOnHeap     : 1;
+}vsf_pool_info_t;
+#endif
 
 //! \name pool
 //! @{
@@ -282,57 +387,69 @@ declare_class(vsf_pool_t)
 def_class(vsf_pool_t,,
 
     private_member(
-        vsf_slist_t free_list;      /*!< free list */
-        uint_fast16_t count;        /*!< the number of free blocks */
+        vsf_slist_t tFreeList;       /*!< free list */
+        uint16_t hwFree;             /*!< the number of free blocks */
+        uint16_t hwUsed;
+#if     VSF_POOL_CFG_STATISTIC_MODE == ENABLED                                  \
+    ||  VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED 
+        implement_ex(vsf_pool_info_t, Statistic);
+#endif
+
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
+        vsf_pool_item_init_evt_handler_t *fnItemInit;
+#endif
+
 #if !defined(VSF_POOL_CFG_ATOM_ACCESS)
-        code_region_t *pregion;     /*!< protection region defined by user */
+        code_region_t *ptRegion;     /*!< protection region defined by user */
 #endif
     )
-    
+
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
     protected_member(
-        void *ptag;             /*!< you can use it to carry mutex or other target */
+        void *pTarget;     /*!< you can use it to carry mutex or other target */
     )
+#endif
 )
 end_def_class(vsf_pool_t)
 //! @}
 
 
 typedef struct {
-    void *ptarget;
-    code_region_t *pregion;
+    void *pTarget;
+    code_region_t *ptRegion;
+    const uint8_t *pchPoolName;
+    vsf_pool_item_init_evt_handler_t *fnItemInit;
 } vsf_pool_cfg_t;
 
-typedef
-void
-vsf_pool_item_init_evt_handler_t(   void *ptarget, 
-                                    void *pitem, 
-                                    uint_fast32_t item_size);
 
 //! \name vsf pool interface
 //! @{
 def_interface(i_pool_t)
-    void (*Init)            (vsf_pool_t *pthis, vsf_pool_cfg_t *pcfg);
+    void (*Init)            (   vsf_pool_t *pObj, 
+                                uint32_t wItemSize, 
+                                uint_fast16_t hwAlign, 
+                                vsf_pool_cfg_t *ptCFG);
     struct {
-        bool (*AddEx)       (vsf_pool_t *pthis,
-                             void *pbuffer,
-                             uint32_t buffer_size,
-                             uint32_t item_size,
-                             vsf_pool_item_init_evt_handler_t *fnhandler_init);
-        bool (*Add)         (vsf_pool_t *pthis,
-                             void *pbuffer,
-                             uint32_t buffer_size,
-                             uint32_t item_size);
+        bool (*AddEx)       (vsf_pool_t *pObj,
+                             void *pBuffer,
+                             uint32_t wBufferSize,
+                             uint32_t wItemSize,
+                             vsf_pool_item_init_evt_handler_t *fnItemInit);
+        bool (*Add)         (vsf_pool_t *pObj,
+                             void *pBuffer,
+                             uint32_t wBufferSize,
+                             uint32_t wItemSize);
     }Buffer;
 
-    void *(*Allocate)       (vsf_pool_t *pthis);
-    void (*Free)            (vsf_pool_t *pthis, void *pitem);
-    uint_fast16_t  (*Count) (vsf_pool_t *pthis);
-
+    void *(*Allocate)       (vsf_pool_t *pObj);
+    void (*Free)            (vsf_pool_t *pObj, void *pItem);
+    uint_fast16_t  (*Count) (vsf_pool_t *pObj);
+#if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
     struct {
-        void *(*Get)        (vsf_pool_t *pthis);
-        void *(*Set)        (vsf_pool_t *pthis, void *ptag);
+        void *(*Get)        (vsf_pool_t *pObj);
+        void *(*Set)        (vsf_pool_t *pObj, void *pTarget);
     }Tag;
-
+#endif
 end_def_interface(i_pool_t)
 //! @}
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -341,81 +458,88 @@ extern const i_pool_t VSF_POOL;
 /*============================ PROTOTYPES ====================================*/
 
 /*! \brief initialise target pool
- *! \param pthis address of the target pool
- *! \param pcfg configurations
+ *! \param pObj address of the target pool
+ *! \param wItemSize memory item size
+ *! \param hwAlign Item Alignment
+ *! \param ptCFG configurations
  *! \return none
  */
-extern void vsf_pool_init(vsf_pool_t *pthis, vsf_pool_cfg_t *pcfg);
+extern void vsf_pool_init(  vsf_pool_t *pObj, 
+                            uint32_t wItemSize, 
+                            uint_fast16_t hwAlign, 
+                            vsf_pool_cfg_t *ptCFG);
 
 /*! \brief add memory to pool
- *! \param pthis            address of the target pool
- *! \param pbuffer          address of the target memory
- *! \param buffer_size      the size of the target memory
- *! \param item_size        memory block size of the pool
- *! \param fnhandler_init   block initialisation handler
+ *! \param pObj             address of the target pool
+ *! \param pBuffer          address of the target memory
+ *! \param wBufferSize      the size of the target memory
+ *! \param wItemSize        memory block size of the pool
+ *! \param fnItemInit       block initialisation handler
  *! \retval false           the buffer size is too small or invalid parameters
  *! \retval true            buffer is added
  */
 extern bool
-vsf_pool_add_buffer_ex( vsf_pool_t *pthis,
-                        void *pbuffer,
-                        uint32_t buffer_size,
-                        uint32_t item_size,
-                        vsf_pool_item_init_evt_handler_t *fnhandler_init);
+vsf_pool_add_buffer_ex( vsf_pool_t *pObj,
+                        void *pBuffer,
+                        uint32_t wBufferSize,
+                        uint32_t wItemSize,
+                        vsf_pool_item_init_evt_handler_t *fnItemInit);
 
 /*! \brief add memory to pool
- *! \param pthis        address of the target pool
- *! \param pbuffer      address of the target memory
- *! \param buffer_size  the size of the target memory
- *! \param item_size    memory block size of the pool
+ *! \param pObj        address of the target pool
+ *! \param pBuffer      address of the target memory
+ *! \param wBufferSize  the size of the target memory
+ *! \param wItemSize    memory block size of the pool
  *! \retval false       the buffer size is too small or invalid parameters
  *! \retval true        buffer is added
  */
-extern bool vsf_pool_add_buffer(  vsf_pool_t *pthis,
-                                void *pbuffer,
-                                uint32_t buffer_size,
-                                uint32_t item_size);
+extern bool vsf_pool_add_buffer(vsf_pool_t *pObj,
+                                void *pBuffer,
+                                uint32_t wBufferSize,
+                                uint32_t wItemSize);
 
 /*! \brief try to fetch a memory block from the target pool
- *! \param pthis    address of the target pool
+ *! \param pObj    address of the target pool
  *! \retval NULL    the pool is empty
  *! \retval !NULL   address of the allocated memory block
  */
-extern void *vsf_pool_alloc(vsf_pool_t *pthis);
+extern void *vsf_pool_alloc(vsf_pool_t *pObj);
 
 /*! \brief return a memory block to the target pool
- *! \param pthis    address of the target pool
- *! \param pitem    target memory block
+ *! \param pObj     address of the target pool
+ *! \param pItem    target memory block
  *! \return none
  */
-extern void vsf_pool_free(vsf_pool_t *pthis, void *pitem);
+extern void vsf_pool_free(vsf_pool_t *pObj, void *pItem);
 
 SECTION("text.vsf.utilities.vsf_pool_get_count")
 /*! \brief get the number of memory blocks available in the target pool
- *! \param pthis    address of the target pool
+ *! \param pObj    address of the target pool
  *! \return the number of memory blocks
  */
-extern uint_fast16_t vsf_pool_get_count(vsf_pool_t *pthis);
+extern uint_fast16_t vsf_pool_get_count(vsf_pool_t *pObj);
+
 
 SECTION("text.vsf.utilities.vsf_pool_get_tag")
 /*! \brief get the address of the object which is attached to the pool
- *! \param pthis    address of the target pool
+ *! \param pObj    address of the target pool
  *! \return the address of the object
  */
-extern void *vsf_pool_get_tag(vsf_pool_t *pthis);
+extern void *vsf_pool_get_tag(vsf_pool_t *pObj);
 
 SECTION("text.vsf.utilities.vsf_pool_set_tag")
 /*! \brief set the address of the object which is attached to the pool
- *! \param pthis    address of the target pool
+ *! \param pObj    address of the target pool
  *! \return the address of the object
  */
-extern void *vsf_pool_set_tag(vsf_pool_t *pthis, void *ptag);
+extern void *vsf_pool_set_tag(vsf_pool_t *pObj, void *pTarget);
+
 
 SECTION("text.vsf.utilities.vsf_pool_get_region")
 /*! \brief get the address of the code region used by this pool
- *! \param pthis    address of the target pool
+ *! \param pObj    address of the target pool
  *! \return the address of the code region
  */
-extern code_region_t *vsf_pool_get_region(vsf_pool_t *pthis);
+extern code_region_t *vsf_pool_get_region(vsf_pool_t *pObj);
 
 #endif

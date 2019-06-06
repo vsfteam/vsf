@@ -373,15 +373,15 @@ def_interface(i_gpio_t)
     //! Switch specified pin direction
     void            (*SwitchDirection)  (uint32_t pin_mask);
     //! get pin value on specified port
-    uint32_t        (*Read)     (void);
+    uint32_t        (*Read)             (void);
     //! write pin value with pin-mask
-    void            (*Write)    (uint_fast32_t value, uint32_t pin_mask);
+    void            (*Write)            (uint_fast32_t value, uint32_t pin_mask);
     //! set specified pins 
-    void            (*Set)      (uint32_t pin_mask);
+    void            (*Set)              (uint32_t pin_mask);
     //! clear specified pins 
-    void            (*Clear)    (uint32_t pin_mask);
+    void            (*Clear)            (uint32_t pin_mask);
     //! toggle specified pins
-    void            (*Toggle)   (uint32_t pin_mask);
+    void            (*Toggle)           (uint32_t pin_mask);
     //! get base address of specified port
     gpio_reg_t *const reg_ptr;
 

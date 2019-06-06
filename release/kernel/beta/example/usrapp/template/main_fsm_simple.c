@@ -101,8 +101,8 @@ fsm_initialiser(user_fsm_task_t,
 implement_fsm(user_fsm_task_t) 
 {
     def_states(WAIT_FOR_SEM, CALL_SUB_TO_PRINT);
-    
-    body_begin();                                                               
+
+    body_begin();                                             
 
     /*! this can be ignored
     on_start(
@@ -111,12 +111,10 @@ implement_fsm(user_fsm_task_t)
     */
 
     state(WAIT_FOR_SEM) {
-        vsf_task_wait_until(
-            vsf_sem_pend(this.psem){                                            //!< wait for semaphore forever
-                init_fsm(user_fsm_sub_task_t, &this.print_task, args(this.cnt));//!< init sub fsm
-                transfer_to(CALL_SUB_TO_PRINT);                                 //!< tranfer to next state
-            }
-        );
+        vsf_sem_pend(this.psem){                                                //!< wait for semaphore forever
+            init_fsm(user_fsm_sub_task_t, &this.print_task, args(this.cnt));    //!< init sub fsm
+            transfer_to(CALL_SUB_TO_PRINT);                                     //!< tranfer to next state
+        }
     }
     
     state(CALL_SUB_TO_PRINT) {
@@ -126,8 +124,8 @@ implement_fsm(user_fsm_task_t)
             reset_fsm();
         }
     }
-    
-    body_end();
+
+    body_end();  
 }
 
 #if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
@@ -148,26 +146,25 @@ fsm_initialiser(user_task_b_t,
  * NOTE: content in body() is protected from debug                            *
  *----------------------------------------------------------------------------*/
 implement_fsm(user_task_b_t) 
-    def_states(PRINT, DELAY);
+    def_states(DELAY, PRINT);
     
     body(
         on_start(
-            update_state_to(PRINT);
+            update_state_to(DELAY);
         )
+        
+        state(DELAY){
+            vsf_task_wait_until( vsf_delay_ms(10000));                          //!< wait 10s
+            vsf_sem_post(this.psem);                                            //!< post a semaphore
+            update_state_to(PRINT);                                             //!< transfer to PRINT without yielding...
+        }
         
         state(PRINT){
             printf("post semaphore...   [%08x]\r\n", this.cnt++);
-            update_state_to(DELAY);                                             //!< transfer to DELAY without yielding...
+            reset_fsm();                                                        //!< reset fsm
         }
         
-        state(DELAY){
-            vsf_task_wait_until(
-                vsf_delay_ms(10000){                                               //!< wait 10s
-                    vsf_sem_post(this.psem);                                    //!< post a semaphore
-                    reset_fsm();                                                //!< reset fsm
-                }
-            );
-        }
+
     )
 #endif
 
