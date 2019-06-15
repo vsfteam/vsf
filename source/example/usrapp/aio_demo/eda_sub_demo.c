@@ -114,7 +114,7 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
          *!       This read will reset interal status to make sure any 
          *!       vsf_call_task()/vsf_eda_call_fsm call working correctly
          */
-        fsm_rt_t ret = vsf_call_task(vsf_task_a, &this.task_cb);                //! DUMMY CALL
+        fsm_rt_t ret = vsf_eda_call_task(vsf_task_a, &this.task_cb);            //! DUMMY CALL
         UNUSED_PARAM(ret);
         vsf_eda_return();
         break;
@@ -126,7 +126,7 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_teda_set_timer_ms(10);
         } else {
             vsf_trace(VSF_TRACE_DEBUG, "call sub fsm in sub eda\r\n");
-            vsf_call_task(vsf_task_a, &this.task_cb);
+            vsf_eda_call_task(vsf_task_a, &this.task_cb);
         }
         break;
     }
@@ -143,7 +143,7 @@ static void eda_sub_demo_teda_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_TIMER:
         vsf_trace(VSF_TRACE_DEBUG, "call sub eda in main eda\r\n");
-        vsf_eda_call_eda(eda_sub_demo_teda_sub_evthandler, NULL /*(void *)(2 << 1)*/);
+        vsf_eda_call_eda(eda_sub_demo_teda_sub_evthandler);
         break;
     }
 }
@@ -163,7 +163,7 @@ static fsm_rt_t eda_sub_demo_fsm_main_entry(void *pthis, vsf_evt_t evt)
     return fsm_rt_yield;
 }
 */
-static void eda_sub_demo_start(void)
+void eda_sub_demo_start(void)
 {
     eda_sub_demo.teda.evthandler = eda_sub_demo_teda_main_evthandler;
     vsf_teda_init(&eda_sub_demo.teda, vsf_priority_0, false);
@@ -180,7 +180,7 @@ static void eda_sub_demo_start(void)
 */
 }
 
-#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+#if 0
 int main(void)
 {
     static_task_instance(
@@ -194,7 +194,7 @@ int main(void)
     
     eda_sub_demo_start();
     
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         //printf("hello world! \r\n");
         vsf_delay_ms(1000);

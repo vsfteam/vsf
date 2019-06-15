@@ -23,70 +23,54 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
 #include "../vsf_eda.h"
+#include "./__vsf_task_common.h"
+
 /*============================ MACROS ========================================*/
+
+#ifndef this
+#   define this        (*ptThis)
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __implement_vsf_pt(__NAME)                                           \
-        void vsf_pt_func_##__NAME(vsf_eda_frame_t *ptFrame, vsf_evt_t evt)      \
-        {                                                                       \
-            pt_cb_##__NAME *ptThis = (pt_cb_##__NAME *)(ptFrame->param);        \
-            uint8_t *ptState = &(ptFrame->state);                               \
-            ASSERT(NULL != ptFrame);  
+        __implement_vsf_pt_common(__NAME, vsf_eda_frame_t *ptFrame) {           \
+            __vsf_pt_common(__NAME) *ptThis =                                   \
+                        (__vsf_pt_common(__NAME) *)(ptFrame->param);            \
+            ASSERT(NULL != ptFrame);
 
-#define __vsf_pt_begin()    enum {                                              \
-                                count_offset = __COUNTER__ + 1,                 \
-                            };                                                  \
-                            switch (*ptState) {                                 \
-                                case __COUNTER__ - count_offset:
-                                        
-#define __vsf_pt_entry(...)     (*ptState) =                                    \
-                                    (__COUNTER__ - count_offset + 1) >> 1;      \
-                                __VA_ARGS__;                                    \
-                                case (__COUNTER__ - count_offset) >> 1:
-
-#   define __vsf_pt_end()                                                       \
-                }   /* for switch */                                            \
-            }vsf_eda_return();
+#   define __vsf_pt_state()         (ptFrame)->state
+#   define __vsf_pt_end()           __vsf_pt_end_closure_common()
 #else
-#   define __implement_vsf_pt(__NAME)                                           \
-        void vsf_pt_func_##__NAME(__NAME *ptThis, vsf_evt_t evt)
 
-#define __vsf_pt_begin()    enum {                                              \
-                                count_offset = __COUNTER__ + 1,                 \
-                            };                                                  \
-                            switch (ptThis->chState) {                          \
-                                case __COUNTER__ - count_offset:
-                                        
-#define __vsf_pt_entry(...)     ptThis->chState =                               \
-                                    (__COUNTER__ - count_offset + 1) >> 1;      \
-                                __VA_ARGS__;                                    \
-                                case (__COUNTER__ - count_offset) >> 1:
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#       define __implement_vsf_pt(__NAME)                                       \
+            __implement_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+#   else
+#       define __implement_vsf_pt(__NAME)                                       \
+            __implement_vsf_pt_common(__NAME, __NAME *ptThis)
+#   endif
 
-#   define __vsf_pt_end()                                                       \
-            } vsf_eda_return();
+#   define __vsf_pt_state()         (ptThis)->chState
+#   define __vsf_pt_end()           __vsf_pt_end_common()
 #endif
 
 
-                                        
+#define __vsf_pt_begin(__state)     __vsf_pt_begin_common(__state)
+#define __vsf_pt_entry(__state, ...)__vsf_pt_entry_common(__state, __VA_ARGS__)
 
-
-
-#define vsf_pt_begin()              __vsf_pt_begin()
-#define vsf_pt_entry(...)           __vsf_pt_entry(__VA_ARGS__)
+#define vsf_pt_begin()              __vsf_pt_begin(__vsf_pt_state())
+#define vsf_pt_entry(...)           __vsf_pt_entry(__vsf_pt_state(), __VA_ARGS__)
 #define vsf_pt_end()                __vsf_pt_end()
 
-#define __vsf_pt_wait_cond(...)                                                 \
-    do {                                                                        \
-        evt = VSF_EVT_INVALID;                                                  \
-        vsf_pt_entry();                                                         \
-        if (__VA_ARGS__){                                                       \
-            return ;                                                            \
-        }                                                                       \
-    } while (0)
+#define __vsf_pt_wait_cond(...)     __vsf_pt_wait_cond_common(__vsf_pt_state())
+#define vsf_pt_wfe(__evt)           __vsf_pt_wait_cond((evt != __evr))
+#define vsf_pt_wait_for_evt(__evt)  vsf_pt_wfe(__evt)
 
-#define vsf_pt_yield()          vsf_pt_entry(vsf_eda_yield();)
+#define vsf_pt_yield()              vsf_pt_entry(vsf_eda_yield();)
 
 
 /*! \note please use if-then clause in the vsf_pt_wait_until()
@@ -107,12 +91,9 @@
                 return ;                                                        \
             }                                                                   
 
-
-#define vsf_pt_wfe(__evt)               __vsf_pt_wait_cond( (evt != __evr))
-
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __vsf_pt_call_sub(__NAME, __TARGET)                                  \
-            vsf_eda_call_eda((vsf_eda_evthandler_t)(__NAME),                    \
+            __vsf_eda_call_eda((vsf_eda_evthandler_t)(__NAME),                  \
                             (__TARGET))
 
 
@@ -123,10 +104,18 @@
         }                                                                       \
         vsf_pt_entry(return;); 
 
-#   define vsf_call_pt(__NAME, __TARGET)                                        \
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#       define vsf_pt_call_pt(__NAME, __TARGET)                                 \
             vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
-        
+#   else
+#       define vsf_pt_call_pt(__NAME, __TARGET)                                 \
+            (__TARGET)->chState = 0;                                            \
+            vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
+#   endif
 #endif
+
+#define vsf_eda_call_pt(__NAME, __TARGET)                                       \
+            __vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))            
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __vsf_pt_call_fsm(__NAME, __TARGET)                                  \
@@ -136,16 +125,17 @@
 
 #   define vsf_pt_call_fsm(__NAME, __TARGET, __RET_ADDR)                        \
         do {                                                                    \
-            fsm_rt_t ATPASTE3(__,__LINE__,tReturn);                             \
+            fsm_rt_t ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn);              \
             /*(__TARGET)->chState = 0; */                                       \
             vsf_pt_entry();                                                     \
-            ATPASTE3(__,__LINE__,tReturn) =                                     \
+            ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn) =                      \
                 __vsf_pt_call_fsm(__NAME, (__TARGET));                          \
-            if (fsm_rt_on_going == ATPASTE3(__,__LINE__,tReturn)) {             \
+            if (fsm_rt_on_going ==                                              \
+                ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn)) {                 \
                 return ;                                                        \
             }                                                                   \
             if (NULL != (__RET_ADDR)) {                                         \
-                *(__RET_ADDR) = ATPASTE3(__,__LINE__,tReturn);                  \
+                *(__RET_ADDR) = ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn);   \
             }                                                                   \
         } while(0)
         
@@ -163,43 +153,31 @@
         
 #define implement_vsf_pt(__NAME)        __implement_vsf_pt(__NAME)
         
-#define __vsf_pt_func(__NAME)           vsf_pt_func_##__NAME        
+#define __vsf_pt_func(__NAME)           __vsf_pt_func_common(__NAME)
 #define vsf_pt_func(__NAME)             __vsf_pt_func(__NAME)
 
-#define __vsf_pt(__NAME)                pt_cb_##__NAME
+#define __vsf_pt(__NAME)                __vsf_pt_common(__NAME)
 #define vsf_pt(__NAME)                  __vsf_pt(__NAME)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __def_vsf_pt(__NAME,...)                                             \
-        struct pt_cb_##__NAME {                                                 \
-            __VA_ARGS__                                                         \
-        };                                                                      \
-        struct __NAME {                                                         \
-            implement(vsf_pt_t);                                                \
-            implement_ex(pt_cb_##__NAME, param);                                \
-        };
+            __def_vsf_pt_common(__NAME, __VA_ARGS__)
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
-        struct pt_cb_##__NAME {                                                 \
-            uint8_t chState;                                                    \
-            __VA_ARGS__                                                         \
-        };                                                                      \
-        struct __NAME {                                                         \
-            implement(vsf_pt_t);                                                \
-            implement_ex(pt_cb_##__NAME, param);                                \
-        };
+            __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)
 #endif
 
 #define def_vsf_pt(__NAME,...)                                                  \
             __def_vsf_pt(__NAME,__VA_ARGS__)
 
 #define __declare_vsf_pt(__NAME)                                                \
-            typedef struct __NAME __NAME;                                       \
-            typedef struct pt_cb_##__NAME  pt_cb_##__NAME;
+            __declare_vsf_pt_common(__NAME)
 
 #define declare_vsf_pt(__NAME)          __declare_vsf_pt(__NAME)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __init_vsf_pt(__NAME, __PT, __PRI, ...)                              \
         do {                                                                    \
             vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
@@ -226,6 +204,17 @@
         } while(0)
 #endif
 
+
+#if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                                \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   define vsf_pt_call_thread(__NAME, __TARGET)                                 \
+        vsf_eda_call_thread_prepare(__NAME, __TARGET);                          \
+        vsf_pt_entry();                                                         \
+        if (VSF_ERR_NONE != vsf_eda_call_thread(__TARGET)) {                    \
+            return ;                                                            \
+        }                                                                       \
+        vsf_pt_entry(return;); 
+#endif
 
 #define init_vsf_pt(__NAME, __PT, __PRI, ...)                                   \
             __init_vsf_pt(__NAME, __PT, __PRI, __VA_ARGS__)

@@ -33,6 +33,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 WEAK void vsf_usbh_on_dev_parsed(vsf_usbh_dev_t *dev, vsf_usbh_dev_parser_t *parser)
@@ -327,7 +331,7 @@ void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
 
     if (usbh->dev_new == dev) {
         vsf_usbh_free_parser(usbh);
-        vsf_teda_fini(&usbh->teda);
+        __vsf_eda_fini(&usbh->teda.use_as__vsf_eda_t);
         usbh->dev_new = NULL;
     }
     VSF_USBH_FREE(dev);

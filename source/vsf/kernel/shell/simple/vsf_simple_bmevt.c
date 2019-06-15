@@ -51,7 +51,7 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *pbmpevt,
     vsf_sync_reason_t reason = VSF_SYNC_PENDING;
     ASSERT(NULL != pbmpevt && NULL != ppender);
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     vsf_eda_t *peda = vsf_eda_get_cur();
     ASSERT(NULL != peda);
 

@@ -15,7 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
-#include "app_cfg.h"
+//#include "app_cfg.h"
 #include "vsf.h"
 #include <stdio.h>
 
@@ -24,7 +24,7 @@
 /*============================ TYPES =========================================*/
 declare_vsf_thread(user_thread_a_t)
 
-def_vsf_thread(user_thread_a_t, 512,
+def_vsf_thread(user_thread_a_t, 1024,
 
     features_used(
         mem_sharable( )
@@ -37,7 +37,7 @@ def_vsf_thread(user_thread_a_t, 512,
 
 declare_vsf_thread(user_thread_b_t)
 
-def_vsf_thread(user_thread_b_t, 512,
+def_vsf_thread(user_thread_b_t, 1024,
 
     features_used(
         mem_sharable( )
@@ -110,7 +110,7 @@ int main(void)
     
     vsf_kernel_thread_simple_demo();
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);

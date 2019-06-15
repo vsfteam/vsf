@@ -33,7 +33,7 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
+/*
 struct vsf_rtos_thread_t {
     implement(vsf_thread_t)
 
@@ -41,6 +41,15 @@ struct vsf_rtos_thread_t {
     lwip_thread_fn fn;
 };
 typedef struct vsf_rtos_thread_t vsf_rtos_thread_t;
+*/
+
+declare_vsf_thread_ex(vsf_rtos_thread_t)
+def_vsf_thread_ex(vsf_rtos_thread_t,
+    def_params(
+        void *arg;
+        lwip_thread_fn fn;
+    ))
+
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -72,29 +81,47 @@ static void vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
     vsf_heap_free(eda);
 }
 
+implement_vsf_thread_ex(vsf_rtos_thread_t)
+{
+    this.fn(this.arg);
+}
+/*
 static void vsf_rtos_thread_entry(vsf_thread_t *thread)
 {
     sys_thread_t sys_thread = (sys_thread_t)thread;
     sys_thread->fn(sys_thread->arg);
 }
-
-sys_thread_t sys_thread_new(const char *name, lwip_thread_fn fn, void *arg, int stacksize, int prio)
+*/
+sys_thread_t sys_thread_new(const char *name, 
+                            lwip_thread_fn fn, 
+                            void *arg, 
+                            int stacksize, 
+                            int prio)
 {
     sys_thread_t thread;
     uint_fast32_t thread_size = (sizeof(*thread) + 7) & ~7;
 
-    thread = vsf_heap_malloc(thread_size + ((stacksize + 7) & ~7));
+    thread = vsf_heap_malloc_aligned(thread_size + ((stacksize + 7) & ~7), 8);
     if (NULL == thread) {
         return NULL;
     }
 
     thread->on_terminate = vsf_rtos_thread_on_terminate;
-    thread->entry = vsf_rtos_thread_entry;
-    thread->stack = (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7);
-    thread->stack_size = stacksize;
+    
     thread->arg = arg;
     thread->fn = fn;
-    vsf_thread_start(&thread->use_as__vsf_thread_t, prio);
+
+    init_vsf_thread_ex( vsf_rtos_thread_t, 
+                        thread, 
+                        prio,
+                        (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7), 
+                        stacksize);
+    /*
+    thread->stack = (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7);
+    thread->stack_size = stacksize;
+    
+    vsf_thread_start(&(thread->use_as__vsf_thread_t), prio);
+    */
     return thread;
 }
 

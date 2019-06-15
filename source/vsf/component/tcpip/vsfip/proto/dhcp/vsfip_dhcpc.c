@@ -27,6 +27,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
+#endif
+
 #ifndef VSFIP_CFG_DHCPC_TIMEOUT
 #   define VSFIP_CFG_DHCPC_TIMEOUT          2000
 #endif
@@ -46,6 +50,10 @@ enum vsfip_dhcpc_evt_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
@@ -260,14 +268,18 @@ void vsfip_dhcpc_stop(vsfip_dhcpc_t *dhcpc)
             vsfip_close(dhcpc->so);
             dhcpc->so = NULL;
         }
-        vsf_teda_fini(&dhcpc->teda);
-
-#ifdef VSFIP_TRACE_NETIF
-        vsf_trace(VSF_TRACE_DEBUG, "vsfip_dhcpc deref");
-#endif
-        vsfip_netif_deref(dhcpc->netif);
-        dhcpc->netif = NULL;
+        __vsf_eda_fini(&dhcpc->teda.use_as__vsf_eda_t);
     }
+}
+
+static void vsfip_dhcpc_on_eda_terminate(vsf_eda_t *eda)
+{
+    vsfip_dhcpc_t *dhcpc = container_of(eda, vsfip_dhcpc_t, teda);
+#ifdef VSFIP_TRACE_NETIF
+    vsf_trace(VSF_TRACE_DEBUG, "vsfip_dhcpc deref");
+#endif
+    vsfip_netif_deref(dhcpc->netif);
+    dhcpc->netif = NULL;
 }
 
 // vsfip_dhcpc_start MUST be called protected with netif
@@ -287,7 +299,12 @@ vsf_err_t vsfip_dhcpc_start(vsfip_netif_t *netif, vsfip_dhcpc_t *dhcpc)
     dhcpc->sockaddr.addr.size = 4;
 
     dhcpc->teda.evthandler = vsfip_dhcpc_evthandler;
-    return vsf_teda_init(&dhcpc->teda, vsf_priority_inherit, false);
+    dhcpc->teda.on_terminate = vsfip_dhcpc_on_eda_terminate;
+    vsf_err_t err = vsf_teda_init(&dhcpc->teda, vsf_priority_inherit, false);
+    if (VSF_ERR_NONE != err) {
+        vsfip_dhcpc_on_eda_terminate(&dhcpc->teda.use_as__vsf_eda_t);
+    }
+    return err;
 }
 
 #endif      // VSF_USE_TCPIP

@@ -25,6 +25,11 @@
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -76,6 +81,10 @@ typedef struct vsf_usbh_hub_t vsf_usbh_hub_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_usbh_hub_t *hub_dev_gethub(vsf_usbh_dev_t *dev_hub)
@@ -409,6 +418,12 @@ fail:
     }
 }
 
+static void vsf_usbh_hub_on_eda_terminate(vsf_eda_t *eda)
+{
+    vsf_usbh_hub_t *hub = container_of(eda, vsf_usbh_hub_t, teda);
+    VSF_USBH_FREE(hub);
+}
+
 static void *vsf_usbh_hub_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         vsf_usbh_ifs_parser_t *parser_ifs)
 {
@@ -431,6 +446,7 @@ static void *vsf_usbh_hub_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     hub->ifs = parser_ifs->ifs;
 
     hub->teda.evthandler = vsf_usbh_hub_evthandler;
+    hub->teda.on_terminate = vsf_usbh_hub_on_eda_terminate;
     vsf_teda_init(&hub->teda, vsf_priority_inherit, false);
 
     return hub;
@@ -440,8 +456,7 @@ static void vsf_usbh_hub_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void 
 {
     vsf_usbh_hub_t *hub = param;
 
-    vsf_teda_fini(&hub->teda);
-    VSF_USBH_FREE(hub);
+    __vsf_eda_fini(&hub->teda.use_as__vsf_eda_t);
 }
 
 static const vsf_usbh_dev_id_t vsf_usbh_hub_dev_id[] = {

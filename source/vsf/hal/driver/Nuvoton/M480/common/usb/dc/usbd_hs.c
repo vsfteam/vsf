@@ -191,7 +191,9 @@ void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
 {
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
     usbd_hs->ep_buf_ptr = 0x1000;
+#ifdef M480_USBD_HS_WROKAROUND_ISO
     usbd_hs->ep_tx_mask = 0;
+#endif
     usbd_hs->reply_status_OUT = false;
     usbd_hs->setup_status_IN = false;
     for (uint_fast8_t i = 0; i < (m480_usbd_hs_ep_number - 2); i++) {
@@ -490,10 +492,19 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
         }
     } else {
         idx -= 2;
-        vsf_protect_t orig = vsf_protect_interrupt();
+#ifdef M480_USBD_HS_WROKAROUND_ISO
+        uint32_t ep_int_en = M480_USBD_EP_REG(idx, EP[0].EPINTEN) & HSUSBD_EPINTEN_TXPKIEN_Msk;
+        M480_USBD_EP_REG(idx, EP[0].EPINTEN) &= ~HSUSBD_EPINTEN_TXPKIEN_Msk;
+            ASSERT(!(usbd_hs->ep_tx_mask & (1 << idx)));
             M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
+            usbd_hs->retry_cnt[idx] = 0;
+            usbd_hs->tx_size[idx] = size;
             usbd_hs->ep_tx_mask |= 1 << idx;
-        vsf_unprotect_interrupt(orig);
+        M480_USBD_EP_REG(idx, EP[0].EPINTEN) |= ep_int_en;
+#else
+        M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
+#endif
+
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
         vsf_trace(0, "set ep%d DATSIZE to %d.\r\n", idx, size);
 //        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
@@ -544,6 +555,7 @@ vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep,
             size -= 1;
             buffer += 1;
         }
+
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
 //        vsf_trace(0, "EPTXCNT=%d,EPDATCNT=%d\r\n",
 //                              M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
@@ -664,12 +676,27 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
                               M480_USBD_EP_REG(idx, EP[0].EPTXCNT),
                               M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF);
 #endif
-                    // TODO: BUG on ISO EP, will receive TCPKIF even if no data is sent
-                    if (    (0 == M480_USBD_EP_REG(idx, EP[0].EPDATCNT))
-                        &&  (usbd_hs->ep_tx_mask & (1 << idx))) {
-                        usbd_hs->ep_tx_mask &= ~(1 << idx);
-                        m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
+
+#ifdef M480_USBD_HS_WROKAROUND_ISO
+                    // ISO EP of M480 will issue interrupt even if ZLP is sent.
+                    // and there is possibility that the EP handed even if TXCNT is written
+                    // so if ep_tx_mask is enabled, and received 10 TXIF interrupt with no data sent
+                    // re-write the EPTXCNT register
+                    if (usbd_hs->ep_tx_mask & (1 << idx)) {
+                        if (0 == M480_USBD_EP_REG(idx, EP[0].EPDATCNT)) {
+                            usbd_hs->ep_tx_mask &= ~(1 << idx);
+                            m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
+                        } else {
+                            if (++usbd_hs->retry_cnt[idx] > 2) {
+                                usbd_hs->retry_cnt[idx] = 0;
+                                M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = usbd_hs->tx_size[idx];
+//                                vsf_trace(0, "resend EP%c %d\r\n", 'A' + idx, usbd_hs->tx_size[idx]);
+                            }
+                        }
                     }
+#else
+                    m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
+#endif
                 }
                 if (status & HSUSBD_EPINTSTS_RXPKIF_Msk) {
                     M480_USBD_EP_REG(idx, EP[0].EPINTEN) &= ~HSUSBD_EPINTEN_RXPKIEN_Msk;

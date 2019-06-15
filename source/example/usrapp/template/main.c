@@ -22,10 +22,15 @@
 #include "ooc_demo/class_simple_demo.h"
 
 /*============================ MACROS ========================================*/
+#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#error In order to run this demo, please set VSF_BSP_CFG_RUN_MAIN_AS_THREAD to ENABLED
+#endif
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(user_task_t)
 
 def_vsf_thread(user_task_t, 1024,
@@ -188,7 +193,7 @@ const static i_code_region_t __example_code_region = {
 };
 
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(user_task_t) 
 {
 
@@ -246,7 +251,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
     
         this.slave.mask = this.mask;
         this.slave.pgroup_evts = this.pgroup_evts;
-        vsf_call_pt(user_pt_bmpevt_demo_slave_t, &this.slave);
+        vsf_pt_call_pt(user_pt_bmpevt_demo_slave_t, &this.slave);
     
         vsf_pt_wait_until( wait_for_one(this.pgroup_evts, this.mask) );
         printf("get timer4_evt in pt master thread\r\n");
@@ -338,7 +343,7 @@ int main(void)
 #endif
 
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     do {
         static NO_INIT user_task_t __user_task;
 #   if VSF_CFG_SYNC_EN == ENABLED
@@ -349,7 +354,7 @@ int main(void)
 #endif
 
 
-#if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_CFG_BMPEVT_EN == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while (1) {
         wait_for_all_timeout_ms(    &__user_grouped_evts, 
                                     all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk,

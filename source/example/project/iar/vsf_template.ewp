@@ -8442,6 +8442,9 @@
                 <name>$PROJ_DIR$\..\..\usrapp\ui_demo\ui_demo.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\usrapp\ui_demo\ui_demo_trans_uvc.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\usrapp\ui_demo\vsf_usr_cfg.h</name>
             </file>
         </group>
@@ -9336,6 +9339,24 @@
                 </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\component\av\vsfav.h</name>
+                </file>
+            </group>
+            <group>
+                <name>fs</name>
+                <group>
+                    <name>vfs</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vfs\vsf_vfs.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs_cfg.h</name>
                 </file>
             </group>
             <group>

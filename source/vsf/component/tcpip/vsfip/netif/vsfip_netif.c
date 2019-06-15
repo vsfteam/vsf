@@ -55,6 +55,9 @@ typedef struct vsfip_arp_head_t vsfip_arp_head_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 extern void vsfip_ip4_input(vsfip_netbuf_t *netbuf);
 extern void vsfip_ip6_input(vsfip_netbuf_t *netbuf);
 extern void vsfip_ipbuf_on_finish(vsfip_netbuf_t *netbuf, vsf_err_t err);
@@ -81,7 +84,7 @@ void vsfip_netif_on_inputted(vsfip_netif_t *netif, vsfip_netbuf_t *netbuf)
 
 static void vsfip_netif_destruct(vsfip_netif_t *netif)
 {
-    vsf_teda_fini(&netif->arpc.teda);
+    __vsf_eda_fini(&netif->arpc.teda.use_as__vsf_eda_t);
     vsf_eda_sync_cancel(&netif->arpc.sem);
     vsf_eda_sync_cancel(&netif->output_sem);
 }

@@ -29,6 +29,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
+#endif
+
 #ifndef VSF_USBH_CDCECM_CFG_NUM_OF_OCB
 #   define VSF_USBH_CDCECM_CFG_NUM_OF_OCB   1
 #endif
@@ -86,6 +90,10 @@ typedef struct vsf_usbh_ecm_t vsf_usbh_ecm_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_usbh_ecm_icb_t * vsf_usbh_ecm_get_icb(vsf_usbh_ecm_t *ecm, vsf_usbh_urb_t *urb)
@@ -398,12 +406,26 @@ static void vsf_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
+static void vsf_usbh_ecm_on_eda_terminate(vsf_eda_t *eda)
+{
+    vsf_usbh_ecm_t *ecm = container_of(eda, vsf_usbh_ecm_t, eda);
+    vsf_netdrv_t *netdrv = &ecm->netdrv;
+
+    netdrv->is_to_free = true;
+    if (vsf_netdrv_is_connected(netdrv)) {
+        vsf_netdrv_disconnect(netdrv);
+    } else {
+        vsf_usbh_ecm_netlink_fini(netdrv);
+    }
+}
+
 static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         vsf_usbh_ifs_parser_t *parser_ifs)
 {
     vsf_usbh_ecm_t *ecm = VSF_USBH_MALLOC(sizeof(vsf_usbh_ecm_t));
     if (ecm != NULL) {
         vsf_usbh_cdc_t *cdc = &ecm->use_as__vsf_usbh_cdc_t;
+        memset(ecm, 0, sizeof(*ecm));
         cdc->evthandler = vsf_usbh_ecm_on_cdc_evt;
         cdc->evt_buffer = ecm->evt;
         cdc->evt_size = sizeof(ecm->evt);
@@ -412,6 +434,7 @@ static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             ecm = NULL;
         } else {
             cdc->eda.evthandler = vsf_usbh_ecm_evthandler;
+            cdc->eda.on_terminate = vsf_usbh_ecm_on_eda_terminate;
             vsf_eda_init(&cdc->eda, vsf_priority_inherit, false);
         }
     }
@@ -421,7 +444,6 @@ static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 static void vsf_usbh_ecm_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param)
 {
     vsf_usbh_ecm_t *ecm = (vsf_usbh_ecm_t *)param;
-    vsf_netdrv_t *netdrv = &ecm->netdrv;
 
     for (int i = 0; i < dimof(ecm->icb); i++) {
         vsf_usbh_cdc_free_urb(&ecm->use_as__vsf_usbh_cdc_t, &ecm->icb[i].urb);
@@ -431,14 +453,7 @@ static void vsf_usbh_ecm_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void 
     }
 
     vsf_usbh_cdc_fini(&ecm->use_as__vsf_usbh_cdc_t);
-    vsf_eda_fini(&ecm->eda);
-
-    netdrv->is_to_free = true;
-    if (vsf_netdrv_is_connected(netdrv)) {
-        vsf_netdrv_disconnect(netdrv);
-    } else {
-        vsf_usbh_ecm_netlink_fini(netdrv);
-    }
+    __vsf_eda_fini(&ecm->eda);
 }
 
 static const vsf_usbh_dev_id_t vsf_usbh_ecm_dev_id[] = {

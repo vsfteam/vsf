@@ -42,7 +42,7 @@ def_fsm(user_fsm_task_t,
         vsf_task(user_fsm_sub_task_t) print_task;
     ));
     
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 declare_fsm(user_task_b_t)
 def_fsm(user_task_b_t,
     def_params(
@@ -128,7 +128,7 @@ implement_fsm(user_fsm_task_t)
     body_end();  
 }
 
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 
 /*! \IMPORTANT You cannot ignore fsm_initialiser at any time
  */
@@ -181,7 +181,7 @@ void vsf_kernel_fsm_simple_demo(void)
         start_fsm(user_fsm_task_t, &__user_task, vsf_priority_0);
     };
 
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(10000);
@@ -217,7 +217,7 @@ int main(void)
     
     vsf_kernel_fsm_simple_demo();
     
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);

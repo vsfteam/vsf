@@ -34,6 +34,8 @@
 #define m480_usbd_hs_ep_number          14
 #define m480_usbd_hs_ep_is_dma          false
 
+#define M480_USBD_HS_WROKAROUND_ISO
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -50,7 +52,11 @@ struct m480_usbd_hs_t {
     bool setup_status_IN;
     bool reply_status_OUT;
     uint16_t ep_buf_ptr;
+#ifdef M480_USBD_HS_WROKAROUND_ISO
     uint16_t ep_tx_mask;
+    uint16_t tx_size[m480_usbd_hs_ep_number - 2];
+    uint8_t retry_cnt[m480_usbd_hs_ep_number - 2];
+#endif
 
     struct {
         usb_dc_evt_handler_t evt_handler;

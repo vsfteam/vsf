@@ -19,6 +19,8 @@
 
 #include "service/vsf_service_cfg.h"
 
+#if VSF_USE_DYNARR == ENABLED
+
 #include "./vsf_dynstack.h"
 #include "../dynarr/vsf_dynarr.h"
 
@@ -125,3 +127,5 @@ vsf_err_t vsf_dynstack_pop_ext(vsf_dynstack_t *stack, void *ptr, uint_fast32_t l
     }
     return VSF_ERR_NONE;
 }
+
+#endif      // VSF_USE_DYNARR

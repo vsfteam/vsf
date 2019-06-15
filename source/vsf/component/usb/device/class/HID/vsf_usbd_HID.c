@@ -36,6 +36,10 @@ enum vsf_usbd_HID_EVT_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_usbd_HID_report_t * vsf_usbd_HID_find_report(
@@ -225,7 +229,7 @@ static vsf_err_t vsf_usbd_HID_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 static vsf_err_t vsf_usbh_HID_fini(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
     vsf_usbd_HID_t *hid = (vsf_usbd_HID_t *)ifs->class_param;
-    return vsf_teda_fini(&hid->teda);
+    return __vsf_eda_fini(&hid->teda.use_as__vsf_eda_t);
 }
 
 static vsf_usbd_desc_t * vsf_usbd_HID_get_desc(vsf_usbd_dev_t *dev,

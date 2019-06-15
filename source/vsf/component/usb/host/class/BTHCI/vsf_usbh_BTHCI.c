@@ -26,6 +26,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
+#endif
+
 #ifndef VSF_USBH_BTHCI_CFG_SCO_EN
 #   define VSF_USBH_BTHCI_CFG_SCO_EN    DISABLED
 #endif
@@ -108,6 +112,10 @@ typedef struct vsf_usbh_bthci_t vsf_usbh_bthci_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 WEAK void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id) {}
@@ -237,6 +245,12 @@ static void vsf_usbh_bthci_free_all(vsf_usbh_bthci_t *bthci)
     }
 }
 
+static void vsf_usbh_bthci_on_eda_terminate(vsf_eda_t *eda)
+{
+    vsf_usbh_bthci_t *bthci = container_of(eda, vsf_usbh_bthci_t, eda);
+    VSF_USBH_FREE(bthci);
+}
+
 static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         vsf_usbh_ifs_parser_t *parser_ifs)
 {
@@ -318,6 +332,7 @@ static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 #endif
 
     bthci->eda.evthandler = vsf_usbh_bthci_evthandler;
+    bthci->eda.on_terminate = vsf_usbh_bthci_on_eda_terminate;
     vsf_eda_init(&bthci->eda, vsf_priority_inherit, false);
     return bthci;
 
@@ -333,8 +348,7 @@ static void vsf_usbh_bthci_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, voi
 
     vsf_usbh_bthci_on_del(bthci);
     vsf_usbh_bthci_free_all(bthci);
-    vsf_eda_fini(&bthci->eda);
-    VSF_USBH_FREE(bthci);
+    __vsf_eda_fini(&bthci->eda);
 }
 
 const vsf_usbh_class_drv_t vsf_usbh_bthci_drv = {

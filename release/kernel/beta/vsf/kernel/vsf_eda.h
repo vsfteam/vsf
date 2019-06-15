@@ -80,6 +80,13 @@
 #define vsf_eda_event_wait(__pevt, __timeout)                                   \
             vsf_eda_sync_decrease((__pevt), (__timeout))
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   define vsf_eda_call_eda(__evthandler)                                       \
+            __vsf_eda_call_eda((void *)__evthandler, NULL)
+#   define vsf_eda_call_param_eda(__param_evthandler, __param)                  \
+            __vsf_eda_call_eda((void *)__param_evthandler, __param)
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef vsf_systimer_cnt_t     vsf_timer_tick_t;
@@ -146,14 +153,18 @@ struct vsf_eda_frame_t {
     union {
         struct {
             uint32_t        : 8;        //!< reserved for state
+            
+        #if VSF_USE_SIMPLE_SHELL == ENABLED
+            uint32_t        : 22;       //!< reserved for future
+            uint32_t is_stack_owner : 1;
+        #else
             uint32_t        : 23;       //!< reserved for future
+        #endif
             uint32_t is_fsm : 1;
         };
-        uint8_t  state;
+        int8_t   state;
         uint32_t flag;
     };
-#   else
-        uint32_t state;
 #   endif
     union {
         void *param;
@@ -167,20 +178,20 @@ def_vsf_pool(vsf_eda_frame_pool, vsf_eda_frame_t)
 
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 struct vsf_eda_cfg_t {
     union {
-        void                    *func;
-        vsf_eda_evthandler_t    evthandler;
-        vsf_fsm_entry_t         fsm_entry;
+        void                        *func;
+        vsf_eda_evthandler_t        evthandler;
+        vsf_param_eda_evthandler_t  param_evthandler;
+        vsf_fsm_entry_t             fsm_entry;
     };
     vsf_priority_t priority;
     void *target;
+    vsf_eda_on_terminate_t      on_terminate;
     bool is_fsm;
     bool is_stack_owner;
 };
 typedef struct vsf_eda_cfg_t vsf_eda_cfg_t;
-#endif
 
 //! \name eda
 //! @{
@@ -195,7 +206,7 @@ def_simple_class(vsf_eda_t) {
             vsf_eda_frame_t         *frame;
         #endif
         };
-    #ifdef VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE
+    #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
         vsf_eda_on_terminate_t  on_terminate;
     #endif
     )
@@ -239,13 +250,12 @@ def_simple_class(vsf_eda_t) {
     #endif
 
     #   if VSF_CFG_SYNC_EN == ENABLED
-                /* if limitted is set, eda can only receive 1 event */
+                /* if is_limitted, eda can only receive 1 event */
                 uint8_t     is_limitted     : 1;
                 uint8_t     is_sync_got     : 1;
     #   endif
 
     #   if VSF_CFG_TIMER_EN == ENABLED
-                /* has_timer and timed is used in teda */
                 uint8_t     is_timed        : 1;
     #   endif
     #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
@@ -259,6 +269,7 @@ def_simple_class(vsf_eda_t) {
                 uint8_t     polling_state   : 1; 
                 uint8_t     is_stack_owner  : 1;
             };
+            // TODO: flag is not always 16-bit here
             uint16_t        flag;                       
     #   else
             };
@@ -517,8 +528,8 @@ extern vsf_err_t vsf_eda_init(  vsf_eda_t *pthis,
                                 vsf_priority_t priotiry, 
                                 bool is_stack_owner);
 
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t vsf_eda_fini(vsf_eda_t *pthis);
+SECTION(".text.vsf.kernel.vsf_eda_init_ex")
+vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg);
 
 SECTION(".text.vsf.kernel.eda")
 extern vsf_eda_t *vsf_eda_get_cur(void);
@@ -532,22 +543,20 @@ extern void *vsf_eda_get_cur_msg(void);
 SECTION(".text.vsf.kernel.vsf_eda_is_stack_owner")
 extern bool vsf_eda_is_stack_owner(vsf_eda_t *pthis);
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-SECTION(".text.vsf.kernel.eda_nesting")
+SECTION(".text.vsf.kernel.vsf_eda_return")
 extern bool vsf_eda_return(void);
-
-SECTION(".text.vsf.kernel.eda_nesting")
-extern vsf_err_t vsf_eda_call_eda(vsf_eda_evthandler_t evthandler, void *param);
 
 SECTION(".text.vsf.kernel.vsf_eda_yield")
 extern void vsf_eda_yield(void);
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+SECTION(".text.vsf.kernel.__vsf_eda_call_eda")
+extern vsf_err_t __vsf_eda_call_eda(void *evthandler, void *param);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
 extern fsm_rt_t vsf_eda_call_fsm(vsf_fsm_entry_t entry, void *param);
 
-SECTION(".text.vsf.kernel.vsf_eda_init_ex")
-vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg);
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 
@@ -559,9 +568,6 @@ extern vsf_err_t vsf_teda_init(vsf_teda_t *pthis,
 
 SECTION(".text.vsf.kernel.vsf_teda_init_ex")
 vsf_err_t vsf_teda_init_ex(vsf_teda_t *pthis, vsf_eda_cfg_t *cfg);
-
-SECTION(".text.vsf.kernel.teda")
-extern vsf_err_t vsf_teda_fini(vsf_teda_t *pthis);
 
 SECTION(".text.vsf.kernel.teda")
 extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);

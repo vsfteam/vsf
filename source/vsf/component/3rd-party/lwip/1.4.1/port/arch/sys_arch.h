@@ -26,8 +26,8 @@
 /*============================ MACROS ========================================*/
 
 #if !NO_SYS
-#   if VSF_USE_KERNEL_THREAD_MODE != ENABLED
-#       error "VSF_USE_KERNEL_THREAD_MODE must be enabled for SYS mode of lwip"
+#   if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#       error "VSF_KERNEL_CFG_SUPPORT_THREAD must be enabled for SYS mode of lwip"
 #   endif
 #endif
 

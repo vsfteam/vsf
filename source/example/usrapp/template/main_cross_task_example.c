@@ -23,13 +23,17 @@
 /*============================ TYPES =========================================*/
 declare_vsf_pt(user_pt_task_t)
 declare_vsf_pt(user_pt_sub_t)
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 declare_vsf_task(user_sub_task_t)
+#endif
 
 def_vsf_pt(user_pt_sub_t,
     def_params(
         uint32_t cnt;
     ));
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 def_vsf_task(user_sub_task_t,
     def_params(
         /*! \note when you want to use fsm_rt_asyn, you need a dedicated chState
@@ -38,6 +42,14 @@ def_vsf_task(user_sub_task_t,
         uint8_t chState;        
         uint32_t cnt;
     ));
+#endif
+
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+declare_vsf_thread(user_thread_a_t)
+def_vsf_thread(user_thread_a_t, 1024);
+
+
+#endif
 
 def_vsf_pt(user_pt_task_t,
     def_params(
@@ -45,13 +57,19 @@ def_vsf_pt(user_pt_task_t,
         uint32_t cnt;
         
         vsf_pt(user_pt_sub_t)       print_task;
+    #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
         vsf_task(user_sub_task_t)   progress_task;
+    #endif
+    #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
+        &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+        vsf_thread(user_thread_a_t) thread_task;
+    #endif
     ));
     
 
 
     
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
 declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
@@ -66,6 +84,14 @@ static NO_INIT vsf_sem_t user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+implement_vsf_thread(user_thread_a_t)
+{
+    printf("run thread...delay 100ms...");
+    vsf_delay_ms(100);
+    printf("cpl\r\n");
+}
+#endif
 
 
 private implement_vsf_pt(user_pt_sub_t) 
@@ -79,6 +105,7 @@ private implement_vsf_pt(user_pt_sub_t)
 
 #define RESET_FSM()     do {this.chState = 0;} while(0)
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 private implement_vsf_task(user_sub_task_t)
 {
     vsf_task_begin();
@@ -112,6 +139,7 @@ private implement_vsf_task(user_sub_task_t)
     
     vsf_task_end();
 }
+#endif
 
 private implement_vsf_pt(user_pt_task_t) 
 {
@@ -121,9 +149,16 @@ private implement_vsf_pt(user_pt_task_t)
     while(1) {
         vsf_pt_wait_until(vsf_sem_pend(this.psem));
 
+    #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         this.print_task.cnt = this.cnt;                                         //!< Pass parameter
-        vsf_call_pt(user_pt_sub_t, &this.print_task);
-        
+        vsf_pt_call_pt(user_pt_sub_t, &this.print_task);
+        //! pt call complete
+        this.cnt = this.print_task.cnt;                                         //!< read parameter
+    #else
+        printf("receive semaphore...[%08x]\r\n", this.cnt++);
+    #endif
+    
+    #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
         this.progress_task.chState = 0;
         do {
             fsm_rt_t ret;
@@ -133,16 +168,19 @@ private implement_vsf_pt(user_pt_task_t)
             } /* else if (fsm_rt_asyn == ret ) */
             printf("%2d%%", this.progress_task.cnt);
         } while(true);
+    #endif
+    
+    #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
+        &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+        vsf_pt_call_thread(user_thread_a_t, &(this.thread_task));
+    #endif
         
-        
-        //! pt call complete
-        this.cnt = this.print_task.cnt;                                         //!< read parameter
     }
 
     vsf_pt_end();
 }
 
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
 private implement_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
@@ -169,7 +207,7 @@ void vsf_kernel_pt_simple_demo(void)
         init_vsf_pt(user_pt_task_t, &__user_pt, vsf_priority_inherit);
     };
 
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(10000);

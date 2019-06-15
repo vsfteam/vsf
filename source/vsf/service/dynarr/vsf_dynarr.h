@@ -21,6 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
+#if VSF_USE_DYNARR == ENABLED
+
 #if     defined(VSF_DYNARR_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
 #   undef VSF_DYNARR_IMPLEMENT
@@ -67,4 +69,5 @@ extern uint_fast32_t vsf_dynarr_get_size(vsf_dynarr_t *dynarr);
 extern vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size);
 extern void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos);
 
+#endif      // VSF_USE_DYNARR
 #endif      // __VSF_DYNARR_H__

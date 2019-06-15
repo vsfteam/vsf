@@ -35,8 +35,8 @@
 #ifndef VSF_OS_MAIN_STACK_SIZE
 #   define VSF_OS_MAIN_STACK_SIZE               2048
 #endif
-#ifndef VSF_OS_RUN_MAIN_AS_THREAD
-#   define VSF_OS_RUN_MAIN_AS_THREAD            1
+#ifndef VSF_BSP_CFG_RUN_MAIN_AS_THREAD
+#   define VSF_BSP_CFG_RUN_MAIN_AS_THREAD            1
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -262,23 +262,14 @@ void __vsf_main_entry(void)
 #endif
         vsf_evtq_init(pevtq);
     }
-
-    __vsf_set_cur_evtq(&__vsf_os.evt_queue[vsf_priority_0]);
+    __vsf_set_cur_evtq(NULL);
 #endif
-
-    __vsf_sched_safe(
 
 #if VSF_CFG_TIMER_EN
-        vsf_timer_init();
+    vsf_timer_init();
 #endif
-        vsf_hal_advance_init();
-
-        __post_vsf_kernel_init();
-
-#ifdef VSF_CFG_EVTQ_EN
-        __vsf_set_cur_evtq(NULL);
-#endif
-    )
+    vsf_hal_advance_init();
+    __post_vsf_kernel_init();
 
     while (1) {
         vsf_plug_in_for_kernel_diagnosis(); //!< customised kernel diagnosis

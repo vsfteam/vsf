@@ -19,6 +19,8 @@
 
 #include "service/vsf_service_cfg.h"
 
+#if VSF_USE_DYNARR == ENABLED
+
 #define VSF_DYNARR_IMPLEMENT
 #include "./vsf_dynarr.h"
 #include "../heap/vsf_heap.h"
@@ -196,3 +198,5 @@ void vsf_dynarr_fini(vsf_dynarr_t *dynarr)
 
     vsf_dynarr_init(dynarr);
 }
+
+#endif      // VSF_USE_DYNARR

@@ -54,7 +54,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
     vsf_teda_t *pteda = (vsf_teda_t *)vsf_eda_get_cur();
     ASSERT(NULL != pteda);
 
-#   if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(&(pteda->use_as__vsf_eda_t))) {
         vsf_thread_delay(tick);
         result = vsf_eda_get_cur_evt();
@@ -95,7 +95,7 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
     ASSERT(NULL != pteda);
     
     do {
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
         if (vsf_eda_is_stack_owner(&(pteda->use_as__vsf_eda_t))) {
             result = vsf_thread_sem_pend(psem, time_out);
         } else 

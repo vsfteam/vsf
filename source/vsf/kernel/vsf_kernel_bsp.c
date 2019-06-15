@@ -34,6 +34,13 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if     VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED                                    \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+declare_vsf_thread(app_main_thread_t)
+def_vsf_thread(app_main_thread_t, VSF_OS_MAIN_STACK_SIZE)
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -92,27 +99,21 @@ uint32_t vsf_arch_req___systimer_freq___from_usr(void)
     return SYSTEM_FREQ;
 }
 
+#if     VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED                                    \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+implement_vsf_thread(app_main_thread_t)
+{
+    main();
+}
+
+#endif
+
 ROOT void __post_vsf_kernel_init(void)
 {
-#if     VSF_OS_RUN_MAIN_AS_THREAD == ENABLED                                    \
-    &&  VSF_USE_KERNEL_THREAD_MODE == ENABLED
-    ALIGN(8) NO_INIT static uint64_t __main_stack[(VSF_OS_MAIN_STACK_SIZE + 7)/8];
-    NO_INIT static vsf_thread_t __main_thread;
-    //!< Align with 8bytes
-    uint_fast32_t stack_size = sizeof(__main_stack) & ~0x07;
-    ASSERT(stack_size >= 64);
-    
-#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-#   if __IS_COMPILER_ARM_COMPILER_5__
-        __main_thread.use_as__vsf_teda_t.use_as__vsf_eda_t.on_terminate = NULL;
-#   else
-        __main_thread.on_terminate = NULL;
-#   endif
-#endif
-    __main_thread.entry = (vsf_thread_entry_t *)main;
-    __main_thread.stack = __main_stack;
-    __main_thread.stack_size = stack_size;
-    vsf_thread_start((vsf_thread_t *)&__main_thread, vsf_priority_inherit);
+#if     VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED                                    \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    static NO_INIT app_main_thread_t __app_main;
+    init_vsf_thread(app_main_thread_t, &__app_main, vsf_priority_0);
 #else
     main();
 #endif

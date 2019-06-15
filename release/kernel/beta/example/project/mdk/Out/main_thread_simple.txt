@@ -2,12 +2,12 @@
 ; commandline ArmCC [--c99 --list --split_sections --debug -c --asm --interleave --gnu -o.\out\main_thread_simple.o --asm_dir=.\Out\ --list_dir=.\Out\ --depend=.\out\main_thread_simple.d --cpu=Cortex-M3 --apcs=interwork -O3 --diag_suppress=9931,64,1,381,177,111 -I..\..\..\vsf -I..\..\usrapp\template -I..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include -I..\..\usrapp\template\app_cfg -I.\RTE\Device\CMSDK_CM3 -I.\RTE\_tempalte_armv7-m_ac5 -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include -IC:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common -IC:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM3\Include -D__MICROLIB -D__UVISION_VERSION=527 -D_RTE_ -DCMSDK_CM3 --enum_is_int --wchar32 --omf_browse=.\out\main_thread_simple.crf ..\..\usrapp\template\main_thread_simple.c]
                           THUMB
 
-                          AREA ||i.main||, CODE, READONLY, ALIGN=1
+                          AREA ||i.main||, CODE, READONLY, ALIGN=2
 
                   main PROC
 ;;;99     #if VSF_PROJ_CFG_USE_CUBE != ENABLED
 ;;;100    int main(void)
-000000  b510              PUSH     {r4,lr}
+000000  f7fffffe          BL       vsf_stdio_init
 ;;;101    {
 ;;;102        static_task_instance(
 ;;;103            features_used(
@@ -17,25 +17,36 @@
 ;;;107        )
 ;;;108    
 ;;;109        vsf_stdio_init();
-000002  f7fffffe          BL       vsf_stdio_init
 ;;;110        
 ;;;111        vsf_kernel_thread_simple_demo();
-000006  f7fffffe          BL       vsf_kernel_thread_simple_demo
+000004  f7fffffe          BL       vsf_kernel_thread_simple_demo
 ;;;112        
-;;;113    #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+;;;113    #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 ;;;114        while(1) {
 ;;;115            printf("hello world! \r\n");
 ;;;116            vsf_delay_ms(1000);
+000008  f44f747a          MOV      r4,#0x3e8
+                  |L1.12|
+00000c  a004              ADR      r0,|L1.32|
+00000e  f7fffffe          BL       __2printf
+000012  4620              MOV      r0,r4
+000014  f7fffffe          BL       vsf_systimer_ms_to_tick
+000018  f7fffffe          BL       __vsf_delay
+00001c  e7f6              B        |L1.12|
 ;;;117        }
 ;;;118    #else
 ;;;119        return 0;
-00000a  2000              MOVS     r0,#0
 ;;;120    #endif
 ;;;121    }
-00000c  bd10              POP      {r4,pc}
 ;;;122    
                           ENDP
 
+00001e  0000              DCW      0x0000
+                  |L1.32|
+000020  68656c6c          DCB      "hello world! \r\n",0
+000024  6f20776f
+000028  726c6421
+00002c  200d0a00
 
                           AREA ||i.vsf_kernel_thread_simple_demo||, CODE, READONLY, ALIGN=2
 
@@ -48,37 +59,37 @@
 ;;;61         vsf_sem_init(&user_sem, 0); 
 000002  f64772ff          MOV      r2,#0x7fff
 000006  2100              MOVS     r1,#0
-000008  4809              LDR      r0,|L2.48|
+000008  4808              LDR      r0,|L2.44|
 00000a  f7fffffe          BL       vsf_eda_sync_init
 ;;;62         
 ;;;63         //! start the user task a
 ;;;64         {
 ;;;65             static NO_INIT user_thread_a_t __user_task_a;
 ;;;66             __user_task_a.param.psem = &user_sem;
-00000e  4c08              LDR      r4,|L2.48|
+00000e  4c07              LDR      r4,|L2.44|
 ;;;67             init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_priority_0);
 000010  2100              MOVS     r1,#0
 000012  f5a46098          SUB      r0,r4,#0x4c0          ;66
-000016  f8c04258          STR      r4,[r0,#0x258]  ; __user_task_a
-00001a  f7fffffe          BL       vsf_thread_user_thread_a_t_start
+000016  6544              STR      r4,[r0,#0x54]  ; __user_task_a
+000018  f7fffffe          BL       vsf_thread_user_thread_a_t_start
 ;;;68         }
 ;;;69         
 ;;;70         //! start the user task b
 ;;;71         {
 ;;;72             static NO_INIT user_thread_b_t __user_task_b;
 ;;;73             __user_task_b.param.psem = &user_sem;
-00001e  f5a47018          SUB      r0,r4,#0x260
+00001c  f5a47018          SUB      r0,r4,#0x260
 ;;;74             init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_priority_0);
-000022  2100              MOVS     r1,#0
-000024  f8c04258          STR      r4,[r0,#0x258]  ; __user_task_b
-000028  e8bd4010          POP      {r4,lr}
-00002c  f7ffbffe          B.W      vsf_thread_user_thread_b_t_start
+000020  2100              MOVS     r1,#0
+000022  6544              STR      r4,[r0,#0x54]  ; __user_task_b
+000024  e8bd4010          POP      {r4,lr}
+000028  f7ffbffe          B.W      vsf_thread_user_thread_b_t_start
 ;;;75         }
 ;;;76     }
 ;;;77     
                           ENDP
 
-                  |L2.48|
+                  |L2.44|
                           DCD      ||.bss.noinit||+0x4c0
 
                           AREA ||i.vsf_thread_user_thread_a_t_entry||, CODE, READONLY, ALIGN=2
@@ -109,7 +120,7 @@
 000016  a003              ADR      r0,|L3.36|
 000018  f7fffffe          BL       __2printf
 ;;;84             vsf_sem_post(this.psem);            //!< post a semaphore
-00001c  6da8              LDR      r0,[r5,#0x58]
+00001c  6968              LDR      r0,[r5,#0x14]
 00001e  f7fffffe          BL       vsf_eda_sync_increase
 000022  e7f1              B        |L3.8|
 ;;;85         }
@@ -133,19 +144,25 @@
                   vsf_thread_user_thread_a_t_start PROC
 ;;;77     
 ;;;78     implement_vsf_thread(user_thread_a_t) 
-000000  4602              MOV      r2,r0
-000002  f5007000          ADD      r0,r0,#0x200
-000006  4b04              LDR      r3,|L4.24|
-000008  6403              STR      r3,[r0,#0x40]
-00000a  6482              STR      r2,[r0,#0x48]
-00000c  f44f7200          MOV      r2,#0x200
-000010  f8a02044          STRH     r2,[r0,#0x44]
-000014  f7ffbffe          B.W      vsf_thread_start
+000000  4b07              LDR      r3,|L4.32|
+000002  6403              STR      r3,[r0,#0x40]
+000004  460a              MOV      r2,r1
+000006  f1000360          ADD      r3,r0,#0x60
+00000a  f1000140          ADD      r1,r0,#0x40
+00000e  6483              STR      r3,[r0,#0x48]
+000010  f44f7300          MOV      r3,#0x200
+000014  808b              STRH     r3,[r1,#4]
+000016  4b03              LDR      r3,|L4.36|
+000018  6583              STR      r3,[r0,#0x58]
+00001a  f7ffbffe          B.W      vsf_thread_start
 ;;;79     {
                           ENDP
 
-                  |L4.24|
+00001e  0000              DCW      0x0000
+                  |L4.32|
                           DCD      vsf_thread_user_thread_a_t_entry
+                  |L4.36|
+                          DCD      0xdeadbeef
 
                           AREA ||i.vsf_thread_user_thread_b_t_entry||, CODE, READONLY, ALIGN=2
 
@@ -167,7 +184,7 @@
 000004  1e66              SUBS     r6,r4,#1
                   |L5.6|
 000006  4631              MOV      r1,r6
-000008  6da8              LDR      r0,[r5,#0x58]
+000008  6968              LDR      r0,[r5,#0x14]
 00000a  f7fffffe          BL       __vsf_sem_pend
 00000e  2804              CMP      r0,#4
 000010  d0f9              BEQ      |L5.6|
@@ -199,19 +216,25 @@
                   vsf_thread_user_thread_b_t_start PROC
 ;;;87     
 ;;;88     implement_vsf_thread(user_thread_b_t) 
-000000  4602              MOV      r2,r0
-000002  f5007000          ADD      r0,r0,#0x200
-000006  4b04              LDR      r3,|L6.24|
-000008  6403              STR      r3,[r0,#0x40]
-00000a  6482              STR      r2,[r0,#0x48]
-00000c  f44f7200          MOV      r2,#0x200
-000010  f8a02044          STRH     r2,[r0,#0x44]
-000014  f7ffbffe          B.W      vsf_thread_start
+000000  4b07              LDR      r3,|L6.32|
+000002  6403              STR      r3,[r0,#0x40]
+000004  460a              MOV      r2,r1
+000006  f1000360          ADD      r3,r0,#0x60
+00000a  f1000140          ADD      r1,r0,#0x40
+00000e  6483              STR      r3,[r0,#0x48]
+000010  f44f7300          MOV      r3,#0x200
+000014  808b              STRH     r3,[r1,#4]
+000016  4b03              LDR      r3,|L6.36|
+000018  6583              STR      r3,[r0,#0x58]
+00001a  f7ffbffe          B.W      vsf_thread_start
 ;;;89     {
                           ENDP
 
-                  |L6.24|
+00001e  0000              DCW      0x0000
+                  |L6.32|
                           DCD      vsf_thread_user_thread_b_t_entry
+                  |L6.36|
+                          DCD      0xdeadbeef
 
                           AREA ||.bss.noinit||, DATA, NOINIT, ALIGN=3
 

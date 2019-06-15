@@ -101,7 +101,7 @@ struct usrapp_t {
 };
 typedef struct usrapp_t usrapp_t;
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(user_task_t)
 
 def_vsf_thread(user_task_t, 1024,
@@ -599,7 +599,7 @@ void usrapp_usbd_connect(vsf_callback_timer_t *timer)
 #endif
 
 static uint_fast32_t count = 0;
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(user_task_t) 
 {
     while (1) {
@@ -716,7 +716,7 @@ int main(void)
 #endif
     
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     do {
         static NO_INIT user_task_t __user_task;
         init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);

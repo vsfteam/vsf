@@ -135,7 +135,7 @@
 //! @}
 
 #define call_fsm(__NAME, __FSM )                                                \
-            vsf_call_task(__NAME, __FSM)                                 
+            vsf_task_call_task(__NAME, __FSM)                                 
 
 #define call_simple_fsm(__NAME, __FSM )                                         \
             call_fsm(__NAME, __FSM)

@@ -82,7 +82,7 @@ const struct {
     }Customisation;
 } VSF_FEATURE_KERNEL = {
     .is_support_teda =              (VSF_CFG_TIMER_EN ? (true) : false),
-    .is_support_thread =            (VSF_USE_KERNEL_THREAD_MODE ? (true) : false),
+    .is_support_thread =            (VSF_KERNEL_CFG_SUPPORT_THREAD ? (true) : false),
     .is_support_simple_shell =      (VSF_USE_SIMPLE_SHELL ? (true) : false),
     .is_support_callback_timer =    (VSF_KERNEL_CFG_CALLBACK_TIMER ? true : false),
 

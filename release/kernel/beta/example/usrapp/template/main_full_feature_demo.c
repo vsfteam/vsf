@@ -20,6 +20,10 @@
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
+#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#error In order to run this demo, please set VSF_BSP_CFG_RUN_MAIN_AS_THREAD to ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -241,7 +245,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
     
         this.slave.mask = this.mask;
         this.slave.pgroup_evts = this.pgroup_evts;
-        vsf_call_pt(user_pt_bmpevt_demo_slave_t, &this.slave);
+        vsf_pt_call_pt(user_pt_bmpevt_demo_slave_t, &this.slave);
     
         vsf_pt_wait_until( wait_for_one(this.pgroup_evts, this.mask) );
         printf("get timer4_evt in pt master thread\r\n");

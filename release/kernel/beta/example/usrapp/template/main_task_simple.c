@@ -41,7 +41,7 @@ def_vsf_task(user_task_t,
                                                        
 
 
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 declare_vsf_task(user_task_b_t)
 def_vsf_task(user_task_b_t,
     def_params(
@@ -87,8 +87,8 @@ implement_vsf_task(user_task_t)
             
             break;
         case CALL_SUB_TO_PRINT:
-            if (fsm_rt_cpl == vsf_call_task(user_sub_task_t, 
-                                            &this.print_task)) {
+            if (fsm_rt_cpl == vsf_task_call_task(user_sub_task_t, 
+                                                &this.print_task)) {
                 //! task complete
                 this.cnt = this.print_task.cnt;                                 //!< read param value
                 USER_TASK_RESET_FSM();                                          //!< reset fsm
@@ -98,7 +98,7 @@ implement_vsf_task(user_task_t)
     vsf_task_end();
 }
 
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 implement_vsf_task(user_task_b_t) 
 {
     vsf_task_begin();
@@ -137,7 +137,7 @@ void vsf_kernel_task_simple_demo(void)
         init_vsf_task(user_task_t, &__user_task, vsf_priority_0);
     }
 
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(10000);
@@ -171,7 +171,7 @@ int main(void)
     
     vsf_kernel_task_simple_demo();
     
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);

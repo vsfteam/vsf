@@ -19,6 +19,8 @@
 
 #include "vsf.h"
 
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
+
 #include "btstack_config.h"
 #include "btstack_debug.h"
 #include "hci.h"
@@ -144,3 +146,4 @@ const hci_transport_t * hci_transport_usb_instance(void)
     return &hci_transport_h2;
 }
 
+#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_BTHCI

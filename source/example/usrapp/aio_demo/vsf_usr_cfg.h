@@ -30,7 +30,7 @@
 #define APP_CFG_USBD_VID                A7A8
 #define APP_CFG_USBD_PID                2347
 
-#define VSF_HEAP_CFG_MCB_MAGIC_ENABLED  ENABLED
+#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 
 #define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
 
@@ -38,12 +38,9 @@
 
 #define SYSTEM_FREQ                     (192000000ul)
 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE     ENABLED
 
-#define VSF_CFG_EDA_FRAME_POOL_EN       ENABLED
-#define VSF_CFG_EDA_FRAME_POOL_COUNT    8
-#define VSF_CFG_EDA_NESTING_EN          ENABLED
-#define VSF_CFG_EDA_FSM_EN              ENABLED
+#define VSF_USE_FS                      ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -132,7 +129,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_RUN_MAIN_AS_THREAD           ENABLED
+#define VSF_BSP_CFG_RUN_MAIN_AS_THREAD           ENABLED
 //          </c>
 //      </h>
 //      <h> Shell Configuration
@@ -149,7 +146,7 @@
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
-#define VSF_USE_KERNEL_THREAD_MODE          ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_THREAD          ENABLED
 //          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack

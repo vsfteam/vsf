@@ -26,6 +26,11 @@
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -59,6 +64,10 @@ typedef struct vsf_usbh_hid_input_t vsf_usbh_hid_input_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -84,6 +93,12 @@ static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsf_eda_post_evt(eda, VSF_EVT_INIT);
         break;
     }
+}
+
+static void vsf_usbh_hid_on_eda_terminate(vsf_eda_t *eda)
+{
+    vsf_usbh_hid_eda_t *hid = container_of(eda, vsf_usbh_hid_eda_t, use_as__vsf_eda_t);
+    VSF_USBH_FREE(hid);
 }
 
 void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
@@ -132,6 +147,7 @@ void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     hid->desc_len = desc_hid->desc[0].wDescriptorLength;
 
     hid->evthandler = vsf_usbh_hid_evthandler;
+    hid->on_terminate = vsf_usbh_hid_on_eda_terminate;
     vsf_eda_init(&hid->use_as__vsf_eda_t, vsf_priority_inherit, false);
 
     return hid;
@@ -145,7 +161,7 @@ void vsf_usbh_hid_disconnect(vsf_usbh_hid_eda_t *hid)
     vsf_usbh_t *usbh = hid->usbh;
     vsf_usbh_free_urb(usbh, &hid->urb_in);
     vsf_usbh_free_urb(usbh, &hid->urb_out);
-    vsf_eda_fini(&hid->use_as__vsf_eda_t);
+    __vsf_eda_fini(&hid->use_as__vsf_eda_t);
 }
 
 static vsf_err_t vsf_usbh_hid_submit_urb(vsf_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_t *urb)
@@ -334,7 +350,6 @@ static void vsf_usbh_hid_input_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     vsf_usbh_hid_input_t *hid = param;
     vsf_usbh_hid_disconnect(&hid->use_as__vsf_usbh_hid_eda_t);
     vsf_usbh_hid_input_on_free(hid);
-    VSF_USBH_FREE(hid);
 }
 
 static const vsf_usbh_dev_id_t vsf_usbh_hid_input_dev_id[] = {

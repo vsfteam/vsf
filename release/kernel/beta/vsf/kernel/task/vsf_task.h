@@ -27,17 +27,25 @@
 #include "./vsf_thread.h"
 #include "./vsf_fsm.h"
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+
 
 /*============================ MACROS ========================================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == DISABLED
+#warning \
+ Although VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is enabled, but\
+ VSF_KERNEL_CFG_EDA_SUPPORT_FSM is disabled, hence vsf_task will be treated as\
+ VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is disabled. If this is not what you wanted,\
+ please set VSF_KERNEL_CFG_EDA_SUPPORT_FSM to ENABLED.
+#endif
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __implement_vsf_task(__NAME)                                         \
         fsm_rt_t vsf_task_func_##__NAME(vsf_eda_frame_t *ptFrame, vsf_evt_t evt)\
         {                                                                       \
             task_cb_##__NAME *ptThis = (task_cb_##__NAME *)ptFrame->param;      \
-            uint8_t *ptState = &(ptFrame->state);                               \
+            int8_t *ptState = &(ptFrame->state);                               \
             UNUSED_PARAM(ptThis); UNUSED_PARAM(ptState);                        \
             ASSERT(NULL != ptFrame);  
             
@@ -53,7 +61,7 @@
         void vsf_task_func_##__NAME(__NAME *ptThis, vsf_evt_t evt)
         
 #   define vsf_task_begin()  
-#   define vsf_task_end()           return fsm_rt_on_going;
+#   define vsf_task_end()           vsf_eda_yield();
                 
 #   define vsf_task_state  (ptThis->chState)
 #endif
@@ -134,7 +142,7 @@
             vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
                 .evthandler = (vsf_eda_evthandler_t)vsf_task_func(__NAME),      \
                 .priority = (__PRI),                                            \
-                .target = &((__TASK)->param),                                   \
+                .target = NULL,                                                 \
                 __VA_ARGS__                                                     \
             };                                                                  \
             (__TASK)->param.chState = 0;                                        \
@@ -150,19 +158,35 @@
 #define vsf_task_call_fsm(__NAME, __TARGET)                                     \
             vsf_eda_call_fsm((vsf_fsm_entry_t)(__NAME),                         \
                             (__TARGET))
-#define vsf_call_task(__NAME, __TARGET)                                         \
+#define vsf_task_call_task(__NAME, __TARGET)                                    \
             vsf_eda_call_fsm((vsf_fsm_entry_t)vsf_task_func(__NAME),            \
                             (__TARGET))
 #endif
-#define vsf_task_call_sub(__NAME, __TARGET)                                     \
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#   define vsf_task_call_sub(__NAME, __TARGET)                                  \
             if (VSF_ERR_NONE != vsf_eda_call_eda(                               \
                     (vsf_eda_evthandler_t)(__NAME),                             \
                     (__TARGET))) {                                              \
                 return fsm_rt_on_going;                                         \
             }
+#   define vsf_eda_call_task    vsf_task_call_task
+
+#elif VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   define vsf_task_call_sub(__NAME, __TARGET)                                  \
+            if (VSF_ERR_NONE != vsf_eda_call_eda(                               \
+                    (vsf_eda_evthandler_t)(__NAME),                             \
+                    (__TARGET))) {                                              \
+                return ;                                                        \
+            }
+#   define vsf_eda_call_task    \
+        vsf_eda_call_sub((vsf_eda_evthandler_t)vsf_task_func(__NAME), (__TARGET))
+#endif
+
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #define vsf_task_call_pt(__NAME, __TARGET)                                      \
             vsf_task_call_sub(vsf_pt_func(__NAME), __TARGET)
-
+#endif
 
 #define on_vsf_task_init()                                                      \
         if (VSF_EVT_INIT == evt)
@@ -199,22 +223,21 @@
             
 #else
 #   define vsf_task_wait_until(...)                                             \
-            __VA_ARGS__ {} else                                                 \
+            __VA_ARGS__ {} else {                                               \
                 return ;                                                        \
             }  
 #endif
 /*============================ TYPES =========================================*/
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+
 #   if VSF_CFG_TIMER_EN == ENABLED
 typedef vsf_teda_t  vsf_task_t;
 #   else
 typedef vsf_eda_t  vsf_task_t;
 #   endif
-#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif
 #endif
 /* EOF */

@@ -78,6 +78,38 @@ const vsf_stream_tx_t VSF_DEBUG_STREAM_TX = {
 #endif
 /*============================ IMPLEMENTATION ================================*/
 
+WEAK void vsf_stdout_init(void)
+{
+    NuConsole_Init();
+}
+
+WEAK void vsf_stderr_init(void)
+{
+    NuConsole_Init();
+}
+
+WEAK void vsf_stdin_init(void)
+{
+    NuConsole_Init();
+}
+
+WEAK int vsf_stdout_putchar(char ch)
+{
+    return NuConsole_Write((const uint8_t *)&ch, 1);
+}
+
+WEAK int vsf_stderr_putchar(char ch)
+{
+    return NuConsole_Write((const uint8_t *)&ch, 1);
+}
+
+WEAK int vsf_stdin_getchar(void)
+{
+    int ch = 0;
+    NuConsole_Read((uint8_t *)&ch, 1);
+    return ch;
+}
+
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static void vsf_nu_console_stream_init(vsf_stream_t *stream)
 {

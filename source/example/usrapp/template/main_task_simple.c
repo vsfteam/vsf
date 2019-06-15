@@ -24,18 +24,20 @@
 declare_vsf_task(user_task_t)
 declare_vsf_task(user_sub_task_t)
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 def_vsf_task(user_sub_task_t,
     def_params(
         uint32_t cnt;
     ));
+#endif
 
 def_vsf_task(user_task_t,
     def_params(
         vsf_sem_t *psem;
         uint32_t cnt;
-        
+    #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
         vsf_task(user_sub_task_t) print_task;
-        
+    #endif
     ));
                                                        
 
@@ -54,7 +56,7 @@ def_vsf_task(user_task_b_t,
 static NO_INIT vsf_sem_t user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 implement_vsf_task(user_sub_task_t) 
 {
     vsf_task_begin();
@@ -62,7 +64,7 @@ implement_vsf_task(user_sub_task_t)
     return fsm_rt_cpl;                  //!< return to caller
     vsf_task_end();
 }
-
+#endif
 
 #define USER_TASK_RESET_FSM()   do { vsf_task_state = 0;} while(0)
 
@@ -80,18 +82,25 @@ implement_vsf_task(user_task_t)
 
     switch (vsf_task_state) {
         case WAIT_FOR_SEM:    
-            vsf_task_wait_until(vsf_sem_pend(this.psem));                       //!< wait for semaphore forever                                                                                  
+            vsf_task_wait_until(vsf_sem_pend(this.psem));                       //!< wait for semaphore forever  
+        #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
             this.print_task.cnt = this.cnt;                                     //!< passing parameter
+        #endif
             vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< tranfer to next state
-            
             break;
+            
         case CALL_SUB_TO_PRINT:
+        #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
             if (fsm_rt_cpl == vsf_call_task(user_sub_task_t, 
                                             &this.print_task)) {
                 //! task complete
                 this.cnt = this.print_task.cnt;                                 //!< read param value
                 USER_TASK_RESET_FSM();                                          //!< reset fsm
             }
+        #else
+            printf("receive semaphore...[%08x]\r\n", this.cnt++);
+            USER_TASK_RESET_FSM();
+        #endif
             break;
     }
     vsf_task_end();

@@ -30,6 +30,8 @@
 
 #include "component/av/vsfav.h"
 
+#include "component/fs/vsf_fs.h"
+
 #include "component/input/vsf_input.h"
 #include "component/input/hid/vsf_input_hid.h"
 
