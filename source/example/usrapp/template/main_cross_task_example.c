@@ -69,7 +69,7 @@ def_vsf_pt(user_pt_task_t,
 
 
     
-#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
 declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
@@ -180,7 +180,7 @@ private implement_vsf_pt(user_pt_task_t)
     vsf_pt_end();
 }
 
-#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
 private implement_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
@@ -207,7 +207,7 @@ void vsf_kernel_pt_simple_demo(void)
         init_vsf_pt(user_pt_task_t, &__user_pt, vsf_priority_inherit);
     };
 
-#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(10000);

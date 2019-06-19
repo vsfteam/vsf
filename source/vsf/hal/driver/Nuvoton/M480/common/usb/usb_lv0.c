@@ -140,6 +140,11 @@ void USB_DC##__N##_IRQHandler(void)                                             
 #define _USB_DC_GET_SERUP(__N, __TYPE)      __USB_DC_GET_SETUP(__N, __TYPE)
 #define USB_DC_GET_SETUP(__N, __VALUE)      _USB_DC_GET_SERUP(__N, USB_DC##__N##_TYPE)
 
+#define __USB_DC_STATUS_STAGE(__N, __TYPE)                                      \
+    case __N: m480_##__TYPE##_status_stage((m480_##__TYPE##_t *)dc, is_in);
+#define _USB_DC_STATUS_STAGE(__N, __TYPE)   __USB_DC_STATUS_STAGE(__N, __TYPE)
+#define USB_DC_STATUS_STAGE(__N, __VALUE)   _USB_DC_STATUS_STAGE(__N, USB_DC##__N##_TYPE)
+
 #define __USB_DC_EP_ADD(__N, __TYPE)                                            \
     case __N: return m480_##__TYPE##_ep_add((m480_##__TYPE##_t *)dc, ep, type, size);
 #define _USB_DC_EP_ADD(__N, __TYPE)         __USB_DC_EP_ADD(__N, __TYPE)
@@ -321,6 +326,13 @@ void vsf_usb_dc_get_setup(vsf_usb_dc_t *dc, uint8_t *buffer)
 {
     switch (dc->index) {
         MREPEAT(USB_DC_COUNT, USB_DC_GET_SETUP, NULL)
+    }
+}
+
+void vsf_usb_dc_status_stage(vsf_usb_dc_t *dc, bool is_in)
+{
+    switch (dc->index) {
+        MREPEAT(USB_DC_COUNT, USB_DC_STATUS_STAGE, NULL)
     }
 }
 

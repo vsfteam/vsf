@@ -35,8 +35,8 @@
 #ifndef VSF_OS_MAIN_STACK_SIZE
 #   define VSF_OS_MAIN_STACK_SIZE               2048
 #endif
-#ifndef VSF_BSP_CFG_RUN_MAIN_AS_THREAD
-#   define VSF_BSP_CFG_RUN_MAIN_AS_THREAD            1
+#ifndef VSF_OS_CFG_RUN_MAIN_AS_THREAD
+#   define VSF_OS_CFG_RUN_MAIN_AS_THREAD        ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -93,6 +93,10 @@
         vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, get_setup)                 \
             (&VSF_USBD_CFG_DRV_OBJ, (uint8_t *)(__request))
 
+#   define vsf_usbd_drv_status_stage(__is_in)                                   \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, status_stage)              \
+            (&VSF_USBD_CFG_DRV_OBJ, (__is_in))
+
 #   define vsf_usbd_drv_ep_add(__addr, __attr, __size)                          \
         vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_add)                    \
             (&VSF_USBD_CFG_DRV_OBJ, (__addr), (__attr), (__size))
@@ -152,6 +156,7 @@
 #   define vsf_usbd_drv_wakeup()
 #   define vsf_usbd_drv_set_address(__addr)
 #   define vsf_usbd_drv_get_setup(__request)
+#   define vsf_usbd_drv_status_stage(__is_in)
 #   define vsf_usbd_drv_ep_add(__addr, __attr, __size)
 
 #   define vsf_usbd_drv_ep_is_dma
@@ -181,6 +186,7 @@
 #   define vsf_usbd_drv_wakeup()                        __drv->Wakeup()
 #   define vsf_usbd_drv_set_address(__addr)             __drv->SetAddress((__addr))
 #   define vsf_usbd_drv_get_setup(__request)            __drv->GetSetup((uint8_t *)(__request))
+#   define vsf_usbd_drv_status_stage(__is_in)           __drv->StatusStage((__is_in))
 #   define vsf_usbd_drv_ep_add(__addr, __attr, __size)  __drv->Ep.Add((__addr), (__attr), (__size))
 
 #   define vsf_usbd_drv_ep_is_dma                       __drv->Ep.IsDMA

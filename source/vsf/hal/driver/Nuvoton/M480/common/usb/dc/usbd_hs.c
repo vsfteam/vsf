@@ -182,7 +182,7 @@ void m480_usbd_hs_fini(m480_usbd_hs_t *usbd_hs)
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
     reg->PHYCTL &= ~HSUSBD_PHYCTL_PHYEN_Msk;
     reg->GINTEN = 0;
-    NVIC_EnableIRQ(usbd_hs->param->irq);
+    NVIC_DisableIRQ(usbd_hs->param->irq);
     // TODO: use pm to config clock
     CLK->AHBCLK &= ~CLK_AHBCLK_HSUSBDCKEN_Msk;
 }
@@ -194,8 +194,6 @@ void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
 #ifdef M480_USBD_HS_WROKAROUND_ISO
     usbd_hs->ep_tx_mask = 0;
 #endif
-    usbd_hs->reply_status_OUT = false;
-    usbd_hs->setup_status_IN = false;
     for (uint_fast8_t i = 0; i < (m480_usbd_hs_ep_number - 2); i++) {
         M480_USBD_EP_REG(i, EP[0].EPCFG) = 0;
         M480_USBD_EP_REG(i, EP[0].EPINTEN) = 0;
@@ -249,7 +247,6 @@ void m480_usbd_hs_get_setup(m480_usbd_hs_t *usbd_hs, uint8_t *buffer)
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
     uint_fast16_t temp = reg->SETUP1_0;
     buffer[0] = temp & 0xFF;
-    usbd_hs->setup_status_IN = (buffer[0] & 0x80) > 0;
     buffer[1] = temp >> 8;
     temp = reg->SETUP3_2;
     buffer[2] = temp & 0xFF;
@@ -260,6 +257,12 @@ void m480_usbd_hs_get_setup(m480_usbd_hs_t *usbd_hs, uint8_t *buffer)
     temp = reg->SETUP7_6;
     buffer[6] = temp & 0xFF;
     buffer[7] = temp >> 8;
+}
+
+void m480_usbd_hs_status_stage(m480_usbd_hs_t *usbd_hs, bool is_in)
+{
+    HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
+    reg->CEPCTL = USB_CEPCTL_NAKCLR;
 }
 
 vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
@@ -391,12 +394,7 @@ uint_fast16_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_
     }
 
     if (idx <= 1) {
-        // some ugly fix because M480 not have IN0/OUT0 for status stage
-		if (usbd_hs->reply_status_OUT) {
-			usbd_hs->reply_status_OUT = false;
-			return 0;
-		}
-		return reg->CEPRXCNT;
+        return reg->CEPRXCNT;
     } else {
         idx -= 2;
         return M480_USBD_EP_REG(idx, EP[0].EPDATCNT) & 0xFFFF;
@@ -419,11 +417,9 @@ vsf_err_t m480_usbd_hs_ep_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, 
     }
 
     if (idx <= 1) {
-        if (!usbd_hs->setup_status_IN) {
-			for (uint_fast16_t i = 0; i < size; i++) {
-				buffer[i] = reg->CEPDAT_BYTE;
-			}
-		}
+        for (uint_fast16_t i = 0; i < size; i++) {
+            buffer[i] = reg->CEPDAT_BYTE;
+        }
     } else {
         idx -= 2;
         // EPJ - EPL has BUG in DWORD read
@@ -459,9 +455,6 @@ vsf_err_t m480_usbd_hs_ep_enable_OUT(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
     }
 
     if (idx <= 1) {
-        if (usbd_hs->setup_status_IN) {
-			reg->CEPCTL = USB_CEPCTL_NAKCLR;
-		}
     } else {
         idx -= 2;
         M480_USBD_EP_REG(idx, EP[0].EPINTEN) |= HSUSBD_EPINTEN_RXPKIEN_Msk;
@@ -485,11 +478,7 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
     }
 
     if (idx <= 1) {
-        if (!usbd_hs->setup_status_IN && (0 == size)) {
-            reg->CEPCTL = USB_CEPCTL_NAKCLR;
-        } else {
-            reg->CEPTXCNT = size;
-        }
+        reg->CEPTXCNT = size;
     } else {
         idx -= 2;
 #ifdef M480_USBD_HS_WROKAROUND_ISO
@@ -595,7 +584,6 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
         }
         if (status & HSUSBD_BUSINTSTS_RSTIF_Msk) {
             status &= ~HSUSBD_BUSINTSTS_RSTIF_Msk;
-            usbd_hs->reply_status_OUT = false;
             m480_usbd_hs_notify(usbd_hs, USB_ON_RESET, 0);
             reg->BUSINTSTS = HSUSBD_BUSINTSTS_RSTIF_Msk;
             reg->CEPINTSTS = 0x1ffc;
@@ -634,12 +622,7 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
         if (status & HSUSBD_CEPINTSTS_STSDONEIF_Msk) {
             reg->CEPINTSTS = HSUSBD_CEPINTSTS_STSDONEIF_Msk;
 
-            if (!usbd_hs->setup_status_IN) {
-                m480_usbd_hs_notify(usbd_hs, USB_ON_IN, 0);
-            } else {
-                usbd_hs->reply_status_OUT = true;
-                m480_usbd_hs_notify(usbd_hs, USB_ON_OUT, 0);
-            }
+            m480_usbd_hs_notify(usbd_hs, USB_ON_STATUS, 0);
         }
 
         if (status & HSUSBD_CEPINTSTS_SETUPPKIF_Msk) {

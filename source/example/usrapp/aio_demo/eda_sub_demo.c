@@ -194,7 +194,7 @@ int main(void)
     
     eda_sub_demo_start();
     
-#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         //printf("hello world! \r\n");
         vsf_delay_ms(1000);

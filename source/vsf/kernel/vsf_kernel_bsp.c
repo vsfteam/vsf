@@ -35,7 +35,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if     VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED                                    \
+#if     VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED                                \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(app_main_thread_t)
 def_vsf_thread(app_main_thread_t, VSF_OS_MAIN_STACK_SIZE)
@@ -99,7 +99,7 @@ uint32_t vsf_arch_req___systimer_freq___from_usr(void)
     return SYSTEM_FREQ;
 }
 
-#if     VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED                                    \
+#if     VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED                                \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)
 {
@@ -110,7 +110,7 @@ implement_vsf_thread(app_main_thread_t)
 
 ROOT void __post_vsf_kernel_init(void)
 {
-#if     VSF_BSP_CFG_RUN_MAIN_AS_THREAD == ENABLED                                    \
+#if     VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED                                \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     static NO_INIT app_main_thread_t __app_main;
     init_vsf_thread(app_main_thread_t, &__app_main, vsf_priority_0);

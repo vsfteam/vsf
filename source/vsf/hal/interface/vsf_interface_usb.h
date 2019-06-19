@@ -60,6 +60,7 @@ static uint_fast16_t    usb_dc##__N##_get_frame_number();                       
 static uint_fast8_t usb_dc##__N##_get_mframe_number();                          \
                                                                                 \
 static void         usb_dc##__N##_get_setup(uint8_t *buffer);                   \
+static void         usb_dc##__N##_status_stage(bool is_in);                     \
                                                                                 \
 static vsf_err_t    usb_dc##__N##_ep_add(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);\
 static uint_fast16_t    usb_dc##__N##_ep_get_size(uint_fast8_t ep);             \
@@ -90,6 +91,7 @@ static void         usb_dc##__N##_irq(void);
                 .GetFrameNo     = &usb_dc##__N##_get_frame_number,              \
                 .GetMicroFrameNo= &usb_dc##__N##_get_mframe_number,             \
                 .GetSetup       = &usb_dc##__N##_get_setup,                     \
+                .StatusStage    = &usb_dc##__N##_status_stage,                  \
                                                                                 \
                 .Ep.Number      = USB_DC##__N##_EP_NUMBER,                      \
                 .Ep.IsDMA       = USB_DC##__N##_EP_IS_DMA,                      \
@@ -130,6 +132,8 @@ static uint_fast8_t usb_dc##__N##_get_mframe_number(void)                       
 { return vsf_usb_dc_get_mframe_number((vsf_usb_dc_t *)&USB_DC##__N);  }         \
 static void usb_dc##__N##_get_setup(uint8_t *buffer)                            \
 { vsf_usb_dc_get_setup((vsf_usb_dc_t *)&USB_DC##__N, buffer); }                 \
+static void usb_dc##__N##_status_stage(bool is_in)                              \
+{ vsf_usb_dc_status_stage((vsf_usb_dc_t *)&USB_DC##__N, is_in); }               \
 static vsf_err_t usb_dc##__N##_ep_add(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)\
 { return vsf_usb_dc_ep_add((vsf_usb_dc_t *)&USB_DC##__N, ep, type, size); }     \
 static uint_fast16_t usb_dc##__N##_ep_get_size(uint_fast8_t ep)                 \
@@ -175,6 +179,7 @@ enum usb_evt_t {
     USB_ON_IN,
     USB_ON_NAK,
     USB_ON_OUT,
+    USB_ON_STATUS,
     USB_ON_UNDERFLOW,
     USB_ON_OVERFLOW,
     USB_USR_EVT,
@@ -247,6 +252,7 @@ def_interface(i_usb_dc_t)
     uint_fast8_t    (*GetMicroFrameNo)  (void);
 
     void            (*GetSetup)         (uint8_t *buffer);
+    void            (*StatusStage)      (bool is_in);
 
     struct {
         //! Number of endpoint
@@ -329,7 +335,9 @@ end_def_interface(i_usb_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if USB_HC_COUNT > 0 || USB_DC_COUNT > 0
 extern const i_usb_t VSF_USB;
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -356,6 +364,7 @@ extern uint_fast16_t vsf_usb_dc_get_frame_number(vsf_usb_dc_t *dc);
 extern uint_fast8_t vsf_usb_dc_get_mframe_number(vsf_usb_dc_t *dc);
 
 extern void vsf_usb_dc_get_setup(vsf_usb_dc_t *dc, uint8_t *buffer);
+extern void vsf_usb_dc_status_stage(vsf_usb_dc_t *dc, bool is_in);
 
 extern vsf_err_t vsf_usb_dc_ep_add(vsf_usb_dc_t *dc, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
 extern uint_fast16_t vsf_usb_dc_ep_get_size(vsf_usb_dc_t *dc, uint_fast8_t ep);

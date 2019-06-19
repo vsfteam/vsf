@@ -558,29 +558,15 @@ static void vsf_usbd_ctrl_process(vsf_usbd_dev_t *dev)
     }
 }
 
-static void vsf_usbd_setup_end_callback(void *param)
-{
-    vsf_usbd_dev_t *dev = (vsf_usbd_dev_t *)param;
-    vsf_usbd_ctrl_process(dev);
-}
-
 static void vsf_usbd_setup_status_callback(void *param)
 {
     vsf_usbd_dev_t *dev = (vsf_usbd_dev_t *)param;
+    VSF_USBD_DRV_PREPARE(dev);
     vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-    vsf_usbd_trans_t *trans = &ctrl_handler->trans;
     bool out = (request->bRequestType & USB_DIR_MASK) == USB_DIR_OUT;
 
-    trans->nSize = 0;
-    trans->zlp = false;
-    trans->on_finish = vsf_usbd_setup_end_callback;
-
-    if (out) {
-        vsf_usbd_ep_send(dev, trans);
-    } else {
-        vsf_usbd_ep_recv(dev, trans);
-    }
+    vsf_usbd_drv_status_stage(out);
 }
 
 WEAK void vsf_usbd_notify_user(vsf_usbd_dev_t *dev, usb_evt_t evt, void *param)
@@ -726,6 +712,9 @@ static void vsf_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             }
             break;
         }
+    case USB_ON_STATUS:
+        vsf_usbd_ctrl_process(dev);
+        break;
     case USB_ON_IN:
         {
             uint_fast8_t ep = value | USB_DIR_IN;

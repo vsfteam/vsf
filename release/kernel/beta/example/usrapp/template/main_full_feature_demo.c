@@ -20,8 +20,8 @@
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
-#if VSF_BSP_CFG_RUN_MAIN_AS_THREAD != ENABLED
-#error In order to run this demo, please set VSF_BSP_CFG_RUN_MAIN_AS_THREAD to ENABLED
+#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#error In order to run this demo, please set VSF_OS_CFG_RUN_MAIN_AS_THREAD to ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
