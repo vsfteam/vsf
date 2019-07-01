@@ -50,7 +50,7 @@
         //    VSF_POOL_INIT(xxxx_pool, &__xxxx_pool, 8);
 
         //    if you haven't decided the number of item inside the pool, you can
-        //    replies on the so-called "feed-on-heap" feature.
+        //    reply on the so-called "feed-on-heap" feature.
 
         //    VSF_POOL_PREPARE(xxxx_pool, &__xxxx_pool);
 

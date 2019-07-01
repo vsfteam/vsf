@@ -32,7 +32,6 @@
 /*============================ MACROS ========================================*/
 
 #define m480_usbd_hs_ep_number          14
-#define m480_usbd_hs_ep_is_dma          false
 
 #define M480_USBD_HS_WROKAROUND_ISO
 
@@ -48,7 +47,6 @@ struct m480_usbd_hs_const_t {
 typedef struct m480_usbd_hs_const_t m480_usbd_hs_const_t;
 
 struct m480_usbd_hs_t {
-    uint8_t index;
     uint16_t ep_buf_ptr;
 #ifdef M480_USBD_HS_WROKAROUND_ISO
     uint16_t ep_tx_mask;
@@ -85,6 +83,7 @@ extern uint_fast8_t m480_usbd_hs_get_mframe_number(m480_usbd_hs_t *usbd_hs);
 extern void m480_usbd_hs_get_setup(m480_usbd_hs_t *usbd_hs, uint8_t *buffer);
 extern void m480_usbd_hs_status_stage(m480_usbd_hs_t *usbd_hs, bool is_in);
 
+extern bool m480_usbd_hs_ep_is_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 extern vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
 extern uint_fast16_t m480_usbd_hs_ep_get_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 

@@ -15,26 +15,31 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_NUVOTON_H__
-#define __HAL_DRIVER_NUVOTON_H__
-
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED || VSF_USE_SERVICE_STREAM == ENABLED
-#include "service/vsf_service.h"
-#endif
-
-#undef VSF_DRIVER_HEADER
+#undef VSF_NUVOTON_DRIVER_HEADER
 
 #if     defined(__M484__)
-#   define  VSF_DRIVER_HEADER       "./M480/M484/driver.h"
+#   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
 #else
 #   error No supported device found.
 #endif
 
 /* include specified device driver header file */
-#include VSF_DRIVER_HEADER
+#include VSF_NUVOTON_DRIVER_HEADER
+
+
+
+#ifndef __HAL_DRIVER_NUVOTON_H__
+#define __HAL_DRIVER_NUVOTON_H__
+
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED || VSF_USE_SERVICE_STREAM == ENABLED
+#include "service/vsf_service.h"
+#endif
+
+
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

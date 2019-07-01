@@ -14,51 +14,36 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-
-#ifndef __VSFIP_DHCPC_H__
-#define __VSFIP_DHCPC_H__
+#ifndef __VSF_OHCI_H___
+#define __VSF_OHCI_H___
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/tcpip/vsf_tcpip_cfg.h"
+#include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_OHCI == ENABLED
 
-#include "../../vsfip.h"
-#include "./vsfip_dhcp_common.h"
+#include "component/usb/host/vsf_usbh.h"
+#include "hal/interface/vsf_interface_usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfip_dhcpc_t {
-    vsfip_netif_t *netif;
-    vsf_teda_t teda;
-    vsfip_socket_t *so;
-    vsfip_sock_addr_t sockaddr;
-    vsfip_netbuf_t *outbuffer;
-    vsfip_netbuf_t *inbuffer;
-    vsfip_ipaddr_t ipaddr;
-    vsfip_ipaddr_t gw;
-    vsfip_ipaddr_t netmask;
-    vsfip_ipaddr_t dns[2];
-    uint32_t xid;
-    uint32_t optlen;
-    uint32_t retry;
-    uint32_t arp_retry;
-    uint32_t leasetime;
-    uint32_t renew_time;
-    uint32_t rebinding_time;
-    unsigned ready : 1;
+struct vsf_ohci_param_t {
+    const i_usb_hc_ip_t *op;
+    vsf_arch_priority_t priority;
 };
-typedef struct vsfip_dhcpc_t vsfip_dhcpc_t;
+typedef struct vsf_ohci_param_t vsf_ohci_param_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const vsf_usbh_hcd_drv_t vsf_ohci_drv;
+
 /*============================ PROTOTYPES ====================================*/
 
-// vsfip_dhcpc_start MUST be called protected with netif
-extern vsf_err_t vsfip_dhcpc_start(vsfip_netif_t*, vsfip_dhcpc_t*);
-extern void vsfip_dhcpc_stop(vsfip_dhcpc_t *);
+void vsf_ohci_init(void);
 
-#endif      // VSF_USE_TCPIP
-#endif      // __VSFIP_DHCPC_H__
+#endif
+
+#endif // __VSF_OHCI_H___

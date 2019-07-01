@@ -37,8 +37,8 @@
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
     &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __implement_vsf_pt(__NAME)                                           \
-        __implement_vsf_pt_common(__NAME, vsf_eda_frame_t *ptFrame) {           \
-            __vsf_pt_common(__NAME) *ptThis =                                   \
+        __implement_vsf_pt_common(__NAME, vsf_eda_frame_t *ptFrame)             \
+        {    __vsf_pt_common(__NAME) *ptThis =                                  \
                         (__vsf_pt_common(__NAME) *)(ptFrame->param);            \
             ASSERT(NULL != ptFrame);
 
@@ -162,10 +162,12 @@
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
     &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __def_vsf_pt(__NAME,...)                                             \
-            __def_vsf_pt_common(__NAME, __VA_ARGS__)
+            __def_vsf_pt_common(__NAME, __VA_ARGS__)                            \
+            __extern_vsf_pt_common(__NAME, vsf_eda_frame_t *ptFrame);        
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
-            __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)
+            __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)           \
+            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis);
 #endif
 
 #define def_vsf_pt(__NAME,...)                                                  \

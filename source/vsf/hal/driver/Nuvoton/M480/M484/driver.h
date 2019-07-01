@@ -15,16 +15,21 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_NUVOTON_M484_H__
-#define __HAL_DRIVER_NUVOTON_M484_H__
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+#   include "hal/vsf_hal_cfg.h"
+#   include "./device.h"
+#else
+
+#   ifndef __HAL_DRIVER_NUVOTON_M484_H__
+#       define __HAL_DRIVER_NUVOTON_M484_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
-#include "./device.h"
-#include "../common/io/io.h"
-#include "../common/usb/usb.h"
-#include "../common/pm/pm.h"
-#include "../common/usart/usart.h"
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+#       include "../common/io/io.h"
+#       include "../common/usb/usb.h"
+#       include "../common/pm/pm.h"
+#       include "../common/usart/usart.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -32,7 +37,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#   endif
 
 #endif
 /* EOF */

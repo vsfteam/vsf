@@ -34,6 +34,10 @@
 #   define VSF_HAL_CFG_USE_VSFSTREAM    VSF_USE_SERVICE_VSFSTREAM
 #endif
 
+#ifndef VSF_SYSTIMER_RESOLUTION
+#   define VSF_SYSTIMER_RESOLUTION      (1000000)    /*! using default 1us */
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -24,6 +24,13 @@
 
 /*============================ MACROS ========================================*/
 
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+//! arch info
+#   define VSF_ARCH_PRI_NUM            16
+#   define VSF_ARCH_PRI_BIT            4
+#endif
+
 #define __def_idx(__name, __no)     TPASTE2(__name, _idx) = (__no)
 #define __def_msk(__name)           TPASTE2(__name, _msk) = _BV(TPASTE2(__name, _idx) & 0x1F)
 
@@ -49,6 +56,7 @@
 */
 
 #define USB_HC_COUNT                1
+#define USB_HC_OHCI_COUNT           1
 
 #define USB_HC0_TYPE                ohci
 #define USB_HC0_IRQHandler          OHCI_IRQHandler
@@ -65,6 +73,9 @@
     .dm.function        = 14,
 
 #define USB_DC_COUNT                1
+#define USB_DC_HS_COUNT             1
+#define USB_DC_FS_COUNT             0
+
 #define USB_DC0_TYPE                usbd_hs
 #define USB_DC0_IRQHandler          USBD20_IRQHandler
 #define USB_DC0_EP_NUMBER           m480_usbd_hs_ep_number

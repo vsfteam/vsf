@@ -420,10 +420,6 @@ static usbd_uvc_t usbd_uvc = {
         .dev.desc               = (vsf_usbd_desc_t *)usbd_uvc_const.usbd.std_desc,
 
         .dev.speed              = USB_DC_SPEED_HIGH,
-        .dev.priority_int       = 0,
-#if VSF_USBD_CFG_USE_EDA == ENABLED
-        .dev.priority_eda       = vsf_priority_0,
-#endif
         .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
 
         .timer.on_timer         = vsf_usbd_on_timer,

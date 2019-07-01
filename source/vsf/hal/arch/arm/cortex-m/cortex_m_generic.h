@@ -20,6 +20,10 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
+
+#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/driver/driver.h"
+
 #include "./SysTick/systick.h"
 /*============================ MACROS ========================================*/
 
@@ -38,13 +42,13 @@
 #   endif
 #elif __ARM_ARCH >= 7 || __TARGET_ARCH_7_M == 1 || __TARGET_ARCH_7E_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
-#       define VSF_ARCH_PRI_NUM         256
+#       define VSF_ARCH_PRI_NUM         128
 #       undef  VSF_ARCH_PRI_BIT         
-#       define VSF_ARCH_PRI_BIT         8
+#       define VSF_ARCH_PRI_BIT         7
 #   endif
 
 #   ifndef VSF_ARCH_PRI_BIT
-#       define VSF_ARCH_PRI_BIT         8
+#       define VSF_ARCH_PRI_BIT         7
 #   endif
 #endif
 
@@ -60,11 +64,16 @@ enum {
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
 };
 
+#if 0
 #define __VSF_ARCH_PRI(__N, __BIT)                                              \
             VSF_ARCH_PRIO_##__N =                                               \
                 ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)           \
                     << (8- (__BIT))) & 0xFF,
-
+#else
+#define __VSF_ARCH_PRI(__N, __BIT)                                              \
+            VSF_ARCH_PRIO_##__N =                                               \
+                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,
+#endif
 enum vsf_arch_priority_t {
     VSF_ARCH_PRIO_IVALID    = -1,
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)

@@ -6593,7 +6593,7 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$\..\..\usrapp\ui_demo</state>
+                    <state>$PROJ_DIR$\..\..\usrapp\aio_demo</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr</state>
@@ -8348,16 +8348,12 @@
                 <configuration>kernel_template_cm7</configuration>
                 <configuration>usbh_m484</configuration>
                 <configuration>WinnerMicro_W600</configuration>
-                <configuration>aio_m484</configuration>
             </excluded>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\bt_demo.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\btstack_config.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\eda_sub_demo.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c</name>
@@ -8379,6 +8375,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\tcpip_demo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\aio_demo\ui_demo.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\aio_demo\usbd_demo.c</name>
@@ -8431,6 +8430,7 @@
                 <configuration>arm_mps2_m7</configuration>
                 <configuration>kernel_template_cm7</configuration>
                 <configuration>usbh_m484</configuration>
+                <configuration>aio_m484</configuration>
             </excluded>
             <file>
                 <name>$PROJ_DIR$\..\..\usrapp\ui_demo\lv_conf.h</name>
@@ -9342,24 +9342,6 @@
                 </file>
             </group>
             <group>
-                <name>fs</name>
-                <group>
-                    <name>vfs</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vfs\vsf_vfs.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs_cfg.h</name>
-                </file>
-            </group>
-            <group>
                 <name>input</name>
                 <excluded>
                     <configuration>arm_mps2_m7</configuration>
@@ -9397,63 +9379,6 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.h</name>
-                    </file>
-                </group>
-                <group>
-                    <name>vsfip</name>
-                    <group>
-                        <name>netif</name>
-                        <group>
-                            <name>eth</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\netif\eth\vsfip_eth.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\netif\eth\vsfip_eth.h</name>
-                            </file>
-                        </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\netif\vsfip_netdrv_adapter.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\netif\vsfip_netdrv_adapter.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\netif\vsfip_netif.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\netif\vsfip_netif.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>proto</name>
-                        <group>
-                            <name>dhcp</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\proto\dhcp\vsfip_dhcp_common.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\proto\dhcp\vsfip_dhcp_common.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\proto\dhcp\vsfip_dhcpc.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\proto\dhcp\vsfip_dhcpc.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\proto\dhcp\vsfip_dhcpd.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\proto\dhcp\vsfip_dhcpd.h</name>
-                            </file>
-                        </group>
-                    </group>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\vsfip.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsfip\vsfip.h</name>
                     </file>
                 </group>
                 <file>
@@ -9557,6 +9482,36 @@
                     </file>
                 </group>
                 <group>
+                    <name>driver</name>
+                    <group>
+                        <name>hcd</name>
+                        <group>
+                            <name>ohci</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\driver\hcd\ohci\vsf_ohci.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\driver\hcd\ohci\vsf_ohci.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
+                        <name>otg</name>
+                        <group>
+                            <name>musb</name>
+                            <group>
+                                <name>fdrc</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc.h</name>
+                                </file>
+                            </group>
+                        </group>
+                    </group>
+                </group>
+                <group>
                     <name>host</name>
                     <group>
                         <name>class</name>
@@ -9609,18 +9564,6 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.h</name>
-                            </file>
-                        </group>
-                    </group>
-                    <group>
-                        <name>hcd</name>
-                        <group>
-                            <name>ohci</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\hcd\ohci\vsf_ohci.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\hcd\ohci\vsf_ohci.h</name>
                             </file>
                         </group>
                     </group>

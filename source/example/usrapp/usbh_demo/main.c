@@ -56,7 +56,7 @@ struct usrapp_t {
     vsf_usbh_class_t usbh_ecm;
     uint8_t dev_count;
     //uint8_t heap[0x4000];
-
+/*
     struct {
         bool inited;
         vsfip_netif_t netif;
@@ -65,6 +65,7 @@ struct usrapp_t {
             vsfip_dhcpd_t dhcpd;
         };
     } tcpip;
+*/
 #endif
 
 #if VSF_USE_USB_DEVICE == ENABLED
@@ -121,8 +122,8 @@ def_vsf_thread(user_task_t, 1024,
 static const usrapp_const_t usrapp_const = {
 #if VSF_USE_USB_HOST == ENABLED
     .ohci_param                 = {
-        .hc                     = (vsf_usb_hc_t *)&USB_HC0,
-        .priority               = 0xFF,
+        .op                     = &VSF_USB_HC0_IP,
+        .priority               = vsf_priority_0,
     },
 #endif
 
@@ -463,10 +464,6 @@ static usrapp_t usrapp = {
         .dev.desc               = (vsf_usbd_desc_t *)usrapp_const.usbd.std_desc,
 
         .dev.speed              = USB_DC_SPEED_HIGH,
-        .dev.priority_int       = 0,
-#if VSF_USBD_CFG_USE_EDA == ENABLED
-        .dev.priority_eda       = vsf_priority_0,
-#endif
         .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
     },
 #endif
@@ -527,6 +524,7 @@ static void app_on_libusb_event(void *param,
 
 #if VSF_USE_USB_HOST == ENABLED
 
+#if 0
 vsfip_socket_t * vsfip_mem_socket_get(void)
 {
     return vsf_heap_malloc(sizeof(vsfip_socket_t));
@@ -588,7 +586,7 @@ void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv)
         usrapp.tcpip.inited = false;
     vsf_unprotect_scheduler(origlevel);
 }
-
+#endif
 #endif
 
 #if VSF_USE_USB_DEVICE == ENABLED

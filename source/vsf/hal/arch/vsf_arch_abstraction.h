@@ -48,10 +48,10 @@ typedef void vsf_swi_hanler_t(void *p);
 
 
 /*! \brief initialise SysTick to generate a system timer
- *! \param frequency the target frequency in Hz
  *! \return initialization result in vsf_err_t 
  */
-extern vsf_err_t vsf_systimer_init(uint32_t tick_freq);
+extern vsf_err_t vsf_systimer_init(void);
+extern vsf_err_t vsf_systimer_start(void);
 extern vsf_systimer_cnt_t vsf_systimer_get(void);
 extern bool vsf_systimer_set(vsf_systimer_cnt_t due);
 extern void vsf_systimer_set_idle(void);

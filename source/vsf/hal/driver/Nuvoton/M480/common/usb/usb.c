@@ -22,12 +22,7 @@
 /*============================ MACROS ========================================*/
 
 #define __USB_HC_INTERFACE_DEF(__N, __VALUE)                                    \
-const i_usb_hc_t VSF_USB_HC##__N =                                              \
-            {                                                                   \
-                .Init           = &usb_hc##__N##_init,                          \
-                .GetRegBase     = &usb_hc##__N##_get_regbase,                   \
-                .Irq            = &usb_hc##__N##_irq,                           \
-            };
+const i_usb_hc_ip_t VSF_USB_HC##__N##_IP = __USB_HC_IP_INTERFACE_FUNC_DEF(__N, __VALUE);
 
 #define __USB_DC_INTERFACE_DEF(__N, __VALUE)                                    \
 const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE);
@@ -36,23 +31,11 @@ const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE);
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-MREPEAT(USB_HC_COUNT, __USB_HC_FUNC_DEF, NULL)
+MREPEAT(USB_HC_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
 MREPEAT(USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
 
-#if USB_HC_COUNT > 0 || USB_DC_COUNT > 0
-const i_usb_t VSF_USB = {
 #if USB_HC_COUNT > 0
-    .HC                 = {MREPEAT(USB_HC_COUNT, __USB_HC_INTERFACE_FUNC_DEF, NULL)},
-#endif
-
-#if USB_DC_COUNT > 0
-    .DC                 = {MREPEAT(USB_DC_COUNT, __USB_DC_INTERFACE_FUNC_DEF, NULL)},
-#endif
-};
-#endif
-
-#if USB_HC_COUNT > 0
-MREPEAT(USB_HC_COUNT, __USB_HC_INTERFACE_DEF, NULL)
+MREPEAT(USB_HC_OHCI_COUNT, __USB_HC_INTERFACE_DEF, NULL)
 #endif
 
 #if USB_DC_COUNT > 0
@@ -63,5 +46,14 @@ MREPEAT(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-MREPEAT(USB_HC_COUNT, __USB_HC_BODY, NULL)
-MREPEAT(USB_DC_COUNT, __USB_DC_BODY, NULL)
+#if USB_HC_OHCI_COUNT > 0
+MREPEAT(USB_HC_COUNT, __USB_HC_IP_BODY, m480_ohci)
+#endif
+
+#if USB_DC_HS_COUNT > 0
+MREPEAT(USB_DC_HS_COUNT, __USB_DC_BODY, m480_usbd_hs)
+#endif
+
+#if USB_DC_FS_COUNT > 0
+MREPEAT(USB_DC_FS_COUNT, __USB_DC_BODY, m480_usbd_fs)
+#endif

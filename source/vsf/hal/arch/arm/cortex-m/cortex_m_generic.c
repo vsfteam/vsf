@@ -113,21 +113,25 @@ WEAK uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
     return VSF_GET_MAIN_CLK();
 }
 
+WEAK uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
+{
+    return 1000000ul;
+}
+
 /*! \brief initialise SysTick to generate a system timer
  *! \param frequency the target tick frequency in Hz
  *! \return initialization result in vsf_err_t 
  */
-WEAK vsf_err_t vsf_systimer_init(uint32_t tick_res)
+WEAK vsf_err_t vsf_systimer_init(void)
 {
-    memset(&__vsf_cm, 0, sizeof(__vsf_cm));
-
     //! calculate the cycle count of 1 tick
+    uint_fast32_t tick_res = vsf_arch_req___systimer_resolution___from_usr();
     __vsf_cm.systimer.unit = vsf_arch_req___systimer_freq___from_usr() / tick_res;
     __vsf_cm.systimer.tick_freq = tick_res;
     __vsf_cm.systimer.max_tick_per_round = (0x01000000ul / __vsf_cm.systimer.unit) - 1;
 
     vsf_systick_cfg (
-        ENABLE_SYSTICK              |
+        DISABLE_SYSTICK             |
         SYSTICK_SOURCE_SYSCLK       |
         ENABLE_SYSTICK_INTERRUPT,
         __vsf_cm.systimer.max_tick_per_round * __vsf_cm.systimer.unit
@@ -136,12 +140,20 @@ WEAK vsf_err_t vsf_systimer_init(uint32_t tick_res)
     return VSF_ERR_NONE;
 }
 
+WEAK vsf_err_t vsf_systimer_start(void)
+{
+    __SAFE_ATOM_CODE(
+        __vsf_systimer_set_target(__vsf_cm.systimer.max_tick_per_round);
+    )
+    return VSF_ERR_NONE;
+}
+
 
 WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
 {
     vsf_systimer_cnt_t ticks = 0;
     bool auto_update = false;
-    SAFE_ATOM_CODE(){
+    __SAFE_ATOM_CODE(
         if (vsf_systick_disable()) {       //!< the match bit will be cleared
             ticks += SYSTICK_RVR;
             auto_update = true;
@@ -153,7 +165,7 @@ WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
         if (auto_update) {
             __vsf_cm.systimer.tick = ticks;
         }
-    }
+    )
     return ticks;
 }
 
@@ -219,8 +231,15 @@ WEAK uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 
 
 WEAK vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
-        vsf_swi_hanler_t *handler, void *pparam) { return VSF_ERR_FAIL; }
-WEAK void vsf_drv_swi_trigger(uint_fast8_t idx) {}
+        vsf_swi_hanler_t *handler, void *pparam)
+{
+    ASSERT(false);
+    return VSF_ERR_FAIL;
+}
+WEAK void vsf_drv_swi_trigger(uint_fast8_t idx)
+{
+    ASSERT(false);
+}
 
 /*! \brief initialise a software interrupt
  *! \param idx the index of the software interrupt
@@ -238,9 +257,8 @@ vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
 #endif
         NVIC_SetPriority(PendSV_IRQn, priority);
         return VSF_ERR_NONE;
-    } else {
-        return vsf_drv_swi_init(idx - 1, priority, handler, pparam);
     }
+    return vsf_drv_swi_init(idx - 1, priority, handler, pparam);
 }
 
 
@@ -271,9 +289,10 @@ istate_t vsf_set_base_priority(istate_t priority)
 {
 #if __ARM_ARCH >= 7
     istate_t origlevel = __get_BASEPRI();
-    __set_BASEPRI(priority);
+    __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
     return origlevel;
 #elif __ARM_ARCH == 6
+    // TODO: MUST pass multi-priority test case
     static istate_t __basepri = 0x100;
     
     istate_t origlevel = __basepri;
@@ -296,6 +315,18 @@ istate_t vsf_set_base_priority(istate_t priority)
 #endif
 }
 
+
+/*! \note initialize architecture specific service 
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */
+bool vsf_arch_init(void)
+{
+    memset(&__vsf_cm, 0, sizeof(__vsf_cm));
+    vsf_systimer_init();
+    return true;
+}
 
 
 istate_t vsf_get_interrupt(void)

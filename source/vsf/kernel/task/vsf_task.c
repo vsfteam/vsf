@@ -91,6 +91,7 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
         vsf_task_stack_frame_t *pframe = 
             VSF_POOL_ALLOC(vsf_task_stack_frame_pool, this.pstack_frame_pool);
         if (NULL == pframe) {
+            ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
         pframe->fnEntry = fnEntry;

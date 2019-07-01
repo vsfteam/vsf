@@ -223,7 +223,7 @@ static vsf_err_t vsf_usbd_HID_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
     hid->ifs = ifs;
     hid->dev = dev;
     hid->teda.evthandler = vsf_usbd_HID_evthandler;
-    return vsf_teda_init(&hid->teda, vsf_usbd_class_priority(dev), false);
+    return vsf_teda_init(&hid->teda, VSF_USBD_CFG_EDA_PRIORITY, false);
 }
 
 static vsf_err_t vsf_usbh_HID_fini(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)

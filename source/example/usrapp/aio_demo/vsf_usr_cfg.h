@@ -62,12 +62,12 @@
 
 //          <o>The number of event queues   <1-4>
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_NUM                     1
+#define VSF_OS_EVTQ_NUM                     10
 //      </h>
 
 //      <o>The number of Software Interrupts <1-2>
 //      <i>Simon, please add description here...
-#define VSF_OS_EVTQ_SWI_NUM                 1
+#define VSF_OS_EVTQ_SWI_NUM                 10
 
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks.
@@ -129,7 +129,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_RUN_MAIN_AS_THREAD       ENABLED
+#define VSF_OS_CFG_RUN_MAIN_AS_THREAD       DISABLED
 //          </c>
 //      </h>
 //      <h> Shell Configuration
@@ -164,8 +164,12 @@
 #define VSF_USE_USB_HOST_HID                ENABLED
 #define VSF_USE_USB_HOST_BTHCI              ENABLED
 #define VSF_USE_USB_HOST_HCD_OHCI           ENABLED
+#define VSF_USBH_CFG_EDA_PRIORITY           vsf_priority_8
 
 #define VSF_USE_USB_DEVICE                  ENABLED
+#define VSF_USBD_CFG_USE_EDA                ENABLED
+#define VSF_USBD_CFG_EDA_PRIORITY           vsf_priority_9
+#define VSF_USBD_CFG_HW_PRIORITY            vsf_priority_9
 
 #define VSF_USE_TCPIP                       ENABLED
 #define VSFIP_CFG_NETIF_HEADLEN             64

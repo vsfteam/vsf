@@ -45,8 +45,8 @@ typedef struct usbh_demo_t usbh_demo_t;
 
 static const usbh_demo_const_t usbh_demo_const = {
     .usbh.ohci_param        = {
-        .hc                 = (vsf_usb_hc_t *)&USB_HC0,
-        .priority           = 0xFF,
+        .op                 = &VSF_USB_HC0_IP,
+        .priority           = vsf_priority_0,
     },
 };
 

@@ -139,7 +139,7 @@
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
 //          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM      DISABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM      ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks

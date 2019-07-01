@@ -138,24 +138,8 @@ __vector_table_0x1c
         DCD     SWI6_IRQHandler           ; 91:
         DCD     EHCI_IRQHandler           ; 92: EHCI
         DCD     USBOTG20_IRQHandler       ; 93:
-        DCD     SWI7_IRQHandler           ; 94-111 SWI
+        DCD     SWI7_IRQHandler           ; 94-95 SWI
         DCD     SWI8_IRQHandler
-        DCD     SWI9_IRQHandler
-        DCD     SWI10_IRQHandler
-        DCD     SWI11_IRQHandler
-        DCD     SWI12_IRQHandler
-        DCD     SWI13_IRQHandler
-        DCD     SWI14_IRQHandler
-        DCD     SWI15_IRQHandler
-        DCD     SWI16_IRQHandler
-        DCD     SWI17_IRQHandler
-        DCD     SWI18_IRQHandler
-        DCD     SWI19_IRQHandler
-        DCD     SWI20_IRQHandler
-        DCD     SWI21_IRQHandler
-        DCD     SWI22_IRQHandler
-        DCD     SWI23_IRQHandler
-        DCD     SWI24_IRQHandler
 __Vectors_End
 
 __Vectors       EQU   __vector_table
@@ -350,22 +334,6 @@ SysTick_Handler
         PUBWEAK  SWI6_IRQHandler
         PUBWEAK  SWI7_IRQHandler
         PUBWEAK  SWI8_IRQHandler
-        PUBWEAK  SWI9_IRQHandler
-        PUBWEAK  SWI10_IRQHandler
-        PUBWEAK  SWI11_IRQHandler
-        PUBWEAK  SWI12_IRQHandler
-        PUBWEAK  SWI13_IRQHandler
-        PUBWEAK  SWI14_IRQHandler
-        PUBWEAK  SWI15_IRQHandler
-        PUBWEAK  SWI16_IRQHandler
-        PUBWEAK  SWI17_IRQHandler
-        PUBWEAK  SWI18_IRQHandler
-        PUBWEAK  SWI19_IRQHandler
-        PUBWEAK  SWI20_IRQHandler
-        PUBWEAK  SWI21_IRQHandler
-        PUBWEAK  SWI22_IRQHandler
-        PUBWEAK  SWI23_IRQHandler
-        PUBWEAK  SWI24_IRQHandler
         SECTION .text:CODE:REORDER:NOROOT(1)
 
 BOD_IRQHandler
@@ -462,22 +430,6 @@ SWI5_IRQHandler
 SWI6_IRQHandler
 SWI7_IRQHandler
 SWI8_IRQHandler
-SWI9_IRQHandler
-SWI10_IRQHandler
-SWI11_IRQHandler
-SWI12_IRQHandler
-SWI13_IRQHandler
-SWI14_IRQHandler
-SWI15_IRQHandler
-SWI16_IRQHandler
-SWI17_IRQHandler
-SWI18_IRQHandler
-SWI19_IRQHandler
-SWI20_IRQHandler
-SWI21_IRQHandler
-SWI22_IRQHandler
-SWI23_IRQHandler
-SWI24_IRQHandler
 Default_Handler
         B Default_Handler
 

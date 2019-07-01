@@ -15,22 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_WINNERMICRO_H__
-#define __HAL_DRIVER_WINNERMICRO_H__
-
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_DRIVER_HEADER
+#undef VSF_WINNERMICRO_DRIVER_HEADER
 
 #if     defined(__W600__)
-#   define  VSF_DRIVER_HEADER       "./W60X/W600/driver.h"
+#   define  VSF_WINNERMICRO_DRIVER_HEADER       "./W60X/W600/driver.h"
 #else
 #   error No supported device found.
 #endif
 
 /* include specified device driver header file */
-#include VSF_DRIVER_HEADER
+#include VSF_WINNERMICRO_DRIVER_HEADER
+
+#ifndef __HAL_DRIVER_WINNERMICRO_H__
+#define __HAL_DRIVER_WINNERMICRO_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

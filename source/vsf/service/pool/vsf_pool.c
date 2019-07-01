@@ -173,6 +173,7 @@ WEAK bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *ptObj)
      *        also use this function to allocate more resources to either pool 
      *        or heap and ask vsf pool to try again.
      */
+    ASSERT(false);
     return false;
 }
 

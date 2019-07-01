@@ -18,47 +18,24 @@
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
-#include <stdio.h>
-#include <stdarg.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_t {
-    bool is_usbd_connected;
-    vsf_callback_timer_t poll_timer;
-};
-typedef struct usrapp_t usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static usrapp_t usrapp;
-
 /*============================ PROTOTYPES ====================================*/
 
+extern void bt_demo_start(void);
 extern void usbh_demo_start(void);
 extern void usbd_demo_start(void);
-extern void usbd_demo_connect(void);
 extern void tcpip_demo_start(void);
 extern void input_demo_start(void);
-extern void eda_sub_demo_start(void);
+extern void ui_demo_start(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-void usrapp_on_timer(vsf_callback_timer_t *timer)
-{
-    if (!usrapp.is_usbd_connected) {
-        usrapp.is_usbd_connected = true;
-        usbd_demo_connect();
-    } else {
-        vsf_trace(VSF_TRACE_INFO, "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
-    }
-    vsf_callback_timer_add_ms(timer, 1000);
-}
-
-int main(void)
+void main(void)
 {
     vsf_trace_init(NULL);
 
@@ -66,11 +43,14 @@ int main(void)
     tcpip_demo_start();
     usbd_demo_start();
     input_demo_start();
-    eda_sub_demo_start();
 
-    usrapp.poll_timer.on_timer = usrapp_on_timer;
-    vsf_callback_timer_add_ms(&usrapp.poll_timer, 200);
-    return 0;
+    // bt_demo uses usbh_demo, support USB bt dongle CSR8510
+    bt_demo_start();
+
+    // ui_demo will not return, so call last
+    // and VSF_OS_CFG_RUN_MAIN_AS_THREAD MUST NOT be enabled
+    // ui_demo uses usbd_demo, ui is implemented over UVC
+    ui_demo_start();
 }
 
 /* EOF */

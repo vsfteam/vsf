@@ -20,11 +20,6 @@
 #include "vsf_arch_abstraction.h"
 
 /*============================ MACROS ========================================*/
-#ifndef VSF_SYSTIMER_RESOLUTION
-#   define VSF_SYSTIMER_RESOLUTION       (1000000)    /*! using default 1us */
-#endif
-
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -40,13 +35,12 @@ WEAK void vsf_systimer_evthandler(vsf_systimer_cnt_t tick) {}
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-bool vsf_arch_init(void)
+WEAK bool vsf_arch_init(void)
 {
-    /* initalize system timer with given frequency */
-    vsf_systimer_init(VSF_SYSTIMER_RESOLUTION);
-
+    vsf_systimer_init();
     return true;
 }
+
 
 
 /* EOF */

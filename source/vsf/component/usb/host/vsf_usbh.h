@@ -50,6 +50,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if !defined(VSF_USBH_CFG_EDA_PRIORITY)
+#   define VSF_USBH_CFG_EDA_PRIORITY        vsf_priority_0
+#endif
+
 #ifdef VSF_USB_HC_ISO_EN
 #ifndef VSF_USB_HC_ISO_PACKET_LIMIT
 #define VSF_USB_HC_ISO_PACKET_LIMIT     2

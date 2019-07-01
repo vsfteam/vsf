@@ -30,13 +30,13 @@
 
 #include "component/av/vsfav.h"
 
-//#include "component/fs/vsf_fs.h"
-
 #include "component/input/vsf_input.h"
 #include "component/input/hid/vsf_input_hid.h"
 
+#include "component/usb/driver/hcd/ohci/vsf_ohci.h"
+#include "component/usb/driver/otg/musb/fdrc/vsf_musb_fdrc.h"
+
 #include "component/usb/host/vsf_usbh.h"
-#include "component/usb/host/hcd/ohci/vsf_ohci.h"
 #include "component/usb/host/class/HUB/vsf_usbh_HUB.h"
 #include "component/usb/host/class/libusb/vsf_usbh_libusb.h"
 #include "component/usb/host/class/CDC/vsf_usbh_CDC.h"
@@ -51,10 +51,6 @@
 #include "component/usb/device/class/UVC/vsf_usbd_UVC.h"
 
 #include "component/tcpip/netdrv/vsf_netdrv.h"
-#include "component/tcpip/vsfip/vsfip.h"
-#include "component/tcpip/vsfip/netif/eth/vsfip_eth.h"
-#include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpd.h"
-#include "component/tcpip/vsfip/proto/dhcp/vsfip_dhcpc.h"
 
 #ifdef VSF_CFG_USER_HEADER
 #   include VSF_CFG_USER_HEADER

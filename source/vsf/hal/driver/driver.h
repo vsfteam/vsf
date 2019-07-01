@@ -15,8 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_H__
-#define __HAL_DRIVER_H__
+
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
@@ -54,8 +53,10 @@
 #endif
 
 /* include specified device driver header file */
-#include VSF_DRIVER_HEADER
+#include    VSF_DRIVER_HEADER
 
+#ifndef __HAL_DRIVER_H__
+#define __HAL_DRIVER_H__
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

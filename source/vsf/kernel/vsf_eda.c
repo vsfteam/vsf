@@ -467,6 +467,7 @@ static vsf_err_t vsf_eda_call(void *func, void *param, bool is_fsm)
     vsf_eda_t *pthis = vsf_eda_get_cur();
     vsf_eda_frame_t *frame = vsf_eda_new_frame();
     if (NULL == frame) {
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     ASSERT(NULL != func);
@@ -476,6 +477,7 @@ static vsf_err_t vsf_eda_call(void *func, void *param, bool is_fsm)
         vsf_eda_frame_t *frame_tmp = vsf_eda_new_frame();
         if (NULL == frame_tmp) {
             vsf_eda_free_frame(frame);
+            ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
 
@@ -683,7 +685,8 @@ vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
     } 
 
     vsf_eda_frame_t *frame = vsf_eda_new_frame();   
-    if (NULL == frame) { 
+    if (NULL == frame) {
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES; 
     }
     //frame->flag = 0;                  //!< clear all flags (Done with memset)
@@ -699,13 +702,13 @@ vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
     pthis->on_terminate = cfg->on_terminate;
 #endif
 
-    __vsf_sched_safe(
+    vsf_protect_t orig = vsf_protect_sched();
         err = vsf_eda_init(pthis, cfg->priority, cfg->is_stack_owner);
     #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         pthis->is_use_frame = true;
         pthis->frame = frame;
     #endif
-    )
+    vsf_unprotect_sched(orig);
 
     return err;
 }
@@ -1709,6 +1712,8 @@ void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 SECTION(".text.vsf.kernel.teda")
 vsf_err_t vsf_timer_init(void)
 {
+    vsf_err_t err;
+
     __vsf_eda.timer.processing = false;
     vsf_timq_init(&__vsf_eda.timer.timq);
 #if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
@@ -1718,11 +1723,15 @@ vsf_err_t vsf_timer_init(void)
 
 #if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
     __vsf_eda.timer.teda.use_as__vsf_eda_t.evthandler = __vsf_timer_evthandler;
-    return vsf_eda_init(&__vsf_eda.timer.teda.use_as__vsf_eda_t, vsf_priority_highest, false);
+    err = vsf_eda_init(&__vsf_eda.timer.teda.use_as__vsf_eda_t, vsf_priority_highest, false);
 #else
     __vsf_eda.timer.eda.evthandler = __vsf_timer_evthandler;
-    return vsf_eda_init(&__vsf_eda.timer.eda, vsf_priority_highest, false);
+    err = vsf_eda_init(&__vsf_eda.timer.eda, vsf_priority_highest, false);
 #endif
+    if (VSF_ERR_NONE == err) {
+        vsf_systimer_start();
+    }
+    return err;
 }
 
 #if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED

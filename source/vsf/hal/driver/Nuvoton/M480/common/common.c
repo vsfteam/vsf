@@ -21,7 +21,9 @@
 
 
 /*============================ MACROS ========================================*/
-#define SWI_COUNT           25
+
+// SWI counter in driver layer
+#define DRV_SWI_COUNT           9
 
 #define __M480_SWI(__N, __VALUE)                                                \
     void SWI##__N##_IRQHandler(void)                                            \
@@ -34,9 +36,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-static const IRQn_Type m480_soft_irq[SWI_COUNT] = {
-    5, 45, 50, 69, 81, 83, 91, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104,
-    105, 106, 107, 108, 109, 110, 111
+static const IRQn_Type m480_soft_irq[DRV_SWI_COUNT] = {
+    5, 45, 50, 69, 81, 83, 91, 94, 95
 };
 
 struct __m480_common_t {
@@ -113,30 +114,45 @@ void m480_bit_field_set(uint_fast16_t bf, uint32_t *ptr, uint_fast32_t value)
 }
 
 // SWI
-MREPEAT(SWI_COUNT, __M480_SWI, NULL)
+MREPEAT(DRV_SWI_COUNT, __M480_SWI, NULL)
+
+WEAK void vsf_usr_swi_trigger(uint_fast8_t idx)
+{
+    ASSERT(false);
+}
+
+WEAK vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, uint_fast8_t priority,
+                            vsf_swi_hanler_t *handler, void *pparam)
+{
+    ASSERT(false);
+    return VSF_ERR_FAIL;
+}
 
 vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
                             vsf_swi_hanler_t *handler, void *pparam)
 {
-    ASSERT(idx < dimof(m480_soft_irq));
+    if (idx < dimof(m480_soft_irq)) {
+        if (handler != NULL) {
+            __m480_common.swi[idx].handler = handler;
+            __m480_common.swi[idx].pparam = pparam;
 
-    if (handler != NULL) {
-        __m480_common.swi[idx].handler = handler;
-        __m480_common.swi[idx].pparam = pparam;
-
-        NVIC_SetPriority(m480_soft_irq[idx], priority);
-        NVIC_EnableIRQ(m480_soft_irq[idx]);
-    } else {
-        NVIC_DisableIRQ(m480_soft_irq[idx]);
+            NVIC_SetPriority(m480_soft_irq[idx], priority);
+            NVIC_EnableIRQ(m480_soft_irq[idx]);
+        } else {
+            NVIC_DisableIRQ(m480_soft_irq[idx]);
+        }
+        return VSF_ERR_NONE;
     }
-    return VSF_ERR_NONE;
+    return vsf_usr_swi_init(idx - dimof(m480_soft_irq), priority, handler, pparam);
 }
 
 void vsf_drv_swi_trigger(uint_fast8_t idx)
 {
-    ASSERT(idx < dimof(m480_soft_irq));
-
-    NVIC_SetPendingIRQ(m480_soft_irq[idx]);
+    if (idx < dimof(m480_soft_irq)) {
+        NVIC_SetPendingIRQ(m480_soft_irq[idx]);
+    } else {
+        vsf_usr_swi_trigger(idx - dimof(m480_soft_irq));
+    }
 }
 
 // USB PHY configuration

@@ -485,6 +485,7 @@ static vsf_err_t ohci_ed_schedule(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
             ed->interval = 32;
         ed->branch = ohci_ed_balance(ohci, ed->interval, ed->load);
         if (ed->branch < 0) {
+            ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
         ohci_link_periodic(ohci, ed);
@@ -555,6 +556,7 @@ static vsf_err_t ohci_ed_init(ohci_urb_t *urb_ohci, vsf_usbh_hcd_urb_t *urb)
     /* dummy td; end of td list for ed */
     td = ohci_td_alloc();
     if (!td) {
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     td->urb_ohci = urb_ohci;
@@ -1071,18 +1073,19 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
         hcd->rh_speed = USB_SPEED_FULL;
         ohci = hcd->priv = ohci_alloc_resource();
         if (!ohci) {
+            ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
 
-        do {
-            usb_hc_cfg_t cfg = {
+        {
+            usb_hc_ip_cfg_t cfg = {
                 .priority       = ohci_param->priority,
                 .irq_handler    = ohci_interrupt,
                 .param          = ohci,
             };
-            vsf_usb_hc_init(ohci_param->hc, &cfg);
-        } while (0);
-        regs = ohci->regs = (ohci_regs_t *)vsf_usb_hc_get_regbase(ohci_param->hc);
+            ohci_param->op->Init(&cfg);
+        }
+        regs = ohci->regs = (ohci_regs_t *)ohci_param->op->GetRegBase();
 
         regs->intrdisable = OHCI_INTR_MIE;
         regs->control = 0;

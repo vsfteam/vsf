@@ -63,13 +63,15 @@
                 implement(vsf_thread_t)                                         \
                 implement_ex(thread_cb_##__NAME##_t, param);                    \
             }ALIGN(8);                                                          \
-            extern void vsf_thread_##__NAME##_start(__NAME *task,               \
-                                                    vsf_priority_t priority); 
+            extern void vsf_thread_##__NAME##_start(struct __NAME *task,        \
+                                                    vsf_priority_t priority);   \
+            extern void vsf_thread_##__NAME##_entry(                            \
+                            struct thread_cb_##__NAME##_t *ptTthis);  
                                                     
 #   define __implement_vsf_thread(__NAME)                                       \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptTthis);                       \
-            void vsf_thread_##__NAME##_start(   __NAME *task,                   \
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptTthis);                \
+            void vsf_thread_##__NAME##_start( struct __NAME *task,              \
                                                 vsf_priority_t priority)        \
             {                                                                   \
                 ASSERT(NULL != task);                                           \
@@ -84,8 +86,8 @@
                                     &(task->param.use_as__vsf_thread_cb_t),     \
                                     priority);                                  \
             }                                                                   \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptThis)
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptThis)
                         
 #   define __vsf_eda_call_thread_prepare__(__NAME, __THREAD_CB)                 \
             do {                                                                \
@@ -116,17 +118,18 @@
                 implement(vsf_thread_t)                                         \
                 implement_ex(thread_cb_##__NAME##_t, param);                    \
             };                                                                  \
-            extern void vsf_thread_##__NAME##_start(   __NAME *task,            \
+            extern void vsf_thread_##__NAME##_start( struct __NAME *task,       \
                                                 vsf_priority_t priority,        \
                                                 void *stack,                    \
-                                                uint_fast32_t size);            
-
+                                                uint_fast32_t size);            \
+            extern void vsf_thread_##__NAME##_entry(                            \
+                            struct thread_cb_##__NAME##_t *ptTthis);            
 
 
 #   define __implement_vsf_thread_ex(__NAME)                                    \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptTthis);                       \
-            void vsf_thread_##__NAME##_start(   __NAME *task,                   \
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptTthis);                \
+            void vsf_thread_##__NAME##_start(   struct __NAME *task,            \
                                                 vsf_priority_t priority,        \
                                                 void *stack,                    \
                                                 uint_fast32_t size)             \
@@ -141,8 +144,8 @@
                                     &(task->param.use_as__vsf_thread_cb_t),     \
                                     priority);                                  \
             }                                                                   \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptThis)
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptThis)
 
 #   define __vsf_eda_call_thread_prepare_ex__(  __NAME,                         \
                                                 __THREAD_CB,                    \
@@ -184,13 +187,15 @@
                 uint64_t    stack_arr[((__STACK)+7)/8];                         \
                 implement_ex(thread_cb_##__NAME##_t, param);                    \
             }ALIGN(8);                                                          \
-            extern void vsf_thread_##__NAME##_start(__NAME *task,               \
-                                                    vsf_priority_t priority);     
+            extern void vsf_thread_##__NAME##_start(struct __NAME *task,        \
+                                                    vsf_priority_t priority);   \
+            extern void vsf_thread_##__NAME##_entry(                            \
+                        struct thread_cb_##__NAME##_t *ptTthis); 
 
-#define __implement_vsf_thread(__NAME)                                          \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptTthis);                       \
-            void vsf_thread_##__NAME##_start(   __NAME *task,                   \
+#   define __implement_vsf_thread(__NAME)                                       \
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptTthis);                \
+            void vsf_thread_##__NAME##_start( struct __NAME *task,              \
                                                 vsf_priority_t priority)        \
             {                                                                   \
                 ASSERT(NULL != task);                                           \
@@ -202,8 +207,8 @@
                 pthis->stack_size = sizeof(task->stack_arr);                    \
                 vsf_thread_start(pthis, priority);                              \
             }                                                                   \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptThis)
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptThis)
 
 #   define __def_vsf_thread_ex(__NAME, ...)                                     \
             struct thread_cb_##__NAME##_t {                                     \
@@ -213,14 +218,16 @@
             struct __NAME {                                                     \
                 implement_ex(thread_cb_##__NAME##_t, param);                    \
             }ALIGN(8);                                                          \
-            extern void vsf_thread_##__NAME##_start(__NAME *task,               \
-                                                    vsf_priority_t priority); 
+            extern void vsf_thread_##__NAME##_start(struct __NAME *task,        \
+                                                    vsf_priority_t priority);   \
+            extern void vsf_thread_##__NAME##_entry(                            \
+                        struct thread_cb_##__NAME##_t *ptThis);                 
                                                     
 
-#define __implement_vsf_thread_ex(__NAME)                                       \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptTthis);                       \
-            void vsf_thread_##__NAME##_start(   __NAME *task,                   \
+#   define __implement_vsf_thread_ex(__NAME)                                    \
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptThis);                 \
+            void vsf_thread_##__NAME##_start(   struct __NAME *task,            \
                                                 vsf_priority_t priority,        \
                                                 void *stack,                    \
                                                 uint_fast32_t size)             \
@@ -234,8 +241,8 @@
                 pthis->stack_size = size;                                       \
                 vsf_thread_start(pthis, priority);                              \
             }                                                                   \
-            static void vsf_thread_##__NAME##_entry(                            \
-                        thread_cb_##__NAME##_t *ptThis)
+            void vsf_thread_##__NAME##_entry(                                   \
+                        struct thread_cb_##__NAME##_t *ptThis)
 
 #endif
 

@@ -149,9 +149,9 @@ static vsf_err_t vsf_usbh_ecm_netlink_init(vsf_netdrv_t *netdrv)
 {
     vsf_usbh_ecm_t *ecm = container_of(netdrv, vsf_usbh_ecm_t, netdrv);
 
-    netdrv->mtu = ecm->max_segment_size - VSFIP_ETH_HEADSIZE;
-    netdrv->mac_header_size = VSFIP_ETH_HEADSIZE;
-    netdrv->hwtype = VSFIP_ETH_HWTYPE;
+    netdrv->mtu = ecm->max_segment_size - TCPIP_ETH_HEADSIZE;
+    netdrv->mac_header_size = TCPIP_ETH_HEADSIZE;
+    netdrv->hwtype = TCPIP_ETH_HWTYPE;
     return VSF_ERR_NONE;
 }
 

@@ -196,6 +196,7 @@ vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb
         return VSF_ERR_NONE;
     } else {
         urb->pipe = pipe;
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 }
@@ -781,12 +782,18 @@ static vsf_err_t vsf_usbh_parse_config(vsf_usbh_t *usbh, vsf_usbh_dev_parser_t *
 
     len = dev->num_of_ifs * sizeof(vsf_usbh_ifs_t);
     dev->ifs = VSF_USBH_MALLOC(len);
-    if (!dev->ifs) { return VSF_ERR_NOT_ENOUGH_RESOURCES; }
+    if (!dev->ifs) {
+        ASSERT(false);
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+    }
     memset(dev->ifs, 0, len);
 
     len = dev->num_of_ifs * sizeof(vsf_usbh_ifs_parser_t);
     parser->parser_ifs = VSF_USBH_MALLOC(len);
-    if (!parser->parser_ifs) { return VSF_ERR_NOT_ENOUGH_RESOURCES; }
+    if (!parser->parser_ifs) {
+        ASSERT(false);
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+    }
     memset(parser->parser_ifs, 0, len);
     parser_ifs = parser->parser_ifs;
     parser_ifs->ifs = dev->ifs;
@@ -811,7 +818,10 @@ static vsf_err_t vsf_usbh_parse_config(vsf_usbh_t *usbh, vsf_usbh_dev_parser_t *
                     parser_ifs->ifs->no = ifs_no;
                     len = parser_ifs->ifs->num_of_alt * sizeof(*parser_ifs->parser_alt);
                     parser_ifs->parser_alt = VSF_USBH_MALLOC(len);
-                    if (!parser_ifs->parser_alt) { return VSF_ERR_NOT_ENOUGH_RESOURCES; }
+                    if (!parser_ifs->parser_alt) {
+                        ASSERT(false);
+                        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+                    }
                     memset(parser_ifs->parser_alt, 0, len);
 
                     claiming = 2;
@@ -1030,7 +1040,7 @@ vsf_err_t vsf_usbh_init(vsf_usbh_t *usbh)
     vsf_bitmap_set(&usbh->device_bitmap, 0);
 
     usbh->teda.evthandler = vsf_usbh_init_evthandler;
-    return vsf_teda_init(&usbh->teda, vsf_priority_inherit, false);
+    return vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY, false);
 }
 
 vsf_err_t vsf_usbh_fini(vsf_usbh_t *usbh)

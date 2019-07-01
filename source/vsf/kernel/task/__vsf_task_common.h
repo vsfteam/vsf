@@ -65,7 +65,8 @@
         struct __NAME {                                                         \
             implement(vsf_pt_t);                                                \
             implement_ex(__vsf_pt_common(__NAME), param);                       \
-        };
+        };                                                                      
+        
 
 #define __declare_vsf_pt_common(__NAME)                                         \
             typedef struct __NAME __NAME;                                       \
@@ -73,6 +74,9 @@
 
 #define __implement_vsf_pt_common(__NAME, __ARG0)                               \
         void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt)
+
+#define __extern_vsf_pt_common(__NAME, __ARG0)                                  \
+        extern void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -92,7 +92,9 @@
         struct __NAME {                                                         \
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
-        };
+        };                                                                      \
+        extern fsm_rt_t vsf_task_func_##__NAME( vsf_eda_frame_t *ptFrame,       \
+                                                vsf_evt_t evt);                 
 #   else
 #       define __def_vsf_task(__NAME,...)                                       \
         struct task_cb_##__NAME {                                               \
@@ -101,7 +103,10 @@
         struct __NAME {                                                         \
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
-        };
+        };                                                                      \
+        extern fsm_rt_t vsf_task_func_##__NAME( vsf_eda_frame_t *ptFrame,       \
+                                                vsf_evt_t evt);                 
+        
 #   endif
 #else
 #   define __def_vsf_task(__NAME,...)                                           \
@@ -112,7 +117,8 @@
         struct __NAME {                                                         \
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
-        };                                                                      
+        };                                                                      \
+        extern void vsf_task_func_##__NAME(struct __NAME *ptThis, vsf_evt_t evt);
 #endif
 
 

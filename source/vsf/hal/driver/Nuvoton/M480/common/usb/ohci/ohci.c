@@ -28,7 +28,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_cfg_t *cfg)
+vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
 {
     const m480_ohci_const_t *hc_cfg = hc->param;
     bool state = m480_reg_unlock();
@@ -73,4 +73,11 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_cfg_t *cfg)
 void *m480_ohci_get_regbase(m480_ohci_t *hc)
 {
     return hc->param->reg;
+}
+
+void m480_ohci_irq(m480_ohci_t *hc)
+{
+    if (hc->callback.irq_handler != NULL) {
+        hc->callback.irq_handler(hc->callback.param);
+    }
 }

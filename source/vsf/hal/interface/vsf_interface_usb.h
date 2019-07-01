@@ -24,25 +24,70 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __USB_HC_FUNC_DEF(__N, __VALUE)                                         \
-static vsf_err_t    usb_hc##__N##_init(usb_hc_cfg_t *cfg);                      \
+#define __USB_HC_IP_FUNC_DEF(__N, __VALUE)                                      \
+static vsf_err_t    usb_hc##__N##_init(usb_hc_ip_cfg_t *cfg);                   \
 static void *       usb_hc##__N##_get_regbase(void);                            \
 static void         usb_hc##__N##_irq(void);
 
-#define __USB_HC_INTERFACE_FUNC_DEF(__N, __VALUE)                               \
+#define __USB_HC_IP_INTERFACE_FUNC_DEF(__N, __VALUE)                            \
             {                                                                   \
                 .Init           = &usb_hc##__N##_init,                          \
                 .GetRegBase     = &usb_hc##__N##_get_regbase,                   \
                 .Irq            = &usb_hc##__N##_irq,                           \
-            },
+            }
 
-#define __USB_HC_BODY(__N, __VALUE)                                             \
-static vsf_err_t usb_hc##__N##_init(usb_hc_cfg_t *cfg)                          \
-{ return vsf_usb_hc_init((vsf_usb_hc_t *)&USB_HC##__N, cfg); }                  \
+#define __USB_HC_IP_BODY(__N, __HEADER)                                         \
+static vsf_err_t usb_hc##__N##_init(usb_hc_ip_cfg_t *cfg)                       \
+{ return __HEADER##_init(&USB_HC##__N##_IP, cfg); }                             \
 static void * usb_hc##__N##_get_regbase(void)                                   \
-{ return vsf_usb_hc_get_regbase((vsf_usb_hc_t *)&USB_HC##__N); }                \
+{ return __HEADER##_get_regbase(&USB_HC##__N##_IP); }                           \
 static void usb_hc##__N##_irq(void)                                             \
-{ vsf_usb_hc_irq((vsf_usb_hc_t *)&USB_HC##__N); }
+{ __HEADER##_irq(&USB_HC##__N##_IP); }
+
+
+
+#define __USB_DC_IP_FUNC_DEF(__N, __VALUE)                                      \
+static vsf_err_t    usb_dc##__N##_init(usb_dc_ip_cfg_t *cfg);                   \
+static void         usb_dc##__N##_fini(void);                                   \
+static void         usb_dc##__N##_get_info(void **regbase, uint8_t *ep_num, bool *dma);\
+static void         usb_dc##__N##_connect(void);                                \
+static void         usb_dc##__N##_disconnect(void);                             \
+static void         usb_dc##__N##_irq(void);
+
+#define __USB_DC_IP_INTERFACE_FUNC_DEF(__N, __VALUE)                            \
+            {                                                                   \
+                .Init           = &usb_dc##__N##_init,                          \
+                .Fini           = &usb_dc##__N##_fini,                          \
+                .GetInfo        = &usb_dc##__N##_get_info,                      \
+                .Connect        = &usb_dc##__N##_connect,                       \
+                .Disconnect     = &usb_dc##__N##_disconnect,                    \
+                .Irq            = &usb_dc##__N##_irq,                           \
+            }
+
+#define __USB_DC_IP_BODY_EX(__N, __OBJ, __HEADER)                               \
+static vsf_err_t usb_dc##__N##_init(usb_dc_ip_cfg_t *cfg)                       \
+{ return __HEADER##_init(&(__OBJ), cfg); }                                      \
+static void usb_dc##__N##_fini(void)                                            \
+{ __HEADER##_fini(&(__OBJ)); }                                                  \
+static void usb_dc##__N##_get_info(void **regbase, uint8_t *ep_num, bool *dma)  \
+{ __HEADER##_get_info(&(__OBJ), regbase, ep_num, dma); }                        \
+static void usb_dc##__N##_connect(void)                                         \
+{ __HEADER##_connect(&(__OBJ)); }                                               \
+static void usb_dc##__N##_disconnect(void)                                      \
+{ __HEADER##_disconnect(&(__OBJ)); }                                            \
+static void usb_dc##__N##_irq(void)                                             \
+{ __HEADER##_irq(&(__OBJ)); }
+
+#define __USB_DC_IP_BODY(__N, __HEADER)                                         \
+    __USB_DC_IP_BODY_EX(__N, USB_DC##__N##_IP, __HEADER)
+#define __USB_OTG_DC_IP_BODY(__N, __HEADER)                                     \
+    __USB_DC_IP_BODY_EX(__N, USB_OTG##__N##_IP, __HEADER)
+
+#define __USB_DC_FROM_IP(__N, __OBJ, __DRV_NAME, __HEADER)                      \
+__USB_DC_FUNC_DEF(__N, NULL)                                                    \
+static const i_usb_dc_t __DRV_NAME = __USB_DC_INTERFACE_FUNC_DEF(__N, NULL);    \
+__USB_DC_BODY_EX(__N, __HEADER, __OBJ)
+
 
 #define __USB_DC_FUNC_DEF(__N, __VALUE)                                         \
 static vsf_err_t    usb_dc##__N##_init(usb_dc_cfg_t *cfg);                      \
@@ -62,6 +107,7 @@ static uint_fast8_t usb_dc##__N##_get_mframe_number();                          
 static void         usb_dc##__N##_get_setup(uint8_t *buffer);                   \
 static void         usb_dc##__N##_status_stage(bool is_in);                     \
                                                                                 \
+static bool         usb_dc##__N##_ep_is_dma(uint_fast8_t ep);                   \
 static vsf_err_t    usb_dc##__N##_ep_add(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);\
 static uint_fast16_t    usb_dc##__N##_ep_get_size(uint_fast8_t ep);             \
                                                                                 \
@@ -93,8 +139,7 @@ static void         usb_dc##__N##_irq(void);
                 .GetSetup       = &usb_dc##__N##_get_setup,                     \
                 .StatusStage    = &usb_dc##__N##_status_stage,                  \
                                                                                 \
-                .Ep.Number      = USB_DC##__N##_EP_NUMBER,                      \
-                .Ep.IsDMA       = USB_DC##__N##_EP_IS_DMA,                      \
+                .Ep.IsDMA       = &usb_dc##__N##_ep_is_dma,                     \
                 .Ep.Add         = &usb_dc##__N##_ep_add,                        \
                 .Ep.GetSize     = &usb_dc##__N##_ep_get_size,                   \
                 .Ep.SetStall    = &usb_dc##__N##_ep_set_stall,                  \
@@ -109,53 +154,58 @@ static void         usb_dc##__N##_irq(void);
                 .Irq            = &usb_dc##__N##_irq,                           \
             }
 
-#define __USB_DC_BODY(__N, __VALUE)                                             \
+#define __USB_DC_BODY_EX(__N, __HEADER, __OBJ)                                  \
 static vsf_err_t usb_dc##__N##_init(usb_dc_cfg_t *cfg)                          \
-{ return vsf_usb_dc_init((vsf_usb_dc_t *)&USB_DC##__N, cfg); }                  \
+{ return __HEADER##_init(&(__OBJ), cfg); }                                      \
 static void usb_dc##__N##_fini(void)                                            \
-{ vsf_usb_dc_fini((vsf_usb_dc_t *)&USB_DC##__N); }                              \
+{ __HEADER##_fini(&(__OBJ)); }                                                  \
 static void usb_dc##__N##_reset(void)                                           \
-{ vsf_usb_dc_reset((vsf_usb_dc_t *)&USB_DC##__N); }                             \
+{ __HEADER##_reset(&(__OBJ)); }                                                 \
 static void usb_dc##__N##_connect(void)                                         \
-{ vsf_usb_dc_connect((vsf_usb_dc_t *)&USB_DC##__N); }                           \
+{ __HEADER##_connect(&(__OBJ)); }                                               \
 static void usb_dc##__N##_disconnect(void)                                      \
-{ vsf_usb_dc_disconnect((vsf_usb_dc_t *)&USB_DC##__N); }                        \
+{ __HEADER##_disconnect(&(__OBJ)); }                                            \
 static void usb_dc##__N##_wakeup(void)                                          \
-{ vsf_usb_dc_wakeup((vsf_usb_dc_t *)&USB_DC##__N); }                            \
+{ __HEADER##_wakeup(&(__OBJ)); }                                                \
 static void usb_dc##__N##_set_address(uint_fast8_t addr)                        \
-{ vsf_usb_dc_set_address((vsf_usb_dc_t *)&USB_DC##__N, addr); }                 \
+{ __HEADER##_set_address(&(__OBJ), addr); }                                     \
 static uint_fast8_t usb_dc##__N##_get_address(void)                             \
-{ return vsf_usb_dc_get_address((vsf_usb_dc_t *)&USB_DC##__N); }                \
+{ return __HEADER##_get_address(&(__OBJ)); }                                    \
 static uint_fast16_t usb_dc##__N##_get_frame_number(void)                       \
-{ return vsf_usb_dc_get_frame_number((vsf_usb_dc_t *)&USB_DC##__N); }           \
+{ return __HEADER##_get_frame_number(&(__OBJ)); }                               \
 static uint_fast8_t usb_dc##__N##_get_mframe_number(void)                       \
-{ return vsf_usb_dc_get_mframe_number((vsf_usb_dc_t *)&USB_DC##__N);  }         \
+{ return __HEADER##_get_mframe_number(&(__OBJ));  }                             \
 static void usb_dc##__N##_get_setup(uint8_t *buffer)                            \
-{ vsf_usb_dc_get_setup((vsf_usb_dc_t *)&USB_DC##__N, buffer); }                 \
+{ __HEADER##_get_setup(&(__OBJ), buffer); }                                     \
 static void usb_dc##__N##_status_stage(bool is_in)                              \
-{ vsf_usb_dc_status_stage((vsf_usb_dc_t *)&USB_DC##__N, is_in); }               \
+{ __HEADER##_status_stage(&(__OBJ), is_in); }                                   \
+static bool usb_dc##__N##_ep_is_dma(uint_fast8_t ep)                            \
+{ return __HEADER##_ep_is_dma(&(__OBJ), ep); }                                  \
 static vsf_err_t usb_dc##__N##_ep_add(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)\
-{ return vsf_usb_dc_ep_add((vsf_usb_dc_t *)&USB_DC##__N, ep, type, size); }     \
+{ return __HEADER##_ep_add(&(__OBJ), ep, type, size); }                         \
 static uint_fast16_t usb_dc##__N##_ep_get_size(uint_fast8_t ep)                 \
-{ return vsf_usb_dc_ep_get_size((vsf_usb_dc_t *)&USB_DC##__N, ep); }            \
+{ return __HEADER##_ep_get_size(&(__OBJ), ep); }                                \
 static vsf_err_t usb_dc##__N##_ep_set_stall(uint_fast8_t ep)                    \
-{ return vsf_usb_dc_ep_set_stall((vsf_usb_dc_t *)&USB_DC##__N, ep); }           \
+{ return __HEADER##_ep_set_stall(&(__OBJ), ep); }                               \
 static bool usb_dc##__N##_ep_is_stalled(uint_fast8_t ep)                        \
-{ return vsf_usb_dc_ep_is_stalled((vsf_usb_dc_t *)&USB_DC##__N, ep); }          \
+{ return __HEADER##_ep_is_stalled(&(__OBJ), ep); }                              \
 static vsf_err_t usb_dc##__N##_ep_clear_stall(uint_fast8_t ep)                  \
-{ return vsf_usb_dc_ep_clear_stall((vsf_usb_dc_t *)&USB_DC##__N, ep); }         \
+{ return __HEADER##_ep_clear_stall(&(__OBJ), ep); }                             \
 static uint_fast16_t usb_dc##__N##_ep_get_data_size(uint_fast8_t ep)            \
-{ return vsf_usb_dc_ep_get_data_size((vsf_usb_dc_t *)&USB_DC##__N, ep); }       \
+{ return __HEADER##_ep_get_data_size(&(__OBJ), ep); }                           \
 static vsf_err_t usb_dc##__N##_ep_read_buffer(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)\
-{ return vsf_usb_dc_ep_read_buffer((vsf_usb_dc_t *)&USB_DC##__N, ep, buffer, size); }\
+{ return __HEADER##_ep_read_buffer(&(__OBJ), ep, buffer, size); }               \
 static vsf_err_t usb_dc##__N##_ep_enable_OUT(uint_fast8_t ep)                   \
-{ return vsf_usb_dc_ep_enable_OUT((vsf_usb_dc_t *)&USB_DC##__N, ep); }          \
+{ return __HEADER##_ep_enable_OUT(&(__OBJ), ep); }                              \
 static vsf_err_t usb_dc##__N##_ep_set_data_size(uint_fast8_t ep, uint_fast16_t size)\
-{ return vsf_usb_dc_ep_set_data_size((vsf_usb_dc_t *)&USB_DC##__N, ep, size); } \
+{ return __HEADER##_ep_set_data_size(&(__OBJ), ep, size); }                     \
 static vsf_err_t usb_dc##__N##_ep_write_buffer(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)\
-{ return vsf_usb_dc_ep_write_buffer((vsf_usb_dc_t *)&USB_DC##__N, ep, buffer, size); }\
+{ return __HEADER##_ep_write_buffer(&(__OBJ), ep, buffer, size); }              \
 static void usb_dc##__N##_irq(void)                                             \
-{ vsf_usb_dc_irq((vsf_usb_dc_t *)&USB_DC##__N); }
+{ __HEADER##_irq(&(__OBJ)); }
+
+#define __USB_DC_BODY(__N, __HEADER)                                            \
+        __USB_DC_BODY_EX(__N, __HEADER, USB_DC##__N)
 
 /*============================ TYPES =========================================*/
 
@@ -201,35 +251,19 @@ enum usb_dc_speed_t {
 };
 typedef enum usb_dc_speed_t usb_dc_speed_t;
 
-typedef struct vsf_usb_dc_t vsf_usb_dc_t;
-typedef void (*usb_dc_irq_handler_t)(void *param);
+typedef void (*usb_ip_irq_handler_t)(void *param);
 typedef void (*usb_dc_evt_handler_t)(void *param, usb_evt_t evt, uint_fast8_t value);
 
 //! \name usb_dc configuration structure
 //! @{
 struct usb_dc_cfg_t{
     vsf_arch_priority_t         priority;       //!< interrupt priority
-    usb_dc_speed_t              speed;          //!< speed
-    union {
-        usb_dc_irq_handler_t    irq_handler;    //!< irq_handler function
-        usb_dc_evt_handler_t    evt_handler;    //!< evt_handler function
-    };
+    usb_dc_evt_handler_t        evt_handler;    //!< evt_handler function
     void *                      param;          //!< dcd related parameters
+
+    usb_dc_speed_t              speed;          //!< speed
 };
 typedef struct usb_dc_cfg_t usb_dc_cfg_t;
-//! @}
-
-//! \name usb_dc control interface
-//! @{
-def_interface(i_usb_dc_ip_t)
-
-    //! initialize
-    void            (*Init)             (usb_dc_cfg_t *cfg);
-
-    //! get register base
-    void *          (*GetRegBase)       (void);
-
-end_def_interface(i_usb_dc_ip_t)
 //! @}
 
 //! \name usb_dc and ep control interface
@@ -255,15 +289,12 @@ def_interface(i_usb_dc_t)
     void            (*StatusStage)      (bool is_in);
 
     struct {
-        //! Number of endpoint
-        uint8_t         Number;
-
         //! is DMA supported
         //!     DMA:    ReadBuffer and WriteBuffer can accept larget buffer,
         //!             GetDataSize and SetDataSize are not used
         //!     NON-DMA:ReadBuffer and WriteBuffer can accept buffer smaller than ep size
         //!             GetDataSize and SetDataSize are used to get/set the size to transfer
-        bool            IsDMA;
+        bool            (*IsDMA)            (uint_fast8_t ep);
 
         vsf_err_t       (*Add)              (uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
         uint_fast16_t   (*GetSize)          (uint_fast8_t ep);
@@ -283,29 +314,62 @@ def_interface(i_usb_dc_t)
     //! irq handler
     void            (*Irq)              (void);
 
-end_def_interface(i_usb_dc_hl_t)
+end_def_interface(i_usb_dc_t)
 //! @}
 
 
-typedef struct vsf_usb_hc_t vsf_usb_hc_t;
-typedef void (*usb_hc_irq_handler_t)(void *param);
+
+
+//! \name usb_dc_ip configuration structure
+//! @{
+struct usb_dc_ip_cfg_t{
+    vsf_arch_priority_t         priority;       //!< interrupt priority
+    usb_ip_irq_handler_t        irq_handler;    //!< irq_handler function
+    void *                      param;          //!< dcd related parameters
+};
+typedef struct usb_dc_ip_cfg_t usb_dc_ip_cfg_t;
+//! @}
+
+//! \name usb_dc_ip control interface
+//! @{
+def_interface(i_usb_dc_ip_t)
+
+    //! initialize
+    vsf_err_t       (*Init)             (usb_dc_ip_cfg_t *cfg);
+    void            (*Fini)             (void);
+
+    void            (*GetInfo)          (void **regbase, uint8_t *ep_num, bool *dma);
+
+    void            (*Connect)          (void);
+    void            (*Disconnect)       (void);
+
+    //! irq handler
+    void            (*Irq)              (void);
+
+end_def_interface(i_usb_dc_ip_t)
+//! @}
+
+
+
+
+
 
 //! \name usb_hc configuration structure
 //! @{
-struct usb_hc_cfg_t{
+struct usb_hc_ip_cfg_t{
     vsf_arch_priority_t         priority;       //!< interrupt priority
-    usb_hc_irq_handler_t        irq_handler;    //!< irq_handler function
+    usb_ip_irq_handler_t        irq_handler;    //!< irq_handler function
     void *                      param;          //!< hcd related parameters
 };
-typedef struct usb_hc_cfg_t usb_hc_cfg_t;
+typedef struct usb_hc_ip_cfg_t usb_hc_ip_cfg_t;
 //! @}
 
-//! \name usb_hc control interface
+//! \name usb_hc_ip control interface
 //! @{
-def_interface(i_usb_hc_t)
+def_interface(i_usb_hc_ip_t)
 
     //! initialize
-    vsf_err_t       (*Init)             (usb_hc_cfg_t *cfg);
+    vsf_err_t       (*Init)             (usb_hc_ip_cfg_t *cfg);
 
     //! get register base
     void *          (*GetRegBase)       (void);
@@ -313,74 +377,12 @@ def_interface(i_usb_hc_t)
     //! irq handler
     void            (*Irq)              (void);
 
-end_def_interface(i_usb_hc_t)
+end_def_interface(i_usb_hc_ip_t)
 //! @}
-
-//! \name usb user interface
-//! @{
-#if USB_HC_COUNT > 0 || USB_DC_COUNT > 0
-def_interface(i_usb_t)
-
-#if USB_HC_COUNT > 0
-    i_usb_hc_t      HC[USB_HC_COUNT];
-#endif
-
-#if USB_DC_COUNT > 0
-    i_usb_dc_t      DC[USB_DC_COUNT];
-#endif
-
-end_def_interface(i_usb_t)
-//! @}
-#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if USB_HC_COUNT > 0 || USB_DC_COUNT > 0
-extern const i_usb_t VSF_USB;
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern vsf_err_t vsf_usb_hc_init(vsf_usb_hc_t *hc, usb_hc_cfg_t *cfg);
-extern void *vsf_usb_hc_get_regbase(vsf_usb_hc_t *hc);
-extern void vsf_usb_hc_irq(vsf_usb_hc_t *hc);
-
-
-
-
-extern vsf_err_t vsf_usb_dc_init(vsf_usb_dc_t *dc, usb_dc_cfg_t *cfg);
-extern void vsf_usb_dc_fini(vsf_usb_dc_t *dc);
-extern void vsf_usb_dc_reset(vsf_usb_dc_t *dc);
-
-extern void vsf_usb_dc_connect(vsf_usb_dc_t *dc);
-extern void vsf_usb_dc_disconnect(vsf_usb_dc_t *dc);
-extern void vsf_usb_dc_wakeup(vsf_usb_dc_t *dc);
-
-extern void vsf_usb_dc_set_address(vsf_usb_dc_t *dc, uint_fast8_t addr);
-extern uint_fast8_t vsf_usb_dc_get_address(vsf_usb_dc_t *dc);
-
-extern uint_fast16_t vsf_usb_dc_get_frame_number(vsf_usb_dc_t *dc);
-extern uint_fast8_t vsf_usb_dc_get_mframe_number(vsf_usb_dc_t *dc);
-
-extern void vsf_usb_dc_get_setup(vsf_usb_dc_t *dc, uint8_t *buffer);
-extern void vsf_usb_dc_status_stage(vsf_usb_dc_t *dc, bool is_in);
-
-extern vsf_err_t vsf_usb_dc_ep_add(vsf_usb_dc_t *dc, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
-extern uint_fast16_t vsf_usb_dc_ep_get_size(vsf_usb_dc_t *dc, uint_fast8_t ep);
-
-extern vsf_err_t vsf_usb_dc_ep_set_stall(vsf_usb_dc_t *dc, uint_fast8_t ep);
-extern bool vsf_usb_dc_ep_is_stalled(vsf_usb_dc_t *dc, uint_fast8_t ep);
-extern vsf_err_t vsf_usb_dc_ep_clear_stall(vsf_usb_dc_t *dc, uint_fast8_t ep);
-
-extern uint_fast16_t vsf_usb_dc_ep_get_data_size(vsf_usb_dc_t *dc, uint_fast8_t ep);
-extern vsf_err_t vsf_usb_dc_ep_read_buffer(vsf_usb_dc_t *dc, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t vsf_usb_dc_ep_enable_OUT(vsf_usb_dc_t *dc, uint_fast8_t ep);
-
-extern vsf_err_t vsf_usb_dc_ep_set_data_size(vsf_usb_dc_t *dc, uint_fast8_t ep, uint_fast16_t size);
-extern vsf_err_t vsf_usb_dc_ep_write_buffer(vsf_usb_dc_t *dc, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-
-extern void vsf_usb_dc_irq(vsf_usb_dc_t *dc);
 
 #endif
 /* EOF */

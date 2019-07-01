@@ -161,7 +161,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     node = __vsf_os_alloc_evt_node();
     if (NULL == node) {
         ASSERT(false);
-//        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     vsf_slist_init_node(vsf_evtq_node_t, use_as__vsf_slist_node_t, node);
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED

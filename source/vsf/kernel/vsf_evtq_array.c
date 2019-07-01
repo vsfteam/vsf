@@ -106,6 +106,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     tail_next = (tail + 1) & mask;
     if (tail_next == evtq->head) {
         vsf_set_interrupt(orig);
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     evtq->tail = tail_next;

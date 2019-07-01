@@ -44,6 +44,18 @@
 #   define VSF_USBD_CFG_USE_EDA             ENABLED
 #endif
 
+#if VSF_USBD_CFG_USE_EDA != ENABLED
+#   error "support VSF_USBD_CFG_USE_EDA only, please enable it!!!"
+#endif
+
+#if (VSF_USBD_CFG_USE_EDA == ENABLED) && !defined(VSF_USBD_CFG_EDA_PRIORITY)
+#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_priority_0
+#endif
+
+#if !defined(VSF_USBD_CFG_HW_PRIORITY)
+#   define VSF_USBD_CFG_HW_PRIORITY         vsf_priority_0
+#endif
+
 #define VSF_USBD_DESC_DEVICE(__LANID, __DESC, __SIZE)                           \
     {USB_DT_DEVICE, 0, (__LANID), (__SIZE), (uint8_t*)(__DESC)}
 #define VSF_USBD_DESC_CONFIG(__LANID, __INDEX, __DESC, __SIZE)                  \
@@ -101,11 +113,9 @@
         vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_add)                    \
             (&VSF_USBD_CFG_DRV_OBJ, (__addr), (__attr), (__size))
 
-#   define vsf_usbd_drv_ep_is_dma                                               \
-        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_is_dma)
-
-#   define vsf_usbd_drv_ep_number                                               \
-        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_number)
+#   define vsf_usbd_drv_ep_is_dma(__ep)                                         \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_is_dma)                 \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep))
 
 #   define vsf_usbd_drv_ep_get_size(__ep)                                       \
         vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_get_size)               \
@@ -159,8 +169,7 @@
 #   define vsf_usbd_drv_status_stage(__is_in)
 #   define vsf_usbd_drv_ep_add(__addr, __attr, __size)
 
-#   define vsf_usbd_drv_ep_is_dma
-#   define vsf_usbd_drv_ep_num
+#   define vsf_usbd_drv_ep_is_dma(__ep)
 #   define vsf_usbd_drv_ep_get_size(__ep)
 #   define vsf_usbd_drv_ep_is_stalled(__ep)
 #   define vsf_usbd_drv_ep_set_stall(__ep)
@@ -189,8 +198,7 @@
 #   define vsf_usbd_drv_status_stage(__is_in)           __drv->StatusStage((__is_in))
 #   define vsf_usbd_drv_ep_add(__addr, __attr, __size)  __drv->Ep.Add((__addr), (__attr), (__size))
 
-#   define vsf_usbd_drv_ep_is_dma                       __drv->Ep.IsDMA
-#   define vsf_usbd_drv_ep_number                       __drv->Ep.Number
+#   define vsf_usbd_drv_ep_is_dma(__ep)                 __drv->Ep.IsDMA((__ep))
 #   define vsf_usbd_drv_ep_get_size(__ep)               __drv->Ep.GetSize((__ep))
 #   define vsf_usbd_drv_ep_is_stalled(__ep)             __drv->Ep.IsStalled((__ep))
 #   define vsf_usbd_drv_ep_set_stall(__ep)              __drv->Ep.SetStall((__ep))
@@ -201,14 +209,6 @@
 #   define vsf_usbd_drv_ep_set_data_size(__ep, __size)  __drv->Ep.SetDataSize((__ep), (__size))
 #   define vsf_usbd_drv_ep_enable_out(__ep)             __drv->Ep.EnableOUT((__ep))
 
-#endif
-
-#if defined(VSF_USBD_IMPLEMENT) || defined(VSF_USBD_INHERIT)
-#   if VSF_USBD_CFG_USE_EDA == ENABLED
-#       define vsf_usbd_class_priority(__dev)           vsf_priority_inherit
-#   else
-#       define vsf_usbd_class_priority(__dev)           (__dev)->priority_eda
-#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -322,10 +322,6 @@ def_simple_class(vsf_usbd_dev_t) {
         uint8_t device_class_ifs;
 
         usb_dc_speed_t speed;
-        vsf_arch_priority_t priority_int;
-#if VSF_USBD_CFG_USE_EDA == ENABLED
-        vsf_priority_t priority_eda;
-#endif
         vsf_usbd_cfg_t *config;
         vsf_usbd_desc_t *desc;
 

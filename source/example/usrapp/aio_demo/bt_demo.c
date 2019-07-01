@@ -46,3 +46,7 @@ vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
 	}
     return VSF_ERR_FAIL;
 }
+
+void bt_demo_start(void)
+{
+}

@@ -99,6 +99,11 @@ uint32_t vsf_arch_req___systimer_freq___from_usr(void)
     return SYSTEM_FREQ;
 }
 
+uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
+{
+    return VSF_SYSTIMER_RESOLUTION;
+}
+
 #if     VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED                                \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)

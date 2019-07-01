@@ -102,6 +102,7 @@ vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
                 buf_idx = 0;
                 table_tmp = (vsf_dynarr_table_t *)vsf_heap_malloc(table_size);
                 if (!table_tmp) {
+                    ASSERT(false);
                     return VSF_ERR_NOT_ENOUGH_RESOURCES;
                 }
                 memset(table_tmp, 0, sizeof(*table_tmp));
@@ -112,6 +113,7 @@ vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
                 if (table_tmp != NULL) {
                     vsf_heap_free(table_tmp);
                 }
+                ASSERT(false);
                 return VSF_ERR_NOT_ENOUGH_RESOURCES;
             }
 

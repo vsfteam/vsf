@@ -265,18 +265,25 @@ void m480_usbd_hs_status_stage(m480_usbd_hs_t *usbd_hs, bool is_in)
     reg->CEPCTL = USB_CEPCTL_NAKCLR;
 }
 
+bool m480_usbd_hs_ep_is_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
+{
+    return false;
+}
+
 vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
 {
     HSUSBD_T *reg;
     int_fast8_t idx;
 
     if (usbd_hs->ep_buf_ptr < size) {
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 
     reg = m480_usbd_hs_get_reg(usbd_hs);
     idx = m480_usbd_hs_get_free_idx(usbd_hs, ep);
     if (idx < 0) {
+        ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 

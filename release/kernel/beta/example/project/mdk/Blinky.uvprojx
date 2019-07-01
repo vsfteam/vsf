@@ -790,6 +790,11 @@
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_task_common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\__vsf_task_common.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1670,6 +1675,11 @@
               <FileName>vsf_fsm.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>__vsf_task_common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\__vsf_task_common.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2552,6 +2562,11 @@
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_task_common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\__vsf_task_common.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2650,7 +2665,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>tempalte_armv7-m_ac5</TargetName>
+      <TargetName>template_armv7-m_ac5</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
@@ -3044,6 +3059,57 @@
               <FileName>main_thread_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_thread_simple.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>main_task_simple.c</FileName>
@@ -3161,57 +3227,6 @@
               <FileName>main_cross_task_example.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_cross_task_example.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
             </File>
             <File>
               <FileName>main_pt_simple.c</FileName>
@@ -3433,6 +3448,11 @@
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_task_common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\__vsf_task_common.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3538,18 +3558,18 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.2.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.5.1"/>
         <targetInfos>
-          <targetInfo name="tempalte_armv7-m_ac5"/>
           <targetInfo name="template_armv6-m_ac5"/>
           <targetInfo name="template_armv6-m_ac6"/>
+          <targetInfo name="template_armv7-m_ac5"/>
           <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </component>
       <component Cbundle="V2M-MPS2" Cclass="Board Support" Cgroup="Common" Cvendor="Keil" Cversion="2.0.0" condition="CMSDK CMSIS">
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
-          <targetInfo name="tempalte_armv7-m_ac5"/>
           <targetInfo name="template_armv6-m_ac5"/>
           <targetInfo name="template_armv6-m_ac6"/>
+          <targetInfo name="template_armv7-m_ac5"/>
           <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </component>
@@ -3563,7 +3583,7 @@
       <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM3 CMSIS">
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
-          <targetInfo name="tempalte_armv7-m_ac5"/>
+          <targetInfo name="template_armv7-m_ac5"/>
           <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </component>
@@ -3607,7 +3627,7 @@
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM3 CMSIS"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
-          <targetInfo name="tempalte_armv7-m_ac5"/>
+          <targetInfo name="template_armv7-m_ac5"/>
           <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </file>
@@ -3616,7 +3636,7 @@
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM3 CMSIS"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
-          <targetInfo name="tempalte_armv7-m_ac5"/>
+          <targetInfo name="template_armv7-m_ac5"/>
           <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </file>
@@ -3625,7 +3645,7 @@
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM3 CMSIS"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
-          <targetInfo name="tempalte_armv7-m_ac5"/>
+          <targetInfo name="template_armv7-m_ac5"/>
           <targetInfo name="template_armv7-m_ac6"/>
         </targetInfos>
       </file>

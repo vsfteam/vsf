@@ -27,14 +27,14 @@
 /*============================ MACROS ========================================*/
 
 #define __USB_HC_DEF(__N, __TYPE)                                               \
-    extern m480_##__TYPE##_t USB_HC##__N;                                       \
-    extern const i_usb_hc_t VSF_USB_HC##__N;           
+    extern m480_##__TYPE##_t USB_HC##__N##_IP;                                  \
+    extern const i_usb_hc_ip_t VSF_USB_HC##__N##_IP;
 #define _USB_HC_DEF(__N, __TYPE)            __USB_HC_DEF(__N, __TYPE)
 #define USB_HC_DEF(__N, __VALUE)            _USB_HC_DEF(__N, USB_HC##__N##_TYPE)
 
 #define __USB_DC_DEF(__N, __TYPE)                                               \
     extern m480_##__TYPE##_t USB_DC##__N;                                       \
-    extern const i_usb_dc_t VSF_USB_DC##__N;           
+    extern const i_usb_dc_t VSF_USB_DC##__N;
 #define _USB_DC_DEF(__N, __TYPE)            __USB_DC_DEF(__N, __TYPE)
 #define USB_DC_DEF(__N, __VALUE)            _USB_DC_DEF(__N, USB_DC##__N##_TYPE)
 

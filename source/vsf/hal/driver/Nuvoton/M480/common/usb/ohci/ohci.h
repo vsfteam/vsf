@@ -46,8 +46,6 @@ struct m480_ohci_const_t {
 typedef struct m480_ohci_const_t m480_ohci_const_t;
 
 struct m480_ohci_t {
-    uint8_t index;
-
     struct {
         void (*irq_handler)(void *param);
         void *param;
@@ -61,8 +59,9 @@ typedef struct m480_ohci_t m480_ohci_t;
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t m480_ohci_init(m480_ohci_t *ohci, usb_hc_cfg_t *cfg);
+extern vsf_err_t m480_ohci_init(m480_ohci_t *ohci, usb_hc_ip_cfg_t *cfg);
 extern void *m480_ohci_get_regbase(m480_ohci_t *ohci);
+extern void m480_ohci_irq(m480_ohci_t *hc);
 
 #endif
 /* EOF */
