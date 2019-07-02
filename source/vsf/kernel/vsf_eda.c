@@ -477,7 +477,7 @@ static vsf_err_t vsf_eda_call(void *func, void *param, bool is_fsm)
         vsf_eda_frame_t *frame_tmp = vsf_eda_new_frame();
         if (NULL == frame_tmp) {
             vsf_eda_free_frame(frame);
-            ASSERT(false);
+            //ASSERT(false);                    //!< this error is allowed, the sub call can be tried later.
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
 
@@ -613,29 +613,6 @@ static void vsf_eda_fsm_evthandler(vsf_eda_t *pthis, vsf_evt_t evt)
     }
 }
 
-
-/*
-vsf_err_t vsf_eda_fsm_init(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
-{
-    vsf_err_t err;
-    ASSERT(     NULL != pthis 
-            &&  NULL != cfg
-            &&  NULL != cfg->entry);
-
-    vsf_eda_frame_t *frame = vsf_eda_new_frame();
-    if (NULL == frame) { return VSF_ERR_NOT_ENOUGH_RESOURCES; }
-
-    frame->fsm_entry = cfg->entry;
-    frame->target = cfg->target;
-
-    pthis->evthandler = vsf_eda_fsm_evthandler_wrapper;
-    err = vsf_eda_init(pthis, cfg->priority, false);
-    if (VSF_ERR_NONE == err) {
-        err = vsf_eda_post_msg(pthis, frame);
-    }
-    return err;
-}
-*/
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 

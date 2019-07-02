@@ -31,6 +31,10 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __USB_DC_FROM_MUSB_FDRC_IP(__N, __OBJ, __DRV_NAME)                      \
+        __USB_DC_FROM_IP(__N, (__OBJ), __DRV_NAME, vsf_musb_fdrc_usbd)
+
 /*============================ TYPES =========================================*/
 
 struct vsf_musb_fdrc_param_t {

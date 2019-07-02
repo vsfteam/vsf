@@ -22,7 +22,7 @@
 #if     (   (VSF_USE_USB_DEVICE == ENABLED)                                     \
         && (VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED))                       \
     ||  (   (VSF_USE_USB_HOST == ENABLED)                                       \
-        && (VSF_USE_USB_DEVICE_HCD_MUSB_FDRC == ENABLED))
+        && (VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED))
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED
 #   define VSF_USBH_IMPLEMENT_HCD
@@ -30,6 +30,90 @@
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
+
+// Common.INTRUSB
+#define MUSB_INTRUSB_RESET              ((uint8_t)(1 << 2))
+#define MUSB_INTRUSB_SOF                ((uint8_t)(1 << 3))
+#define MUSB_INTRUSB_RESUME             ((uint8_t)(1 << 1))
+#define MUSB_INTRUSB_SUSPEND            ((uint8_t)(1 << 0))
+
+// Common.INTRUSBE
+#define MUSB_INTRUSBE_RESET             ((uint8_t)(1 << 2))
+#define MUSB_INTRUSBE_SOF               ((uint8_t)(1 << 3))
+#define MUSB_INTRUSBE_RESUME            ((uint8_t)(1 << 1))
+#define MUSB_INTRUSBE_SUSPEND           ((uint8_t)(1 << 0))
+
+// EP0.CSR0
+#define MUSBD_CSR0_SERVICED_SETUP_END   ((uint8_t)(1 << 7))
+#define MUSBD_CSR0_SERVICED_RX_PKG_RDY  ((uint8_t)(1 << 6))
+#define MUSBD_CSR0_SEND_STALL           ((uint8_t)(1 << 5))
+#define MUSBD_CSR0_SETUP_END            ((uint8_t)(1 << 4))
+#define MUSBD_CSR0_DATA_END             ((uint8_t)(1 << 3))
+#define MUSBD_CSR0_SENT_STALL           ((uint8_t)(1 << 2))
+#define MUSBD_CSR0_TX_PKT_RDY           ((uint8_t)(1 << 1))
+#define MUSBD_CSR0_RX_PKT_RDY           ((uint8_t)(1 << 0))
+
+#define MUSBH_CSR0_NAK_TIMEOUT          ((uint8_t)(1 << 7))
+#define MUSBH_CSR0_STATUS_PKT           ((uint8_t)(1 << 6))
+#define MUSBH_CSR0_REQ_PKT              ((uint8_t)(1 << 5))
+#define MUSBH_CSR0_ERROR                ((uint8_t)(1 << 4))
+#define MUSBH_CSR0_SETUP_PKT            ((uint8_t)(1 << 3))
+#define MUSBH_CSR0_RX_STALL             ((uint8_t)(1 << 2))
+#define MUSBH_CSR0_TX_PKT_RDY           ((uint8_t)(1 << 1))
+#define MUSBH_CSR0_RX_PKT_RDY           ((uint8_t)(1 << 0))
+
+// EPN.TXCSR1
+#define MUSBD_TXCSR1_CLR_DATA_TOG       ((uint8_t)(1 << 6))
+#define MUSBD_TXCSR1_SENT_STALL         ((uint8_t)(1 << 5))
+#define MUSBD_TXCSR1_SEND_STALL         ((uint8_t)(1 << 4))
+#define MUSBD_TXCSR1_FLUSH_FIFO         ((uint8_t)(1 << 3))
+#define MUSBD_TXCSR1_UNDER_RUN          ((uint8_t)(1 << 2))
+#define MUSBD_TXCSR1_FIFO_NOT_EMPTY     ((uint8_t)(1 << 1))
+#define MUSBD_TXCSR1_TX_PKT_RDY         ((uint8_t)(1 << 0))
+
+#define MUSBH_TXCSR1_NAK_TIMEOUT        ((uint8_t)(1 << 7))
+#define MUSBH_TXCSR1_CLR_DATA_TOG       ((uint8_t)(1 << 6))
+#define MUSBH_TXCSR1_RX_STALL           ((uint8_t)(1 << 5))
+#define MUSBH_TXCSR1_FLUSH_FIFO         ((uint8_t)(1 << 3))
+#define MUSBH_TXCSR1_ERROR              ((uint8_t)(1 << 2))
+#define MUSBH_TXCSR1_FIFO_NOT_EMPTY     ((uint8_t)(1 << 1))
+#define MUSBH_TXCSR1_TX_PKT_RDY         ((uint8_t)(1 << 0))
+
+// EPN.TXCSR2
+#define MUSB_TXCSR2_AUTO_SET            ((uint8_t)(1 << 7))
+#define MUSBD_TXCSR2_ISO                ((uint8_t)(1 << 6))
+#define MUSB_TXCSR2_MODE                ((uint8_t)(1 << 5))
+#define MUSB_TXCSR2_DMA_EN              ((uint8_t)(1 << 4))
+#define MUSB_TXCSR2_FRC_DATA_TOG        ((uint8_t)(1 << 3))
+#define MUSB_TXCSR2_DMA_MODE            ((uint8_t)(1 << 2))
+
+// EPN.RXCSR1
+#define MUSBD_RXCSR1_CLR_DATA_TOG       ((uint8_t)(1 << 7))
+#define MUSBD_RXCSR1_SENT_STALL         ((uint8_t)(1 << 6))
+#define MUSBD_RXCSR1_SEND_STALL         ((uint8_t)(1 << 5))
+#define MUSBD_RXCSR1_FLUSH_FIFO         ((uint8_t)(1 << 4))
+#define MUSBD_RXCSR1_DATA_ERROR         ((uint8_t)(1 << 3))
+#define MUSBD_RXCSR1_OVER_RUN           ((uint8_t)(1 << 2))
+#define MUSBD_RXCSR1_FIFO_FULL          ((uint8_t)(1 << 1))
+#define MUSBD_RXCSR1_RX_PKT_RDY         ((uint8_t)(1 << 0))
+
+#define MUSBH_RXCSR1_CLR_DATA_TOG       ((uint8_t)(1 << 7))
+#define MUSBH_RXCSR1_RX_STALL           ((uint8_t)(1 << 6))
+#define MUSBH_RXCSR1_REQ_PKT            ((uint8_t)(1 << 5))
+#define MUSBH_RXCSR1_FLUSH_FIFO         ((uint8_t)(1 << 4))
+#define MUSBH_RXCSR1_DATA_ERROR         ((uint8_t)(1 << 3))
+#define MUSBH_RXCSR1_NAK_TIMEOUT        ((uint8_t)(1 << 3))
+#define MUSBH_RXCSR1_ERROR              ((uint8_t)(1 << 2))
+#define MUSBH_RXCSR1_FIFO_FULL          ((uint8_t)(1 << 1))
+#define MUSBH_RXCSR1_RX_PKT_RDY         ((uint8_t)(1 << 0))
+
+// EPN.RXCSR1
+#define MUSB_RXCSR2_AUTO_CLEAR          ((uint8_t)(1 << 7))
+#define MUSBD_RXCSR2_ISO                ((uint8_t)(1 << 6))
+#define MUSBH_RXCSR2_AUTO_REQ           ((uint8_t)(1 << 6))
+#define MUSB_RXCSR2_DMA_EN              ((uint8_t)(1 << 5))
+#define MUSB_RXCSR2_DMA_MODE            ((uint8_t)(1 << 4))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_musb_fdrc_set_ep(__ep)                                              \
@@ -48,9 +132,9 @@ void vsf_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep)
 {
     ASSERT(ep < 16);
     if (ep < 8) {
-        reg[0] = 1 << ep;
+        reg[0] |= 1 << ep;
     } else {
-        reg[1] = 1 << (ep - 8);
+        reg[1] |= 1 << (ep - 8);
     }
 }
 
@@ -66,7 +150,12 @@ vsf_err_t vsf_musb_fdrc_usbd_init(vsf_musb_fdrc_usbd_t *usbd, usb_dc_cfg_t *cfg)
     ASSERT((usbd != NULL) && (cfg != NULL));
     ASSERT((usbd->param != NULL) && (usbd->param->dc_op != NULL));
 
-    usbd->param->dc_op->GetInfo((void **)&usbd->reg, &usbd->ep_num, &usbd->is_dma);
+    usb_dc_ip_info_t info;
+    usbd->param->dc_op->GetInfo(&info);
+    usbd->reg = info.regbase;
+    usbd->ep_num = info.ep_num;
+    usbd->is_dma = info.is_dma;
+
     usbd->callback.evt_handler = cfg->evt_handler;
     usbd->callback.param = cfg->param;
 
@@ -95,7 +184,11 @@ void vsf_musb_fdrc_usbd_reset(vsf_musb_fdrc_usbd_t *usbd)
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
 
     reg->Common.Power = 0;
-    reg->Common.IntrUSBE = USB_INTR_RESET;
+    reg->Common.IntrUSBE = MUSB_INTRUSBE_RESET;
+    reg->Common.IntrTx1E = 0;
+    reg->Common.IntrTx2E = 0;
+    reg->Common.IntrRx1E = 0;
+    reg->Common.IntrRx2E = 0;
     usbd->ep_buf_ptr = 0;
     usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
 }
@@ -154,7 +247,7 @@ void vsf_musb_fdrc_usbd_status_stage(vsf_musb_fdrc_usbd_t *usbd, bool is_in)
 
     if (usbd->has_data_stage) {
         vsf_musb_fdrc_set_ep(0);
-        reg->EP0.CSR0 |= USB_CSR0_DATA_END;
+        reg->EP0.CSR0 |= MUSBD_CSR0_DATA_END;
     }
 }
 
@@ -184,21 +277,21 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_usbd_t *usbd, uint_fast8_t ep,
             ASSERT(64 == size);
         } else {
             reg->EPN.TxMAXP = size;
-            reg->EPN.TxCSR2 |= USB_TXCSR2_MODE;
+            reg->EPN.TxCSR2 |= MUSB_TXCSR2_MODE;
             switch (type) {
             case USB_EP_TYPE_CONTROL:
                 ASSERT(false);
                 return VSF_ERR_FAIL;
             case USB_EP_TYPE_ISO:
-                reg->EPN.TxCSR2 |= USB_TXCSR2_ISO;
-                reg->EPN.TxCSR2 &= ~USB_TXCSR2_FRC_DATA_TOG;
+                reg->EPN.TxCSR2 |= MUSBD_TXCSR2_ISO;
+                reg->EPN.TxCSR2 &= ~MUSB_TXCSR2_FRC_DATA_TOG;
                 break;
             case USB_EP_TYPE_BULK:
-                reg->EPN.TxCSR2 &= ~(USB_TXCSR2_ISO | USB_TXCSR2_FRC_DATA_TOG);
+                reg->EPN.TxCSR2 &= ~(MUSBD_TXCSR2_ISO | MUSB_TXCSR2_FRC_DATA_TOG);
                 break;
             case USB_EP_TYPE_INTERRUPT:
-                reg->EPN.TxCSR2 &= ~USB_TXCSR2_ISO;
-                reg->EPN.TxCSR2 |= USB_TXCSR2_FRC_DATA_TOG;
+                reg->EPN.TxCSR2 &= ~MUSBD_TXCSR2_ISO;
+                reg->EPN.TxCSR2 |= MUSB_TXCSR2_FRC_DATA_TOG;
                 break;
             }
         }
@@ -209,19 +302,19 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_usbd_t *usbd, uint_fast8_t ep,
         if (ep != 0) {
             reg->EPN.RxMAXP = size;
             vsf_musb_fdrc_set_mask(&reg->Common.IntrRx1E, ep);
-            reg->EPN.RxCSR1 |= USB_RXCSR1_CLR_DATA_TOG;
+            reg->EPN.RxCSR1 |= MUSBD_RXCSR1_CLR_DATA_TOG;
             switch (type) {
             case USB_EP_TYPE_CONTROL:
                 ASSERT(false);
                 return VSF_ERR_FAIL;
             case USB_EP_TYPE_ISO:
-                reg->EPN.RxCSR2 |= USB_TXCSR2_ISO;
+                reg->EPN.RxCSR2 |= MUSBD_TXCSR2_ISO;
                 break;
             default:
-                reg->EPN.RxCSR2 &= ~USB_TXCSR2_ISO;
+                reg->EPN.RxCSR2 &= ~MUSBD_TXCSR2_ISO;
                 break;
             }
-            reg->EPN.RxCSR1 |= USB_RXCSR1_FLUSH_FIFO;
+            reg->EPN.RxCSR1 |= MUSBD_RXCSR1_FLUSH_FIFO;
         }
     }
     usbd->ep_buf_ptr += size;
@@ -248,12 +341,12 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_set_stall(vsf_musb_fdrc_usbd_t *usbd, uint_fast8
     ep &= 0x0F;
     vsf_musb_fdrc_set_ep(ep);
     if (!ep) {
-        reg->EP0.CSR0 |= USB_CSR0_SEND_STALL;
+        reg->EP0.CSR0 |= MUSBD_CSR0_SEND_STALL;
     } else {
         if (is_in) {
-            reg->EPN.TxCSR1 |= USB_TXCSR1_SEND_STALL;
+            reg->EPN.TxCSR1 |= MUSBD_TXCSR1_SEND_STALL;
         } else {
-            reg->EPN.RxCSR1 |= USB_RXCSR1_SEND_STALL;
+            reg->EPN.RxCSR1 |= MUSBD_RXCSR1_SEND_STALL;
         }
     }
     return VSF_ERR_NONE;
@@ -267,12 +360,12 @@ bool vsf_musb_fdrc_usbd_ep_is_stalled(vsf_musb_fdrc_usbd_t *usbd, uint_fast8_t e
     ep &= 0x0F;
     vsf_musb_fdrc_set_ep(ep);
     if (!ep) {
-        is_stall = reg->EP0.CSR0 & USB_CSR0_SEND_STALL;
+        is_stall = reg->EP0.CSR0 & MUSBD_CSR0_SEND_STALL;
     } else {
         if (is_in) {
-            is_stall = reg->EPN.TxCSR1 & USB_TXCSR1_SEND_STALL;
+            is_stall = reg->EPN.TxCSR1 & MUSBD_TXCSR1_SEND_STALL;
         } else {
-            is_stall = reg->EPN.RxCSR1 & USB_RXCSR1_SEND_STALL;
+            is_stall = reg->EPN.RxCSR1 & MUSBD_RXCSR1_SEND_STALL;
         }
     }
     return is_stall > 0;
@@ -286,14 +379,14 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_clear_stall(vsf_musb_fdrc_usbd_t *usbd, uint_fas
     ep &= 0x0F;
     vsf_musb_fdrc_set_ep(ep);
     if (!ep) {
-        reg->EP0.CSR0 &= ~(USB_CSR0_SENT_STALL | USB_CSR0_SEND_STALL);
+        reg->EP0.CSR0 &= ~(MUSBD_CSR0_SENT_STALL | MUSBD_CSR0_SEND_STALL);
     } else {
         if (is_in) {
-            reg->EPN.TxCSR1 &= ~(USB_TXCSR1_SENT_STALL | USB_TXCSR1_SEND_STALL);
-            reg->EPN.TxCSR1 |= USB_TXCSR1_CLR_DATA_TOG | USB_TXCSR1_FLUSH_FIFO;
+            reg->EPN.TxCSR1 &= ~(MUSBD_TXCSR1_SENT_STALL | MUSBD_TXCSR1_SEND_STALL);
+            reg->EPN.TxCSR1 |= MUSBD_TXCSR1_CLR_DATA_TOG | MUSBD_TXCSR1_FLUSH_FIFO;
         } else {
-            reg->EPN.RxCSR1 &= ~(USB_RXCSR1_SENT_STALL | USB_RXCSR1_SEND_STALL);
-            reg->EPN.RxCSR1 |= USB_RXCSR1_CLR_DATA_TOG | USB_RXCSR1_FLUSH_FIFO;
+            reg->EPN.RxCSR1 &= ~(MUSBD_RXCSR1_SENT_STALL | MUSBD_RXCSR1_SEND_STALL);
+            reg->EPN.RxCSR1 |= MUSBD_RXCSR1_CLR_DATA_TOG | MUSBD_RXCSR1_FLUSH_FIFO;
         }
     }
     return VSF_ERR_NONE;
@@ -329,9 +422,9 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_read_buffer(vsf_musb_fdrc_usbd_t *usbd, uint_fas
 
     vsf_musb_fdrc_set_ep(ep);
     if (!ep) {
-        reg->EP0.CSR0 |= USB_CSR0_SERVICED_RX_PKG_RDY;
+        reg->EP0.CSR0 |= MUSBD_CSR0_SERVICED_RX_PKG_RDY;
     } else {
-        reg->EPN.RxCSR1 &= ~USB_RXCSR1_RX_PKT_RDY;
+        reg->EPN.RxCSR1 &= ~MUSBD_RXCSR1_RX_PKT_RDY;
     }
     return VSF_ERR_NONE;
 }
@@ -354,10 +447,10 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_set_data_size(vsf_musb_fdrc_usbd_t *usbd, uint_f
         uint_fast8_t ep0_int_en = reg->Common.IntrTx1E & 1;
         reg->Common.IntrTx1E &= ~1;
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
-            reg->EP0.CSR0 |= USB_CSR0_TX_PKT_RDY;
+            reg->EP0.CSR0 |= MUSBD_CSR0_TX_PKT_RDY;
         reg->Common.IntrTx1E |= ep0_int_en;
     } else {
-        reg->EPN.TxCSR1 |= USB_TXCSR1_TX_PKT_RDY;
+        reg->EPN.TxCSR1 |= MUSBD_TXCSR1_TX_PKT_RDY;
     }
     return VSF_ERR_NONE;
 }
@@ -395,18 +488,18 @@ void vsf_musb_fdrc_usbd_irq(vsf_musb_fdrc_usbd_t *usbd)
     status &= reg->Common.IntrUSBE;
 
     // USB interrupt
-    if (status & USB_INTR_RESET) {
+    if (status & MUSB_INTRUSB_RESET) {
         vsf_musb_fdrc_usbd_notify(usbd, USB_ON_RESET, 0);
         reg->Common.Power |= 1;
     }
-    if (status & USB_INTR_SOF) {
+    if (status & MUSB_INTRUSB_SOF) {
         vsf_musb_fdrc_usbd_notify(usbd, USB_ON_SOF, 0);
     }
-    if (status & USB_INTR_RESUME) {
+    if (status & MUSB_INTRUSB_RESUME) {
         reg->Common.Power |= 1;
         vsf_musb_fdrc_usbd_notify(usbd, USB_ON_RESUME, 0);
     }
-    if (status & USB_INTR_SUSPEND) {
+    if (status & MUSB_INTRUSB_SUSPEND) {
         vsf_musb_fdrc_usbd_notify(usbd, USB_ON_SUSPEND, 0);
     }
 
@@ -421,18 +514,18 @@ void vsf_musb_fdrc_usbd_irq(vsf_musb_fdrc_usbd_t *usbd)
         vsf_musb_fdrc_set_ep(0);
         csr1 = reg->EP0.CSR0;
 
-        if (csr1 & USB_CSR0_SENT_STALL) {
-            reg->EP0.CSR0 &= ~USB_CSR0_SENT_STALL;
+        if (csr1 & MUSBD_CSR0_SENT_STALL) {
+            reg->EP0.CSR0 &= ~MUSBD_CSR0_SENT_STALL;
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
         }
 
-        if (csr1 & USB_CSR0_SETUP_END) {
-            reg->EP0.CSR0 |= USB_CSR0_SERVICED_SETUP_END;
+        if (csr1 & MUSBD_CSR0_SETUP_END) {
+            reg->EP0.CSR0 |= MUSBD_CSR0_SERVICED_SETUP_END;
             vsf_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
         }
 
-        if (csr1 & USB_CSR0_RX_PKT_RDY) {
+        if (csr1 & MUSBD_CSR0_RX_PKT_RDY) {
             switch (usbd->ep0_state) {
             case MUSB_FDRC_USBD_EP0_IDLE:
                 vsf_musb_fdrc_usbd_notify(usbd, USB_ON_SETUP, 0);
@@ -446,7 +539,7 @@ void vsf_musb_fdrc_usbd_irq(vsf_musb_fdrc_usbd_t *usbd)
             }
         }
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
-            &&  !(csr1 & USB_CSR0_TX_PKT_RDY)) {
+            &&  !(csr1 & MUSBD_CSR0_TX_PKT_RDY)) {
             usbd->has_data_stage = true;
             vsf_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
         }

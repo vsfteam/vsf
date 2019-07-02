@@ -49,7 +49,7 @@ static void usb_hc##__N##_irq(void)                                             
 #define __USB_DC_IP_FUNC_DEF(__N, __VALUE)                                      \
 static vsf_err_t    usb_dc##__N##_init(usb_dc_ip_cfg_t *cfg);                   \
 static void         usb_dc##__N##_fini(void);                                   \
-static void         usb_dc##__N##_get_info(void **regbase, uint8_t *ep_num, bool *dma);\
+static void         usb_dc##__N##_get_info(usb_dc_ip_info_t *info);             \
 static void         usb_dc##__N##_connect(void);                                \
 static void         usb_dc##__N##_disconnect(void);                             \
 static void         usb_dc##__N##_irq(void);
@@ -69,8 +69,8 @@ static vsf_err_t usb_dc##__N##_init(usb_dc_ip_cfg_t *cfg)                       
 { return __HEADER##_init(&(__OBJ), cfg); }                                      \
 static void usb_dc##__N##_fini(void)                                            \
 { __HEADER##_fini(&(__OBJ)); }                                                  \
-static void usb_dc##__N##_get_info(void **regbase, uint8_t *ep_num, bool *dma)  \
-{ __HEADER##_get_info(&(__OBJ), regbase, ep_num, dma); }                        \
+static void usb_dc##__N##_get_info(usb_dc_ip_info_t *info)                      \
+{ __HEADER##_get_info(&(__OBJ), info); }                                        \
 static void usb_dc##__N##_connect(void)                                         \
 { __HEADER##_connect(&(__OBJ)); }                                               \
 static void usb_dc##__N##_disconnect(void)                                      \
@@ -330,6 +330,16 @@ struct usb_dc_ip_cfg_t{
 typedef struct usb_dc_ip_cfg_t usb_dc_ip_cfg_t;
 //! @}
 
+//! \name usb_dc_ip information structure
+//! @{
+struct usb_dc_ip_info_t{
+    void *                      regbase;
+    uint8_t                     ep_num;
+    bool                        is_dma;
+};
+typedef struct usb_dc_ip_info_t usb_dc_ip_info_t;
+//! @}
+
 //! \name usb_dc_ip control interface
 //! @{
 def_interface(i_usb_dc_ip_t)
@@ -338,7 +348,7 @@ def_interface(i_usb_dc_ip_t)
     vsf_err_t       (*Init)             (usb_dc_ip_cfg_t *cfg);
     void            (*Fini)             (void);
 
-    void            (*GetInfo)          (void **regbase, uint8_t *ep_num, bool *dma);
+    void            (*GetInfo)          (usb_dc_ip_info_t *info);
 
     void            (*Connect)          (void);
     void            (*Disconnect)       (void);

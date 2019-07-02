@@ -64,18 +64,15 @@ enum {
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
 };
 
-#if 0
 #define __VSF_ARCH_PRI(__N, __BIT)                                              \
             VSF_ARCH_PRIO_##__N =                                               \
-                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)           \
-                    << (8- (__BIT))) & 0xFF,
-#else
-#define __VSF_ARCH_PRI(__N, __BIT)                                              \
-            VSF_ARCH_PRIO_##__N =                                               \
+                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,  \
+            vsf_arch_prio_##__N =                                               \
                 ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,
-#endif
+
 enum vsf_arch_priority_t {
     VSF_ARCH_PRIO_IVALID    = -1,
+    vsf_arch_prio_ivalid    = -1,
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 };
 typedef enum vsf_arch_priority_t vsf_arch_priority_t;
