@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "../common.h"
+#include "../__common.h"
 #include "./pm.h"
 
 /*============================ MACROS ========================================*/
@@ -168,7 +168,7 @@ uint_fast32_t vsf_pm_peripheral_get_clock(pm_periph_async_clk_no_t index)
 {
     uint_fast16_t bf_clksel = (index >> 0) & 0x3FFF;
 
-    if (m480_bit_field_get_bitlen(bf_clksel)) {
+    if (M480_BIT_FIELD_GET_BITLEN(bf_clksel)) {
         pm_periph_async_clk_status_t status = vsf_pm_peripheral_get_status(index);
         uint_fast8_t clksel = (status >> 8) & 0xFF;
         uint_fast16_t clkdiv = (status >> 0) & 0xFFFF;

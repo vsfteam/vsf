@@ -32,6 +32,8 @@
 
 /*============================ MACROS ========================================*/
 
+#define VSF_SWI_NUM                 (VSF_ARCH_SWI_NUM + VSF_DEV_SWI_NUM)
+
 #if __BYTE_ORDER == __BIG_ENDIAN
 #   define cpu_to_le16 bswap_16
 #   define cpu_to_le32 bswap_32

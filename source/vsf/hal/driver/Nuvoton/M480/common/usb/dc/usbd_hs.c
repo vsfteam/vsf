@@ -17,9 +17,9 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "../../common.h"
+#include "../../__common.h"
 #include "./usbd_hs.h"
-//#define VSF_HAL_USBD_TRACE_EN           ENABLED
+
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
 #include "./service/trace/vsf_trace.h"
 #endif
@@ -73,8 +73,6 @@ static const uint8_t m480_usbd_hs_ep_type[4] = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-
-
 static HSUSBD_T * m480_usbd_hs_get_reg(m480_usbd_hs_t *usbd_hs)
 {
     return usbd_hs->param->reg;
@@ -82,6 +80,7 @@ static HSUSBD_T * m480_usbd_hs_get_reg(m480_usbd_hs_t *usbd_hs)
 
 static int_fast8_t m480_usbd_hs_get_idx(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
 {
+    uint8_t ep_num = usbd_hs->param->ep_num - 2;
     HSUSBD_T *reg;
 
     if (!(ep & 0x0F)) {
@@ -89,7 +88,7 @@ static int_fast8_t m480_usbd_hs_get_idx(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
     }
 
     reg = m480_usbd_hs_get_reg(usbd_hs);
-    for (int_fast8_t cfg, idx = 0; idx < (m480_usbd_hs_ep_number - 2); idx++) {
+    for (int_fast8_t cfg, idx = 0; idx < ep_num; idx++) {
         cfg = M480_USBD_EP_REG(idx, EP[0].EPCFG);
         if (cfg & USB_EP_CFG_VALID) {
             cfg = ((cfg & 0xF0) >> 4) | ((cfg & 0x08) << 4);
@@ -103,6 +102,7 @@ static int_fast8_t m480_usbd_hs_get_idx(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
 
 static int_fast8_t m480_usbd_hs_get_free_idx(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
 {
+    uint8_t ep_num = usbd_hs->param->ep_num - 2;
     HSUSBD_T *reg;
 
     if (!(ep & 0x0F)) {
@@ -110,7 +110,7 @@ static int_fast8_t m480_usbd_hs_get_free_idx(m480_usbd_hs_t *usbd_hs, uint_fast8
     }
 
     reg = m480_usbd_hs_get_reg(usbd_hs);
-    for (int_fast8_t cfg, idx = 0; idx < (m480_usbd_hs_ep_number - 2); idx++) {
+    for (int_fast8_t cfg, idx = 0; idx < ep_num; idx++) {
         cfg = M480_USBD_EP_REG(idx, EP[0].EPCFG);
         if (!(cfg & USB_EP_CFG_VALID)) {
             return idx + 2;
@@ -189,12 +189,13 @@ void m480_usbd_hs_fini(m480_usbd_hs_t *usbd_hs)
 
 void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
 {
+    uint8_t ep_num = usbd_hs->param->ep_num - 2;
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
     usbd_hs->ep_buf_ptr = 0x1000;
 #ifdef M480_USBD_HS_WROKAROUND_ISO
     usbd_hs->ep_tx_mask = 0;
 #endif
-    for (uint_fast8_t i = 0; i < (m480_usbd_hs_ep_number - 2); i++) {
+    for (uint_fast8_t i = 0; i < ep_num; i++) {
         M480_USBD_EP_REG(i, EP[0].EPCFG) = 0;
         M480_USBD_EP_REG(i, EP[0].EPINTEN) = 0;
     }
@@ -493,8 +494,8 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
         M480_USBD_EP_REG(idx, EP[0].EPINTEN) &= ~HSUSBD_EPINTEN_TXPKIEN_Msk;
             ASSERT(!(usbd_hs->ep_tx_mask & (1 << idx)));
             M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
-            usbd_hs->retry_cnt[idx] = 0;
-            usbd_hs->tx_size[idx] = size;
+            usbd_hs->param->tx_retry_cnt[idx] = 0;
+            usbd_hs->param->tx_size[idx] = size;
             usbd_hs->ep_tx_mask |= 1 << idx;
         M480_USBD_EP_REG(idx, EP[0].EPINTEN) |= ep_int_en;
 #else
@@ -645,7 +646,9 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
 
     // EP interrupt
     if (gstatus & (~3)) {
-        for (uint_fast8_t ep, idx = 0; idx < m480_usbd_hs_ep_number - 2; idx++) {
+        uint8_t ep_num = usbd_hs->param->ep_num - 2;
+
+        for (uint_fast8_t ep, idx = 0; idx < ep_num; idx++) {
             ep = M480_USBD_EP_REG(idx, EP[0].EPCFG);
             if (!(ep & USB_EP_CFG_VALID)) {
                 continue;
@@ -677,9 +680,9 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
                             usbd_hs->ep_tx_mask &= ~(1 << idx);
                             m480_usbd_hs_notify(usbd_hs, USB_ON_IN, ep);
                         } else {
-                            if (++usbd_hs->retry_cnt[idx] > 2) {
-                                usbd_hs->retry_cnt[idx] = 0;
-                                M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = usbd_hs->tx_size[idx];
+                            if (++usbd_hs->param->tx_retry_cnt[idx] > 2) {
+                                usbd_hs->param->tx_retry_cnt[idx] = 0;
+                                M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = usbd_hs->param->tx_size[idx];
 //                                vsf_trace(0, "resend EP%c %d\r\n", 'A' + idx, usbd_hs->tx_size[idx]);
                             }
                         }

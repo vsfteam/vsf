@@ -25,9 +25,6 @@
 #include "./vsf_os.h"
 
 /*============================ MACROS ========================================*/
-#ifndef VSF_OS_EVTQ_SWI_NUM
-#   define VSF_OS_EVTQ_SWI_NUM                  2
-#endif
 
 #define __VSF_OS_EVTQ_SWI_PRIO_INIT(__index, __unused)                          \
     VSF_ARCH_PRIO_##__index,
@@ -51,8 +48,8 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 {
 
 #if VSF_CFG_EVTQ_EN == ENABLED
-    static const vsf_arch_priority_t __vsf_os_priority[VSF_OS_EVTQ_NUM] = {
-        MREPEAT(VSF_OS_EVTQ_SWI_NUM, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
+    static const vsf_arch_priority_t __vsf_os_priority[VSF_OS_CFG_PREEPT_PRI_NUM] = {
+        MREPEAT(VSF_OS_CFG_PREEPT_PRI_NUM, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
     
 #   if defined(VSF_CFG_EVTQ_LIST) && defined(VSF_OS_EVTQ_POOL_SIZE)

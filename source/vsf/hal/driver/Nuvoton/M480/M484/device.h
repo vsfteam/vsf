@@ -20,16 +20,19 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "../common/common.h"
+#include "../common/__common.h"
 
 /*============================ MACROS ========================================*/
 
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 //! arch info
-#   define VSF_ARCH_PRI_NUM            16
-#   define VSF_ARCH_PRI_BIT            4
+#   define VSF_ARCH_PRI_NUM          16
+#   define VSF_ARCH_PRI_BIT          4
 #endif
+
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_NUM             9
 
 #define __def_idx(__name, __no)     TPASTE2(__name, _idx) = (__no)
 #define __def_msk(__name)           TPASTE2(__name, _msk) = _BV(TPASTE2(__name, _idx) & 0x1F)
@@ -76,10 +79,10 @@
 #define USB_DC_HS_COUNT             1
 #define USB_DC_FS_COUNT             0
 
+
 #define USB_DC0_TYPE                usbd_hs
 #define USB_DC0_IRQHandler          USBD20_IRQHandler
-#define USB_DC0_EP_NUMBER           m480_usbd_hs_ep_number
-#define USB_DC0_EP_IS_DMA           m480_usbd_hs_ep_is_dma
+#define USB_DC0_EP_NUM              14
 #define USB_DC0_CONFIG                                                          \
     .reg                = HSUSBD,                                               \
     .ahbclk             = AHBCLK_USBD_idx,                                      \
@@ -222,85 +225,85 @@ typedef enum pm_periph_clksel_t pm_periph_clksel_t;
 //! @{
 enum pm_periph_async_clk_no_t{
                         // NAME         BF_CLKSEL,      BF_CLKDIV,      CLKSEL_MAP_IDX
-    m480_bit_field(     HCLK_CLKSEL,    0,  3,  true),
-    m480_bit_field(     SYSTICK_CLKSEL, 3,  3,  true),
+    M480_BIT_FIELD(     HCLK_CLKSEL,    0,  3,  true),
+    M480_BIT_FIELD(     SYSTICK_CLKSEL, 3,  3,  true),
 
-    m480_bit_field(     WWDT_CLKSEL,    62, 2,  false),
+    M480_BIT_FIELD(     WWDT_CLKSEL,    62, 2,  false),
     __def_periph_clk(   PCLK_WWDT,      WWDT_CLKSEL,    0,              WWDT_CLKSEL_MAP_IDX),
-    m480_bit_field(     USB_CLKDIV,     4,  4,  false),
+    M480_BIT_FIELD(     USB_CLKDIV,     4,  4,  false),
     __def_periph_clk(   PCLK_USB,       0,              USB_CLKDIV,     0),
     // AHB
-    m480_bit_field(     EMAC_CLKDIV,    48, 8,  false),
+    M480_BIT_FIELD(     EMAC_CLKDIV,    48, 8,  false),
     __def_periph_clk(   PCLK_EMAC,      0,              EMAC_CLKDIV,    0),
-    m480_bit_field(     SDH0_CLKSEL,    20, 2,  true),
-    m480_bit_field(     SDH0_CLKDIV,    24, 8,  false),
+    M480_BIT_FIELD(     SDH0_CLKSEL,    20, 2,  true),
+    M480_BIT_FIELD(     SDH0_CLKDIV,    24, 8,  false),
     __def_periph_clk(   PCLK_SDH0,      SDH0_CLKSEL,    SDH0_CLKDIV,    SDH0_CLKSEL_MAP_IDX),
-    m480_bit_field(     SDH1_CLKSEL,    22, 2,  true),
-    m480_bit_field(     SDH1_CLKDIV,    56, 8,  false),
+    M480_BIT_FIELD(     SDH1_CLKSEL,    22, 2,  true),
+    M480_BIT_FIELD(     SDH1_CLKDIV,    56, 8,  false),
     __def_periph_clk(   PCLK_SDH1,      SDH1_CLKSEL,    0,              SDH1_CLKSEL_MAP_IDX),
 
     // APB0
-    m480_bit_field(     WDT_CLKSEL,     32, 2,  true),
+    M480_BIT_FIELD(     WDT_CLKSEL,     32, 2,  true),
     __def_periph_clk(   PCLK_WDT,       WDT_CLKSEL,     0,              WDT_CLKSEL_MAP_IDX),
-    m480_bit_field(     RTC_CLKSEL,     104,1,  false),
+    M480_BIT_FIELD(     RTC_CLKSEL,     104,1,  false),
     __def_periph_clk(   PCLK_RTC,       RTC_CLKSEL,     0,              RTC_CLKSEL_MAP_IDX),
-    m480_bit_field(     TMR0_CLKSEL,    40, 3,  false),
+    M480_BIT_FIELD(     TMR0_CLKSEL,    40, 3,  false),
     __def_periph_clk(   PCLK_TMR0,      TMR0_CLKSEL,    0,              TMR0_CLKSEL_MAP_IDX),
-    m480_bit_field(     TMR1_CLKSEL,    44, 3,  false),
+    M480_BIT_FIELD(     TMR1_CLKSEL,    44, 3,  false),
     __def_periph_clk(   PCLK_TMR1,      TMR1_CLKSEL,    0,              TMR1_CLKSEL_MAP_IDX),
-    m480_bit_field(     TMR2_CLKSEL,    48, 3,  false),
+    M480_BIT_FIELD(     TMR2_CLKSEL,    48, 3,  false),
     __def_periph_clk(   PCLK_TMR2,      TMR2_CLKSEL,    0,              TMR2_CLKSEL_MAP_IDX),
-    m480_bit_field(     TMR3_CLKSEL,    52, 3,  false),
+    M480_BIT_FIELD(     TMR3_CLKSEL,    52, 3,  false),
     __def_periph_clk(   PCLK_TMR3,      TMR3_CLKSEL,    0,              TMR3_CLKSEL_MAP_IDX),
-    m480_bit_field(     CLKO_CLKSEL,    60, 2,  false),
+    M480_BIT_FIELD(     CLKO_CLKSEL,    60, 2,  false),
     __def_periph_clk(   PCLK_CLKO,      CLKO_CLKSEL,    0,              CLKO_CLKSEL_MAP_IDX),
-    m480_bit_field(     QSPI0_CLKSEL,   66, 2,  false),
+    M480_BIT_FIELD(     QSPI0_CLKSEL,   66, 2,  false),
     __def_periph_clk(   PCLK_QSPI0,     QSPI0_CLKSEL,   0,              QSPI0_CLKSEL_MAP_IDX),
-    m480_bit_field(     SPI0_CLKSEL,    68, 2,  false),
+    M480_BIT_FIELD(     SPI0_CLKSEL,    68, 2,  false),
     __def_periph_clk(   PCLK_SPI0,      SPI0_CLKSEL,    0,              SPI0_CLKSEL_MAP_IDX),
-    m480_bit_field(     SPI1_CLKSEL,    70, 2,  false),
+    M480_BIT_FIELD(     SPI1_CLKSEL,    70, 2,  false),
     __def_periph_clk(   PCLK_SPI1,      SPI1_CLKSEL,    0,              SPI1_CLKSEL_MAP_IDX),
-    m480_bit_field(     SPI2_CLKSEL,    74, 2,  false),
+    M480_BIT_FIELD(     SPI2_CLKSEL,    74, 2,  false),
     __def_periph_clk(   PCLK_SPI2,      SPI2_CLKSEL,    0,              SPI2_CLKSEL_MAP_IDX),
-    m480_bit_field(     UART0_CLKSEL,   56, 2,  false),
-    m480_bit_field(     UART0_CLKDIV,   8,  4,  false),
+    M480_BIT_FIELD(     UART0_CLKSEL,   56, 2,  false),
+    M480_BIT_FIELD(     UART0_CLKDIV,   8,  4,  false),
     __def_periph_clk(   PCLK_UART0,     UART0_CLKSEL,   UART0_CLKDIV,   UART0_CLKSEL_MAP_IDX),
-    m480_bit_field(     UART1_CLKSEL,   58, 2,  false),
-    m480_bit_field(     UART1_CLKDIV,   12, 4,  false),
+    M480_BIT_FIELD(     UART1_CLKSEL,   58, 2,  false),
+    M480_BIT_FIELD(     UART1_CLKDIV,   12, 4,  false),
     __def_periph_clk(   PCLK_UART1,     UART1_CLKSEL,   UART1_CLKDIV,   UART1_CLKSEL_MAP_IDX),
-    m480_bit_field(     UART2_CLKSEL,   120,2,  false),
-    m480_bit_field(     UART2_CLKDIV,   64, 4,  false),
+    M480_BIT_FIELD(     UART2_CLKSEL,   120,2,  false),
+    M480_BIT_FIELD(     UART2_CLKDIV,   64, 4,  false),
     __def_periph_clk(   PCLK_UART2,     UART2_CLKSEL,   UART2_CLKDIV,   UART2_CLKSEL_MAP_IDX),
-    m480_bit_field(     UART3_CLKSEL,   122,2,  false),
-    m480_bit_field(     UART3_CLKDIV,   68, 4,  false),
+    M480_BIT_FIELD(     UART3_CLKSEL,   122,2,  false),
+    M480_BIT_FIELD(     UART3_CLKDIV,   68, 4,  false),
     __def_periph_clk(   PCLK_UART3,     UART3_CLKSEL,   UART3_CLKDIV,   UART3_CLKSEL_MAP_IDX),
-    m480_bit_field(     UART4_CLKSEL,   124,2,  false),
-    m480_bit_field(     UART4_CLKDIV,   72, 4,  false),
+    M480_BIT_FIELD(     UART4_CLKSEL,   124,2,  false),
+    M480_BIT_FIELD(     UART4_CLKDIV,   72, 4,  false),
     __def_periph_clk(   PCLK_UART4,     UART4_CLKSEL,   UART4_CLKDIV,   UART4_CLKSEL_MAP_IDX),
-    m480_bit_field(     UART5_CLKSEL,   126,2,  false),
-    m480_bit_field(     UART5_CLKDIV,   76, 4,  false),
+    M480_BIT_FIELD(     UART5_CLKSEL,   126,2,  false),
+    M480_BIT_FIELD(     UART5_CLKDIV,   76, 4,  false),
     __def_periph_clk(   PCLK_UART5,     UART5_CLKSEL,   UART5_CLKDIV,   UART5_CLKSEL_MAP_IDX),
-    m480_bit_field(     EADC_CLKDIV,    16, 8,  false),
+    M480_BIT_FIELD(     EADC_CLKDIV,    16, 8,  false),
     __def_periph_clk(   PCLK_EADC,      0,              EADC_CLKDIV,    0),
-    m480_bit_field(     I2S0_CLKSEL,    112,2,  false),
+    M480_BIT_FIELD(     I2S0_CLKSEL,    112,2,  false),
     __def_periph_clk(   PCLK_I2S0,      I2S0_CLKSEL,    0,              I2S0_CLKSEL_MAP_IDX),
 
     // APB1
-    m480_bit_field(     SC0_CLKSEL,     96, 2,  false),
+    M480_BIT_FIELD(     SC0_CLKSEL,     96, 2,  false),
     __def_periph_clk(   PCLK_SC0,       SC0_CLKSEL,     0,              SC0_CLKSEL_MAP_IDX),
-    m480_bit_field(     SC1_CLKSEL,     98, 2,  false),
+    M480_BIT_FIELD(     SC1_CLKSEL,     98, 2,  false),
     __def_periph_clk(   PCLK_SC1,       SC1_CLKSEL,     0,              SC1_CLKSEL_MAP_IDX),
-    m480_bit_field(     SC2_CLKSEL,     100,2,  false),
+    M480_BIT_FIELD(     SC2_CLKSEL,     100,2,  false),
     __def_periph_clk(   PCLK_SC2,       SC2_CLKSEL,     0,              SC2_CLKSEL_MAP_IDX),
-    m480_bit_field(     SPI3_CLKSEL,    76, 2,  false),
+    M480_BIT_FIELD(     SPI3_CLKSEL,    76, 2,  false),
     __def_periph_clk(   PCLK_SPI3,      SPI3_CLKSEL,    0,              SPI3_CLKSEL_MAP_IDX),
-    m480_bit_field(     EPWM0_CLKSEL,   64, 1,  false),
+    M480_BIT_FIELD(     EPWM0_CLKSEL,   64, 1,  false),
     __def_periph_clk(   PCLK_EPWM0,     EPWM0_CLKSEL,   0,              EPWM0_CLKSEL_MAP_IDX),
-    m480_bit_field(     EPWM1_CLKSEL,   65, 1,  false),
+    M480_BIT_FIELD(     EPWM1_CLKSEL,   65, 1,  false),
     __def_periph_clk(   PCLK_EPWM1,     EPWM1_CLKSEL,   0,              EPWM1_CLKSEL_MAP_IDX),
-    m480_bit_field(     BPWM0_CLKSEL,   72, 1,  false),
+    M480_BIT_FIELD(     BPWM0_CLKSEL,   72, 1,  false),
     __def_periph_clk(   PCLK_BPWM0,     BPWM0_CLKSEL,   0,              BPWM0_CLKSEL_MAP_IDX),
-    m480_bit_field(     BPWM1_CLKSEL,   73, 1,  false),
+    M480_BIT_FIELD(     BPWM1_CLKSEL,   73, 1,  false),
     __def_periph_clk(   PCLK_BPWM1,     BPWM1_CLKSEL,   0,              BPWM1_CLKSEL_MAP_IDX),
 };
 //! @}

@@ -18,6 +18,7 @@
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #   include "hal/vsf_hal_cfg.h"
 #   include "./device.h"
+#   undef   __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #else
 
 #   ifndef __HAL_DRIVER_NUVOTON_M484_H__

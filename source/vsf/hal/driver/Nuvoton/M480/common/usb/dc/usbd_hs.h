@@ -20,18 +20,15 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "../../../device.h"
+#include "../../../__device.h"
 
+//! include the infrastructure
 #include "../../io/io.h"
 #include "../../pm/pm.h"
 
-#include "hal/interface/vsf_interface_io.h"
-#include "hal/interface/vsf_interface_pm.h"
 #include "hal/interface/vsf_interface_usb.h"
 
 /*============================ MACROS ========================================*/
-
-#define m480_usbd_hs_ep_number          14
 
 #define M480_USBD_HS_WROKAROUND_ISO
 
@@ -39,6 +36,14 @@
 /*============================ TYPES =========================================*/
 
 struct m480_usbd_hs_const_t {
+#ifdef M480_USBD_HS_WROKAROUND_ISO
+    // information from lv0
+    uint16_t *tx_size;
+    uint8_t *tx_retry_cnt;
+#endif
+
+    // information from device.h
+    uint8_t ep_num;
     m480_usbphy_t phy;
     IRQn_Type irq;
     pm_ahb_clk_no_t ahbclk;
@@ -50,8 +55,6 @@ struct m480_usbd_hs_t {
     uint16_t ep_buf_ptr;
 #ifdef M480_USBD_HS_WROKAROUND_ISO
     uint16_t ep_tx_mask;
-    uint16_t tx_size[m480_usbd_hs_ep_number - 2];
-    uint8_t retry_cnt[m480_usbd_hs_ep_number - 2];
 #endif
 
     struct {

@@ -20,13 +20,12 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "../../../device.h"
+#include "../../../__device.h"
 
+//! include the infrastructure
 #include "../../io/io.h"
 #include "../../pm/pm.h"
 
-#include "hal/interface/vsf_interface_io.h"
-#include "hal/interface/vsf_interface_pm.h"
 #include "hal/interface/vsf_interface_usb.h"
 
 /*============================ MACROS ========================================*/

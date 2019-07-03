@@ -20,7 +20,11 @@
 #define __HAL_DRIVER_NUVOTON_M484_USART_H__
 
 #include "hal/vsf_hal_cfg.h"
-#include "../../device.h"
+#include "../../__device.h"
+
+//! include the infrastructure
+#include "../io/io.h"
+#include "../pm/pm.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

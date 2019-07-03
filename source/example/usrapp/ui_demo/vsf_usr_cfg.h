@@ -61,12 +61,8 @@
 
 //          <o>The number of event queues   <1-4>
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_NUM                     1
+#define VSF_OS_CFG_PREEPT_PRI_NUM           1
 //      </h>
-
-//      <o>The number of Software Interrupts <1-2>
-//      <i>Simon, please add description here...
-#define VSF_OS_EVTQ_SWI_NUM                 1
 
 //      <o>The default vsf_task_t stack frame pool size <1-65535>
 //      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 

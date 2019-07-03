@@ -60,14 +60,10 @@
 //          <i>Simon, please add description here...
 #define VSF_OS_EVTQ_BITSIZE                 4
 
-//          <o>The number of event queues   <1-4>
+//          <o>The number of preemptive priorities <1-4>
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_NUM                     10
+#define VSF_OS_CFG_PREEPT_PRI_NUM           10
 //      </h>
-
-//      <o>The number of Software Interrupts <1-2>
-//      <i>Simon, please add description here...
-#define VSF_OS_EVTQ_SWI_NUM                 10
 
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks.

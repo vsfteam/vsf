@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "../../device.h"
+#include "../../__device.h"
 #include "./ohci/ohci.h"
 #include "./dc/usbd_hs.h"
 

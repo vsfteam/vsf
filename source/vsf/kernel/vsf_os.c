@@ -28,10 +28,6 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_OS_EVTQ_NUM
-#   define VSF_OS_EVTQ_NUM                      3
-#endif
-
 #ifndef VSF_OS_MAIN_STACK_SIZE
 #   define VSF_OS_MAIN_STACK_SIZE               2048
 #endif
@@ -44,9 +40,9 @@
 
 struct __vsf_os_t {
 #if VSF_CFG_EVTQ_EN == ENABLED
-    vsf_evtq_t evt_queue[VSF_OS_EVTQ_NUM];
+    vsf_evtq_t evt_queue[VSF_OS_CFG_PREEPT_PRI_NUM];
 #if defined(VSF_CFG_EVTQ_ARRAY)
-    vsf_evt_node_t nodes[VSF_OS_EVTQ_NUM][1 << VSF_OS_EVTQ_BITSIZE];
+    vsf_evt_node_t nodes[VSF_OS_CFG_PREEPT_PRI_NUM][1 << VSF_OS_EVTQ_BITSIZE];
 #elif defined(VSF_CFG_EVTQ_LIST)
     vsf_pool(vsf_evt_node_pool) node_pool;
 #endif
@@ -135,7 +131,7 @@ static void __vsf_os_evtq_swi_handler(void *p)
 
 vsf_evtq_t *__vsf_os_evtq_get(vsf_priority_t priority)
 {
-    if ((priority >= 0) && (priority < VSF_OS_EVTQ_NUM)) {
+    if ((priority >= 0) && (priority < VSF_OS_CFG_PREEPT_PRI_NUM)) {
         return &__vsf_os.evt_queue[priority];
     }
     return NULL;
@@ -144,7 +140,7 @@ vsf_evtq_t *__vsf_os_evtq_get(vsf_priority_t priority)
 vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_priority_t priority)
 {
     uint_fast8_t index = pthis - __vsf_os.evt_queue;
-    ASSERT((pthis != NULL) && (index < VSF_OS_EVTQ_NUM));
+    ASSERT((pthis != NULL) && (index < VSF_OS_CFG_PREEPT_PRI_NUM));
 
     if (priority >= 0) {
         return vsf_swi_init(
@@ -158,7 +154,7 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_priority_t priority)
 vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
 {
     uint_fast8_t index = pthis - __vsf_os.evt_queue;
-    ASSERT((pthis != NULL) && (index < VSF_OS_EVTQ_NUM));
+    ASSERT((pthis != NULL) && (index < VSF_OS_CFG_PREEPT_PRI_NUM));
 
     __vsf_os_evtq_set_priority(pthis, (vsf_priority_t)index);
     return VSF_ERR_NONE;
@@ -167,7 +163,7 @@ vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
 vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
 {
     uint_fast8_t index = pthis - __vsf_os.evt_queue;
-    ASSERT((pthis != NULL) && (index < VSF_OS_EVTQ_NUM));
+    ASSERT((pthis != NULL) && (index < VSF_OS_CFG_PREEPT_PRI_NUM));
 
     vsf_swi_trigger(index);
     return VSF_ERR_NONE;
@@ -176,7 +172,7 @@ vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
 vsf_priority_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis)
 {
     uint_fast8_t index = pthis - __vsf_os.evt_queue;
-    ASSERT((pthis != NULL) && (index < VSF_OS_EVTQ_NUM));
+    ASSERT((pthis != NULL) && (index < VSF_OS_CFG_PREEPT_PRI_NUM));
 
     return (vsf_priority_t)index;
 }
@@ -198,7 +194,7 @@ void __vsf_os_free_evt_node(vsf_evt_node_t *pnode)
 vsf_sched_lock_status_t vsf_sched_lock(void)
 {
     return vsf_set_base_priority(
-        __vsf_os.res_ptr->arch.os_priorities_ptr[VSF_OS_EVTQ_NUM - 1]);
+        __vsf_os.res_ptr->arch.os_priorities_ptr[VSF_OS_CFG_PREEPT_PRI_NUM - 1]);
 }
 
 void vsf_sched_unlock(vsf_sched_lock_status_t origlevel)
@@ -255,7 +251,7 @@ void __vsf_main_entry(void)
 
 #ifdef VSF_CFG_EVTQ_EN
     vsf_evtq_t *pevtq = &__vsf_os.evt_queue[0];
-    for (uint_fast8_t i = 0; i < VSF_OS_EVTQ_NUM; i++, pevtq++) {
+    for (uint_fast8_t i = 0; i < VSF_OS_CFG_PREEPT_PRI_NUM; i++, pevtq++) {
 #ifdef VSF_CFG_EVTQ_ARRAY
         pevtq->node = __vsf_os.nodes[i];
         pevtq->bitsize = VSF_OS_EVTQ_BITSIZE;

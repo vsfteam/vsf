@@ -27,8 +27,8 @@
 #include "./SysTick/systick.h"
 /*============================ MACROS ========================================*/
 
-#define __LITTLE_ENDIAN             1
-#define __BYTE_ORDER                __LITTLE_ENDIAN
+#define __LITTLE_ENDIAN                 1
+#define __BYTE_ORDER                    __LITTLE_ENDIAN
 
 #if __ARM_ARCH == 6 || __TARGET_ARCH_6_M == 1 || __TARGET_ARCH_6S_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
@@ -51,6 +51,9 @@
 #       define VSF_ARCH_PRI_BIT         7
 #   endif
 #endif
+
+// software interrupt provided by arch
+#define VSF_ARCH_SWI_NUM                1
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
