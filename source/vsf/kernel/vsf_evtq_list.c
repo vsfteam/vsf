@@ -19,6 +19,8 @@
 #define __VSF_EDA_CLASS_IMPLEMENT
 #include "kernel/vsf_kernel_cfg.h"
 
+#if VSF_USE_KERNEL == ENABLED
+
 #include "./vsf_kernel_common.h"
 
 #include "./vsf_eda.h"
@@ -26,7 +28,7 @@
 
 #include "./vsf_os.h"
 
-#ifdef VSF_CFG_EVTQ_LIST
+#ifdef __VSF_OS_CFG_EVTQ_LIST
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,22 +46,21 @@ extern vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq);
 SECTION(".text.vsf.kernel.eda")
 extern void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt);
 
-extern vsf_evtq_t * __vsf_os_evtq_get(vsf_priority_t priority);
-extern vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_priority_t priority);
+extern vsf_evtq_t * __vsf_os_evtq_get(vsf_prio_t priority);
+extern vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis);
 extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis);
-extern vsf_priority_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis);
+extern vsf_prio_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis);
 
 extern vsf_evt_node_t * __vsf_os_alloc_evt_node(void);
 extern void __vsf_os_free_evt_node(vsf_evt_node_t *node);
 
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *pthis, vsf_priority_t priority)
+static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *pthis, vsf_prio_t priority)
 {
-
     if (pthis->is_ready) {
-        vsf_evtq_t *evtq = __vsf_os_evtq_get((vsf_priority_t)pthis->cur_priority);
+        vsf_evtq_t *evtq = __vsf_os_evtq_get((vsf_prio_t)pthis->cur_priority);
         vsf_dlist_remove(
                 vsf_eda_t, rdy_node,
                 &evtq->rdy_list,
@@ -70,22 +71,27 @@ static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *pthis, vsf_priority_t prio
                 &evtq->rdy_list,
                 pthis);
     }
+    pthis->cur_priority = priority;
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_eda_set_priority(vsf_eda_t *pthis, vsf_priority_t priority)
+vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *pthis)
 {
-    vsf_evtq_t *evtq;
+    VSF_KERNEL_ASSERT(pthis != NULL);
+    return pthis->is_new_prio ? pthis->new_priority : pthis->cur_priority;
+}
 
-    ASSERT(pthis != NULL);
+vsf_err_t __vsf_eda_set_priority(vsf_eda_t *pthis, vsf_prio_t priority)
+{
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
-    vsf_interrupt_safe(){
-        evtq = __vsf_os_evtq_get((vsf_priority_t)pthis->cur_priority);
-        ASSERT(evtq != NULL);
+    vsf_protect_t orig = vsf_protect_int();
         if (pthis->cur_priority != priority) {
+            vsf_evtq_t *evtq = __vsf_os_evtq_get((vsf_prio_t)pthis->cur_priority);
+            VSF_KERNEL_ASSERT(evtq != NULL);
+
             if ((evtq->cur.eda != pthis) && !pthis->is_new_prio) {
                 __vsf_eda_update_priotiry(pthis, priority);
-                pthis->cur_priority = priority;
             } else {
                 pthis->is_new_prio = true;
                 pthis->new_priority = priority;
@@ -94,7 +100,7 @@ vsf_err_t vsf_eda_set_priority(vsf_eda_t *pthis, vsf_priority_t priority)
                 }
             }
         }
-    }
+    vsf_unprotect_int(orig);
     return VSF_ERR_NONE;
 }
 
@@ -108,20 +114,20 @@ void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
 {
     vsf_evt_node_t *node;
     vsf_evtq_t *evtq;
-    istate_t orig;
+    vsf_protect_t orig;
 
-    orig = vsf_disable_interrupt();
-    evtq = __vsf_os_evtq_get((vsf_priority_t)pthis->cur_priority);
+    orig = vsf_protect_int();
+    evtq = __vsf_os_evtq_get((vsf_prio_t)pthis->cur_priority);
     if (evtq->cur.eda == pthis) {
         pthis->is_to_exit = true;
-        vsf_set_interrupt(orig);
+        vsf_unprotect_int(orig);
         return;
     } else if (pthis->is_ready) {
         vsf_dlist_remove(vsf_eda_t, rdy_node,
                 &evtq->rdy_list,
                 pthis);
     }
-    vsf_set_interrupt(orig);
+    vsf_unprotect_int(orig);
 
     while (!vsf_slist_queue_is_empty(&pthis->evt_list)) {
         vsf_slist_queue_dequeue(
@@ -137,7 +143,7 @@ void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
 
 vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
 {
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
     pthis->cur.eda = NULL;
     pthis->cur.evt = VSF_EVT_INVALID;
     pthis->cur.msg = NULL;
@@ -154,13 +160,13 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     vsf_evt_node_t *node;
     vsf_evtq_t *evtq;
     vsf_err_t err;
-    istate_t orig;
+    vsf_protect_t orig;
 
-    ASSERT(eda != NULL);
+    VSF_KERNEL_ASSERT(eda != NULL);
 
     node = __vsf_os_alloc_evt_node();
     if (NULL == node) {
-        ASSERT(false);
+        VSF_KERNEL_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     vsf_slist_init_node(vsf_evtq_node_t, use_as__vsf_slist_node_t, node);
@@ -171,15 +177,15 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     node->value = value;
 #endif
 
-    orig = vsf_disable_interrupt();
+    orig = vsf_protect_int();
     if (eda->is_limitted && eda->is_ready && !force) {
-        vsf_set_interrupt(orig);
+        vsf_unprotect_int(orig);
         __vsf_os_free_evt_node(node);
         return VSF_ERR_FAIL;
     }
 
     vsf_slist_queue_enqueue(vsf_evt_node_t, use_as__vsf_slist_node_t, &eda->evt_list, node);
-    evtq = __vsf_os_evtq_get((vsf_priority_t)eda->cur_priority);
+    evtq = __vsf_os_evtq_get((vsf_prio_t)eda->cur_priority);
     if (!eda->is_ready) {
         eda->is_ready = true;
         vsf_dlist_queue_enqueue(vsf_eda_t, rdy_node,
@@ -187,7 +193,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
                     eda);
     }
     err = __vsf_os_evtq_activate(evtq);
-    vsf_set_interrupt(orig);
+    vsf_unprotect_int(orig);
 
     return err;
 }
@@ -221,13 +227,13 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
     vsf_evt_node_t *node_evt;
     vsf_dlist_node_t *node_eda;
     vsf_eda_t *eda;
-    istate_t orig;
+    vsf_protect_t orig;
 
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     evtq_orig = __vsf_set_cur_evtq(pthis);
     while (!vsf_dlist_is_empty(&pthis->rdy_list)) {
-        orig = vsf_disable_interrupt();
+        orig = vsf_protect_int();
         node_eda = pthis->rdy_list.head;
         while (node_eda != NULL) {
             pthis->cur.eda = (vsf_eda_t *)__vsf_dlist_get_host(vsf_eda_t, rdy_node, node_eda);
@@ -236,7 +242,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                     vsf_evt_node_t, use_as__vsf_slist_node_t,
                     &eda->evt_list,
                     node_evt);
-            vsf_set_interrupt(orig);
+            vsf_unprotect_int(orig);
 
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
             pthis->evt_cur = node->evt;
@@ -258,37 +264,42 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
             pthis->cur.evt = VSF_EVT_INVALID;
             pthis->cur.msg = NULL;
 
-            orig = vsf_disable_interrupt();
+            orig = vsf_protect_int();
             node_eda = eda->rdy_node.next;
+
+            // remove current eda, and will enqueue again if more events pending
+            // so the eda will always have an opportunity to run
+            vsf_dlist_remove(
+                    vsf_eda_t, rdy_node,
+                    &pthis->rdy_list,
+                    eda);
             if (NULL == eda->evt_list.head.next) {
                 eda->is_ready = false;
-                vsf_dlist_remove(
+            } else {
+                vsf_dlist_queue_enqueue(
                     vsf_eda_t, rdy_node,
                     &pthis->rdy_list,
                     eda);
             }
             pthis->cur.eda = NULL;
 
-            if (!eda->is_to_exit) {
-                if (eda->is_new_prio) {
-                    bool is_prio_rise = eda->new_priority > eda->cur_priority;
-                    __vsf_eda_update_priotiry(eda, (vsf_priority_t)eda->new_priority);
-                    eda->cur_priority = eda->new_priority;
-                    eda->is_new_prio = false;
-                    if (is_prio_rise) {
-                        __vsf_os_evtq_set_priority(pthis, (vsf_priority_t)eda->priority);
-                    }
-                }
-            } else {
-                vsf_set_interrupt(orig);
+            if (eda->is_new_prio) {
+                eda->is_new_prio = false;
+                __vsf_eda_update_priotiry(eda, (vsf_prio_t)eda->new_priority);
+                __vsf_os_evtq_set_priority(pthis, __vsf_os_evtq_get_prio(pthis));
+            }
+            if (eda->is_to_exit) {
+                vsf_unprotect_int(orig);
                 vsf_evtq_on_eda_fini(eda);
-                orig = vsf_disable_interrupt();
+                orig = vsf_protect_int();
             }
         }
-        vsf_set_interrupt(orig);
+        vsf_unprotect_int(orig);
     }
     __vsf_set_cur_evtq(evtq_orig);
     return VSF_ERR_NONE;
 }
+
+#endif
 
 #endif

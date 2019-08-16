@@ -16,7 +16,6 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "../__common.h"
 #include "./pm.h"
 
 /*============================ MACROS ========================================*/
@@ -159,7 +158,7 @@ static uint_fast32_t vsf_pm_peripheral_get_clksrc(uint_fast8_t index)
 
 static uint_fast32_t vsf_pm_peripheral_get_clksrc_from_clksel(uint_fast8_t map_idx, uint_fast8_t clksel)
 {
-    ASSERT((map_idx < dimof(vsf_pm_peripheral_clksel)) && (clksel <= 7));
+    VSF_HAL_ASSERT((map_idx < dimof(vsf_pm_peripheral_clksel)) && (clksel <= 7));
     uint_fast8_t clksrc = (vsf_pm_peripheral_clksel[map_idx] >> (4 * clksel)) & 0x0F;
     return vsf_pm_peripheral_get_clksrc(clksrc);
 }

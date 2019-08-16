@@ -1,0 +1,362 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="vsf">
+      <UniqueIdentifier>{8d274662-e323-444b-9400-463caf08a30e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities">
+      <UniqueIdentifier>{d60c55f4-53b3-4c9a-8b93-88233db96bc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\3rd-party">
+      <UniqueIdentifier>{62c76f41-43f2-4812-ab8a-86f41359706b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\3rd-party\PLOOC">
+      <UniqueIdentifier>{13f4c357-bdff-44d1-b9da-101da19e1cc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\compiler">
+      <UniqueIdentifier>{0e3691b0-ad34-44ea-bf5c-9eb9e6b99885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\preprocessor">
+      <UniqueIdentifier>{a36c5d70-a219-41ae-b997-d6ffcbd3d4be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\template">
+      <UniqueIdentifier>{b501da8e-740e-480c-8797-3e094dede1b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\kernel">
+      <UniqueIdentifier>{24a9aa6e-ae99-4f73-9350-2b71d3635a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp">
+      <UniqueIdentifier>{9abbfc52-9869-46c5-b607-1bc7928e5c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\kernel_test">
+      <UniqueIdentifier>{9d1ce8cc-c1a2-44fb-9db4-8016a8a4d7a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal">
+      <UniqueIdentifier>{2ebd8b45-b15c-4530-9459-9bd274b29d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch">
+      <UniqueIdentifier>{baaa611a-e0a3-4b7c-acd7-92912ed5e7ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\x86">
+      <UniqueIdentifier>{5d5e3772-f437-4013-a1f6-be4f9c1c363a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\x86\linux">
+      <UniqueIdentifier>{074a1f89-c9cb-487a-91f0-fbccdbddb71c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver">
+      <UniqueIdentifier>{05390638-5541-429f-b27f-da52780a56e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\interface">
+      <UniqueIdentifier>{07c7983d-c229-4ccf-9c88-0b9662245e82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service">
+      <UniqueIdentifier>{18a55312-cb73-4163-b217-033734ca27e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\trace">
+      <UniqueIdentifier>{c72e3c4f-32cd-47b1-8c90-8f6eec67f07a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\pool">
+      <UniqueIdentifier>{0a830bb9-a40e-45c1-9c47-52a352377ec3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\vsfstream">
+      <UniqueIdentifier>{496e4355-7a97-445a-9862-a5f93608dade}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\vsfstream\fifo_stream">
+      <UniqueIdentifier>{cd092461-d065-4d7c-868e-6c50de6ab043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\stream">
+      <UniqueIdentifier>{6bc4318b-cd8b-48bb-9a24-16b76de042e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\stream\pbuf">
+      <UniqueIdentifier>{9669e398-0c86-422d-936e-3ca7633573e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\stream\pbuf_queue">
+      <UniqueIdentifier>{2a3f9972-b3ae-4904-8977-db2c51bdc015}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\heap">
+      <UniqueIdentifier>{943da9ff-0193-49e6-8be2-7e28b7d62439}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\language_extension">
+      <UniqueIdentifier>{b7aa5cec-551b-44d1-aff4-0f3704330427}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mrepeat.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\preprocessor.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\tpaste.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\template.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\communicate.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\type.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_common.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\kernel_test\vsf_usr_cfg.h">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\vsf.h">
+      <Filter>vsf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\vsf_cfg.h">
+      <Filter>vsf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\x86\linux\linux_generic.h">
+      <Filter>vsf\hal\arch\x86\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\driver.h">
+      <Filter>vsf\hal\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal.h">
+      <Filter>vsf\hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal_cfg.h">
+      <Filter>vsf\hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_common.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_io.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_pm.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usart.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usb.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\trace\vsf_trace.h">
+      <Filter>vsf\service\trace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pool\vsf_pool.h">
+      <Filter>vsf\service\pool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsf_service.h">
+      <Filter>vsf\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h">
+      <Filter>vsf\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h">
+      <Filter>vsf\service\vsfstream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h">
+      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\interface.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_base.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_reader.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h">
+      <Filter>vsf\service\stream\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h">
+      <Filter>vsf\service\stream\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h">
+      <Filter>vsf\service\stream\pbuf_queue</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h">
+      <Filter>vsf\service\heap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h">
+      <Filter>vsf\utilities\language_extension</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h">
+      <Filter>vsf\utilities\language_extension</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c">
+      <Filter>vsf\utilities\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c">
+      <Filter>vsf\utilities\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\main.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\mutex_test.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\queue_test.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\sem_test.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\arch\x86\linux\linux_generic.c">
+      <Filter>vsf\hal\arch\x86\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.c">
+      <Filter>vsf\hal\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c">
+      <Filter>vsf\hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\trace\vsf_trace.c">
+      <Filter>vsf\service\trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pool\vsf_pool.c">
+      <Filter>vsf\service\pool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsf_service.c">
+      <Filter>vsf\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c">
+      <Filter>vsf\service\vsfstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c">
+      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_base.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_reader.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c">
+      <Filter>vsf\service\stream\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c">
+      <Filter>vsf\service\stream\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c">
+      <Filter>vsf\service\stream\pbuf_queue</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c">
+      <Filter>vsf\service\heap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
+      <Filter>vsf\hal\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c">
+      <Filter>vsf\utilities\language_extension</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

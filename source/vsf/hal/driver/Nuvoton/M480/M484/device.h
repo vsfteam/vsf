@@ -20,19 +20,35 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "../common/__common.h"
 
 /*============================ MACROS ========================================*/
 
+/*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 //! arch info
-#   define VSF_ARCH_PRI_NUM          16
-#   define VSF_ARCH_PRI_BIT          4
+#   define VSF_ARCH_PRI_NUM         16
+#   define VSF_ARCH_PRI_BIT         4
 #endif
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             9
+#define VSF_DEV_SWI_LIST            5, 45, 50, 69, 81, 83, 91, 94, 95
+
+/*============================ INCLUDES ======================================*/
+
+/*\note this is should be the only place where __common.h is included.*/
+#include "../common/__common.h"
+
+/*============================ MACROS ========================================*/
+
+// bit0 - bit7  : __bit_offset  (0 .. 255)
+// bit8 - bit12 : __bit_len     (0 .. 31)
+// bit13        : __is_wprotect
+#define M480_BIT_FIELD(__name, __bit_offset, __bit_len, __is_wprotect)          \
+        __name = (__bit_offset) | ((__bit_len) << 8) | ((__is_wprotect) << 13)
+
+#define M480_BIT_FIELD_GET_BITLEN(__bf) (((__bf) >> 8) & 0x1F)
 
 #define __def_idx(__name, __no)     TPASTE2(__name, _idx) = (__no)
 #define __def_msk(__name)           TPASTE2(__name, _msk) = _BV(TPASTE2(__name, _idx) & 0x1F)
@@ -88,6 +104,7 @@
     .ahbclk             = AHBCLK_USBD_idx,                                      \
     .phy                = M480_USBPHY_HS,                                       \
     .irq                = USBD20_IRQn,
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

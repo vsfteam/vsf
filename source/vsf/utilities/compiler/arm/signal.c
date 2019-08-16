@@ -19,64 +19,15 @@
 /*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
 #include "../../compiler.h"
-#include "../../3rd-party/PLOOC/plooc.h"
-#include "../../type.h"
 #include "signal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
-static void __default_code_region_atom_code_on_enter(void *pobj, void *plocal);
-static void __default_code_region_atom_code_on_leave(void *pobj,void *plocal);
-static void __default_code_region_none_on_enter(void *pobj, void *plocal);
-static void __default_code_region_none_on_leave(void *pobj,void *plocal);
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-static const i_code_region_t __vsf_i_default_code_region_atom_code = {
-    .local_obj_size =   sizeof(istate_t),
-    .OnEnter =          &__default_code_region_atom_code_on_enter,
-    .OnLeave =          &__default_code_region_atom_code_on_leave,
-};
-
-static const i_code_region_t __vsf_i_default_code_region_none = {
-    .OnEnter =          &__default_code_region_none_on_enter,
-    .OnLeave =          &__default_code_region_none_on_leave,
-};
-
-const code_region_t DEFAULT_CODE_REGION_ATOM_CODE = {
-    .pmethods = (i_code_region_t *)&__vsf_i_default_code_region_atom_code,
-};
-
-const code_region_t DEFAULT_CODE_REGION_NONE = {
-    .pmethods = (i_code_region_t *)&__vsf_i_default_code_region_none,
-};
-
 /*============================ IMPLEMENTATION ================================*/
-
-static void __default_code_region_atom_code_on_enter(void *pobj, void *plocal)
-{
-    istate_t *pstate = (istate_t *)plocal;
-    ASSERT(NULL != plocal);
-    (*pstate) = DISABLE_GLOBAL_INTERRUPT();
-}
-
-static void __default_code_region_atom_code_on_leave(void *pobj,void *plocal)
-{
-    istate_t *pstate = (istate_t *)plocal;
-    ASSERT(NULL != plocal);
-    SET_GLOBAL_INTERRUPT_STATE(*pstate);
-}
-
-static void __default_code_region_none_on_enter(void *pobj, void *plocal)
-{
-}
-
-static void __default_code_region_none_on_leave(void *pobj,void *plocal)
-{
-}
 
 /*! \brief initialize a locker
  *! \param plock locker object
@@ -103,12 +54,12 @@ bool enter_lock(locker_t *plock)
         return true;
     }
     if (UNLOCKED == (*plock)) {
-        SAFE_ATOM_CODE(){
+        __SAFE_ATOM_CODE(
             if (UNLOCKED == (*plock)) {
                 (*plock) = LOCKED;
                 result = true;
             }
-        };
+        )
     }
         
     return result;

@@ -15,16 +15,18 @@
  *                                                                           *
  ****************************************************************************/
 
-
+/*============================ INCLUDES ======================================*/
+//! \note do not move this pre-processor statement to other places
+#include "component/vsf_component_cfg.h"
 
 #ifndef __VSF_USB_CFG_H__
 #define __VSF_USB_CFG_H__
 
 /*============================ MACROS ========================================*/
-/*============================ INCLUDES ======================================*/
-#include "vsf_cfg.h"
 
-/*============================ MACROS ========================================*/
+#ifndef VSF_USB_ASSERT
+#   define VSF_USB_ASSERT(...)          ASSERT(__VA_ARGS__)
+#endif
 
 #ifndef VSF_USBD_CFG_STREAM_EN
 #   if VSF_USE_SERVICE_STREAM == ENABLED || VSF_USE_SERVICE_VSFSTREAM == ENABLED

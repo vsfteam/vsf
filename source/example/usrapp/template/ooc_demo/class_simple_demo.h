@@ -41,7 +41,7 @@ declare_class(class_simple_demo_t)
 def_class(class_simple_base_t,
     public_member(
         uint8_t public_param_base;
-    ),
+    )
 
     private_member(
         uint8_t private_param_base;
@@ -61,13 +61,61 @@ def_simple_class(class_simple_demo_t) {
     )
 };
 
+declare_class(xxxxx_t)
+
+typedef struct xxxxx_cfg_t xxxxx_cfg_t;
+struct xxxxx_cfg_t {
+    uint8_t *pchBuffer;
+    uint32_t wNumber;
+};
+
+def_simple_class(xxxxx_t) {
+    
+    private_member(
+        implement(xxxxx_cfg_t);
+        uint32_t other_private_members;
+    )
+
+};
+/*
+vsf_err_t xxxxx_cfg(xxxxx_t *ptObj, xxxxx_cfg_t *ptCFG)
+{
+    ...
+    ptObj->use_as__xxxxx_cfg_t = (*ptCFG);      //! copy to initialise
+    ...
+}
+*/
+#if defined(__OOC_RELEASE__)
+#define STATIC_XXXXX(__VAR, ...)            \
+        do {                                \
+            xxxxx_t __VAR = {               \
+                .use_as__xxxxx_cfg_t = {    \
+                    __VA_ARGS__             \
+                },                          \
+            };                              \
+        } while(0);
+#else
+#define STATIC_XXXXX(__VAR, ...)            \
+        do {                                \
+            xxxxx_t __VAR;                  \
+            const xxxxx_cfg_t tCFG = {      \
+                __VA_ARGS__                 \
+            };                              \
+            xxxxx_cfg(&(__VAR), &tCFG);     \
+        } while(0);
+#endif
+
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t class_simple_base_init(class_simple_base_t *pthis, uint_fast8_t param);
+extern vsf_err_t class_simple_base_init(class_simple_base_t *pthis, 
+                                        uint_fast8_t param);
 extern uint_fast8_t class_simple_base_get_param(class_simple_base_t *pthis);
 
-extern vsf_err_t class_simple_demo_init(class_simple_demo_t *pthis, uint_fast8_t param, uint_fast8_t param_base);
+extern vsf_err_t class_simple_demo_init(class_simple_demo_t *pthis,
+                                        uint_fast8_t param, 
+                                        uint_fast8_t param_base);
 extern uint_fast8_t class_simple_demo_get_param(class_simple_demo_t *pthis);
 extern uint_fast8_t class_simple_demo_get_base_param(class_simple_demo_t *pthis);
 

@@ -85,14 +85,14 @@ vsf_usbh_eppipe_t vsf_usbh_get_pipe_from_ep_desc(vsf_usbh_dev_t *dev,
 void vsf_usbh_urb_prepare_by_pipe(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
             vsf_usbh_eppipe_t pipe)
 {
-    ASSERT((urb != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((urb != NULL) && (dev != NULL));
     urb->pipe = pipe;
 }
 
 void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
-    ASSERT((urb != NULL) && (dev != NULL) && (desc_ep != NULL));
+    VSF_USB_ASSERT((urb != NULL) && (dev != NULL) && (desc_ep != NULL));
     urb->pipe = vsf_usbh_get_pipe_from_ep_desc(dev, desc_ep);
 }
 
@@ -124,7 +124,7 @@ static void vsf_usbh_urb_reset_buffer(vsf_usbh_hcd_urb_t *urb_hcd)
 
 void vsf_usbh_hcd_urb_free_buffer(vsf_usbh_hcd_urb_t *urb_hcd)
 {
-    ASSERT(urb_hcd != NULL);
+    VSF_USB_ASSERT(urb_hcd != NULL);
     if (urb_hcd->buffer && (urb_hcd->free_buffer != NULL)) {
         urb_hcd->free_buffer(urb_hcd->free_buffer_param);
     }
@@ -138,7 +138,7 @@ static void vsf_usbh_free_buffer(void *buffer)
 
 void * vsf_usbh_hcd_urb_alloc_buffer(vsf_usbh_hcd_urb_t *urb_hcd, uint_fast16_t size)
 {
-    ASSERT((urb_hcd != NULL) && (size > 0));
+    VSF_USB_ASSERT((urb_hcd != NULL) && (size > 0));
     vsf_usbh_hcd_urb_free_buffer(urb_hcd);
     urb_hcd->buffer = VSF_USBH_MALLOC(size);
     urb_hcd->transfer_length = size;
@@ -147,18 +147,18 @@ void * vsf_usbh_hcd_urb_alloc_buffer(vsf_usbh_hcd_urb_t *urb_hcd, uint_fast16_t 
     return urb_hcd->buffer;
 }
 
-vsf_usbh_dev_t * vsf_usbh_alloc_device(vsf_usbh_t *usbh)
+static vsf_usbh_dev_t * vsf_usbh_alloc_device(vsf_usbh_t *usbh)
 {
     vsf_usbh_dev_t *dev;
 
-    ASSERT(usbh != NULL);
+    VSF_USB_ASSERT(usbh != NULL);
 
     dev = VSF_USBH_MALLOC(sizeof(vsf_usbh_dev_t));
     if (NULL == dev) { return NULL; }
     memset(dev, 0, sizeof(vsf_usbh_dev_t));
 
     if (    (usbh->drv->alloc_device != NULL)
-        &&  (usbh->drv->alloc_device(&usbh->use_as__vsf_usbh_hcd_t, dev) != VSF_ERR_NONE)) {
+        &&  (usbh->drv->alloc_device(&usbh->use_as__vsf_usbh_hcd_t, &dev->use_as__vsf_usbh_hcd_dev_t) != VSF_ERR_NONE)) {
 free_dev:
         VSF_USBH_FREE(dev);
         return NULL;
@@ -170,12 +170,35 @@ free_dev:
     return dev;
 }
 
+vsf_usbh_dev_t * vsf_usbh_new_device(vsf_usbh_t *usbh, enum usb_device_speed_t speed,
+            vsf_usbh_dev_t *dev_parent, uint_fast8_t idx)
+{
+    vsf_usbh_dev_t *dev_new = vsf_usbh_alloc_device(usbh);
+    if (dev_new != NULL) {
+        dev_new->speed = speed;
+        if (dev_parent != NULL) {
+#if VSF_USE_USB_HOST_HUB == ENABLED
+            dev_new->index = idx;
+            dev_new->dev_parent = dev_parent;
+            vsf_slist_add_to_head(vsf_usbh_dev_t, child_node, &dev_parent->children_list, dev_new);
+#else
+            VSF_USB_ASSERT(false);
+#endif
+        }
+
+        // notify to emulate new device
+        usbh->dev_new = dev_new;
+        vsf_eda_post_evt(&usbh->teda.use_as__vsf_eda_t, VSF_EVT_INIT);
+    }
+    return dev_new;
+}
+
 static void vsf_usbh_clean_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
 {
-    ASSERT((usbh != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     vsf_usbh_free_urb(usbh, &dev->ep0.urb);
     if (usbh->drv->free_device != NULL) {
-        usbh->drv->free_device(&usbh->use_as__vsf_usbh_hcd_t, dev);
+        usbh->drv->free_device(&usbh->use_as__vsf_usbh_hcd_t, &dev->use_as__vsf_usbh_hcd_dev_t);
     }
     if (dev->ifs != NULL) {
         VSF_USBH_FREE(dev->ifs);
@@ -183,11 +206,36 @@ static void vsf_usbh_clean_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
     }
 }
 
+static void vsf_usbh_reset_dev(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
+{
+#if VSF_USE_USB_HOST_HUB == ENABLED
+    if (dev->dev_parent != NULL) {
+        vsf_usbh_hub_reset_dev(dev);
+    } else
+#endif
+    if (usbh->drv->reset_dev != NULL){
+        usbh->drv->reset_dev(&usbh->use_as__vsf_usbh_hcd_t, &dev->use_as__vsf_usbh_hcd_dev_t);
+    }
+}
+
+static bool vsf_usbh_is_dev_resetting(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
+{
+#if VSF_USE_USB_HOST_HUB == ENABLED
+    if (dev->dev_parent != NULL) {
+        return vsf_usbh_hub_is_dev_resetting(dev);
+    } else
+#endif
+    if (usbh->drv->is_dev_reset != NULL) {
+        return usbh->drv->is_dev_reset(&usbh->use_as__vsf_usbh_hcd_t, &dev->use_as__vsf_usbh_hcd_dev_t);
+    }
+    return false;
+}
+
 vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb_t *urb)
 {
     vsf_usbh_eppipe_t pipe;
 
-    ASSERT((usbh != NULL) && (dev != NULL) && (urb != NULL) && urb->pipe.is_pipe);
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (urb != NULL) && urb->pipe.is_pipe);
     pipe = urb->pipe;
     urb->urb_hcd = usbh->drv->alloc_urb(&usbh->use_as__vsf_usbh_hcd_t);
     if (urb->urb_hcd != NULL) {
@@ -196,14 +244,14 @@ vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb
         return VSF_ERR_NONE;
     } else {
         urb->pipe = pipe;
-        ASSERT(false);
+        VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 }
 
 void vsf_usbh_free_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb)
 {
-    ASSERT((usbh != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (urb != NULL));
 
     if (vsf_usbh_urb_is_alloced(urb)) {
         vsf_usbh_eppipe_t pipe = urb->urb_hcd->pipe;
@@ -215,7 +263,7 @@ void vsf_usbh_free_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb)
 
 void vsf_usbh_urb_free_buffer(vsf_usbh_urb_t *urb)
 {
-    ASSERT(urb != NULL);
+    VSF_USB_ASSERT(urb != NULL);
     if (!urb->pipe.is_pipe) {
         vsf_usbh_hcd_urb_free_buffer(urb->urb_hcd);
     }
@@ -223,7 +271,7 @@ void vsf_usbh_urb_free_buffer(vsf_usbh_urb_t *urb)
 
 void * vsf_usbh_urb_alloc_buffer(vsf_usbh_urb_t *urb, uint_fast16_t size)
 {
-    ASSERT((urb != NULL) && (size > 0) && !urb->pipe.is_pipe);
+    VSF_USB_ASSERT((urb != NULL) && (size > 0) && !urb->pipe.is_pipe);
     return vsf_usbh_hcd_urb_alloc_buffer(urb->urb_hcd, size);
 }
 
@@ -234,7 +282,7 @@ void * vsf_usbh_urb_peek_buffer(vsf_usbh_urb_t *urb)
 
 void * vsf_usbh_urb_take_buffer(vsf_usbh_urb_t *urb)
 {
-    ASSERT((urb != NULL) && !urb->pipe.is_pipe);
+    VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
     void *buffer = vsf_usbh_urb_peek_buffer(urb);
     vsf_usbh_urb_reset_buffer(urb->urb_hcd);
     return buffer;
@@ -243,7 +291,7 @@ void * vsf_usbh_urb_take_buffer(vsf_usbh_urb_t *urb)
 void vsf_usbh_urb_set_buffer(vsf_usbh_urb_t *urb, void *buffer,
             uint_fast32_t size)
 {
-    ASSERT((urb != NULL) && !urb->pipe.is_pipe);
+    VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
     vsf_usbh_hcd_urb_t *urb_hcd = urb->urb_hcd;
     vsf_usbh_urb_free_buffer(urb);
     urb_hcd->buffer = buffer;
@@ -252,20 +300,20 @@ void vsf_usbh_urb_set_buffer(vsf_usbh_urb_t *urb, void *buffer,
 
 int_fast16_t vsf_usbh_urb_get_status(vsf_usbh_urb_t *urb)
 {
-    ASSERT((urb != NULL) && !urb->pipe.is_pipe);
+    VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
     return urb->urb_hcd->status;
 }
 
 uint_fast32_t vsf_usbh_urb_get_actual_length(vsf_usbh_urb_t *urb)
 {
-    ASSERT((urb != NULL) && !urb->pipe.is_pipe);
+    VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
     return urb->urb_hcd->actual_length;
 }
 
 void vsf_usbh_remove_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             vsf_usbh_ifs_t *ifs)
 {
-    ASSERT((usbh != NULL) && (dev != NULL) && (ifs != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (ifs != NULL));
     const vsf_usbh_class_drv_t *drv = ifs->drv;
     if (drv) {
         vsf_usbh_on_remove_interface(ifs);
@@ -308,11 +356,11 @@ static void vsf_usbh_free_parser(vsf_usbh_t *usbh)
 
 void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
 {
-    vsf_usbh_dev_t *dev_child;
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
 
-    ASSERT((usbh != NULL) && (dev != NULL));
-
+#if VSF_USE_USB_HOST_HUB == ENABLED    
     vsf_slist_remove(vsf_usbh_dev_t, child_node, &dev->dev_parent->children_list, dev);
+#endif
 
     if (dev->num_of_ifs && (dev->ifs != NULL)) {
         vsf_usbh_ifs_t *ifs = dev->ifs;
@@ -320,10 +368,14 @@ void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
             vsf_usbh_remove_interface(usbh, dev, ifs);
         }
     }
+
+#if VSF_USE_USB_HOST_HUB == ENABLED
+    vsf_usbh_dev_t *dev_child;
     while (!vsf_slist_is_empty(&dev->children_list)) {
         vsf_slist_remove_from_head_unsafe(vsf_usbh_dev_t, child_node, &dev->children_list, dev_child);
         vsf_usbh_disconnect_device(usbh, dev_child);
     }
+#endif
     vsf_usbh_clean_device(usbh, dev);
 
     if (dev->devnum != 0) {
@@ -524,7 +576,7 @@ static vsf_err_t __vsf_usbh_submit_urb_imp(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb
 {
     vsf_usbh_hcd_urb_t *urb_hcd;
 
-    ASSERT(     (usbh != NULL) && (urb != NULL) && (urb->urb_hcd != NULL)
+    VSF_USB_ASSERT(     (usbh != NULL) && (urb != NULL) && (urb->urb_hcd != NULL)
             &&  !urb->pipe.is_pipe);
 
     urb_hcd = urb->urb_hcd;
@@ -573,7 +625,7 @@ vsf_err_t vsf_usbh_submit_urb_ex(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fas
 static vsf_usbh_urb_t * vsf_usbh_control_msg_common(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             struct usb_ctrlrequest_t *req)
 {
-    ASSERT((usbh != NULL) && (dev != NULL) && (req != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (req != NULL));
     vsf_usbh_urb_t *urb = &dev->ep0.urb;
     vsf_usbh_hcd_urb_t *urb_hcd = urb->urb_hcd;
 
@@ -621,7 +673,7 @@ vsf_err_t vsf_usbh_control_msg_ex(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 
 vsf_err_t vsf_usbh_set_address(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
 {
-    ASSERT((usbh != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     struct usb_ctrlrequest_t req = {
         .bRequestType    =  USB_RECIP_DEVICE | USB_DIR_OUT,
         .bRequest        =  USB_REQ_SET_ADDRESS,
@@ -634,7 +686,7 @@ vsf_err_t vsf_usbh_set_address(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
 vsf_err_t vsf_usbh_get_descriptor(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             uint_fast8_t type, uint_fast8_t index, uint_fast16_t size)
 {
-    ASSERT((usbh != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     struct usb_ctrlrequest_t req = {
         .bRequestType    =  USB_RECIP_DEVICE | USB_DIR_IN,
         .bRequest        =  USB_REQ_GET_DESCRIPTOR,
@@ -648,7 +700,7 @@ vsf_err_t vsf_usbh_get_class_descriptor(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             uint_fast16_t ifs_no, uint_fast8_t type, uint_fast8_t id,
             uint_fast16_t size)
 {
-    ASSERT((usbh != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     struct usb_ctrlrequest_t req = {
         .bRequestType    =  USB_RECIP_INTERFACE | USB_DIR_IN,
         .bRequest        =  USB_REQ_GET_DESCRIPTOR,
@@ -661,7 +713,7 @@ vsf_err_t vsf_usbh_get_class_descriptor(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 vsf_err_t vsf_usbh_set_configuration(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             uint_fast8_t configuration)
 {
-    ASSERT((usbh != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     struct usb_ctrlrequest_t req = {
         .bRequestType    =  USB_RECIP_DEVICE | USB_DIR_OUT,
         .bRequest        =  USB_REQ_SET_CONFIGURATION,
@@ -672,14 +724,14 @@ vsf_err_t vsf_usbh_set_configuration(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     return vsf_usbh_control_msg(usbh, dev, &req);
 }
 vsf_err_t vsf_usbh_set_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-            uint_fast8_t interface, uint_fast8_t alternate)
+            uint_fast8_t ifs, uint_fast8_t alternate)
 {
-    ASSERT((usbh != NULL) && (dev != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     struct usb_ctrlrequest_t req = {
         .bRequestType    =  USB_RECIP_INTERFACE | USB_DIR_OUT,
         .bRequest        =  USB_REQ_SET_INTERFACE,
         .wValue          =  alternate,
-        .wIndex          =  interface,
+        .wIndex          =  ifs,
         .wLength         =  0,
     };
     return vsf_usbh_control_msg(usbh, dev, &req);
@@ -783,7 +835,7 @@ static vsf_err_t vsf_usbh_parse_config(vsf_usbh_t *usbh, vsf_usbh_dev_parser_t *
     len = dev->num_of_ifs * sizeof(vsf_usbh_ifs_t);
     dev->ifs = VSF_USBH_MALLOC(len);
     if (!dev->ifs) {
-        ASSERT(false);
+        VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     memset(dev->ifs, 0, len);
@@ -791,7 +843,7 @@ static vsf_err_t vsf_usbh_parse_config(vsf_usbh_t *usbh, vsf_usbh_dev_parser_t *
     len = dev->num_of_ifs * sizeof(vsf_usbh_ifs_parser_t);
     parser->parser_ifs = VSF_USBH_MALLOC(len);
     if (!parser->parser_ifs) {
-        ASSERT(false);
+        VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     memset(parser->parser_ifs, 0, len);
@@ -819,7 +871,7 @@ static vsf_err_t vsf_usbh_parse_config(vsf_usbh_t *usbh, vsf_usbh_dev_parser_t *
                     len = parser_ifs->ifs->num_of_alt * sizeof(*parser_ifs->parser_alt);
                     parser_ifs->parser_alt = VSF_USBH_MALLOC(len);
                     if (!parser_ifs->parser_alt) {
-                        ASSERT(false);
+                        VSF_USB_ASSERT(false);
                         return VSF_ERR_NOT_ENOUGH_RESOURCES;
                     }
                     memset(parser_ifs->parser_alt, 0, len);
@@ -910,7 +962,7 @@ static void vsf_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         memset(parser, 0, sizeof(*parser));
         usbh->parser = parser;
 
-        vsf_eda_crit_init(&dev->ep0.crit);
+        __vsf_eda_crit_npb_init(&dev->ep0.crit);
         parser->devnum_temp = dev->devnum;
         parser->probe_state = VSF_USBH_PROBE_START;
         dev->devnum = 0;
@@ -926,7 +978,7 @@ static void vsf_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             buffer = vsf_usbh_urb_take_buffer(urb);
             urb->urb_hcd->pipe.size = buffer[7];
             vsf_usbh_free_buffer(buffer);
-            vsf_usbh_hub_reset_dev(dev);
+            vsf_usbh_reset_dev(usbh, dev);
             goto check_device_reset;
         case VSF_USBH_PROBE_WAIT_SET_ADDRESS:
             vsf_teda_set_timer_ms(10);
@@ -977,7 +1029,7 @@ static void vsf_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         switch (parser->probe_state) {
         case VSF_USBH_PROBE_WAIT_DEVICE_RESET:
         check_device_reset:
-            if (vsf_usbh_hub_dev_is_reset(dev)) {
+            if (vsf_usbh_is_dev_resetting(usbh, dev)) {
                 vsf_teda_set_timer_ms(20);
                 return;
             } else {
@@ -1016,30 +1068,39 @@ static void vsf_usbh_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vsf_usbh_t *usbh = container_of(eda, vsf_usbh_t, teda);
     vsf_err_t err = usbh->drv->init_evthandler(eda, evt, &usbh->use_as__vsf_usbh_hcd_t);
 
-    ASSERT(err >= 0);
+    VSF_USB_ASSERT(err >= 0);
     if (VSF_ERR_NONE == err) {
-        usbh->teda.evthandler = vsf_usbh_probe_evthandler;
+        if (VSF_ERR_NONE != vsf_eda_set_evthandler(
+                                &(usbh->teda.use_as__vsf_eda_t), 
+                                vsf_usbh_probe_evthandler)) {
+            VSF_USB_ASSERT(false);
+        }
+        //usbh->teda.evthandler = vsf_usbh_probe_evthandler;
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
-        usbh->dev_rh = vsf_usbh_alloc_device(usbh);
-        ASSERT(usbh->dev_rh != NULL);
-
-        usbh->dev_rh->speed = usbh->rh_speed;
-        usbh->dev_new = usbh->dev_rh;
-        vsf_eda_post_evt(eda, VSF_EVT_INIT);
+        if (usbh->drv->rh_control != NULL) {
+            usbh->dev_rh = vsf_usbh_new_device(usbh, usbh->rh_speed, NULL, 0);
+            VSF_USB_ASSERT(usbh->dev_rh != NULL);
+        }
 #endif
     }
 }
 
 vsf_err_t vsf_usbh_init(vsf_usbh_t *usbh)
 {
-    ASSERT((usbh != NULL) && (usbh->drv != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (usbh->drv != NULL));
 
     vsf_slist_init(&usbh->class_list);
     vsf_bitmap_reset(&usbh->device_bitmap, VSF_USBH_CFG_MAX_DEVICE);
     vsf_bitmap_set(&usbh->device_bitmap, 0);
 
-    usbh->teda.evthandler = vsf_usbh_init_evthandler;
+    if (VSF_ERR_NONE != vsf_eda_set_evthandler(
+                            &(usbh->teda.use_as__vsf_eda_t), 
+                            vsf_usbh_init_evthandler)) {
+        VSF_USB_ASSERT(false);
+    }
+    //usbh->teda.evthandler = vsf_usbh_init_evthandler;
+    
     return vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY, false);
 }
 
@@ -1051,14 +1112,14 @@ vsf_err_t vsf_usbh_fini(vsf_usbh_t *usbh)
 
 void vsf_usbh_register_class(vsf_usbh_t *usbh, vsf_usbh_class_t *class)
 {
-    ASSERT((usbh != NULL) && (class != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (class != NULL));
     vsf_slist_add_to_head(vsf_usbh_class_t, node, &usbh->class_list, class);
 }
 
 vsf_err_t vsf_usbh_register_class_driver(vsf_usbh_t *usbh,
         const vsf_usbh_class_drv_t *drv)
 {
-    ASSERT((usbh != NULL) && (drv != NULL));
+    VSF_USB_ASSERT((usbh != NULL) && (drv != NULL));
     vsf_usbh_class_t *class = VSF_USBH_MALLOC(sizeof(*class));
     if (class == NULL) { return VSF_ERR_FAIL; }
 
@@ -1072,7 +1133,7 @@ vsf_err_t vsf_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
 {
     struct usb_descriptor_header_t *header;
 
-    ASSERT((buf != NULL) && (ptr != NULL));
+    VSF_USB_ASSERT((buf != NULL) && (ptr != NULL));
 
     while (size >= sizeof(struct usb_descriptor_header_t)) {
         header = (struct usb_descriptor_header_t *)buf;

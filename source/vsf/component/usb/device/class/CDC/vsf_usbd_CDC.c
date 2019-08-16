@@ -37,7 +37,7 @@ static vsf_err_t vsf_usbd_CDC_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs
 {
     vsf_usbd_CDC_t *pthis = (vsf_usbd_CDC_t *)ifs->class_param;
 
-    ASSERT(pthis != NULL);
+    VSF_USB_ASSERT(pthis != NULL);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
     pthis->stream.tx.dev  = dev;
     pthis->stream.tx.ep   = pthis->ep.in;
@@ -105,8 +105,8 @@ static vsf_err_t vsf_usbd_CDC_control_request_prepare(vsf_usbd_dev_t *dev, vsf_u
         return VSF_ERR_FAIL;
     }
 
-    ctrl_handler->trans.pchBuffer = buffer;
-    ctrl_handler->trans.nSize = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
     return VSF_ERR_NONE;
 }
 

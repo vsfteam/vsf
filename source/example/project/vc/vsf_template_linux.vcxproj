@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{c0f3c334-8f80-413b-9109-4c338e1fc989}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>vsf_template</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
+    <LinuxProjectType>{D51BCBC9-82E9-4017-911E-C93873C4EA2B}</LinuxProjectType>
+    <ProjectName>vsf_template_linux</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WSL_1_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>WSL_1_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ProjectPublicIncludePath>$(ProjectPublicIncludePath)</ProjectPublicIncludePath>
+    <MultiProcNumber>0</MultiProcNumber>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ProjectPublicIncludePath>$(ProjectPublicIncludePath)</ProjectPublicIncludePath>
+    <MultiProcNumber>0</MultiProcNumber>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch.h" />
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.h" />
+    <ClInclude Include="..\..\..\vsf\hal\arch\x86\linux\linux_generic.h" />
+    <ClInclude Include="..\..\..\vsf\hal\driver\driver.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_common.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_io.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_pm.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usart.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usb.h" />
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal.h" />
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_common.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h" />
+    <ClInclude Include="..\..\..\vsf\service\pool\vsf_pool.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\interface.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_base.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_reader.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h" />
+    <ClInclude Include="..\..\..\vsf\service\trace\vsf_trace.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsf_service.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\communicate.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mrepeat.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\preprocessor.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\tpaste.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\template.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\type.h" />
+    <ClInclude Include="..\..\..\vsf\vsf.h" />
+    <ClInclude Include="..\..\..\vsf\vsf_cfg.h" />
+    <ClInclude Include="..\..\usrapp\kernel_test\vsf_usr_cfg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.c" />
+    <ClCompile Include="..\..\..\vsf\hal\arch\x86\linux\linux_generic.c" />
+    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c" />
+    <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c" />
+    <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
+    <ClCompile Include="..\..\..\vsf\service\pool\vsf_pool.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_base.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_reader.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c" />
+    <ClCompile Include="..\..\..\vsf\service\trace\vsf_trace.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\main.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\mutex_test.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\queue_test.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\sem_test.c" />
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__CPU_X86__;__LINUX__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>Full</Optimization>
+      <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <CAdditionalWarning>switch;no-deprecated-declarations;no-empty-body;no-conversion;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;no-attributes;no-pointer-to-int-cast;no-int-to-pointer-cast;no-comment;no-maybe-uninitialized</CAdditionalWarning>
+    </ClCompile>
+    <Link />
+    <Link>
+      <LibraryDependencies>pthread</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__CPU_X86__;__LINUX__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CLanguageStandard>c99</CLanguageStandard>
+    </ClCompile>
+    <Link />
+    <Link>
+      <LibraryDependencies>pthread</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__CPU_X86__;__LINUX__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__CPU_X86__;__LINUX__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

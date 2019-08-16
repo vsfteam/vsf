@@ -34,8 +34,8 @@
 
 
 // UI configuration
-#define SCREEN_WIDTH                    LV_HOR_RES
-#define SCREEN_HEIGHT                   LV_VER_RES
+#define SCREEN_WIDTH                    LV_HOR_RES_MAX
+#define SCREEN_HEIGHT                   LV_VER_RES_MAX
 #define SCREEN_FPS                      30
 
 #if LV_COLOR_DEPTH == 24

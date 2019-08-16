@@ -82,7 +82,8 @@ typedef struct vsf_input_parser_t vsf_input_parser_t;
 
 /*============================ INCLUDES ======================================*/
 
-#include "./vsf_input_sensor.h"
+#include "./protocol/vsf_input_gamepad.h"
+#include "./protocol/vsf_input_sensor.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

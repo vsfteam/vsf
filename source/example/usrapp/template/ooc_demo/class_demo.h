@@ -46,26 +46,24 @@ declare_class(class_demo_t)
 
 def_class(class_base_t,
     public_member(
-        uint8_t public_param_base;
-    ),
+        uint8_t chPublicParamBase;
+    )
 
     private_member(
-        uint8_t private_param_base;
+        uint8_t chPrivateParamBase;
     )
 )
-
-
 
 def_class(class_demo_t,
     which(
         implement(class_base_t)
     )
     public_member(
-        uint8_t public_param_demo;
-    ),
+        uint8_t chPublicParamDemo;
+    )
 
     private_member(
-        uint8_t private_param_demo;
+        uint8_t chPrivateParamDemo;
     )
 )
 
@@ -73,11 +71,13 @@ def_class(class_demo_t,
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t class_base_init(class_base_t *pthis, uint_fast8_t param);
-extern uint_fast8_t class_base_get_param(class_base_t *pthis);
+extern vsf_err_t class_base_init(class_base_t *ptThis, uint_fast8_t chParam);
+extern uint_fast8_t class_base_get_param(class_base_t *ptThis);
 
-extern vsf_err_t class_demo_init(class_demo_t *pthis, uint_fast8_t param, uint_fast8_t param_base);
-extern uint_fast8_t class_demo_get_param(class_demo_t *pthis);
-extern uint_fast8_t class_demo_get_base_param(class_demo_t *pthis);
+extern vsf_err_t class_demo_init(   class_demo_t *ptThis, 
+                                    uint_fast8_t chParam, 
+                                    uint_fast8_t chParamBase);
+extern uint_fast8_t class_demo_get_param(class_demo_t *ptThis);
+extern uint_fast8_t class_demo_get_base_param(class_demo_t *ptThis);
 
 #endif      // __CLASS_DEMO_H__

@@ -21,9 +21,11 @@
 /*============================ INCLUDES ======================================*/
 #include "./vsf_kernel_cfg.h"
 
+#if VSF_USE_KERNEL == ENABLED
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
+#include "./vsf_queue.h"
 #include "./vsf_os.h"
 #include "./shell/vsf_shell.h"
 #include "./task/vsf_task.h"
@@ -34,6 +36,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#endif
 #endif
 /* EOF */

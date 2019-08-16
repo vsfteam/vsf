@@ -101,7 +101,7 @@ private implement_vsf_pt(user_pt_task_b_t)
 void vsf_kernel_pt_simple_demo(void)
 {  
     //! initialise semaphore
-    vsf_sem_init(&user_sem, 0); 
+    vsf_sem_init(&user_sem, 0);
     
     //! start a user task
     {

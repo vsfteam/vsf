@@ -129,13 +129,12 @@ static NO_INIT timer_example_t __timer_example[5];
 #if VSF_CFG_SYNC_EN == ENABLED
 static NO_INIT vsf_sem_t user_sem;
 
-#if VSF_CFG_BMPEVT_EN == ENABLED
-static NO_INIT bmevt_demo_t __bmevt_demo;
-
-
 implement_grouped_evts(user_grouped_evts_t,
     add_sync_adapter( &user_sem, sem_evt_msk ),
 )
+
+#if VSF_CFG_BMPEVT_EN == ENABLED
+static NO_INIT bmevt_demo_t __bmevt_demo;
 
 static NO_INIT user_grouped_evts_t __user_grouped_evts;
 #endif

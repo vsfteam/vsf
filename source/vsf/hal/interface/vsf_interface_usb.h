@@ -26,23 +26,28 @@
 
 #define __USB_HC_IP_FUNC_DEF(__N, __VALUE)                                      \
 static vsf_err_t    usb_hc##__N##_init(usb_hc_ip_cfg_t *cfg);                   \
-static void *       usb_hc##__N##_get_regbase(void);                            \
+static void         usb_hc##__N##_get_info(usb_hc_ip_info_t *info);             \
 static void         usb_hc##__N##_irq(void);
 
 #define __USB_HC_IP_INTERFACE_FUNC_DEF(__N, __VALUE)                            \
             {                                                                   \
                 .Init           = &usb_hc##__N##_init,                          \
-                .GetRegBase     = &usb_hc##__N##_get_regbase,                   \
+                .GetInfo        = &usb_hc##__N##_get_info,                      \
                 .Irq            = &usb_hc##__N##_irq,                           \
             }
 
-#define __USB_HC_IP_BODY(__N, __HEADER)                                         \
+#define __USB_HC_IP_BODY_EX(__N, __OBJ, __HEADER)                               \
 static vsf_err_t usb_hc##__N##_init(usb_hc_ip_cfg_t *cfg)                       \
-{ return __HEADER##_init(&USB_HC##__N##_IP, cfg); }                             \
-static void * usb_hc##__N##_get_regbase(void)                                   \
-{ return __HEADER##_get_regbase(&USB_HC##__N##_IP); }                           \
+{ return __HEADER##_init(&(__OBJ), cfg); }                                      \
+static void usb_hc##__N##_get_info(usb_hc_ip_info_t *info)                      \
+{ __HEADER##_get_info(&(__OBJ), info); }                                        \
 static void usb_hc##__N##_irq(void)                                             \
-{ __HEADER##_irq(&USB_HC##__N##_IP); }
+{ __HEADER##_irq(&(__OBJ)); }
+
+#define __USB_HC_IP_BODY(__N, __HEADER)                                         \
+    __USB_HC_IP_BODY_EX(__N, USB_HC##__N##_IP, __HEADER)
+#define __USB_OTG_HC_IP_BODY(__N, __HEADER)                                     \
+    __USB_HC_IP_BODY_EX(__N, USB_OTG##__N##_IP, __HEADER)
 
 
 
@@ -91,18 +96,18 @@ __USB_DC_BODY_EX(__N, __HEADER, __OBJ)
 
 #define __USB_DC_FUNC_DEF(__N, __VALUE)                                         \
 static vsf_err_t    usb_dc##__N##_init(usb_dc_cfg_t *cfg);                      \
-static void         usb_dc##__N##_fini();                                       \
-static void         usb_dc##__N##_reset();                                      \
+static void         usb_dc##__N##_fini(void);                                   \
+static void         usb_dc##__N##_reset(void);                                  \
                                                                                 \
-static void         usb_dc##__N##_connect();                                    \
-static void         usb_dc##__N##_disconnect();                                 \
-static void         usb_dc##__N##_wakeup();                                     \
+static void         usb_dc##__N##_connect(void);                                \
+static void         usb_dc##__N##_disconnect(void);                             \
+static void         usb_dc##__N##_wakeup(void);                                 \
                                                                                 \
 static void         usb_dc##__N##_set_address(uint_fast8_t addr);               \
-static uint_fast8_t usb_dc##__N##_get_address();                                \
+static uint_fast8_t usb_dc##__N##_get_address(void);                            \
                                                                                 \
-static uint_fast16_t    usb_dc##__N##_get_frame_number();                       \
-static uint_fast8_t usb_dc##__N##_get_mframe_number();                          \
+static uint_fast16_t    usb_dc##__N##_get_frame_number(void);                   \
+static uint_fast8_t usb_dc##__N##_get_mframe_number(void);                      \
                                                                                 \
 static void         usb_dc##__N##_get_setup(uint8_t *buffer);                   \
 static void         usb_dc##__N##_status_stage(bool is_in);                     \
@@ -257,7 +262,7 @@ typedef void (*usb_dc_evt_handler_t)(void *param, usb_evt_t evt, uint_fast8_t va
 //! \name usb_dc configuration structure
 //! @{
 struct usb_dc_cfg_t{
-    vsf_arch_priority_t         priority;       //!< interrupt priority
+    vsf_arch_prio_t         priority;       //!< interrupt priority
     usb_dc_evt_handler_t        evt_handler;    //!< evt_handler function
     void *                      param;          //!< dcd related parameters
 
@@ -323,7 +328,7 @@ end_def_interface(i_usb_dc_t)
 //! \name usb_dc_ip configuration structure
 //! @{
 struct usb_dc_ip_cfg_t{
-    vsf_arch_priority_t         priority;       //!< interrupt priority
+    vsf_arch_prio_t         priority;       //!< interrupt priority
     usb_ip_irq_handler_t        irq_handler;    //!< irq_handler function
     void *                      param;          //!< dcd related parameters
 };
@@ -364,14 +369,24 @@ end_def_interface(i_usb_dc_ip_t)
 
 
 
-//! \name usb_hc configuration structure
+//! \name usb_hc_ip configuration structure
 //! @{
 struct usb_hc_ip_cfg_t{
-    vsf_arch_priority_t         priority;       //!< interrupt priority
+    vsf_arch_prio_t         priority;       //!< interrupt priority
     usb_ip_irq_handler_t        irq_handler;    //!< irq_handler function
     void *                      param;          //!< hcd related parameters
 };
 typedef struct usb_hc_ip_cfg_t usb_hc_ip_cfg_t;
+//! @}
+
+//! \name usb_hc_ip information structure
+//! @{
+struct usb_hc_ip_info_t{
+    void *                      regbase;
+    uint8_t                     ep_num;
+    bool                        is_dma;
+};
+typedef struct usb_hc_ip_info_t usb_hc_ip_info_t;
 //! @}
 
 //! \name usb_hc_ip control interface
@@ -382,7 +397,7 @@ def_interface(i_usb_hc_ip_t)
     vsf_err_t       (*Init)             (usb_hc_ip_cfg_t *cfg);
 
     //! get register base
-    void *          (*GetRegBase)       (void);
+    void            (*GetInfo)          (usb_hc_ip_info_t *info);
 
     //! irq handler
     void            (*Irq)              (void);

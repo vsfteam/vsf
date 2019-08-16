@@ -37,8 +37,8 @@
 #       define  VSF_DRIVER_HEADER       "./Nuvoton/driver.h"
 #   elif    defined(__WinnerMicro__)
 #       define  VSF_DRIVER_HEADER       "./WinnerMicro/driver.h"
-#   elif    defined(__CPU_PC__)  
-#       define  VSF_DRIVER_HEADER       "./pc/driver.h"
+#   elif    defined(__CPU_X86__)  
+#       define  VSF_DRIVER_HEADER       "./x86/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"
@@ -57,10 +57,24 @@
 
 #ifndef __HAL_DRIVER_H__
 #define __HAL_DRIVER_H__
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED || VSF_USE_SERVICE_STREAM == ENABLED
+#include "service/vsf_service.h"
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
+#   if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+extern vsf_stream_t  VSF_DEBUG_STREAM_TX;
+#   elif   VSF_USE_SERVICE_STREAM == ENABLED
+extern const vsf_stream_tx_t VSF_DEBUG_STREAM_TX;
+#   endif
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

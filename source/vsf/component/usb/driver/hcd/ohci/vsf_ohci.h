@@ -32,7 +32,7 @@
 
 struct vsf_ohci_param_t {
     const i_usb_hc_ip_t *op;
-    vsf_arch_priority_t priority;
+    vsf_arch_prio_t priority;
 };
 typedef struct vsf_ohci_param_t vsf_ohci_param_t;
 

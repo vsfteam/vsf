@@ -58,8 +58,8 @@ typedef struct m480_ohci_t m480_ohci_t;
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t m480_ohci_init(m480_ohci_t *ohci, usb_hc_ip_cfg_t *cfg);
-extern void *m480_ohci_get_regbase(m480_ohci_t *ohci);
+extern vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg);
+extern void m480_ohci_get_info(m480_ohci_t *hc, usb_hc_ip_info_t *info);
 extern void m480_ohci_irq(m480_ohci_t *hc);
 
 #endif

@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
-
+#if VSF_USE_KERNEL == ENABLED
 #include "../vsf_eda.h"
 
 /*============================ MACROS ========================================*/
@@ -39,9 +39,11 @@
             case (__COUNTER__ - count_offset) >> 1:
 
 #define __vsf_pt_end_common()       } vsf_eda_return();
-#define __vsf_pt_end_closure_common()                                           \
-                }   /* for switch */                                            \
-            __vsf_pt_end_common()
+
+//#define __vsf_pt_end_closure_common()                                         \
+//                }   /* for switch */                                          \
+//            __vsf_pt_end_common()
+
 
 #define __vsf_pt_wait_cond_common(__state, ...)                                 \
     do {                                                                        \
@@ -76,10 +78,10 @@
         void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt)
 
 #define __extern_vsf_pt_common(__NAME, __ARG0)                                  \
-        extern void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt)
+        extern void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt);        
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#endif
 #endif

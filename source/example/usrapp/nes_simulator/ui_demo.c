@@ -43,6 +43,11 @@ static void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, cons
     }
 }
 
+void uvc_app_on_fill_line_cpl(bool frame_cpl)
+{
+    lv_flush_ready();
+}
+
 static void lv_refr_task(void * param)
 {
     static lv_coord_t y;

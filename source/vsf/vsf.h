@@ -23,34 +23,14 @@
 
 /*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
-#include "service/vsf_service.h"
 #include "hal/vsf_hal.h"
+#include "service/vsf_service.h"
 
-#include "kernel/vsf_kernel.h"
+#if VSF_USE_KERNEL == ENABLED
+#   include "kernel/vsf_kernel.h"
+#endif
 
-#include "component/av/vsfav.h"
-
-#include "component/input/vsf_input.h"
-#include "component/input/hid/vsf_input_hid.h"
-
-#include "component/usb/driver/hcd/ohci/vsf_ohci.h"
-#include "component/usb/driver/otg/musb/fdrc/vsf_musb_fdrc.h"
-
-#include "component/usb/host/vsf_usbh.h"
-#include "component/usb/host/class/HUB/vsf_usbh_HUB.h"
-#include "component/usb/host/class/libusb/vsf_usbh_libusb.h"
-#include "component/usb/host/class/CDC/vsf_usbh_CDC.h"
-#include "component/usb/host/class/CDC/vsf_usbh_CDCECM.h"
-#include "component/usb/host/class/BTHCI/vsf_usbh_BTHCI.h"
-#include "component/usb/host/class/HID/vsf_usbh_HID.h"
-
-#include "component/usb/device/vsf_usbd.h"
-#include "component/usb/device/class/CDC/vsf_usbd_CDC.h"
-#include "component/usb/device/class/CDC/vsf_usbd_CDCACM.h"
-#include "component/usb/device/class/HID/vsf_usbd_HID.h"
-#include "component/usb/device/class/UVC/vsf_usbd_UVC.h"
-
-#include "component/tcpip/netdrv/vsf_netdrv.h"
+#include "component/vsf_component.h"
 
 #ifdef VSF_CFG_USER_HEADER
 #   include VSF_CFG_USER_HEADER

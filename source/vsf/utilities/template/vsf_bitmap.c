@@ -41,26 +41,26 @@ void __vsf_bitmap_reset(uint_fast32_t *pthis, uint_fast16_t bitsize)
     memset(pthis, 0, (bitsize + 7) >> 3);
 }
 
-WEAK int msb(uint32_t a)
+WEAK int32_t msb(uint_fast32_t a)
 {
-	int c = -1;
-	while (a > 0) {
-		c++;
-		a >>= 1;
-	}
-	return c;
+    int c = -1;
+    while (a > 0) {
+        c++;
+        a >>= 1;
+    }
+    return c;
 }
 
-WEAK int ffz(uint32_t a)
+WEAK int32_t ffz(uint_fast32_t a)
 {
-	a = ~a;
-	return msb(a & -(int32_t)a);
+    a = ~a;
+    return msb(a & -(int32_t)a);
 }
 
-int __vsf_bitmap_ffz(uint32_t *pbitmap, uint_fast16_t bitsize)
+int32_t __vsf_bitmap_ffz(uint32_t *pbitmap, uint_fast16_t bitsize)
 {
     uint_fast16_t dwordsize = (bitsize + 31) >> 5, i;
-    int index;
+    int32_t index;
 
     for (i = 0; i < dwordsize; i++) {
         index = ffz(pbitmap[i]);

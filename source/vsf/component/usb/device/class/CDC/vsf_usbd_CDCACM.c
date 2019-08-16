@@ -40,10 +40,10 @@
 vsf_err_t vsf_usbd_CMDACM_init( vsf_usbd_CDCACM_t *obj, 
                                 const vsf_usbd_CDCACM_cfg_t *cfg)
 {
-    ASSERT(NULL != obj && NULL != cfg);
+    VSF_USB_ASSERT(NULL != obj && NULL != cfg);
 
     memset(obj, 0, sizeof(vsf_usbd_CDCACM_t));
-    this.ep_cfg = cfg->ep_cfg;
+    this.use_as__vsf_usbd_CDC_t.ep.ep_cfg = cfg->ep.ep_cfg;
 
 
     this.line_coding = (usb_CDCACM_line_coding_t){
@@ -53,24 +53,24 @@ vsf_err_t vsf_usbd_CMDACM_init( vsf_usbd_CDCACM_t *obj,
                 .datalen        = 8,
             };
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    ASSERT(     (NULL != cfg->rx_stream) 
+    VSF_USB_ASSERT(     (NULL != cfg->rx_stream) 
             &&  (NULL != cfg->tx_stream));
 
     this.stream.rx.stream = cfg->rx_stream;
     this.stream.tx.stream = cfg->tx_stream;
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
-    vsf_stream_usr_init(&(this.stream.use_as__vsf_stream_usr_t),
+    vsf_stream_usr_init(&(this.use_as__vsf_usbd_CDC_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_usr_t),
                         &cfg->stream_usr);
-    vsf_stream_src_init(&(this.stream.use_as__vsf_stream_src_t),
+    vsf_stream_src_init(&(this.use_as__vsf_usbd_CDC_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_src_t),
                         &cfg->stream_src);
 
     do {
         vsf_usbd_ep_stream_cfg_t cfg = {
-            .rx_ep = this.ep.out,
-            .tx_ep = this.ep.in,
+            .rx_ep = this.use_as__vsf_usbd_CDC_t.ep.out,
+            .tx_ep = this.use_as__vsf_usbd_CDC_t.ep.in,
         };
-        vsf_usbd_ep_stream_init(&this.stream.use_as__vsf_usbd_ep_stream_t, &cfg);
+        vsf_usbd_ep_stream_init(&this.use_as__vsf_usbd_CDC_t.stream.use_as__vsf_usbd_ep_stream_t, &cfg);
         
     } while(0);
 #endif
@@ -140,8 +140,8 @@ static vsf_err_t vsf_usbd_CDCACM_control_request_prepare(
 		return vsf_usbd_CDC_control.request_prepare(dev, ifs);
 	}
 
-    ctrl_handler->trans.pchBuffer = buffer;
-    ctrl_handler->trans.nSize = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
 	return VSF_ERR_NONE;
 }
 

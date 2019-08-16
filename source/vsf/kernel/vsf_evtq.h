@@ -20,6 +20,8 @@
 
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
+#if VSF_USE_KERNEL == ENABLED
+
 #include "./vsf_eda.h"
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
@@ -31,12 +33,12 @@ struct vsf_evtq_ctx_t {
 }ALIGN(4);
 typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
 
-#if VSF_CFG_PREMPT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
 
 typedef struct vsf_evt_node_t vsf_evt_node_t;
 typedef struct vsf_evtq_t vsf_evtq_t;
 
-#if VSF_CFG_DYNAMIC_PRIOTIRY_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
 
 struct vsf_evtq_t {
     vsf_dlist_t rdy_list;
@@ -89,7 +91,7 @@ struct vsf_evtq_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_CFG_PREMPT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
 extern void vsf_evtq_on_eda_init(vsf_eda_t *eda);
 extern void vsf_evtq_on_eda_fini(vsf_eda_t *eda);
 
@@ -103,4 +105,5 @@ extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis);
 #endif
 
+#endif
 #endif

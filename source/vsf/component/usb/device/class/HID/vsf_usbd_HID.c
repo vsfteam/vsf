@@ -45,7 +45,7 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 static vsf_usbd_HID_report_t * vsf_usbd_HID_find_report(
         vsf_usbd_HID_t *hid, uint_fast8_t type, uint_fast8_t id)
 {
-    ASSERT(hid != NULL);
+    VSF_USB_ASSERT(hid != NULL);
 
     for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
         if ((hid->reports[i].type == type) && (hid->reports[i].id == id)) {
@@ -222,7 +222,12 @@ static vsf_err_t vsf_usbd_HID_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 
     hid->ifs = ifs;
     hid->dev = dev;
-    hid->teda.evthandler = vsf_usbd_HID_evthandler;
+
+    if (VSF_ERR_NONE != vsf_eda_set_evthandler( &(hid->teda.use_as__vsf_eda_t), 
+                                                vsf_usbd_HID_evthandler)) {
+        VSF_USB_ASSERT(false);
+    }
+    //hid->teda.evthandler = vsf_usbd_HID_evthandler;
     return vsf_teda_init(&hid->teda, VSF_USBD_CFG_EDA_PRIORITY, false);
 }
 

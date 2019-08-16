@@ -28,6 +28,8 @@
 #   include "./compiler/avr/avr_compiler.h"
 #elif   defined(__CPU_ARM__)                //!< ARM series
 #   include "./compiler/arm/arm_compiler.h"
+#elif   defined(__CPU_X86__)
+#   include "./compiler/x86/x86_compiler.h"
 #else
 //#warning No specified MCU type! use arm as default
 #   include "./compiler/arm/arm_compiler.h"

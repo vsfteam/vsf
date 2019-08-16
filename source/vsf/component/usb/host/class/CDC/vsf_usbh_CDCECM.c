@@ -19,7 +19,9 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
+#if     VSF_USE_USB_HOST == ENABLED                                             \
+    &&  VSF_USE_USB_HOST_ECM == ENABLED                                         \
+    &&  VSF_USE_TCPIP == ENABLED
 
 #define VSF_USBH_IMPLEMENT_CLASS
 #define VSF_USBH_CDC_INHERIT
@@ -136,7 +138,7 @@ static void vsf_usbh_ecm_recv(vsf_usbh_ecm_t *ecm, vsf_usbh_ecm_icb_t *icb)
         if (icb->netbuf != NULL) {
             vsf_mem_t mem;
             void *netbuf = vsf_netdrv_read_buf(&ecm->netdrv, icb->netbuf, &mem);
-            ASSERT(netbuf == NULL);
+            VSF_USB_ASSERT(netbuf == NULL);
             vsf_usbh_urb_set_buffer(&icb->urb, mem.pchBuffer, mem.nSize);
             if (VSF_ERR_NONE != vsf_usbh_cdc_submit_urb(&ecm->use_as__vsf_usbh_cdc_t, &icb->urb)) {
                 vsf_netdrv_on_inputted(&ecm->netdrv, icb->netbuf, 0);
@@ -183,7 +185,7 @@ static vsf_err_t vsf_usbh_ecm_netlink_output(vsf_netdrv_t *netdrv, void *netbuf)
     if ((netbuf = vsf_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL) {
         uint_fast16_t pos = 0;
         do {
-            ASSERT((mem.nSize + pos) <= sizeof(ocb->buffer));
+            VSF_USB_ASSERT((mem.nSize + pos) <= sizeof(ocb->buffer));
             memcpy(&ocb->buffer[pos], mem.pchBuffer, mem.nSize);
             pos += mem.nSize;
         } while ((netbuf = vsf_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL);
@@ -192,7 +194,7 @@ static vsf_err_t vsf_usbh_ecm_netlink_output(vsf_netdrv_t *netdrv, void *netbuf)
     }
 #else
     if (vsf_netdrv_read_buf(netdrv, netbuf, &mem) != NULL) {
-        ASSERT(false);
+        VSF_USB_ASSERT(false);
     }
 #endif
 
@@ -341,7 +343,7 @@ static void vsf_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         ecm->init_state = VSF_USBH_ECM_INIT_START;
-        err = vsf_eda_crit_enter(&dev->ep0.crit, -1);
+        err = __vsf_eda_crit_npb_enter(&dev->ep0.crit);
         if (err != VSF_ERR_NONE) {
             break;
         }
@@ -385,12 +387,16 @@ static void vsf_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             err = vsf_usbh_set_interface(usbh, dev, cdc->data_ifs, 1);
             break;
         case VSF_USBH_ECM_INIT_WAIT_SET_IF1:
-            vsf_eda_crit_leave(&dev->ep0.crit);
+            __vsf_eda_crit_npb_leave(&dev->ep0.crit);
 
             ecm->netdrv.netlink_op = &vsf_usbh_ecm_netlink_op;
             vsf_pnp_on_netdrv_new(&ecm->netdrv);
 
-            eda->evthandler = vsf_usbh_cdc_evthandler;
+            if (VSF_ERR_NONE != vsf_eda_set_evthandler( eda, 
+                                                        vsf_usbh_cdc_evthandler)) {
+                VSF_USB_ASSERT(false);
+            }
+            //eda->evthandler = vsf_usbh_cdc_evthandler;
             vsf_eda_post_evt(eda, VSF_EVT_INIT);
             return;
         }
@@ -398,7 +404,7 @@ static void vsf_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     if (err < 0) {
         if (ecm->init_state != VSF_USBH_ECM_INIT_START) {
-            vsf_eda_crit_leave(&dev->ep0.crit);
+            __vsf_eda_crit_npb_leave(&dev->ep0.crit);
         }
         vsf_usbh_remove_interface(usbh, dev, cdc->ifs);
     } else {
@@ -433,9 +439,14 @@ static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             VSF_USBH_FREE(ecm);
             ecm = NULL;
         } else {
-            cdc->eda.evthandler = vsf_usbh_ecm_evthandler;
+
+            if (VSF_ERR_NONE != vsf_eda_set_evthandler( &(cdc->eda), 
+                                                        vsf_usbh_ecm_evthandler)) {
+                VSF_USB_ASSERT(false);
+            }
+            //cdc->eda.evthandler = vsf_usbh_ecm_evthandler;
             cdc->eda.on_terminate = vsf_usbh_ecm_on_eda_terminate;
-            vsf_eda_init(&cdc->eda, vsf_priority_inherit, false);
+            vsf_eda_init(&cdc->eda, vsf_prio_inherit, false);
         }
     }
     return ecm;

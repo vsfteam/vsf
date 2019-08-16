@@ -23,35 +23,37 @@
 
 /*============================ MACROS ========================================*/
 #undef  this
-#define this    (*ptThis)
+#define this    (*pthis)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-vsf_err_t class_simple_base_init(class_simple_base_t *ptThis, uint_fast8_t chParam)
+vsf_err_t class_simple_base_init(class_simple_base_t *pthis, uint_fast8_t param)
 {
-    this.private_param_base = chParam;
+    this.private_param_base = param;
     return VSF_ERR_NONE;
 }
 
-uint_fast8_t class_simple_base_get_param(class_simple_base_t *ptThis)
+uint_fast8_t class_simple_base_get_param(class_simple_base_t *pthis)
 {
     return this.private_param_base;
 }
 
-vsf_err_t class_simple_demo_init(class_simple_demo_t *ptThis, uint_fast8_t chParam, uint_fast8_t param_base)
+vsf_err_t class_simple_demo_init(   class_simple_demo_t *pthis, 
+                                    uint_fast8_t param, 
+                                    uint_fast8_t param_base)
 {
-    this.private_param_demo = chParam;
+    this.private_param_demo = param;
     return class_simple_base_init(&this.use_as__class_simple_base_t, param_base);
 }
 
-uint_fast8_t class_simple_demo_get_param(class_simple_demo_t *ptThis)
+uint_fast8_t class_simple_demo_get_param(class_simple_demo_t *pthis)
 {
     return this.private_param_demo;
 }
 
-uint_fast8_t class_simple_demo_get_base_param(class_simple_demo_t *ptThis)
+uint_fast8_t class_simple_demo_get_base_param(class_simple_demo_t *pthis)
 {
     return this.private_param_base;
 }

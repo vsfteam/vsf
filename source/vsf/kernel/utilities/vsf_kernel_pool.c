@@ -63,7 +63,7 @@
 void vsf_kernel_pool_init(vsf_kernel_pool_t *pobj)
 {
     class_internal(pobj, pthis, vsf_kernel_pool_t);
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     vsf_sem_init(&this.available_sem, 0);
     
@@ -92,7 +92,7 @@ bool vsf_kernel_pool_add_buffer(   vsf_kernel_pool_t *pobj,
     class_internal(pobj, pthis, vsf_kernel_pool_t);
     bool result = false;
     
-    ASSERT(     (pthis != NULL) 
+    VSF_KERNEL_ASSERT(     (pthis != NULL) 
             &&  (pbuffer != NULL));
     
     VSF_KERNEL_POOL_CFG_ATOM_ACCESS(){
@@ -126,7 +126,7 @@ vsf_kernel_pool_add_buffer_ex(  vsf_kernel_pool_t *pobj,
     class_internal(pobj, pthis, vsf_kernel_pool_t);
     bool result = false;
     
-    ASSERT(     (pthis != NULL) 
+    VSF_KERNEL_ASSERT(     (pthis != NULL) 
             &&  (pbuffer != NULL));
     
     VSF_KERNEL_POOL_CFG_ATOM_ACCESS(){
@@ -154,7 +154,7 @@ void *vsf_kernel_pool_alloc(vsf_kernel_pool_t *pobj, uint32_t time_out)
     
     void *pnode = NULL;
 
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     if (VSF_SYNC_GET == vsf_thread_sem_pend(&(this.available_sem), time_out)) {
         pnode = vsf_pool_alloc(&(this.use_as__vsf_pool_t));
@@ -171,7 +171,7 @@ void *vsf_kernel_pool_alloc(vsf_kernel_pool_t *pobj, uint32_t time_out)
 void vsf_kernel_pool_free(vsf_pool_t *pobj, void *pitem)
 {
     class_internal(pobj, pthis, vsf_kernel_pool_t);
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
     
     if (NULL == pitem) {
         return ;

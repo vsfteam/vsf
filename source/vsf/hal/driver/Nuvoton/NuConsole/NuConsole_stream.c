@@ -17,6 +17,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "hal/vsf_hal_cfg.h"
+
+#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
+
 #include "../driver.h"
 #include "./NuConsole.h"
 
@@ -29,11 +33,13 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*
 static struct {
     bool                        bInitialised;
     //vsf_stream_status_t         tStatus;
     //vsf_stream_dat_drn_evt_t    tEvent;
 } s_tNuStream = {0};
+*/
 /*============================ PROTOTYPES ====================================*/
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static void vsf_nu_console_stream_init(vsf_stream_t *stream);
@@ -80,17 +86,17 @@ const vsf_stream_tx_t VSF_DEBUG_STREAM_TX = {
 
 WEAK void vsf_stdout_init(void)
 {
-    NuConsole_Init();
+    //NuConsole_Init();
 }
 
 WEAK void vsf_stderr_init(void)
 {
-    NuConsole_Init();
+    //NuConsole_Init();
 }
 
 WEAK void vsf_stdin_init(void)
 {
-    NuConsole_Init();
+    //NuConsole_Init();
 }
 
 WEAK int vsf_stdout_putchar(char ch)
@@ -113,17 +119,17 @@ WEAK int vsf_stdin_getchar(void)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static void vsf_nu_console_stream_init(vsf_stream_t *stream)
 {
-    NuConsole_Init();
+    //NuConsole_Init();
 }
 
 static uint_fast32_t vsf_nu_console_stream_write(   vsf_stream_t *stream, 
                                                     uint8_t *buf, 
                                                     uint_fast32_t size)
 {
-    if (!s_tNuStream.bInitialised) {
+    /*if (!s_tNuStream.bInitialised) {
         s_tNuStream.bInitialised = true;
         NuConsole_Init();
-    }
+    }*/
     return NuConsole_Write(buf, size);
 }
 
@@ -137,10 +143,10 @@ static vsf_err_t vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *ptObj,
                                                     vsf_pbuf_t *ptBlock)
 {
     vsf_err_t tResult = VSF_ERR_NONE;
-    if (!s_tNuStream.bInitialised) {
+    /*if (!s_tNuStream.bInitialised) {
         s_tNuStream.bInitialised = true;
         NuConsole_Init();
-    }
+    }*/
     do {
         if (NULL == ptBlock) {
             tResult = VSF_ERR_INVALID_PTR;
@@ -178,5 +184,5 @@ static vsf_err_t vsf_nu_console_stream_tx_dat_drn_evt_reg(
     //s_tNuStream.tEvent = tEvent;
     return VSF_ERR_NONE;
 }
-
+#endif
 #endif

@@ -29,7 +29,7 @@
     } xxxx_t;
 
     // 2. Declare the pool with user type
-    declare_vsf_pool(xxxx_pool, xxxx_t)
+    declare_vsf_pool(xxxx_pool)
 
     // 3. Defining the pool  
     def_vsf_pool(xxxx_pool, xxxx_t)

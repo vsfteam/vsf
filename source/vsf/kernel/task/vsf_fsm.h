@@ -37,11 +37,11 @@
 
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
-#include <stdint.h>
 
+#include <stdint.h>
 /*============================ MACROS ========================================*/
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED && VSF_USE_KERNEL == ENABLED
 #ifndef this
 #   define this    (*ptThis)
 #endif
@@ -61,7 +61,6 @@
 
 #define __def_fsm(__FSM_TYPE, ...)                                              \
         def_vsf_task(__FSM_TYPE,                                                \
-            uint8_t chState;                                                    \
             __VA_ARGS__);                                           
         
 #define def_fsm(__NAME, ...)                                                    \
@@ -171,7 +170,7 @@
 #define __fsm_initialiser(__NAME, ...)                                          \
         fsm(__NAME) *__NAME##_init(fsm(__NAME) *ptThis __VA_ARGS__)             \
         {                                                                       \
-            ASSERT (NULL != ptThis);                                            \
+            VSF_KERNEL_ASSERT (NULL != ptThis);                                 \
             ptThis->chState = 0;
             
 #define fsm_initialiser(__NAME, ...)                                            \
@@ -313,5 +312,4 @@ typedef enum {
 
 
 #endif
-
 #endif

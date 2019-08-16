@@ -28,24 +28,20 @@
 #undef  this
 #define this    (*ptThis)
 
-#ifndef VSF_POOL_CFG_ATOM_ACCESS
-
+#if     defined(VSF_POOL_LOCK) && !defined(VSF_POOL_UNLOCK) 
+#   define  VSF_POOL_UNLOCK(...)
+#elif   !defined(VSF_POOL_LOCK) && defined(VSF_POOL_UNLOCK) 
+#   define  VSF_POOL_LOCK(...)
+#else
+#   define VSF_POOL_LOCK(...)   CODE_REGION_START(this.ptRegion)
+#   define VSF_POOL_UNLOCK()    CODE_REGION_END()
 #   define __VSF_POOL_USE_DEFAULT_ATOM_ACCESS
-/*! \note   By default, the driver tries to make all APIs thread-safe, in the  
- *!         case when you want to disable it, please use following macro to 
- *!         disable it:
- *!
- *!         #define VSF_POOL_CFG_ATOM_ACCESS(...)   __VA_ARGS__
- *!                 
- *!         
- *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h
- */
-#   define VSF_POOL_CFG_ATOM_ACCESS(...)                                        \
-        code_region_simple(this.ptRegion, __VA_ARGS__)
+#endif
 
-#elif defined(VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY)
+#if defined(VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY)
 #       include VSF_POOL_CFG_ATOM_ACCESS_DEPENDENCY
 #endif
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -100,7 +96,7 @@ void vsf_pool_init( vsf_pool_t *ptObj,
                     vsf_pool_cfg_t *ptCFG)
 {
     class_internal(ptObj, ptThis, vsf_pool_t);
-    ASSERT(ptThis != NULL);
+    VSF_SERVICE_ASSERT(ptThis != NULL);
 
     memset(ptObj, 0, sizeof(vsf_pool_t));
 
@@ -122,11 +118,11 @@ void vsf_pool_init( vsf_pool_t *ptObj,
 #endif
 
 #if VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED
-    this.wItemSize = wItemSize;
+    this.Statistic.wItemSize = wItemSize;
     if (0 == hwAlign) {
         hwAlign = sizeof(uint_fast8_t);
     } 
-    this.u15Align = hwAlign;
+    this.Statistic.u15Align = hwAlign;
     this.fnItemInit = ptCFG->fnItemInit;
 #endif
 
@@ -173,9 +169,11 @@ WEAK bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *ptObj)
      *        also use this function to allocate more resources to either pool 
      *        or heap and ask vsf pool to try again.
      */
-    ASSERT(false);
+    VSF_SERVICE_ASSERT(false);
     return false;
 }
+
+
 
 WEAK void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
 {
@@ -185,6 +183,11 @@ WEAK void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
      *        this function by yourself
      */     
     void *pMemory = NULL;
+    
+extern int posix_memalign(  void ** /*ret*/, 
+                            size_t /*alignment*/, 
+                            size_t /*size*/);
+
     posix_memalign(&pMemory, wSize, wAlign);
     return pMemory;
 }
@@ -201,10 +204,10 @@ void *vsf_pool_alloc(vsf_pool_t *ptObj)
     class_internal(ptObj, ptThis, vsf_pool_t);
     __vsf_pool_node_t *ptNode = NULL;
 
-    ASSERT(ptThis != NULL);
+    VSF_SERVICE_ASSERT(ptThis != NULL);
 
 
-    VSF_POOL_CFG_ATOM_ACCESS(
+    VSF_POOL_LOCK();
         /* verify it again for safe */
         if (!vsf_slist_is_empty(&this.tFreeList)) {
             vsf_slist_stack_pop(__vsf_pool_node_t, 
@@ -221,11 +224,11 @@ void *vsf_pool_alloc(vsf_pool_t *ptObj)
             bool bRetry = false;
             do {
                 //! feed on heap
-                ptNode = vsf_heap_malloc_aligned(this.wItemSize, this.Statistic.u15Align);
+                ptNode = (__vsf_pool_node_t *)vsf_heap_malloc_aligned(this.Statistic.wItemSize, this.Statistic.u15Align);
                 if (NULL != ptNode) {
                 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
                     if (this.fnItemInit != NULL) {
-                        (*(this.fnItemInit))(this.pTarget, ptNode, this.wItemSize);
+                        (*(this.fnItemInit))(this.pTarget, ptNode, this.Statistic.wItemSize);
                     }
                 #else
                     if (this.fnItemInit != NULL) {
@@ -239,7 +242,7 @@ void *vsf_pool_alloc(vsf_pool_t *ptObj)
             } while(bRetry);
         }
 #endif
-    )
+    VSF_POOL_UNLOCK();
 
     return (void *)ptNode;
 }
@@ -249,10 +252,10 @@ static void __vsf_pool_add_item(vsf_pool_t *ptObj, void *pitem)
     class_internal(ptObj, ptThis, vsf_pool_t);
     __vsf_pool_node_t *ptNode = (__vsf_pool_node_t *)pitem;
 
-    VSF_POOL_CFG_ATOM_ACCESS(
+    VSF_POOL_LOCK();
         vsf_slist_stack_push(__vsf_pool_node_t, node, &this.tFreeList, ptNode);
         this.hwFree++;
-    )
+    VSF_POOL_UNLOCK();
 }
 
 /*! \brief add memory to pool 
@@ -273,7 +276,7 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *ptObj,
     class_internal(ptObj, ptThis, vsf_pool_t);
     __vsf_pool_node_t *ptNode;
 
-    ASSERT(     (ptThis != NULL) 
+    VSF_SERVICE_ASSERT(     (ptThis != NULL) 
             &&  (pBuffer != NULL));
 
     /* Allowing multiple-layers of Pool management */
@@ -316,12 +319,12 @@ void vsf_pool_free(vsf_pool_t *ptObj, void *pItem)
 {
     
     class_internal(ptObj, ptThis, vsf_pool_t);
-    ASSERT((ptObj != NULL) && (pItem != NULL));
+    VSF_SERVICE_ASSERT((ptObj != NULL) && (pItem != NULL));
 
-    VSF_POOL_CFG_ATOM_ACCESS(
+    VSF_POOL_LOCK();
         __vsf_pool_add_item(ptObj, pItem);
         this.hwUsed--;
-    )
+    VSF_POOL_UNLOCK();
 
 }
 
@@ -333,7 +336,7 @@ SECTION("text.vsf.utilities.vsf_pool_get_count")
 uint_fast16_t vsf_pool_get_count(vsf_pool_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_pool_t);
-    ASSERT(ptThis != NULL);
+    VSF_SERVICE_ASSERT(ptThis != NULL);
 
     return this.hwFree;
 }
@@ -347,7 +350,7 @@ void *vsf_pool_get_tag(vsf_pool_t *ptObj)
 {
 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
     class_internal(ptObj, ptThis, vsf_pool_t);
-    ASSERT(ptThis != NULL);
+    VSF_SERVICE_ASSERT(ptThis != NULL);
 
     return this.pTarget;
 #else
@@ -364,7 +367,7 @@ void *vsf_pool_set_tag(vsf_pool_t *ptObj, void *pTarget)
 {
 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
     class_internal(ptObj, ptThis, vsf_pool_t);
-    ASSERT(ptThis != NULL);
+    VSF_SERVICE_ASSERT(ptThis != NULL);
     this.pTarget = pTarget;
 
     return this.pTarget;
@@ -382,7 +385,7 @@ code_region_t *vsf_pool_get_region(vsf_pool_t *ptObj)
 {
 #if defined(__VSF_POOL_USE_DEFAULT_ATOM_ACCESS)
     class_internal(ptObj, ptThis, vsf_pool_t);
-    ASSERT(ptThis != NULL);
+    VSF_SERVICE_ASSERT(ptThis != NULL);
 
     return this.ptRegion;
 #else

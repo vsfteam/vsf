@@ -32,35 +32,35 @@
 vsf_err_t class_base_init(class_base_t *ptObj, uint_fast8_t chParam)
 {
     class_internal(ptObj, ptThis, class_base_t);
-    this.private_param_base = chParam;
+    this.chPrivateParamBase = chParam;
     return VSF_ERR_NONE;
 }
 
 uint_fast8_t class_base_get_param(class_base_t *ptObj)
 {
     class_internal(ptObj, ptThis, class_base_t);
-    return this.private_param_base;
+    return this.chPrivateParamBase;
 }
 
 vsf_err_t class_demo_init(class_demo_t *ptObj, uint_fast8_t chParam, uint_fast8_t chParamBase)
 {
     class_internal(ptObj, ptThis, class_demo_t);
-    this.private_param_demo = chParam;
+    this.chPrivateParamDemo = chParam;
     return class_base_init(&this.use_as__class_base_t, chParamBase);
 }
 
 uint_fast8_t class_demo_get_param(class_demo_t *ptObj)
 {
     class_internal(ptObj, ptThis, class_demo_t);
-    return this.private_param_demo;
+    return this.chPrivateParamDemo;
 }
 
 uint_fast8_t class_demo_get_base_param(class_demo_t *ptObj)
 {
     class_internal(ptObj, ptThis, class_demo_t);
-    uint_fast8_t base_param;
+    uint_fast8_t chBaseParam;
     with_class(class_base_t, &this.use_as__class_base_t,
-                    base_param = _->private_param_base;
+                    chBaseParam = _->chPrivateParamBase;
                 );
-    return base_param;
+    return chBaseParam;
 }

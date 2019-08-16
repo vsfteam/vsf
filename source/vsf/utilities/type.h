@@ -118,6 +118,7 @@ typedef enum {
     VSF_ERR_IO                          =-12,   //!< IO error
     VSF_ERR_REQ_ALREADY_REGISTERED      =-13,   //!< request all ready exist
     VSF_ERR_BUG                         =-14,   //!< bug
+    VSF_ERR_OVERRUN                     =-15,   //!< overrun
 } vsf_err_t;
 //! @}
 

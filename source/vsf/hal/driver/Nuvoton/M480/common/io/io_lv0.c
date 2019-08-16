@@ -16,7 +16,6 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "../__common.h"
 #include "./io.h"
 
 /*============================ MACROS ========================================*/
@@ -67,7 +66,7 @@ void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
     uint_fast32_t mode = 0, pull = 0, mask = 0;
     uint_fast8_t offset = 32, tmp8;
 
-    ASSERT(!(pin_mask >> 16));
+    VSF_HAL_ASSERT(!(pin_mask >> 16));
 
     while (pin_mask) {
         tmp8 = __CLZ(pin_mask) + 1;
@@ -106,7 +105,7 @@ void vsf_gpio_set_direction(    vsf_gpio_t *pthis,
     uint_fast32_t mode = 0, mask = 0;
     uint_fast8_t offset = 32, tmp8;
 
-    ASSERT(!(pin_mask >> 16));
+    VSF_HAL_ASSERT(!(pin_mask >> 16));
 
     while (pin_mask) {
         tmp8 = __CLZ(pin_mask) + 1;
@@ -138,7 +137,7 @@ uint_fast32_t vsf_gpio_get_direction(vsf_gpio_t *pthis, uint32_t pin_mask)
     uint_fast32_t mode = 0;
     uint_fast8_t offset = 32, tmp8;
 
-    ASSERT(!(pin_mask >> 16));
+    VSF_HAL_ASSERT(!(pin_mask >> 16));
 
     while (pin_mask) {
         tmp8 = __CLZ(pin_mask) + 1;

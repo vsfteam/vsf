@@ -123,7 +123,7 @@ static const usrapp_const_t usrapp_const = {
 #if VSF_USE_USB_HOST == ENABLED
     .ohci_param                 = {
         .op                     = &VSF_USB_HC0_IP,
-        .priority               = vsf_priority_0,
+        .priority               = vsf_arch_prio_0,
     },
 #endif
 
@@ -717,12 +717,12 @@ int main(void)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     do {
         static NO_INIT user_task_t __user_task;
-        init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
+        init_vsf_thread(user_task_t, &__user_task, vsf_prio_0);
     } while(0);
 #else
     do {
         static vsf_teda_t teda = { .evthandler = usrapp_heartbeat_evthandler };
-        vsf_teda_init(&teda, vsf_priority_0, false);
+        vsf_teda_init(&teda, vsf_prio_0, false);
     } while (0);
 #endif
 

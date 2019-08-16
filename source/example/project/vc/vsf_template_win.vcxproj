@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{FB7A0395-5EAE-461F-99B4-6517535542C2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>vsftemplatewin</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>ClangCL</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.c" />
+    <ClCompile Include="..\..\..\vsf\hal\arch\x86\win\win_generic.c" />
+    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c" />
+    <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\shell\vsf_shell.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\task\vsf_task.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\task\vsf_thread.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c" />
+    <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
+    <ClCompile Include="..\..\..\vsf\service\pool\vsf_pool.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_base.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_reader.c" />
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c" />
+    <ClCompile Include="..\..\..\vsf\service\trace\vsf_trace.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\main.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\mutex_test.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\queue_test.c" />
+    <ClCompile Include="..\..\usrapp\kernel_test\sem_test.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch.h" />
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.h" />
+    <ClInclude Include="..\..\..\vsf\hal\arch\x86\win\win_generic.h" />
+    <ClInclude Include="..\..\..\vsf\hal\driver\driver.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_common.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_io.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_pm.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usart.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usb.h" />
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal.h" />
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_fsm.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_pt.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_task.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_thread.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\task\__vsf_task_common.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_common.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h" />
+    <ClInclude Include="..\..\..\vsf\service\pool\vsf_pool.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\interface.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_base.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_reader.h" />
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h" />
+    <ClInclude Include="..\..\..\vsf\service\trace\vsf_trace.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsf_service.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\communicate.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mrepeat.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\preprocessor.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\tpaste.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\template.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\type.h" />
+    <ClInclude Include="..\..\..\vsf\vsf.h" />
+    <ClInclude Include="..\..\..\vsf\vsf_cfg.h" />
+    <ClInclude Include="..\..\usrapp\kernel_test\vsf_usr_cfg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

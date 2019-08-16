@@ -20,7 +20,9 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 
-#if VSF_USE_SIMPLE_SHELL == ENABLED && VSF_CFG_BMPEVT_EN == ENABLED
+#if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                  \
+    &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED                          \
+    &&  VSF_USE_KERNEL == ENABLED
 
 #   include "../../vsf_kernel_common.h"
 #   include "./vsf_simple.h"
@@ -49,11 +51,11 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *pbmpevt,
 {
 
     vsf_sync_reason_t reason = VSF_SYNC_PENDING;
-    ASSERT(NULL != pbmpevt && NULL != ppender);
+    VSF_KERNEL_ASSERT(NULL != pbmpevt && NULL != ppender);
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     vsf_eda_t *peda = vsf_eda_get_cur();
-    ASSERT(NULL != peda);
+    VSF_KERNEL_ASSERT(NULL != peda);
 
     if (vsf_eda_is_stack_owner(peda)) {
         //! a thread
@@ -97,7 +99,7 @@ vsf_sync_reason_t vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
                     break;
                 }
             }
-            result = vsf_bmpevt_poll(   pbmpevt, 
+            result = vsf_eda_bmpevt_poll(   pbmpevt, 
                                         (vsf_bmpevt_pender_t *)ppender, 
                                         VSF_EVT_SYNC_POLL);
             if (VSF_SYNC_GET == result) {
@@ -127,13 +129,13 @@ void grouped_evts_init(vsf_bmpevt_t *ptThis,
                     uint_fast8_t adapter_count,
                     uint_fast32_t auto_reset)
 {
-    ASSERT(NULL != ptThis && NULL != ppadapters);
+    VSF_KERNEL_ASSERT(NULL != ptThis && NULL != ppadapters);
     this.auto_reset = auto_reset;
     
     if (adapter_count) {
         this.adapters = ppadapters;
     }
-    vsf_bmpevt_init(ptThis, adapter_count);
+    vsf_eda_bmpevt_init(ptThis, adapter_count);
 }
 
 #endif

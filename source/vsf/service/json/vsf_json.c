@@ -254,7 +254,7 @@ int vsf_json_get_string(const char *json, char *result, int len)
         if (ch == '\\') {
             ch = *json++;
             if (result && (curlen >= len)) {
-                ASSERT(false);
+                VSF_SERVICE_ASSERT(false);
                 return VSF_ERR_NOT_ENOUGH_RESOURCES;
             }
             switch (ch) {
@@ -274,7 +274,7 @@ int vsf_json_get_string(const char *json, char *result, int len)
             }
         } else if (ch != '\"') {
             if (result && (curlen >= len)) {
-                ASSERT(false);
+                VSF_SERVICE_ASSERT(false);
                 return VSF_ERR_NOT_ENOUGH_RESOURCES;
             }
             if (result) {
@@ -285,7 +285,7 @@ int vsf_json_get_string(const char *json, char *result, int len)
     } while (ch != '\"');
 
     if (result && (curlen >= len)) {
-        ASSERT(false);
+        VSF_SERVICE_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     if (result) {

@@ -40,25 +40,93 @@ static void input_demo_trace_hid(vsf_hid_event_t *hid_evt)
     }
 }
 
-#if 1
+static void input_demo_trace_gamepad(vsf_gamepad_evt_t *gamepad_evt)
+{
+    if (gamepad_evt->id != GAMEPAD_ID_DUMMY) {
+        vsf_trace(VSF_TRACE_DEBUG, "gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
+            (vsf_gamepad_id_t)gamepad_evt->id, gamepad_evt->cur, gamepad_evt->pre);
+    }
+}
+
+static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
+{
+    int16_t gyro_pitch = 0, gyro_yaw = 0, gyro_roll = 0, acc_x = 0, acc_y = 0, acc_z = 0;
+    uint_fast32_t value_cnt = 0, pos = 0;
+    uint8_t *buffer = sensor_evt->data;
+    vsf_sensor_item_info_t *info;
+
+    for (uint_fast8_t i = 0; i < sensor_evt->desc.item_num; i++) {
+        info = &sensor_evt->desc.item_info[i];
+
+        switch (info->id) {
+        case SENSOR_ID_GYRO:
+            switch (info->subid) {
+            case SENSOR_SUBID_PITCH:
+                ASSERT(info->bitlen == 16);
+                gyro_pitch = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                value_cnt++;
+                break;
+            case SENSOR_SUBID_YAW:
+                ASSERT(info->bitlen == 16);
+                gyro_yaw = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                value_cnt++;
+                break;
+            case SENSOR_SUBID_ROLL:
+                ASSERT(info->bitlen == 16);
+                gyro_roll = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                value_cnt++;
+                break;
+            }
+            break;
+        case SENSOR_ID_ACC:
+            switch (info->subid) {
+            case SENSOR_SUBID_X:
+                ASSERT(info->bitlen == 16);
+                acc_x = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                value_cnt++;
+                break;
+            case SENSOR_SUBID_Y:
+                ASSERT(info->bitlen == 16);
+                acc_y = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                value_cnt++;
+                break;
+            case SENSOR_SUBID_Z:
+                ASSERT(info->bitlen == 16);
+                acc_z = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                value_cnt++;
+                break;
+            }
+            break;
+        }
+        pos += info->bitlen;
+    }
+
+    if (value_cnt >= 6) {
+        vsf_trace(VSF_TRACE_DEBUG, "6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
+            (int)acc_x, (int)acc_y, (int)acc_z, (int)gyro_pitch, (int)gyro_yaw, (int)gyro_roll);
+    }
+}
+
 void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
 {
     switch (type) {
+#if VSF_INPUT_CFG_HID_EN == ENABLED
     case VSF_INPUT_TYPE_HID:
         input_demo_trace_hid((vsf_hid_event_t *)event);
         break;
+#endif
     case VSF_INPUT_TYPE_SENSOR:
+        input_demo_trace_sensor((vsf_sensor_evt_t *)event);
         break;
+#if VSF_INPUT_CFG_DS4_EN == ENABLED
+    case VSF_INPUT_TYPE_DS4:
+        input_demo_trace_gamepad((vsf_gamepad_evt_t *)event);
+        break;
+#endif
     default:
         break;
     }
 }
-#else
-void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
-{
-    input_demo_trace_hid(hid_evt);
-}
-#endif
 
 void input_demo_start(void)
 {

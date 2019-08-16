@@ -122,7 +122,7 @@ static volatile uint32_t s_wCSRBuffer = 0;
 bool vsf_systick_init(systick_cfg_t *cfg_ptr)
 {
     //! \brief check the input
-    ASSERT(cfg_ptr != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
 
     vsf_systick_set_reload(cfg_ptr->reload_value);
     vsf_systick_clear_count();
@@ -159,6 +159,31 @@ bool vsf_systick_disable(void)
         wTemp = SYSTICK_CSR;            //! read to clear COUNTFLAG
     )
     return wTemp & SYSTICK_CSR_COUNTFLAG_MSK;
+}
+
+
+
+/*!\brief enable
+ *! \param void
+ *! \retval none
+ */
+void vsf_systick_int_enable(void)
+{
+    __SYSTICK_ATOM_CODE(
+        s_wCSRBuffer |= ENABLE_SYSTICK_INTERRUPT;
+        SYSTICK_CSR = s_wCSRBuffer;
+    )
+}
+/*!\brief enable
+ *! \param void
+ *! \retval bool
+ */
+void vsf_systick_int_disable(void)
+{
+    __SYSTICK_ATOM_CODE(
+        s_wCSRBuffer &= ~ENABLE_SYSTICK_INTERRUPT;
+        SYSTICK_CSR = s_wCSRBuffer;
+    )
 }
 
 /*! \brief check compare match event

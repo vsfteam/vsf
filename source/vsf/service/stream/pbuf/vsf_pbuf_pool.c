@@ -35,7 +35,7 @@ const i_pbuf_methods_t VSF_PBUF_ADAPTER_METHODS_STREAM_SRC = {
 
 static vsf_pbuf_t * __vsf_stream_src_pbuf_free(void *pObj, vsf_pbuf_t *ptBlock)
 {
-    ASSERT(NULL != pObj);
+    VSF_SERVICE_ASSERT(NULL != pObj);
 
     vsf_pbuf_pool_free( (vsf_pbuf_pool_t *)pObj, ptBlock);
     return NULL;

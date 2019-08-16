@@ -35,6 +35,13 @@ void uart_config(void)
 #endif
 }
 
+#if __IS_COMPILER_IAR__
+WEAK void vsf_stdio_init(void)
+{
+    //! do nothing here
+}
+#endif
+
 void vsf_stdout_init(void)
 {
     uart_config();

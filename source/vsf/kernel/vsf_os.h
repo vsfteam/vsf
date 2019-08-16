@@ -21,14 +21,15 @@
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
 
+#if VSF_USE_KERNEL == ENABLED
 #include "./vsf_kernel_common.h"
 #include "./vsf_evtq.h"
 #include "./task/vsf_task.h"
 /*============================ MACROS ========================================*/
 
-typedef uint_fast8_t vsf_sched_lock_status_t;
+typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 
-#if VSF_CFG_PREMPT_EN
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 
 #   define __vsf_sched_safe(...)                                                \
         {                                                                       \
@@ -62,25 +63,34 @@ typedef uint_fast8_t vsf_sched_lock_status_t;
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#ifdef VSF_CFG_EVTQ_LIST
+#ifdef __VSF_OS_CFG_EVTQ_LIST
 declare_vsf_pool(vsf_evt_node_pool)
 def_vsf_pool(vsf_evt_node_pool, vsf_evt_node_t)
 #endif
 
 struct vsf_kernel_resource_t {
-#if VSF_CFG_EVTQ_EN == ENABLED     
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     struct {
-        const vsf_arch_priority_t   *os_priorities_ptr;
-        uint16_t                    priority_cnt;
+        const vsf_arch_prio_t   *os_swi_priorities_ptr;
+        uint16_t                    swi_priority_cnt;
     }arch;
-#   if defined(VSF_CFG_EVTQ_LIST)
+
     struct {
+        vsf_evtq_t *queue_array;
+#   if defined(__VSF_OS_CFG_EVTQ_ARRAY)
+        vsf_evt_node_t                    **nodes;
+        uint8_t                             node_bit_sz;
+#endif
+#   if defined(__VSF_OS_CFG_EVTQ_LIST)
         vsf_pool_block(vsf_evt_node_pool)   *nodes_buf_ptr;
         uint16_t                            node_cnt;
-    }evt_queue;
 #   endif
+
+        uint16_t                            queue_cnt;
+    }evt_queue;
+
 #endif
-#if VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     struct {
         vsf_pool_block(vsf_eda_frame_pool)  *frame_buf_ptr;
         uint16_t                            frame_cnt;
@@ -94,10 +104,16 @@ extern const code_region_t VSF_SCHED_SAFE_CODE_REGION;
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_CFG_PREMPT_EN
+//! vsf_kernel_os_start and vsf_kernel_os_run_priority are ONLY used when __vsf_main_entry is not used
+extern void vsf_kernel_os_start(void);
+extern void vsf_kernel_os_run_priority(vsf_prio_t priority);
+
+extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
+
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 extern vsf_sched_lock_status_t vsf_sched_lock(void);
 extern void vsf_sched_unlock(vsf_sched_lock_status_t origlevel);
-extern void vsf_kernel_os_init(void);
 #endif
 
+#endif
 #endif

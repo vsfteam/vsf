@@ -3,6 +3,8 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
+#include "kernel/vsf_kernel.h"
+
 #include "usb_type.h"
 
 #include "usb_ch9.h"

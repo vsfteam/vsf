@@ -31,7 +31,7 @@
 
 extern const vsf_usbh_class_drv_t vsf_usbh_hub_drv;
 
-extern bool vsf_usbh_hub_dev_is_reset(struct vsf_usbh_dev_t *dev);
+extern bool vsf_usbh_hub_is_dev_resetting(struct vsf_usbh_dev_t *dev);
 extern vsf_err_t vsf_usbh_hub_reset_dev(struct vsf_usbh_dev_t *dev);
 
 #endif

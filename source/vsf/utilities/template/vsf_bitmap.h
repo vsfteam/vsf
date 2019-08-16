@@ -98,7 +98,7 @@ typedef uint32_t __vsf_bitmap(__name)[((__bitsize) + 31) / 32];
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_bitmap_reset(uint32_t *pbitmap, uint_fast16_t bitsize);
-extern int __vsf_bitmap_ffz(uint32_t *pbitmap, uint_fast16_t bitsize);
+extern void __vsf_bitmap_reset(uint_fast32_t* pthis, uint_fast16_t bitsize);
+extern int32_t __vsf_bitmap_ffz(uint32_t* pbitmap, uint_fast16_t bitsize);
 
 #endif

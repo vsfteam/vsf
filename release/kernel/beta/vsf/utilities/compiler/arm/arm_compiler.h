@@ -310,7 +310,7 @@ static ALWAYS_INLINE uint32_t ____disable_irq(void)
 
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   define DISABLE_GLOBAL_INTERRUPT()           __disable_irq()
-#elif __IS_COMPILER_ARM_COMPILER_6__
+#elif __IS_COMPILER_ARM_COMPILER_6__ && !defined(__CMSIS_ARMCC_V6_H)
 #   define DISABLE_GLOBAL_INTERRUPT()           __disable_irq()
 #elif __IS_COMPILER_GCC_
 #   define DISABLE_GLOBAL_INTERRUPT()           __disable_irq()

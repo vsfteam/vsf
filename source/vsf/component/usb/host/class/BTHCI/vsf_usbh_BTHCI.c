@@ -154,7 +154,7 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         bthci->is_initing = true;
-        err = vsf_eda_crit_enter(&dev->ep0.crit, -1);
+        err = __vsf_eda_crit_npb_enter(&dev->ep0.crit);
         if (VSF_ERR_NONE != err) {
             break;
         }
@@ -165,7 +165,7 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_MESSAGE:
         if (bthci->is_initing) {
             bthci->is_initing = false;
-            vsf_eda_crit_leave(&dev->ep0.crit);
+            __vsf_eda_crit_npb_leave(&dev->ep0.crit);
 
             err = vsf_usbh_urb_get_status(&dev->ep0.urb);
             if (VSF_ERR_NONE != err) {
@@ -190,7 +190,7 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         } else {
             vsf_usbh_bthci_iocb_t *iocb = vsf_usbh_bthci_get_iocb(bthci, (vsf_usbh_hcd_urb_t *)vsf_eda_get_cur_msg());
             vsf_usbh_urb_t *urb;
-            ASSERT(iocb != NULL);
+            VSF_USB_ASSERT(iocb != NULL);
             urb = &iocb->urb;
 
             int_fast16_t status = vsf_usbh_urb_get_status(urb);
@@ -206,7 +206,7 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             } else {
                 if (iocb->is_ep0_claimed) {
                     iocb->is_ep0_claimed = false;
-                    vsf_eda_crit_leave(&dev->ep0.crit);
+                    __vsf_eda_crit_npb_leave(&dev->ep0.crit);
                 }
                 if (URB_OK == status) {
                     vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
@@ -331,9 +331,13 @@ static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     bthci->scoout_ocb.is_icb = false;
 #endif
 
-    bthci->eda.evthandler = vsf_usbh_bthci_evthandler;
+    if (VSF_ERR_NONE != vsf_eda_set_evthandler(&(bthci->eda), vsf_usbh_bthci_evthandler)) {
+        VSF_USB_ASSERT(false);
+    }
+
+    //bthci->eda.evthandler = vsf_usbh_bthci_evthandler;
     bthci->eda.on_terminate = vsf_usbh_bthci_on_eda_terminate;
-    vsf_eda_init(&bthci->eda, vsf_priority_inherit, false);
+    vsf_eda_init(&bthci->eda, vsf_prio_inherit, false);
     return bthci;
 
 free_all:
@@ -386,7 +390,7 @@ vsf_err_t vsf_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t
 
     switch (type) {
     case BTHCI_PACKET_TYPE_CMD:
-        if (ocb->is_ep0_claimed || vsf_eda_crit_enter(&bthci->dev->ep0.crit, 0)) {
+        if (ocb->is_ep0_claimed || __vsf_eda_crit_npb_try_to_enter(&bthci->dev->ep0.crit, 0)) {
             return VSF_ERR_NOT_AVAILABLE;
         }
 

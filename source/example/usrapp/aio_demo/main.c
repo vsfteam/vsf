@@ -32,12 +32,18 @@ extern void usbd_demo_start(void);
 extern void tcpip_demo_start(void);
 extern void input_demo_start(void);
 extern void ui_demo_start(void);
+extern void ai_demo_start(void);
+
+// remove later
+void ai_demo_init(void);
+extern void ai_demo_mnist(uint_fast8_t index);
 
 /*============================ IMPLEMENTATION ================================*/
 
 void main(void)
 {
     vsf_trace_init(NULL);
+    vsf_stdio_init();
 
     usbh_demo_start();
     tcpip_demo_start();
@@ -47,8 +53,11 @@ void main(void)
     // bt_demo uses usbh_demo, support USB bt dongle CSR8510
     bt_demo_start();
 
+    ai_demo_init();
+    ai_demo_mnist(1);
+
     // ui_demo will not return, so call last
-    // and VSF_OS_CFG_RUN_MAIN_AS_THREAD MUST NOT be enabled
+    // and VSF_OS_CFG_MAIN_MODE MUST be VSF_OS_CFG_MAIN_MODE_BAREMETAL
     // ui_demo uses usbd_demo, ui is implemented over UVC
     ui_demo_start();
 }

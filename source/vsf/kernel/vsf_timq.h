@@ -22,7 +22,9 @@
 
 #include "kernel/vsf_kernel_cfg.h"
 
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_USE_KERNEL == ENABLED
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 
 #include "./vsf_timq_dlist.h"
 // todo: impelement vsf_timq_rbtree.h
@@ -33,5 +35,5 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#endif
 #endif

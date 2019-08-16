@@ -77,7 +77,7 @@ implement_pbuf_pool(general_pbuf_pool_t)
 vsf_stream_tx_t *vsf_stream_src_get_tx(vsf_stream_src_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_src_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
 
     return this.ptTX;
 }
@@ -91,14 +91,14 @@ vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *ptObj,
     /*! \note check them seperately to avoid busfault, in order to give the right 
               diagnosis info
      */
-    ASSERT(     (NULL != ptThis)
+    VSF_SERVICE_ASSERT(     (NULL != ptThis)
             &&  (NULL != ptCFG));
     if ( NULL == ptCFG->ptTX ) {
         return VSF_ERR_INVALID_PTR;
     }
-    ASSERT( NULL != ptCFG->ptTX->piMethod );
-    ASSERT( NULL != ptCFG->ptTX->piMethod->DataDrainEvent.Register );
-    ASSERT( NULL != ptCFG->ptTX->piMethod->Send );
+    VSF_SERVICE_ASSERT( NULL != ptCFG->ptTX->piMethod );
+    VSF_SERVICE_ASSERT( NULL != ptCFG->ptTX->piMethod->DataDrainEvent.Register );
+    VSF_SERVICE_ASSERT( NULL != ptCFG->ptTX->piMethod->Send );
 
     this.use_as__vsf_stream_src_cfg_t = *ptCFG;
 
@@ -140,14 +140,14 @@ vsf_pbuf_t *vsf_stream_src_new_pbuf (      vsf_stream_src_t *ptObj,
     /*! \note check them seperately to avoid busfault, in order to give the right 
               diagnosis info
      */
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     vsf_pbuf_t *pbuf = NULL;
     do {
         if ( NULL == this.ptTX ) {
             break;
         }
-        ASSERT( NULL != this.ptTX->piMethod );
-        ASSERT( NULL != this.ptTX->piMethod->GetStatus );
+        VSF_SERVICE_ASSERT( NULL != this.ptTX->piMethod );
+        VSF_SERVICE_ASSERT( NULL != this.ptTX->piMethod->GetStatus );
         vsf_stream_status_t tStatus = this.ptTX->piMethod->GetStatus(this.ptTX);
         UNUSED_PARAM(tStatus);
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
@@ -162,7 +162,7 @@ vsf_pbuf_t *vsf_stream_src_new_pbuf (      vsf_stream_src_t *ptObj,
             break;
         }
     #endif
-        ASSERT(NULL != this.tRequestPBUFEvent.fnHandler);
+        VSF_SERVICE_ASSERT(NULL != this.tRequestPBUFEvent.fnHandler);
         pbuf =  this.tRequestPBUFEvent.fnHandler(this.tRequestPBUFEvent.pTarget, 
                                                 nNoLessThan, 
                                                 nBestSize,
@@ -185,7 +185,7 @@ vsf_err_t vsf_stream_src_set_limitation(    vsf_stream_src_t *ptObj,
                                             uint_fast16_t hwpbufPoolReserve)
 {
     class_internal(ptObj, ptThis, vsf_stream_src_t);
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     
     this.hwpbufCountUpLimit = hwpbufCountUpLimit;
     this.hwpbufPoolReserve = hwpbufPoolReserve;
@@ -201,12 +201,12 @@ vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *ptObj,
     /*! \note check them seperately to avoid busfault, in order to give the right 
               diagnosis info
      */
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     if (NULL == this.ptTX) {
         return VSF_ERR_INVALID_PTR;
     }
 
-    ASSERT(NULL != this.ptTX->piMethod);
+    VSF_SERVICE_ASSERT(NULL != this.ptTX->piMethod);
 
     if (NULL == ptOldBlock) {
         return VSF_ERR_INVALID_PTR;
@@ -229,15 +229,15 @@ vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *ptObj,
     /*! \note check them seperately to avoid busfault, in order to give the right 
               diagnosis info
      */
-    ASSERT(     (NULL != ptThis)
+    VSF_SERVICE_ASSERT(     (NULL != ptThis)
             &&  (NULL != ptCFG));
     if ( NULL == ptCFG->ptRX ) {
         return VSF_ERR_INVALID_PTR;
     }
 
-    ASSERT( NULL != ptCFG->ptRX->piMethod );
-    ASSERT( NULL != ptCFG->ptRX->piMethod->DataReadyEvent.Register );
-    ASSERT( NULL != ptCFG->ptRX->piMethod->Fetch );
+    VSF_SERVICE_ASSERT( NULL != ptCFG->ptRX->piMethod );
+    VSF_SERVICE_ASSERT( NULL != ptCFG->ptRX->piMethod->DataReadyEvent.Register );
+    VSF_SERVICE_ASSERT( NULL != ptCFG->ptRX->piMethod->Fetch );
 
     do {
         this.ptRX = ptCFG->ptRX;
@@ -259,12 +259,12 @@ vsf_pbuf_t *vsf_stream_usr_fetch_pbuf ( vsf_stream_usr_t *ptObj)
     /*! \note check them seperately to avoid busfault, in order to give the right 
               diagnosis info
      */
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     if (NULL == this.ptRX) {
         return NULL;
     }
-    ASSERT(NULL != this.ptRX->piMethod);
-    ASSERT(NULL != this.ptRX->piMethod->Fetch);
+    VSF_SERVICE_ASSERT(NULL != this.ptRX->piMethod);
+    VSF_SERVICE_ASSERT(NULL != this.ptRX->piMethod->Fetch);
 
     //! read stream
     return this.ptRX->piMethod->Fetch(this.ptRX);
@@ -275,12 +275,12 @@ void vsf_stream_usr_open ( vsf_stream_usr_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_usr_t);
 
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     if (NULL == this.ptRX) {
         return ;
     }
-    ASSERT(NULL != this.ptRX->piMethod);
-    ASSERT(NULL != this.ptRX->piMethod->Open);
+    VSF_SERVICE_ASSERT(NULL != this.ptRX->piMethod);
+    VSF_SERVICE_ASSERT(NULL != this.ptRX->piMethod->Open);
 
     this.ptRX->piMethod->Open(this.ptRX);
 }
@@ -289,12 +289,12 @@ void vsf_stream_usr_close ( vsf_stream_usr_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_usr_t);
 
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     if (NULL == this.ptRX) {
         return ;
     }
-    ASSERT(NULL != this.ptRX->piMethod);
-    ASSERT(NULL != this.ptRX->piMethod->Close);
+    VSF_SERVICE_ASSERT(NULL != this.ptRX->piMethod);
+    VSF_SERVICE_ASSERT(NULL != this.ptRX->piMethod->Close);
 
     this.ptRX->piMethod->Close(this.ptRX);
 }

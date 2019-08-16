@@ -112,15 +112,18 @@
                             __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist)    /* the address of the list */           \
-    for (__host_type *_ = (__plist)->head; _ != NULL; _ = _->__member.next)
+    for (   __host_type *_ = (__host_type *)((__plist)->head);                  \
+            _ != NULL;                                                          \
+            _ = (__host_type *)(_->__member.next))
 
 #define __vsf_slist_foreach_next_unsafe(                                        \
                             __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist)    /* the address of the list */           \
-    for (__host_type *_ = (__plist)->head, *__ = _ ? _->__member.next : NULL;   \
+    for (   __host_type *_ = (__host_type *)((__plist)->head),                  \
+                *__ = _ ? (__host_type *)(_->__member.next) : NULL;             \
             _ != NULL;                                                          \
-            _ = __, __ = _ ? _->__member.next : NULL)
+            _ = __, __ = _ ? (__host_type *)(_->__member.next) : NULL)
             
 
 #define __vsf_slist_foreach(__host_type,/* the type of the host type */         \
@@ -296,11 +299,11 @@
         }                                                                       \
     } while (0)
 
-#define __vsf_dlist_insert(     __host_type,  /* type of the host object */     \
-                                __member,     /* the name of the list */        \
-                                __plist,      /* the address of the list */     \
-                                __pitem,      /* the address of the new item */ \
-                                ...)          /* how to find insert point */    \
+#define __vsf_dlist_insert(     __host_type,/* type of the host object */       \
+                                __member,   /* the name of the list */          \
+                                __plist,    /* the address of the list */       \
+                                __pitem,    /* the address of the new item */   \
+                                ...)        /* how to find insert point */      \
     do {                                                                        \
         vsf_dlist_init_node(__host_type, __member, __pitem);                    \
         vsf_dlist_node_t *__ = (vsf_dlist_node_t *)(__plist);                   \
@@ -320,6 +323,16 @@
                     __host_type, __member, __plist, (__pitem));                 \
         }                                                                       \
     } while (0)
+
+#define __vsf_dlist_foreach_unsafe(                                             \
+                            __host_type,    /* the type of the host type */     \
+                            __member,       /* the member name of the list */   \
+                            __plist)        /* the address of the list */       \
+    for (   __host_type *_ = NULL == (__plist)->head ? NULL :                   \
+                __vsf_dlist_get_host(__host_type, __member, (__plist)->head);   \
+            _ != NULL;                                                          \
+            _ = NULL == _->__member.next ? NULL:                                \
+                __vsf_dlist_get_host(__host_type, __member, _->__member.next))
 
 
 /*-----------------------------------------------------------------------------*
@@ -499,7 +512,7 @@
             vsf_slist_is_empty(&(__pqueue)->head)
 
 #define vsf_slist_queue_init(__pqueue)                                          \
-            __vsf_slist_queue_init((__pqueue))
+            __vsf_slist_queue_init((__pqueue))  /* the address of the queue */
 
 #define vsf_slist_queue_enqueue(    __host_type,/* the type of the host type */ \
                                     __member,   /* the member name of the list*/\

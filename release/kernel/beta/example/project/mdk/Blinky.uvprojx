@@ -10,7 +10,7 @@
       <TargetName>template_armv7-m_ac6</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130000::V6.13.0.1 (dev drop 1) for Armv8.1-M and MVE::..\..\Program Files\ARMCompiler6.13DevdropforArmv8.1-MandMVE</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -335,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-fms-extensions -Wno-empty-body -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
+              <MiscControls>-fms-extensions -Wno-enum-conversion -Wno-empty-body -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>_MSC_VER</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
@@ -682,6 +682,62 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -813,9 +869,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>::Board Support</GroupName>
-        </Group>
-        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
@@ -896,7 +949,7 @@
       <TargetName>template_armv6-m_ac6</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130000::V6.13.0.1 (dev drop 1) for Armv8.1-M and MVE::..\..\Program Files\ARMCompiler6.13DevdropforArmv8.1-MandMVE</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1221,7 +1274,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-fms-extensions -Wno-empty-body -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
+              <MiscControls>-fms-extensions -Wno-enum-conversion -Wno-empty-body -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
               <Define>_MSC_VER</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
@@ -1568,6 +1621,62 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1697,9 +1806,6 @@
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::Board Support</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -2107,7 +2213,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--diag_suppress=64,1,381,177,111 --wchar32</MiscControls>
+              <MiscControls>--diag_suppress=64,1,381,177,111,188 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
@@ -2454,6 +2560,62 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2583,9 +2745,6 @@
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::Board Support</GroupName>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>
@@ -2993,7 +3152,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--diag_suppress=64,1,381,177,111 --wchar32</MiscControls>
+              <MiscControls>--diag_suppress=64,1,381,177,111,188 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
@@ -3059,57 +3218,6 @@
               <FileName>main_thread_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_thread_simple.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
             </File>
             <File>
               <FileName>main_task_simple.c</FileName>
@@ -3227,6 +3335,57 @@
               <FileName>main_cross_task_example.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_cross_task_example.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>main_pt_simple.c</FileName>
@@ -3288,6 +3447,62 @@
               <FileName>main_full_feature_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_full_feature_demo.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -3471,9 +3686,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>::Board Support</GroupName>
-        </Group>
-        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
@@ -3557,15 +3769,6 @@
     <components>
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.2.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.5.1"/>
-        <targetInfos>
-          <targetInfo name="template_armv6-m_ac5"/>
-          <targetInfo name="template_armv6-m_ac6"/>
-          <targetInfo name="template_armv7-m_ac5"/>
-          <targetInfo name="template_armv7-m_ac6"/>
-        </targetInfos>
-      </component>
-      <component Cbundle="V2M-MPS2" Cclass="Board Support" Cgroup="Common" Cvendor="Keil" Cversion="2.0.0" condition="CMSDK CMSIS">
-        <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
         <targetInfos>
           <targetInfo name="template_armv6-m_ac5"/>
           <targetInfo name="template_armv6-m_ac6"/>

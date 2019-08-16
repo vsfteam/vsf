@@ -64,14 +64,14 @@ void vsf_kernel_thread_simple_demo(void)
     {
         static NO_INIT user_thread_a_t __user_task_a;
         __user_task_a.param.psem = &user_sem;
-        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_priority_0);
+        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
     
     //! start the user task b
     {
         static NO_INIT user_thread_b_t __user_task_b;
         __user_task_b.param.psem = &user_sem;
-        init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_priority_0);
+        init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_prio_0);
     }
 }
 
@@ -79,7 +79,7 @@ implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_delay_ms(1000);
+        vsf_delay_ms(1);
         printf("post semaphore...     [%08x]\r\n", cnt++);
         vsf_sem_post(this.psem);            //!< post a semaphore
     }
@@ -110,10 +110,11 @@ int main(void)
     
     vsf_kernel_thread_simple_demo();
     
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
+#if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay_ms(1000);
+        vsf_yield();
     }
 #else
     return 0;

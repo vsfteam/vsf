@@ -16,8 +16,6 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "../../__common.h"
 #include "./usbd_hs.h"
 
 #if VSF_HAL_USBD_TRACE_EN == ENABLED
@@ -147,7 +145,7 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
         reg->OPER = HSUSBD_OPER_HISPDEN_Msk;
         break;
     default:
-        ASSERT(false);
+        VSF_HAL_ASSERT(false);
         return VSF_ERR_NOT_SUPPORT;
     }
 
@@ -277,14 +275,14 @@ vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_t
     int_fast8_t idx;
 
     if (usbd_hs->ep_buf_ptr < size) {
-        ASSERT(false);
+        VSF_HAL_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 
     reg = m480_usbd_hs_get_reg(usbd_hs);
     idx = m480_usbd_hs_get_free_idx(usbd_hs, ep);
     if (idx < 0) {
-        ASSERT(false);
+        VSF_HAL_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
 
@@ -492,7 +490,7 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
 #ifdef M480_USBD_HS_WROKAROUND_ISO
         uint32_t ep_int_en = M480_USBD_EP_REG(idx, EP[0].EPINTEN) & HSUSBD_EPINTEN_TXPKIEN_Msk;
         M480_USBD_EP_REG(idx, EP[0].EPINTEN) &= ~HSUSBD_EPINTEN_TXPKIEN_Msk;
-            ASSERT(!(usbd_hs->ep_tx_mask & (1 << idx)));
+            VSF_HAL_ASSERT(!(usbd_hs->ep_tx_mask & (1 << idx)));
             M480_USBD_EP_REG(idx, EP[0].EPTXCNT) = size;
             usbd_hs->param->tx_retry_cnt[idx] = 0;
             usbd_hs->param->tx_size[idx] = size;

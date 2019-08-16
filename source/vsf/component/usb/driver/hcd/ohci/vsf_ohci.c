@@ -193,11 +193,6 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define usb_gettoggle(dev, ep, out) (((dev)->toggle[out] >> (ep)) & 1)
-#define usb_dotoggle(dev, ep, out)  ((dev)->toggle[out] ^= (1 << (ep)))
-#define usb_settoggle(dev, ep, out, bit) \
-    ((dev)->toggle[out] = ((dev)->toggle[out] & ~(1 << (ep))) | ((bit) << (ep)))
-
 #define CC_TO_ERROR(cc) (cc == 0 ? VSF_ERR_NONE : -cc)
 
 /*============================ TYPES =========================================*/
@@ -360,7 +355,7 @@ implement_vsf_pool(ohci_td_pool, ohci_td_t);
 
 static NO_INIT vsf_pool(ohci_td_pool) __vsf_ohci_td_pool;
 
-static ohci_td_t *ohci_td_alloc(void)
+static ohci_td_t * ohci_td_alloc(void)
 {
     ohci_td_t *td = VSF_POOL_ALLOC(ohci_td_pool, &__vsf_ohci_td_pool);
     if (td != NULL) {
@@ -485,7 +480,7 @@ static vsf_err_t ohci_ed_schedule(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
             ed->interval = 32;
         ed->branch = ohci_ed_balance(ohci, ed->interval, ed->load);
         if (ed->branch < 0) {
-            ASSERT(false);
+            VSF_USB_ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
         ohci_link_periodic(ohci, ed);
@@ -551,12 +546,12 @@ static vsf_err_t ohci_ed_init(ohci_urb_t *urb_ohci, vsf_usbh_hcd_urb_t *urb)
     ohci_ed_t *ed;
     ohci_td_t *td;
 
-    ASSERT((urb_ohci != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((urb_ohci != NULL) && (urb != NULL));
 
     /* dummy td; end of td list for ed */
     td = ohci_td_alloc();
     if (!td) {
-        ASSERT(false);
+        VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     td->urb_ohci = urb_ohci;
@@ -614,7 +609,7 @@ static ohci_td_t * ohci_td_fill(ohci_td_t *td, uint_fast32_t info, void *data,
 {
     ohci_td_t *td_tmp;
 
-    ASSERT(td != NULL);
+    VSF_USB_ASSERT(td != NULL);
 
     td_tmp = urb_ohci->ed->td_dummy;
     urb_ohci->ed->td_dummy = td;
@@ -639,7 +634,7 @@ static ohci_td_t * ohci_td_fill_iso(ohci_td_t *td, uint_fast32_t info, void *dat
     uint_fast32_t bufferStart;
     vsf_usbh_hcd_urb_t *urb = container_of(urb_ohci, vsf_usbh_hcd_urb_t, priv);
 
-    ASSERT(td != NULL);
+    VSF_USB_ASSERT(td != NULL);
 
     td_tmp = urb_ohci->ed->td_dummy;
     urb_ohci->ed->td_dummy = td;
@@ -671,7 +666,7 @@ static void ohci_td_submit_urb(vsf_ohci_t *ohci, struct vsf_usbh_hcd_urb_t *urb)
     uint_fast32_t data_len, info, n, m;
     void *data;
 
-    ASSERT((ohci != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((ohci != NULL) && (urb != NULL));
     regs = ohci->regs;
     urb_ohci = (ohci_urb_t *)urb->priv;
     urb_ohci->td_num_served = 0;
@@ -1002,7 +997,7 @@ static void ohci_interrupt(void *param)
     regs->intrenable = OHCI_INTR_MIE;
 }
 
-static vsf_ohci_t *ohci_alloc_resource(void)
+static vsf_ohci_t * ohci_alloc_resource(void)
 {
     uint_fast16_t ohci_size = (sizeof(vsf_ohci_t) + 31) & ~31;
     vsf_ohci_t *ohci = VSF_USBH_MALLOC_ALIGNED(ohci_size, 256);
@@ -1063,9 +1058,11 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
     vsf_ohci_param_t *ohci_param;
     ohci_regs_t *regs;
 
-    ASSERT(hcd != NULL);
-    ohci = hcd->priv;
-    regs = ohci->regs;
+    VSF_USB_ASSERT(hcd != NULL);
+    if (hcd->priv != NULL) {
+        ohci = hcd->priv;
+        regs = ohci->regs;
+    }
     ohci_param = hcd->param;
 
     switch (evt) {
@@ -1073,7 +1070,7 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
         hcd->rh_speed = USB_SPEED_FULL;
         ohci = hcd->priv = ohci_alloc_resource();
         if (!ohci) {
-            ASSERT(false);
+            VSF_USB_ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
 
@@ -1085,7 +1082,11 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
             };
             ohci_param->op->Init(&cfg);
         }
-        regs = ohci->regs = (ohci_regs_t *)ohci_param->op->GetRegBase();
+        {
+            usb_hc_ip_info_t info;
+            ohci_param->op->GetInfo(&info);
+            regs = ohci->regs = info.regbase;
+        }
 
         regs->intrdisable = OHCI_INTR_MIE;
         regs->control = 0;
@@ -1107,8 +1108,11 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
             ohci->state++;
             break;
         case OHCI_HCD_STATE_READY:
-            ohci->eda.evthandler = ohci_ed_free_evthanlder;
-            vsf_eda_init(&ohci->eda, vsf_priority_inherit, false);
+            if (VSF_ERR_NONE != vsf_eda_set_evthandler(&ohci->eda, ohci_ed_free_evthanlder)) {
+                VSF_USB_ASSERT(false);
+            }
+            //ohci->eda.evthandler = ohci_ed_free_evthanlder;
+            vsf_eda_init(&ohci->eda, vsf_prio_inherit, false);
             return VSF_ERR_NONE;
         }
     }
@@ -1130,14 +1134,14 @@ static vsf_err_t ohci_resume(vsf_usbh_hcd_t *hcd)
     return VSF_ERR_NONE;
 }
 
-static vsf_usbh_hcd_urb_t *ohci_alloc_urb(vsf_usbh_hcd_t *hcd)
+static vsf_usbh_hcd_urb_t * ohci_alloc_urb(vsf_usbh_hcd_t *hcd)
 {
     uint_fast32_t size;
     vsf_usbh_hcd_urb_t *urb = NULL;
     ohci_urb_t *urb_ohci;
     ohci_ed_t *ed;
 
-    ASSERT(hcd != NULL);
+    VSF_USB_ASSERT(hcd != NULL);
 
     size = sizeof(ohci_ed_t) + sizeof(vsf_usbh_hcd_urb_t) + sizeof(ohci_urb_t);
     ed = VSF_USBH_MALLOC_ALIGNED(size, 16);
@@ -1161,10 +1165,10 @@ static void ohci_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     vsf_ohci_t *ohci;
     ohci_urb_t *urb_ohci;
 
-    ASSERT((hcd != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
     ohci = (vsf_ohci_t *)hcd->priv;
     urb_ohci = (ohci_urb_t *)urb->priv;
-    ASSERT((ohci != NULL) && (urb_ohci != NULL));
+    VSF_USB_ASSERT((ohci != NULL) && (urb_ohci != NULL));
 
     if (urb_ohci->state) {
         urb_ohci->state &= ~URB_PRIV_WAIT_COMPLETE;
@@ -1188,10 +1192,10 @@ static vsf_err_t ohci_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     ohci_ed_t *ed;
     ohci_td_t *td;
 
-    ASSERT((hcd != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
     ohci = (vsf_ohci_t *)hcd->priv;
     urb_ohci = (ohci_urb_t *)urb->priv;
-    ASSERT((ohci != NULL) && (urb_ohci != NULL));
+    VSF_USB_ASSERT((ohci != NULL) && (urb_ohci != NULL));
 
     if (ohci->state != OHCI_HCD_STATE_READY) {
         return VSF_ERR_FAIL;
@@ -1260,11 +1264,11 @@ static vsf_err_t ohci_relink_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     vsf_ohci_t *ohci;
     ohci_urb_t *urb_ohci;
 
-    ASSERT((hcd != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
     ohci = (vsf_ohci_t *)hcd->priv;
-    ASSERT(ohci != NULL);
+    VSF_USB_ASSERT(ohci != NULL);
     urb_ohci = (ohci_urb_t *)urb->priv;
-    ASSERT(urb_ohci != NULL);
+    VSF_USB_ASSERT(urb_ohci != NULL);
 
     if (urb_ohci->state != (URB_PRIV_EDLINK | URB_PRIV_TDALLOC)) {
         return VSF_ERR_FAIL;
@@ -1281,7 +1285,7 @@ static vsf_err_t ohci_relink_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     case USB_ENDPOINT_XFER_INT:
         break;
     default:
-        ASSERT(false);
+        VSF_USB_ASSERT(false);
     }
 
     urb->actual_length = 0;
@@ -1301,9 +1305,9 @@ static int ohci_rh_control(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     uint8_t *data = (uint8_t*)datadw;
     uint_fast8_t len = 0;
 
-    ASSERT((hcd != NULL) && (urb != NULL));
+    VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
     ohci = (vsf_ohci_t *)hcd->priv;
-    ASSERT(ohci != NULL);
+    VSF_USB_ASSERT(ohci != NULL);
     regs = ohci->regs;
 
     typeReq = (req->bRequestType << 8) | req->bRequest;

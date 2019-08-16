@@ -37,7 +37,7 @@
 
 struct __w600_common_t {
     struct {
-        vsf_swi_hanler_t *handler;
+        vsf_swi_handler_t *handler;
         void *pparam;
     } swi[SWI_COUNT];
 };
@@ -54,10 +54,12 @@ static __w600_common_t __w600_common;
 // SWI
 MREPEAT(SWI_COUNT, __W600_SWI, NULL)
 
-vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
-                            vsf_swi_hanler_t *handler, void *pparam)
+vsf_err_t vsf_drv_swi_init( uint_fast8_t idx, 
+                            vsf_arch_prio_t priority,
+                            vsf_swi_handler_t *handler, 
+                            void *pparam)
 {
-    ASSERT(idx < SWI_COUNT);
+    VSF_HAL_ASSERT(idx < SWI_COUNT);
 
     if (handler != NULL) {
         __w600_common.swi[idx].handler = handler;
@@ -73,7 +75,7 @@ vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
 
 void vsf_drv_swi_trigger(uint_fast8_t idx)
 {
-    ASSERT(idx < SWI_COUNT);
+    VSF_HAL_ASSERT(idx < SWI_COUNT);
 
     NVIC_SetPendingIRQ(SWI_START_IRQ + idx);
 }

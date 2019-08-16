@@ -18,6 +18,9 @@
 /*============================ INCLUDES ======================================*/
 #define __VSF_EDA_CLASS_IMPLEMENT
 #include "kernel/vsf_kernel_cfg.h"
+
+#if VSF_USE_KERNEL == ENABLED
+
 #include "./vsf_kernel_common.h"
 
 #include "./vsf_eda.h"
@@ -25,7 +28,7 @@
 
 #include "./vsf_os.h"
 
-#ifdef VSF_CFG_EVTQ_ARRAY
+#ifdef __VSF_OS_CFG_EVTQ_ARRAY
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -43,7 +46,7 @@ extern vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq);
 SECTION(".text.vsf.kernel.eda")
 extern void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt);
 
-extern vsf_evtq_t *__vsf_os_evtq_get(vsf_priority_t priority);
+extern vsf_evtq_t *__vsf_os_evtq_get(vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis);
 extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis);
 
@@ -55,7 +58,7 @@ static bool __vsf_eda_terminate(vsf_eda_t *pthis)
 {
     bool terminate;
 
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     terminate = !pthis->evt_cnt;
     if (terminate) {
@@ -74,7 +77,7 @@ void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
 
 vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
 {
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
     pthis->cur.eda = NULL;
     pthis->cur.evt = VSF_EVT_INVALID;
     pthis->cur.msg = NULL;
@@ -91,22 +94,22 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
 {
     vsf_evtq_t *evtq;
     uint_fast8_t tail, tail_next, mask;
-    istate_t orig;
+    vsf_protect_t orig;
 
-    ASSERT(eda != NULL);
-    evtq = __vsf_os_evtq_get((vsf_priority_t)eda->cur_priority);
+    VSF_KERNEL_ASSERT(eda != NULL);
+    evtq = __vsf_os_evtq_get((vsf_prio_t)eda->cur_priority);
     mask = (1 << evtq->bitsize) - 1;
 
-    orig = vsf_disable_interrupt();
+    orig = vsf_protect_int();
     if (eda->evt_cnt && eda->is_limitted && !force) {
-        vsf_set_interrupt(orig);
+        vsf_unprotect_int(orig);
         return VSF_ERR_FAIL;
     }
     tail = evtq->tail;
     tail_next = (tail + 1) & mask;
     if (tail_next == evtq->head) {
-        vsf_set_interrupt(orig);
-        ASSERT(false);
+        vsf_unprotect_int(orig);
+        VSF_KERNEL_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     evtq->tail = tail_next;
@@ -118,7 +121,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     evtq->node[tail].value = value;
 #endif
     eda->evt_cnt++;
-    vsf_set_interrupt(orig);
+    vsf_unprotect_int(orig);
 
     return __vsf_os_evtq_activate(evtq);
 }
@@ -152,8 +155,9 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
     vsf_evt_node_t *node;
     vsf_eda_t *eda;
     uint_fast8_t size;
+    vsf_protect_t orig;
 
-    ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(pthis != NULL);
     size = 1 << pthis->bitsize;
 
     evtq_orig = __vsf_set_cur_evtq(pthis);
@@ -165,7 +169,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
         if (eda != NULL) {
 
             if (!eda->is_to_exit) {
-                vsf_interrupt_safe(){
+                orig = vsf_protect_int();
                     pthis->cur.eda = eda;
 
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
@@ -181,17 +185,17 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                         pthis->cur.msg = (void *)value;
                     }
 #endif
-                }
+                vsf_unprotect_int(orig);
 
                 __vsf_dispatch_evt(eda, pthis->cur.evt);
             }
 
-            vsf_interrupt_safe(){
+            orig = vsf_protect_int();
                 pthis->cur.eda = NULL;
                 pthis->cur.evt = VSF_EVT_INVALID;
                 pthis->cur.msg = NULL;
                 eda->evt_cnt--;
-            }
+            vsf_unprotect_int(orig);
             pthis->cur.eda = NULL;
 
             if (eda->is_to_exit) {
@@ -202,5 +206,5 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
     __vsf_set_cur_evtq(evtq_orig);
     return VSF_ERR_NONE;
 }
-
+#endif
 #endif

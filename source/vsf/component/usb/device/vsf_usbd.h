@@ -49,11 +49,11 @@
 #endif
 
 #if (VSF_USBD_CFG_USE_EDA == ENABLED) && !defined(VSF_USBD_CFG_EDA_PRIORITY)
-#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_priority_0
+#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_prio_0
 #endif
 
 #if !defined(VSF_USBD_CFG_HW_PRIORITY)
-#   define VSF_USBD_CFG_HW_PRIORITY         vsf_priority_0
+#   define VSF_USBD_CFG_HW_PRIORITY         vsf_arch_prio_0
 #endif
 
 #define VSF_USBD_DESC_DEVICE(__LANID, __DESC, __SIZE)                           \

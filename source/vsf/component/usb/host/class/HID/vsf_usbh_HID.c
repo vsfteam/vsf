@@ -77,7 +77,7 @@ static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (VSF_ERR_NONE != vsf_eda_crit_enter(&dev->ep0.crit, -1)) {
+        if (VSF_ERR_NONE != __vsf_eda_crit_npb_enter(&dev->ep0.crit)) {
             break;
         }
         // fall through
@@ -88,7 +88,10 @@ static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_MESSAGE:
-        hid->evthandler = hid->user_evthandler;
+        if (VSF_ERR_NONE != vsf_eda_set_evthandler(eda, hid->user_evthandler)) {
+            VSF_USB_ASSERT(false);
+        }
+        //hid->evthandler = hid->user_evthandler;
         hid->ep0 = &dev->ep0;
         vsf_eda_post_evt(eda, VSF_EVT_INIT);
         break;
@@ -146,9 +149,13 @@ void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     hid->ifs = ifs;
     hid->desc_len = desc_hid->desc[0].wDescriptorLength;
 
-    hid->evthandler = vsf_usbh_hid_evthandler;
+    if (VSF_ERR_NONE != vsf_eda_set_evthandler( &hid->use_as__vsf_eda_t, 
+                                                vsf_usbh_hid_evthandler)) {
+        VSF_USB_ASSERT(false);
+    }
+    //hid->evthandler = vsf_usbh_hid_evthandler;
     hid->on_terminate = vsf_usbh_hid_on_eda_terminate;
-    vsf_eda_init(&hid->use_as__vsf_eda_t, vsf_priority_inherit, false);
+    vsf_eda_init(&hid->use_as__vsf_eda_t, vsf_prio_inherit, false);
 
     return hid;
 free_all:
@@ -294,17 +301,18 @@ static void vsf_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_usbh_ep0_t *ep0 = hid->ep0;
             vsf_usbh_urb_t *urb = &ep0->urb;
             uint8_t *desc_buf;
-            uint_fast32_t desc_len, max_report_size;
+            uint_fast32_t desc_len;
+            int_fast32_t max_report_size;
 
             if (vsf_usbh_urb_get_status(urb) != URB_OK) {
-                vsf_eda_crit_leave(&ep0->crit);
+                __vsf_eda_crit_npb_leave(&ep0->crit);
                 vsf_usbh_remove_interface(hid->usbh, hid->dev, hid->ifs);
                 return;
             }
 
             desc_buf = vsf_usbh_urb_take_buffer(urb);
             desc_len = vsf_usbh_urb_get_actual_length(urb);
-            vsf_eda_crit_leave(&ep0->crit);
+            __vsf_eda_crit_npb_leave(&ep0->crit);
 
             max_report_size = vsf_usbh_hid_input_on_desc(hid, desc_buf, desc_len);
             if (max_report_size <= 0) {

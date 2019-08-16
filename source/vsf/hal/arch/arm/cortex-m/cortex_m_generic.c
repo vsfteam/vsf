@@ -27,12 +27,13 @@
 
 struct __vsf_cm_t {
     struct {
-        vsf_swi_hanler_t *handler;
+        vsf_swi_handler_t *handler;
         void *pparam;
 #if __ARM_ARCH == 6
         bool enabled;
         bool sw_pending_bit;
 #endif
+        vsf_gint_state_t global_int_state;
     } pendsv;
     struct {
         vsf_systimer_cnt_t tick;
@@ -79,6 +80,7 @@ static bool __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
     vsf_systick_set_reload(tick_cnt);
     SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;    //!< clear pending bit
     vsf_systick_clear_count();              //!< force a reload
+    vsf_systick_int_enable();
     vsf_systick_enable();
     return true;
 }
@@ -93,9 +95,11 @@ WEAK void vsf_systimer_set_idle(void)
 }
 
 ROOT void SysTick_Handler(void)
-{
+{   
+    vsf_systick_int_disable();
     __vsf_systimer_update();
     vsf_systimer_cnt_t tick = __vsf_cm.systimer.tick;
+    vsf_systick_disable();
     if (on_arch_systimer_tick_evt(tick)) {
         vsf_systimer_evthandler(tick);
     }
@@ -229,36 +233,27 @@ WEAK uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
     return vsf_systimer_tick_to_us(tick) / 1000;
 }
 
-
-WEAK vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
-        vsf_swi_hanler_t *handler, void *pparam)
-{
-    ASSERT(false);
-    return VSF_ERR_FAIL;
-}
-WEAK void vsf_drv_swi_trigger(uint_fast8_t idx)
-{
-    ASSERT(false);
-}
-
 /*! \brief initialise a software interrupt
  *! \param idx the index of the software interrupt
  *! \return initialization result in vsf_err_t
  */
-vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
-        vsf_swi_hanler_t *handler, void *pparam)
+vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, 
+                            vsf_arch_prio_t priority,
+                            vsf_swi_handler_t *handler, 
+                            void *pparam)
 {
     if (0 == idx) {
         __vsf_cm.pendsv.handler = handler;
         __vsf_cm.pendsv.pparam = pparam;
-#if __ARM_ARCH == 6
+#if __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
         __vsf_cm.pendsv.enabled = true;
         __vsf_cm.pendsv.sw_pending_bit = 0;
 #endif
         NVIC_SetPriority(PendSV_IRQn, priority);
         return VSF_ERR_NONE;
     }
-    return vsf_drv_swi_init(idx - 1, priority, handler, pparam);
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_INVALID_PARAMETER;
 }
 
 
@@ -266,12 +261,12 @@ vsf_err_t vsf_swi_init(uint_fast8_t idx, uint_fast8_t priority,
 /*! \brief trigger a software interrupt
  *! \param idx the index of the software interrupt
  */
-void vsf_swi_trigger(uint_fast8_t idx)
+void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
     if (0 == idx) {
-    #if __ARM_ARCH >= 7
+    #if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-    #elif __ARM_ARCH == 6
+    #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
         __SAFE_ATOM_CODE(
             if (__vsf_cm.pendsv.enabled) {
                 SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
@@ -280,22 +275,38 @@ void vsf_swi_trigger(uint_fast8_t idx)
             }
         )
     #endif
-    } else {
-        vsf_drv_swi_trigger(idx - 1);
+        return;
     }
+    VSF_HAL_ASSERT(false);
 }
 
-istate_t vsf_set_base_priority(istate_t priority)
+vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 {
-#if __ARM_ARCH >= 7
-    istate_t origlevel = __get_BASEPRI();
-    __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
-    return origlevel;
-#elif __ARM_ARCH == 6
-    // TODO: MUST pass multi-priority test case
-    static istate_t __basepri = 0x100;
+#if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
+    static vsf_gint_state_t __basepri = 0x100;
+    vsf_gint_state_t origlevel = __basepri;
+        
+        if (0 == priority) {
+            __set_BASEPRI(0);
+            __vsf_cm.pendsv.global_int_state = DISABLE_GLOBAL_INTERRUPT();
+            __basepri = 0;
+        } else if (priority >= 0x100) {
+            __set_BASEPRI(0);
+            __basepri = 0x100;
+            SET_GLOBAL_INTERRUPT_STATE(__vsf_cm.pendsv.global_int_state);
+            
+        } else {
+            __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
+            __basepri = __get_BASEPRI();
+        }
     
-    istate_t origlevel = __basepri;
+    return origlevel;
+    
+#elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
+    // TODO: MUST pass multi-priority test case
+    static vsf_gint_state_t __basepri = 0x100;
+    
+    vsf_gint_state_t origlevel = __basepri;
     __SAFE_ATOM_CODE(
         if (priority <= VSF_ARCH_PRIO_0) {
             //! lock sched
@@ -311,7 +322,7 @@ istate_t vsf_set_base_priority(istate_t priority)
         }
         __basepri = priority;
     )
-    return origlevel;
+    return (vsf_arch_prio_t)origlevel;
 #endif
 }
 
@@ -329,17 +340,17 @@ bool vsf_arch_init(void)
 }
 
 
-istate_t vsf_get_interrupt(void)
+vsf_gint_state_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
 }
 
-void vsf_set_interrupt(istate_t level)
+void vsf_set_interrupt(vsf_gint_state_t level)
 {
     SET_GLOBAL_INTERRUPT_STATE(level);
 }
 
-istate_t vsf_disable_interrupt(void)
+vsf_gint_state_t vsf_disable_interrupt(void)
 {
     return DISABLE_GLOBAL_INTERRUPT();
 }

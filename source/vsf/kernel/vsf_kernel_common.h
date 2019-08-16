@@ -20,40 +20,31 @@
 
 /*============================ INCLUDES ======================================*/
 #include "./vsf_kernel_cfg.h"
+
+#if VSF_USE_KERNEL == ENABLED
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_USR_SWI_NUM
-#   define VSF_USR_SWI_NUM              0
-#endif
-
-#ifndef VSF_OS_CFG_PREEPT_PRI_NUM
-#   define VSF_OS_CFG_PREEPT_PRI_NUM    1
-#endif
-
-#if VSF_OS_CFG_PREEPT_PRI_NUM > (VSF_USR_SWI_NUM + VSF_SWI_NUM)
-#   error "too many VSF_OS_CFG_PREEPT_PRI_NUM!!!"
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_SWI_PRIO_INIT(__index, __unused)                                  \
-    vsf_priority_##__index,
+    vsf_prio_##__index,
 
 /*============================ TYPES =========================================*/
 
-enum vsf_priority_t {
-    vsf_priority_inherit = -1,
-    MREPEAT(VSF_OS_CFG_PREEPT_PRI_NUM, __VSF_SWI_PRIO_INIT, NULL)
-    vsf_priority_highest = VSF_OS_CFG_PREEPT_PRI_NUM - 1,
+#define MFUNC_IN_U8_DEC_VALUE                    VSF_OS_CFG_PRIORITY_NUM
+#   include "utilities/preprocessor/mf_u8_dec2str.h"
+enum vsf_prio_t {
+    vsf_prio_inherit = -1,
+    MREPEAT(MFUNC_OUT_DEC_STR, __VSF_SWI_PRIO_INIT, NULL)
+    vsf_prio_highest = MFUNC_OUT_DEC_STR - 1,
 };
-typedef enum vsf_priority_t vsf_priority_t;
+typedef enum vsf_prio_t vsf_prio_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#endif
 #endif
 /* EOF */

@@ -110,7 +110,7 @@ vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *ptObj,
                                 vsf_stream_fifo_cfg_t *ptCFG)
 {
     class_internal(ptObj, ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
 
     memset(ptObj, 0, sizeof(vsf_stream_fifo_t));
 
@@ -137,7 +137,7 @@ vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *ptObj,
 vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *ptObj, vsf_pbuf_t *pblock)
 {
     class_internal(ptObj, ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     vsf_err_t tResult = VSF_ERR_NONE;
     
     do {
@@ -190,7 +190,7 @@ vsf_pbuf_t * vsf_pbuf_queue_peek(vsf_stream_fifo_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_fifo_t);
     vsf_pbuf_t *ptBuff = NULL;
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     
     vsf_slist_queue_peek(   vsf_pbuf_t, 
                             use_as__vsf_slist_node_t,
@@ -203,7 +203,7 @@ vsf_pbuf_t * vsf_pbuf_queue_peek(vsf_stream_fifo_t *ptObj)
 vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     vsf_pbuf_t *ptBuff = NULL;
     bool bDataDrain = false;
 
@@ -244,7 +244,7 @@ vsf_err_t vsf_pbuf_queue_data_available_event_register(
     vsf_stream_fifo_t *ptObj, vsf_stream_dat_rdy_evt_t tEventHandling)
 {
     class_internal(ptObj, ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     this.tDataReadyEventHandling = tEventHandling;
     return VSF_ERR_NONE;
 }
@@ -253,7 +253,7 @@ vsf_err_t vsf_pbuf_queue_data_drain_event_register(
     vsf_stream_fifo_t *ptObj, vsf_stream_dat_drn_evt_t tEventHandling)
 {
     class_internal(ptObj, ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     this.tDataDrainEventHandling = tEventHandling;
     return VSF_ERR_NONE;
 }
@@ -267,7 +267,7 @@ vsf_pbuf_t * __vsf_stream_pbuf_rx_fecch(vsf_stream_rx_t *ptObj)
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, RX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     
     return vsf_pbuf_queue_dequeue((vsf_stream_fifo_t *)ptThis);
 }
@@ -278,7 +278,7 @@ void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *ptObj)
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, RX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
         this.tStatus.IsOpen = true;
     )
@@ -289,7 +289,7 @@ void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *ptObj)
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, RX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
         this.tStatus.IsOpen = false;
     )
@@ -301,7 +301,7 @@ vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *ptObj)
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, RX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
 
     return this.tStatus;
 }
@@ -311,7 +311,7 @@ static vsf_err_t __vsf_stream_pbuf_rx_register_notification(
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, RX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
 
     return vsf_pbuf_queue_data_available_event_register( 
         (vsf_stream_fifo_t *)ptThis, tEventHandling);
@@ -321,7 +321,7 @@ static vsf_err_t __vsf_stream_pbuf_tx_send(vsf_stream_tx_t *ptObj, vsf_pbuf_t *p
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, TX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
     
     return vsf_pbuf_queue_enqueue((vsf_stream_fifo_t *)ptThis, pbuf);
 }
@@ -331,7 +331,7 @@ static vsf_err_t __vsf_stream_pbuf_tx_register_notification(
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, TX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
 
     return vsf_pbuf_queue_data_drain_event_register( (vsf_stream_fifo_t *)ptThis, 
                                                         tEventHandling);
@@ -342,7 +342,7 @@ vsf_stream_status_t __vsf_stream_pbuf_tx_get_status(vsf_stream_tx_t *ptObj)
 {
     class_internal( container_of(ptObj, vsf_stream_fifo_t, TX), 
                     ptThis, vsf_stream_fifo_t);
-    ASSERT(NULL != ptThis);
+    VSF_SERVICE_ASSERT(NULL != ptThis);
 
     return this.tStatus;
 }

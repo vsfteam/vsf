@@ -223,9 +223,9 @@ Output:
 
 
 #define vsf_protect_t                   uint_fast32_t
-#define vsf_protect_interrupt()         GET_GLOBAL_INTERRUPT_STATE()
+#define vsf_protect_interrupt()         DISABLE_GLOBAL_INTERRUPT()
 #define vsf_unprotect_interrupt(__state)SET_GLOBAL_INTERRUPT_STATE(__state)
-#define vsf_protect_none()              0
+#define vsf_protect_none()              (0)
 #define vsf_unprotect_none(__state)     UNUSED_PARAM(__state)
 
 #define vsf_protect_int()               vsf_protect_interrupt()

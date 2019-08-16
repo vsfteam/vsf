@@ -15,12 +15,12 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
+//! \note do not move this pre-processor statement to other places
+#include "component/vsf_component_cfg.h"
+
 #ifndef __VSF_TCPIP_CFG_H__
 #define __VSF_TCPIP_CFG_H__
-
-/*============================ INCLUDES ======================================*/
-
-#include "vsf_cfg.h"
 
 /*============================ MACROS ========================================*/
 

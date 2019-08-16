@@ -20,7 +20,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 
-#if VSF_USE_SIMPLE_SHELL == ENABLED
+#if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED && VSF_USE_KERNEL == ENABLED
 #include "../../vsf_kernel_common.h"
 #include "./vsf_simple.h"
 #include "../../task/vsf_thread.h"
@@ -39,7 +39,7 @@ extern void vsf_eda_polling_state_set(vsf_eda_t *peda, bool state);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION("text.vsf.kernel.__vsf_delay")
 vsf_evt_t __vsf_delay(uint_fast32_t tick)
 {
@@ -52,7 +52,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
         return VSF_EVT_TIMER;
     }
     vsf_teda_t *pteda = (vsf_teda_t *)vsf_eda_get_cur();
-    ASSERT(NULL != pteda);
+    VSF_KERNEL_ASSERT(NULL != pteda);
 
 #   if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(&(pteda->use_as__vsf_eda_t))) {
@@ -92,7 +92,7 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
     };
     
     vsf_teda_t *pteda = (vsf_teda_t *)vsf_eda_get_cur();
-    ASSERT(NULL != pteda);
+    VSF_KERNEL_ASSERT(NULL != pteda);
     
     do {
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
@@ -128,10 +128,42 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
 }
 
 SECTION("text.vsf.kernel.vsf_mutex_enter")
-vsf_sync_reason_t vsf_mutex_enter(vsf_mutex_t *pmtx, int_fast32_t time_out)
+vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *pmtx, int_fast32_t time_out)
 {
-    ASSERT(NULL != pmtx);
+    VSF_KERNEL_ASSERT(NULL != pmtx);
     return __vsf_sem_pend(&(pmtx->use_as__vsf_sync_t), time_out);
+}
+
+SECTION("text.vsf.kernel.vsf_yield")
+vsf_evt_t __vsf_yield(void)
+{    
+    vsf_evt_t result = VSF_EVT_YIELD;
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(NULL != eda);
+
+    enum {
+        VSF_APP_STATE_YIELD = 0,
+        VSF_APP_STATE_WAIT_EVENT,
+    };
+
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    if (vsf_eda_is_stack_owner(eda)) {
+        vsf_eda_yield();
+        vsf_thread_wait();          //!< wait for any evt
+    } else 
+#endif
+    {
+        if (vsf_eda_polling_state_get(eda)) {
+            /* VSF_APP_STATE_WAIT_EVENT */
+            vsf_eda_polling_state_set(eda, VSF_APP_STATE_YIELD);
+        } else {
+            vsf_eda_yield();
+            /* VSF_APP_STATE_YIELD */
+            vsf_eda_polling_state_set(eda, VSF_APP_STATE_WAIT_EVENT);
+            result = VSF_EVT_NONE;
+        }
+    }
+    return result;
 }
 
 #endif

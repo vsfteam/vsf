@@ -32,9 +32,7 @@ typedef struct mem_t {
     uint16_t    hwSize;                 //!< buffer size
 }mem_t;
 
-/*! \NOTE: Make sure #include "plooc_class.h" is close to the class
- *!        definition and there is NO ANY OTHER module-interface-header file 
- *!        included in this file
+/*! \NOTE: Make sure #include "plooc_class.h" is close to the class definition 
  */
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
@@ -46,16 +44,18 @@ typedef struct mem_t {
 
 #include "plooc_class.h"
 
+
 //! \name class byte_queue_t
 //! @{
 declare_class(byte_queue_t)
 
-def_class(byte_queue_t, /*!< no inherit or implement */
-    /*! no public_member */  ,/*! don't forget the comma here */
+def_class(byte_queue_t,
+
     private_member(
         implement(mem_t)                    //!< queue buffer
         void        *pTarget;               //!< user target
     )
+    
     protected_member(
         uint16_t    hwHead;                 //!< head pointer
         uint16_t    hwTail;                 //!< tail pointer
@@ -65,6 +65,7 @@ def_class(byte_queue_t, /*!< no inherit or implement */
 
 end_def_class(byte_queue_t) /* do not remove this for forward compatibility  */
 //! @}
+
 
 typedef struct byte_queue_cfg_t {
     implement(mem_t)                        //!< queue buffer

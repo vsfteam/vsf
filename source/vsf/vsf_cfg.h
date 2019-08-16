@@ -47,11 +47,41 @@
 /* template for abstraction data type */
 #include "utilities/template/template.h"
 
+/* other high level language externsion for OOPC */
+#include "utilities/language_extension/language_extension.h"
+
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_USE_KERNEL
+#   define VSF_USE_KERNEL                                   ENABLED
+#endif
+
 #ifndef Hz
 #   define Hz                                   ul
+#endif
+
+#ifndef VSF_USR_SWI_NUM
+#   define VSF_USR_SWI_NUM                      0
+#endif
+
+#if VSF_USE_KERNEL == ENABLED && defined(VSF_OS_CFG_PRIORITY_NUM)
+#   if (VSF_OS_CFG_PRIORITY_NUM < 1)
+#       error VSF_OS_CFG_PRIORITY_NUM MUST be defined to calculate \
+__VSF_HAL_SWI_NUM and its value must at least be 1. 
+#   endif
+
+#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#       if VSF_OS_CFG_PRIORITY_NUM > 1
+#           define __VSF_HAL_SWI_NUM                (VSF_OS_CFG_PRIORITY_NUM - 1)
+#       else
+#           define __VSF_HAL_SWI_NUM                0
+#       endif
+#   else
+#       define __VSF_HAL_SWI_NUM                    (VSF_OS_CFG_PRIORITY_NUM)
+#   endif
+// priority configurations
+#   define __VSF_OS_SWI_NUM                        __VSF_HAL_SWI_NUM
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

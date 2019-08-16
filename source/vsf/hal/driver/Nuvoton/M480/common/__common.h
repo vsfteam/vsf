@@ -18,22 +18,17 @@
 #ifndef __HAL_DRIVER_NUVOTON_M480_COMMON_H__
 #define __HAL_DRIVER_NUVOTON_M480_COMMON_H__
 
+/* \note __common.h should only be included by device.h */
+
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "./vendor/Include/M480.h"
-
+#include "hal/arch/vsf_arch.h"
 /*============================ MACROS ========================================*/
-
-// bit0 - bit7  : __bit_offset  (0 .. 255)
-// bit8 - bit12 : __bit_len     (0 .. 31)
-// bit13        : __is_wprotect
-#define M480_BIT_FIELD(__name, __bit_offset, __bit_len, __is_wprotect)          \
-        __name = (__bit_offset) | ((__bit_len) << 8) | ((__is_wprotect) << 13)
-
-#define M480_BIT_FIELD_GET_BITLEN(__bf) (((__bf) >> 8) & 0x1F)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+//typedef void vsf_swi_handler_t(void *p);
 
 enum m480_usbphy_t {
     M480_USBPHY_FS      = 0,
@@ -50,8 +45,8 @@ typedef enum m480_usbphy_role_t m480_usbphy_role_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-
 extern bool m480_reg_unlock(void);
 extern void m480_reg_lock(bool islocked);
 
@@ -63,5 +58,10 @@ extern void m480_bit_field_set_wprotect(uint_fast16_t bf, uint32_t *ptr, uint_fa
 extern void m480_enable_usbphy(m480_usbphy_t phy, m480_usbphy_role_t role);
 extern void m480_disable_usbphy(m480_usbphy_t phy);
 
+/* todo: should remove this but keep it for a while
+extern vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
+                            vsf_swi_handler_t *handler, void *pparam);
+extern void vsf_drv_swi_trigger(uint_fast8_t idx);
+*/
 #endif
 /* EOF */

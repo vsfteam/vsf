@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
+#include "../../NuConsole/NuConsole.h"
 
 /*============================ MACROS ========================================*/
 
@@ -97,6 +98,7 @@ typedef enum m480_pllsrc_t m480_pllsrc_t;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+// TODO: if these initialization is implemented in startup file, remove here
 void __low_level_init(void)
 {
     // to use SRAM BANK2
@@ -220,6 +222,10 @@ bool vsf_driver_init(void)
     CLK->CLKSEL0 = (CLK->CLKSEL0 & ~CLK_CLKSEL0_HCLKSEL_Msk) | temp32;
 
     m480_reg_lock(state);
+
+#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
+    NuConsole_Init();
+#endif
 
     return true;
 }

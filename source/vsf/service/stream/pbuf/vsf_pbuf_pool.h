@@ -54,7 +54,7 @@
                                                 uint_fast16_t hwReserve)        \
 {                                                                               \
     vsf_pool(__NAME) *ptThis = (vsf_pool(__NAME) *)pTarget;                     \
-    ASSERT(NULL != ptThis);                                                     \
+    VSF_SERVICE_ASSERT(NULL != ptThis);                                                     \
     if (vsf_pbuf_get_pool_item_count(                                           \
             &(ptThis->use_as__vsf_pbuf_pool_t)) <= hwReserve) {                 \
         return NULL;                                                            \
@@ -69,7 +69,7 @@
                                                 uint_fast16_t hwReserve)        \
 {                                                                               \
     vsf_pool(__NAME) *ptThis = (vsf_pool(__NAME) *)pTarget;                     \
-    ASSERT(NULL != ptThis);                                                     \
+    VSF_SERVICE_ASSERT(NULL != ptThis);                                                     \
     return vsf_pbuf_pool_alloc(&(ptThis->use_as__vsf_pbuf_pool_t));             \
 }
 #endif

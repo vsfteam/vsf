@@ -67,16 +67,21 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-static void vsf_trace_output_string(const char *str);
+static uint_fast32_t vsf_trace_output(const char* buff, uint_fast32_t size);
 
 /*============================ IMPLEMENTATION ================================*/
 
-
+/*! \note user can retarget trace to other output device
+ */
+WEAK void vsf_trace_output_string(const char* str)
+{
+    vsf_trace_output(str, strlen(str));
+}
 
 static void vsf_trace_set_level(vsf_trace_level_t level)
 {
 #if VSF_TRACE_CFG_COLOR_EN == ENABLED
-    ASSERT(level < dimof(__vsf_trace_color));
+    VSF_SERVICE_ASSERT(level < dimof(__vsf_trace_color));
     vsf_trace_output_string((char *)__vsf_trace_color[level]);
 #endif
 }
@@ -134,7 +139,7 @@ void __vsf_trace_init(vsf_stream_tx_t *ptTX)
         ptTX = (vsf_stream_tx_t *)&VSF_DEBUG_STREAM_TX;
     } 
 
-    //ASSERT(NULL != ptTX);
+    //VSF_SERVICE_ASSERT(NULL != ptTX);
     
     //! initialise stream source
     do {
@@ -200,13 +205,6 @@ static void vsf_trace_arg(const char *format, va_list *arg)
     vsf_stream_writer_send_pbuf(&__vsf_trace, block);
 }
 #endif
-
-/*! \note user can retarget trace to other output device
- */
-WEAK void vsf_trace_output_string(const char *str)
-{
-	vsf_trace_output(str, strlen(str));
-}
 
 WEAK void vsf_trace_string(vsf_trace_level_t level, const char *str)
 {

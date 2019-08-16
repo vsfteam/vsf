@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/3rd-party/littlevgl/5.3/raw/lvgl/lvgl.h"
+#include "lvgl/lvgl.h"
 #include "lv_conf.h"
 
 /*============================ MACROS ========================================*/
@@ -28,10 +28,10 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void lv_refr_task(void * param)
+void lv_refr_task(struct _lv_task_t *task)
 {
     static lv_coord_t y;
-    lv_obj_t *label1 = (lv_obj_t *)param;
+    lv_obj_t *label1 = (lv_obj_t *)task->user_data;
 
     y = (y + 10) % LV_VER_RES;
   

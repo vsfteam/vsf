@@ -73,7 +73,9 @@
 #ifdef __IS_COMPILER_GCC__
 #   undef __IS_COMPILER_GCC__
 #endif
-#if defined(__GNUC__) && !(__IS_COMPILER_ARM_COMPILER_6__ || __IS_COMPILER_LLVM__)
+#if defined(__GNUC__) && !(     __IS_COMPILER_ARM_COMPILER_6__                  \
+                            ||  __IS_COMPILER_LLVM__                            \
+                            ||  __IS_COMPILER_ARM_COMPILER_5__)
 #   define __IS_COMPILER_GCC__                 1
 #endif
 //! @}
@@ -193,6 +195,7 @@
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __attribute__((packed))
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
@@ -214,6 +217,7 @@
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __attribute__((packed))
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
 #elif __IS_COMPILER_ARM_COMPILER_6__
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
@@ -235,27 +239,31 @@
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __unaligned
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+
 #elif __IS_COMPILER_LLVM__
 
 #   define ROM_FLASH            __attribute__(( __section__( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( __section__( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__(( __section__( ".bss.noinit")))
-#   define ROOT                 __used    
-#   define INLINE               inline
-#   define NO_INLINE            __noinline
-#   define ALWAYS_INLINE        __always_inline
-#   define WEAK                 __weak_symbol
+#   define ROOT                 __attribute__((__used__))    
+#   define INLINE               __inline__
+#   define NO_INLINE            __attribute__ ((__noinline__))
+#   define ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
+#   define WEAK                 __attribute__((__weak__))
 #   define RAMFUNC              __attribute__((__section__ (".textrw")))
 #   define __asm__              __asm
-#   define __ALIGN(__N)         __aligned(__N)
-#   define __AT_ADDR(__ADDR)    __section(".ARM.__at_" #__ADDR) 
-#   define __SECTION(__SEC)     __section(__SEC)
+#   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
+#   define __AT_ADDR(__ADDR)    __attribute__((__section__(".ARM.__at_" #__ADDR)))
+#   define __SECTION(__SEC)     __attribute__((__section__(__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS)                                      \
-                                __weak_reference(__ORIGIN,__ALIAS)
+                                __asm__(".weak " #__ALIAS);                     \
+                                __asm__(".equ " #__ALIAS ", " #__ORIGIN)
 
-#   define PACKED               __packed
-#   define UNALIGNED            __packed
+#   define PACKED               __attribute__((__packed__))
+#   define UNALIGNED            __attribute__((__packed__))
 #   define TRANSPARENT_UNION    __attribute__((__transparent_union__))
+#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
 #else  /*__IS_COMPILER_GCC__: Using GCC as default for those GCC compliant compilers*/
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
@@ -277,6 +285,7 @@
 #   define PACKED               __attribute__((packed))
 #   define UNALIGNED            __attribute__((packed))
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __ALIGN_OF(...)    __alignof__(__VA_ARGS__)
 
 #endif
 
@@ -285,6 +294,8 @@
 #define AT_ADDR(__ADDR)     __AT_ADDR(__ADDR)
 #define ALIGN(__N)          __ALIGN(__N)
 #define SECTION(__SEC)      __SECTION(__SEC)
+#define ALIGN_OF(...)       __ALIGN_OF(__VA_ARGS__)
+#define ALIGN_WITH(...)     ALIGN(ALIGN_OF(__VA_ARGS__))
 
 /*----------------------------------------------------------------------------*
  * Signal & Interrupt Definition                                              *
@@ -310,7 +321,7 @@ static ALWAYS_INLINE uint32_t ____disable_irq(void)
 
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   define DISABLE_GLOBAL_INTERRUPT()           __disable_irq()
-#elif __IS_COMPILER_ARM_COMPILER_6__
+#elif __IS_COMPILER_ARM_COMPILER_6__ && !defined(__CMSIS_ARMCC_V6_H)
 #   define DISABLE_GLOBAL_INTERRUPT()           __disable_irq()
 #elif __IS_COMPILER_GCC_
 #   define DISABLE_GLOBAL_INTERRUPT()           __disable_irq()
@@ -332,17 +343,17 @@ static ALWAYS_INLINE uint32_t ____disable_irq(void)
 #if __IS_COMPILER_IAR__
 #   define GET_GLOBAL_INTERRUPT_STATE()         __get_interrupt_state()
 #   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_interrupt_state(__STATE)
-typedef __istate_t   istate_t;
+typedef __istate_t   vsf_gint_state_t;
 #elif __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
 #   define GET_GLOBAL_INTERRUPT_STATE()         __get_PRIMASK()
 #   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_PRIMASK(__STATE)
-typedef int   istate_t;
+typedef int   vsf_gint_state_t;
 #elif __IS_COMPILER_GCC__
 #   define GET_GLOBAL_INTERRUPT_STATE()         __get_PRIMASK()
 #   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_PRIMASK(__STATE)
-typedef uint32_t   istate_t;
+typedef uint32_t   vsf_gint_state_t;
 #else
-typedef uint32_t   istate_t;
+typedef uint32_t   vsf_gint_state_t;
 #   define GET_GLOBAL_INTERRUPT_STATE()         ____get_PRIMASK()
 
 /**
@@ -369,6 +380,39 @@ __attribute__((always_inline)) static inline void ____set_PRIMASK(uint32_t priMa
 {
     __asm__ volatile ("MSR primask, %0" : : "r" (priMask) : "memory");
 }
+#endif
+
+/*----------------------------------------------------------------------------*
+ * Startup Source Code                                                        *
+ *----------------------------------------------------------------------------*/
+#if     __IS_COMPILER_IAR__
+#ifndef __VECTOR_TABLE
+#   define __VECTOR_TABLE               __vector_table
+#endif
+#ifndef __VECTOR_TABLE_ATTRIBUTE
+#   define __VECTOR_TABLE_ATTRIBUTE     @".intvec"
+#endif
+#ifndef __PROGRAM_START
+#   define __PROGRAM_START              __iar_program_start
+#endif
+#ifndef __INITIAL_SP
+#   define __INITIAL_SP                 CSTACK$$Limit
+#endif
+#elif   __IS_COMPILER_ARM_COMPILER_6__ || __IS_COMPILER_ARM_COMPILER_5__
+#ifndef __VECTOR_TABLE
+#   define __VECTOR_TABLE               __Vectors
+#endif
+#ifndef __VECTOR_TABLE_ATTRIBUTE
+#   define __VECTOR_TABLE_ATTRIBUTE     ROOT SECTION("RESET")
+#endif
+#ifndef __PROGRAM_START
+#   define __PROGRAM_START              __main
+#endif
+#ifndef __INITIAL_SP
+#   define __INITIAL_SP                 Image$$ARM_LIB_STACK$$ZI$$Limit
+#endif
+#else   //__IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+#   error Unsupported compiler detected. Please contact vsf team for support.
 #endif
 
 /*============================ TYPES =========================================*/

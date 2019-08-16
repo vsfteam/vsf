@@ -38,7 +38,7 @@
 #if     VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED                                \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(app_main_thread_t)
-def_vsf_thread(app_main_thread_t, VSF_OS_MAIN_STACK_SIZE)
+def_vsf_thread(app_main_thread_t, VSF_OS_CFG_MAIN_STACK_SIZE)
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

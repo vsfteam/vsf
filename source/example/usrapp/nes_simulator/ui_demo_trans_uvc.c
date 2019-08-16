@@ -24,7 +24,7 @@
 
 #define SCREEN_WIDTH                    256
 #define SCREEN_HEIGHT                   240
-#define SCREEN_FPS                      60
+#define SCREEN_FPS                      20
 
 #define NES_COLOR_DEPTH                 16
 

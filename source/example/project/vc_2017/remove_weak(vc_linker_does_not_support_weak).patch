@@ -1,0 +1,208 @@
+ source/example/usrapp/usbh_demo_win/input_demo.c       |  8 ++++----
+ .../3rd-party/btstack/port/hci_transport_h2_vsf.c      |  8 ++++----
+ source/vsf/component/input/vsf_input.c                 |  6 +++---
+ .../component/usb/host/class/BTHCI/vsf_usbh_BTHCI.c    |  6 +++---
+ source/vsf/hal/arch/vsf_arch_abstraction.c             | 18 +++++++++---------
+ source/vsf/kernel/vsf_eda.c                            |  8 ++++----
+ source/vsf/kernel/vsf_kernel_bsp.c                     |  8 ++++----
+ source/vsf/kernel/vsf_os.c                             |  6 +++---
+ source/vsf/service/pool/vsf_pool.c                     |  4 ++--
+ 9 files changed, 36 insertions(+), 36 deletions(-)
+
+diff --git a/source/example/usrapp/usbh_demo_win/input_demo.c b/source/example/usrapp/usbh_demo_win/input_demo.c
+index 1f5badf7..8d371488 100644
+--- a/source/example/usrapp/usbh_demo_win/input_demo.c
++++ b/source/example/usrapp/usbh_demo_win/input_demo.c
+@@ -28,7 +28,7 @@
+ 
+ static void input_demo_trace_hid(vsf_hid_event_t *hid_evt)
+ {
+-    if (hid_evt->id != 0) {
++    if ((hid_evt->id != 0) && (hid_evt->cur.val8 < 2)) {
+         uint_fast16_t generic_usage, usage_page, usage_id;
+ 
+         generic_usage = HID_GET_GENERIC_USAGE(hid_evt->id);
+@@ -42,7 +42,7 @@ static void input_demo_trace_hid(vsf_hid_event_t *hid_evt)
+ 
+ static void input_demo_trace_gamepad(vsf_gamepad_evt_t *gamepad_evt)
+ {
+-    if (gamepad_evt->id != GAMEPAD_ID_DUMMY) {
++    if ((gamepad_evt->id != GAMEPAD_ID_DUMMY) && (1 == gamepad_evt->bitlen)) {
+         vsf_trace(VSF_TRACE_DEBUG, "gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
+             (vsf_gamepad_id_t)gamepad_evt->id, gamepad_evt->cur, gamepad_evt->pre);
+     }
+@@ -102,8 +102,8 @@ static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
+     }
+ 
+     if (value_cnt >= 6) {
+-        vsf_trace(VSF_TRACE_DEBUG, "6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
+-            (int)acc_x, (int)acc_y, (int)acc_z, (int)gyro_pitch, (int)gyro_yaw, (int)gyro_roll);
++//        vsf_trace(VSF_TRACE_DEBUG, "6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
++//            (int)acc_x, (int)acc_y, (int)acc_z, (int)gyro_pitch, (int)gyro_yaw, (int)gyro_roll);
+     }
+ }
+ 
+diff --git a/source/vsf/component/3rd-party/btstack/port/hci_transport_h2_vsf.c b/source/vsf/component/3rd-party/btstack/port/hci_transport_h2_vsf.c
+index 405da219..6e23ca1b 100644
+--- a/source/vsf/component/3rd-party/btstack/port/hci_transport_h2_vsf.c
++++ b/source/vsf/component/3rd-party/btstack/port/hci_transport_h2_vsf.c
+@@ -46,10 +46,10 @@ static hci_transport_h2_param_t hci_transport_h2_param;
+ /*============================ PROTOTYPES ====================================*/
+ /*============================ IMPLEMENTATION ================================*/
+ 
+-WEAK vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
+-{
+-    return VSF_ERR_NOT_SUPPORT;
+-}
++//WEAK vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
++//{
++//    return VSF_ERR_NOT_SUPPORT;
++//}
+ 
+ static int hci_transport_h2_open(void)
+ {
+diff --git a/source/vsf/component/input/vsf_input.c b/source/vsf/component/input/vsf_input.c
+index e8aa94c0..9b28c0d5 100644
+--- a/source/vsf/component/input/vsf_input.c
++++ b/source/vsf/component/input/vsf_input.c
+@@ -132,9 +132,9 @@ WEAK void vsf_input_on_free_dev(vsf_input_type_t type, void *dev)
+ {
+ }
+ 
+-WEAK void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt)
+-{
+-}
++//WEAK void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt)
++//{
++//}
+ 
+ uint_fast32_t vsf_input_update_timestamp(vsf_input_timestamp_t *timestamp)
+ {
+diff --git a/source/vsf/component/usb/host/class/BTHCI/vsf_usbh_BTHCI.c b/source/vsf/component/usb/host/class/BTHCI/vsf_usbh_BTHCI.c
+index f8d7656c..0c38f553 100644
+--- a/source/vsf/component/usb/host/class/BTHCI/vsf_usbh_BTHCI.c
++++ b/source/vsf/component/usb/host/class/BTHCI/vsf_usbh_BTHCI.c
+@@ -118,9 +118,9 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+ 
+ /*============================ IMPLEMENTATION ================================*/
+ 
+-WEAK void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id) {}
+-WEAK void vsf_usbh_bthci_on_del(void *dev) {}
+-WEAK void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
++//WEAK void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id) {}
++//WEAK void vsf_usbh_bthci_on_del(void *dev) {}
++//WEAK void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
+ 
+ static vsf_usbh_bthci_iocb_t * vsf_usbh_bthci_get_iocb(vsf_usbh_bthci_t *bthci, vsf_usbh_hcd_urb_t *urb_hcd)
+ {
+diff --git a/source/vsf/hal/arch/vsf_arch_abstraction.c b/source/vsf/hal/arch/vsf_arch_abstraction.c
+index 70eeb093..ab68669f 100644
+--- a/source/vsf/hal/arch/vsf_arch_abstraction.c
++++ b/source/vsf/hal/arch/vsf_arch_abstraction.c
+@@ -189,20 +189,20 @@ WEAK vsf_err_t vsf_swi_init(uint_fast8_t idx,
+ }
+ 
+ 
+-WEAK void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
+-{
+-    VSF_HAL_ASSERT(false);
+-}
++//WEAK void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
++//{
++//    VSF_HAL_ASSERT(false);
++//}
+ 
+ /*! \note initialize architecture specific service 
+  *  \param none
+  *  \retval true initialization succeeded.
+  *  \retval false initialization failed
+  */
+-WEAK bool vsf_arch_init(void)
+-{
+-    vsf_systimer_init();
+-    return true;
+-}
++//WEAK bool vsf_arch_init(void)
++//{
++//    vsf_systimer_init();
++//    return true;
++//}
+ 
+ /* EOF */
+diff --git a/source/vsf/kernel/vsf_eda.c b/source/vsf/kernel/vsf_eda.c
+index a7c5248d..42d203f8 100644
+--- a/source/vsf/kernel/vsf_eda.c
++++ b/source/vsf/kernel/vsf_eda.c
+@@ -351,10 +351,10 @@ static vsf_evtq_ctx_t * vsf_evtq_get_cur_ctx(void)
+ }
+ #endif
+ 
+-WEAK void vsf_kernel_err_report(enum vsf_kernel_error_t err)
+-{
+-    ASSERT(false);
+-}
++//WEAK void vsf_kernel_err_report(enum vsf_kernel_error_t err)
++//{
++//    ASSERT(false);
++//}
+ 
+ SECTION(".text.vsf.kernel.eda")
+ vsf_eda_t * vsf_eda_get_cur(void)
+diff --git a/source/vsf/kernel/vsf_kernel_bsp.c b/source/vsf/kernel/vsf_kernel_bsp.c
+index 3ad08bd0..d9bc5509 100644
+--- a/source/vsf/kernel/vsf_kernel_bsp.c
++++ b/source/vsf/kernel/vsf_kernel_bsp.c
+@@ -119,10 +119,10 @@ uint32_t vsf_arch_req___systimer_freq___from_usr(void)
+     return SYSTEM_FREQ;
+ }
+ 
+-uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
+-{
+-    return VSF_SYSTIMER_RESOLUTION;
+-}
++//uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
++//{
++//    return VSF_SYSTIMER_RESOLUTION;
++//}
+ 
+ 
+ void vsf_kernel_err_report(enum vsf_kernel_error_t err)
+diff --git a/source/vsf/kernel/vsf_os.c b/source/vsf/kernel/vsf_os.c
+index 6106da4c..4f2c783b 100644
+--- a/source/vsf/kernel/vsf_os.c
++++ b/source/vsf/kernel/vsf_os.c
+@@ -252,9 +252,9 @@ WEAK void vsf_plug_in_for_kernel_diagnosis(void)
+     //! doing nothing here
+ }
+ 
+-WEAK void __post_vsf_kernel_init(void)
+-{
+-}
++//WEAK void __post_vsf_kernel_init(void)
++//{
++//}
+ 
+ void vsf_kernel_os_run_priority(vsf_prio_t priority)
+ {
+diff --git a/source/vsf/service/pool/vsf_pool.c b/source/vsf/service/pool/vsf_pool.c
+index a4488483..a6fe57f7 100644
+--- a/source/vsf/service/pool/vsf_pool.c
++++ b/source/vsf/service/pool/vsf_pool.c
+@@ -174,7 +174,7 @@ WEAK bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *ptObj)
+ }
+ 
+ 
+-
++#if 0
+ WEAK void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
+ {
+     /*! \note if vsf_heap is enabled in your project, this function will be 
+@@ -191,7 +191,7 @@ extern int posix_memalign(  void ** /*ret*/,
+     posix_memalign(&pMemory, wSize, wAlign);
+     return pMemory;
+ }
+-
++#endif
+ #endif
+ 
+ /*! \brief try to fetch a memory block from the target pool

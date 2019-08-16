@@ -36,6 +36,9 @@
 #   define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_t
 #   define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_urb_t
 #   define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
+#   if  defined(VSF_USBH_IMPLEMENT_HUB)
+#       define VSF_USBH_INHERIT_vsf_usbh_t
+#   endif
 #elif   defined(VSF_USBH_IMPLEMENT_CLASS)
 #   define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
 #   define VSF_USBH_INHERIT_vsf_usbh_t
@@ -51,7 +54,7 @@
 /*============================ MACROS ========================================*/
 
 #if !defined(VSF_USBH_CFG_EDA_PRIORITY)
-#   define VSF_USBH_CFG_EDA_PRIORITY        vsf_priority_0
+#   define VSF_USBH_CFG_EDA_PRIORITY        vsf_prio_0
 #endif
 
 #ifdef VSF_USB_HC_ISO_EN
@@ -101,6 +104,14 @@
 #define URB_ZERO_PACKET         0x40
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifdef VSF_USBH_IMPLEMENT_HCD
+#   define usb_gettoggle(__dev, __ep, __out)    (((__dev)->toggle[__out] >> (__ep)) & 1)
+#   define usb_dotoggle(__dev, __ep, __out)     ((__dev)->toggle[__out] ^= (1 << (__ep)))
+#   define usb_settoggle(__dev, __ep, __out, __bit)                             \
+        ((__dev)->toggle[__out] = ((__dev)->toggle[__out] & ~(1 << (__ep))) | ((__bit) << (__ep)))
+#endif
+
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vsf_usbh_hcd_t)
@@ -228,13 +239,21 @@ def_simple_class(vsf_usbh_hcd_drv_t) {
         vsf_err_t (*fini)(vsf_usbh_hcd_t *hcd);
         vsf_err_t (*suspend)(vsf_usbh_hcd_t *hcd);
         vsf_err_t (*resume)(vsf_usbh_hcd_t *hcd);
-        vsf_err_t (*alloc_device)(vsf_usbh_hcd_t *hcd, vsf_usbh_dev_t *dev);
-        void (*free_device)(vsf_usbh_hcd_t *hcd, vsf_usbh_dev_t *dev);
+        vsf_err_t (*alloc_device)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
+        void (*free_device)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
         vsf_usbh_hcd_urb_t * (*alloc_urb)(vsf_usbh_hcd_t *hcd);
         void (*free_urb)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
         vsf_err_t (*submit_urb)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
         vsf_err_t (*relink_urb)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
-        int (*rh_control)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
+
+        union {
+            int (*rh_control)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
+            struct {
+                // for virtual hcd without root hub
+                vsf_err_t (*reset_dev)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
+                bool (*is_dev_reset)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
+            };
+        };
     )
 };
 
@@ -242,7 +261,7 @@ def_simple_class(vsf_usbh_hcd_t) {
     public_member(
         const vsf_usbh_hcd_drv_t *drv;
         void *param;
-        uint8_t rh_speed;
+        enum usb_device_speed_t rh_speed;
     )
 
     private_member(
@@ -339,7 +358,7 @@ def_simple_class(vsf_usbh_urb_t) {
 #include "utilities/ooc_class.h"
 
 struct vsf_usbh_ep0_t {
-    vsf_crit_t crit;
+    __vsf_crit_npb_t crit;
     vsf_usbh_urb_t urb;
 };
 typedef struct vsf_usbh_ep0_t vsf_usbh_ep0_t;
@@ -354,9 +373,11 @@ def_simple_class(vsf_usbh_dev_t) {
         vsf_usbh_ep0_t ep0;
         vsf_usbh_ifs_t *ifs;
 
+#if VSF_USE_USB_HOST_HUB == ENABLED
         vsf_usbh_dev_t *dev_parent;
         vsf_slist_node_t child_node;
         vsf_slist_t children_list;
+#endif
 
         uint8_t devnum;
         uint8_t num_of_ifs;
@@ -446,10 +467,11 @@ extern vsf_err_t vsf_usbh_submit_urb_flags(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb
 extern vsf_err_t vsf_usbh_submit_urb_ex(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda);
 
 #if defined(VSF_USBH_IMPLEMENT_HUB)
-extern vsf_usbh_dev_t * vsf_usbh_alloc_device(vsf_usbh_t *usbh);
+extern vsf_usbh_dev_t * vsf_usbh_new_device(vsf_usbh_t *usbh, enum usb_device_speed_t speed,
+            vsf_usbh_dev_t *dev_parent, uint_fast8_t idx);
+extern void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
 #endif
 
-extern void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
 extern void vsf_usbh_remove_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         vsf_usbh_ifs_t *ifs);
 

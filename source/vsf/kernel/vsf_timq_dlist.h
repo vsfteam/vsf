@@ -21,6 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
 
+#if VSF_USE_KERNEL == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #define vsf_timq_init(__queue)              vsf_dlist_init(__queue)
@@ -91,5 +93,5 @@ typedef vsf_dlist_t vsf_timer_queue_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#endif
 #endif

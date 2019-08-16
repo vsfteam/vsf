@@ -16,8 +16,6 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "../../__common.h"
 #include "./ohci.h"
 #include "../../pm/pm.h"
 /*============================ MACROS ========================================*/
@@ -70,9 +68,11 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
     return VSF_ERR_NONE;
 }
 
-void *m480_ohci_get_regbase(m480_ohci_t *hc)
+void m480_ohci_get_info(m480_ohci_t *hc, usb_hc_ip_info_t *info)
 {
-    return hc->param->reg;
+    if (info != NULL) {
+        info->regbase = hc->param->reg;
+    }
 }
 
 void m480_ohci_irq(m480_ohci_t *hc)

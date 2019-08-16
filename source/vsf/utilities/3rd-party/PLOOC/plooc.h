@@ -29,7 +29,8 @@
           a. if the target processor is 8 bits, define it as uint8_t
           b. if the target processor is 16 bits, define it as uint16_t 
           c. if the target processor is 32 bits, define it as uint32_t
-          d. if the target processor is 64 bits, define it as either uint32_t or uint64_t
+          d. if the target processor is 64 bits, define it as either uint32_t or 
+             uint64_t
  */
 
 /*============================ MACROS ========================================*/
@@ -58,12 +59,8 @@
  *!       def_interface( i_lv1_t, which( inherit( i_lv0_abc_t ) 
  *!                                      inherit( i_lv0_efg_t ) ) )
  *!           ...
- *!       end_def_interface( i_lv1_t, which( inherit( i_lv0_abc_t ) 
- *!                                          inherit( i_lv0_efg_t ) ) )
+ *!       end_def_interface( i_lv1_t )
   */
-  
-  
-#define WHICH(...)                  struct { __VA_ARGS__ };
 
 #define DECLARE_INTERFACE(__NAME)   typedef struct __NAME __NAME;
 
@@ -105,31 +102,58 @@
 #define INHERIT(__TYPE)                __INHERIT(__TYPE)
 
 /*! \note You can only use IMPLEMENT when defining INTERFACE. For Implement 
- *        interface when defining CLASS, you should use DEF_CLASS_IMPLEMENT 
+ *        interface when defining class, you should use DEF_CLASS_IMPLEMENT 
  *        instead.
  */
-#define __IMPLEMENT(__INTERFACE)    __IMPLEMENT_EX(__INTERFACE, use_as__##__INTERFACE)
-#define IMPLEMENT(__INTERFACE)      __IMPLEMENT(__INTERFACE)  
+#define __IMPLEMENT(__INTERFACE)        __IMPLEMENT_EX( __INTERFACE,            \
+                                                        use_as__##__INTERFACE)
+#define IMPLEMENT(__INTERFACE)          __IMPLEMENT(__INTERFACE)  
 
-/*! \note if you have used INHERIT or IMPLEMENT to define a CLASS / INTERFACE, 
+/*! \note if you have used INHERIT or IMPLEMENT to define a class / INTERFACE, 
           you can use OBJ_CONVERT_AS to extract the reference to the inherited 
           object. 
   \*/
 #define __OBJ_CONVERT_AS(__OBJ, __INTERFACE)    (__OBJ.use_as__##__INTERFACE)
-#define OBJ_CONVERT_AS(__OBJ, __INTERFACE)      __OBJ_CONVERT_AS((__OBJ), __INTERFACE)          
+#define OBJ_CONVERT_AS(__OBJ, __INTERFACE)      __OBJ_CONVERT_AS(   (__OBJ),    \
+                                                                    __INTERFACE)
 
 #define __REF_OBJ_AS(__OBJ, __TYPE)             (&(__OBJ.use_as__##__TYPE))
 #define REF_OBJ_AS(__OBJ, __TYPE)               __REF_OBJ_AS((__OBJ), __TYPE)
            
-/*----------------------------------------------------------------------------*          
+           
+/*! \brief You can use __PLOOC_EVAL() to dynamically select the right API which
+ *!        has the right number of parameters (no more than 8).
+ */
+//! @{
+#define __PLOOC_VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,_6,_7, _8, __N,...)      __N
+#define __PLOOC_VA_NUM_ARGS(...)                                                \
+            __PLOOC_VA_NUM_ARGS_IMPL(__VA_ARGS__, 8,7,6,5,4,3,2,1)
+
+
+
+#define __8_PLOOC_EVAL(__FUNC, __NO_ARGS)   __FUNC##__NO_ARGS
+#define __7_PLOOC_EVAL(__FUNC, __NO_ARGS)   __8_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __6_PLOOC_EVAL(__FUNC, __NO_ARGS)   __7_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __5_PLOOC_EVAL(__FUNC, __NO_ARGS)   __6_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __4_PLOOC_EVAL(__FUNC, __NO_ARGS)   __5_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __3_PLOOC_EVAL(__FUNC, __NO_ARGS)   __4_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __2_PLOOC_EVAL(__FUNC, __NO_ARGS)   __3_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __1_PLOOC_EVAL(__FUNC, __NO_ARGS)   __2_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __0_PLOOC_EVAL(__FUNC, __NO_ARGS)   __1_PLOOC_EVAL(__FUNC, __NO_ARGS)
+
+#define __PLOOC_EVAL(__FUNC, ...)           __0_PLOOC_EVAL(                     \
+                                                __FUNC,                         \
+                                                __PLOOC_VA_NUM_ARGS(__VA_ARGS__))
+//! @}   
+           
+/*----------------------------------------------------------------------------* 
  * new standard (lower case)                                                  *
  *----------------------------------------------------------------------------*/
 #define implement(__TYPE)                   IMPLEMENT(__TYPE)
 #define implement_ex(__TYPE, __NAME)        __IMPLEMENT_EX(__TYPE, __NAME)
 #define inherit_ex(__TYPE, __NAME)          INHERIT_EX(__TYPE, __NAME)
 #define inherit(__TYPE)                     INHERIT(__TYPE)
-#define which(...)                          WHICH(__VA_ARGS__)
-#define ref_interface(__NAME)               REF_INTERFACE(__NAME)
+#define ref_interface(__INTERFACE)          const __INTERFACE *ptMethod;
 #define convert_obj_as(__OBJ, __TYPE)       OBJ_CONVERT_AS(__OBJ, __TYPE)
 #define obj_convert_as(__OBJ, __TYPE)       OBJ_CONVERT_AS(__OBJ, __TYPE)       /*  obsolete */
 #define ref_obj_as(__OBJ, __TYPE)           REF_OBJ_AS(__OBJ, __TYPE)

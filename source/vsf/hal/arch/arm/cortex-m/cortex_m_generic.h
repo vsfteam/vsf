@@ -23,6 +23,7 @@
 
 #define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #include "hal/driver/driver.h"
+#undef  __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 #include "./SysTick/systick.h"
 /*============================ MACROS ========================================*/
@@ -73,12 +74,13 @@ enum {
             vsf_arch_prio_##__N =                                               \
                 ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,
 
-enum vsf_arch_priority_t {
-    VSF_ARCH_PRIO_IVALID    = -1,
-    vsf_arch_prio_ivalid    = -1,
+enum vsf_arch_prio_t {
+    // avoid vsf_arch_prio_t to be optimized to 8bit
+    VSF_ARCH_PRIO_IVALID    = (uint16_t)-1,
+    vsf_arch_prio_ivalid    = (uint16_t)-1,
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 };
-typedef enum vsf_arch_priority_t vsf_arch_priority_t;
+typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

@@ -16,14 +16,27 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "./__common.h"
 #include "../__device.h"
-#include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 
+#if !defined(__VSF_HAL_SWI_NUM)
+//! when there is no defined __VSF_HAL_SWI_NUM, use the maximum available value
+#   define __VSF_DEV_SWI_NUM                VSF_DEV_SWI_NUM
+#elif __VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM
+#   if (__VSF_HAL_SWI_NUM - VSF_ARCH_SWI_NUM) > VSF_DEV_SWI_NUM
+#       define MFUNC_IN_U8_DEC_VALUE       (VSF_DEV_SWI_NUM)
+#   else
+#       define MFUNC_IN_U8_DEC_VALUE       (__VSF_HAL_SWI_NUM - VSF_ARCH_SWI_NUM)
+#   endif
+#   include "utilities/preprocessor/mf_u8_dec2str.h"
+#   define __VSF_DEV_SWI_NUM           MFUNC_OUT_DEC_STR
+#else
+#   define __VSF_DEV_SWI_NUM           0
+#endif
+
 #define __M480_SWI(__N, __VALUE)                                                \
-    void SWI##__N##_IRQHandler(void)                                            \
+    ROOT void SWI##__N##_IRQHandler(void)                                       \
     {                                                                           \
         if (__m480_common.swi[__N].handler != NULL) {                           \
             __m480_common.swi[__N].handler(__m480_common.swi[__N].pparam);      \
@@ -33,22 +46,26 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#if __VSF_DEV_SWI_NUM > 0
 static const IRQn_Type m480_soft_irq[VSF_DEV_SWI_NUM] = {
-    5, 45, 50, 69, 81, 83, 91, 94, 95
+    VSF_DEV_SWI_LIST
 };
 
 struct __m480_common_t {
     struct {
-        vsf_swi_hanler_t *handler;
+        vsf_swi_handler_t *handler;
         void *pparam;
-    } swi[dimof(m480_soft_irq)];
+    } swi[__VSF_DEV_SWI_NUM];
 };
 typedef struct __m480_common_t __m480_common_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
+#if __VSF_DEV_SWI_NUM > 0
 static __m480_common_t __m480_common;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -111,24 +128,15 @@ void m480_bit_field_set(uint_fast16_t bf, uint32_t *ptr, uint_fast32_t value)
 }
 
 // SWI
-MREPEAT(VSF_DEV_SWI_NUM, __M480_SWI, NULL)
+#if __VSF_DEV_SWI_NUM > 0
+MREPEAT(__VSF_DEV_SWI_NUM, __M480_SWI, NULL)
 
-WEAK void vsf_usr_swi_trigger(uint_fast8_t idx)
+static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 
+                                                vsf_arch_prio_t priority,
+                                                vsf_swi_handler_t *handler, 
+                                                void *pparam)
 {
-    ASSERT(false);
-}
-
-WEAK vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, uint_fast8_t priority,
-                            vsf_swi_hanler_t *handler, void *pparam)
-{
-    ASSERT(false);
-    return VSF_ERR_FAIL;
-}
-
-vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
-                            vsf_swi_hanler_t *handler, void *pparam)
-{
-    if (idx < dimof(m480_soft_irq)) {
+    if (idx < __VSF_DEV_SWI_NUM) {
         if (handler != NULL) {
             __m480_common.swi[idx].handler = handler;
             __m480_common.swi[idx].pparam = pparam;
@@ -140,17 +148,85 @@ vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, uint_fast8_t priority,
         }
         return VSF_ERR_NONE;
     }
-    return vsf_usr_swi_init(idx - dimof(m480_soft_irq), priority, handler, pparam);
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_FAIL;
 }
 
-void vsf_drv_swi_trigger(uint_fast8_t idx)
+static ALWAYS_INLINE void vsf_drv_swi_trigger(uint_fast8_t idx)
 {
-    if (idx < dimof(m480_soft_irq)) {
+    if (idx < __VSF_DEV_SWI_NUM) {
         NVIC_SetPendingIRQ(m480_soft_irq[idx]);
-    } else {
-        vsf_usr_swi_trigger(idx - dimof(m480_soft_irq));
+        return;
     }
+    VSF_HAL_ASSERT(false);
 }
+#endif
+
+#if __VSF_HAL_SWI_NUM > 0 || !defined(__VSF_HAL_SWI_NUM)
+// SWI
+
+WEAK void vsf_usr_swi_trigger(uint_fast8_t idx)
+{
+    VSF_HAL_ASSERT(false);
+}
+
+void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
+{
+#if __VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM || !defined(__VSF_HAL_SWI_NUM)
+#   if __VSF_DEV_SWI_NUM > 0
+    if (idx < __VSF_DEV_SWI_NUM) {
+        vsf_drv_swi_trigger(idx);
+        return;
+    }
+    idx -= __VSF_DEV_SWI_NUM;
+#   endif
+
+#   if      (__VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM + __VSF_DEV_SWI_NUM)          \
+        ||  !defined(__VSF_HAL_SWI_NUM)
+    vsf_usr_swi_trigger(idx);
+#   else
+    VSF_HAL_ASSERT(false);
+#   endif
+#else
+    VSF_HAL_ASSERT(false);
+#endif
+}
+
+WEAK vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, 
+                                vsf_arch_prio_t priority,
+                                vsf_swi_handler_t *handler, 
+                                void *param)
+{
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_FAIL;
+}
+
+vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx, 
+                                vsf_arch_prio_t priority,
+                                vsf_swi_handler_t *handler, 
+                                void *param)
+{
+#if __VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM || !defined(__VSF_HAL_SWI_NUM)
+#   if __VSF_DEV_SWI_NUM > 0
+    if (idx < __VSF_DEV_SWI_NUM) {
+        return vsf_drv_swi_init(idx, priority, handler, param);
+    }
+    idx -= __VSF_DEV_SWI_NUM;
+#   endif
+
+#   if      (__VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM + __VSF_DEV_SWI_NUM)          \
+        ||  !defined(__VSF_HAL_SWI_NUM)
+    return vsf_usr_swi_init(idx, priority, handler, param);
+#   else
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_FAIL;
+#   endif
+#else
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_FAIL;
+#endif
+}
+#endif
 
 // USB PHY configuration
 void m480_enable_usbphy(m480_usbphy_t phy, m480_usbphy_role_t role)

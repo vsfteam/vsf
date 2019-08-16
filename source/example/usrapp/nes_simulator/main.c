@@ -19,76 +19,139 @@
 
 #include "vsf.h"
 
-#include "component/3rd-party/littlevgl/5.3/raw/lvgl/lvgl.h"
-#include "lv_conf.h"
-
 /*============================ MACROS ========================================*/
+#ifndef VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER
+#   define VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER           DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_t {
-    uint32_t frame_rate;
-    uint32_t idletick_orig;
-    volatile uint32_t idletick;
-    vsf_callback_timer_t poll_timer;
-    struct {
-        volatile bool started;
-        bool flushing;
-        bool last;
-        //lv_disp_drv_t disp_drv;
-        uint8_t buffer[2 + (LV_HOR_RES * LV_COLOR_DEPTH / 8)];
-        vsf_eda_t eda;
-    } ui;
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+typedef struct line_buffer_t line_buffer_t;
+struct line_buffer_t {
+    implement(vsf_slist_node_t)
+    uint16_t line[256];
+    bool    last;
 };
-typedef struct usrapp_t usrapp_t;
+#endif
 
+struct vsf_usbd_uvc_helper_t {
+    volatile struct {
+        uint8_t started     : 1;
+        uint8_t flushing    : 1;
+        uint8_t last        : 1;
+    }flag;
+    uint8_t frame_rate;
+    uint8_t idletick_orig;
+    volatile uint8_t idletick;
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+    line_buffer_t *current_line;
+    vsf_slist_queue_t line_queue;
+#endif
+
+    uint8_t buffer[2 + (240 * 16 / 8)];
+    vsf_eda_t eda;
+    vsf_callback_timer_t poll_timer;
+};
+typedef struct vsf_usbd_uvc_helper_t vsf_usbd_uvc_helper_t;
+
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+declare_vsf_pool(line_pool);
+def_vsf_pool(line_pool, line_buffer_t);
+#endif
 /*============================ PROTOTYPES ====================================*/
 
-static void usrapp_on_timer(vsf_callback_timer_t *timer);
-static void usrapp_ui_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
+static void __uvc_helper_on_statistic_timer(vsf_callback_timer_t *timer);
+static void __uvc_helper_refresh_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-usrapp_t usrapp = {
-    .poll_timer.on_timer        = usrapp_on_timer,
-    .ui.eda.evthandler          = usrapp_ui_disp_evthandler,
+static vsf_usbd_uvc_helper_t __uvc_helper = {
+    .poll_timer.on_timer    = __uvc_helper_on_statistic_timer,
+    //.eda.evthandler         = __uvc_helper_refresh_evthandler,
 };
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void lvgl_create_demo(void);
-
 /*============================ IMPLEMENTATION ================================*/
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+implement_vsf_pool(line_pool, line_buffer_t)
+
+static NO_INIT vsf_pool(line_pool) __line_pool;
+#endif
 
 WEAK void ui_demo_trans_init(void) {}
 WEAK void ui_demo_trans_disp_line(uint8_t *buffer, uint_fast32_t size) {}
 WEAK void uvc_app_init(void){}
 WEAK void uvc_app_task(void){}
+WEAK void uvc_app_on_fill_line_cpl(bool frame_cpl){}
 
 void ui_demo_on_ready(void)
 {
-    usrapp.ui.started = true;
-    vsf_eda_init(&usrapp.ui.eda, vsf_priority_0, false);
+    __uvc_helper.flag.started = true;
+    vsf_eda_init(&__uvc_helper.eda, vsf_prio_0, false);
 }
 
 void uvc_app_fill_line(void *line_buf, uint_fast16_t size, bool last_line)
 {
-    /*
-    usrapp.ui.last = (y1 == (LV_VER_RES - 1));
-    memcpy(&usrapp.ui.buffer[2], color, pixel_number * LV_COLOR_DEPTH / 8);
-    usrapp.ui.flushing = true;
-    vsf_eda_post_evt(&usrapp.ui.eda, VSF_EVT_USER);
-    */
-    usrapp.ui.last = last_line;
-    usrapp.ui.flushing = true;
-    memcpy(&usrapp.ui.buffer[2], line_buf, size);
-    vsf_eda_post_evt(&usrapp.ui.eda, VSF_EVT_USER);
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+    line_buffer_t *line = NULL;
+    do {
+        line = VSF_POOL_ALLOC(line_pool, &__line_pool);
+    } while(NULL == line);
+    
+    line->last = last_line;
+    memcpy(line->line, line_buf, size);
+
+    vsf_slist_queue_enqueue(line_buffer_t, 
+                            use_as__vsf_slist_node_t, 
+                            &(__uvc_helper.line_queue),
+                            line);
+#else
+    while(__uvc_helper.flag.flushing);
+    __uvc_helper.flag.last = last_line;
+    memcpy(&__uvc_helper.buffer[2], line_buf, size);
+    __uvc_helper.flag.flushing = true;
+#endif
+    
+    vsf_eda_post_evt(&__uvc_helper.eda, VSF_EVT_USER);
 }
 
-static void usrapp_ui_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+static bool __request_transfer(vsf_usbd_uvc_helper_t *pthis)
 {
-    uint8_t *buffer = usrapp.ui.buffer;
+    bool bResult = false;
+    vsf_sched_safe() {
+        do {
+            if (NULL != pthis->current_line) {
+                //! busy
+                break;
+            }
+            //! dequeue
+            vsf_slist_queue_dequeue(line_buffer_t, 
+                                    use_as__vsf_slist_node_t, 
+                                    &(__uvc_helper.line_queue),
+                                    (pthis->current_line));
+            if (NULL == pthis->current_line) {
+                //! no content
+                break;
+            }
+            memcpy(&pthis->buffer[2], pthis->current_line, sizeof(pthis->current_line->line));
+            pthis->flag.last = (pthis->current_line->last) != 0;
+            pthis->flag.flushing = true;
+            ui_demo_trans_disp_line(pthis->buffer, sizeof(pthis->buffer));
+            bResult = true;
+        } while(0);
+    }
+
+    return bResult;
+}
+#endif
+
+static void __uvc_helper_refresh_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    uint8_t *buffer = __uvc_helper.buffer;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -96,48 +159,94 @@ static void usrapp_ui_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         buffer[1] = 0;
         break;
     case VSF_EVT_USER:
-        ui_demo_trans_disp_line(buffer, sizeof(usrapp.ui.buffer));
+    #if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+        __request_transfer(&__uvc_helper);
+    #else
+        ui_demo_trans_disp_line(buffer, sizeof(__uvc_helper.buffer));
+    #endif
         break;
     case VSF_EVT_MESSAGE:
-        usrapp.ui.flushing = false;
-        lv_flush_ready();
-
-        if (usrapp.ui.last) {
+        __uvc_helper.flag.flushing = false;
+        if (__uvc_helper.flag.last) {
             buffer[1] ^= 1;
-            usrapp.frame_rate++;
+            __uvc_helper.frame_rate++;
         }
+
+    #if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+        vsf_sched_safe() {
+            VSF_POOL_FREE(line_pool, &__line_pool, __uvc_helper.current_line);
+            __uvc_helper.current_line = NULL;
+        }
+        __request_transfer(&__uvc_helper);
+    #endif
+        uvc_app_on_fill_line_cpl(__uvc_helper.flag.last);
         break;
     }
 }
 
-static void usrapp_on_timer(vsf_callback_timer_t *timer)
+static void __uvc_helper_on_statistic_timer(vsf_callback_timer_t *timer)
 {
-    if (usrapp.ui.started) {
-        vsf_trace(VSF_TRACE_INFO, "frame_rate: %d" VSF_TRACE_CFG_LINEEND, usrapp.frame_rate);
+    if (__uvc_helper.flag.started) {
+        vsf_trace(VSF_TRACE_INFO, "frame_rate: %d" VSF_TRACE_CFG_LINEEND, __uvc_helper.frame_rate);
     }
-    uint32_t idletick = usrapp.idletick - usrapp.idletick_orig;
+    uint32_t idletick = __uvc_helper.idletick - __uvc_helper.idletick_orig;
     vsf_trace(VSF_TRACE_INFO, "idletick: %d" VSF_TRACE_CFG_LINEEND, idletick);
-    usrapp.idletick_orig = usrapp.idletick;
+    __uvc_helper.idletick_orig = __uvc_helper.idletick;
 
-    usrapp.frame_rate = 0;
+    __uvc_helper.frame_rate = 0;
     vsf_callback_timer_add_ms(timer, 1000);
+}
+
+vsf_err_t vsf_usbd_uvc_helper_init(void)
+{
+    if (VSF_ERR_NONE != vsf_eda_set_evthandler(&__uvc_helper.eda, 
+                                                __uvc_helper_refresh_evthandler)) {
+        ASSERT(false);
+    }
+
+#if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
+    VSF_POOL_PREPARE(line_pool, &__line_pool);
+    vsf_slist_queue_init(&(__uvc_helper.line_queue));
+#endif
+
+    ui_demo_trans_init();
+    vsf_callback_timer_add_ms(&__uvc_helper.poll_timer, 1000);
+
+    uvc_app_init();
+    return VSF_ERR_NONE;
+}
+
+void vsf_usbd_uvc_helper_task(void)
+{
+    __uvc_helper.idletick++;
+    if (__uvc_helper.flag.started) {
+        uvc_app_task();
+    }
+}
+
+static void demo(void)
+{
+#define MFUNC_IN_U8_DEC_VALUE          0x7E
+
+#include "utilities\preprocessor\mf_u8_dec2str.h"
+
+    vsf_trace(VSF_TRACE_INFO, "0x7F is converted to " STR(MFUNC_OUT_DEC_STR) );
 }
 
 int main(void)
 {
     vsf_trace_init(NULL);
-    ui_demo_trans_init();
-    vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
 
-    uvc_app_init();
+    demo();
+
+    vsf_usbd_uvc_helper_init();
 
     while (1) {
-        usrapp.idletick++;
-        if (usrapp.ui.started && !usrapp.ui.flushing) {
-            uvc_app_task();
-        }
+        vsf_usbd_uvc_helper_task();
     }
     return 0;
 }
+
+
 
 /* EOF */

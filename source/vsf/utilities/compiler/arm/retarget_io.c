@@ -51,8 +51,8 @@ extern int vsf_stdout_putchar(char ch);
 extern int vsf_stderr_putchar(char ch);
 extern int vsf_stdin_getchar(void);
 
-extern WEAK void vsf_stdout_init(void){}
-extern WEAK void vsf_stdin_init(void){}
+extern void vsf_stdout_init(void);
+extern void vsf_stdin_init(void);
 
 void vsf_stdio_init(void)
 {
@@ -425,7 +425,7 @@ size_t __write(int handle, const unsigned char *buf, size_t bufSize)
     /* Check for stdout and stderr
     (only necessary if FILE descriptors are enabled.) */
     if (handle != 1 && handle != 2) {
-        return -1;
+        return 0;
     }
     for (/* Empty */; bufSize > 0; --bufSize) {
         vsf_stdout_putchar(*buf++);
@@ -441,7 +441,7 @@ size_t __read(int handle, unsigned char *buf, size_t bufSize)
     /* Check for stdin
     (only necessary if FILE descriptors are enabled) */
     if (handle != 0) {
-        return -1;
+        return 0;
     }
     for (/*Empty*/; bufSize > 0; --bufSize) {
         uint8_t c = vsf_stdin_getchar();

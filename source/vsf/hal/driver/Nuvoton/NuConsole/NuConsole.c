@@ -9,7 +9,9 @@
  * Copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 
-#include "vsf.h"
+#include "hal/vsf_hal_cfg.h"
+
+#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
 #include "NuConsole.h"
 #include <string.h>
 
@@ -17,7 +19,7 @@
 	#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-NUCONSOLE_INFOBLOCK NuConsole_InfoBlock __AT_ADDR(0x20000000);
+NUCONSOLE_INFOBLOCK NuConsole_InfoBlock AT_ADDR(0x20000000);
 
 static uint8_t g_acTxBuffer[NUCOSOLE_TX_BUFFER_SIZE];
 static uint8_t g_acRxBuffer[NUCOSOLE_RX_BUFFER_SIZE];
@@ -200,3 +202,4 @@ uint32_t NuConsole_Read(uint8_t *pucBuffer, uint32_t uNumBytes)
 
 	return 0;
 }
+#endif

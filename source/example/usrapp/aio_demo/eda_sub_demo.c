@@ -166,12 +166,12 @@ static fsm_rt_t eda_sub_demo_fsm_main_entry(void *pthis, vsf_evt_t evt)
 void eda_sub_demo_start(void)
 {
     eda_sub_demo.teda.evthandler = eda_sub_demo_teda_main_evthandler;
-    vsf_teda_init(&eda_sub_demo.teda, vsf_priority_0, false);
+    vsf_teda_init(&eda_sub_demo.teda, vsf_prio_0, false);
 /*
     {
         vsf_eda_cfg_t cfg = {
             .fsm_entry  = eda_sub_demo_fsm_main_entry,
-            .priority   = vsf_priority_0,
+            .priority   = vsf_prio_0,
             .target     = NULL,
             .is_fsm     = true,
         };
@@ -194,7 +194,7 @@ int main(void)
     
     eda_sub_demo_start();
     
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
     while(1) {
         //printf("hello world! \r\n");
         vsf_delay_ms(1000);

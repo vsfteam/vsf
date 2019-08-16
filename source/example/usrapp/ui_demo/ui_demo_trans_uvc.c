@@ -22,8 +22,8 @@
 
 /*============================ MACROS ========================================*/
 
-#define SCREEN_WIDTH                    LV_HOR_RES
-#define SCREEN_HEIGHT                   LV_VER_RES
+#define SCREEN_WIDTH                    LV_HOR_RES_MAX
+#define SCREEN_HEIGHT                   LV_VER_RES_MAX
 #define SCREEN_FPS                      30
 
 #if LV_COLOR_DEPTH == 24
@@ -429,7 +429,7 @@ static usbd_uvc_t usbd_uvc = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void ui_demo_on_ready(void) {}
+WEAK void usrapp_on_ready(void) {}
 
 void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
@@ -442,7 +442,7 @@ void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
     if (!usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = true;
-        ui_demo_on_ready();
+        usrapp_on_ready();
     }
 }
 
@@ -451,12 +451,12 @@ static void vsf_usbd_on_timer(vsf_callback_timer_t *timer)
     vsf_usbd_connect(&usbd_uvc.usbd.dev);
 }
 
-void ui_demo_trans_disp_line(uint8_t *buffer, uint_fast32_t size)
+void usrapp_trans_disp_line(uint8_t *buffer, uint_fast32_t size)
 {
     vsf_usbd_UVC_send_packet(&usbd_uvc.usbd.uvc.param, buffer, size);
 }
 
-void ui_demo_trans_init(void)
+void usrapp_trans_init(void)
 {
     usbd_uvc.usbd.uvc.stream.probe_commit = usbd_uvc_const.usbd.uvc.stream.probe_commit;
     vsf_usbd_init(&usbd_uvc.usbd.dev);

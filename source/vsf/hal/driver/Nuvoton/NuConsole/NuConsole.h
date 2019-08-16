@@ -12,6 +12,10 @@
 #ifndef __NUCONSOLE_H__
 #define __NUCONSOLE_H__
 
+#include "hal/vsf_hal_cfg.h"
+
+#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
+
 #include <stdint.h>
 #include "NuConsole_Config.h"
 #include "NuConsole.h"
@@ -51,5 +55,5 @@ uint32_t NuConsole_Read(uint8_t *pucBuffer, uint32_t uNumBytes);
 #ifdef __cplusplus
 }
 #endif
-
+#endif
 #endif

@@ -34,14 +34,14 @@
 
 vsf_err_t vsf_fifo_init(vsf_fifo_t *fifo)
 {
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     fifo->head = fifo->tail = 0;
     return VSF_ERR_NONE;
 }
 
 uint_fast32_t vsf_fifo_get_data_length(vsf_fifo_t *fifo)
 {
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     if (fifo->head >= fifo->tail) {
         return fifo->head - fifo->tail;
     } else {
@@ -53,7 +53,7 @@ uint_fast32_t vsf_fifo_get_avail_length(vsf_fifo_t *fifo)
 {
     uint_fast32_t len;
 
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     len = fifo->size - vsf_fifo_get_data_length(fifo);
     if (len > 0) {
         len--;
@@ -65,7 +65,7 @@ uint_fast32_t vsf_fifo_write(vsf_fifo_t *fifo, uint8_t *buf, uint_fast32_t size)
 {
     uint_fast32_t tmp32;
 
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     if (size > vsf_fifo_get_avail_length(fifo)) {
         return 0;
     }
@@ -93,7 +93,7 @@ uint_fast32_t vsf_fifo_get_rbuf(vsf_fifo_t *fifo, uint8_t **buf)
 {
     uint_fast32_t tmp32, avail_len = vsf_fifo_get_data_length(fifo);
 
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     if (buf != NULL) {
         *buf = &fifo->buffer[fifo->tail];
     }
@@ -105,7 +105,7 @@ uint_fast32_t vsf_fifo_get_wbuf(vsf_fifo_t *fifo, uint8_t **buf)
 {
     uint_fast32_t tmp32, avail_len = vsf_fifo_get_avail_length(fifo);
 
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     if (buf != NULL) {
         *buf = &fifo->buffer[fifo->head];
     }
@@ -118,7 +118,7 @@ uint_fast32_t vsf_fifo_peek(vsf_fifo_t *fifo, uint8_t *buf, uint_fast32_t size)
     uint_fast32_t tmp32;
     uint_fast32_t avail_len = vsf_fifo_get_data_length(fifo);
 
-    ASSERT(fifo != NULL);
+    VSF_SERVICE_ASSERT(fifo != NULL);
     if (size > avail_len) {
         size = avail_len;
     }

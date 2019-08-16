@@ -39,6 +39,11 @@
 
 #define SYSTEM_FREQ                     (192000000ul)
 
+#if defined(__WIN__)
+//! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
+#   define VSF_SYSTIMER_RESOLUTION      (10 * 1000 * 1000)
+#endif
+
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
 //http://www.keil.com/support/man/docs/uv4/uv4_ut_configwizard.htm
@@ -51,20 +56,20 @@
 //      <h> Kernal event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
-//#define VSF_OS_EVTQ_POOL_SIZE               16
+//#define VSF_OS_CFG_EVTQ_POOL_SIZE           16
 
 //          <o>Event Bits <4-8>
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_BITSIZE                 4
+#define VSF_OS_CFG_EVTQ_BITSIZE                 4
 
 //          <o>The number of preemptive priorities <1-4>
 //          <i>Simon, please add description here...
-#define VSF_OS_CFG_PREEPT_PRI_NUM           1
+#define VSF_OS_CFG_PRIORITY_NUM                 1
 //      </h>
 
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks.
-//#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
+//#define VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE    16
 //  </h>
 
 
@@ -75,18 +80,18 @@
 //  <h> Kernel Feature Configuration
 //      <c1>Enable Inter-task synchronisation (vsf_sync_t)
 //      <i>Simon, please add description here...
-#define VSF_CFG_SYNC_EN                     ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_SYNC                     ENABLED
 //      </c>
 
 //      <h> Schedule Policy 
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_CFG_PREMPT_EN                   ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
 //          <i>Simon, please add description here...
-#define VSF_CFG_DYNAMIC_PRIOTIRY_EN         ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY         ENABLED
 //          </c>
 //      </h>
 
@@ -97,38 +102,38 @@
 
 //      <c1>Enable Timer-integrated tasks (vsf_teda_t)
 //      <i>Simon, please add description here...
-#define VSF_CFG_TIMER_EN                    ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                    ENABLED
 //      </c>
 
 //      <c1>Enable message queue support
 //      <i>Simon, please add description here...
-#define VSF_CFG_QUEUE_EN                    ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                    ENABLED
 //      </c>
 
 //      <c1>Enable Bitmap Event support
 //      <i>Simon, please add description here...
-#define VSF_CFG_BMPEVT_EN                   ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT                   ENABLED
 //      </c>
 
 //      <c1>Enable kernel tracing
 //      <i>Simon, please add description here...
-//#define VSF_CFG_EVT_TRACE_EN                ENABLED
+//#define VSF_KERNEL_CFG_TRACE                ENABLED
 //      </c>
 
 //      <h> Main Function
 //          <o>Main Stack Size              <128-65536:8>
 //          <i>When main function is configured as a thread, this option controls the size of the stack.
-//#define VSF_OS_MAIN_STACK_SIZE              2048
+//#define VSF_OS_CFG_MAIN_STACK_SIZE              2048
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_RUN_MAIN_AS_THREAD       DISABLED
+#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_BAREMETAL
 //          </c>
 //      </h>
 //      <h> Shell Configuration
 //          <c1>Enable default VSF simple shell
 //          <i>The default VSF simple shell provides an simple, easy and unified way to use kernel resources
-#define VSF_USE_SIMPLE_SHELL                ENABLED
+#define VSF_USE_KERNEL_SIMPLE_SHELL                ENABLED
 //          </c>
 //      </h>
 
@@ -155,13 +160,19 @@
 #define VSF_USE_USB_HOST_ECM                            ENABLED
 #define VSF_USE_USB_HOST_HCD_OHCI                       ENABLED
 
+#if defined(__WIN__) || defined(__LINUX__)
+#define VSF_USE_USB_DEVICE                              DISABLED
+#else
 #define VSF_USE_USB_DEVICE                              ENABLED
+#endif
 
 #define VSF_USE_TCPIP                                   ENABLED
 #define VSFIP_CFG_NETIF_HEADLEN                         64
 
 #define VSF_USE_TRACE                                   ENABLED
-
+#if defined(__WIN__) || defined(__LINUX__)
+#   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
+#endif
 
 #define VSF_USE_PBUF                                    ENABLED
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT                DISABLED

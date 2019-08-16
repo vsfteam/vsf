@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED && VSF_USE_KERNEL == ENABLED
 #include "../vsf_eda.h"
 #include "./__vsf_task_common.h"
 
@@ -34,29 +34,17 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
-    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __implement_vsf_pt(__NAME)                                           \
-        __implement_vsf_pt_common(__NAME, vsf_eda_frame_t *ptFrame)             \
-        {    __vsf_pt_common(__NAME) *ptThis =                                  \
-                        (__vsf_pt_common(__NAME) *)(ptFrame->param);            \
-            ASSERT(NULL != ptFrame);
-
-#   define __vsf_pt_state()         (ptFrame)->state
-#   define __vsf_pt_end()           __vsf_pt_end_closure_common()
-#else
-
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #       define __implement_vsf_pt(__NAME)                                       \
             __implement_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
-#   else
+#else
 #       define __implement_vsf_pt(__NAME)                                       \
             __implement_vsf_pt_common(__NAME, __NAME *ptThis)
-#   endif
-
-#   define __vsf_pt_state()         (ptThis)->chState
-#   define __vsf_pt_end()           __vsf_pt_end_common()
 #endif
+
+#define __vsf_pt_state()         (ptThis->chState)
+#define __vsf_pt_end()           __vsf_pt_end_common()
+
 
 
 #define __vsf_pt_begin(__state)     __vsf_pt_begin_common(__state)
@@ -93,7 +81,7 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __vsf_pt_call_sub(__NAME, __TARGET)                                  \
-            __vsf_eda_call_eda((vsf_eda_evthandler_t)(__NAME),                  \
+            __vsf_eda_call_eda((void *)(__NAME),                                \
                             (__TARGET))
 
 
@@ -104,14 +92,11 @@
         }                                                                       \
         vsf_pt_entry(return;); 
 
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#       define vsf_pt_call_pt(__NAME, __TARGET)                                 \
-            vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
-#   else
-#       define vsf_pt_call_pt(__NAME, __TARGET)                                 \
+
+#   define vsf_pt_call_pt(__NAME, __TARGET)                                     \
             (__TARGET)->chState = 0;                                            \
             vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
-#   endif
+
 #endif
 
 #define vsf_eda_call_pt(__NAME, __TARGET)                                       \
@@ -126,7 +111,6 @@
 #   define vsf_pt_call_fsm(__NAME, __TARGET, __RET_ADDR)                        \
         do {                                                                    \
             fsm_rt_t ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn);              \
-            /*(__TARGET)->chState = 0; */                                       \
             vsf_pt_entry();                                                     \
             ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn) =                      \
                 __vsf_pt_call_fsm(__NAME, (__TARGET));                          \
@@ -143,7 +127,7 @@
         vsf_pt_call_fsm(vsf_task_func(__NAME), __TARGET, __RET_ADDR)
 #endif
 
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #   define vsf_pt_start(...)        vsf_teda_init_ex(__VA_ARGS__)
 #else
 #   define vsf_pt_start(...)        vsf_eda_init_ex(__VA_ARGS__)
@@ -159,43 +143,31 @@
 #define __vsf_pt(__NAME)                __vsf_pt_common(__NAME)
 #define vsf_pt(__NAME)                  __vsf_pt(__NAME)
 
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
-    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __def_vsf_pt(__NAME,...)                                             \
-            __def_vsf_pt_common(__NAME, __VA_ARGS__)                            \
-            __extern_vsf_pt_common(__NAME, vsf_eda_frame_t *ptFrame);        
-#else
-#   define __def_vsf_pt(__NAME,...)                                             \
-            __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)           \
-            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis);
-#endif
+
+#define __def_vsf_pt(__NAME,...)                                                \
+            __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)           
+
 
 #define def_vsf_pt(__NAME,...)                                                  \
             __def_vsf_pt(__NAME,__VA_ARGS__)
 
-#define __declare_vsf_pt(__NAME)                                                \
-            __declare_vsf_pt_common(__NAME)
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   define __declare_vsf_pt(__NAME)                                             \
+            __declare_vsf_pt_common(__NAME)                                     \
+            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis);
+#else
+#   define __declare_vsf_pt(__NAME)                                             \
+            __declare_vsf_pt_common(__NAME)                                     \
+            __extern_vsf_pt_common(__NAME, __NAME *ptThis);
+#endif
 
 #define declare_vsf_pt(__NAME)          __declare_vsf_pt(__NAME)
 
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
-    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __init_vsf_pt(__NAME, __PT, __PRI, ...)                              \
+
+#define __init_vsf_pt(__NAME, __PT, __PRI, ...)                                 \
         do {                                                                    \
             vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
-                .evthandler = (vsf_eda_evthandler_t)__vsf_pt_func(__NAME),      \
-                .priority = (__PRI),                                            \
-                .target = &((__PT)->param),                                     \
-                __VA_ARGS__                                                     \
-            };                                                                  \
-            vsf_pt_start( &((__PT)->use_as__vsf_pt_t),                          \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
-        } while(0)
-#else
-#   define __init_vsf_pt(__NAME, __PT, __PRI, ...)                              \
-        do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
-                .evthandler = (vsf_eda_evthandler_t)__vsf_pt_func(__NAME),      \
+                .evthandler = (vsf_pt_entry_t)__vsf_pt_func(__NAME),            \
                 .priority = (__PRI),                                            \
                 .target = &((__PT)->param),                                     \
                 __VA_ARGS__                                                     \
@@ -204,7 +176,7 @@
             vsf_pt_start( &((__PT)->use_as__vsf_pt_t),                          \
                             &ATPASTE3(__,__LINE__,tCFG));                       \
         } while(0)
-#endif
+
 
 
 #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                                \
@@ -222,11 +194,13 @@
             __init_vsf_pt(__NAME, __PT, __PRI, __VA_ARGS__)
 /*============================ TYPES =========================================*/
 
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 typedef vsf_teda_t  vsf_pt_t;
 #else
 typedef vsf_eda_t  vsf_pt_t;
 #endif
+
+typedef vsf_eda_evthandler_t    vsf_pt_entry_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

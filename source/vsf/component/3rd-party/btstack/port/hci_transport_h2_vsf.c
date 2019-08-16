@@ -74,7 +74,7 @@ static void hci_transport_h2_register_packet_handler(
 
 static int hci_transport_h2_can_send_packet_now(uint8_t packet_type)
 {
-    if (hci_transport_h2_param.is_opened) {
+    if (hci_transport_h2_param.is_opened && (hci_transport_h2_param.dev != NULL)) {
         return vsf_usbh_bthci_can_send(hci_transport_h2_param.dev, packet_type);
     }
     return 0;
@@ -82,7 +82,7 @@ static int hci_transport_h2_can_send_packet_now(uint8_t packet_type)
 
 static int hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, int size)
 {
-    if (hci_transport_h2_param.is_opened) {
+    if (hci_transport_h2_param.is_opened && (hci_transport_h2_param.dev != NULL)) {
         return vsf_usbh_bthci_send(hci_transport_h2_param.dev, packet_type, packet, size);
     }
     return 0;

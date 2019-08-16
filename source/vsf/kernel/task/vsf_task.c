@@ -77,7 +77,7 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
                             void *pTarget, 
                             bool is_sub_call )
 {
-    ASSERT(NULL != ptask);
+    VSF_KERNEL_ASSERT(NULL != ptask);
     class_internal(ptask, ptThis, vsf_task_t);   
 
     if (!is_sub_call) {
@@ -91,7 +91,7 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
         vsf_task_stack_frame_t *pframe = 
             VSF_POOL_ALLOC(vsf_task_stack_frame_pool, this.pstack_frame_pool);
         if (NULL == pframe) {
-            ASSERT(false);
+            VSF_KERNEL_ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
         pframe->fnEntry = fnEntry;
@@ -148,7 +148,7 @@ static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
 {
     vsf_task_t *ptask = (vsf_task_t *)peda;
     class_internal(ptask, ptThis, vsf_task_t);
-    ASSERT(     ptask != NULL 
+    VSF_KERNEL_ASSERT(     ptask != NULL 
             &&  NULL != this.stack.frame_ptr
             &&  NULL != this.stack.frame_ptr->fnEntry);
 
@@ -214,7 +214,7 @@ void vsf_task_init( vsf_pool_block(vsf_task_stack_frame_pool) *frame_buf_ptr,
 
 vsf_err_t vsf_task_start(vsf_task_t *ptask, vsf_task_cfg_t *pcfg)
 {
-    ASSERT(     NULL != ptask 
+    VSF_KERNEL_ASSERT(     NULL != ptask 
             &&  NULL != pcfg
             &&  NULL != pcfg->fnEntry);
             

@@ -15,86 +15,210 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
+
+// for VSF_SWI_NUM and VSF_ARCH_PRI_NUM
+#include "hal/vsf_hal.h"
 
 #ifndef __VSF_KERNAL_CFG_H__
 #define __VSF_KERNAL_CFG_H__
 
-/*============================ INCLUDES ======================================*/
+#if VSF_USE_KERNEL == ENABLED
+
 /*============================ MACROS ========================================*/
-#ifndef VSF_CFG_SYNC_EN
-#   define VSF_CFG_SYNC_EN                      ENABLED
+
+#ifndef VSF_KERNEL_ASSERT
+#   define VSF_KERNEL_ASSERT(...)               ASSERT(__VA_ARGS__)
 #endif
-#if VSF_CFG_SYNC_EN == ENABLED
-#   ifndef VSF_CFG_BMPEVT_EN
-#       define VSF_CFG_BMPEVT_EN                ENABLED
+
+#define VSF_OS_CFG_MAIN_MODE_NONE               0
+#define VSF_OS_CFG_MAIN_MODE_THREAD             1
+#define VSF_OS_CFG_MAIN_MODE_EDA                2
+#define VSF_OS_CFG_MAIN_MODE_BAREMETAL          3
+    
+#ifndef VSF_OS_CFG_MAIN_MODE
+#   define VSF_OS_CFG_MAIN_MODE                 VSF_OS_CFG_MAIN_MODE_THREAD
+#endif
+
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
+#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
+#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
 #   endif
-#   ifndef VSF_CFG_QUEUE_EN
-#       define VSF_CFG_QUEUE_EN                 ENABLED
+#   ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
+#       define VSF_KERNEL_CFG_SUPPORT_THREAD                ENABLED
+#   elif VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#       error VSF_KERNEL_CFG_SUPPORT_THREAD MUST be enabled to use VSF_OS_CFG_MAIN_MODE_THREAD
 #   endif
 #endif
-#ifndef VSF_CFG_PREMPT_EN
-#   define VSF_CFG_PREMPT_EN                    ENABLED
+
+#ifndef VSF_KERNEL_CFG_SUPPORT_SYNC
+#   define VSF_KERNEL_CFG_SUPPORT_SYNC                      ENABLED
 #endif
-#ifndef VSF_CFG_TIMER_EN
-#   define VSF_CFG_TIMER_EN                     ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#   ifndef VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
+#       define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT          ENABLED
+#   endif
+#   ifndef VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE
+#       define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE             ENABLED
+#   endif
+#endif
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                 ENABLED
 #endif
 #ifndef VSF_KERNEL_CFG_CALLBACK_TIMER
-#   define VSF_KERNEL_CFG_CALLBACK_TIMER        ENABLED
+#   define VSF_KERNEL_CFG_CALLBACK_TIMER                    ENABLED
 #endif
 
 
+
+
+#ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
+#   define VSF_KERNEL_CFG_SUPPORT_THREAD                    ENABLED
+#endif
 
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL  ENABLED
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL              ENABLED
 #endif
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_FSM
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_FSM       ENABLED
-#endif
-#ifndef VSF_KERNEL_CFG_EDA_FRAME_POOL
-#   define VSF_KERNEL_CFG_EDA_FRAME_POOL        ENABLED
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                   ENABLED
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
 #       warning "VSF_KERNEL_CFG_EDA_SUPPORT_FSM need VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL, enable by default"
-#       define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL       ENABLED
+#       define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL  ENABLED
 #   endif
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   undef VSF_KERNEL_CFG_EDA_FRAME_POOL
-#   define VSF_KERNEL_CFG_EDA_FRAME_POOL        ENABLED
-#endif
-
-#if VSF_CFG_PREMPT_EN == ENABLED
-#   ifndef VSF_CFG_DYNAMIC_PRIOTIRY_EN
-#       define VSF_CFG_DYNAMIC_PRIOTIRY_EN  DISABLED
-#   endif
-#else
-#   undef VSF_CFG_DYNAMIC_PRIOTIRY_EN
-#   define VSF_CFG_DYNAMIC_PRIOTIRY_EN      DISABLED
-#endif
-
-#if VSF_CFG_PREMPT_EN == ENABLED
-#   define VSF_CFG_EVTQ_EN                  ENABLED
-#   if VSF_CFG_DYNAMIC_PRIOTIRY_EN == ENABLED
-#       define VSF_CFG_EVTQ_LIST
-#   else
-#       define VSF_CFG_EVTQ_ARRAY
+#   ifndef __VSF_KERNEL_CFG_EDA_FRAME_POOL
+#       define __VSF_KERNEL_CFG_EDA_FRAME_POOL              ENABLED
 #   endif
 #endif
 
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE  ENABLED
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE          ENABLED
 #endif
+
+#ifndef VSF_USE_KERNEL_SIMPLE_SHELL
+#   define VSF_USE_KERNEL_SIMPLE_SHELL                      ENABLED
+#endif
+
+// queue configurations
+#if VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE == ENABLED
+#   if __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE != ENABLED
+#       undef __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE
+#       define __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE       ENABLED
+#   endif
+#   define __VSF_KERNEL_CFG_SUPPORT_LIST_QUEUE              ENABLED
+#endif
+
+
+#ifndef VSF_USR_SWI_NUM
+#   define VSF_USR_SWI_NUM                      0
+#endif
+#if     !defined(VSF_OS_CFG_PRIORITY_NUM) && !defined(__VSF_OS_SWI_NUM)
+#   if (VSF_SWI_NUM + VSF_USR_SWI_NUM) > VSF_ARCH_PRI_NUM
+#       define __VSF_OS_SWI_NUM             VSF_ARCH_PRI_NUM
+#   else
+#       define __VSF_OS_SWI_NUM             (VSF_SWI_NUM + VSF_USR_SWI_NUM)
+#   endif
+#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#       define VSF_OS_CFG_PRIORITY_NUM      (__VSF_OS_SWI_NUM+1)
+#   else
+#       define VSF_OS_CFG_PRIORITY_NUM      __VSF_OS_SWI_NUM
+#   endif
+#elif !defined(__VSF_OS_SWI_NUM)
+#   warning "VSF_OS_CFG_PRIORITY_NUM is defined while __VSF_OS_SWI_NUM is not \
+automatically calculated based on VSF_OS_CFG_PRIORITY_NUM in vsf_cfg.h. This \
+should not happen."
+#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#       define __VSF_OS_SWI_NUM             (VSF_OS_CFG_PRIORITY_NUM-1)
+#   else
+#       define __VSF_OS_SWI_NUM             VSF_OS_CFG_PRIORITY_NUM
+#   endif
+#elif !defined(VSF_OS_CFG_PRIORITY_NUM)
+#   warning "User should never define __VSF_OS_SWI_NUM which is ought to be \
+calculated from macro VSF_OS_CFG_PRIORITY_NUM. Please define \
+VSF_OS_CFG_PRIORITY_NUM in your vsf_usr_cfg.h (or any configuration header file \
+included by vsf_usr_cfg.h)"
+#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#       define VSF_OS_CFG_PRIORITY_NUM      (__VSF_OS_SWI_NUM+1)
+#   else
+#       define VSF_OS_CFG_PRIORITY_NUM      __VSF_OS_SWI_NUM
+#   endif
+#endif
+
+
+#ifndef VSF_KERNEL_CFG_SUPPORT_PREMPT
+#   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
+#endif
+#ifndef VSF_OS_CFG_MAIN_EVTQ_EN
+#   define VSF_OS_CFG_MAIN_EVTQ_EN                          DISABLED
+#endif
+
+#if __VSF_OS_SWI_NUM > (VSF_USR_SWI_NUM + VSF_SWI_NUM)
+#   error "too many VSF_OS_CFG_PRIORITY_NUM!!!"
+#endif
+#if VSF_OS_CFG_PRIORITY_NUM <= 0
+#   error "VSF_OS_CFG_PRIORITY_NUM MUST be > 0"
+#endif
+
+#if __VSF_OS_SWI_NUM > 1 && VSF_KERNEL_CFG_SUPPORT_PREMPT != ENABLED
+#   warning "VSF_KERNEL_CFG_SUPPORT_PREMPT MUST be enabled to support           \
+VSF_OS_CFG_PRIORITY_NUM > 1"
+#   undef VSF_KERNEL_CFG_SUPPORT_PREMPT
+#   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
+#endif
+
+#if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_PREMPT != ENABLED
+#       warning "VSF_KERNEL_CFG_SUPPORT_PREMPT MUST be enabled to support       \
+VSF_OS_CFG_MAIN_EVTQ_EN"
+#       undef VSF_KERNEL_CFG_SUPPORT_PREMPT
+#       define VSF_KERNEL_CFG_SUPPORT_PREMPT                ENABLED
+#   endif
+
+/*! \note when VSF_OS_CFG_PRIORITY_NUM equals 1, no SWI is required, hence the 
+          macro __VSF_OS_SWI_PRIORITY_BEGIN should **NOT** be defined.
+*/
+#   if VSF_OS_CFG_PRIORITY_NUM > 1
+#       define __VSF_OS_SWI_PRIORITY_BEGIN      vsf_priority_1
+#   endif
+#else
+#   define __VSF_OS_SWI_PRIORITY_BEGIN          vsf_prio_0
+#endif
+
+#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#   define __VSF_KERNEL_CFG_EVTQ_EN                         ENABLED
+
+#   ifndef VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY
+#       define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY      ENABLED
+#   endif
+
+#   if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+#       define __VSF_OS_CFG_EVTQ_LIST
+#   else
+#       define __VSF_OS_CFG_EVTQ_ARRAY
+#       ifndef VSF_OS_CFG_EVTQ_BITSIZE
+#           define VSF_OS_CFG_EVTQ_BITSIZE                  4
+#       endif
+#   endif
+#else
+#   undef VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY
+#   define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY          DISABLED
+#endif
+
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#endif
 
 #endif
 /* EOF */

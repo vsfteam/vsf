@@ -145,26 +145,24 @@ fsm_initialiser(user_task_b_t,
  * NOTE: content in body() is protected from debug                            *
  *----------------------------------------------------------------------------*/
 implement_fsm(user_task_b_t) 
-    def_states(PRINT, DELAY);
+    def_states(DELAY, PRINT);
     
     body(
         on_start(
-            update_state_to(PRINT);
+            update_state_to(DELAY);
         )
+        
+        state(DELAY){
+            vsf_task_wait_until(vsf_delay_ms(10000))                            //!< wait 10s
+            update_state_to(PRINT);                                             //!< transfer to PRINT without yielding...
+        }
         
         state(PRINT){
             printf("post semaphore...   [%08x]\r\n", this.cnt++);
-            update_state_to(DELAY);                                             //!< transfer to DELAY without yielding...
+            vsf_sem_post(this.psem);                                            //!< post a semaphore
+            reset_fsm();                                                        //!< reset fsm
         }
         
-        state(DELAY){
-            vsf_task_wait_until(
-                vsf_delay_ms(10000){                                               //!< wait 10s
-                    vsf_sem_post(this.psem);                                    //!< post a semaphore
-                    reset_fsm();                                                //!< reset fsm
-                }
-            );
-        }
     )
 #endif
 
@@ -178,14 +176,14 @@ void vsf_kernel_fsm_simple_demo(void)
     {
         static NO_INIT user_fsm_task_t __user_task;
         init_fsm(user_fsm_task_t, &(__user_task.param), args(&user_sem));
-        start_fsm(user_fsm_task_t, &__user_task, vsf_priority_0);
+        start_fsm(user_fsm_task_t, &__user_task, vsf_prio_0);
     };
 
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
-        printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_delay_ms(10000);
+        printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
 #else
@@ -197,7 +195,7 @@ void vsf_kernel_fsm_simple_demo(void)
     {
         static NO_INIT user_task_b_t __user_task_b;
         init_fsm(user_task_b_t, &(__user_task_b.param), args(&user_sem));
-        start_fsm(user_task_b_t, &__user_task_b, vsf_priority_0);
+        start_fsm(user_task_b_t, &__user_task_b, vsf_prio_0);
     };
 #endif
 }

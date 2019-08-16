@@ -26,6 +26,11 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_SERVICE_ASSERT
+#   define VSF_SERVICE_ASSERT(...)               ASSERT(__VA_ARGS__)
+#endif
+
 #if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED && VSF_USE_HEAP != ENABLED
 #   warning [DEPENDENCY WARNING]\
 The Feature VSF_POOL_CFG_FEED_ON_HEAP is enabled but VSF_USE_HEAP is disabled.\

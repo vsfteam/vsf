@@ -66,6 +66,9 @@ struct vsf_usbh_hub_t {
         HUB_STAT_CONNECT_WAIT_PORT_CLEAR_CONNECT_CHANGE,
         HUB_STAT_CONNECT_WAIT_PORT_STABLE,
         HUB_STAT_CONNECT_WAIT_PORT_RESET_STABLE,
+
+        // standalone state
+        HUB_STAT_SCAN_DELAY_FOR_RESCAN_CURRENT_PORT,
     } state;
 
     uint8_t is_running              : 1;
@@ -196,7 +199,7 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
         switch (hub->state) {
         default:
-            ASSERT(false);
+            VSF_USB_ASSERT(false);
             break;
         case HUB_STAT_ENUM_WAIT_HUB_DESC_LEN:
             vsf_usbh_urb_set_buffer(urb, &hub->desc_hub, hub->desc_hub.bDescLength);
@@ -226,6 +229,9 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_teda_set_timer_ms(20);
             break;
         case HUB_STAT_RESET_CHILD_WAIT_GET_PORT_STATUS:
+            // clear reset mask here
+            hub->reset_mask &= ~(1 << (hub->cur_dev_idx - 1));
+
             // check port status after reset
             if (hub->hub_portsts.wPortStatus & USB_PORT_STAT_ENABLE) {
                 // reset ready
@@ -275,7 +281,12 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 err = hub_clear_port_feature(hub->usbh, dev, hub->cur_dev_idx,
                         USB_PORT_FEAT_C_RESET);
                 retain_state = true;
+            } else if (hub->usbh->dev_new != NULL) {
+                vsf_teda_set_timer_ms(10);
+                hub->state = HUB_STAT_SCAN_DELAY_FOR_RESCAN_CURRENT_PORT;
+                retain_state = true;
             } else if (hub->cur_dev_idx++ < dev->maxchild) {
+            scan_current_child:
                 hub->state = HUB_STAT_SCAN_START;
                 goto scan_next_child;
             } else {
@@ -323,7 +334,7 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_TIMER:
         switch (hub->state) {
         default:
-            ASSERT(false);
+            VSF_USB_ASSERT(false);
             break;
         case HUB_STAT_ENUM_WAIT_PORT_POWER_ON_STABLE:
             if (hub->cur_dev_idx < dev->maxchild) {
@@ -337,9 +348,6 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 hub->cur_dev_idx = 1;
             scan_next_child:
                 if (hub->reset_mask & (1 << (hub->cur_dev_idx - 1))) {
-                    // reset child requested
-                    hub->reset_mask &= ~(1 << (hub->cur_dev_idx - 1));
-
                 reset_child:
                     hub->state = HUB_STAT_RESET_CHILD_START;
                     hub->retry = 0;
@@ -371,23 +379,17 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case HUB_STAT_CONNECT_WAIT_PORT_STABLE:
             goto reset_child;
         case HUB_STAT_CONNECT_WAIT_PORT_RESET_STABLE:
-            // wait for new_dev free
             if (hub->usbh->dev_new != NULL) {
-                vsf_teda_set_timer_ms(200);
-                retain_state = true;
+                // should not run to here, because after dev_new is set,
+                //  hub driver will poll current port only
+                ASSERT(false);
             } else {
-                vsf_usbh_dev_t *dev_new = vsf_usbh_alloc_device(hub->usbh);
-                if (dev_new != NULL) {
-                    dev_new->speed =
+                enum usb_device_speed_t speed =
                         (hub->hub_portsts.wPortStatus & USB_PORT_STAT_LOW_SPEED) ? USB_SPEED_LOW :
                         (hub->hub_portsts.wPortStatus & USB_PORT_STAT_HIGH_SPEED) ? USB_SPEED_HIGH : USB_SPEED_FULL;
-
-                    dev_new->index = hub->cur_dev_idx - 1;
-                    dev_new->dev_parent = dev;
-                    vsf_slist_add_to_head(vsf_usbh_dev_t, child_node, &dev->children_list, dev_new);
-
-                    hub->usbh->dev_new = dev_new;
-                    vsf_eda_post_evt(&hub->usbh->teda.use_as__vsf_eda_t, VSF_EVT_INIT);
+                vsf_usbh_dev_t *dev_new = vsf_usbh_new_device(hub->usbh, speed, dev, hub->cur_dev_idx - 1);
+                if (NULL == dev_new) {
+                    // TODO: process if fail to allocate new device
                 }
 
                 hub->is_child_connecting = false;
@@ -395,6 +397,8 @@ static void vsf_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto scan_check_port_status;
             }
             break;
+        case HUB_STAT_SCAN_DELAY_FOR_RESCAN_CURRENT_PORT:
+            goto scan_current_child;
         }
         break;
     }
@@ -445,9 +449,14 @@ static void *vsf_usbh_hub_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     hub->dev = dev;
     hub->ifs = parser_ifs->ifs;
 
-    hub->teda.evthandler = vsf_usbh_hub_evthandler;
+    if (VSF_ERR_NONE != vsf_eda_set_evthandler( &(hub->teda.use_as__vsf_eda_t), 
+                                                vsf_usbh_hub_evthandler)) {
+        VSF_USB_ASSERT(false);
+    }
+    //hub->teda.evthandler = vsf_usbh_hub_evthandler;
+    
     hub->teda.on_terminate = vsf_usbh_hub_on_eda_terminate;
-    vsf_teda_init(&hub->teda, vsf_priority_inherit, false);
+    vsf_teda_init(&hub->teda, vsf_prio_inherit, false);
 
     return hub;
 }
@@ -474,11 +483,11 @@ const vsf_usbh_class_drv_t vsf_usbh_hub_drv = {
     .disconnect = vsf_usbh_hub_disconnect,
 };
 
-bool vsf_usbh_hub_dev_is_reset(vsf_usbh_dev_t *dev)
+bool vsf_usbh_hub_is_dev_resetting(vsf_usbh_dev_t *dev)
 {
     vsf_usbh_dev_t *dev_hub;
 
-    ASSERT(dev != NULL);
+    VSF_USB_ASSERT(dev != NULL);
     dev_hub = dev->dev_parent;
     if (dev_hub != NULL) {
         vsf_usbh_hub_t *hub = hub_dev_gethub(dev_hub);
@@ -491,7 +500,7 @@ vsf_err_t vsf_usbh_hub_reset_dev(vsf_usbh_dev_t *dev)
 {
     vsf_usbh_dev_t *dev_hub;
 
-    ASSERT(dev != NULL);
+    VSF_USB_ASSERT(dev != NULL);
     dev_hub = dev->dev_parent;
     if (dev_hub != NULL) {
         vsf_usbh_hub_t *hub = hub_dev_gethub(dev_hub);

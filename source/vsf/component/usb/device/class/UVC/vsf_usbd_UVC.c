@@ -41,8 +41,8 @@ static char * vsf_usbd_UVC_trace_get_request(uint_fast8_t request)
     case USB_UVCREQ_MIN:    return "MIN";
     case USB_UVCREQ_MAX:    return "MAX";
     case USB_UVCREQ_RES:    return "RES";
-	case USB_UVCREQ_LEN:    return "LEN";
-	case USB_UVCREQ_INFO:   return "INFO";
+    case USB_UVCREQ_LEN:    return "LEN";
+    case USB_UVCREQ_INFO:   return "INFO";
     case USB_UVCREQ_DEF:    return "DEF";
     default:                return "UNKNOWN";
     }
@@ -140,8 +140,8 @@ static vsfav_control_value_t *vsf_usbd_UVC_get_value(
     case USB_UVCREQ_MIN:    value = (vsfav_control_value_t *)&control->info->min; break;
     case USB_UVCREQ_MAX:    value = (vsfav_control_value_t *)&control->info->max; break;
     case USB_UVCREQ_RES:
-	case USB_UVCREQ_LEN:
-	case USB_UVCREQ_INFO:   break;
+    case USB_UVCREQ_LEN:
+    case USB_UVCREQ_INFO:   break;
     case USB_UVCREQ_DEF:    value = (vsfav_control_value_t *)&control->info->def; break;
     }
     return value;
@@ -221,8 +221,8 @@ static vsf_err_t vsf_usbd_UVC_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
     case USB_RECIP_ENDPOINT:
         break;
     }
-    ctrl_handler->trans.pchBuffer = buffer;
-    ctrl_handler->trans.nSize = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
 #if VSF_USBD_UVC_TRACE_EN == ENABLED
     uvc->cur_size = size;
     vsf_usbd_UVC_trace_request_prepare(ctrl_handler);
@@ -250,20 +250,21 @@ static vsf_err_t vsf_usbd_UVC_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
                 break;
             }
             break;
-        case USB_TYPE_CLASS: {
-//            uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
-            uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
-            uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
+        case USB_TYPE_CLASS:
+            {
+//                uint_fast8_t ifs_ep = (request->wIndex >> 0) & 0xFF;
+                uint_fast8_t entity = (request->wIndex >> 8) & 0xFF;
+                uint_fast8_t cs = (request->wValue >> 8) & 0xFF;
 
-            control = vsf_usbd_UVC_get_control(uvc, entity, cs);
-            if (!control) { return VSF_ERR_FAIL; }
+                control = vsf_usbd_UVC_get_control(uvc, entity, cs);
+                if (!control) { return VSF_ERR_FAIL; }
 
-            if (    (request->bRequest == (USB_UVCREQ_SET | USB_UVCREQ_CUR))
-                &&  (control->info->on_set != NULL)) {
-                control->info->on_set(control);
+                if (    (request->bRequest == (USB_UVCREQ_SET | USB_UVCREQ_CUR))
+                    &&  (control->info->on_set != NULL)) {
+                    control->info->on_set(control);
+                }
+                break;
             }
-            break;
-        }
         }
         break;
     case USB_RECIP_ENDPOINT:
