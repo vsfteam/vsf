@@ -263,10 +263,10 @@ typedef void (*usb_dc_evt_handler_t)(void *param, usb_evt_t evt, uint_fast8_t va
 //! @{
 struct usb_dc_cfg_t{
     vsf_arch_prio_t         priority;       //!< interrupt priority
-    usb_dc_evt_handler_t        evt_handler;    //!< evt_handler function
-    void *                      param;          //!< dcd related parameters
+    usb_dc_evt_handler_t    evt_handler;    //!< evt_handler function
+    void *                  param;          //!< dcd related parameters
 
-    usb_dc_speed_t              speed;          //!< speed
+    usb_dc_speed_t          speed;          //!< speed
 };
 typedef struct usb_dc_cfg_t usb_dc_cfg_t;
 //! @}
@@ -329,8 +329,8 @@ end_def_interface(i_usb_dc_t)
 //! @{
 struct usb_dc_ip_cfg_t{
     vsf_arch_prio_t         priority;       //!< interrupt priority
-    usb_ip_irq_handler_t        irq_handler;    //!< irq_handler function
-    void *                      param;          //!< dcd related parameters
+    usb_ip_irq_handler_t    irq_handler;    //!< irq_handler function
+    void *                  param;          //!< dcd related parameters
 };
 typedef struct usb_dc_ip_cfg_t usb_dc_ip_cfg_t;
 //! @}
@@ -338,9 +338,9 @@ typedef struct usb_dc_ip_cfg_t usb_dc_ip_cfg_t;
 //! \name usb_dc_ip information structure
 //! @{
 struct usb_dc_ip_info_t{
-    void *                      regbase;
-    uint8_t                     ep_num;
-    bool                        is_dma;
+    void *                  regbase;
+    uint8_t                 ep_num;
+    bool                    is_dma;
 };
 typedef struct usb_dc_ip_info_t usb_dc_ip_info_t;
 //! @}
@@ -373,8 +373,8 @@ end_def_interface(i_usb_dc_ip_t)
 //! @{
 struct usb_hc_ip_cfg_t{
     vsf_arch_prio_t         priority;       //!< interrupt priority
-    usb_ip_irq_handler_t        irq_handler;    //!< irq_handler function
-    void *                      param;          //!< hcd related parameters
+    usb_ip_irq_handler_t    irq_handler;    //!< irq_handler function
+    void *                  param;          //!< hcd related parameters
 };
 typedef struct usb_hc_ip_cfg_t usb_hc_ip_cfg_t;
 //! @}
@@ -382,9 +382,9 @@ typedef struct usb_hc_ip_cfg_t usb_hc_ip_cfg_t;
 //! \name usb_hc_ip information structure
 //! @{
 struct usb_hc_ip_info_t{
-    void *                      regbase;
-    uint8_t                     ep_num;
-    bool                        is_dma;
+    void *                  regbase;
+    uint8_t                 ep_num;
+    bool                    is_dma;
 };
 typedef struct usb_hc_ip_info_t usb_hc_ip_info_t;
 //! @}

@@ -75,3 +75,4 @@ source/example/project/vc_2017/x64
 source/example/project/vc_2017/Debug
 
 *.___i
+*.custom_argvars

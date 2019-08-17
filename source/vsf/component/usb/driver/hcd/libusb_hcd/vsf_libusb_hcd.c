@@ -102,7 +102,9 @@ struct vsf_libusb_hcd_urb_t {
         VSF_LIBUSB_HCD_URB_STATE_TO_FREE,
     } state;
 
-    bool irq_enabled;
+    bool is_irq_enabled;
+    bool is_msg_processed;
+
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
 };
@@ -399,6 +401,10 @@ static void __vsf_libusb_hcd_urb_thread(void *arg)
     while (1) {
         __vsf_arch_irq_request_pend(irq_request);
 
+            while (!libusb_urb->is_msg_processed) {
+                Sleep(1);
+            }
+
             is_to_free = VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state;
             if (!is_to_free) {
                 vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
@@ -459,16 +465,17 @@ static void __vsf_libusb_hcd_urb_thread(void *arg)
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
             __vsf_libusb_hcd_trace_urb(urb, "post msg in irq");
 #endif
-#if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
             if (is_to_free) {
+                libusb_urb->is_irq_enabled = false;
+#if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
                 __vsf_libusb_hcd_trace_urb_irq(urb, "fini");
-            }
 #endif
+            }
+            libusb_urb->is_msg_processed = false;
             vsf_eda_post_msg(&__vsf_libusb_hcd.teda.use_as__vsf_eda_t, urb);
         __vsf_arch_irq_end(irq_thread, false);
 
         if (is_to_free) {
-            libusb_urb->irq_enabled = false;
             __vsf_arch_irq_fini(irq_thread);
             __vsf_arch_irq_request_fini(irq_request);
             return;
@@ -512,20 +519,22 @@ static void __vsf_libusb_hcd_init_thread(void *arg)
 
 
 
-static void vsf_libusb_hcd_free_urb_do(vsf_usbh_hcd_urb_t *urb)
+static bool vsf_libusb_hcd_free_urb_do(vsf_usbh_hcd_urb_t *urb)
 {
     vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
-    if (libusb_urb->irq_enabled) {
+    if (libusb_urb->is_irq_enabled) {
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
         __vsf_libusb_hcd_trace_urb(urb, "irq running, try to exit first");
 #endif
         VSF_USB_ASSERT(VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state);
         __vsf_arch_irq_request_send(&libusb_urb->irq_request);
+        return false;
     } else {
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
         __vsf_libusb_hcd_trace_urb(urb, "freed");
 #endif
         VSF_USBH_FREE(urb);
+        return true;
     }
 }
 
@@ -620,13 +629,16 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             __vsf_libusb_hcd_trace_urb(urb, "get msg in hcd task");
 #endif
             if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state) {
-                vsf_libusb_hcd_free_urb_do(urb);
+                if (!vsf_libusb_hcd_free_urb_do(urb)) {
+                    libusb_urb->is_msg_processed = true;
+                }
             } else {
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
                 __vsf_libusb_hcd_trace_urb(urb, "notify");
 #endif
                 vsf_eda_post_msg(urb->eda_caller, urb);
                 libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_IDLE;
+                libusb_urb->is_msg_processed = true;
             }
         }
         break;
@@ -726,7 +738,8 @@ static vsf_usbh_hcd_urb_t * vsf_libusb_hcd_alloc_urb(vsf_usbh_hcd_t *hcd)
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
         __vsf_libusb_hcd_trace_urb_irq(urb, "init");
 #endif
-        libusb_urb->irq_enabled = true;
+        libusb_urb->is_msg_processed = true;
+        libusb_urb->is_irq_enabled = true;
         __vsf_arch_irq_init(&libusb_urb->irq_thread, __vsf_libusb_hcd_urb_thread, param->priority, true);
     }
     return urb;
@@ -741,7 +754,7 @@ static void vsf_libusb_hcd_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb
 #endif
         vsf_protect_t orig = vsf_protect_int();
             libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_TO_FREE;
-        if (libusb_urb->irq_enabled) {
+        if (libusb_urb->is_irq_enabled) {
             vsf_unprotect_int(orig);
             __vsf_arch_irq_request_send(&libusb_urb->irq_request);
             return;
