@@ -1,0 +1,16 @@
+ source/vsf/component/3rd-party/btstack/raw/src/hci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/vsf/component/3rd-party/btstack/raw/src/hci.c b/source/vsf/component/3rd-party/btstack/raw/src/hci.c
+index a55f9692..c1cfffda 100644
+--- a/source/vsf/component/3rd-party/btstack/raw/src/hci.c
++++ b/source/vsf/component/3rd-party/btstack/raw/src/hci.c
+@@ -94,7 +94,7 @@
+ #endif
+ 
+ #define HCI_CONNECTION_TIMEOUT_MS 10000
+-#define HCI_RESET_RESEND_TIMEOUT_MS 200
++#define HCI_RESET_RESEND_TIMEOUT_MS 2000
+ 
+ // Names are arbitrarily shortened to 32 bytes if not requested otherwise
+ #ifndef GAP_INQUIRY_MAX_NAME_LEN
