@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDCACM == ENABLED
 
 #include "../../../common/class/CDC/vsf_usb_CDCACM.h"
 
@@ -56,7 +56,7 @@ def_simple_class(vsf_usbd_CDCACM_t) {
 };
 
 typedef struct {
-    implement_ex(vsf_usbd_ep_cfg_t, ep);
+    implement_ex(vsf_usbd_ep_cfg_t, ep)
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
     vsf_stream_t *tx_stream;
     vsf_stream_t *rx_stream;
@@ -76,5 +76,5 @@ vsf_err_t vsf_usbd_CMDACM_init( vsf_usbd_CDCACM_t *obj,
                                 const vsf_usbd_CDCACM_cfg_t *cfg);
 
 
-#endif  // VSF_USE_USB_DEVICE
+#endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM
 #endif	// __VSF_USBD_CDCACM_H__

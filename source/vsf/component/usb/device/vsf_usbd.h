@@ -377,7 +377,7 @@ def_class(vsf_usbd_ep_stream_t,
     which(
         implement(vsf_stream_src_t)
         implement(vsf_stream_usr_t)
-    ),
+    )
     private_member(
         vsf_usbd_trans_t tx_trans;
         vsf_usbd_trans_t rx_trans;

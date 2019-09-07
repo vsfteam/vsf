@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDCACM == ENABLED
 
 #define VSF_USBD_INHERIT
 #define VSF_USBD_CDC_INHERIT
@@ -183,4 +183,4 @@ const vsf_usbd_class_op_t vsf_usbd_CDCACM_data =
 	.init = vsf_usbd_CDCACM_data_init,
 };
 
-#endif  // VSF_USE_USB_DEVICE
+#endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM

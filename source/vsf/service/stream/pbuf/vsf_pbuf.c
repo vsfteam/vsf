@@ -377,8 +377,8 @@ vsf_pbuf_t * vsf_pbuf_free(vsf_pbuf_t *pbuf)
 }
 
 
-void vsf_pbuf_pool_item_init_event_handler( void *ptTarget, 
-                                            void *pbuf, 
+void vsf_pbuf_pool_item_init_event_handler( uintptr_t ptTarget, 
+                                            uintptr_t pbuf, 
                                             uint_fast32_t nSize)
 {
     VSF_SERVICE_ASSERT(NULL != ptTarget);

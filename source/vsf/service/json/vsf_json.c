@@ -19,6 +19,8 @@
 
 #include "service/vsf_service_cfg.h"
 
+#if VSF_USE_JSON == ENABLED
+
 #define VSF_JSON_IMPLEMENT
 #include "./vsf_json.h"
 #include <ctype.h>
@@ -441,3 +443,5 @@ int vsf_json_set_null(vsf_json_constructor_t *c, char *key)
     if (vsf_json_set_key(c, key) < 0) { return -1; }
     return vsf_json_set_token(c, "null");
 }
+
+#endif      // VSF_USE_JSON

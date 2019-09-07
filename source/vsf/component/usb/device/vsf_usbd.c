@@ -571,7 +571,8 @@ static void vsf_usbd_setup_status_callback(void *param)
     vsf_usbd_drv_status_stage(out);
 }
 
-WEAK void vsf_usbd_notify_user(vsf_usbd_dev_t *dev, usb_evt_t evt, void *param)
+WEAK(vsf_usbd_notify_user)
+void vsf_usbd_notify_user(vsf_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
     
 }

@@ -98,16 +98,16 @@ void usrapp_sem_test_start(void)
 
     for (int i = 0; i < dimof(usrapp_sem.eda_recv); i++) {
         const vsf_eda_cfg_t cfg = {
-            .evthandler = usrapp_sem_recv_evthandler,
-            .priority = vsf_prio_0 + i,
+            .fn.evthandler  = usrapp_sem_recv_evthandler,
+            .priority       = vsf_prio_0 + i,
         };
         vsf_teda_init_ex(&usrapp_sem.eda_recv[i], (vsf_eda_cfg_t *)&cfg);
     }
 
     for (int i = 0; i < dimof(usrapp_sem.eda_send); i++) {
         const vsf_eda_cfg_t cfg = {
-            .evthandler = usrapp_sem_send_evthandler,
-            .priority = vsf_prio_0 + i,
+            .fn.evthandler  = usrapp_sem_send_evthandler,
+            .priority       = vsf_prio_0 + i,
         };
         vsf_teda_init_ex(&usrapp_sem.eda_send[i], (vsf_eda_cfg_t *)&cfg);
     }

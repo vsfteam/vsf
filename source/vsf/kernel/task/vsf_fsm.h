@@ -38,10 +38,12 @@
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
 
-#include <stdint.h>
+#include "utilities/compiler.h"
 /*============================ MACROS ========================================*/
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED && VSF_USE_KERNEL == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
+    &&  VSF_USE_KERNEL == ENABLED                                               \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
 #ifndef this
 #   define this    (*ptThis)
 #endif

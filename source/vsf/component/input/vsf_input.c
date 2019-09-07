@@ -18,6 +18,9 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./vsf_input_cfg.h"
+
+#if VSF_USE_INPUT == ENABLED
+
 #include "./vsf_input.h"
 #include "kernel/vsf_kernel.h"
 
@@ -27,6 +30,12 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
+    &&  defined(WEAK_VSF_INPUT_ON_EVT)
+WEAK_VSF_INPUT_ON_EVT_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 void vsf_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
@@ -119,22 +128,32 @@ vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre
     return NULL;
 }
 
-WEAK void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt)
+WEAK(vsf_input_on_sensor)
+void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt)
 {
+#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vsf_input_evt_t);
+#else
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vsf_input_evt_t);
+#endif
 }
 
-WEAK void vsf_input_on_new_dev(vsf_input_type_t type, void *dev)
+WEAK(vsf_input_on_new_dev)
+void vsf_input_on_new_dev(vsf_input_type_t type, void *dev)
 {
 }
 
-WEAK void vsf_input_on_free_dev(vsf_input_type_t type, void *dev)
+WEAK(vsf_input_on_free_dev)
+void vsf_input_on_free_dev(vsf_input_type_t type, void *dev)
 {
 }
 
-WEAK void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt)
+#ifndef WEAK_VSF_INPUT_ON_EVT
+WEAK(vsf_input_on_evt)
+void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt)
 {
 }
+#endif
 
 uint_fast32_t vsf_input_update_timestamp(vsf_input_timestamp_t *timestamp)
 {
@@ -143,3 +162,5 @@ uint_fast32_t vsf_input_update_timestamp(vsf_input_timestamp_t *timestamp)
     *timestamp = cur;
     return duration;
 }
+
+#endif      // VSF_USE_INPUT

@@ -28,7 +28,8 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_component_init(void)
+WEAK(vsf_component_init)
+void vsf_component_init(void)
 {
 
 }

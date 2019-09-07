@@ -214,6 +214,8 @@
 #   define with_class(__TYPE, __SRC, ...)                                       \
             __with_class(__TYPE, __SRC, __VA_ARGS__)                  
 
+#undef which
+#define which(...)                      PLOOC_VISIBLE(__VA_ARGS__)
         
 /*============================ TYPES =========================================*/
 

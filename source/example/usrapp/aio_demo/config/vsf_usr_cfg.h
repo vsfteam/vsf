@@ -155,8 +155,11 @@
 //  </h>
 //! @}
 
-#define VSF_INPUT_CFG_HID_EN                ENABLED
-#define VSF_INPUT_CFG_DS4_EN                ENABLED
+#define VSF_USE_INPUT                       ENABLED
+#define VSF_USE_INPUT_HID                   ENABLED
+#define VSF_USE_INPUT_DS4                   ENABLED
+
+#define VSF_USE_AV                          ENABLED
 
 #define VSF_USE_USB_HOST                    ENABLED
 #define VSF_USE_USB_HOST_HUB                ENABLED
@@ -173,8 +176,15 @@
 #define VSF_USBD_CFG_USE_EDA                ENABLED
 #define VSF_USBD_CFG_EDA_PRIORITY           vsf_prio_9
 #define VSF_USBD_CFG_HW_PRIORITY            vsf_arch_prio_9
+#define VSF_USE_USB_DEVICE_CDCACM           ENABLED
+#define VSF_USE_USB_DEVICE_UVC              ENABLED
+#   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
 
 #define VSF_USE_TCPIP                       ENABLED
+
+#define VSF_USE_UI                          ENABLED
+#define VSF_USE_UI_LVGL                     ENABLED
+#define VSF_USE_DISP_DRV_USBD_UVC           ENABLED
 
 #define VSF_USE_TRACE                       ENABLED
 

@@ -64,14 +64,14 @@ extern const vsf_stream_op_t vsf_fifo_stream_op;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_fifo_init(struct vsf_fifo_t *fifo);
-extern uint_fast32_t vsf_fifo_write(struct vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
-extern uint_fast32_t vsf_fifo_read(struct vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
-extern uint_fast32_t vsf_fifo_peek(struct vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
-extern uint_fast32_t vsf_fifo_get_wbuf(struct vsf_fifo_t *fifo, uint8_t **data);
-extern uint_fast32_t vsf_fifo_get_rbuf(struct vsf_fifo_t *fifo, uint8_t **data);
-extern uint_fast32_t vsf_fifo_get_data_length(struct vsf_fifo_t *fifo);
-extern uint_fast32_t vsf_fifo_get_avail_length(struct vsf_fifo_t *fifo);
+extern vsf_err_t vsf_fifo_init(vsf_fifo_t *fifo);
+extern uint_fast32_t vsf_fifo_write(vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
+extern uint_fast32_t vsf_fifo_read(vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
+extern uint_fast32_t vsf_fifo_peek(vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
+extern uint_fast32_t vsf_fifo_get_wbuf(vsf_fifo_t *fifo, uint8_t **data);
+extern uint_fast32_t vsf_fifo_get_rbuf(vsf_fifo_t *fifo, uint8_t **data);
+extern uint_fast32_t vsf_fifo_get_data_length(vsf_fifo_t *fifo);
+extern uint_fast32_t vsf_fifo_get_avail_length(vsf_fifo_t *fifo);
 
 #endif      // VSF_USE_SERVICE_VSFSTREAM
 #endif      // __VSF_FIFO_STREAM_H__

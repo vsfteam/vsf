@@ -36,7 +36,7 @@
 #endif
 
 #define __M480_SWI(__N, __VALUE)                                                \
-    ROOT void SWI##__N##_IRQHandler(void)                                       \
+    ROOT ISR(SWI##__N##_IRQHandler)                                             \
     {                                                                           \
         if (__m480_common.swi[__N].handler != NULL) {                           \
             __m480_common.swi[__N].handler(__m480_common.swi[__N].pparam);      \
@@ -165,7 +165,8 @@ static ALWAYS_INLINE void vsf_drv_swi_trigger(uint_fast8_t idx)
 #if __VSF_HAL_SWI_NUM > 0 || !defined(__VSF_HAL_SWI_NUM)
 // SWI
 
-WEAK void vsf_usr_swi_trigger(uint_fast8_t idx)
+WEAK(vsf_usr_swi_trigger)
+void vsf_usr_swi_trigger(uint_fast8_t idx)
 {
     VSF_HAL_ASSERT(false);
 }
@@ -192,7 +193,8 @@ void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 #endif
 }
 
-WEAK vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, 
+WEAK(vsf_usr_swi_init)
+vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, 
                                 vsf_arch_prio_t priority,
                                 vsf_swi_handler_t *handler, 
                                 void *param)

@@ -173,7 +173,8 @@ MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 #pragma GCC diagnostic pop
 #endif
 
-WEAK void vsf_hal_pre_startup_init(void)
+WEAK(vsf_hal_pre_startup_init) 
+void vsf_hal_pre_startup_init(void)
 {}
 
 /*----------------------------------------------------------------------------

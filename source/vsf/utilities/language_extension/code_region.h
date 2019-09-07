@@ -19,8 +19,7 @@
 #define __CODE_REGION_H__
 
 /*============================ INCLUDES ======================================*/
-#include <stdbool.h>
-#include <stdint.h>
+#include "utilities/compiler.h"
 
 /*! \brief How To Define and Use your own CODE_REGION
  *!        Example:
@@ -140,7 +139,26 @@ Output:
 #   define __CODE_REGION_START(__REGION_ADDR)   __CODE_REGION(__REGION_ADDR) {
 #   define __CODE_REGION_END()                  }
 
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __CODE_REGION_SIMPLE(__REGION_ADDR, __CODE)                          \
+    do {if (NULL != (__REGION_ADDR)) {                                          \
+        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
+        uint8_t local[pcode_region->pmethods->local_obj_size];                  \
+        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          \
+        __CODE;                                                                 \
+        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+    } }while(0);
 
+#   define __CODE_REGION_SIMPLE_START(__REGION_ADDR)                            \
+    do {if (NULL != (__REGION_ADDR)) {                                          \
+        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
+        uint8_t local[pcode_region->pmethods->local_obj_size];                  \
+        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          
+
+#   define __CODE_REGION_SIMPLE_END(__REGION_ADDR)                              \
+        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+    } } while(0);
+#else
 #   define __CODE_REGION_SIMPLE(__REGION_ADDR, ...)                             \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
@@ -149,8 +167,7 @@ Output:
         __VA_ARGS__;                                                            \
         pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
     } }while(0);
-
-
+    
 #   define __CODE_REGION_SIMPLE_START(__REGION_ADDR, ...)                       \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
@@ -160,6 +177,9 @@ Output:
 #   define __CODE_REGION_SIMPLE_END(__REGION_ADDR, ...)                         \
         pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
     } } while(0);
+#endif
+
+
 
 #endif
         
@@ -173,11 +193,18 @@ Output:
 #define CODE_REGION_START(__REGION_ADDR)    __CODE_REGION_START((__REGION_ADDR))
 #define CODE_REGION_END()                   __CODE_REGION_END()
 
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#define CODE_REGION_SIMPLE(__REGION_ADDR, __CODE)                               \
+            __CODE_REGION_SIMPLE((__REGION_ADDR), __CODE)
+#define code_region_simple(__REGION_ADDR, __CODE)                               \
+            __CODE_REGION_SIMPLE((__REGION_ADDR), __CODE)
+#else
 #define CODE_REGION_SIMPLE(__REGION_ADDR, ...)                                  \
             __CODE_REGION_SIMPLE((__REGION_ADDR), __VA_ARGS__)
 #define code_region_simple(__REGION_ADDR, ...)                                  \
             __CODE_REGION_SIMPLE((__REGION_ADDR), __VA_ARGS__)
-
+#endif
+    
 #define CODE_REGION_SIMPLE_START(__REGION_ADDR)                                 \
             __CODE_REGION_SIMPLE_START((__REGION_ADDR))
 #define CODE_REGION_SIMPLE_END()                                                \

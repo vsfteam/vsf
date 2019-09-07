@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDC == ENABLED
 
 #include "../../../common/class/CDC/vsf_usb_CDC.h"
 
@@ -87,5 +87,5 @@ extern const struct vsf_usbd_class_op_t vsf_usbd_CDC_data;
 // helper functions
 extern void vsf_usbd_CDC_data_connect(vsf_usbd_CDC_t *cdc);
 
-#endif  // VSF_USE_USB_DEVICE
+#endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDC
 #endif	// __VSF_USBD_CDC_H__

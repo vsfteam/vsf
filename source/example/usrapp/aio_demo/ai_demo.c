@@ -63,7 +63,7 @@ void print_img(int8_t * buf)
 {
     for(int y = 0; y < 28; y++)  {
         for (int x = 0; x < 28; x++)  {
-            int index = 69 / 127.0 * (127 - buf[y*28+x]); 
+            int index = 69 / 127 * (127 - buf[y*28+x]); 
             if(index > 69) index =69;
             if(index < 0) index = 0;
             printf("%c",codeLib[index]);

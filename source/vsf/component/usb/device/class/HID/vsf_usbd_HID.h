@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_HID == ENABLED
 
 #include "../../../common/class/HID/vsf_usb_HID.h"
 
@@ -115,5 +115,5 @@ extern const vsf_usbd_class_op_t vsf_usbd_HID;
 extern bool vsf_usbh_HID_IN_report_can_update(vsf_usbd_HID_report_t *report);
 extern vsf_err_t vsf_usbd_HID_IN_report_changed(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *report);
 
-#endif      // VSF_USE_USB_DEVICE
+#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_HID
 #endif      // __VSF_USBD_HID_H__

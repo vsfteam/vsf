@@ -20,6 +20,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "component/usb/vsf_usb_cfg.h"
+
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
+
 #include "utilities/compiler.h"
 
 /*============================ MACROS ========================================*/
@@ -80,4 +84,5 @@ typedef struct usb_UVC_ct_roi_t usb_UVC_ct_roi_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif    // __VSFUSB_UVC_H__
+#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
+#endif      // __VSFUSB_UVC_H__

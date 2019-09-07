@@ -24,19 +24,38 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-//! \name stream
-//! @{
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 typedef struct vsf_mem_t vsf_mem_t;
 struct vsf_mem_t {
     union {
         uint8_t *pchBuffer;         //!< stream buffer
         uint8_t *pchSrc;
         void *pObj;
+    }PTR;
+    int_fast32_t nSize;            //!< stream size
+};
+//! @}
+#else
+//! \name stream
+//! @{
+typedef struct vsf_mem_t vsf_mem_t;
+struct vsf_mem_t {
+    union {
+        union {
+            uint8_t *pchBuffer;         //!< stream buffer
+            uint8_t *pchSrc;
+            void *pObj;
+        };
+        union {
+            uint8_t *pchBuffer;         //!< stream buffer
+            uint8_t *pchSrc;
+            void *pObj;
+        }PTR;
     };
     int_fast32_t nSize;            //!< stream size
 };
 //! @}
-
+#endif
 
 //! \name interface: byte pipe
 //! @{

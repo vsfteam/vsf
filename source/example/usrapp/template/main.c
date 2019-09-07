@@ -334,10 +334,10 @@ int main(void)
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     for (int i = 0; i < dimof(__timer_example); i++) {
-        init_vsf_task(  timer_example_t,                        //!< vst_task type
-                        &__timer_example[i],                    //!< vsf_task object
-                        vsf_prio_0,                         //!< priority
-                        .target = &__timer_example[i]);         //!< target object (pthis)
+        init_vsf_task(  timer_example_t,                            //!< vst_task type
+                        &__timer_example[i],                        //!< vsf_task object
+                        vsf_prio_0,                                 //!< priority
+                        .target = (uintptr_t)&__timer_example[i]);   //!< target object (pthis)
     }
 #endif
 

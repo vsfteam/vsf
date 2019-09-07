@@ -103,8 +103,8 @@ void usrapp_mutex_test_start(void)
 
         {
             const vsf_eda_cfg_t cfg = {
-                .evthandler = usrapp_mutex_evthandler,
-                .priority = vsf_prio_0 + i,
+                .fn.evthandler  = usrapp_mutex_evthandler,
+                .priority       = vsf_prio_0 + i,
             };
             vsf_teda_init_ex(&usrapp_mutex.mutex_eda[i].teda, (vsf_eda_cfg_t *)&cfg);
         }

@@ -66,8 +66,8 @@ const vsf_stream_op_t vsf_nu_console_stream_op = {
 };
 
 vsf_stream_t  VSF_DEBUG_STREAM = {
-        .op = &vsf_nu_console_stream_op,
-    };
+    .op = &vsf_nu_console_stream_op,
+};
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
 static const i_stream_pbuf_tx_t s_iNUConsoleStreamTx = {
@@ -84,32 +84,37 @@ const vsf_stream_tx_t VSF_DEBUG_STREAM_TX = {
 #endif
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_stdout_init(void)
+WEAK(vsf_stdout_init) 
+void vsf_stdout_init(void)
 {
     //NuConsole_Init();
 }
 
-WEAK void vsf_stderr_init(void)
+WEAK(vsf_stderr_init) 
+void vsf_stderr_init(void)
 {
     //NuConsole_Init();
 }
 
-WEAK void vsf_stdin_init(void)
+WEAK(vsf_stdin_init) 
+void vsf_stdin_init(void)
 {
     //NuConsole_Init();
 }
 
-WEAK int vsf_stdout_putchar(char ch)
+WEAK(vsf_stdout_putchar) int vsf_stdout_putchar(char ch)
 {
     return NuConsole_Write((const uint8_t *)&ch, 1);
 }
 
-WEAK int vsf_stderr_putchar(char ch)
+WEAK(vsf_stderr_putchar) 
+int vsf_stderr_putchar(char ch)
 {
     return NuConsole_Write((const uint8_t *)&ch, 1);
 }
 
-WEAK int vsf_stdin_getchar(void)
+WEAK(vsf_stdin_getchar) 
+int vsf_stdin_getchar(void)
 {
     int ch = 0;
     NuConsole_Read((uint8_t *)&ch, 1);

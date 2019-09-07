@@ -104,7 +104,8 @@ static NO_INIT __vsf_heap_t __vsf_heap;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
+WEAK(vsf_heap_get_freelist)
+vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
 {
 	return &__vsf_heap.freelist[0];
 }
@@ -125,7 +126,7 @@ static void __vsf_heap_mcb_init(__vsf_heap_mcb_t *mcb)
 
 static uint_fast32_t __vsf_heap_calc_unaligned_size(void *buffer, uint_fast32_t alignment)
 {
-    uint_fast32_t unaligned_size = (uint_fast32_t)buffer & (alignment - 1);
+    uint_fast32_t unaligned_size = (uintptr_t)buffer & (alignment - 1);
     if (unaligned_size != 0) {
         unaligned_size = alignment - unaligned_size;
     }
@@ -134,7 +135,7 @@ static uint_fast32_t __vsf_heap_calc_unaligned_size(void *buffer, uint_fast32_t 
 
 static void __vsf_heap_mcb_set_next(__vsf_heap_mcb_t *mcb, __vsf_heap_mcb_t *mcb_next)
 {
-    uint_fast32_t margin_size = (uint32_t)mcb_next - (uint32_t)mcb;
+    uint_fast32_t margin_size = (uint8_t *)mcb_next - (uint8_t *)mcb;
     margin_size >>= VSF_HEAP_CFG_MCB_ALIGN_BIT;
     mcb->linear.next = mcb_next->linear.prev = margin_size;
 }
@@ -144,7 +145,7 @@ static __vsf_heap_mcb_t * __vsf_heap_mcb_get_next(__vsf_heap_mcb_t *mcb)
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
-    __vsf_heap_mcb_t *mcb_next = (__vsf_heap_mcb_t *)((uint32_t)mcb + __vsf_mcb_get_size(mcb));
+    __vsf_heap_mcb_t *mcb_next = (__vsf_heap_mcb_t *)((uint8_t *)mcb + __vsf_mcb_get_size(mcb));
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb_next->magic == VSF_HEAP_MCB_MAGIC);
 #endif
@@ -156,7 +157,7 @@ static __vsf_heap_mcb_t * __vsf_heap_mcb_get_prev(__vsf_heap_mcb_t *mcb)
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
 #endif
-    __vsf_heap_mcb_t *mcb_prev = (__vsf_heap_mcb_t *)((uint32_t)mcb - __vsf_mcb_get_prev_size(mcb));
+    __vsf_heap_mcb_t *mcb_prev = (__vsf_heap_mcb_t *)((uint8_t *)mcb - __vsf_mcb_get_prev_size(mcb));
 #if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
     VSF_SERVICE_ASSERT(mcb_prev->magic == VSF_HEAP_MCB_MAGIC);
 #endif
@@ -189,7 +190,7 @@ static void __vsf_heap_mcb_add_to_freelist(__vsf_heap_mcb_t *mcb)
 
 static __vsf_heap_mcb_t * __vsf_heap_get_mcb(uint8_t *buffer)
 {
-    uint_fast32_t addr = (uint32_t)buffer - sizeof(__vsf_heap_mcb_t);
+    uintptr_t addr = (uintptr_t)buffer - sizeof(__vsf_heap_mcb_t);
     addr = (addr + (VSF_HEAP_CFG_MCB_ALIGN - 1)) & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
     return (__vsf_heap_mcb_t *)addr;
 }
@@ -223,7 +224,7 @@ static void * __vsf_heap_mcb_malloc(__vsf_heap_mcb_t *mcb, uint_fast32_t size,
 
         __vsf_heap_mcb_remove_from_freelist(mcb);
         mcb_new = __vsf_heap_get_mcb(buffer);
-        margin_size = (uint32_t)mcb_new - (uint32_t)mcb;
+        margin_size = (uint8_t *)mcb_new - (uint8_t *)mcb;
 
         if (0 == margin_size) {
             temp_size = mcb->linear.prev;
@@ -244,15 +245,15 @@ static void * __vsf_heap_mcb_malloc(__vsf_heap_mcb_t *mcb, uint_fast32_t size,
         mcb = __vsf_heap_mcb_get_next(mcb_new);
         mcb->linear.prev = mcb_new->linear.next;
 
-        uint_fast32_t addr = (uint_fast32_t)buffer + size;
+        uintptr_t addr = (uintptr_t)buffer + size;
         addr += VSF_HEAP_CFG_MCB_ALIGN - 1;
         addr &= ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
-        margin_size = buffer_size - (addr - (uint_fast32_t)buffer);
+        margin_size = buffer_size - (addr - (uintptr_t)buffer);
         if(margin_size > sizeof(__vsf_heap_mcb_t)) {
             mcb = (__vsf_heap_mcb_t *)addr;
             __vsf_heap_mcb_init(mcb);
 
-            margin_size = (uint32_t)mcb - (uint32_t)mcb_new;
+            margin_size = (uint8_t *)mcb - (uint8_t *)mcb_new;
             margin_size >>= VSF_HEAP_CFG_MCB_ALIGN_BIT;
             mcb->linear.next = mcb_new->linear.next - margin_size;
             mcb->linear.prev = mcb_new->linear.next = margin_size;
@@ -529,7 +530,7 @@ label_first_add:
 
 void vsf_heap_add_memory(vsf_mem_t mem)
 {
-    vsf_heap_add(mem.pchSrc, mem.nSize);
+    vsf_heap_add(mem.PTR.pchSrc, mem.nSize);
 }
 
 void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
@@ -538,7 +539,7 @@ void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
     void *buffer;
 
     if (alignment) {
-        VSF_SERVICE_ASSERT((alignment >= 4) && !(alignment & (alignment - 1)));
+        VSF_SERVICE_ASSERT(!(alignment & (alignment - 1)));
     }
 
     size = (size + 3) & ~3;
@@ -562,20 +563,21 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
 {
     void             *new_buffer;           
     __vsf_heap_mcb_t *mcb, *mcb_new;
-    uint_fast32_t    memory_size, margin_size, addr;
+    uint_fast32_t    memory_size, margin_size;
+    uintptr_t        addr;
     
     VSF_SERVICE_ASSERT((buffer != NULL) && (alignment >= 4) && !(alignment & (alignment - 1)));
     
     mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
     realloc:
     memory_size = __vsf_mcb_get_size(mcb);
-    memory_size -= (uint_fast32_t)buffer - (uint_fast32_t)mcb;
+    memory_size -= (uint8_t *)buffer - (uint8_t *)mcb;
     
     if(memory_size >= size) {
-        addr = (uint_fast32_t)buffer + size;
+        addr = (uintptr_t)buffer + size;
         addr += alignment - 1;
         addr &= ~(alignment - 1);
-        margin_size = memory_size - addr + (uint_fast32_t)buffer;
+        margin_size = memory_size - addr + (uintptr_t)buffer;
         if(margin_size > sizeof(__vsf_heap_mcb_t)) {
             mcb_new = (__vsf_heap_mcb_t *)addr;
             __vsf_heap_mcb_init(mcb_new);
@@ -689,7 +691,7 @@ bool vsf_heap_partial_free(void *buffer, uint_fast32_t pos, uint_fast32_t size)
         // need to allocate new mcb for tail area
         buffer_tmp += size;
         mcb_tail = __vsf_heap_get_mcb(buffer_tmp);
-        if ((uint32_t)mcb_tail <= ((uint32_t)mcb_free + sizeof(__vsf_heap_mcb_t))) {
+        if ((uint8_t *)mcb_tail <= ((uint8_t *)mcb_free + sizeof(__vsf_heap_mcb_t))) {
             return false;
         }
         __vsf_heap_mcb_init(mcb_tail);
@@ -699,7 +701,7 @@ bool vsf_heap_partial_free(void *buffer, uint_fast32_t pos, uint_fast32_t size)
     }
     __vsf_heap_mcb_set_next(mcb_tail, mcb_next);
 
-    vsf_heap_free((void *)((uint32_t)mcb_free + sizeof(__vsf_heap_mcb_t)));
+    vsf_heap_free((void *)((uint8_t *)mcb_free + sizeof(__vsf_heap_mcb_t)));
     return true;
 }
 

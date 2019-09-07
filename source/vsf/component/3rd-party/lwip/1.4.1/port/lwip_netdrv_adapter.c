@@ -48,7 +48,8 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void lwip_request__addr__from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gateway)
+WEAK(lwip_request__addr__from_user)
+void lwip_request__addr__from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gateway)
 {
 }
 

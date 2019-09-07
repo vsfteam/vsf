@@ -82,10 +82,16 @@
 #endif
 //! @}
 
+#undef __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
+#if defined(__GNUC__)
+#   define  __IS_COMPILER_SUPPORT_GNUC_EXTENSION__      1
+#endif
+
 #if __IS_COMPILER_IAR__
 #   include <intrinsics.h>
 #endif
 
+#include "./type.h"
 
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_ARM_COMPILER_5__
@@ -184,7 +190,7 @@
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK                 __weak
+#   define WEAK(...)            __weak
 #   define RAMFUNC              __ramfunc
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))
@@ -197,6 +203,10 @@
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
+#   define __IAR_STARTUP_DATA_INIT  __iar_data_init3
+
+#   define __ISR(__VEC)       void __VEC(void)
+
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
@@ -205,7 +215,7 @@
 #   define INLINE               __inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        __inline __attribute__((always_inline))
-#   define WEAK                 __attribute__((weak))
+#   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N))) 
@@ -219,6 +229,8 @@
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
+#   define __ISR(__VEC)       void __VEC(void)
+
 #elif __IS_COMPILER_ARM_COMPILER_6__
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
@@ -227,7 +239,7 @@
 #   define INLINE               __inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        __inline __attribute__((always_inline))
-#   define WEAK                 __attribute__((weak))
+#   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N))) 
@@ -241,6 +253,8 @@
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
+#   define __ISR(__VEC)       void __VEC(void)
+
 #elif __IS_COMPILER_LLVM__
 
 #   define ROM_FLASH            __attribute__(( __section__( ".rom.flash"))) const
@@ -250,7 +264,7 @@
 #   define INLINE               __inline__
 #   define NO_INLINE            __attribute__ ((__noinline__))
 #   define ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
-#   define WEAK                 __attribute__((__weak__))
+#   define WEAK(...)            __attribute__((__weak__))
 #   define RAMFUNC              __attribute__((__section__ (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
@@ -265,6 +279,8 @@
 #   define TRANSPARENT_UNION    __attribute__((__transparent_union__))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
+#   define __ISR(__VEC)       void __VEC(void)
+
 #else  /*__IS_COMPILER_GCC__: Using GCC as default for those GCC compliant compilers*/
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
@@ -273,7 +289,7 @@
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK                 __attribute__((weak))
+#   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))
@@ -287,6 +303,7 @@
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)    __alignof__(__VA_ARGS__)
 
+#   define __ISR(__VEC)       void __VEC(void)
 #endif
 
 #define WEAK_ALIAS(__ORIGIN, __ALIAS)                                           \
@@ -296,7 +313,7 @@
 #define SECTION(__SEC)      __SECTION(__SEC)
 #define ALIGN_OF(...)       __ALIGN_OF(__VA_ARGS__)
 #define ALIGN_WITH(...)     ALIGN(ALIGN_OF(__VA_ARGS__))
-
+#define ISR(...)            __ISR(__VA_ARGS__)
 /*----------------------------------------------------------------------------*
  * Signal & Interrupt Definition                                              *
  *----------------------------------------------------------------------------*/

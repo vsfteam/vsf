@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_KERNEL_ASSERT
-#   define VSF_KERNEL_ASSERT(...)               ASSERT(__VA_ARGS__)
+#   define VSF_KERNEL_ASSERT                    ASSERT
 #endif
 
 #define VSF_OS_CFG_MAIN_MODE_NONE               0
@@ -67,8 +67,16 @@
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                 ENABLED
 #endif
-#ifndef VSF_KERNEL_CFG_CALLBACK_TIMER
-#   define VSF_KERNEL_CFG_CALLBACK_TIMER                    ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   ifndef VSF_KERNEL_CFG_CALLBACK_TIMER
+#       define VSF_KERNEL_CFG_CALLBACK_TIMER                ENABLED
+#   endif
+#else
+#   if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
+#       warning "VSF_KERNEL_CFG_EDA_SUPPORT_TIMER MUST be enabled to use callback_timer"
+#       undef VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#       define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER             ENABLED
+#   endif
 #endif
 
 
@@ -185,7 +193,7 @@ VSF_OS_CFG_MAIN_EVTQ_EN"
           macro __VSF_OS_SWI_PRIORITY_BEGIN should **NOT** be defined.
 */
 #   if VSF_OS_CFG_PRIORITY_NUM > 1
-#       define __VSF_OS_SWI_PRIORITY_BEGIN      vsf_priority_1
+#       define __VSF_OS_SWI_PRIORITY_BEGIN      vsf_prio_1
 #   endif
 #else
 #   define __VSF_OS_SWI_PRIORITY_BEGIN          vsf_prio_0

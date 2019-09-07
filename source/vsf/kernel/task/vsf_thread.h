@@ -305,7 +305,7 @@ def_class(vsf_thread_cb_t,
         vsf_thread_entry_t  *entry;
         uint16_t            stack_size;
         uint64_t            *stack;                 //!< stack must be 8byte aligned
-    ),
+    )
 
     private_member(
         jmp_buf         *pos;

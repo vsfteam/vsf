@@ -20,7 +20,7 @@
 #include "hal/arch/vsf_arch_abstraction.h"
 #include "systick/systick.h"
 #include "hal/driver/driver.h"
-
+#include "hal/arch/__vsf_arch_interface.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -35,202 +35,95 @@ struct __vsf_cm_t {
 #endif
         vsf_gint_state_t global_int_state;
     } pendsv;
-    struct {
-        vsf_systimer_cnt_t tick;
-        vsf_systimer_cnt_t unit;
-        vsf_systimer_cnt_t max_tick_per_round;
-        uint32_t           tick_freq;
-    } systimer;
 };
 typedef struct __vsf_cm_t __vsf_cm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-NO_INIT static __vsf_cm_t __vsf_cm;
+static __vsf_cm_t __vsf_cm;
 
 /*============================ PROTOTYPES ====================================*/
-extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
-
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
+/*----------------------------------------------------------------------------*
+ * System Timer                                                               *
+ *----------------------------------------------------------------------------*/
+
+vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
 {
-    UNUSED_PARAM(tick);
-    return true;
+    return SYSTICK_RVR - vsf_systick_get_count();
 }
 
-static vsf_systimer_cnt_t __vsf_systimer_update(void)
+void vsf_systimer_clear_int_pending_bit(void)
 {
-    vsf_systimer_cnt_t tick;
-   
-    tick = vsf_systimer_get();
-    __vsf_cm.systimer.tick = tick;
-    return tick;
+    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;            //!< clear pending bit
 }
 
-static bool __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
+void vsf_systimer_reset_counter_value(void)
 {
-    if (0 == tick_cnt) {
-        return false;
-    }
-    tick_cnt *= __vsf_cm.systimer.unit;
-    
-    vsf_systick_disable();
-    vsf_systick_set_reload(tick_cnt);
-    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;    //!< clear pending bit
-    vsf_systick_clear_count();              //!< force a reload
-    vsf_systick_int_enable();
-    vsf_systick_enable();
-    return true;
+    vsf_systick_clear_count();
 }
 
-WEAK void vsf_systimer_set_idle(void)
-{   
-//    vsf_trace(VSF_TRACE_DEBUG, "systimer_idle\r\n");
-    __SAFE_ATOM_CODE(
-        __vsf_systimer_update();
-        __vsf_systimer_set_target(__vsf_cm.systimer.max_tick_per_round);
-    )
-}
-
-ROOT void SysTick_Handler(void)
-{   
-    vsf_systick_int_disable();
-    __vsf_systimer_update();
-    vsf_systimer_cnt_t tick = __vsf_cm.systimer.tick;
-    vsf_systick_disable();
-    if (on_arch_systimer_tick_evt(tick)) {
-        vsf_systimer_evthandler(tick);
-    }
-}
-
-ROOT void PendSV_Handler(void)
-{
-    if (__vsf_cm.pendsv.handler != NULL) {
-        __vsf_cm.pendsv.handler(__vsf_cm.pendsv.pparam);
-    }
-}
-
-WEAK uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
-{
-    return VSF_GET_MAIN_CLK();
-}
-
-WEAK uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
-{
-    return 1000000ul;
-}
-
-/*! \brief initialise SysTick to generate a system timer
- *! \param frequency the target tick frequency in Hz
- *! \return initialization result in vsf_err_t 
+/*! \brief disable systimer and return over-flow flag status
+ *! \param none
+ *! \retval true  overflow happened
+ *! \retval false no overflow happened
  */
-WEAK vsf_err_t vsf_systimer_init(void)
+bool vsf_systimer_low_level_disable(void)
 {
-    //! calculate the cycle count of 1 tick
-    uint_fast32_t tick_res = vsf_arch_req___systimer_resolution___from_usr();
-    __vsf_cm.systimer.unit = vsf_arch_req___systimer_freq___from_usr() / tick_res;
-    __vsf_cm.systimer.tick_freq = tick_res;
-    __vsf_cm.systimer.max_tick_per_round = (0x01000000ul / __vsf_cm.systimer.unit) - 1;
+    return vsf_systick_disable();
+}
 
+/*! \brief only enable systimer without clearing any flags
+ */
+void vsf_systimer_low_level_enable(void)
+{
+    vsf_systick_enable();
+}
+
+void vsf_systimer_low_level_int_disable(void)
+{
+    vsf_systick_int_disable();
+}
+
+void vsf_systimer_low_level_int_enable(void)
+{
+    vsf_systick_int_enable();
+}
+
+void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
+{
+    vsf_systick_set_reload(tick_cnt);
+}
+
+ROOT ISR(SysTick_Handler)
+{   
+    vsf_systimer_ovf_evt_hanlder();
+}
+
+
+/*! \brief initialise systimer without enable it 
+ */
+vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
+{
     vsf_systick_cfg (
         DISABLE_SYSTICK             |
         SYSTICK_SOURCE_SYSCLK       |
         ENABLE_SYSTICK_INTERRUPT,
-        __vsf_cm.systimer.max_tick_per_round * __vsf_cm.systimer.unit
+        ticks
     );
-
-    return VSF_ERR_NONE;
-}
-
-WEAK vsf_err_t vsf_systimer_start(void)
-{
-    __SAFE_ATOM_CODE(
-        __vsf_systimer_set_target(__vsf_cm.systimer.max_tick_per_round);
-    )
-    return VSF_ERR_NONE;
-}
-
-
-WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
-{
-    vsf_systimer_cnt_t ticks = 0;
-    bool auto_update = false;
-    __SAFE_ATOM_CODE(
-        if (vsf_systick_disable()) {       //!< the match bit will be cleared
-            ticks += SYSTICK_RVR;
-            auto_update = true;
-        }
-        ticks += (SYSTICK_RVR - vsf_systick_get_count());
-        vsf_systick_enable();
-        ticks /= __vsf_cm.systimer.unit;
-        ticks += __vsf_cm.systimer.tick;
-        if (auto_update) {
-            __vsf_cm.systimer.tick = ticks;
-        }
-    )
-    return ticks;
-}
-
-WEAK bool vsf_systimer_set(vsf_systimer_cnt_t due)
-{
-    bool result = false;
-    //vsf_systimer_cnt_t unit = __vsf_cm.systimer.unit;
-    vsf_systimer_cnt_t max_tick_per_round = __vsf_cm.systimer.max_tick_per_round;
-
-    SAFE_ATOM_CODE(){
-        vsf_systimer_cnt_t current = __vsf_systimer_update();
-        //vsf_systick_disable();
-        vsf_systimer_cnt_t tick_cnt;
-//        vsf_trace(VSF_TRACE_DEBUG, "systimer_set: %lld %lld %c\r\n",
-//                    current, due, due > current ? '*' : ' ');
-        /*
-        if (due < current) {
-            tick_cnt = 0xFFFFFFFF - current + due + 1;
-        } else {
-            tick_cnt = due - current;
-        }
-        */
-        if (due > current) {
-            tick_cnt = due - current;
-            tick_cnt = min(max_tick_per_round, tick_cnt);
-            result = __vsf_systimer_set_target(tick_cnt);
-        }
-    }
     
-    return result;
+    return VSF_ERR_NONE;
 }
 
-WEAK bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+/*----------------------------------------------------------------------------*
+ * SWI / PendSV                                                               *
+ *----------------------------------------------------------------------------*/
+ROOT ISR(PendSV_Handler)
 {
-    return (__vsf_cm.systimer.tick >= due);
-}
-
-
-
-WEAK vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
-{
-    return ((uint64_t)  ((uint64_t)time_us 
-                            * (uint64_t)__vsf_cm.systimer.tick_freq) 
-                        / 1000000ul);
-}
-
-WEAK vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
-{
-    return ((uint64_t)  ((uint64_t)time_ms 
-                            * (uint64_t)__vsf_cm.systimer.tick_freq) 
-                        / 1000ul);
-}
-
-WEAK uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
-{
-    return tick * 1000000ul / __vsf_cm.systimer.tick_freq;
-}
-
-WEAK uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
-{
-    return vsf_systimer_tick_to_us(tick) / 1000;
+    if (__vsf_cm.pendsv.handler != NULL) {
+        __vsf_cm.pendsv.handler(__vsf_cm.pendsv.pparam);
+    }
 }
 
 /*! \brief initialise a software interrupt
@@ -332,10 +225,10 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-bool vsf_arch_init(void)
+bool vsf_arch_low_level_init(void)
 {
-    memset(&__vsf_cm, 0, sizeof(__vsf_cm));
-    vsf_systimer_init();
+    //memset(&__vsf_cm, 0, sizeof(__vsf_cm));
+    //vsf_systimer_init();
     return true;
 }
 

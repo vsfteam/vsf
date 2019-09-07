@@ -29,7 +29,8 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void uvc_app_fill_line(void *line_buf, uint_fast16_t size, bool last_line);
+WEAK(uvc_app_fill_line)
+void uvc_app_fill_line(void *line_buf, uint_fast16_t size, bool last_line);
 
 static void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t *color)
 {

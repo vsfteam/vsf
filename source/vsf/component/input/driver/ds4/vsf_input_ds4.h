@@ -22,7 +22,7 @@
 
 #include "../../vsf_input_cfg.h"
 
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
 
 #include "component/usb/common/class/HID/vsf_usb_ds4.h"
 #include "../../vsf_input_get_type.h"
@@ -52,5 +52,5 @@ extern void vsf_ds4u_process_input(vsf_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in
 extern void vsf_ds4u_new_dev(vsf_input_ds4u_t *dev);
 extern void vsf_ds4u_free_dev(vsf_input_ds4u_t *dev);
 
-#endif      // VSF_INPUT_CFG_DS4_EN
+#endif      // VSF_USE_INPUT && VSF_USE_INPUT_DS4
 #endif      // __VSF_INPUT_DS4_H__

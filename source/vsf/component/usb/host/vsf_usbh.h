@@ -440,6 +440,12 @@ extern void vsf_usbh_register_class(vsf_usbh_t *usbh, vsf_usbh_class_t *class);
 void vsf_usbh_hcd_urb_free_buffer(vsf_usbh_hcd_urb_t *urb_hcd);
 #endif
 
+#if defined(VSF_USBH_IMPLEMENT_HUB)
+extern vsf_usbh_dev_t * vsf_usbh_new_device(vsf_usbh_t *usbh, enum usb_device_speed_t speed,
+            vsf_usbh_dev_t *dev_parent, uint_fast8_t idx);
+extern void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
+#endif
+
 #if defined(VSF_USBH_IMPLEMENT) || defined(VSF_USBH_IMPLEMENT_CLASS)
 // APIs to be called by class drivers
 extern vsf_usbh_eppipe_t vsf_usbh_get_pipe_from_ep_desc(vsf_usbh_dev_t *dev,
@@ -465,12 +471,6 @@ extern uint_fast32_t vsf_usbh_urb_get_actual_length(vsf_usbh_urb_t *urb);
 extern vsf_err_t vsf_usbh_submit_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb);
 extern vsf_err_t vsf_usbh_submit_urb_flags(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fast16_t flags);
 extern vsf_err_t vsf_usbh_submit_urb_ex(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda);
-
-#if defined(VSF_USBH_IMPLEMENT_HUB)
-extern vsf_usbh_dev_t * vsf_usbh_new_device(vsf_usbh_t *usbh, enum usb_device_speed_t speed,
-            vsf_usbh_dev_t *dev_parent, uint_fast8_t idx);
-extern void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
-#endif
 
 extern void vsf_usbh_remove_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         vsf_usbh_ifs_t *ifs);

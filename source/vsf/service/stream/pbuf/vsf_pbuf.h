@@ -162,8 +162,8 @@ def_interface(i_pbuf_t)
     struct {
         vsf_pbuf_t *   (*Free)(vsf_pbuf_t *);
         struct {
-            void        (*Get) (void *ptarget, 
-                                void *pitem, 
+            void        (*Get) (uintptr_t ptarget, 
+                                uintptr_t pitem, 
                                 uint_fast32_t size);
         }ItemInitEventHandler;
     } PoolHelper;
@@ -233,8 +233,8 @@ extern int_fast32_t vsf_pbuf_buffer_read(  vsf_pbuf_t *pobj,
                                         void *psrc, 
                                         int_fast32_t size, 
                                         uint_fast32_t offsite);
-extern void vsf_pbuf_pool_item_init_event_handler(  void *ptarget, 
-                                                    void *pitem, 
+extern void vsf_pbuf_pool_item_init_event_handler(  uintptr_t ptarget, 
+                                                    uintptr_t pitem, 
                                                     uint_fast32_t item_size);
 #if VSF_PBUF_CFG_SUPPORT_REF_COUNTING == ENABLED
 extern void vsf_pbuf_ref_increase(vsf_pbuf_t *pbuf);

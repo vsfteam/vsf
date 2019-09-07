@@ -39,15 +39,27 @@
 /*============================ MACROS ========================================*/
 
 #ifndef vsf_log_info
-#   define vsf_log_info(...)
+#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#       define vsf_log_info(__ARG)
+#   else
+#       define vsf_log_info(...)
+#   endif
 #endif
 
 #ifndef vsf_log_warning
-#   define vsf_log_warning(...)
+#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#       define vsf_log_warning(__ARG)
+#   else
+#       define vsf_log_warning(...)
+#   endif
 #endif
 
 #ifndef vsf_log_debug
-#   define vsf_log_debug(...)
+#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#       define vsf_log_debug(__ARG)
+#   else
+#       define vsf_log_debug(...)
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

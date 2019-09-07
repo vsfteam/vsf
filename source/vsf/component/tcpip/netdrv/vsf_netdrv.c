@@ -32,11 +32,16 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_pnp_on_netdrv_new(vsf_netdrv_t *netdrv) {}
-WEAK void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv) {}
-WEAK void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv) {}
-WEAK void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv) {}
-WEAK void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv) {}
+WEAK(vsf_pnp_on_netdrv_new)
+void vsf_pnp_on_netdrv_new(vsf_netdrv_t *netdrv) {}
+WEAK(vsf_pnp_on_netdrv_del)
+void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv) {}
+WEAK(vsf_pnp_on_netdrv_connect)
+void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv) {}
+WEAK(vsf_pnp_on_netdrv_connected)
+void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv) {}
+WEAK(vsf_pnp_on_netdrv_disconnect)
+void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv) {}
 
 void vsf_netdrv_on_outputted(vsf_netdrv_t *netdrv, void *netbuf, int_fast32_t size)
 {

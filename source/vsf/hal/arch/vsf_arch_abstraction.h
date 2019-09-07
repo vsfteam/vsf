@@ -44,6 +44,8 @@ typedef vsf_irq_handler_t vsf_swi_handler_t;
 #   define  VSF_ARCH_HEADER     "./x86/linux/linux_generic.h"
 # elif   defined(__CPU_X86__) && __WIN__
 #   define  VSF_ARCH_HEADER     "./x86/win/win_generic.h"
+# elif   defined(__CPU_MCS51__)
+#   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
 # else
 #   error no supported architecture found!
 # endif
@@ -111,14 +113,22 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
 /*============================ PROTOTYPES ====================================*/
 
+
+/*----------------------------------------------------------------------------*
+ * APIs or Interfaces for users                                               *
+ *----------------------------------------------------------------------------*/
 extern uint_fast8_t bswap_8(uint_fast8_t);
 extern uint_fast16_t bswap_16(uint_fast16_t);
 extern uint_fast32_t bswap_32(uint_fast32_t);
+#ifdef UINT64_MAX
 extern uint_fast64_t bswap_64(uint_fast64_t);
+#endif
 
 DECLARE_ENDIAN_FUNC(16)
 DECLARE_ENDIAN_FUNC(32)
+#ifdef UINT64_MAX
 DECLARE_ENDIAN_FUNC(64)
+#endif
 
 extern vsf_err_t vsf_swi_init(  uint_fast8_t idx, 
                                 vsf_arch_prio_t priority,
@@ -130,14 +140,15 @@ extern void vsf_swi_trigger(uint_fast8_t idx);
 /*! \brief initialise SysTick to generate a system timer
  *! \return initialization result in vsf_err_t 
  */
-extern vsf_err_t vsf_systimer_init(void);
+//extern vsf_err_t vsf_systimer_init(void);
 extern vsf_err_t vsf_systimer_start(void);
 extern vsf_systimer_cnt_t vsf_systimer_get(void);
 extern bool vsf_systimer_set(vsf_systimer_cnt_t due);
 extern void vsf_systimer_set_idle(void);
+extern bool vsf_systimer_is_due(vsf_systimer_cnt_t due);
+
 extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 extern vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
-extern bool vsf_systimer_is_due(vsf_systimer_cnt_t due);
 extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
 extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
 
@@ -150,16 +161,15 @@ extern void vsf_arch_swi_trigger(uint_fast8_t idx);
 
 extern vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority);
 
-extern ALWAYS_INLINE void vsf_arch_set_pc(uint32_t pc);
-extern ALWAYS_INLINE uint32_t vsf_arch_get_lr(void);
-extern ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack);
-
 extern vsf_gint_state_t vsf_get_interrupt(void);
 extern void vsf_set_interrupt(vsf_gint_state_t level);
 extern vsf_gint_state_t vsf_disable_interrupt(void);
 extern void vsf_enable_interrupt(void);
 
 extern void vsf_arch_sleep(uint32_t mode);
+
+
+
 
 #endif
 /* EOF */

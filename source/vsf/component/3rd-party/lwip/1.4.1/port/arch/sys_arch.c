@@ -47,7 +47,7 @@ declare_vsf_thread_ex(vsf_rtos_thread_t)
 def_vsf_thread_ex(vsf_rtos_thread_t,
     def_params(
         void *arg;
-        lwip_thread_fn fn;
+        lwip_thread_fn lwip_thread;
     ))
 
 
@@ -83,7 +83,7 @@ static void vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
 
 implement_vsf_thread_ex(vsf_rtos_thread_t)
 {
-    this.fn(this.arg);
+    this.lwip_thread(this.arg);
 }
 /*
 static void vsf_rtos_thread_entry(vsf_thread_t *thread)
@@ -109,7 +109,7 @@ sys_thread_t sys_thread_new(const char *name,
     thread->on_terminate = vsf_rtos_thread_on_terminate;
     
     thread->arg = arg;
-    thread->fn = fn;
+    thread->lwip_thread = fn;
 
     init_vsf_thread_ex( vsf_rtos_thread_t, 
                         thread, 
@@ -139,12 +139,12 @@ void sys_sem_free(sys_sem_t *sem)
 
 int sys_sem_valid(sys_sem_t *sem)
 {
-    return sem->max_value != 0 ? 1 : 0;
+    return sem->max_union.max_value != 0 ? 1 : 0;
 }
 
 void sys_sem_set_invalid(sys_sem_t *sem)
 {
-    sem->max = 0;
+    sem->max_union.bits.max = 0;
 }
 
 void sys_sem_signal(sys_sem_t *sem)
@@ -188,18 +188,18 @@ void sys_mutex_unlock(sys_mutex_t *mutex)
 
 int sys_mutex_valid(sys_mutex_t *mutex)
 {
-    return mutex->has_owner ? 1 : 0;
+    return mutex->cur_union.bits.has_owner ? 1 : 0;
 }
 
 void sys_mutex_set_invalid(sys_mutex_t *mutex)
 {
-    mutex->has_owner = 0;
+    mutex->cur_union.bits.has_owner = 0;
 }
 
 // mbox
 static void __sys_mbox_next(sys_mbox_t *mbox, uint16_t *pos)
 {
-    if (++(*pos) >= mbox->max_value) {
+    if (++(*pos) >= mbox->max_union.max_value) {
         *pos = 0;
     }
 }

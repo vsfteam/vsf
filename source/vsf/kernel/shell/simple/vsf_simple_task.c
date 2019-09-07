@@ -90,22 +90,23 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
         VSF_APP_STATE_PENDING = 0,
         VSF_APP_STATE_WAIT_PENDING,
     };
-    
-    vsf_teda_t *pteda = (vsf_teda_t *)vsf_eda_get_cur();
-    VSF_KERNEL_ASSERT(NULL != pteda);
+
+
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(NULL != eda);
     
     do {
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-        if (vsf_eda_is_stack_owner(&(pteda->use_as__vsf_eda_t))) {
+        if (vsf_eda_is_stack_owner(eda)) {
             result = vsf_thread_sem_pend(psem, time_out);
         } else 
 #endif
         {
-            if (vsf_eda_polling_state_get(&(pteda->use_as__vsf_eda_t))) {
+            if (vsf_eda_polling_state_get(eda)) {
                 /* VSF_APP_STATE_WAIT_PENDING */
                 result = vsf_eda_sync_get_reason(psem, vsf_eda_get_cur_evt());
                 if (result != VSF_SYNC_PENDING) {
-                    vsf_eda_polling_state_set(  &(pteda->use_as__vsf_eda_t),
+                    vsf_eda_polling_state_set(  eda,
                                                 (bool)VSF_APP_STATE_PENDING);
                 }
             } else {
@@ -118,7 +119,7 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
                     result = VSF_SYNC_FAIL; 
                     break;
                 } 
-                vsf_eda_polling_state_set(  &(pteda->use_as__vsf_eda_t),
+                vsf_eda_polling_state_set(  eda,
                                             (bool)VSF_APP_STATE_WAIT_PENDING);
             }
         }

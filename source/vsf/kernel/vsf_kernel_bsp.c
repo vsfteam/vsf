@@ -43,7 +43,7 @@ def_vsf_thread(app_main_thread_t, VSF_OS_CFG_MAIN_STACK_SIZE)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if !__IS_COMPILER_IAR__
+#if !__IS_COMPILER_IAR__ && __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
 __attribute__((constructor(255)))
 #endif
 extern void __vsf_main_entry(void);
@@ -52,15 +52,17 @@ ROOT
 const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 {
 
-#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
-
-    static NO_INIT vsf_evtq_t __vsf_os_evt_queue[VSF_OS_CFG_PRIORITY_NUM];
-
-#   define MFUNC_IN_U8_DEC_VALUE                   __VSF_OS_SWI_NUM
-#       include "utilities/preprocessor/mf_u8_dec2str.h"
+#if __VSF_OS_SWI_NUM > 0
+#define MFUNC_IN_U8_DEC_VALUE                   __VSF_OS_SWI_NUM
+#include "utilities/preprocessor/mf_u8_dec2str.h"
     static const vsf_arch_prio_t __vsf_os_swi_priority[MFUNC_OUT_DEC_STR] = {
         MREPEAT(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
+#endif
+
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+
+    static NO_INIT vsf_evtq_t __vsf_os_evt_queue[VSF_OS_CFG_PRIORITY_NUM];
     
 #   if defined(__VSF_OS_CFG_EVTQ_LIST) && defined(VSF_OS_CFG_EVTQ_POOL_SIZE)
     static NO_INIT vsf_pool_block(vsf_evt_node_pool)    
@@ -80,32 +82,39 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #endif
 
     static const vsf_kernel_resource_t res = {
-#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
-        .arch = {
-            .os_swi_priorities_ptr = __vsf_os_swi_priority,
-            .swi_priority_cnt = UBOUND(__vsf_os_swi_priority),
+#if __VSF_OS_SWI_NUM > 0
+        {
+            __vsf_os_swi_priority,                  // os_swi_priorities_ptr
+            UBOUND(__vsf_os_swi_priority),          // swi_priority_cnt
         },
+#endif
 
-        .evt_queue = {
-            .queue_array = __vsf_os_evt_queue,
-            .queue_cnt = UBOUND(__vsf_os_evt_queue),
-#   if defined(__VSF_OS_CFG_EVTQ_LIST) && defined(VSF_OS_CFG_EVTQ_POOL_SIZE)
-            .nodes_buf_ptr = __evt_node_buffer,
-            .node_cnt = UBOUND(__evt_node_buffer),
-#   endif    
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+        {
+            __vsf_os_evt_queue,                     // queue_array
 #   if defined(__VSF_OS_CFG_EVTQ_ARRAY)
-            .nodes = (vsf_evt_node_t **)__vsf_os_nodes,
-            .node_bit_sz = VSF_OS_CFG_EVTQ_BITSIZE,
+            (vsf_evt_node_t **)__vsf_os_nodes,      // nodes
+            VSF_OS_CFG_EVTQ_BITSIZE,                // node_bit_sz
 #   endif
+#   if defined(__VSF_OS_CFG_EVTQ_LIST)
+#       if defined(VSF_OS_CFG_EVTQ_POOL_SIZE)
+            __evt_node_buffer,                      // nodes_buf_ptr
+            (uint16_t)UBOUND(__evt_node_buffer),    // node_cnt
+#       else
+            NULL,                                   // nodes_buf_ptr
+            0,                                      // node_cnt
+#       endif
+#   endif    
+            (uint16_t)UBOUND(__vsf_os_evt_queue),   // queue_cnt
         },
 
 #endif
 
 #if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED \
     &&  defined(VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE)
-        .frame_stack = {
-            .frame_buf_ptr = __vsf_eda_frame_buffer,
-            .frame_cnt = UBOUND(__vsf_eda_frame_buffer),
+        {
+            __vsf_eda_frame_buffer,                 // frame_buf_ptr
+            UBOUND(__vsf_eda_frame_buffer),         // frame_cnt
         },
 #endif
 
@@ -124,8 +133,7 @@ uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
     return VSF_SYSTIMER_RESOLUTION;
 }
 
-
-void vsf_kernel_err_report(enum vsf_kernel_error_t err)
+void vsf_kernel_err_report(vsf_kernel_error_t err)
 {
     switch (err) {
         default:
@@ -137,8 +145,10 @@ void vsf_kernel_err_report(enum vsf_kernel_error_t err)
             2. When VSF_OS_CFG_MAIN_MODE is not VSF_OS_CFG_MAIN_MODE_THREAD, using
                any vsf_eda_xxxx APIs. 
             */
-            SAFE_ATOM_CODE() {
+            {
+                vsf_gint_state_t gint_state = vsf_disable_interrupt(); 
                 while(1);
+                vsf_set_interrupt(gint_state);
             }
             break;
         case VSF_KERNEL_ERR_NONE:
@@ -188,7 +198,9 @@ ROOT void __post_vsf_kernel_init(void)
 }
 
 #if VSF_USE_HEAP == ENABLED
-WEAK vsf_mem_t vsf_service_req___heap_memory_buffer__from_usr(void)
+#ifndef WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR
+WEAK(vsf_service_req___heap_memory_buffer___from_usr)
+vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void)
 {
 #ifndef VSF_HEAP_SIZE
 #   warning \
@@ -199,12 +211,14 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
 #else
     NO_INIT static uint_fast8_t s_chHeapBuffer[
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
+    
     return (vsf_mem_t){
-        .pchSrc = (uint8_t *)s_chHeapBuffer, 
+        .PTR.pchSrc = (uint8_t *)s_chHeapBuffer, 
         .nSize = sizeof(s_chHeapBuffer)
     };
 #endif
 }
+#endif
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -224,18 +238,22 @@ __asm(".global __ARM_use_no_argv\n\t");
  * Compiler Specific Code to run __vsf_main_entry() before main()             *
  *----------------------------------------------------------------------------*/
 #if __IS_COMPILER_IAR__
-extern int  __low_level_init(void);
-extern void __iar_data_init3(void);
+WEAK(__low_level_init)
+char __low_level_init(void)
+{
+    return 1;
+}
+
+extern void __IAR_STARTUP_DATA_INIT(void);
 extern void exit(int arg);
 __root
 __noreturn __stackless void __cmain(void) 
 {
-  
-  if (__low_level_init() != 0) {
-    __iar_data_init3();
-  }
-  __vsf_main_entry();
-  exit(0);
+    if (__low_level_init() != 0) {
+        __IAR_STARTUP_DATA_INIT();
+    }
+    __vsf_main_entry();
+    exit(0);
 }
 #elif   __IS_COMPILER_GCC__                                                     \
     ||  __IS_COMPILER_LLVM__                                                    \

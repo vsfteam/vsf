@@ -39,12 +39,14 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_usbh_on_dev_parsed(vsf_usbh_dev_t *dev, vsf_usbh_dev_parser_t *parser)
+WEAK(vsf_usbh_on_dev_parsed)
+void vsf_usbh_on_dev_parsed(vsf_usbh_dev_t *dev, vsf_usbh_dev_parser_t *parser)
 {
     
 }
 
-WEAK vsf_err_t vsf_usbh_on_match_interface(
+WEAK(vsf_usbh_on_match_interface)
+vsf_err_t vsf_usbh_on_match_interface(
         vsf_usbh_dev_parser_t *parser, vsf_usbh_ifs_parser_t *parser_ifs)
 {
     vsf_trace(VSF_TRACE_INFO, "%s: vid%04X pid%04X interface%d" VSF_TRACE_CFG_LINEEND,
@@ -54,7 +56,8 @@ WEAK vsf_err_t vsf_usbh_on_match_interface(
     return VSF_ERR_NONE;
 }
 
-WEAK void vsf_usbh_on_remove_interface(vsf_usbh_ifs_t *ifs)
+WEAK(vsf_usbh_on_remove_interface)
+void vsf_usbh_on_remove_interface(vsf_usbh_ifs_t *ifs)
 {
     vsf_trace(VSF_TRACE_INFO, "%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
 }

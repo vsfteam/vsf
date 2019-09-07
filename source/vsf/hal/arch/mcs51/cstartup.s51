@@ -1,0 +1,706 @@
+/*******************************************************************************
+ *
+ * Startup code executed before the C/EC++ "main" function is called. The code 
+ * is designed to run on any processor based on the 8051 architecture.
+ *
+ * Copyright 2004-2009 IAR Systems. All rights reserved.
+ *
+ * $Revision: 13630 $
+ *
+ ******************************************************************************/
+
+#include "iar_common.h"
+
+	MODULE	 CSTARTUP
+  FUNCTION __program_start,0203H
+	PUBLIC   __program_start	
+
+	EXTERN  ?B0
+	EXTERNS_FOR_ALL_DPTR_SYMBOLS()
+	REQUIRE ?B0
+        REQUIRE __call_main
+
+     #if (__NUMBER_OF_DPTRS__ > 1)
+	REQUIRE ?RESET_DPS
+     #endif
+
+     #if (__CORE__ == __CORE_EXTENDED1__)
+        REQUIRE __call_init_extended1
+     #endif
+
+     #if (__CORE__ == __CORE_EXTENDED2__)
+        REQUIRE __call_init_extended2
+     #endif
+
+        ; Uncomment this when rom-monitor requires 3 NOPS between statements.
+;	REQUIRE ?ROM_MONITOR_NOPS
+
+	RSEG	REGISTERS:NOROOT:DATA
+	PUBLIC  ?REGISTERS
+
+?REGISTERS:
+
+//------------------------------------------------------------------------
+// The C stack segment. Should be mapped into internal data RAM
+//
+//   ISTACK:    Should be mapped into internal data RAM
+//   PSTACK:    Should be mapped into external data RAM page
+//   XSTACK:    Should be mapped into external data RAM
+//   EXT_STACK: Should be mapped into external data RAM
+//
+//------------------------------------------------------------------------
+// The C stack is used for LCALL's and temporary storage for
+// code generator help-routines (math etc). The stack will be
+// located after all other internal RAM variables if the stan-
+// dard linking procedure is followed. Note that C interrupt
+// routines can double stack size demands.
+//
+//------------------------------------------------------------------------
+
+	RSEG	ISTACK:NOROOT:IDATA
+	PUBLIC  ?ISTACK_START
+?ISTACK_START:
+
+	RSEG	PSTACK:NOROOT:XDATA
+	PUBLIC  ?PSTACK_START
+?PSTACK_START:
+
+	RSEG	XSTACK:NOROOT:XDATA
+	PUBLIC  ?XSTACK_START
+?XSTACK_START:
+
+	RSEG	EXT_STACK:NOROOT:XDATA
+	PUBLIC  ?EXT_STACK_START
+?EXT_STACK_START:
+
+
+//------------------------------------------------------------------------
+//
+// Define reset vector.
+//
+//------------------------------------------------------------------------
+
+        COMMON	INTVEC:CODE:ROOT(0)
+
+        // The reset vector must be located at address zero, the reset
+        // vector is located first in the INTVEC segment. This segment
+        // must thus be located at address zero. Be carefull if using
+        // assembler sequences located with the ASEG directive, which may
+        // prevent the INTVEC segment from being located at address zero.
+
+        LIMIT SFB(INTVEC),0,0,"The INTVEC segment must begin at address zero"
+
+?reset_vector:
+	DB	0x02    ; LJMP
+#if defined(START_INIT_IN_FAR)
+	DB	BYTE3(__program_start)
+#endif
+	DB	high(__program_start)
+	DB	low(__program_start)
+
+
+//------------------------------------------------------------------------
+//					
+// Initialize the chip to suit IAR ICC8051 Compiler
+//
+//------------------------------------------------------------------------
+
+	RSEG    CSTART:CODE:ROOT
+	EXTERN  ?REGISTER_BANK
+	REQUIRE ?REGISTERS
+        REQUIRE ?reset_vector
+
+__program_start:
+	MOV     PSW,#(?REGISTER_BANK << 3)
+
+//------------------------------------------------------------------------
+//
+// Initialize the extended1 core
+//
+//------------------------------------------------------------------------
+
+#if (__CORE__ == __CORE_EXTENDED1__)
+
+        REQUIRE __call_init_extended1
+
+        RSEG	CSTART:CODE:NOROOT
+        PUBLIC  __call_init_extended1
+	EXTERN	__init_extended1
+
+
+__call_init_extended1:
+	DB	0x12    ; LCALL
+#if defined(START_INIT_IN_FAR) 
+	DB	BYTE3(__init_extended1)
+#endif
+	DB	high(__init_extended1)
+	DB	low(__init_extended1)
+#endif
+
+//------------------------------------------------------------------------
+//
+// Reset of bank registers and stack pointers
+// ==========================================
+//
+// ?RESET_SP:  Resets the IDATA stack pointer
+// ?RESET_ESP: Resets the extended stack pointer
+// ?RESET_PSP: Resets the PDATA stack pointer
+// ?RESET_XSP: Resets the XDATA stack pointer
+//
+// ?RESET_CODE_BANK:      Resets the current code bank register
+// ?RESET_PDATA_BANK:     Resets the high byte of PDATA page register
+//
+// ?RESET_DPS: Resets the DPTR selector (point at DPTR0)
+//
+//------------------------------------------------------------------------
+
+	
+//------------------------------------------------------------------------
+//
+// Reset idata or extended stack pointer
+//   extended stack pointer if  the extended stack is used
+//   otherwise, the ordinary stack pointer
+//
+//------------------------------------------------------------------------
+
+#if (defined(__EXTENDED_STACK__) )
+
+//
+// Reset extended stack pointer
+//
+
+	PUBLIC  ?RESET_ESP
+	REQUIRE ?EXT_STACK_START
+	EXTERN	?ESP
+
+?RESET_ESP:
+	MOV     SP,#low(sfb(EXT_STACK))
+	MOV     ?ESP,#high(sfb(EXT_STACK))
+#else
+
+//
+// Reset idata stack pointer
+//
+
+	PUBLIC  ?RESET_SP
+	REQUIRE ?ISTACK_START
+
+?RESET_SP:
+	MOV     SP,#SFB(ISTACK)-1
+#endif
+
+
+//------------------------------------------------------------------------
+//
+// Reset pdata stack pointer
+//
+//------------------------------------------------------------------------
+
+	RSEG	CSTART:CODE:NOROOT
+	PUBLIC  ?RESET_PSP
+	EXTERN  ?PSP
+	REQUIRE ?PSTACK_START
+	REQUIRE ?RESET_PDATA_BANK
+	EXTERN  ?PSTACK
+
+?RESET_PSP:
+	MOV     ?PSP,#low(sfe(PSTACK))
+
+
+//------------------------------------------------------------------------
+//
+// Reset xdata stack pointer
+//
+//------------------------------------------------------------------------
+
+	RSEG	CSTART:CODE:NOROOT
+	PUBLIC  ?RESET_XSP
+	EXTERN  ?XSP
+	REQUIRE ?XSTACK_START
+	EXTERN  ?XSTACK
+
+?RESET_XSP:
+	MOV     ?XSP,#low(sfe(XSTACK))
+	MOV     ?XSP+1,#high(sfe(XSTACK))
+
+
+//------------------------------------------------------------------------
+//
+// Reset code bank
+//
+//------------------------------------------------------------------------
+
+#if ( (__CODE_MODEL__ == __CM_BANKED__) || ( __CODE_MODEL__ == __CM_NEAR__ ) )
+	RSEG	CSTART:CODE:NOROOT
+	PUBLIC  ?RESET_CODE_BANK
+	EXTERN  ?CBANK
+
+?RESET_CODE_BANK:
+	MOV	?CBANK,#0x00
+#endif
+
+
+//------------------------------------------------------------------------
+//
+// Reset pdata page
+//
+//------------------------------------------------------------------------
+	RSEG	PDATA_Z:NOROOT
+	RSEG	CSTART:CODE:NOROOT
+	PUBLIC  ?RESET_PDATA_BANK
+	EXTERN  ?PBANK
+?RESET_PDATA_BANK:
+	MOV     ?PBANK,#HIGH(SFB(PDATA_Z))
+#if (defined ( __EXTENDED_DPTR__))
+	EXTERN  ?PBANK_EXT
+
+?RESET_PDATA_BANK_EXT:
+	MOV     ?PBANK_EXT,#0x00
+#endif
+
+
+//------------------------------------------------------------------------
+//
+// Reset data pointer select register
+//
+//------------------------------------------------------------------------
+
+#if (__NUMBER_OF_DPTRS__ > 1)
+
+	RSEG	CSTART:CODE:NOROOT
+	PUBLIC  ?RESET_DPS
+
+?RESET_DPS:
+  SELECT_DPTR0()
+
+#endif
+
+
+
+//------------------------------------------------------------------------
+//
+// Initialize the extended2 core
+//
+//------------------------------------------------------------------------
+
+#if (__CORE__ == __CORE_EXTENDED2__)
+
+        REQUIRE __call_init_extended2
+
+        RSEG	CSTART:CODE:NOROOT
+        PUBLIC  __call_init_extended2
+	PUBLIC  ?MEX1
+	PUBLIC  ?MEX2
+	PUBLIC  ?MEX3
+	PUBLIC  ?MEXSP
+	EXTERN	__init_extended2
+?MEX1	EQU  0x94
+?MEX2	EQU  0x95
+?MEX3	EQU  0x96
+?MEXSP	EQU  0x97
+__call_init_extended2:
+	;; MEX1 = 0x00 at reset
+	ORL	?MEX1, #(BYTE3(__init_extended2) & 0x0F)	
+	LCALL	__init_extended2 & 0x00FFFF
+#endif
+
+
+
+//------------------------------------------------------------------------
+//
+// Disable the PFLASH cache in Infineon devices that have the hardware
+// bug.
+//
+//------------------------------------------------------------------------
+
+        RSEG    CSTART:CODE:NOROOT
+        PUBLIC __disable_infineon_pflash
+
+__disable_infineon_pflash:
+	DB	0x12    ; LCALL
+#if defined(START_INIT_IN_FAR)
+	DB	0x00
+#endif
+	DB	0xDF
+	DB	0xFC
+
+
+	
+//------------------------------------------------------------------------
+//
+// Jump to the code that performs the rest of the system initialization
+// before calling main().
+//
+//------------------------------------------------------------------------
+
+
+	RSEG    CSTART:CODE:NOROOT
+	EXTERN  __cmain
+
+__call_main:
+        LJMP	__cmain
+
+	ENDMOD __program_start
+
+
+
+
+;----------------------------------------------------------------;
+; Virtual registers						 ;
+; =================						 ;
+; Below is some segment needed for the IAR ICC C/EC++ compiler   ;
+;								 ;
+; BREG  : A segment for 8 bit registers for use by the compiler. ;
+;         ?B0 is the first register.                             ;
+; VREG  : Segment that holds up to 32 virtual registers for      ;
+;         use by the compiler. ?V0 is the first register.        ;
+; PSP   : Segment containing the PDATA stack pointer (?PSP)      ;
+; XSP   : Segment containing the XDATA stack pointer (?XSP)      ;
+; 								 ;
+;----------------------------------------------------------------;
+;----------------------------------------------------------------;
+
+	MODULE  VIRTUAL_REGISTERS
+	PUBLIC  ?B0
+	PUBLIC  ?V0
+	PUBLIC  ?V1
+	PUBLIC  ?V2
+	PUBLIC  ?V3
+	PUBLIC  ?V4
+	PUBLIC  ?V5
+	PUBLIC  ?V6
+	PUBLIC  ?V7
+	PUBLIC  ?V8
+	PUBLIC  ?V9
+	PUBLIC  ?V10
+	PUBLIC  ?V11
+	PUBLIC  ?V12
+	PUBLIC  ?V13
+	PUBLIC  ?V14
+	PUBLIC  ?V15
+	PUBLIC  ?V16
+	PUBLIC  ?V17
+	PUBLIC  ?V18
+	PUBLIC  ?V19
+	PUBLIC  ?V20
+	PUBLIC  ?V21
+	PUBLIC  ?V22
+	PUBLIC  ?V23
+	PUBLIC  ?V24
+	PUBLIC  ?V25
+	PUBLIC  ?V26
+	PUBLIC  ?V27
+	PUBLIC  ?V28
+	PUBLIC  ?V29
+	PUBLIC  ?V30
+	PUBLIC  ?V31
+	PUBLIC  ?PSP
+	PUBLIC  ?XSP
+	RSEG    BREG:BIT:NOROOT
+
+?B0:
+	DS      8
+
+  	RSEG    VREG:DATA:NOROOT
+?V0:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V0
+?V1:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V1
+?V2:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V2
+?V3:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V3
+?V4:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V4
+?V5:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V5
+?V6:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V6
+?V7:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V7
+?V8:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V8
+?V9:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V9
+?V10:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V10
+?V11:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V11
+?V12:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V12
+?V13:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V13
+?V14:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V14
+?V15:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V15
+?V16:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V16
+?V17:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V17
+?V18:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V18
+?V19:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V19
+?V20:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V20
+?V21:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V21
+?V22:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V22
+?V23:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V23
+?V24:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V24
+?V25:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V25
+?V26:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V26
+?V27:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V27
+?V28:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V28
+?V29:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V29
+?V30:
+	DS      1
+
+  	RSEG    VREG:DATA:NOROOT
+  	REQUIRE ?V30
+?V31:
+	DS      1
+
+	RSEG    PSP:DATA:NOROOT
+	EXTERN  ?RESET_PSP
+	REQUIRE	?RESET_PSP
+?PSP:
+	DS      1
+
+	RSEG    XSP:DATA:NOROOT
+	EXTERN  ?RESET_XSP
+	REQUIRE	?RESET_XSP
+?XSP:
+	DS      2
+
+	ENDMOD ; VIRTUAL_REGISTERS
+
+
+
+
+
+
+
+;----------------------------------------------------------------;
+; NOPs             						 ;
+; =================						 ;
+;								 ;
+; These segments are used for waiting for an mdu to finish with  ;
+; the result.                                                    ;
+; 								 ;
+;----------------------------------------------------------------;
+;----------------------------------------------------------------;
+
+	MODULE  NOPS
+	PUBLIC  ?NOP8
+	PUBLIC  ?NOP9
+	PUBLIC  ?NOP10
+	PUBLIC  ?NOP11
+	PUBLIC  ?NOP12
+	PUBLIC  ?NOP13
+	PUBLIC  ?NOP14
+	PUBLIC  ?NOP15
+	PUBLIC  ?NOP16
+	PUBLIC  ?NOP17
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP17:
+  	REQUIRE ?NOP16
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP16:
+  	REQUIRE ?NOP15
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP15:
+  	REQUIRE ?NOP14
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP14:
+  	REQUIRE ?NOP13
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP13:
+  	REQUIRE ?NOP12
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP12:
+  	REQUIRE ?NOP11
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP11:
+  	REQUIRE ?NOP10
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP10:
+  	REQUIRE ?NOP9
+	NOP
+
+	RSEG	RCODE:CODE:NOROOT
+?NOP9:
+  	REQUIRE ?NOP8
+	NOP
+
+  	RSEG    RCODE:CODE:NOROOT
+?NOP8:
+	NOP
+        RET
+
+
+	ENDMOD ; NOPS
+
+
+;----------------------------------------------------------------;
+; Register banks						 ;
+; =================						 ;
+; Below is some segment needed for the IAR ICC C/EC++ compiler   ;
+;								 ;
+; The register banks will only be included if the #pragma        ;
+; register_bank is used for the corresponding register bank      ;
+; 								 ;
+;----------------------------------------------------------------;
+
+	MODULE	REGISTER_BANK0
+	PUBLIC	__REG_BANK_0
+	ASEGN	__REG_BANK0:DATA,0x00
+__REG_BANK_0:
+	DS	8
+	ENDMOD
+
+
+	MODULE	REGISTER_BANK1
+	PUBLIC	__REG_BANK_1
+	ASEGN	__REG_BANK1:DATA,0x08
+        RTMODEL "__register_banks", "x"
+__REG_BANK_1:
+	DS	8
+	ENDMOD
+
+
+	MODULE	REGISTER_BANK2
+	PUBLIC	__REG_BANK_2
+	ASEGN	__REG_BANK2:DATA,0x10
+        RTMODEL "__register_banks", "x"
+__REG_BANK_2:
+	DS	8
+	ENDMOD
+
+
+	MODULE	REGISTER_BANK3
+	PUBLIC	__REG_BANK_3
+	ASEGN	__REG_BANK3:DATA,0x18
+        RTMODEL "__register_banks", "x"
+__REG_BANK_3:
+	DS	8
+	ENDMOD	; REGISTER_BANK3
+
+
+	END
+
+	

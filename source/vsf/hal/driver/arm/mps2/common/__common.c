@@ -36,7 +36,7 @@
 #endif
 
 #define __MPS2_SWI(__N, __VALUE)                                                \
-    ROOT void SWI##__N##_IRQHandler(void)                                       \
+    ROOT ISR(SWI##__N##_IRQHandler)                                             \
     {                                                                           \
         if (__mps2_common.swi[__N].handler != NULL) {                           \
             __mps2_common.swi[__N].handler(__mps2_common.swi[__N].pparam);      \

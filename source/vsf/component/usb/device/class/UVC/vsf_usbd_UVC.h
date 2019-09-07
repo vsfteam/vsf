@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
 
 #include "../../../common/class/UVC/vsf_usb_UVC.h"
 
@@ -33,6 +33,11 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_AV != ENABLED
+#   error "VSF_USE_AV MUST be enabled to use uvc"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -81,7 +86,7 @@ def_simple_class(vsf_usbd_UVC_t) {
         vsf_usbd_trans_t trans_in;
         vsf_usbd_dev_t *dev;
         vsf_usbd_ifs_t *ifs;
-#if VSF_USBD_UVC_TRACE_EN == ENABLED
+#if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
         uint_fast32_t cur_size;
 #endif
     )
@@ -96,5 +101,5 @@ extern const vsf_usbd_class_op_t vsf_usbd_UVC_stream_class;
 
 extern vsf_err_t vsf_usbd_UVC_send_packet(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size);
 
-#endif      // VSF_USE_USB_DEVICE
+#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
 #endif      // __VSF_USBD_UVC_H__

@@ -16,13 +16,14 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#define __VSF_EDA_CLASS_IMPLEMENT
+
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
 
 #include "./vsf_kernel_common.h"
 
+#define __VSF_EDA_CLASS_IMPLEMENT
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
 
@@ -71,7 +72,7 @@ static bool __vsf_eda_terminate(vsf_eda_t *pthis)
 void vsf_evtq_on_eda_fini(vsf_eda_t *pthis)
 {
     if (!__vsf_eda_terminate((vsf_eda_t *)pthis)) {
-        pthis->is_to_exit = true;
+        pthis->state.bits.is_to_exit = true;
     }
 }
 
@@ -89,7 +90,7 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
 static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, vsf_evt_t evt, void *msg, bool force)
 #else
-static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force)
+static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 #endif
 {
     vsf_evtq_t *evtq;
@@ -97,14 +98,20 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     vsf_protect_t orig;
 
     VSF_KERNEL_ASSERT(eda != NULL);
-    evtq = __vsf_os_evtq_get((vsf_prio_t)eda->cur_priority);
+    evtq = __vsf_os_evtq_get((vsf_prio_t)eda->priority);
     mask = (1 << evtq->bitsize) - 1;
 
     orig = vsf_protect_int();
-    if (eda->evt_cnt && eda->is_limitted && !force) {
+
+    if (    eda->evt_cnt 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+        &&  eda->state.bits.is_limitted 
+#endif
+        && !force) {
         vsf_unprotect_int(orig);
         return VSF_ERR_FAIL;
     }
+
     tail = evtq->tail;
     tail_next = (tail + 1) & mask;
     if (tail_next == evtq->head) {
@@ -118,7 +125,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uint_fast32_t value, bool force
     evtq->node[tail].evt = (vsf_evt_t)value;
     evtq->node[tail].msg = msg;
 #else
-    evtq->node[tail].value = value;
+    evtq->node[tail].evt_union.value = value;
 #endif
     eda->evt_cnt++;
     vsf_unprotect_int(orig);
@@ -131,7 +138,7 @@ vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force)
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
     return __vsf_evtq_post(pthis, evt, NULL, force);
 #else
-    return __vsf_evtq_post(pthis, (uint32_t)((evt << 1) | 1), force);
+    return __vsf_evtq_post(pthis, (uintptr_t)((evt << 1) | 1), force);
 #endif
 }
 
@@ -145,7 +152,7 @@ vsf_err_t vsf_evtq_post_msg(vsf_eda_t *pthis, void *msg)
 #if VSF_CFG_EVT_MESSAGE_EN == ENABLED
     return __vsf_evtq_post(pthis, VSF_EVT_MESSAGE, msg, false);
 #else
-    return __vsf_evtq_post(pthis, (uint32_t)msg, false);
+    return __vsf_evtq_post(pthis, (uintptr_t)msg, false);
 #endif
 }
 
@@ -168,7 +175,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
 
         if (eda != NULL) {
 
-            if (!eda->is_to_exit) {
+            if (!eda->state.bits.is_to_exit) {
                 orig = vsf_protect_int();
                     pthis->cur.eda = eda;
 
@@ -176,7 +183,8 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                     pthis->evt_cur = node->evt;
                     pthis->msg_cur = node->msg;
 #else
-                    uint_fast32_t value = node->value;
+                {
+                    uintptr_t value = node->evt_union.value;
                     if (value & 1) {
                         pthis->cur.evt = (vsf_evt_t)(value >> 1);
                         pthis->cur.msg = NULL;
@@ -184,6 +192,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                         pthis->cur.evt = VSF_EVT_MESSAGE;
                         pthis->cur.msg = (void *)value;
                     }
+                }
 #endif
                 vsf_unprotect_int(orig);
 
@@ -198,7 +207,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
             vsf_unprotect_int(orig);
             pthis->cur.eda = NULL;
 
-            if (eda->is_to_exit) {
+            if (eda->state.bits.is_to_exit) {
                 __vsf_eda_terminate(eda);
             }
         }

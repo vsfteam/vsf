@@ -1,5 +1,6 @@
 
 *.o
+*.obj
 *.map
 *.pbi
 *.xcl
@@ -60,6 +61,8 @@ build.ninja
 .metadata
 *.tlog
 
+Debug
+
 source/example/project/vc/.vs
 source/example/project/vc/obj
 source/example/project/vc/bin
@@ -76,3 +79,7 @@ source/example/project/vc_2017/Debug
 
 *.___i
 *.custom_argvars
+
+*.r51
+*.m51
+*.scvd

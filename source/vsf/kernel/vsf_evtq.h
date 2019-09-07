@@ -53,9 +53,9 @@ struct vsf_evt_node_t {
     void *msg;
 #else
     union {
-        uint32_t value;
+        uintptr_t value;
         void *msg;
-    };
+    } evt_union;
 #endif
 }ALIGN(4);
 
@@ -69,9 +69,9 @@ struct vsf_evt_node_t {
     void *msg;
 #else
     union {
-        uint32_t value;
+        uintptr_t value;
         void *msg;
-    };
+    } evt_union;
 #endif
 }ALIGN(4);
 

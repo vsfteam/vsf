@@ -54,7 +54,7 @@
                                                 uint_fast16_t hwReserve)        \
 {                                                                               \
     vsf_pool(__NAME) *ptThis = (vsf_pool(__NAME) *)pTarget;                     \
-    VSF_SERVICE_ASSERT(NULL != ptThis);                                                     \
+    VSF_SERVICE_ASSERT(NULL != ptThis);                                         \
     if (vsf_pbuf_get_pool_item_count(                                           \
             &(ptThis->use_as__vsf_pbuf_pool_t)) <= hwReserve) {                 \
         return NULL;                                                            \
@@ -69,7 +69,7 @@
                                                 uint_fast16_t hwReserve)        \
 {                                                                               \
     vsf_pool(__NAME) *ptThis = (vsf_pool(__NAME) *)pTarget;                     \
-    VSF_SERVICE_ASSERT(NULL != ptThis);                                                     \
+    VSF_SERVICE_ASSERT(NULL != ptThis);                                         \
     return vsf_pbuf_pool_alloc(&(ptThis->use_as__vsf_pbuf_pool_t));             \
 }
 #endif
@@ -81,7 +81,7 @@
             const vsf_pbuf_adapter_t *pAdatper =                                \
                     vsf_pbuf_adapter_get(__ID);                                 \
             vsf_pool_cfg_t tCFG = {                                             \
-                .pTarget = (void *)pAdatper,                                    \
+                .pTarget = (uintptr_t)pAdatper,                                 \
                 .pchPoolName = #__NAME,                                         \
                 __VA_ARGS__                                                     \
             };                                                                  \
@@ -104,7 +104,7 @@
             const vsf_pbuf_adapter_t *pAdatper =                                \
                     vsf_pbuf_adapter_get(__ID);                                 \
             vsf_pool_cfg_t tCFG = {                                             \
-                .pTarget = (void *)pAdatper,                                    \
+                .pTarget = (uintptr_t)pAdatper,                                 \
                 .pchPoolName = #__NAME,                                         \
                 .fnItemInit = &vsf_pbuf_pool_item_init_event_handler,           \
                 __VA_ARGS__                                                     \
@@ -125,7 +125,7 @@
 
 #define declare_pbuf_pool(__NAME)       __declare_pbuf_pool(__NAME)
 
-#define vsf_pbuf_pool_req_pbuf_evt(__NAME, __POOL)                                   \
+#define vsf_pbuf_pool_req_pbuf_evt(__NAME, __POOL)                              \
             __vsf_pbuf_pool_req_pbuf_evt(__NAME, (__POOL))
 
 #define implement_pbuf_pool(...)        __implement_pbuf_pool(__VA_ARGS__)        
@@ -177,7 +177,7 @@ SECTION(".text." "vsf_pbuf" "_pool_get_region")
 extern code_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *);  
          
 SECTION(".text." "vsf_pbuf" "_pool_get_target")                                     
-extern void *vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *);        
+extern uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *);        
             
 #endif
 #endif

@@ -95,6 +95,7 @@ implement_vsf_task(user_task_t)
 
     switch (vsf_task_state) {
         case WAIT_FOR_SEM:    
+            
             vsf_task_wait_until(vsf_sem_pend(this.psem));                       //!< wait for semaphore forever  
         #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
             prepare_vsf_task(user_sub_task_t, &this.print_task);

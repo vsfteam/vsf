@@ -159,7 +159,7 @@ int fgetc (FILE * stream) {
              family of functions do not check the error return.
 */
 SECTION(".vsf.utilities.stdio.arm_compiler.__backspace")
-WEAK
+WEAK(__backspace)
 int __backspace(FILE *stream) {
  
   if (stream == &__stdin) {
@@ -205,7 +205,7 @@ void __aeabi_assert (const char *expr, const char *file, int line) {
 }
  
 SECTION(".vsf.utilities.stdio.arm_compiler.abort")
-WEAK
+WEAK(abort)
 void abort(void) {
   for (;;);
 }
@@ -256,7 +256,7 @@ FILEHANDLE $Sub$$_sys_open (const char *name, int openmode)
              an error.
 */
 SECTION(".vsf.utilities.stdio.arm_compiler._sys_close")
-WEAK
+WEAK(_sys_close)
 int _sys_close (FILEHANDLE fh) 
 {
     UNUSED_PARAM(fh);
@@ -285,7 +285,7 @@ int _sys_close (FILEHANDLE fh)
 */
 
 SECTION(".vsf.utilities.stdio.arm_compiler._sys_write")
-WEAK
+WEAK(_sys_write)
 int _sys_write (FILEHANDLE fh, const uint8_t *buf, uint32_t len, int mode) {
 
   int ch;
@@ -348,7 +348,7 @@ int _sys_write (FILEHANDLE fh, const uint8_t *buf, uint32_t len, int mode) {
 */
 
 SECTION(".vsf.utilities.stdio.arm_compiler._sys_read")
-WEAK
+WEAK(_sys_read)
 int _sys_read (FILEHANDLE fh, uint8_t *buf, uint32_t len, int mode) {
   int ch;
 
@@ -393,21 +393,21 @@ int _sys_read (FILEHANDLE fh, uint8_t *buf, uint32_t len, int mode) {
   \param[in] ch character to write
 */
 SECTION(".vsf.utilities.stdio.arm_compiler._ttywrch")
-WEAK
+WEAK(_ttywrch)
 void _ttywrch (int ch) 
 {
     vsf_stdout_putchar(ch);
 }
 
 SECTION(".vsf.utilities.stdio.arm_compiler._sys_exit")
-WEAK 
+WEAK(_sys_exit)
 void _sys_exit(int ch)
 {
     while(1);
 }
 
 SECTION(".vsf.utilities.stdio.arm_compiler.stderr_putchar")
-WEAK
+WEAK(vsf_stderr_putchar)
 int vsf_stderr_putchar(char ch)
 {
     return vsf_stdout_putchar(ch);

@@ -155,6 +155,8 @@
 //! @}
 
 
+#define VSF_USE_AV                                      ENABLED
+
 #define VSF_USE_USB_HOST                                ENABLED
 #define VSF_USE_USB_HOST_HUB                            ENABLED
 #define VSF_USE_USB_HOST_ECM                            ENABLED
@@ -165,6 +167,8 @@
 #else
 #define VSF_USE_USB_DEVICE                              ENABLED
 #endif
+#define VSF_USE_USB_DEVICE_UVC                          ENABLED
+#   define VSF_USBD_UVC_CFG_TRACE_EN                    ENABLED
 
 #define VSF_USE_TCPIP                                   ENABLED
 #define VSFIP_CFG_NETIF_HEADLEN                         64

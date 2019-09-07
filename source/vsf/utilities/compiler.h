@@ -18,21 +18,22 @@
 #ifndef _USE_COMPILER_H_
 #define _USE_COMPILER_H_            
 
-
-#include "./type.h"
-#include "./preprocessor/mrepeat.h"
-     
 //! \brief CPU io
 
-#if     defined(__CPU_AVR__)                    //!< Atmel AVR series
+#if     defined(__CPU_AVR__)                //!< Atmel AVR series
 #   include "./compiler/avr/avr_compiler.h"
 #elif   defined(__CPU_ARM__)                //!< ARM series
 #   include "./compiler/arm/arm_compiler.h"
+#elif   defined(__CPU_MCS51__)              //!< MCS-51 series
+#   include "./compiler/mcs51/mcs51_compiler.h"
 #elif   defined(__CPU_X86__)
 #   include "./compiler/x86/x86_compiler.h"
 #else
 //#warning No specified MCU type! use arm as default
 #   include "./compiler/arm/arm_compiler.h"
 #endif
+
+
+#include "./preprocessor/mrepeat.h"
 
 #endif

@@ -282,7 +282,8 @@ const pFunc __VECTOR_TABLE[240] __VECTOR_TABLE_ATTRIBUTE  = {
 #pragma GCC diagnostic pop
 #endif
 
-WEAK void vsf_hal_pre_startup_init(void)
+WEAK(vsf_hal_pre_startup_init) 
+void vsf_hal_pre_startup_init(void)
 {}
 
 /*----------------------------------------------------------------------------

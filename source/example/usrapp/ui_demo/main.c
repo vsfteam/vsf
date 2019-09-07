@@ -83,8 +83,10 @@ extern void lvgl_create_demo(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void usrapp_trans_init(void) {}
-WEAK void usrapp_trans_disp_line(uint8_t *buffer, uint_fast32_t size) {}
+WEAK(usrapp_trans_init)
+void usrapp_trans_init(void) {}
+WEAK(usrapp_trans_disp_line)
+void usrapp_trans_disp_line(uint8_t *buffer, uint_fast32_t size) {}
 
 #if USE_LV_LOG
 static void lvgl_printf(lv_log_level_t level, const char *file, uint32_t line,  const char *dsc)

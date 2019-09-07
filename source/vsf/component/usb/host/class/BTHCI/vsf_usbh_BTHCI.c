@@ -113,14 +113,40 @@ typedef struct vsf_usbh_bthci_t vsf_usbh_bthci_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#if     defined(WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN)                              \
+    &&  defined(WEAK_VSF_USBH_BTHCI_ON_NEW)
+WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN)                              \
+    &&  defined(WEAK_VSF_USBH_BTHCI_ON_DEL)
+WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN)                           \
+    &&  defined(WEAK_VSF_USBH_BTHCI_ON_PACKET)
+WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN
+#endif
+
 SECTION(".text.vsf.kernel.eda")
 vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id) {}
-WEAK void vsf_usbh_bthci_on_del(void *dev) {}
-WEAK void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
+#ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
+WEAK(vsf_usbh_bthci_on_new)
+void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id) {}
+#endif
+
+#ifndef WEAK_VSF_USBH_BTHCI_ON_DEL
+WEAK(vsf_usbh_bthci_on_del)
+void vsf_usbh_bthci_on_del(void *dev) {}
+#endif
+
+#ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
+WEAK(vsf_usbh_bthci_on_packet)
+void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
+#endif
 
 static vsf_usbh_bthci_iocb_t * vsf_usbh_bthci_get_iocb(vsf_usbh_bthci_t *bthci, vsf_usbh_hcd_urb_t *urb_hcd)
 {
@@ -186,7 +212,11 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->aclin_icb.urb))) {
                 break;
             }
+#ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
             vsf_usbh_bthci_on_new(bthci, &bthci->id);
+#else
+            WEAK_VSF_USBH_BTHCI_ON_NEW(bthci, &bthci->id);
+#endif
         } else {
             vsf_usbh_bthci_iocb_t *iocb = vsf_usbh_bthci_get_iocb(bthci, (vsf_usbh_hcd_urb_t *)vsf_eda_get_cur_msg());
             vsf_usbh_urb_t *urb;
@@ -199,8 +229,13 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             if (iocb->is_icb) {
                 if (URB_OK == status) {
+#ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
                     vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
                         buffer, actual_length);
+#else
+                    WEAK_VSF_USBH_BTHCI_ON_PACKET(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
+                        buffer, actual_length);
+#endif
                 }
                 err = vsf_usbh_submit_urb(usbh, urb);
             } else {
@@ -209,8 +244,13 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     __vsf_eda_crit_npb_leave(&dev->ep0.crit);
                 }
                 if (URB_OK == status) {
+#ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
                     vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
                         buffer, actual_length);
+#else
+                    WEAK_VSF_USBH_BTHCI_ON_PACKET(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
+                        buffer, actual_length);
+#endif
                 }
             }
         }
@@ -300,7 +340,7 @@ static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             }
             break;
         }
-        desc_ep = (struct usb_endpoint_desc_t *)((uint32_t)desc_ep + USB_DT_ENDPOINT_SIZE);
+        desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
     if (    !vsf_usbh_urb_is_valid(&bthci->event_icb.urb)
         ||  !vsf_usbh_urb_is_valid(&bthci->aclin_icb.urb)
@@ -350,7 +390,12 @@ static void vsf_usbh_bthci_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, voi
 {
     vsf_usbh_bthci_t *bthci = param;
 
+#ifndef WEAK_VSF_USBH_BTHCI_ON_DEL
     vsf_usbh_bthci_on_del(bthci);
+#else
+    WEAK_VSF_USBH_BTHCI_ON_DEL(bthci);
+#endif
+
     vsf_usbh_bthci_free_all(bthci);
     __vsf_eda_fini(&bthci->eda);
 }

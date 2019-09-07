@@ -34,6 +34,9 @@
 #if VSF_USE_USB_HOST_HUB == ENABLED
 #   error "libusb_hcd does not support hub"
 #endif
+#ifndef __CPU_X86__
+#	error "libusb_hcd ONLY support x86"
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

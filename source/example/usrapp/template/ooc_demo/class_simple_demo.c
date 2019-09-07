@@ -55,5 +55,5 @@ uint_fast8_t class_simple_demo_get_param(class_simple_demo_t *pthis)
 
 uint_fast8_t class_simple_demo_get_base_param(class_simple_demo_t *pthis)
 {
-    return this.private_param_base;
+    return this.use_as__class_simple_base_t.private_param_base;
 }

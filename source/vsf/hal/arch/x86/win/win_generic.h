@@ -42,7 +42,7 @@
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                32
-
+#define __VSF_ARCH_SYSTIMER_BITS        32      //! TODO modify this macro for x86 systimer implementation.
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

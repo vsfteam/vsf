@@ -60,7 +60,7 @@ bool vsf_pbuf_pool_add_buffer(  vsf_pbuf_pool_t *pthis,
         return false;
     }
                                                                 
-    return vsf_pool_add_buffer_ex(  (vsf_pool_t *)pthis, ptBuffer,              
+    return vsf_pool_add_buffer_ex(  (vsf_pool_t *)pthis, (uintptr_t)ptBuffer,              
                                     wSize,                                      
                                     hwItemSize,               
                                     vsf_pbuf_pool_item_init_event_handler );                            
@@ -78,7 +78,7 @@ vsf_pbuf_t *vsf_pbuf_pool_alloc(vsf_pbuf_pool_t *pthis)
                                                                             
 void vsf_pbuf_pool_free(vsf_pbuf_pool_t *pthis, vsf_pbuf_t *ptItem)                 
 {                                                                               
-    vsf_pool_free((vsf_pool_t *)pthis, (void *)ptItem);                         
+    vsf_pool_free((vsf_pool_t *)pthis, (uintptr_t)ptItem);                         
 }                                                                               
                                                                             
 SECTION(".text." "vsf_pbuf" "_get_pool_item_count")                                
@@ -95,7 +95,7 @@ code_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *pthis)
 }                                                                               
                                                                             
 SECTION(".text." "vsf_pbuf" "_pool_get_target")                                    
-void *vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *pthis)                          
+uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *pthis)                          
 {                                                                               
     return vsf_pool_get_tag((vsf_pool_t *)pthis);                               
 }                                                                               

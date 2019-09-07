@@ -22,7 +22,7 @@
 
 #include "../../vsf_input_cfg.h"
 
-#if VSF_INPUT_CFG_HID_EN == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
 
 #include "../../vsf_input_get_type.h"
 
@@ -132,5 +132,5 @@ extern void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast3
 extern void vsf_hid_new_dev(vsf_input_hid_t *dev);
 extern void vsf_hid_free_dev(vsf_input_hid_t *dev);
 
-#endif      // VSF_INPUT_CFG_HID_EN
+#endif      // VSF_USE_INPUT && VSF_USE_INPUT_HID
 #endif      // __VSF_INPUT_HID_H__

@@ -36,14 +36,15 @@
  *! \param pthis    address of the target bitmap
  *! \param biesize  the size of the bitmap in bits
  */
-void __vsf_bitmap_reset(uint_fast32_t *pthis, uint_fast16_t bitsize)
+void __vsf_bitmap_reset(uint_fast8_t *pthis, int_fast16_t bitsize)
 {
     memset(pthis, 0, (bitsize + 7) >> 3);
 }
 
-WEAK int32_t msb(uint_fast32_t a)
+WEAK(msb)
+int_fast16_t msb(uint_fast8_t a)
 {
-    int c = -1;
+    int_fast16_t c = -1;
     while (a > 0) {
         c++;
         a >>= 1;
@@ -51,16 +52,17 @@ WEAK int32_t msb(uint_fast32_t a)
     return c;
 }
 
-WEAK int32_t ffz(uint_fast32_t a)
+WEAK(ffz)
+int_fast16_t ffz(uint_fast8_t a)
 {
     a = ~a;
-    return msb(a & -(int32_t)a);
+    return msb(a & -(int_fast8_t)a);
 }
 
-int32_t __vsf_bitmap_ffz(uint32_t *pbitmap, uint_fast16_t bitsize)
+int_fast16_t __vsf_bitmap_ffz(uint_fast8_t *pbitmap, int_fast16_t bitsize)
 {
-    uint_fast16_t dwordsize = (bitsize + 31) >> 5, i;
-    int32_t index;
+    int_fast16_t dwordsize = (bitsize + __optimal_bit_sz - 1) / __optimal_bit_sz, i;
+    int_fast16_t index;
 
     for (i = 0; i < dwordsize; i++) {
         index = ffz(pbitmap[i]);

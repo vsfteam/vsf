@@ -664,14 +664,11 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 
 
 
-WEAK bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
+WEAK(on_arch_systimer_tick_evt)
+bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
 {
     UNUSED_PARAM(tick);
     return true;
-}
-
-WEAK void vsf_systimer_set_idle(void)
-{
 }
 
 static void vsf_systimer_thread(void *arg)
@@ -704,16 +701,11 @@ static void vsf_systimer_thread(void *arg)
     }
 }
 
-WEAK uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
-{
-    return VSF_ARCH_SYSTIMER_FREQ;
-}
-
 /*! \brief initialise SysTick to generate a system timer
  *! \param frequency the target tick frequency in Hz
  *! \return initialization result in vsf_err_t
  */
-WEAK vsf_err_t vsf_systimer_init(void)
+vsf_err_t vsf_systimer_init(void)
 {
     __vsf_x86.systimer.start_tick = 0;
     __vsf_x86.systimer.start_tick = vsf_systimer_get();
@@ -727,21 +719,24 @@ WEAK vsf_err_t vsf_systimer_init(void)
     return VSF_ERR_NONE;
 }
 
-WEAK vsf_err_t vsf_systimer_start(void)
+vsf_err_t vsf_systimer_start(void)
 {
     ResumeThread(__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t.thread);
     return VSF_ERR_NONE;
 }
 
+void vsf_systimer_set_idle(void)
+{
+}
 
-WEAK vsf_systimer_cnt_t vsf_systimer_get(void)
+vsf_systimer_cnt_t vsf_systimer_get(void)
 {
     LARGE_INTEGER li;
     GetSystemTimeAsFileTime((LPFILETIME)&li);
     return (vsf_systimer_cnt_t)li.QuadPart - __vsf_x86.systimer.start_tick;
 }
 
-WEAK bool vsf_systimer_set(vsf_systimer_cnt_t due)
+bool vsf_systimer_set(vsf_systimer_cnt_t due)
 {
     LARGE_INTEGER li = {
         .QuadPart = __vsf_x86.systimer.start_tick + due,
@@ -758,27 +753,27 @@ WEAK bool vsf_systimer_set(vsf_systimer_cnt_t due)
     return true;
 }
 
-WEAK bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
 {
     return (vsf_systimer_get() >= due);
 }
 
-WEAK vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     return (vsf_systimer_cnt_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
 }
 
-WEAK vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     return (vsf_systimer_cnt_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
 }
 
-WEAK uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
 {
     return tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
 }
 
-WEAK uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 {
     return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
 }
@@ -874,7 +869,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-bool vsf_arch_init(void)
+bool vsf_arch_low_level_init(void)
 {
     memset(&__vsf_x86, 0, sizeof(__vsf_x86));
 
@@ -904,7 +899,6 @@ bool vsf_arch_init(void)
         __vsf_x86.swi[i].use_as__vsf_arch_irq_thread_t.name = strdup(name);
     }
 
-    vsf_systimer_init();
     return true;
 }
 

@@ -39,7 +39,6 @@
 #define VSF_HEAP_SIZE                   0x800
 
 #define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
-#define VSF_USBD_UVC_TRACE_EN           ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -151,7 +150,8 @@
 //  </h>
 //! @}
 
-#define VSF_INPUT_CFG_HID_EN                ENABLED
+#define VSF_USE_INPUT                       ENABLED
+#define VSF_USE_INPUT_HID                   ENABLED
 
 #define VSF_USE_USB_HOST                    ENABLED
 #define VSF_USE_USB_HOST_HUB                ENABLED
@@ -161,6 +161,8 @@
 #define VSF_USE_USB_HOST_HCD_OHCI           ENABLED
 
 #define VSF_USE_USB_DEVICE                  ENABLED
+#define VSF_USE_USB_DEVICE_UVC              ENABLED
+#   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
 
 #define VSF_USE_TCPIP                       ENABLED
 #define VSFIP_CFG_NETIF_HEADLEN             64

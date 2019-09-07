@@ -327,7 +327,7 @@
             <uC99>1</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
-            <v6Lang>4</v6Lang>
+            <v6Lang>1</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -fms-extensions  -Wno-enum-conversion -Wno-empty-body -fomit-frame-pointer -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
-              <Define>_MSC_VER __ARM__ __MPS2__</Define>
+              <Define>_MSC_VER __ARM__ __MPS2__ __OOC_DEBUG__</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
             </VariousControls>
@@ -670,57 +670,6 @@
               <FileName>main_task_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_task_simple.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
             </File>
             <File>
               <FileName>eda_sub_demo.c</FileName>
@@ -838,6 +787,57 @@
               <FileName>main_thread_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_thread_simple.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
           </Files>
         </Group>
@@ -863,6 +863,11 @@
               <FileName>vsf_arch_abstraction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
+            </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1053,11 +1058,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>
@@ -2416,6 +2416,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2947,11 +2952,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>
@@ -4360,6 +4360,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4669,11 +4674,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>
@@ -6137,6 +6137,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6326,11 +6331,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>
@@ -7637,6 +7637,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8219,11 +8224,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>
@@ -9632,6 +9632,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -10217,11 +10222,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>
@@ -11635,7 +11635,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -11647,7 +11647,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>1</uC99>
+            <uC99>0</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
             <v6Lang>4</v6Lang>
@@ -11659,7 +11659,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=64,1,381,177,111,188,186 --wchar32</MiscControls>
-              <Define>_MSC_VER __ARM__ __MPS2__</Define>
+              <Define>_MSC_VER __ARM__ __MPS2__ __OOC_DEBUG__</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
             </VariousControls>
@@ -12289,6 +12289,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
+            <File>
+              <FileName>__vsf_arch_interface.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -12478,11 +12483,6 @@
               <FileName>compiler.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler.h</FilePath>
-            </File>
-            <File>
-              <FileName>type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\utilities\type.h</FilePath>
             </File>
             <File>
               <FileName>signal.h</FileName>

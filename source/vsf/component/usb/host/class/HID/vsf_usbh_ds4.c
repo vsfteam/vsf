@@ -84,28 +84,32 @@ const vsf_usbh_class_drv_t vsf_usbh_ds4_drv = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_usbh_ds4_on_report_input(vsf_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
+WEAK(vsf_usbh_ds4_on_report_input)
+void vsf_usbh_ds4_on_report_input(vsf_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
 {
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT_DS4 == ENABLED
     vsf_ds4u_process_input(&ds4->use_as__vsf_input_ds4u_t, report);
 #endif
 }
 
-WEAK void vsf_usbh_ds4_on_new(vsf_usbh_ds4_t *ds4)
+WEAK(vsf_usbh_ds4_on_new)
+void vsf_usbh_ds4_on_new(vsf_usbh_ds4_t *ds4)
 {
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT_DS4 == ENABLED
     vsf_ds4u_new_dev(&ds4->use_as__vsf_input_ds4u_t);
 #endif
 }
 
-WEAK void vsf_usbh_ds4_on_free(vsf_usbh_ds4_t *ds4)
+WEAK(vsf_usbh_ds4_on_free)
+void vsf_usbh_ds4_on_free(vsf_usbh_ds4_t *ds4)
 {
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT_DS4 == ENABLED
     vsf_ds4u_free_dev(&ds4->use_as__vsf_input_ds4u_t);
 #endif
 }
 
-WEAK int_fast32_t vsf_usbh_ds4_get_output_report(vsf_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_out_report_t *report)
+WEAK(vsf_usbh_ds4_get_output_report)
+int_fast32_t vsf_usbh_ds4_get_output_report(vsf_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_out_report_t *report)
 {
     return 0;
 }
@@ -116,7 +120,7 @@ static void vsf_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        do {
+        {
             vsf_usbh_ep0_t *ep0 = ds4->ep0;
             vsf_usbh_urb_t *urb = &ep0->urb;
 
@@ -124,10 +128,10 @@ static void vsf_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_usbh_hid_set_idle(ds4, 0, 0);
 
             vsf_teda_set_timer_ms(1000);
-        } while (0);
+        }
         break;
     case VSF_EVT_MESSAGE:
-        do {
+        {
             vsf_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
             vsf_usbh_eppipe_t pipe;
 
@@ -151,7 +155,7 @@ static void vsf_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 ds4->out_idle = false;
                 vsf_usbh_hid_send_report((vsf_usbh_hid_eda_t *)&ds4->use_as__vsf_usbh_hid_teda_t, (uint8_t *)&ds4->gamepad_out_buf, sizeof(ds4->gamepad_out_buf));
             }
-        } while (0);
+        }
         break;
     }
 }

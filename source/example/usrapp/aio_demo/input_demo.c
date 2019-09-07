@@ -110,7 +110,7 @@ static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
 void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
 {
     switch (type) {
-#if VSF_INPUT_CFG_HID_EN == ENABLED
+#if VSF_USE_INPUT_HID == ENABLED
     case VSF_INPUT_TYPE_HID:
         input_demo_trace_hid((vsf_hid_event_t *)event);
         break;
@@ -118,7 +118,7 @@ void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
     case VSF_INPUT_TYPE_SENSOR:
         input_demo_trace_sensor((vsf_sensor_evt_t *)event);
         break;
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT_DS4 == ENABLED
     case VSF_INPUT_TYPE_DS4:
         input_demo_trace_gamepad((vsf_gamepad_evt_t *)event);
         break;

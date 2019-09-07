@@ -21,6 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
+#if VSF_USE_JSON == ENABLED
+
 #if     defined(VSF_JSON_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
 #   undef VSF_JSON_IMPLEMENT
@@ -121,4 +123,5 @@ extern int vsf_json_set_number(vsf_json_constructor_t *c, char *key, double valu
 extern int vsf_json_set_boolean(vsf_json_constructor_t *c, char *key, bool value);
 extern int vsf_json_set_null(vsf_json_constructor_t *c, char *key);
 
+#endif      // VSF_USE_JSON
 #endif      // __VSF_JSON_H__

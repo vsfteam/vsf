@@ -39,6 +39,8 @@
 #       define  VSF_DRIVER_HEADER       "./WinnerMicro/driver.h"
 #   elif    defined(__CPU_X86__)  
 #       define  VSF_DRIVER_HEADER       "./x86/driver.h"
+#   elif    defined(__SiliconLabs__)  
+#       define  VSF_DRIVER_HEADER       "./SiliconLabs/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"

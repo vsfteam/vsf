@@ -119,7 +119,7 @@ vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
             return VSF_ERR_FAIL;
         }
         vsf_usbh_cdc_parse_ep(pthis, desc_ep);
-        desc_ep = (struct usb_endpoint_desc_t *)((uint32_t)desc_ep + USB_DT_ENDPOINT_SIZE);
+        desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
 
     desc = (struct usb_class_interface_descriptor_t *)desc_ifs;
@@ -146,7 +146,7 @@ vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
             }
         }
         parsed_size += desc->bLength;
-        desc = (struct usb_class_interface_descriptor_t *)((uint32_t)desc + desc->bLength);
+        desc = (struct usb_class_interface_descriptor_t *)((uintptr_t)desc + desc->bLength);
     }
 
     // parse data interface
@@ -176,7 +176,7 @@ vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
                         return VSF_ERR_FAIL;
                     }
                     vsf_usbh_cdc_parse_ep(pthis, desc_ep);
-                    desc_ep = (struct usb_endpoint_desc_t *)((uint32_t)desc_ep + USB_DT_ENDPOINT_SIZE);
+                    desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
                 }
             }
             break;

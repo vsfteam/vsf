@@ -23,6 +23,8 @@
 /*============================ INCLUDES ======================================*/
 #include "./vsf_input_cfg.h"
 
+#if VSF_USE_INPUT == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #define VSF_INPUT_ITEM(__id, __bitoffset, __bitlen, __is_signed)                \
@@ -104,5 +106,7 @@ extern void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt);
 
 // returns duration
 extern uint_fast32_t vsf_input_update_timestamp(vsf_input_timestamp_t *timestamp);
-#endif
+
+#endif      // VSF_USE_INPUT
+#endif      // __VSF_INPUT_H__
 /* EOF */

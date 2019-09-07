@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_HID == ENABLED
 
 #define VSF_USBD_INHERIT
 #define VSF_USBD_HID_IMPLEMENT
@@ -358,4 +358,4 @@ const vsf_usbd_class_op_t vsf_usbd_HID = {
     .fini =             vsf_usbh_HID_fini,
 };
 
-#endif      // VSF_USE_USB_DEVICE
+#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_HID

@@ -107,15 +107,6 @@
 
 #   undef  class
 #   define class(__NAME)                    __class(__NAME)
-
-#   undef __class_internal
-#   define __class_internal(__SRC, __DES, __TYPE, ...)                          \
-            class(__TYPE) *(__DES) = (class(__TYPE) *)(__SRC);                  \
-            __with_class(__TYPE, (__SRC), __VA_ARGS__)
-            
-#   undef class_internal
-#   define class_internal(__SRC, __DES, __TYPE,...)                             \
-            __class_internal(__SRC, __DES, __TYPE, __VA_ARGS__)
             
 #   undef __with_class
 #   define __with_class(__TYPE, __SRC, ...)                                     \
@@ -129,6 +120,15 @@
 #   undef with_class
 #   define with_class(__TYPE, __SRC, ...)                                       \
             __with_class(__TYPE, __SRC, __VA_ARGS__)
+            
+#   undef __class_internal
+#   define __class_internal(__SRC, __DES, __TYPE, ...)                          \
+            class(__TYPE) *(__DES) = (class(__TYPE) *)(__SRC);                  \
+            __with_class(__TYPE, (__SRC), __VA_ARGS__)
+            
+#   undef class_internal
+#   define class_internal(__SRC, __DES, __TYPE,...)                             \
+            __class_internal(__SRC, __DES, __TYPE, __VA_ARGS__)
 
 #define __extern_class(...)                                    
 
@@ -142,13 +142,7 @@
 #   undef  class_protected
 #   define class_protected(__NAME)              __class_protected(__NAME)
 
-#   undef __protected_internal
-#   define __protected_internal(__SRC, __DES, __TYPE)                           \
-            class_protected(__TYPE) *(__DES) = (class_protected(__TYPE) *)(__SRC) 
 
-#   undef protected_internal            
-#   define protected_internal(__SRC, __DES, __TYPE)                             \
-            __protected_internal(__SRC, __DES, __TYPE)    
 
 #   undef __with_protected
 #   define __with_protected(__TYPE, __SRC, ...)                                 \
@@ -159,7 +153,17 @@
 
 #   undef with_protected
 #   define with_protected(__TYPE, __SRC, ...)                                   \
-            __with_protected(__TYPE, __SRC, __VA_ARGS__)            
+            __with_protected(__TYPE, __SRC, __VA_ARGS__)     
+
+
+#   undef __protected_internal
+#   define __protected_internal(__SRC, __DES, __TYPE, ...)                      \
+            class_protected(__TYPE) *(__DES)=(class_protected(__TYPE) *)(__SRC);\
+            __with_protected(__TYPE, __SRC, __VA_ARGS__)
+
+#   undef protected_internal            
+#   define protected_internal(__SRC, __DES, __TYPE, ...)                        \
+            __protected_internal(__SRC, __DES, __TYPE, __VA_ARGS__)                
 
 #define __extern_class(...)                                    
 

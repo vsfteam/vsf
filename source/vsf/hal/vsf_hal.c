@@ -27,12 +27,21 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_DRIVER_INIT_EXTERN)                                    \
+    &&  defined(WEAK_VSF_DRIVER_INIT)
+WEAK_VSF_DRIVER_INIT_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK bool vsf_driver_init(void) 
+#ifndef WEAK_VSF_DRIVER_INIT
+WEAK(vsf_driver_init)
+bool vsf_driver_init(void) 
 {
     return true;
 }
+#endif
 
 /*! \note initialize level 0/1 hardware abstract layer
  *  \param none
@@ -41,22 +50,39 @@ WEAK bool vsf_driver_init(void)
  */  
 bool vsf_hal_init( void )
 {
-    if (!vsf_arch_init() || !vsf_driver_init()) {
+    
+    if (    
+        #ifndef WEAK_VSF_ARCH_INIT
+            !vsf_arch_init() 
+        #else
+            !WEAK_VSF_ARCH_INIT() 
+        #endif
+        ||  
+        #ifndef WEAK_VSF_DRIVER_INIT
+            !vsf_driver_init()
+        #else
+            !WEAK_VSF_DRIVER_INIT()
+        #endif
+        ) {
+        
         return false;
     }
 
     return true;
 }
 
+#ifndef WEAK_VSF_HAL_ADVANCE_INIT
 /*! \note initialize level 2 hardware abstract layer
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */  
-WEAK bool vsf_hal_advance_init(void)
+WEAK(vsf_hal_advance_init)
+bool vsf_hal_advance_init(void)
 {
     //! level 2 hal init
     return true;
 }
+#endif
 
 /* EOF */

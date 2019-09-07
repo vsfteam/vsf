@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
 
 #define VSF_USBD_INHERIT
 #define VSF_USBD_UVC_IMPLEMENT
@@ -33,7 +33,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USBD_UVC_TRACE_EN == ENABLED
+#if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
 static char * vsf_usbd_UVC_trace_get_request(uint_fast8_t request)
 {
     switch (request) {
@@ -88,11 +88,13 @@ static void vsf_usbd_UVC_trace_request_process(vsf_usbd_ctrl_handler_t *ctrl_han
 }
 #endif
 
-WEAK void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
+WEAK(vsf_usbd_UVC_stop_stream)
+void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
 }
 
-WEAK void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
+WEAK(vsf_usbd_UVC_start_stream)
+void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
 }
 
@@ -166,12 +168,12 @@ static vsf_err_t vsf_usbd_UVC_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
             case USB_REQ_SET_INTERFACE:
                 if (0 == request->wValue) {
                     // 0-bandwidth
-#if VSF_USBD_UVC_TRACE_EN == ENABLED
+#if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: stop stream." VSF_TRACE_CFG_LINEEND);
 #endif
                     vsf_usbd_UVC_stop_stream(uvc, request->wValue);
                 } else {
-#if VSF_USBD_UVC_TRACE_EN == ENABLED
+#if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: start stream %d." VSF_TRACE_CFG_LINEEND,
                                 request->wValue);
 #endif
@@ -223,7 +225,7 @@ static vsf_err_t vsf_usbd_UVC_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
     }
     ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
     ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
-#if VSF_USBD_UVC_TRACE_EN == ENABLED
+#if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
     uvc->cur_size = size;
     vsf_usbd_UVC_trace_request_prepare(ctrl_handler);
 #endif
@@ -237,7 +239,7 @@ static vsf_err_t vsf_usbd_UVC_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
     vsf_usbd_UVC_control_t *control;
 
-#if VSF_USBD_UVC_TRACE_EN == ENABLED
+#if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
     ctrl_handler->trans.nSize = uvc->cur_size;
     vsf_usbd_UVC_trace_request_process(ctrl_handler);
 #endif
@@ -302,4 +304,4 @@ const vsf_usbd_class_op_t vsf_usbd_UVC_stream_class = {
     .init =             vsf_usbd_UVCVS_class_init,
 };
 
-#endif      // VSF_USE_USB_DEVICE
+#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC

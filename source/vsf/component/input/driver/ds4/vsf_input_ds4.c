@@ -19,7 +19,7 @@
 
 #include "../../vsf_input_cfg.h"
 
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
 
 #include "vsf.h"
 
@@ -61,24 +61,38 @@ const vsf_sensor_item_info_t vsf_ds4u_sensor_item_info[6] = {
 };
 
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
+    &&  defined(WEAK_VSF_INPUT_ON_EVT)
+WEAK_VSF_INPUT_ON_EVT_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_ds4u_on_new_dev(vsf_input_ds4u_t *dev)
+WEAK(vsf_ds4u_on_new_dev)
+void vsf_ds4u_on_new_dev(vsf_input_ds4u_t *dev)
 {
     vsf_input_on_new_dev(VSF_INPUT_TYPE_DS4, dev);
 }
 
-WEAK void vsf_ds4u_on_free_dev(vsf_input_ds4u_t *dev)
+WEAK(vsf_ds4u_on_free_dev)
+void vsf_ds4u_on_free_dev(vsf_input_ds4u_t *dev)
 {
     vsf_input_on_free_dev(VSF_INPUT_TYPE_DS4, dev);
 }
 
-WEAK void vsf_ds4u_on_report_input(vsf_gamepad_evt_t *gamepad_evt)
+WEAK(vsf_ds4u_on_report_input)
+void vsf_ds4u_on_report_input(vsf_gamepad_evt_t *gamepad_evt)
 {
+#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_DS4, &gamepad_evt->use_as__vsf_input_evt_t);
+#else
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_DS4, &gamepad_evt->use_as__vsf_input_evt_t);
+#endif
 }
 
-WEAK void vsf_ds4u_on_sensor(vsf_sensor_evt_t *sensor_evt)
+WEAK(vsf_ds4u_on_sensor)
+void vsf_ds4u_on_sensor(vsf_sensor_evt_t *sensor_evt)
 {
     vsf_input_on_sensor(sensor_evt);
 }
@@ -140,4 +154,4 @@ void vsf_ds4u_process_input(vsf_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report
     dev->data = *data;
 }
 
-#endif      // VSF_INPUT_CFG_DS4_EN
+#endif      // VSF_USE_INPUT && VSF_USE_INPUT_DS4

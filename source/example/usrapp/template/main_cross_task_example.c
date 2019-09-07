@@ -227,7 +227,9 @@ void vsf_kernel_pt_simple_demo(void)
         init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_inherit);
     };
 
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                                \
+    &&  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+    
     //! start the user task a
     {
         static NO_INIT user_thread_a_t __user_task_a;

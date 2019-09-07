@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SERVICE_ASSERT
-#   define VSF_SERVICE_ASSERT(...)               ASSERT(__VA_ARGS__)
+#   define VSF_SERVICE_ASSERT                    ASSERT
 #endif
 
 #if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED && VSF_USE_HEAP != ENABLED
@@ -36,7 +36,11 @@
 The Feature VSF_POOL_CFG_FEED_ON_HEAP is enabled but VSF_USE_HEAP is disabled.\
 The VSF_USE_HEAP will be forced to ENABLED here to provide required services
 #   undef VSF_USE_HEAP
-#   define VSF_USE_HEAP     ENABLED
+#   define VSF_USE_HEAP                         ENABLED
+#endif
+
+#ifndef VSF_USE_POOL
+#   define VSF_USE_POOL                         ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

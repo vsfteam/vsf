@@ -2795,7 +2795,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -14272,6 +14272,9 @@
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\signal.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\type.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</name>
                     <excluded>
                         <configuration>arm_mps2_m7</configuration>
@@ -14332,9 +14335,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\utilities\ooc_class.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\utilities\type.h</name>
             </file>
         </group>
         <file>

@@ -429,7 +429,8 @@ static usbd_uvc_t usbd_uvc = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void usrapp_on_ready(void) {}
+WEAK(usrapp_on_ready)
+void usrapp_on_ready(void) {}
 
 void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {

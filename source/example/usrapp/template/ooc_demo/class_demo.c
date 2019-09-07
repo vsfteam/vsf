@@ -59,8 +59,13 @@ uint_fast8_t class_demo_get_base_param(class_demo_t *ptObj)
 {
     class_internal(ptObj, ptThis, class_demo_t);
     uint_fast8_t chBaseParam;
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+    class_internal(&this.use_as__class_base_t, ptBase, class_base_t);
+    chBaseParam = ptBase->chPrivateParamBase;
+#else
     with_class(class_base_t, &this.use_as__class_base_t,
                     chBaseParam = _->chPrivateParamBase;
                 );
+#endif
     return chBaseParam;
 }

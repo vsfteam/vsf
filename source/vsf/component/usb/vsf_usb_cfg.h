@@ -25,14 +25,29 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USB_ASSERT
-#   define VSF_USB_ASSERT(...)          ASSERT(__VA_ARGS__)
+#   define VSF_USB_ASSERT                       ASSERT
+#endif
+
+#if VSF_USE_USB_DEVICE == ENABLED
+
+// check dependency here
+#   if VSF_USE_USB_DEVICE_CDCACM == ENABLED
+#       ifndef VSF_USE_USB_DEVICE_CDC
+#           define VSF_USE_USB_DEVICE_CDC       ENABLED
+#       elif VSF_USE_USB_DEVICE_CDC != ENABLED
+#           #warning "VSF_USE_USB_DEVICE_CDC MUST be enabled to use VSF_USE_USB_DEVICE_CDCACM"
+#           undef VSF_USE_USB_DEVICE_CDC
+#           define VSF_USE_USB_DEVICE_CDC       ENABLED
+#       endif
+#   endif
+
 #endif
 
 #ifndef VSF_USBD_CFG_STREAM_EN
 #   if VSF_USE_SERVICE_STREAM == ENABLED || VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#       define VSF_USBD_CFG_STREAM_EN   ENABLED
+#       define VSF_USBD_CFG_STREAM_EN           ENABLED
 #   else
-#       define VSF_USBD_CFG_STREAM_EN   DISABLED
+#       define VSF_USBD_CFG_STREAM_EN           DISABLED
 #   endif
 #endif
 
@@ -44,7 +59,7 @@
 
 #if VSF_USE_USB_HOST_ECM == ENABLED
 #   undef VSF_USE_USB_HOST_CDC
-#   define VSF_USE_USB_HOST_CDC         ENABLED
+#   define VSF_USE_USB_HOST_CDC                 ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

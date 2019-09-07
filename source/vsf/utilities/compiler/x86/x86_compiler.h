@@ -48,6 +48,13 @@
 #endif
 //! @}
 
+#undef __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
+#if defined(__GNUC__)
+#   define  __IS_COMPILER_SUPPORT_GNUC_EXTENSION__      1
+#endif
+
+
+#include "./type.h"
 
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_LLVM__
@@ -141,7 +148,7 @@
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK                 __weak
+#   define WEAK(...)            __weak
 #   define RAMFUNC              __ramfunc
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))
@@ -161,7 +168,7 @@
 #   define INLINE               __inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        __inline __attribute__((always_inline))
-#   define WEAK                 __attribute__((weak))
+#   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N))) 
@@ -182,7 +189,7 @@
 #   define INLINE               __inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        __inline __attribute__((always_inline))
-#   define WEAK                 __attribute__((weak))
+#   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N))) 
@@ -203,7 +210,7 @@
 #   define INLINE               __inline__
 #   define NO_INLINE            __attribute__ ((__noinline__))
 #   define ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
-#   define WEAK                 __attribute__((__weak__))
+#   define WEAK(...)            __attribute__((__weak__))
 #   define RAMFUNC              __attribute__((__section__ (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
@@ -226,7 +233,7 @@
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK                 __attribute__((weak))
+#   define WEAK(...)            __attribute__((weak))
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))

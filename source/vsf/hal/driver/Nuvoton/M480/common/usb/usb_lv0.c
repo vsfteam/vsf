@@ -30,7 +30,7 @@ static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  
 m480_##__TYPE##_t USB_HC##__N##_IP = {                                          \
     .param = &__USB_HC##__N##_const,                                            \
 };                                                                              \
-ROOT void USB_HC##__N##_IRQHandler(void)                                        \
+ROOT ISR(USB_HC##__N##_IRQHandler)                                              \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_HC##__N##_IP);                                     \
 }
@@ -42,7 +42,7 @@ static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  
 m480_##__TYPE##_t USB_HC##__N##_IP = {                                          \
     .param = &__USB_HC##__N##_const,                                            \
 };                                                                              \
-void USB_HC##__N##_IRQHandler(void)                                             \
+ISR(USB_HC##__N##_IRQHandler)                                                   \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_HC##__N##_IP);                                     \
 }
@@ -68,7 +68,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ROOT void USB_DC##__N##_IRQHandler(void)                                        \
+ROOT ISR(USB_DC##__N##_IRQHandler)                                              \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
@@ -85,7 +85,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-void USB_DC##__N##_IRQHandler(void)                                             \
+ISR(USB_DC##__N##_IRQHandler)                                                   \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
@@ -99,7 +99,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ROOT void USB_DC##__N##_IRQHandler(void)                                        \
+ROOT ISR(USB_DC##__N##_IRQHandler)                                              \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
@@ -111,7 +111,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-void USB_DC##__N##_IRQHandler(void)                                             \
+ISR(USB_DC##__N##_IRQHandler)                                                   \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }

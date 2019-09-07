@@ -35,9 +35,9 @@
 #define MFUNC_IN_U8_DEC_VALUE                    VSF_OS_CFG_PRIORITY_NUM
 #   include "utilities/preprocessor/mf_u8_dec2str.h"
 enum vsf_prio_t {
-    vsf_prio_inherit = -1,
+    vsf_prio_inherit                    = -1,
     MREPEAT(MFUNC_OUT_DEC_STR, __VSF_SWI_PRIO_INIT, NULL)
-    vsf_prio_highest = MFUNC_OUT_DEC_STR - 1,
+    vsf_prio_highest                    = MFUNC_OUT_DEC_STR - 1,
 };
 typedef enum vsf_prio_t vsf_prio_t;
 

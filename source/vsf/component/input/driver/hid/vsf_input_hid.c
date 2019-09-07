@@ -19,7 +19,7 @@
 
 #include "../../vsf_input_cfg.h"
 
-#if VSF_INPUT_CFG_HID_EN == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
 
 #include "vsf.h"
 
@@ -79,21 +79,34 @@ typedef struct hid_desc_t hid_desc_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
+    &&  defined(WEAK_VSF_INPUT_ON_EVT)
+WEAK_VSF_INPUT_ON_EVT_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK void vsf_hid_on_new_dev(vsf_input_hid_t *dev)
+WEAK(vsf_hid_on_new_dev)
+void vsf_hid_on_new_dev(vsf_input_hid_t *dev)
 {
     vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
 }
 
-WEAK void vsf_hid_on_free_dev(vsf_input_hid_t *dev)
+WEAK(vsf_hid_on_free_dev)
+void vsf_hid_on_free_dev(vsf_input_hid_t *dev)
 {
     vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
 }
 
-WEAK void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
+WEAK(vsf_hid_on_report_input)
+void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
 {
+#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vsf_input_evt_t);
+#else
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vsf_input_evt_t);
+#endif
 }
 
 static vsf_hid_report_t * vsf_hid_get_report(vsf_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
@@ -463,4 +476,4 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
     memcpy(report->value, buf, len);
 }
 
-#endif      // VSF_INPUT_CFG_HID_EN
+#endif      // VSF_USE_INPUT && VSF_USE_INPUT_HID

@@ -12330,6 +12330,15 @@
                     <group>
                         <name>6.0</name>
                         <group>
+                            <name>port</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>raw</name>
                             <group>
                                 <name>src</name>
@@ -13166,6 +13175,30 @@
                 </group>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\component\tcpip\vsf_tcpip_cfg.h</name>
+                </file>
+            </group>
+            <group>
+                <name>ui</name>
+                <group>
+                    <name>disp_drv</name>
+                    <group>
+                        <name>usbd_uvc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp_drv\usbd_uvc\vsf_disp_drv_usbd_uvc.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp_drv\usbd_uvc\vsf_disp_drv_usbd_uvc.h</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\ui\vsf_ui_cfg.h</name>
                 </file>
             </group>
             <group>
@@ -14439,6 +14472,9 @@
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\signal.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\type.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</name>
                     <excluded>
                         <configuration>kernel_lib_armv7m_full_size</configuration>
@@ -14510,9 +14546,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\utilities\ooc_class.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\utilities\type.h</name>
             </file>
         </group>
         <file>

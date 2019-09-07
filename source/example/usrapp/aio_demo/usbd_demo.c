@@ -741,7 +741,8 @@ void usbd_demo_start(void)
 }
 
 // UVC
-WEAK void usbd_demo_uvc_on_ready(void) {}
+WEAK(usbd_demo_uvc_on_ready)
+void usbd_demo_uvc_on_ready(void) {}
 
 void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
@@ -758,7 +759,7 @@ void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
     }
 }
 
-void usbd_demo_uvc_trans_disp_line(uint8_t *buffer, uint_fast32_t size)
+vsf_usbd_UVC_t * usbd_demo_get_uvc(void)
 {
-    vsf_usbd_UVC_send_packet(&usbd_demo.usbd.uvc.param, buffer, size);
+    return &usbd_demo.usbd.uvc.param;
 }

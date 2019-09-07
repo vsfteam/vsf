@@ -81,11 +81,16 @@ implement_vsf_pool(line_pool, line_buffer_t)
 static NO_INIT vsf_pool(line_pool) __line_pool;
 #endif
 
-WEAK void ui_demo_trans_init(void) {}
-WEAK void ui_demo_trans_disp_line(uint8_t *buffer, uint_fast32_t size) {}
-WEAK void uvc_app_init(void){}
-WEAK void uvc_app_task(void){}
-WEAK void uvc_app_on_fill_line_cpl(bool frame_cpl){}
+WEAK(ui_demo_trans_init)
+void ui_demo_trans_init(void) {}
+WEAK(ui_demo_trans_disp_line)
+void ui_demo_trans_disp_line(uint8_t *buffer, uint_fast32_t size) {}
+WEAK(uvc_app_init)
+void uvc_app_init(void){}
+WEAK(uvc_app_task)
+void uvc_app_task(void){}
+WEAK(uvc_app_on_fill_line_cpl)
+void uvc_app_on_fill_line_cpl(bool frame_cpl){}
 
 void ui_demo_on_ready(void)
 {

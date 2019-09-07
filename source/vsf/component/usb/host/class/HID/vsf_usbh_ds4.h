@@ -25,7 +25,7 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_DS4 == ENABLED
 
 #include "component/usb/common/class/HID/vsf_usb_ds4.h"
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT_DS4 == ENABLED
 #   include "component/input/driver/ds4/vsf_input_ds4.h"
 #endif
 
@@ -48,7 +48,7 @@ declare_simple_class(vsf_usbh_ds4_t)
 
 def_simple_class(vsf_usbh_ds4_t) {
 	implement(vsf_usbh_hid_teda_t)
-#if VSF_INPUT_CFG_DS4_EN == ENABLED
+#if VSF_USE_INPUT_DS4 == ENABLED
     implement(vsf_input_ds4u_t)
 #endif
 

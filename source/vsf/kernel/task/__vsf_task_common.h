@@ -33,10 +33,17 @@
             switch ((__state)) {                                                \
                 case __COUNTER__ - count_offset:
 
-#define __vsf_pt_entry_common(__state, ...)                                     \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __vsf_pt_entry_common(__state, __CODE)                               \
+            (__state) = (__COUNTER__ - count_offset + 1) >> 1;                  \
+            __CODE;                                                             \
+            case (__COUNTER__ - count_offset) >> 1:
+#else
+#   define __vsf_pt_entry_common(__state, ...)                                  \
             (__state) = (__COUNTER__ - count_offset + 1) >> 1;                  \
             __VA_ARGS__;                                                        \
             case (__COUNTER__ - count_offset) >> 1:
+#endif
 
 #define __vsf_pt_end_common()       } vsf_eda_return();
 
@@ -44,8 +51,17 @@
 //                }   /* for switch */                                          \
 //            __vsf_pt_end_common()
 
-
-#define __vsf_pt_wait_cond_common(__state, ...)                                 \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __vsf_pt_wait_cond_common(__state, __CON)                            \
+    do {                                                                        \
+        evt = VSF_EVT_INVALID;                                                  \
+        __vsf_pt_entry_common(__state);                                         \
+        if (__CON){                                                             \
+            return ;                                                            \
+        }                                                                       \
+    } while (0)
+#else
+#   define __vsf_pt_wait_cond_common(__state, ...)                              \
     do {                                                                        \
         evt = VSF_EVT_INVALID;                                                  \
         __vsf_pt_entry_common(__state);                                         \
@@ -53,6 +69,8 @@
             return ;                                                            \
         }                                                                       \
     } while (0)
+#endif
+
 
 #define __vsf_pt_wfe_common(__state, __evt)                                     \
     __vsf_pt_wait_cond_common(__state, (evt != __evt))
@@ -60,7 +78,17 @@
 #define __vsf_pt_func_common(__NAME)        vsf_pt_func_##__NAME
 #define __vsf_pt_common(__NAME)             pt_cb_##__NAME
 
-#define __def_vsf_pt_common(__NAME, ...)                                        \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __def_vsf_pt_common(__NAME, __MEMBER)                                \
+        struct __vsf_pt_common(__NAME) {                                        \
+            __MEMBER                                                            \
+        };                                                                      \
+        struct __NAME {                                                         \
+            implement(vsf_pt_t);                                                \
+            implement_ex(__vsf_pt_common(__NAME), param);                       \
+        }; 
+#else
+#   define __def_vsf_pt_common(__NAME, ...)                                     \
         struct __vsf_pt_common(__NAME) {                                        \
             __VA_ARGS__                                                         \
         };                                                                      \
@@ -68,7 +96,7 @@
             implement(vsf_pt_t);                                                \
             implement_ex(__vsf_pt_common(__NAME), param);                       \
         };                                                                      
-        
+#endif
 
 #define __declare_vsf_pt_common(__NAME)                                         \
             typedef struct __NAME __NAME;                                       \

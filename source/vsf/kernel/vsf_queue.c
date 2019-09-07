@@ -33,7 +33,7 @@
 
 #if __VSF_KERNEL_CFG_SUPPORT_LIST_QUEUE == ENABLED
 struct __vsf_eda_list_node_wrapper {
-    implement_ex(vsf_slist_node_t, node);
+    implement_ex(vsf_slist_node_t, node)
 };
 typedef struct __vsf_eda_list_node_wrapper __vsf_eda_list_node_wrapper;
 #endif
