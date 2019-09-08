@@ -100,13 +100,20 @@ void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           
 }
 
 
-#ifndef __VSF_ARCH_SYSTIMER_BITS   
-#error [DEPENDENCY ERROR] Architecture specific header files should provide\
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+
+#   ifndef __VSF_ARCH_SYSTIMER_BITS   
+#       error [DEPENDENCY ERROR] Architecture specific header files should provide\
  number of bits used for systimer via macro __VSF_ARCH_SYSTIMER_BITS
+#   endif
 #endif
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 typedef struct __systimer_t {
     vsf_systimer_cnt_t tick;
     vsf_systimer_cnt_t unit;
@@ -114,10 +121,15 @@ typedef struct __systimer_t {
     vsf_systimer_cnt_t reload;
     uint32_t           tick_freq;
 } __systimer_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 static volatile __systimer_t __systimer;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -125,6 +137,12 @@ static volatile __systimer_t __systimer;
     &&  defined(WEAK_VSF_SYSTIMER_EVTHANDLER)
 WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN
 #endif
+
+#if     defined(WEAK_ON_ARCH_SYSTIMER_TICK_EVT_EXTERN)                          \
+    &&  defined(WEAK_ON_ARCH_SYSTIMER_TICK_EVT)
+WEAK_ON_ARCH_SYSTIMER_TICK_EVT_EXTERN
+#endif
+
 
 #if     defined(WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN)      \
     &&  defined(WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR)
@@ -268,40 +286,82 @@ vsf_err_t vsf_swi_init(uint_fast8_t idx,
 }
 
 /*----------------------------------------------------------------------------*
- * System Timer Common Logic                                                  *
+ * System Timer                                                               *
  *----------------------------------------------------------------------------*/
 
-#ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
-WEAK(vsf_arch_req___systimer_freq___from_usr)
-uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
-{
-    return VSF_GET_MAIN_CLK();
-}
-#endif
-
-#ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
-WEAK(vsf_arch_req___systimer_resolution___from_usr)
-uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
-{
-    return 1000000ul;
-}
-#endif
-
-#ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
+#   ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
 WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 {
     VSF_HAL_ASSERT(false);
 }
-#endif
+#   endif
 
+#   ifndef WEAK_ON_ARCH_SYSTIMER_TICK_EVT
 WEAK(on_arch_systimer_tick_evt)
 bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
 {
     UNUSED_PARAM(tick);
     return true;
 }
+#endif
 
+
+
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+
+#   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
+WEAK(vsf_arch_req___systimer_freq___from_usr)
+uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
+{
+    return VSF_GET_MAIN_CLK();
+}
+#   endif
+
+#   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
+WEAK(vsf_arch_req___systimer_resolution___from_usr)
+uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
+{
+    return 1000000ul;
+}
+#   endif
+
+
+WEAK(vsf_systimer_us_to_tick)
+vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+{
+    return ((uintmax_t)  ((uintmax_t)time_us 
+                            * (uintmax_t)__systimer.tick_freq) 
+                        / 1000000ul);
+}
+
+WEAK(vsf_systimer_ms_to_tick)
+vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+{
+    return ((uintmax_t)  ((uintmax_t)time_ms 
+                            * (uintmax_t)__systimer.tick_freq) 
+                        / 1000ul);
+}
+
+WEAK(vsf_systimer_tick_to_us)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+{
+    return tick * 1000000ul / __systimer.tick_freq;
+}
+
+WEAK(vsf_systimer_tick_to_ms)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+{
+    return vsf_systimer_tick_to_us(tick) / 1000;
+}
+
+#endif
+
+/*----------------------------------------------------------------------------*
+ * System Timer : Implement with Normal Timer (Count down or Count up)        *
+ *----------------------------------------------------------------------------*/
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 static vsf_systimer_cnt_t __vsf_systimer_update(void)
 {
     vsf_systimer_cnt_t tick;
@@ -466,35 +526,40 @@ bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
     return (__systimer.tick >= due);
 }
 
+#endif
 
+/*----------------------------------------------------------------------------*
+ * System Timer : Implement with a timer supporting compare match             *
+ *----------------------------------------------------------------------------*/
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+//! todo
+#endif
 
-WEAK(vsf_systimer_us_to_tick)
-vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+/*----------------------------------------------------------------------------*
+ * System Timer : Implement with request / response model                     *
+ *----------------------------------------------------------------------------*/
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+
+/*! \brief systimer timeout event handler which is called by request response 
+ *!        service.
+ */
+void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick)
 {
-    return ((uintmax_t)  ((uintmax_t)time_us 
-                            * (uintmax_t)__systimer.tick_freq) 
-                        / 1000000ul);
+#ifndef WEAK_ON_ARCH_SYSTIMER_TICK_EVT
+    if (on_arch_systimer_tick_evt(tick)) {
+#else
+    if (WEAK_ON_ARCH_SYSTIMER_TICK_EVT(tick)) {
+#endif
+
+#ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
+        vsf_systimer_evthandler(tick);
+#else
+        WEAK_VSF_SYSTIMER_EVTHANDLER(tick);
+#endif
+    }
 }
 
-WEAK(vsf_systimer_ms_to_tick)
-vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
-{
-    return ((uintmax_t)  ((uintmax_t)time_ms 
-                            * (uintmax_t)__systimer.tick_freq) 
-                        / 1000ul);
-}
-
-WEAK(vsf_systimer_tick_to_us)
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
-{
-    return tick * 1000000ul / __systimer.tick_freq;
-}
-
-WEAK(vsf_systimer_tick_to_ms)
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
-{
-    return vsf_systimer_tick_to_us(tick) / 1000;
-}
+#endif
 
 #ifndef WEAK_VSF_ARCH_INIT
 /*! \note initialize architecture specific service 

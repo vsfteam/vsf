@@ -40,6 +40,8 @@
 
 #define VSF_ARCH_PRI_NUM                64
 
+#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                32
 #define __VSF_ARCH_SYSTIMER_BITS        32      //! TODO modify this macro for x86 systimer implementation.

@@ -150,6 +150,7 @@
     <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch.h" />
     <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.h" />
     <ClInclude Include="..\..\..\vsf\hal\arch\x86\win\win_generic.h" />
+    <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h" />
     <ClInclude Include="..\..\..\vsf\hal\driver\driver.h" />
     <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h" />
     <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_common.h" />

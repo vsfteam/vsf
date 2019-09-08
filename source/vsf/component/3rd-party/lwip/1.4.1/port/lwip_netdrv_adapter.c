@@ -46,12 +46,20 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_LWIP_REQ___ADDR___FROM_USER_EXTERN)                        \
+    &&  defined(WEAK_LWIP_REQ___ADDR___FROM_USER)
+WEAK_LWIP_REQ___ADDR___FROM_USER_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(lwip_request__addr__from_user)
-void lwip_request__addr__from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gateway)
+#ifndef WEAK_LWIP_REQ___ADDR___FROM_USER
+WEAK(lwip_req___addr___from_user)
+void lwip_req___addr___from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gateway)
 {
 }
+#endif
 
 // ethernetif implementation
 static err_t ethernetif_low_level_output(struct netif *netif, struct pbuf *p)
@@ -126,7 +134,12 @@ static vsf_err_t lwip_netdrv_adapter_on_connect(void *netif)
     struct netif *lwip_netif = netif;
     ip_addr_t ipaddr = { .addr = 0 }, netmask = { .addr = 0 }, gateway = { .addr = 0 };
 
-    lwip_request__addr__from_user(&ipaddr, &netmask, &gateway);
+#ifndef WEAK_LWIP_REQ___ADDR___FROM_USER
+    lwip_req___addr___from_user(&ipaddr, &netmask, &gateway);
+#else
+    WEAK_LWIP_REQ___ADDR___FROM_USER(&ipaddr, &netmask, &gateway);
+#endif
+
     netif_add(lwip_netif, &ipaddr, &netmask, &gateway, lwip_netif->state,
               ethernetif_init, tcpip_input);
     netif_set_default(lwip_netif);

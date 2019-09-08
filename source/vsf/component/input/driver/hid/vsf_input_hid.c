@@ -85,20 +85,43 @@ typedef struct hid_desc_t hid_desc_t;
 WEAK_VSF_INPUT_ON_EVT_EXTERN
 #endif
 
+#if     defined(WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN)                               \
+    &&  defined(WEAK_VSF_INPUT_ON_NEW_DEV)
+WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN)                              \
+    &&  defined(WEAK_VSF_INPUT_ON_FREE_DEV)
+WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
+#ifndef WEAK_VSF_HID_ON_NEW_DEV
 WEAK(vsf_hid_on_new_dev)
 void vsf_hid_on_new_dev(vsf_input_hid_t *dev)
 {
+#   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
     vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
+#   else
+    WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_HID, dev);
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_HID_ON_FREE_DEV
 WEAK(vsf_hid_on_free_dev)
 void vsf_hid_on_free_dev(vsf_input_hid_t *dev)
 {
+#   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
     vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
+#   else
+    WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_HID, dev);
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_HID_ON_REPORT_INPUT
 WEAK(vsf_hid_on_report_input)
 void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
 {
@@ -108,6 +131,7 @@ void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
     WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vsf_input_evt_t);
 #endif
 }
+#endif
 
 static vsf_hid_report_t * vsf_hid_get_report(vsf_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
 {
@@ -348,14 +372,23 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
 
 void vsf_hid_new_dev(vsf_input_hid_t *dev)
 {
+#ifndef WEAK_VSF_HID_ON_NEW_DEV
     vsf_hid_on_new_dev(dev);
+#else
+    WEAK_VSF_HID_ON_NEW_DEV(dev);
+#endif
 }
 
 void vsf_hid_free_dev(vsf_input_hid_t *dev)
 {
     vsf_hid_report_t *report;
 
+#ifndef WEAK_VSF_HID_ON_FREE_DEV
     vsf_hid_on_free_dev(dev);
+#else
+    WEAK_VSF_HID_ON_FREE_DEV(dev);
+#endif
+
     __vsf_slist_foreach_next_unsafe(vsf_hid_report_t, report_node, &dev->report_list) {
         report = _;
         __vsf_slist_foreach_next_unsafe(vsf_hid_usage_t, usage_node, &report->usage_list) {
@@ -463,7 +496,11 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
                 event.usage = _;
 
                 reported = true;
+#ifndef WEAK_VSF_HID_ON_REPORT_INPUT
                 vsf_hid_on_report_input(&event);
+#else
+                WEAK_VSF_HID_ON_REPORT_INPUT(&event);
+#endif
             }
         }
     }
@@ -471,7 +508,11 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
     // just report input process end if changed reportted
     if (reported) {
         event.id = 0;
+#ifndef WEAK_VSF_HID_ON_REPORT_INPUT
         vsf_hid_on_report_input(&event);
+#else
+        WEAK_VSF_HID_ON_REPORT_INPUT(&event);
+#endif
     }
     memcpy(report->value, buf, len);
 }

@@ -14,82 +14,35 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
+#ifndef __VSF_LVGL_PORT_H___
+#define __VSF_LVGL_PORT_H___
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal.h"
 
-#include "./arch/vsf_arch.h"
-#include "./driver/driver.h"
+#include "component/ui/vsf_ui_cfg.h"
+
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+
+#include "lv_conf.h"
 
 /*============================ MACROS ========================================*/
 
+#if !LV_USE_USER_DATA
+#   error "vsf_lvgl_port require LV_USE_USER_DATA"
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+/*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_ARCH_INIT)                                             \
-    &&  defined(WEAK_VSF_ARCH_INIT_EXTERN)
-WEAK_VSF_ARCH_INIT_EXTERN
+#if USE_LV_LOG
+extern void vsf_lvgl_printf(lv_log_level_t level, const char *file, uint32_t line, const char *dsc)£»
 #endif
 
-#if     defined(WEAK_VSF_DRIVER_INIT_EXTERN)                                    \
-    &&  defined(WEAK_VSF_DRIVER_INIT)
-WEAK_VSF_DRIVER_INIT_EXTERN
-#endif
+extern void vsf_lvgl_bind(vsf_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv);
+extern void vsf_lvgl_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p);
 
-/*============================ IMPLEMENTATION ================================*/
-
-#ifndef WEAK_VSF_DRIVER_INIT
-WEAK(vsf_driver_init)
-bool vsf_driver_init(void) 
-{
-    return true;
-}
-#endif
-
-/*! \note initialize level 0/1 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */  
-bool vsf_hal_init( void )
-{
-    
-    if (    
-        #ifndef WEAK_VSF_ARCH_INIT
-            !vsf_arch_init() 
-        #else
-            !WEAK_VSF_ARCH_INIT() 
-        #endif
-        ||  
-        #ifndef WEAK_VSF_DRIVER_INIT
-            !vsf_driver_init()
-        #else
-            !WEAK_VSF_DRIVER_INIT()
-        #endif
-        ) {
-        
-        return false;
-    }
-
-    return true;
-}
-
-#ifndef WEAK_VSF_HAL_ADVANCE_INIT
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */  
-WEAK(vsf_hal_advance_init)
-bool vsf_hal_advance_init(void)
-{
-    //! level 2 hal init
-    return true;
-}
-#endif
-
-/* EOF */
+#endif  // VSF_USE_UI_LVGL
+#endif  // __VSF_LVGL_PORT_H___

@@ -37,14 +37,32 @@
 SECTION(".text.vsf.kernel.eda")
 vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
+#if     defined(WEAK_VSF_USBH_ON_DEV_PARSED_EXTERN)                             \
+    &&  defined(WEAK_VSF_USBH_ON_DEV_PARSED)
+WEAK_VSF_USBH_ON_DEV_PARSED_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_ON_MATCH_INTERFACE_EXTERN)                        \
+    &&  defined(WEAK_VSF_USBH_ON_MATCH_INTERFACE)
+WEAK_VSF_USBH_ON_MATCH_INTERFACE_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_ON_REMOVE_INTERFACE_EXTERN)                       \
+    &&  defined(WEAK_VSF_USBH_ON_REMOVE_INTERFACE)
+WEAK_VSF_USBH_ON_REMOVE_INTERFACE_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
+#ifndef WEAK_VSF_USBH_ON_DEV_PARSED
 WEAK(vsf_usbh_on_dev_parsed)
 void vsf_usbh_on_dev_parsed(vsf_usbh_dev_t *dev, vsf_usbh_dev_parser_t *parser)
 {
     
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_ON_MATCH_INTERFACE
 WEAK(vsf_usbh_on_match_interface)
 vsf_err_t vsf_usbh_on_match_interface(
         vsf_usbh_dev_parser_t *parser, vsf_usbh_ifs_parser_t *parser_ifs)
@@ -55,12 +73,15 @@ vsf_err_t vsf_usbh_on_match_interface(
                 parser_ifs->parser_alt[parser_ifs->ifs->cur_alt].desc_ifs->bInterfaceNumber);
     return VSF_ERR_NONE;
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_ON_REMOVE_INTERFACE
 WEAK(vsf_usbh_on_remove_interface)
 void vsf_usbh_on_remove_interface(vsf_usbh_ifs_t *ifs)
 {
     vsf_trace(VSF_TRACE_INFO, "%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
 }
+#endif
 
 static vsf_usbh_eppipe_t vsf_usbh_get_pipe(vsf_usbh_dev_t *dev,
             uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size)
@@ -319,7 +340,11 @@ void vsf_usbh_remove_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (ifs != NULL));
     const vsf_usbh_class_drv_t *drv = ifs->drv;
     if (drv) {
+#ifndef WEAK_VSF_USBH_ON_REMOVE_INTERFACE
         vsf_usbh_on_remove_interface(ifs);
+#else
+        WEAK_VSF_USBH_ON_REMOVE_INTERFACE(ifs);
+#endif
         drv->disconnect(usbh, dev, ifs->param);
         ifs->drv = NULL;
         ifs->param = NULL;
@@ -805,7 +830,11 @@ static vsf_err_t vsf_usbh_find_intrface_driver(vsf_usbh_t *usbh,
             if (param != NULL) {
                 ifs->param = param;
                 ifs->drv = drv;
+#ifndef WEAK_VSF_USBH_ON_MATCH_INTERFACE
                 if (VSF_ERR_NONE != vsf_usbh_on_match_interface(parser, parser_ifs)) {
+#else
+                if (VSF_ERR_NONE != WEAK_VSF_USBH_ON_MATCH_INTERFACE(parser, parser_ifs)) {
+#endif
                     drv->disconnect(usbh, usbh->dev_new, param);
                     continue;
                 }
@@ -930,7 +959,11 @@ static vsf_err_t vsf_usbh_parse_config(vsf_usbh_t *usbh, vsf_usbh_dev_parser_t *
         }
     }
 
+#ifndef WEAK_VSF_USBH_ON_DEV_PARSED
     vsf_usbh_on_dev_parsed(usbh->dev_new, parser);
+#else
+    WEAK_VSF_USBH_ON_DEV_PARSED(usbh->dev_new, parser);
+#endif
 
     // probe
     claiming = 0;

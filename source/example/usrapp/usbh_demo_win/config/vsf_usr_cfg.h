@@ -144,8 +144,6 @@
 //  </h>
 //! @}
 
-#define WEAK_VSF_KERNEL_ERR_REPORT                      vsf_kernel_err_report
-
 #define VSF_USE_USB_HOST                                ENABLED
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #define VSF_USE_USB_HOST_HCD_LIBUSB                     ENABLED
@@ -234,12 +232,12 @@ enum {
         vsf_systimer_evthandler(__TICK)
 
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN               \
-        extern vsf_arch_req___systimer_resolution___from_usr(void);
+        extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR()                    \
         vsf_arch_req___systimer_resolution___from_usr()
 
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN                     \
-        extern vsf_arch_req___systimer_freq___from_usr(void);
+        extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
         vsf_arch_req___systimer_freq___from_usr()
 

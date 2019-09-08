@@ -82,4 +82,7 @@ source/example/project/vc_2017/Debug
 
 *.r51
 *.m51
+*.plg
+
 *.scvd
+*.bak

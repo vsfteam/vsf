@@ -21,6 +21,7 @@
 #include "hal/arch/vsf_arch_abstraction.h"
 #include "hal/driver/driver.h"
 #include "utilities/template/vsf_list.h"
+#include "hal/arch/__vsf_arch_interface.h"
 
 #include <stdio.h>
 #include <Windows.h>
@@ -693,9 +694,7 @@ static void vsf_systimer_thread(void *arg)
                 VSF_ARCH_TRACE_SYSTIMER("systimer triggered: %lld\r\n", tick);
             __vsf_arch_unlock();
 #endif
-            if (on_arch_systimer_tick_evt(tick)) {
-                vsf_systimer_evthandler(tick);
-            }
+            vsf_systimer_timeout_evt_hanlder(tick);
 
         __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
     }

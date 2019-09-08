@@ -28,6 +28,19 @@
  ******************************************************************************/
 
 /*============================ MACROS ========================================*/
+
+//! \name different models to implement systimer
+//! @{
+#define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      0
+#define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     1
+#define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       2              
+
+//! \note implement systimer with normal timer by default, e.g. SysTick in Cortex-M
+#ifndef VSF_SYSTIMER_CFG_IMPL_MODE         
+#   define VSF_SYSTIMER_CFG_IMPL_MODE  VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#endif
+//!@}
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -45,14 +58,18 @@
  */
 extern bool vsf_arch_low_level_init(void);
 
-/*! \brief systimer overflow event handler which is called by target timer 
- *!        interrupt handler
- */
-extern void vsf_systimer_ovf_evt_hanlder(void);
 
+/*----------------------------------------------------------------------------*
+ * System Timer : Implement with Normal Timer (Count down or Count up)        *
+ *----------------------------------------------------------------------------*/
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
+
+/*-------------------------------------------*
+ * APIs to be implemented by target arch     *
+ *-------------------------------------------*/
 /*! \brief initialise systimer without enable it 
  */
-extern vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks );
+extern vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks);
 
 /*! \brief disable systimer and return over-flow flag status
  *! \param none
@@ -70,6 +87,48 @@ extern void vsf_systimer_set_reload_value( vsf_systimer_cnt_t tick_cnt);
 extern void vsf_systimer_reset_counter_value(void);
 extern void vsf_systimer_clear_int_pending_bit(void);
 extern vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void);
+
+/*-------------------------------------------*
+ * APIs to be used by target arch            *
+ *-------------------------------------------*/
+/*! \brief systimer overflow event handler which is called by target timer 
+ *!        interrupt handler
+ */
+extern void vsf_systimer_ovf_evt_hanlder(void);
+#endif
+
+/*----------------------------------------------------------------------------*
+ * System Timer : Implement with request / response model                     *
+ *----------------------------------------------------------------------------*/
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+
+/*-------------------------------------------*
+ * APIs to be implemented by target arch     *
+ *-------------------------------------------*/
+extern vsf_err_t vsf_systimer_init(void);
+extern bool vsf_systimer_is_due(vsf_systimer_cnt_t due);
+
+extern vsf_err_t vsf_systimer_start(void);
+extern void vsf_systimer_set_idle(void);
+
+extern vsf_systimer_cnt_t vsf_systimer_get(void);
+extern bool vsf_systimer_set(vsf_systimer_cnt_t due);
+
+extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
+extern vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
+extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
+extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
+
+/*-------------------------------------------*
+ * APIs to be used by target arch            *
+ *-------------------------------------------*/
+/*! \brief systimer timeout event handler which is called by request response 
+ *!        service.
+ */
+extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick);
+extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
+extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
+#endif
 
 #endif
 /* EOF */

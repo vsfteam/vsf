@@ -128,6 +128,7 @@ vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre
     return NULL;
 }
 
+#ifndef WEAK_VSF_INPUT_ON_SENSOR
 WEAK(vsf_input_on_sensor)
 void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt)
 {
@@ -137,16 +138,21 @@ void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt)
     WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vsf_input_evt_t);
 #endif
 }
+#endif
 
+#ifndef WEAK_VSF_INPUT_ON_NEW_DEV
 WEAK(vsf_input_on_new_dev)
 void vsf_input_on_new_dev(vsf_input_type_t type, void *dev)
 {
 }
+#endif
 
+#ifndef WEAK_VSF_INPUT_ON_FREE_DEV
 WEAK(vsf_input_on_free_dev)
 void vsf_input_on_free_dev(vsf_input_type_t type, void *dev)
 {
 }
+#endif
 
 #ifndef WEAK_VSF_INPUT_ON_EVT
 WEAK(vsf_input_on_evt)

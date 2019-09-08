@@ -14,7 +14,8 @@ The Protected Low-overhead Object Oriented Programming with ANSI-C, a.k.a PLOOC 
 - Support strict type checking/validation in certain compilers, such as IAR with multi-file compilation enabled.
 - Compliant with __ANSI-C99__ 
   - ANSI-C90 is also supported but the protection for private feature is disabled.
-  - When C11 or _Generic is available, fully support for polymorphism is possible (we are working on this...)
+- Support **Polymorphism**
+  - Require C11 or _Generic
 - Low-overhead
 > NOTE: Almost ZERO OVERHEAD. The template fully utilises the ANSI-C enforced compilation rules to deliver desired OO features with the the least necessary cost.
 
@@ -76,6 +77,8 @@ If you have any questions or suggestions, please feel free to let us know.
 ## Update Log
 ---
 
+- [09/06/2019] Add support for C89/90, version 4.50
+    - Add support for polymorphism \(require C11\)
 - \[09/05/2019] Add support for C89/90, version 4.40
     - When C89/90 is enforced, \_\_OOC_DEBUG\_\_ should always be defined. 
     - The protection for private and protected members is turned off.
@@ -199,7 +202,30 @@ More examples will be added later...
 
   - Require C11 support
 
-    ![example3](https://github.com/GorgonMeducer/PLOOC/tree/master/example/picture/example3.png)
+```
+LOG_OUT("\r\n-[Demo of polymorphism]------------------------------\r\n");
+LOG_OUT((uint32_t) 0x12345678);
+LOG_OUT("\r\n");
+LOG_OUT(0x12345678);
+LOG_OUT("\r\n");
+LOG_OUT("PI is ");
+LOG_OUT(3.1415926f);
+LOG_OUT("\r\n");
+
+LOG_OUT("\r\nShow BYTE Array:\r\n");
+LOG_OUT((uint8_t *)main, 100);
+
+LOG_OUT("\r\nShow Half-WORD Array:\r\n");
+LOG_OUT((uint16_t *)main, 100/sizeof(uint16_t));
+
+LOG_OUT("\r\nShow WORD Array:\r\n");
+LOG_OUT((uint32_t *)main, 100/sizeof(uint32_t));
+```
+
+
+
+![example3](https://github.com/GorgonMeducer/PLOOC/blob/master/example/picture/example3.png?raw=true)
 
   
+
 

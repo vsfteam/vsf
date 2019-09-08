@@ -28,10 +28,12 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
+#ifndef WEAK_VSF_COMPONENT_INIT
 WEAK(vsf_component_init)
 void vsf_component_init(void)
 {
 
 }
+#endif
 
 /* EOF */

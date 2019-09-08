@@ -825,6 +825,9 @@
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
       <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">

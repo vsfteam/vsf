@@ -13447,6 +13447,9 @@
                     </group>
                 </group>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\hal\arch\__vsf_arch_interface.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\hal\arch\vsf_arch.h</name>
                 </file>
                 <file>

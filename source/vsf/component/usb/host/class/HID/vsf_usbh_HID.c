@@ -68,6 +68,26 @@ typedef struct vsf_usbh_hid_input_t vsf_usbh_hid_input_t;
 SECTION(".text.vsf.kernel.eda")
 vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
+#if     defined(WEAK_VSF_USBH_HID_INPUT_ON_DESC_EXTERN)                         \
+    &&  defined(WEAK_VSF_USBH_HID_INPUT_ON_DESC)
+WEAK_VSF_USBH_HID_INPUT_ON_DESC_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_HID_INPUT_ON_NEW_EXTERN)                          \
+    &&  defined(WEAK_VSF_USBH_HID_INPUT_ON_NEW)
+WEAK_VSF_USBH_HID_INPUT_ON_NEW_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_HID_INPUT_ON_FREE_EXTERN)                         \
+    &&  defined(WEAK_VSF_USBH_HID_INPUT_ON_FREE)
+WEAK_VSF_USBH_HID_INPUT_ON_FREE_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT_EXTERN)                 \
+    &&  defined(WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT)
+WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 static void vsf_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -261,39 +281,47 @@ vsf_err_t __vsf_usbh_hid_recv_report_imp(vsf_usbh_hid_eda_t *hid, uint8_t *buffe
 
 
 // hid input, which uses vsf_hid
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_DESC
 WEAK(vsf_usbh_hid_input_on_desc)
 int_fast32_t vsf_usbh_hid_input_on_desc(vsf_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
 {
-#if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT_HID == ENABLED
     return vsf_hid_parse_desc(&hid->use_as__vsf_input_hid_t, desc_buf, desc_len);
-#else
+#   else
     return -1;
-#endif
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT
 WEAK(vsf_usbh_hid_input_on_report_input)
 void vsf_usbh_hid_input_on_report_input(vsf_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len)
 {
-#if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT_HID == ENABLED
     vsf_hid_process_input(&hid->use_as__vsf_input_hid_t, report, len);
-#endif
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_NEW
 WEAK(vsf_usbh_hid_input_on_new)
 void vsf_usbh_hid_input_on_new(vsf_usbh_hid_input_t *hid)
 {
-#if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT_HID == ENABLED
     vsf_hid_new_dev(&hid->use_as__vsf_input_hid_t);
-#endif
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_FREE
 WEAK(vsf_usbh_hid_input_on_free)
 void vsf_usbh_hid_input_on_free(vsf_usbh_hid_input_t *hid)
 {
-#if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT_HID == ENABLED
     vsf_hid_free_dev(&hid->use_as__vsf_input_hid_t);
-#endif
+#   endif
 }
+#endif
 
 static void vsf_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -318,7 +346,11 @@ static void vsf_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             desc_len = vsf_usbh_urb_get_actual_length(urb);
             __vsf_eda_crit_npb_leave(&ep0->crit);
 
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_DESC
             max_report_size = vsf_usbh_hid_input_on_desc(hid, desc_buf, desc_len);
+#else
+            max_report_size = WEAK_VSF_USBH_HID_INPUT_ON_DESC(hid, desc_buf, desc_len);
+#endif
             if (max_report_size <= 0) {
                 VSF_USBH_FREE(desc_buf);
                 vsf_usbh_remove_interface(hid->usbh, hid->dev, hid->ifs);
@@ -337,7 +369,11 @@ static void vsf_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (URB_OK == vsf_usbh_urb_get_status(&urb)) {
                 uint_fast32_t len = vsf_usbh_urb_get_actual_length(&urb);
                 uint8_t *report = vsf_usbh_urb_peek_buffer(&urb);
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT
                 vsf_usbh_hid_input_on_report_input(hid, report, len);
+#else
+                WEAK_VSF_USBH_HID_INPUT_ON_REPORT_INPUT(hid, report, len);
+#endif
             }
 
             vsf_usbh_hid_recv_report(&hid->use_as__vsf_usbh_hid_eda_t, NULL, 0);
@@ -352,7 +388,11 @@ static void * vsf_usbh_hid_input_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     vsf_usbh_hid_input_t *hid = vsf_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vsf_usbh_hid_input_t));
     if (hid != NULL) {
         hid->user_evthandler = vsf_usbh_hid_input_evthandler;
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_NEW
         vsf_usbh_hid_input_on_new(hid);
+#else
+        WEAK_VSF_USBH_HID_INPUT_ON_NEW(hid);
+#endif
     }
     return hid;
 }
@@ -361,7 +401,11 @@ static void vsf_usbh_hid_input_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 {
     vsf_usbh_hid_input_t *hid = param;
     vsf_usbh_hid_disconnect(&hid->use_as__vsf_usbh_hid_eda_t);
+#ifndef WEAK_VSF_USBH_HID_INPUT_ON_FREE
     vsf_usbh_hid_input_on_free(hid);
+#else
+    WEAK_VSF_USBH_HID_INPUT_ON_FREE(hid);
+#endif
 }
 
 static const vsf_usbh_dev_id_t vsf_usbh_hid_input_dev_id[] = {

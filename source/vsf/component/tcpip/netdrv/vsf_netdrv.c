@@ -30,18 +30,48 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_PNP_ON_NETDRV_CONNECT_EXTERN)                          \
+    &&  defined(WEAK_VSF_PNP_ON_NETDRV_CONNECT)
+WEAK_VSF_PNP_ON_NETDRV_CONNECT_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_PNP_ON_NETDRV_CONNECTED_EXTERN)                        \
+    &&  defined(WEAK_VSF_PNP_ON_NETDRV_CONNECTED)
+WEAK_VSF_PNP_ON_NETDRV_CONNECTED_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_PNP_ON_NETDRV_DISCONNECT_EXTERN)                       \
+    &&  defined(WEAK_VSF_PNP_ON_NETDRV_DISCONNECT)
+WEAK_VSF_PNP_ON_NETDRV_DISCONNECT_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
+#ifndef WEAK_VSF_PNP_ON_NETDRV_NEW
 WEAK(vsf_pnp_on_netdrv_new)
 void vsf_pnp_on_netdrv_new(vsf_netdrv_t *netdrv) {}
+#endif
+
+#ifndef WEAK_VSF_PNP_ON_NETDRV_DEL
 WEAK(vsf_pnp_on_netdrv_del)
 void vsf_pnp_on_netdrv_del(vsf_netdrv_t *netdrv) {}
+#endif
+
+#ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECT
 WEAK(vsf_pnp_on_netdrv_connect)
 void vsf_pnp_on_netdrv_connect(vsf_netdrv_t *netdrv) {}
+#endif
+
+#ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECTED
 WEAK(vsf_pnp_on_netdrv_connected)
 void vsf_pnp_on_netdrv_connected(vsf_netdrv_t *netdrv) {}
+#endif
+
+#ifndef WEAK_VSF_PNP_ON_NETDRV_DISCONNECT
 WEAK(vsf_pnp_on_netdrv_disconnect)
 void vsf_pnp_on_netdrv_disconnect(vsf_netdrv_t *netdrv) {}
+#endif
 
 void vsf_netdrv_on_outputted(vsf_netdrv_t *netdrv, void *netbuf, int_fast32_t size)
 {
@@ -103,11 +133,19 @@ vsf_err_t vsf_netdrv_connect(vsf_netdrv_t *netdrv)
     ASSERT(netdrv != NULL);
     if (!netdrv->is_connected) {
         netdrv->is_connected = true;
+#ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECT
         vsf_pnp_on_netdrv_connect(netdrv);
+#else
+        WEAK_VSF_PNP_ON_NETDRV_CONNECT(netdrv);
+#endif
         if (netdrv->adapter != NULL) {
             vsf_err_t err = netdrv->adapter->on_connect(netdrv->netif);
             if (!err) {
+#ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECTED
                 vsf_pnp_on_netdrv_connected(netdrv);
+#else
+                WEAK_VSF_PNP_ON_NETDRV_CONNECTED(netdrv);
+#endif
             }
             return err;
         }
@@ -120,7 +158,11 @@ void vsf_netdrv_disconnect(vsf_netdrv_t *netdrv)
     ASSERT(netdrv != NULL);
     if (netdrv->is_connected) {
         netdrv->is_connected = false;
+#ifndef WEAK_VSF_PNP_ON_NETDRV_DISCONNECT
         vsf_pnp_on_netdrv_disconnect(netdrv);
+#else
+        WEAK_VSF_PNP_ON_NETDRV_DISCONNECT(netdrv);
+#endif
         if (netdrv->adapter != NULL) {
             netdrv->adapter->on_disconnect(netdrv->netif);
         }

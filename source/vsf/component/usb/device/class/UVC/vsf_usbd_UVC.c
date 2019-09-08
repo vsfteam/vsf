@@ -31,6 +31,17 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_USBD_UVC_STOP_STREAM_EXTERN)                           \
+    &&  defined(WEAK_VSF_USBD_UVC_STOP_STREAM)
+WEAK_VSF_USBD_UVC_STOP_STREAM_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBD_UVC_START_STREAM_EXTERN)                          \
+    &&  defined(WEAK_VSF_USBD_UVC_START_STREAM)
+WEAK_VSF_USBD_UVC_START_STREAM_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
@@ -88,15 +99,19 @@ static void vsf_usbd_UVC_trace_request_process(vsf_usbd_ctrl_handler_t *ctrl_han
 }
 #endif
 
+#ifndef WEAK_VSF_USBD_UVC_STOP_STREAM
 WEAK(vsf_usbd_UVC_stop_stream)
 void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
 }
+#endif
 
+#ifndef WEAK_VSF_USBD_UVC_START_STREAM
 WEAK(vsf_usbd_UVC_start_stream)
 void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
 {
 }
+#endif
 
 vsf_err_t vsf_usbd_UVC_send_packet(vsf_usbd_UVC_t *uvc, uint8_t *buffer, uint_fast32_t size)
 {
@@ -171,13 +186,21 @@ static vsf_err_t vsf_usbd_UVC_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: stop stream." VSF_TRACE_CFG_LINEEND);
 #endif
+#ifndef WEAK_VSF_USBD_UVC_STOP_STREAM
                     vsf_usbd_UVC_stop_stream(uvc, request->wValue);
+#else
+                    WEAK_VSF_USBD_UVC_STOP_STREAM(uvc, request->wValue);
+#endif
                 } else {
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: start stream %d." VSF_TRACE_CFG_LINEEND,
                                 request->wValue);
 #endif
+#ifndef WEAK_VSF_USBD_UVC_START_STREAM
                     vsf_usbd_UVC_start_stream(uvc, request->wValue);
+#else
+                    WEAK_VSF_USBD_UVC_START_STREAM(uvc, request->wValue);
+#endif
                 }
                 break;
             }

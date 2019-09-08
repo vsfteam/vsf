@@ -17,76 +17,62 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/3rd-party/littlevgl/5.3/raw/lvgl/lvgl.h"
-#include "lv_conf.h"
+#define __VSF_DISP_CLASS_INHERIT
 #include "vsf.h"
+
+#include "lvgl/lvgl.h"
+#include "lv_conf.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
 /*============================ PROTOTYPES ====================================*/
+
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(uvc_app_fill_line)
-void uvc_app_fill_line(void *line_buf, uint_fast16_t size, bool last_line) {};
-
-static void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const lv_color_t *color)
+#if USE_LV_LOG
+void vsf_lvgl_printf(lv_log_level_t level, const char *file, uint32_t line, const char *dsc)
 {
-    uint_fast32_t pixel_number = LV_HOR_RES;
+    static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error"};
+    vsf_trace(VSF_TRACE_DEBUG, "%s: %s \t(%s #%d)\r\n", lvl_prefix[level], dsc,  file, line);
+}
+#endif
 
-    if ((0 == x1) && ((LV_HOR_RES - 1) == x2) && (y1 == y2)) {
-        uvc_app_fill_line((void *)color, pixel_number * LV_COLOR_DEPTH / 8, (y1 == (LV_VER_RES - 1)));
-    } else {
-        vsf_trace(0, "non-line disp area [%d,%d], [%d,%d]\r\n", x1, y1, x2, y2);
-        ASSERT(false);
+void vsf_lvgl_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+{
+    lv_coord_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
+    lv_coord_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
+
+    vsf_disp_t *disp = disp_drv->user_data;
+    vsf_disp_area_t disp_area;
+
+    if(area->x2 < 0 || area->y2 < 0 || area->x1 > hres - 1 || area->y1 > vres - 1) {
+        lv_disp_flush_ready(disp_drv);
+        return;
     }
+
+    VSF_UI_ASSERT(area->y2 >= area->y1);
+    VSF_UI_ASSERT(area->x2 >= area->x1);
+
+    disp_area.pos.x = area->x1;
+    disp_area.pos.y = area->y1;
+    disp_area.size.x = area->x2 + 1 - area->x1;
+    disp_area.size.y = area->y2 + 1 - area->y1;
+    vsf_disp_refresh(disp, &disp_area, color_p);
 }
 
-void uvc_app_on_fill_line_cpl(bool frame_cpl)
+void vsf_lvgl_on_ready(vsf_disp_t *disp)
 {
-    lv_flush_ready();
+    lv_disp_drv_t *disp_drv = (lv_disp_drv_t *)disp->ui_data;
+    lv_disp_flush_ready(disp_drv);
 }
 
-static void lv_refr_task(void * param)
+void vsf_lvgl_bind(vsf_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
 {
-    static lv_coord_t y;
-    lv_obj_t *label1 = (lv_obj_t *)param;
-
-    y = (y + 1) % LV_VER_RES;
-  
-    lv_obj_set_y(label1, y);
+    lvgl_disp_drv->user_data = disp;
+    disp->ui_data = lvgl_disp_drv;
+    disp->ui_on_ready = vsf_lvgl_on_ready;
+    vsf_disp_init(disp);
 }
-
-static void lvgl_create_demo(void)
-{
-    lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
-    /*Modify the Label's text*/
-    lv_label_set_text(label1, "Hello world!");
-    /* Align the Label to the center
-    * NULL means align on parent (which is the screen now)
-    * 0, 0 at the end means an x, y offset after alignment*/
-    lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
-
-    lv_task_create(lv_refr_task, 33, LV_TASK_PRIO_LOWEST, label1);
-}
-
-void uvc_app_init(void)
-{
-    static NO_INIT lv_disp_drv_t __disp_drv;
-
-    lv_init();
-    lv_disp_drv_init(&__disp_drv);
-    __disp_drv.disp_flush = lvgl_disp_flush;
-    lv_disp_drv_register(&__disp_drv);
-
-    lvgl_create_demo();
-}
-
-void uvc_app_task(void)
-{
-    lv_task_handler();
-}
-
-/* EOF */

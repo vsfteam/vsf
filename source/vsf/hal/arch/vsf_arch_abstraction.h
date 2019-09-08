@@ -168,8 +168,5 @@ extern void vsf_enable_interrupt(void);
 
 extern void vsf_arch_sleep(uint32_t mode);
 
-
-
-
 #endif
 /* EOF */

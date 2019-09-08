@@ -72,6 +72,21 @@ static void * vsf_usbh_ds4_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             vsf_usbh_ifs_parser_t *parser_ifs);
 static void vsf_usbh_ds4_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param);
 
+#if     defined(WEAK_VSF_USBH_DS4_ON_REPORT_INPUT_EXTERN)                       \
+    &&  defined(WEAK_VSF_USBH_DS4_ON_REPORT_INPUT)
+WEAK_VSF_USBH_DS4_ON_REPORT_INPUT_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_DS4_ON_NEW_EXTERN)                                \
+    &&  defined(WEAK_VSF_USBH_DS4_ON_NEW)
+WEAK_VSF_USBH_DS4_ON_NEW_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_USBH_DS4_ON_FREE_EXTERN)                               \
+    &&  defined(WEAK_VSF_USBH_DS4_ON_FREE)
+WEAK_VSF_USBH_DS4_ON_FREE_EXTERN
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_usbh_class_drv_t vsf_usbh_ds4_drv = {
@@ -84,35 +99,43 @@ const vsf_usbh_class_drv_t vsf_usbh_ds4_drv = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
 WEAK(vsf_usbh_ds4_on_report_input)
 void vsf_usbh_ds4_on_report_input(vsf_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
 {
-#if VSF_USE_INPUT_DS4 == ENABLED
+#   if VSF_USE_INPUT_DS4 == ENABLED
     vsf_ds4u_process_input(&ds4->use_as__vsf_input_ds4u_t, report);
-#endif
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_DS4_ON_NEW
 WEAK(vsf_usbh_ds4_on_new)
 void vsf_usbh_ds4_on_new(vsf_usbh_ds4_t *ds4)
 {
-#if VSF_USE_INPUT_DS4 == ENABLED
+#   if VSF_USE_INPUT_DS4 == ENABLED
     vsf_ds4u_new_dev(&ds4->use_as__vsf_input_ds4u_t);
-#endif
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_DS4_ON_FREE
 WEAK(vsf_usbh_ds4_on_free)
 void vsf_usbh_ds4_on_free(vsf_usbh_ds4_t *ds4)
 {
-#if VSF_USE_INPUT_DS4 == ENABLED
+#   if VSF_USE_INPUT_DS4 == ENABLED
     vsf_ds4u_free_dev(&ds4->use_as__vsf_input_ds4u_t);
-#endif
+#   endif
 }
+#endif
 
+#ifndef WEAK_VSF_USBH_DS4_GET_OUTPUT_REPORT
 WEAK(vsf_usbh_ds4_get_output_report)
 int_fast32_t vsf_usbh_ds4_get_output_report(vsf_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_out_report_t *report)
 {
     return 0;
 }
+#endif
 
 static void vsf_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -143,7 +166,11 @@ static void vsf_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 if (pipe.dir_in1out0) {
                     if (    (URB_OK == vsf_usbh_urb_get_status(&urb))
                         &&    (sizeof(vsf_usb_ds4_gamepad_in_report_t) == vsf_usbh_urb_get_actual_length(&urb))) {
+#ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
                         vsf_usbh_ds4_on_report_input(ds4, (vsf_usb_ds4_gamepad_in_report_t *)vsf_usbh_urb_peek_buffer(&urb));
+#else
+                        WEAK_VSF_USBH_DS4_ON_REPORT_INPUT(ds4, (vsf_usb_ds4_gamepad_in_report_t *)vsf_usbh_urb_peek_buffer(&urb));
+#endif
                     }
                     vsf_usbh_hid_recv_report((vsf_usbh_hid_eda_t *)&ds4->use_as__vsf_usbh_hid_teda_t, NULL, sizeof(vsf_usb_ds4_gamepad_in_report_t));
                 } else {
@@ -177,7 +204,11 @@ static void * vsf_usbh_ds4_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 
 static void vsf_usbh_ds4_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param)
 {
+#ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
     vsf_usbh_ds4_on_report_input(param, NULL);
+#else
+    WEAK_VSF_USBH_DS4_ON_REPORT_INPUT(param, NULL);
+#endif
 
     vsf_usbh_hid_disconnect((vsf_usbh_hid_eda_t *)param);
     VSF_USBH_FREE(param);

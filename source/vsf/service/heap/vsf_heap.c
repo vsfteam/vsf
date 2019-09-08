@@ -102,18 +102,30 @@ const i_heap_t VSF_HEAP = {
 static NO_INIT __vsf_heap_t __vsf_heap;
 
 /*============================ PROTOTYPES ====================================*/
+
+#if     defined(WEAK_VSF_HEAP_GET_FREELIST_EXTERN)                              \
+    &&  defined(WEAK_VSF_HEAP_GET_FREELIST)
+WEAK_VSF_HEAP_GET_FREELIST_EXTERN
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
+#ifndef WEAK_VSF_HEAP_GET_FREELIST
 WEAK(vsf_heap_get_freelist)
 vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
 {
-	return &__vsf_heap.freelist[0];
+    return &__vsf_heap.freelist[0];
 }
+#endif
 
 // MUST NOT return NULL;
 static vsf_dlist_t * __vsf_heap_get_freelist(uint_fast32_t size)
 {
-	return vsf_heap_get_freelist(&__vsf_heap.freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
+#ifndef WEAK_VSF_HEAP_GET_FREELIST
+    return vsf_heap_get_freelist(&__vsf_heap.freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
+#else
+    return WEAK_VSF_HEAP_GET_FREELIST(&__vsf_heap.freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
+#endif
 }
 
 static void __vsf_heap_mcb_init(__vsf_heap_mcb_t *mcb)
