@@ -40,7 +40,9 @@
 
 #define VSF_ARCH_PRI_NUM                64
 
-#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+#ifndef VSF_SYSTIMER_CFG_IMPL_MODE
+#   define VSF_SYSTIMER_CFG_IMPL_MODE   VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+#endif
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                32

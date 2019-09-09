@@ -401,6 +401,9 @@
     <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h">
       <Filter>vsf\kernel\shell\simple</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">

@@ -84,7 +84,7 @@ typedef enum {
 
 //! \brief system macros
 #ifndef ASSERT
-#   define ASSERT(...)      assert(__VA_ARGS__)
+#   define ASSERT           assert
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

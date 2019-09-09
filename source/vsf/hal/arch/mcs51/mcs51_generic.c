@@ -45,9 +45,26 @@ NO_INIT static __vsf_mcs51_t __vsf_mcs51;
 /*============================ IMPLEMENTATION ================================*/
 
 /*----------------------------------------------------------------------------*
+ * Infrastructure                                                             *
+ *----------------------------------------------------------------------------*/
+/*! \note initialize architecture specific service 
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */
+bool vsf_arch_low_level_init(void)
+{
+    //memset(&__vsf_mcs51, 0, sizeof(__vsf_mcs51));
+    //vsf_systimer_init();
+    return true;
+}
+
+
+/*----------------------------------------------------------------------------*
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
 
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
 {
     return (((uint32_t)TH0 << 8) + TL0) - __vsf_mcs51.systimer_reload;
@@ -139,7 +156,11 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
     return VSF_ERR_NONE;
 }
 
+#endif
 
+/*----------------------------------------------------------------------------*
+ * SWI / PendSV                                                               *
+ *----------------------------------------------------------------------------*/
 void __vsf_mcs51_enabled_irq(uint_fast8_t irq, vsf_arch_prio_t priority)
 {
     vsf_gint_state_t state = vsf_disable_interrupt();
@@ -185,19 +206,6 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
     return orig;
 }
 
-/*! \note initialize architecture specific service 
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-bool vsf_arch_low_level_init(void)
-{
-    //memset(&__vsf_mcs51, 0, sizeof(__vsf_mcs51));
-    //vsf_systimer_init();
-    return true;
-}
-
-
 vsf_gint_state_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
@@ -217,6 +225,10 @@ void vsf_enable_interrupt(void)
 {
     ENABLE_GLOBAL_INTERRUPT();
 }
+
+/*----------------------------------------------------------------------------*
+ * Others: sleep, reset, etc.                                                 *
+ *----------------------------------------------------------------------------*/
 
 void vsf_arch_sleep(uint32_t mode)
 {

@@ -46,8 +46,25 @@ static __vsf_cm_t __vsf_cm;
 /*============================ IMPLEMENTATION ================================*/
 
 /*----------------------------------------------------------------------------*
- * System Timer                                                               *
+ * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
+/*! \note initialize architecture specific service 
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */
+bool vsf_arch_low_level_init(void)
+{
+    //memset(&__vsf_cm, 0, sizeof(__vsf_cm));
+    //vsf_systimer_init();
+    return true;
+}
+
+/*----------------------------------------------------------------------------*
+ * System Timer Implementation                                                *
+ *----------------------------------------------------------------------------*/
+
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
 
 vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -115,6 +132,8 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
     
     return VSF_ERR_NONE;
 }
+
+#endif
 
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *
@@ -219,20 +238,6 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 #endif
 }
 
-
-/*! \note initialize architecture specific service 
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */
-bool vsf_arch_low_level_init(void)
-{
-    //memset(&__vsf_cm, 0, sizeof(__vsf_cm));
-    //vsf_systimer_init();
-    return true;
-}
-
-
 vsf_gint_state_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
@@ -253,13 +258,16 @@ void vsf_enable_interrupt(void)
     ENABLE_GLOBAL_INTERRUPT();
 }
 
+
+/*----------------------------------------------------------------------------*
+ * Others: sleep, reset, etc                                                  *
+ *----------------------------------------------------------------------------*/
+
 void vsf_arch_sleep(uint32_t mode)
 {
     ENABLE_GLOBAL_INTERRUPT();
     __WFI();
 }
-
-
 
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {

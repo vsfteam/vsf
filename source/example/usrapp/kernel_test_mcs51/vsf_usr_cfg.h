@@ -170,8 +170,11 @@
 #define VSF_USE_SERVICE_STREAM              DISABLED
 #define VSF_USE_SERVICE_VSFSTREAM           DISABLED
 
-// #if 0 for IAR 51, #if 1 for Keil 51
-#if 1
+/*============================ INCLUDES ======================================*/
+
+#include "utilities/compiler.h"
+
+#if __IS_COMPILER_51_KEIL__
 #define VSF_POOL_LOCK()                     { vsf_gint_state_t gint_state = __disable_interrupt(); 
 #define VSF_POOL_UNLOCK()                   __set_interrupt_state(gint_state);}
 

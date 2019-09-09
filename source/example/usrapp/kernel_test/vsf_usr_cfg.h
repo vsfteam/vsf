@@ -146,7 +146,7 @@
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
-#define VSF_KERNEL_CFG_SUPPORT_THREAD               ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_THREAD               DISABLED
 //          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack
@@ -210,6 +210,75 @@ enum {
             .ID = VSF_PBUF_ADAPTER_CDC_SRC,                                     \
             .piMethods = &VSF_PBUF_ADAPTER_METHODS_STREAM_SRC,                  \
         }
+#endif
+
+/*----------------------------------------------------------------------------*
+ * Regarget Weak interface                                                    *
+ *----------------------------------------------------------------------------*/
+#if defined(__WIN__)
+#define WEAK_VSF_KERNEL_ERR_REPORT_EXTERN                                       \
+        extern void vsf_kernel_err_report(vsf_kernel_error_t err);
+#define WEAK_VSF_KERNEL_ERR_REPORT(__ERR)                                       \
+        vsf_kernel_err_report(__ERR)
+
+#define WEAK___POST_VSF_KERNEL_INIT_EXTERN                                      \
+        extern void __post_vsf_kernel_init(void);
+#define WEAK___POST_VSF_KERNEL_INIT()                                           \
+        __post_vsf_kernel_init()
+
+#define WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN                                     \
+        extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
+#define WEAK_VSF_SYSTIMER_EVTHANDLER(__TICK)                                    \
+        vsf_systimer_evthandler(__TICK)
+
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN               \
+        extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR()                    \
+        vsf_arch_req___systimer_resolution___from_usr()
+
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN                     \
+        extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
+        vsf_arch_req___systimer_freq___from_usr()
+
+
+
+
+#define WEAK_VSF_INPUT_ON_EVT_EVTERN                                            \
+        extern void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt);
+#define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
+        vsf_input_on_evt((__TYPE), (__EVT))
+
+
+
+#define WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN                                     \
+        extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
+#define WEAK_VSF_HEAP_MALLOC_ALIGNED(__SIZE, __ALIGNMENT)                       \
+        vsf_heap_malloc_aligned((__SIZE), (__ALIGNMENT))
+
+
+
+
+#define WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN                                       \
+        extern void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id);
+#define WEAK_VSF_USBH_BTHCI_ON_NEW(__DEV, __ID)                                 \
+        vsf_usbh_bthci_on_new((__DEV), (__ID))
+
+#define WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN                                       \
+        extern void vsf_usbh_bthci_on_del(void *dev);
+#define WEAK_VSF_USBH_BTHCI_ON_DEL(__DEV)                                       \
+        vsf_usbh_bthci_on_del((__DEV))
+
+#define WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN                                    \
+        extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
+#define WEAK_VSF_USBH_BTHCI_ON_PACKET(__DEV, __TYPE, __PACKET, __SIZE)          \
+        vsf_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
+
+
+#define WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN                                     \
+        extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id);
+#define WEAK_VSF_BLUETOOTH_H2_ON_NEW(__DEV, __ID)                               \
+        vsf_bluetooth_h2_on_new((__DEV), (__ID))
 #endif
 
 /*============================ TYPES =========================================*/

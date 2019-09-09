@@ -49,7 +49,7 @@
 //! @}
 
 #undef __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
-#if defined(__GNUC__)
+#if defined(__GNUC__) || __IS_COMPILER_LLVM__
 #   define  __IS_COMPILER_SUPPORT_GNUC_EXTENSION__      1
 #endif
 

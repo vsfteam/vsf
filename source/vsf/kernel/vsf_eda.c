@@ -924,7 +924,7 @@ vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda)
     vsf_protect_t origlevel;
     vsf_eda_t *eda_pending;
 
-    VSF_KERNEL_ASSERT(pthis != NULL)
+    VSF_KERNEL_ASSERT(pthis != NULL);
 
     origlevel = vsf_protect_sched();
     if (pthis->cur_union.bits.cur >= pthis->max_union.bits.max) {

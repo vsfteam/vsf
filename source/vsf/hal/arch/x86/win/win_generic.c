@@ -228,13 +228,16 @@ static __vsf_arch_background_trace_t __vsf_arch_background_trace;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
-
 #if VSF_ARCH_CFG_NO_UNLOCKED_SUSPEND_EN == ENABLED
 static void __vsf_arch_irq_pend(vsf_arch_irq_thread_t *irq_thread);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
+
+/*----------------------------------------------------------------------------*
+ * infrastructure                                                             *
+ *----------------------------------------------------------------------------*/
+
 
 #if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
 static __vsf_arch_background_trace_event_t * __vsf_arch_bg_trace_get(void)
@@ -662,15 +665,11 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 
 
 
+/*----------------------------------------------------------------------------*
+ * Systimer Timer Implementation                                              *
+ *----------------------------------------------------------------------------*/
 
-
-
-WEAK(on_arch_systimer_tick_evt)
-bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
-{
-    UNUSED_PARAM(tick);
-    return true;
-}
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
 static void vsf_systimer_thread(void *arg)
 {
@@ -777,12 +776,12 @@ uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
     return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
 }
 
+#endif
 
 
-
-
-
-
+/*----------------------------------------------------------------------------*
+ * SWI Implementation                                                         *
+ *----------------------------------------------------------------------------*/
 static void vsf_arch_swi_thread(void *arg)
 {
     vsf_arch_swi_ctx_t *ctx = arg;
@@ -949,6 +948,9 @@ void vsf_enable_interrupt(void)
     vsf_set_interrupt(true);
 }
 
+/*----------------------------------------------------------------------------*
+ * Others: sleep, reset and etc.                                              *
+ *----------------------------------------------------------------------------*/
 void vsf_arch_sleep(uint32_t mode)
 {
     if (GetCurrentThreadId() == __vsf_x86.por_thread.thread_id) {
