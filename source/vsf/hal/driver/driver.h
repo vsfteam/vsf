@@ -29,18 +29,20 @@
 
 #   if      defined(__STMicro__)
 #       define  VSF_DRIVER_HEADER       "./STMicro/driver.h"
-#   elif    defined(__NXP__)  
+#   elif    defined(__NXP__)
 #       define  VSF_DRIVER_HEADER       "./NXP/driver.h"
-#   elif    defined(__MicroChip__)  
+#   elif    defined(__MicroChip__)
 #       define  VSF_DRIVER_HEADER       "./MicroChip/driver.h"
 #   elif    defined(__Nuvoton__)
 #       define  VSF_DRIVER_HEADER       "./Nuvoton/driver.h"
 #   elif    defined(__WinnerMicro__)
 #       define  VSF_DRIVER_HEADER       "./WinnerMicro/driver.h"
-#   elif    defined(__CPU_X86__)  
+#   elif    defined(__CPU_X86__) || defined(__CPU_X64__)
 #       define  VSF_DRIVER_HEADER       "./x86/driver.h"
-#   elif    defined(__SiliconLabs__)  
+#   elif    defined(__SiliconLabs__)
 #       define  VSF_DRIVER_HEADER       "./SiliconLabs/driver.h"
+#   elif    defined(__GigaDevice__)
+#		define  VSF_DRIVER_HEADER       "./GigaDevice/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"

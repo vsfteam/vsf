@@ -37,8 +37,8 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef __CPU_X86__
-#   error "libusb_hcd ONLY support x86"
+#if !defined(__CPU_X86__) && !defined(__CPU_X64__)
+#   error "libusb_hcd ONLY support x86/64"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

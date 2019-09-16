@@ -201,6 +201,15 @@
     <ClCompile Include="..\..\usrapp\kernel_test\main.c">
       <Filter>usrapp\kernel_test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\main_cross_task_example.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\main_task_simple.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\kernel_test\main_thread_simple.c">
+      <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\usrapp\kernel_test\vsf_usr_cfg.h">
@@ -400,9 +409,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h">
       <Filter>vsf\kernel\shell\simple</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h">
-      <Filter>vsf\hal\arch</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

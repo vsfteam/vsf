@@ -136,6 +136,99 @@
     <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
       <UniqueIdentifier>{81641b97-4577-45bf-ad6d-8ec4f525ea32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="libusb">
+      <UniqueIdentifier>{60558e31-f6d7-4257-8882-e92a7018a2f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party">
+      <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack">
+      <UniqueIdentifier>{f8bbf347-4548-4ab2-94fb-65b85eea5484}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\port">
+      <UniqueIdentifier>{0f8f456f-7a17-4e71-a2e9-35165e100a9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw">
+      <UniqueIdentifier>{ff58c8cb-51a1-426a-95e1-cdbd11c6d509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw\chipset">
+      <UniqueIdentifier>{2e09660c-75ac-4255-9cd1-fe7d2e9a75c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw\chipset\csr">
+      <UniqueIdentifier>{ca2d7930-0abd-4bad-8194-e865261b28da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw\src">
+      <UniqueIdentifier>{97826024-fc64-4213-ac14-347207873536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw\src\classic">
+      <UniqueIdentifier>{88863bfe-7131-4cf0-995e-b8dce8d103fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\usbh_demo_win\config">
+      <UniqueIdentifier>{8e3245e6-1484-4060-9eea-7b227939410c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input">
+      <UniqueIdentifier>{9f6d160e-5145-4e7f-949c-7785b1e92e5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver">
+      <UniqueIdentifier>{a8c1f548-b85a-412d-ac4d-da2b2aba2566}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\ds4">
+      <UniqueIdentifier>{85ca653e-7c11-4251-aef5-48a9edf7ab76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\hid">
+      <UniqueIdentifier>{b4e8d762-c880-4d47-8961-f6d8e5ae5d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\protocol">
+      <UniqueIdentifier>{9e71b4ca-1584-4beb-aaaf-276a6c525d66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui">
+      <UniqueIdentifier>{16b6f51f-2859-4b63-bbc5-277c3de0a84f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp_drv">
+      <UniqueIdentifier>{426a816e-299c-4753-bb8c-19b793f1c00e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp_drv\sdl2">
+      <UniqueIdentifier>{378a9a07-be30-4358-a3a9-fd8351214394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86">
+      <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl">
+      <UniqueIdentifier>{799c00c9-835a-4a83-9e62-18f1662c107c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0">
+      <UniqueIdentifier>{c84c0ea3-c7fb-4590-ac29-cd7fe62c99cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw">
+      <UniqueIdentifier>{8ac714c2-6989-4d1e-9ce7-1fbcbcbd3f62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src">
+      <UniqueIdentifier>{d95c1683-46c8-488d-acf8-2504869ad30c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core">
+      <UniqueIdentifier>{b5d9d708-8436-4e58-8c4c-65fd455842ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw">
+      <UniqueIdentifier>{66b6b29e-00fd-4ff7-aa26-7b4a54c0de1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font">
+      <UniqueIdentifier>{3818b012-1df2-4fe7-a3c9-f21ce245ce8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal">
+      <UniqueIdentifier>{cc334457-400b-4fe3-b279-04a7cb461fe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc">
+      <UniqueIdentifier>{c1d318c0-6bc7-48b0-a3d6-1c3082c5e2ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx">
+      <UniqueIdentifier>{a4028455-2b04-4e11-9453-9ee00bf1b1a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes">
+      <UniqueIdentifier>{6d85ead6-ba34-4023-88f9-9162fa7517bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\6.0\port">
+      <UniqueIdentifier>{49e453fd-d654-4478-8c12-78517460433d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -151,9 +244,6 @@
       <Filter>vsf\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h">
-      <Filter>vsf\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\type.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h">
@@ -390,11 +480,353 @@
     <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h">
       <Filter>vsf\kernel\shell</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\vsf_usr_cfg.h">
-      <Filter>usrapp\usbh_demo_win</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h">
+      <Filter>vsf\component\3rd-party\btstack\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\chipset\csr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\btstack_config.h">
+      <Filter>usrapp\usbh_demo_win\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\vsf_usr_cfg.h">
+      <Filter>usrapp\usbh_demo_win\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h">
+      <Filter>vsf\component\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h">
+      <Filter>vsf\component\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_gamepad.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_sensor.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h">
+      <Filter>vsf\component\input\driver\ds4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
+      <Filter>vsf\component\input\driver\hid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h">
+      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h">
+      <Filter>vsf\hal\driver\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h">
+      <Filter>vsf\component\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h">
+      <Filter>vsf\component\ui\disp_drv</Filter>
+    </ClInclude>
+    <ClInclude Include="libusb\libusb.h">
+      <Filter>libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_group.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_indev.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_obj.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_refr.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_style.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_arc.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_basic.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_img.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_label.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_line.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_rect.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_triangle.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_cache.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_decoder.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_fmt_txt.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_symbol_def.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_disp.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_indev.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_tick.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_anim.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_area.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_circ.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_color.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_fs.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_gc.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_ll.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_log.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_math.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_mem.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_task.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_templ.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_txt.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_types.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_utils.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_arc.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_bar.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btn.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btnm.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_calendar.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_canvas.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cb.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_chart.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cont.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ddlist.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_gauge.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_img.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_imgbtn.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_kb.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_label.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_led.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_line.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_list.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_lmeter.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_mbox.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_objx_templ.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_page.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_preload.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_roller.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_slider.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_spinbox.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_sw.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ta.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_table.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tabview.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tileview.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_win.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_alien.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_default.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_material.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_mono.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_nemo.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_night.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_templ.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_zen.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_conf_checker.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_version.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\lvgl.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\lv_conf.h">
+      <Filter>usrapp\usbh_demo_win\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.h">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h">
+      <Filter>vsf\hal\arch</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -441,9 +873,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\arch\x86\win\win_generic.c">
       <Filter>vsf\hal\arch\x86\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
-      <Filter>vsf\hal\driver</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c">
       <Filter>vsf\service</Filter>
@@ -526,11 +955,338 @@
     <ClCompile Include="..\..\..\vsf\kernel\shell\vsf_shell.c">
       <Filter>vsf\kernel\shell</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\usrapp\usbh_demo_win\main.c">
       <Filter>usrapp\usbh_demo_win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c">
+      <Filter>vsf\component\3rd-party\btstack\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\hci_dump_vsf.c">
+      <Filter>vsf\component\3rd-party\btstack\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\hci_transport_h2_vsf.c">
+      <Filter>vsf\component\3rd-party\btstack\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\chipset\csr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\classic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\usbh_demo_win\bt_demo.c">
+      <Filter>usrapp\usbh_demo_win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c">
+      <Filter>usrapp\usbh_demo_win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\usbh_demo_win\input_demo.c">
+      <Filter>usrapp\usbh_demo_win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c">
+      <Filter>vsf\component\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c">
+      <Filter>vsf\component\input\driver\ds4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
+      <Filter>vsf\component\input\driver\hid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c">
+      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
+      <Filter>vsf\hal\driver\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c">
+      <Filter>vsf\component\ui\disp_drv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_group.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_indev.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_obj.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_refr.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_style.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_arc.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_basic.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_img.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_label.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_line.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_rect.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_triangle.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_cache.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_decoder.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_fmt_txt.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_12.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_16.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_22.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_28.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_unscii_8.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_disp.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_indev.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_tick.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_anim.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_area.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_circ.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_color.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_fs.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_gc.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_ll.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_log.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_math.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_mem.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_task.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_templ.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_txt.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_utils.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_misc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_arc.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_bar.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btn.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btnm.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_calendar.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_canvas.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cb.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_chart.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cont.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ddlist.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_gauge.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_img.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_imgbtn.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_kb.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_label.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_led.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_line.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_list.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_lmeter.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_mbox.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_objx_templ.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_page.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_preload.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_roller.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_slider.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_spinbox.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_sw.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ta.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_table.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tabview.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tileview.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_win.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_alien.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_default.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_material.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_mono.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_nemo.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_night.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_templ.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_zen.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_themes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c">
+      <Filter>vsf\component\3rd-party\littlevgl\6.0\port</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

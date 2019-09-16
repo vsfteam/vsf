@@ -99,7 +99,7 @@
 
 //      <c1>Enable eda to call other edas
 //      <i>If this feature is enabled, eda is capable to call other eda based tasks, i.e. pure-eda, vsf_task, vsf_pt, simple_fsm and etc.
-#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL         ENABLED
 //      </c>
 
 //      <c1>Enable Timer-integrated tasks (vsf_teda_t)
@@ -129,7 +129,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_MAIN_MODE                        VSF_OS_CFG_MAIN_MODE_BAREMETAL
+#define VSF_OS_CFG_MAIN_MODE                        VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
 //      <h> Shell Configuration
@@ -146,7 +146,7 @@
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
-#define VSF_KERNEL_CFG_SUPPORT_THREAD               DISABLED
+#define VSF_KERNEL_CFG_SUPPORT_THREAD               ENABLED
 //          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack

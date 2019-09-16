@@ -57,7 +57,7 @@ void main(void)
     ai_demo_mnist(1);
 
     // ui_demo will not return, so call last
-    // and VSF_OS_CFG_MAIN_MODE MUST be VSF_OS_CFG_MAIN_MODE_BAREMETAL
+    // and VSF_OS_CFG_MAIN_MODE MUST be VSF_OS_CFG_MAIN_MODE_IDLE
     // ui_demo uses usbd_demo, ui is implemented over UVC
     ui_demo_start();
 }

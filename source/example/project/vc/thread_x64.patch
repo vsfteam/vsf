@@ -1,0 +1,135 @@
+ source/vsf/kernel/task/vsf_thread.c | 42 ++++++++++++++++++-------------------
+ source/vsf/kernel/task/vsf_thread.h |  4 ++--
+ 2 files changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/source/vsf/kernel/task/vsf_thread.c b/source/vsf/kernel/task/vsf_thread.c
+index 5b53f986..a8360029 100644
+--- a/source/vsf/kernel/task/vsf_thread.c
++++ b/source/vsf/kernel/task/vsf_thread.c
+@@ -59,9 +59,9 @@ void vsf_thread_ret(void)
+     class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
+                     pthis, vsf_thread_cb_t);
+ #   endif
+-    longjmp(*(pthis->ret), 0); 
++    longjmp(pthis->ret, 0); 
+ #else
+-    longjmp(*(thread)->ret, 0);
++    longjmp(thread->ret, 0);
+ #endif
+ }
+ 
+@@ -71,7 +71,7 @@ vsf_evt_t vsf_thread_wait(void)
+     vsf_thread_t *thread_obj = vsf_thread_get_cur();
+     class_internal(thread_obj, thread, vsf_thread_t);
+     vsf_evt_t curevt;
+-    jmp_buf pos;
++//    jmp_buf pos;
+ 
+     VSF_KERNEL_ASSERT(thread != NULL);
+     
+@@ -83,11 +83,11 @@ vsf_evt_t vsf_thread_wait(void)
+     class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
+                     pthis, vsf_thread_cb_t);
+ #   endif
+-    pthis->pos = &pos;
+-    curevt = setjmp(*(pthis->pos));
++//    pthis->pos = &pos;
++    curevt = setjmp(pthis->pos);
+ #else
+-    thread->pos = &pos;
+-    curevt = setjmp(*thread->pos);
++//    thread->pos = &pos;
++    curevt = setjmp(thread->pos);
+     //pthread_obj->current_evt = curevt;
+ #endif
+     if (!curevt) {
+@@ -115,11 +115,11 @@ void vsf_thread_wfe(vsf_evt_t evt)
+     class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
+                     pthis, vsf_thread_cb_t);
+ #   endif
+-    pthis->pos = &pos;
+-    curevt = setjmp(*(pthis->pos));
++//    pthis->pos = &pos;
++    curevt = setjmp(pthis->pos);
+ #else
+-    thread->pos = &pos;
+-    curevt = setjmp(*thread->pos);
++//    thread->pos = &pos;
++    curevt = setjmp(thread->pos);
+     //pthread_obj->current_evt = curevt;
+ #endif
+ 
+@@ -158,12 +158,12 @@ static void __vsf_thread_entry(void)
+ #   endif
+   
+     vsf_eda_return();
+-    longjmp(*(pthis->ret), 0);
++    longjmp(pthis->ret, 0);
+ #else
+     thread->entry(thread_obj);
+     
+     vsf_eda_return();
+-    longjmp(*(thread)->ret, 0);
++    longjmp(thread->ret, 0);
+ #endif
+ }
+ 
+@@ -171,18 +171,18 @@ SECTION("text.vsf.kernel.vsf_thread")
+ #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+ static void __vsf_thread_evthandler(vsf_thread_cb_t *target, vsf_evt_t evt)
+ {
+-    jmp_buf ret;
++//    jmp_buf ret;
+ 
+     VSF_KERNEL_ASSERT(target != NULL);
+     class_internal(target, pthis, vsf_thread_cb_t);
+-    pthis->ret = &ret;
+-    if (!setjmp(ret)) {
++//    pthis->ret = &ret;
++    if (!setjmp(pthis->ret)) {
+         if (VSF_EVT_INIT == evt) {
+             vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size>>3)]));
+             __vsf_thread_entry();
+             
+         } else {
+-            longjmp(*(pthis->pos), evt);
++            longjmp(pthis->pos, evt);
+         }
+     } 
+ }
+@@ -191,16 +191,16 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+ {
+     class_internal((vsf_thread_t *)eda, thread, vsf_thread_t);
+ 
+-    jmp_buf ret;
++//    jmp_buf ret;
+ 
+     VSF_KERNEL_ASSERT(thread != NULL);
+-    thread->ret = &ret;
+-    if (!setjmp(ret)) {
++//    thread->ret = &ret;
++    if (!setjmp(thread->ret)) {
+         if (VSF_EVT_INIT == evt) {
+             vsf_arch_set_stack((uint_fast32_t)(&thread->stack[(thread->stack_size>>3)]));
+             __vsf_thread_entry();
+         } else {
+-            longjmp(*thread->pos, evt);
++            longjmp(thread->pos, evt);
+         }
+     }
+ }
+diff --git a/source/vsf/kernel/task/vsf_thread.h b/source/vsf/kernel/task/vsf_thread.h
+index da499c74..e5e1f482 100644
+--- a/source/vsf/kernel/task/vsf_thread.h
++++ b/source/vsf/kernel/task/vsf_thread.h
+@@ -318,8 +318,8 @@ def_class(vsf_thread_cb_t,
+     )
+ 
+     private_member(
+-        jmp_buf         *pos;
+-        jmp_buf         *ret;
++        jmp_buf         pos ALIGN(16);
++        jmp_buf         ret ALIGN(16);
+     )
+ )
+ end_def_class(vsf_thread_cb_t)

@@ -52,12 +52,14 @@ int_fast16_t msb(uint_fast8_t a)
     return c;
 }
 
+#ifndef VSF_FFZ
 WEAK(ffz)
 int_fast16_t ffz(uint_fast8_t a)
 {
     a = ~a;
     return msb(a & -(int_fast8_t)a);
 }
+#endif
 
 int_fast16_t __vsf_bitmap_ffz(uint_fast8_t *pbitmap, int_fast16_t bitsize)
 {

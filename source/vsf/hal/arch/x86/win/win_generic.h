@@ -46,7 +46,10 @@
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                32
-#define __VSF_ARCH_SYSTIMER_BITS        32      //! TODO modify this macro for x86 systimer implementation.
+
+#define VSF_ARCH_STACK_PAGE_SIZE        4096
+#define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -119,19 +122,21 @@ extern void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate);
 
-static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
-    // TODO: movl only supports x86
-    // TODO: it seems that _chkstk will fail with this implementation
+#if     defined(__CPU_X86__)
     __asm__("movl %0, %%esp" : : "r"(stack));
+#elif   defined(__CPU_X64__)
+    __asm__("movq %0, %%rsp" : : "r"(stack));
+#endif
 }
 
-static ALWAYS_INLINE void vsf_arch_set_pc(uint32_t pc)
+static ALWAYS_INLINE void vsf_arch_set_pc(uintptr_t pc)
 {
     VSF_HAL_ASSERT(false);
 }
 
-static ALWAYS_INLINE uint32_t vsf_arch_get_lr(void)
+static ALWAYS_INLINE uintptr_t vsf_arch_get_lr(void)
 {
     VSF_HAL_ASSERT(false);
     return 0;

@@ -86,3 +86,4 @@ source/example/project/vc_2017/Debug
 
 *.scvd
 *.bak
+*.lds

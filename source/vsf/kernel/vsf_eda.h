@@ -52,6 +52,9 @@
             vsf_eda_sync_init((__psem), (__cnt), VSF_SYNC_MAX | VSF_SYNC_AUTO_RST)
 #define vsf_eda_sem_post(__psem)            vsf_eda_sync_increase((__psem))
 #define vsf_eda_sem_pend(__psem, __timeout) vsf_eda_sync_decrease((__psem), (__timeout))
+#if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
+#   define vsf_eda_sem_post_irq(__psem)     vsf_eda_sync_increase_irq((__psem))
+#endif
 
 // MUTEX
 #define vsf_eda_mutex_init(__pmtx)                                              \
@@ -90,6 +93,9 @@
 #define vsf_eda_trig_reset(__pevt)         vsf_eda_sync_force_reset((__pevt))
 #define vsf_eda_trig_wait(__pevt, __timeout)                                    \
             vsf_eda_sync_decrease((__pevt), (__timeout))
+#if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
+#   define vsf_eda_trig_set_irq(__pevt)     vsf_eda_sync_increase_irq((__pevt))
+#endif
 
 // CRIT without priority boost, internal use only
 // only used for edas with same priority
@@ -707,12 +713,20 @@ extern vsf_err_t vsf_eda_post_evt(vsf_eda_t *pthis, vsf_evt_t evt);
 
 SECTION(".text.vsf.kernel.vsf_eda_post_msg")
 extern vsf_err_t vsf_eda_post_msg(vsf_eda_t *pthis, void *msg);
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+SECTION(".text.vsf.kernel.vsf_eda_post_evt_msg")
 extern vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg);
+#endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
 extern vsf_err_t vsf_eda_sync_init(vsf_sync_t *pthis, uint_fast16_t cur_value,
         uint_fast16_t max_value);
+
+#if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
+SECTION(".text.vsf.kernel.vsf_sync")
+vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *pthis);
+#endif
 
 SECTION(".text.vsf.kernel.vsf_sync")
 extern vsf_err_t vsf_eda_sync_increase(vsf_sync_t *pthis);

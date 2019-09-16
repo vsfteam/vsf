@@ -65,7 +65,7 @@
 #define VSF_OS_CFG_PRIORITY_NUM                         10
 //      </h>
 
-#define VSF_OS_CFG_MAIN_EVTQ_EN                         DISABLED
+#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                         DISABLED
 
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks.
@@ -127,7 +127,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_MAIN_MODE                        VSF_OS_CFG_MAIN_MODE_BAREMETAL
+#define VSF_OS_CFG_MAIN_MODE                        VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 
 //      </h>

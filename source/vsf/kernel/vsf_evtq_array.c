@@ -87,7 +87,7 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
     return __vsf_os_evtq_init(pthis);
 }
 
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
 static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, vsf_evt_t evt, void *msg, bool force)
 #else
 static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
@@ -121,7 +121,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
     }
     evtq->tail = tail_next;
     evtq->node[tail].eda = eda;
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     evtq->node[tail].evt = (vsf_evt_t)value;
     evtq->node[tail].msg = msg;
 #else
@@ -135,7 +135,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 
 vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force)
 {
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     return __vsf_evtq_post(pthis, evt, NULL, force);
 #else
     return __vsf_evtq_post(pthis, (uintptr_t)((evt << 1) | 1), force);
@@ -149,12 +149,19 @@ vsf_err_t vsf_evtq_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 
 vsf_err_t vsf_evtq_post_msg(vsf_eda_t *pthis, void *msg)
 {
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     return __vsf_evtq_post(pthis, VSF_EVT_MESSAGE, msg, false);
 #else
     return __vsf_evtq_post(pthis, (uintptr_t)msg, false);
 #endif
 }
+
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg)
+{
+    return __vsf_evtq_post(pthis, evt, msg, false);
+}
+#endif
 
 vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
 {
@@ -179,7 +186,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                 orig = vsf_protect_int();
                     pthis->cur.eda = eda;
 
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
                     pthis->evt_cur = node->evt;
                     pthis->msg_cur = node->msg;
 #else

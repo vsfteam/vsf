@@ -57,9 +57,14 @@
 #   error "VSF_USE_SERVICE_STREAM or VSF_USE_SERVICE_VSFSTREAM must be enabled to use VSF_USBD_CFG_STREAM_EN"
 #endif
 
-#if VSF_USE_USB_HOST_ECM == ENABLED
-#   undef VSF_USE_USB_HOST_CDC
-#   define VSF_USE_USB_HOST_CDC                 ENABLED
+#if VSF_USE_USB_HOST == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#       error "USBH require VSF_KERNEL_CFG_EDA_SUPPORT_TIMER"
+#   endif
+#   if VSF_USE_USB_HOST_ECM == ENABLED
+#       undef VSF_USE_USB_HOST_CDC
+#       define VSF_USE_USB_HOST_CDC                 ENABLED
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

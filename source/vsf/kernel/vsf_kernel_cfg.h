@@ -35,7 +35,7 @@
 #define VSF_OS_CFG_MAIN_MODE_NONE               0
 #define VSF_OS_CFG_MAIN_MODE_THREAD             1
 #define VSF_OS_CFG_MAIN_MODE_EDA                2
-#define VSF_OS_CFG_MAIN_MODE_BAREMETAL          3
+#define VSF_OS_CFG_MAIN_MODE_IDLE               3
     
 #ifndef VSF_OS_CFG_MAIN_MODE
 #   define VSF_OS_CFG_MAIN_MODE                 VSF_OS_CFG_MAIN_MODE_THREAD
@@ -57,6 +57,9 @@
 #   define VSF_KERNEL_CFG_SUPPORT_SYNC                      ENABLED
 #endif
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#   ifndef VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ
+#       define VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ              ENABLED
+#   endif
 #   ifndef VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
 #       define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT          ENABLED
 #   endif
@@ -133,7 +136,7 @@
 #   else
 #       define __VSF_OS_SWI_NUM             (VSF_SWI_NUM + VSF_USR_SWI_NUM)
 #   endif
-#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       define VSF_OS_CFG_PRIORITY_NUM      (__VSF_OS_SWI_NUM+1)
 #   else
 #       define VSF_OS_CFG_PRIORITY_NUM      __VSF_OS_SWI_NUM
@@ -142,7 +145,7 @@
 #   warning "VSF_OS_CFG_PRIORITY_NUM is defined while __VSF_OS_SWI_NUM is not \
 automatically calculated based on VSF_OS_CFG_PRIORITY_NUM in vsf_cfg.h. This \
 should not happen."
-#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       define __VSF_OS_SWI_NUM             (VSF_OS_CFG_PRIORITY_NUM-1)
 #   else
 #       define __VSF_OS_SWI_NUM             VSF_OS_CFG_PRIORITY_NUM
@@ -152,7 +155,7 @@ should not happen."
 calculated from macro VSF_OS_CFG_PRIORITY_NUM. Please define \
 VSF_OS_CFG_PRIORITY_NUM in your vsf_usr_cfg.h (or any configuration header file \
 included by vsf_usr_cfg.h)"
-#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       define VSF_OS_CFG_PRIORITY_NUM      (__VSF_OS_SWI_NUM+1)
 #   else
 #       define VSF_OS_CFG_PRIORITY_NUM      __VSF_OS_SWI_NUM
@@ -163,8 +166,8 @@ included by vsf_usr_cfg.h)"
 #ifndef VSF_KERNEL_CFG_SUPPORT_PREMPT
 #   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
 #endif
-#ifndef VSF_OS_CFG_MAIN_EVTQ_EN
-#   define VSF_OS_CFG_MAIN_EVTQ_EN                          DISABLED
+#ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
+#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                          DISABLED
 #endif
 
 #if __VSF_OS_SWI_NUM > (VSF_USR_SWI_NUM + VSF_SWI_NUM)
@@ -181,10 +184,10 @@ VSF_OS_CFG_PRIORITY_NUM > 1"
 #   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
 #endif
 
-#if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #   if VSF_KERNEL_CFG_SUPPORT_PREMPT != ENABLED
 #       warning "VSF_KERNEL_CFG_SUPPORT_PREMPT MUST be enabled to support       \
-VSF_OS_CFG_MAIN_EVTQ_EN"
+VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #       undef VSF_KERNEL_CFG_SUPPORT_PREMPT
 #       define VSF_KERNEL_CFG_SUPPORT_PREMPT                ENABLED
 #   endif
@@ -219,6 +222,26 @@ VSF_OS_CFG_MAIN_EVTQ_EN"
 #   define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY          DISABLED
 #endif
 
+#if __VSF_KERNEL_CFG_EVTQ_EN == EBABKED
+#   ifndef VSF_KERNEL_CFG_EVT_MESSAGE_EN
+#       define VSF_KERNEL_CFG_EVT_MESSAGE_EN                ENABLED
+#   endif
+#else
+#   if VSF_KERNEL_CFG_EVT_MESSAGE_EN == ENABLED
+#       error "VSF_KERNEL_CFG_EVT_MESSAGE_EN requires __VSF_KERNEL_CFG_EVTQ_EN"
+#   endif
+#endif
+
+
+#if     !defined(VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE)                         \
+    &&  defined(VSF_ARCH_STACK_PAGE_SIZE)
+#   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE        VSF_ARCH_STACK_PAGE_SIZE
+#endif
+
+#if     !defined(VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE)                     \
+    &&  defined(VSF_ARCH_STACK_GUARDIAN_SIZE)                               
+#   define VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE    VSF_ARCH_STACK_GUARDIAN_SIZE
+#endif
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

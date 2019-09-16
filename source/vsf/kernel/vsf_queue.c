@@ -67,8 +67,8 @@ static bool __vsf_eda_list_queue_dequeue(vsf_queue_t *pthis, void **node)
 
 vsf_err_t vsf_eda_list_queue_init(vsf_list_queue_t *pthis, uint_fast16_t max)
 {
-    pthis->op.enqueue = __vsf_eda_list_queue_enqueue;
-    pthis->op.dequeue = __vsf_eda_list_queue_dequeue;
+    pthis->use_as__vsf_queue_t.op.enqueue = __vsf_eda_list_queue_enqueue;
+    pthis->use_as__vsf_queue_t.op.dequeue = __vsf_eda_list_queue_dequeue;
     vsf_slist_queue_init(&pthis->queue);
     return vsf_eda_queue_init(&pthis->use_as__vsf_queue_t, max);
 }

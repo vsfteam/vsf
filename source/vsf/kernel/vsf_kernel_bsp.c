@@ -189,7 +189,7 @@ ROOT void __post_vsf_kernel_init(void)
     static NO_INIT vsf_eda_t __app_main;
     vsf_eda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   endif
-#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_BAREMETAL
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE
     main();
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_NONE
 #else

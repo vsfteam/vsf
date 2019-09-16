@@ -71,7 +71,7 @@
 __VSF_HAL_SWI_NUM and its value must at least be 1. 
 #   endif
 
-#   if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       if VSF_OS_CFG_PRIORITY_NUM > 1
 #           define __VSF_HAL_SWI_NUM                (VSF_OS_CFG_PRIORITY_NUM - 1)
 #       else

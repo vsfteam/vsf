@@ -160,6 +160,10 @@ typedef enum {
     VSF_ERR_REQ_ALREADY_REGISTERED      =-13,   //!< request all ready exist
     VSF_ERR_BUG                         =-14,   //!< bug
     VSF_ERR_OVERRUN                     =-15,   //!< overrun
+    VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT
+                                        =-17,   //!< the resource provided by user is not sufficient
+    VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED
+                                        =-18,   //!< the provided resource is not aligned to certain size (2^N)
 } vsf_err_t;
 //! @}
 
@@ -184,9 +188,9 @@ typedef enum {
 
 #define __REG_TYPE__
 
-typedef volatile unsigned char     reg8_t;
-typedef volatile unsigned short    reg16_t;
-typedef volatile unsigned int      reg32_t;
+typedef volatile uint8_t     reg8_t;
+typedef volatile uint16_t    reg16_t;
+typedef volatile uint32_t    reg32_t;
 
 
 /*============================ GLOBAL VARIABLES ==============================*/

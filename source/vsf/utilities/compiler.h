@@ -26,8 +26,10 @@
 #   include "./compiler/arm/arm_compiler.h"
 #elif   defined(__CPU_MCS51__)              //!< MCS-51 series
 #   include "./compiler/mcs51/mcs51_compiler.h"
-#elif   defined(__CPU_X86__)
+#elif   defined(__CPU_X86__) || defined(__CPU_X64__)
 #   include "./compiler/x86/x86_compiler.h"
+#elif   defined(__CPU_RV__)
+#   include "./compiler/rv/rv_compiler.h"
 #else
 //#warning No specified MCU type! use arm as default
 #   include "./compiler/arm/arm_compiler.h"

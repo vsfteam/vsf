@@ -313,7 +313,7 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *ptObj,
     
 
     VSF_SERVICE_ASSERT(     (ptThis != NULL) 
-            &&  (pBuffer != NULL));
+            			&&  (pBuffer != 0));
 
     /* Allowing multiple-layers of Pool management */
     if (    (wItemSize < sizeof(__vsf_pool_node_t))
@@ -357,7 +357,7 @@ void vsf_pool_free(vsf_pool_t *ptObj, uintptr_t pItem)
 {
     
     class_internal(ptObj, ptThis, vsf_pool_t);
-    VSF_SERVICE_ASSERT((ptObj != NULL) && (pItem != NULL));
+    VSF_SERVICE_ASSERT((ptObj != NULL) && (pItem != 0));
 
     VSF_POOL_LOCK();
         __vsf_pool_add_item(ptObj, (uintptr_t)pItem);

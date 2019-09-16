@@ -67,7 +67,7 @@
 #define VSF_OS_CFG_PRIORITY_NUM                 1
 //      </h>
 
-#define VSF_OS_CFG_MAIN_EVTQ_EN                 ENABLED
+#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE             ENABLED
 
 //      <o>The default vsf_task_t stack frame pool size <1-65535>
 //      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 
@@ -129,7 +129,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_BAREMETAL
+#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
 //      <h> Shell Configuration

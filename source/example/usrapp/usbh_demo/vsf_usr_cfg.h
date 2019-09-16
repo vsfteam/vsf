@@ -127,7 +127,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_BAREMETAL
+#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
 //      <h> Shell Configuration
@@ -167,6 +167,7 @@
 #else
 #define VSF_USE_USB_DEVICE                              ENABLED
 #endif
+#define VSF_USE_USB_DEVICE_CDCACM                       ENABLED
 #define VSF_USE_USB_DEVICE_UVC                          ENABLED
 #   define VSF_USBD_UVC_CFG_TRACE_EN                    ENABLED
 

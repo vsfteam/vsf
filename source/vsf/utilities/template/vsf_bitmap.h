@@ -107,6 +107,9 @@ typedef uint_fast8_t __vsf_bitmap(__name)[                                      
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifndef VSF_FFZ
+extern int_fast16_t ffz(uint_fast8_t);
+#endif
 extern void __vsf_bitmap_reset(uint_fast8_t* pthis, int_fast16_t bitsize);
 extern int_fast16_t __vsf_bitmap_ffz(uint_fast8_t* pbitmap,  int_fast16_t bitsize);
 

@@ -118,7 +118,7 @@
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_BAREMETAL //VSF_OS_CFG_MAIN_MODE_THREAD
+#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_IDLE //VSF_OS_CFG_MAIN_MODE_THREAD
 //          </c>
 //      </h>
 //      <h> Shell Configuration

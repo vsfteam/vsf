@@ -40,12 +40,14 @@ typedef vsf_irq_handler_t vsf_swi_handler_t;
 #   define VSF_ARCH_HEADER      "./arm/cortex-a/cortex_a_generic.h"
 # elif    defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'R' || __TARGET_PROFILE_R
 #   define VSF_ARCH_HEADER      "./arm/cortex-r/cortex_r_generic.h"
-# elif   defined(__CPU_X86__) && __LINUX__
+# elif   (defined(__CPU_X86__) || defined(__CPU_X64__)) && __LINUX__
 #   define  VSF_ARCH_HEADER     "./x86/linux/linux_generic.h"
-# elif   defined(__CPU_X86__) && __WIN__
+# elif   (defined(__CPU_X86__) || defined(__CPU_X64__)) && __WIN__
 #   define  VSF_ARCH_HEADER     "./x86/win/win_generic.h"
 # elif   defined(__CPU_MCS51__)
 #   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
+# elif   defined(__CPU_RV__)
+#   define  VSF_ARCH_HEADER     "./rv/rv_generic.h"
 # else
 #   error no supported architecture found!
 # endif

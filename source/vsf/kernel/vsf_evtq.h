@@ -48,7 +48,7 @@ struct vsf_evtq_t {
 struct vsf_evt_node_t {
     implement(vsf_slist_node_t)
 
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     vsf_evt_t evt;
     void *msg;
 #else
@@ -64,7 +64,7 @@ struct vsf_evt_node_t {
 struct vsf_evt_node_t {
     vsf_eda_t *eda;
 
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     vsf_evt_t evt;
     void *msg;
 #else
@@ -96,9 +96,9 @@ extern void vsf_evtq_on_eda_init(vsf_eda_t *eda);
 extern void vsf_evtq_on_eda_fini(vsf_eda_t *eda);
 
 extern vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis);
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
 extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *eda, vsf_evt_t evt, void *msg);
-#endif
+#   endif
 extern vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *eda, vsf_evt_t evt, bool force);
 extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);

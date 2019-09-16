@@ -66,8 +66,7 @@ void vsf_kernel_init(   vsf_pool_block(vsf_eda_frame_pool) *frame_buf_ptr,
 void vsf_kernel_init(void);
 #endif
 
-SECTION(".text.vsf.kernel.teda")
-extern vsf_err_t vsf_timer_init(void);
+extern vsf_err_t __vsf_kernel_start(void);
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
@@ -162,7 +161,7 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
     VSF_KERNEL_ASSERT((     pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
-    #if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+    #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
     if (vsf_prio_0 == priority) {
     #   ifndef WEAK_VSF_KERNEL_ERR_REPORT
         vsf_kernel_err_report(VSF_KERNEL_ERR_INVALID_USAGE);
@@ -325,9 +324,8 @@ void vsf_kernel_os_start(void)
     }
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
-    vsf_timer_init();
-#endif
+    __vsf_kernel_start();
+
 #ifndef WEAK_VSF_HAL_ADVANCE_INIT
     vsf_hal_advance_init();
 #else
@@ -350,7 +348,7 @@ void __vsf_main_entry(void)
     vsf_kernel_os_start();
 
     while (1) {
-    #if VSF_OS_CFG_MAIN_EVTQ_EN == ENABLED
+    #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
         vsf_kernel_os_run_priority(vsf_prio_0);
     #endif
     #ifndef WEAK_VSF_PLUG_IN_FOR_KERNEL_DIAGNOSIS
