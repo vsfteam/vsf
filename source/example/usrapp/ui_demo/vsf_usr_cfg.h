@@ -30,15 +30,11 @@
 #define APP_CFG_USBD_VID                A7A8
 #define APP_CFG_USBD_PID                2348
 
-#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
-
-#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
-
-#define SYSTEM_FREQ                     (192000000ul)
+#define VSF_SYSTIMER_FREQ               (192000000ul)
 
 #define VSF_HEAP_SIZE                   0x800
+#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -98,55 +94,57 @@
 
 //      <c1>Enable Timer-integrated tasks (vsf_teda_t)
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                    ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                ENABLED
 //      </c>
+#define VSF_KERNEL_CFG_CALLBACK_TIMER                   ENABLED
 
 //      <c1>Enable message queue support
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                    ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                ENABLED
 //      </c>
 
 //      <c1>Enable Bitmap Event support
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT                   ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT             ENABLED
 //      </c>
 
 //      <c1>Enable kernel tracing
 //      <i>Simon, please add description here...
-//#define VSF_KERNEL_CFG_TRACE                ENABLED
+//#define VSF_KERNEL_CFG_TRACE                            ENABLED
 //      </c>
 
 //      <h> Main Function
 //          <o>Main Stack Size              <128-65536:8>
 //          <i>When main function is configured as a thread, this option controls the size of the stack.
-#define VSF_OS_CFG_MAIN_STACK_SIZE              2048
+#define VSF_OS_CFG_MAIN_STACK_SIZE                      2048
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_IDLE
+#define VSF_OS_CFG_MAIN_MODE                            VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
 //      <h> Shell Configuration
 //          <c1>Enable default VSF simple shell
 //          <i>The default VSF simple shell provides an simple, easy and unified way to use kernel resources
-#define VSF_USE_KERNEL_SIMPLE_SHELL                ENABLED
+#define VSF_USE_KERNEL_SIMPLE_SHELL                     ENABLED
 //          </c>
 //      </h>
 
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
 //          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM            ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                  ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
-#define VSF_KERNEL_CFG_SUPPORT_THREAD          ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_THREAD                   ENABLED
 //          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack
-#define VSF_KERNEL_CFG_EDA_SUPPORT_PT              ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_PT                   ENABLED
 //          </c>
 //      </h>
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE         ENABLED
 //  </h>
 //! @}
 

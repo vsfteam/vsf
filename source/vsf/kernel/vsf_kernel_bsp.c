@@ -123,15 +123,17 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
     return &res;
 }
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 uint32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
-    return SYSTEM_FREQ;
+    return VSF_SYSTIMER_FREQ;
 }
 
 uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 {
     return VSF_SYSTIMER_RESOLUTION;
 }
+#endif
 
 void vsf_kernel_err_report(vsf_kernel_error_t err)
 {

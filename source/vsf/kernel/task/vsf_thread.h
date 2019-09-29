@@ -368,11 +368,19 @@ end_def_class(vsf_thread_t)
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-extern 
-vsf_err_t __vsf_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,
-                                        vsf_thread_prepare_cfg_t *cfg);
+SECTION("text.vsf.kernel.__vsf_eda_call_thread_prepare")
+extern vsf_err_t __vsf_eda_call_thread_prepare( vsf_thread_cb_t *thread_cb,
+                                                vsf_thread_prepare_cfg_t *cfg);
 
+SECTION("text.vsf.kernel.__vsf_eda_call_thread")
 extern vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb);
+
+SECTION("text.vsf.kernel.__vsf_thread_call_fsm")
+extern 
+fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param);
+
+SECTION("text.vsf.kernel.__vsf_thread_call_sub")
+extern void __vsf_thread_call_sub(uintptr_t eda_handler, uintptr_t param);
 
 #endif
 

@@ -34,11 +34,6 @@
 #define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      0
 #define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     1
 #define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       2              
-
-//! \note implement systimer with normal timer by default, e.g. SysTick in Cortex-M
-#ifndef VSF_SYSTIMER_CFG_IMPL_MODE         
-#   define VSF_SYSTIMER_CFG_IMPL_MODE  VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-#endif
 //!@}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -59,10 +54,11 @@
 extern bool vsf_arch_low_level_init(void);
 
 
+#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with Normal Timer (Count down or Count up)        *
  *----------------------------------------------------------------------------*/
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
 
 /*-------------------------------------------*
  * APIs to be implemented by target arch     *
@@ -95,12 +91,12 @@ extern vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void);
  *!        interrupt handler
  */
 extern void vsf_systimer_ovf_evt_hanlder(void);
-#endif
+#   endif
 
 /*----------------------------------------------------------------------------*
  * System Timer : Implement with request / response model                     *
  *----------------------------------------------------------------------------*/
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
 /*-------------------------------------------*
  * APIs to be implemented by target arch     *
@@ -128,7 +124,8 @@ extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
 extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick);
 extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
-#endif
+#   endif
+#endif      // VSF_SYSTIMER_CFG_IMPL_MODE
 
 #endif
 /* EOF */

@@ -48,6 +48,22 @@ static void input_demo_trace_gamepad(vsf_gamepad_evt_t *gamepad_evt)
     }
 }
 
+static void input_demo_trace_touchscreen(vsf_touchscreen_evt_t* ts_evt)
+{
+    vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
+        VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt),
+        VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) ? "down" : "up",
+        VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
+        VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt));
+}
+
+static void input_demo_trace_keyboard(vsf_keyboard_evt_t* kb_evt)
+{
+    vsf_trace(VSF_TRACE_DEBUG, "keyboard: %d %s" VSF_TRACE_CFG_LINEEND,
+        VSF_INPUT_KEYBOARD_GET_KEYCODE(kb_evt),
+        VSF_INPUT_KEYBOARD_IS_DOWN(kb_evt) ? "down" : "up");
+}
+
 static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
 {
     int16_t gyro_pitch = 0, gyro_yaw = 0, gyro_roll = 0, acc_x = 0, acc_y = 0, acc_z = 0;
@@ -118,11 +134,17 @@ void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
     case VSF_INPUT_TYPE_SENSOR:
         input_demo_trace_sensor((vsf_sensor_evt_t *)event);
         break;
+    case VSF_INPUT_TYPE_TOUCHSCREEN:
+        input_demo_trace_touchscreen((vsf_touchscreen_evt_t*)event);
+        break;
 #if VSF_USE_INPUT_DS4 == ENABLED
     case VSF_INPUT_TYPE_DS4:
         input_demo_trace_gamepad((vsf_gamepad_evt_t *)event);
         break;
 #endif
+    case VSF_INPUT_TYPE_KEYBOARD:
+        input_demo_trace_keyboard((vsf_keyboard_evt_t*)event);
+        break;
     default:
         break;
     }

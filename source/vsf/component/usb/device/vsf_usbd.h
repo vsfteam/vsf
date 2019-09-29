@@ -153,6 +153,14 @@
         vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_enable_OUT)             \
             (&VSF_USBD_CFG_DRV_OBJ, (__ep))
 
+#   define vsf_usbd_drv_ep_send_dma(__ep, __buf, __size, __zlp)                 \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_send_dma)               \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep), (__buf), (__size), (__zlp))
+
+#   define vsf_usbd_drv_ep_recv_dma(__ep, __buf, __size)                        \
+        vsf_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_recv_dma)               \
+            (&VSF_USBD_CFG_DRV_OBJ, (__ep), (__buf), (__size))
+
 #elif defined(VSF_USBD_CFG_DRV_LV1)
 #   undef VSF_USBD_CFG_DRV_INTERFACE
 // lv1 API used as usbd driver
@@ -179,6 +187,8 @@
 #   define vsf_usbd_drv_ep_get_data_size(__ep)
 #   define vsf_usbd_drv_ep_set_data_size(__ep, __size)
 #   define vsf_usbd_drv_ep_enable_out(__ep)
+#   define vsf_usbd_drv_ep_send_dma(__ep, __buf, __size, __zlp)
+#   define vsf_usbd_drv_ep_recv_dma(__ep, __buf, __size)
 
 #else
 #   define VSF_USBD_CFG_DRV_INTERFACE
@@ -208,6 +218,8 @@
 #   define vsf_usbd_drv_ep_get_data_size(__ep)          __drv->Ep.GetDataSize((__ep))
 #   define vsf_usbd_drv_ep_set_data_size(__ep, __size)  __drv->Ep.SetDataSize((__ep), (__size))
 #   define vsf_usbd_drv_ep_enable_out(__ep)             __drv->Ep.EnableOUT((__ep))
+#   define vsf_usbd_drv_ep_send_dma(__ep, __buf, __size, __zlp) __drv->Ep.SendDMA((__ep), (__buf), (__size), (__zlp))
+#   define vsf_usbd_drv_ep_recv_dma(__ep, __buf, __size)        __drv->Ep.RecvDMA((__ep), (__buf), (__size))
 
 #endif
 

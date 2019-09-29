@@ -32,9 +32,7 @@
 
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 
-#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
-
-#define SYSTEM_FREQ                     (192000000ul)
+#define VSF_SYSTIMER_FREQ               (192000000ul)
 
 #if defined(__WIN__)
 //! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
@@ -42,9 +40,6 @@
 #endif
 
 #define VSF_HEAP_SIZE                   0x800
-
-#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
-//#define VSF_USR_SWI_NUM                 3
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -106,6 +101,7 @@
 //      <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER            ENABLED
 //      </c>
+#define VSF_KERNEL_CFG_CALLBACK_TIMER               ENABLED
 
 //      <c1>Enable message queue support
 //      <i>Simon, please add description here...
@@ -153,6 +149,7 @@
 #define VSF_KERNEL_CFG_EDA_SUPPORT_PT               ENABLED
 //          </c>
 //      </h>
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE     ENABLED
 //  </h>
 //! @}
 

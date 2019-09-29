@@ -99,9 +99,6 @@
     <ClCompile Include="..\..\usrapp\kernel_test\sem_test.c">
       <Filter>usrapp\kernel_test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
-      <Filter>vsf\utilities\compiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
       <Filter>vsf\utilities\compiler</Filter>
     </ClCompile>
@@ -409,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h">
       <Filter>vsf\kernel\shell\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
+      <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,14 +30,10 @@
 #define APP_CFG_USBD_VID                A7A8
 #define APP_CFG_USBD_PID                2347
 
-#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
-#define VSF_HEAP_CFG_TRACE_CNT          1024
-
 #define VSF_HEAP_SIZE                   0x4000
+#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 
-#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
-
-#define SYSTEM_FREQ                     (192000000ul)
+#define VSF_SYSTIMER_FREQ               (192000000ul)
 
 #if defined(__WIN__)
 //! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
@@ -80,44 +76,45 @@
 //  <h> Kernel Feature Configuration
 //      <c1>Enable Inter-task synchronisation (vsf_sync_t)
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_SYNC                     ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_SYNC                 ENABLED
 //      </c>
 
 //      <h> Schedule Policy 
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_PREMPT               ENABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY         ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY     ENABLED
 //          </c>
 //      </h>
 
 //      <c1>Enable eda to call other edas
 //      <i>If this feature is enabled, eda is capable to call other eda based tasks, i.e. pure-eda, vsf_task, vsf_pt, simple_fsm and etc.
-#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL         ENABLED
 //      </c>
 
 //      <c1>Enable Timer-integrated tasks (vsf_teda_t)
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                    ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER            ENABLED
 //      </c>
+#define VSF_KERNEL_CFG_CALLBACK_TIMER               ENABLED
 
 //      <c1>Enable message queue support
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                    ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE            ENABLED
 //      </c>
 
 //      <c1>Enable Bitmap Event support
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT                   ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT         ENABLED
 //      </c>
 
 //      <c1>Enable kernel tracing
 //      <i>Simon, please add description here...
-//#define VSF_KERNEL_CFG_TRACE                ENABLED
+//#define VSF_KERNEL_CFG_TRACE                    ENABLED
 //      </c>
 
 //      <h> Main Function
@@ -133,24 +130,25 @@
 //      <h> Shell Configuration
 //          <c1>Enable default VSF simple shell
 //          <i>The default VSF simple shell provides an simple, easy and unified way to use kernel resources
-#define VSF_USE_KERNEL_SIMPLE_SHELL                ENABLED
+#define VSF_USE_KERNEL_SIMPLE_SHELL             ENABLED
 //          </c>
 //      </h>
 
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
 //          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM      ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM          ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks
-#define VSF_KERNEL_CFG_SUPPORT_THREAD       ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_THREAD           ENABLED
 //          </c>
 //          <c1>Enable the protoThread support
 //          <i>Enable this feature will provide protoThread style of task support,i.e. tasks will share the same system stack
-#define VSF_KERNEL_CFG_EDA_SUPPORT_PT       ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_PT           ENABLED
 //          </c>
 //      </h>
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE ENABLED
 //  </h>
 //! @}
 

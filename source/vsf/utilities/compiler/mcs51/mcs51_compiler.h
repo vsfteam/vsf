@@ -46,10 +46,6 @@
 #endif
 //! @}
 
-#undef __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
-#if defined(__GNUC__)
-#   define  __IS_COMPILER_SUPPORT_GNUC_EXTENSION__      1
-#endif
 
 #if __IS_COMPILER_IAR__
 #   include <intrinsics.h>
@@ -57,7 +53,7 @@
 
 
 #include "./type.h"
-
+#include "../__common/__compiler.h"
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_51_KEIL__
   //#pragma push
@@ -70,89 +66,13 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef DEF_REG
-#define DEF_REG                     \
-        union  {                    \
-            struct {
-#endif
-    
-#ifndef END_DEF_REG
-#define END_DEF_REG(__NAME)         \
-            };                      \
-            reg32_t Value;          \
-        }__NAME;
-#endif
-
-#ifndef __REG_MACRO__
-#define __REG_MACRO__
-#endif
-
-
-#ifndef REG_RSVD_0x10
-#define REG_RSVD_0x10                   \
-    reg32_t                     : 32;   \
-    reg32_t                     : 32;   \
-    reg32_t                     : 32;   \
-    reg32_t                     : 32;   
-#endif
-#ifndef REG_RSVD_0x80       
-#define REG_RSVD_0x80                   \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10
-#endif
-
-#ifndef REG_RSVD_0x100                 
-#define REG_RSVD_0x100                  \
-            REG_RSVD_0x80               \
-            REG_RSVD_0x80
-#endif
-
-#ifndef REG_RSVD_0x800
-#define REG_RSVD_0x800                  \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100
-#endif
-
-
-//! \brief The mcu memory align mode
-# define MCU_MEM_ALIGN_SIZE             sizeof(int)
-
-#ifndef __volatile__
-#define __volatile__                    volatile
-#endif
 
 //! \brief 1 cycle nop operation
 #ifndef NOP
     #define NOP()                       __asm__ __volatile__ ("nop");
 #endif
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   ifndef __STR
-#       define __STR(__STRING)      #__STRING  
-#   endif
-#   ifndef STR
-#       define STR(__STRING)        __STR(__STRING)
-#   endif
-#else
-#   ifndef __STR
-#       define __STR(...)           #__VA_ARGS__  
-#   endif
-#   ifndef STR
-#       define STR(...)             __STR(__VA_ARGS__)
-#   endif
-#endif
+
 
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
@@ -204,7 +124,7 @@
 #   define TRANSPARENT_UNION    
 #   define __ALIGN_OF(__ANYTHING)      
 
-#define __ISR(__VEC)                                                            \
+#   define __ISR(__VEC)                                                         \
         void vect_##__VEC##_handler(void) interrupt __VEC
 
 //! TODO: Need further investigation about the negative effect
@@ -213,11 +133,6 @@
 #   define __IAR_STARTUP_DATA_INIT  __INIT_XDATA_I
 #endif
 
-#define WEAK_ALIAS(__ORIGIN, __ALIAS)                                           \
-                            __WEAK_ALIAS(__ORIGIN, __ALIAS)
-#define AT_ADDR(__ADDR)     __AT_ADDR(__ADDR)
-#define ALIGN(__N)          __ALIGN(__N)
-#define SECTION(__SEC)      __SECTION(__SEC)
         
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #define ALIGN_OF(__TYPE)       __ALIGN_OF(__TYPE)

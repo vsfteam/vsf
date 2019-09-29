@@ -45,52 +45,56 @@ void __NO_RETURN Reset_Handler  (void);
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler
  *----------------------------------------------------------------------------*/
+#define WEAK_ISR(__NAME, ...)                                                   \
+    WEAK(__NAME)                                                                \
+    void __NAME(void) { __VA_ARGS__ }
+
 /* Exceptions */
-void NMI_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
-void HardFault_Handler      (void) __attribute__ ((weak, alias("Default_Handler")));
-void MemManage_Handler      (void) __attribute__ ((weak, alias("Default_Handler")));
-void BusFault_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
-void UsageFault_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void SVC_Handler            (void) __attribute__ ((weak, alias("Default_Handler")));
-void DebugMon_Handler       (void) __attribute__ ((weak, alias("Default_Handler")));
-void PendSV_Handler         (void) __attribute__ ((weak, alias("Default_Handler")));
-void SysTick_Handler        (void) __attribute__ ((weak, alias("Default_Handler")));
+WEAK_ISR( NMI_Handler            )
+WEAK_ISR( HardFault_Handler      , while(1);)
+WEAK_ISR( MemManage_Handler      , while(1);)
+WEAK_ISR( BusFault_Handler       , while(1);)
+WEAK_ISR( UsageFault_Handler     , while(1);)
+WEAK_ISR( SVC_Handler            )
+WEAK_ISR( DebugMon_Handler       , while(1);)
+WEAK_ISR( PendSV_Handler         )
+WEAK_ISR( SysTick_Handler        )
 
-void Interrupt0_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt1_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt2_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt3_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt4_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt5_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt6_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt7_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt8_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
-void Interrupt9_Handler     (void) __attribute__ ((weak, alias("Default_Handler")));
+WEAK_ISR( Interrupt0_Handler     )
+WEAK_ISR( Interrupt1_Handler     )
+WEAK_ISR( Interrupt2_Handler     )
+WEAK_ISR( Interrupt3_Handler     )
+WEAK_ISR( Interrupt4_Handler     )
+WEAK_ISR( Interrupt5_Handler     )
+WEAK_ISR( Interrupt6_Handler     )
+WEAK_ISR( Interrupt7_Handler     )
+WEAK_ISR( Interrupt8_Handler     )
+WEAK_ISR( Interrupt9_Handler     )
 
-void UART0RX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //   0 UART 0 receive interrupt
-void UART0TX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //   1 UART 0 transmit interrupt
-void UART1RX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //   2 UART 1 receive interrupt
-void UART1TX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //   3 UART 1 transmit interrupt
-void UART2RX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //   4 UART 2 receive interrupt
-void UART2TX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //   5 UART 2 transmit interrupt
-void GPIO0ALL_Handler       (void) __attribute__ ((weak, alias("Default_Handler"))); //   6 GPIO 0 combined interrupt
-void GPIO1ALL_Handler       (void) __attribute__ ((weak, alias("Default_Handler"))); //   7 GPIO 1 combined interrupt
-void TIMER0_Handler         (void) __attribute__ ((weak, alias("Default_Handler"))); //   8 Timer 0 interrupt
-void TIMER1_Handler         (void) __attribute__ ((weak, alias("Default_Handler"))); //   9 Timer 1 interrupt
-void DUALTIMER_Handler      (void) __attribute__ ((weak, alias("Default_Handler"))); //  10 Dual Timer interrupt
-void SPI_0_1_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  11 SPI #0, #1 interrupt
-void UART_0_1_2_OVF_Handler (void) __attribute__ ((weak, alias("Default_Handler"))); //  12 UART overflow (0, 1 & 2) interrupt
-void ETHERNET_Handler       (void) __attribute__ ((weak, alias("Default_Handler"))); //  13 Ethernet interrupt
-void I2S_Handler            (void) __attribute__ ((weak, alias("Default_Handler"))); //  14 Audio I2S interrupt
-void TOUCHSCREEN_Handler    (void) __attribute__ ((weak, alias("Default_Handler"))); //  15 Touch Screen interrupt
-void GPIO2_Handler          (void) __attribute__ ((weak, alias("Default_Handler"))); //  16 GPIO 2 combined interrupt
-void GPIO3_Handler          (void) __attribute__ ((weak, alias("Default_Handler"))); //  17 GPIO 3 combined interrupt
-void UART3RX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  18 UART 3 receive interrupt
-void UART3TX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  19 UART 3 transmit interrupt
-void UART4RX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  20 UART 4 receive interrupt
-void UART4TX_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  21 UART 4 transmit interrupt
-void SPI_2_Handler          (void) __attribute__ ((weak, alias("Default_Handler"))); //  22 SPI #2 interrupt
-void SPI_3_4_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  23 SPI #3, SPI #4 interrupt
+WEAK_ISR( UART0RX_Handler        ) //   0 UART 0 receive interrupt
+WEAK_ISR( UART0TX_Handler        ) //   1 UART 0 transmit interrupt
+WEAK_ISR( UART1RX_Handler        ) //   2 UART 1 receive interrupt
+WEAK_ISR( UART1TX_Handler        ) //   3 UART 1 transmit interrupt
+WEAK_ISR( UART2RX_Handler        ) //   4 UART 2 receive interrupt
+WEAK_ISR( UART2TX_Handler        ) //   5 UART 2 transmit interrupt
+WEAK_ISR( GPIO0ALL_Handler       ) //   6 GPIO 0 combined interrupt
+WEAK_ISR( GPIO1ALL_Handler       ) //   7 GPIO 1 combined interrupt
+WEAK_ISR( TIMER0_Handler         ) //   8 Timer 0 interrupt
+WEAK_ISR( TIMER1_Handler         ) //   9 Timer 1 interrupt
+WEAK_ISR( DUALTIMER_Handler      ) //  10 Dual Timer interrupt
+WEAK_ISR( SPI_0_1_Handler        ) //  11 SPI #0, #1 interrupt
+WEAK_ISR( UART_0_1_2_OVF_Handler ) //  12 UART overflow (0, 1 & 2) interrupt
+WEAK_ISR( ETHERNET_Handler       ) //  13 Ethernet interrupt
+WEAK_ISR( I2S_Handler            ) //  14 Audio I2S interrupt
+WEAK_ISR( TOUCHSCREEN_Handler    ) //  15 Touch Screen interrupt
+WEAK_ISR( GPIO2_Handler          ) //  16 GPIO 2 combined interrupt
+WEAK_ISR( GPIO3_Handler          ) //  17 GPIO 3 combined interrupt
+WEAK_ISR( UART3RX_Handler        ) //  18 UART 3 receive interrupt
+WEAK_ISR( UART3TX_Handler        ) //  19 UART 3 transmit interrupt
+WEAK_ISR( UART4RX_Handler        ) //  20 UART 4 receive interrupt
+WEAK_ISR( UART4TX_Handler        ) //  21 UART 4 transmit interrupt
+WEAK_ISR( SPI_2_Handler          ) //  22 SPI #2 interrupt
+WEAK_ISR( SPI_3_4_Handler        ) //  23 SPI #3, SPI #4 interrupt
 /*
 void GPIO0_0_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  24 GPIO 0 individual interrupt ( 0)
 void GPIO0_1_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  25 GPIO 0 individual interrupt ( 1)
@@ -102,8 +106,8 @@ void GPIO0_6_Handler        (void) __attribute__ ((weak, alias("Default_Handler"
 void GPIO0_7_Handler        (void) __attribute__ ((weak, alias("Default_Handler"))); //  31 GPIO 0 individual interrupt ( 7)
 */
 
-#define __DECLARE_SWI_IRQ_HANDLER(__N, __NULL)  \
-    extern void SWI##__N##_IRQHandler (void) __attribute__ ((weak, alias("Default_Handler")));
+#define __DECLARE_SWI_IRQ_HANDLER(__N, __NULL)                                  \
+    WEAK_ISR(SWI##__N##_IRQHandler)                                             
 
 MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 

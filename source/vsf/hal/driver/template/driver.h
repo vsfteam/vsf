@@ -24,21 +24,22 @@
 #undef VSF_DRIVER_HEADER
 
 #if     defined(__DEVICE_NAME_A__)
-#   define  VSF_DRIVER_HEADER       "./__series_name__/__device_name_1__/driver.h"
+#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_1__/driver.h"
 /* example
 #elif   defined(__DEVICE_NAME_B__)  
-#       define  VSF_DRIVER_HEADER   "./__series_name__/__device_name_2__/driver.h"
+#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_2__/driver.h"
 #elif   defined(__DEVICE_NAME_C__)  
-#   define  VSF_DRIVER_HEADER       "./__series_name__/__device_name_3__/driver.h"
+#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_3__/driver.h"
 #elif   defined(__DEVICE_NAME_X__)
-#   define  VSF_DRIVER_HEADER       "./__series_name__/__device_name_n__/driver.h"
+#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_n__/driver.h"
 */
 #else
-#   error No supported device found.
+#   warning No supported device found, use template
+#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_template__/__device_template__/driver.h"
 #endif
 
 /* include specified device driver header file */
-#include VSF_DRIVER_HEADER
+#include VSF_TEMPLATE_DRIVER_HEADER
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

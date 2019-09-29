@@ -28,7 +28,7 @@
 struct __vsf_cm_t {
     struct {
         vsf_swi_handler_t *handler;
-        void *pparam;
+        void *param;
 #if __ARM_ARCH == 6
         bool enabled;
         bool sw_pending_bit;
@@ -121,7 +121,7 @@ ROOT ISR(SysTick_Handler)
 
 /*! \brief initialise systimer without enable it 
  */
-vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
+vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 {
     vsf_systick_cfg (
         DISABLE_SYSTICK             |
@@ -141,7 +141,7 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
 ROOT ISR(PendSV_Handler)
 {
     if (__vsf_cm.pendsv.handler != NULL) {
-        __vsf_cm.pendsv.handler(__vsf_cm.pendsv.pparam);
+        __vsf_cm.pendsv.handler(__vsf_cm.pendsv.param);
     }
 }
 
@@ -152,11 +152,11 @@ ROOT ISR(PendSV_Handler)
 vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, 
                             vsf_arch_prio_t priority,
                             vsf_swi_handler_t *handler, 
-                            void *pparam)
+                            void *param)
 {
     if (0 == idx) {
         __vsf_cm.pendsv.handler = handler;
-        __vsf_cm.pendsv.pparam = pparam;
+        __vsf_cm.pendsv.param = param;
 #if __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
         __vsf_cm.pendsv.enabled = true;
         __vsf_cm.pendsv.sw_pending_bit = 0;
@@ -238,6 +238,10 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 #endif
 }
 
+/*----------------------------------------------------------------------------*
+ * interrupt                                                                  *
+ *----------------------------------------------------------------------------*/
+
 vsf_gint_state_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
@@ -268,6 +272,10 @@ void vsf_arch_sleep(uint32_t mode)
     ENABLE_GLOBAL_INTERRUPT();
     __WFI();
 }
+
+/*----------------------------------------------------------------------------*
+ * arch enhancement                                                           *
+ *----------------------------------------------------------------------------*/
 
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {

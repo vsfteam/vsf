@@ -197,7 +197,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     thread->ret = &ret;
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
-            vsf_arch_set_stack((uint_fast32_t)(&thread->stack[(thread->stack_size>>3)]));
+            vsf_arch_set_stack((uintptr_t)(&thread->stack[(thread->stack_size>>3)]));
             __vsf_thread_entry();
         } else {
             longjmp(*thread->pos, evt);
@@ -262,20 +262,13 @@ vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
     VSF_KERNEL_ASSERT(NULL != thread_cb);
     vsf_err_t ret;
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
-    &&  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
-    __vsf_sched_safe(
-        ret =  vsf_eda_call_param_eda(__vsf_thread_evthandler, thread_cb);
-        //__vsf_eda_set_is_stack_owner();
-        do {
-            vsf_eda_t *eda = vsf_eda_get_cur();
-        #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-            if (eda->state.bits.is_use_frame) {
-                eda->fn.frame->state.bits.is_stack_owner = true;
-            }
-        #endif
-            eda->state.bits.is_stack_owner = true;
-        } while(0);
-    )
+    &&  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED 
+        __vsf_eda_frame_state_t state = { .bits = {.is_fsm = false,
+                                          .is_stack_owner = true,}
+                                        };
+        ret = __vsf_eda_call_eda_ex(   (uintptr_t)__vsf_thread_evthandler, 
+                                        (uintptr_t)thread_cb, 
+                                        state);
 #else
     ret =  vsf_eda_call_param_eda(__vsf_thread_evthandler, thread_cb);
 #endif
@@ -283,7 +276,42 @@ vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
     return ret;
 }
 
+SECTION("text.vsf.kernel.__vsf_thread_call_sub")
+void __vsf_thread_call_sub(uintptr_t eda_handler, uintptr_t param)
+{
+    vsf_err_t err;
+    vsf_evt_t evt;
 
+    while (1) {
+        __vsf_eda_frame_state_t state = { .bits.is_fsm = false,};
+        err = __vsf_eda_call_eda_ex(eda_handler, param, state);
+        if (VSF_ERR_NONE != err) {
+            vsf_eda_yield();
+        }
+        evt = vsf_thread_wait();
+        if (evt == VSF_EVT_RETURN) {
+            break;
+        }
+    }
+}
+
+SECTION("text.vsf.kernel.__vsf_thread_call_fsm")
+fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
+{
+    fsm_rt_t ret;
+
+    while (1) {
+        ret = vsf_eda_call_fsm(eda_handler, param);
+        if (fsm_rt_on_going == ret) {
+            vsf_eda_yield();
+        } else {
+            break;
+        }
+        vsf_thread_wait();
+    }
+    
+    return ret;
+}
 #else
 vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
 {

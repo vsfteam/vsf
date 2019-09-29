@@ -21,6 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "../vsf_input_cfg.h"
 
+#include "../vsf_input_get_type.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -30,6 +32,10 @@
                 (__bitoffset), (__bitlen), (__is_signed))
 
 /*============================ TYPES =========================================*/
+
+enum {
+    VSF_INPUT_TYPE_GAMEPAD = VSF_INPUT_USER_TYPE,
+};
 
 //                         VIRTUAL_GAMEPAD
 //          LT                                      RT

@@ -177,7 +177,7 @@ static const usbd_uvc_const_t usbd_uvc_const = {
             0x01,                   // bDescriptorSubtype: VC_HEADER
             USB_DESC_WORD(0x0150),  // bcdUVC: 1.5
             USB_DESC_WORD(39),      // wTotalLength
-            USB_DESC_DWORD(SYSTEM_FREQ),
+            USB_DESC_DWORD(100 * 1000 * 1000),
                                     // dwClockFrequency: deprecated, MUST not be 0
             0x01,                   // bInCollection: Number of streaming interfaces
             0x01,                   // baInterfaceNr[1]:

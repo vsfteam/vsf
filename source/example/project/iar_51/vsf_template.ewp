@@ -339,7 +339,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe301,Pe606,Pe381</state>
+                    <state>Pe550,Pe301,Pe606,Pe381,Pe047,Pa082,Pe177</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -371,7 +371,7 @@
                 </option>
                 <option>
                     <name>CCMultibyteSupport</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCMigrationPreprocExtentions</name>
@@ -2515,14 +2515,23 @@
             </group>
             <group>
                 <name>compiler</name>
+                <group>
+                    <name>__common</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\__common\__compiler.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\__common\__signal.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\__common\__type.h</name>
+                    </file>
+                </group>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\mcs51_compiler.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\retarget_io.c</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\signal.c</name>

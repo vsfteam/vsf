@@ -327,7 +327,7 @@
             <uC99>1</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
+            <v6Lang>6</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -fms-extensions  -Wno-enum-conversion -Wno-empty-body -fomit-frame-pointer -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
-              <Define>_MSC_VER __ARM__ __MPS2__ __OOC_DEBUG__</Define>
+              <Define>_MSC_VER __ARM__ __MPS2__</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
             </VariousControls>

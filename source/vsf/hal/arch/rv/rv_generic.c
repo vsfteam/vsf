@@ -170,7 +170,6 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
 
         eclic_set_irq_lvl(PENDSV_IRQ, priority << (8 - VSF_ARCH_PRI_BIT));
         eclic_enable_interrupt(PENDSV_IRQ);
-        //NVIC_SetPriority(PendSV_IRQn, priority);
         return VSF_ERR_NONE;
     }
     VSF_HAL_ASSERT(false);

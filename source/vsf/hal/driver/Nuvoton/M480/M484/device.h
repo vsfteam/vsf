@@ -24,12 +24,13 @@
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+//#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+//#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+//#endif
 //! arch info
 #   define VSF_ARCH_PRI_NUM         16
 #   define VSF_ARCH_PRI_BIT         4
-#endif
+
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             9
@@ -324,6 +325,10 @@ enum pm_periph_async_clk_no_t{
     __def_periph_clk(   PCLK_BPWM1,     BPWM1_CLKSEL,   0,              BPWM1_CLKSEL_MAP_IDX),
 };
 //! @}
+
+enum pm_main_clk_no_t {
+    MCLK_CORE_idx = 0,
+};
 
 //! \name Peripheral AHB Clock Macros
 //! @{

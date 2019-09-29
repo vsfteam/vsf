@@ -43,11 +43,13 @@ void vsf_stdio_init(void)
 }
 #endif
 
+ROOT
 void vsf_stdout_init(void)
 {
     uart_config();
 }
 
+ROOT
 void vsf_stdin_init(void)
 {
 
@@ -66,6 +68,7 @@ char vsf_stdin_getchar(void)
 #endif
 }
 
+ROOT
 int vsf_stdout_putchar(char txchar)
 {
     if (txchar == 10) vsf_stdout_putchar((char) 13);

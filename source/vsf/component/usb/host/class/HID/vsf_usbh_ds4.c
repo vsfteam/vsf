@@ -204,14 +204,7 @@ static void * vsf_usbh_ds4_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 
 static void vsf_usbh_ds4_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param)
 {
-#ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
-    vsf_usbh_ds4_on_report_input(param, NULL);
-#else
-    WEAK_VSF_USBH_DS4_ON_REPORT_INPUT(param, NULL);
-#endif
-
     vsf_usbh_hid_disconnect((vsf_usbh_hid_eda_t *)param);
-    VSF_USBH_FREE(param);
 }
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_DS4

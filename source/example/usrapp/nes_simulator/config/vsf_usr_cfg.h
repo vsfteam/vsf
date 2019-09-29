@@ -30,15 +30,10 @@
 #define APP_CFG_USBD_VID                A7A8
 #define APP_CFG_USBD_PID                2348
 
-#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
-
-#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
-
-#define SYSTEM_FREQ                     (192000000ul)
+#define VSF_SYSTIMER_FREQ               (192000000ul)
 
 #define VSF_HEAP_SIZE                   (16*1024)
-
-#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE    ENABLED
+#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -100,6 +95,7 @@
 //      <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                ENABLED
 //      </c>
+#define VSF_KERNEL_CFG_CALLBACK_TIMER                   ENABLED
 
 //      <c1>Enable message queue support
 //      <i>Simon, please add description here...
@@ -147,6 +143,7 @@
 #define VSF_KERNEL_CFG_EDA_SUPPORT_PT                   ENABLED
 //          </c>
 //      </h>
+#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE         ENABLED
 //  </h>
 //! @}
 

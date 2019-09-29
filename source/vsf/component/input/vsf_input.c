@@ -140,6 +140,42 @@ void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt)
 }
 #endif
 
+#ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
+WEAK(vsf_input_on_touchscreen)
+void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
+{
+#ifndef WEAK_VSF_INPUT_ON_EVT
+    vsf_input_on_evt(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vsf_input_evt_t);
+#else
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vsf_input_evt_t);
+#endif
+}
+#endif
+
+#ifndef WEAK_VSF_INPUT_ON_GAMEPAD
+WEAK(vsf_input_on_gamepad)
+void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt)
+{
+#ifndef WEAK_VSF_INPUT_ON_EVT
+    vsf_input_on_evt(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vsf_input_evt_t);
+#else
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vsf_input_evt_t);
+#endif
+}
+#endif
+
+#ifndef WEAK_VSF_INPUT_ON_KEYBOARD
+WEAK(vsf_input_on_keyboard)
+void vsf_input_on_keyboard(vsf_keyboard_evt_t *keyboard_evt)
+{
+#ifndef WEAK_VSF_INPUT_ON_EVT
+    vsf_input_on_evt(VSF_INPUT_TYPE_KEYBOARD, &keyboard_evt->use_as__vsf_input_evt_t);
+#else
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_KEYBOARD, &keyboard_evt->use_as__vsf_input_evt_t);
+#endif
+}
+#endif
+
 #ifndef WEAK_VSF_INPUT_ON_NEW_DEV
 WEAK(vsf_input_on_new_dev)
 void vsf_input_on_new_dev(vsf_input_type_t type, void *dev)

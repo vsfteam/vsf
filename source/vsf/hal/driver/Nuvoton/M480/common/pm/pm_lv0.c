@@ -225,7 +225,7 @@ fsm_rt_t vsf_pm_mclk_init(pm_main_clk_cfg_t *cfg)
     return fsm_rt_cpl;
 }
 
-uint_fast32_t vsf_pm_mclk_get(void)
+uint_fast32_t vsf_pm_mclk_get(pm_main_clk_no_t sel)
 {
     return 0;
 }

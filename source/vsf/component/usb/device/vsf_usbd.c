@@ -54,6 +54,15 @@ vsf_usbd_desc_t * vsf_usbd_get_descriptor(vsf_usbd_desc_t *desc,
     return 0;
 }
 
+static vsf_usbd_ifs_t * vsf_usbd_get_ifs_byep(vsf_usbd_cfg_t *config, uint_fast8_t ep)
+{
+    int_fast8_t ifs;
+
+    ep = (ep & 0x0F) | ((ep & 0x80) >> 3);
+    ifs = config->ep_ifs_map[ep];
+    return ifs >= 0 ? &config->ifs[ifs] : NULL;
+}
+
 static vsf_usbd_trans_t * vsf_usbd_get_trans(vsf_usbd_dev_t *dev, uint_fast8_t ep)
 {
     vsf_usbd_trans_t *trans;
@@ -91,7 +100,7 @@ vsf_err_t vsf_usbd_ep_recv(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans)
     if (vsf_usbd_drv_ep_is_dma(trans->ep)) {
         uint_fast32_t size = trans->use_as__vsf_mem_t.nSize;
         trans->use_as__vsf_mem_t.nSize = 0;
-        err = vsf_usbd_drv_ep_read_buffer(trans->ep, trans->use_as__vsf_mem_t.pchBuffer, size);
+        err = vsf_usbd_drv_ep_recv_dma(trans->ep, trans->use_as__vsf_mem_t.pchBuffer, size);
     } else {
         trans->cur = trans->use_as__vsf_mem_t.pchBuffer;
         err = vsf_usbd_drv_ep_enable_out(trans->ep);
@@ -132,7 +141,7 @@ vsf_err_t vsf_usbd_ep_send(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans)
     if (vsf_usbd_drv_ep_is_dma(trans->ep)) {
         uint_fast32_t size = trans->use_as__vsf_mem_t.nSize;
         trans->use_as__vsf_mem_t.nSize = 0;
-        err = vsf_usbd_drv_ep_write_buffer(trans->ep, trans->use_as__vsf_mem_t.pchBuffer, size);
+        err = vsf_usbd_drv_ep_send_dma(trans->ep, trans->use_as__vsf_mem_t.pchBuffer, size, trans->zlp);
     } else {
         trans->cur = trans->use_as__vsf_mem_t.pchBuffer;
         err = vsf_usbd_ep_send_imp(dev, trans);
@@ -370,6 +379,9 @@ static vsf_err_t vsf_usbd_stdctrl_prepare(vsf_usbd_dev_t *dev)
         }
     } else if (USB_RECIP_ENDPOINT == recip) {
         uint_fast8_t ep = request->wIndex & 0xFF;
+        vsf_usbd_ifs_t *ifs = vsf_usbd_get_ifs_byep(config, ep);
+        VSF_USB_ASSERT(ifs != NULL);
+        const vsf_usbd_class_op_t *class_op = ifs->class_op;
 
         if ((request->bRequestType & USB_DIR_MASK) == USB_DIR_IN) {
             return VSF_ERR_FAIL;
@@ -393,8 +405,8 @@ static vsf_err_t vsf_usbd_stdctrl_prepare(vsf_usbd_dev_t *dev)
                 return VSF_ERR_FAIL;
             }
             vsf_usbd_drv_ep_clear_stall(ep);
-            if ((ep & USB_DIR_MASK) == USB_DIR_OUT) {
-                vsf_usbd_drv_ep_enable_out(ep);
+            if (class_op->request_prepare != NULL) {
+                class_op->request_prepare(dev, ifs);
             }
             break;
         case USB_REQ_SET_FEATURE:
@@ -485,15 +497,6 @@ static vsf_err_t vsf_usbd_stdctrl_process(vsf_usbd_dev_t *dev)
         }
     }
     return VSF_ERR_NONE;
-}
-
-static vsf_usbd_ifs_t * vsf_usbd_get_ifs_byep(vsf_usbd_cfg_t *config, uint_fast8_t ep)
-{
-    int_fast8_t ifs;
-
-    ep = (ep & 0x0F) | ((ep & 0x80) >> 3);
-    ifs = config->ep_ifs_map[ep];
-    return ifs >= 0 ? &config->ifs[ifs] : NULL;
 }
 
 static vsf_err_t vsf_usbd_ctrl_prepare(vsf_usbd_dev_t *dev)
@@ -748,15 +751,20 @@ static void vsf_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
 
                 // ignore the over-run data
                 pkg_size = min(pkg_size, trans->use_as__vsf_mem_t.nSize);
-                vsf_usbd_drv_ep_read_buffer(ep, trans->cur, pkg_size);
-                trans->cur += pkg_size;
-                trans->use_as__vsf_mem_t.nSize -= pkg_size;
 
-                // TODO: check trans->zlp
-                if ((trans->use_as__vsf_mem_t.nSize > 0) && (pkg_size == ep_size)) {
-                    vsf_usbd_drv_ep_enable_out(ep);
-                } else {
+                if (vsf_usbd_drv_ep_is_dma(trans->ep)) {
                     vsf_usbd_trans_finish(dev, trans);
+                } else {
+                    vsf_usbd_drv_ep_read_buffer(ep, trans->cur, pkg_size);
+                    trans->cur += pkg_size;
+                    trans->use_as__vsf_mem_t.nSize -= pkg_size;
+
+                    // TODO: check trans->zlp
+                    if ((trans->use_as__vsf_mem_t.nSize > 0) && (pkg_size == ep_size)) {
+                        vsf_usbd_drv_ep_enable_out(ep);
+                    } else {
+                        vsf_usbd_trans_finish(dev, trans);
+                    }
                 }
             }
             break;
@@ -822,9 +830,9 @@ void vsf_usbd_init(vsf_usbd_dev_t *dev)
         VSF_USB_ASSERT(desc != NULL);
         desc_config = (struct usb_config_descriptor_t *)desc->buffer;
         VSF_USB_ASSERT(     (desc->size == le16_to_cpu(desc_config->wTotalLength))
-               &&   (desc_config->bLength == USB_DT_CONFIG_SIZE)
-               &&   (desc_config->bDescriptorType == USB_DT_CONFIG)
-               &&   (desc_config->bNumInterfaces == config->num_of_ifs));
+                        &&  (desc_config->bLength == USB_DT_CONFIG_SIZE)
+                        &&  (desc_config->bDescriptorType == USB_DT_CONFIG)
+                        &&  (desc_config->bNumInterfaces == config->num_of_ifs));
         config->configuration_value = desc_config->bConfigurationValue;
 #endif
 
@@ -838,10 +846,7 @@ void vsf_usbd_init(vsf_usbd_dev_t *dev)
     vsf_usbd_notify_user(dev, USB_ON_INIT, NULL);
 
 #if VSF_USBD_CFG_USE_EDA == ENABLED
-    if (VSF_ERR_NONE != vsf_eda_set_evthandler(&(dev->eda), vsf_usbd_evt_handler)) {
-        VSF_USB_ASSERT(false);
-    }
-    //dev->eda.evthandler = vsf_usbd_evt_handler;
+    vsf_eda_set_evthandler(&(dev->eda), vsf_usbd_evt_handler);
     vsf_eda_init(&dev->eda, VSF_USBD_CFG_EDA_PRIORITY, false);
 #endif
 }
@@ -857,6 +862,7 @@ void vsf_usbd_fini(vsf_usbd_dev_t *dev)
     vsf_usbd_notify_user(dev, USB_ON_FINI, NULL);
 }
 
+// TODO: move stream related code into vsf_usbd_stream.c
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 

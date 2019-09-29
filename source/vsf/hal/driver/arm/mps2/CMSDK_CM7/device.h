@@ -33,10 +33,11 @@
 /*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#endif
 //! arch info
 #   define VSF_ARCH_PRI_NUM         8
 #   define VSF_ARCH_PRI_BIT         3
-#endif
+
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             7

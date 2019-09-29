@@ -123,7 +123,9 @@
 
 /*============================ TYPES =========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 typedef vsf_systimer_cnt_t     vsf_timer_tick_t;
+#endif
 
 enum {
     /*!\ note wait for invalid also means wait for any evt */
@@ -629,6 +631,11 @@ SECTION(".text.vsf.kernel.vsf_timer_get_elapsed")
 extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
 
 #endif
+
+SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
+extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *pthis, 
+                                        vsf_eda_evthandler_t evthandler);
+
 SECTION(".text.vsf.kernel.eda")
 extern vsf_err_t vsf_eda_init(  vsf_eda_t *pthis, 
                                 vsf_prio_t priotiry, 
@@ -661,6 +668,11 @@ extern void vsf_eda_yield(void);
 SECTION(".text.vsf.kernel.__vsf_eda_call_eda")
 extern vsf_err_t __vsf_eda_call_eda(uintptr_t evthandler, uintptr_t param);
 
+SECTION(".text.vsf.kernel.eda_nesting")
+extern vsf_err_t __vsf_eda_call_eda_ex( uintptr_t func, 
+                                        uintptr_t param, 
+                                        __vsf_eda_frame_state_t state);
+
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
 extern fsm_rt_t vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
@@ -676,10 +688,6 @@ extern vsf_err_t vsf_teda_init(vsf_teda_t *pthis,
 
 SECTION(".text.vsf.kernel.vsf_teda_init_ex")
 extern vsf_err_t vsf_teda_init_ex(vsf_teda_t *pthis, vsf_eda_cfg_t *cfg);
-
-SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
-extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *pthis, 
-                                        vsf_eda_evthandler_t evthandler);
 
 SECTION(".text.vsf.kernel.teda")
 extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);

@@ -190,7 +190,7 @@ uint_fast32_t bswap_32(uint_fast32_t value32)
 WEAK(bswap_64)
 uint_fast64_t bswap_64(uint_fast64_t value64)
 {
-    return (bswap_32(value64) << 16) | bswap_32(value64 >> 16);
+    return ((uint_fast64_t)bswap_32(value64) << 32) | (uint_fast64_t)bswap_32(value64 >> 32);
 }
 #endif
 
@@ -250,7 +250,7 @@ void vsf_swi_trigger(uint_fast8_t idx)
 }
 
 WEAK(vsf_drv_usr_swi_init)
-vsf_err_t vsf_drv_usr_swi_init(uint_fast8_t idx, 
+vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx, 
                                     vsf_arch_prio_t priority,
                                     vsf_swi_handler_t *handler, 
                                     void *param)
@@ -260,7 +260,7 @@ vsf_err_t vsf_drv_usr_swi_init(uint_fast8_t idx,
 }
 
 WEAK(vsf_swi_init)
-vsf_err_t vsf_swi_init(uint_fast8_t idx, 
+vsf_err_t vsf_swi_init(     uint_fast8_t idx, 
                             vsf_arch_prio_t priority,
                             vsf_swi_handler_t *handler, 
                             void *param)
@@ -289,6 +289,7 @@ vsf_err_t vsf_swi_init(uint_fast8_t idx,
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
 
+#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 #   ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
 WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
@@ -560,6 +561,7 @@ void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick)
 }
 
 #endif
+#endif      // VSF_SYSTIMER_CFG_IMPL_MODE
 
 #ifndef WEAK_VSF_ARCH_INIT
 /*! \note initialize architecture specific service 
@@ -571,7 +573,9 @@ WEAK(vsf_arch_init)
 bool vsf_arch_init(void)
 {
     vsf_arch_low_level_init();
+#   ifdef VSF_SYSTIMER_CFG_IMPL_MODE
     vsf_systimer_init();
+#   endif
     return true;
 }
 #endif

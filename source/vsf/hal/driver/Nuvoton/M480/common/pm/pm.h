@@ -61,7 +61,7 @@ extern vsf_err_t vsf_pm_ahbclk_resume(pm_ahb_clk_no_t index, pm_ahbclk_status_t 
 extern pm_ahbclk_status_t vsf_pm_ahbclk_enable(pm_ahb_clk_no_t index);
 extern pm_ahbclk_status_t vsf_pm_ahbclk_disable(pm_ahb_clk_no_t index);
 extern fsm_rt_t vsf_pm_mclk_init(pm_main_clk_cfg_t *cfg);
-extern uint_fast32_t vsf_pm_mclk_get(void);
+extern uint_fast32_t vsf_pm_mclk_get(pm_main_clk_no_t sel);
 extern fsm_rt_t vsf_pm_pll_init(pm_pll_sel_t pll, pm_pll_cfg_t *cfg);
 extern bool vsf_pm_pll_is_locked(pm_pll_sel_t pll);
 extern uint_fast32_t vsf_pm_pll_get_clk_out(pm_pll_sel_t pll);

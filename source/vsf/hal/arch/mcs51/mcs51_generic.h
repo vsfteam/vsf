@@ -35,7 +35,7 @@
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                0
-
+#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 #define __VSF_ARCH_SYSTIMER_BITS        16
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

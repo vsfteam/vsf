@@ -43,10 +43,7 @@ struct ui_demo_t {
     vsf_disp_usbd_uvc_t disp;
     struct {
         volatile bool started;
-
         lv_disp_buf_t disp_buf;
-        lv_disp_drv_t disp_drv;
-
         ui_demo_buffer_t buffer[2];
     } ui;
 };
@@ -121,6 +118,9 @@ void usbd_demo_uvc_on_ready(void)
 
 void ui_demo_start(void)
 {
+    lv_disp_drv_t disp_drv;
+    lv_disp_t *disp;
+
     vsf_callback_timer_add_ms(&ui_demo.poll_timer, 1000);
 
 #if USE_LV_LOG
@@ -132,15 +132,15 @@ void ui_demo_start(void)
                         &ui_demo.ui.buffer[0].color,
                         &ui_demo.ui.buffer[1].color,
                         LV_HOR_RES_MAX * 1);
-    lv_disp_drv_init(&ui_demo.ui.disp_drv);
+    lv_disp_drv_init(&disp_drv);
 
-    ui_demo.ui.disp_drv.hor_res = LV_HOR_RES_MAX;
-    ui_demo.ui.disp_drv.ver_res = LV_VER_RES_MAX;
-    ui_demo.ui.disp_drv.flush_cb = vsf_lvgl_disp_flush;
-    ui_demo.ui.disp_drv.buffer = &ui_demo.ui.disp_buf;
+    disp_drv.hor_res = LV_HOR_RES_MAX;
+    disp_drv.ver_res = LV_VER_RES_MAX;
+    disp_drv.flush_cb = vsf_lvgl_disp_flush;
+    disp_drv.buffer = &ui_demo.ui.disp_buf;
     ui_demo.disp.uvc = usbd_demo_get_uvc();
-    vsf_lvgl_bind(&ui_demo.disp.use_as__vsf_disp_t, &ui_demo.ui.disp_drv);
-    lv_disp_drv_register(&ui_demo.ui.disp_drv);
+    disp = lv_disp_drv_register(&disp_drv);
+    vsf_lvgl_bind(&ui_demo.disp.use_as__vsf_disp_t, &disp->driver);
 
     lvgl_create_demo();
     while (1) {

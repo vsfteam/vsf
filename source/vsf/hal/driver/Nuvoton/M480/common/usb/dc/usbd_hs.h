@@ -101,6 +101,9 @@ extern vsf_err_t m480_usbd_hs_ep_enable_OUT(m480_usbd_hs_t *usbd_hs, uint_fast8_
 extern vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint_fast16_t size);
 extern vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
+extern vsf_err_t m480_usbd_hs_ep_recv_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t m480_usbd_hs_ep_send_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp);
+
 extern void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs);
 
 #endif

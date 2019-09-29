@@ -70,13 +70,6 @@ source/example/project/vc/x86
 source/example/project/vc/x64
 source/example/project/vc/Debug
 
-source/example/project/vc_2017/.vs
-source/example/project/vc_2017/obj
-source/example/project/vc_2017/bin
-source/example/project/vc_2017/x86
-source/example/project/vc_2017/x64
-source/example/project/vc_2017/Debug
-
 *.___i
 *.custom_argvars
 
@@ -86,4 +79,3 @@ source/example/project/vc_2017/Debug
 
 *.scvd
 *.bak
-*.lds

@@ -127,6 +127,9 @@ static vsf_err_t    usb_dc##__N##_ep_enable_OUT(uint_fast8_t ep);               
 static vsf_err_t    usb_dc##__N##_ep_set_data_size(uint_fast8_t ep, uint_fast16_t size);\
 static vsf_err_t    usb_dc##__N##_ep_write_buffer(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);\
                                                                                 \
+static vsf_err_t    usb_dc##__N##_ep_recv_dma(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);\
+static vsf_err_t    usb_dc##__N##_ep_send_dma(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp);\
+                                                                                \
 static void         usb_dc##__N##_irq(void);
 
 #define __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE)                               \
@@ -155,6 +158,8 @@ static void         usb_dc##__N##_irq(void);
                 .Ep.EnableOUT   = &usb_dc##__N##_ep_enable_OUT,                 \
                 .Ep.SetDataSize = &usb_dc##__N##_ep_set_data_size,              \
                 .Ep.WriteBuffer = &usb_dc##__N##_ep_write_buffer,               \
+                .Ep.RecvDMA     = &usb_dc##__N##_ep_recv_dma,                   \
+                .Ep.SendDMA     = &usb_dc##__N##_ep_send_dma,                   \
                                                                                 \
                 .Irq            = &usb_dc##__N##_irq,                           \
             }
@@ -206,6 +211,10 @@ static vsf_err_t usb_dc##__N##_ep_set_data_size(uint_fast8_t ep, uint_fast16_t s
 { return __HEADER##_ep_set_data_size(&(__OBJ), ep, size); }                     \
 static vsf_err_t usb_dc##__N##_ep_write_buffer(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)\
 { return __HEADER##_ep_write_buffer(&(__OBJ), ep, buffer, size); }              \
+static vsf_err_t usb_dc##__N##_ep_recv_dma(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)\
+{ return __HEADER##_ep_recv_dma(&(__OBJ), ep, buffer, size); }                  \
+static vsf_err_t usb_dc##__N##_ep_send_dma(uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp)\
+{ return __HEADER##_ep_send_dma(&(__OBJ), ep, buffer, size, zlp); }             \
 static void usb_dc##__N##_irq(void)                                             \
 { __HEADER##_irq(&(__OBJ)); }
 
@@ -294,11 +303,6 @@ def_interface(i_usb_dc_t)
     void            (*StatusStage)      (bool is_in);
 
     struct {
-        //! is DMA supported
-        //!     DMA:    ReadBuffer and WriteBuffer can accept larget buffer,
-        //!             GetDataSize and SetDataSize are not used
-        //!     NON-DMA:ReadBuffer and WriteBuffer can accept buffer smaller than ep size
-        //!             GetDataSize and SetDataSize are used to get/set the size to transfer
         bool            (*IsDMA)            (uint_fast8_t ep);
 
         vsf_err_t       (*Add)              (uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
@@ -308,12 +312,20 @@ def_interface(i_usb_dc_t)
         bool            (*IsStalled)        (uint_fast8_t ep);
         vsf_err_t       (*ClearStall)       (uint_fast8_t ep);
 
+        //! get the data size in hw-buffer in non-DMA mode
+        //! get the all transfered data size in DMA mode  
         uint_fast16_t   (*GetDataSize)      (uint_fast8_t ep);
+
+        //! non-DMA mode
         vsf_err_t       (*ReadBuffer)       (uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
         vsf_err_t       (*EnableOUT)        (uint_fast8_t ep);
 
         vsf_err_t       (*SetDataSize)      (uint_fast8_t ep, uint_fast16_t size);
         vsf_err_t       (*WriteBuffer)      (uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+
+        //! DMA mode
+        vsf_err_t       (*RecvDMA)          (uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+        vsf_err_t       (*SendDMA)          (uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp);
     } Ep;
 
     //! irq handler

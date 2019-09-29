@@ -13,8 +13,11 @@ usrapp_t usrapp;
 
 static inline __attribute__((always_inline)) void vsf_arch_set_stack(uintptr_t stack)
 {
-//    __asm__("movl %0, %%esp" : : "r"(stack));       // x86
-    __asm__("movq %0, %%rsp" : : "r"(stack));       // x64
+#if     defined(__CPU_X86__)
+    __asm__("movl %0, %%esp" : : "r"(stack));
+#elif   defined(__CPU_X64__)
+    __asm__("movq %0, %%rsp" : : "r"(stack));
+#endif
 }
 
 static void __vsf_thread_entry(void)

@@ -86,6 +86,9 @@ typedef struct vsf_input_parser_t vsf_input_parser_t;
 
 #include "./protocol/vsf_input_gamepad.h"
 #include "./protocol/vsf_input_sensor.h"
+#include "./protocol/vsf_input_touchscreen.h"
+#include "./protocol/vsf_input_keyboard.h"
+#include "./protocol/vsf_input_mouse.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -99,6 +102,9 @@ extern void vsf_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t le
 extern vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
 
 extern void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt);
+extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
+extern void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt);
+extern void vsf_input_on_keyboard(vsf_keyboard_evt_t *keyboard_evt);
 
 extern void vsf_input_on_new_dev(vsf_input_type_t type, void *dev);
 extern void vsf_input_on_free_dev(vsf_input_type_t type, void *dev);

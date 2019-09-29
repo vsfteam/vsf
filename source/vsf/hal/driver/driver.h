@@ -43,6 +43,8 @@
 #       define  VSF_DRIVER_HEADER       "./SiliconLabs/driver.h"
 #   elif    defined(__GigaDevice__)
 #		define  VSF_DRIVER_HEADER       "./GigaDevice/driver.h"
+#   elif    defined(__TI__)
+#		define  VSF_DRIVER_HEADER       "./TI/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"

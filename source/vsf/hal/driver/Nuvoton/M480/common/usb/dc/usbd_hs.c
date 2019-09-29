@@ -567,6 +567,18 @@ static void m480_usbd_hs_notify(m480_usbd_hs_t *usbd_hs, usb_evt_t evt, uint_fas
     }
 }
 
+vsf_err_t m480_usbd_hs_ep_recv_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+{
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+vsf_err_t m480_usbd_hs_ep_send_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp)
+{
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
 {
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);

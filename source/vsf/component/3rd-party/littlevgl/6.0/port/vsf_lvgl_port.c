@@ -20,6 +20,7 @@
 #define __VSF_DISP_CLASS_INHERIT
 #include "vsf.h"
 
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
 
@@ -76,3 +77,5 @@ void vsf_lvgl_bind(vsf_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
     disp->ui_on_ready = vsf_lvgl_on_ready;
     vsf_disp_init(disp);
 }
+
+#endif

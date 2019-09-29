@@ -828,6 +828,15 @@
     <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h">
       <Filter>vsf\hal\arch</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_keyboard.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_mouse.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -835,9 +844,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
-      <Filter>vsf\utilities\compiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
       <Filter>vsf\utilities\compiler</Filter>
     </ClCompile>
@@ -1287,6 +1293,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c">
       <Filter>vsf\component\3rd-party\littlevgl\6.0\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\usbh_demo_win\ui_demo_gamepad.c">
+      <Filter>usrapp\usbh_demo_win</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

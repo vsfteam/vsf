@@ -261,7 +261,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                 pthis->cur.msg = NULL;
             } else {
                 pthis->cur.evt = VSF_EVT_MESSAGE;
-                pthis->cur.msg = (void *)value;
+                pthis->cur.msg = value;
             }
 #endif
             __vsf_os_free_evt_node(node_evt);

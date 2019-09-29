@@ -62,9 +62,9 @@ const vsf_sensor_item_info_t vsf_ds4u_sensor_item_info[6] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
-    &&  defined(WEAK_VSF_INPUT_ON_EVT)
-WEAK_VSF_INPUT_ON_EVT_EXTERN
+#if     defined(WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN)                               \
+    &&  defined(WEAK_VSF_INPUT_ON_GAMEPAD)
+WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
 #endif
 
 #if     defined(WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN)                               \
@@ -112,10 +112,10 @@ void vsf_ds4u_on_free_dev(vsf_input_ds4u_t *dev)
 WEAK(vsf_ds4u_on_report_input)
 void vsf_ds4u_on_report_input(vsf_gamepad_evt_t *gamepad_evt)
 {
-#   ifndef WEAK_VSF_INPUT_ON_EVT
-    vsf_input_on_evt(VSF_INPUT_TYPE_DS4, &gamepad_evt->use_as__vsf_input_evt_t);
+#   ifndef WEAK_VSF_INPUT_ON_GAMEPAD
+    vsf_input_on_gamepad(gamepad_evt);
 #   else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_DS4, &gamepad_evt->use_as__vsf_input_evt_t);
+    WEAK_VSF_INPUT_ON_GAMEPAD(gamepad_evt);
 #   endif
 }
 #endif

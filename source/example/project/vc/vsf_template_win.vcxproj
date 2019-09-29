@@ -187,12 +187,6 @@
     <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
-    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
@@ -266,6 +260,7 @@
     <ClInclude Include="..\..\..\vsf\utilities\communicate.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h" />
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h" />
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h" />

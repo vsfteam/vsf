@@ -29,7 +29,7 @@
 struct vsf_evtq_ctx_t {
     vsf_eda_t *eda;
     vsf_evt_t evt;
-    void *msg;
+    uintptr_t msg;
 }ALIGN(4);
 typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
 

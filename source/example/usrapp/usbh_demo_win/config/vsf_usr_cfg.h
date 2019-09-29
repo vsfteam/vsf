@@ -30,9 +30,7 @@
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 #define VSF_HEAP_SIZE                   0x4000
 
-#define VSF_KERNEL_CFG_CALLBACK_TIMER   ENABLED
-
-#define SYSTEM_FREQ                     (192000000ul)
+#define VSF_SYSTIMER_FREQ               (192000000ul)
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -99,6 +97,7 @@
 //      <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                ENABLED
 //      </c>
+#define VSF_KERNEL_CFG_CALLBACK_TIMER                   ENABLED
 
 //      <c1>Enable Bitmap Event support
 //      <i>Simon, please add description here...
@@ -147,11 +146,13 @@
 #define VSF_USE_USB_HOST                                ENABLED
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #define VSF_USE_USB_HOST_HCD_LIBUSB                     ENABLED
-#   define VSF_LIBUSB_HCD_CFG_DEV_NUM                   2
+#   define VSF_LIBUSB_HCD_CFG_DEV_NUM                   3
 #   define VSF_LIBUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
 #   define VSF_LIBUSB_HCD_DEV0_PID                      0x0001
 #   define VSF_LIBUSB_HCD_DEV1_VID                      0x054C      // DS4
 #   define VSF_LIBUSB_HCD_DEV1_PID                      0x05C4
+#   define VSF_LIBUSB_HCD_DEV2_VID                      0x054C      // DS4
+#   define VSF_LIBUSB_HCD_DEV2_PID                      0x09CC
 #define VSF_USE_USB_HOST_HUB                            DISABLED
 #define VSF_USE_USB_HOST_ECM                            DISABLED
 #define VSF_USE_USB_HOST_BTHCI                          ENABLED
@@ -248,6 +249,18 @@ enum {
         extern void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt);
 #define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
         vsf_input_on_evt((__TYPE), (__EVT))
+
+#if VSF_USE_UI == ENABLED
+#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
+        extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
+#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
+        vsf_input_on_touchscreen((__TS_EVT))
+
+#   define WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN                                     \
+        extern void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt);
+#   define WEAK_VSF_INPUT_ON_GAMEPAD(__GAMEPAD_EVT)                             \
+        vsf_input_on_gamepad((__GAMEPAD_EVT))
+#endif
 
 
 

@@ -121,7 +121,10 @@
     <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h" />
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h" />
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_gamepad.h" />
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_keyboard.h" />
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_mouse.h" />
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_sensor.h" />
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
@@ -366,12 +369,6 @@
     <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
-    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\retarget_io.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
@@ -379,6 +376,7 @@
     <ClCompile Include="..\..\usrapp\usbh_demo_win\bt_demo.c" />
     <ClCompile Include="..\..\usrapp\usbh_demo_win\input_demo.c" />
     <ClCompile Include="..\..\usrapp\usbh_demo_win\main.c" />
+    <ClCompile Include="..\..\usrapp\usbh_demo_win\ui_demo_gamepad.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

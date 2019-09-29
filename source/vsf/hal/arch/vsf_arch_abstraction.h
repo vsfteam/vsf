@@ -49,7 +49,8 @@ typedef vsf_irq_handler_t vsf_swi_handler_t;
 # elif   defined(__CPU_RV__)
 #   define  VSF_ARCH_HEADER     "./rv/rv_generic.h"
 # else
-#   error no supported architecture found!
+#   warning no supported architecture found, use default arch template!
+#   define  VSF_ARCH_HEADER     "./template/template_generic.h"
 # endif
 #endif
 #include VSF_ARCH_HEADER
@@ -139,10 +140,7 @@ extern vsf_err_t vsf_swi_init(  uint_fast8_t idx,
 extern void vsf_swi_trigger(uint_fast8_t idx);
 
 
-/*! \brief initialise SysTick to generate a system timer
- *! \return initialization result in vsf_err_t 
- */
-//extern vsf_err_t vsf_systimer_init(void);
+#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 extern vsf_err_t vsf_systimer_start(void);
 extern vsf_systimer_cnt_t vsf_systimer_get(void);
 extern bool vsf_systimer_set(vsf_systimer_cnt_t due);
@@ -153,6 +151,7 @@ extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 extern vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
 extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
 extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
+#endif
 
 
 

@@ -20,14 +20,13 @@
 #include "vsf.h"
 #include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
 
-#include "lvgl/lvgl.h"
-#include "lv_conf.h"
-#include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#   include "lvgl/lvgl.h"
+#   include "lv_conf.h"
+#   include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
+#endif
 
 /*============================ MACROS ========================================*/
-
-#define GENERATE_HEX(value)                TPASTE2(0x, value)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -51,13 +50,14 @@ struct usrapp_t {
     vsf_usbh_class_t ds4;
 #endif
 
-    vsf_disp_sdl2_t disp;
-
+#if VSF_USE_UI == ENABLED
     struct {
+        vsf_disp_sdl2_t disp;
+        vsf_touchscreen_evt_t ts_evt;
         lv_disp_buf_t disp_buf;
-        lv_disp_drv_t disp_drv;
         lv_color_t color[LV_VER_RES_MAX][LV_HOR_RES_MAX];
     } ui;
+#endif
 };
 typedef struct usrapp_t usrapp_t;
 
@@ -87,7 +87,8 @@ static usrapp_t usrapp = {
     .ds4.drv                    = &vsf_usbh_ds4_drv,
 #endif
 
-    .disp                       = {
+#if VSF_USE_UI == ENABLED
+    .ui.disp                    = {
         .param                  = {
             .height             = LV_VER_RES_MAX,
             .width              = LV_HOR_RES_MAX,
@@ -96,34 +97,36 @@ static usrapp_t usrapp = {
         },
         .amplifier              = 2,
     },
+#endif
 };
 
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_USE_UI == ENABLED
+extern void ui_demo_start(void);
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
-// lv demo
-void lv_refr_task(struct _lv_task_t *task)
+#if VSF_USE_UI == ENABLED
+void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
 {
-    static lv_coord_t y;
-    lv_obj_t *label1 = (lv_obj_t *)task->user_data;
-
-    y = (y + 10) % LV_VER_RES;
-  
-    lv_obj_set_y(label1, y);
+    if (ts_evt->dev == &usrapp.ui.disp) {
+        usrapp.ui.ts_evt = *ts_evt;
+    }
 }
 
-void lvgl_create_demo(void)
+static bool usrapp_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-    lv_obj_t * label1 =  lv_label_create(lv_scr_act(), NULL);
-    /*Modify the Label's text*/
-    lv_label_set_text(label1, "Hello world!");
-    /* Align the Label to the center
-    * NULL means align on parent (which is the screen now)
-    * 0, 0 at the end means an x, y offset after alignment*/
-    lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
-
-    lv_task_create(lv_refr_task, 100, LV_TASK_PRIO_LOWEST, label1);
+    data->state = VSF_INPUT_TOUCHSCREEN_IS_DOWN(&usrapp.ui.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+    data->point.x = VSF_INPUT_TOUCHSCREEN_GET_X(&usrapp.ui.ts_evt);
+    data->point.y = VSF_INPUT_TOUCHSCREEN_GET_Y(&usrapp.ui.ts_evt);
+//    vsf_trace(VSF_TRACE_DEBUG, "touchscreen: %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
+//        data->state == LV_INDEV_STATE_PR ? "press" : "release",
+//        data->point.x, data->point.y);
+    return false;
 }
+#endif
 
 // TODO: SDL require that main need argc and argv
 int main(int argc, char *argv[])
@@ -145,28 +148,40 @@ int main(int argc, char *argv[])
     vsf_usbh_register_class(&usrapp.usbh, &usrapp.ds4);
 #endif
 
-#if USE_LV_LOG
+#if VSF_USE_UI == ENABLED
+#   if USE_LV_LOG
     lv_log_register_print(vsf_lvgl_printf);
-#endif
+#   endif
     lv_init();
+
+    lv_disp_drv_t disp_drv;
+    lv_indev_drv_t indev_drv;
+    lv_disp_t *disp;
 
     lv_disp_buf_init(   &usrapp.ui.disp_buf,
                         &usrapp.ui.color,
                         NULL,
                         LV_HOR_RES_MAX * LV_VER_RES_MAX);
-    lv_disp_drv_init(&usrapp.ui.disp_drv);
+    lv_disp_drv_init(&disp_drv);
 
-    usrapp.ui.disp_drv.hor_res = LV_HOR_RES_MAX;
-    usrapp.ui.disp_drv.ver_res = LV_VER_RES_MAX;
-    usrapp.ui.disp_drv.flush_cb = vsf_lvgl_disp_flush;
-    usrapp.ui.disp_drv.buffer = &usrapp.ui.disp_buf;
-    vsf_lvgl_bind(&usrapp.disp.use_as__vsf_disp_t, &usrapp.ui.disp_drv);
-    lv_disp_drv_register(&usrapp.ui.disp_drv);
+    disp_drv.hor_res = LV_HOR_RES_MAX;
+    disp_drv.ver_res = LV_VER_RES_MAX;
+    disp_drv.flush_cb = vsf_lvgl_disp_flush;
+    disp_drv.buffer = &usrapp.ui.disp_buf;
+    disp = lv_disp_drv_register(&disp_drv);
+    vsf_lvgl_bind(&usrapp.ui.disp.use_as__vsf_disp_t, &disp->driver);
 
-    lvgl_create_demo();
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.disp = disp;
+    indev_drv.read_cb = usrapp_touchscreen_read;
+    lv_indev_drv_register(&indev_drv);
+
+    ui_demo_start();
     while (1) {
         lv_task_handler();
     }
+#endif
     return 0;
 }
 

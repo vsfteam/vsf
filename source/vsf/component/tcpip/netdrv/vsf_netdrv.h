@@ -24,6 +24,8 @@
 
 #if VSF_USE_TCPIP == ENABLED
 
+#include "kernel/vsf_kernel.h"
+
 #if     defined(VSF_NETDRV_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
 #elif   defined(VSF_NETDRV_INHERIT_NETLINK) || defined(VSF_NETDRV_INHERIT_NETIF)

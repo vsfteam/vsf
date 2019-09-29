@@ -31,14 +31,10 @@
    POSSIBILITY OF SUCH DAMAGE.
    ---------------------------------------------------------------------------*/
  
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-//#include <assert.h>
 
 #include "arm_compiler.h"
- 
+
+
 #if !__IS_COMPILER_IAR__
 #include <rt_sys.h>
 #endif
@@ -47,18 +43,7 @@
 # define UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
 #endif
 
-extern int vsf_stdout_putchar(char ch);
-extern int vsf_stderr_putchar(char ch);
-extern int vsf_stdin_getchar(void);
-
-extern void vsf_stdout_init(void);
-extern void vsf_stdin_init(void);
-
-void vsf_stdio_init(void)
-{
-    vsf_stdout_init();
-    vsf_stdin_init();
-}
+#include "../__common/__retarget_io.c"
 
 #if __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
 #define RTE_Compiler_IO_STDOUT
@@ -235,7 +220,7 @@ void abort(void) {
 */
 
 //__attribute__((weak))
-SECTION(".vsf.utilities.stdio.arm_compiler._sys_open")
+//SECTION(".vsf.utilities.stdio.arm_compiler._sys_open")
 FILEHANDLE $Sub$$_sys_open (const char *name, int openmode) 
 {
     UNUSED_PARAM(name);
@@ -255,7 +240,7 @@ FILEHANDLE $Sub$$_sys_open (const char *name, int openmode)
   \return    The return value is 0 if successful. A nonzero value indicates
              an error.
 */
-SECTION(".vsf.utilities.stdio.arm_compiler._sys_close")
+//SECTION(".vsf.utilities.stdio.arm_compiler._sys_close")
 WEAK(_sys_close)
 int _sys_close (FILEHANDLE fh) 
 {
@@ -380,91 +365,3 @@ int _sys_read (FILEHANDLE fh, uint8_t *buf, uint32_t len, int mode) {
 
 #endif
  
-/**
-  Defined in rt_sys.h, this function writes a character to the console. The
-  console might have been redirected. You can use this function as a last
-  resort error handling routine.
-  
-  The default implementation of this function uses semihosting.
-  You can redefine this function, or __raise(), even if there is no other
-  input/output. For example, it might write an error message to a log kept
-  in nonvolatile memory.
- 
-  \param[in] ch character to write
-*/
-SECTION(".vsf.utilities.stdio.arm_compiler._ttywrch")
-WEAK(_ttywrch)
-void _ttywrch (int ch) 
-{
-    vsf_stdout_putchar(ch);
-}
-
-SECTION(".vsf.utilities.stdio.arm_compiler._sys_exit")
-WEAK(_sys_exit)
-void _sys_exit(int ch)
-{
-    while(1);
-}
-
-SECTION(".vsf.utilities.stdio.arm_compiler.stderr_putchar")
-WEAK(vsf_stderr_putchar)
-int vsf_stderr_putchar(char ch)
-{
-    return vsf_stdout_putchar(ch);
-}
-
-SECTION(".vsf.utilities.stdio.iar.__write")
-/* for IAR */
-size_t __write(int handle, const unsigned char *buf, size_t bufSize)
-{
-    size_t nChars = 0;
-    /* Check for the command to flush all handles */
-    if (handle == -1) {
-        return 0;
-    }
-    /* Check for stdout and stderr
-    (only necessary if FILE descriptors are enabled.) */
-    if (handle != 1 && handle != 2) {
-        return 0;
-    }
-    for (/* Empty */; bufSize > 0; --bufSize) {
-        vsf_stdout_putchar(*buf++);
-        ++nChars;
-    }
-    return nChars;
-}
-
-SECTION(".vsf.utilities.stdio.iar.__read")
-size_t __read(int handle, unsigned char *buf, size_t bufSize)
-{
-    size_t nChars = 0;
-    /* Check for stdin
-    (only necessary if FILE descriptors are enabled) */
-    if (handle != 0) {
-        return 0;
-    }
-    for (/*Empty*/; bufSize > 0; --bufSize) {
-        uint8_t c = vsf_stdin_getchar();
-        if (c == 0) { break; }
-        *buf++ = c;
-        ++nChars;
-    }
-    return nChars;
-}
-
-
-
-
-/* for GCC / LLVM */
-SECTION(".vsf.utilities.stdio.gcc._write")
-int _write (int handle, char *buf, int bufSize)
-{
-    return __write(handle, (const unsigned char *)buf, bufSize);
-}
-
-SECTION(".vsf.utilities.stdio.gcc._read")
-int _read (int handle, char *buf, int bufSize)
-{
-    return __read(handle, (unsigned char *)buf, bufSize);
-}
-
