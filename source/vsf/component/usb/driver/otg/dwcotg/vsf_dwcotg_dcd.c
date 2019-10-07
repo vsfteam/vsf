@@ -194,18 +194,21 @@ bool vsf_dwcotg_usbd_ep_is_dma(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
     return true;
 }
 
+static uint32_t * dwcotg_usbd_get_ep_ctrl(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+{
+    uint_fast8_t is_in = ep & 0x80;
+    ep &= 0x0F;
+    return is_in ? &usbd->reg.dev.ep.in_regs[ep].diepctl : &usbd->reg.dev.ep.out_regs[ep].doepctl;
+}
+
 vsf_err_t vsf_dwcotg_usbd_ep_add(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
 {
-    struct dwcotg_dev_in_ep_regs_t *in_regs = usbd->reg.dev.ep.in_regs;
-    struct dwcotg_dev_out_ep_regs_t *out_regs = usbd->reg.dev.ep.out_regs;
+    volatile uint32_t *ep_ctrl = dwcotg_usbd_get_ep_ctrl(usbd, ep);
     uint_fast8_t is_in = ep & 0x80;
-    volatile uint32_t *ep_ctrl;
 
     ep &= 0x0F;
     // TODO: check ep_num
     
-
-    ep_ctrl = is_in ? &in_regs[ep].diepctl : &out_regs[ep].doepctl;
     *ep_ctrl &= ~USB_OTG_DIEPCTL_MPSIZ;
     if (0 == ep) {
         *ep_ctrl |= USB_OTG_DIEPCTL_USBAEP;
@@ -249,10 +252,11 @@ vsf_err_t vsf_dwcotg_usbd_ep_add(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep
 
 uint_fast16_t vsf_dwcotg_usbd_ep_get_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
-    volatile uint32_t *ep_ctrl = ep & 0x80 ?
-        &usbd->reg.dev.ep.in_regs[ep].diepctl : &usbd->reg.dev.ep.out_regs[ep].doepctl;
-    ep &= 0x0F;
+    volatile uint32_t *ep_ctrl = dwcotg_usbd_get_ep_ctrl(usbd, ep);
 
+    ep &= 0x0F;
+    // TODO: check ep_num
+    
     if (0 == ep) {
         switch (*ep_ctrl & USB_OTG_DIEPCTL_MPSIZ) {
         case 0:     return 64;

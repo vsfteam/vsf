@@ -254,9 +254,8 @@ vsf_err_t vsf_usbd_ep_recv(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans)
     vsf_slist_add_to_head(vsf_usbd_trans_t, node, &dev->trans_list, trans);
 
     if (vsf_usbd_drv_ep_is_dma(trans->ep)) {
-        uint_fast32_t size = trans->use_as__vsf_mem_t.nSize;
-        trans->use_as__vsf_mem_t.nSize = 0;
-        err = vsf_usbd_drv_ep_recv_dma(trans->ep, trans->use_as__vsf_mem_t.pchBuffer, size);
+        err = vsf_usbd_drv_ep_recv_dma(trans->ep, trans->use_as__vsf_mem_t.pchBuffer,
+                trans->use_as__vsf_mem_t.nSize);
     } else {
         trans->cur = trans->use_as__vsf_mem_t.pchBuffer;
         err = vsf_usbd_drv_ep_enable_out(trans->ep);
