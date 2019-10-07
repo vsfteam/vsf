@@ -168,6 +168,7 @@
 #define VSF_USE_USB_HOST_HCD_OHCI           ENABLED
 
 #define VSF_USE_USB_DEVICE                  ENABLED
+#   define VSF_USE_USB_DEVICE_DCD_DWCOTG    ENABLED
 #define VSF_USE_USB_DEVICE_UVC              ENABLED
 #   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
 

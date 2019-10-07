@@ -30,6 +30,7 @@
 
 #include "./usb/driver/hcd/ohci/vsf_ohci.h"
 #include "./usb/driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
+#include "./usb/driver/otg/dwcotg/vsf_dwcotg_dcd.h"
 
 #include "./usb/host/vsf_usbh.h"
 #include "./usb/host/class/HUB/vsf_usbh_HUB.h"

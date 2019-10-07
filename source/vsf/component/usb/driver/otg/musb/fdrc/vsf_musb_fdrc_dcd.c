@@ -33,6 +33,17 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static void vsf_musb_fdrc_usbd_reset_do(vsf_musb_fdrc_dcd_t *usbd)
+{
+    vsf_musb_fdrc_reg_t *reg = usbd->reg;
+
+    reg->Common.Power = 0;
+    vsf_musb_fdrc_interrupt_init(reg);
+    reg->Common.IntrUSBE = MUSB_INTRUSBE_RESET;
+    usbd->ep_buf_ptr = 0;
+    usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+}
+
 vsf_err_t vsf_musb_fdrc_usbd_init(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
 {
     VSF_USB_ASSERT((usbd != NULL) && (cfg != NULL));
@@ -56,7 +67,7 @@ vsf_err_t vsf_musb_fdrc_usbd_init(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
         usbd->param->op->Init(&ip_cfg);
     }
 
-    vsf_musb_fdrc_usbd_reset(usbd);
+    vsf_musb_fdrc_usbd_reset_do(usbd);
     return VSF_ERR_NONE;
 }
 
@@ -67,15 +78,9 @@ void vsf_musb_fdrc_usbd_fini(vsf_musb_fdrc_dcd_t *usbd)
     usbd->param->op->Fini();
 }
 
-void vsf_musb_fdrc_usbd_reset(vsf_musb_fdrc_dcd_t *usbd)
+void vsf_musb_fdrc_usbd_reset(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
 {
-    vsf_musb_fdrc_reg_t *reg = usbd->reg;
-
-    reg->Common.Power = 0;
-    vsf_musb_fdrc_interrupt_init(reg);
-    reg->Common.IntrUSBE = MUSB_INTRUSBE_RESET;
-    usbd->ep_buf_ptr = 0;
-    usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+    vsf_musb_fdrc_usbd_init(usbd, cfg);
 }
 
 void vsf_musb_fdrc_usbd_connect(vsf_musb_fdrc_dcd_t *usbd)
@@ -131,8 +136,9 @@ void vsf_musb_fdrc_usbd_status_stage(vsf_musb_fdrc_dcd_t *usbd, bool is_in)
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
 
     if (usbd->has_data_stage) {
-        vsf_musb_fdrc_set_ep(0);
-        reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND;
+        uint_fast8_t ep_orig = vsf_musb_fdrc_set_ep(reg, 0);
+            reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND;
+        vsf_musb_fdrc_set_ep(reg, ep_orig);
     }
 }
 
@@ -147,13 +153,14 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, 
     uint_fast8_t is_in = ep & 0x80;
     uint_fast16_t addr = usbd->ep_buf_ptr >> 3;
     uint_fast8_t size_msk;
+    uint_fast8_t ep_orig;
 
     if (size == 1023) { size = 1024; }
     VSF_USB_ASSERT(!(size & (size - 1)) && (size >= 8) && (size <= 1024));
 
     size_msk = ffz(~size) - 3;
     ep &= 0x0F;
-    vsf_musb_fdrc_set_ep(ep);
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
 
     if (is_in) {
         reg->EPN.RxFIFO1 = addr & 0xFF;
@@ -202,6 +209,7 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, 
             reg->EPN.RxCSR1 |= MUSBD_RXCSR1_FLUSHFIFO;
         }
     }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
     usbd->ep_buf_ptr += size;
     return VSF_ERR_NONE;
 }
@@ -209,31 +217,37 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, 
 uint_fast16_t vsf_musb_fdrc_usbd_ep_get_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
+    uint_fast16_t result;
+    uint_fast8_t ep_orig;
 
     ep &= 0x0F;
     if (!ep) {
         return 64;
     }
-    vsf_musb_fdrc_set_ep(ep);
-    return reg->EPN.TxMAXP;
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        result = reg->EPN.TxMAXP;
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
+    return result;
 }
 
 vsf_err_t vsf_musb_fdrc_usbd_ep_set_stall(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
     uint_fast8_t is_in = ep & 0x80;
+    uint_fast8_t ep_orig;
 
     ep &= 0x0F;
-    vsf_musb_fdrc_set_ep(ep);
-    if (!ep) {
-        reg->EP0.CSR0 |= MUSBD_CSR0_SENDSTALL;
-    } else {
-        if (is_in) {
-            reg->EPN.TxCSR1 |= MUSBD_TXCSR1_SENDSTALL;
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        if (!ep) {
+            reg->EP0.CSR0 |= MUSBD_CSR0_SENDSTALL;
         } else {
-            reg->EPN.RxCSR1 |= MUSBD_RXCSR1_SENDSTALL;
+            if (is_in) {
+                reg->EPN.TxCSR1 |= MUSBD_TXCSR1_SENDSTALL;
+            } else {
+                reg->EPN.RxCSR1 |= MUSBD_RXCSR1_SENDSTALL;
+            }
         }
-    }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
     return VSF_ERR_NONE;
 }
 
@@ -241,18 +255,20 @@ bool vsf_musb_fdrc_usbd_ep_is_stalled(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
     uint_fast8_t is_in = ep & 0x80, is_stall;
+    uint_fast8_t ep_orig;
 
     ep &= 0x0F;
-    vsf_musb_fdrc_set_ep(ep);
-    if (!ep) {
-        is_stall = reg->EP0.CSR0 & MUSBD_CSR0_SENDSTALL;
-    } else {
-        if (is_in) {
-            is_stall = reg->EPN.TxCSR1 & MUSBD_TXCSR1_SENDSTALL;
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        if (!ep) {
+            is_stall = reg->EP0.CSR0 & MUSBD_CSR0_SENDSTALL;
         } else {
-            is_stall = reg->EPN.RxCSR1 & MUSBD_RXCSR1_SENDSTALL;
+            if (is_in) {
+                is_stall = reg->EPN.TxCSR1 & MUSBD_TXCSR1_SENDSTALL;
+            } else {
+                is_stall = reg->EPN.RxCSR1 & MUSBD_RXCSR1_SENDSTALL;
+            }
         }
-    }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
     return is_stall > 0;
 }
 
@@ -260,24 +276,26 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_clear_stall(vsf_musb_fdrc_dcd_t *usbd, uint_fast
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
     uint_fast8_t is_in = ep & 0x80;
+    uint_fast8_t ep_orig;
 
     ep &= 0x0F;
-    vsf_musb_fdrc_set_ep(ep);
-    if (!ep) {
-        reg->EP0.CSR0 &= ~(MUSBD_CSR0_SENTSTALL | MUSBD_CSR0_SENDSTALL);
-    } else {
-        if (is_in) {
-            reg->EPN.TxCSR1 &= ~(MUSBD_TXCSR1_SENTSTALL | MUSBD_TXCSR1_SENDSTALL);
-            reg->EPN.TxCSR1 |= MUSBD_TXCSR1_CLRDATATOG | MUSBD_TXCSR1_FLUSHFIFO;
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        if (!ep) {
+            reg->EP0.CSR0 &= ~(MUSBD_CSR0_SENTSTALL | MUSBD_CSR0_SENDSTALL);
         } else {
-            reg->EPN.RxCSR1 &= ~(MUSBD_RXCSR1_SENTSTALL | MUSBD_RXCSR1_SENDSTALL);
-            reg->EPN.RxCSR1 |= MUSBD_RXCSR1_CLRDATATOG | MUSBD_RXCSR1_FLUSHFIFO;
+            if (is_in) {
+                reg->EPN.TxCSR1 &= ~(MUSBD_TXCSR1_SENTSTALL | MUSBD_TXCSR1_SENDSTALL);
+                reg->EPN.TxCSR1 |= MUSBD_TXCSR1_CLRDATATOG | MUSBD_TXCSR1_FLUSHFIFO;
+            } else {
+                reg->EPN.RxCSR1 &= ~(MUSBD_RXCSR1_SENTSTALL | MUSBD_RXCSR1_SENDSTALL);
+                reg->EPN.RxCSR1 |= MUSBD_RXCSR1_CLRDATATOG | MUSBD_RXCSR1_FLUSHFIFO;
+            }
         }
-    }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
     return VSF_ERR_NONE;
 }
 
-uint_fast16_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
+uint_fast32_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
 
@@ -288,18 +306,20 @@ uint_fast16_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uin
 vsf_err_t vsf_musb_fdrc_usbd_ep_read_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     vsf_musb_fdrc_reg_t *reg;
+    uint_fast8_t ep_orig;
 
     VSF_USB_ASSERT(!(ep & 0x80) && ((ep & 0x0F)) < (usbd->ep_num / 2));
 
     reg = usbd->reg;
     vsf_musb_fdrc_read_fifo(reg, ep, buffer, size);
 
-    vsf_musb_fdrc_set_ep(ep);
-    if (!ep) {
-        reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
-    } else {
-        reg->EPN.RxCSR1 &= ~MUSBD_RXCSR1_RXPKTRDY;
-    }
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        if (!ep) {
+            reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
+        } else {
+            reg->EPN.RxCSR1 &= ~MUSBD_RXCSR1_RXPKTRDY;
+        }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
     return VSF_ERR_NONE;
 }
 
@@ -312,20 +332,22 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_enable_OUT(vsf_musb_fdrc_dcd_t *usbd, uint_fast8
 vsf_err_t vsf_musb_fdrc_usbd_ep_set_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size)
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
+    uint_fast8_t ep_orig;
 
     VSF_USB_ASSERT((ep & 0x80) && ((ep & 0x0F)) < (usbd->ep_num / 2));
 
     ep &= 0x0F;
-    vsf_musb_fdrc_set_ep(ep);
-    if (!ep) {
-        uint_fast8_t ep0_int_en = reg->Common.IntrTx1E & 1;
-        reg->Common.IntrTx1E &= ~1;
-            usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
-            reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
-        reg->Common.IntrTx1E |= ep0_int_en;
-    } else {
-        reg->EPN.TxCSR1 |= MUSBD_TXCSR1_TXPKTRDY;
-    }
+    ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        if (!ep) {
+            uint_fast8_t ep0_int_en = reg->Common.IntrTx1E & 1;
+            reg->Common.IntrTx1E &= ~1;
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
+                reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
+            reg->Common.IntrTx1E |= ep0_int_en;
+        } else {
+            reg->EPN.TxCSR1 |= MUSBD_TXCSR1_TXPKTRDY;
+        }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
     return VSF_ERR_NONE;
 }
 
@@ -338,6 +360,18 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_write_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fas
     reg = usbd->reg;
     vsf_musb_fdrc_write_fifo(reg, ep, buffer, size);
     return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_musb_fdrc_usbd_ep_recv_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+{
+    VSF_USB_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+vsf_err_t vsf_musb_fdrc_usbd_ep_send_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp)
+{
+    VSF_USB_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 static void vsf_musb_fdrc_usbd_notify(vsf_musb_fdrc_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
@@ -379,17 +413,22 @@ void vsf_musb_fdrc_usbd_irq(vsf_musb_fdrc_dcd_t *usbd)
 
     // EP0 interrupt
     if (status_tx & 1) {
+        uint_fast8_t ep_orig;
+
         status_tx &= ~1;
-        vsf_musb_fdrc_set_ep(0);
+        ep_orig = vsf_musb_fdrc_set_ep(reg, 0);
         csr1 = reg->EP0.CSR0;
 
         if (csr1 & MUSBD_CSR0_SENTSTALL) {
             reg->EP0.CSR0 &= ~MUSBD_CSR0_SENTSTALL;
+            vsf_musb_fdrc_set_ep(reg, ep_orig);
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
         }
 
         if (csr1 & MUSBD_CSR0_SETUPEND) {
             reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDSETUPEND;
+            vsf_musb_fdrc_set_ep(reg, ep_orig);
+
             vsf_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
         }

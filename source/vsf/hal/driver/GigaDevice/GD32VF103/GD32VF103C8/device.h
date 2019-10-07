@@ -24,19 +24,9 @@
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-
-//! arch info
-#   define VSF_ARCH_PRI_NUM         16
-#   define VSF_ARCH_PRI_BIT         4
-#endif
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             0
-//#define VSF_DEV_SWI_LIST            5, 45, 50, 69, 81, 83, 91, 94, 95
-
-
 
 /*============================ INCLUDES ======================================*/
 
@@ -46,6 +36,20 @@
 #include "./Vendor/gd32vf103.h"
 
 /*============================ MACROS ========================================*/
+
+#define USB_OTG_COUNT               1
+#define USB_OTG0_IRQHandler         USBFS_IRQHandler
+
+#define USB_OTG0_CONFIG                                                         \
+    .ep_num = 8,                                                                \
+    .irq = USBFS_IRQn,                                                          \
+    .reg = 0x50000000,                                                          \
+    .speed = USB_SPEED_FULL,                                                    \
+	.dma_en = false,                                                            \
+	.ulpi_en = false,                                                           \
+	.utmi_en = false,                                                           \
+	.vbus_en = false,
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -134,12 +134,6 @@
 #define MUSB_RXCSR2_DMAMODE             ((uint8_t)(1 << 4))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#   define vsf_musb_fdrc_set_ep(__ep)                                           \
-        do {                                                                    \
-            reg->Common.Index = (__ep);                                         \
-        } while (0)
-
 /*============================ TYPES =========================================*/
 
 struct vsf_musb_fdrc_reg_t {
@@ -209,6 +203,8 @@ typedef struct vsf_musb_fdrc_reg_t vsf_musb_fdrc_reg_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern uint_fast8_t vsf_musb_fdrc_set_ep(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep);
 
 extern void vsf_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep);
 extern void vsf_musb_fdrc_clear_mask(volatile uint8_t *reg, uint_fast8_t ep);

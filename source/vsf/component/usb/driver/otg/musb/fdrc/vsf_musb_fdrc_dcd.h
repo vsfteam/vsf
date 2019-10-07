@@ -44,7 +44,6 @@
 
 struct vsf_musb_fdrc_dcd_param_t {
     const i_usb_dc_ip_t *op;
-    vsf_arch_prio_t priority;
 };
 typedef struct vsf_musb_fdrc_dcd_param_t vsf_musb_fdrc_dcd_param_t;
 
@@ -83,7 +82,7 @@ def_simple_class(vsf_musb_fdrc_dcd_t) {
 
 extern vsf_err_t vsf_musb_fdrc_usbd_init(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg);
 extern void vsf_musb_fdrc_usbd_fini(vsf_musb_fdrc_dcd_t *usbd);
-extern void vsf_musb_fdrc_usbd_reset(vsf_musb_fdrc_dcd_t *usbd);
+extern void vsf_musb_fdrc_usbd_reset(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg);
 
 extern void vsf_musb_fdrc_usbd_connect(vsf_musb_fdrc_dcd_t *usbd);
 extern void vsf_musb_fdrc_usbd_disconnect(vsf_musb_fdrc_dcd_t *usbd);
@@ -106,12 +105,15 @@ extern vsf_err_t vsf_musb_fdrc_usbd_ep_set_stall(vsf_musb_fdrc_dcd_t *usbd, uint
 extern bool vsf_musb_fdrc_usbd_ep_is_stalled(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 extern vsf_err_t vsf_musb_fdrc_usbd_ep_clear_stall(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 
-extern uint_fast16_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast32_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 extern vsf_err_t vsf_musb_fdrc_usbd_ep_read_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 extern vsf_err_t vsf_musb_fdrc_usbd_ep_enable_OUT(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 
 extern vsf_err_t vsf_musb_fdrc_usbd_ep_set_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size);
 extern vsf_err_t vsf_musb_fdrc_usbd_ep_write_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+
+extern vsf_err_t vsf_musb_fdrc_usbd_ep_recv_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vsf_musb_fdrc_usbd_ep_send_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp);
 
 extern void vsf_musb_fdrc_usbd_irq(vsf_musb_fdrc_dcd_t *usbd);
 

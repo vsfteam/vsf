@@ -73,12 +73,15 @@ void vsf_musb_fdrc_interrupt_init(vsf_musb_fdrc_reg_t *reg)
 
 uint_fast16_t vsf_musb_fdrc_rx_fifo_size(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep)
 {
-    vsf_musb_fdrc_set_ep(ep);
-    if (!ep) {
-        return reg->EP0.Count0;
-    } else {
-        return ((reg->EPN.RxCount2 & 7) << 8) | reg->EPN.RxCount1;
-    }
+    uint_fast8_t ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+        uint_fast16_t result;
+        if (!ep) {
+            result = reg->EP0.Count0;
+        } else {
+            result = ((reg->EPN.RxCount2 & 7) << 8) | reg->EPN.RxCount1;
+        }
+    vsf_musb_fdrc_set_ep(reg, ep_orig);
+    return result;
 }
 
 void vsf_musb_fdrc_read_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
@@ -102,6 +105,13 @@ void vsf_musb_fdrc_write_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t
     while (size--) {
         *fifo = *buffer++;
     }
+}
+
+uint_fast8_t vsf_musb_fdrc_set_ep(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep)
+{
+    uint_fast8_t ep_orig = reg->Common.Index;
+    reg->Common.Index = ep;
+    return ep_orig;
 }
 
 #endif

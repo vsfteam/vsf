@@ -71,7 +71,7 @@ typedef struct m480_usbd_hs_t m480_usbd_hs_t;
 
 extern vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg);
 extern void m480_usbd_hs_fini(m480_usbd_hs_t *usbd_hs);
-extern void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs);
+extern void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg);
 
 extern void m480_usbd_hs_connect(m480_usbd_hs_t *usbd_hs);
 extern void m480_usbd_hs_disconnect(m480_usbd_hs_t *usbd_hs);
@@ -94,7 +94,7 @@ extern vsf_err_t m480_usbd_hs_ep_set_stall(m480_usbd_hs_t *usbd_hs, uint_fast8_t
 extern bool m480_usbd_hs_ep_is_stalled(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 extern vsf_err_t m480_usbd_hs_ep_clear_stall(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 
-extern uint_fast16_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
+extern uint_fast32_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 extern vsf_err_t m480_usbd_hs_ep_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 extern vsf_err_t m480_usbd_hs_ep_enable_OUT(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 

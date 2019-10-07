@@ -79,3 +79,8 @@ source/example/project/vc/Debug
 
 *.scvd
 *.bak
+
+fp-info-cache
+*.kicad_pcb-bak
+*.sch-bak
+*-cache.lib

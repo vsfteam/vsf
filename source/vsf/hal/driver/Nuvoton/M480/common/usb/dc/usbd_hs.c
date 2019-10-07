@@ -185,7 +185,7 @@ void m480_usbd_hs_fini(m480_usbd_hs_t *usbd_hs)
     CLK->AHBCLK &= ~CLK_AHBCLK_HSUSBDCKEN_Msk;
 }
 
-void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
+void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
 {
     uint8_t ep_num = usbd_hs->param->ep_num - 2;
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
@@ -197,6 +197,7 @@ void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs)
         M480_USBD_EP_REG(i, EP[0].EPCFG) = 0;
         M480_USBD_EP_REG(i, EP[0].EPINTEN) = 0;
     }
+    m480_usbd_hs_init(usbd_hs, cfg);
 }
 
 void m480_usbd_hs_connect(m480_usbd_hs_t *usbd_hs)
@@ -384,7 +385,7 @@ vsf_err_t m480_usbd_hs_ep_clear_stall(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
     return VSF_ERR_NONE;
 }
 
-uint_fast16_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
+uint_fast32_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
 {
     HSUSBD_T *reg;
     int_fast8_t idx;
@@ -625,8 +626,8 @@ void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)
         status &= reg->CEPINTEN;
 
         // IMPORTANT:
-        //         the OUT ep of M480 has no flow control, so the order of
-        //         checking the interrupt flash MUST be as follow:
+        //         the OUT ep0 of M480 has no flow control, so the order of
+        //         checking the interrupt flag MUST be as follows:
         //         IN0 -->> STATUS -->> SETUP -->> OUT0
         // consider this:
         //         SETUP -->> IN0 -->> STATUS -->> SETUP -->> OUT0 -->> STATUS

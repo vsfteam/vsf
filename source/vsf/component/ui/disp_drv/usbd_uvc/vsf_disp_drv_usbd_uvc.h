@@ -39,6 +39,10 @@
 #   error "need VSF_USBD_CFG_USE_EDA¡°
 #endif
 
+#if VSF_USE_USB_DEVICE != ENABLED || VSF_USE_USB_DEVICE_UVC != ENABLED
+#   error "need VSF_USE_USB_DEVICE and VSF_USE_USB_DEVICE_UVC"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
