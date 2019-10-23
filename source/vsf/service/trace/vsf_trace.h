@@ -84,11 +84,11 @@ typedef enum vsf_trace_level_t vsf_trace_level_t;
 
 #if VSF_USE_TRACE == ENABLED
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 extern void __vsf_trace_init(vsf_stream_t *stream);
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#   elif VSF_USE_SERVICE_STREAM == ENABLED
 extern void __vsf_trace_init(vsf_stream_tx_t *ptTX);
-#endif
+#   endif
 extern void vsf_trace_fini(void);
 
 SECTION(".text.vsf.trace.vsf_trace_buffer")

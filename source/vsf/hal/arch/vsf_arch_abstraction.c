@@ -23,42 +23,42 @@
 
 #define IMPLEMENT_ENDIAN_FUNC(__bitlen)                                         \
 WEAK(cpu_to_le##__bitlen##p)                                                    \
-uint_fast##__bitlen##_t cpu_to_le##__bitlen##p(uint_fast##__bitlen##_t *p)      \
+uint_fast##__bitlen##_t cpu_to_le##__bitlen##p(uint##__bitlen##_t *p)           \
 {                                                                               \
     return cpu_to_le##__bitlen(*p);                                             \
 }                                                                               \
 WEAK(cpu_to_be##__bitlen##p)                                                    \
-uint_fast##__bitlen##_t cpu_to_be##__bitlen##p(uint_fast##__bitlen##_t *p)      \
+uint_fast##__bitlen##_t cpu_to_be##__bitlen##p(uint##__bitlen##_t *p)           \
 {                                                                               \
     return cpu_to_be##__bitlen(*p);                                             \
 }                                                                               \
 WEAK(le##__bitlen##_to_cpup)                                                    \
-uint_fast##__bitlen##_t le##__bitlen##_to_cpup(uint_fast##__bitlen##_t *p)      \
+uint_fast##__bitlen##_t le##__bitlen##_to_cpup(uint##__bitlen##_t *p)           \
 {                                                                               \
     return le##__bitlen##_to_cpu(*p);                                           \
 }                                                                               \
 WEAK(be##__bitlen##_to_cpup)                                                    \
-uint_fast##__bitlen##_t be##__bitlen##_to_cpup(uint_fast##__bitlen##_t *p)      \
+uint_fast##__bitlen##_t be##__bitlen##_to_cpup(uint##__bitlen##_t *p)           \
 {                                                                               \
     return be##__bitlen##_to_cpu(*p);                                           \
 }                                                                               \
 WEAK(cpu_to_le##__bitlen##s)                                                    \
-void cpu_to_le##__bitlen##s(uint_fast##__bitlen##_t *p)                         \
+void cpu_to_le##__bitlen##s(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = cpu_to_le##__bitlen(*p);                                               \
 }                                                                               \
 WEAK(cpu_to_be##__bitlen##s)                                                    \
-void cpu_to_be##__bitlen##s(uint_fast##__bitlen##_t *p)                         \
+void cpu_to_be##__bitlen##s(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = cpu_to_be##__bitlen(*p);                                               \
 }                                                                               \
 WEAK(le##__bitlen##_to_cpus)                                                    \
-void le##__bitlen##_to_cpus(uint_fast##__bitlen##_t *p)                         \
+void le##__bitlen##_to_cpus(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = le##__bitlen##_to_cpu(*p);                                             \
 }                                                                               \
 WEAK(be##__bitlen##_to_cpus)                                                    \
-void be##__bitlen##_to_cpus(uint_fast##__bitlen##_t *p)                         \
+void be##__bitlen##_to_cpus(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = be##__bitlen##_to_cpu(*p);                                             \
 }                                                                               \
@@ -110,6 +110,9 @@ void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           
 #endif
 
 
+#ifndef VSF_GET_MAIN_CLK
+#   define VSF_GET_MAIN_CLK()         (0)
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \

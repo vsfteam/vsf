@@ -265,9 +265,9 @@ void m480_usbd_hs_status_stage(m480_usbd_hs_t *usbd_hs, bool is_in)
     reg->CEPCTL = USB_CEPCTL_NAKCLR;
 }
 
-bool m480_usbd_hs_ep_is_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
+uint_fast8_t m480_usbd_hs_ep_get_feature(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
 {
-    return false;
+    return 0;
 }
 
 vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
@@ -408,7 +408,7 @@ uint_fast32_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_
     }
 }
 
-vsf_err_t m480_usbd_hs_ep_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t m480_usbd_hs_ep_transaction_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     HSUSBD_T *reg;
     int_fast8_t idx;
@@ -446,7 +446,7 @@ vsf_err_t m480_usbd_hs_ep_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, 
     return VSF_ERR_NONE;
 }
 
-vsf_err_t m480_usbd_hs_ep_enable_OUT(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
+vsf_err_t m480_usbd_hs_ep_transaction_enable_out(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
 {
     HSUSBD_T *reg;
     int_fast8_t idx;
@@ -469,7 +469,7 @@ vsf_err_t m480_usbd_hs_ep_enable_OUT(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint_fast16_t size)
+vsf_err_t m480_usbd_hs_ep_transaction_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint_fast16_t size)
 {
     HSUSBD_T *reg;
     int_fast8_t idx;
@@ -511,7 +511,7 @@ vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
     return VSF_ERR_NONE;
 }
 
-vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t m480_usbd_hs_ep_transaction_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     HSUSBD_T *reg;
     int_fast8_t idx;
@@ -561,23 +561,23 @@ vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep,
     return VSF_ERR_NONE;
 }
 
+vsf_err_t m480_usbd_hs_ep_transfer_recv(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
+{
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+vsf_err_t m480_usbd_hs_ep_transfer_send(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp)
+{
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 static void m480_usbd_hs_notify(m480_usbd_hs_t *usbd_hs, usb_evt_t evt, uint_fast8_t value)
 {
     if (usbd_hs->callback.evt_handler != NULL) {
         usbd_hs->callback.evt_handler(usbd_hs->callback.param, evt, value);
     }
-}
-
-vsf_err_t m480_usbd_hs_ep_recv_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
-{
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t m480_usbd_hs_ep_send_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp)
-{
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NOT_SUPPORT;
 }
 
 void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs)

@@ -347,11 +347,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM7\Include</state>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
-                    <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -774,7 +772,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>lnk0t.icf</state>
+                    <state>$TOOLKIT_DIR$\config\linker\ARM\MPS2FVP.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -834,7 +832,7 @@
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabel</name>
-                    <state></state>
+                    <state>__iar_program_start</state>
                 </option>
                 <option>
                     <name>DoFill</name>
@@ -1007,7 +1005,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -1107,7 +1105,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.32.2.19370</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -1388,9 +1386,6 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM7\Include</state>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
-                    <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
@@ -1752,7 +1747,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -1816,7 +1811,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>lnk0t.icf</state>
+                    <state>$TOOLKIT_DIR$\config\linker\ARM\MPS2FVP.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -1876,7 +1871,7 @@
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabel</name>
-                    <state></state>
+                    <state>__iar_program_start</state>
                 </option>
                 <option>
                     <name>DoFill</name>
@@ -2049,7 +2044,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -2431,9 +2426,6 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM7\Include</state>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
-                    <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
@@ -3192,7 +3184,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.32.2.19370</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -3474,9 +3466,6 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM0\Include</state>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
-                    <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
@@ -3838,7 +3827,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -7365,7 +7354,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.32.2.19370</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -7647,9 +7636,6 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM7\Include</state>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
-                    <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
@@ -8011,7 +7997,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -9455,7 +9441,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.32.2.19370</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -9736,11 +9722,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Device\CMSDK_CM0\Include</state>
-                    <state>C:\Keil_v5\ARM\PACK\Keil\V2M-MPS2_CMx_BSP\1.7.0\Boards\ARM\V2M-MPS2\Common</state>
-                    <state>C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</state>
                     <state>$PROJ_DIR$\..\..\usrapp\template</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -10099,7 +10083,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -10163,7 +10147,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>lnk0t.icf</state>
+                    <state>$TOOLKIT_DIR$\config\linker\ARM\MPS2FVP.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -10223,7 +10207,7 @@
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabel</name>
-                    <state></state>
+                    <state>__iar_program_start</state>
                 </option>
                 <option>
                     <name>DoFill</name>
@@ -10396,7 +10380,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>vsf_template_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>

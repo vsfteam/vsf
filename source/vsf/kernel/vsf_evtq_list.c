@@ -252,8 +252,8 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
             vsf_unprotect_int(orig);
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
-            pthis->evt_cur = node->evt;
-            pthis->msg_cur = node->msg;
+            pthis->cur.evt = node_evt->evt;
+            pthis->cur.msg = (uintptr_t)node_evt->msg;
 #else
             uintptr_t value = node_evt->evt_union.value;
             if (value & 1) {

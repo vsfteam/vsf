@@ -40,6 +40,7 @@
 #include "./usb/host/class/BTHCI/vsf_usbh_BTHCI.h"
 #include "./usb/host/class/HID/vsf_usbh_HID.h"
 #include "./usb/host/class/HID/vsf_usbh_ds4.h"
+#include "./usb/host/class/libusb/vsf_usbh_libusb.h"
 
 #include "./usb/device/vsf_usbd.h"
 #include "./usb/device/class/CDC/vsf_usbd_CDC.h"

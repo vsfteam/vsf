@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_DYNARR == ENABLED
+#if VSF_USE_DYNSTACK == ENABLED
 
 #include "../dynarr/vsf_dynarr.h"
 
@@ -59,5 +59,5 @@ extern vsf_err_t vsf_dynstack_push(vsf_dynstack_t *stack, void *item, uint_fast1
 extern vsf_err_t vsf_dynstack_push_ext(vsf_dynstack_t *stack, void *ptr, uint_fast32_t len);
 extern vsf_err_t vsf_dynstack_pop_ext(vsf_dynstack_t *stack, void *ptr, uint_fast32_t len);
 
-#endif      // VSF_USE_DYNARR
+#endif      // VSF_USE_DYNSTACK
 #endif      // __VSF_DYNSTACK_H__

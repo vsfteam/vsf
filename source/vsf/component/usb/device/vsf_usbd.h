@@ -26,6 +26,7 @@
 
 #include "../common/usb_common.h"
 #include "../common/usb_desc.h"
+#include "kernel/vsf_kernel.h"
 
 #if     defined(VSF_USBD_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -216,7 +217,7 @@ def_simple_class(vsf_usbd_ep_stream_t) {
 
     protected_member(
         implement(vsf_usbd_trans_t)
-        vsf_usbd_dev_t *dev;                //!< todo: rx and tx can share the same dev
+        vsf_usbd_dev_t *dev;
         uint32_t cur_size;
     )
 };

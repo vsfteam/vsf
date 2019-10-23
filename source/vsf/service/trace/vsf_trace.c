@@ -23,7 +23,7 @@
 #include "hal/vsf_hal.h"
 
 //! todo: remove this dependency
-#include "kernel/vsf_os.h"
+#include "kernel/vsf_kernel.h"
 
 #include "./vsf_trace.h"
 #include <stdio.h>

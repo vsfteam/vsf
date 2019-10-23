@@ -122,7 +122,7 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
     evtq->tail = tail_next;
     evtq->node[tail].eda = eda;
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
-    evtq->node[tail].evt = (vsf_evt_t)value;
+    evtq->node[tail].evt = evt;
     evtq->node[tail].msg = msg;
 #else
     evtq->node[tail].evt_union.value = value;
@@ -187,8 +187,8 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                     pthis->cur.eda = eda;
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
-                    pthis->evt_cur = node->evt;
-                    pthis->msg_cur = node->msg;
+                    pthis->cur.evt = node->evt;
+                    pthis->cur.msg = (uintptr_t)node->msg;
 #else
                 {
                     uintptr_t value = node->evt_union.value;

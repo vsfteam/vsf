@@ -21,24 +21,22 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_LIBUSB == ENABLED
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_usbh_libusb_dev_t
-{
+struct vsf_usbh_libusb_dev_t {
     vsf_usbh_t *usbh;
     vsf_usbh_dev_t *dev;
 
     uint16_t vid, pid;
-    unsigned opened : 1;
-    unsigned removed : 1;
+    bool is_opened;
+    bool is_to_remove;
 };
 typedef struct vsf_usbh_libusb_dev_t vsf_usbh_libusb_dev_t;
 
-enum vsf_usbh_libusb_evt_t
-{
+enum vsf_usbh_libusb_evt_t {
     VSF_USBH_LIBUSB_EVT_ON_ARRIVED,
     VSF_USBH_LIBUSB_EVT_ON_LEFT,
 };

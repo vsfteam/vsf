@@ -1,8 +1,6 @@
 #ifndef __USB_CH11_H__
 #define __USB_CH11_H__
 
-#include "component/usb/vsf_usb_cfg.h"
-
 #include "usb_type.h"
 
 /* This is arbitrary.

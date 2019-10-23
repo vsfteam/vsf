@@ -19,8 +19,6 @@
 #define __USE_ARM_COMPILER_H__
 
 /*============================ INCLUDES ======================================*/
-#include "vsf_usr_cfg.h"
-
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>

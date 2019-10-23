@@ -60,10 +60,19 @@ declare_simple_class(vsf_dwcotg_dcd_trans_t)
 def_simple_class(vsf_dwcotg_dcd_trans_t) {
     private_member(
         uint8_t *buffer;
-        uint32_t size   : 19;
+        uint32_t remain;
+        uint32_t size;
+        uint32_t zlp    : 1;
         uint32_t use_dma: 1;
     )
 };
+
+enum ctrl_transfer_state_t{
+    DWCOTG_SETUP_STAGE,
+    DWCOTG_DATA_STAGE,
+    DWCOTG_STATUS_STAGE,
+};
+typedef enum ctrl_transfer_state_t ctrl_transfer_state_t;
 
 declare_simple_class(vsf_dwcotg_dcd_t)
 def_simple_class(vsf_dwcotg_dcd_t) {
@@ -79,9 +88,10 @@ def_simple_class(vsf_dwcotg_dcd_t) {
             void *param;
         } callback;
         uint8_t setup[8];
+        uint16_t buffer_word_pos;
         bool dma_en;
-        bool status_phase;
-        vsf_dwcotg_dcd_trans_t trans[2 * 16];
+        ctrl_transfer_state_t ctrl_transfer_state;
+        vsf_dwcotg_dcd_trans_t trans[2 * VSF_DWCOTG_DCD_CFG_EP_NUM];
     )
 };
 
@@ -106,7 +116,7 @@ extern uint_fast8_t vsf_dwcotg_usbd_get_mframe_number(vsf_dwcotg_dcd_t *usbd);
 extern void vsf_dwcotg_usbd_get_setup(vsf_dwcotg_dcd_t *usbd, uint8_t *buffer);
 extern void vsf_dwcotg_usbd_status_stage(vsf_dwcotg_dcd_t *usbd, bool is_in);
 
-extern bool vsf_dwcotg_usbd_ep_is_dma(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast8_t vsf_dwcotg_usbd_ep_get_feature(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
 extern vsf_err_t vsf_dwcotg_usbd_ep_add(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
 extern uint_fast16_t vsf_dwcotg_usbd_ep_get_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
 
@@ -115,14 +125,14 @@ extern bool vsf_dwcotg_usbd_ep_is_stalled(vsf_dwcotg_dcd_t *usbd, uint_fast8_t e
 extern vsf_err_t vsf_dwcotg_usbd_ep_clear_stall(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
 
 extern uint_fast32_t vsf_dwcotg_usbd_ep_get_data_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
-extern vsf_err_t vsf_dwcotg_usbd_ep_read_buffer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t vsf_dwcotg_usbd_ep_enable_OUT(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
 
-extern vsf_err_t vsf_dwcotg_usbd_ep_set_data_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size);
-extern vsf_err_t vsf_dwcotg_usbd_ep_write_buffer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vsf_dwcotg_usbd_ep_transaction_read_buffer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vsf_dwcotg_usbd_ep_transaction_enable_out(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep);
+extern vsf_err_t vsf_dwcotg_usbd_ep_transaction_set_data_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size);
+extern vsf_err_t vsf_dwcotg_usbd_ep_transaction_write_buffer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
-extern vsf_err_t vsf_dwcotg_usbd_ep_recv_dma(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t vsf_dwcotg_usbd_ep_send_dma(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp);
+extern vsf_err_t vsf_dwcotg_usbd_ep_transfer_recv(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size);
+extern vsf_err_t vsf_dwcotg_usbd_ep_transfer_send(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
 
 extern void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd);
 

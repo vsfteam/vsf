@@ -25,7 +25,7 @@
 #   define USRAPP_CFG_CDC_NUM               6
 #endif
 
-#if USRAPP_CFG_CDC_NUM >= 10
+#if USRAPP_CFG_CDC_NUM > 8
 #   error not support
 #endif
 
@@ -33,8 +33,14 @@
 
 // __INT_EP starts from USRAPP_CFG_CDC_NUM + 1
 // __I_FUNC starts from 4(first 3 are manufactorer/device/serial strings)
-#define USRAPP_DESC_CDC_CFG(__N, __UNUSED)                                      \
+#if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
+#   define USRAPP_DESC_CDC_CFG(__N, __UNUSED)                                   \
             USB_DESC_CDC_UART_HS((__N) * 2, 4 + (__N), USRAPP_CFG_CDC_NUM + 1 + (__N), 1 + (__N), 1 + (__N))
+#elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
+#   define USRAPP_DESC_CDC_CFG(__N, __UNUSED)                                   \
+            USB_DESC_CDC_UART_FS((__N) * 2, 4 + (__N), USRAPP_CFG_CDC_NUM + 1 + (__N), 1 + (__N), 1 + (__N))
+#endif
+
 #define USRAPP_DESC_CDC_STRING(__N, __UNUSED)                                   \
             .str_cdc[(__N)]             = {                                     \
                 USB_DESC_STRING(14,                                             \
@@ -62,12 +68,14 @@
             .stream.rx.stream   = (vsf_stream_t *)&__USBD.cdc[(__N)].stream.rx, \
         },                                                                      \
         .stream             = {                                                 \
-            .tx.op              = &vsf_fifo_stream_op,                          \
-            .tx.buffer          = (uint8_t *)&__USBD.cdc[(__N)].stream.tx_buffer,\
-            .tx.size            = sizeof(__USBD.cdc[(__N)].stream.tx_buffer),   \
-            .rx.op              = &vsf_fifo_stream_op,                          \
-            .rx.buffer          = (uint8_t *)&__USBD.cdc[(__N)].stream.rx_buffer,\
-            .rx.size            = sizeof(__USBD.cdc[(__N)].stream.rx_buffer),   \
+            .tx.op              = &vsf_mem_stream_op,                           \
+            .tx.pchBuffer       = (uint8_t *)&__USBD.cdc[(__N)].stream.tx_buffer,\
+            .tx.nSize           = sizeof(__USBD.cdc[(__N)].stream.tx_buffer),   \
+            .tx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
+            .rx.op              = &vsf_mem_stream_op,                           \
+            .rx.pchBuffer       = (uint8_t *)&__USBD.cdc[(__N)].stream.rx_buffer,\
+            .rx.nSize           = sizeof(__USBD.cdc[(__N)].stream.rx_buffer),   \
+            .rx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
         },                                                                      \
     },                                                                          \
     .ifs[2 * (__N)].class_op        = &vsf_usbd_CDCACM_control,                 \
@@ -79,8 +87,10 @@
 
 struct usrapp_const_t {
     struct {
-#ifdef __GD32VF103__
+#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
         vsf_dwcotg_dcd_param_t dwcotg_param;
+#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        vsf_musb_fdrc_dcd_param_t musb_fdrc_param;
 #endif
         uint8_t dev_desc[18];
         uint8_t config_desc[9 + USRAPP_CFG_CDC_NUM * USB_DESC_CDC_ACM_LEN];
@@ -95,15 +105,17 @@ typedef struct usrapp_const_t usrapp_const_t;
 
 struct usrapp_t {
     struct {
-#ifdef __GD32VF103__
+#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
         vsf_dwcotg_dcd_t dwcotg_dcd;
+#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        vsf_musb_fdrc_dcd_t musb_fdrc_dcd;
 #endif
         struct {
             vsf_usbd_CDCACM_t param;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             struct {
-                vsf_fifo_stream_t tx;
-                vsf_fifo_stream_t rx;
+                vsf_mem_stream_t tx;
+                vsf_mem_stream_t rx;
                 uint8_t tx_buffer[4 * 1024];
                 uint8_t rx_buffer[4 * 1024];
             } stream;
@@ -125,10 +137,14 @@ typedef struct usrapp_t usrapp_t;
 
 static const usrapp_const_t usrapp_const = {
     .usbd                       = {
-#ifdef __GD32VF103__
+#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
         .dwcotg_param           = {
             .op                 = &VSF_USB_DC0_IP,
-            .speed              = USB_SPEED_FULL,
+            .speed              = USRAPP_CFG_USBD_SPEED,
+        },
+#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        musb_fdrc_param         = {
+            .op                 = &VSF_USB_DC0_IP,
         },
 #endif
         .dev_desc               = {
@@ -165,15 +181,19 @@ static const usrapp_const_t usrapp_const = {
     },
 };
 
-#ifdef __GD32VF103__
 static usrapp_t usrapp;
+#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
 VSF_USB_DC_FROM_DWCOTG_IP(0, usrapp.usbd.dwcotg_dcd, VSF_USB_DC0)
+#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+VSF_USB_DC_FROM_MUSB_FDRC_IP(0, usrapp.usbd.musb_fdrc_dcd, VSF_USB_DC0)
 #endif
 
 static usrapp_t usrapp = {
     .usbd                       = {
-#ifdef __GD32VF103__
+#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
         .dwcotg_dcd.param       = &usrapp_const.usbd.dwcotg_param,
+#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        .musb_fdrc_dcd.param    = &usrapp_const.usbd.musb_fdrc_param,
 #endif
         MREPEAT(USRAPP_CFG_CDC_NUM, USRAPP_CDC_INSTANCE, usrapp.usbd)
 
@@ -185,7 +205,11 @@ static usrapp_t usrapp = {
         .dev.num_of_desc        = dimof(usrapp_const.usbd.std_desc),
         .dev.desc               = (vsf_usbd_desc_t *)usrapp_const.usbd.std_desc,
 
+#if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
         .dev.speed              = USB_DC_SPEED_HIGH,
+#elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
+        .dev.speed              = USB_DC_SPEED_FULL,
+#endif
         .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
     },
 };
@@ -204,6 +228,11 @@ void main(void)
     vsf_trace_init(NULL);
     vsf_stdio_init();
 #endif
+
+    for (uint_fast8_t i = 0; i < USRAPP_CFG_CDC_NUM; i++) {
+        vsf_stream_init(&usrapp.usbd.cdc[i].stream.tx.use_as__vsf_stream_t);
+        vsf_stream_init(&usrapp.usbd.cdc[i].stream.rx.use_as__vsf_stream_t);
+    }
 
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);

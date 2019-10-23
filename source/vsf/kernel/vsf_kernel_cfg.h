@@ -19,6 +19,7 @@
 #include "vsf_cfg.h"
 
 // for VSF_SWI_NUM and VSF_ARCH_PRI_NUM
+#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #include "hal/vsf_hal.h"
 
 #ifndef __VSF_KERNAL_CFG_H__
@@ -222,13 +223,13 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY          DISABLED
 #endif
 
-#if __VSF_KERNEL_CFG_EVTQ_EN == EBABKED
-#   ifndef VSF_KERNEL_CFG_EVT_MESSAGE_EN
-#       define VSF_KERNEL_CFG_EVT_MESSAGE_EN                ENABLED
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+#   ifndef VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE
+#       define VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE           ENABLED
 #   endif
 #else
-#   if VSF_KERNEL_CFG_EVT_MESSAGE_EN == ENABLED
-#       error "VSF_KERNEL_CFG_EVT_MESSAGE_EN requires __VSF_KERNEL_CFG_EVTQ_EN"
+#   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+#       error "VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE requires __VSF_KERNEL_CFG_EVTQ_EN"
 #   endif
 #endif
 

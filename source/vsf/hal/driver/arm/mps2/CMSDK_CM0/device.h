@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "CMSDK_CM0.h"
+//#include "CMSDK_CM0.h"
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */

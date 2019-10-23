@@ -26,7 +26,7 @@
 #include "hal/interface/vsf_interface_usb.h"
 
 // for vsf_dwcotg_hw_info_t
-#include "component/usb/driver/otg/dwcotg/vsf_dwcotg_common.h"
+#include "component/usb/driver/otg/dwcotg/vsf_dwcotg_hw.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -445,20 +445,13 @@
             __vsf_slist_append_imp(                                             \
                 (__plist), (__pitem), offset_of(__host_type, __member))
 
-#define vsf_slist_get_index(__host_type,/* the type of the host type */         \
-                            __member,   /* the member name of the list */       \
-                            __plist,    /* the address of the list */           \
-                            __pitem)    /* the address of the target item */    \
-            __vsf_slist_get_index_imp(                                          \
-                (__plist), (__pitem), offset_of(__host_type, __member))
-
 #define vsf_slist_is_in(    __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem)    /* the address of the target item */    \
         (   vsf_slist_get_index(                                                \
-                (__plist), (__pitem), offset_of(__host_type, __member))         \
-        >   0)
+                __host_type, __member, (__plist), (__pitem))                    \
+        >=   0)
 
 #define vsf_slist_init_node(__host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \

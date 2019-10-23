@@ -211,9 +211,23 @@ static void __vsf_disp_sdl2_thread(void *arg)
                 is_to_update = true;
                 evt_type = VSF_INPUT_TYPE_GAMEPAD;
 
-                evt.gamepad_evt.is_signed = true;
-                evt.gamepad_evt.bitlen = 16;
                 evt.gamepad_evt.cur.val16 = event.caxis.value;
+
+                switch (event.caxis.axis) {
+                case SDL_CONTROLLER_AXIS_LEFTX:
+                case SDL_CONTROLLER_AXIS_LEFTY:
+                case SDL_CONTROLLER_AXIS_RIGHTX:
+                case SDL_CONTROLLER_AXIS_RIGHTY:
+                    evt.gamepad_evt.bitlen = 16;
+                    evt.gamepad_evt.is_signed = true;
+                    break;
+                case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+                case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+                    evt.gamepad_evt.bitlen = 15;
+                    evt.gamepad_evt.is_signed = false;
+                    break;
+                default:                                    is_to_update = false;                       break;
+                }
 
                 switch (event.caxis.axis) {
                 case SDL_CONTROLLER_AXIS_LEFTX:             evt.gamepad_evt.id = GAMEPAD_ID_LX;         break;

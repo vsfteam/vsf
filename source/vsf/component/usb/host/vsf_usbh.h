@@ -23,6 +23,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED
 
+#include "kernel/vsf_kernel.h"
 #include "../common/usb_common.h"
 #include "../common/usb_ch11.h"
 
@@ -467,6 +468,8 @@ extern void vsf_usbh_urb_set_buffer(vsf_usbh_urb_t *urb, void *buffer,
             uint_fast32_t size);
 extern int_fast16_t vsf_usbh_urb_get_status(vsf_usbh_urb_t *urb);
 extern uint_fast32_t vsf_usbh_urb_get_actual_length(vsf_usbh_urb_t *urb);
+
+extern void vsf_usbh_reset_dev(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
 
 extern vsf_err_t vsf_usbh_submit_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb);
 extern vsf_err_t vsf_usbh_submit_urb_flags(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fast16_t flags);

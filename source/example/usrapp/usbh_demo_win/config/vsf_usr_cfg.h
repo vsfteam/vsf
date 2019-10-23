@@ -212,6 +212,8 @@ enum {
 
 #endif
 
+#define VSF_USE_MSG_TREE                                ENABLED
+
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *

@@ -157,7 +157,7 @@ vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
     return VSF_ERR_NONE;
 }
 
-void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast16_t pos)
+void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos)
 {
     if (pos < dynarr->length) {
         vsf_dynarr_table_t *table;

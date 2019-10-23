@@ -31,10 +31,10 @@
 #define __BYTE_ORDER                    __LITTLE_ENDIAN
 
 #ifndef VSF_ARCH_PRI_NUM
-#   define VSF_ARCH_PRI_NUM             4
+#   define VSF_ARCH_PRI_NUM             128
 #endif
 #ifndef VSF_ARCH_PRI_BIT
-#   define VSF_ARCH_PRI_BIT             16
+#   define VSF_ARCH_PRI_BIT             7
 #endif
 
 // software interrupt provided by arch

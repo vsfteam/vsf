@@ -22,7 +22,10 @@
 
 #if VSF_USE_KERNEL == ENABLED
 
+#define __INCLUDE_MUTEX_EDA
 #include "service/vsf_service.h"
+#undef  __INCLUDE_MUTEX_EDA
+
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file 
  *!        included in this file
@@ -207,7 +210,7 @@ def_simple_class(__vsf_eda_frame_t) {
     )
 #   endif
 #else
-protected_member (
+    protected_member (
         implement(vsf_slist_node_t)
         union {
             uintptr_t                       func;
@@ -689,8 +692,11 @@ extern vsf_err_t vsf_teda_init(vsf_teda_t *pthis,
 SECTION(".text.vsf.kernel.vsf_teda_init_ex")
 extern vsf_err_t vsf_teda_init_ex(vsf_teda_t *pthis, vsf_eda_cfg_t *cfg);
 
-SECTION(".text.vsf.kernel.teda")
+SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);
+
+SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
+vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, uint_fast32_t tick);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
 extern vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms);

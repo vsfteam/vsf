@@ -19,7 +19,6 @@
 #define __USE_RV_COMPILER_H__
 
 /*============================ INCLUDES ======================================*/
-#include "vsf_usr_cfg.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>

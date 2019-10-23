@@ -22,7 +22,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
-#include "./vsf_kernel_common.h"
+//#include "./vsf_kernel_common.h"
 #include "./vsf_evtq.h"
 #include "./task/vsf_task.h"
 /*============================ MACROS ========================================*/

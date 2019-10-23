@@ -24,13 +24,6 @@
 
 #define GENERATE_HEX(value)             TPASTE2(0x, value)
 
-#define USB_DESC_WORD(__value)                                                  \
-            ((__value) >> 0) & 0xFF, ((__value) >> 8) & 0xFF
-
-#define USB_DESC_DWORD(__value)                                                 \
-            ((__value) >> 0) & 0xFF, ((__value) >> 8) & 0xFF,                   \
-            ((__value) >> 16) & 0xFF, ((__value) >> 24) & 0xFF
-
 
 
 // UI configuration

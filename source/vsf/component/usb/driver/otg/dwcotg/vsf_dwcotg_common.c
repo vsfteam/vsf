@@ -45,6 +45,7 @@ void vsf_dwcotg_phy_init(vsf_dwcotg_t *dwcotg,
 {
     struct dwcotg_core_global_regs_t *global_regs = dwcotg->reg.global_regs;
 
+    VSF_USB_ASSERT(hw_info->speed >= param->speed);
     if (param->ulpi_en) {
         VSF_USB_ASSERT(hw_info->ulpi_en);
 

@@ -25,6 +25,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef USRAPP_UI_CFG_GAMEPAD_NUM
+#   define USRAPP_UI_CFG_GAMEPAD_NUM    1
+#endif
+
 // __R, __G, __B in [0, 255]
 #if LV_COLOR_DEPTH == 16
 #   define UI_COLOR(__R, __G, __B)                                              \
@@ -85,8 +89,8 @@ struct __ui_demo_gamepad_t {
 typedef struct __ui_demo_gamepad_t __ui_demo_gamepad_t;
 
 struct __ui_demo_t {
-    lv_obj_t *cont[2];
-        __ui_demo_gamepad_t gamepad[2];
+    lv_obj_t *cont[USRAPP_UI_CFG_GAMEPAD_NUM];
+        __ui_demo_gamepad_t gamepad[USRAPP_UI_CFG_GAMEPAD_NUM];
 };
 typedef struct __ui_demo_t __ui_demo_t;
 
@@ -371,20 +375,22 @@ static void ui_demo_create_gamepad(__ui_demo_gamepad_t *gamepad, lv_obj_t *cont,
 void ui_demo_start(void)
 {
     lv_obj_t *obj, *screen;
-    lv_coord_t margin;
+    lv_coord_t margin_x, margin_y, margin, top_margin;
 
     screen = lv_scr_act();
-    margin = min(lv_obj_get_width(screen), lv_obj_get_height(screen)) / 30;
+    margin_x = lv_obj_get_width(screen) / 30;
+    margin_y = lv_obj_get_height(screen) / (16 * USRAPP_UI_CFG_GAMEPAD_NUM);
+    margin = min(margin_x, margin_y);
+    top_margin = (lv_obj_get_height(screen) - 16 * USRAPP_UI_CFG_GAMEPAD_NUM * margin) / 2;
 
-    obj = lv_cont_create(screen, NULL);
-    lv_obj_set_pos(obj, (lv_obj_get_width(screen) - 30 * margin) / 2, 0);
-    __ui_demo.cont[0] = obj;
-    ui_demo_create_gamepad(&__ui_demo.gamepad[0], __ui_demo.cont[0], margin);
-
-    obj = lv_cont_create(screen, NULL);
-    lv_obj_set_pos(obj, (lv_obj_get_width(screen) - 30 * margin) / 2, lv_obj_get_height(screen) / 2);
-    __ui_demo.cont[1] = obj;
-    ui_demo_create_gamepad(&__ui_demo.gamepad[1], __ui_demo.cont[1], margin);
+    for (uint_fast8_t i = 0; i < USRAPP_UI_CFG_GAMEPAD_NUM; i++) {
+        obj = lv_cont_create(screen, NULL);
+        // gamepad size is 15 X 30
+        lv_obj_set_pos(obj, (lv_obj_get_width(screen) - 30 * margin) / 2, top_margin);
+        top_margin += 16 * margin;
+        __ui_demo.cont[i] = obj;
+        ui_demo_create_gamepad(&__ui_demo.gamepad[i], __ui_demo.cont[i], margin);
+    }
 }
 
 #endif

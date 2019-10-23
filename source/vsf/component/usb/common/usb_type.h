@@ -1,8 +1,7 @@
 #ifndef __USB_TYPE_H__
 #define __USB_TYPE_H__
 
-#include "component/usb/vsf_usb_cfg.h"
-
+#include "utilities/compiler.h"
 #include <stdint.h>
 
 typedef uint8_t  __u8;

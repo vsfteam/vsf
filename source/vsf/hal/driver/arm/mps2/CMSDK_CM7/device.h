@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-
+/*
 #if defined(CMSDK_CM7)
 #   include "CMSDK_CM7.h"
 #elif defined(CMSDK_CM7_SP)
@@ -28,6 +28,7 @@
 #elif defined(CMSDK_CM7_DP)
 #   include "CMSDK_CM7_DP.h"
 #endif
+*/
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */

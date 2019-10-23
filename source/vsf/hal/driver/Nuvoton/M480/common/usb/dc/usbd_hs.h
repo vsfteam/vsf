@@ -86,7 +86,7 @@ extern uint_fast8_t m480_usbd_hs_get_mframe_number(m480_usbd_hs_t *usbd_hs);
 extern void m480_usbd_hs_get_setup(m480_usbd_hs_t *usbd_hs, uint8_t *buffer);
 extern void m480_usbd_hs_status_stage(m480_usbd_hs_t *usbd_hs, bool is_in);
 
-extern bool m480_usbd_hs_ep_is_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
+extern uint_fast8_t m480_usbd_hs_ep_get_feature(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 extern vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
 extern uint_fast16_t m480_usbd_hs_ep_get_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 
@@ -95,14 +95,14 @@ extern bool m480_usbd_hs_ep_is_stalled(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
 extern vsf_err_t m480_usbd_hs_ep_clear_stall(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 
 extern uint_fast32_t m480_usbd_hs_ep_get_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
-extern vsf_err_t m480_usbd_hs_ep_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t m480_usbd_hs_ep_enable_OUT(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
 
-extern vsf_err_t m480_usbd_hs_ep_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint_fast16_t size);
-extern vsf_err_t m480_usbd_hs_ep_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t m480_usbd_hs_ep_transaction_read_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t m480_usbd_hs_ep_transaction_enable_out(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep);
+extern vsf_err_t m480_usbd_hs_ep_transaction_set_data_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint_fast16_t size);
+extern vsf_err_t m480_usbd_hs_ep_transaction_write_buffer(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
-extern vsf_err_t m480_usbd_hs_ep_recv_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t m480_usbd_hs_ep_send_dma(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp);
+extern vsf_err_t m480_usbd_hs_ep_transfer_recv(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size);
+extern vsf_err_t m480_usbd_hs_ep_transfer_send(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
 
 extern void m480_usbd_hs_irq(m480_usbd_hs_t *usbd_hs);
 

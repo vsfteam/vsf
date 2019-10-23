@@ -1,12 +1,7 @@
 #ifndef __USB_COMMON_H__
 #define __USB_COMMON_H__
 
-#include "component/usb/vsf_usb_cfg.h"
-
-#include "kernel/vsf_kernel.h"
-
 #include "usb_type.h"
-
 #include "usb_ch9.h"
 
 #define USB_DT_HID          (USB_TYPE_CLASS | 0x01)

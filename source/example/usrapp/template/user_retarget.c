@@ -15,7 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 #include "vsf.h"
-#include "Device.h"
 #include <stdio.h>
 void uart_config(void)
 {

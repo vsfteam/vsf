@@ -1,0 +1,355 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
+#include "vsf_vm_cfg.h"
+
+#if     ((VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED))\
+    &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_LIBUSB == ENABLED)
+
+#define VSF_USBH_INHERIT_vsf_usbh_urb_t
+#define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
+#define __VSF_EDA_CLASS_INHERIT
+#define VSF_USBH_IMPLEMENT_CLASS
+#include "vsf.h"
+
+#define VSFVM_RUNTIME_INHERIT
+#include "common/vsfvm_common.h"
+#include "runtime/vsfvm_runtime.h"
+#include "extension/std/vsfvm_ext_std.h"
+#include "./vsfvm_ext_libusb.h"
+
+/*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED
+#   error vsfvm_ext_libusb requires VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE
+#endif
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+
+struct vsfvm_ext_libusb_dev_t {
+    vsf_usbh_libusb_dev_t *ldev;
+    vsfvm_instance_t *inst;
+    vsf_slist_node_t dev_node;
+    vsf_usbh_urb_t urb;
+};
+typedef struct vsfvm_ext_libusb_dev_t vsfvm_ext_libusb_dev_t;
+
+struct vsfvm_ext_libusb_t {
+    implement(vsfvm_ext_t)
+    implement(vsf_eda_t)
+    vsf_slist_t dev_list;
+    vsfvm_runtime_callback_t callback;
+    bool callback_registered;
+};
+typedef struct vsfvm_ext_libusb_t vsfvm_ext_libusb_t;
+
+enum {
+    VSFVM_LIBUSB_EXTFUNC_START = 0,
+    VSFVM_LIBUSB_EXTFUNC_RESET,
+    VSFVM_LIBUSB_EXTFUNC_TRANSFER,
+    VSFVM_LIBUSB_EXTFUNC_NUM,
+};
+
+enum {
+    VSFVM_LIBUSB_EVT_ON_ARRIVED = VSF_EVT_USER,
+    VSFVM_LIBUSB_EVT_ON_LEFT,
+};
+
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+
+static NO_INIT vsfvm_ext_libusb_t vsfvm_ext_libusb;
+
+/*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.eda")
+extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
+/*============================ IMPLEMENTATION ================================*/
+
+#if VSFVM_CFG_RUNTIME_EN == ENABLED
+
+static void vsfvm_ext_libusb_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    if (evt >= VSF_EVT_USER) {
+        vsf_usbh_libusb_dev_t *ldev = vsf_eda_get_cur_msg();
+        vsfvm_var_t argv[2] = {
+            {
+                .type   = VSFVM_VAR_TYPE_VALUE,
+            },
+        };
+
+        VSFVM_ASSERT(ldev != NULL);
+        switch (evt) {
+        case VSFVM_LIBUSB_EVT_ON_ARRIVED:
+            if (vsfvm_ext_libusb.callback_registered) {
+                if (!vsf_usbh_libusb_open(ldev)) {
+                    argv[0].value = VSF_USBH_LIBUSB_EVT_ON_ARRIVED;
+                    argv[1].type = VSFVM_VAR_TYPE_INSTANCE;
+                    argv[1].inst = vsfvm_instance_alloc(sizeof(vsfvm_ext_libusb_dev_t), &vsfvm_ext_libusb_dev);
+                    if (argv[1].inst != NULL) {
+                        vsfvm_ext_libusb_dev_t *ext_ldev = argv[1].inst->pObj;
+                        ext_ldev->ldev = ldev;
+                        ext_ldev->inst = argv[1].inst;
+                        vsf_slist_append(vsfvm_ext_libusb_dev_t, dev_node, &vsfvm_ext_libusb.dev_list, ext_ldev);
+                        vsfvm_runtime_call_callback(&vsfvm_ext_libusb.callback, dimof(argv), (vsfvm_var_t *)&argv);
+                    } else {
+                        vsf_usbh_libusb_close(ldev);
+                    }
+                }
+            }
+            break;
+        case VSFVM_LIBUSB_EVT_ON_LEFT:
+            __vsf_slist_foreach_unsafe(vsfvm_ext_libusb_dev_t, dev_node, &vsfvm_ext_libusb.dev_list) {
+                if (_->ldev == ldev) {
+                    argv[0].value = VSF_USBH_LIBUSB_EVT_ON_LEFT;
+                    argv[1].inst = _->inst;
+                    argv[1].type = VSFVM_VAR_TYPE_INSTANCE;
+                    vsfvm_runtime_call_callback(&vsfvm_ext_libusb.callback, dimof(argv), (vsfvm_var_t *)&argv);
+                }
+            }
+            break;
+        }
+    } else if (evt == VSF_EVT_MESSAGE) {
+        vsfvm_thread_ready((vsfvm_thread_t *)eda);
+    }
+}
+
+static void vsfvm_ext_libusb_on_evt(void *param, vsf_usbh_libusb_dev_t *ldev, vsf_usbh_libusb_evt_t evt)
+{
+    switch (evt) {
+    case VSF_USBH_LIBUSB_EVT_ON_ARRIVED:
+        vsf_eda_post_evt_msg(&vsfvm_ext_libusb.use_as__vsf_eda_t, VSFVM_LIBUSB_EVT_ON_ARRIVED, ldev);
+        break;
+    case VSF_USBH_LIBUSB_EVT_ON_LEFT:
+        vsf_eda_post_evt_msg(&vsfvm_ext_libusb.use_as__vsf_eda_t, VSFVM_LIBUSB_EVT_ON_LEFT, ldev);
+        break;
+    }
+}
+
+static vsfvm_ret_t vsfvm_ext_libusb_start(vsfvm_thread_t *thread)
+{
+    vsfvm_var_t *func = vsfvm_get_func_argu_ref(thread, 0);
+
+    if (!vsfvm_ext_libusb.fn.evthandler) {
+        vsf_slist_init(&vsfvm_ext_libusb.dev_list);
+        vsfvm_ext_libusb.fn.evthandler = vsfvm_ext_libusb_evthandler;
+        vsf_eda_init(&vsfvm_ext_libusb.use_as__vsf_eda_t, VSFVM_CFG_PRIORITY, false);
+        vsf_usbh_libusb_set_evthandler(&vsfvm_ext_libusb, vsfvm_ext_libusb_on_evt);
+    }
+
+    vsfvm_ext_libusb.callback_registered = vsfvm_runtime_register_callback(&vsfvm_ext_libusb.callback, thread, func);
+    return vsfvm_ext_libusb.callback_registered ? VSFVM_RET_FINISHED : VSFVM_RET_INVALID_PARAM;
+}
+
+static vsfvm_ret_t vsfvm_ext_libusb_reset(vsfvm_thread_t *thread)
+{
+    vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
+    vsf_usbh_libusb_dev_t *ldev;
+
+    if (    (thread->func.argc != 1)
+        ||  !vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
+        return VSFVM_RET_ERROR;
+    }
+
+    ldev = ((vsfvm_ext_libusb_dev_t *)thiz->inst->pObj)->ldev;
+    vsf_usbh_reset_dev(ldev->usbh, ldev->dev);
+    return VSFVM_RET_FINISHED;
+}
+
+static vsfvm_ret_t vsfvm_ext_libusb_transfer(vsfvm_thread_t *thread)
+{
+    uint_fast8_t argc = thread->func.argc;
+    vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
+    vsfvm_var_t *ep = vsfvm_get_func_argu_ref(thread, 1);
+    vsfvm_var_t *result = vsfvm_get_func_argu_ref(thread, 2);
+    uint_fast8_t epnum;
+    vsfvm_ext_libusb_dev_t *ext_ldev;
+    vsf_usbh_urb_t *urb;
+
+    if (    (argc < 3)
+        ||  !vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
+        return VSFVM_RET_ERROR;
+    }
+
+    ext_ldev = thiz->inst->pObj;
+    epnum = ep->uval8 &~USB_DIR_MASK;
+    urb = epnum > 0 ? &ext_ldev->urb : &ext_ldev->ldev->dev->ep0.urb;
+
+    if (!thread->fn.evthandler) {
+        vsf_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
+        bool is_in = (ep->uval8 & USB_DIR_MASK) == USB_DIR_IN;
+
+        vsfvm_var_t *length;
+        vsfvm_var_t *buffer;
+
+        if (!epnum) {
+            if (argc != 9) {
+                goto ret_fail;
+            }
+            length = vsfvm_get_func_argu_ref(thread, 7);
+            buffer = vsfvm_get_func_argu_ref(thread, 8);
+        } else {
+            if (argc != 5) {
+                goto ret_fail;
+            }
+            length = vsfvm_get_func_argu_ref(thread, 3);
+            buffer = vsfvm_get_func_argu_ref(thread, 4);
+        }
+
+        if (epnum != 0) {
+            vsf_usbh_eppipe_t pipe = vsf_usbh_urb_get_pipe(urb);
+            if ((pipe.endpoint == epnum) && ((bool)pipe.dir_in1out0 == is_in)) {
+                vsf_usbh_free_urb(ldev->usbh, urb);
+// TODO: implement pipe array in ldev
+//                vsf_usbh_urb_prepare_by_pipe(urb, ldev->dev, ldev->pipe[(is_in ? 16 : 0) + epnum]);
+                if (vsf_usbh_alloc_urb(ldev->usbh, ldev->dev, urb)) {
+                    goto ret_fail;
+                }
+            }
+        }
+
+        if (length->uval32 > 0) {
+            if (!buffer->inst) { return VSFVM_RET_ERROR; }
+            vsf_usbh_urb_set_buffer(urb, buffer->inst->pchBuffer, length->uval32);
+        } else {
+            vsf_usbh_urb_set_buffer(urb, NULL, 0);
+        }
+
+        thread->fn.evthandler = vsfvm_ext_libusb_evthandler;
+        vsf_teda_init(&thread->use_as__vsf_teda_t, VSFVM_CFG_PRIORITY, false);
+
+        if (!epnum) {
+            // control transfer
+            vsfvm_var_t *type = vsfvm_get_func_argu_ref(thread, 3);
+            vsfvm_var_t *request = vsfvm_get_func_argu_ref(thread, 4);
+            vsfvm_var_t *value = vsfvm_get_func_argu_ref(thread, 5);
+            vsfvm_var_t *index = vsfvm_get_func_argu_ref(thread, 6);
+            struct usb_ctrlrequest_t req = {
+                .bRequestType   = type->uval8,
+                .bRequest       = request->uval8,
+                .wValue         = value->uval16,
+                .wIndex         = index->uval16,
+                .wLength        = length->uval16,
+            };
+
+            if (vsf_usbh_control_msg_ex(ldev->usbh, ldev->dev, &req, &thread->use_as__vsf_eda_t)) {
+                goto ret_fail;
+            }
+        } else {
+            if (vsf_usbh_submit_urb_ex(ldev->usbh, urb, 0, &thread->use_as__vsf_eda_t)) {
+                goto ret_fail;
+            }
+        }
+        return VSFVM_RET_PEND;
+    } else {
+        __vsf_eda_fini(&thread->use_as__vsf_eda_t);
+        thread->fn.evthandler = NULL;
+
+        vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vsf_usbh_urb_get_status(urb));
+        if (URB_OK == result->value) {
+            vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vsf_usbh_urb_get_actual_length(urb));
+        }
+
+        return VSFVM_RET_FINISHED;
+    }
+
+ret_fail:
+    vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, VSF_ERR_FAIL);
+    return VSFVM_RET_FINISHED;
+}
+
+static void vsfvm_ext_libusb_dev_print(vsfvm_instance_t *inst)
+{
+    // TODO
+}
+
+static void vsfvm_ext_libusb_dev_destroy(vsfvm_instance_t *inst)
+{
+    VSFVM_ASSERT(vsfvm_instance_of(inst, &vsfvm_ext_libusb_dev));
+    vsfvm_ext_libusb_dev_t *ext_ldev = inst->pObj;
+    VSFVM_ASSERT(vsf_slist_is_in(vsfvm_ext_libusb_dev_t, dev_node, &vsfvm_ext_libusb.dev_list, ext_ldev));
+
+    vsf_slist_remove(vsfvm_ext_libusb_dev_t, dev_node, &vsfvm_ext_libusb.dev_list, ext_ldev);
+    if (ext_ldev->ldev != NULL) {
+        vsf_usbh_libusb_close(ext_ldev->ldev);
+    }
+}
+
+#endif
+
+const vsfvm_class_t vsfvm_ext_libusb_dev = {
+#if VSFVM_CFG_COMPILER_EN == ENABLED
+    .name = "libusb_dev",
+#endif
+#if VSFVM_CFG_RUNTIME_EN == ENABLED
+    .type = VSFVM_CLASS_USER,
+    .op.print = vsfvm_ext_libusb_dev_print,
+    .op.destroy = vsfvm_ext_libusb_dev_destroy,
+#endif
+};
+
+#if VSFVM_CFG_COMPILER_EN == ENABLED
+extern const vsfvm_ext_op_t vsfvm_ext_libusb_op;
+static const vsfvm_lexer_sym_t vsfvm_ext_libusb_sym[] = {
+    VSFVM_LEXERSYM_EXTFUNC("libusb_start", &vsfvm_ext_libusb_op, NULL, NULL, 1, VSFVM_LIBUSB_EXTFUNC_START),
+    VSFVM_LEXERSYM_CONST("USB_EVT_ON_ARRIVED", &vsfvm_ext_libusb_op, NULL, VSF_USBH_LIBUSB_EVT_ON_ARRIVED),
+    VSFVM_LEXERSYM_CONST("USB_EVT_ON_LEFT", &vsfvm_ext_libusb_op, NULL, VSF_USBH_LIBUSB_EVT_ON_LEFT),
+    VSFVM_LEXERSYM_CONST("USB_OUT", &vsfvm_ext_libusb_op, NULL, USB_DIR_OUT),
+    VSFVM_LEXERSYM_CONST("USB_IN", &vsfvm_ext_libusb_op, NULL, USB_DIR_IN),
+
+    // class libusb_dev
+    VSFVM_LEXERSYM_CLASS("libusb_dev", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev),
+    VSFVM_LEXERSYM_EXTFUNC("libusb_dev_reset", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, &vsfvm_ext_libusb_dev, -1, VSFVM_LIBUSB_EXTFUNC_RESET),
+    VSFVM_LEXERSYM_EXTFUNC("libusb_dev_transfer", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, &vsfvm_ext_libusb_dev, -1, VSFVM_LIBUSB_EXTFUNC_TRANSFER),
+};
+#endif
+
+#if VSFVM_CFG_RUNTIME_EN == ENABLED
+static const vsfvm_extfunc_t vsfvm_ext_libusb_func[VSFVM_LIBUSB_EXTFUNC_NUM] = {
+    [VSFVM_LIBUSB_EXTFUNC_START] = VSFVM_EXTFUNC(vsfvm_ext_libusb_start, 1),
+    [VSFVM_LIBUSB_EXTFUNC_RESET] = VSFVM_EXTFUNC(vsfvm_ext_libusb_reset, 1),
+    [VSFVM_LIBUSB_EXTFUNC_TRANSFER] = VSFVM_EXTFUNC(vsfvm_ext_libusb_transfer, -1),
+};
+#endif
+
+static const vsfvm_ext_op_t vsfvm_ext_libusb_op = {
+#if VSFVM_CFG_COMPILER_EN == ENABLED
+    .name = "libusb",
+    .sym = vsfvm_ext_libusb_sym,
+    .sym_num = dimof(vsfvm_ext_libusb_sym),
+#endif
+#if VSFVM_CFG_RUNTIME_EN == ENABLED
+    .init = NULL,
+    .fini = NULL,
+    .func = (vsfvm_extfunc_t *)vsfvm_ext_libusb_func,
+#endif
+    .func_num = dimof(vsfvm_ext_libusb_func),
+};
+
+void vsfvm_ext_register_libusb(void)
+{
+    memset(&vsfvm_ext_libusb, 0, sizeof(vsfvm_ext_libusb));
+
+    vsfvm_ext_libusb.op = &vsfvm_ext_libusb_op;
+    vsfvm_register_ext(&vsfvm_ext_libusb.use_as__vsfvm_ext_t);
+}
+
+#endif      // (VSFVM_CFG_RUNTIME_EN || VSFVM_CFG_COMPILER_EN) && VSF_USE_USB_HOST && VSF_USE_USB_HOST_LIBUSB

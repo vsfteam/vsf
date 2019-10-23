@@ -52,14 +52,6 @@
 //          <o>Event Bits <4-8>
 //          <i>Simon, please add description here...
 #define VSF_OS_CFG_EVTQ_BITSIZE                         4
-
-//          <o>The number of preemptive priorities <1-4>
-//          <i>Simon, please add description here...
-#ifdef __GD32VF103__
-#   define VSF_OS_CFG_PRIORITY_NUM                      1
-#else
-#   define VSF_OS_CFG_PRIORITY_NUM                      10
-#endif
 //      </h>
 
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                         DISABLED
@@ -174,14 +166,6 @@
 
 #define VSF_USE_USB_DEVICE                  ENABLED
 //#   define VSF_USE_USB_DEVICE_DCD_MUSB_FDRC ENABLED
-#ifdef __GD32VF103__
-#   define VSF_USE_USB_DEVICE_DCD_DWCOTG    ENABLED
-#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_prio_0
-#   define VSF_USBD_CFG_HW_PRIORITY         vsf_arch_prio_0
-#else
-#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_prio_9
-#   define VSF_USBD_CFG_HW_PRIORITY         vsf_arch_prio_9
-#endif
 #define VSF_USBD_CFG_USE_EDA                ENABLED
 #   define VSF_USE_USB_DEVICE_CDCACM        ENABLED
 #   define VSF_USE_USB_DEVICE_UVC           DISABLED
@@ -192,12 +176,6 @@
 #define VSF_USE_UI                          DISABLED
 #   define VSF_USE_UI_LVGL                  ENABLED
 #define VSF_USE_DISP_DRV_USBD_UVC           ENABLED
-
-#ifdef __GD32VF103__
-#   define VSF_USE_TRACE                    DISABLED
-#else
-#   define VSF_USE_TRACE                    ENABLED
-#endif
 
 #define VSF_USE_PBUF                        ENABLED
 #   define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT DISABLED
@@ -223,8 +201,49 @@ enum {
         }
 #endif
 
-#ifdef __GD32VF103__
+#ifndef USRAPP_CFG_DCD_TYPE_DEFAULT
+#   define USRAPP_CFG_DCD_TYPE_DEFAULT      0
+#   define USRAPP_CFG_DCD_TYPE_DWCOTG       1
+#   define USRAPP_CFG_DCD_TYPE_MUSB_FDRC    2
+#endif
+
+#include "component/usb/common/usb_common.h"
+#if     defined(__GD32VF103__)
+#   define VSF_USE_TRACE                    DISABLED
+
+#   define VSF_OS_CFG_PRIORITY_NUM          1
+
+#   define VSF_USE_USB_DEVICE_DCD_DWCOTG    ENABLED
+#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_prio_0
+#   define VSF_USBD_CFG_HW_PRIORITY         vsf_arch_prio_0
+
+#   define USRAPP_CFG_USBD_SPEED            USB_SPEED_FULL
 #   define USRAPP_CFG_CDC_NUM               1
+#   define USRAPP_CFG_DCD_TYPE              USRAPP_CFG_DCD_TYPE_DWCOTG
+#   define USRAPP_CFG_STREAM_ALIGN          4
+#elif   defined(__M484__)
+#   define VSF_USE_TRACE                    ENABLED
+
+#   define VSF_OS_CFG_PRIORITY_NUM          10
+
+#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_prio_9
+#   define VSF_USBD_CFG_HW_PRIORITY         vsf_arch_prio_9
+
+#   define USRAPP_CFG_USBD_SPEED            USB_SPEED_HIGH
+#   define USRAPP_CFG_CDC_NUM               3
+#   define USRAPP_CFG_DCD_TYPE              USRAPP_CFG_DCD_TYPE_DEFAULT
+#   define USRAPP_CFG_STREAM_ALIGN          1
+#else
+#   define VSF_USBD_CFG_EDA_PRIORITY        vsf_prio_0
+#   define VSF_USBD_CFG_HW_PRIORITY         vsf_arch_prio_0
+
+#   define USRAPP_CFG_USBD_SPEED            USB_SPEED_FULL
+#   define USRAPP_CFG_DCD_TYPE              USRAPP_CFG_DCD_TYPE_DEFAULT
+#   define USRAPP_CFG_STREAM_ALIGN          1
+#endif
+
+#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+#   define VSF_DWCOTG_DCD_CFG_AUTO_BUFFER_INIT  ENABLED
 #endif
 
 /*============================ TYPES =========================================*/

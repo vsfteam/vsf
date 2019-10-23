@@ -254,8 +254,6 @@ vsf_err_t __vsf_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,
     return VSF_ERR_NONE;
 }
 
-extern void __vsf_eda_set_is_stack_owner(void);
-
 SECTION("text.vsf.kernel.__vsf_eda_call_thread")
 vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
 {

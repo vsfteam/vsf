@@ -172,8 +172,10 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
     #endif
 #ifdef __VSF_OS_SWI_PRIORITY_BEGIN
     if (priority >= __VSF_OS_SWI_PRIORITY_BEGIN) {
+        priority -= __VSF_OS_SWI_PRIORITY_BEGIN;
+        index -= __VSF_OS_SWI_PRIORITY_BEGIN;
         return vsf_swi_init(
-                index, 
+                index,
                 __vsf_os.res_ptr->arch.os_swi_priorities_ptr[priority],
                 &__vsf_os_evtq_swi_handler, pthis);
     }
@@ -203,6 +205,7 @@ vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
 
 #ifdef __VSF_OS_SWI_PRIORITY_BEGIN
     if (index >= __VSF_OS_SWI_PRIORITY_BEGIN) {
+        index -= __VSF_OS_SWI_PRIORITY_BEGIN;
         vsf_swi_trigger(index);
     }
 #endif

@@ -230,7 +230,7 @@ static void vsf_usbh_clean_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
     }
 }
 
-static void vsf_usbh_reset_dev(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
+void vsf_usbh_reset_dev(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev)
 {
 #if VSF_USE_USB_HOST_HUB == ENABLED
     if (dev->dev_parent != NULL) {
@@ -324,7 +324,7 @@ void vsf_usbh_urb_set_buffer(vsf_usbh_urb_t *urb, void *buffer,
 
 int_fast16_t vsf_usbh_urb_get_status(vsf_usbh_urb_t *urb)
 {
-    VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
+    VSF_USB_ASSERT((urb != NULL) && (urb->urb_hcd != NULL) && !urb->pipe.is_pipe);
     return urb->urb_hcd->status;
 }
 

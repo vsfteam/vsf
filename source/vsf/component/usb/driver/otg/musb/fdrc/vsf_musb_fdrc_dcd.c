@@ -142,9 +142,9 @@ void vsf_musb_fdrc_usbd_status_stage(vsf_musb_fdrc_dcd_t *usbd, bool is_in)
     }
 }
 
-bool vsf_musb_fdrc_usbd_ep_is_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
+uint_fast8_t vsf_musb_fdrc_usbd_ep_get_feature(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
 {
-    return usbd->is_dma;
+    return usbd->is_dma ? USB_DC_FEATURE_TRANSFER : 0;
 }
 
 vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
@@ -303,7 +303,7 @@ uint_fast32_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uin
     return vsf_musb_fdrc_rx_fifo_size(reg, ep);
 }
 
-vsf_err_t vsf_musb_fdrc_usbd_ep_read_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_read_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     vsf_musb_fdrc_reg_t *reg;
     uint_fast8_t ep_orig;
@@ -323,13 +323,13 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_read_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_musb_fdrc_usbd_ep_enable_OUT(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
+vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_enable_out(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
 {
     VSF_USB_ASSERT(!(ep & 0x80) && ((ep & 0x0F)) < (usbd->ep_num / 2));
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_musb_fdrc_usbd_ep_set_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size)
+vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_set_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size)
 {
     vsf_musb_fdrc_reg_t *reg = usbd->reg;
     uint_fast8_t ep_orig;
@@ -351,7 +351,7 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_set_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fa
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_musb_fdrc_usbd_ep_write_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_write_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     vsf_musb_fdrc_reg_t *reg;
 
@@ -362,13 +362,13 @@ vsf_err_t vsf_musb_fdrc_usbd_ep_write_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fas
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_musb_fdrc_usbd_ep_recv_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t vsf_musb_fdrc_usbd_ep_transfer_recv(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;
 }
 
-vsf_err_t vsf_musb_fdrc_usbd_ep_send_dma(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size, bool zlp)
+vsf_err_t vsf_musb_fdrc_usbd_ep_transfer_send(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp)
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;

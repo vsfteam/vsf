@@ -22,26 +22,26 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#include "./dwcotg_regs.h"
+#if     (VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED)\
+    ||  (VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED)
+
+#include "hal/vsf_hal.h"
 #include "hal/interface/vsf_interface_usb.h"
 
+#include "./vsf_dwcotg_hw.h"
+
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_DWCOTG_DCD_CFG_EP_NUM
+#   ifdef USB_DWCOTG_MAX_EP_NUM
+#       define VSF_DWCOTG_DCD_CFG_EP_NUM        USB_DWCOTG_MAX_EP_NUM
+#   else
+#       define VSF_DWCOTG_DCD_CFG_EP_NUM        16
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct vsf_dwcotg_hw_info_t {
-    union {
-        struct {
-            uint8_t speed : 4;
-            uint8_t ulpi_en : 1;
-            uint8_t utmi_en : 1;
-            uint8_t vbus_en : 1;
-            uint8_t dma_en : 1;
-        };
-        uint8_t feature;
-    };
-};
-typedef struct vsf_dwcotg_hw_info_t vsf_dwcotg_hw_info_t;
 
 struct vsf_dwcotg_param_t {
     union {
@@ -79,8 +79,7 @@ struct vsf_dwcotg_reg_t {
             } ep;
         } dev;
     };
-    // TODO:
-    uint32_t * dfifo[16];
+    uint32_t * dfifo[VSF_DWCOTG_DCD_CFG_EP_NUM];
 };
 typedef struct vsf_dwcotg_reg_t vsf_dwcotg_reg_t;
 
@@ -98,5 +97,6 @@ void vsf_dwcotg_phy_init(vsf_dwcotg_t *dwcotg,
                         const vsf_dwcotg_param_t *param,
                         vsf_dwcotg_hw_info_t *hw_info);
 
+#endif
 #endif
 /* EOF */

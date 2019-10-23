@@ -22,6 +22,8 @@
 #include "./vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
+
+#define __INCLUDE_MUTEX_KERNEL
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
@@ -29,6 +31,8 @@
 #include "./vsf_os.h"
 #include "./shell/vsf_shell.h"
 #include "./task/vsf_task.h"
+#undef __INCLUDE_MUTEX_KERNEL
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

@@ -64,8 +64,12 @@
 #ifndef __HAL_DRIVER_H__
 #define __HAL_DRIVER_H__
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED || VSF_USE_SERVICE_STREAM == ENABLED
-#include "service/vsf_service.h"
+#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED 
+#       include "service/vsfstream/vsfstream.h"
+#   elif VSF_USE_SERVICE_STREAM == ENABLED
+#       include "service/stream/vsf_stream.h"
+#   endif
 #endif
 
 /*============================ MACROS ========================================*/

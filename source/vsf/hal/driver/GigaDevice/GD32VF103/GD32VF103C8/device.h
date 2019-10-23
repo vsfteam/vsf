@@ -24,6 +24,8 @@
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */
+#define VSF_ARCH_PRI_NUM            16
+#define VSF_ARCH_PRI_BIT            4
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             0
@@ -39,11 +41,14 @@
 
 #define USB_OTG_COUNT               1
 #define USB_OTG0_IRQHandler         USBFS_IRQHandler
+// required by dwcotg, define the max ep number of dwcotg
+#define USB_DWCOTG_MAX_EP_NUM       4
 
 #define USB_OTG0_CONFIG                                                         \
     .ep_num = 8,                                                                \
     .irq = USBFS_IRQn,                                                          \
     .reg = 0x50000000,                                                          \
+    .buffer_word_size = 0x500 >> 2,                                             \
     .speed = USB_SPEED_FULL,                                                    \
 	.dma_en = false,                                                            \
 	.ulpi_en = false,                                                           \

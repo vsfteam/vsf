@@ -57,6 +57,7 @@ void gd32vf103_usbd_get_info(gd32vf103_usb_t *dc, usb_dc_ip_info_t *info)
     VSF_HAL_ASSERT(dwcotg_info != NULL);
     dwcotg_info->regbase = dc->param->reg;
     dwcotg_info->ep_num = param->ep_num;
+    dwcotg_info->buffer_word_size = param->buffer_word_size;
     dwcotg_info->feature = param->feature;
 }
 

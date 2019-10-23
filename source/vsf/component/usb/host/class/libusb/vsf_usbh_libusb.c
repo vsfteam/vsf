@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_LIBUSB == ENABLED
 
 #define VSF_USBH_IMPLEMENT_CLASS
 #include "vsf.h"
@@ -85,16 +85,16 @@ static void vsf_usbh_libusb_disconnect(vsf_usbh_t *usbh,
                     ldev,
                     VSF_USBH_LIBUSB_EVT_ON_LEFT);
         }
-        if (ldev->opened) {
-            ldev->removed = true;
+
+        if (ldev->is_opened) {
+            ldev->is_to_remove = true;
         } else {
             vsf_usbh_libusb_free(ldev);
         }
     }
 }
 
-static const vsf_usbh_dev_id_t vsf_usbh_libusb_id[] =
-{
+static const vsf_usbh_dev_id_t vsf_usbh_libusb_id[] = {
     {
         .match_dev_lo = 1,
         .bcdDevice_lo = 0,
@@ -110,24 +110,23 @@ void vsf_usbh_libusb_set_evthandler(void *param, vsf_usbh_libusb_on_event_t on_e
 
 void vsf_usbh_libusb_close(vsf_usbh_libusb_dev_t *ldev)
 {
-    ldev->opened = false;
-    if (ldev->removed) {
+    ldev->is_opened = false;
+    if (ldev->is_to_remove) {
         vsf_usbh_libusb_free(ldev);
     }
 }
 
 vsf_err_t vsf_usbh_libusb_open(vsf_usbh_libusb_dev_t *ldev)
 {
-    if (ldev->opened) {
+    if (ldev->is_opened) {
         return VSF_ERR_FAIL;
     } else {
-        ldev->opened = true;
+        ldev->is_opened = true;
         return VSF_ERR_NONE;
     }
 }
 
-const vsf_usbh_class_drv_t vsf_usbh_libusb_drv =
-{
+const vsf_usbh_class_drv_t vsf_usbh_libusb_drv = {
     .name       = "libusb",
     .dev_id_num = dimof(vsf_usbh_libusb_id),
     .dev_ids    = vsf_usbh_libusb_id,
