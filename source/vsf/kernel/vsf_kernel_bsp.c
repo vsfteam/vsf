@@ -53,9 +53,16 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 {
 
 #if __VSF_OS_SWI_NUM > 0
-#define MFUNC_IN_U8_DEC_VALUE                   __VSF_OS_SWI_NUM
+
+#if __VSF_OS_SWI_NUM < VSF_ARCH_PRI_NUM
+/*! \note including (vsf_prio_highest + 1) into the lookup table
+ */
+#   define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM+1)
+#else
+#   define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM)
+#endif
 #include "utilities/preprocessor/mf_u8_dec2str.h"
-    static const vsf_arch_prio_t __vsf_os_swi_priority[MFUNC_OUT_DEC_STR] = {
+    static const vsf_arch_prio_t __vsf_os_swi_priority[] = {
         MREPEAT(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
 #endif

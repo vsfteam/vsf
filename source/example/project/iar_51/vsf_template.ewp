@@ -371,7 +371,7 @@
                 </option>
                 <option>
                     <name>CCMultibyteSupport</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCMigrationPreprocExtentions</name>
@@ -2597,7 +2597,7 @@
                 </option>
                 <option>
                     <name>CCMultibyteSupport</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCMigrationPreprocExtentions</name>
@@ -3344,9 +3344,6 @@
             <data />
         </settings>
     </configuration>
-    <mfc_discard>
-        <configuration>Debug</configuration>
-    </mfc_discard>
     <group>
         <name>usrapp</name>
         <group>
@@ -3813,6 +3810,10 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\retarget_io.c</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                        <configuration>vsfvm</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\signal.c</name>

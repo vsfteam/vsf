@@ -35,11 +35,20 @@
 
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#       define __implement_vsf_pt(__NAME)                                       \
+#   define __implement_vsf_pt(__NAME)                                           \
             __implement_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+
+#   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
+            __implement_vsf_pt_common(  __FUNC_NAME,                            \
+                                        __vsf_pt_common(__NAME) *ptThis)
+
 #else
-#       define __implement_vsf_pt(__NAME)                                       \
+#   define __implement_vsf_pt(__NAME)                                           \
             __implement_vsf_pt_common(__NAME, __NAME *ptThis)
+
+#   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
+            __implement_vsf_pt_common(  __FUNC_NAME,                            \
+                                        __NAME *ptThis)
 #endif
 
 #define __vsf_pt_state()         (ptThis->chState)
@@ -153,6 +162,8 @@
 
 
 #define implement_vsf_pt(__NAME)        __implement_vsf_pt(__NAME)
+#define implement_vsf_pt_ex(__NAME, __FUNC_NAME)                                \
+            __implement_vsf_pt_ex(__NAME, __FUNC_NAME)
 
 #define __vsf_pt_func(__NAME)           __vsf_pt_func_common(__NAME)
 #define vsf_pt_func(__NAME)             __vsf_pt_func(__NAME)
@@ -168,12 +179,15 @@
                                 __MEMBER)           
 
 #   define def_vsf_pt(__NAME,__MEMBER)       __def_vsf_pt(__NAME, __MEMBER)
+#   define end_def_vsf_pt(__NAME)
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
             __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)           
 
 #   define def_vsf_pt(__NAME,...)       __def_vsf_pt(__NAME,__VA_ARGS__)
+#   define end_def_vsf_pt(...)
 #endif
+
 
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED

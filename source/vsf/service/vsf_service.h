@@ -28,7 +28,6 @@
 #include "./stream/vsf_stream.h"
 #include "./vsfstream/vsfstream.h"
 
-#include "./msg_tree/vsf_msg_tree.h"
 #include "./trace/vsf_trace.h"
 #include "./json/vsf_json.h"
 

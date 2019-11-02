@@ -102,7 +102,7 @@ ROOT ISR(SysTick_Handler)
 
 /*! \brief initialise systimer without enable it 
  */
-vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
+vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 {
     return VSF_ERR_NOT_SUPPORT;
 }

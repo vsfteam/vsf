@@ -58,6 +58,7 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
 #pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Wconstant-conversion"
 #elif __IS_COMPILER_GCC__
 #else
   #warning Not supported compiler type

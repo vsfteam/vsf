@@ -120,7 +120,7 @@ void vsf_trace_fini(void)
 static void vsf_trace_arg(const char *format, va_list *arg)
 {
     vsf_protect_t origlevel = vsf_protect_scheduler();
-    //__vsf_sched_safe(  
+    //__vsf_sched_safe(
         uint_fast32_t size = vsnprintf( (char *)__vsf_trace.print_buffer,
                                         sizeof(__vsf_trace.print_buffer),
                                         format, 

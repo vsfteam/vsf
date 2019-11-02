@@ -28,7 +28,7 @@
 //#define ASSERT(...)
 
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
-#define VSF_HEAP_SIZE                   0x4000
+#define VSF_HEAP_SIZE                   0x10000
 
 #define VSF_SYSTIMER_FREQ               (192000000ul)
 
@@ -146,6 +146,7 @@
 #define VSF_USE_USB_HOST                                ENABLED
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #define VSF_USE_USB_HOST_HCD_LIBUSB                     ENABLED
+#   define VSF_LIBUSB_HCD_CFG_REMOVE_ON_ERROR           ENABLED
 #   define VSF_LIBUSB_HCD_CFG_DEV_NUM                   3
 #   define VSF_LIBUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
 #   define VSF_LIBUSB_HCD_DEV0_PID                      0x0001
@@ -212,8 +213,8 @@ enum {
 
 #endif
 
+#define VSF_USE_TINY_GUI                                ENABLED
 #define VSF_USE_MSG_TREE                                ENABLED
-
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *

@@ -30,6 +30,7 @@
 #   include "kernel/vsf_kernel.h"
 #endif
 
+#include "osa_service/vsf_osa_service.h"
 #include "component/vsf_component.h"
 
 #ifdef VSF_CFG_USER_HEADER

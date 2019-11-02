@@ -159,6 +159,7 @@
 #define VSF_USE_USB_HOST_HUB                            ENABLED
 #define VSF_USE_USB_HOST_ECM                            ENABLED
 #define VSF_USE_USB_HOST_HCD_OHCI                       ENABLED
+#define VSF_USE_USB_HOST_LIBUSB                         ENABLED
 
 #if defined(__WIN__) || defined(__LINUX__)
 #define VSF_USE_USB_DEVICE                              DISABLED

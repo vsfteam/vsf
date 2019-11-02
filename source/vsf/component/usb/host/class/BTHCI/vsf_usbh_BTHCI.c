@@ -21,6 +21,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
 
+#define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_urb_t
 #define VSF_USBH_IMPLEMENT_CLASS
 #include "vsf.h"
 
@@ -30,18 +31,52 @@
 #   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
 #endif
 
-#ifndef VSF_USBH_BTHCI_CFG_SCO_EN
-#   define VSF_USBH_BTHCI_CFG_SCO_EN    DISABLED
+#ifndef VSF_USBH_BTHCI_CFG_SCO_IN_NUM
+#   define VSF_USBH_BTHCI_CFG_SCO_IN_NUM    8
 #endif
 
-#define BTHCI_PACKET_TYPE_CMD           1
-#define BTHCI_PACKET_TYPE_ACL           2
-#define BTHCI_PACKET_TYPE_SCO           3
-#define BTHCI_PACKET_TYPE_EVENT         4
-#define BTHCI_PACKET_TYPE_IN            0x00
-#define BTHCI_PACKET_TYPE_OUT           0x80
+#ifndef VSF_USBH_BTHCI_CFG_SCO_OUT_NUM
+#   define VSF_USBH_BTHCI_CFG_SCO_OUT_NUM   8
+#endif
 
-#define BTHCI_BUFSIZE                    (255 + 3)
+#ifndef VSF_USBH_BTHCI_CFG_ACL_IN_NUM
+#   define VSF_USBH_BTHCI_CFG_ACL_IN_NUM    8
+#endif
+
+#ifndef VSF_USBH_BTHCI_CFG_ACL_OUT_NUM
+#   define VSF_USBH_BTHCI_CFG_ACL_OUT_NUM   8
+#endif
+
+#ifndef VSF_USBH_BTHCI_CFG_URB_BUFSIZE
+#   define VSF_USBH_BTHCI_CFG_URB_BUFSIZE   1024
+#endif
+
+// VSF_USBH_BTHCI_CFG_URB_OUT_USE_LOCAL_BUFFER MUST be enabled for btstack if fragmentation is used
+//  because btstack will overwrite last 4 bytes of previous packet with header of the current packet
+#ifndef VSF_USBH_BTHCI_CFG_URB_OUT_USE_LOCAL_BUFFER
+#   define VSF_USBH_BTHCI_CFG_URB_OUT_USE_LOCAL_BUFFER          ENABLED
+
+#   ifndef VSF_USBH_BTHCI_CFG_URB_OUT_USE_DYNAMIC_BUFFER
+#       define VSF_USBH_BTHCI_CFG_URB_OUT_USE_DYNAMIC_BUFFER    ENABLED
+#   endif
+#endif
+
+
+
+#define BTHCI_PACKET_TYPE_CMD               1
+#define BTHCI_PACKET_TYPE_ACL               2
+#define BTHCI_PACKET_TYPE_SCO               3
+#define BTHCI_PACKET_TYPE_EVENT             4
+#define BTHCI_PACKET_TYPE_IN                0x00
+#define BTHCI_PACKET_TYPE_OUT               0x80
+
+#if (VSF_USBH_BTHCI_CFG_SCO_OUT_NUM + VSF_USBH_BTHCI_CFG_SCO_IN_NUM) > 0
+#   define VSF_USBH_BTHCI_CFG_SCO_EN        ENABLED
+#endif
+
+#if (VSF_USBH_BTHCI_CFG_ACL_OUT_NUM + VSF_USBH_BTHCI_CFG_ACL_IN_NUM) > 0
+#   define VSF_USBH_BTHCI_CFG_ACL_EN        ENABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -52,9 +87,10 @@ typedef struct vsf_usbh_bthci_t vsf_usbh_bthci_t;
 struct vsf_usbh_bthci_iocb_t {
     vsf_usbh_urb_t urb;
     uint8_t type;
-    bool is_icb         : 1;
-    bool is_busy        : 1;
-    bool is_ep0_claimed : 1;
+    uint8_t is_supported    : 1;
+    uint8_t is_icb          : 1;
+    uint8_t is_busy         : 1;
+    uint8_t is_ep0_claimed  : 1;
 };
 typedef struct vsf_usbh_bthci_iocb_t vsf_usbh_bthci_iocb_t;
 
@@ -72,39 +108,33 @@ struct vsf_usbh_bthci_t {
             union {
                 struct {
                     vsf_usbh_bthci_iocb_t event_icb;
-                    vsf_usbh_bthci_iocb_t aclin_icb;
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-                    vsf_usbh_bthci_iocb_t scoin_icb;
+#if VSF_USBH_BTHCI_CFG_ACL_IN_NUM > 0
+                    vsf_usbh_bthci_iocb_t acl_icb[VSF_USBH_BTHCI_CFG_ACL_IN_NUM];
+#endif
+#if VSF_USBH_BTHCI_CFG_SCO_IN_NUM > 0
+                    vsf_usbh_bthci_iocb_t sco_icb[VSF_USBH_BTHCI_CFG_SCO_IN_NUM];
 #endif
                 };
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-                vsf_usbh_bthci_iocb_t icb[3];
-#else
-                vsf_usbh_bthci_iocb_t icb[2];
-#endif
+                vsf_usbh_bthci_iocb_t icb[1 + VSF_USBH_BTHCI_CFG_ACL_IN_NUM + VSF_USBH_BTHCI_CFG_SCO_IN_NUM];
             };
 
             union {
                 struct {
                     vsf_usbh_bthci_iocb_t cmd_ocb;
-                    vsf_usbh_bthci_iocb_t aclout_ocb;
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-                    vsf_usbh_bthci_iocb_t scoout_ocb;
+#if VSF_USBH_BTHCI_CFG_ACL_OUT_NUM > 0
+                    vsf_usbh_bthci_iocb_t acl_ocb[VSF_USBH_BTHCI_CFG_ACL_OUT_NUM];
+#endif
+#if VSF_USBH_BTHCI_CFG_SCO_OUT_NUM > 0
+                    vsf_usbh_bthci_iocb_t sco_ocb[VSF_USBH_BTHCI_CFG_SCO_OUT_NUM];
 #endif
                 };
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-                vsf_usbh_bthci_iocb_t ocb[3];
-#else
-                vsf_usbh_bthci_iocb_t ocb[2];
-#endif
+                vsf_usbh_bthci_iocb_t ocb[1 + VSF_USBH_BTHCI_CFG_ACL_OUT_NUM + VSF_USBH_BTHCI_CFG_SCO_OUT_NUM];
             };
         };
-
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-        vsf_usbh_bthci_iocb_t iocb[6];
-#else
-        vsf_usbh_bthci_iocb_t iocb[4];
-#endif
+        vsf_usbh_bthci_iocb_t iocb[
+                        2       // event_icb, cmd_ocb
+                    +   VSF_USBH_BTHCI_CFG_ACL_IN_NUM + VSF_USBH_BTHCI_CFG_SCO_IN_NUM
+                    +   VSF_USBH_BTHCI_CFG_ACL_OUT_NUM + VSF_USBH_BTHCI_CFG_SCO_OUT_NUM];
     };
 };
 typedef struct vsf_usbh_bthci_t vsf_usbh_bthci_t;
@@ -163,7 +193,21 @@ static vsf_usbh_bthci_iocb_t * vsf_usbh_bthci_get_ocb(vsf_usbh_bthci_t *bthci, u
 {
     vsf_usbh_bthci_iocb_t *ocb = bthci->ocb;
     for (int i = 0; i < dimof(bthci->ocb); i++, ocb++) {
-        if ((ocb->type == type) && !ocb->is_busy) {
+        if ((ocb->type == type) && ocb->is_supported && !ocb->is_busy) {
+            if ((ocb->type != BTHCI_PACKET_TYPE_CMD) && !vsf_usbh_urb_is_alloced(&ocb->urb)) {
+                vsf_usbh_t *usbh = bthci->usbh;
+                vsf_usbh_dev_t *dev = bthci->dev;
+                if (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &ocb->urb)) {
+                    break;
+                }
+#if     VSF_USBH_BTHCI_CFG_URB_OUT_USE_LOCAL_BUFFER == ENABLED                  \
+    &&  VSF_USBH_BTHCI_CFG_URB_OUT_USE_DYNAMIC_BUFFER != ENABLED
+                if (NULL == vsf_usbh_urb_alloc_buffer(&ocb->urb, VSF_USBH_BTHCI_CFG_URB_BUFSIZE)) {
+                    vsf_usbh_free_urb(usbh, &ocb->urb);
+                    break;
+                }
+#endif
+            }
             return ocb;
         }
     }
@@ -198,20 +242,38 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
 
-            if (    (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->aclout_ocb.urb))
-                ||  (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->event_icb.urb))
-                ||  (NULL == vsf_usbh_urb_alloc_buffer(&bthci->event_icb.urb, BTHCI_BUFSIZE))
-                ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->event_icb.urb))
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-                ||  (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->scoin_icb.urb))
-                ||  (NULL == vsf_usbh_urb_alloc_buffer(&bthci->scoin_icb.urb, BTHCI_BUFSIZE))
-                ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->scoin_icb.urb))
-#endif
-                ||  (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->aclin_icb.urb))
-                ||  (NULL == vsf_usbh_urb_alloc_buffer(&bthci->aclin_icb.urb, BTHCI_BUFSIZE))
-                ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->aclin_icb.urb))) {
+            if (    (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->event_icb.urb))
+                ||  (NULL == vsf_usbh_urb_alloc_buffer(&bthci->event_icb.urb, VSF_USBH_BTHCI_CFG_URB_BUFSIZE))
+                ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->event_icb.urb))) {
                 break;
             }
+
+#if VSF_USBH_BTHCI_CFG_SCO_IN_NUM > 0
+            for (int i = 0; i < VSF_USBH_BTHCI_CFG_SCO_IN_NUM; i++) {
+                if (    bthci->sco_icb[i].is_supported
+                    &&  (   (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->sco_icb[i].urb))
+                        ||  (NULL == vsf_usbh_urb_alloc_buffer(&bthci->sco_icb[i].urb, VSF_USBH_BTHCI_CFG_URB_BUFSIZE))
+                        ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->sco_icb[i].urb)))) {
+                    // ignore errors and go on
+                    vsf_trace(VSF_TRACE_ERROR, "fail to prepare scoin_icb %d", i);
+                    break;
+                }
+            }
+#endif
+
+#if VSF_USBH_BTHCI_CFG_ACL_IN_NUM > 0
+            for (int i = 0; i < VSF_USBH_BTHCI_CFG_ACL_IN_NUM; i++) {
+                if (    bthci->acl_icb[i].is_supported
+                    &&  (   (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &bthci->acl_icb[i].urb))
+                        ||  (NULL == vsf_usbh_urb_alloc_buffer(&bthci->acl_icb[i].urb, VSF_USBH_BTHCI_CFG_URB_BUFSIZE))
+                        ||  (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &bthci->acl_icb[i].urb)))) {
+                    // ignore errors and go on
+                    vsf_trace(VSF_TRACE_ERROR, "fail to prepare aclin_icb %d", i);
+                    break;
+                }
+            }
+#endif
+
 #ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
             vsf_usbh_bthci_on_new(bthci, &bthci->id);
 #else
@@ -243,6 +305,7 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     iocb->is_ep0_claimed = false;
                     __vsf_eda_crit_npb_leave(&dev->ep0.crit);
                 }
+                iocb->is_busy = false;
                 if (URB_OK == status) {
 #ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
                     vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
@@ -299,6 +362,7 @@ static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     struct usb_endpoint_desc_t *desc_ep = parser_ifs->parser_alt[ifs->cur_alt].desc_ep;
     vsf_usbh_bthci_t *bthci;
     uint_fast8_t epaddr;
+    bool is_in;
 
     // only probe interface 0
     if (desc_ifs->bInterfaceNumber != 0) {
@@ -316,35 +380,59 @@ static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
             goto free_all;
         }
         epaddr = desc_ep->bEndpointAddress;
-        switch (desc_ep->bmAttributes)
-        {
+        is_in = (epaddr & USB_DIR_MASK) == USB_DIR_IN;
+        switch (desc_ep->bmAttributes) {
 #if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
         case USB_ENDPOINT_XFER_ISOC:
-            if (epaddr & USB_ENDPOINT_DIR_MASK) {
-                vsf_usbh_urb_prepare(&bthci->scoin_icb.urb, dev, desc_ep);
+            if (is_in) {
+                for (int i = 0; i < VSF_USBH_BTHCI_CFG_SCO_IN_NUM; i++) {
+                    vsf_usbh_urb_prepare(&bthci->sco_icb[i].urb, dev, desc_ep);
+                    bthci->sco_icb[i].type = BTHCI_PACKET_TYPE_SCO;
+                    bthci->sco_icb[i].is_supported = true;
+                    bthci->sco_icb[i].is_icb = true;
+                }
             } else {
-                vsf_usbh_urb_prepare(&bthci->scoout_ocb.urb, dev, desc_ep);
+                for (int i = 0; i < VSF_USBH_BTHCI_CFG_SCO_OUT_NUM; i++) {
+                    vsf_usbh_urb_prepare(&bthci->sco_ocb[i].urb, dev, desc_ep);
+                    bthci->sco_ocb[i].type = BTHCI_PACKET_TYPE_SCO;
+                    bthci->sco_ocb[i].is_supported = true;
+                    bthci->sco_ocb[i].is_icb = false;
+                }
             }
             break;
 #endif
+#if VSF_USBH_BTHCI_CFG_ACL_EN == ENABLED
         case USB_ENDPOINT_XFER_BULK:
-            if (epaddr & USB_ENDPOINT_DIR_MASK) {
-                vsf_usbh_urb_prepare(&bthci->aclin_icb.urb, dev, desc_ep);
+            if (is_in) {
+                for (int i = 0; i < VSF_USBH_BTHCI_CFG_SCO_IN_NUM; i++) {
+                    vsf_usbh_urb_prepare(&bthci->acl_icb[i].urb, dev, desc_ep);
+                    bthci->acl_icb[i].type = BTHCI_PACKET_TYPE_ACL;
+                    bthci->acl_icb[i].is_supported = true;
+                    bthci->acl_icb[i].is_icb = true;
+                }
             } else {
-                vsf_usbh_urb_prepare(&bthci->aclout_ocb.urb, dev, desc_ep);
+                for (int i = 0; i < VSF_USBH_BTHCI_CFG_SCO_OUT_NUM; i++) {
+                    vsf_usbh_urb_prepare(&bthci->acl_ocb[i].urb, dev, desc_ep);
+                    bthci->acl_ocb[i].type = BTHCI_PACKET_TYPE_ACL;
+                    bthci->acl_ocb[i].is_supported = true;
+                    bthci->acl_ocb[i].is_icb = false;
+                }
             }
             break;
+#endif
         case USB_ENDPOINT_XFER_INT:
-            if (epaddr & USB_ENDPOINT_DIR_MASK) {
+            if (is_in) {
                 vsf_usbh_urb_prepare(&bthci->event_icb.urb, dev, desc_ep);
+                bthci->event_icb.type = BTHCI_PACKET_TYPE_EVENT;
+                bthci->event_icb.is_supported = true;
+                bthci->event_icb.is_icb = true;
             }
             break;
         }
         desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
-    if (    !vsf_usbh_urb_is_valid(&bthci->event_icb.urb)
-        ||  !vsf_usbh_urb_is_valid(&bthci->aclin_icb.urb)
-        ||  !vsf_usbh_urb_is_valid(&bthci->aclout_ocb.urb)) {
+
+    if (!bthci->event_icb.is_supported) {
         goto free_all;
     }
 
@@ -354,28 +442,12 @@ static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     bthci->id.idProduct = usbh->parser->desc_device->idProduct;
     bthci->id.idVendor = usbh->parser->desc_device->idVendor;
 
-    // event_icb is used for init at startup
-    bthci->event_icb.type = BTHCI_PACKET_TYPE_EVENT;
-    bthci->event_icb.is_icb = true;
-    bthci->aclin_icb.type = BTHCI_PACKET_TYPE_ACL;
-    bthci->aclin_icb.is_icb = true;
-    bthci->aclout_ocb.type = BTHCI_PACKET_TYPE_ACL;
-    bthci->aclout_ocb.is_icb = false;
     bthci->cmd_ocb.type = BTHCI_PACKET_TYPE_CMD;
+    bthci->cmd_ocb.is_supported = true;
     bthci->cmd_ocb.is_icb = false;
     bthci->cmd_ocb.urb.urb_hcd = dev->ep0.urb.urb_hcd;
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
-    bthci->scoin_icb.type = BTHCI_PACKET_TYPE_SCO;
-    bthci->scoin_icb.is_icb = true;
-    bthci->scoout_ocb.type = BTHCI_PACKET_TYPE_SCO;
-    bthci->scoout_ocb.is_icb = false;
-#endif
 
-    if (VSF_ERR_NONE != vsf_eda_set_evthandler(&(bthci->eda), vsf_usbh_bthci_evthandler)) {
-        VSF_USB_ASSERT(false);
-    }
-
-    //bthci->eda.evthandler = vsf_usbh_bthci_evthandler;
+    vsf_eda_set_evthandler(&(bthci->eda), vsf_usbh_bthci_evthandler);
     bthci->eda.on_terminate = vsf_usbh_bthci_on_eda_terminate;
     vsf_eda_init(&bthci->eda, vsf_prio_inherit, false);
     return bthci;
@@ -426,21 +498,13 @@ vsf_err_t vsf_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t
     if (!ocb) {
         return VSF_ERR_NOT_AVAILABLE;
     }
-    if (size > BTHCI_BUFSIZE) {
-        return VSF_ERR_NOT_SUPPORT;
-    }
-
     urb = &ocb->urb;
-    vsf_usbh_urb_set_buffer(urb, packet, size);
 
     switch (type) {
     case BTHCI_PACKET_TYPE_CMD:
         if (ocb->is_ep0_claimed || __vsf_eda_crit_npb_try_to_enter(&bthci->dev->ep0.crit, 0)) {
             return VSF_ERR_NOT_AVAILABLE;
-        }
-
-        ocb->is_ep0_claimed = true;
-        do {
+        } else {
             struct usb_ctrlrequest_t req = {
                 .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_DEVICE | USB_DIR_OUT,
                 .bRequest        =  0,
@@ -448,19 +512,45 @@ vsf_err_t vsf_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t
                 .wIndex          =  0,
                 .wLength         =  size,
             };
-            return vsf_usbh_control_msg_ex(usbh, bthci->dev, &req, &bthci->eda);
-        } while (0);
+
+            ocb->is_ep0_claimed = true;
+            ocb->is_busy = true;
+            vsf_usbh_urb_set_buffer(urb, packet, size);
+            return vsf_usbh_control_msg_ex(usbh, bthci->dev, &req, 0, &bthci->eda);
+        }
         break;
     case BTHCI_PACKET_TYPE_ACL:
         flags |= URB_ZERO_PACKET;
         break;
     case BTHCI_PACKET_TYPE_SCO:
-#if VSF_USBH_BTHCI_CFG_SCO_EN == ENABLED
+#if VSF_USBH_BTHCI_CFG_SCO_OUT_NUM > 0
         break;
 #else
+        VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_SUPPORT;
 #endif
     }
+
+#if VSF_USBH_BTHCI_CFG_URB_OUT_USE_LOCAL_BUFFER == ENABLED
+#   if VSF_USBH_BTHCI_CFG_URB_OUT_USE_DYNAMIC_BUFFER == ENABLED
+    uint8_t *buffer = vsf_usbh_urb_alloc_buffer(&ocb->urb, size);
+    if (NULL == buffer) {
+        VSF_USB_ASSERT(false);
+        return VSF_ERR_NOT_ENOUGH_RESOURCES;
+    }
+    memcpy(buffer, packet, size);
+#   else
+    if (size > VSF_USBH_BTHCI_CFG_URB_BUFSIZE) {
+        VSF_USB_ASSERT(false);
+        return VSF_ERR_NOT_SUPPORT;
+    }
+    memcpy(urb->urb_hcd->buffer, packet, size);
+    urb->urb_hcd->transfer_length = size;
+#   endif
+#else
+    vsf_usbh_urb_set_buffer(urb, packet, size);
+#endif
+    ocb->is_busy = true;
     return vsf_usbh_submit_urb_ex(usbh, urb, flags, &bthci->eda);
 }
 

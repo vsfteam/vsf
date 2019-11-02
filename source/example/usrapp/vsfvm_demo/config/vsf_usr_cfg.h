@@ -144,7 +144,6 @@
 
 #define VSF_USE_AV                          ENABLED
 
-#define VSF_USE_USB_HOST_HUB                ENABLED
 #define VSF_USE_USB_HOST_ECM                ENABLED
 #define VSF_USE_USB_HOST_HID                ENABLED
 #define VSF_USE_USB_HOST_BTHCI              ENABLED
@@ -159,7 +158,6 @@
 #   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
 
 #define VSF_USE_UI_LVGL                     ENABLED
-#define VSF_USE_DISP_DRV_USBD_UVC           ENABLED
 
 #define VSF_USE_PBUF                        ENABLED
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT    DISABLED
@@ -193,10 +191,12 @@ enum {
 #   define VSF_USE_TCPIP                    ENABLED
 #   define VSF_USE_FS                       ENABLED
 #   define VSF_USE_UI                       ENABLED
+#       define VSF_USE_DISP_DRV_USBD_UVC    ENABLED
 #   define VSF_USE_USB_DEVICE               ENABLED
 #       define VSF_USBD_CFG_EDA_PRIORITY    vsf_prio_9
 #       define VSF_USBD_CFG_HW_PRIORITY     vsf_arch_prio_9
 #   define VSF_USE_USB_HOST                 ENABLED
+#       define VSF_USE_USB_HOST_HUB         ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI        ENABLED
 #       define VSF_USBH_CFG_EDA_PRIORITY    vsf_prio_8
 #   define VSF_USE_TRACE                    ENABLED
@@ -206,6 +206,65 @@ enum {
 
 #   define VSF_HEAP_SIZE                    0x8000
 #   define USRAPP_CFG_STDIO_EN              ENABLED
+#   define USRAPP_CFG_VM_BYTECODE_MAX_NUMBER    (16 * 1024)
+#   define USRAPP_CFG_SCRIPT_ADDR           0x00010000
+#   define USRAPP_CFG_BYTECODE_ADDR         0x00010000
+#elif   defined(__WIN__)
+#   define VSF_OS_CFG_PRIORITY_NUM          1
+#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      ENABLED
+#   ifdef __CPU_X86__
+#       define VSF_KERNEL_CFG_SUPPORT_THREAD    ENABLED
+#   else
+#       define VSF_KERNEL_CFG_SUPPORT_THREAD    DISABLED
+#   endif
+
+#   define VSF_USE_INPUT                    ENABLED
+#   define VSF_USE_TCPIP                    DISABLED
+#   define VSF_USE_FS                       DISABLED
+#   define VSF_USE_UI                       ENABLED
+#       define VSF_USE_DISP_DRV_SDL2        ENABLED
+#   define VSF_USE_USB_DEVICE               DISABLED
+#   define VSF_USE_USB_HOST                 ENABLED
+#   define VSF_USBH_CFG_ENABLE_ROOT_HUB     DISABLED
+#       define VSF_USE_USB_HOST_HCD_LIBUSB  ENABLED
+#       define VSF_LIBUSB_HCD_CFG_DEV_NUM   4
+#       define VSF_LIBUSB_HCD_DEV0_VID      0x0A12      // CSR8510 bthci
+#       define VSF_LIBUSB_HCD_DEV0_PID      0x0001
+#       define VSF_LIBUSB_HCD_DEV1_VID      0x054C      // DS4
+#       define VSF_LIBUSB_HCD_DEV1_PID      0x05C4
+#       define VSF_LIBUSB_HCD_DEV2_VID      0x054C      // DS4
+#       define VSF_LIBUSB_HCD_DEV2_PID      0x09CC
+#       define VSF_LIBUSB_HCD_DEV3_VID      0x05AC      // Apple DFU
+#       define VSF_LIBUSB_HCD_DEV3_PID      0x1227
+#   define VSF_USE_USB_HOST_HUB             DISABLED
+#   define VSF_USE_TRACE                    ENABLED
+
+#   define VSFVM_CFG_COMPILER_EN            ENABLED
+#   define VSFVM_LEXER_MAX_SYMLEN           (8 * 1024)
+#   define USRAPP_CFG_VM_BYTECODE_MAX_NUMBER    0x10000
+//#   define VSFVM_CFG_RUNTIME_STACK_SIZE     128
+
+#   define VSF_HEAP_SIZE                    0x100000
+#   define VSF_HEAP_CFG_MCB_ALIGN_BIT       4
+#   define USRAPP_CFG_STDIO_EN              ENABLED
+#elif   defined(__CPU_MCS51__)
+#   define VSF_OS_CFG_PRIORITY_NUM          1
+#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      ENABLED
+#   define VSF_KERNEL_CFG_SUPPORT_THREAD    DISABLED
+
+#   define VSF_USE_INPUT                    DISABLED
+#   define VSF_USE_TCPIP                    DISABLED
+#   define VSF_USE_FS                       DISABLED
+#   define VSF_USE_UI                       DISABLED
+#   define VSF_USE_USB_DEVICE               DISABLED
+#   define VSF_USE_USB_HOST                 DISABLED
+#   define VSF_USE_TRACE                    ENABLED
+
+#   define VSFVM_CFG_COMPILER_EN            DISABLED
+#   define VSFVM_CFG_RUNTIME_STACK_SIZE     128
+
+#   define VSF_HEAP_SIZE                    0x1000
+#   define USRAPP_CFG_STDIO_EN              DISABLED
 #else
 #   define VSF_OS_CFG_PRIORITY_NUM          1
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      ENABLED
@@ -224,6 +283,109 @@ enum {
 
 #   define VSF_HEAP_SIZE                    0x1000
 #   define USRAPP_CFG_STDIO_EN              DISABLED
+#endif
+
+/*----------------------------------------------------------------------------*
+ * Regarget Weak interface                                                    *
+ *----------------------------------------------------------------------------*/
+
+#ifdef __WIN__
+#define WEAK_VSF_KERNEL_ERR_REPORT_EXTERN                                       \
+        extern void vsf_kernel_err_report(vsf_kernel_error_t err);
+#define WEAK_VSF_KERNEL_ERR_REPORT(__ERR)                                       \
+        vsf_kernel_err_report(__ERR)
+
+#define WEAK___POST_VSF_KERNEL_INIT_EXTERN                                      \
+        extern void __post_vsf_kernel_init(void);
+#define WEAK___POST_VSF_KERNEL_INIT()                                           \
+        __post_vsf_kernel_init()
+
+#define WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN                                     \
+        extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
+#define WEAK_VSF_SYSTIMER_EVTHANDLER(__TICK)                                    \
+        vsf_systimer_evthandler(__TICK)
+
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN               \
+        extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR()                    \
+        vsf_arch_req___systimer_resolution___from_usr()
+
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN                     \
+        extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
+        vsf_arch_req___systimer_freq___from_usr()
+
+
+
+#if 0
+#define WEAK_VSF_INPUT_ON_EVT_EVTERN                                            \
+        extern void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt);
+#define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
+        vsf_input_on_evt((__TYPE), (__EVT))
+
+#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
+        extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
+#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
+        vsf_input_on_touchscreen((__TS_EVT))
+
+#   define WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN                                     \
+        extern void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt);
+#   define WEAK_VSF_INPUT_ON_GAMEPAD(__GAMEPAD_EVT)                             \
+        vsf_input_on_gamepad((__GAMEPAD_EVT))
+
+#define WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN                                     \
+        extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id);
+#define WEAK_VSF_BLUETOOTH_H2_ON_NEW(__DEV, __ID)                               \
+        vsf_bluetooth_h2_on_new((__DEV), (__ID))
+#endif
+
+
+
+#define WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN                                     \
+        extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
+#define WEAK_VSF_HEAP_MALLOC_ALIGNED(__SIZE, __ALIGNMENT)                       \
+        vsf_heap_malloc_aligned((__SIZE), (__ALIGNMENT))
+
+
+
+#define WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN                                       \
+        extern void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id);
+#define WEAK_VSF_USBH_BTHCI_ON_NEW(__DEV, __ID)                                 \
+        vsf_usbh_bthci_on_new((__DEV), (__ID))
+
+#define WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN                                       \
+        extern void vsf_usbh_bthci_on_del(void *dev);
+#define WEAK_VSF_USBH_BTHCI_ON_DEL(__DEV)                                       \
+        vsf_usbh_bthci_on_del((__DEV))
+
+#define WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN                                    \
+        extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
+#define WEAK_VSF_USBH_BTHCI_ON_PACKET(__DEV, __TYPE, __PACKET, __SIZE)          \
+        vsf_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
+
+
+// on idle
+#define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN                                  \
+        extern void vsf_plug_in_on_kernel_idle(void);
+#define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE()                                       \
+        vsf_plug_in_on_kernel_idle()
+
+// for vsfvm
+#define WEAK_VSFVM_SET_BYTECODE_IMP_EXTERN                                      \
+        extern int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, uint_fast32_t offset);
+#define WEAK_VSFVM_SET_BYTECODE_IMP(__COMPILER, __CODE, __OFFSET)               \
+        vsfvm_set_bytecode_imp((__COMPILER), (__CODE), (__OFFSET))
+
+#define WEAK_VSFVM_GET_BYTECODE_IMP_EXTERN                                      \
+        extern vsfvm_bytecode_t vsfvm_get_bytecode_imp(const void *token, uint_fast32_t *pc);
+#define WEAK_VSFVM_GET_BYTECODE_IMP(__TOKEN, __PC)                              \
+        vsfvm_get_bytecode_imp((__TOKEN), (__PC))
+
+#define WEAK_VSFVM_GET_RES_IMP_EXTERN                                           \
+        extern int_fast32_t vsfvm_get_res_imp(const void *token, uint_fast32_t offset, uint8_t **buffer);
+#define WEAK_VSFVM_GET_RES_IMP(__TOKEN, __OFFSET, __BUFFER)                     \
+        vsfvm_get_res_imp((__TOKEN), (__OFFSET), (__BUFFER))
+
 #endif
 
 /*============================ TYPES =========================================*/

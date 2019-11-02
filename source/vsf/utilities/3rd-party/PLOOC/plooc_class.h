@@ -238,8 +238,13 @@ __PLOOC_CLASS_USE_SIMPLE_TEMPLATE__ in ANSI-C89/90.
 
 #endif
 
-#undef which
-#define which                                   ,_which
+#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   undef which
+#   define which(__DECLARE)                     ,_which(__DECLARE)
+#else
+#   undef which
+#   define which(...)                           ,_which(__VA_ARGS__)
+#endif
 
 #undef private_member
 #define private_member                          ,_private_member

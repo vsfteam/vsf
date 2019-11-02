@@ -123,14 +123,23 @@ ROOT ISR(SysTick_Handler)
  */
 vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 {
-    vsf_systick_cfg (
-        DISABLE_SYSTICK             |
-        SYSTICK_SOURCE_SYSCLK       |
-        ENABLE_SYSTICK_INTERRUPT,
-        ticks
-    );
+    vsf_gint_state_t orig = vsf_disable_interrupt();
+        vsf_systick_cfg (
+            DISABLE_SYSTICK             |
+            SYSTICK_SOURCE_SYSCLK       |
+            ENABLE_SYSTICK_INTERRUPT,
+            ticks
+        );
+
+        NVIC_ClearPendingIRQ(SysTick_IRQn);
+    vsf_set_interrupt(orig);
     
     return VSF_ERR_NONE;
+}
+
+void vsf_systimer_prio_set(vsf_arch_prio_t priority)
+{
+    NVIC_SetPriority(SysTick_IRQn, priority);
 }
 
 #endif

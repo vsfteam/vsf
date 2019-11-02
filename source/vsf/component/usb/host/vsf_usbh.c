@@ -122,20 +122,33 @@ void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
 
 bool vsf_usbh_urb_is_valid(vsf_usbh_urb_t *urb)
 {
+    VSF_USB_ASSERT(urb != NULL);
     return urb->pipe.value != 0;
 }
 
 bool vsf_usbh_urb_is_alloced(vsf_usbh_urb_t *urb)
 {
+    VSF_USB_ASSERT(urb != NULL);
     return !urb->pipe.is_pipe && (urb->urb_hcd != NULL);
 }
 
 vsf_usbh_eppipe_t vsf_usbh_urb_get_pipe(vsf_usbh_urb_t *urb)
 {
+    VSF_USB_ASSERT(urb != NULL);
     if (urb->pipe.is_pipe) {
         return urb->pipe;
     } else {
         return urb->urb_hcd->pipe;
+    }
+}
+
+void vsf_usbh_urb_set_pipe(vsf_usbh_urb_t *urb, vsf_usbh_eppipe_t pipe)
+{
+    VSF_USB_ASSERT(urb != NULL && pipe.is_pipe);
+    if (urb->pipe.is_pipe) {
+        urb->pipe = pipe;
+    } else {
+        urb->urb_hcd->pipe = pipe;
     }
 }
 
@@ -690,11 +703,11 @@ vsf_err_t vsf_usbh_control_msg(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 }
 
 vsf_err_t vsf_usbh_control_msg_ex(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        struct usb_ctrlrequest_t *req, vsf_eda_t *eda)
+        struct usb_ctrlrequest_t *req, uint_fast16_t flags, vsf_eda_t *eda)
 {
     vsf_usbh_urb_t * urb = vsf_usbh_control_msg_common(usbh, dev, req);
     if (urb != NULL) {
-        return vsf_usbh_submit_urb_ex(usbh, urb, 0, eda);
+        return vsf_usbh_submit_urb_ex(usbh, urb, flags, eda);
     }
     return VSF_ERR_FAIL;
 }

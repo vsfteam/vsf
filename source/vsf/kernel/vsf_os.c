@@ -53,9 +53,14 @@ typedef struct __vsf_os_t __vsf_os_t;
 static NO_INIT __vsf_os_t __vsf_os;
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_KERNEL_ERR_REPORT_EXTERN) \
+#if     defined(WEAK_VSF_KERNEL_ERR_REPORT_EXTERN)                              \
     &&  defined(WEAK_VSF_KERNEL_ERR_REPORT)
 WEAK_VSF_KERNEL_ERR_REPORT_EXTERN
+#endif
+
+#if     defined(WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN)                         \
+    &&  defined(WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE)
+WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN
 #endif
 
 SECTION(".text.vsf.kernel.eda")
@@ -326,6 +331,19 @@ void vsf_kernel_os_start(void)
         __vsf_set_cur_evtq(NULL);
     }
 #endif
+
+    //! configure systimer priority (using higest+1 or highest)
+    {
+#if __VSF_OS_SWI_NUM > 0
+        vsf_arch_prio_t priorit = 
+            __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
+                __vsf_os.res_ptr->arch.swi_priority_cnt - 1];
+#else
+        vsf_arch_prio_t priorit = vsf_arch_prio_highest;
+#endif
+
+        vsf_systimer_prio_set(priorit);
+    }
 
     __vsf_kernel_start();
 

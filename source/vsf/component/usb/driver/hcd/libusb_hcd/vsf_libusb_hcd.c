@@ -313,9 +313,7 @@ static int __vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_urb_t *urb)
     case USB_ENDPOINT_XFER_CONTROL:
         if (pipe.endpoint != 0) {
             return LIBUSB_ERROR_INVALID_PARAM;
-        }
-
-        {
+        } else {
             struct usb_ctrlrequest_t *setup = &urb->setup_packet;
 
             return libusb_control_transfer(libusb_dev->handle, setup->bRequestType,
@@ -325,8 +323,7 @@ static int __vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_urb_t *urb)
     case USB_ENDPOINT_XFER_ISOC:
         // TODO: add support to iso transfer
         return LIBUSB_ERROR_NOT_SUPPORTED;
-    case USB_ENDPOINT_XFER_BULK:
-        {
+    case USB_ENDPOINT_XFER_BULK: {
             int actual_length;
             int err = libusb_bulk_transfer(libusb_dev->handle,
                         (pipe.dir_in1out0 ? 0x80 : 0x00) | pipe.endpoint,
@@ -337,8 +334,7 @@ static int __vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_urb_t *urb)
                 return actual_length;
             }
         }
-    case USB_ENDPOINT_XFER_INT:
-        {
+    case USB_ENDPOINT_XFER_INT: {
             int actual_length;
             int err = libusb_interrupt_transfer(libusb_dev->handle,
                         (pipe.dir_in1out0 ? 0x80 : 0x00) | pipe.endpoint,
@@ -447,18 +443,21 @@ static void __vsf_libusb_hcd_urb_thread(void *arg)
                         }
                     }
                 }
+
+#if VSF_LIBUSB_HCD_CFG_REMOVE_ON_ERROR == ENABLED
                 if (urb->status == LIBUSB_ERROR_IO) {
                     // device removed
-#if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
+#   if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
                     __vsf_arch_irq_start(irq_thread);
                         __vsf_libusb_hcd_trace_urb(urb, "device removed, to free");
                     __vsf_arch_irq_end(irq_thread, false);
-#endif
+#   endif
                     if (libusb_urb->state != VSF_LIBUSB_HCD_URB_STATE_TO_FREE) {
                         libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_WAIT_TO_FREE;
                     }
                     __vsf_libusb_hcd_on_left(libusb_dev);
                 }
+#endif
             }
 
         __vsf_arch_irq_start(irq_thread);
@@ -553,8 +552,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
         // fall through
-    case VSF_EVT_SYNC:
-        {
+    case VSF_EVT_SYNC: {
             vsf_libusb_hcd_urb_t *libusb_urb;
             vsf_protect_t orig = vsf_protect_sched();
                 vsf_dlist_remove_head(vsf_libusb_hcd_urb_t, urb_node,
@@ -620,8 +618,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         vsf_teda_set_timer_ms(100);
         break;
-    case VSF_EVT_MESSAGE:
-        {
+    case VSF_EVT_MESSAGE: {
             vsf_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
             VSF_USB_ASSERT((urb != NULL) && urb->pipe.is_pipe);
             vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
@@ -642,8 +639,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         }
         break;
-    default:
-        {
+    default: {
             int idx = evt & 0xFF;
             VSF_USB_ASSERT(idx < dimof(__vsf_libusb_hcd.devs));
             vsf_libusb_hcd_dev_t *libusb_dev = &__vsf_libusb_hcd.devs[idx];

@@ -161,14 +161,14 @@ void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos)
 {
     if (pos < dynarr->length) {
         vsf_dynarr_table_t *table;
-        uint_fast16_t item_idx, buf_idx;
+        uint_fast16_t item_idx;
 
         item_idx = pos & ((1UL << dynarr->item_num_per_buf_bitlen) - 1);
         pos >>= dynarr->item_num_per_buf_bitlen;
-        buf_idx = pos & ((1UL << dynarr->buf_num_per_table_bitlen) - 1);
 
-        table = vsf_dynarr_get_table(dynarr, buf_idx);
+        table = vsf_dynarr_get_table(dynarr, pos);
         if (table != NULL) {
+            uint_fast16_t buf_idx = pos & ((1UL << dynarr->buf_num_per_table_bitlen) - 1);
             return (void *)((uint32_t *)table->buffer[buf_idx] +
                 ((item_idx * dynarr->item_size) >> 2));
         }

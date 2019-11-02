@@ -31,6 +31,8 @@ struct vsf_usbh_libusb_dev_t {
     vsf_usbh_dev_t *dev;
 
     uint16_t vid, pid;
+    uint8_t ifs;
+    uint8_t address;
     bool is_opened;
     bool is_to_remove;
 };

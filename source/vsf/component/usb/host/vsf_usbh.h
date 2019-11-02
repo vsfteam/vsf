@@ -102,7 +102,8 @@
 // struct vsf_hcd_urb_t.transfer_flags
 #define URB_SHORT_NOT_OK        0x01
 #define URB_ISO_ASAP            0x02
-#define URB_ZERO_PACKET         0x40
+#define URB_ZERO_PACKET         0x04
+#define URB_HCD_SPECIFIED_FLAGS 0x10
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -458,6 +459,7 @@ extern void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
 extern bool vsf_usbh_urb_is_valid(vsf_usbh_urb_t *urb);
 extern bool vsf_usbh_urb_is_alloced(vsf_usbh_urb_t *urb);
 extern vsf_usbh_eppipe_t vsf_usbh_urb_get_pipe(vsf_usbh_urb_t *urb);
+extern void vsf_usbh_urb_set_pipe(vsf_usbh_urb_t *urb, vsf_usbh_eppipe_t pipe);
 extern vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb_t *urb);
 extern void vsf_usbh_free_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb);
 extern void * vsf_usbh_urb_alloc_buffer(vsf_usbh_urb_t *urb, uint_fast16_t size);
@@ -481,7 +483,7 @@ extern void vsf_usbh_remove_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
 extern vsf_err_t vsf_usbh_control_msg(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
         struct usb_ctrlrequest_t *req);
 extern vsf_err_t vsf_usbh_control_msg_ex(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        struct usb_ctrlrequest_t *req, vsf_eda_t *eda);
+        struct usb_ctrlrequest_t *req, uint_fast16_t flags, vsf_eda_t *eda);
 
 extern vsf_err_t vsf_usbh_get_descriptor(vsf_usbh_t *usbh,
         vsf_usbh_dev_t *dev, uint_fast8_t type, uint_fast8_t index,

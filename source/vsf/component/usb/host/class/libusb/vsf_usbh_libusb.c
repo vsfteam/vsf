@@ -59,6 +59,8 @@ static void *vsf_usbh_libusb_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     ldev->dev = dev;
     ldev->vid = usbh->parser->desc_device->idVendor;
     ldev->pid = usbh->parser->desc_device->idProduct;
+    ldev->ifs = parser_ifs->ifs->no;
+    ldev->address = dev->devnum;
 
     if (vsf_usbh_libusb.cb.on_event != NULL) {
         vsf_usbh_libusb.cb.on_event(

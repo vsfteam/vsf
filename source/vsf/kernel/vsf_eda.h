@@ -21,10 +21,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
-
-#define __INCLUDE_MUTEX_EDA
 #include "service/vsf_service.h"
-#undef  __INCLUDE_MUTEX_EDA
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file 

@@ -83,9 +83,6 @@
 #   endif
 #endif
 
-
-
-
 #ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
 #   define VSF_KERNEL_CFG_SUPPORT_THREAD                    ENABLED
 #endif
@@ -243,6 +240,7 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
     &&  defined(VSF_ARCH_STACK_GUARDIAN_SIZE)                               
 #   define VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE    VSF_ARCH_STACK_GUARDIAN_SIZE
 #endif
+
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

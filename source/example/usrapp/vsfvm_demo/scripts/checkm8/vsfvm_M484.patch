@@ -1,0 +1,90 @@
+ .../example/usrapp/vsfvm_demo/config/vsf_usr_cfg.h |  2 +-
+ .../vsf/component/usb/driver/hcd/ohci/vsf_ohci.c   | 46 +++++++++++++++-------
+ 2 files changed, 32 insertions(+), 16 deletions(-)
+
+diff --git a/source/example/usrapp/vsfvm_demo/config/vsf_usr_cfg.h b/source/example/usrapp/vsfvm_demo/config/vsf_usr_cfg.h
+index 1aa45615..aff19eb5 100644
+--- a/source/example/usrapp/vsfvm_demo/config/vsf_usr_cfg.h
++++ b/source/example/usrapp/vsfvm_demo/config/vsf_usr_cfg.h
+@@ -201,7 +201,7 @@ enum {
+ #       define VSF_USBH_CFG_EDA_PRIORITY    vsf_prio_8
+ #   define VSF_USE_TRACE                    ENABLED
+ 
+-#   define VSFVM_CFG_COMPILER_EN            ENABLED
++#   define VSFVM_CFG_COMPILER_EN            DISABLED
+ //#   define VSFVM_CFG_RUNTIME_STACK_SIZE     128
+ 
+ #   define VSF_HEAP_SIZE                    0x8000
+diff --git a/source/vsf/component/usb/driver/hcd/ohci/vsf_ohci.c b/source/vsf/component/usb/driver/hcd/ohci/vsf_ohci.c
+index 84a8a02e..c826f47c 100644
+--- a/source/vsf/component/usb/driver/hcd/ohci/vsf_ohci.c
++++ b/source/vsf/component/usb/driver/hcd/ohci/vsf_ohci.c
+@@ -25,6 +25,10 @@
+ 
+ /*============================ MACROS ========================================*/
+ 
++#define VSF_OHCI_FLAG_NO_DATA   0x10
++#define VSF_OHCI_FLAG_NO_STATUS 0x20
++
++
+ #define OHCI_ISO_DELAY          2
+ 
+ /*******************************************************
+@@ -682,23 +686,29 @@ static void ohci_td_submit_urb(vsf_ohci_t *ohci, struct vsf_usbh_hcd_urb_t *urb)
+     case USB_ENDPOINT_XFER_CONTROL:
+         info = TD_CC | TD_DP_SETUP | TD_T_DATA0;
+         td = ohci_td_fill(td, info, (void *)&urb->setup_packet, 8, urb_ohci);
+-        info = isout ? TD_CC | TD_DP_OUT | TD_T_DATA1 :
+-                    TD_CC | TD_DP_IN | TD_T_DATA1;
+-        m = data_len;
+-        while (m) {
+-            n = min(m, 4096);
+-            m -= n;
+-
+-            if (!m) {
+-                info |= TD_R;
++
++        if (!(urb->transfer_flags & VSF_OHCI_FLAG_NO_DATA)) {
++            info = isout ? TD_CC | TD_DP_OUT | TD_T_DATA1 :
++                        TD_CC | TD_DP_IN | TD_T_DATA1;
++            m = data_len;
++            while (m) {
++                n = min(m, 4096);
++                m -= n;
++
++                if (!m) {
++                    info |= TD_R;
++                }
++                td = ohci_td_fill(td, info, data, n, urb_ohci);
++                data = (void *)((uint32_t)data + n);
++                info &= ~TD_T;
+             }
+-            td = ohci_td_fill(td, info, data, n, urb_ohci);
+-            data = (void *)((uint32_t)data + n);
+-            info &= ~TD_T;
+         }
+-        info = (isout || data_len == 0) ? (TD_CC | TD_DP_IN | TD_T_DATA1) :
+-                    (TD_CC | TD_DP_OUT | TD_T_DATA1);
+-        td = ohci_td_fill(td, info, NULL, 0, urb_ohci);
++
++        if (!(urb->transfer_flags & VSF_OHCI_FLAG_NO_STATUS)) {
++            info = (isout || data_len == 0) ? (TD_CC | TD_DP_IN | TD_T_DATA1) :
++                        (TD_CC | TD_DP_OUT | TD_T_DATA1);
++            td = ohci_td_fill(td, info, NULL, 0, urb_ohci);
++        }
+         regs->cmdstatus = OHCI_CLF;
+         break;
+     case USB_ENDPOINT_XFER_INT:
+@@ -1206,6 +1216,12 @@ static vsf_err_t ohci_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+     switch (urb->pipe.type) {
+     case USB_ENDPOINT_XFER_CONTROL:
+         size = 2;
++        if (urb->transfer_flags & VSF_OHCI_FLAG_NO_STATUS) {
++            size--;
++        }
++        if (urb->transfer_flags & VSF_OHCI_FLAG_NO_DATA) {
++            break;
++        }
+     case USB_ENDPOINT_XFER_BULK:
+     case USB_ENDPOINT_XFER_INT:
+         size += datablock;

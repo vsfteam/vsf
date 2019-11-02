@@ -158,11 +158,11 @@
 #   define VSF_POOL_CFG_SUPPORT_USER_OBJECT     DISABLED
 #   define VSF_POOL_CFG_SUPPORT_USER_ITEM_INIT  DISABLED
 
-#define VSF_USE_TRACE                       DISABLED
+#define VSF_USE_TRACE                       ENABLED
 #   define VSF_TRACE_CFG_COLOR_EN           DISABLED
 
 #define VSF_USE_SERVICE_STREAM              DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM           DISABLED
+#define VSF_USE_SERVICE_VSFSTREAM           ENABLED
 
 /*============================ INCLUDES ======================================*/
 

@@ -229,8 +229,23 @@
     <Filter Include="usrapp\mvc_demo_win\config">
       <UniqueIdentifier>{3ae681fe-128d-4b3b-923e-54c6cf279b51}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\msg_tree">
+    <Filter Include="vsf\osa_service">
+      <UniqueIdentifier>{0a2a75b8-573f-47ec-af54-c36c1fbf0783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_service\msg_tree">
       <UniqueIdentifier>{8e1838f7-282e-4e35-8d88-293d2eeeed0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui">
+      <UniqueIdentifier>{3ab7c62c-fcd3-443e-a947-5187f416ddfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_mc">
+      <UniqueIdentifier>{6393f9b8-b79a-4a79-8ae6-7ab695e405cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_mc\controls">
+      <UniqueIdentifier>{35b69fa6-a2bb-4a86-adec-cc1998dc657b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\mvc_demo_win\tgui_demo">
+      <UniqueIdentifier>{4c1e8e15-bad3-4e27-96a3-6d606a51b929}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -840,8 +855,47 @@
     <ClInclude Include="..\..\usrapp\usbh_demo_win\config\lv_conf.h">
       <Filter>usrapp\mvc_demo_win\config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\msg_tree\vsf_msg_tree.h">
-      <Filter>vsf\service\msg_tree</Filter>
+    <ClInclude Include="..\..\..\vsf\osa_service\vsf_osa_service.h">
+      <Filter>vsf\osa_service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_service\vsf_osa_service_cfg.h">
+      <Filter>vsf\osa_service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h">
+      <Filter>vsf\osa_service\msg_tree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.h">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_container.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h">
+      <Filter>vsf\component\ui\tgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1303,8 +1357,38 @@
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c">
       <Filter>usrapp\mvc_demo_win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\msg_tree\vsf_msg_tree.c">
-      <Filter>vsf\service\msg_tree</Filter>
+    <ClCompile Include="..\..\..\vsf\osa_service\vsf_osa_service.c">
+      <Filter>vsf\osa_service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c">
+      <Filter>vsf\osa_service\msg_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.c">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_container.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\usbh_demo_win\tgui_demo\tgui_demo.c">
+      <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

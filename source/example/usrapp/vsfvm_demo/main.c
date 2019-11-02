@@ -23,6 +23,10 @@
 #include "component/3rd-party/vsfvm/extension/vsf/kernel/vsfvm_ext_kernel.h"
 #include "component/3rd-party/vsfvm/extension/vsf/libusb/vsfvm_ext_libusb.h"
 
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSFVM_CFG_RUNTIME_EN
@@ -42,6 +46,8 @@ struct usrapp_const_t {
     struct {
 #       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
         vsf_ohci_param_t ohci_param;
+#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+        vsf_libusb_hcd_param_t libusb_hcd_param;
 #       endif
     } usbh;
 #   endif
@@ -89,7 +95,49 @@ typedef struct usrapp_t usrapp_t;
 
 #if VSFVM_CFG_COMPILER_EN != ENABLED
 static const vsfvm_bytecode_t vsfvm_bytecode[] = {
-    0,
+    0x63000003, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, VSFVM_CODE_VARIABLE_POS_LOCAL, 3),
+    0x81010000, //VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_EXT, 1, 0),
+    0x19000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0),
+    0x21000007, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, 0, 7),
+    0x63000018, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, VSFVM_CODE_VARIABLE_POS_LOCAL, 24),
+    0x76667376, //VSFVM_VARIABLE(unknown variable type, unknown variable position, 29558),
+    0x6564206D, //VSFVM_VARIABLE(unknown variable type, unknown variable position, 8301),
+    0x73206F6D, //VSFVM_VARIABLE(unknown variable type, unknown variable position, 28525),
+    0x74726174, //VSFVM_VARIABLE(unknown variable type, unknown variable position, 24948),
+    0x2E2E6465, //unknown keyword: 14
+    0x000A0D2E, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NOT, 10, 3374),
+    0x20000000, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_var, 0, 0),
+    0x61000000, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, VSFVM_CODE_VARIABLE_POS_LOCAL, 0),
+    0x40000000, //VSFVM_NUMBER(0),
+    0x18000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0),
+    0x19000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0),
+    0x20000000, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_var, 0, 0),
+    0x61020000, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, VSFVM_CODE_VARIABLE_POS_STACK_END, 0),
+    0x40000001, //VSFVM_NUMBER(1),
+    0x18000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0),
+    0x19000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0),
+    0x22000013, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_if, 0, 19),
+    0x63000007, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, VSFVM_CODE_VARIABLE_POS_LOCAL, 7),
+    0x60000000, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_NORMAL, VSFVM_CODE_VARIABLE_POS_LOCAL, 0),
+    0x63000003, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, VSFVM_CODE_VARIABLE_POS_LOCAL, 3),
+    0x81030000, //VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_EXT, 3, 0),
+    0x19000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0),
+    0x21000006, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, 0, 6),
+    0x63000003, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, VSFVM_CODE_VARIABLE_POS_LOCAL, 3),
+    0x00000A0D, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NOT, 0, 2573),
+    0x6300000C, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, VSFVM_CODE_VARIABLE_POS_LOCAL, 12),
+    0x72616568, //VSFVM_VARIABLE(unknown variable type, unknown variable position, 25960),
+    0x65622074, //VSFVM_VARIABLE(unknown variable type, unknown variable position, 8308),
+    0x00207461, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NOT, 32, 29793),
+    0x61000000, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, VSFVM_CODE_VARIABLE_POS_LOCAL, 0),
+    0x60000000, //VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_NORMAL, VSFVM_CODE_VARIABLE_POS_LOCAL, 0),
+    0x40000001, //VSFVM_NUMBER(1),
+    0x07000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ADD, 0, 0),
+    0x18000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0),
+    0x19000000, //VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0),
+    0x2100FFE7, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, 0, 65511),
+    0x23000000, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0),
+    0x23000000, //VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0),
 };
 #endif
 
@@ -101,6 +149,10 @@ static const usrapp_const_t usrapp_const = {
         .op                 = &VSF_USB_HC0_IP,
         .priority           = vsf_arch_prio_0,
     },
+#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+    .usbh.libusb_hcd_param = {
+        .priority = vsf_arch_prio_0,
+    },
 #       endif
 #   endif
 
@@ -110,7 +162,8 @@ print(\'vsfvm demo started...\\r\\n\');\r\n"
 #       if VSF_USE_USB_HOST == ENABLED
 "\
 libusb_on_evt(evt, libusb_dev dev) {\r\n\
-    if (USB_EVT_ON_ARRIVED == evt) {\r\n\
+    if ((USB_EVT_ON_ARRIVED == evt) && (0 == dev.ifs())) {\r\n\
+        print(\'libusb_dev_on_arrived: \', dev);\r\n\
         var desc = buffer_create(18);\r\n\
         var result;\r\n\
         dev.transfer(0, @result, 0x80, 0x06, 0x0100, 0x0000, 18, desc);\r\n\
@@ -138,6 +191,9 @@ static usrapp_t usrapp = {
 #   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
         .host.drv           = &vsf_ohci_drv,
         .host.param         = (void *)&usrapp_const.usbh.ohci_param,
+#   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+        .host.drv           = &vsf_libusb_hcd_drv,
+        .host.param         = (void*)&usrapp_const.usbh.libusb_hcd_param,
 #   endif
 #   if VSF_USE_USB_HOST_HUB == ENABLED
         .hub.drv            = &vsf_usbh_hub_drv,
@@ -194,8 +250,41 @@ static const char *vsfvm_errcode_str[] = {
 };
 #endif
 
+#ifdef __CPU_MCS51__
+#   if VSF_USE_TRACE == ENABLED
+static uint_fast32_t vsf_stdio_console_stream_write(
+        vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t vsf_stdio_console_stream_get_data_length(vsf_stream_t *stream);
+
+static const vsf_stream_op_t vsf_stdio_console_stream_op = {
+    .get_data_length    = vsf_stdio_console_stream_get_data_length,
+    .write              = vsf_stdio_console_stream_write,
+};
+
+vsf_stream_t VSF_DEBUG_STREAM_TX = {
+    .op = &vsf_stdio_console_stream_op,
+};
+#   endif
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#ifdef __CPU_MCS51__
+#   if VSF_USE_TRACE == ENABLED
+#include <stdio.h>
+static uint_fast32_t vsf_stdio_console_stream_write(
+        vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
+{
+    return printf("%s", buf);
+}
+
+static uint_fast32_t vsf_stdio_console_stream_get_data_length(vsf_stream_t *stream)
+{
+    return 0;
+}
+#   endif
+#endif
 
 vsfvm_bytecode_t vsfvm_get_bytecode_imp(const void *token, uint_fast32_t *pc)
 {
@@ -234,8 +323,69 @@ int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, ui
 }
 #endif
 
+#ifdef __WIN__
+#include <stdio.h>
+
+// TODO: SDL require that main need argc and argv
+int main(int argc, char *argv[])
+{
+#   if VSFVM_CFG_COMPILER_EN == ENABLED
+    if (argc > 3) {
+        fprintf(stderr, "invalid command line" VSF_TRACE_CFG_LINEEND);
+    print_info_and_exit:
+        printf("format: %s [script_file] [output_file]" VSF_TRACE_CFG_LINEEND, argv[0]);
+    exit:
+        exit(-1);
+    }
+
+    FILE *fp;
+    long size;
+
+    char *code = usrapp_const.vm.dart_code;
+    char *output = NULL;
+    if (argc > 1) {
+        fp = fopen(argv[1], "rb");
+
+        if (NULL == fp) {
+            fprintf(stderr, "fail to open script file: %s" VSF_TRACE_CFG_LINEEND, argv[1]);
+            goto print_info_and_exit;
+        }
+
+        fseek(fp, 0, SEEK_END);
+        size = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+
+        code = malloc(size + 1);
+        if (NULL == code) {
+            fprintf(stderr, "not enough resources" VSF_TRACE_CFG_LINEEND);
+        close_and_exit:
+            fclose(fp);
+            goto exit;
+        }
+
+        if (size != fread(code, 1, size, fp)) {
+            fprintf(stderr, "fail to read from file: %s, errcode: %d" VSF_TRACE_CFG_LINEEND, argv[1], ferror(fp));
+            goto close_and_exit;
+        }
+        code[size] = '\0';
+    }
+    if (argc > 2) {
+        output = argv[2];
+    }
+#   endif
+#else
 int main(void)
 {
+#   if VSFVM_CFG_COMPILER_EN == ENABLED
+#       ifdef USRAPP_CFG_SCRIPT_ADDR
+    char *code = (*(char *)USRAPP_CFG_SCRIPT_ADDR == 0xFF) ?
+                usrapp_const.vm.dart_code : (char *)USRAPP_CFG_SCRIPT_ADDR;
+#       else
+    char *code = usrapp_const.vm.dart_code;
+#       endif
+#   endif
+#endif
+
     vsf_trace_init(NULL);
 #if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
@@ -256,7 +406,6 @@ int main(void)
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
     vsfvm_compiler_t *compiler = &usrapp.vm.compiler;
-    char *code = usrapp_const.vm.dart_code;
     int err;
 #endif
 
@@ -293,18 +442,43 @@ int main(void)
         const char eof = 0xFF;
         vsfvm_compiler_input(compiler, &eof);
         script->token = &usrapp.vm.bytecode;
-        usrapp.vm.bytecode_num = compiler->bytecode_pos + 1;
+        usrapp.vm.bytecode_num = compiler->bytecode_pos;
         vsfvm_objdump(usrapp.vm.bytecode, usrapp.vm.bytecode_num);
+
+#ifdef __WIN__
+        if (output != NULL) {
+            fp = fopen(output, "wb");
+            if (NULL == fp) {
+                fprintf(stderr, "fail to open output file: %s" VSF_TRACE_CFG_LINEEND, output);
+                goto print_info_and_exit;
+            }
+
+            size = sizeof(vsfvm_bytecode_t) * usrapp.vm.bytecode_num;
+            if (size != fwrite(usrapp.vm.bytecode, 1, size, fp)) {
+                fprintf(stderr, "fail to write to file: %s, errcode: %d" VSF_TRACE_CFG_LINEEND, output, ferror(fp));
+                goto close_and_exit;
+            }
+            fclose(fp);
+        }
+#endif
 
         // 3. compile succeed, start runtime
         vsfvm_runtime_init(runtime);
         vsfvm_runtime_script_init(runtime, script);
     }
 #else
+#   ifdef USRAPP_CFG_BYTECODE_ADDR
+    if (*(uint32_t *)USRAPP_CFG_BYTECODE_ADDR != 0xFFFFFFFF) {
+        usrapp.vm.bytecode = (vsfvm_bytecode_t *)USRAPP_CFG_BYTECODE_ADDR;
+        usrapp.vm.bytecode_num = (uint32_t)-1;
+    }
+#   endif
+
     script->token = &usrapp.vm.bytecode;
     vsfvm_runtime_init(runtime);
     vsfvm_runtime_script_init(runtime, script);
 #endif
+    return 0;
 }
 
 void vsf_plug_in_on_kernel_idle(void)

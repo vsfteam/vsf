@@ -597,6 +597,25 @@ static void __vsf_arch_irq_deactivate(vsf_arch_irq_thread_t *irq_thread, bool is
     __vsf_arch_preempt(is_terminate ? VSF_ARCH_IRQ_PP_EXIT_SUSPEND : VSF_ARCH_IRQ_PP_EXIT_RUNNING);
 }
 
+static void __vsf_arch_irq_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority)
+{
+    bool is_in;
+    __vsf_arch_lock();
+        is_in = vsf_dlist_is_in(vsf_arch_irq_thread_t, rdy_node,
+                &__vsf_x86.irq_rdy_list, irq_thread);
+        if (is_in) {
+            vsf_dlist_remove(vsf_arch_irq_thread_t, rdy_node,
+                &__vsf_x86.irq_rdy_list, irq_thread);
+        }
+        irq_thread->priority = priority;
+        if (is_in) {
+            vsf_dlist_insert(vsf_arch_irq_thread_t, rdy_node,
+                &__vsf_x86.irq_rdy_list, irq_thread,
+                _->priority < irq_thread->priority);
+        }
+    __vsf_arch_unlock();
+}
+
 void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread)
 {
     __vsf_arch_irq_activate(irq_thread);
@@ -774,6 +793,11 @@ uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
 uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 {
     return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
+}
+
+void vsf_systimer_prio_set(vsf_arch_prio_t priority)
+{
+    __vsf_arch_irq_set_priority(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t, priority);
 }
 
 #endif
