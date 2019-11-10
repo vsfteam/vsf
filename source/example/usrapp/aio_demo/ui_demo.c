@@ -52,7 +52,7 @@ typedef struct ui_demo_t ui_demo_t;
 /*============================ PROTOTYPES ====================================*/
 
 static void ui_demo_on_timer(vsf_callback_timer_t *timer);
-extern vsf_usbd_UVC_t * usbd_demo_get_uvc(void);
+extern vsf_usbd_uvc_t * usbd_demo_get_uvc(void);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

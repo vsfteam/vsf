@@ -176,6 +176,8 @@
 #define VSF_USE_USB_DEVICE_CDCACM           ENABLED
 #define VSF_USE_USB_DEVICE_UVC              ENABLED
 #   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
+#define VSF_USE_USB_DEVICE_HID              ENABLED
+#define VSF_USE_USB_DEVICE_MSC              ENABLED
 
 #define VSF_USE_TCPIP                       ENABLED
 

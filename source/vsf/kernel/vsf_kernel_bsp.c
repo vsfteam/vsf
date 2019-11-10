@@ -188,7 +188,7 @@ ROOT void __post_vsf_kernel_init(void)
     init_vsf_thread(app_main_thread_t, &__app_main, vsf_prio_0);
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA
     const vsf_eda_cfg_t cfg = {
-        .evthandler = __app_main_evthandler,
+        .fn.evthandler = __app_main_evthandler,
         .priority = vsf_prio_0,
     };
 #   if  VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED

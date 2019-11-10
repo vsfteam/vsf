@@ -19,7 +19,7 @@
 #define __UTILITIES_COMMUNICATE_H__
 
 /*============================ INCLUDES ======================================*/
-#include "./3rd-party/PLOOC/plooc.h"
+#include "./3rd-party/PLOOC/raw/plooc.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -32,7 +32,7 @@ struct vsf_mem_t {
         uint8_t *pchSrc;
         void *pObj;
     }PTR;
-    int_fast32_t nSize;            //!< stream size
+    int32_t nSize;                  //!< stream size
 };
 //! @}
 #else
@@ -52,7 +52,7 @@ struct vsf_mem_t {
             void *pObj;
         }PTR;
     };
-    int_fast32_t nSize;            //!< stream size
+    int32_t nSize;                      //!< stream size
 };
 //! @}
 #endif

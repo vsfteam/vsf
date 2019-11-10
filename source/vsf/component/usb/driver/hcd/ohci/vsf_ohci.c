@@ -682,23 +682,35 @@ static void ohci_td_submit_urb(vsf_ohci_t *ohci, struct vsf_usbh_hcd_urb_t *urb)
     case USB_ENDPOINT_XFER_CONTROL:
         info = TD_CC | TD_DP_SETUP | TD_T_DATA0;
         td = ohci_td_fill(td, info, (void *)&urb->setup_packet, 8, urb_ohci);
-        info = isout ? TD_CC | TD_DP_OUT | TD_T_DATA1 :
-                    TD_CC | TD_DP_IN | TD_T_DATA1;
-        m = data_len;
-        while (m) {
-            n = min(m, 4096);
-            m -= n;
 
-            if (!m) {
-                info |= TD_R;
+#if VSF_OHCI_CFG_SETUP_CONTROL == ENABLED
+        if (!(urb->transfer_flags & VSF_OHCI_FLAG_NO_DATA)) {
+#endif
+            info = isout ? TD_CC | TD_DP_OUT | TD_T_DATA1 :
+                        TD_CC | TD_DP_IN | TD_T_DATA1;
+            m = data_len;
+            while (m) {
+                n = min(m, 4096);
+                m -= n;
+
+                if (!m) {
+                    info |= TD_R;
+                }
+                td = ohci_td_fill(td, info, data, n, urb_ohci);
+                data = (void *)((uint32_t)data + n);
+                info &= ~TD_T;
             }
-            td = ohci_td_fill(td, info, data, n, urb_ohci);
-            data = (void *)((uint32_t)data + n);
-            info &= ~TD_T;
+#if VSF_OHCI_CFG_SETUP_CONTROL == ENABLED
         }
-        info = (isout || data_len == 0) ? (TD_CC | TD_DP_IN | TD_T_DATA1) :
-                    (TD_CC | TD_DP_OUT | TD_T_DATA1);
-        td = ohci_td_fill(td, info, NULL, 0, urb_ohci);
+
+        if (!(urb->transfer_flags & VSF_OHCI_FLAG_NO_STATUS)) {
+#endif
+            info = (isout || data_len == 0) ? (TD_CC | TD_DP_IN | TD_T_DATA1) :
+                        (TD_CC | TD_DP_OUT | TD_T_DATA1);
+            td = ohci_td_fill(td, info, NULL, 0, urb_ohci);
+#if VSF_OHCI_CFG_SETUP_CONTROL == ENABLED
+        }
+#endif
         regs->cmdstatus = OHCI_CLF;
         break;
     case USB_ENDPOINT_XFER_INT:
@@ -1206,6 +1218,14 @@ static vsf_err_t ohci_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     switch (urb->pipe.type) {
     case USB_ENDPOINT_XFER_CONTROL:
         size = 2;
+#if VSF_OHCI_CFG_SETUP_CONTROL == ENABLED
+        if (urb->transfer_flags & VSF_OHCI_FLAG_NO_STATUS) {
+            size--;
+        }
+        if (urb->transfer_flags & VSF_OHCI_FLAG_NO_DATA) {
+            break;
+        }
+#endif
     case USB_ENDPOINT_XFER_BULK:
     case USB_ENDPOINT_XFER_INT:
         size += datablock;

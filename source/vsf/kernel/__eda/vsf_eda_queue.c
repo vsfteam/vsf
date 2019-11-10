@@ -34,11 +34,11 @@
 
 #if __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE == ENABLED
 /*-----------------------------------------------------------------------------*
- * vsf_queue_t                                                                 *
+ * vsf_eda_queue_t                                                                 *
  *-----------------------------------------------------------------------------*/
 
 SECTION(".text.vsf.kernel.vsf_queue")
-static void __vsf_eda_queue_notify(vsf_queue_t *pthis, bool tx, vsf_protect_t orig)
+static void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_t orig)
 {
     vsf_eda_t *eda = tx ?
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
@@ -76,7 +76,7 @@ static void __vsf_eda_queue_notify(vsf_queue_t *pthis, bool tx, vsf_protect_t or
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_init")
-vsf_err_t vsf_eda_queue_init(vsf_queue_t *pthis, uint_fast16_t max)
+vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *pthis, uint_fast16_t max)
 {
     VSF_KERNEL_ASSERT(pthis != NULL);
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
@@ -87,7 +87,7 @@ vsf_err_t vsf_eda_queue_init(vsf_queue_t *pthis, uint_fast16_t max)
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_ex")
-vsf_err_t vsf_eda_queue_send_ex(vsf_queue_t *pthis, void *node, int_fast32_t timeout, vsf_eda_t *eda)
+vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *pthis, void *node, int_fast32_t timeout, vsf_eda_t *eda)
 {
     vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
     vsf_protect_t origlevel;
@@ -115,13 +115,13 @@ vsf_err_t vsf_eda_queue_send_ex(vsf_queue_t *pthis, void *node, int_fast32_t tim
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send")
-vsf_err_t vsf_eda_queue_send(vsf_queue_t *pthis, void *node, int_fast32_t timeout)
+vsf_err_t vsf_eda_queue_send(vsf_eda_queue_t *pthis, void *node, int_fast32_t timeout)
 {
     return vsf_eda_queue_send_ex(pthis, node, timeout, NULL);
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_get_reason")
-vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, void *node)
+vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void *node)
 {
     vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
     vsf_sync_reason_t reason = vsf_eda_sync_get_reason(sync, evt);
@@ -149,7 +149,7 @@ vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_queue_t *pthis, vsf_evt_t ev
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv_ex")
-vsf_err_t vsf_eda_queue_recv_ex(vsf_queue_t *pthis, void **node, int_fast32_t timeout, vsf_eda_t *eda)
+vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *pthis, void **node, int_fast32_t timeout, vsf_eda_t *eda)
 {
     vsf_protect_t origlevel;
 
@@ -181,13 +181,13 @@ vsf_err_t vsf_eda_queue_recv_ex(vsf_queue_t *pthis, void **node, int_fast32_t ti
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv")
-vsf_err_t vsf_eda_queue_recv(vsf_queue_t *pthis, void **node, int_fast32_t timeout)
+vsf_err_t vsf_eda_queue_recv(vsf_eda_queue_t *pthis, void **node, int_fast32_t timeout)
 {
     return vsf_eda_queue_recv_ex(pthis, node, timeout, NULL);
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv_get_reason")
-vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_queue_t *pthis, vsf_evt_t evt, void **node)
+vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void **node)
 {
     vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
     vsf_sync_reason_t reason = __vsf_eda_sync_get_reason(sync, evt, false);

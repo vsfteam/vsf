@@ -7,7 +7,7 @@
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
- *  Unless required by applicable law or agreed to in writing, software      *
+ *  Unless requir by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
@@ -50,7 +50,7 @@ struct usrapp_t {
     vsf_usbh_class_t ds4;
 #endif
 
-#if VSF_USE_UI == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
     struct {
         vsf_disp_sdl2_t disp;
         vsf_touchscreen_evt_t ts_evt;
@@ -58,6 +58,15 @@ struct usrapp_t {
         lv_color_t color[LV_VER_RES_MAX][LV_HOR_RES_MAX];
     } ui;
 #endif
+
+#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
+    struct {
+        vsf_disp_sdl2_t disp;
+        vsf_touchscreen_evt_t ts_evt;
+        vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
+    } ui;
+#endif
+
 };
 typedef struct usrapp_t usrapp_t;
 
@@ -87,7 +96,7 @@ static usrapp_t usrapp = {
     .ds4.drv                    = &vsf_usbh_ds4_drv,
 #endif
 
-#if VSF_USE_UI == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED 
     .ui.disp                    = {
         .param                  = {
             .height             = LV_VER_RES_MAX,
@@ -98,17 +107,29 @@ static usrapp_t usrapp = {
         .amplifier              = 2,
     },
 #endif
+
+#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED 
+    .ui.disp                    = {
+        .param                  = {
+            .height             = VSF_TGUI_VER_MAX,
+            .width              = VSF_TGUI_HOR_MAX,
+            .drv                = &vsf_disp_drv_sdl2,
+            .color              = VSF_DISP_COLOR_ARGB8888,
+        },
+        .amplifier              = 1,
+    },
+#endif
 };
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_UI == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED 
 extern void ui_demo_start(void);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_UI == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
 {
     if (ts_evt->dev == &usrapp.ui.disp) {
@@ -148,7 +169,7 @@ int main(int argc, char *argv[])
     vsf_usbh_register_class(&usrapp.usbh, &usrapp.ds4);
 #endif
 
-#if VSF_USE_UI == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 #   if USE_LV_LOG
     lv_log_register_print(vsf_lvgl_printf);
 #   endif
@@ -181,6 +202,11 @@ int main(int argc, char *argv[])
     while (1) {
         lv_task_handler();
     }
+#endif
+
+#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
+	extern void vsf_tgui_bind(vsf_disp_t * disp, void* ui_data);
+	vsf_tgui_bind(&usrapp.ui.disp, &usrapp.ui.color);
 #endif
     return 0;
 }

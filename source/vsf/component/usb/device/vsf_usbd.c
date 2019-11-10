@@ -249,6 +249,14 @@ static void vsf_usbd_trans_finish(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans)
     }
 }
 
+vsf_err_t vsf_usbd_ep_stall(vsf_usbd_dev_t *dev, uint_fast8_t ep)
+{
+    VSF_USB_ASSERT(dev != NULL);
+    VSF_USBD_DRV_PREPARE(dev);
+
+    return vsf_usbd_drv_ep_set_stall(ep);
+}
+
 vsf_err_t vsf_usbd_ep_recv(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans)
 {
     VSF_USB_ASSERT((dev != NULL) && (trans != NULL));
@@ -541,9 +549,6 @@ static vsf_err_t vsf_usbd_stdctrl_prepare(vsf_usbd_dev_t *dev)
         }
     } else if (USB_RECIP_ENDPOINT == recip) {
         uint_fast8_t ep = request->wIndex & 0xFF;
-        vsf_usbd_ifs_t *ifs = vsf_usbd_get_ifs_byep(config, ep);
-        VSF_USB_ASSERT(ifs != NULL);
-        const vsf_usbd_class_op_t *class_op = ifs->class_op;
 
         if ((request->bRequestType & USB_DIR_MASK) == USB_DIR_IN) {
             return VSF_ERR_FAIL;
@@ -562,13 +567,23 @@ static vsf_err_t vsf_usbd_stdctrl_prepare(vsf_usbd_dev_t *dev)
             buffer[1] = 0;
             size = 2;
             break;
-        case USB_REQ_CLEAR_FEATURE:
-            if (request->wValue != USB_ENDPOINT_HALT) {
-                return VSF_ERR_FAIL;
-            }
-            vsf_usbd_drv_ep_clear_stall(ep);
-            if (class_op->request_prepare != NULL) {
-                class_op->request_prepare(dev, ifs);
+        case USB_REQ_CLEAR_FEATURE: {
+                if (request->wValue != USB_ENDPOINT_HALT) {
+                    return VSF_ERR_FAIL;
+                }
+
+                if (0 == ep) {
+                    break;
+                } else {
+                    vsf_usbd_ifs_t *ifs = vsf_usbd_get_ifs_byep(config, ep);
+                    VSF_USB_ASSERT(ifs != NULL);
+                    const vsf_usbd_class_op_t *class_op = ifs->class_op;
+
+                    vsf_usbd_drv_ep_clear_stall(ep);
+                    if (class_op->request_prepare != NULL) {
+                        class_op->request_prepare(dev, ifs);
+                    }
+                }
             }
             break;
         case USB_REQ_SET_FEATURE:
@@ -679,8 +694,9 @@ static vsf_err_t vsf_usbd_ctrl_prepare(vsf_usbd_dev_t *dev)
         case USB_RECIP_DEVICE:
             tmp = dev->device_class_ifs;
         case USB_RECIP_INTERFACE:
-            if (tmp < config->num_of_ifs)
+            if (tmp < config->num_of_ifs) {
                 ifs = &config->ifs[tmp];
+            }
             break;
         case USB_RECIP_ENDPOINT:
             ifs = vsf_usbd_get_ifs_byep(config, tmp);

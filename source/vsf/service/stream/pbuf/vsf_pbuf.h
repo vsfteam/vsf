@@ -83,7 +83,7 @@ struct req_pbuf_evt_t {
 
 //! \brief fixed memory block used as stream buffer
 //! @{
-typedef union {
+typedef union vsf_pbuf_capability_t {
     struct {
         uint32_t    u24BlockSize        : 24;
         uint32_t    isNoWrite           : 1;
@@ -148,7 +148,7 @@ typedef struct vsf_pbuf_adapter_t vsf_pbuf_adapter_t;
 
 
 
-typedef struct {
+typedef struct vsf_pbuf_cfg_t {
     void *              pBuffer;
     vsf_pbuf_capability_t;
     uint_fast8_t        AdapterID;

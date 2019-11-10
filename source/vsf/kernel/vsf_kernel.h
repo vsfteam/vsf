@@ -26,7 +26,7 @@
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
-#include "./vsf_queue.h"
+#include "./vsf_eda_list_queue.h"
 #include "./vsf_os.h"
 #include "./shell/vsf_shell.h"
 #include "./task/vsf_task.h"

@@ -32,21 +32,40 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static vsf_err_t vsf_usbd_cdcacm_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbd_cdcacm_control_request_prepare(
+        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbd_cdcacm_control_request_process(
+        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_usbd_class_op_t vsf_usbd_cdcacm_control =
+{
+    .request_prepare = vsf_usbd_cdcacm_control_request_prepare,
+    .request_process = vsf_usbd_cdcacm_control_request_process,
+};
+
+const vsf_usbd_class_op_t vsf_usbd_cdcacm_data =
+{
+    .init = vsf_usbd_cdcacm_data_init,
+};
+
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_usbd_CMDACM_init( vsf_usbd_CDCACM_t *obj, 
-                                const vsf_usbd_CDCACM_cfg_t *cfg)
+vsf_err_t vsf_usbd_cdcacm_init( vsf_usbd_cdcacm_t *obj, 
+                                const vsf_usbd_cdcacm_cfg_t *cfg)
 {
     VSF_USB_ASSERT(NULL != obj && NULL != cfg);
 
-    memset(obj, 0, sizeof(vsf_usbd_CDCACM_t));
-    this.use_as__vsf_usbd_CDC_t.ep.ep_cfg = cfg->ep.ep_cfg;
+    memset(obj, 0, sizeof(vsf_usbd_cdcacm_t));
+    this.use_as__vsf_usbd_cdc_t.ep.ep_cfg = cfg->ep.ep_cfg;
 
 
-    this.line_coding = (usb_CDCACM_line_coding_t){
+    this.line_coding = (usb_cdcacm_line_coding_t){
                 .bitrate        = 115200,
                 .stop           = 0,
                 .parity         = 0,
@@ -60,127 +79,116 @@ vsf_err_t vsf_usbd_CMDACM_init( vsf_usbd_CDCACM_t *obj,
     this.stream.tx.stream = cfg->tx_stream;
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
-    vsf_stream_usr_init(&(this.use_as__vsf_usbd_CDC_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_usr_t),
+    vsf_stream_usr_init(&(this.use_as__vsf_usbd_cdc_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_usr_t),
                         &cfg->stream_usr);
-    vsf_stream_src_init(&(this.use_as__vsf_usbd_CDC_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_src_t),
+    vsf_stream_src_init(&(this.use_as__vsf_usbd_cdc_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_src_t),
                         &cfg->stream_src);
 
     do {
         vsf_usbd_ep_stream_cfg_t cfg = {
-            .rx_ep = this.use_as__vsf_usbd_CDC_t.ep.out,
-            .tx_ep = this.use_as__vsf_usbd_CDC_t.ep.in,
+            .rx_ep = this.use_as__vsf_usbd_cdc_t.ep.out,
+            .tx_ep = this.use_as__vsf_usbd_cdc_t.ep.in,
         };
-        vsf_usbd_ep_stream_init(&this.use_as__vsf_usbd_CDC_t.stream.use_as__vsf_usbd_ep_stream_t, &cfg);
+        vsf_usbd_ep_stream_init(&this.use_as__vsf_usbd_cdc_t.stream.use_as__vsf_usbd_ep_stream_t, &cfg);
         
     } while(0);
 #endif
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_usbd_CDCACM_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_cdcacm_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-	vsf_usbd_CDCACM_t *acm = (vsf_usbd_CDCACM_t *)ifs->class_param;
+    vsf_usbd_cdcacm_t *acm = ifs->class_param;
 
-	acm->control_line = 0;
-	if (    (acm->callback.set_line_coding != NULL)
+    acm->control_line = 0;
+    if (    (acm->callback.set_line_coding != NULL)
         &&  (VSF_ERR_NONE != acm->callback.set_line_coding(&acm->line_coding))) {
-		return VSF_ERR_FAIL;
-	}
-	return vsf_usbd_CDC_data.init(dev, ifs);
+        return VSF_ERR_FAIL;
+    }
+    return vsf_usbd_cdc_data.init(dev, ifs);
 }
 
-static vsf_err_t vsf_usbd_CDCACM_control_request_prepare(
-		vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_cdcacm_control_request_prepare(
+        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-	vsf_usbd_CDCACM_t *acm = (vsf_usbd_CDCACM_t *)ifs->class_param;
-	vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
-	struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-	usb_CDCACM_line_coding_t *line_coding = &acm->line_coding;
+    vsf_usbd_cdcacm_t *acm = ifs->class_param;
+    vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
+    struct usb_ctrlrequest_t *request = &ctrl_handler->request;
+    usb_cdcacm_line_coding_t *line_coding = &acm->line_coding;
     uint8_t *buffer = NULL;
     uint_fast32_t size = 0;
 
-	switch (request->bRequest) {
-	case USB_CDCACMREQ_SET_LINE_CODING:
-		if ((request->wLength != 7) || (request->wValue != 0)) {
-			return VSF_ERR_FAIL;
-		}
+    switch (request->bRequest) {
+    case USB_CDCACM_REQ_SET_LINE_CODING:
+        if ((request->wLength != 7) || (request->wValue != 0)) {
+            return VSF_ERR_FAIL;
+        }
 
         buffer = (uint8_t *)line_coding;
         size = 7;
-		break;
-	case USB_CDCACMREQ_GET_LINE_CODING:
-		if ((request->wLength != 7) || (request->wValue != 0)) {
-			return VSF_ERR_FAIL;
-		}
+        break;
+    case USB_CDCACM_REQ_GET_LINE_CODING:
+        if ((request->wLength != 7) || (request->wValue != 0)) {
+            return VSF_ERR_FAIL;
+        }
 
         cpu_to_le32s(&acm->line_coding.bitrate);
-		buffer = (uint8_t *)line_coding;
+        buffer = (uint8_t *)line_coding;
         size = 7;
-		break;
-	case USB_CDCACMREQ_SET_CONTROL_LINE_STATE:
-		if (    (request->wLength != 0)
+        break;
+    case USB_CDCACM_REQ_SET_CONTROL_LINE_STATE:
+        if (    (request->wLength != 0)
             ||  (request->wValue & ~USB_CDCACM_CONTROLLINE_MASK)) {
-			return VSF_ERR_FAIL;
-		}
+            return VSF_ERR_FAIL;
+        }
 
-		acm->control_line = (uint8_t)request->wValue;
-		if (    (acm->callback.set_control_line != NULL)
+        acm->control_line = (uint8_t)request->wValue;
+        if (    (acm->callback.set_control_line != NULL)
             &&  (VSF_ERR_NONE != acm->callback.set_control_line(acm->control_line))) {
-			return VSF_ERR_FAIL;
-		}
-		break;
-	case USB_CDCACMREQ_SEND_BREAK:
-		if (    (request->wLength != 0)
+            return VSF_ERR_FAIL;
+        }
+        break;
+    case USB_CDCACM_REQ_SEND_BREAK:
+        if (    (request->wLength != 0)
             ||  (   (acm->callback.send_break != NULL)
                 &&  acm->callback.send_break())) {
-			return VSF_ERR_FAIL;
-		}
-		break;
-	default:
-		return vsf_usbd_CDC_control.request_prepare(dev, ifs);
-	}
+            return VSF_ERR_FAIL;
+        }
+        break;
+    default:
+        return vsf_usbd_cdc_control.request_prepare(dev, ifs);
+    }
 
     ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
     ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
-	return VSF_ERR_NONE;
+    return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_usbd_CDCACM_control_request_process(
-		vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_cdcacm_control_request_process(
+        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-	vsf_usbd_CDCACM_t *acm = (vsf_usbd_CDCACM_t *)ifs->class_param;
-	vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
-	struct usb_ctrlrequest_t *request = &ctrl_handler->request;
+    vsf_usbd_cdcacm_t *acm = ifs->class_param;
+    vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
+    struct usb_ctrlrequest_t *request = &ctrl_handler->request;
 
     switch (request->bRequest) {
-	case USB_CDCACMREQ_SET_LINE_CODING:
+    case USB_CDCACM_REQ_SET_LINE_CODING:
         le32_to_cpus(&acm->line_coding.bitrate);
         if (    (acm->callback.set_line_coding != NULL)
             &&  (VSF_ERR_NONE != acm->callback.set_line_coding(&acm->line_coding))) {
             return VSF_ERR_FAIL;
         }
-        vsf_usbd_CDC_data_connect(&acm->use_as__vsf_usbd_CDC_t);
+        vsf_usbd_cdc_data_connect(&acm->use_as__vsf_usbd_cdc_t);
         break;
-    case USB_CDCACMREQ_GET_LINE_CODING:
+    case USB_CDCACM_REQ_GET_LINE_CODING:
         le32_to_cpus(&acm->line_coding.bitrate);
-	case USB_CDCACMREQ_SET_CONTROL_LINE_STATE:
-    case USB_CDCACMREQ_SEND_BREAK:
+    case USB_CDCACM_REQ_SET_CONTROL_LINE_STATE:
+    case USB_CDCACM_REQ_SEND_BREAK:
         break;
     default:
-		return vsf_usbd_CDC_control.request_process(dev, ifs);
+        return vsf_usbd_cdc_control.request_process(dev, ifs);
     }
-	return VSF_ERR_NONE;
+    return VSF_ERR_NONE;
 }
-
-const vsf_usbd_class_op_t vsf_usbd_CDCACM_control =
-{
-	.request_prepare = vsf_usbd_CDCACM_control_request_prepare,
-	.request_process = vsf_usbd_CDCACM_control_request_process,
-};
-
-const vsf_usbd_class_op_t vsf_usbd_CDCACM_data =
-{
-	.init = vsf_usbd_CDCACM_data_init,
-};
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM

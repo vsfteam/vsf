@@ -70,13 +70,13 @@ struct usbd_uvc_const_t {
 
         struct {
             struct {
-                usb_UVC_ct_roi_t roi_def;
-                vsf_usbd_UVC_control_info_t control_info[1];
+                usb_uvc_ct_roi_t roi_def;
+                vsf_usbd_uvc_control_info_t control_info[1];
             } camera;
 
             struct {
-                usb_UVC_vs_t probe_commit;
-                vsf_usbd_UVC_control_info_t control_info[2];
+                usb_uvc_vs_t probe_commit;
+                vsf_usbd_uvc_control_info_t control_info[2];
             } stream;
         } uvc;
     } usbd;
@@ -87,15 +87,15 @@ struct usbd_uvc_t {
     struct {
         struct {
             struct {
-                usb_UVC_ct_roi_t roi_cur;
-                vsf_usbd_UVC_control_t control[1];
+                usb_uvc_ct_roi_t roi_cur;
+                vsf_usbd_uvc_control_t control[1];
             } camera;
             struct {
-                usb_UVC_vs_t probe_commit;
-                vsf_usbd_UVC_control_t control[2];
+                usb_uvc_vs_t probe_commit;
+                vsf_usbd_uvc_control_t control[2];
             } stream;
-            vsf_usbd_UVC_entity_t entity[3];
-            vsf_usbd_UVC_t param;
+            vsf_usbd_uvc_entity_t entity[3];
+            vsf_usbd_uvc_t param;
             vsf_teda_t teda;
             uint32_t frame_pos;
             uint16_t cur_size;
@@ -335,7 +335,7 @@ static const usbd_uvc_const_t usbd_uvc_const = {
             .control_info       = {
                 [0]             = {
                     .selector   = 0x14,     // CT_REGION_OF_INTEREST_CONTROL
-                    .size       = sizeof(usb_UVC_ct_roi_t),
+                    .size       = sizeof(usb_uvc_ct_roi_t),
                     .def.buffer = (void *)&usbd_uvc_const.usbd.uvc.camera.roi_def,
                 },
             },
@@ -349,14 +349,14 @@ static const usbd_uvc_const_t usbd_uvc_const = {
         .uvc.stream.control_info= {
             [0]                 = {
                 .selector       = 0x01,     // VS_PROBE_CONTROL
-                .size           = sizeof(usb_UVC_vs_t),
+                .size           = sizeof(usb_uvc_vs_t),
                 .def.buffer     = (void *)&usbd_uvc_const.usbd.uvc.stream.probe_commit,
                 .max.buffer     = (void *)&usbd_uvc_const.usbd.uvc.stream.probe_commit,
                 .min.buffer     = (void *)&usbd_uvc_const.usbd.uvc.stream.probe_commit,
             },
             [1]                 = {
                 .selector       = 0x02,     // VS_COMMIT_CONTROL
-                .size           = sizeof(usb_UVC_vs_t),
+                .size           = sizeof(usb_uvc_vs_t),
                 .def.buffer     = (void *)&usbd_uvc_const.usbd.uvc.stream.probe_commit,
                 .max.buffer     = (void *)&usbd_uvc_const.usbd.uvc.stream.probe_commit,
                 .min.buffer     = (void *)&usbd_uvc_const.usbd.uvc.stream.probe_commit,
@@ -406,9 +406,9 @@ static usbd_uvc_t usbd_uvc = {
             .entity             = usbd_uvc.usbd.uvc.entity,
         },
 
-        .ifs[0].class_op        = &vsf_usbd_UVC_control_class,
+        .ifs[0].class_op        = &vsf_usbd_uvc_control_class,
         .ifs[0].class_param     = &usbd_uvc.usbd.uvc.param,
-        .ifs[1].class_op        = &vsf_usbd_UVC_stream_class,
+        .ifs[1].class_op        = &vsf_usbd_uvc_stream_class,
         .ifs[1].class_param     = &usbd_uvc.usbd.uvc.param,
 
         .config[0].num_of_ifs   = dimof(usbd_uvc.usbd.ifs),
@@ -432,14 +432,14 @@ static usbd_uvc_t usbd_uvc = {
 WEAK(usrapp_on_ready)
 void usrapp_on_ready(void) {}
 
-void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
+void vsf_usbd_uvc_stop_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = false;
     }
 }
 
-void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
+void vsf_usbd_uvc_start_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (!usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = true;
@@ -454,7 +454,7 @@ static void vsf_usbd_on_timer(vsf_callback_timer_t *timer)
 
 void usrapp_trans_disp_line(uint8_t *buffer, uint_fast32_t size)
 {
-    vsf_usbd_UVC_send_packet(&usbd_uvc.usbd.uvc.param, buffer, size);
+    vsf_usbd_uvc_send_packet(&usbd_uvc.usbd.uvc.param, buffer, size);
 }
 
 void usrapp_trans_init(void)

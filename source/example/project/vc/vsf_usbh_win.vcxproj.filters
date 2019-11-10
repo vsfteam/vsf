@@ -306,9 +306,6 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h">
-      <Filter>vsf\kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
@@ -837,6 +834,9 @@
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_mouse.h">
       <Filter>vsf\component\input\protocol</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -866,9 +866,6 @@
       <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c">
-      <Filter>vsf\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c">
@@ -1296,6 +1293,9 @@
     </ClCompile>
     <ClCompile Include="..\..\usrapp\usbh_demo_win\ui_demo_gamepad.c">
       <Filter>usrapp\usbh_demo_win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+      <Filter>vsf\kernel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

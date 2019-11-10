@@ -71,6 +71,7 @@ struct vsf_libusb_hcd_dev_t {
 
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
+    vsf_dlist_t urb_pending_list;
 };
 typedef struct vsf_libusb_hcd_dev_t vsf_libusb_hcd_dev_t;
 
@@ -93,6 +94,7 @@ typedef struct vsf_libusb_hcd_t vsf_libusb_hcd_t;
 
 struct vsf_libusb_hcd_urb_t {
     vsf_dlist_node_t urb_node;
+    vsf_dlist_node_t urb_pending_node;
 
     enum {
         VSF_LIBUSB_HCD_URB_STATE_IDLE,
@@ -569,6 +571,9 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state) {
                     vsf_libusb_hcd_free_urb_do(urb);
                 } else {
+                    vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
+                    vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
+
                     if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
                         struct usb_ctrlrequest_t *setup = &urb->setup_packet;
 
@@ -576,17 +581,29 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                             &&  (USB_REQ_SET_ADDRESS == setup->bRequest)) {
 
-                            vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
-                            vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
-
                             VSF_USB_ASSERT(0 == libusb_dev->addr);
                             libusb_dev->addr = setup->wValue;
                             urb->status = URB_OK;
                             urb->actual_length = 0;
+
+                            VSF_USB_ASSERT(vsf_dlist_is_empty(&libusb_dev->urb_pending_list));
+                            vsf_dlist_add_to_tail(vsf_libusb_hcd_urb_t, urb_pending_node, &libusb_dev->urb_pending_list, libusb_urb);
                             vsf_eda_post_msg(&__vsf_libusb_hcd.teda.use_as__vsf_eda_t, urb);
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
                             __vsf_libusb_hcd_trace_urb(urb, "done");
 #endif
+                            goto wait_next_urb;
+                        }
+                    }
+
+                    if (!urb->pipe.dir_in1out0) {
+                        vsf_libusb_hcd_urb_t *libusb_urb_head;
+
+                        // add to urb_pending_list for out transfer
+                        vsf_dlist_add_to_tail(vsf_libusb_hcd_urb_t, urb_pending_node, &libusb_dev->urb_pending_list, libusb_urb);
+
+                        vsf_dlist_peek_head(vsf_libusb_hcd_urb_t, urb_pending_node, &libusb_dev->urb_pending_list, libusb_urb_head);
+                        if (libusb_urb_head != libusb_urb) {
                             goto wait_next_urb;
                         }
                     }
@@ -609,6 +626,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 int idx = ffz(~__vsf_libusb_hcd.new_mask);
                 VSF_USB_ASSERT(idx < dimof(__vsf_libusb_hcd.devs));
                 vsf_libusb_hcd_dev_t *libusb_dev = &__vsf_libusb_hcd.devs[idx];
+                VSF_USB_ASSERT(vsf_dlist_is_empty(&libusb_dev->urb_pending_list));
                 __vsf_libusb_hcd.cur_dev_idx = idx;
                 __vsf_libusb_hcd.new_mask &= ~(1 << idx);
                 libusb_dev->addr = 0;
@@ -622,9 +640,34 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
             VSF_USB_ASSERT((urb != NULL) && urb->pipe.is_pipe);
             vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
+
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
             __vsf_libusb_hcd_trace_urb(urb, "get msg in hcd task");
 #endif
+
+            do {
+                if (!urb->pipe.dir_in1out0) {
+                    vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
+                    if (NULL == dev) { break; }
+                    vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
+                    if (NULL == libusb_dev) { break; }
+                    vsf_libusb_hcd_urb_t *libusb_urb_head;
+
+                    if (VSF_LIBUSB_HCD_DEV_STATE_ATTACHED == libusb_dev->state) {
+                        vsf_dlist_remove_head(vsf_libusb_hcd_urb_t, urb_pending_node, &libusb_dev->urb_pending_list, libusb_urb_head);
+                        VSF_USB_ASSERT(libusb_urb_head == libusb_urb);
+                        vsf_dlist_peek_head(vsf_libusb_hcd_urb_t, urb_pending_node, &libusb_dev->urb_pending_list, libusb_urb_head);
+                        if (libusb_urb_head != NULL) {
+                            libusb_urb_head->state = VSF_LIBUSB_HCD_URB_STATE_SUBMITTING;
+#if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
+                            __vsf_libusb_hcd_trace_urb(urb, "send submit request");
+#endif
+                            __vsf_arch_irq_request_send(&libusb_urb_head->irq_request);
+                        }
+                    }
+                }
+            } while (0);
+
             if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state) {
                 if (!vsf_libusb_hcd_free_urb_do(urb)) {
                     libusb_urb->is_msg_processed = true;
@@ -633,6 +676,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
                 __vsf_libusb_hcd_trace_urb(urb, "notify");
 #endif
+
                 vsf_eda_post_msg(urb->eda_caller, urb);
                 libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_IDLE;
                 libusb_urb->is_msg_processed = true;
@@ -654,6 +698,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 if (libusb_dev->state != VSF_LIBUSB_HCD_DEV_STATE_DETACHED) {
                     libusb_dev->state = VSF_LIBUSB_HCD_DEV_STATE_DETACHED;
                     vsf_usbh_disconnect_device((vsf_usbh_t *)libusb->hcd, libusb_dev->dev);
+                    vsf_dlist_init(&libusb_dev->urb_pending_list);
                     libusb_dev->evt_mask.is_detached = true;
                     libusb_dev->evt_mask.is_detaching = false;
                     __vsf_arch_irq_request_send(&libusb_dev->irq_request);
@@ -763,6 +808,7 @@ static vsf_err_t vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb
 {
     vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
     vsf_dlist_init_node(vsf_libusb_hcd_urb_t, urb_node, libusb_urb);
+    vsf_dlist_init_node(vsf_libusb_hcd_urb_t, urb_pending_node, libusb_urb);
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_add_to_tail(vsf_libusb_hcd_urb_t, urb_node, &__vsf_libusb_hcd.urb_list, libusb_urb);
         libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_QUEUED;

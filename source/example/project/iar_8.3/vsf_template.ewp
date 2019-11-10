@@ -13791,6 +13791,12 @@
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_list_queue.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_list_queue.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_evtq.h</name>
             </file>
             <file>
@@ -13830,12 +13836,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_os.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_queue.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_queue.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_timq.h</name>
@@ -14021,24 +14021,27 @@
                 </excluded>
                 <group>
                     <name>PLOOC</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\README.md</name>
-                    </file>
+                    <group>
+                        <name>raw</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h</name>
+                        </file>
+                    </group>
                 </group>
             </group>
             <group>

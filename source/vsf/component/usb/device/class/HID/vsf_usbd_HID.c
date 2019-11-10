@@ -33,17 +33,33 @@ enum vsf_usbd_HID_EVT_t {
     VSF_USBD_HID_EVT_INREPORT = VSF_EVT_USER + 0,
 };
 
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
 SECTION(".text.vsf.kernel.eda")
 vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
+static vsf_usbd_desc_t * vsf_usbd_hid_get_desc(vsf_usbd_dev_t *dev,
+            uint_fast8_t type, uint_fast8_t index, uint_fast16_t lanid);
+static vsf_err_t vsf_usbd_hid_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbd_hid_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbd_hid_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbh_hid_fini(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_usbd_class_op_t vsf_usbd_HID = {
+    .get_desc =         vsf_usbd_hid_get_desc,
+    .request_prepare =  vsf_usbd_hid_request_prepare,
+    .request_process =  vsf_usbd_hid_request_process,
+    .init =             vsf_usbd_hid_init,
+    .fini =             vsf_usbh_hid_fini,
+};
+
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_usbd_HID_report_t * vsf_usbd_HID_find_report(
-        vsf_usbd_HID_t *hid, uint_fast8_t type, uint_fast8_t id)
+static vsf_usbd_hid_report_t * vsf_usbd_hid_find_report(
+        vsf_usbd_hid_t *hid, uint_fast8_t type, uint_fast8_t id)
 {
     VSF_USB_ASSERT(hid != NULL);
 
@@ -55,7 +71,7 @@ static vsf_usbd_HID_report_t * vsf_usbd_HID_find_report(
     return NULL;
 }
 
-static void vsf_usbd_HID_on_report(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *report)
+static void vsf_usbd_hid_on_report(vsf_usbd_hid_t *hid, vsf_usbd_hid_report_t *report)
 {
     if (hid->notify_eda) {
         vsf_eda_post_msg(hid->eda, report);
@@ -64,25 +80,33 @@ static void vsf_usbd_HID_on_report(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *r
     }
 }
 
-bool vsf_usbh_HID_IN_report_can_update(vsf_usbd_HID_report_t *report)
+bool vsf_usbh_hid_in_report_can_update(vsf_usbd_hid_report_t *report)
 {
     return !report->changed;
 }
 
-vsf_err_t vsf_usbd_HID_IN_report_changed(vsf_usbd_HID_t *hid, vsf_usbd_HID_report_t *report)
+void vsf_usbd_hid_in_report_changed(vsf_usbd_hid_t *hid, vsf_usbd_hid_report_t *report)
 {
+    VSF_USB_ASSERT(!report->changed);
     report->changed = true;
     if (!hid->busy) {
         vsf_eda_post_evt(&hid->teda.use_as__vsf_eda_t, VSF_USBD_HID_EVT_INREPORT);
     }
-    return VSF_ERR_NONE;
 }
 
-static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+void vsf_usbh_hid_out_report_processed(vsf_usbd_hid_t *hid, vsf_usbd_hid_report_t *report)
 {
-    vsf_usbd_HID_t *hid = container_of(eda, vsf_usbd_HID_t, teda);
+    vsf_usbd_trans_t *trans = &hid->transact_out;
+    report->mem.pchBuffer = NULL;
+    trans->nSize = hid->rx_buffer.nSize;
+    vsf_usbd_ep_recv(hid->dev, trans);
+}
+
+static void vsf_usbd_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    vsf_usbd_hid_t *hid = container_of(eda, vsf_usbd_hid_t, teda);
     vsf_usbd_dev_t *dev = hid->dev;
-    vsf_usbd_HID_report_t *report;
+    vsf_usbd_hid_report_t *report;
     vsf_usbd_trans_t *trans;
 
     switch (evt) {
@@ -92,12 +116,10 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             trans->eda = eda;
             trans->notify_eda = true;
             trans->ep = hid->ep_out;
-            trans->pchBuffer = NULL;
+            trans->use_as__vsf_mem_t = hid->rx_buffer;
             vsf_usbd_ep_recv(dev, trans);
         }
 
-        hid->pos_out = 0;
-        hid->output_state = HID_OUTPUT_STATE_WAIT;
         hid->busy = false;
         for (uint_fast8_t i = 0; i < hid->num_of_report; i++) {
             report = &hid->reports[i];
@@ -109,61 +131,23 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_MESSAGE:
         trans = vsf_eda_get_cur_msg();
         if (trans == &hid->transact_in) {
-            report = vsf_usbd_HID_find_report(hid, USB_HID_REPORT_INPUT, hid->cur_IN_id);
+            report = vsf_usbd_hid_find_report(hid, USB_HID_REPORT_INPUT, hid->cur_in_id);
             hid->busy = false;
-            vsf_usbd_HID_on_report(hid, report);
+            vsf_usbd_hid_on_report(hid, report);
             goto process_in_report;
         } else /* if (trans == &hid->transact_out) */ {
-            VSF_USBD_DRV_PREPARE(dev);
-            uint_fast8_t ep_out = hid->ep_out;
-            uint_fast16_t ep_size = vsf_usbd_drv_ep_get_size(ep_out);
-            uint_fast16_t pkg_size = vsf_usbd_drv_ep_get_data_size(ep_out);
-            uint8_t report_id = 0;
-
-            switch (hid->output_state) {
-            case HID_OUTPUT_STATE_WAIT:
+            uint_fast16_t size = hid->rx_buffer.nSize - trans->nSize;
+            if (size > 0) {
+                uint_fast8_t report_id = 0;
                 if (hid->has_report_id) {
-                    vsf_usbd_drv_ep_read_buffer(ep_out, &report_id, 1);
+                    report_id = hid->rx_buffer.pchBuffer[0];
                 }
-                report = vsf_usbd_HID_find_report(hid, USB_HID_REPORT_OUTPUT, report_id);
-                if ((NULL == report) || (pkg_size > report->mem.nSize)) {
-                    return;
+                report = vsf_usbd_hid_find_report(hid, USB_HID_REPORT_OUTPUT, report_id);
+                if (report != NULL) {
+                    VSF_USB_ASSERT(report->mem.nSize == size);
+                    report->mem.pchBuffer = hid->rx_buffer.pchBuffer;
+                    vsf_usbd_hid_on_report(hid, report);
                 }
-
-                if (hid->has_report_id) {
-                    report->mem.pchBuffer[0] = report_id;
-                }
-
-                do {
-                    uint_fast8_t offset = hid->has_report_id ? 1 : 0;
-                    vsf_usbd_drv_ep_read_buffer(ep_out, &report->mem.pchBuffer[offset], pkg_size - offset);
-                } while (0);
-
-                if (pkg_size < report->mem.nSize) {
-                    hid->pos_out = pkg_size;
-                    hid->output_state++;
-                    hid->cur_OUT_id = report_id;
-                    vsf_usbd_ep_recv(dev, trans);
-                } else {
-                notify_report_rx:
-                    vsf_usbd_HID_on_report(hid, report);
-                }
-                break;
-            case HID_OUTPUT_STATE_RECEIVING:
-                report_id = hid->cur_OUT_id;
-                report = vsf_usbd_HID_find_report(hid, USB_HID_REPORT_OUTPUT, report_id);
-                if ((NULL == report) || ((pkg_size + hid->pos_out) > report->mem.nSize)) {
-                    return;
-                }
-
-                vsf_usbd_drv_ep_read_buffer(ep_out, report->mem.pchBuffer + hid->pos_out, pkg_size);
-                hid->pos_out += pkg_size;
-                if (hid->pos_out >= report->mem.nSize) {
-                    hid->pos_out = 0;
-                    hid->output_state = HID_OUTPUT_STATE_WAIT;
-                    goto notify_report_rx;
-                }
-                break;
             }
         }
         break;
@@ -196,7 +180,7 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 &&  (   report->changed
                     || (    (report->idle != 0)
                         &&  (report->idle_cnt >= report->idle)))) {
-                hid->cur_IN_id = report->id;
+                hid->cur_in_id = report->id;
 
                 trans->ep = hid->ep_in;
                 trans->use_as__vsf_mem_t = report->mem;
@@ -216,33 +200,30 @@ static void vsf_usbd_HID_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t vsf_usbd_HID_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_hid_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_HID_t *hid = (vsf_usbd_HID_t *)ifs->class_param;
+    vsf_usbd_hid_t *hid = ifs->class_param;
 
+    VSF_USB_ASSERT((hid->rx_buffer.pchBuffer != NULL) && (hid->rx_buffer.nSize > 0));
     hid->ifs = ifs;
     hid->dev = dev;
 
-    if (VSF_ERR_NONE != vsf_eda_set_evthandler( &(hid->teda.use_as__vsf_eda_t), 
-                                                vsf_usbd_HID_evthandler)) {
-        VSF_USB_ASSERT(false);
-    }
-    //hid->teda.evthandler = vsf_usbd_HID_evthandler;
+    vsf_eda_set_evthandler(&(hid->teda.use_as__vsf_eda_t), vsf_usbd_hid_evthandler);
     return vsf_teda_init(&hid->teda, VSF_USBD_CFG_EDA_PRIORITY, false);
 }
 
-static vsf_err_t vsf_usbh_HID_fini(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbh_hid_fini(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_HID_t *hid = (vsf_usbd_HID_t *)ifs->class_param;
+    vsf_usbd_hid_t *hid = ifs->class_param;
     return __vsf_eda_fini(&hid->teda.use_as__vsf_eda_t);
 }
 
-static vsf_usbd_desc_t * vsf_usbd_HID_get_desc(vsf_usbd_dev_t *dev,
+static vsf_usbd_desc_t * vsf_usbd_hid_get_desc(vsf_usbd_dev_t *dev,
             uint_fast8_t type, uint_fast8_t index, uint_fast16_t lanid)
 {
     struct usb_ctrlrequest_t *request = &dev->ctrl_handler.request;
     vsf_usbd_ifs_t *ifs = vsf_usbd_get_ifs(dev, request->wIndex & 0xFF);
-    vsf_usbd_HID_t *hid = (struct vsf_usbd_HID_t *)ifs->class_param;
+    vsf_usbd_hid_t *hid = ifs->class_param;
 
     if ((NULL == ifs) || (NULL == hid) || (NULL == hid->desc)) {
         return NULL;
@@ -251,19 +232,19 @@ static vsf_usbd_desc_t * vsf_usbd_HID_get_desc(vsf_usbd_dev_t *dev,
     return vsf_usbd_get_descriptor(hid->desc, 1, type, index, lanid);
 }
 
-static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_hid_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_HID_t *hid = (vsf_usbd_HID_t *)ifs->class_param;
+    vsf_usbd_hid_t *hid = ifs->class_param;
     vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
     uint_fast8_t type = request->wValue >> 8, id = request->wValue;
-    vsf_usbd_HID_report_t *report = vsf_usbd_HID_find_report(hid, type, id);
+    vsf_usbd_hid_report_t *report = vsf_usbd_hid_find_report(hid, type, id);
     uint8_t *buffer = NULL;
     uint_fast32_t size = 0;
 
     switch (request->bRequest) {
-    case USB_HIDREQ_GET_REPORT:
-        if ((NULL == report) || (type != report->type)) {
+    case USB_HID_REQ_GET_REPORT:
+        if ((NULL == report) || (type != report->type) || (NULL == report->mem.pchBuffer)) {
             return VSF_ERR_FAIL;
         }
 
@@ -274,7 +255,7 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
             buffer++;
         }
         break;
-    case USB_HIDREQ_GET_IDLE:
+    case USB_HID_REQ_GET_IDLE:
         if ((NULL == report) || (request->wLength != 1)) {
             return VSF_ERR_FAIL;
         }
@@ -282,7 +263,7 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
         size = 1;
         buffer = &report->idle;
         break;
-    case USB_HIDREQ_GET_PROTOCOL:
+    case USB_HID_REQ_GET_PROTOCOL:
         if ((request->wValue != 0) || (request->wLength != 1)) {
             return VSF_ERR_FAIL;
         }
@@ -290,7 +271,7 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
         size = 1;
         buffer = &hid->protocol;
         break;
-    case USB_HIDREQ_SET_REPORT:
+    case USB_HID_REQ_SET_REPORT:
         if ((NULL == report) || (type != report->type)) {
             return VSF_ERR_FAIL;
         }
@@ -302,7 +283,7 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
             buffer++;
         }
         break;
-    case USB_HIDREQ_SET_IDLE:
+    case USB_HID_REQ_SET_IDLE:
         if (request->wLength != 0) {
             return VSF_ERR_FAIL;
         }
@@ -314,7 +295,7 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
             }
         }
         break;
-    case USB_HIDREQ_SET_PROTOCOL:
+    case USB_HID_REQ_SET_PROTOCOL:
         if (    (request->wLength != 1)
             ||  (   (request->wValue != USB_HID_PROTOCOL_BOOT)
                  && (request->wValue != USB_HID_PROTOCOL_REPORT))) {
@@ -330,32 +311,24 @@ static vsf_err_t vsf_usbd_HID_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_usbd_HID_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_hid_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_HID_t *hid = (vsf_usbd_HID_t *)ifs->class_param;
+    vsf_usbd_hid_t *hid = ifs->class_param;
     vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
 
-    if (    (USB_HIDREQ_SET_REPORT == request->bRequest)
-        ||  (USB_HIDREQ_GET_REPORT == request->bRequest)) {
+    if (    (USB_HID_REQ_SET_REPORT == request->bRequest)
+        ||  (USB_HID_REQ_GET_REPORT == request->bRequest)) {
 
         uint_fast8_t type = request->wValue >> 8, id = request->wValue;
-        vsf_usbd_HID_report_t *report = vsf_usbd_HID_find_report(hid, type, id);
+        vsf_usbd_hid_report_t *report = vsf_usbd_hid_find_report(hid, type, id);
 
         if ((NULL == report) || (type != report->type)) {
             return VSF_ERR_FAIL;
         }
-        vsf_usbd_HID_on_report(hid, report);
+        vsf_usbd_hid_on_report(hid, report);
     }
     return VSF_ERR_NONE;
 }
-
-const vsf_usbd_class_op_t vsf_usbd_HID = {
-    .get_desc =         vsf_usbd_HID_get_desc,
-    .request_prepare =  vsf_usbd_HID_request_prepare,
-    .request_process =  vsf_usbd_HID_request_process,
-    .init =             vsf_usbd_HID_init,
-    .fini =             vsf_usbh_HID_fini,
-};
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_HID

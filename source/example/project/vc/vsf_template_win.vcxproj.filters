@@ -123,9 +123,6 @@
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c">
-      <Filter>vsf\kernel</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c">
       <Filter>vsf\hal</Filter>
     </ClCompile>
@@ -206,6 +203,9 @@
     </ClCompile>
     <ClCompile Include="..\..\usrapp\kernel_test\main_thread_simple.c">
       <Filter>usrapp\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+      <Filter>vsf\kernel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -288,9 +288,6 @@
       <Filter>vsf\kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h">
-      <Filter>vsf\kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h">
@@ -409,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
       <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+      <Filter>vsf\kernel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -247,6 +247,24 @@
     <Filter Include="usrapp\mvc_demo_win\tgui_demo">
       <UniqueIdentifier>{4c1e8e15-bad3-4e27-96a3-6d606a51b929}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\utilities\3rd-party\PLOOC\raw">
+      <UniqueIdentifier>{7cd795c2-654d-44b6-9c22-74f5f3f4fd55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\kernel\__eda">
+      <UniqueIdentifier>{5e5dc00c-602a-4e7e-8ce2-f29934945b7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v">
+      <UniqueIdentifier>{d51c94c5-faa8-4566-97c1-aeb0c7526045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v\simple_view">
+      <UniqueIdentifier>{dbf59837-1517-4b51-8d96-cd1e9076b17d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v\utilities">
+      <UniqueIdentifier>{7be3a088-0e82-47b3-af7f-c69f0e8e195e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v\template">
+      <UniqueIdentifier>{6d892a83-21b8-428a-b568-d02772155863}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -263,21 +281,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h">
       <Filter>vsf\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h">
-      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h">
-      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h">
-      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h">
-      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h">
-      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h">
       <Filter>vsf\utilities\compiler</Filter>
@@ -322,9 +325,6 @@
       <Filter>vsf\kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h">
-      <Filter>vsf\kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h">
@@ -846,15 +846,6 @@
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_mouse.h">
       <Filter>vsf\component\input\protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\vsf_usr_cfg.h">
-      <Filter>usrapp\mvc_demo_win\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\btstack_config.h">
-      <Filter>usrapp\mvc_demo_win\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\lv_conf.h">
-      <Filter>usrapp\mvc_demo_win\config</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\osa_service\vsf_osa_service.h">
       <Filter>vsf\osa_service</Filter>
     </ClInclude>
@@ -897,11 +888,84 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h">
       <Filter>vsf\component\ui\tgui</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
-      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
-    </None>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_queue.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h">
+      <Filter>vsf\component\ui\tgui\gui_v</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_style.h">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_usr_cfg.h">
+      <Filter>usrapp\mvc_demo_win\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -926,9 +990,6 @@
       <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c">
-      <Filter>vsf\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c">
@@ -1342,21 +1403,6 @@
     <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c">
       <Filter>vsf\component\3rd-party\littlevgl\6.0\port</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\input_demo.c">
-      <Filter>usrapp\mvc_demo_win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\main.c">
-      <Filter>usrapp\mvc_demo_win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\ui_demo_gamepad.c">
-      <Filter>usrapp\mvc_demo_win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\bt_demo.c">
-      <Filter>usrapp\mvc_demo_win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c">
-      <Filter>usrapp\mvc_demo_win</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\osa_service\vsf_osa_service.c">
       <Filter>vsf\osa_service</Filter>
     </ClCompile>
@@ -1387,8 +1433,81 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\tgui_demo\tgui_demo.c">
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_bmpevt.c">
+      <Filter>vsf\kernel\__eda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_queue.c">
+      <Filter>vsf\kernel\__eda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_sync.c">
+      <Filter>vsf\kernel\__eda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_timer.c">
+      <Filter>vsf\kernel\__eda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_queue.c">
+      <Filter>vsf\utilities\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c">
+      <Filter>vsf\component\ui\tgui\gui_v</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_demo.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_port.c">
+      <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\main.c">
+      <Filter>usrapp\mvc_demo_win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\README.md">
+      <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
+    </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

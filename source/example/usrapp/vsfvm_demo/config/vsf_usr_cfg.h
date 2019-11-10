@@ -198,6 +198,7 @@ enum {
 #   define VSF_USE_USB_HOST                 ENABLED
 #       define VSF_USE_USB_HOST_HUB         ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI        ENABLED
+#       define VSF_OHCI_CFG_SETUP_CONTROL   ENABLED
 #       define VSF_USBH_CFG_EDA_PRIORITY    vsf_prio_8
 #   define VSF_USE_TRACE                    ENABLED
 

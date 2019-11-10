@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level Application Configuration
 
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
@@ -71,7 +71,7 @@
 #define VSF_KERNEL_CFG_SUPPORT_SYNC                     ENABLED
 //      </c>
 
-//      <h> Schedule Policy 
+//      <h> Schedule Policy
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
@@ -115,7 +115,7 @@
 //#define VSF_OS_CFG_MAIN_STACK_SIZE                    2048
 
 //          <c1>Run main as a thread
-//          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
+//          <i>This feature will run main function as a thread. RTOS thread support must be enabled.
 #define VSF_OS_CFG_MAIN_MODE                            VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
@@ -128,7 +128,7 @@
 
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
-//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
+//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant.
 #define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                  ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
@@ -202,19 +202,17 @@ enum {
 #   define VSF_SERVICE_CFG_INSERTION                                            \
     extern vsf_pbuf_pool_t  g_tGenericPBUFPool;
 
-#     define VSF_SERVICE_CFG_DEPENDENCY      
+#     define VSF_SERVICE_CFG_DEPENDENCY
 
 
 
 #   define VSF_PBUF_ADAPTERS                                                    \
-        vsf_pbuf_pool_adapter(VSF_PBUF_ADAPTER_XXXXX, &g_tGenericPBUFPool)    
+        vsf_pbuf_pool_adapter(VSF_PBUF_ADAPTER_XXXXX, &g_tGenericPBUFPool)
 */
 
 
 #endif
 
-#define VSF_USE_TINY_GUI                                ENABLED
-#define VSF_USE_MSG_TREE                                ENABLED
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
@@ -253,7 +251,7 @@ enum {
 #define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
         vsf_input_on_evt((__TYPE), (__EVT))
 
-#if VSF_USE_UI == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
         extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \

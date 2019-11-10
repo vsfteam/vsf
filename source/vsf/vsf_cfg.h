@@ -39,7 +39,7 @@
 #include "utilities/compiler.h"
 
 /* minimal OO support for interface definie only, no class support */
-#include "utilities/3rd-party/PLOOC/plooc.h"
+#include "utilities/3rd-party/PLOOC/raw/plooc.h"
 
 /* definition for communication pipe and memory block */
 #include "utilities/communicate.h"       

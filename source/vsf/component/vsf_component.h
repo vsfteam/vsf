@@ -47,6 +47,7 @@
 #include "./usb/device/class/CDC/vsf_usbd_CDCACM.h"
 #include "./usb/device/class/HID/vsf_usbd_HID.h"
 #include "./usb/device/class/UVC/vsf_usbd_UVC.h"
+#include "./usb/device/class/MSC/vsf_usbd_MSC.h"
 
 #include "./tcpip/netdrv/vsf_netdrv.h"
 

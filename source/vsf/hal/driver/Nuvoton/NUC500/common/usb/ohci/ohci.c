@@ -16,62 +16,53 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "kernel/vsf_kernel_cfg.h"
-
-#if VSF_USE_KERNEL == ENABLED
-
-#include "./vsf_kernel_common.h"
-#include "./vsf_eda.h"
-
-#define __VSF_QUEUE_CLASS_IMPLEMENT
-#include "./vsf_queue.h"
-
+#include "./ohci.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-#if __VSF_KERNEL_CFG_SUPPORT_LIST_QUEUE == ENABLED
-struct __vsf_eda_list_node_wrapper {
-    implement_ex(vsf_slist_node_t, node)
-};
-typedef struct __vsf_eda_list_node_wrapper __vsf_eda_list_node_wrapper;
-#endif
-
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if __VSF_KERNEL_CFG_SUPPORT_LIST_QUEUE == ENABLED
-
-static bool __vsf_eda_list_queue_enqueue(vsf_queue_t *pthis, void *node)
+vsf_err_t nuc500_ohci_init(nuc500_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
 {
-    __vsf_eda_list_node_wrapper *list_node = node;
-    vsf_slist_init_node(__vsf_eda_list_node_wrapper, node, list_node);
-    vsf_slist_queue_enqueue(__vsf_eda_list_node_wrapper, node,
-                            &((vsf_list_queue_t *)pthis)->queue,
-                            (__vsf_eda_list_node_wrapper *)node);
-    return true;
+    const nuc500_ohci_const_t *hc_cfg = hc->param;
+
+    // TODO: use pm to configure usbh clock
+//    vsf_pm_ahbclk_enable(hc_cfg->ahbclk);
+    CLK->AHBCLK |= CLK_AHBCLK_USBHCKEN_Msk;
+    // TODO: get pll clock from pm
+    uint_fast32_t pll_clk = 480000000;
+    CLK->CLKDIV0 = (CLK->CLKDIV0 & ~(CLK_CLKDIV0_USBHDIV_Msk | CLK_CLKDIV0_USBHSEL_Msk))
+                |   CLK_CLKDIV0_USBHSEL_Msk | ((pll_clk / 48000000 - 1) << CLK_CLKDIV0_USBHDIV_Pos);
+
+    // TODO: GPIO for USBH should be configured by user, use use PB12/PB13 for test
+    SYS->GPB_MFPH = (SYS->GPB_MFPH & ~(SYS_GPB_MFPH_PB12MFP_Msk | SYS_GPB_MFPH_PB13MFP_Msk))
+                |   (0x2 << SYS_GPB_MFPH_PB12MFP_Pos) | (0x2 << SYS_GPB_MFPH_PB13MFP_Pos);
+
+    hc->callback.irq_handler = cfg->irq_handler;
+    hc->callback.param = cfg->param;
+
+    if (cfg->priority >= 0) {
+        NVIC_SetPriority(hc_cfg->irq, cfg->priority);
+        NVIC_EnableIRQ(hc_cfg->irq);
+    } else {
+        NVIC_DisableIRQ(hc_cfg->irq);
+    }
+    return VSF_ERR_NONE;
 }
 
-static bool __vsf_eda_list_queue_dequeue(vsf_queue_t *pthis, void **node)
+void nuc500_ohci_get_info(nuc500_ohci_t *hc, usb_hc_ip_info_t *info)
 {
-    __vsf_eda_list_node_wrapper *list_node;
-    vsf_slist_queue_dequeue(__vsf_eda_list_node_wrapper, node,
-                            &((vsf_list_queue_t *)pthis)->queue,
-                            list_node);
-    *node = list_node;
-    return *node != NULL;
+    if (info != NULL) {
+        info->regbase = hc->param->reg;
+    }
 }
 
-vsf_err_t vsf_eda_list_queue_init(vsf_list_queue_t *pthis, uint_fast16_t max)
+void nuc500_ohci_irq(nuc500_ohci_t *hc)
 {
-    pthis->use_as__vsf_queue_t.op.enqueue = __vsf_eda_list_queue_enqueue;
-    pthis->use_as__vsf_queue_t.op.dequeue = __vsf_eda_list_queue_dequeue;
-    vsf_slist_queue_init(&pthis->queue);
-    return vsf_eda_queue_init(&pthis->use_as__vsf_queue_t, max);
+    if (hc->callback.irq_handler != NULL) {
+        hc->callback.irq_handler(hc->callback.param);
+    }
 }
-
-#endif
-#endif

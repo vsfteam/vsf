@@ -496,7 +496,7 @@ end_def_class(vsf_pool_t)
 #endif
 //! @}
 
-typedef struct  {
+typedef struct vsf_pool_cfg_t {
     const uint8_t *pchPoolName;
     uintptr_t pTarget;
     code_region_t *ptRegion;

@@ -37,7 +37,7 @@
 #if !NO_SYS
 
 struct sys_mbox_t {
-    implement(vsf_queue_t)
+    implement(vsf_eda_queue_t)
     uint16_t head;
     uint16_t tail;
     void **queue;

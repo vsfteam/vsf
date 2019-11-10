@@ -27,6 +27,12 @@
 #include "hal/interface/vsf_interface_usb.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_OHCI_CFG_SETUP_CONTROL == ENABLED
+#   define VSF_OHCI_FLAG_NO_DATA   0x10
+#   define VSF_OHCI_FLAG_NO_STATUS 0x20
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

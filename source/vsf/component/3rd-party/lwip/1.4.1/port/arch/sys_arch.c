@@ -204,7 +204,7 @@ static void __sys_mbox_next(sys_mbox_t *mbox, uint16_t *pos)
     }
 }
 
-static bool __sys_mbox_queue_enqueue(vsf_queue_t *pthis, void *node)
+static bool __sys_mbox_queue_enqueue(vsf_eda_queue_t *pthis, void *node)
 {
     sys_mbox_t *mbox = (sys_mbox_t *)pthis;
     mbox->queue[mbox->tail] = node;
@@ -212,7 +212,7 @@ static bool __sys_mbox_queue_enqueue(vsf_queue_t *pthis, void *node)
     return true;
 }
 
-static bool __sys_mbox_queue_dequeue(vsf_queue_t *pthis, void **node)
+static bool __sys_mbox_queue_dequeue(vsf_eda_queue_t *pthis, void **node)
 {
     sys_mbox_t *mbox = (sys_mbox_t *)pthis;
     *node = mbox->queue[mbox->head];
@@ -220,7 +220,7 @@ static bool __sys_mbox_queue_dequeue(vsf_queue_t *pthis, void **node)
     return true;
 }
 
-static const vsf_queue_op_t __sys_mbox_queue_op = {
+static const vsf_eda_queue_op_t __sys_mbox_queue_op = {
     .enqueue = __sys_mbox_queue_enqueue,
     .dequeue = __sys_mbox_queue_dequeue,
 };
@@ -235,14 +235,14 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
     }
     mbox->head = mbox->tail = 0;
 
-    mbox->use_as__vsf_queue_t.op = __sys_mbox_queue_op;
-    vsf_eda_queue_init(&mbox->use_as__vsf_queue_t, size);
+    mbox->use_as__vsf_eda_queue_t.op = __sys_mbox_queue_op;
+    vsf_eda_queue_init(&mbox->use_as__vsf_eda_queue_t, size);
     return ERR_OK;
 }
 
 void sys_mbox_free(sys_mbox_t *mbox)
 {
-//    vsf_eda_queue_fini(&mbox->use_as__vsf_queue_t);
+//    vsf_eda_queue_fini(&mbox->use_as__vsf_eda_queue_t);
     if (mbox->queue != NULL) {
         vsf_heap_free(mbox->queue);
     }
@@ -260,7 +260,7 @@ void sys_mbox_set_invalid(sys_mbox_t *mbox)
 
 err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 {
-    if (VSF_ERR_NONE == vsf_eda_queue_send(&mbox->use_as__vsf_queue_t, msg, 0)) {
+    if (VSF_ERR_NONE == vsf_eda_queue_send(&mbox->use_as__vsf_eda_queue_t, msg, 0)) {
         return ERR_OK;
     }
     return ERR_MEM;
@@ -268,18 +268,18 @@ err_t sys_mbox_trypost(sys_mbox_t *mbox, void *msg)
 
 void sys_mbox_post(sys_mbox_t *mbox, void *msg)
 {
-    if (VSF_ERR_NONE != vsf_eda_queue_send(&mbox->use_as__vsf_queue_t, msg, -1)) {
+    if (VSF_ERR_NONE != vsf_eda_queue_send(&mbox->use_as__vsf_eda_queue_t, msg, -1)) {
         vsf_sync_reason_t reason;
 
         do {
-            reason = vsf_eda_queue_send_get_reason(&mbox->use_as__vsf_queue_t, vsf_thread_wait(), msg);
+            reason = vsf_eda_queue_send_get_reason(&mbox->use_as__vsf_eda_queue_t, vsf_thread_wait(), msg);
         } while (reason == VSF_SYNC_PENDING);
     }
 }
 
 u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 {
-    if (VSF_ERR_NONE == vsf_eda_queue_recv(&mbox->use_as__vsf_queue_t, msg, 0)) {
+    if (VSF_ERR_NONE == vsf_eda_queue_recv(&mbox->use_as__vsf_eda_queue_t, msg, 0)) {
         return 0;
     }
     return SYS_MBOX_EMPTY;
@@ -291,9 +291,9 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     u32_t duration;
     vsf_sync_reason_t reason;
 
-    if (VSF_ERR_NONE != vsf_eda_queue_recv(&mbox->use_as__vsf_queue_t, msg, vsf_systimer_ms_to_tick(timeout))) {
+    if (VSF_ERR_NONE != vsf_eda_queue_recv(&mbox->use_as__vsf_eda_queue_t, msg, vsf_systimer_ms_to_tick(timeout))) {
         do {
-            reason = vsf_eda_queue_recv_get_reason(&mbox->use_as__vsf_queue_t, vsf_thread_wait(), msg);
+            reason = vsf_eda_queue_recv_get_reason(&mbox->use_as__vsf_eda_queue_t, vsf_thread_wait(), msg);
         } while (reason == VSF_SYNC_PENDING);
     } else {
         reason = VSF_SYNC_GET;

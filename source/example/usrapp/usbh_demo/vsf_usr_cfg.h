@@ -27,19 +27,6 @@
 #define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
 //#define ASSERT(...)
 
-#define APP_CFG_USBD_VID                A7A8
-#define APP_CFG_USBD_PID                2347
-
-#define VSF_HEAP_SIZE                   0x4000
-#define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
-
-#define VSF_SYSTIMER_FREQ               (192000000ul)
-
-#if defined(__WIN__)
-//! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
-#   define VSF_SYSTIMER_RESOLUTION      (10 * 1000 * 1000)
-#endif
-
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
 //http://www.keil.com/support/man/docs/uv4/uv4_ut_configwizard.htm
@@ -153,67 +140,43 @@
 //! @}
 
 
+#define VSF_USE_INPUT                                   ENABLED
+#define VSF_USE_INPUT_HID                               ENABLED
+#define VSF_USE_INPUT_DS4                               ENABLED
+
 #define VSF_USE_AV                                      ENABLED
 
 #define VSF_USE_USB_HOST                                ENABLED
 #define VSF_USE_USB_HOST_HUB                            ENABLED
-#define VSF_USE_USB_HOST_ECM                            ENABLED
-#define VSF_USE_USB_HOST_HCD_OHCI                       ENABLED
+#define VSF_USE_USB_HOST_HID                            ENABLED
+#define VSF_USE_USB_HOST_DS4                            ENABLED
+#define VSF_USE_USB_HOST_ECM                            DISABLED
 #define VSF_USE_USB_HOST_LIBUSB                         ENABLED
 
-#if defined(__WIN__) || defined(__LINUX__)
-#define VSF_USE_USB_DEVICE                              DISABLED
-#else
-#define VSF_USE_USB_DEVICE                              ENABLED
-#endif
-#define VSF_USE_USB_DEVICE_CDCACM                       ENABLED
-#define VSF_USE_USB_DEVICE_UVC                          ENABLED
-#   define VSF_USBD_UVC_CFG_TRACE_EN                    ENABLED
-
-#define VSF_USE_TCPIP                                   ENABLED
+#define VSF_USE_TCPIP                                   DISABLED
 #define VSFIP_CFG_NETIF_HEADLEN                         64
 
 #define VSF_USE_TRACE                                   ENABLED
-#if defined(__WIN__) || defined(__LINUX__)
+
+#define VSF_USE_SERVICE_STREAM                          DISABLED
+#define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
+
+#define VSF_USE_HEAP                                    ENABLED
+#define VSF_HEAP_CFG_MCB_MAGIC_EN                       ENABLED
+
+#if     defined(__M484__)
+#   define VSF_HEAP_SIZE                                0x4000
+#   define VSF_SYSTIMER_FREQ                            (192000000ul)
+#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#elif   defined(__NUC505__)
+#   define VSF_HEAP_SIZE                                0x4000
+#   define VSF_SYSTIMER_FREQ                            (96000000ul)
+#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#elif   defined(__WIN__)
+#   define VSF_HEAP_SIZE                                0x100000
+//! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
+#   define VSF_SYSTIMER_RESOLUTION                      (10 * 1000 * 1000)
 #   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
-#endif
-
-#define VSF_USE_PBUF                                    ENABLED
-#define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT                DISABLED
-#define VSF_PBUF_CFG_SUPPORT_REF_COUNTING               DISABLED
-
-#define VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE               DISABLED
-#define VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION      DISABLED
-#define VSF_STREAM_CFG_GENERAL_PBUF_POOL                ENABLED
-#define GENERAL_PBUF_POOL_BLOCK_SIZE                    64
-//#define GENERAL_PBUF_POOL_BLOCK_COUNT                   16
-#define GENERAL_PBUF_POLL_PRIV_USER_COUNT               2
-
-#define VSF_USE_SERVICE_STREAM                          ENABLED
-#define VSF_USE_SERVICE_VSFSTREAM                       DISABLED
-
-#if VSF_USE_SERVICE_STREAM == ENABLED
-
-/* \note uncomment this part to add dedicated pbuf pool
-enum {
-#   if VSF_STREAM_CFG_GENERAL_PBUF_POOL == ENABLED
-    VSF_PBUF_ADAPTER_GENERAL = 0,
-#   endif
-    VSF_PBUF_ADAPTER_XXXXX,
-};
-
-#   define VSF_SERVICE_CFG_INSERTION                                            \
-    extern vsf_pbuf_pool_t  g_tGenericPBUFPool;
-
-#     define VSF_SERVICE_CFG_DEPENDENCY      
-
-
-
-#   define VSF_PBUF_ADAPTERS                                                    \
-        vsf_pbuf_pool_adapter(VSF_PBUF_ADAPTER_XXXXX, &g_tGenericPBUFPool)    
-*/
-
-
 #endif
 
 /*============================ TYPES =========================================*/

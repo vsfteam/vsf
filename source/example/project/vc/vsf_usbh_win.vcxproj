@@ -172,12 +172,12 @@
     <ClInclude Include="..\..\..\vsf\kernel\task\vsf_thread.h" />
     <ClInclude Include="..\..\..\vsf\kernel\task\__vsf_task_common.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_common.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
     <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h" />
@@ -351,11 +351,11 @@
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_task.c" />
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_thread.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c" />
     <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\vsf\service\pool\vsf_pool.c" />
     <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c" />

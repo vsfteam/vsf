@@ -28,14 +28,29 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static vsf_err_t vsf_usbd_cdc_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbd_cdc_control_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vsf_usbd_cdc_control_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_usbd_class_op_t vsf_usbd_cdc_control = {
+    .request_prepare = vsf_usbd_cdc_control_request_prepare,
+    .request_process = vsf_usbd_cdc_control_request_process,
+};
+
+const vsf_usbd_class_op_t vsf_usbd_cdc_data = {
+    .init = vsf_usbd_cdc_data_init,
+};
+
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t vsf_usbd_CDC_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_cdc_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_CDC_t *pthis = (vsf_usbd_CDC_t *)ifs->class_param;
+    vsf_usbd_cdc_t *pthis = (vsf_usbd_cdc_t *)ifs->class_param;
 
     VSF_USB_ASSERT(pthis != NULL);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -61,7 +76,7 @@ static vsf_err_t vsf_usbd_CDC_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs
     return VSF_ERR_NONE;
 }
 
-void vsf_usbd_CDC_data_connect(vsf_usbd_CDC_t *cdc)
+void vsf_usbd_cdc_data_connect(vsf_usbd_cdc_t *cdc)
 {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
@@ -78,9 +93,9 @@ void vsf_usbd_CDC_data_connect(vsf_usbd_CDC_t *cdc)
 #endif
 }
 
-static vsf_err_t vsf_usbd_CDC_control_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_cdc_control_request_prepare(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_CDC_t *cdc = (vsf_usbd_CDC_t *)ifs->class_param;
+    vsf_usbd_cdc_t *cdc = (vsf_usbd_cdc_t *)ifs->class_param;
     vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
     uint8_t *buffer = NULL;
@@ -110,9 +125,9 @@ static vsf_err_t vsf_usbd_CDC_control_request_prepare(vsf_usbd_dev_t *dev, vsf_u
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_usbd_CDC_control_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vsf_usbd_cdc_control_request_process(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
 {
-    vsf_usbd_CDC_t *cdc = (vsf_usbd_CDC_t *)ifs->class_param;
+    vsf_usbd_cdc_t *cdc = (vsf_usbd_cdc_t *)ifs->class_param;
     vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
     vsf_usbd_encapsulate_t *pkg;
@@ -135,14 +150,5 @@ static vsf_err_t vsf_usbd_CDC_control_request_process(vsf_usbd_dev_t *dev, vsf_u
     }
     return VSF_ERR_NONE;
 }
-
-const vsf_usbd_class_op_t vsf_usbd_CDC_control = {
-    .request_prepare = vsf_usbd_CDC_control_request_prepare,
-    .request_process = vsf_usbd_CDC_control_request_process,
-};
-
-const vsf_usbd_class_op_t vsf_usbd_CDC_data = {
-    .init = vsf_usbd_CDC_data_init,
-};
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDC

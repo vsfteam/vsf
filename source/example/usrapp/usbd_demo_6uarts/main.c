@@ -35,10 +35,10 @@
 // __I_FUNC starts from 4(first 3 are manufactorer/device/serial strings)
 #if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
 #   define USRAPP_DESC_CDC_CFG(__N, __UNUSED)                                   \
-            USB_DESC_CDC_UART_HS((__N) * 2, 4 + (__N), USRAPP_CFG_CDC_NUM + 1 + (__N), 1 + (__N), 1 + (__N))
+            USB_DESC_CDC_UART_HS_IAD((__N) * 2, 4 + (__N), USRAPP_CFG_CDC_NUM + 1 + (__N), 1 + (__N), 1 + (__N))
 #elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
 #   define USRAPP_DESC_CDC_CFG(__N, __UNUSED)                                   \
-            USB_DESC_CDC_UART_FS((__N) * 2, 4 + (__N), USRAPP_CFG_CDC_NUM + 1 + (__N), 1 + (__N), 1 + (__N))
+            USB_DESC_CDC_UART_FS_IAD((__N) * 2, 4 + (__N), USRAPP_CFG_CDC_NUM + 1 + (__N), 1 + (__N), 1 + (__N))
 #endif
 
 #define USRAPP_DESC_CDC_STRING(__N, __UNUSED)                                   \
@@ -78,9 +78,9 @@
             .rx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
         },                                                                      \
     },                                                                          \
-    .ifs[2 * (__N)].class_op        = &vsf_usbd_CDCACM_control,                 \
+    .ifs[2 * (__N)].class_op        = &vsf_usbd_cdcacm_control,                 \
     .ifs[2 * (__N)].class_param     = &__USBD.cdc[(__N)].param,                 \
-    .ifs[2 * (__N) + 1].class_op    = &vsf_usbd_CDCACM_data,                    \
+    .ifs[2 * (__N) + 1].class_op    = &vsf_usbd_cdcacm_data,                    \
     .ifs[2 * (__N) + 1].class_param = &__USBD.cdc[(__N)].param,
 
 /*============================ TYPES =========================================*/
@@ -93,7 +93,7 @@ struct usrapp_const_t {
         vsf_musb_fdrc_dcd_param_t musb_fdrc_param;
 #endif
         uint8_t dev_desc[18];
-        uint8_t config_desc[9 + USRAPP_CFG_CDC_NUM * USB_DESC_CDC_ACM_LEN];
+        uint8_t config_desc[9 + USRAPP_CFG_CDC_NUM * USB_DESC_CDC_ACM_IAD_LEN];
         uint8_t str_lanid[4];
         uint8_t str_vendor[20];
         uint8_t str_product[26];
@@ -111,7 +111,7 @@ struct usrapp_t {
         vsf_musb_fdrc_dcd_t musb_fdrc_dcd;
 #endif
         struct {
-            vsf_usbd_CDCACM_t param;
+            vsf_usbd_cdcacm_t param;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             struct {
                 vsf_mem_stream_t tx;
@@ -148,7 +148,7 @@ static const usrapp_const_t usrapp_const = {
         },
 #endif
         .dev_desc               = {
-            USB_DESC_DEV(64, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 1, 2, 0, 1)
+            USB_DESC_DEV_IAD(64, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 1, 2, 0, 1)
         },
         .config_desc            = {
             USB_DESC_CFG(sizeof(usrapp_const.usbd.config_desc), 2 * USRAPP_CFG_CDC_NUM, 1, 0, 0x80, 100)

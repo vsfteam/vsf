@@ -98,7 +98,6 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *ptObj,
                                     uint_fast16_t hwSize)
 {
     class_internal(ptObj, ptThis, vsf_stream_reader_t);
-    vsf_pbuf_t *pbuf;
     int_fast32_t nReadSize = -1;
     VSF_SERVICE_ASSERT(NULL != ptObj);
     

@@ -386,9 +386,11 @@ int main(void)
 #   endif
 #endif
 
+#if VSF_USE_TRACE == ENABLED
     vsf_trace_init(NULL);
-#if USRAPP_CFG_STDIO_EN == ENABLED
+#   if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
+#   endif
 #endif
 
 #if VSF_USE_USB_HOST == ENABLED

@@ -23,14 +23,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum usb_CDC_req_t {
+enum usb_cdc_req_t {
     USB_CDCREQ_SEND_ENCAPSULATED_COMMAND    = 0x00,
     USB_CDCREQ_GET_ENCAPSULATED_RESPONSE    = 0x01,
     USB_CDCREQ_SET_COMM_FEATURE             = 0x02,
     USB_CDCREQ_GET_COMM_FEATURE             = 0x03,
     USB_CDCREQ_CLEAR_COMM_FEATURE           = 0x04,
 };
-typedef enum usb_CDC_req_t usb_CDC_req_t;
+typedef enum usb_cdc_req_t usb_cdc_req_t;
 
 struct usb_cdc_union_descriptor_t {
     uint8_t bLength;

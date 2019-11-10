@@ -67,13 +67,13 @@ struct usbd_demo_const_t {
 
         struct {
             struct {
-                usb_UVC_ct_roi_t roi_def;
-                vsf_usbd_UVC_control_info_t control_info[1];
+                usb_uvc_ct_roi_t roi_def;
+                vsf_usbd_uvc_control_info_t control_info[1];
             } camera;
 
             struct {
-                usb_UVC_vs_t probe_commit;
-                vsf_usbd_UVC_control_info_t control_info[2];
+                usb_uvc_vs_t probe_commit;
+                vsf_usbd_uvc_control_info_t control_info[2];
             } stream;
         } uvc;
     } usbd;
@@ -83,7 +83,7 @@ typedef struct usbd_demo_const_t usbd_demo_const_t;
 struct usbd_demo_t {
     struct {
         struct {
-            vsf_usbd_CDCACM_t param;
+            vsf_usbd_cdcacm_t param;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             struct {
                 vsf_fifo_stream_t tx;
@@ -97,15 +97,15 @@ struct usbd_demo_t {
 
         struct {
             struct {
-                usb_UVC_ct_roi_t roi_cur;
-                vsf_usbd_UVC_control_t control[1];
+                usb_uvc_ct_roi_t roi_cur;
+                vsf_usbd_uvc_control_t control[1];
             } camera;
             struct {
-                usb_UVC_vs_t probe_commit;
-                vsf_usbd_UVC_control_t control[2];
+                usb_uvc_vs_t probe_commit;
+                vsf_usbd_uvc_control_t control[2];
             } stream;
-            vsf_usbd_UVC_entity_t entity[3];
-            vsf_usbd_UVC_t param;
+            vsf_usbd_uvc_entity_t entity[3];
+            vsf_usbd_uvc_t param;
             vsf_teda_t teda;
             uint32_t frame_pos;
             uint16_t cur_size;
@@ -551,7 +551,7 @@ static const usbd_demo_const_t usbd_demo_const = {
             .control_info       = {
                 [0]             = {
                     .selector   = 0x14,     // CT_REGION_OF_INTEREST_CONTROL
-                    .size       = sizeof(usb_UVC_ct_roi_t),
+                    .size       = sizeof(usb_uvc_ct_roi_t),
                     .def.buffer = (void *)&usbd_demo_const.usbd.uvc.camera.roi_def,
                 },
             },
@@ -565,14 +565,14 @@ static const usbd_demo_const_t usbd_demo_const = {
         .uvc.stream.control_info= {
             [0]                 = {
                 .selector       = 0x01,     // VS_PROBE_CONTROL
-                .size           = sizeof(usb_UVC_vs_t),
+                .size           = sizeof(usb_uvc_vs_t),
                 .def.buffer     = (void *)&usbd_demo_const.usbd.uvc.stream.probe_commit,
                 .max.buffer     = (void *)&usbd_demo_const.usbd.uvc.stream.probe_commit,
                 .min.buffer     = (void *)&usbd_demo_const.usbd.uvc.stream.probe_commit,
             },
             [1]                 = {
                 .selector       = 0x02,     // VS_COMMIT_CONTROL
-                .size           = sizeof(usb_UVC_vs_t),
+                .size           = sizeof(usb_uvc_vs_t),
                 .def.buffer     = (void *)&usbd_demo_const.usbd.uvc.stream.probe_commit,
                 .max.buffer     = (void *)&usbd_demo_const.usbd.uvc.stream.probe_commit,
                 .min.buffer     = (void *)&usbd_demo_const.usbd.uvc.stream.probe_commit,
@@ -685,21 +685,21 @@ static usbd_demo_t usbd_demo = {
         },
 
         // CDC0
-        .ifs[0].class_op        = &vsf_usbd_CDCACM_control,
+        .ifs[0].class_op        = &vsf_usbd_cdcacm_control,
         .ifs[0].class_param     = &usbd_demo.usbd.cdc[0].param,
-        .ifs[1].class_op        = &vsf_usbd_CDCACM_data,
+        .ifs[1].class_op        = &vsf_usbd_cdcacm_data,
         .ifs[1].class_param     = &usbd_demo.usbd.cdc[0].param,
 
         // CDC1
-        .ifs[2].class_op        = &vsf_usbd_CDCACM_control,
+        .ifs[2].class_op        = &vsf_usbd_cdcacm_control,
         .ifs[2].class_param     = &usbd_demo.usbd.cdc[1].param,
-        .ifs[3].class_op        = &vsf_usbd_CDCACM_data,
+        .ifs[3].class_op        = &vsf_usbd_cdcacm_data,
         .ifs[3].class_param     = &usbd_demo.usbd.cdc[1].param,
 
         // UVC
-        .ifs[4].class_op        = &vsf_usbd_UVC_control_class,
+        .ifs[4].class_op        = &vsf_usbd_uvc_control_class,
         .ifs[4].class_param     = &usbd_demo.usbd.uvc.param,
-        .ifs[5].class_op        = &vsf_usbd_UVC_stream_class,
+        .ifs[5].class_op        = &vsf_usbd_uvc_stream_class,
         .ifs[5].class_param     = &usbd_demo.usbd.uvc.param,
 
         .config[0].num_of_ifs   = dimof(usbd_demo.usbd.ifs),
@@ -737,14 +737,14 @@ void usbd_demo_start(void)
 WEAK(usbd_demo_uvc_on_ready)
 void usbd_demo_uvc_on_ready(void) {}
 
-void vsf_usbd_UVC_stop_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
+void vsf_usbd_uvc_stop_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (usbd_demo.usbd.uvc.stream_started) {
         usbd_demo.usbd.uvc.stream_started = false;
     }
 }
 
-void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
+void vsf_usbd_uvc_start_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (!usbd_demo.usbd.uvc.stream_started) {
         usbd_demo.usbd.uvc.stream_started = true;
@@ -752,7 +752,7 @@ void vsf_usbd_UVC_start_stream(vsf_usbd_UVC_t *uvc, uint_fast8_t ifs)
     }
 }
 
-vsf_usbd_UVC_t * usbd_demo_get_uvc(void)
+vsf_usbd_uvc_t * usbd_demo_get_uvc(void)
 {
     return &usbd_demo.usbd.uvc.param;
 }

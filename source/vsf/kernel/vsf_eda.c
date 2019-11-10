@@ -839,6 +839,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             vsf_callback_timq_dequeue(done_queue, timer);
             while (timer != NULL) {
+                timer->due = 0;
                 if (timer->on_timer != NULL) {
                     timer->on_timer(timer);
                 }
@@ -848,6 +849,8 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
 #   endif
     case VSF_EVT_TIMER:
+        // TODO: kernel_evthandler is running at vsf_prio_highest
+        //   need to call vsf_protect_sched?
         origlevel = vsf_protect_sched();
         vsf_timq_peek(&__vsf_eda.timer.timq, teda);
         while ((teda != NULL) && vsf_systimer_is_due(teda->due)) {

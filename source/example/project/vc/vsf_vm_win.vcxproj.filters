@@ -366,9 +366,6 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h">
-      <Filter>vsf\kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
@@ -936,6 +933,9 @@
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.h">
       <Filter>vsf\component\usb\host\class\libusb</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -968,9 +968,6 @@
       <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c">
-      <Filter>vsf\kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_task.c">
@@ -1422,6 +1419,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.c">
       <Filter>vsf\component\usb\host\class\libusb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+      <Filter>vsf\kernel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

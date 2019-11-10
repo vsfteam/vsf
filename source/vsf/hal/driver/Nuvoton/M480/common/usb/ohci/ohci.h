@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_NUVOTON_M484_OHCI_H__
-#define __HAL_DRIVER_NUVOTON_M484_OHCI_H__
+#ifndef __HAL_DRIVER_NUVOTON_M480_OHCI_H__
+#define __HAL_DRIVER_NUVOTON_M480_OHCI_H__
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"

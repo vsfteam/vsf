@@ -52,7 +52,7 @@ def_simple_class(vsf_disp_usbd_uvc_t) {
     implement(vsf_disp_t);
 
     public_member(
-        vsf_usbd_UVC_t  *uvc;
+        vsf_usbd_uvc_t  *uvc;
         uint16_t        frame_cnt;
     )
     private_member(

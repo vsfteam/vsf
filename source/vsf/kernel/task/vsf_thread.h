@@ -287,6 +287,14 @@
 #   define vsf_thread(__NAME)        __vsf_thread(__NAME) 
 
 #endif
+
+#define vsf_thread_wfm      vsf_thread_wait_for_msg
+#define vsf_thread_wfe      vsf_thread_wait_for_evt
+
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+#   define vsf_thread_wfem     vsf_thread_wait_for_evt_msg
+#endif
+
 /*============================ TYPES =========================================*/
 
 declare_class(vsf_thread_t)
@@ -384,6 +392,7 @@ extern void __vsf_thread_call_sub(uintptr_t eda_handler, uintptr_t param);
 
 #endif
 
+
 SECTION("text.vsf.kernel.vsf_thread")
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 extern vsf_err_t vsf_thread_start(  vsf_thread_t *thread, 
@@ -392,6 +401,7 @@ extern vsf_err_t vsf_thread_start(  vsf_thread_t *thread,
 #else
 extern vsf_err_t vsf_thread_start(vsf_thread_t *ptThis, vsf_prio_t tPriority);
 #endif
+
 SECTION("text.vsf.kernel.vsf_thread_get_cur")
 extern vsf_thread_t *vsf_thread_get_cur(void);
 
@@ -402,10 +412,18 @@ SECTION("text.vsf.kernel.vsf_thread_wait")
 extern vsf_evt_t vsf_thread_wait(void);
 
 SECTION("text.vsf.kernel.vsf_thread_wfe")
-extern void vsf_thread_wfe(vsf_evt_t evt);
+extern void vsf_thread_wait_for_evt(vsf_evt_t evt);
 
 SECTION("text.vsf.kernel.vsf_thread_sendevt")
 extern void vsf_thread_sendevt(vsf_thread_t *thread, vsf_evt_t evt);
+
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+SECTION("text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+extern uintptr_t vsf_thread_wait_for_evt_msg(vsf_evt_t evt);
+#endif
+
+SECTION("text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+extern uintptr_t vsf_thread_wait_for_msg(void);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 SECTION("text.vsf.kernel.vsf_thread_delay")

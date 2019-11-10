@@ -137,6 +137,23 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_style.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h" />
@@ -183,12 +200,12 @@
     <ClInclude Include="..\..\..\vsf\kernel\task\vsf_thread.h" />
     <ClInclude Include="..\..\..\vsf\kernel\task\__vsf_task_common.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_common.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_queue.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
     <ClInclude Include="..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h" />
@@ -209,11 +226,12 @@
     <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h" />
     <ClInclude Include="..\..\..\vsf\utilities\communicate.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h" />
@@ -229,15 +247,11 @@
     <ClInclude Include="..\..\..\vsf\utilities\template\template.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_queue.h" />
     <ClInclude Include="..\..\..\vsf\vsf.h" />
     <ClInclude Include="..\..\..\vsf\vsf_cfg.h" />
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\btstack_config.h" />
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\lv_conf.h" />
-    <ClInclude Include="..\..\usrapp\usbh_demo_win\config\vsf_usr_cfg.h" />
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_usr_cfg.h" />
     <ClInclude Include="libusb\libusb.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c" />
@@ -353,7 +367,31 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.c" />
@@ -373,11 +411,15 @@
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_task.c" />
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_thread.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_queue.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_bmpevt.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_queue.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_sync.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_timer.c" />
     <ClCompile Include="..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c" />
     <ClCompile Include="..\..\..\vsf\osa_service\vsf_osa_service.c" />
     <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
@@ -397,11 +439,14 @@
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c" />
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\bt_demo.c" />
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\input_demo.c" />
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\main.c" />
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\tgui_demo\tgui_demo.c" />
-    <ClCompile Include="..\..\usrapp\usbh_demo_win\ui_demo_gamepad.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_queue.c" />
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\main.c" />
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_demo.c" />
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_port.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\README.md" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -478,8 +523,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__CPU_X86__;__WIN__;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\usbh_demo_win;$(ProjectDir)..\..\usrapp\usbh_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\mvc_demo_win;$(ProjectDir)..\..\usrapp\mvc_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Wno-microsoft-include -Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

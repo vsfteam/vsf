@@ -129,6 +129,15 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
     VSF_KERNEL_ASSERT(timer != NULL);
 
     lock_status = vsf_protect_sched();
+        if (timer->due != 0) {
+    #ifndef WEAK_VSF_KERNEL_ERR_REPORT
+            vsf_kernel_err_report(VSF_KERNEL_ERR_INVALID_USAGE);
+    #else
+            WEAK_VSF_KERNEL_ERR_REPORT(VSF_KERNEL_ERR_INVALID_USAGE);
+    #endif
+            return VSF_ERR_FAIL;
+        }
+
         timer->due = tick + vsf_timer_get_tick();
         vsf_callback_timq_insert(&__vsf_eda.timer.callback_timq, timer);
 
@@ -163,7 +172,10 @@ vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer)
     VSF_KERNEL_ASSERT(timer != NULL);
 
     lock_status = vsf_protect_sched();
-        vsf_callback_timq_remove(&__vsf_eda.timer.callback_timq, timer);
+        if (timer->due != 0) {
+            timer->due = 0;
+            vsf_callback_timq_remove(&__vsf_eda.timer.callback_timq, timer);
+        }
     vsf_unprotect_sched(lock_status);
     return VSF_ERR_NONE;
 }

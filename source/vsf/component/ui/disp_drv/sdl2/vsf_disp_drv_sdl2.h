@@ -23,6 +23,7 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_DRV_SDL2 == ENABLED
 
+#include "hal/vsf_hal.h"
 #include "SDL.h"
 
 #if     defined(__VSF_DISP_SDL2_CLASS_IMPLEMENT)

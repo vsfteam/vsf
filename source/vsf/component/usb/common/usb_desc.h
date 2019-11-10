@@ -8,7 +8,7 @@
             ((__VALUE) >> 0) & 0xFF, ((__VALUE) >> 8) & 0xFF,                   \
             ((__VALUE) >> 16) & 0xFF, ((__VALUE) >> 24) & 0xFF
 
-#define USB_DESC_DEV(__EP0_SIZE, __VID, __PID, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
+#define USB_DESC_DEV_IAD(__EP0_SIZE, __VID, __PID, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
             USB_DT_DEVICE_SIZE,                                                 \
             USB_DT_DEVICE,                                                      \
             0x00, 0x02,                         /* bcdUSB */                    \

@@ -22,6 +22,8 @@
 
 #if     defined(__M484__)
 #   define  VSF_NUVOTON_DRIVER_HEADER       "./M480/M484/driver.h"
+#elif   defined(__NUC505__)
+#   define  VSF_NUVOTON_DRIVER_HEADER       "./NUC500/NUC505/driver.h"
 #else
 #   error No supported device found.
 #endif

@@ -67,7 +67,7 @@ static void vsf_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vsf_disp_on_ready(&disp_uvc->use_as__vsf_disp_t);
         break;
     case VSF_EVT_REFRESH:
-        vsf_usbd_UVC_send_packet(disp_uvc->uvc, disp_uvc->cur_buffer,
+        vsf_usbd_uvc_send_packet(disp_uvc->uvc, disp_uvc->cur_buffer,
                 2 + disp_uvc->param.width * VSF_DISP_GET_PIXEL_SIZE(disp_uvc) / 8);
         break;
     }

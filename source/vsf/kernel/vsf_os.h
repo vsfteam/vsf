@@ -40,11 +40,13 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 
 #   define vsf_sched_safe()             code_region(&VSF_SCHED_SAFE_CODE_REGION)
 #   define vsf_sched_safe_exit()        vsf_sched_unlock(lock_status)
+#   define vsf_unprotect_scheduler(__state)                                     \
+            vsf_sched_unlock((vsf_sched_lock_status_t)(__state))
 #else
             
 #   define VSF_SCHED_SAFE_CODE_REGION   DEFAULT_CODE_REGION_NONE
 #   define vsf_sched_lock()             0
-#   define vsf_sched_unlock(level)      
+#   define vsf_sched_unlock(level)      UNUSED_PARAM(level)
 #   define vsf_sched_safe()             if (0)
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #       define __vsf_sched_safe(__CODE) __CODE
@@ -52,14 +54,14 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 #       define __vsf_sched_safe(...)    __VA_ARGS__
 #   endif
 #   define vsf_sched_safe_exit()
+#   define vsf_unprotect_scheduler(__state)     vsf_sched_unlock(__state) 
 #endif
 
 #define __vsf_interrupt_safe            __SAFE_ATOM_CODE
 #define vsf_interrupt_safe              SAFE_ATOM_CODE
 
 #define vsf_protect_scheduler()         vsf_sched_lock()
-#define vsf_unprotect_scheduler(__state)                                        \
-            vsf_sched_unlock((vsf_sched_lock_status_t)(__state))
+
 #define vsf_protect_sched()             vsf_protect_scheduler()
 #define vsf_unprotect_sched             vsf_unprotect_scheduler
 

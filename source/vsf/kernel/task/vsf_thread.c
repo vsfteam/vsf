@@ -52,7 +52,7 @@ void vsf_thread_ret(void)
     VSF_KERNEL_ASSERT(thread != NULL);
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
 #   else
@@ -76,7 +76,7 @@ vsf_evt_t vsf_thread_wait(void)
     VSF_KERNEL_ASSERT(thread != NULL);
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
 #   else
@@ -98,7 +98,10 @@ vsf_evt_t vsf_thread_wait(void)
 
 
 SECTION("text.vsf.kernel.vsf_thread_wfe")
-void vsf_thread_wfe(vsf_evt_t evt)
+
+//! todo: check whether the new implementation stable and equivalent to the old implementation.
+#if 0
+void vsf_thread_wait_for_evt(vsf_evt_t evt)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
@@ -108,7 +111,7 @@ void vsf_thread_wfe(vsf_evt_t evt)
     VSF_KERNEL_ASSERT(thread != NULL);
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
 #   else
@@ -127,13 +130,43 @@ void vsf_thread_wfe(vsf_evt_t evt)
         vsf_thread_ret();
     }
 }
+#else
+void vsf_thread_wait_for_evt(vsf_evt_t evt)
+{
+    while(evt != vsf_thread_wait());
+}
+#endif
+
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+SECTION("text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+uintptr_t vsf_thread_wait_for_evt_msg(vsf_evt_t evt)
+{
+    vsf_thread_wfe(evt);
+    return (uintptr_t)vsf_eda_get_cur_msg();
+}
+
+SECTION("text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+uintptr_t vsf_thread_wait_for_msg(void)
+{
+    return vsf_thread_wait_for_evt_msg(VSF_EVT_MESSAGE);
+}
+#else
+
+SECTION("text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+uintptr_t vsf_thread_wait_for_msg(void)
+{
+    vsf_thread_wait();
+    return (uintptr_t)vsf_eda_get_cur_msg();
+}
+#endif
+
 
 SECTION("text.vsf.kernel.vsf_thread_sendevt")
 void vsf_thread_sendevt(vsf_thread_t *thread, vsf_evt_t evt)
 {
     VSF_KERNEL_ASSERT(thread != NULL);
     class_internal(thread, pthis, vsf_thread_t);
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     vsf_eda_post_evt(&pthis->use_as__vsf_teda_t.use_as__vsf_eda_t, evt);
 #else
     vsf_eda_post_evt(&pthis->use_as__vsf_eda_t, evt);
@@ -147,7 +180,7 @@ static void __vsf_thread_entry(void)
     class_internal(thread_obj, thread, vsf_thread_t);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
     pthis->entry((vsf_thread_cb_t *)thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param);
@@ -233,7 +266,7 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
         return VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED;
     }
 
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     return vsf_teda_init_ex(&pthis->use_as__vsf_teda_t, &cfg);
 #   else
     return vsf_eda_init_ex(&pthis->use_as__vsf_eda_t, &cfg);
@@ -328,7 +361,7 @@ vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
         return VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED;
     }
 
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     return vsf_teda_init(&pthis->use_as__vsf_teda_t, priority, true);
 #   else
     return vsf_eda_init(&pthis->use_as__vsf_eda_t, priority, true);
@@ -336,7 +369,7 @@ vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
 }
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION("text.vsf.kernel.vsf_thread_delay")
 void vsf_thread_delay(uint_fast32_t tick)
 {
@@ -345,7 +378,7 @@ void vsf_thread_delay(uint_fast32_t tick)
 }
 #endif
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")
 static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32_t time_out)
@@ -388,7 +421,7 @@ vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem)
     return vsf_eda_sem_post(sem);
 }
 
-#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
+#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 
 SECTION("text.vsf.kernel.vsf_thread_bmpevt_pend")
 vsf_sync_reason_t vsf_thread_bmpevt_pend(

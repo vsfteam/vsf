@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <flash_device>
-  <exe>$PROJ_DIR$\FlashM481_160K.out</exe>
+  <exe>FlashM481_160K.out</exe>
   <page>4</page>
   <block>128 0x1000</block>
   <flash_base>0x0</flash_base>
-  <macro>$PROJ_DIR$\NuMicro_M4_APROM.mac</macro>
+  <macro>NuMicro_M4_APROM.mac</macro>
   <aggregate>1</aggregate>
   <args_doc>The "--config" argument is used to program
 Config0 and Config1. For example use 

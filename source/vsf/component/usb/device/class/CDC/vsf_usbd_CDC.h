@@ -41,7 +41,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbd_CDC_t)
+declare_simple_class(vsf_usbd_cdc_t)
 
 typedef struct vsf_usbd_encapsulate_t vsf_usbd_encapsulate_t;
 struct vsf_usbd_encapsulate_t {
@@ -53,7 +53,7 @@ struct vsf_usbd_encapsulate_t {
     };
 };
 
-def_simple_class(vsf_usbd_CDC_t) {
+def_simple_class(vsf_usbd_cdc_t) {
 
     public_member(
         implement_ex(vsf_usbd_ep_cfg_t, ep)
@@ -79,13 +79,13 @@ def_simple_class(vsf_usbd_CDC_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const struct vsf_usbd_class_op_t vsf_usbd_CDC_control;
-extern const struct vsf_usbd_class_op_t vsf_usbd_CDC_data;
+extern const struct vsf_usbd_class_op_t vsf_usbd_cdc_control;
+extern const struct vsf_usbd_class_op_t vsf_usbd_cdc_data;
 
 /*============================ PROTOTYPES ====================================*/
 
 // helper functions
-extern void vsf_usbd_CDC_data_connect(vsf_usbd_CDC_t *cdc);
+extern void vsf_usbd_cdc_data_connect(vsf_usbd_cdc_t *cdc);
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDC
 #endif	// __VSF_USBD_CDC_H__

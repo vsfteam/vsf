@@ -39,7 +39,7 @@
     ROOT ISR(SWI##__N##_IRQHandler)                                             \
     {                                                                           \
         if (__m480_common.swi[__N].handler != NULL) {                           \
-            __m480_common.swi[__N].handler(__m480_common.swi[__N].pparam);      \
+            __m480_common.swi[__N].handler(__m480_common.swi[__N].param);       \
         }                                                                       \
     }
 
@@ -54,7 +54,7 @@ static const IRQn_Type m480_soft_irq[VSF_DEV_SWI_NUM] = {
 struct __m480_common_t {
     struct {
         vsf_swi_handler_t *handler;
-        void *pparam;
+        void *param;
     } swi[__VSF_DEV_SWI_NUM];
 };
 typedef struct __m480_common_t __m480_common_t;
@@ -145,12 +145,12 @@ MREPEAT(__VSF_DEV_SWI_NUM, __M480_SWI, NULL)
 static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 
                                                 vsf_arch_prio_t priority,
                                                 vsf_swi_handler_t *handler, 
-                                                void *pparam)
+                                                void *param)
 {
     if (idx < __VSF_DEV_SWI_NUM) {
         if (handler != NULL) {
             __m480_common.swi[idx].handler = handler;
-            __m480_common.swi[idx].pparam = pparam;
+            __m480_common.swi[idx].param = param;
 
             NVIC_SetPriority(m480_soft_irq[idx], priority);
             NVIC_EnableIRQ(m480_soft_irq[idx]);
