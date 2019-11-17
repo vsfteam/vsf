@@ -55,7 +55,7 @@
 #include "./tcpip/netdrv/vsf_netdrv.h"
 
 #include "./ui/disp_drv/vsf_disp_drv.h"
-#include "./ui/tgui/vsf_tgui.h"
+//#include "./ui/tgui/vsf_tgui.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
