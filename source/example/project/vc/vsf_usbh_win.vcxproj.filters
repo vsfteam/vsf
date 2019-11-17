@@ -834,7 +834,7 @@
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_mouse.h">
       <Filter>vsf\component\input\protocol</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1294,7 +1294,7 @@
     <ClCompile Include="..\..\usrapp\usbh_demo_win\ui_demo_gamepad.c">
       <Filter>usrapp\usbh_demo_win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
   </ItemGroup>

@@ -265,6 +265,12 @@
     <Filter Include="vsf\component\ui\tgui\gui_v\template">
       <UniqueIdentifier>{6d892a83-21b8-428a-b568-d02772155863}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\mvc_demo_win\tgui_demo\images">
+      <UniqueIdentifier>{f709acb0-ec27-4191-922d-dfe077b19de7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\mvc_demo_win\tgui_demo\fonts">
+      <UniqueIdentifier>{f01f6faf-4ab0-4005-8899-08a4980ef18e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -882,9 +888,6 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.h">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_container.h">
-      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h">
       <Filter>vsf\component\ui\tgui</Filter>
     </ClInclude>
@@ -905,9 +908,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h">
       <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
-      <Filter>vsf\kernel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_queue.h">
       <Filter>vsf\utilities\template</Filter>
@@ -965,6 +965,33 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h">
       <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\__vsf_tgui_control_types.h">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.h">
+      <Filter>usrapp\mvc_demo_win\tgui_demo\images</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\fonts\demo_font.h">
+      <Filter>usrapp\mvc_demo_win\tgui_demo\fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1418,9 +1445,6 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.c">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_container.c">
-      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClCompile>
@@ -1444,9 +1468,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_timer.c">
       <Filter>vsf\kernel\__eda</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
-      <Filter>vsf\kernel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_queue.c">
       <Filter>vsf\utilities\template</Filter>
@@ -1502,6 +1523,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
       <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.c">
+      <Filter>usrapp\mvc_demo_win\tgui_demo\images</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\fonts\demo_font.c">
+      <Filter>usrapp\mvc_demo_win\tgui_demo\fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
+      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

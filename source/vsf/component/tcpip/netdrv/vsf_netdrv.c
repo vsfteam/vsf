@@ -22,6 +22,7 @@
 #if VSF_USE_TCPIP == ENABLED
 
 #define VSF_NETDRV_IMPLEMENT
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

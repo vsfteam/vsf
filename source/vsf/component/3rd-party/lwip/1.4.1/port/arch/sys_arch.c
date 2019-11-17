@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_EDA_CLASS_INHERIT
+// TODO: use dedicated include
 #include "vsf.h"
 
 #include "./cc.h"

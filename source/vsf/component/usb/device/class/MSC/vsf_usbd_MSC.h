@@ -38,8 +38,8 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_USBD_MSC_CFG_REPLY_SIZE
-#   define VSF_USBD_MSC_CFG_REPLY_SIZE              36  // reply size for inquiry
+#if VSF_USE_SCSI != ENABLED
+#   error msc uses scsi!!!
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -51,61 +51,31 @@ union vsf_usbd_msc_scsi_ctx_t {
     usb_msc_cbw_t cbw;
     struct {
         usb_msc_csw_t csw;
-        union {
-            uint8_t reply[VSF_USBD_MSC_CFG_REPLY_SIZE];
-            struct {
-                uint64_t addr;
-                uint32_t size;
-                uint32_t cur_size;
-                uint8_t cmd;
-            };
+        struct {
+            uint32_t cur_size;
+            uint32_t reply_size;
         };
     };
 };
 typedef union vsf_usbd_msc_scsi_ctx_t vsf_usbd_msc_scsi_ctx_t;
 
-struct vsf_usbd_msc_op_t {
-    /*! \brief execute commands
-     *! \param msc          mass storage class object
-     *! \param ctx          scsi context
-     *! \param mem          memory for the data phase
-     *! \retval < 0         error
-     *! \retval >= 0        byte size of data phase
-     */
-    int_fast32_t (*execute)(vsf_usbd_msc_t *msc, vsf_usbd_msc_scsi_ctx_t *ctx, vsf_mem_t *mem);
-
-    /*! \brief read memory asynchronously, call vsf_usbd_msc_send_data when done
-     *! \param msc          mass storage class object
-     *! \param ctx          scsi context
-     *! \param mem          memory buffer for read operation
-     *! \retval             error code
-     */
-    vsf_err_t (*read)(vsf_usbd_msc_t *msc, vsf_usbd_msc_scsi_ctx_t *ctx, vsf_mem_t *mem);
-
-    /*! \brief write memory asynchronously, call vsf_usbd_msc_recv_data when done
-     *! \param msc          mass storage class object
-     *! \param ctx          scsi context
-     *! \param mem          memory buffer for read operation
-     *! \retval             error code
-     */
-    vsf_err_t (*write)(vsf_usbd_msc_t *msc, vsf_usbd_msc_scsi_ctx_t *ctx, vsf_mem_t *mem);
-};
-typedef struct vsf_usbd_msc_op_t vsf_usbd_msc_op_t;
-
 def_simple_class(vsf_usbd_msc_t) {
+
+    private_member(
+        vsf_eda_t eda;
+        vsf_usbd_msc_scsi_ctx_t ctx;
+        vsf_usbd_dev_t *dev;
+        vsf_usbd_ep_stream_t ep_stream;
+        uint8_t is_inited   : 1;
+        uint8_t is_stream   : 1;
+    )
 
     public_member(
         const uint8_t ep_out;
         const uint8_t ep_in;
         const uint8_t max_lun;
-        vsf_usbd_msc_op_t const * const op;
-    )
-
-    private_member(
-        vsf_usbd_msc_scsi_ctx_t ctx;
-        vsf_usbd_dev_t *dev;
-        vsf_usbd_trans_t trans;
-        int32_t reply_size;
+        vsf_scsi_t *scsi;
+        vsf_stream_t *stream;
     )
 };
 
@@ -114,9 +84,6 @@ def_simple_class(vsf_usbd_msc_t) {
 extern const vsf_usbd_class_op_t vsf_usbd_msc_class;
 
 /*============================ PROTOTYPES ====================================*/
-
-extern void vsf_usbd_msc_send_data(vsf_usbd_msc_t *msc);
-extern void vsf_usbd_msc_recv_data(vsf_usbd_msc_t *msc);
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_MSC
 #endif      // __VSF_USBD_MSC_H__

@@ -156,6 +156,13 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
     return VSF_ERR_NONE;
 }
 
+
+#warning "todo: implement vsf_systimer_prio_set()"
+void vsf_systimer_prio_set(vsf_arch_prio_t priority)
+{
+
+}
+
 #endif
 
 /*----------------------------------------------------------------------------*

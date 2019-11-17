@@ -20,6 +20,26 @@
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef USRAPP_CFG_FAKEFAT32
+#   define USRAPP_CFG_FAKEFAT32                 ENABLED
+#endif
+
+#if USRAPP_CFG_FAKEFAT32 == ENABLED
+#   undef USRAPP_CFG_MSC_SIZE
+#   define USRAPP_CFG_MSC_SIZE                  (512 * 0x1040)
+#endif
+
+#ifndef USRAPP_CFG_MSC_SIZE
+#   define USRAPP_CFG_MSC_SIZE                  (16 * 1024)
+#endif
+
+/*============================ INCLUDES ======================================*/
+
+#if USRAPP_CFG_FAKEFAT32 == ENABLED
+#   include "fakefat32.c"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -37,6 +57,10 @@ struct usrapp_const_t {
         uint8_t str_product[16];
         vsf_usbd_desc_t std_desc[6];
     } usbd;
+
+    struct {
+        vsf_virtual_scsi_param_t param;
+    } scsi;
 };
 typedef struct usrapp_const_t usrapp_const_t;
 
@@ -57,16 +81,29 @@ struct usrapp_t {
 
         vsf_callback_timer_t connect_timer;
     } usbd;
+
+    struct {
+#if USRAPP_CFG_FAKEFAT32 == ENABLED
+        vsf_fakefat32_mal_t fakefat32_mal;
+#else
+        uint8_t mem[USRAPP_CFG_MSC_SIZE];
+        vsf_mem_mal_t mem_mal;
+#endif
+        vsf_mal_scsi_t mal_scsi;
+    } scsi;
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+    struct {
+        uint8_t buffer[1024];
+        vsf_mem_stream_t mem_stream;
+    } stream;
+#endif
 };
 typedef struct usrapp_t usrapp_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 /*============================ PROTOTYPES ====================================*/
-
-extern void usrapp_msc_scsi_init(vsf_usbd_msc_t *msc);
-extern vsf_usbd_msc_op_t usrapp_msc_op;
-
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const usrapp_const_t usrapp_const = {
@@ -88,7 +125,7 @@ static const usrapp_const_t usrapp_const = {
         .config_desc            = {
             USB_DESC_CFG(sizeof(usrapp_const.usbd.config_desc), 1, 1, 0, 0x80, 100)
 #if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
-            USB_DESC_MSCBOT_IAD(0, 4, 1, 1, 256)
+            USB_DESC_MSCBOT_IAD(0, 4, 1, 1, 512)
 #elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
             USB_DESC_MSCBOT_IAD(0, 4, 1, 1, 64)
 #endif
@@ -116,6 +153,15 @@ static const usrapp_const_t usrapp_const = {
             VSF_USBD_DESC_STRING(0x0409, 4, usrapp_const.usbd.str_product, sizeof(usrapp_const.usbd.str_product)),
         },
     },
+
+    .scsi.param                 = {
+        .block_size             = 512,
+        .block_num              = USRAPP_CFG_MSC_SIZE / 512,
+        .vendor                 = "Simon   ",
+        .product                = "VSFDriver       ",
+        .revision               = "1.00",
+        .type                   = SCSI_PDT_DIRECT_ACCESS_BLOCK,
+    },
 };
 
 static usrapp_t usrapp;
@@ -137,7 +183,8 @@ static usrapp_t usrapp = {
             .ep_out             = 1,
             .ep_in              = 1,
             .max_lun            = 1,
-            .op                 = &usrapp_msc_op,
+            .scsi               = &usrapp.scsi.mal_scsi.use_as__vsf_scsi_t,
+            .stream             = &usrapp.stream.mem_stream.use_as__vsf_stream_t,
         },
 
         .ifs[0].class_op        = &vsf_usbd_msc_class,
@@ -158,6 +205,53 @@ static usrapp_t usrapp = {
 #endif
         .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
     },
+
+    .scsi                       = {
+#if USRAPP_CFG_FAKEFAT32 == ENABLED
+        .fakefat32_mal          = {
+            .drv                = &vsf_fakefat32_mal_drv,
+            .sector_size        = 512,
+            .sector_number      = USRAPP_CFG_MSC_SIZE / 512,
+            .sectors_per_cluster= 8,
+            .volume_id          = 0x12345678,
+            .disk_id            = 0x9ABCEF01,
+            .root               = {
+                .name           = "ROOT",
+                .d.child        = (vsf_memfs_file_t *)fakefat32_root,
+                .d.child_num    = dimof(fakefat32_root),
+            },
+        },
+#else
+        .mem_mal                = {
+            .drv                = &vsf_mem_mal_drv,
+            .mem                = {
+                .pchBuffer      = usrapp.scsi.mem,
+                .nSize          = sizeof(usrapp.scsi.mem),
+            },
+            .blksz              = 512,
+        },
+#endif
+        .mal_scsi               = {
+            .drv                = &vsf_virtual_scsi_drv,
+            .param              = (void *)&usrapp_const.scsi.param,
+            .virtual_scsi_drv   = &vsf_mal_virtual_scsi_drv,
+#if USRAPP_CFG_FAKEFAT32 == ENABLED
+            .mal                = &usrapp.scsi.fakefat32_mal.use_as__vsf_mal_t,
+#else
+            .mal                = &usrapp.scsi.mem_mal.use_as__vsf_mal_t,
+#endif
+        },
+    },
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+    .stream                     = {
+        .mem_stream             = {
+            .op                 = &vsf_mem_stream_op,
+            .pchBuffer          = usrapp.stream.buffer,
+            .nSize              = sizeof(usrapp.stream.buffer),
+        },
+    },
+#endif
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -167,18 +261,18 @@ static void usrapp_on_timer(vsf_callback_timer_t *timer)
     vsf_usbd_connect(&usrapp.usbd.dev);
 }
 
-void main(void)
+int main(void)
 {
 #if VSF_USE_TRACE == ENABLED
     vsf_trace_init(NULL);
     vsf_stdio_init();
 #endif
 
-    usrapp_msc_scsi_init(&usrapp.usbd.msc.param);
     vsf_usbd_init(&usrapp.usbd.dev);
     vsf_usbd_disconnect(&usrapp.usbd.dev);
     usrapp.usbd.connect_timer.on_timer = usrapp_on_timer;
     vsf_callback_timer_add_ms(&usrapp.usbd.connect_timer, 200);
+    return 0;
 }
 
 /* EOF */

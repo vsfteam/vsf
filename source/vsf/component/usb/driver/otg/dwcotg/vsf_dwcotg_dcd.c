@@ -22,6 +22,7 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED
 
 #define VSF_DWCOTG_DCD_IMPLEMENT
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

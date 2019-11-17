@@ -23,6 +23,7 @@
 
 #define VSF_USBD_INHERIT
 #define VSF_USBD_CDC_IMPLEMENT
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
@@ -81,11 +82,11 @@ void vsf_usbd_cdc_data_connect(vsf_usbd_cdc_t *cdc)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
     if ((cdc->stream.tx.stream != NULL) && !VSF_STREAM_IS_RX_CONNECTED(cdc->stream.tx.stream)) {
-        vsf_usbd_ep_send_stream(&cdc->stream.tx);
+        vsf_usbd_ep_send_stream(&cdc->stream.tx, 0);
     }
 
     if ((cdc->stream.rx.stream != NULL) && !VSF_STREAM_IS_TX_CONNECTED(cdc->stream.rx.stream)) {
-        vsf_usbd_ep_recv_stream(&cdc->stream.rx);
+        vsf_usbd_ep_recv_stream(&cdc->stream.rx, 0);
     }
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED

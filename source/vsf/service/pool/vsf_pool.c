@@ -213,12 +213,14 @@ void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
      *        this function by yourself
      */     
     void *pMemory = NULL;
-    
+#if     defined(_POSIX_VERSION)                                                 \
+    ||  (__IS_COMPILER_ARM_COMPILER_6 && !defined(__STRICT_ANSI__))
 extern int posix_memalign(  void ** /*ret*/, 
                             size_t /*alignment*/, 
                             size_t /*size*/);
 
     posix_memalign(&pMemory, wSize, wAlign);
+#endif
     return pMemory;
 }
 #endif

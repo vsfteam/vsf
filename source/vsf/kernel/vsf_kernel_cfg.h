@@ -121,7 +121,7 @@
 #       undef __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE
 #       define __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE       ENABLED
 #   endif
-#   define __VSF_KERNEL_CFG_SUPPORT_LIST_QUEUE              ENABLED
+#   define __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE         ENABLED
 #endif
 
 

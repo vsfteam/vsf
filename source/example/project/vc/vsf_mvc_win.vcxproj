@@ -132,31 +132,36 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_container.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_style.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\__vsf_tgui_control_types.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDCACM.h" />
@@ -200,7 +205,7 @@
     <ClInclude Include="..\..\..\vsf\kernel\task\vsf_thread.h" />
     <ClInclude Include="..\..\..\vsf\kernel\task\__vsf_task_common.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h" />
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h" />
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h" />
@@ -251,6 +256,8 @@
     <ClInclude Include="..\..\..\vsf\vsf.h" />
     <ClInclude Include="..\..\..\vsf\vsf_cfg.h" />
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_usr_cfg.h" />
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\fonts\demo_font.h" />
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.h" />
     <ClInclude Include="libusb\libusb.h" />
   </ItemGroup>
   <ItemGroup>
@@ -362,7 +369,6 @@
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_container.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c" />
@@ -370,6 +376,7 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
@@ -390,6 +397,7 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c" />
@@ -411,7 +419,7 @@
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_task.c" />
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_thread.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c" />
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c" />
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
@@ -441,6 +449,8 @@
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_queue.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\main.c" />
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\fonts\demo_font.c" />
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_demo.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_port.c" />
   </ItemGroup>

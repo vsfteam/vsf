@@ -21,6 +21,7 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_OHCI == ENABLED
 
 #define VSF_USBH_IMPLEMENT_HCD
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

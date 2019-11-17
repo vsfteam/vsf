@@ -22,6 +22,7 @@
 #if     (VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED)\
     ||  (VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED)
 
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

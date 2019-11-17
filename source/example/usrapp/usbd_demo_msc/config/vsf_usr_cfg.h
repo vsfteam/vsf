@@ -147,13 +147,21 @@
 //  </h>
 //! @}
 
-#define VSF_USE_FS                          DISABLED
+#define VSF_USE_FS                          ENABLED
+#   define VSF_USE_MEMFS                    ENABLED
+#   define VSF_USE_FATFS                    ENABLED
 
 #define VSF_USE_INPUT                       DISABLED
 #define VSF_USE_INPUT_HID                   ENABLED
 #define VSF_USE_INPUT_DS4                   ENABLED
 
 #define VSF_USE_AV                          DISABLED
+
+#define VSF_USE_MAL                         ENABLED
+#   define VSF_USE_MEM_MAL                  ENABLED
+#   define VSF_USE_FAKEFAT32_MAL            ENABLED
+#define VSF_USE_SCSI                        ENABLED
+#   define VSF_USE_MAL_SCSI                 ENABLED
 
 #define VSF_USE_USB_HOST                    DISABLED
 #define VSF_USE_USB_HOST_HUB                ENABLED

@@ -204,7 +204,7 @@
     <ClCompile Include="..\..\usrapp\kernel_test\main_thread_simple.c">
       <Filter>usrapp\kernel_test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
   </ItemGroup>
@@ -407,7 +407,7 @@
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
       <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
   </ItemGroup>

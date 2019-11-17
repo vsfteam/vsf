@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_DISP_CLASS_INHERIT
+// TODO: use dedicated include
 #include "vsf.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED

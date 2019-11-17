@@ -57,6 +57,7 @@ enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_IVALID = -1,
     vsf_arch_prio_ivalid = -1,
     MREPEAT(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
+    vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 };
 typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 

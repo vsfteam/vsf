@@ -17618,10 +17618,13 @@
                 </file>
             </group>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_msc\main.c</name>
+                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_msc\fakefat32.c</name>
+                <excluded>
+                    <configuration>usbd_demo_msc</configuration>
+                </excluded>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_msc\scsi_dev.c</name>
+                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_msc\main.c</name>
             </file>
         </group>
         <group>
@@ -18716,6 +18719,39 @@
                 </file>
             </group>
             <group>
+                <name>fs</name>
+                <group>
+                    <name>driver</name>
+                    <group>
+                        <name>fatfs</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>memfs</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h</name>
+                        </file>
+                    </group>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\fs\vsf_fs_cfg.h</name>
+                </file>
+            </group>
+            <group>
                 <name>input</name>
                 <excluded>
                     <configuration>nes_simulator</configuration>
@@ -18747,7 +18783,16 @@
                         <name>$PROJ_DIR$\..\..\..\vsf\component\input\protocol\vsf_input_gamepad.h</name>
                     </file>
                     <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\protocol\vsf_input_keyboard.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\protocol\vsf_input_mouse.h</name>
+                    </file>
+                    <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\component\input\protocol\vsf_input_sensor.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h</name>
                     </file>
                 </group>
                 <file>
@@ -18758,6 +18803,72 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\component\input\vsf_input_cfg.h</name>
+                </file>
+            </group>
+            <group>
+                <name>mal</name>
+                <group>
+                    <name>driver</name>
+                    <group>
+                        <name>fakefat32_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>mem_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.h</name>
+                        </file>
+                    </group>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\mal\vsf_mal.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\mal\vsf_mal.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\mal\vsf_mal_cfg.h</name>
+                </file>
+            </group>
+            <group>
+                <name>scsi</name>
+                <group>
+                    <name>driver</name>
+                    <group>
+                        <name>mal_scsi</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>virtual_scsi</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.h</name>
+                        </file>
+                    </group>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\vsf_scsi.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\vsf_scsi.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\scsi\vsf_scsi_cfg.h</name>
                 </file>
             </group>
             <group>
@@ -19831,10 +19942,10 @@
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_list_queue.c</name>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_slist_queue.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_list_queue.h</name>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_slist_queue.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_evtq.h</name>

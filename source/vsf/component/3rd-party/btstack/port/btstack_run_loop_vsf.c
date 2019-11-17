@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+// TODO: use dedicated include
 #include "vsf.h"
 
 #include "btstack_linked_list.h"

@@ -592,7 +592,7 @@ SECTION(".text.vsf.kernel.__vsf_eda_call_eda")
 vsf_err_t __vsf_eda_call_eda(uintptr_t evthandler, uintptr_t param)
 {
     __vsf_eda_frame_state_t state = { .bits.is_fsm = 0,};
-    return __vsf_eda_call_eda_ex(evthandler, param, state);;
+    return __vsf_eda_call_eda_ex(evthandler, param, state);
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED

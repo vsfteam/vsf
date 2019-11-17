@@ -22,6 +22,7 @@
 #if (VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED)
 
 #define __VSF_EDA_CLASS_INHERIT
+// TODO: use dedicated include
 #include "vsf.h"
 
 #define VSFVM_RUNTIME_INHERIT

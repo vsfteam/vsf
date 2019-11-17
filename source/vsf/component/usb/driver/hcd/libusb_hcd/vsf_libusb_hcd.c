@@ -22,6 +22,7 @@
 
 #define VSF_USBH_IMPLEMENT_HCD
 #define VSF_USBH_IMPLEMENT_HUB
+// TODO: use dedicated include
 #include "vsf.h"
 #include "./vsf_libusb_hcd.h"
 

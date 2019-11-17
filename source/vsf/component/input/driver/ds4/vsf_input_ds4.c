@@ -20,7 +20,7 @@
 #include "../../vsf_input_cfg.h"
 
 #if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
-
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

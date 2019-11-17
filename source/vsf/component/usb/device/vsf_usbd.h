@@ -213,11 +213,17 @@ def_simple_class(vsf_usbd_ep_stream_t) {
 
     public_member(
         vsf_stream_t *stream;
+        struct {
+           void (*on_finish)(void *param);
+           void *param;
+       } callback;
     )
 
     protected_member(
         implement(vsf_usbd_trans_t)
         vsf_usbd_dev_t *dev;
+        uint32_t total_size;
+        uint32_t transfered_size;
         uint32_t cur_size;
     )
 };
@@ -273,8 +279,8 @@ extern vsf_err_t vsf_usbd_ep_send(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans);
 
 
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
-extern vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *);
-extern vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *);
+extern vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *stream, uint_fast32_t size);
+extern vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *stream, uint_fast32_t size);
 
 #if VSF_USE_SERVICE_STREAM == ENABLED
 

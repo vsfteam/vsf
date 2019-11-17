@@ -24,7 +24,7 @@
 #define VSF_USBD_IMPLEMENT
 #define VSFSTREAM_CLASS_IMPLEMENT
 #define __VSF_STREAM_BASE_CLASS_INHERIT
-
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
@@ -1040,7 +1040,14 @@ void vsf_usbd_fini(vsf_usbd_dev_t *dev)
 static void vsf_usbd_stream_tx_recv(vsf_usbd_ep_stream_t *stream_ep, uint_fast16_t ep_size)
 {
     uint8_t *buffer;
-    uint_fast32_t size = vsf_stream_get_wbuf(stream_ep->stream, &buffer);
+    uint_fast32_t size, wbuf_size = vsf_stream_get_wbuf(stream_ep->stream, &buffer);
+
+    if (stream_ep->total_size > 0) {
+        uint_fast32_t remain_size = stream_ep->total_size - stream_ep->transfered_size;
+        size = min(wbuf_size, remain_size);
+    } else {
+        size = wbuf_size;
+    }
 
     if (size >= ep_size) {
         stream_ep->use_as__vsf_usbd_trans_t.use_as__vsf_mem_t.nSize = size;
@@ -1078,11 +1085,17 @@ static void vsf_usbd_stream_tx_on_trans_finish(void *param)
     }
 
     vsf_stream_write(stream, NULL, pkg_size);
+    stream_ep->transfered_size += pkg_size;
 
-    if (vsf_stream_get_free_size(stream) > ep_size) {
-        vsf_usbd_stream_tx_recv(stream_ep, ep_size);
-    } else {
-        stream_ep->use_as__vsf_usbd_trans_t.on_finish = NULL;
+    if (!stream_ep->total_size || (stream_ep->transfered_size < stream_ep->total_size)) {
+        if (vsf_stream_get_free_size(stream) > ep_size) {
+            vsf_usbd_stream_tx_recv(stream_ep, ep_size);
+        } else {
+            stream_ep->use_as__vsf_usbd_trans_t.on_finish = NULL;
+        }
+    } else if (stream_ep->callback.on_finish != NULL) {
+        vsf_stream_disconnect_tx(stream);
+        stream_ep->callback.on_finish(stream_ep->callback.param);
     }
 }
 
@@ -1096,7 +1109,9 @@ static void vsf_usbd_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_OUT:
-        if (NULL == stream_ep->on_finish) {
+        if (    (NULL == stream_ep->on_finish)
+            &&  (   !stream_ep->total_size
+                ||  (stream_ep->transfered_size < stream_ep->total_size))) {
             if (vsf_stream_get_free_size(stream) >= ep_size) {
                 stream_ep->use_as__vsf_usbd_trans_t.on_finish = vsf_usbd_stream_tx_on_trans_finish;
                 vsf_usbd_stream_tx_recv(stream_ep, ep_size);
@@ -1106,14 +1121,17 @@ static void vsf_usbd_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
     }
 }
 
-vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *stream_ep)
+vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *stream_ep, uint_fast32_t size)
 {
     vsf_usbd_trans_t *trans = &stream_ep->use_as__vsf_usbd_trans_t;
     vsf_stream_t *stream = stream_ep->stream;
 
+    stream_ep->total_size = size;
+    stream_ep->transfered_size = 0;
     stream->tx.param = stream_ep;
     stream->tx.evthandler = vsf_usbd_stream_tx_evthandler;
     trans->param = stream_ep;
+    trans->on_finish = NULL;
     trans->pchBuffer = NULL;
     vsf_stream_connect_tx(stream);
 
@@ -1127,16 +1145,22 @@ static void vsf_usbd_stream_rx_on_trans_finish(void *param)
     vsf_stream_t *stream = stream_ep->stream;
 
     if (stream_ep->cur_size > 0) {
+        stream_ep->transfered_size += stream_ep->cur_size;
         vsf_stream_read(stream_ep->stream, NULL, stream_ep->cur_size);
         stream_ep->cur_size = 0;
     }
 
-    stream_ep->nSize = vsf_stream_get_rbuf(stream, &stream_ep->pchBuffer);
-    if (stream_ep->nSize > 0) {
-        stream_ep->cur_size = stream_ep->nSize;
-        vsf_usbd_ep_send(stream_ep->dev, &stream_ep->use_as__vsf_usbd_trans_t);
-    } else {
-        stream_ep->on_finish = NULL;
+    if (!stream_ep->total_size || (stream_ep->transfered_size < stream_ep->total_size)) {
+        stream_ep->nSize = vsf_stream_get_rbuf(stream, &stream_ep->pchBuffer);
+        if (stream_ep->nSize > 0) {
+            stream_ep->cur_size = stream_ep->nSize;
+            vsf_usbd_ep_send(stream_ep->dev, &stream_ep->use_as__vsf_usbd_trans_t);
+        } else {
+            stream_ep->on_finish = NULL;
+        }
+    } else if (stream_ep->callback.on_finish != NULL) {
+        vsf_stream_disconnect_rx(stream);
+        stream_ep->callback.on_finish(stream_ep->callback.param);
     }
 }
 
@@ -1148,8 +1172,9 @@ static void vsf_usbd_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
 
     switch (evt) {
     case VSF_STREAM_ON_RX:
-        if (NULL == stream_ep->on_finish) {
-            // TODO: current implementation will send short packet
+        if (    (NULL == stream_ep->on_finish)
+            &&  (   !stream_ep->total_size
+                ||  (stream_ep->transfered_size < stream_ep->total_size))) {
             stream_ep->nSize = vsf_stream_get_rbuf(stream, &stream_ep->pchBuffer);
             if (stream_ep->nSize > 0) {
                 stream_ep->cur_size = stream_ep->nSize;
@@ -1161,14 +1186,17 @@ static void vsf_usbd_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
     }
 }
 
-vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *stream_ep)
+vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *stream_ep, uint_fast32_t size)
 {
     vsf_usbd_trans_t *trans = &stream_ep->use_as__vsf_usbd_trans_t;
     vsf_stream_t *stream = stream_ep->stream;
 
+    stream_ep->total_size = size;
+    stream_ep->transfered_size = 0;
     stream->rx.param = stream_ep;
     stream->rx.evthandler = vsf_usbd_stream_rx_evthandler;
     trans->param = stream_ep;
+    trans->on_finish = NULL;
     vsf_stream_connect_rx(stream);
 
     vsf_usbd_stream_rx_evthandler(stream_ep, VSF_STREAM_ON_IN);

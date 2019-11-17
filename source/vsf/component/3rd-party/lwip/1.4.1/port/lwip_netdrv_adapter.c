@@ -22,6 +22,7 @@
 #if VSF_USE_TCPIP == ENABLED
 
 #define VSF_NETDRV_INHERIT_NETIF
+// TODO: use dedicated include
 #include "vsf.h"
 
 #include "lwip/opt.h"

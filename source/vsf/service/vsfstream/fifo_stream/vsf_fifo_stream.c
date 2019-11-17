@@ -28,8 +28,29 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
+
+static void vsf_fifo_stream_init(vsf_stream_t *stream);
+static uint_fast32_t vsf_fifo_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t vsf_fifo_stream_get_data_length(vsf_stream_t *stream);
+static uint_fast32_t vsf_fifo_stream_get_avail_length(vsf_stream_t *stream);
+static uint_fast32_t vsf_fifo_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr);
+static uint_fast32_t vsf_fifo_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr);
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_stream_op_t vsf_fifo_stream_op = {
+    .init               = vsf_fifo_stream_init,
+    .fini               = vsf_fifo_stream_init,
+    .write              = vsf_fifo_stream_write,
+    .read               = vsf_fifo_stream_read,
+    .get_data_length    = vsf_fifo_stream_get_data_length,
+    .get_avail_length   = vsf_fifo_stream_get_avail_length,
+    .get_wbuf           = vsf_fifo_stream_get_wbuf,
+    .get_rbuf           = vsf_fifo_stream_get_rbuf,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
 vsf_err_t vsf_fifo_init(vsf_fifo_t *fifo)
@@ -197,16 +218,5 @@ static uint_fast32_t vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, ui
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_read(&fifo_stream->use_as__vsf_fifo_t, buf, size);
 }
-
-const vsf_stream_op_t vsf_fifo_stream_op = {
-    .init               = vsf_fifo_stream_init,
-    .fini               = vsf_fifo_stream_init,
-    .write              = vsf_fifo_stream_write,
-    .read               = vsf_fifo_stream_read,
-    .get_data_length    = vsf_fifo_stream_get_data_length,
-    .get_avail_length   = vsf_fifo_stream_get_avail_length,
-    .get_wbuf           = vsf_fifo_stream_get_wbuf,
-    .get_rbuf           = vsf_fifo_stream_get_rbuf,
-};
 
 #endif      // VSF_USE_SERVICE_VSFSTREAM

@@ -131,7 +131,7 @@ enum {
     /*!\ note wait for invalid also means wait for any evt */
     VSF_EVT_INVALID             = -1,       //!< compatible with fsm_rt_err 
     VSF_EVT_NONE                = 0,        //!< compatible with fsm_rt_cpl
-    VSF_EVT_RETURN              = 0,                 
+    VSF_EVT_RETURN              = 0,        
     VSF_EVT_YIELD               = 1,        //!< compatible with fsm_rt_on_going
 
     VSF_EVT_SYSTEM              = 0x100,
@@ -200,7 +200,7 @@ def_simple_class(__vsf_eda_frame_t) {
             uintptr_t target;
         } ptr;
     )
-        
+
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
     protected_member (
         __vsf_eda_frame_state_t             state;

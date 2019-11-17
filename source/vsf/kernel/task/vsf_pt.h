@@ -74,8 +74,8 @@
 
 #define vsf_pt_end()                __vsf_pt_end()
 
-#define __vsf_pt_wait_cond()        __vsf_pt_wait_cond_common(__vsf_pt_state())
-#define vsf_pt_wfe(__evt)           __vsf_pt_wait_cond((evt != __evr))
+#define __vsf_pt_wait_cond(__CON)   __vsf_pt_wait_cond_common(__vsf_pt_state(), __CON)
+#define vsf_pt_wfe(__evt)           __vsf_pt_wait_cond((evt != __evt))
 #define vsf_pt_wait_for_evt(__evt)  vsf_pt_wfe(__evt)
 
 #define vsf_pt_yield()              vsf_pt_entry(vsf_eda_yield();)

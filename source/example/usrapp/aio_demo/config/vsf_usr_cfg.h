@@ -158,6 +158,10 @@
 
 #define VSF_USE_AV                          ENABLED
 
+#define VSF_USE_MAL                         ENABLED
+#define VSF_USE_MEM_MAL                     ENABLED
+#define VSF_USE_SCSI                        ENABLED
+
 #define VSF_USE_USB_HOST                    ENABLED
 #define VSF_USE_USB_HOST_HUB                ENABLED
 #define VSF_USE_USB_HOST_ECM                ENABLED

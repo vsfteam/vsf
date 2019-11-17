@@ -933,7 +933,7 @@
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.h">
       <Filter>vsf\component\usb\host\class\libusb</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_list_queue.h">
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1420,7 +1420,7 @@
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.c">
       <Filter>vsf\component\usb\host\class\libusb</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_list_queue.c">
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
   </ItemGroup>

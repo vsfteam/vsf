@@ -10,7 +10,7 @@
       <TargetName>demo_armv7-m</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130000::V6.13::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130000::V6.13::.\ARMCompiler6.13</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -940,9 +940,9 @@
               <FilePath>..\..\..\vsf\kernel\vsf_kernel_bsp.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_eda_list_queue.c</FileName>
+              <FileName>vsf_eda_slist_queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\vsf_eda_list_queue.c</FilePath>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1365,7 +1365,7 @@
       <TargetName>template_armv7-m_ac6</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130000::V6.13::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130000::V6.13::.\ARMCompiler6.13</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -2633,9 +2633,9 @@
               <FilePath>..\..\..\vsf\kernel\vsf_kernel_bsp.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_eda_list_queue.c</FileName>
+              <FileName>vsf_eda_slist_queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\vsf_eda_list_queue.c</FilePath>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4605,9 +4605,9 @@
               <FilePath>..\..\..\vsf\kernel\vsf_kernel_bsp.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_eda_list_queue.c</FileName>
+              <FileName>vsf_eda_slist_queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\vsf_eda_list_queue.c</FilePath>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6297,9 +6297,9 @@
               <FilePath>..\..\..\vsf\kernel\vsf_kernel_bsp.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_eda_list_queue.c</FileName>
+              <FileName>vsf_eda_slist_queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\vsf_eda_list_queue.c</FilePath>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -8214,9 +8214,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>vsf_eda_list_queue.c</FileName>
+              <FileName>vsf_eda_slist_queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\vsf_eda_list_queue.c</FilePath>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -10481,9 +10481,9 @@
               <FilePath>..\..\..\vsf\kernel\vsf_kernel_bsp.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_eda_list_queue.c</FileName>
+              <FileName>vsf_eda_slist_queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\kernel\vsf_eda_list_queue.c</FilePath>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
             </File>
           </Files>
         </Group>

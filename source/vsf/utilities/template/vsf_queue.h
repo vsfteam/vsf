@@ -100,7 +100,7 @@
         static uint16_t s_hwItem;
 
         //NO_INIT static uint8_t s_chQueueBuffer[1024];
-        //VSF_QUEUE_PREPARE(my_hword_queue_t, &s_tQueue, &s_chQueueBuffer, sizeof(s_chQueueBuffer), true);
+        //VSF_QUEUE_PREPARE(my_hword_queue_t, &s_tQueue, &s_chQueueBuffer, sizeof(s_chQueueBuffer));
 
         VSF_QUEUE_INIT(my_hword_queue_t, uint16_t, &s_tQueue, 32);
 
@@ -157,7 +157,7 @@
     };                                                                          \
                                                                                 \
     struct __NAME##_cfg_t {                                                     \
-        uint16_t *ptBuffer;                                                     \
+        __TYPE *ptBuffer;                                                       \
         uint16_t hwSize;                                                        \
         bool     bInitAsFull;                                                   \
     };                                                                          \
@@ -394,7 +394,7 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
         __NAME##_cfg_t tCFG = {                                                 \
             (__BUFFER),                                                         \
             (__SIZE),                                                           \
-            __VA_ARGS__,                                                        \
+            __VA_ARGS__                                                         \
         };                                                                      \
         __NAME##_init((__QADDR), & tCFG);                                       \
     } while(0)

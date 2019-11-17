@@ -22,6 +22,7 @@
 #if VSF_USE_USB_HOST == ENABLED
 
 #define VSF_USBH_IMPLEMENT
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

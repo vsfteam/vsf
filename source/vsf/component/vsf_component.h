@@ -21,6 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "./vsf_component_cfg.h"
 
+#include "./mal/vsf_mal.h"
+#include "./scsi/vsf_scsi.h"
+#include "./fs/vsf_fs.h"
 
 #include "./av/vsfav.h"
 

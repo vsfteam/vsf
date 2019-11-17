@@ -22,6 +22,7 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED
 
 #define VSF_MUSB_FDRC_DCD_IMPLEMENT
+// TODO: use dedicated include
 #include "vsf.h"
 #include "./__vsf_musb_fdrc_common.h"
 

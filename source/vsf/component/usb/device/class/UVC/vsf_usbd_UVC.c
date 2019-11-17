@@ -23,6 +23,7 @@
 
 #define VSF_USBD_INHERIT
 #define VSF_USBD_UVC_IMPLEMENT
+// TODO: use dedicated include
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

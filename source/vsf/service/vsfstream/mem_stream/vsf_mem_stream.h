@@ -51,6 +51,7 @@ def_simple_class(vsf_mem_stream_t) {
     )
     private_member(
         bool is_writing;
+        uint32_t data_size;
         uint32_t rpos;
         uint32_t wpos;
     )

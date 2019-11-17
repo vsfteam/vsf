@@ -26,6 +26,7 @@
 #define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
 #define __VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT_CLASS
+// TODO: use dedicated include
 #include "vsf.h"
 
 #define VSFVM_RUNTIME_INHERIT

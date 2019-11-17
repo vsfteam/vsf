@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+// TODO: use dedicated include
 #include "vsf.h"
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED

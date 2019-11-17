@@ -1,0 +1,58 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+#ifndef __VSF_MAL_SCSI_H__
+#define __VSF_MAL_SCSI_H__
+
+/*============================ INCLUDES ======================================*/
+
+#include "../../vsf_scsi_cfg.h"
+
+#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL_SCSI == ENABLED
+
+#if     defined(VSF_MAL_SCSI_IMPLEMENT)
+#   undef VSF_MAL_SCSI_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT
+#elif   defined(VSF_MAL_SCSI_INHERIT)
+#   undef VSF_MAL_SCSI_INHERIT
+#   define __PLOOC_CLASS_INHERIT
+#endif
+
+#include "utilities/ooc_class.h"
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+
+declare_simple_class(vsf_mal_scsi_t)
+
+def_simple_class(vsf_mal_scsi_t) {
+    implement(vsf_virtual_scsi_t)
+    public_member(
+        vsf_mal_t *mal;
+    )
+};
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+extern const vsf_virtual_scsi_drv_t vsf_mal_virtual_scsi_drv;
+
+/*============================ PROTOTYPES ====================================*/
+
+
+#endif      // VSF_USE_SCSI && VSF_USE_MAL_SCSI
+#endif      // __VSF_MAL_SCSI_H__
