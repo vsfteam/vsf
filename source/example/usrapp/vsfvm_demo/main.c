@@ -150,7 +150,7 @@ static const usrapp_const_t usrapp_const = {
         .priority           = vsf_arch_prio_0,
     },
 #       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-    .usbh.libusb_hcd_param = {
+    .usbh.libusb_hcd_param  = {
         .priority = vsf_arch_prio_0,
     },
 #       endif

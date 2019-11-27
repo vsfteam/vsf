@@ -57,6 +57,15 @@ struct usrapp_t {
 #if VSF_USE_USB_HOST_DS4 == ENABLED
         vsf_usbh_class_t ds4;
 #endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
+        vsf_usbh_class_t nspro;
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
+        vsf_usbh_class_t xb360;
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
+        vsf_usbh_class_t xb1;
+#endif
 #if VSF_USE_USB_HOST_ECM == ENABLED
         vsf_usbh_class_t ecm;
 /*
@@ -108,6 +117,15 @@ static usrapp_t usrapp = {
 #endif
 #if VSF_USE_USB_HOST_DS4 == ENABLED
         .ds4.drv            = &vsf_usbh_ds4_drv,
+#endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
+        .nspro.drv          = &vsf_usbh_nspro_drv,
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
+        .xb360.drv          = &vsf_usbh_xb360_drv,
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
+        .xb1.drv            = &vsf_usbh_xb1_drv,
 #endif
 #if VSF_USE_USB_HOST_LIBUSB == ENABLED
         .libusb.drv         = &vsf_usbh_libusb_drv,
@@ -164,6 +182,15 @@ int main(void)
 #endif
 #if VSF_USE_USB_HOST_DS4 == ENABLED
     vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.ds4);
+#endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
+    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.nspro);
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
+    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.xb360);
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
+    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.xb1);
 #endif
 #if VSF_USE_USB_HOST_HUB == ENABLED
     vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hub);

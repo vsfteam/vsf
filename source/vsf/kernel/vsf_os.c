@@ -66,9 +66,9 @@ WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN
 SECTION(".text.vsf.kernel.eda")
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
 void vsf_kernel_init(   vsf_pool_block(vsf_eda_frame_pool) *frame_buf_ptr,
-                        uint_fast16_t count);
+                        uint_fast16_t count, vsf_prio_t highest_prio);
 #else
-void vsf_kernel_init(void);
+void vsf_kernel_init(   vsf_prio_t highest_prio);
 #endif
 
 extern vsf_err_t __vsf_kernel_start(void);
@@ -94,11 +94,14 @@ static void vsf_kernel_os_init(void)
     __vsf_os.res_ptr = vsf_kernel_get_resource_on_init();
     VSF_KERNEL_ASSERT(NULL != __vsf_os.res_ptr);
 
+#if __VSF_OS_SWI_NUM > 0
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     vsf_kernel_init(__vsf_os.res_ptr->frame_stack.frame_buf_ptr, 
-                    __vsf_os.res_ptr->frame_stack.frame_cnt);
+                    __vsf_os.res_ptr->frame_stack.frame_cnt,
+                    __vsf_os.res_ptr->arch.sched_prio.highest);
 #else
-    vsf_kernel_init();
+    vsf_kernel_init(__vsf_os.res_ptr->arch.sched_prio.highest);
+#endif
 #endif
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
@@ -175,16 +178,18 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
     #   endif
     }
     #endif
-#ifdef __VSF_OS_SWI_PRIORITY_BEGIN
-    if (priority >= __VSF_OS_SWI_PRIORITY_BEGIN) {
-        priority -= __VSF_OS_SWI_PRIORITY_BEGIN;
-        index -= __VSF_OS_SWI_PRIORITY_BEGIN;
+
+#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
+    if (priority >= __vsf_os.res_ptr->arch.sched_prio.begin) {
+        priority -= __vsf_os.res_ptr->arch.sched_prio.begin;
+        index -= __vsf_os.res_ptr->arch.sched_prio.begin;
         return vsf_swi_init(
                 index,
                 __vsf_os.res_ptr->arch.os_swi_priorities_ptr[priority],
                 &__vsf_os_evtq_swi_handler, pthis);
     }
 #endif
+
     return VSF_ERR_FAIL;
 }
 
@@ -193,12 +198,12 @@ vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
     uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
     VSF_KERNEL_ASSERT(      (pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
-
-#ifdef __VSF_OS_SWI_PRIORITY_BEGIN
-    if (index >= __VSF_OS_SWI_PRIORITY_BEGIN) {
+#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
+    if (index >= __vsf_os.res_ptr->arch.sched_prio.begin) {
         __vsf_os_evtq_set_priority(pthis, (vsf_prio_t)index);
     }
 #endif
+
     return VSF_ERR_NONE;
 }
 
@@ -208,12 +213,13 @@ vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
     VSF_KERNEL_ASSERT(      (pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
-#ifdef __VSF_OS_SWI_PRIORITY_BEGIN
-    if (index >= __VSF_OS_SWI_PRIORITY_BEGIN) {
-        index -= __VSF_OS_SWI_PRIORITY_BEGIN;
+#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
+    if (index >= __vsf_os.res_ptr->arch.sched_prio.begin) {
+        index -= __vsf_os.res_ptr->arch.sched_prio.begin;
         vsf_swi_trigger(index);
     }
 #endif
+
     return VSF_ERR_NONE;
 }
 
@@ -358,10 +364,6 @@ void vsf_kernel_os_start(void)
     WEAK___POST_VSF_KERNEL_INIT();
 #endif
 }
-
-#if !__IS_COMPILER_IAR__ && __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
-__attribute__((constructor(255)))
-#endif
 
 void __vsf_main_entry(void)
 {

@@ -50,8 +50,12 @@ def_tgui_panel(my_stopwatch_t,
 
 end_def_tgui_panel(my_stopwatch_t)
 
+declare_vsf_pt(tgui_demo_t)
+def_vsf_pt(tgui_demo_t)
+
 /*============================ LOCAL VARIABLES ===============================*/
 static NO_INIT vsf_tgui_t __tgui_demo;
+NO_INIT static tgui_demo_t __demo_task;
 
 /*============================ PROTOTYPES ====================================*/
 static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_mc_button_t* ptNode, vsf_msgt_msg_t* ptMSG);
@@ -158,9 +162,6 @@ void refresh_my_stopwatch(void)
 
     test_only_refresh_time_label();
 #else
-    __cnt++;
-    sprintf(s_chTimeBuffer, "%02d:%02d", __cnt / 99 % 99, __cnt % 99);
-
     vsf_tgui_refresh(&__tgui_demo);
 #endif
     //
@@ -179,6 +180,8 @@ vsf_err_t tgui_demo_init(void)
 {
     NO_INIT static vsf_tgui_evt_t __evt_queue_buffer[16];
     NO_INIT static uint16_t __bfs_buffer[32];
+    
+
     const vsf_tgui_cfg_t cfg = {
         .tEVTQueue = {
             .pObj = __evt_queue_buffer, 
@@ -190,7 +193,11 @@ vsf_err_t tgui_demo_init(void)
         },
         .ptRootNode = (vsf_tgui_control_t *)&__my_stopwatch,
     };
-    return vsf_tgui_init(&__tgui_demo, &cfg);
+    vsf_err_t err = vsf_tgui_init(&__tgui_demo, &cfg);
+
+    init_vsf_pt(tgui_demo_t, &__demo_task, vsf_prio_0);
+
+    return err;
 }
 
 
@@ -205,18 +212,44 @@ void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt)
  */
     vsf_tgui_evt_t tEvent = {
         .tPointerEvt = {
-            .tMSG = VSF_TGUI_MSG_POINTER_EVT,
-            .chEvent = VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) 
+            .tMSG = VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) 
                                 ?   VSF_TGUI_EVT_POINTER_DOWN 
                                 :   VSF_TGUI_EVT_POINTER_UP,
-            {
-                VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-                VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
-            },
+            
+            .nX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
+            .nY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
         },
     };
 
     vsf_tgui_send_message(&__tgui_demo, tEvent);
+}
+
+extern bool vsf_tgui_port_is_ready_to_refresh(void);
+
+void vsf_tgui_demo_on_ready(void)
+{
+    vsf_eda_post_evt(&(__demo_task.use_as__vsf_eda_t), VSF_EVT_USER);
+}
+
+implement_vsf_pt(tgui_demo_t)
+{
+    vsf_pt_begin();
+
+    refresh_all();
+
+    while(1) {
+        while(!vsf_tgui_port_is_ready_to_refresh()) {
+            vsf_pt_wait_for_evt(VSF_EVT_USER);
+        }
+
+        vsf_tgui_refresh_ex(&__tgui_demo, (vsf_tgui_control_t *)&(__my_stopwatch.time), NULL);
+        __cnt++;
+        sprintf(s_chTimeBuffer, "%02d:%02d", __cnt / 99 % 99, __cnt % 99);
+
+        vsf_pt_wait_until(vsf_delay_ms(1000));
+    }
+
+    vsf_pt_end();
 }
 
 #endif

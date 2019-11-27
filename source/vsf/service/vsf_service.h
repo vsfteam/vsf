@@ -25,6 +25,9 @@
 #include "./pool/vsf_pool.h"
 #include "./dynarr/vsf_dynarr.h"
 #include "./dynstack/vsf_dynstack.h"
+#include "./pbuf/vsf_pbuf.h"
+#include "./pbuf/vsf_pbuf_pool.h"
+
 #include "./stream/vsf_stream.h"
 #include "./vsfstream/vsfstream.h"
 

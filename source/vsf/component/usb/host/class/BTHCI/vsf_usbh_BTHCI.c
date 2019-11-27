@@ -139,8 +139,34 @@ struct vsf_usbh_bthci_t {
 };
 typedef struct vsf_usbh_bthci_t vsf_usbh_bthci_t;
 
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static const vsf_usbh_dev_id_t vsf_usbh_bthci_dev_id[] =
+{
+    { VSF_USBH_MATCH_DEV_CLASS(USB_CLASS_WIRELESS_CONTROLLER, 0x01, 0x01) },
+    // BCM20702
+    {
+        .match_vendor       = true,
+        .idVendor           = 0x0A5C,   // broadcom
+        VSF_USBH_MATCH_DEV_CLASS(USB_CLASS_VENDOR_SPEC, 0x01, 0x01)
+    },
+};
+
+/*============================ PROTOTYPES ====================================*/
+
+static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs);
+static void vsf_usbh_bthci_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_usbh_class_drv_t vsf_usbh_bthci_drv = {
+    .name       = "bthci_usb",
+    .dev_id_num = dimof(vsf_usbh_bthci_dev_id),
+    .dev_ids    = vsf_usbh_bthci_dev_id,
+    .probe      = vsf_usbh_bthci_probe,
+    .disconnect = vsf_usbh_bthci_disconnect,
+};
+
 /*============================ PROTOTYPES ====================================*/
 
 #if     defined(WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN)                              \
@@ -325,18 +351,6 @@ static void vsf_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static const vsf_usbh_dev_id_t vsf_usbh_bthci_dev_id[] =
-{
-    {
-        .match_dev_class    = true,
-        .match_dev_subclass = true,
-        .match_dev_protocol = true,
-        .bDeviceClass       = 0xE0, // Wireless class: USB_CLASS_WIRELESS_CONTROLLER
-        .bDeviceSubClass    = 0x01, // RF subclass
-        .bDeviceProtocol    = 0x01, // bt programming protocol
-    },
-};
-
 static void vsf_usbh_bthci_free_all(vsf_usbh_bthci_t *bthci)
 {
     vsf_usbh_t *usbh = bthci->usbh;
@@ -354,8 +368,7 @@ static void vsf_usbh_bthci_on_eda_terminate(vsf_eda_t *eda)
     VSF_USBH_FREE(bthci);
 }
 
-static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        vsf_usbh_ifs_parser_t *parser_ifs)
+static void * vsf_usbh_bthci_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs)
 {
     vsf_usbh_ifs_t *ifs = parser_ifs->ifs;
     struct usb_interface_desc_t *desc_ifs = parser_ifs->parser_alt[ifs->cur_alt].desc_ifs;
@@ -471,14 +484,6 @@ static void vsf_usbh_bthci_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, voi
     vsf_usbh_bthci_free_all(bthci);
     __vsf_eda_fini(&bthci->eda);
 }
-
-const vsf_usbh_class_drv_t vsf_usbh_bthci_drv = {
-    .name       = "bthci_usb",
-    .dev_id_num = dimof(vsf_usbh_bthci_dev_id),
-    .dev_ids    = vsf_usbh_bthci_dev_id,
-    .probe      = vsf_usbh_bthci_probe,
-    .disconnect = vsf_usbh_bthci_disconnect,
-};
 
 bool vsf_usbh_bthci_can_send(void *dev, uint8_t type)
 {

@@ -53,13 +53,16 @@
 */
 #   elif    defined(__ARM__)
 #       define  VSF_DRIVER_HEADER       "./arm/driver.h"
-#   else
-#       define  VSF_DRIVER_HEADER       "./template/driver.h"
+//#   else
+//#       define  VSF_DRIVER_HEADER       "./template/driver.h"
 #   endif
 #endif
 
+//! you don't have to implement a driver in your system.
+#ifdef VSF_DRIVER_HEADER
 /* include specified device driver header file */
-#include    VSF_DRIVER_HEADER
+#   include    VSF_DRIVER_HEADER
+#endif
 
 #ifndef __HAL_DRIVER_H__
 #define __HAL_DRIVER_H__

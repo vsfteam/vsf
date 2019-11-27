@@ -30,6 +30,9 @@
 #include "./input/vsf_input.h"
 #include "./input/driver/hid/vsf_input_hid.h"
 #include "./input/driver/ds4/vsf_input_ds4.h"
+#include "./input/driver/nspro/vsf_input_nspro.h"
+#include "./input/driver/xb360/vsf_input_xb360.h"
+#include "./input/driver/xb1/vsf_input_xb1.h"
 
 #include "./usb/driver/hcd/ohci/vsf_ohci.h"
 #include "./usb/driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
@@ -43,6 +46,9 @@
 #include "./usb/host/class/BTHCI/vsf_usbh_BTHCI.h"
 #include "./usb/host/class/HID/vsf_usbh_HID.h"
 #include "./usb/host/class/HID/vsf_usbh_ds4.h"
+#include "./usb/host/class/HID/vsf_usbh_nspro.h"
+#include "./usb/host/class/HID/vsf_usbh_xb360.h"
+#include "./usb/host/class/XB1/vsf_usbh_xb1.h"
 #include "./usb/host/class/libusb/vsf_usbh_libusb.h"
 
 #include "./usb/device/vsf_usbd.h"

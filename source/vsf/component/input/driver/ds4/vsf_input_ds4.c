@@ -42,12 +42,12 @@ const vsf_input_item_info_t vsf_ds4u_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO(  MENU_RIGHT,     53, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  MENU_MAIN,      56, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  SPECIAL,        57, 1,  false),
-    VSF_GAMEPAD_DEF_ITEM_INFO(  LX,             8,  8,  false),
-    VSF_GAMEPAD_DEF_ITEM_INFO(  LY,             16, 8,  false),
-    VSF_GAMEPAD_DEF_ITEM_INFO(  RX,             24, 8,  false),
-    VSF_GAMEPAD_DEF_ITEM_INFO(  RY,             32, 8,  false),
-    VSF_GAMEPAD_DEF_ITEM_INFO(  LT,             64, 8,  false),
-    VSF_GAMEPAD_DEF_ITEM_INFO(  RT,             72, 8,  false),
+    VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   LX,     8,  8,  false, false),
+    VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   LY,     16, 8,  false, true),
+    VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RX,     24, 8,  false, false),
+    VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RY,     32, 8,  false, true),
+    VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   LT,     64, 8,  false, false),
+    VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RT,     72, 8,  false, false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  DPAD,           40, 4,  false),
 };
 
@@ -163,6 +163,9 @@ void vsf_ds4u_process_input(vsf_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report
         struct {
             vsf_sensor_evt_t evt;
         } sensor;
+        struct {
+            vsf_touchscreen_evt_t evt;
+        } touch;
     } parser;
 
     parser.gamepad.evt.duration     = vsf_input_update_timestamp(&dev->timestamp);
@@ -174,9 +177,8 @@ void vsf_ds4u_process_input(vsf_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report
     do {
         parser.gamepad.info = vsf_input_parse(&parser.gamepad.parser, (uint8_t *)&dev->data, (uint8_t *)data);
         if (parser.gamepad.info != NULL) {
-            parser.gamepad.evt.id = parser.gamepad.info->id;
-            parser.gamepad.evt.bitlen = parser.gamepad.info->bitlen;
-            parser.gamepad.evt.is_signed = parser.gamepad.info->is_signed;
+            parser.gamepad.evt.id = parser.gamepad.info->item;
+            parser.gamepad.evt.info = *parser.gamepad.info;
             parser.gamepad.evt.pre = parser.gamepad.parser.pre;
             parser.gamepad.evt.cur = parser.gamepad.parser.cur;
 #ifndef WEAK_VSF_DS4U_ON_REPORT_INPUT
@@ -205,6 +207,27 @@ void vsf_ds4u_process_input(vsf_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report
 #else
     WEAK_VSF_DS4U_ON_SENSOR(&parser.sensor.evt);
 #endif
+
+    // touch
+    if (data->touch[0] > 0) {
+        uint_fast16_t x, y;
+
+        // TODO: get the real resolution
+        parser.touch.evt.info.width     = 1920;
+        parser.touch.evt.info.height    = 942;
+
+        if ((dev->data.touch[2] != data->touch[2]) || !(data->touch[2] & 0x80)) {
+            x = data->touch[3] + ((data->touch[4] & 0x0F) << 8);
+            y = ((data->touch[4] & 0xF0) >> 4) + (data->touch[5] << 4);
+            VSF_INPUT_TOUCHSCREEN_SET(&parser.touch.evt, 0, !(data->touch[2] & 0x80), x, y);
+        }
+
+        if ((dev->data.touch[6] != data->touch[6]) || !(data->touch[6] & 0x80)) {
+            x = data->touch[7] + ((data->touch[8] & 0x0F) << 8);
+            y = ((data->touch[8] & 0xF0) >> 4) + (data->touch[9] << 4);
+            VSF_INPUT_TOUCHSCREEN_SET(&parser.touch.evt, 1, !(data->touch[6] & 0x80), x, y);
+        }
+    }
 
     dev->data = *data;
 }

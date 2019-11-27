@@ -166,7 +166,7 @@
 
 #   define VSF_USE_MSG_TREE                             ENABLED
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING     ENABLED         /* Enabled for debug */
-
+#       define VSF_MSGT_NODE_OFFSET_TYPE                int8_t
 
 #define VSF_USE_PBUF                                    DISABLED
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT                DISABLED
@@ -253,6 +253,10 @@ enum {
 #define WEAK_VSF_HEAP_MALLOC_ALIGNED(__SIZE, __ALIGNMENT)                       \
         vsf_heap_malloc_aligned((__SIZE), (__ALIGNMENT))
 
+#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN                             \
+        extern vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
+#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE(__PTTILE)                          \
+        vsf_tgui_sdl_idx_root_tile_get_size(__PTTILE)
 
  /*============================ TYPES =========================================*/
  /*============================ GLOBAL VARIABLES ==============================*/

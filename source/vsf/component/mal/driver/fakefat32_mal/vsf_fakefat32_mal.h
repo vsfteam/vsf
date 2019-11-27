@@ -49,20 +49,6 @@ struct vsf_fakefat32_cb_t {
 };
 typedef struct vsf_fakefat32_cb_t vsf_fakefat32_cb_t;
 
-struct vsf_fakefat32_record_t {
-    // refer to :
-    //  Microsoft Extensible Firmware Initiative FAT32 File System Specification
-    uint8_t CrtTimeTenth;
-    uint16_t CrtTime;
-    uint16_t CrtDate;
-    uint16_t LastAccDate;
-    uint16_t FstClusHI;
-    uint16_t WrtTime;
-    uint16_t WrtDate;
-    uint16_t FstClusLO;
-} PACKED;
-typedef struct vsf_fakefat32_record_t vsf_fakefat32_record_t;
-
 def_simple_class(vsf_fakefat32_file_t) {
     implement(vsf_memfs_file_t)
 
@@ -72,7 +58,18 @@ def_simple_class(vsf_fakefat32_file_t) {
 
     private_member(
         uint32_t first_cluster;
-        vsf_fakefat32_record_t record;
+        struct {
+            // refer to :
+            //  Microsoft Extensible Firmware Initiative FAT32 File System Specification
+            uint8_t CrtTimeTenth;
+            uint16_t CrtTime;
+            uint16_t CrtDate;
+            uint16_t LastAccDate;
+            uint16_t FstClusHI;
+            uint16_t WrtTime;
+            uint16_t WrtDate;
+            uint16_t FstClusLO;
+        } PACKED record;
     )
 };
 

@@ -106,7 +106,7 @@ extern const vsf_usbh_class_drv_t vsf_usbh_hid_drv;
 
 #ifdef VSF_USBH_HID_INHERIT
 extern void * vsf_usbh_hid_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-            vsf_usbh_ifs_parser_t *parser_ifs, uint_fast32_t obj_size);
+            vsf_usbh_ifs_parser_t *parser_ifs, uint_fast32_t obj_size, bool has_hid_desc);
 extern void vsf_usbh_hid_disconnect(vsf_usbh_hid_eda_t *hid);
 
 extern uint8_t * __vsf_usbh_hid_get_tx_report_imp(vsf_usbh_hid_eda_t *hid);

@@ -283,6 +283,8 @@ static void __vsf_disp_sdl2_thread(void *arg)
                 __vsf_arch_irq_start(irq_thread);
                     switch (evt_type) {
                     case VSF_INPUT_TYPE_TOUCHSCREEN:
+                        evt.ts_evt.info.width = disp_sdl2->param.width;
+                        evt.ts_evt.info.height = disp_sdl2->param.height;
                         VSF_INPUT_TOUCHSCREEN_SET(&evt.ts_evt, 0, is_down, x, y);
 #ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
                         vsf_input_on_touchscreen(&evt.ts_evt);

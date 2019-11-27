@@ -95,6 +95,29 @@
 
 
 
+
+#define VSF_USBH_MATCH_VID_PID(__VID, __PID)                                    \
+            .match_vendor       = true,                                         \
+            .match_product      = true,                                         \
+            .idVendor           = (__VID),                                      \
+            .idProduct          = (__PID),
+#define VSF_USBH_MATCH_DEV_CLASS(__CLASS, __SUB_CLASS, __PROTOCOL)              \
+            .match_dev_class    = true,                                         \
+            .match_dev_subclass = true,                                         \
+            .match_dev_protocol = true,                                         \
+            .bDeviceClass       = (__CLASS),                                    \
+            .bDeviceSubClass    = (__SUB_CLASS),                                \
+            .bDeviceProtocol    = (__PROTOCOL),
+#define VSF_USBH_MATCH_IFS_CLASS(__CLASS, __SUB_CLASS, __PROTOCOL)              \
+            .match_ifs_class    = true,                                         \
+            .match_ifs_subclass = true,                                         \
+            .match_ifs_protocol = true,                                         \
+            .bInterfaceClass    = (__CLASS),                                    \
+            .bInterfaceSubClass = (__SUB_CLASS),                                \
+            .bInterfaceProtocol = (__PROTOCOL),
+
+
+
 #define URB_OK                  VSF_ERR_NONE
 #define URB_FAIL                VSF_ERR_FAIL
 #define URB_PENDING             VSF_ERR_NOT_READY
@@ -179,9 +202,9 @@ struct vsf_usbh_dev_id_t {
     uint16_t match_dev_class    : 1;
     uint16_t match_dev_subclass : 1;
     uint16_t match_dev_protocol : 1;
-    uint16_t match_int_class    : 1;
-    uint16_t match_int_subclass : 1;
-    uint16_t match_int_protocol : 1;
+    uint16_t match_ifs_class    : 1;
+    uint16_t match_ifs_subclass : 1;
+    uint16_t match_ifs_protocol : 1;
     uint16_t                    : 6;
 
     uint16_t idVendor;

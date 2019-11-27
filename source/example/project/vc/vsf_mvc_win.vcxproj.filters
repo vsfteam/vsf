@@ -49,9 +49,6 @@
     <Filter Include="vsf\service\trace">
       <UniqueIdentifier>{2be5827e-853c-4e28-b8bd-078ac6d2af65}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\pool">
-      <UniqueIdentifier>{87ee7aca-817c-4250-9053-4cdfbff8546a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\vsfstream">
       <UniqueIdentifier>{f15d66bc-26cb-4a40-beea-94665651b182}</UniqueIdentifier>
     </Filter>
@@ -60,9 +57,6 @@
     </Filter>
     <Filter Include="vsf\service\stream">
       <UniqueIdentifier>{631cd5e2-8cb5-497c-aa0f-5c0d0cdc4c67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\service\stream\pbuf">
-      <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\service\stream\pbuf_queue">
       <UniqueIdentifier>{079583b9-4195-4656-bcf6-ed0c90644204}</UniqueIdentifier>
@@ -271,6 +265,12 @@
     <Filter Include="usrapp\mvc_demo_win\tgui_demo\fonts">
       <UniqueIdentifier>{f01f6faf-4ab0-4005-8899-08a4980ef18e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\pbuf">
+      <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\pool">
+      <UniqueIdentifier>{87ee7aca-817c-4250-9053-4cdfbff8546a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -404,12 +404,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h">
       <Filter>vsf\service\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h">
-      <Filter>vsf\service\stream\pbuf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h">
-      <Filter>vsf\service\stream\pbuf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h">
       <Filter>vsf\service\stream\pbuf_queue</Filter>
@@ -966,9 +960,6 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h">
       <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\__vsf_tgui_control_types.h">
-      <Filter>vsf\component\ui\tgui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.h">
       <Filter>usrapp\mvc_demo_win\tgui_demo\images</Filter>
     </ClInclude>
@@ -992,6 +983,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images_data.h">
+      <Filter>usrapp\mvc_demo_win\tgui_demo\images</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h">
+      <Filter>vsf\service\pbuf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1054,12 +1054,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c">
       <Filter>vsf\service\stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c">
-      <Filter>vsf\service\stream\pbuf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c">
-      <Filter>vsf\service\stream\pbuf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c">
       <Filter>vsf\service\stream\pbuf_queue</Filter>
@@ -1538,6 +1532,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.c">
       <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
+      <Filter>vsf\service\pbuf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

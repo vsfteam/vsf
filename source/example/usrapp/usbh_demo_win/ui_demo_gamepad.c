@@ -112,6 +112,7 @@ static float ui_demo_calc_joystick_offset(vsf_gamepad_evt_t *gamepad_evt)
     uint32_t mask = (1UL << gamepad_evt->bitlen) - 1;
     uint32_t cur = gamepad_evt->cur.valu32 & mask;
     int cur_i32;
+    float result;
 
     if (gamepad_evt->is_signed) {
         cur_i32 = cur;
@@ -120,8 +121,13 @@ static float ui_demo_calc_joystick_offset(vsf_gamepad_evt_t *gamepad_evt)
     } else {
         cur_i32 = cur - (1 << (gamepad_evt->bitlen - 1));
     }
+
     ASSERT(mask != 0);
-    return (float)cur_i32 / (float)mask;
+    result = (float)cur_i32 / (float)mask;
+    if (gamepad_evt->config) {
+        result = -result;
+    }
+    return result;
 }
 
 static __ui_demo_gamepad_t * ui_demo_get_gamepad(void *dev)
@@ -180,7 +186,7 @@ void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt)
     case GAMEPAD_ID_LY:
         offset = ui_demo_calc_joystick_offset(gamepad_evt);
         lv_obj_set_y(   gamepad->joystick_left.btn,
-                        1 * margin + (margin >> 1) + (int32_t)((float)radius * offset));
+                        1 * margin + (margin >> 1) - (int32_t)((float)radius * offset));
         break;
     case GAMEPAD_ID_RX:
         offset = ui_demo_calc_joystick_offset(gamepad_evt);
@@ -190,7 +196,7 @@ void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt)
     case GAMEPAD_ID_RY:
         offset = ui_demo_calc_joystick_offset(gamepad_evt);
         lv_obj_set_y(   gamepad->joystick_right.btn,
-                        1 * margin + (margin >> 1) + (int32_t)((float)radius * offset));
+                        1 * margin + (margin >> 1) - (int32_t)((float)radius * offset));
         break;
     case GAMEPAD_ID_LT:
         itoa(cur, gamepad->lbl_lt_text, 10);

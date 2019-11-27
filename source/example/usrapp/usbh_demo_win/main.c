@@ -49,6 +49,15 @@ struct usrapp_t {
 #if VSF_USE_USB_HOST_DS4 == ENABLED
     vsf_usbh_class_t ds4;
 #endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
+    vsf_usbh_class_t nspro;
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
+    vsf_usbh_class_t xb360;
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
+    vsf_usbh_class_t xb1;
+#endif
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
     struct {
@@ -95,8 +104,17 @@ static usrapp_t usrapp = {
 #if VSF_USE_USB_HOST_DS4 == ENABLED
     .ds4.drv                    = &vsf_usbh_ds4_drv,
 #endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
+    .nspro.drv                  = &vsf_usbh_nspro_drv,
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
+    .xb360.drv                  = &vsf_usbh_xb360_drv,
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
+    .xb1.drv                    = &vsf_usbh_xb1_drv,
+#endif
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED 
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
     .ui.disp                    = {
         .param                  = {
             .height             = LV_VER_RES_MAX,
@@ -108,7 +126,7 @@ static usrapp_t usrapp = {
     },
 #endif
 
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED 
+#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     .ui.disp                    = {
         .param                  = {
             .height             = VSF_TGUI_VER_MAX,
@@ -167,6 +185,15 @@ int main(int argc, char *argv[])
 #endif
 #if VSF_USE_USB_HOST_DS4 == ENABLED
     vsf_usbh_register_class(&usrapp.usbh, &usrapp.ds4);
+#endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
+    vsf_usbh_register_class(&usrapp.usbh, &usrapp.nspro);
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
+    vsf_usbh_register_class(&usrapp.usbh, &usrapp.xb360);
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
+    vsf_usbh_register_class(&usrapp.usbh, &usrapp.xb1);
 #endif
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED

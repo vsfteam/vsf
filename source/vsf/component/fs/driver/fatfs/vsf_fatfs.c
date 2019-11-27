@@ -171,7 +171,7 @@ bool vsf_fatfs_parse_dentry_fat(vsf_fatfs_dentry_parser_t *parser)
     while (parser->entry_num-- > 0) {
         if (!entry->fat.Name[0]) {
             break;
-        } else if (entry->fat.Name[0] != 0xE5) {
+        } else if (entry->fat.Name[0] != (char)0xE5) {
             char *ptr;
             int i;
 

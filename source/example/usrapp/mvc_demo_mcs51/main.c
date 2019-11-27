@@ -27,7 +27,7 @@ struct usrapp_t {
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     struct {
         vsf_disp_t disp;
-        vsf_touchscreen_evt_t ts_evt;
+        //vsf_touchscreen_evt_t ts_evt;
         //vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
         vsf_tgui_color_t color;
     } ui;
@@ -59,6 +59,7 @@ extern void refresh_my_stopwatch(void);
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_UI == ENABLED
+#if 0
 extern void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt);
 void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
 {
@@ -66,6 +67,7 @@ void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
         vsf_tgui_on_touchscreen_evt(ts_evt);
     }
 }
+#endif
 #endif
 
 int main(void)

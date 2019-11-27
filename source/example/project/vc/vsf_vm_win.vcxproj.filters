@@ -79,9 +79,6 @@
     <Filter Include="vsf\service\stream">
       <UniqueIdentifier>{4a25fbdb-1652-4fea-8a09-a7fa39ebe869}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\stream\pbuf">
-      <UniqueIdentifier>{d202efd3-dff3-4b76-897b-316d578cef26}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\stream\pbuf_queue">
       <UniqueIdentifier>{1780092e-6da3-404b-b9df-143b8b999945}</UniqueIdentifier>
     </Filter>
@@ -277,6 +274,9 @@
     <Filter Include="vsf\component\usb\host\class\libusb">
       <UniqueIdentifier>{a689baaa-3745-4f80-bb17-e04c9967857e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\pbuf">
+      <UniqueIdentifier>{d202efd3-dff3-4b76-897b-316d578cef26}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libusb\libusb.h">
@@ -467,12 +467,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h">
       <Filter>vsf\service\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h">
-      <Filter>vsf\service\stream\pbuf</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h">
-      <Filter>vsf\service\stream\pbuf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h">
       <Filter>vsf\service\stream\pbuf_queue</Filter>
@@ -936,6 +930,12 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -1023,12 +1023,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c">
       <Filter>vsf\service\stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c">
-      <Filter>vsf\service\stream\pbuf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c">
-      <Filter>vsf\service\stream\pbuf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c">
       <Filter>vsf\service\stream\pbuf_queue</Filter>
@@ -1422,6 +1416,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
+      <Filter>vsf\service\pbuf</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

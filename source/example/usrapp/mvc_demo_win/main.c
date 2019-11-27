@@ -27,7 +27,6 @@ struct usrapp_t {
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     struct {
         vsf_disp_sdl2_t disp;
-        //vsf_touchscreen_evt_t ts_evt;
         vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
     } ui;
 #endif
@@ -72,11 +71,11 @@ int main(int argc, char *argv[])
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 
-    extern vsf_err_t tgui_demo_init(void);
-    tgui_demo_init();
-
 	extern void vsf_tgui_bind(vsf_disp_t * disp, void* ui_data);
 	vsf_tgui_bind(&(usrapp.ui.disp.use_as__vsf_disp_t), &usrapp.ui.color);
+
+    extern vsf_err_t tgui_demo_init(void);
+    tgui_demo_init();
 #endif
     return 0;
 }

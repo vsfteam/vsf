@@ -78,7 +78,7 @@ void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize
     }
 }
 
-void vsf_tgui_draw_tile(vsf_tgui_location_t* ptLocation,
+void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
                         vsf_tgui_location_t* ptTileLocation,
                         vsf_tgui_size_t* ptSize,
                         const vsf_tgui_tile_t* ptTile)
@@ -94,22 +94,26 @@ void vsf_tgui_draw_tile(vsf_tgui_location_t* ptLocation,
     VSF_TGUI_ASSERT(0 <= (ptLocation->nY + ptSize->nHeight));                       // y_end   point in screen
     VSF_TGUI_ASSERT((ptLocation->nY + ptSize->nHeight) <= VSF_TGUI_VER_MAX);
     VSF_TGUI_ASSERT(vsf_tgui_tile_is_root(ptTile));
-    VSF_TGUI_ASSERT(ptTileLocation->nX < ptTile->tSize.nWidth);
-    VSF_TGUI_ASSERT(ptTileLocation->nY < ptTile->tSize.nHeight);
 
-    uint32_t wSize = (ptTile->tTile.tAttribute.u2ColorSize == VSF_TGUI_COLOR_ARGB_8888) ? 4 : 3;
+    vsf_tgui_size_t tTileSize = vsf_tgui_root_tile_get_size(ptTile);
+    VSF_TGUI_ASSERT(ptTileLocation->nX < tTileSize.nWidth);
+    VSF_TGUI_ASSERT(ptTileLocation->nY < tTileSize.nHeight);
+
+    const vsf_tgui_tile_buf_root_t* ptBufTile = &ptTile->tBufRoot;
+    const vsf_tgui_tile_core_t* ptCoreTile = &ptBufTile->use_as__vsf_tgui_tile_core_t;
+    uint32_t wSize = (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) ? 4 : 3;
 
     vsf_tgui_region_t tDisplay;
     tDisplay.tLocation = *ptLocation;
-    tDisplay.tSize.nWidth = min(ptSize->nWidth, ptTile->tSize.nWidth - ptTileLocation->nX);
-    tDisplay.tSize.nHeight = min(ptSize->nHeight, ptTile->tSize.nHeight - ptTileLocation->nY);
+    tDisplay.tSize.nWidth = min(ptSize->nWidth, tTileSize.nWidth - ptTileLocation->nX);
+    tDisplay.tSize.nHeight = min(ptSize->nHeight, tTileSize.nHeight - ptTileLocation->nY);
     if (tDisplay.tSize.nHeight <= 0 || tDisplay.tSize.nWidth <= 0) {
         return ;
     }
 
     for (uint16_t i = 0; i < tDisplay.tSize.nHeight; i++) {
-        uint32_t wOffset = wSize * ((ptTileLocation->nY + i) * ptTile->tSize.nWidth + ptTileLocation->nX);
-        char* pchData = (char *)ptTile->tTile.ptBitmap;
+        uint32_t wOffset = wSize * ((ptTileLocation->nY + i) * tTileSize.nWidth + ptTileLocation->nX);
+        const char* pchData = (const char *)ptBufTile->ptBitmap;
         pchData += wOffset;
 
         for (uint16_t j = 0; j < tDisplay.tSize.nWidth; j++) {
@@ -119,12 +123,12 @@ void vsf_tgui_draw_tile(vsf_tgui_location_t* ptLocation,
             tTileColor.chG = *pchData++;
             tTileColor.chB = *pchData++;
 
-            if (ptTile->tTile.tAttribute.u2ColorSize == VSF_TGUI_COLOR_ARGB_8888) {
+            if (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) {
                 tTileColor.chA = *pchData++;
                 vsf_tgui_color_t tPixelColor = vsf_tgui_get_pixel(&tPixelLocation);
                 tPixelColor = vsf_tgui_color_mix(tTileColor, tPixelColor, tTileColor.chA);
                 vsf_tgui_set_pixel(&tPixelLocation, tPixelColor);
-            } else if (ptTile->tTile.tAttribute.u2ColorSize == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE) {
+            } else if (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE) {
                 tTileColor.chA = 0xFF;
                 vsf_tgui_set_pixel(&tPixelLocation, tTileColor);
             }
@@ -150,6 +154,54 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
     }
 }
 
+const vsf_tgui_sv_panel_tiles_t gPanelAdditionalTiles = {
+    .tTopLeft = {
+        .tChild = {
+            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .tLocation = {.nX = 0, .nY = 0},
+        },
+    },
+    .tTopRight = {
+        .tChild = {
+            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .tLocation = {.nX = 200 - 12, .nY = 0},
+        },
+    },
+    .tBottomLeft = {
+        .tChild = {
+            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .tLocation = {.nX = 0, .nY = 200 - 12},
+        },
+    },
+    .tBottomRight = {
+        .tChild = {
+            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .tLocation = {.nX = 200-12, .nY = 200-12},
+        },
+    },
+};
+
+const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
+    .tLeft = {
+        .tChild = {
+            .tSize = {.nWidth = 16, .nHeight = 32, },
+            .ptParent = (vsf_tgui_tile_core_t *)&bg3_RGB,
+            .tLocation = {.nX = 0, .nY = 0},
+        },
+    },
+    .tRight = {
+        .tChild = {
+            .tSize = {.nWidth = 16, .nHeight = 32, },
+            .ptParent = (vsf_tgui_tile_core_t *)&bg3_RGB,
+            .tLocation = {.nX = 16, .nY = 0},
+        },
+    },
+ };
+
 
 /**********************************************************************************/
 
@@ -159,7 +211,7 @@ static void draw_screen_white(void)
     memset(pixmap, 0xFF, VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX * sizeof(vsf_tgui_color_t));
 }
 
-static void refresh_now(void)
+static void __refresh_now(void)
 {
     vsf_tgui_color_t* pixmap = __disp->ui_data;
     vsf_disp_area_t area = {
@@ -176,8 +228,24 @@ void refresh_all(void)
 
     extern void refresh_my_stopwatch(void);
     refresh_my_stopwatch();
+}
 
-    refresh_now();
+/*! \brief begin a refresh loop
+ *! \param ptGUI the tgui object address
+ *! \param ptPlannedRefreshRegion the planned refresh region
+ *! \retval NULL    No need to refresh (or rendering service is not ready)
+ *! \retval !NULL   The actual refresh region
+ */
+vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *ptGUI, 
+                                            vsf_tgui_region_t *ptPlannedRefreshRegion)
+{
+
+    
+}
+
+bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *ptGUI)
+{
+    __refresh_now();
 }
 
 void vsf_tgui_on_ready(vsf_disp_t* disp)

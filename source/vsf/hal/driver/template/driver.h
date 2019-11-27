@@ -38,9 +38,10 @@
 #   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_template__/__device_template__/driver.h"
 #endif
 
+#ifdef VSF_TEMPLATE_DRIVER_HEADER
 /* include specified device driver header file */
-#include VSF_TEMPLATE_DRIVER_HEADER
-
+#   include VSF_TEMPLATE_DRIVER_HEADER
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

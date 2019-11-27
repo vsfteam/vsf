@@ -26,6 +26,11 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(__name, __bitoffset, __bitlen, __is_signed, __config)\
+            [TPASTE2(GAMEPAD_ID_, __name)] = VSF_INPUT_ITEM_EX(                 \
+                TPASTE2(GAMEPAD_ID_, __name),                                   \
+                (__bitoffset), (__bitlen), (__is_signed), (__config))
+
 #define VSF_GAMEPAD_DEF_ITEM_INFO(__name, __bitoffset, __bitlen, __is_signed)   \
             [TPASTE2(GAMEPAD_ID_, __name)] = VSF_INPUT_ITEM(                    \
                 TPASTE2(GAMEPAD_ID_, __name),                                   \
@@ -78,8 +83,7 @@ typedef enum vsf_gamepad_id_t vsf_gamepad_id_t;
 
 struct vsf_gamepad_evt_t {
     implement(vsf_input_evt_t)
-    uint8_t bitlen      : 7;
-    uint8_t is_signed   : 1;
+    implement_ex(vsf_input_item_info_t, info)
 };
 typedef struct vsf_gamepad_evt_t vsf_gamepad_evt_t;
 

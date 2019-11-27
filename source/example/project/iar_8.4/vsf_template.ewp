@@ -18776,6 +18776,33 @@
                             <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h</name>
                         </file>
                     </group>
+                    <group>
+                        <name>nspro</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>xb1</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>xb360</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.h</name>
+                        </file>
+                    </group>
                 </group>
                 <group>
                     <name>protocol</name>
@@ -18936,6 +18963,12 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_HID.h</name>
                             </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_nspro.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_xb360.h</name>
+                            </file>
                         </group>
                         <group>
                             <name>MSC</name>
@@ -18947,6 +18980,12 @@
                             <name>UVC</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>XB1</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\common\class\XB1\vsf_usb_xb1.h</name>
                             </file>
                         </group>
                     </group>
@@ -19122,6 +19161,18 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_HID.h</name>
                             </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_nspro.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_nspro.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.h</name>
+                            </file>
                         </group>
                         <group>
                             <name>HUB</name>
@@ -19139,6 +19190,15 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>XB1</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.h</name>
                             </file>
                         </group>
                     </group>
@@ -20070,7 +20130,19 @@
                 </file>
             </group>
             <group>
-                <name>msg_tree</name>
+                <name>pbuf</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h</name>
+                </file>
             </group>
             <group>
                 <name>pool</name>
@@ -20088,21 +20160,6 @@
                     <configuration>kernel_lib_armv6m_full_size</configuration>
                     <configuration>kernel_lib_armv7em_full_size</configuration>
                 </excluded>
-                <group>
-                    <name>pbuf</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h</name>
-                    </file>
-                </group>
                 <group>
                     <name>pbuf_queue</name>
                     <file>

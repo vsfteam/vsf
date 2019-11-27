@@ -23,6 +23,8 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
+#define VSF_TGUI_COLORTYPE_RGB         0
+#define VSF_TGUI_COLORTYPE_RGBA        1
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

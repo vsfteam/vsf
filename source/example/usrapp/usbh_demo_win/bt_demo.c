@@ -22,7 +22,8 @@
 #include "btstack_run_loop.h"
 #include "btstack_memory.h"
 #include "hci.h"
-#include "btstack_chipset_csr.h"
+#include "csr/btstack_chipset_csr.h"
+#include "bcm/btstack_chipset_bcm.h"
 #include "component/3rd-party/btstack/port/btstack_run_loop_vsf.h"
 
 /*============================ MACROS ========================================*/
@@ -38,13 +39,18 @@ extern int btstack_main(int argc, const char * argv[]);
 
 vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
 {
-	if ((id->idVendor == 0x0A12) && (id->idProduct == 0x0001)) {
-		btstack_memory_init();
-		btstack_run_loop_init(btstack_run_loop_vsf_get_instance());
-		hci_init(hci_transport_usb_instance(), dev);
-		hci_set_chipset(btstack_chipset_csr_instance());
-		btstack_main(0, NULL);
-        return VSF_ERR_NONE;
-	}
-    return VSF_ERR_FAIL;
+    btstack_memory_init();
+    btstack_run_loop_init(btstack_run_loop_vsf_get_instance());
+    hci_init(hci_transport_usb_instance(), dev);
+
+    if ((id->idVendor == 0x0A12) && (id->idProduct == 0x0001)) {
+        hci_set_chipset(btstack_chipset_csr_instance());
+    } else if ((id->idVendor == 0x0A5C) && (id->idProduct == 0x21E8)) {
+        hci_set_chipset(btstack_chipset_bcm_instance());
+    } else {
+        return VSF_ERR_FAIL;
+    }
+
+    btstack_main(0, NULL);
+    return VSF_ERR_NONE;
 }

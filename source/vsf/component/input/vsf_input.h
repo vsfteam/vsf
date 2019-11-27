@@ -27,13 +27,17 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_INPUT_ITEM(__id, __bitoffset, __bitlen, __is_signed)                \
+#define VSF_INPUT_ITEM_EX(__item, __bitoffset, __bitlen, __is_signed, __config) \
             {                                                                   \
-                .id         = (__id),                                           \
+                .item       = (__item),                                         \
                 .offset     = (__bitoffset),                                    \
                 .bitlen     = (__bitlen),                                       \
                 .is_signed  = (__is_signed),                                    \
+                .config     = (__config),                                       \
             }
+
+#define VSF_INPUT_ITEM(__item, __bitoffset, __bitlen, __is_signed)              \
+            VSF_INPUT_ITEM_EX((__item), (__bitoffset), (__bitlen), (__is_signed), false)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -41,10 +45,11 @@
 typedef uint32_t vsf_input_timestamp_t;
 
 struct vsf_input_item_info_t {
-    uint8_t id;
-    uint8_t bitlen      : 7;
-    uint8_t is_signed   : 1;
-    uint16_t offset;
+    uint32_t item       : 8;
+    uint32_t bitlen     : 7;
+    uint32_t is_signed  : 1;
+    uint32_t offset     : 15;
+    uint32_t config     : 1;
 };
 typedef struct vsf_input_item_info_t vsf_input_item_info_t;
 

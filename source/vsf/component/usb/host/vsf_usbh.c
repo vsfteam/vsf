@@ -793,9 +793,9 @@ static bool vsf_usbh_match_id(vsf_usbh_dev_parser_t *parser,
         ||  (dev_id->match_dev_class && (dev_id->bDeviceClass != parser->desc_device->bDeviceClass))
         ||  (dev_id->match_dev_subclass && (dev_id->bDeviceSubClass!= parser->desc_device->bDeviceSubClass))
         ||  (dev_id->match_dev_protocol && (dev_id->bDeviceProtocol != parser->desc_device->bDeviceProtocol))
-        ||  (dev_id->match_int_class && (dev_id->bInterfaceClass != desc_ifs->bInterfaceClass))
-        ||  (dev_id->match_int_subclass && (dev_id->bInterfaceSubClass != desc_ifs->bInterfaceSubClass))
-        ||  (dev_id->match_int_protocol && (dev_id->bInterfaceProtocol != desc_ifs->bInterfaceProtocol))) {
+        ||  (dev_id->match_ifs_class && (dev_id->bInterfaceClass != desc_ifs->bInterfaceClass))
+        ||  (dev_id->match_ifs_subclass && (dev_id->bInterfaceSubClass != desc_ifs->bInterfaceSubClass))
+        ||  (dev_id->match_ifs_protocol && (dev_id->bInterfaceProtocol != desc_ifs->bInterfaceProtocol))) {
         return false;
     }
     return true;

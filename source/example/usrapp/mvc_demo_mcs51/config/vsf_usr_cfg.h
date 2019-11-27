@@ -161,7 +161,7 @@
 #define VSF_USE_SERVICE_STREAM              DISABLED
 #define VSF_USE_SERVICE_VSFSTREAM           DISABLED
 
-#define VSF_USE_INPUT                                   ENABLED
+#define VSF_USE_INPUT                                   DISABLED
 #define VSF_USE_UI                                      ENABLED
 #   define VSF_USE_UI_LVGL                              DISABLED
 #   define VSF_USE_DISP_DRV_SDL2                        DISABLED
@@ -173,6 +173,7 @@
 
 #   define VSF_USE_MSG_TREE                             ENABLED
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING     ENABLED         /* Enabled for debug */
+#       define VSF_MSGT_NODE_OFFSET_TYPE                int8_t
 
 /*============================ INCLUDES ======================================*/
 

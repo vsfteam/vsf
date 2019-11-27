@@ -81,8 +81,30 @@ struct vsf_usbh_hub_t {
 };
 typedef struct vsf_usbh_hub_t vsf_usbh_hub_t;
 
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static const vsf_usbh_dev_id_t vsf_usbh_hub_dev_id[] = {
+    {
+        .match_ifs_class = 1,
+        .bInterfaceClass = USB_CLASS_HUB,
+    },
+};
+
+/*============================ PROTOTYPES ====================================*/
+
+static void *vsf_usbh_hub_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs);
+static void vsf_usbh_hub_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_usbh_class_drv_t vsf_usbh_hub_drv = {
+    .name       = "hub",
+    .dev_id_num = dimof(vsf_usbh_hub_dev_id),
+    .dev_ids    = vsf_usbh_hub_dev_id,
+    .probe      = vsf_usbh_hub_probe,
+    .disconnect = vsf_usbh_hub_disconnect,
+};
+
 /*============================ PROTOTYPES ====================================*/
 
 SECTION(".text.vsf.kernel.eda")
@@ -428,8 +450,7 @@ static void vsf_usbh_hub_on_eda_terminate(vsf_eda_t *eda)
     VSF_USBH_FREE(hub);
 }
 
-static void *vsf_usbh_hub_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        vsf_usbh_ifs_parser_t *parser_ifs)
+static void *vsf_usbh_hub_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs)
 {
     vsf_usbh_hub_t *hub;
 
@@ -467,21 +488,6 @@ static void vsf_usbh_hub_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void 
 
     __vsf_eda_fini(&hub->teda.use_as__vsf_eda_t);
 }
-
-static const vsf_usbh_dev_id_t vsf_usbh_hub_dev_id[] = {
-    {
-        .match_int_class = 1,
-        .bInterfaceClass = USB_CLASS_HUB,
-    },
-};
-
-const vsf_usbh_class_drv_t vsf_usbh_hub_drv = {
-    .name       = "hub",
-    .dev_id_num = dimof(vsf_usbh_hub_dev_id),
-    .dev_ids    = vsf_usbh_hub_dev_id,
-    .probe      = vsf_usbh_hub_probe,
-    .disconnect = vsf_usbh_hub_disconnect,
-};
 
 bool vsf_usbh_hub_is_dev_resetting(vsf_usbh_dev_t *dev)
 {

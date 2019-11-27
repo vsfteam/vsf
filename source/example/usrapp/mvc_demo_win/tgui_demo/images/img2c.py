@@ -6,6 +6,8 @@ from PIL import Image
 from cProfile import Profile
 
 PIX_CNT = 4
+rgba_index = 0
+rgb_index = 0
 
 def tgui_get_data_from_image(mode, file_path):
     im = Image.open(file_path).convert(mode)
@@ -41,23 +43,45 @@ def tgui_image_to_dict(mode, file_path):
     image_dict['height'] = height
     image_dict['mode'] = mode
     if mode == 'RGBA':
-        image_dict['color_size'] = 'VSF_TGUI_COLOR_ARGB_8888'
+        image_dict['color_size'] = 5
+        image_dict['color_type'] = 1
     else:
-        image_dict['color_size'] = 'VSF_TGUI_COLOR_RGB8_USER_TEMPLATE'
+        image_dict['color_size'] = 6
+        image_dict['color_type'] = 0
     return image_dict
 
 def tgui_image_data_buid(image):
-    source_output = '''static const char _{name}_{mode}_maps[] = {{
-{hex_array}}};
-const vsf_tgui_tile_t {name}_{mode}  = {{
-    tgui_size({width}, {height}),
-    .tTile = {{
-        .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)_{name}_{mode}_maps,
+    global rgba_index
+    global rgb_index
+
+    tile_rgb_size  = ''
+    tile_rgba_size  = ''
+    tile_rgba_array = ''
+    tile_rgb_array = ''
+
+    if image['mode'] == 'RGBA':
+        index = rgba_index
+        rgba_index += 1
+        tile_rgba_size = '    {{.nWidth = {width}, .nHeight = {height}}},\n'.format(width=image['width'], height=image['height'])
+        rgba_pixmap = '    '
+        tile_rgba_array = '    _{name}_{mode}_maps,\n'.format(name=image['name'], mode=image['mode'])
+    else:
+        index = rgb_index
+        rgb_index += 1
+        tile_rgb_size = '    {{.nWidth = {width}, .nHeight = {height}}},\n'.format(width=image['width'], height=image['height'])
+        tile_rgb_array = '    _{name}_{mode}_maps,\n'.format(name=image['name'], mode=image['mode'])
+
+    ## tile define
+    tile_def = '''const vsf_tgui_tile_idx_root_t {name}_{mode}  = {{
+    .use_as__vsf_tgui_tile_core_t = {{
         .tAttribute = {{
-            .u2ColorSize = {color_size},
-            .bIsNoParent = 1,
+            .u2RootTileType = 1,
+            .u2ColorType = {color_type},
+            .u3ColorSize = {color_size},
+            .bIsRootTile = 1,
         }},
     }},
+    .chIndex = {index}
 }};
 
 '''.format(hex_array=image['data'],
@@ -65,15 +89,26 @@ const vsf_tgui_tile_t {name}_{mode}  = {{
               width=image['width'],
               height=image['height'],
               mode=image['mode'],
-              color_size=image['color_size'])
+              color_size=image['color_size'],
+              color_type=image['color_type'],
+              index=index)
 
-    header_output = '''extern const vsf_tgui_tile_t {name}_{mode}; //{name}:{mode}, width: {width}, height: {height}
+
+    ## tile data
+    tile_data = '''static const char _{name}_{mode}_maps[] = {{
+{hex_array}}};
+'''.format(hex_array=image['data'],
+              name=image['name'],
+              mode=image['mode'])
+
+    ## tile header
+    tile_header = '''extern const vsf_tgui_tile_t {name}_{mode}; //{name}:{mode}, width: {width}, height: {height}
 '''.format(
               name=image['name'],
               width=image['width'],
               height=image['height'],
               mode=image['mode'])
-    return (source_output, header_output)
+    return (tile_def, tile_data, tile_rgb_size,  tile_rgba_size, tile_rgb_array, tile_rgba_array, tile_header)
 
 def tgui_code_build(file_path, output_str):
     with open(file_path, 'w') as tgt_f:
@@ -81,8 +116,13 @@ def tgui_code_build(file_path, output_str):
             tgt_f.write(src_f.read().replace('STR_REPLACE', output_str))
 
 def main():
-    source_output = ''
-    header_output = ''
+    tiles_def        = ''
+    tiles_data       = ''
+    tiles_header     = ''
+    tiles_rgb_size   = ''
+    tiles_rgba_size  = ''
+    tiles_rgb_array  = ''
+    tiles_rgba_array = ''
 
     search_dirs = {'RGB':'./rgb-images', 'RGBA':'./rgba-images'}
     for (mode, dirname) in search_dirs.items():
@@ -91,17 +131,34 @@ def main():
             file_path = os.path.join(dirname, f)
             if os.path.isfile(file_path):
                 image = tgui_image_to_dict(mode, file_path)
-                image_source, image_header = tgui_image_data_buid(image)
-                source_output += image_source
-                header_output += image_header
+                tile_def, tile_data, tile_rgb_size, tile_rgba_size, tile_rgb_array, tile_rgba_array, tile_header = tgui_image_data_buid(image)
 
-    tgui_code_build('./demo_images.c', source_output)
-    tgui_code_build('./demo_images.h', header_output)
+                tiles_def        += tile_def
+                tiles_data       += tile_data
+                tiles_rgb_size   += tile_rgb_size
+                tiles_rgba_size  += tile_rgba_size
+                tiles_rgb_array  += tile_rgb_array
+                tiles_rgba_array += tile_rgba_array
+                tiles_header     += tile_header
+
+    tiles_def += '\nvsf_tgui_size_t gIdxRootRGBTileSizes[] = {\n' + tiles_rgb_size + '\n};\n'
+    tiles_def += '\nvsf_tgui_size_t gIdxRootRGBATileSizes[] = {\n' + tiles_rgba_size + '\n};\n'
+
+    tiles_header += '\nextern vsf_tgui_size_t gIdxRootRGBTileSizes[' + str(rgb_index) + '];\n'
+    tiles_header += '\nextern vsf_tgui_size_t gIdxRootRGBATileSizes[' + str(rgba_index) + '];\n'
+
+    tiles_data += '\nstatic const char * rgb_pixmap_array[] = {\n' + tiles_rgb_array + '};\n'
+    tiles_data += '\nstatic const char * rgba_pixmap_array[] = {\n' + tiles_rgba_array + '};\n'
+
+    tgui_code_build('./demo_images.c', tiles_def)
+    tgui_code_build('./demo_images.h', tiles_header)
+    tgui_code_build('./demo_images_data.h', tiles_data)
 
 if __name__ == "__main__":
     #prof = Profile()
     #prof.runcall(main)
     #prof.print_stats()
     main()
+
 
 

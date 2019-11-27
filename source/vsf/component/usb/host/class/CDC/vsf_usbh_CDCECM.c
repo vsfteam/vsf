@@ -89,8 +89,27 @@ struct vsf_usbh_ecm_t {
 };
 typedef struct vsf_usbh_ecm_t vsf_usbh_ecm_t;
 
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static const vsf_usbh_dev_id_t vsf_usbh_ecm_dev_id[] = {
+    { VSF_USBH_MATCH_IFS_CLASS(USB_CLASS_COMM, 6, 0) },
+};
+
+/*============================ PROTOTYPES ====================================*/
+
+static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs);
+static void vsf_usbh_ecm_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsf_usbh_class_drv_t vsf_usbh_ecm_drv = {
+    .name       = "cdc_ecm",
+    .dev_id_num = dimof(vsf_usbh_ecm_dev_id),
+    .dev_ids    = vsf_usbh_ecm_dev_id,
+    .probe      = vsf_usbh_ecm_probe,
+    .disconnect = vsf_usbh_ecm_disconnect,
+};
+
 /*============================ PROTOTYPES ====================================*/
 
 SECTION(".text.vsf.kernel.eda")
@@ -443,8 +462,7 @@ static void vsf_usbh_ecm_on_eda_terminate(vsf_eda_t *eda)
     }
 }
 
-static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        vsf_usbh_ifs_parser_t *parser_ifs)
+static void *vsf_usbh_ecm_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs)
 {
     vsf_usbh_ecm_t *ecm = VSF_USBH_MALLOC(sizeof(vsf_usbh_ecm_t));
     if (ecm != NULL) {
@@ -484,25 +502,5 @@ static void vsf_usbh_ecm_disconnect(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void 
     vsf_usbh_cdc_fini(&ecm->use_as__vsf_usbh_cdc_t);
     __vsf_eda_fini(&ecm->eda);
 }
-
-static const vsf_usbh_dev_id_t vsf_usbh_ecm_dev_id[] = {
-    {
-        .match_int_class    = true,
-        .match_int_subclass = true,
-        .match_int_protocol = true,
-
-        .bInterfaceClass    = USB_CLASS_COMM,
-        .bInterfaceSubClass = 6,        // ECM
-        .bInterfaceProtocol = 0x00,
-    },
-};
-
-const vsf_usbh_class_drv_t vsf_usbh_ecm_drv = {
-    .name       = "cdc_ecm",
-    .dev_id_num = dimof(vsf_usbh_ecm_dev_id),
-    .dev_ids    = vsf_usbh_ecm_dev_id,
-    .probe      = vsf_usbh_ecm_probe,
-    .disconnect = vsf_usbh_ecm_disconnect,
-};
 
 #endif

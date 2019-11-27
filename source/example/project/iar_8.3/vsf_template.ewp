@@ -13710,6 +13710,7 @@
                 <name>interface</name>
                 <excluded>
                     <configuration>kernel_lib_armv6m_full_size</configuration>
+                    <configuration>kernel_lib_armv7em_full_size</configuration>
                 </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\hal\interface\vsf_interface_common.h</name>
@@ -13791,10 +13792,10 @@
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_list_queue.c</name>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_slist_queue.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_list_queue.h</name>
+                <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_eda_slist_queue.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\kernel\vsf_evtq.h</name>
@@ -13898,6 +13899,21 @@
                 </file>
             </group>
             <group>
+                <name>pbuf</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h</name>
+                </file>
+            </group>
+            <group>
                 <name>pool</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\pool\vsf_pool.c</name>
@@ -13913,21 +13929,6 @@
                     <configuration>kernel_lib_armv6m_full_size</configuration>
                     <configuration>kernel_lib_armv7em_full_size</configuration>
                 </excluded>
-                <group>
-                    <name>pbuf</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf\vsf_pbuf_pool.h</name>
-                    </file>
-                </group>
                 <group>
                     <name>pbuf_queue</name>
                     <file>
@@ -14312,6 +14313,12 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\template\vsf_list.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\template\vsf_queue.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\template\vsf_queue.h</name>
                 </file>
             </group>
             <file>

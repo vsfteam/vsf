@@ -43,9 +43,6 @@ def_vsf_thread(app_main_thread_t, VSF_OS_CFG_MAIN_STACK_SIZE)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if !__IS_COMPILER_IAR__ && __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
-__attribute__((constructor(255)))
-#endif
 extern void __vsf_main_entry(void);
 extern int main(void);
 ROOT
@@ -93,6 +90,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
         {
             __vsf_os_swi_priority,                  // os_swi_priorities_ptr
             UBOUND(__vsf_os_swi_priority),          // swi_priority_cnt
+            {vsf_prio_highest, __VSF_OS_SWI_PRIORITY_BEGIN},
         },
 #endif
 
@@ -268,6 +266,15 @@ __noreturn __stackless void __cmain(void)
     ||  __IS_COMPILER_LLVM__                                                    \
     ||  __IS_COMPILER_ARM_COMPILER_5__                                          \
     ||  __IS_COMPILER_ARM_COMPILER_6__
+
+#if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
+__attribute__((constructor(255)))
+#endif
+void vsf_main_entry(void)
+{
+    __vsf_main_entry();
+}
+
 
 #else
 

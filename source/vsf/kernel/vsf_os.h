@@ -78,6 +78,10 @@ struct vsf_kernel_resource_t {
     struct {
         const vsf_arch_prio_t               *os_swi_priorities_ptr;
         uint16_t                            swi_priority_cnt;
+        struct {
+            vsf_prio_t                      highest;
+            vsf_prio_t                      begin;
+        }sched_prio;
     } arch;
 #endif
 

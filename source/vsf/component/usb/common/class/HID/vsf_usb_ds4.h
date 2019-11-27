@@ -65,7 +65,8 @@ typedef struct vsf_usb_ds4_gamepad_in_report_t vsf_usb_ds4_gamepad_in_report_t;
 
 struct vsf_usb_ds4_gamepad_out_report_t {
     uint8_t id;
-    uint8_t dummy1[3];
+    uint8_t dummyFF;
+    uint8_t dummy1[2];
     
     uint8_t rumble_r;       // 0 - 255
     uint8_t rumble_l;

@@ -64,5 +64,9 @@ extern const vsf_usbh_class_drv_t vsf_usbh_ds4_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
+extern bool vsf_usbh_ds4_can_output(vsf_usbh_ds4_t *ds4);
+extern void vsf_usbh_ds4_set_rumble(vsf_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t right);
+extern void vsf_usbh_ds4_set_led(vsf_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b);
+
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_DS4
 #endif      // __VSF_USBH_DS4_H__

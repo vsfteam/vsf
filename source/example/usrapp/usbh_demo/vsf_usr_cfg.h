@@ -143,6 +143,9 @@
 #define VSF_USE_INPUT                                   ENABLED
 #define VSF_USE_INPUT_HID                               ENABLED
 #define VSF_USE_INPUT_DS4                               ENABLED
+#define VSF_USE_INPUT_NSPRO                             ENABLED
+#define VSF_USE_INPUT_XB360                             ENABLED
+#define VSF_USE_INPUT_XB1                               ENABLED
 
 #define VSF_USE_AV                                      ENABLED
 
@@ -150,6 +153,9 @@
 #define VSF_USE_USB_HOST_HUB                            ENABLED
 #define VSF_USE_USB_HOST_HID                            ENABLED
 #define VSF_USE_USB_HOST_DS4                            ENABLED
+#define VSF_USE_USB_HOST_NSPRO                          ENABLED
+#define VSF_USE_USB_HOST_XB360                          ENABLED
+#define VSF_USE_USB_HOST_XB1                            ENABLED
 #define VSF_USE_USB_HOST_ECM                            DISABLED
 #define VSF_USE_USB_HOST_LIBUSB                         ENABLED
 

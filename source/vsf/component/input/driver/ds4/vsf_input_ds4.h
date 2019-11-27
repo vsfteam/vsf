@@ -43,7 +43,7 @@ typedef struct vsf_input_ds4u_t vsf_input_ds4u_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_input_item_info_t vsf_ds4u_gamepad_item_info[GAMEPAD_ID_USER];
+extern const vsf_input_item_info_t vsf_ds4u_gamepad_item_info[GAMEPAD_ID_NUM];
 extern const vsf_sensor_item_info_t vsf_ds4u_sensor_item_info[6];
 
 /*============================ PROTOTYPES ====================================*/

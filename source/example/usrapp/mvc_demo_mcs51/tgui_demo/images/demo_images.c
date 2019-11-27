@@ -24,123 +24,146 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-const vsf_tgui_tile_t bg2_RGB  = {
+const vsf_tgui_tile_buf_root_t bg1_RGB  = {
+    tgui_size(200, 200),
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
+        .tAttribute = {
+            .u3ColorSize = VSF_TGUI_COLOR_RGB8_USER_TEMPLATE,
+            .bIsRootTile = 1,
+        },
+    },
+};
+
+const vsf_tgui_tile_buf_root_t bg2_RGB  = {
     tgui_size(1280, 718),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_RGB8_USER_TEMPLATE,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_RGB8_USER_TEMPLATE,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_autorenew_black_18dp_RGBA  = {
+const vsf_tgui_tile_buf_root_t bg3_RGB  = {
+    tgui_size(32, 32),
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
+        .tAttribute = {
+            .u3ColorSize = VSF_TGUI_COLOR_RGB8_USER_TEMPLATE,
+            .bIsRootTile = 1,
+        },
+    },
+};
+
+const vsf_tgui_tile_buf_root_t ic_autorenew_black_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_build_black_18dp_RGBA  = {
+const 
+vsf_tgui_tile_buf_root_t ic_build_black_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_done_black_18dp_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_done_black_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_find_in_page_white_18dp_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_find_in_page_white_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_help_outline_black_18dp_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_help_outline_black_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_https_white_18dp_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_https_white_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_power_settings_new_18pt_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_power_settings_new_18pt_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_settings_applications_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_settings_applications_RGBA  = {
     tgui_size(24, 24),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_settings_bluetooth_white_18dp_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_settings_bluetooth_white_18dp_RGBA  = {
     tgui_size(18, 18),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };
 
-const vsf_tgui_tile_t ic_settings_phone_RGBA  = {
+const vsf_tgui_tile_buf_root_t ic_settings_phone_RGBA  = {
     tgui_size(24, 24),
-    .tTile = {
-        .ptBitmap = 0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0,
+    .use_as__vsf_tgui_tile_core_t = {
         .tAttribute = {
-            .u2ColorSize = VSF_TGUI_COLOR_ARGB_8888,
-            .bIsNoParent = 1,
+            .u3ColorSize = VSF_TGUI_COLOR_ARGB_8888,
+            .bIsRootTile = 1,
         },
     },
 };

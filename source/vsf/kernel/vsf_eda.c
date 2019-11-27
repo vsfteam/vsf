@@ -52,7 +52,7 @@ struct __vsf_local_t {
 #       define __VSF_KERNEL_TASK_EDA
     vsf_eda_t               eda;
 #   endif
-
+    vsf_prio_t              highest_prio;
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -145,13 +145,13 @@ void vsf_eda_on_terminate(vsf_eda_t *pthis)
 SECTION(".text.vsf.kernel.eda")
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
 void vsf_kernel_init(   vsf_pool_block(vsf_eda_frame_pool) *frame_buf_ptr,
-                        uint_fast16_t count)
+                        uint_fast16_t count, vsf_prio_t highest_prio)
 #else
-void vsf_kernel_init(void)
+void vsf_kernel_init(   vsf_prio_t highest_prio)
 #endif
 {
     memset(&__vsf_eda, 0, sizeof(__vsf_eda));
-
+    __vsf_eda.highest_prio = highest_prio;
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     do {
     #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
@@ -920,10 +920,10 @@ vsf_err_t __vsf_kernel_start(void)
 
 #   if defined(__VSF_KERNEL_TASK_TEDA)
     __vsf_eda.teda.use_as__vsf_eda_t.fn.evthandler = __vsf_kernel_evthandler;
-    err = vsf_eda_init(&__vsf_eda.teda.use_as__vsf_eda_t, vsf_prio_highest, false);
+    err = vsf_eda_init(&__vsf_eda.teda.use_as__vsf_eda_t, __vsf_eda.highest_prio, false);
 #   elif defined(__VSF_KERNEL_TASK_EDA)
     __vsf_eda.eda.fn.evthandler = __vsf_kernel_evthandler;
-    err = vsf_eda_init(&__vsf_eda.eda, vsf_prio_highest, false);
+    err = vsf_eda_init(&__vsf_eda.eda, __vsf_eda.highest_prio, false);
 #   endif
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED

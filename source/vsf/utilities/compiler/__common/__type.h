@@ -52,11 +52,11 @@
 #endif
 
 #ifndef offset_of
-#   define offset_of(s, m)  (uint32_t)(&(((s *)0)->m))
+#   define offset_of(s, m)  (uintptr_t)(&(((s *)0)->m))
 #endif
 #ifndef container_of
 #   define container_of(ptr, type, member)      \
-        ((type *)((char *)(ptr) - offset_of(type, member)))
+        ((type *)((uintptr_t)(ptr) - offset_of(type, member)))
 #endif
 #ifndef safe_container_of
 #   define safe_container_of(ptr, type, member) \
@@ -130,6 +130,7 @@ typedef enum {
     fsm_rt_wait_for_evt = 2,    
     fsm_rt_wfe          = 2,
     fsm_rt_asyn         = 3,     //!< fsm asynchronose complete, you can check it later.
+    fsm_rt_user         = 4,
 } fsm_rt_t;
 //! @}
 

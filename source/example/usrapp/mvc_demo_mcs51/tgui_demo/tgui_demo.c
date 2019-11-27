@@ -77,9 +77,9 @@ static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_mc_button_t* ptNode, v
 static char s_chTimeBuffer[] = "00:00";
 
 static const vsf_tgui_tile_t bg2_offset_RGB = {
-    .tSize = {.nWidth = VSF_TGUI_HOR_MAX - 4 * DEMO_OFFSET, .nHeight = VSF_TGUI_VER_MAX - 4 * DEMO_OFFSET, },
-    .tParent = {
-        .ptSrc = (vsf_tgui_tile_t *)&bg2_RGB,
+    .tChild = {
+        .tSize = {.nWidth = VSF_TGUI_HOR_MAX - 4 * DEMO_OFFSET, .nHeight = VSF_TGUI_VER_MAX - 4 * DEMO_OFFSET, },
+        .ptParent = (vsf_tgui_tile_core_t *)&bg2_RGB,
         .tLocation = {.nX = 100, .nY = 100},
     },
 };
@@ -165,7 +165,8 @@ implement_tgui_panel(my_stopwatch_t, __my_stopwatch,
     tgui_button(start_stop, &__my_stopwatch, sizeof(vsf_tgui_mc_label_t), false,
         tgui_region(8, 72, 84, 32),
         tgui_text(tLabel, "START", VSF_TGUI_ALIGN_LEFT),
-        tgui_background(&ic_build_black_18dp_RGBA, VSF_TGUI_ALIGN_RIGHT),
+        tgui_background(    (const vsf_tgui_tile_t*)&ic_build_black_18dp_RGBA, 
+                            VSF_TGUI_ALIGN_RIGHT),
         //tgui_handler(VSF_MSGT_NODE_HANDLER_TYPE_FSM,
         //    &my_stopwatch_start_stop_on_click),
     ),
@@ -215,7 +216,7 @@ void test_only_refresh_time_label(void)
 
     
     __cnt++;
-    sprintf(s_chTimeBuffer, "%02d:%02d", __cnt / 99 % 99, __cnt % 99);
+    //sprintf(s_chTimeBuffer, "%02d:%02d", __cnt / 99 % 99, __cnt % 99);
 }
 
 void refresh_my_stopwatch(void)
@@ -273,6 +274,7 @@ vsf_err_t tgui_demo_init(void)
 }
 
 
+#if 0
 void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt)
 {
 /*
@@ -297,6 +299,7 @@ void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt)
 
     vsf_tgui_send_message(&__tgui_demo, tEvent);
 }
+#endif
 
 #endif
 

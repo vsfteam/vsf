@@ -130,7 +130,7 @@ vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
                     break;
                 }
                 //! point to next node with offset 
-                ptNode = (vsf_msgt_node_t*)((uintptr_t)ptNode + ptNode->Offset.iNext);
+                ptNode = (vsf_msgt_node_t*)((intptr_t)ptNode + ptNode->Offset.iNext);
             } while(true);
 
         } while (0);
@@ -367,6 +367,8 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
             } else if (fsm_rt_cpl == tfsm) {
                 RESET_MSGT_BACKWARD_PROPAGATE_MSG_FSM();
                 //return fsm_rt_cpl;
+            } else if (tfsm >= fsm_rt_user) {
+                RESET_MSGT_BACKWARD_PROPAGATE_MSG_FSM();
             }
             return tfsm;
 
@@ -427,7 +429,7 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj,
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
-                                            vsf_msgt_node_t* ptNode,
+                                            const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage)
 {
     class_internal(ptObj, ptThis, vsf_msgt_t);
@@ -497,7 +499,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                         if (0 == ptTemp->Offset.iNext) {
                             break;
                         }
-                        ptTemp = (vsf_msgt_node_t*)((uintptr_t)ptTemp + ptTemp->Offset.iNext);
+                        ptTemp = (vsf_msgt_node_t*)((intptr_t)ptTemp + ptTemp->Offset.iNext);
                     } while(1);
                 } 
                 break;

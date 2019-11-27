@@ -45,13 +45,23 @@
 
 /*============================ MACROS ========================================*/
 #ifndef VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING
-#   define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING                 DISABLED
+#   define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING         DISABLED
 #endif
 
-#define VSF_MSGT_NODE_ID_USER                                   2
+#define VSF_MSGT_NODE_ID_USER                           2
+
+#ifndef VSF_MSGT_NODE_OFFSET_TYPE
+#   define VSF_MSGT_NODE_OFFSET_TYPE                    int16_t
+#endif
+
+#ifndef VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST
+#   define VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST           DISABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef VSF_MSGT_NODE_OFFSET_TYPE  vsf_msgt_node_offset_t;
 
 declare_vsf_queue(__bfs_node_fifo_t)
 
@@ -133,8 +143,10 @@ def_structure(vsf_msgt_node_t)
     };
     vsf_msgt_node_t* ptParent;                                                  //!< parent node
     struct {
-        int16_t iPrevious;
-        int16_t iNext;
+#if VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST == ENABLED
+        vsf_msgt_node_offset_t iPrevious;
+#endif
+        vsf_msgt_node_offset_t iNext;
     } Offset;
 #if VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING == ENABLED
     const char *pchNodeName;
@@ -212,8 +224,8 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj,
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern 
-fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
-                                            vsf_msgt_node_t* ptNode,
+fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
+                                            const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage);
 #endif
 

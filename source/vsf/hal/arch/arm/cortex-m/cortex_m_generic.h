@@ -43,13 +43,13 @@
 #   endif
 #elif __ARM_ARCH >= 7 || __TARGET_ARCH_7_M == 1 || __TARGET_ARCH_7E_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
-#       define VSF_ARCH_PRI_NUM         128
+#       define VSF_ARCH_PRI_NUM         16
 #       undef  VSF_ARCH_PRI_BIT         
-#       define VSF_ARCH_PRI_BIT         7
+#       define VSF_ARCH_PRI_BIT         4
 #   endif
 
 #   ifndef VSF_ARCH_PRI_BIT
-#       define VSF_ARCH_PRI_BIT         7
+#       define VSF_ARCH_PRI_BIT         4
 #   endif
 #endif
 

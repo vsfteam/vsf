@@ -33,26 +33,6 @@
 #   define VSF_KERNEL_ASSERT                    ASSERT
 #endif
 
-#define VSF_OS_CFG_MAIN_MODE_NONE               0
-#define VSF_OS_CFG_MAIN_MODE_THREAD             1
-#define VSF_OS_CFG_MAIN_MODE_EDA                2
-#define VSF_OS_CFG_MAIN_MODE_IDLE               3
-    
-#ifndef VSF_OS_CFG_MAIN_MODE
-#   define VSF_OS_CFG_MAIN_MODE                 VSF_OS_CFG_MAIN_MODE_THREAD
-#endif
-
-#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
-#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
-#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
-#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
-#   endif
-#   ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
-#       define VSF_KERNEL_CFG_SUPPORT_THREAD                ENABLED
-#   elif VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-#       error VSF_KERNEL_CFG_SUPPORT_THREAD MUST be enabled to use VSF_OS_CFG_MAIN_MODE_THREAD
-#   endif
-#endif
 
 #ifndef VSF_KERNEL_CFG_SUPPORT_SYNC
 #   define VSF_KERNEL_CFG_SUPPORT_SYNC                      ENABLED
@@ -68,6 +48,8 @@
 #       define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE             ENABLED
 #   endif
 #endif
+
+
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                 ENABLED
 #endif
@@ -83,9 +65,7 @@
 #   endif
 #endif
 
-#ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
-#   define VSF_KERNEL_CFG_SUPPORT_THREAD                    ENABLED
-#endif
+
 
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL              ENABLED
@@ -111,9 +91,44 @@
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE          ENABLED
 #endif
 
+#ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
+#   define VSF_KERNEL_CFG_SUPPORT_THREAD                    ENABLED
+#endif
+
 #ifndef VSF_USE_KERNEL_SIMPLE_SHELL
 #   define VSF_USE_KERNEL_SIMPLE_SHELL                      ENABLED
 #endif
+
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_PT
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_PT                    ENABLED
+#endif
+
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM            ENABLED
+#endif
+
+
+#define VSF_OS_CFG_MAIN_MODE_NONE               0
+#define VSF_OS_CFG_MAIN_MODE_THREAD             1
+#define VSF_OS_CFG_MAIN_MODE_EDA                2
+#define VSF_OS_CFG_MAIN_MODE_IDLE               3
+    
+#ifndef VSF_OS_CFG_MAIN_MODE
+#   define VSF_OS_CFG_MAIN_MODE                 VSF_OS_CFG_MAIN_MODE_THREAD
+#endif
+
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
+#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
+#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
+#   endif
+#   ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
+#       define VSF_KERNEL_CFG_SUPPORT_THREAD                ENABLED
+#   elif VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#       error VSF_KERNEL_CFG_SUPPORT_THREAD MUST be enabled to use VSF_OS_CFG_MAIN_MODE_THREAD
+#   endif
+#endif
+
 
 // queue configurations
 #if VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE == ENABLED
@@ -165,7 +180,7 @@ included by vsf_usr_cfg.h)"
 #   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
 #endif
 #ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
-#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                          DISABLED
+#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                      DISABLED
 #endif
 
 #if __VSF_OS_SWI_NUM > (VSF_USR_SWI_NUM + VSF_SWI_NUM)
