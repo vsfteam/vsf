@@ -28,12 +28,12 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_class_drv_t vsf_usbh_hub_drv;
+extern const vk_usbh_class_drv_t vk_usbh_hub_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vsf_usbh_hub_is_dev_resetting(struct vsf_usbh_dev_t *dev);
-extern vsf_err_t vsf_usbh_hub_reset_dev(struct vsf_usbh_dev_t *dev);
+extern bool vk_usbh_hub_is_dev_resetting(struct vk_usbh_dev_t *dev);
+extern vsf_err_t vk_usbh_hub_reset_dev(struct vk_usbh_dev_t *dev);
 
 #endif
 

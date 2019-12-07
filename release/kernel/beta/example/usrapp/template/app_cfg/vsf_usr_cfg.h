@@ -16,18 +16,23 @@
  ****************************************************************************/
 
 
-//! \note Top Level VSF Configuration 
+//! \note Top Level Application Configuration 
 
-#ifndef __TOP_VSF_USR_CFG_H__
-#define __TOP_VSF_USR_CFG_H__
+#ifndef __TOP_APP_CFG_H__
+#define __TOP_APP_CFG_H__
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
-#define ASSERT(...)
+#define ASSERT(...)         if (!(__VA_ARGS__)) {SAFE_ATOM_CODE() {while(1);}};
+//#define ASSERT(...)
 
-#define VSF_PROJ_CFG_USE_CUBE               DISABLED
+#define VSF_SYSTIMER_FREQ               25000000ul
+
+#define VSF_HEAP_SIZE                   4096
+
+/*! \note please do not change the value of this macro!!!! */
+#define VSF_KERNEL_CFG_DEPLOY_IN_LIB_WITH_FULL_FEATURE_SET      ENABLED
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> --------------------
 
@@ -36,61 +41,39 @@
 //! \name kernel resource configuration
 //! @{
 
-//  <o>System Frequency (Hz)                     <32768-0xFFFFFFFF>
-//  <i>Please specify the system frequency here.
-#define SYSTEM_FREQ                         25000000ul
-
-//  <o>System Timer Frequency (Hz)/ Tick Resolution         <32768-0xFFFFFFFF>
-//  <i>Please specify the system timer frequency here. The frequency determins the period of 1 systmer timer tick. For example, 1000 means tick resolution is 1ms. 1000000 means tick resolution is us.
-#define VSF_SYSTIMER_RESOLUTION             1000000ul
 //  <h> Kernel Resource Configuration
 
 //      <h> Kernal event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
-//#define VSF_OS_EVTQ_POOL_SIZE               16
+//#define VSF_OS_CFG_EVTQ_POOL_SIZE                         16
 
-//          <o>The number of event queues   <1-4>
+//          <o>The number of preemptive priorities <1-4>
 //          <i>Simon, please add description here...
-#define VSF_OS_EVTQ_NUM                     1
+//#define VSF_OS_CFG_PRIORITY_NUM                           2
 //      </h>
-
-//      <o>The number of Software Interrupts <1-2>
-//      <i>Simon, please add description here...
-#define VSF_OS_EVTQ_SWI_NUM                 1
-
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks. 
-//#define VSF_TASK_DEFAULT_FRAME_POOL_SIZE    16
-
-//      <o>The heap size                    <256-0xFFFFFFFF>
-//      <i>Specify the vsf heap size
-#define VSF_HEAP_SIZE                       8192
+//#define VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE           16
 //  </h>
-
 
 //! @}
 
 //! \name kernel feature configuration
 //! @{
 //  <h> Kernel Feature Configuration
-
 //      <h> Main Function
 //          <o>Main Stack Size              <128-65536:8>
 //          <i>When main function is configured as a thread, this option controls the size of the stack.
-#define VSF_OS_CFG_MAIN_STACK_SIZE          1024
+#define VSF_OS_CFG_MAIN_STACK_SIZE              2048
 
 //          <c1>Run main as a thread
 //          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
-#define VSF_OS_CFG_RUN_MAIN_AS_THREAD       ENABLED
+#define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_THREAD
 //          </c>
 //      </h>
 //  </h>
 //! @}
-
-
-
-
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

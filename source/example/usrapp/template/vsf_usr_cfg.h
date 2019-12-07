@@ -24,11 +24,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//#define ASSERT(...)         if (!(__VA_ARGS__)) {while(1);};
+//#define ASSERT(...)         if (!(__VA_ARGS__)) {SAFE_ATOM_CODE() {while(1);}};
 #define ASSERT(...)
-
-//! for test only ...
-#define VSF_GET_MAIN_CLK()              (20000000)
 
 #define VSF_SYSTIMER_FREQ               25000000ul
 
@@ -50,8 +47,10 @@
 
 //          <o>The number of preemptive priorities <1-4>
 //          <i>Simon, please add description here...
-//#define VSF_OS_CFG_PRIORITY_NUM                       9
+//#define VSF_OS_CFG_PRIORITY_NUM                         1
 //      </h>
+
+//#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks. 

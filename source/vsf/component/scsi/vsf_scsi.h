@@ -38,7 +38,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_scsi_t)
+declare_simple_class(vk_scsi_t)
 
 enum scsi_sensekey_t {
     SCSI_SENSEKEY_NO_SENSE                      = 0,
@@ -99,21 +99,21 @@ enum scsi_cmd_code_t {
 };
 typedef enum scsi_cmd_code_t scsi_cmd_code_t;
 
-struct vsf_scsi_drv_t {
+struct i_scsi_drv_t {
     void (*init)(uintptr_t target, vsf_evt_t evt);
     void (*fini)(uintptr_t target, vsf_evt_t evt);
-    bool (*buffer)(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
+    bool (*buffer)(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
     void (*execute)(uintptr_t target, vsf_evt_t evt);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
     void (*execute_stream)(uintptr_t target, vsf_evt_t evt);
 #endif
 };
-typedef struct vsf_scsi_drv_t vsf_scsi_drv_t;
+typedef struct i_scsi_drv_t i_scsi_drv_t;
 
 
-def_simple_class(vsf_scsi_t) {
+def_simple_class(vk_scsi_t) {
     public_member(
-        const vsf_scsi_drv_t *drv;
+        const i_scsi_drv_t *drv;
         void *param;
     )
 
@@ -140,16 +140,16 @@ def_simple_class(vsf_scsi_t) {
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_scsi_init(vsf_scsi_t *pthis);
-extern vsf_err_t vsf_scsi_fini(vsf_scsi_t *pthis);
+extern vsf_err_t vk_scsi_init(vk_scsi_t *pthis);
+extern vsf_err_t vk_scsi_fini(vk_scsi_t *pthis);
 // used to get mem from driver, if supported
-extern bool vsf_scsi_prepare_buffer(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
-extern vsf_err_t vsf_scsi_execute(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
+extern bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
+extern vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-extern vsf_err_t vsf_scsi_execute_stream(vsf_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream);
+extern vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream);
 #endif
 
-extern vsf_err_t vsf_scsi_get_errcode(vsf_scsi_t *pthis, uint32_t *reply_len);
+extern vsf_err_t vk_scsi_get_errcode(vk_scsi_t *pthis, uint32_t *reply_len);
 
 #endif      // VSF_USE_SCSI
 #endif      // __VSF_SCSI_H__

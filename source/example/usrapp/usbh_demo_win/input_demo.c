@@ -26,7 +26,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void input_demo_trace_hid(vsf_hid_event_t *hid_evt)
+static void input_demo_trace_hid(vk_hid_event_t *hid_evt)
 {
     if (hid_evt->id != 0) {
         uint_fast16_t generic_usage, usage_page, usage_id;
@@ -40,7 +40,7 @@ static void input_demo_trace_hid(vsf_hid_event_t *hid_evt)
     }
 }
 
-static void input_demo_trace_gamepad(vsf_gamepad_evt_t *gamepad_evt)
+static void input_demo_trace_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     if (gamepad_evt->id != GAMEPAD_ID_DUMMY) {
         vsf_trace(VSF_TRACE_DEBUG, "gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
@@ -48,7 +48,7 @@ static void input_demo_trace_gamepad(vsf_gamepad_evt_t *gamepad_evt)
     }
 }
 
-static void input_demo_trace_touchscreen(vsf_touchscreen_evt_t* ts_evt)
+static void input_demo_trace_touchscreen(vk_touchscreen_evt_t* ts_evt)
 {
     vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
         VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt),
@@ -57,19 +57,19 @@ static void input_demo_trace_touchscreen(vsf_touchscreen_evt_t* ts_evt)
         VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt));
 }
 
-static void input_demo_trace_keyboard(vsf_keyboard_evt_t* kb_evt)
+static void input_demo_trace_keyboard(vk_keyboard_evt_t* kb_evt)
 {
     vsf_trace(VSF_TRACE_DEBUG, "keyboard: %d %s" VSF_TRACE_CFG_LINEEND,
         VSF_INPUT_KEYBOARD_GET_KEYCODE(kb_evt),
         VSF_INPUT_KEYBOARD_IS_DOWN(kb_evt) ? "down" : "up");
 }
 
-static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
+static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
 {
     int16_t gyro_pitch = 0, gyro_yaw = 0, gyro_roll = 0, acc_x = 0, acc_y = 0, acc_z = 0;
     uint_fast32_t value_cnt = 0, pos = 0;
     uint8_t *buffer = sensor_evt->data;
-    vsf_sensor_item_info_t *info;
+    vk_sensor_item_info_t *info;
 
     for (uint_fast8_t i = 0; i < sensor_evt->desc.item_num; i++) {
         info = &sensor_evt->desc.item_info[i];
@@ -79,17 +79,17 @@ static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
             switch (info->subid) {
             case SENSOR_SUBID_PITCH:
                 ASSERT(info->bitlen == 16);
-                gyro_pitch = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                gyro_pitch = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_YAW:
                 ASSERT(info->bitlen == 16);
-                gyro_yaw = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                gyro_yaw = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_ROLL:
                 ASSERT(info->bitlen == 16);
-                gyro_roll = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                gyro_roll = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             }
@@ -98,17 +98,17 @@ static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
             switch (info->subid) {
             case SENSOR_SUBID_X:
                 ASSERT(info->bitlen == 16);
-                acc_x = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                acc_x = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_Y:
                 ASSERT(info->bitlen == 16);
-                acc_y = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                acc_y = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_Z:
                 ASSERT(info->bitlen == 16);
-                acc_z = vsf_input_buf_get_value(buffer, pos, info->bitlen);
+                acc_z = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             }
@@ -123,27 +123,27 @@ static void input_demo_trace_sensor(vsf_sensor_evt_t *sensor_evt)
     }
 }
 
-void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *event)
+void vk_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
 {
     switch (type) {
 #if VSF_USE_INPUT_HID == ENABLED
     case VSF_INPUT_TYPE_HID:
-        input_demo_trace_hid((vsf_hid_event_t *)event);
+        input_demo_trace_hid((vk_hid_event_t *)event);
         break;
 #endif
     case VSF_INPUT_TYPE_SENSOR:
-        input_demo_trace_sensor((vsf_sensor_evt_t *)event);
+        input_demo_trace_sensor((vk_sensor_evt_t *)event);
         break;
-    case VSF_INPUT_TYPE_TOUCHSCREEN:
-        input_demo_trace_touchscreen((vsf_touchscreen_evt_t*)event);
+    case vk_input_type_tOUCHSCREEN:
+        input_demo_trace_touchscreen((vk_touchscreen_evt_t*)event);
         break;
 #if VSF_USE_INPUT_DS4 == ENABLED
     case VSF_INPUT_TYPE_DS4:
-        input_demo_trace_gamepad((vsf_gamepad_evt_t *)event);
+        input_demo_trace_gamepad((vk_gamepad_evt_t *)event);
         break;
 #endif
     case VSF_INPUT_TYPE_KEYBOARD:
-        input_demo_trace_keyboard((vsf_keyboard_evt_t*)event);
+        input_demo_trace_keyboard((vk_keyboard_evt_t*)event);
         break;
     default:
         break;

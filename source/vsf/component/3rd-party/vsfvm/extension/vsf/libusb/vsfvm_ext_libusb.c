@@ -22,8 +22,8 @@
 #if     ((VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED))\
     &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_LIBUSB == ENABLED)
 
-#define VSF_USBH_INHERIT_vsf_usbh_urb_t
-#define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
+#define VSF_USBH_INHERIT_vk_usbh_urb_t
+#define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
 #define __VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT_CLASS
 // TODO: use dedicated include
@@ -45,10 +45,10 @@
 /*============================ TYPES =========================================*/
 
 struct vsfvm_ext_libusb_dev_t {
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
     vsfvm_instance_t *inst;
     vsf_slist_node_t dev_node;
-    vsf_usbh_urb_t urb;
+    vk_usbh_urb_t urb;
     uint8_t cur_address;
 };
 typedef struct vsfvm_ext_libusb_dev_t vsfvm_ext_libusb_dev_t;
@@ -96,7 +96,7 @@ extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 static void vsfvm_ext_libusb_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     if (evt >= VSF_EVT_USER) {
-        vsf_usbh_libusb_dev_t *ldev = vsf_eda_get_cur_msg();
+        vk_usbh_libusb_dev_t *ldev = vsf_eda_get_cur_msg();
         vsfvm_var_t argv[2] = {
             {
                 .type   = VSFVM_VAR_TYPE_VALUE,
@@ -107,7 +107,7 @@ static void vsfvm_ext_libusb_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         switch (evt) {
         case VSFVM_LIBUSB_EVT_ON_ARRIVED:
             if (vsfvm_ext_libusb.callback_registered) {
-                if (!vsf_usbh_libusb_open(ldev)) {
+                if (!vk_usbh_libusb_open(ldev)) {
                     argv[0].value = VSF_USBH_LIBUSB_EVT_ON_ARRIVED;
                     argv[1].type = VSFVM_VAR_TYPE_INSTANCE;
                     argv[1].inst = vsfvm_instance_alloc(sizeof(vsfvm_ext_libusb_dev_t), &vsfvm_ext_libusb_dev);
@@ -119,7 +119,7 @@ static void vsfvm_ext_libusb_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         vsf_slist_append(vsfvm_ext_libusb_dev_t, dev_node, &vsfvm_ext_libusb.dev_list, ext_ldev);
                         vsfvm_runtime_call_callback(&vsfvm_ext_libusb.callback, dimof(argv), (vsfvm_var_t *)&argv);
                     } else {
-                        vsf_usbh_libusb_close(ldev);
+                        vk_usbh_libusb_close(ldev);
                     }
                 }
             }
@@ -140,7 +140,7 @@ static void vsfvm_ext_libusb_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static void vsfvm_ext_libusb_on_evt(void *param, vsf_usbh_libusb_dev_t *ldev, vsf_usbh_libusb_evt_t evt)
+static void vsfvm_ext_libusb_on_evt(void *param, vk_usbh_libusb_dev_t *ldev, vk_usbh_libusb_evt_t evt)
 {
     switch (evt) {
     case VSF_USBH_LIBUSB_EVT_ON_ARRIVED:
@@ -160,7 +160,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_start(vsfvm_thread_t *thread)
         vsf_slist_init(&vsfvm_ext_libusb.dev_list);
         vsfvm_ext_libusb.fn.evthandler = vsfvm_ext_libusb_evthandler;
         vsf_eda_init(&vsfvm_ext_libusb.use_as__vsf_eda_t, VSFVM_CFG_PRIORITY, false);
-        vsf_usbh_libusb_set_evthandler(&vsfvm_ext_libusb, vsfvm_ext_libusb_on_evt);
+        vk_usbh_libusb_set_evthandler(&vsfvm_ext_libusb, vsfvm_ext_libusb_on_evt);
     }
 
     vsfvm_ext_libusb.callback_registered = vsfvm_runtime_register_callback(&vsfvm_ext_libusb.callback, thread, func);
@@ -171,7 +171,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_address(vsfvm_thread_t *thread)
 {
     vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
     vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
 
     if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
         return VSFVM_RET_ERROR;
@@ -186,7 +186,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_pid(vsfvm_thread_t *thread)
 {
     vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
     vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
 
     if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
         return VSFVM_RET_ERROR;
@@ -201,7 +201,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_vid(vsfvm_thread_t *thread)
 {
     vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
     vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
 
     if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
         return VSFVM_RET_ERROR;
@@ -216,7 +216,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_ifs(vsfvm_thread_t *thread)
 {
     vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
     vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
 
     if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
         return VSFVM_RET_ERROR;
@@ -231,7 +231,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_reset(vsfvm_thread_t *thread)
 {
     vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
     vsfvm_ext_libusb_dev_t *ext_ldev;
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
 
     if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
         return VSFVM_RET_ERROR;
@@ -240,7 +240,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_reset(vsfvm_thread_t *thread)
     ext_ldev = thiz->inst->pObj;
     ext_ldev->cur_address = 0;
     ldev = ext_ldev->ldev;
-    vsf_usbh_reset_dev(ldev->usbh, ldev->dev);
+    vk_usbh_reset_dev(ldev->usbh, ldev->dev);
     return VSFVM_RET_FINISHED;
 }
 
@@ -252,7 +252,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
     vsfvm_var_t *result = vsfvm_get_func_argu_ref(thread, 2);
     uint_fast8_t epnum;
     vsfvm_ext_libusb_dev_t *ext_ldev;
-    vsf_usbh_urb_t *urb;
+    vk_usbh_urb_t *urb;
 
     if (    (NULL == ep) || (argc != (ep->uval8 ? 6 : 10))
         ||  !vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
@@ -264,7 +264,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
     urb = epnum > 0 ? &ext_ldev->urb : &ext_ldev->ldev->dev->ep0.urb;
 
     if (!thread->fn.evthandler) {
-        vsf_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
+        vk_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
         bool is_in = (ep->uval8 & USB_DIR_MASK) == USB_DIR_IN;
 
         vsfvm_var_t *length;
@@ -279,12 +279,12 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
         }
 
         if (epnum != 0) {
-            vsf_usbh_eppipe_t pipe = vsf_usbh_urb_get_pipe(urb);
+            vk_usbh_eppipe_t pipe = vk_usbh_urb_get_pipe(urb);
             if ((pipe.endpoint == epnum) && ((bool)pipe.dir_in1out0 == is_in)) {
-                vsf_usbh_free_urb(ldev->usbh, urb);
+                vk_usbh_free_urb(ldev->usbh, urb);
                 // TODO: implement pipe array in ldev
-                //      vsf_usbh_urb_prepare_by_pipe(urb, ldev->dev, ldev->pipe[(is_in ? 16 : 0) + epnum]);
-                if (vsf_usbh_alloc_urb(ldev->usbh, ldev->dev, urb)) {
+                //      vk_usbh_urb_prepare_by_pipe(urb, ldev->dev, ldev->pipe[(is_in ? 16 : 0) + epnum]);
+                if (vk_usbh_alloc_urb(ldev->usbh, ldev->dev, urb)) {
                     goto ret_fail;
                 }
             }
@@ -292,16 +292,16 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
 
         if (length->uval32 > 0) {
             if (!buffer->inst) { return VSFVM_RET_ERROR; }
-            vsf_usbh_urb_set_buffer(urb, buffer->inst->pchBuffer, length->uval32);
+            vk_usbh_urb_set_buffer(urb, buffer->inst->pchBuffer, length->uval32);
         } else {
-            vsf_usbh_urb_set_buffer(urb, NULL, 0);
+            vk_usbh_urb_set_buffer(urb, NULL, 0);
         }
 
         // update address
         if (ext_ldev->cur_address != ldev->dev->devnum) {
-            vsf_usbh_eppipe_t pipe = vsf_usbh_urb_get_pipe(urb);
+            vk_usbh_eppipe_t pipe = vk_usbh_urb_get_pipe(urb);
             ldev->dev->devnum = pipe.address = ext_ldev->cur_address;
-            vsf_usbh_urb_set_pipe(urb, pipe);
+            vk_usbh_urb_set_pipe(urb, pipe);
         }
 
         thread->fn.evthandler = vsfvm_ext_libusb_evthandler;
@@ -322,7 +322,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
             };
 
             vsfvm_var_t *flags = vsfvm_get_func_argu_ref(thread, 9);
-            if (vsf_usbh_control_msg_ex(ldev->usbh, ldev->dev, &req, flags->uval16, &thread->use_as__vsf_eda_t)) {
+            if (vk_usbh_control_msg_ex(ldev->usbh, ldev->dev, &req, flags->uval16, &thread->use_as__vsf_eda_t)) {
                 goto ret_fail;
             } else if ( ((USB_RECIP_DEVICE | USB_DIR_OUT) == req.bRequestType)
                     &&  (USB_REQ_SET_ADDRESS == req.bRequest)) {
@@ -331,7 +331,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
             }
         } else {
             vsfvm_var_t *flags = vsfvm_get_func_argu_ref(thread, 5);
-            if (vsf_usbh_submit_urb_ex(ldev->usbh, urb, flags->uval16, &thread->use_as__vsf_eda_t)) {
+            if (vk_usbh_submit_urb_ex(ldev->usbh, urb, flags->uval16, &thread->use_as__vsf_eda_t)) {
                 goto ret_fail;
             }
         }
@@ -340,9 +340,9 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
         __vsf_eda_fini(&thread->use_as__vsf_eda_t);
         thread->fn.evthandler = NULL;
 
-        vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vsf_usbh_urb_get_status(urb));
+        vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vk_usbh_urb_get_status(urb));
         if (URB_OK == result->value) {
-            vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vsf_usbh_urb_get_actual_length(urb));
+            vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vk_usbh_urb_get_actual_length(urb));
         }
 
         return VSFVM_RET_FINISHED;
@@ -383,7 +383,7 @@ static void vsfvm_ext_libusb_dev_print(vsfvm_instance_t *inst)
 {
     if (vsfvm_instance_of(inst, &vsfvm_ext_libusb_dev)) {
         vsfvm_ext_libusb_dev_t *ext_ldev = inst->pObj;
-        vsf_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
+        vk_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
 
         vsf_trace(VSF_TRACE_INFO, "libusb_dev@(%02X_%04X:%04X:%02X)",
                     ldev->address, ldev->vid, ldev->pid, ldev->ifs);
@@ -398,7 +398,7 @@ static void vsfvm_ext_libusb_dev_destroy(vsfvm_instance_t *inst)
 
     vsf_slist_remove(vsfvm_ext_libusb_dev_t, dev_node, &vsfvm_ext_libusb.dev_list, ext_ldev);
     if (ext_ldev->ldev != NULL) {
-        vsf_usbh_libusb_close(ext_ldev->ldev);
+        vk_usbh_libusb_close(ext_ldev->ldev);
     }
 }
 

@@ -16,7 +16,6 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "app_cfg.h"
-#include "vsf.h"
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
@@ -36,18 +35,14 @@ def_vsf_pt(user_pt_sub_t,
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 def_vsf_task(user_sub_task_t,
-    def_params(
-        /*! \note when you want to use fsm_rt_asyn, you need a dedicated chState
-         *        rather than using vsf_task_state by default.
-         */
-        uint8_t chState;        
+    def_params(      
         uint32_t cnt;
     ));
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-declare_vsf_thread(user_thread_a_t)
-def_vsf_thread(user_thread_a_t, 1024);
+declare_vsf_thread(user_thread_b_t)
+def_vsf_thread(user_thread_b_t, 1024);
 
 
 #endif
@@ -63,30 +58,43 @@ def_vsf_pt(user_pt_task_t,
     #endif
     #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
         &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        vsf_thread(user_thread_a_t) thread_task;
+        vsf_thread(user_thread_b_t) thread_task;
     #endif
     ));
     
 
 
     
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD
 declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
         uint32_t cnt;
         vsf_sem_t *psem;
     ));
+#else
+declare_vsf_thread(user_thread_a_t)
+
+def_vsf_thread(user_thread_a_t, 1024,
+
+    features_used(
+        mem_sharable( )
+        mem_nonsharable( )
+    )
+    
+    def_params(
+        vsf_sem_t *psem;
+    ));
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t user_sem;
+static NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-implement_vsf_thread(user_thread_a_t)
+implement_vsf_thread(user_thread_b_t)
 {
     printf("run thread...delay 100ms...");
     vsf_delay_ms(100);
@@ -104,7 +112,7 @@ private implement_vsf_pt(user_pt_sub_t)
     vsf_pt_end();
 }
 
-#define RESET_FSM()     do {this.chState = 0;} while(0)
+#define RESET_FSM()     do {vsf_task_state = 0;} while(0)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 private implement_vsf_task(user_sub_task_t)
@@ -118,10 +126,10 @@ private implement_vsf_task(user_sub_task_t)
     /*! \note when you want to use fsm_rt_asyn, you need a dedicated chState
      *        rather than using vsf_task_state by default.
      */
-    switch (this.chState) {
+    switch (vsf_task_state) {
         case START:
             this.cnt = 0;
-            this.chState = PRINT_PROGRESS;
+            vsf_task_state = PRINT_PROGRESS;
             printf("\r\n[");
             //break;
         case PRINT_PROGRESS:
@@ -160,7 +168,7 @@ private implement_vsf_pt(user_pt_task_t)
     #endif
     
     #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        this.progress_task.chState = 0;
+        prepare_vsf_task(user_sub_task_t,&this.progress_task);
         do {
             fsm_rt_t ret;
             vsf_pt_call_task(user_sub_task_t, &this.progress_task, &ret);
@@ -173,7 +181,7 @@ private implement_vsf_pt(user_pt_task_t)
     
     #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
         &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        vsf_pt_call_thread(user_thread_a_t, &(this.thread_task));
+        vsf_pt_call_thread(user_thread_b_t, &(this.thread_task));
     #endif
         
     }
@@ -181,7 +189,7 @@ private implement_vsf_pt(user_pt_task_t)
     vsf_pt_end();
 }
 
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD
 private implement_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
@@ -194,26 +202,39 @@ private implement_vsf_pt(user_pt_task_b_t)
     
     vsf_pt_end();
 }
+#else
+implement_vsf_thread(user_thread_a_t) 
+{
+    uint32_t cnt = 0;
+    while (1) {
+        vsf_delay_ms(10000);
+        printf("post semaphore...   [%08x]\r\n", cnt++);
+        vsf_sem_post(&__user_sem);            //!< post a semaphore
+    }
+}
+
 #endif
 
-void vsf_kernel_task_cross_call_demo(void)
+void vsf_kernel_pt_simple_demo(void)
 {  
     //! initialise semaphore
-    vsf_sem_init(&user_sem, 0); 
+    vsf_sem_init(&__user_sem, 0); 
     
     //! start a user task
     {
         static NO_INIT user_pt_task_t __user_pt;
-        __user_pt.param.psem = &user_sem;
-        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_priority_inherit);
+        __user_pt.param.psem = &__user_sem;
+        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_0);
     };
 
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
-    uint32_t cnt = 0;
-    while(1) {
-        vsf_delay_ms(10000);
-        printf("post semaphore...   [%08x]\r\n", cnt++);
-        vsf_sem_post(&user_sem);            //!< post a semaphore
+#if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                                \
+    &&  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+    
+    //! start the user task a
+    {
+        static NO_INIT user_thread_a_t __user_task_a;
+        __user_task_a.param.psem = &__user_sem;
+        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
 #else
     //! in this case, we only use main to initialise vsf_tasks
@@ -221,9 +242,9 @@ void vsf_kernel_task_cross_call_demo(void)
     //! start a user task b
     {
         static NO_INIT user_pt_task_b_t __user_pt_task_b;
-        __user_pt_task_b.param.psem = &user_sem;
+        __user_pt_task_b.param.psem = &__user_sem;
         __user_pt_task_b.param.cnt = 0;
-        init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_priority_0);
+        init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_prio_0);
     }
 #endif
 }
@@ -240,9 +261,10 @@ int main(void)
 
     vsf_stdio_init();
     
-    vsf_kernel_task_cross_call_demo();
+    vsf_kernel_pt_simple_demo();
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);

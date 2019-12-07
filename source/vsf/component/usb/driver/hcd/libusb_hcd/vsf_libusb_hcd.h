@@ -48,7 +48,7 @@ typedef struct vsf_libusb_hcd_param_t vsf_libusb_hcd_param_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_hcd_drv_t vsf_libusb_hcd_drv;
+extern const vk_usbh_hcd_drv_t vsf_libusb_hcd_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

@@ -21,6 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "./vsf_component_cfg.h"
 
+#include "./crypto/hash/crc/vsf_crc.h"
+
 #include "./mal/vsf_mal.h"
 #include "./scsi/vsf_scsi.h"
 #include "./fs/vsf_fs.h"

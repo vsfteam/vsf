@@ -38,28 +38,28 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_USB_DC_FROM_MUSB_FDRC_IP(__N, __OBJ, __DRV_NAME)                    \
-        __USB_DC_FROM_IP(__N, (__OBJ), __DRV_NAME, vsf_musb_fdrc_usbd)
+        __USB_DC_FROM_IP(__N, (__OBJ), __DRV_NAME, vk_musb_fdrc_usbd)
 
 /*============================ TYPES =========================================*/
 
-struct vsf_musb_fdrc_dcd_param_t {
+struct vk_musb_fdrc_dcd_param_t {
     const i_usb_dc_ip_t *op;
 };
-typedef struct vsf_musb_fdrc_dcd_param_t vsf_musb_fdrc_dcd_param_t;
+typedef struct vk_musb_fdrc_dcd_param_t vk_musb_fdrc_dcd_param_t;
 
-declare_simple_class(vsf_musb_fdrc_dcd_t)
+declare_simple_class(vk_musb_fdrc_dcd_t)
 
-enum vsf_musb_fdrc_dcd_ep0state_t {
+enum vk_musb_fdrc_dcd_ep0state_t {
     MUSB_FDRC_USBD_EP0_IDLE,
     MUSB_FDRC_USBD_EP0_DATA_IN,
     MUSB_FDRC_USBD_EP0_DATA_OUT,
 };
-typedef enum vsf_musb_fdrc_dcd_ep0state_t vsf_musb_fdrc_dcd_ep0state_t;
+typedef enum vk_musb_fdrc_dcd_ep0state_t vk_musb_fdrc_dcd_ep0state_t;
 
-def_simple_class(vsf_musb_fdrc_dcd_t) {
+def_simple_class(vk_musb_fdrc_dcd_t) {
 
     public_member(
-        vsf_musb_fdrc_dcd_param_t const * const param;
+        vk_musb_fdrc_dcd_param_t const * const param;
     )
 
     private_member(
@@ -69,7 +69,7 @@ def_simple_class(vsf_musb_fdrc_dcd_t) {
             void *param;
         } callback;
         uint16_t ep_buf_ptr;
-        vsf_musb_fdrc_dcd_ep0state_t ep0_state;
+        vk_musb_fdrc_dcd_ep0state_t ep0_state;
         bool has_data_stage;
         uint8_t ep_num;
         bool is_dma;
@@ -80,42 +80,42 @@ def_simple_class(vsf_musb_fdrc_dcd_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_musb_fdrc_usbd_init(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg);
-extern void vsf_musb_fdrc_usbd_fini(vsf_musb_fdrc_dcd_t *usbd);
-extern void vsf_musb_fdrc_usbd_reset(vsf_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg);
+extern vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg);
+extern void vk_musb_fdrc_usbd_fini(vk_musb_fdrc_dcd_t *usbd);
+extern void vk_musb_fdrc_usbd_reset(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg);
 
-extern void vsf_musb_fdrc_usbd_connect(vsf_musb_fdrc_dcd_t *usbd);
-extern void vsf_musb_fdrc_usbd_disconnect(vsf_musb_fdrc_dcd_t *usbd);
-extern void vsf_musb_fdrc_usbd_wakeup(vsf_musb_fdrc_dcd_t *usbd);
+extern void vk_musb_fdrc_usbd_connect(vk_musb_fdrc_dcd_t *usbd);
+extern void vk_musb_fdrc_usbd_disconnect(vk_musb_fdrc_dcd_t *usbd);
+extern void vk_musb_fdrc_usbd_wakeup(vk_musb_fdrc_dcd_t *usbd);
 
-extern void vsf_musb_fdrc_usbd_set_address(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t addr);
-extern uint_fast8_t vsf_musb_fdrc_usbd_get_address(vsf_musb_fdrc_dcd_t *usbd);
+extern void vk_musb_fdrc_usbd_set_address(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t addr);
+extern uint_fast8_t vk_musb_fdrc_usbd_get_address(vk_musb_fdrc_dcd_t *usbd);
 
-extern uint_fast16_t vsf_musb_fdrc_usbd_get_frame_number(vsf_musb_fdrc_dcd_t *usbd);
-extern uint_fast8_t vsf_musb_fdrc_usbd_get_mframe_number(vsf_musb_fdrc_dcd_t *usbd);
+extern uint_fast16_t vk_musb_fdrc_usbd_get_frame_number(vk_musb_fdrc_dcd_t *usbd);
+extern uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd);
 
-extern void vsf_musb_fdrc_usbd_get_setup(vsf_musb_fdrc_dcd_t *usbd, uint8_t *buffer);
-extern void vsf_musb_fdrc_usbd_status_stage(vsf_musb_fdrc_dcd_t *usbd, bool is_in);
+extern void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer);
+extern void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in);
 
-extern uint_fast8_t vsf_musb_fdrc_usbd_ep_get_feature(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_add(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
-extern uint_fast16_t vsf_musb_fdrc_usbd_ep_get_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast8_t vk_musb_fdrc_usbd_ep_get_feature(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_add(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
+extern uint_fast16_t vk_musb_fdrc_usbd_ep_get_size(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_set_stall(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
-extern bool vsf_musb_fdrc_usbd_ep_is_stalled(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_clear_stall(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_set_stall(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern bool vk_musb_fdrc_usbd_ep_is_stalled(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_clear_stall(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 
-extern uint_fast32_t vsf_musb_fdrc_usbd_ep_get_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast32_t vk_musb_fdrc_usbd_ep_get_data_size(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
 
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_read_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_enable_out(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_set_data_size(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size);
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_transaction_write_buffer(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_transaction_read_buffer(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_transaction_enable_out(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_transaction_set_data_size(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_transaction_write_buffer(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_transfer_recv(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size);
-extern vsf_err_t vsf_musb_fdrc_usbd_ep_transfer_send(vsf_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_transfer_recv(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size);
+extern vsf_err_t vk_musb_fdrc_usbd_ep_transfer_send(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
 
-extern void vsf_musb_fdrc_usbd_irq(vsf_musb_fdrc_dcd_t *usbd);
+extern void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd);
 
 #endif
 #endif

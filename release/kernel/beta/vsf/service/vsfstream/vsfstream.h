@@ -120,6 +120,7 @@ def_simple_class(vsf_stream_t) {
 /*============================ INCLUDES ======================================*/
 
 #include "./fifo_stream/vsf_fifo_stream.h"
+#include "./mem_stream/vsf_mem_stream.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

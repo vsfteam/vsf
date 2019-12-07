@@ -31,19 +31,19 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void __vsf_queue_init(  vsf_queue_t* ptObj, 
+void __vsf_rng_buf_init(  vsf_rng_buf_t* ptObj, 
                         uint_fast16_t hwBufferItemCount, 
                         bool bInitAsFull)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
-    memset(ptObj, 0, sizeof(vsf_queue_t));
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    memset(ptObj, 0, sizeof(vsf_rng_buf_t));
     this.hwBufferItemCount = hwBufferItemCount;
     this.hwLength = bInitAsFull ? hwBufferItemCount : 0;
 }
 
-int32_t __vsf_queue_enqueue_one(vsf_queue_t *ptObj)
+int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
 
     ASSERT( NULL != ptObj);
@@ -63,9 +63,9 @@ int32_t __vsf_queue_enqueue_one(vsf_queue_t *ptObj)
     return nIndex;
 }
 
-int32_t __vsf_queue_dequeue_one(vsf_queue_t* ptObj)
+int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
 
     ASSERT(NULL != ptObj);
@@ -90,20 +90,20 @@ int32_t __vsf_queue_dequeue_one(vsf_queue_t* ptObj)
     return nIndex;
 }
 
-SECTION(".text.vsf.utilities.__vsf_queue_item_count")
-uint_fast16_t __vsf_queue_item_count(vsf_queue_t* ptObj)
+SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
+uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
 
     ASSERT(NULL != ptObj);
 
     return this.hwLength;
 }
 
-SECTION(".text.vsf.utilities.__vsf_queue_enqueue_multiple")
-int32_t __vsf_queue_enqueue_multiple(vsf_queue_t *ptObj, uint16_t *phwItemCount)
+SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *ptObj, uint16_t *phwItemCount)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
     uint_fast16_t hwWritten = 0;
     uint_fast16_t hwSpaceLeft;
@@ -134,10 +134,10 @@ int32_t __vsf_queue_enqueue_multiple(vsf_queue_t *ptObj, uint16_t *phwItemCount)
     return nIndex;
 }
 
-SECTION(".text.vsf.utilities.__vsf_queue_dequeue_multiple")
-int32_t __vsf_queue_dequeue_multiple(vsf_queue_t* ptObj, uint16_t* phwItemCount)
+SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
+int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
     uint_fast16_t hwRead = 0;
 
@@ -172,10 +172,10 @@ int32_t __vsf_queue_dequeue_multiple(vsf_queue_t* ptObj, uint16_t* phwItemCount)
 }
 
 
-SECTION(".text.vsf.utilities.__vsf_queue_peek_one")
-int32_t __vsf_queue_peek_one(vsf_queue_t* ptObj)
+SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
+int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
 
     ASSERT(NULL != ptObj);
@@ -196,10 +196,10 @@ int32_t __vsf_queue_peek_one(vsf_queue_t* ptObj)
 }
 
 
-SECTION(".text.vsf.utilities.__vsf_queue_item_count_peekable")
-uint_fast16_t __vsf_queue_item_count_peekable(vsf_queue_t* ptObj)
+SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
+uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
 
     ASSERT(NULL != ptObj);
 
@@ -207,10 +207,10 @@ uint_fast16_t __vsf_queue_item_count_peekable(vsf_queue_t* ptObj)
 }
 
 
-SECTION(".text.vsf.utilities.__vsf_queue_peek_multiple")
-int32_t __vsf_queue_peek_multiple(vsf_queue_t* ptObj, uint16_t* phwItemCount)
+SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
 {
-    class_internal(ptObj, ptThis, vsf_queue_t);
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
     uint_fast16_t hwItemLeft;
     uint_fast16_t hwPeeked  = 0;

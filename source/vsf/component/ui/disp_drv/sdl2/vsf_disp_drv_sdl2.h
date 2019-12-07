@@ -45,10 +45,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_disp_sdl2_t)
+declare_simple_class(vk_disp_sdl2_t)
 
-def_simple_class(vsf_disp_sdl2_t) {
-    implement(vsf_disp_t);
+def_simple_class(vk_disp_sdl2_t) {
+    implement(vk_disp_t);
 
     public_member(
         uint8_t                     amplifier;
@@ -56,7 +56,7 @@ def_simple_class(vsf_disp_sdl2_t) {
 
     private_member(
         vsf_arch_irq_thread_t       thread;
-        vsf_disp_area_t             area;
+        vk_disp_area_t             area;
         void                        *disp_buff;
 
         SDL_Window                  *window;
@@ -67,7 +67,7 @@ def_simple_class(vsf_disp_sdl2_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_disp_drv_t vsf_disp_drv_sdl2;
+extern const vk_disp_drv_t vk_disp_drv_sdl2;
 
 /*============================ PROTOTYPES ====================================*/
 

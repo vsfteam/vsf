@@ -320,22 +320,22 @@ enum {
 
 #if 0
 #define WEAK_VSF_INPUT_ON_EVT_EVTERN                                            \
-        extern void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt);
+        extern void vk_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
 #define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
-        vsf_input_on_evt((__TYPE), (__EVT))
+        vk_input_on_evt((__TYPE), (__EVT))
 
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
+        extern void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vsf_input_on_touchscreen((__TS_EVT))
+        vk_input_on_touchscreen((__TS_EVT))
 
 #   define WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN                                     \
-        extern void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt);
+        extern void vk_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 #   define WEAK_VSF_INPUT_ON_GAMEPAD(__GAMEPAD_EVT)                             \
-        vsf_input_on_gamepad((__GAMEPAD_EVT))
+        vk_input_on_gamepad((__GAMEPAD_EVT))
 
 #define WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN                                     \
-        extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id);
+        extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id);
 #define WEAK_VSF_BLUETOOTH_H2_ON_NEW(__DEV, __ID)                               \
         vsf_bluetooth_h2_on_new((__DEV), (__ID))
 #endif
@@ -350,19 +350,19 @@ enum {
 
 
 #define WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN                                       \
-        extern void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id);
+        extern void vk_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id);
 #define WEAK_VSF_USBH_BTHCI_ON_NEW(__DEV, __ID)                                 \
-        vsf_usbh_bthci_on_new((__DEV), (__ID))
+        vk_usbh_bthci_on_new((__DEV), (__ID))
 
 #define WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN                                       \
-        extern void vsf_usbh_bthci_on_del(void *dev);
+        extern void vk_usbh_bthci_on_del(void *dev);
 #define WEAK_VSF_USBH_BTHCI_ON_DEL(__DEV)                                       \
-        vsf_usbh_bthci_on_del((__DEV))
+        vk_usbh_bthci_on_del((__DEV))
 
 #define WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN                                    \
-        extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
+        extern void vk_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
 #define WEAK_VSF_USBH_BTHCI_ON_PACKET(__DEV, __TYPE, __PACKET, __SIZE)          \
-        vsf_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
+        vk_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
 
 
 // on idle

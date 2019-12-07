@@ -168,19 +168,10 @@ extern vsf_err_t vsf_arch_swi_init( uint_fast8_t idx,
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(bswap_8)
-uint_fast8_t bswap_8(uint_fast8_t value8)
-{
-    value8 = ((value8 >> 1) & 0x55) | ((value8 << 1) & 0xAA);
-    value8 = ((value8 >> 2) & 0x33) | ((value8 << 2) & 0xCC);
-    value8 = ((value8 >> 4) & 0x0F) | ((value8 << 4) & 0xF0);
-    return value8;
-}
-
 WEAK(bswap_16)
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {
-    return ((uint_fast16_t)bswap_8(value16) << 8) | (uint_fast16_t)bswap_8(value16 >> 8);
+    return ((uint_fast16_t)(value16 & 0x00FF) << 8) | ((uint_fast16_t)(value16 & 0xFF00) >> 8);
 }
 
 WEAK(bswap_32)

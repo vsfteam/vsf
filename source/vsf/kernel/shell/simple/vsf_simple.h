@@ -55,7 +55,7 @@
 #   endif
 #else
 #   define static_task_instance(...)                                            \
-        struct {uint_fast8_t __canery;__VA_ARGS__;                              \
+        struct {uint_fast8_t chState;__VA_ARGS__;                               \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);
             

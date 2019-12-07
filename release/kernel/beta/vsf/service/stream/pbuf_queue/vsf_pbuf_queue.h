@@ -49,7 +49,7 @@
 
 declare_class(vsf_stream_fifo_t)
 
-typedef struct {
+typedef struct vsf_stream_fifo_cfg_t {
     vsf_stream_dat_rdy_evt_t        tDataReadyEventHandling;
     vsf_stream_dat_drn_evt_t        tDataDrainEventHandling;
     struct {

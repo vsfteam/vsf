@@ -43,7 +43,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_dwcotg_param_t {
+struct vk_dwcotg_param_t {
     union {
         struct {
             uint8_t speed : 4;
@@ -54,9 +54,9 @@ struct vsf_dwcotg_param_t {
         uint8_t feature;
     };
 };
-typedef struct vsf_dwcotg_param_t vsf_dwcotg_param_t;
+typedef struct vk_dwcotg_param_t vk_dwcotg_param_t;
 
-struct vsf_dwcotg_reg_t {
+struct vk_dwcotg_reg_t {
     // Core Global registers starting at offset 000h
 	struct dwcotg_core_global_regs_t *global_regs;
     union {
@@ -81,21 +81,21 @@ struct vsf_dwcotg_reg_t {
     };
     uint32_t * dfifo[VSF_DWCOTG_DCD_CFG_EP_NUM];
 };
-typedef struct vsf_dwcotg_reg_t vsf_dwcotg_reg_t;
+typedef struct vk_dwcotg_reg_t vk_dwcotg_reg_t;
 
-struct vsf_dwcotg_t {
-    vsf_dwcotg_reg_t reg;
+struct vk_dwcotg_t {
+    vk_dwcotg_reg_t reg;
     uint8_t ep_num;
 };
-typedef struct vsf_dwcotg_t vsf_dwcotg_t;
+typedef struct vk_dwcotg_t vk_dwcotg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-void vsf_dwcotg_phy_init(vsf_dwcotg_t *dwcotg,
-                        const vsf_dwcotg_param_t *param,
-                        vsf_dwcotg_hw_info_t *hw_info);
+void vk_dwcotg_phy_init(vk_dwcotg_t *dwcotg,
+                        const vk_dwcotg_param_t *param,
+                        vk_dwcotg_hw_info_t *hw_info);
 
 #endif
 #endif

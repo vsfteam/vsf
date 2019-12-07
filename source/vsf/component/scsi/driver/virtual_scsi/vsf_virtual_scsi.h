@@ -38,7 +38,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_virtual_scsi_t)
+declare_simple_class(vk_virtual_scsi_t)
 
 enum vsf_virtual_scsi_drv_type_t {
     VSF_VIRTUAL_SCSI_DRV_NORMAL,
@@ -46,31 +46,31 @@ enum vsf_virtual_scsi_drv_type_t {
 };
 typedef enum vsf_virtual_scsi_drv_type_t vsf_virtual_scsi_drv_type_t;
 
-struct vsf_virtual_scsi_drv_t {
+struct i_virtual_scsi_drv_t {
     uint8_t drv_type        : 4;
     uint8_t feaature        : 4;
     union {
         struct {
-            bool (*buffer)(vsf_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem);
+            bool (*buffer)(vk_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem);
             void (*init)(void);
             void (*read)(void);
             void (*write)(void);
         };
         struct {
-            bool (*buffer)(vsf_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem);
-            vsf_err_t (*init)(vsf_scsi_t *scsi);
-            vsf_err_t (*read)(vsf_scsi_t *scsi, uint_fast64_t addr, uint_fast32_t size);
-            vsf_err_t (*write)(vsf_scsi_t *scsi, uint_fast64_t addr, uint_fast32_t size);
+            bool (*buffer)(vk_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem);
+            vsf_err_t (*init)(vk_scsi_t *scsi);
+            vsf_err_t (*read)(vk_scsi_t *scsi, uint_fast64_t addr, uint_fast32_t size);
+            vsf_err_t (*write)(vk_scsi_t *scsi, uint_fast64_t addr, uint_fast32_t size);
         } normal;
         struct {
-            bool (*buffer)(vsf_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem);
+            bool (*buffer)(vk_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem);
             void (*init)(uintptr_t target, vsf_evt_t evt);
             void (*read)(uintptr_t target, vsf_evt_t evt);
             void (*write)(uintptr_t target, vsf_evt_t evt);
         } param_subcall;
     };
 };
-typedef struct vsf_virtual_scsi_drv_t vsf_virtual_scsi_drv_t;
+typedef struct i_virtual_scsi_drv_t i_virtual_scsi_drv_t;
 
 enum scsi_pdt_t {
     SCSI_PDT_DIRECT_ACCESS_BLOCK                = 0x00,
@@ -78,7 +78,7 @@ enum scsi_pdt_t {
 };
 typedef enum scsi_pdt_t scsi_pdt_t;
 
-struct vsf_virtual_scsi_param_t {
+struct vk_virtual_scsi_param_t {
     uint32_t block_size;
     uint32_t block_num;
     char vendor[8];
@@ -87,12 +87,12 @@ struct vsf_virtual_scsi_param_t {
     bool removable;
     scsi_pdt_t type;
 };
-typedef struct vsf_virtual_scsi_param_t vsf_virtual_scsi_param_t;
+typedef struct vk_virtual_scsi_param_t vk_virtual_scsi_param_t;
 
-def_simple_class(vsf_virtual_scsi_t) {
-    implement(vsf_scsi_t)
+def_simple_class(vk_virtual_scsi_t) {
+    implement(vk_scsi_t)
     public_member(
-        const vsf_virtual_scsi_drv_t *virtual_scsi_drv;
+        const i_virtual_scsi_drv_t *virtual_scsi_drv;
     )
 
     protected_member(
@@ -114,7 +114,7 @@ def_simple_class(vsf_virtual_scsi_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_scsi_drv_t vsf_virtual_scsi_drv;
+extern const i_scsi_drv_t VK_VIRTUAL_SCSI_DRV;
 
 /*============================ PROTOTYPES ====================================*/
 

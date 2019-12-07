@@ -16,7 +16,6 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "app_cfg.h"
-#include "vsf.h"
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
@@ -24,7 +23,7 @@
 /*============================ TYPES =========================================*/
 declare_vsf_thread(user_thread_a_t)
 
-def_vsf_thread(user_thread_a_t, 512,
+def_vsf_thread(user_thread_a_t, 1024,
 
     features_used(
         mem_sharable( )
@@ -37,7 +36,7 @@ def_vsf_thread(user_thread_a_t, 512,
 
 declare_vsf_thread(user_thread_b_t)
 
-def_vsf_thread(user_thread_b_t, 512,
+def_vsf_thread(user_thread_b_t, 1024,
 
     features_used(
         mem_sharable( )
@@ -64,14 +63,14 @@ void vsf_kernel_thread_simple_demo(void)
     {
         static NO_INIT user_thread_a_t __user_task_a;
         __user_task_a.param.psem = &user_sem;
-        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_priority_0);
+        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
     
     //! start the user task b
     {
         static NO_INIT user_thread_b_t __user_task_b;
         __user_task_b.param.psem = &user_sem;
-        init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_priority_0);
+        init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_prio_0);
     }
 }
 
@@ -110,10 +109,12 @@ int main(void)
     
     vsf_kernel_thread_simple_demo();
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
+    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay_ms(1000);
+        vsf_delay_ms(10000);
+        //vsf_yield();
     }
 #else
     return 0;

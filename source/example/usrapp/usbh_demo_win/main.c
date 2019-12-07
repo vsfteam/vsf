@@ -36,33 +36,33 @@ struct usrapp_const_t {
 typedef struct usrapp_const_t usrapp_const_t;
 
 struct usrapp_t {
-    vsf_usbh_t usbh;
+    vk_usbh_t usbh;
 #if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    vsf_usbh_class_t ecm;
+    vk_usbh_class_t ecm;
 #endif
 #if VSF_USE_USB_HOST_BTHCI == ENABLED
-    vsf_usbh_class_t bthci;
+    vk_usbh_class_t bthci;
 #endif
 #if VSF_USE_USB_HOST_HID == ENABLED
-    vsf_usbh_class_t hid;
+    vk_usbh_class_t hid;
 #endif
 #if VSF_USE_USB_HOST_DS4 == ENABLED
-    vsf_usbh_class_t ds4;
+    vk_usbh_class_t ds4;
 #endif
 #if VSF_USE_USB_HOST_NSPRO == ENABLED
-    vsf_usbh_class_t nspro;
+    vk_usbh_class_t nspro;
 #endif
 #if VSF_USE_USB_HOST_XB360 == ENABLED
-    vsf_usbh_class_t xb360;
+    vk_usbh_class_t xb360;
 #endif
 #if VSF_USE_USB_HOST_XB1 == ENABLED
-    vsf_usbh_class_t xb1;
+    vk_usbh_class_t xb1;
 #endif
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
     struct {
-        vsf_disp_sdl2_t disp;
-        vsf_touchscreen_evt_t ts_evt;
+        vk_disp_sdl2_t disp;
+        vk_touchscreen_evt_t ts_evt;
         lv_disp_buf_t disp_buf;
         lv_color_t color[LV_VER_RES_MAX][LV_HOR_RES_MAX];
     } ui;
@@ -70,8 +70,8 @@ struct usrapp_t {
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     struct {
-        vsf_disp_sdl2_t disp;
-        vsf_touchscreen_evt_t ts_evt;
+        vk_disp_sdl2_t disp;
+        vk_touchscreen_evt_t ts_evt;
         vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
     } ui;
 #endif
@@ -93,25 +93,25 @@ static usrapp_t usrapp = {
     .usbh.param                 = (void *)&usrapp_const.libusb_hcd_param,
 
 #if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    .ecm.drv                    = &vsf_usbh_ecm_drv,
+    .ecm.drv                    = &vk_usbh_ecm_drv,
 #endif
 #if VSF_USE_USB_HOST_BTHCI == ENABLED
-    .bthci.drv                  = &vsf_usbh_bthci_drv,
+    .bthci.drv                  = &vk_usbh_bthci_drv,
 #endif
 #if VSF_USE_USB_HOST_HID == ENABLED
-    .hid.drv                    = &vsf_usbh_hid_drv,
+    .hid.drv                    = &vk_usbh_hid_drv,
 #endif
 #if VSF_USE_USB_HOST_DS4 == ENABLED
-    .ds4.drv                    = &vsf_usbh_ds4_drv,
+    .ds4.drv                    = &vk_usbh_ds4_drv,
 #endif
 #if VSF_USE_USB_HOST_NSPRO == ENABLED
-    .nspro.drv                  = &vsf_usbh_nspro_drv,
+    .nspro.drv                  = &vk_usbh_nspro_drv,
 #endif
 #if VSF_USE_USB_HOST_XB360 == ENABLED
-    .xb360.drv                  = &vsf_usbh_xb360_drv,
+    .xb360.drv                  = &vk_usbh_xb360_drv,
 #endif
 #if VSF_USE_USB_HOST_XB1 == ENABLED
-    .xb1.drv                    = &vsf_usbh_xb1_drv,
+    .xb1.drv                    = &vk_usbh_xb1_drv,
 #endif
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
@@ -119,7 +119,7 @@ static usrapp_t usrapp = {
         .param                  = {
             .height             = LV_VER_RES_MAX,
             .width              = LV_HOR_RES_MAX,
-            .drv                = &vsf_disp_drv_sdl2,
+            .drv                = &vk_disp_drv_sdl2,
             .color              = VSF_DISP_COLOR_RGB565,
         },
         .amplifier              = 2,
@@ -131,7 +131,7 @@ static usrapp_t usrapp = {
         .param                  = {
             .height             = VSF_TGUI_VER_MAX,
             .width              = VSF_TGUI_HOR_MAX,
-            .drv                = &vsf_disp_drv_sdl2,
+            .drv                = &vk_disp_drv_sdl2,
             .color              = VSF_DISP_COLOR_ARGB8888,
         },
         .amplifier              = 1,
@@ -148,10 +148,14 @@ extern void ui_demo_start(void);
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
-void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
+void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
-    if (ts_evt->dev == &usrapp.ui.disp) {
+    if (0 == VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt)) {
         usrapp.ui.ts_evt = *ts_evt;
+//        vsf_trace(VSF_TRACE_DEBUG, "ts: (%d, %d) %s" VSF_TRACE_CFG_LINEEND,
+//                VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
+//                VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
+//                VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) ? "down" : "up");
     }
 }
 
@@ -173,27 +177,27 @@ int main(int argc, char *argv[])
     vsf_trace_init(NULL);
     vsf_stdio_init();
 
-    vsf_usbh_init(&usrapp.usbh);
+    vk_usbh_init(&usrapp.usbh);
 #if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.ecm);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.ecm);
 #endif
 #if VSF_USE_USB_HOST_BTHCI == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.bthci);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.bthci);
 #endif
 #if VSF_USE_USB_HOST_HID == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.hid);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.hid);
 #endif
 #if VSF_USE_USB_HOST_DS4 == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.ds4);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.ds4);
 #endif
 #if VSF_USE_USB_HOST_NSPRO == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.nspro);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.nspro);
 #endif
 #if VSF_USE_USB_HOST_XB360 == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.xb360);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.xb360);
 #endif
 #if VSF_USE_USB_HOST_XB1 == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh, &usrapp.xb1);
+    vk_usbh_register_class(&usrapp.usbh, &usrapp.xb1);
 #endif
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
@@ -217,7 +221,7 @@ int main(int argc, char *argv[])
     disp_drv.flush_cb = vsf_lvgl_disp_flush;
     disp_drv.buffer = &usrapp.ui.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
-    vsf_lvgl_bind(&usrapp.ui.disp.use_as__vsf_disp_t, &disp->driver);
+    vsf_lvgl_bind(&usrapp.ui.disp.use_as__vk_disp_t, &disp->driver);
 
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
@@ -232,7 +236,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-	extern void vsf_tgui_bind(vsf_disp_t * disp, void* ui_data);
+	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data);
 	vsf_tgui_bind(&usrapp.ui.disp, &usrapp.ui.color);
 #endif
     return 0;

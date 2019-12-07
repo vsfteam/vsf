@@ -224,7 +224,7 @@ void vsf_kernel_pt_simple_demo(void)
     {
         static NO_INIT user_pt_task_t __user_pt;
         __user_pt.param.psem = &__user_sem;
-        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_inherit);
+        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_0);
     };
 
 #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                                \

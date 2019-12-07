@@ -43,10 +43,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbd_hid_t)
-declare_simple_class(vsf_usbd_hid_report_t)
+declare_simple_class(vk_usbd_hid_t)
+declare_simple_class(vk_usbd_hid_report_t)
 
-def_simple_class(vsf_usbd_hid_report_t) {
+def_simple_class(vk_usbd_hid_report_t) {
 
     public_member(
         usb_hid_report_type_t type;
@@ -61,7 +61,7 @@ def_simple_class(vsf_usbd_hid_report_t) {
     )
 };
 
-def_simple_class(vsf_usbd_hid_t) {
+def_simple_class(vk_usbd_hid_t) {
 
     public_member(
         uint8_t ep_out;
@@ -72,11 +72,11 @@ def_simple_class(vsf_usbd_hid_t) {
         uint8_t notify_eda      : 1;
 
         vsf_mem_t rx_buffer;
-        vsf_usbd_hid_report_t *reports;
-        vsf_usbd_desc_t *desc;
+        vk_usbd_hid_report_t *reports;
+        vk_usbd_desc_t *desc;
 
         union {
-            vsf_err_t (*on_report)(vsf_usbd_hid_t *hid, vsf_usbd_hid_report_t *report);
+            vsf_err_t (*on_report)(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
             vsf_eda_t *eda;
         };
     )
@@ -88,24 +88,24 @@ def_simple_class(vsf_usbd_hid_t) {
 
         bool busy;
 
-        vsf_usbd_trans_t transact_in;
-        vsf_usbd_trans_t transact_out;
+        vk_usbd_trans_t transact_in;
+        vk_usbd_trans_t transact_out;
         vsf_teda_t teda;
 
-        vsf_usbd_dev_t *dev;
-        vsf_usbd_ifs_t *ifs;
+        vk_usbd_dev_t *dev;
+        vk_usbd_ifs_t *ifs;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbd_class_op_t vsf_usbd_HID;
+extern const vk_usbd_class_op_t vk_usbd_HID;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vsf_usbh_hid_in_report_can_update(vsf_usbd_hid_report_t *report);
-extern void vsf_usbd_hid_in_report_changed(vsf_usbd_hid_t *hid, vsf_usbd_hid_report_t *report);
-extern void vsf_usbh_hid_out_report_processed(vsf_usbd_hid_t *hid, vsf_usbd_hid_report_t *report);
+extern bool vk_usbh_hid_in_report_can_update(vk_usbd_hid_report_t *report);
+extern void vk_usbd_hid_in_report_changed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
+extern void vk_usbh_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_HID
 #endif      // __VSF_USBD_HID_H__

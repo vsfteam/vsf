@@ -31,10 +31,10 @@ enum {
     VSF_INPUT_TYPE_MOUSE = VSF_INPUT_USER_TYPE,
 };
 
-struct vsf_mouse_evt_t {
-    implement(vsf_input_evt_t)
+struct vk_mouse_evt_t {
+    implement(vk_input_evt_t)
 };
-typedef struct vsf_mouse_evt_t vsf_mouse_evt_t;
+typedef struct vk_mouse_evt_t vk_mouse_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

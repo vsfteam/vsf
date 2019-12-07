@@ -31,7 +31,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_class_drv_t vsf_usbh_ecm_drv;
+extern const vk_usbh_class_drv_t vk_usbh_ecm_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

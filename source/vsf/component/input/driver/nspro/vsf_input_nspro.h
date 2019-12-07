@@ -35,22 +35,22 @@ enum {
     VSF_INPUT_TYPE_NSPRO = VSF_INPUT_USER_TYPE,
 };
 
-struct vsf_input_nspro_t {
+struct vk_input_nspro_t {
     vsf_usb_nspro_gamepad_in_report_t data;
-    vsf_input_timestamp_t timestamp;
+    vk_input_timestamp_t timestamp;
 };
-typedef struct vsf_input_nspro_t vsf_input_nspro_t;
+typedef struct vk_input_nspro_t vk_input_nspro_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_input_item_info_t vsf_nspro_gamepad_item_info[GAMEPAD_ID_NUM];
-extern const vsf_sensor_item_info_t vsf_nspro_sensor_item_info[6];
+extern const vk_input_item_info_t vk_nspro_gamepad_item_info[GAMEPAD_ID_NUM];
+extern const vk_sensor_item_info_t vk_nspro_sensor_item_info[6];
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_nspro_process_input(vsf_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data);
-extern void vsf_nspro_new_dev(vsf_input_nspro_t *dev);
-extern void vsf_nspro_free_dev(vsf_input_nspro_t *dev);
+extern void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data);
+extern void vk_nspro_new_dev(vk_input_nspro_t *dev);
+extern void vk_nspro_free_dev(vk_input_nspro_t *dev);
 
 #endif      // VSF_USE_INPUT && VSF_USE_INPUT_NSPRO
 #endif      // __VSF_INPUT_NSPRO_H__

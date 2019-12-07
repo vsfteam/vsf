@@ -37,7 +37,7 @@ extern int btstack_main(int argc, const char * argv[]);
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
+vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
     btstack_memory_init();
     btstack_run_loop_init(btstack_run_loop_vsf_get_instance());

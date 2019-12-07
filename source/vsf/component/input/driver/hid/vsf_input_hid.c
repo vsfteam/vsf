@@ -98,11 +98,11 @@ WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_HID_ON_NEW_DEV
-WEAK(vsf_hid_on_new_dev)
-void vsf_hid_on_new_dev(vsf_input_hid_t *dev)
+WEAK(vk_hid_on_new_dev)
+void vk_hid_on_new_dev(vk_input_hid_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
-    vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
+    vk_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
 #   else
     WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_HID, dev);
 #   endif
@@ -110,11 +110,11 @@ void vsf_hid_on_new_dev(vsf_input_hid_t *dev)
 #endif
 
 #ifndef WEAK_VSF_HID_ON_FREE_DEV
-WEAK(vsf_hid_on_free_dev)
-void vsf_hid_on_free_dev(vsf_input_hid_t *dev)
+WEAK(vk_hid_on_free_dev)
+void vk_hid_on_free_dev(vk_input_hid_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
-    vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
+    vk_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
 #   else
     WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_HID, dev);
 #   endif
@@ -122,22 +122,22 @@ void vsf_hid_on_free_dev(vsf_input_hid_t *dev)
 #endif
 
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-WEAK(vsf_hid_on_report_input)
-void vsf_hid_on_report_input(vsf_hid_event_t *hid_evt)
+WEAK(vk_hid_on_report_input)
+void vk_hid_on_report_input(vk_hid_event_t *hid_evt)
 {
 #ifndef WEAK_VSF_INPUT_ON_EVT
-    vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vsf_input_evt_t);
+    vk_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
 #else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vsf_input_evt_t);
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
 #endif
 }
 #endif
 
-static vsf_hid_report_t * vsf_hid_get_report(vsf_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
+static vk_hid_report_t * vk_hid_get_report(vk_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
 {
-    vsf_hid_report_t *report = NULL;
+    vk_hid_report_t *report = NULL;
 
-    __vsf_slist_foreach_unsafe(vsf_hid_report_t, report_node, &dev->report_list) {
+    __vsf_slist_foreach_unsafe(vk_hid_report_t, report_node, &dev->report_list) {
         if ((_->type == type) && (_->id == desc->report_id)) {
             report = _;
             break;
@@ -148,7 +148,7 @@ static vsf_hid_report_t * vsf_hid_get_report(vsf_input_hid_t *dev, hid_desc_t *d
         report = vsf_heap_malloc(sizeof(*report));
         if (report != NULL) {
             memset(report, 0, sizeof(*report));
-            vsf_slist_add_to_head(vsf_hid_report_t, report_node, &dev->report_list, report);
+            vsf_slist_add_to_head(vk_hid_report_t, report_node, &dev->report_list, report);
             report->type = type;
             report->id = (desc->report_id >= 0) ? desc->report_id : -1;
             report->generic_usage = desc->generic_usage;
@@ -157,11 +157,11 @@ static vsf_hid_report_t * vsf_hid_get_report(vsf_input_hid_t *dev, hid_desc_t *d
     return report;
 }
 
-static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
+static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
         hid_desc_t *desc, uint_fast8_t tag, uint_fast32_t size, uint8_t *buf)
 {
-    vsf_hid_report_t *report;
-    vsf_hid_usage_t *usage;
+    vk_hid_report_t *report;
+    vk_hid_usage_t *usage;
     uint_fast32_t value, ival;
 
     if (size == 1) {
@@ -174,12 +174,12 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
 
     switch (tag) {
         case HID_ITEM_INPUT:
-            report = vsf_hid_get_report(dev, desc, HID_ITEM_INPUT);
+            report = vk_hid_get_report(dev, desc, HID_ITEM_INPUT);
             if (!report) { return VSF_ERR_FAIL; }
 
             if ((desc->usage_min != -1) && (desc->usage_max != -1)) {
                 desc->usage_num = desc->usage_max - desc->usage_min + 1;
-                usage = vsf_heap_malloc(sizeof(vsf_hid_usage_t));
+                usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                 if (usage == NULL) { return VSF_ERR_FAIL; }
 
                 usage->data_flag = value;
@@ -195,13 +195,13 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
                 usage->logical_min = desc->logical_min;
                 usage->logical_max = desc->logical_max;
 
-                vsf_slist_append(vsf_hid_usage_t, usage_node, &report->usage_list, usage);
+                vsf_slist_append(vk_hid_usage_t, usage_node, &report->usage_list, usage);
 
                 desc->usage_min = -1;
                 desc->usage_max = -1;
             } else {
                 for (int i = 0; i < desc->report_count; i++) {
-                    usage = vsf_heap_malloc(sizeof(vsf_hid_usage_t));
+                    usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                     if (usage == NULL) { return VSF_ERR_FAIL; }
 
                     usage->report_size = (int32_t)desc->report_size;
@@ -217,7 +217,7 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
                     usage->logical_min = desc->logical_min;
                     usage->logical_max = desc->logical_max;
 
-                    vsf_slist_append(vsf_hid_usage_t, usage_node, &report->usage_list, usage);
+                    vsf_slist_append(vk_hid_usage_t, usage_node, &report->usage_list, usage);
                 }
             }
 
@@ -226,12 +226,12 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
             break;
 
         case HID_ITEM_OUTPUT:
-            report = vsf_hid_get_report(dev, desc, HID_ITEM_OUTPUT);
+            report = vk_hid_get_report(dev, desc, HID_ITEM_OUTPUT);
             if (!report) { return VSF_ERR_FAIL; }
 
             if ((desc->usage_min != -1) && (desc->usage_max != -1)) {
                 desc->usage_num = desc->usage_max - desc->usage_min + 1;
-                usage = vsf_heap_malloc(sizeof(vsf_hid_usage_t));
+                usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                 if (usage == NULL) { return VSF_ERR_FAIL; }
 
                 usage->report_size = desc->report_size;
@@ -247,13 +247,13 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
                 usage->logical_min = desc->logical_min;
                 usage->logical_max = desc->logical_max;
 
-                vsf_slist_append(vsf_hid_usage_t, usage_node, &report->usage_list, usage);
+                vsf_slist_append(vk_hid_usage_t, usage_node, &report->usage_list, usage);
 
                 desc->usage_min = -1;
                 desc->usage_max = -1;
             } else {
                 for (int i = 0; i < desc->usage_num; i++) {
-                    usage = vsf_heap_malloc(sizeof(vsf_hid_usage_t));
+                    usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                     if (usage == NULL) { return VSF_ERR_FAIL; }
 
                     usage->report_size = desc->report_size;
@@ -270,7 +270,7 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
                     usage->logical_min = desc->logical_min;
                     usage->logical_max = desc->logical_max;
 
-                    vsf_slist_append(vsf_hid_usage_t, usage_node, &report->usage_list, usage);
+                    vsf_slist_append(vk_hid_usage_t, usage_node, &report->usage_list, usage);
                 }
             }
 
@@ -279,7 +279,7 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
             break;
 
         case HID_ITEM_FEATURE:
-            report = vsf_hid_get_report(dev, desc, HID_ITEM_FEATURE);
+            report = vk_hid_get_report(dev, desc, HID_ITEM_FEATURE);
             if (!report) { return VSF_ERR_FAIL; }
             break;
 
@@ -370,28 +370,28 @@ static vsf_err_t vsf_hid_parse_item(vsf_input_hid_t *dev,
     return VSF_ERR_NONE;
 }
 
-void vsf_hid_new_dev(vsf_input_hid_t *dev)
+void vk_hid_new_dev(vk_input_hid_t *dev)
 {
 #ifndef WEAK_VSF_HID_ON_NEW_DEV
-    vsf_hid_on_new_dev(dev);
+    vk_hid_on_new_dev(dev);
 #else
     WEAK_VSF_HID_ON_NEW_DEV(dev);
 #endif
 }
 
-void vsf_hid_free_dev(vsf_input_hid_t *dev)
+void vk_hid_free_dev(vk_input_hid_t *dev)
 {
-    vsf_hid_report_t *report;
+    vk_hid_report_t *report;
 
 #ifndef WEAK_VSF_HID_ON_FREE_DEV
-    vsf_hid_on_free_dev(dev);
+    vk_hid_on_free_dev(dev);
 #else
     WEAK_VSF_HID_ON_FREE_DEV(dev);
 #endif
 
-    __vsf_slist_foreach_next_unsafe(vsf_hid_report_t, report_node, &dev->report_list) {
+    __vsf_slist_foreach_next_unsafe(vk_hid_report_t, report_node, &dev->report_list) {
         report = _;
-        __vsf_slist_foreach_next_unsafe(vsf_hid_usage_t, usage_node, &report->usage_list) {
+        __vsf_slist_foreach_next_unsafe(vk_hid_usage_t, usage_node, &report->usage_list) {
             vsf_heap_free(_);
         }
 
@@ -402,11 +402,11 @@ void vsf_hid_free_dev(vsf_input_hid_t *dev)
     }
 }
 
-static uint_fast32_t vsf_hid_get_max_input_size(vsf_input_hid_t *dev)
+static uint_fast32_t vk_hid_get_max_input_size(vk_input_hid_t *dev)
 {
     uint_fast32_t maxsize = 0;
 
-    __vsf_slist_foreach_unsafe(vsf_hid_report_t, report_node, &dev->report_list) {
+    __vsf_slist_foreach_unsafe(vk_hid_report_t, report_node, &dev->report_list) {
         if (_->bitlen > maxsize) {
             maxsize = _->bitlen;
         }
@@ -414,7 +414,7 @@ static uint_fast32_t vsf_hid_get_max_input_size(vsf_input_hid_t *dev)
     return (maxsize + 7) >> 3;
 }
 
-uint_fast32_t vsf_hid_parse_desc(vsf_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t len)
+uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t len)
 {
     hid_desc_t *desc = vsf_heap_malloc(sizeof(hid_desc_t));
     uint8_t *end = desc_buf + len;
@@ -427,13 +427,13 @@ uint_fast32_t vsf_hid_parse_desc(vsf_input_hid_t *dev, uint8_t *desc_buf, uint_f
     desc->usage_min = -1;
     desc->usage_max = -1;
 
-    memset(dev, 0, sizeof(vsf_input_hid_t));
+    memset(dev, 0, sizeof(vk_input_hid_t));
     while (desc_buf < end) {
         if (HID_LONG_ITEM(*desc_buf)) {
             item_size = *(desc_buf + 1);
         } else {
             item_size = HID_ITEM_SIZE(*desc_buf);
-            err = vsf_hid_parse_item(dev, desc, HID_ITEM_TAG(*desc_buf), item_size, desc_buf + 1);
+            err = vk_hid_parse_item(dev, desc, HID_ITEM_TAG(*desc_buf), item_size, desc_buf + 1);
             if (err) { break; }
         }
         desc_buf += (item_size + 1);
@@ -443,25 +443,25 @@ uint_fast32_t vsf_hid_parse_desc(vsf_input_hid_t *dev, uint8_t *desc_buf, uint_f
         goto free_hid_report;
     }
     vsf_heap_free(desc);
-    return vsf_hid_get_max_input_size(dev);
+    return vk_hid_get_max_input_size(dev);
 
 free_hid_report:
     vsf_heap_free(desc);
-    vsf_hid_free_dev(dev);
+    vk_hid_free_dev(dev);
     return 0;
 }
 
-void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
+void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
 {
-    vsf_hid_report_t *report = NULL;
-    vsf_hid_event_t event;
+    vk_hid_report_t *report = NULL;
+    vk_hid_event_t event;
     uint_fast32_t cur_value, pre_value;
     bool reported = false;
     int_fast16_t id = dev->report_has_id ? *buf++ : -1;
     int_fast32_t i;
     uint_fast16_t usage_page, usage_id;
 
-    __vsf_slist_foreach_unsafe(vsf_hid_report_t, report_node, &dev->report_list) {
+    __vsf_slist_foreach_unsafe(vk_hid_report_t, report_node, &dev->report_list) {
         if ((_->type == HID_ITEM_INPUT) && (_->id == id)) {
             report = _;
             break;
@@ -477,13 +477,13 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
         memset(report->value, 0, len);
     }
 
-    event.duration = vsf_input_update_timestamp(&dev->timestamp);
+    event.duration = vk_input_update_timestamp(&dev->timestamp);
     event.dev = dev;
-    __vsf_slist_foreach_unsafe(vsf_hid_usage_t, usage_node, &report->usage_list) {
+    __vsf_slist_foreach_unsafe(vk_hid_usage_t, usage_node, &report->usage_list) {
         for (i = 0; i < _->report_count; ++i) {
             /* get usage value */
-            cur_value = vsf_input_buf_get_value(buf, _->bit_offset + i * _->report_size, _->report_size);
-            pre_value = vsf_input_buf_get_value(report->value, _->bit_offset + i * _->report_size, _->report_size);
+            cur_value = vk_input_buf_get_value(buf, _->bit_offset + i * _->report_size, _->report_size);
+            pre_value = vk_input_buf_get_value(report->value, _->bit_offset + i * _->report_size, _->report_size);
 
             /* compare and process */
             if (cur_value != (HID_USAGE_IS_REL(_) ? 0 : pre_value)) {
@@ -497,7 +497,7 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
 
                 reported = true;
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-                vsf_hid_on_report_input(&event);
+                vk_hid_on_report_input(&event);
 #else
                 WEAK_VSF_HID_ON_REPORT_INPUT(&event);
 #endif
@@ -509,7 +509,7 @@ void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len
     if (reported) {
         event.id = 0;
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-        vsf_hid_on_report_input(&event);
+        vk_hid_on_report_input(&event);
 #else
         WEAK_VSF_HID_ON_REPORT_INPUT(&event);
 #endif

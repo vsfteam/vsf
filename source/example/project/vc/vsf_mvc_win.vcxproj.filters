@@ -262,14 +262,44 @@
     <Filter Include="usrapp\mvc_demo_win\tgui_demo\images">
       <UniqueIdentifier>{f709acb0-ec27-4191-922d-dfe077b19de7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\mvc_demo_win\tgui_demo\fonts">
-      <UniqueIdentifier>{f01f6faf-4ab0-4005-8899-08a4980ef18e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\service\pool">
       <UniqueIdentifier>{87ee7aca-817c-4250-9053-4cdfbff8546a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype">
+      <UniqueIdentifier>{3f57793a-0965-402b-9be7-acab10039a28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1">
+      <UniqueIdentifier>{ba6bef7c-7daf-4243-944d-e788f32b477a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw">
+      <UniqueIdentifier>{8a3664c5-76de-4f64-9cce-5204fd8367d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\port">
+      <UniqueIdentifier>{9312a9a2-6edd-485a-94f8-59d7be66c7e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\src">
+      <UniqueIdentifier>{6a473376-ab05-4f0a-b1ba-511c0ffae47d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES">
+      <UniqueIdentifier>{bb741321-19fc-4478-b95c-5e19ac9b9f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\port\config">
+      <UniqueIdentifier>{5c567e4b-0790-44f9-b7af-dd5c0dd37d39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\include">
+      <UniqueIdentifier>{3326a08a-3d6d-448c-80d1-5b932eaa0161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype">
+      <UniqueIdentifier>{c1db5d65-daac-4da8-8b99-606396a14a6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal">
+      <UniqueIdentifier>{b097e932-73fc-411a-96fa-23e3a6d50579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services">
+      <UniqueIdentifier>{958f215d-6876-434c-9670-b8faac6367d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -966,9 +996,6 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
       <Filter>vsf\kernel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\fonts\demo_font.h">
-      <Filter>usrapp\mvc_demo_win\tgui_demo\fonts</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
     </ClInclude>
@@ -992,6 +1019,285 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h">
       <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlist.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlzw.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmac.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmm.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmodapi.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmoderr.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftotval.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftoutln.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftparams.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftpfr.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftrender.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsizes.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsnames.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftstroke.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsynth.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsystem.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttrigon.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttypes.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftwinfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\t1tables.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\freetype.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftadvanc.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbbox.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbdf.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbitmap.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbzip2.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcache.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftchapters.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcid.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcolor.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftdriver.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrdef.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrors.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftfntfmt.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgasp.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftglyph.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgxval.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgzip.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftimage.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftincrem.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlcdfil.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\autohint.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cffotypes.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cfftypes.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftcalc.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdebug.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdrv.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftgloadr.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fthash.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftmemory.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftobjs.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftpsprop.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftrfork.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftserv.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftstream.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fttrace.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftvalid.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\internal.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\psaux.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\pshints.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\sfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\t1types.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\tttypes.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\wofftypes.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgxval.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svkern.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmetric.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmm.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svotval.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpfr.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpostnm.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svprop.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpscmap.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpsinfo.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svsfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttcmap.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svtteng.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttglyf.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svwinfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svbdf.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcfftl.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcid.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svfntfmt.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgldict.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1524,9 +1830,6 @@
     <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\fonts\demo_font.c">
-      <Filter>usrapp\mvc_demo_win\tgui_demo\fonts</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
     </ClCompile>
@@ -1538,6 +1841,129 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
       <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\autofit\autofit.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbase.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cff\cff.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\truetype\truetype.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type42\type42.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type1\type1.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\smooth\smooth.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\sfnt\sfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\raster\raster.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psnames\psnames.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pshinter\pshinter.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psaux\psaux.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pfr\pfr.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pcf\pcf.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\otvalid\otvalid.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\lzw\ftlzw.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gzip\ftgzip.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gxvalid\gxvalid.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cid\type1cid.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cache\ftcache.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bzip2\ftbzip2.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bdf\bdf.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbbox.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbdf.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbitmap.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftcid.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftfstype.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgasp.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftglyph.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftpfr.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftstroke.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsynth.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\fttype1.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftwinfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgxval.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftmm.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftotval.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsystem.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftinit.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\builds\windows\ftdebug.c">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -44,12 +44,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbh_ds4_t)
+declare_simple_class(vk_usbh_ds4_t)
 
-def_simple_class(vsf_usbh_ds4_t) {
-	implement(vsf_usbh_hid_teda_t)
+def_simple_class(vk_usbh_ds4_t) {
+	implement(vk_usbh_hid_teda_t)
 #if VSF_USE_INPUT_DS4 == ENABLED
-    implement(vsf_input_ds4u_t)
+    implement(vk_input_ds4u_t)
 #endif
 
     private_member(
@@ -60,13 +60,13 @@ def_simple_class(vsf_usbh_ds4_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_class_drv_t vsf_usbh_ds4_drv;
+extern const vk_usbh_class_drv_t vk_usbh_ds4_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vsf_usbh_ds4_can_output(vsf_usbh_ds4_t *ds4);
-extern void vsf_usbh_ds4_set_rumble(vsf_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t right);
-extern void vsf_usbh_ds4_set_led(vsf_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b);
+extern bool vk_usbh_ds4_can_output(vk_usbh_ds4_t *ds4);
+extern void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t right);
+extern void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b);
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_DS4
 #endif      // __VSF_USBH_DS4_H__

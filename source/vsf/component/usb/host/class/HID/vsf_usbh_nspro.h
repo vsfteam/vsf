@@ -44,40 +44,40 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbh_nspro_t)
+declare_simple_class(vk_usbh_nspro_t)
 
-enum vsf_usbh_nspro_state_t {
+enum vk_usbh_nspro_state_t {
     VSF_USBH_NSPRO_GET_INFO,
     VSF_USBH_NSPRO_HANDSHAKE,
     VSF_USBH_NSPRO_RUNNING,
 };
-typedef enum vsf_usbh_nspro_state_t vsf_usbh_nspro_state_t;
+typedef enum vk_usbh_nspro_state_t vk_usbh_nspro_state_t;
 
-enum vsf_usbh_nspro_type_t {
+enum vk_usbh_nspro_type_t {
     NSPRO_LEFT      = 0x01,
     NSPRO_RIGHT     = 0x02,
     NSPRO_BOTH      = 0x03,
 };
-typedef enum vsf_usbh_nspro_type_t vsf_usbh_nspro_type_t;
+typedef enum vk_usbh_nspro_type_t vk_usbh_nspro_type_t;
 
-def_simple_class(vsf_usbh_nspro_t) {
-	implement(vsf_usbh_hid_teda_t)
+def_simple_class(vk_usbh_nspro_t) {
+	implement(vk_usbh_hid_teda_t)
 #if VSF_USE_INPUT_NSPRO == ENABLED
-    implement(vsf_input_nspro_t)
+    implement(vk_input_nspro_t)
 #endif
 
     private_member(
         bool out_idle;
-        vsf_usbh_nspro_state_t start_state;
+        vk_usbh_nspro_state_t start_state;
         uint8_t mac[6];
-        vsf_usbh_nspro_type_t type;
+        vk_usbh_nspro_type_t type;
         vsf_usb_nspro_gamepad_out_report_t gamepad_out_buf;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_class_drv_t vsf_usbh_nspro_drv;
+extern const vk_usbh_class_drv_t vk_usbh_nspro_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

@@ -82,7 +82,7 @@ enum {
     VSF_INPUT_TYPE_HID = VSF_INPUT_USER_TYPE,
 };
 
-struct vsf_hid_usage_t {
+struct vk_hid_usage_t {
     implement_ex(vsf_slist_node_t, usage_node)
 
     uint16_t usage_page;
@@ -96,15 +96,15 @@ struct vsf_hid_usage_t {
     int32_t report_count;
     uint32_t data_flag;
 };
-typedef struct vsf_hid_usage_t vsf_hid_usage_t;
+typedef struct vk_hid_usage_t vk_hid_usage_t;
 
-struct vsf_hid_event_t {
-    implement(vsf_input_evt_t)
-    vsf_hid_usage_t *usage;
+struct vk_hid_event_t {
+    implement(vk_input_evt_t)
+    vk_hid_usage_t *usage;
 };
-typedef struct vsf_hid_event_t vsf_hid_event_t;
+typedef struct vk_hid_event_t vk_hid_event_t;
 
-struct vsf_hid_report_t {
+struct vk_hid_report_t {
     implement_ex(vsf_slist_node_t, report_node)
 
     uint8_t type;
@@ -115,22 +115,22 @@ struct vsf_hid_report_t {
     uint8_t *value;
     vsf_slist_t usage_list;
 };
-typedef struct vsf_hid_report_t vsf_hid_report_t;
+typedef struct vk_hid_report_t vk_hid_report_t;
 
-struct vsf_input_hid_t {
+struct vk_input_hid_t {
     vsf_slist_t report_list;
-    vsf_input_timestamp_t timestamp;
+    vk_input_timestamp_t timestamp;
     bool report_has_id;
 };
-typedef struct vsf_input_hid_t vsf_input_hid_t;
+typedef struct vk_input_hid_t vk_input_hid_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint_fast32_t vsf_hid_parse_desc(vsf_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t desc_len);
-extern void vsf_hid_process_input(vsf_input_hid_t *dev, uint8_t *buf, uint_fast32_t len);
-extern void vsf_hid_new_dev(vsf_input_hid_t *dev);
-extern void vsf_hid_free_dev(vsf_input_hid_t *dev);
+extern uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t desc_len);
+extern void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len);
+extern void vk_hid_new_dev(vk_input_hid_t *dev);
+extern void vk_hid_free_dev(vk_input_hid_t *dev);
 
 #endif      // VSF_USE_INPUT && VSF_USE_INPUT_HID
 #endif      // __VSF_INPUT_HID_H__

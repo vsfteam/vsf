@@ -51,24 +51,33 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
+#define __optimal_bit_sz        (sizeof(uint_fast8_t) * 8)
+#define __optimal_bit_msk       (__optimal_bit_sz - 1)
+
 #define __vsf_bitmap(__name)        __name##_bitmap_t
 
 #define __vsf_declare_bitmap(__name, __bitsize)                                 \
-typedef uint32_t __vsf_bitmap(__name)[((__bitsize) + 31) / 32];
+typedef uint_fast8_t __vsf_bitmap(__name)[                                      \
+            ((__bitsize) + __optimal_bit_sz - 1) / __optimal_bit_sz];
 
-#define __vsf_bitmap_get(__pbitmap, __bit, __pbit_val)                           \
+
+
+#define __vsf_bitmap_get(__pbitmap, __bit, __pbit_val)                          \
     do {                                                                        \
-        *(&(__bit_val)) = __pbitmap[(__bit) >> 5] & (1 << ((__bit) & 0x1F));    \
+        *(&(__bit_val)) =   __pbitmap[(__bit) / __optimal_bit_sz]               \
+                        &   (1 << ((__bit) & __optimal_bit_msk));               \
     } while (0)
 
 #define __vsf_bitmap_set(__pbitmap, __bit)                                      \
     do {                                                                        \
-        (__pbitmap)[(__bit) >> 5] |= (1 << ((__bit) & 0x1F));                   \
+        (__pbitmap)[(__bit) / __optimal_bit_sz] |=                              \
+            (1 << ((__bit) & __optimal_bit_msk));                               \
     } while (0)
 
 #define __vsf_bitmap_clear(__pbitmap, __bit)                                    \
     do {                                                                        \
-        (__pbitmap)[(__bit) >> 5] &= ~(1 << ((__bit) & 0x1F));                  \
+        (__pbitmap)[(__bit) / __optimal_bit_sz] &=                              \
+            ~(1 << ((__bit) & __optimal_bit_msk));                              \
     } while (0)
 
 //! \name bitmap normal access
@@ -79,26 +88,29 @@ typedef uint32_t __vsf_bitmap(__name)[((__bitsize) + 31) / 32];
             __vsf_declare_bitmap(__name, __bitsize)
 
 #define vsf_bitmap_get(__pbitmap, __bit, __pbit_val)                            \
-            __vsf_bitmap_get((uint32_t *)(__pbitmap), (__bit), (__pbit_val))
+            __vsf_bitmap_get((uint_fast8_t *)(__pbitmap), (__bit), (__pbit_val))
 
 #define vsf_bitmap_set(__pbitmap, __bit)                                        \
-            __vsf_bitmap_set((uint32_t *)(__pbitmap), (__bit))
+            __vsf_bitmap_set((uint_fast8_t *)(__pbitmap), (__bit))
 
 #define vsf_bitmap_clear(__pbitmap, __bit)                                      \
-            __vsf_bitmap_clear((uint32_t *)(__pbitmap), (__bit))
+            __vsf_bitmap_clear((uint_fast8_t *)(__pbitmap), (__bit))
 
 #define vsf_bitmap_reset(__pbitmap, __bitsize)                                  \
-            __vsf_bitmap_reset((uint32_t *)(__pbitmap), (__bitsize))
+            __vsf_bitmap_reset((uint_fast8_t *)(__pbitmap), (__bitsize))
 
 #define vsf_bitmap_ffz(__pbitmap, __bitsize)                                    \
-            __vsf_bitmap_ffz((uint32_t *)(__pbitmap), (__bitsize))
+            __vsf_bitmap_ffz((uint_fast8_t *)(__pbitmap), (__bitsize))
 //! @}
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_bitmap_reset(uint32_t *pbitmap, uint_fast16_t bitsize);
-extern int __vsf_bitmap_ffz(uint32_t *pbitmap, uint_fast16_t bitsize);
+#ifndef VSF_FFZ
+extern int_fast16_t ffz(uint_fast8_t);
+#endif
+extern void __vsf_bitmap_reset(uint_fast8_t* pthis, int_fast16_t bitsize);
+extern int_fast16_t __vsf_bitmap_ffz(uint_fast8_t* pbitmap,  int_fast16_t bitsize);
 
 #endif

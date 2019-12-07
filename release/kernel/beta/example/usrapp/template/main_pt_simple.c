@@ -16,7 +16,6 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "app_cfg.h"
-#include "vsf.h"
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
@@ -39,7 +38,9 @@ def_vsf_pt(user_pt_task_t,
         
     ));
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_EDA                        \
+    &&  !(  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
 declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
@@ -83,7 +84,9 @@ private implement_vsf_pt(user_pt_task_t)
     vsf_pt_end();
 }
 
-#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_EDA                        \
+    &&  !(  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
 private implement_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
@@ -107,17 +110,19 @@ void vsf_kernel_pt_simple_demo(void)
     {
         static NO_INIT user_pt_task_t __user_pt;
         __user_pt.param.psem = &user_sem;
-        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_priority_inherit);
+        init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_0);
     };
 
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(10000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
-#else
+#elif   VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_EDA                        \
+    &&  !(  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
     //! in this case, we only use main to initialise vsf_tasks
 
     //! start a user task b
@@ -125,12 +130,13 @@ void vsf_kernel_pt_simple_demo(void)
         static NO_INIT user_pt_task_b_t __user_pt_task_b;
         __user_pt_task_b.param.psem = &user_sem;
         __user_pt_task_b.param.cnt = 0;
-        init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_priority_0);
+        init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_prio_0);
     }
 #endif
 }
 
-#if VSF_PROJ_CFG_USE_CUBE != ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+#   if VSF_PROJ_CFG_USE_CUBE != ENABLED
 int main(void)
 {
     static_task_instance(
@@ -144,14 +150,53 @@ int main(void)
     
     vsf_kernel_pt_simple_demo();
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#       if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
     }
-#else
+#       else
     return 0;
-#endif
+#       endif
+}
+#   endif
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
+    ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
+void main(void)
+{
+    static_task_instance(
+        features_used(
+            mem_sharable( )
+            mem_nonsharable( )
+        )
+        def_params(
+            uint32_t cnt;
+        )
+    )
+
+    vsf_pt_begin()
+
+    vsf_stdio_init();
+    
+    vsf_kernel_pt_simple_demo();
+    
+    this.cnt = 0;
+    while(1) {
+        vsf_pt_wait_until(vsf_delay_ms(10000));
+        printf("post semaphore...   [%08x]\r\n", this.cnt++);
+        vsf_sem_post(&user_sem);            //!< post a semaphore
+    }
+    vsf_pt_end()
+}
+#else 
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_pt_simple_demo();
+    
+    return 0;
 }
 
 #endif

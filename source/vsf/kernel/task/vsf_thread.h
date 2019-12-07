@@ -46,15 +46,15 @@
 #ifndef VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE
 #   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE	    1
 #endif
-#ifndef VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE
-#   define VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE    0
+#ifndef VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE
+#   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE    0
 #endif
 
 #define __VSF_THREAD_STACK_SAFE_SIZE(__STACK)                                   \
             (   (   (   ((__STACK) + VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE - 1) \
                     /   VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE)                  \
                 * VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE)                        \
-            + VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE)
+            + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

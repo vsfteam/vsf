@@ -79,7 +79,7 @@ implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_delay_ms(1);
+        vsf_delay_ms(1000);
         printf("post semaphore...     [%08x]\r\n", cnt++);
         vsf_sem_post(this.psem);            //!< post a semaphore
     }
@@ -114,7 +114,7 @@ int main(void)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_yield();
+        vsf_delay_ms(10000);
     }
 #else
     return 0;

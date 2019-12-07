@@ -293,6 +293,10 @@ typedef enum {
 } pm_divider_t;
 //! @}
 
+typedef enum pm_main_clk_core_div_t pm_main_clk_core_div_t;
+typedef enum pm_main_clk_axi_div_t pm_main_clk_axi_div_t;
+typedef enum pm_main_clk_ahb_div_t pm_main_clk_ahb_div_t;
+typedef enum pm_main_clk_apb_div_t pm_main_clk_apb_div_t;
 
 /*! \note pm_main_clk_cfg_t, CORE_NUM and XXX_CLK_NUM should be defined in 
           device specific header filer device.h
@@ -301,22 +305,40 @@ typedef enum {
 //! \name main clock config sturct
 //! @{
 struct pm_main_clk_cfg_t {
-    pm_clk_src_sel_t    clk_src;                //!< main clock source
-    uint32_t            freq;                   //!< system oscilator frequency
-    uint16_t            core_div[CORE_NUM];     //!< system core clock divider
-    uint16_t            axi_div[AXI_CLK_NUM];   //!< system AXI clock divider
-    uint16_t            ahb_div[AHB_CLK_NUM];   //!< system AHB clock divider
-    uint16_t            apb_div[APB_CLK_NUM];   //!< system APB clock divider
+    pm_clk_src_sel_t    clk_src;                    //!< main clock source
+    uint32_t            freq;                       //!< system oscilator frequency
+    pm_main_clk_core_div_t  core_div[CORE_NUM];     //!< system core clock divider
+    pm_main_clk_axi_div_t   axi_div[AXI_CLK_NUM];   //!< system AXI clock divider
+    pm_main_clk_ahb_div_t   ahb_div[AHB_CLK_NUM];   //!< system AHB clock divider
+    pm_main_clk_apb_div_t   apb_div[APB_CLK_NUM];   //!< system APB clock divider
 };
 //! @}
  */
 typedef struct pm_main_clk_cfg_t pm_main_clk_cfg_t;
 
+typedef enum pm_main_clk_no_t pm_main_clk_no_t;
+
+/*
+enum pm_main_clk_no_t {
+    MCLK_CORE_idx = 0,
+    MCLK_CORE0_idx = 0,
+
+    MCLK_AXI0_idx,
+    MCLK_AXI1_idx,
+
+    MCLK_AHB0_idx,
+    MCLK_AHB1_idx,
+
+    MCLK_APB0_idx,
+    MCLK_APB1_idx
+};
+ */
+
 //! \name main clock struct type
 //! @{
 def_interface(i_pm_main_clk_t)
     fsm_rt_t            (*Init)         (pm_main_clk_cfg_t *tCfg);
-    uint_fast32_t       (*GetClock)     (void);
+    uint_fast32_t       (*GetClock)     (pm_main_clk_no_t tSelect);
 end_def_interface(i_pm_main_clk_t)
 //! @}
 
@@ -351,15 +373,21 @@ struct pm_pll_cfg_t {
 
 typedef struct pm_pll_cfg_t pm_pll_cfg_t;
 
+
+typedef enum pm_pll_post_div_t pm_pll_post_div_t;
+
+/*
 //! \name pll post divider
 //! @{
-typedef enum {
+enum pm_pll_post_div_t {
     PLL_POST_DIV_1              = 0x00,     //!< pll post divider rate is 1
     PLL_POST_DIV_2              = 0x01,     //!< pll post divider rate is 2
     PLL_POST_DIV_4              = 0x02,     //!< pll post divider rate is 4
     PLL_POST_DIV_8              = 0x03,     //!< pll post divider rate is 8
-} pm_pll_post_div_t;
+} ;
 //! @}
+*/
+
 
 //! \name pll struct type
 //! @{

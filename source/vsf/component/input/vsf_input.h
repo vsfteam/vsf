@@ -42,18 +42,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef uint32_t vsf_input_timestamp_t;
+typedef uint32_t vk_input_timestamp_t;
 
-struct vsf_input_item_info_t {
+struct vk_input_item_info_t {
     uint32_t item       : 8;
     uint32_t bitlen     : 7;
     uint32_t is_signed  : 1;
-    uint32_t offset     : 15;
+    uint32_t offset     : 14;
     uint32_t config     : 1;
+    uint32_t endian     : 1;
 };
-typedef struct vsf_input_item_info_t vsf_input_item_info_t;
+typedef struct vk_input_item_info_t vk_input_item_info_t;
 
-union vsf_input_value_t {
+union vk_input_value_t {
     uint32_t bit    : 1;
     uint32_t valu32;
     uint16_t valu16;
@@ -62,30 +63,30 @@ union vsf_input_value_t {
     int16_t val16;
     int8_t val8;
 };
-typedef union vsf_input_value_t vsf_input_value_t;
+typedef union vk_input_value_t vk_input_value_t;
 
-enum vsf_input_type_t {
+enum vk_input_type_t {
     VSF_INPUT_TYPE_UNKNOWN,
 };
-typedef enum vsf_input_type_t vsf_input_type_t;
+typedef enum vk_input_type_t vk_input_type_t;
 
-struct vsf_input_evt_t {
+struct vk_input_evt_t {
     void *dev;
     uint32_t duration;          // duration in ms between pre and cur
     uint64_t id;
-    vsf_input_value_t pre;
-    vsf_input_value_t cur;
+    vk_input_value_t pre;
+    vk_input_value_t cur;
 };
-typedef struct vsf_input_evt_t vsf_input_evt_t;
+typedef struct vk_input_evt_t vk_input_evt_t;
 
-struct vsf_input_parser_t {
-    vsf_input_item_info_t *info;
+struct vk_input_parser_t {
+    vk_input_item_info_t *info;
     uint8_t num;
 
-    vsf_input_value_t pre;
-    vsf_input_value_t cur;
+    vk_input_value_t pre;
+    vk_input_value_t cur;
 };
-typedef struct vsf_input_parser_t vsf_input_parser_t;
+typedef struct vk_input_parser_t vk_input_parser_t;
 
 /*============================ INCLUDES ======================================*/
 
@@ -99,24 +100,24 @@ typedef struct vsf_input_parser_t vsf_input_parser_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint_fast32_t vsf_input_buf_get_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
-extern void vsf_input_buf_set_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len, uint_fast32_t value);
-extern void vsf_input_buf_clear(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
-extern void vsf_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
+extern uint_fast32_t vk_input_buf_get_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
+extern void vk_input_buf_set_value(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len, uint_fast32_t value);
+extern void vk_input_buf_clear(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
+extern void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
 
-extern vsf_input_item_info_t * vsf_input_parse(vsf_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
+extern vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
 
-extern void vsf_input_on_sensor(vsf_sensor_evt_t *sensor_evt);
-extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
-extern void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt);
-extern void vsf_input_on_keyboard(vsf_keyboard_evt_t *keyboard_evt);
+extern void vk_input_on_sensor(vk_sensor_evt_t *sensor_evt);
+extern void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+extern void vk_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
+extern void vk_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
 
-extern void vsf_input_on_new_dev(vsf_input_type_t type, void *dev);
-extern void vsf_input_on_free_dev(vsf_input_type_t type, void *dev);
-extern void vsf_input_on_evt(vsf_input_type_t type, vsf_input_evt_t *evt);
+extern void vk_input_on_new_dev(vk_input_type_t type, void *dev);
+extern void vk_input_on_free_dev(vk_input_type_t type, void *dev);
+extern void vk_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
 
 // returns duration
-extern uint_fast32_t vsf_input_update_timestamp(vsf_input_timestamp_t *timestamp);
+extern uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp);
 
 #endif      // VSF_USE_INPUT
 #endif      // __VSF_INPUT_H__

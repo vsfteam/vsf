@@ -2426,7 +2426,7 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$\..\..\usrapp\template</state>
+                    <state>$PROJ_DIR$\..\..\usrapp\kernel_lib</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
@@ -2763,7 +2763,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild>C:\Keil_v5\ARM\ARMCLANG\bin\armar.exe -s $PROJ_DIR$\kernel_lib\vsf_kernel_armv7m_full_size.a</postbuild>
+                <postbuild>C:\Keil_v5\ARM\ARMCLANG\bin\armar.exe -s $PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</postbuild>
             </data>
         </settings>
         <settings>
@@ -3109,7 +3109,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>$PROJ_DIR$\kernel_lib\vsf_kernel_armv7m_full_size.a</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</state>
                 </option>
             </data>
         </settings>
@@ -3466,7 +3466,7 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$\..\..\usrapp\template</state>
+                    <state>$PROJ_DIR$\..\..\usrapp\kernel_lib</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
@@ -3803,7 +3803,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild>C:\Keil_v5\ARM\ARMCLANG\bin\armar.exe -s $PROJ_DIR$\kernel_lib\vsf_kernel_armv6m_full_size.a</postbuild>
+                <postbuild>C:\Keil_v5\ARM\ARMCLANG\bin\armar.exe -s $PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv6m_full_size.a</postbuild>
             </data>
         </settings>
         <settings>
@@ -4149,7 +4149,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>$PROJ_DIR$\kernel_lib\vsf_kernel_armv6m_full_size.a</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv6m_full_size.a</state>
                 </option>
             </data>
         </settings>
@@ -7304,7 +7304,7 @@
                 <debug>1</debug>
                 <option>
                     <name>ExePath</name>
-                    <state>kernel_lib_armv7em_full_size\Exe</state>
+                    <state>..\..\..\vsf\kernel\lib</state>
                 </option>
                 <option>
                     <name>ObjPath</name>
@@ -7551,7 +7551,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state>Pa082, Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -7636,7 +7636,7 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$\..\..\usrapp\template</state>
+                    <state>$PROJ_DIR$\..\..\usrapp\kernel_lib</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                 </option>
@@ -7973,7 +7973,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild>C:\Keil_v5\ARM\ARMCLANG\bin\armar.exe -s $PROJ_DIR$\kernel_lib\vsf_kernel_armv7em_full_size.a</postbuild>
+                <postbuild>C:\Keil_v5\ARM\ARMCLANG\bin\armar.exe -s $PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</postbuild>
             </data>
         </settings>
         <settings>
@@ -8319,7 +8319,7 @@
                 </option>
                 <option>
                     <name>IarchiveOutput</name>
-                    <state>$PROJ_DIR$\kernel_lib\vsf_kernel_armv7em_full_size.a</state>
+                    <state>$PROJ_DIR$\..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</state>
                 </option>
             </data>
         </settings>
@@ -11537,6 +11537,12 @@
             </file>
         </group>
         <group>
+            <name>kernel_lib</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\kernel_lib\vsf_usr_cfg.h</name>
+            </file>
+        </group>
+        <group>
             <name>kernel_test</name>
             <excluded>
                 <configuration>arm_mps2_m7</configuration>
@@ -13740,6 +13746,12 @@
         </group>
         <group>
             <name>kernel</name>
+            <group>
+                <name>lib</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\kernel\lib\__kernel_lib_with_full_feature_set.h</name>
+                </file>
+            </group>
             <group>
                 <name>shell</name>
                 <excluded>

@@ -201,7 +201,7 @@ vsf_err_t tgui_demo_init(void)
 }
 
 
-void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt)
+void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 {
 /*
     vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,

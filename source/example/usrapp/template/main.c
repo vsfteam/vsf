@@ -298,16 +298,6 @@ int main(void)
         )
     )
 
-    class_demo.chPublicParamBase = 100;
-    class_demo_init(&class_demo, 1, 2);
-    class_demo_get_param(&class_demo);
-    class_demo_get_base_param(&class_demo);
-
-    class_demo.chPublicParamDemo = 200;
-    class_simple_demo_init(&class_simple_demo, 1, 2);
-    class_simple_demo_get_param(&class_simple_demo);
-    class_simple_demo_get_base_param(&class_simple_demo);
-
     vsf_stdio_init();
     
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
@@ -322,8 +312,9 @@ int main(void)
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
         do {
             static user_pt_bmpevt_demo_thread_t __pt_demo = {
-                .mask = timer4_evt_msk,
-                .pgroup_evts = &__user_grouped_evts,
+                .param = {.mask = timer4_evt_msk,
+                    .pgroup_evts = &__user_grouped_evts,
+                },
             };
             init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_prio_inherit);
         } while(0);
@@ -346,7 +337,7 @@ int main(void)
     do {
         static NO_INIT user_task_t __user_task;
 #   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-        __user_task.psem = &user_sem;
+        __user_task.param.psem = &user_sem;
 #   endif
         init_vsf_thread(user_task_t, &__user_task, vsf_prio_0);
     } while(0);

@@ -45,7 +45,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_mal_t)
+declare_simple_class(vk_mal_t)
 
 enum vsf_mal_op_t {
     VSF_MAL_OP_ERASE,
@@ -62,21 +62,21 @@ enum vsf_mal_feature_t {
 };
 typedef enum vsf_mal_feature_t vsf_mal_feature_t;
 
-struct vsf_mal_drv_t {
+struct i_mal_drv_t {
     // blksz can be called after successfully initialized
-    uint_fast32_t (*blksz)(vsf_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-    bool (*buffer)(vsf_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+    uint_fast32_t (*blksz)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+    bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
     void (*init)(uintptr_t target, vsf_evt_t evt);
     void (*fini)(uintptr_t target, vsf_evt_t evt);
     void (*erase)(uintptr_t target, vsf_evt_t evt);
     void (*read)(uintptr_t target, vsf_evt_t evt);
     void (*write)(uintptr_t target, vsf_evt_t evt);
 };
-typedef struct vsf_mal_drv_t vsf_mal_drv_t;
+typedef struct i_mal_drv_t i_mal_drv_t;
 
-def_simple_class(vsf_mal_t) {
+def_simple_class(vk_mal_t) {
     public_member(
-        const vsf_mal_drv_t *drv;
+        const i_mal_drv_t *drv;
         void *param;
         uint64_t size;
         uint8_t feature;
@@ -113,22 +113,22 @@ def_simple_class(vsf_mal_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_mal_init(vsf_mal_t *pthis);
-extern vsf_err_t vsf_mal_fini(vsf_mal_t *pthis);
-extern uint_fast32_t vsf_mal_blksz(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-// vsf_mal_prepare_buffer is used to get buffer for read/write if VSF_MAL_LOCAL_BUFFER is supported
-extern bool vsf_mal_prepare_buffer(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+extern vsf_err_t vk_mal_init(vk_mal_t *pthis);
+extern vsf_err_t vk_mal_fini(vk_mal_t *pthis);
+extern uint_fast32_t vk_mal_blksz(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+// vk_mal_prepare_buffer is used to get buffer for read/write if VSF_MAL_LOCAL_BUFFER is supported
+extern bool vk_mal_prepare_buffer(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
 // to erase all, size should be 0
-extern vsf_err_t vsf_mal_erase(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size);
-extern vsf_err_t vsf_mal_read(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
-extern vsf_err_t vsf_mal_write(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
+extern vsf_err_t vk_mal_erase(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size);
+extern vsf_err_t vk_mal_read(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
+extern vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-extern vsf_err_t vsf_mal_read_stream(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
-extern vsf_err_t vsf_mal_write_stream(vsf_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
+extern vsf_err_t vk_mal_read_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
+extern vsf_err_t vk_mal_write_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 #endif
 
-extern vsf_err_t vsf_mal_get_result(vsf_mal_t *pthis, uint32_t *size);
+extern vsf_err_t vk_mal_get_result(vk_mal_t *pthis, uint32_t *size);
 
 #endif      // VSF_USE_MAL
 #endif      // __VSF_MAL_H__

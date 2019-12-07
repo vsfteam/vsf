@@ -258,7 +258,7 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
         .is_stack_owner         = true,                                                  
     };
     
-    if (thread_cb->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE)) {
+    if (thread_cb->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)) {
         VSF_KERNEL_ASSERT(false);
         return VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
     } else if (0 != (thread_cb->stack_size & (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE - 1))) {
@@ -299,7 +299,7 @@ vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
                                         };
         ret = __vsf_eda_call_eda_ex(   (uintptr_t)__vsf_thread_evthandler, 
                                         (uintptr_t)thread_cb, 
-                                        state);
+                                        state, true);
 #else
     ret =  vsf_eda_call_param_eda(__vsf_thread_evthandler, thread_cb);
 #endif
@@ -315,7 +315,7 @@ void __vsf_thread_call_sub(uintptr_t eda_handler, uintptr_t param)
 
     while (1) {
         __vsf_eda_frame_state_t state = { .bits.is_fsm = false,};
-        err = __vsf_eda_call_eda_ex(eda_handler, param, state);
+        err = __vsf_eda_call_eda_ex(eda_handler, param, state, true);
         if (VSF_ERR_NONE != err) {
             vsf_eda_yield();
         }
@@ -353,7 +353,7 @@ vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
                         &&  (0 != pthis->stack_size));
     pthis->fn.evthandler = __vsf_thread_evthandler;
 
-    if (pthis->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE)) {
+    if (pthis->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)) {
         VSF_KERNEL_ASSERT(false);
         return VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
     } else if (0 != (pthis->stack_size & (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE - 1))) {

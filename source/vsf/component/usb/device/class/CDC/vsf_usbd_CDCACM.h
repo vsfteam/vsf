@@ -37,12 +37,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbd_cdcacm_t)
+declare_simple_class(vk_usbd_cdcacm_t)
 
-def_simple_class(vsf_usbd_cdcacm_t) {
+def_simple_class(vk_usbd_cdcacm_t) {
 
     public_member(
-        implement(vsf_usbd_cdc_t)
+        implement(vk_usbd_cdc_t)
 
         usb_cdcacm_line_coding_t line_coding;
         uint8_t control_line;
@@ -56,8 +56,8 @@ def_simple_class(vsf_usbd_cdcacm_t) {
     )
 };
 
-struct vsf_usbd_cdcacm_cfg_t {
-    implement_ex(vsf_usbd_ep_cfg_t, ep)
+struct vk_usbd_cdcacm_cfg_t {
+    implement_ex(vk_usbd_ep_cfg_t, ep)
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
     vsf_stream_t *tx_stream;
     vsf_stream_t *rx_stream;
@@ -66,16 +66,16 @@ struct vsf_usbd_cdcacm_cfg_t {
     implement_ex(vsf_stream_src_cfg_t, stream_src);
 #endif
 };
-typedef struct vsf_usbd_cdcacm_cfg_t vsf_usbd_cdcacm_cfg_t;
+typedef struct vk_usbd_cdcacm_cfg_t vk_usbd_cdcacm_cfg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbd_class_op_t vsf_usbd_cdcacm_control;
-extern const vsf_usbd_class_op_t vsf_usbd_cdcacm_data;
+extern const vk_usbd_class_op_t vk_usbd_cdcacm_control;
+extern const vk_usbd_class_op_t vk_usbd_cdcacm_data;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_usbd_cdcacm_init(vsf_usbd_cdcacm_t *obj, const vsf_usbd_cdcacm_cfg_t *cfg);
+extern vsf_err_t vk_usbd_cdcacm_init(vk_usbd_cdcacm_t *obj, const vk_usbd_cdcacm_cfg_t *cfg);
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM
 #endif	// __VSF_USBD_CDCACM_H__

@@ -20,6 +20,8 @@
 
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
+#if VSF_USE_KERNEL == ENABLED
+
 #include "./vsf_eda.h"
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
@@ -27,51 +29,51 @@
 struct vsf_evtq_ctx_t {
     vsf_eda_t *eda;
     vsf_evt_t evt;
-    void *msg;
-}ALIGN(4);
+    uintptr_t msg;
+};
 typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
 
-#if VSF_CFG_PREMPT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
 
 typedef struct vsf_evt_node_t vsf_evt_node_t;
 typedef struct vsf_evtq_t vsf_evtq_t;
 
-#if VSF_CFG_DYNAMIC_PRIOTIRY_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
 
 struct vsf_evtq_t {
     vsf_dlist_t rdy_list;
     vsf_evtq_ctx_t cur;
-}ALIGN(4);
+};
 
 struct vsf_evt_node_t {
     implement(vsf_slist_node_t)
 
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     vsf_evt_t evt;
     void *msg;
 #else
     union {
-        uint32_t value;
+        uintptr_t value;
         void *msg;
-    };
+    } evt_union;
 #endif
-}ALIGN(4);
+};
 
 #else
 
 struct vsf_evt_node_t {
     vsf_eda_t *eda;
 
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
     vsf_evt_t evt;
     void *msg;
 #else
     union {
-        uint32_t value;
+        uintptr_t value;
         void *msg;
-    };
+    } evt_union;
 #endif
-}ALIGN(4);
+};
 
 struct vsf_evtq_t {
     vsf_evt_node_t *node;
@@ -81,7 +83,7 @@ struct vsf_evtq_t {
     uint8_t head;
     uint8_t tail;
     vsf_evtq_ctx_t cur;
-}ALIGN(4);
+};
 
 #endif
 #endif
@@ -89,18 +91,19 @@ struct vsf_evtq_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_CFG_PREMPT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
 extern void vsf_evtq_on_eda_init(vsf_eda_t *eda);
 extern void vsf_evtq_on_eda_fini(vsf_eda_t *eda);
 
 extern vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis);
-#if VSF_CFG_EVT_MESSAGE_EN == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
 extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *eda, vsf_evt_t evt, void *msg);
-#endif
+#   endif
 extern vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *eda, vsf_evt_t evt, bool force);
 extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis);
 #endif
 
+#endif
 #endif

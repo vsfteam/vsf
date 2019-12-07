@@ -208,6 +208,9 @@
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\fs\driver\winfs">
+      <UniqueIdentifier>{1a87fa4f-99d7-42fd-9ca0-66fd276b652f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -564,6 +567,9 @@
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h">
       <Filter>vsf\service\pbuf</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.h">
+      <Filter>vsf\component\fs\driver\winfs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -747,6 +753,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
       <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.c">
+      <Filter>vsf\component\fs\driver\winfs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

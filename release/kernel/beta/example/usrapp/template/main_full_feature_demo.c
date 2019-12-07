@@ -16,18 +16,21 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "app_cfg.h"
-#include "vsf.h"
 #include <stdio.h>
 
+#include "ooc_demo/class_demo.h"
+#include "ooc_demo/class_simple_demo.h"
+
 /*============================ MACROS ========================================*/
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
-#error In order to run this demo, please set VSF_OS_CFG_RUN_MAIN_AS_THREAD to ENABLED
+#if VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD
+#error In order to run this demo, please set VSF_OS_CFG_MAIN_MODE to VSF_OS_CFG_MAIN_MODE_THREAD
 #endif
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(user_task_t)
 
 def_vsf_thread(user_task_t, 1024,
@@ -38,13 +41,13 @@ def_vsf_thread(user_task_t, 1024,
     )
     
     def_params(
-#if VSF_CFG_SYNC_EN
+#if VSF_KERNEL_CFG_SUPPORT_SYNC
         vsf_sem_t *psem;
 #endif
     ));
 #endif
 
-#if VSF_CFG_SYNC_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 declare_grouped_evts(user_grouped_evts_t)
 
 def_grouped_evts(user_grouped_evts_t)
@@ -99,7 +102,7 @@ typedef struct user_msg_t user_msg_t;
 declare_vsf_pool(user_msg_pool_t)
 def_vsf_pool(user_msg_pool_t, user_msg_t)
 
-#if VSF_CFG_BMPEVT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 declare_vsf_task(bmevt_demo_t)
 def_vsf_task(bmevt_demo_t,
     features_used(
@@ -108,12 +111,15 @@ def_vsf_task(bmevt_demo_t,
     )
 )
 #endif
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 declare_vsf_task(timer_example_t)
 
 def_vsf_task(timer_example_t)
 
 #endif
+
+static NO_INIT class_demo_t class_demo;
+static NO_INIT class_simple_demo_t class_simple_demo;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -121,27 +127,28 @@ def_vsf_task(timer_example_t)
 /*============================ IMPLEMENTATION ================================*/
 
 // user code below
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 static NO_INIT timer_example_t __timer_example[5];
 
 #endif
 
-#if VSF_CFG_SYNC_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 static NO_INIT vsf_sem_t user_sem;
+
+#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
+static NO_INIT bmevt_demo_t __bmevt_demo;
+
 
 implement_grouped_evts(user_grouped_evts_t,
     add_sync_adapter( &user_sem, sem_evt_msk ),
 )
-
-#if VSF_CFG_BMPEVT_EN == ENABLED
-static NO_INIT bmevt_demo_t __bmevt_demo;
 
 static NO_INIT user_grouped_evts_t __user_grouped_evts;
 #endif
 
 #endif
 
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 
 static implement_vsf_task(timer_example_t)
 {
@@ -149,21 +156,20 @@ static implement_vsf_task(timer_example_t)
     
     int index = (timer_example_t *)ptThis - __timer_example;
     int delay = 2000 * (1 + index);
-    user_msg_t *pmsg;
 
 	switch (evt) {
     case VSF_EVT_TIMER:
         printf("%d: timer post\r\n ", index);
-#if VSF_CFG_BMPEVT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
         set_grouped_evts( &__user_grouped_evts,  1 << (index + timer0_evt_idx));
 #endif
     case VSF_EVT_INIT:
         vsf_teda_set_timer_ms(delay);
         break;
 	}
-    
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
     return fsm_rt_wait_for_evt;
-    
+#endif
     vsf_task_end();
 }
 #endif
@@ -186,7 +192,7 @@ const static i_code_region_t __example_code_region = {
 };
 
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(user_task_t) 
 {
 
@@ -195,17 +201,17 @@ implement_vsf_thread(user_task_t)
         NULL,
         (i_code_region_t *)&__example_code_region,
     };
-/*
+
     code_region(&user_region){
         printf("\tbody\r\n");
     }
-*/
+
     while (1) {
-#if VSF_CFG_TIMER_EN
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
         vsf_delay_ms(1000);
 #endif
         printf("user_thread post user sem:\r\n");
-#if VSF_CFG_SYNC_EN
+#if VSF_KERNEL_CFG_SUPPORT_SYNC
         vsf_sem_post(this.psem);
 #endif
     }
@@ -213,7 +219,7 @@ implement_vsf_thread(user_task_t)
 #endif
 
 
-#if VSF_CFG_BMPEVT_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
 
@@ -225,7 +231,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
     printf("get timer4_evt in pt slave thread\r\n");
         
     vsf_pt_wait_until( vsf_sem_pend_timeout_ms(&user_sem, 2000) );
-        on_sem_timeout() {
+        on_timeout() {
             printf("get user sem TIMEOUT pt slave thread\r\n");
         } else {
             printf("get user sem in pt slave thread\r\n");
@@ -251,7 +257,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
             
         
         vsf_pt_wait_until( vsf_sem_pend_timeout_ms(&user_sem, 2000) );
-            on_sem_timeout() {
+            on_timeout() {
                 printf("get user sem TIMEOUT pt master thread\r\n");
             } else {
                 printf("get user sem in pt master thread\r\n");
@@ -294,52 +300,51 @@ int main(void)
 
     vsf_stdio_init();
     
-#if VSF_CFG_SYNC_EN == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
     // initialize adapter
     do {
         vsf_sem_init(&user_sem, 0);
 
-#   if VSF_CFG_BMPEVT_EN == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
         init_grouped_evts(user_grouped_evts_t, &__user_grouped_evts, timer4_evt_msk);
 
-        init_vsf_task(bmevt_demo_t, &__bmevt_demo, vsf_priority_0);
+        init_vsf_task(bmevt_demo_t, &__bmevt_demo, vsf_prio_0);
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
         do {
             static user_pt_bmpevt_demo_thread_t __pt_demo = {
-                .param = {
-                    .mask = timer4_evt_msk,
+                .param = {.mask = timer4_evt_msk,
                     .pgroup_evts = &__user_grouped_evts,
                 },
             };
-            init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_priority_inherit);
+            init_vsf_pt(user_pt_bmpevt_demo_thread_t, &__pt_demo, vsf_prio_inherit);
         } while(0);
 #       endif
 #   endif
     } while(0);
 #endif
     
-#if VSF_CFG_TIMER_EN == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     for (int i = 0; i < dimof(__timer_example); i++) {
-        init_vsf_task(  timer_example_t,                        //!< vst_task type
-                        &__timer_example[i],                    //!< vsf_task object
-                        vsf_priority_0,                         //!< priority
-                        .target = &__timer_example[i]);         //!< target object (pthis)
+        init_vsf_task(  timer_example_t,                            //!< vst_task type
+                        &__timer_example[i],                        //!< vsf_task object
+                        vsf_prio_0,                                 //!< priority
+                        .target = (uintptr_t)&__timer_example[i]);   //!< target object (pthis)
     }
 #endif
 
 
-#if VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     do {
         static NO_INIT user_task_t __user_task;
-#   if VSF_CFG_SYNC_EN == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         __user_task.param.psem = &user_sem;
 #   endif
-        init_vsf_thread(user_task_t, &__user_task, vsf_priority_0);
+        init_vsf_thread(user_task_t, &__user_task, vsf_prio_0);
     } while(0);
 #endif
 
 
-#if VSF_CFG_BMPEVT_EN == ENABLED && VSF_USE_KERNEL_THREAD_MODE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while (1) {
         wait_for_all_timeout_ms(    &__user_grouped_evts, 
                                     all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk,
@@ -349,7 +354,7 @@ int main(void)
                                 all_evts_msk_of_user_grouped_evts_t &~timer4_evt_msk);
             printf("\r\n--------------barrier--------------: \r\n");
             
-            on_bmevt_timeout() {
+            on_timeout() {
                 //! when timeout happened
                 printf("\r\n============== barrier timeout ============: \r\n");
             }

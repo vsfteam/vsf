@@ -94,7 +94,7 @@ static void vsf_kernel_os_init(void)
     __vsf_os.res_ptr = vsf_kernel_get_resource_on_init();
     VSF_KERNEL_ASSERT(NULL != __vsf_os.res_ptr);
 
-#if __VSF_OS_SWI_NUM > 0
+//#if __VSF_OS_SWI_NUM > 0
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     vsf_kernel_init(__vsf_os.res_ptr->frame_stack.frame_buf_ptr, 
                     __vsf_os.res_ptr->frame_stack.frame_cnt,
@@ -102,7 +102,7 @@ static void vsf_kernel_os_init(void)
 #else
     vsf_kernel_init(__vsf_os.res_ptr->arch.sched_prio.highest);
 #endif
-#endif
+//#endif
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 #   ifdef __VSF_OS_CFG_EVTQ_LIST
@@ -236,41 +236,41 @@ void __vsf_os_free_evt_node(vsf_evt_node_t *pnode)
 #endif
 #endif
 
-#if VSF_OS_CFG_PRIORITY_NUM > 1
-vsf_sched_lock_status_t vsf_sched_lock(void)
+#if __VSF_OS_SWI_NUM > 0
+vsf_sched_lock_status_t vsf_forced_sched_lock(void)
 {
     return vsf_set_base_priority(
         __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
                 __vsf_os.res_ptr->arch.swi_priority_cnt - 1]);
 }
 
-void vsf_sched_unlock(vsf_sched_lock_status_t origlevel)
+void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel)
 {
     vsf_set_base_priority(origlevel);
 }
 
-static void __vsf_code_region_sched_on_enter(void *pobj, void *plocal)
+static void __vsf_code_region_forced_sched_on_enter(void *pobj, void *plocal)
 {
     vsf_sched_lock_status_t *pstate = (vsf_sched_lock_status_t *)plocal;
     VSF_KERNEL_ASSERT(NULL != plocal);
     (*pstate) = vsf_sched_lock();
 }
 
-static void __vsf_code_region_sched_on_leave(void *pobj,void *plocal)
+static void __vsf_code_region_forced_sched_on_leave(void *pobj,void *plocal)
 {
     vsf_sched_lock_status_t *pstate = (vsf_sched_lock_status_t *)plocal;
     VSF_KERNEL_ASSERT(NULL != plocal);
     vsf_sched_unlock(*pstate);   
 }
 
-static const i_code_region_t __vsf_i_code_region_sched_safe = {
+static const i_code_region_t __vsf_i_code_region_forced_sched_safe = {
     .local_obj_size =   sizeof(vsf_sched_lock_status_t),
-    .OnEnter =          &__vsf_code_region_sched_on_enter,
-    .OnLeave =          &__vsf_code_region_sched_on_leave,
+    .OnEnter =          &__vsf_code_region_forced_sched_on_enter,
+    .OnLeave =          &__vsf_code_region_forced_sched_on_leave,
 };
 
-const code_region_t VSF_SCHED_SAFE_CODE_REGION = {
-    .pmethods = (i_code_region_t *)&__vsf_i_code_region_sched_safe,
+const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION = {
+    .pmethods = (i_code_region_t *)&__vsf_i_code_region_forced_sched_safe,
 };
 #endif
 

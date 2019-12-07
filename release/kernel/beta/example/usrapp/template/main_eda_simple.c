@@ -16,7 +16,6 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "app_cfg.h"
-#include "vsf.h"
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
@@ -88,8 +87,8 @@ void vsf_kernel_task_simple_demo(void)
     {
         static NO_INIT user_task_t __user_task_t;
         const vsf_eda_cfg_t cfg = {
-            .evthandler = user_task_evthandler,
-            .priority = vsf_priority_0,
+            .fn.evthandler = user_task_evthandler,
+            .priority = vsf_prio_0,
         };
         __user_task_t.psem = &__user_sem;
         vsf_eda_init_ex(&__user_task_t.use_as__vsf_eda_t, (vsf_eda_cfg_t *)&cfg);
@@ -109,8 +108,8 @@ void vsf_kernel_task_simple_demo(void)
     {
         static NO_INIT vsf_teda_t __user_task_b;
         const vsf_eda_cfg_t cfg = {
-            .evthandler = user_task_b_evthandler,
-            .priority = vsf_priority_0,
+            .fn.evthandler = user_task_b_evthandler,
+            .priority = vsf_prio_0,
         };
         vsf_teda_init_ex(&__user_task_b, (vsf_eda_cfg_t *)&cfg);
     }

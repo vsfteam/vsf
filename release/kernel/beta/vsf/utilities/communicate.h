@@ -19,24 +19,43 @@
 #define __UTILITIES_COMMUNICATE_H__
 
 /*============================ INCLUDES ======================================*/
-#include "./3rd-party/PLOOC/plooc.h"
+#include "./3rd-party/PLOOC/raw/plooc.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-//! \name stream
-//! @{
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 typedef struct vsf_mem_t vsf_mem_t;
 struct vsf_mem_t {
     union {
         uint8_t *pchBuffer;         //!< stream buffer
         uint8_t *pchSrc;
         void *pObj;
-    };
-    int_fast32_t nSize;            //!< stream size
+    }PTR;
+    int32_t nSize;                  //!< stream size
 };
 //! @}
-
+#else
+//! \name stream
+//! @{
+typedef struct vsf_mem_t vsf_mem_t;
+struct vsf_mem_t {
+    union {
+        union {
+            uint8_t *pchBuffer;         //!< stream buffer
+            uint8_t *pchSrc;
+            void *pObj;
+        };
+        union {
+            uint8_t *pchBuffer;         //!< stream buffer
+            uint8_t *pchSrc;
+            void *pObj;
+        }PTR;
+    };
+    int32_t nSize;                      //!< stream size
+};
+//! @}
+#endif
 
 //! \name interface: byte pipe
 //! @{
@@ -52,7 +71,9 @@ end_def_interface(i_byte_pipe_t)
 
 //! \name interface: pipe
 //! @{
-def_interface(i_pipe_t) which ( implement(i_byte_pipe_t) )
+def_interface(i_pipe_t) 
+
+    implement(i_byte_pipe_t) 
     
     struct {
         //! read a block

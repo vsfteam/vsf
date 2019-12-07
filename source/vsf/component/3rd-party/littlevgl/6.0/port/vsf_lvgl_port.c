@@ -47,8 +47,8 @@ void vsf_lvgl_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_colo
     lv_coord_t hres = disp_drv->rotated == 0 ? disp_drv->hor_res : disp_drv->ver_res;
     lv_coord_t vres = disp_drv->rotated == 0 ? disp_drv->ver_res : disp_drv->hor_res;
 
-    vsf_disp_t *disp = disp_drv->user_data;
-    vsf_disp_area_t disp_area;
+    vk_disp_t *disp = disp_drv->user_data;
+    vk_disp_area_t disp_area;
 
     if(area->x2 < 0 || area->y2 < 0 || area->x1 > hres - 1 || area->y1 > vres - 1) {
         lv_disp_flush_ready(disp_drv);
@@ -62,21 +62,21 @@ void vsf_lvgl_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_colo
     disp_area.pos.y = area->y1;
     disp_area.size.x = area->x2 + 1 - area->x1;
     disp_area.size.y = area->y2 + 1 - area->y1;
-    vsf_disp_refresh(disp, &disp_area, color_p);
+    vk_disp_refresh(disp, &disp_area, color_p);
 }
 
-void vsf_lvgl_on_ready(vsf_disp_t *disp)
+void vsf_lvgl_on_ready(vk_disp_t *disp)
 {
     lv_disp_drv_t *disp_drv = (lv_disp_drv_t *)disp->ui_data;
     lv_disp_flush_ready(disp_drv);
 }
 
-void vsf_lvgl_bind(vsf_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
+void vsf_lvgl_bind(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
 {
     lvgl_disp_drv->user_data = disp;
     disp->ui_data = lvgl_disp_drv;
     disp->ui_on_ready = vsf_lvgl_on_ready;
-    vsf_disp_init(disp);
+    vk_disp_init(disp);
 }
 
 #endif

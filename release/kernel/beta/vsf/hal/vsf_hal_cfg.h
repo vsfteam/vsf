@@ -26,6 +26,33 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#ifndef VSF_HAL_ASSERT
+#   define VSF_HAL_ASSERT(__CON)        ASSERT(__CON)
+#endif
+#else
+#ifndef VSF_HAL_ASSERT
+#   define VSF_HAL_ASSERT(...)          ASSERT(__VA_ARGS__)
+#endif
+#endif
+
+#ifndef VSF_HAL_CFG_USE_STREAM
+#   define VSF_HAL_CFG_USE_STREAM       VSF_USE_SERVICE_STREAM
+#endif
+
+#ifndef VSF_HAL_CFG_USE_VSFSTREAM
+#   define VSF_HAL_CFG_USE_VSFSTREAM    VSF_USE_SERVICE_VSFSTREAM
+#endif
+
+#ifndef VSF_SYSTIMER_RESOLUTION
+#   define VSF_SYSTIMER_RESOLUTION      (1000000)    /*! using default 1us */
+#endif
+
+#ifndef VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT
+#   define  VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

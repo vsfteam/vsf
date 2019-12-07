@@ -38,18 +38,18 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_mal_scsi_t)
+declare_simple_class(vk_mal_scsi_t)
 
-def_simple_class(vsf_mal_scsi_t) {
-    implement(vsf_virtual_scsi_t)
+def_simple_class(vk_mal_scsi_t) {
+    implement(vk_virtual_scsi_t)
     public_member(
-        vsf_mal_t *mal;
+        vk_mal_t *mal;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_virtual_scsi_drv_t vsf_mal_virtual_scsi_drv;
+extern const i_virtual_scsi_drv_t VK_MAL_VIRTUAL_SCSI_DRV;
 
 /*============================ PROTOTYPES ====================================*/
 

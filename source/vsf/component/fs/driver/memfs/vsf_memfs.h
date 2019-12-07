@@ -38,10 +38,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_memfs_file_t)
+declare_simple_class(vk_memfs_file_t)
 
-def_simple_class(vsf_memfs_file_t) {
-    implement(vsf_file_t)
+def_simple_class(vk_memfs_file_t) {
+    implement(vk_file_t)
 
     public_member(
         union {
@@ -49,17 +49,26 @@ def_simple_class(vsf_memfs_file_t) {
                 uint8_t *buff;
             } f;
             struct {
-                vsf_memfs_file_t *child;
+                vk_memfs_file_t *child;
                 uint16_t child_num;
                 uint16_t child_size;
             } d;
         };
+        struct {
+            void (*read)(uintptr_t target, vsf_evt_t evt);
+            void (*write)(uintptr_t target, vsf_evt_t evt);
+        } callback;
     )
 };
 
+struct vk_memfs_info_t {
+    vk_memfs_file_t root;
+};
+typedef struct vk_memfs_info_t vk_memfs_info_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_fs_op_t vsf_memfs_op;
+extern const vk_fs_op_t vk_memfs_op;
 
 /*============================ PROTOTYPES ====================================*/
 

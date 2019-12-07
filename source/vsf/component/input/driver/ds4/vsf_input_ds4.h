@@ -35,22 +35,22 @@ enum {
     VSF_INPUT_TYPE_DS4 = VSF_INPUT_USER_TYPE,
 };
 
-struct vsf_input_ds4u_t {
+struct vk_input_ds4u_t {
     vsf_usb_ds4_gamepad_in_report_t data;
-    vsf_input_timestamp_t timestamp;
+    vk_input_timestamp_t timestamp;
 };
-typedef struct vsf_input_ds4u_t vsf_input_ds4u_t;
+typedef struct vk_input_ds4u_t vk_input_ds4u_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_input_item_info_t vsf_ds4u_gamepad_item_info[GAMEPAD_ID_NUM];
-extern const vsf_sensor_item_info_t vsf_ds4u_sensor_item_info[6];
+extern const vk_input_item_info_t vk_ds4u_gamepad_item_info[GAMEPAD_ID_NUM];
+extern const vk_sensor_item_info_t vk_ds4u_sensor_item_info[6];
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_ds4u_process_input(vsf_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t *data);
-extern void vsf_ds4u_new_dev(vsf_input_ds4u_t *dev);
-extern void vsf_ds4u_free_dev(vsf_input_ds4u_t *dev);
+extern void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t *data);
+extern void vk_ds4u_new_dev(vk_input_ds4u_t *dev);
+extern void vk_ds4u_free_dev(vk_input_ds4u_t *dev);
 
 #endif      // VSF_USE_INPUT && VSF_USE_INPUT_DS4
 #endif      // __VSF_INPUT_DS4_H__

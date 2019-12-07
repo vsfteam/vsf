@@ -22,42 +22,37 @@
  *!        definition and there is NO ANY OTHER module-interface-header file 
  *!        included in this file
  */
-#define __VSF_CLASS_USE_STRICT_TEMPLATE__
+#define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
 #include "utilities/ooc_class.h"
 
 declare_class(class_base_t)
 declare_class(class_demo_t)
 
-def_class(class_base_t)
+def_class(class_base_t,
 
     public_member(
         uint8_t public_param_base;
-    )
+    ),
 
     private_member(
         uint8_t private_param_base;
     )
-
+)
 end_def_class(class_base_t)
-
-
-
 
 
 def_class(class_demo_t,
     which(
         implement(class_base_t)
     )
-)
-
     public_member(
         uint8_t public_param_demo;
-    )
+    ),
 
     private_member(
         uint8_t private_param_demo;
     )
-
+)
 end_def_class(class_demo_t)
 
 

@@ -34,7 +34,7 @@
 /*============================ MACROS ========================================*/
 
 #define VSF_DISP_GET_PIXEL_SIZE(__disp)                                         \
-            ((((vsf_disp_t *)(__disp))->param.color >> 8) & 0xFF)
+            ((((vk_disp_t *)(__disp))->param.color >> 8) & 0xFF)
 
 #define VSF_DISP_COLOR_IDX_DEF(__name)                                          \
             VSF_DISP_COLOR_IDX_##__name
@@ -45,60 +45,60 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_disp_t)
+declare_simple_class(vk_disp_t)
 
-enum vsf_disp_color_idx_t {
+enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(INVALID),
     VSF_DISP_COLOR_IDX_DEF(RGB565),
     VSF_DISP_COLOR_IDX_DEF(ARGB8888),
 };
-typedef enum vsf_disp_color_idx_t vsf_disp_color_idx_t;
+typedef enum vk_disp_color_idx_t vk_disp_color_idx_t;
 
-enum vsf_disp_color_t {
-    // avoid vsf_disp_color_t to be optimized to 8bit
+enum vk_disp_color_t {
+    // avoid vk_disp_color_t to be optimized to 8bit
     __VSF_DISP_COLOR_LEAST_MAX	= INT16_MAX,
     __VSF_DISP_COLOR_LEAST_MIN  = INT16_MIN,
     VSF_DISP_COLOR_DEF(INVALID, 0),
     VSF_DISP_COLOR_DEF(RGB565, 16),
     VSF_DISP_COLOR_DEF(ARGB8888, 32),
 };
-typedef enum vsf_disp_color_t vsf_disp_color_t;
+typedef enum vk_disp_color_t vk_disp_color_t;
 
-struct vsf_disp_point {
+struct vk_disp_point {
     uint16_t x;
     uint16_t y;
 };
-typedef struct vsf_disp_point vsf_disp_point;
+typedef struct vk_disp_point vk_disp_point;
 
-struct vsf_disp_area_t {
-    vsf_disp_point pos;
-    vsf_disp_point size;
+struct vk_disp_area_t {
+    vk_disp_point pos;
+    vk_disp_point size;
 };
-typedef struct vsf_disp_area_t vsf_disp_area_t;
+typedef struct vk_disp_area_t vk_disp_area_t;
 
-struct vsf_disp_drv_t {
-    vsf_err_t (*init)(vsf_disp_t *pthis);
-    vsf_err_t (*refresh)(vsf_disp_t *pthis, vsf_disp_area_t *area, void *disp_buff);
+struct vk_disp_drv_t {
+    vsf_err_t (*init)(vk_disp_t *pthis);
+    vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 };
-typedef struct vsf_disp_drv_t vsf_disp_drv_t;
+typedef struct vk_disp_drv_t vk_disp_drv_t;
 
-struct vsf_disp_param_t {
-    const vsf_disp_drv_t *drv;
+struct vk_disp_param_t {
+    const vk_disp_drv_t *drv;
     uint16_t width;
     uint16_t height;
-    vsf_disp_color_t color; 
+    vk_disp_color_t color; 
 };
-typedef struct vsf_disp_param_t vsf_disp_param_t;
+typedef struct vk_disp_param_t vk_disp_param_t;
 
-typedef void (*vsf_disp_on_ready_t)(vsf_disp_t *disp);
+typedef void (*vk_disp_on_ready_t)(vk_disp_t *disp);
 
-def_simple_class(vsf_disp_t) {
+def_simple_class(vk_disp_t) {
     public_member(
-        const vsf_disp_param_t  param;
+        const vk_disp_param_t  param;
         void                    *ui_data;
     )
     protected_member(
-        vsf_disp_on_ready_t     ui_on_ready;
+        vk_disp_on_ready_t     ui_on_ready;
     )
 };
 
@@ -114,11 +114,11 @@ def_simple_class(vsf_disp_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_disp_init(vsf_disp_t *pthis);
-extern vsf_err_t vsf_disp_refresh(vsf_disp_t *pthis, vsf_disp_area_t *area, void *disp_buff);
+extern vsf_err_t vk_disp_init(vk_disp_t *pthis);
+extern vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 #ifdef __VSF_DISP_CLASS_INHERIT
-extern void vsf_disp_on_ready(vsf_disp_t *pthis);
+extern void vk_disp_on_ready(vk_disp_t *pthis);
 #endif
 
 #undef __VSF_DISP_CLASS_IMPLEMENT

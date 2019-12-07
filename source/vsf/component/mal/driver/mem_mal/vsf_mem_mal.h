@@ -38,10 +38,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_mem_mal_t)
+declare_simple_class(vk_mem_mal_t)
 
-def_simple_class(vsf_mem_mal_t) {
-    implement(vsf_mal_t)
+def_simple_class(vk_mem_mal_t) {
+    implement(vk_mal_t)
 
     public_member(
         vsf_mem_t mem;
@@ -51,7 +51,7 @@ def_simple_class(vsf_mem_mal_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_mal_drv_t vsf_mem_mal_drv;
+extern const i_mal_drv_t VK_MEM_MAL_DRV;
 
 /*============================ PROTOTYPES ====================================*/
 

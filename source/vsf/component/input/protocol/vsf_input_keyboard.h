@@ -44,10 +44,10 @@ enum {
     VSF_INPUT_TYPE_KEYBOARD = VSF_INPUT_USER_TYPE,
 };
 
-struct vsf_keyboard_evt_t {
-    implement(vsf_input_evt_t)
+struct vk_keyboard_evt_t {
+    implement(vk_input_evt_t)
 };
-typedef struct vsf_keyboard_evt_t vsf_keyboard_evt_t;
+typedef struct vk_keyboard_evt_t vk_keyboard_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

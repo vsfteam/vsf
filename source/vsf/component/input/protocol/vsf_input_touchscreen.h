@@ -46,20 +46,20 @@
 /*============================ TYPES =========================================*/
 
 enum {
-    VSF_INPUT_TYPE_TOUCHSCREEN = VSF_INPUT_USER_TYPE,
+    vk_input_type_tOUCHSCREEN = VSF_INPUT_USER_TYPE,
 };
 
-struct vsf_touchscreen_info_t {
+struct vk_touchscreen_info_t {
     uint16_t width;
     uint16_t height;
 };
-typedef struct vsf_touchscreen_info_t vsf_touchscreen_info_t;
+typedef struct vk_touchscreen_info_t vk_touchscreen_info_t;
 
-struct vsf_touchscreen_evt_t {
-    implement(vsf_input_evt_t)
-    vsf_touchscreen_info_t info;
+struct vk_touchscreen_evt_t {
+    implement(vk_input_evt_t)
+    vk_touchscreen_info_t info;
 };
-typedef struct vsf_touchscreen_evt_t vsf_touchscreen_evt_t;
+typedef struct vk_touchscreen_evt_t vk_touchscreen_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

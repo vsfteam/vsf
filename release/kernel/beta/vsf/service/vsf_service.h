@@ -23,8 +23,12 @@
 
 #include "./heap/vsf_heap.h"
 #include "./pool/vsf_pool.h"
+#include "./pbuf/vsf_pbuf.h"
+#include "./pbuf/vsf_pbuf_pool.h"
+
 #include "./stream/vsf_stream.h"
 #include "./vsfstream/vsfstream.h"
+
 #include "./trace/vsf_trace.h"
 
 /*============================ MACROS ========================================*/

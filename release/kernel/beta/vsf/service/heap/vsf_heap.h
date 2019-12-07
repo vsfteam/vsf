@@ -49,6 +49,8 @@ def_interface(i_heap_t)
     void (*AddMemory)       (vsf_mem_t mem);
     void *(*MallocAligned)  (uint_fast32_t size, uint_fast32_t alignment);
     void *(*Malloc)         (uint_fast32_t size);
+    void *(*ReallocAligned) (void *buffer, uint_fast32_t size, uint_fast32_t alignment);
+    void *(*Realloc)        (void *buffer, uint_fast32_t size);
     void (*Free)            (void *buffer);
 end_def_interface(i_heap_t)
 //! @}
@@ -62,8 +64,10 @@ extern const i_heap_t VSF_HEAP;
 extern void vsf_heap_init(void);
 extern void vsf_heap_add(uint8_t *heap, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
-extern void *vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
-extern void *vsf_heap_malloc(uint_fast32_t size);
+extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
+extern void * vsf_heap_malloc(uint_fast32_t size);
+extern void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t alignment);
+extern void * vsf_heap_realloc(void *buffer, uint_fast32_t size);
 extern void vsf_heap_free(void *buffer);
 
 /*! \brief partially free a target memory

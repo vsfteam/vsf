@@ -61,7 +61,7 @@ vsf_err_t vsf_stream_writer_init(   vsf_stream_writer_t *ptObj,
                                     const vsf_stream_src_cfg_t *ptCFG)
 {
     class_internal(ptObj, ptThis, vsf_stream_writer_t);
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
 
     memset(ptObj, 0, sizeof(vsf_stream_writer_t));
     return vsf_stream_src_init(&this.use_as__vsf_stream_src_t, ptCFG);
@@ -93,7 +93,7 @@ vsf_err_t vsf_stream_writer_send_pbuf ( vsf_stream_writer_t *ptObj,
 {
     class_internal(ptObj, ptThis, vsf_stream_writer_t);
 
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     
     __vsf_stream_writer_send_current_pbuf(ptObj);
 
@@ -106,7 +106,7 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *ptObj,
                                         uint_fast16_t hwSize)
 {
     class_internal(ptObj, ptThis, vsf_stream_writer_t);
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     int_fast32_t nWrittenSize = -1;
     
 
@@ -158,7 +158,7 @@ fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_writer_t);
     fsm_rt_t tReturn;
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     
 
     if (NULL != this.ptCurrent) {

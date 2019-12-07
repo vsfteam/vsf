@@ -28,32 +28,32 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_usbh_libusb_t {
+struct vk_usbh_libusb_t {
     struct {
         void *param;
-        vsf_usbh_libusb_on_event_t on_event;
+        vk_usbh_libusb_on_event_t on_event;
     } cb;
 };
-typedef struct vsf_usbh_libusb_t vsf_usbh_libusb_t;
+typedef struct vk_usbh_libusb_t vk_usbh_libusb_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static vsf_usbh_libusb_t vsf_usbh_libusb;
+static vk_usbh_libusb_t vk_usbh_libusb;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void *vsf_usbh_libusb_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        vsf_usbh_ifs_parser_t *parser_ifs)
+static void *vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+        vk_usbh_ifs_parser_t *parser_ifs)
 {
-    vsf_usbh_libusb_dev_t *ldev;
+    vk_usbh_libusb_dev_t *ldev;
 
-    ldev = VSF_USBH_MALLOC(sizeof(vsf_usbh_libusb_dev_t));
+    ldev = VSF_USBH_MALLOC(sizeof(vk_usbh_libusb_dev_t));
     if (ldev == NULL) {
         return NULL;
     }
-    memset(ldev, 0, sizeof(vsf_usbh_libusb_dev_t));
+    memset(ldev, 0, sizeof(vk_usbh_libusb_dev_t));
 
     ldev->usbh = usbh;
     ldev->dev = dev;
@@ -62,28 +62,28 @@ static void *vsf_usbh_libusb_probe(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
     ldev->ifs = parser_ifs->ifs->no;
     ldev->address = dev->devnum;
 
-    if (vsf_usbh_libusb.cb.on_event != NULL) {
-        vsf_usbh_libusb.cb.on_event(
-                    vsf_usbh_libusb.cb.param,
+    if (vk_usbh_libusb.cb.on_event != NULL) {
+        vk_usbh_libusb.cb.on_event(
+                    vk_usbh_libusb.cb.param,
                     ldev,
                     VSF_USBH_LIBUSB_EVT_ON_ARRIVED);
     }
     return ldev;
 }
 
-static void vsf_usbh_libusb_free(vsf_usbh_libusb_dev_t *ldev)
+static void vk_usbh_libusb_free(vk_usbh_libusb_dev_t *ldev)
 {
     VSF_USBH_FREE(ldev);
 }
 
-static void vsf_usbh_libusb_disconnect(vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, void *param)
+static void vk_usbh_libusb_disconnect(vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, void *param)
 {
-    vsf_usbh_libusb_dev_t *ldev = (vsf_usbh_libusb_dev_t *)param;
+    vk_usbh_libusb_dev_t *ldev = (vk_usbh_libusb_dev_t *)param;
     if (ldev) {
-        if (vsf_usbh_libusb.cb.on_event != NULL) {
-            vsf_usbh_libusb.cb.on_event(
-                    vsf_usbh_libusb.cb.param,
+        if (vk_usbh_libusb.cb.on_event != NULL) {
+            vk_usbh_libusb.cb.on_event(
+                    vk_usbh_libusb.cb.param,
                     ldev,
                     VSF_USBH_LIBUSB_EVT_ON_LEFT);
         }
@@ -91,12 +91,12 @@ static void vsf_usbh_libusb_disconnect(vsf_usbh_t *usbh,
         if (ldev->is_opened) {
             ldev->is_to_remove = true;
         } else {
-            vsf_usbh_libusb_free(ldev);
+            vk_usbh_libusb_free(ldev);
         }
     }
 }
 
-static const vsf_usbh_dev_id_t vsf_usbh_libusb_id[] = {
+static const vk_usbh_dev_id_t vk_usbh_libusb_id[] = {
     {
         .match_dev_lo = 1,
         .bcdDevice_lo = 0,
@@ -104,21 +104,21 @@ static const vsf_usbh_dev_id_t vsf_usbh_libusb_id[] = {
     },
 };
 
-void vsf_usbh_libusb_set_evthandler(void *param, vsf_usbh_libusb_on_event_t on_event)
+void vk_usbh_libusb_set_evthandler(void *param, vk_usbh_libusb_on_event_t on_event)
 {
-    vsf_usbh_libusb.cb.param = param;
-    vsf_usbh_libusb.cb.on_event = on_event;
+    vk_usbh_libusb.cb.param = param;
+    vk_usbh_libusb.cb.on_event = on_event;
 }
 
-void vsf_usbh_libusb_close(vsf_usbh_libusb_dev_t *ldev)
+void vk_usbh_libusb_close(vk_usbh_libusb_dev_t *ldev)
 {
     ldev->is_opened = false;
     if (ldev->is_to_remove) {
-        vsf_usbh_libusb_free(ldev);
+        vk_usbh_libusb_free(ldev);
     }
 }
 
-vsf_err_t vsf_usbh_libusb_open(vsf_usbh_libusb_dev_t *ldev)
+vsf_err_t vk_usbh_libusb_open(vk_usbh_libusb_dev_t *ldev)
 {
     if (ldev->is_opened) {
         return VSF_ERR_FAIL;
@@ -128,12 +128,12 @@ vsf_err_t vsf_usbh_libusb_open(vsf_usbh_libusb_dev_t *ldev)
     }
 }
 
-const vsf_usbh_class_drv_t vsf_usbh_libusb_drv = {
+const vk_usbh_class_drv_t vk_usbh_libusb_drv = {
     .name       = "libusb",
-    .dev_id_num = dimof(vsf_usbh_libusb_id),
-    .dev_ids    = vsf_usbh_libusb_id,
-    .probe      = vsf_usbh_libusb_probe,
-    .disconnect = vsf_usbh_libusb_disconnect,
+    .dev_id_num = dimof(vk_usbh_libusb_id),
+    .dev_ids    = vk_usbh_libusb_id,
+    .probe      = vk_usbh_libusb_probe,
+    .disconnect = vk_usbh_libusb_disconnect,
 };
 
 #endif

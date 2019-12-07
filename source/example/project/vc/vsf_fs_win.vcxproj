@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.h" />
     <ClInclude Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h" />
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.h" />
     <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs.h" />
     <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.c" />
     <ClCompile Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c" />
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.c" />
     <ClCompile Include="..\..\..\vsf\component\fs\vsf_fs.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c" />
@@ -257,6 +259,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <UseMultiToolTask>true</UseMultiToolTask>
+    <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

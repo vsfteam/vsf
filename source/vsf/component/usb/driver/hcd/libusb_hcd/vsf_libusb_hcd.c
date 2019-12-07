@@ -50,7 +50,7 @@
 struct vsf_libusb_hcd_dev_t {
     uint16_t vid, pid;
     libusb_device_handle *handle;
-    vsf_usbh_dev_t *dev;
+    vk_usbh_dev_t *dev;
 
     enum usb_device_speed_t speed;
     enum {
@@ -80,7 +80,7 @@ struct vsf_libusb_hcd_t {
     libusb_context *ctx;
 
     vsf_libusb_hcd_dev_t devs[VSF_LIBUSB_HCD_CFG_DEV_NUM];
-    vsf_usbh_hcd_t *hcd;
+    vk_usbh_hcd_t *hcd;
     uint32_t new_mask;
     uint8_t cur_dev_idx;
     bool is_hotplug_supported;
@@ -122,24 +122,24 @@ typedef enum vsf_libusb_hcd_evt_t vsf_libusb_hcd_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vsf_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hcd_t *hcd);
-static vsf_err_t vsf_libusb_hcd_fini(vsf_usbh_hcd_t *hcd);
-static vsf_err_t vsf_libusb_hcd_suspend(vsf_usbh_hcd_t *hcd);
-static vsf_err_t vsf_libusb_hcd_resume(vsf_usbh_hcd_t *hcd);
-static vsf_err_t vsf_libusb_hcd_alloc_device(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
-static void vsf_libusb_hcd_free_device(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
-static vsf_usbh_hcd_urb_t * vsf_libusb_hcd_alloc_urb(vsf_usbh_hcd_t *hcd);
-static void vsf_libusb_hcd_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
-static vsf_err_t vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
-static vsf_err_t vsf_libusb_hcd_relink_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
-static vsf_err_t vsf_libusb_hcd_reset_dev(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
-static bool vsf_libusb_hcd_is_dev_reset(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
+static vsf_err_t vsf_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
+static vsf_err_t vsf_libusb_hcd_fini(vk_usbh_hcd_t *hcd);
+static vsf_err_t vsf_libusb_hcd_suspend(vk_usbh_hcd_t *hcd);
+static vsf_err_t vsf_libusb_hcd_resume(vk_usbh_hcd_t *hcd);
+static vsf_err_t vsf_libusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static void vsf_libusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static vk_usbh_hcd_urb_t * vsf_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
+static void vsf_libusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t vsf_libusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t vsf_libusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t vsf_libusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static bool vsf_libusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 
 static void __vsf_libusb_hcd_dev_thread(void *arg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vsf_usbh_hcd_drv_t vsf_libusb_hcd_drv = {
+const vk_usbh_hcd_drv_t vsf_libusb_hcd_drv = {
     .init_evthandler    = vsf_libusb_hcd_init_evthandler,
     .fini               = vsf_libusb_hcd_fini,
     .suspend            = vsf_libusb_hcd_suspend,
@@ -165,9 +165,9 @@ static vsf_libusb_hcd_t __vsf_libusb_hcd = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-static void __vsf_libusb_hcd_trace_urb(vsf_usbh_hcd_urb_t *urb, char *msg)
+static void __vsf_libusb_hcd_trace_urb(vk_usbh_hcd_urb_t *urb, char *msg)
 {
-    vsf_usbh_eppipe_t pipe = urb->pipe;
+    vk_usbh_eppipe_t pipe = urb->pipe;
     vsf_trace(VSF_TRACE_INFO, "libusb_urb EP%d_%s(%08X): %s\r\n", pipe.endpoint,
         pipe.dir_in1out0 ? "IN" : "OUT", urb, msg);
 }
@@ -184,9 +184,9 @@ static void __vsf_libusb_hcd_trace_hcd_irq(char *msg)
     vsf_trace(VSF_TRACE_INFO, "libusb_hcd_irq(%08X): %s\r\n", &__vsf_libusb_hcd.init_thread, msg);
 }
 
-static void __vsf_libusb_hcd_trace_urb_irq(vsf_usbh_hcd_urb_t *urb, char *msg)
+static void __vsf_libusb_hcd_trace_urb_irq(vk_usbh_hcd_urb_t *urb, char *msg)
 {
-    vsf_usbh_eppipe_t pipe = urb->pipe;
+    vk_usbh_eppipe_t pipe = urb->pipe;
     vsf_trace(VSF_TRACE_INFO, "libusb_urb EP%d_%s(%08X): irq %s\r\n", pipe.endpoint,
         pipe.dir_in1out0 ? "IN" : "OUT", urb, msg);
 }
@@ -302,11 +302,11 @@ static int __vsf_libusb_hcd_init(void)
 }
 
 // TODO: call libusb_claim_interface for non-control transfer
-static int __vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_urb_t *urb)
+static int __vsf_libusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
 {
-    vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
+    vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
     vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
-    vsf_usbh_eppipe_t pipe = urb->pipe;
+    vk_usbh_eppipe_t pipe = urb->pipe;
 
     if (NULL == libusb_dev->handle) {
         return LIBUSB_ERROR_NO_DEVICE;
@@ -391,7 +391,7 @@ static void __vsf_libusb_hcd_urb_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
     vsf_libusb_hcd_urb_t *libusb_urb = container_of(irq_thread, vsf_libusb_hcd_urb_t, irq_thread);
-    vsf_usbh_hcd_urb_t *urb = container_of(libusb_urb, vsf_usbh_hcd_urb_t, priv);
+    vk_usbh_hcd_urb_t *urb = container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
     vsf_arch_irq_request_t *irq_request = &libusb_urb->irq_request;
     bool is_to_free;
     int actual_length;
@@ -406,7 +406,7 @@ static void __vsf_libusb_hcd_urb_thread(void *arg)
 
             is_to_free = VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state;
             if (!is_to_free) {
-                vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
+                vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
                 vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
 
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
@@ -521,7 +521,7 @@ static void __vsf_libusb_hcd_init_thread(void *arg)
 
 
 
-static bool vsf_libusb_hcd_free_urb_do(vsf_usbh_hcd_urb_t *urb)
+static bool vsf_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
     if (libusb_urb->is_irq_enabled) {
@@ -561,18 +561,18 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_dlist_remove_head(vsf_libusb_hcd_urb_t, urb_node,
                         &__vsf_libusb_hcd.urb_list, libusb_urb);
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-                vsf_usbh_hcd_urb_t *urb = container_of(libusb_urb, vsf_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
                 __vsf_libusb_hcd_trace_urb(urb, "dequeued-");
 #endif
             vsf_unprotect_sched(orig);
 
             if (libusb_urb != NULL) {
-                vsf_usbh_hcd_urb_t *urb = container_of(libusb_urb, vsf_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
 
                 if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state) {
                     vsf_libusb_hcd_free_urb_do(urb);
                 } else {
-                    vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
+                    vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
                     vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
 
                     if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
@@ -622,7 +622,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_TIMER:
         if (__vsf_libusb_hcd.new_mask != 0) {
-            vsf_usbh_t *usbh = (vsf_usbh_t *)libusb->hcd;
+            vk_usbh_t *usbh = (vk_usbh_t *)libusb->hcd;
             if (NULL == usbh->dev_new) {
                 int idx = ffz(~__vsf_libusb_hcd.new_mask);
                 VSF_USB_ASSERT(idx < dimof(__vsf_libusb_hcd.devs));
@@ -631,14 +631,14 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 __vsf_libusb_hcd.cur_dev_idx = idx;
                 __vsf_libusb_hcd.new_mask &= ~(1 << idx);
                 libusb_dev->addr = 0;
-                libusb_dev->dev = vsf_usbh_new_device((vsf_usbh_t *)libusb->hcd, libusb_dev->speed, NULL, 0);
+                libusb_dev->dev = vk_usbh_new_device((vk_usbh_t *)libusb->hcd, libusb_dev->speed, NULL, 0);
                 libusb_dev->state = VSF_LIBUSB_HCD_DEV_STATE_ATTACHED;
             }
         }
         vsf_teda_set_timer_ms(100);
         break;
     case VSF_EVT_MESSAGE: {
-            vsf_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
+            vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
             VSF_USB_ASSERT((urb != NULL) && urb->pipe.is_pipe);
             vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
 
@@ -648,7 +648,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             do {
                 if (!urb->pipe.dir_in1out0) {
-                    vsf_usbh_hcd_dev_t *dev = urb->dev_hcd;
+                    vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
                     if (NULL == dev) { break; }
                     vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
                     if (NULL == libusb_dev) { break; }
@@ -698,7 +698,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             case VSF_EVT_LIBUSB_HCD_DETACH:
                 if (libusb_dev->state != VSF_LIBUSB_HCD_DEV_STATE_DETACHED) {
                     libusb_dev->state = VSF_LIBUSB_HCD_DEV_STATE_DETACHED;
-                    vsf_usbh_disconnect_device((vsf_usbh_t *)libusb->hcd, libusb_dev->dev);
+                    vk_usbh_disconnect_device((vk_usbh_t *)libusb->hcd, libusb_dev->dev);
                     vsf_dlist_init(&libusb_dev->urb_pending_list);
                     libusb_dev->evt_mask.is_detached = true;
                     libusb_dev->evt_mask.is_detaching = false;
@@ -712,7 +712,7 @@ static void vsf_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t vsf_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hcd_t *hcd)
+static vsf_err_t vsf_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
 {
     vsf_libusb_hcd_param_t *param = hcd->param;
 
@@ -738,37 +738,37 @@ static vsf_err_t vsf_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, v
     return VSF_ERR_NOT_READY;
 }
 
-static vsf_err_t vsf_libusb_hcd_fini(vsf_usbh_hcd_t *hcd)
+static vsf_err_t vsf_libusb_hcd_fini(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_libusb_hcd_suspend(vsf_usbh_hcd_t *hcd)
+static vsf_err_t vsf_libusb_hcd_suspend(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_libusb_hcd_resume(vsf_usbh_hcd_t *hcd)
+static vsf_err_t vsf_libusb_hcd_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_libusb_hcd_alloc_device(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev)
+static vsf_err_t vsf_libusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     VSF_USB_ASSERT(__vsf_libusb_hcd.cur_dev_idx < dimof(__vsf_libusb_hcd.devs));
     dev->dev_priv = &__vsf_libusb_hcd.devs[__vsf_libusb_hcd.cur_dev_idx];
     return VSF_ERR_NONE;
 }
 
-static void vsf_libusb_hcd_free_device(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev)
+static void vsf_libusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     dev->dev_priv = NULL;
 }
 
-static vsf_usbh_hcd_urb_t * vsf_libusb_hcd_alloc_urb(vsf_usbh_hcd_t *hcd)
+static vk_usbh_hcd_urb_t * vsf_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
-    uint_fast32_t size = sizeof(vsf_usbh_hcd_urb_t) + sizeof(vsf_libusb_hcd_urb_t);
-    vsf_usbh_hcd_urb_t *urb = VSF_USBH_MALLOC(size);
+    uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vsf_libusb_hcd_urb_t);
+    vk_usbh_hcd_urb_t *urb = VSF_USBH_MALLOC(size);
 
     if (urb != NULL) {
         memset(urb, 0, size);
@@ -787,7 +787,7 @@ static vsf_usbh_hcd_urb_t * vsf_libusb_hcd_alloc_urb(vsf_usbh_hcd_t *hcd)
     return urb;
 }
 
-static void vsf_libusb_hcd_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static void vsf_libusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
     if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE != libusb_urb->state) {
@@ -805,7 +805,7 @@ static void vsf_libusb_hcd_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb
     }
 }
 
-static vsf_err_t vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static vsf_err_t vsf_libusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     vsf_libusb_hcd_urb_t *libusb_urb = (vsf_libusb_hcd_urb_t *)urb->priv;
     vsf_dlist_init_node(vsf_libusb_hcd_urb_t, urb_node, libusb_urb);
@@ -821,12 +821,12 @@ static vsf_err_t vsf_libusb_hcd_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_libusb_hcd_relink_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static vsf_err_t vsf_libusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     return vsf_libusb_hcd_submit_urb(hcd, urb);
 }
 
-static vsf_err_t vsf_libusb_hcd_reset_dev(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev)
+static vsf_err_t vsf_libusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vsf_libusb_hcd_dev_t *libusb_dev = (vsf_libusb_hcd_dev_t *)dev->dev_priv;
     libusb_dev->evt_mask.is_resetting = true;
@@ -834,7 +834,7 @@ static vsf_err_t vsf_libusb_hcd_reset_dev(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_
     return VSF_ERR_NONE;
 }
 
-static bool vsf_libusb_hcd_is_dev_reset(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev)
+static bool vsf_libusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vsf_libusb_hcd_dev_t *libusb_dev = (vsf_libusb_hcd_dev_t *)dev->dev_priv;
     return libusb_dev->evt_mask.is_resetting;

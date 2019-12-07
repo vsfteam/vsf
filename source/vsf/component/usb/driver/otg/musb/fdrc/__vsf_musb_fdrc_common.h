@@ -136,7 +136,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_musb_fdrc_reg_t {
+struct vk_musb_fdrc_reg_t {
     struct {
         volatile uint8_t FAddr;
         volatile uint8_t Power;
@@ -198,22 +198,22 @@ struct vsf_musb_fdrc_reg_t {
         volatile uint32_t FIFO[8];
     };
 };
-typedef struct vsf_musb_fdrc_reg_t vsf_musb_fdrc_reg_t;
+typedef struct vk_musb_fdrc_reg_t vk_musb_fdrc_reg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint_fast8_t vsf_musb_fdrc_set_ep(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep);
+extern uint_fast8_t vk_musb_fdrc_set_ep(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep);
 
-extern void vsf_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep);
-extern void vsf_musb_fdrc_clear_mask(volatile uint8_t *reg, uint_fast8_t ep);
-extern uint16_t vsf_musb_fdrc_get_mask(volatile uint8_t *reg);
+extern void vk_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep);
+extern void vk_musb_fdrc_clear_mask(volatile uint8_t *reg, uint_fast8_t ep);
+extern uint16_t vk_musb_fdrc_get_mask(volatile uint8_t *reg);
 
-extern void vsf_musb_fdrc_interrupt_init(vsf_musb_fdrc_reg_t *reg);
-extern uint_fast16_t vsf_musb_fdrc_rx_fifo_size(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep);
-extern void vsf_musb_fdrc_read_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern void vsf_musb_fdrc_write_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern void vk_musb_fdrc_interrupt_init(vk_musb_fdrc_reg_t *reg);
+extern uint_fast16_t vk_musb_fdrc_rx_fifo_size(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep);
+extern void vk_musb_fdrc_read_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern void vk_musb_fdrc_write_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
 #endif
 #endif      // __VSF_MUSB_FDRC_COMMON_H__

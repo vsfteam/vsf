@@ -241,6 +241,8 @@ enum {
 #       define VSF_LIBUSB_HCD_DEV0_PID      0x5567
 #   endif
 
+#   define VSF_USE_WINFS                    ENABLED
+
 #   define VSF_HEAP_SIZE                    0x100000
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT       4
 #else
@@ -283,9 +285,9 @@ enum {
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_TGUI == ENABLED
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt);
+        extern void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vsf_input_on_touchscreen((__TS_EVT))
+        vk_input_on_touchscreen((__TS_EVT))
 #endif
 
 

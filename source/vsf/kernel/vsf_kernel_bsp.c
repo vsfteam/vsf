@@ -30,6 +30,13 @@
 #define __VSF_OS_EVTQ_SWI_PRIO_INIT(__index, __unused)                          \
     VSF_ARCH_PRIO_##__index,
 
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
+#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
+#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -90,7 +97,11 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
         {
             __vsf_os_swi_priority,                  // os_swi_priorities_ptr
             UBOUND(__vsf_os_swi_priority),          // swi_priority_cnt
-            {vsf_prio_highest, __VSF_OS_SWI_PRIORITY_BEGIN},
+            {__VSF_OS_SWI_PRIORITY_BEGIN, vsf_prio_highest},
+        },
+#else
+        {
+            {vsf_prio_highest},
         },
 #endif
 
@@ -143,7 +154,7 @@ uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 void vsf_kernel_err_report(vsf_kernel_error_t err)
 {
     switch (err) {
-        default:
+        
         case VSF_KERNEL_ERR_NULL_EDA_PTR:
             /*! \note
             This should not happen. Two possible reasons could be:
@@ -152,12 +163,21 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
             2. When VSF_OS_CFG_MAIN_MODE is not VSF_OS_CFG_MAIN_MODE_THREAD, using
                any vsf_eda_xxxx APIs. 
             */
+            
+        case VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR:
+            /*! \note
+             This should not happen. One possible reason is:
+             > You start task, e.g. eda, vsf_task, vsf_pt or vsf_thread in the idle
+               task. Please use vsf_prio_0 when you do this in idle task.
+             */
+        default:
             {
                 vsf_gint_state_t gint_state = vsf_disable_interrupt(); 
                 while(1);
                 vsf_set_interrupt(gint_state);
             }
             break;
+            
         case VSF_KERNEL_ERR_NONE:
             break;
     }
@@ -171,7 +191,9 @@ implement_vsf_thread(app_main_thread_t)
 {
     main();
 }
-#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
+    ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
 static void __app_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     main();
@@ -184,7 +206,9 @@ ROOT void __post_vsf_kernel_init(void)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     static NO_INIT app_main_thread_t __app_main;
     init_vsf_thread(app_main_thread_t, &__app_main, vsf_prio_0);
-#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
+    ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
     const vsf_eda_cfg_t cfg = {
         .fn.evthandler = __app_main_evthandler,
         .priority = vsf_prio_0,

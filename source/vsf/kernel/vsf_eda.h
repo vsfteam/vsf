@@ -78,7 +78,7 @@
             vsf_eda_mutex_try_to_enter((__pcrit), (__timeout))
 
 #define vsf_eda_crit_enter(__pcrit)                                             \
-            vsf_eda_mutex_enter((__pcrit), -1)
+            vsf_eda_mutex_enter((__pcrit))
 
 #define vsf_eda_crit_leave(__pcrit)                                             \
             vsf_eda_mutex_leave((__pcrit))
@@ -600,18 +600,16 @@ typedef vsf_sync_t          __vsf_crit_npb_t;
 typedef vsf_sync_owner_t    vsf_mutex_t;
 typedef vsf_mutex_t         vsf_crit_t;
 
-struct vsf_bmpevt_adapter_sync_t {
+typedef struct vsf_bmpevt_adapter_sync_t {
     implement(vsf_bmpevt_adapter_eda_t)
     vsf_sync_t *sync;
-}ALIGN(4);
-typedef struct vsf_bmpevt_adapter_sync_t vsf_bmpevt_adapter_sync_t;
+} vsf_bmpevt_adapter_sync_t;
 
-struct vsf_bmpevt_adapter_bmpevt_t {
+typedef struct vsf_bmpevt_adapter_bmpevt_t {
     implement(vsf_bmpevt_adapter_eda_t)
     vsf_bmpevt_t *bmpevt;
     vsf_bmpevt_pender_t pender;
-}ALIGN(4);
-typedef struct vsf_bmpevt_adapter_bmpevt_t vsf_bmpevt_adapter_bmpevt_t;
+} vsf_bmpevt_adapter_bmpevt_t;
 #endif
 
 typedef enum vsf_kernel_error_t {
@@ -619,6 +617,7 @@ typedef enum vsf_kernel_error_t {
     VSF_KERNEL_ERR_NULL_EDA_PTR,
     VSF_KERNEL_ERR_INVALID_USAGE,
     VSF_KERNEL_ERR_EDA_DOES_NOT_SUPPORT_TIMER,
+    VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR,
 }vsf_kernel_error_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -639,6 +638,9 @@ extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
 SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
 extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *pthis, 
                                         vsf_eda_evthandler_t evthandler);
+
+SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
+extern vsf_err_t vsf_eda_go_to(uintptr_t evthandler);
 
 SECTION(".text.vsf.kernel.eda")
 extern vsf_err_t vsf_eda_init(  vsf_eda_t *pthis, 
@@ -672,16 +674,26 @@ extern void vsf_eda_yield(void);
 SECTION(".text.vsf.kernel.__vsf_eda_call_eda")
 extern vsf_err_t __vsf_eda_call_eda(uintptr_t evthandler, uintptr_t param);
 
+SECTION(".text.vsf.kernel.__vsf_eda_go_to_ex")
+extern vsf_err_t __vsf_eda_go_to_ex(uintptr_t evthandler, uintptr_t param);
+
 SECTION(".text.vsf.kernel.eda_nesting")
 extern vsf_err_t __vsf_eda_call_eda_ex( uintptr_t func, 
                                         uintptr_t param, 
-                                        __vsf_eda_frame_state_t state);
+                                        __vsf_eda_frame_state_t state,
+                                        bool is_sub_call);
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+SECTION(".text.vsf.kernel.vsf_eda_target_set")
+extern vsf_err_t vsf_eda_target_set(uintptr_t param);
+
+SECTION(".text.vsf.kernel.vsf_eda_target_get")
+extern uintptr_t vsf_eda_target_get(void);
+
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
 extern fsm_rt_t vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
+#   endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 
-#endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED

@@ -45,9 +45,9 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_class(vsf_usbd_msc_t)
+declare_class(vk_usbd_msc_t)
 
-union vsf_usbd_msc_scsi_ctx_t {
+union vk_usbd_msc_scsi_ctx_t {
     usb_msc_cbw_t cbw;
     struct {
         usb_msc_csw_t csw;
@@ -57,15 +57,15 @@ union vsf_usbd_msc_scsi_ctx_t {
         };
     };
 };
-typedef union vsf_usbd_msc_scsi_ctx_t vsf_usbd_msc_scsi_ctx_t;
+typedef union vk_usbd_msc_scsi_ctx_t vk_usbd_msc_scsi_ctx_t;
 
-def_simple_class(vsf_usbd_msc_t) {
+def_simple_class(vk_usbd_msc_t) {
 
     private_member(
         vsf_eda_t eda;
-        vsf_usbd_msc_scsi_ctx_t ctx;
-        vsf_usbd_dev_t *dev;
-        vsf_usbd_ep_stream_t ep_stream;
+        vk_usbd_msc_scsi_ctx_t ctx;
+        vk_usbd_dev_t *dev;
+        vk_usbd_ep_stream_t ep_stream;
         uint8_t is_inited   : 1;
         uint8_t is_stream   : 1;
     )
@@ -74,14 +74,14 @@ def_simple_class(vsf_usbd_msc_t) {
         const uint8_t ep_out;
         const uint8_t ep_in;
         const uint8_t max_lun;
-        vsf_scsi_t *scsi;
+        vk_scsi_t *scsi;
         vsf_stream_t *stream;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbd_class_op_t vsf_usbd_msc_class;
+extern const vk_usbd_class_op_t vk_usbd_msc_class;
 
 /*============================ PROTOTYPES ====================================*/
 

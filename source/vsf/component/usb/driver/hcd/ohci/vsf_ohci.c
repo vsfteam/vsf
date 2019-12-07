@@ -308,7 +308,7 @@ enum ohci_hcd_state_t {
 typedef enum ohci_hcd_state_t ohci_hcd_state_t;
 
 /* Full ohci controller descriptor */
-struct vsf_ohci_t {
+struct vk_ohci_t {
     implement(ohci_hcca_t);
 
     vsf_eda_t eda;
@@ -324,7 +324,7 @@ struct vsf_ohci_t {
     vsf_slist_t ed_rm_list;
     vsf_slist_t td_dl_list;
 };
-typedef struct vsf_ohci_t vsf_ohci_t;
+typedef struct vk_ohci_t vk_ohci_t;
 
 struct ohci_urb_t {
     ohci_ed_t *ed;
@@ -348,17 +348,17 @@ struct ohci_urb_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void ohci_free_urb_do(vsf_usbh_hcd_urb_t *urb);
+static void ohci_free_urb_do(vk_usbh_hcd_urb_t *urb);
 
 /*============================ IMPLEMENTATION ================================*/
 
 implement_vsf_pool(ohci_td_pool, ohci_td_t);
 
-static NO_INIT vsf_pool(ohci_td_pool) __vsf_ohci_td_pool;
+static NO_INIT vsf_pool(ohci_td_pool) __vk_ohci_td_pool;
 
 static ohci_td_t * ohci_td_alloc(void)
 {
-    ohci_td_t *td = VSF_POOL_ALLOC(ohci_td_pool, &__vsf_ohci_td_pool);
+    ohci_td_t *td = VSF_POOL_ALLOC(ohci_td_pool, &__vk_ohci_td_pool);
     if (td != NULL) {
         memset(td, 0, sizeof(*td));
     }
@@ -367,10 +367,10 @@ static ohci_td_t * ohci_td_alloc(void)
 
 static void ohci_td_free(ohci_td_t *td)
 {
-    VSF_POOL_FREE(ohci_td_pool, &__vsf_ohci_td_pool, td);
+    VSF_POOL_FREE(ohci_td_pool, &__vk_ohci_td_pool, td);
 }
 
-static int_fast8_t ohci_ed_balance(vsf_ohci_t *ohci, uint_fast8_t interval, uint_fast8_t load)
+static int_fast8_t ohci_ed_balance(vk_ohci_t *ohci, uint_fast8_t interval, uint_fast8_t load)
 {
     int_fast8_t i, j, branch = -1;
 
@@ -398,7 +398,7 @@ static int_fast8_t ohci_ed_balance(vsf_ohci_t *ohci, uint_fast8_t interval, uint
     return branch;
 }
 
-static void ohci_link_periodic(vsf_ohci_t *ohci, ohci_ed_t *ed)
+static void ohci_link_periodic(vk_ohci_t *ohci, ohci_ed_t *ed)
 {
     ohci_ed_t *ed_here, **ed_prev;
 
@@ -422,7 +422,7 @@ static void ohci_link_periodic(vsf_ohci_t *ohci, ohci_ed_t *ed)
     }
 }
 
-static void ohci_unlink_periodic(vsf_ohci_t *ohci, ohci_ed_t *ed)
+static void ohci_unlink_periodic(vk_ohci_t *ohci, ohci_ed_t *ed)
 {
     ohci_ed_t **ed_prev;
     for (int_fast8_t i = ed->branch; i < OHCI_NUM_CHAINS; i += ed->interval)
@@ -440,7 +440,7 @@ static void ohci_unlink_periodic(vsf_ohci_t *ohci, ohci_ed_t *ed)
 }
 
 // link an ed into one of the HC chains
-static vsf_err_t ohci_ed_schedule(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
+static vsf_err_t ohci_ed_schedule(vk_ohci_t *ohci, ohci_urb_t *urb_ohci)
 {
     ohci_regs_t *regs = ohci->regs;
     ohci_ed_t *ed = urb_ohci->ed;
@@ -491,7 +491,7 @@ static vsf_err_t ohci_ed_schedule(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
     return VSF_ERR_NONE;
 }
 
-static void ohci_ed_deschedule(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
+static void ohci_ed_deschedule(vk_ohci_t *ohci, ohci_urb_t *urb_ohci)
 {
     ohci_regs_t *regs = ohci->regs;
     ohci_ed_t *ed = urb_ohci->ed;
@@ -541,9 +541,9 @@ static void ohci_ed_deschedule(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
     urb_ohci->state &= ~URB_PRIV_EDLINK;
 }
 
-static vsf_err_t ohci_ed_init(ohci_urb_t *urb_ohci, vsf_usbh_hcd_urb_t *urb)
+static vsf_err_t ohci_ed_init(ohci_urb_t *urb_ohci, vk_usbh_hcd_urb_t *urb)
 {
-    vsf_usbh_eppipe_t pipe;
+    vk_usbh_eppipe_t pipe;
     ohci_ed_t *ed;
     ohci_td_t *td;
 
@@ -633,7 +633,7 @@ static ohci_td_t * ohci_td_fill_iso(ohci_td_t *td, uint_fast32_t info, void *dat
 {
     ohci_td_t *td_tmp;
     uint_fast32_t bufferStart;
-    vsf_usbh_hcd_urb_t *urb = container_of(urb_ohci, vsf_usbh_hcd_urb_t, priv);
+    vk_usbh_hcd_urb_t *urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
     VSF_USB_ASSERT(td != NULL);
 
@@ -658,7 +658,7 @@ static ohci_td_t * ohci_td_fill_iso(ohci_td_t *td, uint_fast32_t info, void *dat
 }
 #endif // VSFHAL_HCD_ISO_EN
 
-static void ohci_td_submit_urb(vsf_ohci_t *ohci, struct vsf_usbh_hcd_urb_t *urb)
+static void ohci_td_submit_urb(vk_ohci_t *ohci, struct vk_usbh_hcd_urb_t *urb)
 {
     ohci_urb_t *urb_ohci;
     ohci_regs_t *regs;
@@ -747,7 +747,7 @@ static void ohci_td_submit_urb(vsf_ohci_t *ohci, struct vsf_usbh_hcd_urb_t *urb)
     urb_ohci->state |= URB_PRIV_TDLINK;
 }
 
-static void ohci_update_dl(vsf_ohci_t *ohci)
+static void ohci_update_dl(vk_ohci_t *ohci)
 {
     ohci_td_t *td, *td_tmp, *td_next;
     ohci_urb_t *urb_ohci;
@@ -791,11 +791,11 @@ static void ohci_update_dl(vsf_ohci_t *ohci)
     }
 }
 
-static void ohci_finish_unlinks(vsf_ohci_t *ohci)
+static void ohci_finish_unlinks(vk_ohci_t *ohci)
 {
     ohci_regs_t *regs = ohci->regs;
     ohci_urb_t *urb_ohci;
-    vsf_usbh_hcd_urb_t *urb;
+    vk_usbh_hcd_urb_t *urb;
     uint_fast8_t frame = ohci->frame_no & 0x01;
     ohci_ed_t *ed, **ed_last, *ed_dellist = NULL;
     uint_fast32_t cmd = 0, ctrl = 0;
@@ -805,7 +805,7 @@ static void ohci_finish_unlinks(vsf_ohci_t *ohci)
     for (ed_last = (ohci_ed_t **)&ohci->ed_rm_list.head, ed = *ed_last; ed != NULL; ed = *ed_last) {
         if (ed->rm_frame == frame) {
             urb_ohci = ed->td_dummy->urb_ohci;
-            urb = container_of(urb_ohci, vsf_usbh_hcd_urb_t, priv);
+            urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
             usb_settoggle(urb->dev_hcd, urb->pipe.endpoint,
                         !urb->pipe.dir_in1out0, (ed->hwHeadP & ED_C) >> 1);
@@ -856,7 +856,7 @@ static void ohci_finish_unlinks(vsf_ohci_t *ohci)
     }
 }
 
-static vsf_err_t ohci_td_done(vsf_usbh_hcd_urb_t *urb, ohci_td_t *td)
+static vsf_err_t ohci_td_done(vk_usbh_hcd_urb_t *urb, ohci_td_t *td)
 {
     ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
     int_fast32_t cc = 0;
@@ -912,7 +912,7 @@ static vsf_err_t ohci_td_done(vsf_usbh_hcd_urb_t *urb, ohci_td_t *td)
     return err;
 }
 
-static void ohci_ed_start_unlink(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
+static void ohci_ed_start_unlink(vk_ohci_t *ohci, ohci_urb_t *urb_ohci)
 {
     ohci_regs_t *regs = ohci->regs;
     ohci_ed_t *ed = urb_ohci->ed;
@@ -933,11 +933,11 @@ static void ohci_ed_start_unlink(vsf_ohci_t *ohci, ohci_urb_t *urb_ohci)
     ed->rm_frame = (ohci->frame_no + 1) & 0x1;
 }
 
-static void ohci_td_takeback(vsf_ohci_t *ohci, ohci_td_t *td)
+static void ohci_td_takeback(vk_ohci_t *ohci, ohci_td_t *td)
 {
     vsf_err_t err;
     ohci_urb_t *urb_ohci = td->urb_ohci;
-    vsf_usbh_hcd_urb_t *urb = container_of(urb_ohci, vsf_usbh_hcd_urb_t, priv);
+    vk_usbh_hcd_urb_t *urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
     err = ohci_td_done(urb, td);
     urb_ohci->td_num_served++;
@@ -959,7 +959,7 @@ static void ohci_td_takeback(vsf_ohci_t *ohci, ohci_td_t *td)
     }
 }
 
-static void ohci_work(vsf_ohci_t *ohci)
+static void ohci_work(vk_ohci_t *ohci)
 {
     ohci_td_t *td;
 
@@ -975,7 +975,7 @@ static void ohci_work(vsf_ohci_t *ohci)
 
 static void ohci_interrupt(void *param)
 {
-    vsf_ohci_t *ohci = (vsf_ohci_t *)param;
+    vk_ohci_t *ohci = (vk_ohci_t *)param;
     ohci_regs_t *regs = ohci->regs;
     uint_fast32_t intrstatus = regs->intrstatus & regs->intrenable;
 
@@ -1010,17 +1010,17 @@ static void ohci_interrupt(void *param)
     regs->intrenable = OHCI_INTR_MIE;
 }
 
-static vsf_ohci_t * ohci_alloc_resource(void)
+static vk_ohci_t * ohci_alloc_resource(void)
 {
-    uint_fast16_t ohci_size = (sizeof(vsf_ohci_t) + 31) & ~31;
-    vsf_ohci_t *ohci = VSF_USBH_MALLOC_ALIGNED(ohci_size, 256);
+    uint_fast16_t ohci_size = (sizeof(vk_ohci_t) + 31) & ~31;
+    vk_ohci_t *ohci = VSF_USBH_MALLOC_ALIGNED(ohci_size, 256);
     if (ohci == NULL) { return NULL; }
-    memset(ohci, 0, sizeof(vsf_ohci_t));
+    memset(ohci, 0, sizeof(vk_ohci_t));
     return ohci;
 }
 
 // return ms for PowerOn to PowerGood
-static uint_fast32_t ohci_start(vsf_ohci_t *ohci)
+static uint_fast32_t ohci_start(vk_ohci_t *ohci)
 {
     ohci_regs_t *regs = ohci->regs;
 
@@ -1047,7 +1047,7 @@ static void ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
         case VSF_EVT_MESSAGE:
         {
             ohci_ed_t *ed, *ed_dellist = vsf_eda_get_cur_msg();
-            vsf_usbh_hcd_urb_t *urb;
+            vk_usbh_hcd_urb_t *urb;
             ohci_urb_t *urb_ohci;
 
             while (ed_dellist != NULL) {
@@ -1055,8 +1055,8 @@ static void ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_slist_peek_next(ohci_ed_t, node, &ed->node, ed_dellist);
 
                 urb_ohci = ed->td_dummy->urb_ohci;
-                urb = container_of(urb_ohci, vsf_usbh_hcd_urb_t, priv);
-                vsf_usbh_hcd_urb_free_buffer(urb);
+                urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_free_buffer(urb);
                 ohci_ed_fini(urb_ohci);
                 ohci_free_urb_do(urb);
             }
@@ -1065,10 +1065,10 @@ static void ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hcd_t *hcd)
+static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
 {
-    vsf_ohci_t *ohci;
-    vsf_ohci_param_t *ohci_param;
+    vk_ohci_t *ohci;
+    vk_ohci_param_t *ohci_param;
     ohci_regs_t *regs;
 
     VSF_USB_ASSERT(hcd != NULL);
@@ -1132,54 +1132,54 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hc
     return VSF_ERR_NOT_READY;
 }
 
-static vsf_err_t ohci_fini(vsf_usbh_hcd_t *hcd)
+static vsf_err_t ohci_fini(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t ohci_suspend(vsf_usbh_hcd_t *hcd)
+static vsf_err_t ohci_suspend(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t ohci_resume(vsf_usbh_hcd_t *hcd)
+static vsf_err_t ohci_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_usbh_hcd_urb_t * ohci_alloc_urb(vsf_usbh_hcd_t *hcd)
+static vk_usbh_hcd_urb_t * ohci_alloc_urb(vk_usbh_hcd_t *hcd)
 {
     uint_fast32_t size;
-    vsf_usbh_hcd_urb_t *urb = NULL;
+    vk_usbh_hcd_urb_t *urb = NULL;
     ohci_urb_t *urb_ohci;
     ohci_ed_t *ed;
 
     VSF_USB_ASSERT(hcd != NULL);
 
-    size = sizeof(ohci_ed_t) + sizeof(vsf_usbh_hcd_urb_t) + sizeof(ohci_urb_t);
+    size = sizeof(ohci_ed_t) + sizeof(vk_usbh_hcd_urb_t) + sizeof(ohci_urb_t);
     ed = VSF_USBH_MALLOC_ALIGNED(size, 16);
     if (ed) {
         memset(ed, 0, size);
-        urb = (vsf_usbh_hcd_urb_t *)(ed + 1);
+        urb = (vk_usbh_hcd_urb_t *)(ed + 1);
         urb_ohci = (ohci_urb_t *)urb->priv;
         urb_ohci->ed = ed;
     }
     return urb;
 }
 
-static void ohci_free_urb_do(vsf_usbh_hcd_urb_t *urb)
+static void ohci_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
     VSF_USBH_FREE(urb_ohci->ed);
 }
 
-static void ohci_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static void ohci_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    vsf_ohci_t *ohci;
+    vk_ohci_t *ohci;
     ohci_urb_t *urb_ohci;
 
     VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
-    ohci = (vsf_ohci_t *)hcd->priv;
+    ohci = (vk_ohci_t *)hcd->priv;
     urb_ohci = (ohci_urb_t *)urb->priv;
     VSF_USB_ASSERT((ohci != NULL) && (urb_ohci != NULL));
 
@@ -1192,21 +1192,21 @@ static void ohci_free_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
             ohci_ed_start_unlink(ohci, urb_ohci);
         }
     } else {
-        vsf_usbh_hcd_urb_free_buffer(urb);
+        vk_usbh_hcd_urb_free_buffer(urb);
         ohci_free_urb_do(urb);
     }
 }
 
-static vsf_err_t ohci_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static vsf_err_t ohci_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     uint_fast32_t size = 0, datablock;
-    vsf_ohci_t *ohci;
+    vk_ohci_t *ohci;
     ohci_urb_t *urb_ohci;
     ohci_ed_t *ed;
     ohci_td_t *td;
 
     VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
-    ohci = (vsf_ohci_t *)hcd->priv;
+    ohci = (vk_ohci_t *)hcd->priv;
     urb_ohci = (ohci_urb_t *)urb->priv;
     VSF_USB_ASSERT((ohci != NULL) && (urb_ohci != NULL));
 
@@ -1280,13 +1280,13 @@ static vsf_err_t ohci_submit_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t ohci_relink_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static vsf_err_t ohci_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    vsf_ohci_t *ohci;
+    vk_ohci_t *ohci;
     ohci_urb_t *urb_ohci;
 
     VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
-    ohci = (vsf_ohci_t *)hcd->priv;
+    ohci = (vk_ohci_t *)hcd->priv;
     VSF_USB_ASSERT(ohci != NULL);
     urb_ohci = (ohci_urb_t *)urb->priv;
     VSF_USB_ASSERT(urb_ohci != NULL);
@@ -1315,10 +1315,10 @@ static vsf_err_t ohci_relink_urb(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     return VSF_ERR_NONE;
 }
 
-static int ohci_rh_control(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
+static int ohci_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     uint_fast16_t typeReq, wValue, wIndex, wLength;
-    vsf_ohci_t *ohci;
+    vk_ohci_t *ohci;
     ohci_regs_t *regs;
     struct usb_ctrlrequest_t *req = &urb->setup_packet;
     uint_fast32_t temp;
@@ -1327,7 +1327,7 @@ static int ohci_rh_control(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb)
     uint_fast8_t len = 0;
 
     VSF_USB_ASSERT((hcd != NULL) && (urb != NULL));
-    ohci = (vsf_ohci_t *)hcd->priv;
+    ohci = (vk_ohci_t *)hcd->priv;
     VSF_USB_ASSERT(ohci != NULL);
     regs = ohci->regs;
 
@@ -1441,24 +1441,24 @@ error:
     return -1;
 }
 
-void vsf_ohci_init(void)
+void vk_ohci_init(void)
 {
     /*
     vsf_pool_cfg_t cfg = {
         NULL,
         (code_region_t *)&DEFAULT_CODE_REGION_NONE,
     };
-    ohci_td_pool_pool_init(&__vsf_ohci_td_pool, &cfg);
+    ohci_td_pool_pool_init(&__vk_ohci_td_pool, &cfg);
     */
 
 
 #if defined(VSF_OHCI_CFG_MAX_TD_NUM)
-    VSF_POOL_INIT_EX(ohci_td_pool, &__vsf_ohci_td_pool, VSF_OHCI_CFG_MAX_TD_NUM, 32,
+    VSF_POOL_INIT_EX(ohci_td_pool, &__vk_ohci_td_pool, VSF_OHCI_CFG_MAX_TD_NUM, 32,
         .pTarget = NULL,
         .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE, 
     );
 #else
-    VSF_POOL_PREPARE_EX(ohci_td_pool, &__vsf_ohci_td_pool, 32,
+    VSF_POOL_PREPARE_EX(ohci_td_pool, &__vk_ohci_td_pool, 32,
         .pTarget = NULL,
         .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE,
     );
@@ -1466,14 +1466,14 @@ void vsf_ohci_init(void)
     void *td_buffer = VSF_USBH_MALLOC_ALIGNED(
             sizeof(ohci_td_t) * VSF_OHCI_CFG_MAX_TD_NUM, 32);
     VSF_POOL_ADD_BUFFER(    ohci_td_pool,
-                            &__vsf_ohci_td_pool,
+                            &__vk_ohci_td_pool,
                             td_buffer,
                             VSF_OHCI_CFG_MAX_TD_NUM * sizeof(ohci_td_t));
 */
 #endif
 }
 
-const vsf_usbh_hcd_drv_t vsf_ohci_drv = {
+const vk_usbh_hcd_drv_t vk_ohci_drv = {
     .init_evthandler = ohci_init_evthandler,
     .fini = ohci_fini,
     .suspend = ohci_suspend,

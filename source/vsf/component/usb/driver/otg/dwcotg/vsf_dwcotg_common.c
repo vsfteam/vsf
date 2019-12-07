@@ -33,16 +33,16 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void vsf_dwcotg_reset(vsf_dwcotg_t *dwcotg)
+static void vk_dwcotg_reset(vk_dwcotg_t *dwcotg)
 {
     dwcotg->reg.global_regs->grstctl |= USB_OTG_GRSTCTL_CSRST;
     while (dwcotg->reg.global_regs->grstctl & USB_OTG_GRSTCTL_CSRST);
     while ((dwcotg->reg.global_regs->grstctl & USB_OTG_GRSTCTL_AHBIDL) == 0U);
 }
 
-void vsf_dwcotg_phy_init(vsf_dwcotg_t *dwcotg,
-                        const vsf_dwcotg_param_t *param,
-                        vsf_dwcotg_hw_info_t *hw_info)
+void vk_dwcotg_phy_init(vk_dwcotg_t *dwcotg,
+                        const vk_dwcotg_param_t *param,
+                        vk_dwcotg_hw_info_t *hw_info)
 {
     struct dwcotg_core_global_regs_t *global_regs = dwcotg->reg.global_regs;
 
@@ -60,7 +60,7 @@ void vsf_dwcotg_phy_init(vsf_dwcotg_t *dwcotg,
             global_regs->gusbcfg |= USB_OTG_GUSBCFG_ULPIEVBUSD;
         }
 
-        vsf_dwcotg_reset(dwcotg);
+        vk_dwcotg_reset(dwcotg);
     } else if (param->utmi_en) {
         VSF_USB_ASSERT(hw_info->utmi_en);
 
@@ -72,12 +72,12 @@ void vsf_dwcotg_phy_init(vsf_dwcotg_t *dwcotg,
         // Select vbus source
         global_regs->gusbcfg &= ~(USB_OTG_GUSBCFG_ULPIEVBUSD | USB_OTG_GUSBCFG_ULPIEVBUSI);
 
-        vsf_dwcotg_reset(dwcotg);
+        vk_dwcotg_reset(dwcotg);
     } else {
         // init embedded phy
         global_regs->gusbcfg |= USB_OTG_GUSBCFG_PHYSEL;
 
-        vsf_dwcotg_reset(dwcotg);
+        vk_dwcotg_reset(dwcotg);
 
         global_regs->gccfg = USB_OTG_GCCFG_PWRDWN | USB_OTG_GCCFG_VBUSACEN | USB_OTG_GCCFG_VBUSBCEN;
         if (!param->vbus_en) {

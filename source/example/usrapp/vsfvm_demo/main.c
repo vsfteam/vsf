@@ -45,7 +45,7 @@ struct usrapp_const_t {
 #   if VSF_USE_USB_HOST == ENABLED
     struct {
 #       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        vsf_ohci_param_t ohci_param;
+        vk_ohci_param_t ohci_param;
 #       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
         vsf_libusb_hcd_param_t libusb_hcd_param;
 #       endif
@@ -64,12 +64,12 @@ typedef struct usrapp_const_t usrapp_const_t;
 struct usrapp_t {
 #if VSF_USE_USB_HOST == ENABLED
     struct {
-        vsf_usbh_t host;
+        vk_usbh_t host;
 #   if VSF_USE_USB_HOST_HUB == ENABLED
-        vsf_usbh_class_t hub;
+        vk_usbh_class_t hub;
 #   endif
 #   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-        vsf_usbh_class_t libusb;
+        vk_usbh_class_t libusb;
 #   endif
     } usbh;
 #endif
@@ -189,17 +189,17 @@ static usrapp_t usrapp = {
 #if VSF_USE_USB_HOST == ENABLED
     .usbh                   = {
 #   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        .host.drv           = &vsf_ohci_drv,
+        .host.drv           = &vk_ohci_drv,
         .host.param         = (void *)&usrapp_const.usbh.ohci_param,
 #   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
         .host.drv           = &vsf_libusb_hcd_drv,
         .host.param         = (void*)&usrapp_const.usbh.libusb_hcd_param,
 #   endif
 #   if VSF_USE_USB_HOST_HUB == ENABLED
-        .hub.drv            = &vsf_usbh_hub_drv,
+        .hub.drv            = &vk_usbh_hub_drv,
 #   endif
 #   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-        .libusb.drv         = &vsf_usbh_libusb_drv,
+        .libusb.drv         = &vk_usbh_libusb_drv,
 #   endif
     },
 #endif
@@ -395,14 +395,14 @@ int main(void)
 
 #if VSF_USE_USB_HOST == ENABLED
 #   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-    vsf_ohci_init();
+    vk_ohci_init();
 #   endif
-    vsf_usbh_init(&usrapp.usbh.host);
+    vk_usbh_init(&usrapp.usbh.host);
 #   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.libusb);
+    vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.libusb);
 #   endif
 #   if VSF_USE_USB_HOST_HUB == ENABLED
-    vsf_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hub);
+    vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hub);
 #   endif
 #endif
 

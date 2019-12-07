@@ -78,9 +78,9 @@
             .rx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
         },                                                                      \
     },                                                                          \
-    .ifs[2 * (__N)].class_op        = &vsf_usbd_cdcacm_control,                 \
+    .ifs[2 * (__N)].class_op        = &vk_usbd_cdcacm_control,                 \
     .ifs[2 * (__N)].class_param     = &__USBD.cdc[(__N)].param,                 \
-    .ifs[2 * (__N) + 1].class_op    = &vsf_usbd_cdcacm_data,                    \
+    .ifs[2 * (__N) + 1].class_op    = &vk_usbd_cdcacm_data,                    \
     .ifs[2 * (__N) + 1].class_param = &__USBD.cdc[(__N)].param,
 
 /*============================ TYPES =========================================*/
@@ -88,9 +88,9 @@
 struct usrapp_const_t {
     struct {
 #if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-        vsf_dwcotg_dcd_param_t dwcotg_param;
+        vk_dwcotg_dcd_param_t dwcotg_param;
 #elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-        vsf_musb_fdrc_dcd_param_t musb_fdrc_param;
+        vk_musb_fdrc_dcd_param_t musb_fdrc_param;
 #endif
         uint8_t dev_desc[18];
         uint8_t config_desc[9 + USRAPP_CFG_CDC_NUM * USB_DESC_CDC_ACM_IAD_LEN];
@@ -98,7 +98,7 @@ struct usrapp_const_t {
         uint8_t str_vendor[20];
         uint8_t str_product[26];
         uint8_t str_cdc[USRAPP_CFG_CDC_NUM][16];
-        vsf_usbd_desc_t std_desc[5 + USRAPP_CFG_CDC_NUM];
+        vk_usbd_desc_t std_desc[5 + USRAPP_CFG_CDC_NUM];
     } usbd;
 };
 typedef struct usrapp_const_t usrapp_const_t;
@@ -106,12 +106,12 @@ typedef struct usrapp_const_t usrapp_const_t;
 struct usrapp_t {
     struct {
 #if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-        vsf_dwcotg_dcd_t dwcotg_dcd;
+        vk_dwcotg_dcd_t dwcotg_dcd;
 #elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-        vsf_musb_fdrc_dcd_t musb_fdrc_dcd;
+        vk_musb_fdrc_dcd_t musb_fdrc_dcd;
 #endif
         struct {
-            vsf_usbd_cdcacm_t param;
+            vk_usbd_cdcacm_t param;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             struct {
                 vsf_mem_stream_t tx;
@@ -123,9 +123,9 @@ struct usrapp_t {
 #endif
         } cdc[USRAPP_CFG_CDC_NUM];
 
-        vsf_usbd_ifs_t ifs[2 * USRAPP_CFG_CDC_NUM];
-        vsf_usbd_cfg_t config[1];
-        vsf_usbd_dev_t dev;
+        vk_usbd_ifs_t ifs[2 * USRAPP_CFG_CDC_NUM];
+        vk_usbd_cfg_t config[1];
+        vk_usbd_dev_t dev;
 
         vsf_callback_timer_t connect_timer;
     } usbd;
@@ -203,7 +203,7 @@ static usrapp_t usrapp = {
         .dev.num_of_config      = dimof(usrapp.usbd.config),
         .dev.config             = usrapp.usbd.config,
         .dev.num_of_desc        = dimof(usrapp_const.usbd.std_desc),
-        .dev.desc               = (vsf_usbd_desc_t *)usrapp_const.usbd.std_desc,
+        .dev.desc               = (vk_usbd_desc_t *)usrapp_const.usbd.std_desc,
 
 #if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
         .dev.speed              = USB_DC_SPEED_HIGH,
@@ -219,7 +219,7 @@ static usrapp_t usrapp = {
 
 static void usrapp_on_timer(vsf_callback_timer_t *timer)
 {
-    vsf_usbd_connect(&usrapp.usbd.dev);
+    vk_usbd_connect(&usrapp.usbd.dev);
 }
 
 void main(void)
@@ -234,8 +234,8 @@ void main(void)
         vsf_stream_init(&usrapp.usbd.cdc[i].stream.rx.use_as__vsf_stream_t);
     }
 
-    vsf_usbd_init(&usrapp.usbd.dev);
-    vsf_usbd_disconnect(&usrapp.usbd.dev);
+    vk_usbd_init(&usrapp.usbd.dev);
+    vk_usbd_disconnect(&usrapp.usbd.dev);
     usrapp.usbd.connect_timer.on_timer = usrapp_on_timer;
     vsf_callback_timer_add_ms(&usrapp.usbd.connect_timer, 200);
 }

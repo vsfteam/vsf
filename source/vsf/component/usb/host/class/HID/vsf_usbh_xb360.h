@@ -44,14 +44,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbh_xb360_t)
+declare_simple_class(vk_usbh_xb360_t)
 
 // xb360 controller is not HID class, but almost compatible with HID class
-def_simple_class(vsf_usbh_xb360_t) {
+def_simple_class(vk_usbh_xb360_t) {
 
-    implement(vsf_usbh_hid_teda_t)
+    implement(vk_usbh_hid_teda_t)
 #if VSF_USE_INPUT_XB360 == ENABLED
-    implement(vsf_input_xb360_t)
+    implement(vk_input_xb360_t)
 #endif
 
     private_member(
@@ -62,7 +62,7 @@ def_simple_class(vsf_usbh_xb360_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_class_drv_t vsf_usbh_xb360_drv;
+extern const vk_usbh_class_drv_t vk_usbh_xb360_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

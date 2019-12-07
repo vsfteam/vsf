@@ -16,7 +16,6 @@
  ****************************************************************************/
 /*============================ INCLUDES ======================================*/
 #include "app_cfg.h"
-#include "vsf.h"
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
@@ -42,7 +41,7 @@ def_fsm(user_fsm_task_t,
         vsf_task(user_fsm_sub_task_t) print_task;
     ));
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
 declare_fsm(user_task_b_t)
 def_fsm(user_task_b_t,
     def_params(
@@ -128,7 +127,7 @@ implement_fsm(user_fsm_task_t)
     body_end();  
 }
 
-#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
+#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
 
 /*! \IMPORTANT You cannot ignore fsm_initialiser at any time
  */
@@ -154,17 +153,16 @@ implement_fsm(user_task_b_t)
         )
         
         state(DELAY){
-            vsf_task_wait_until( vsf_delay_ms(10000));                          //!< wait 10s
-            vsf_sem_post(this.psem);                                            //!< post a semaphore
+            vsf_task_wait_until(vsf_delay_ms(10000))                            //!< wait 10s
             update_state_to(PRINT);                                             //!< transfer to PRINT without yielding...
         }
         
         state(PRINT){
             printf("post semaphore...   [%08x]\r\n", this.cnt++);
+            vsf_sem_post(this.psem);                                            //!< post a semaphore
             reset_fsm();                                                        //!< reset fsm
         }
         
-
     )
 #endif
 
@@ -178,10 +176,10 @@ void vsf_kernel_fsm_simple_demo(void)
     {
         static NO_INIT user_fsm_task_t __user_task;
         init_fsm(user_fsm_task_t, &(__user_task.param), args(&user_sem));
-        start_fsm(user_fsm_task_t, &__user_task, vsf_priority_0);
+        start_fsm(user_fsm_task_t, &__user_task, vsf_prio_0);
     };
 
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(10000);
@@ -197,7 +195,7 @@ void vsf_kernel_fsm_simple_demo(void)
     {
         static NO_INIT user_task_b_t __user_task_b;
         init_fsm(user_task_b_t, &(__user_task_b.param), args(&user_sem));
-        start_fsm(user_task_b_t, &__user_task_b, vsf_priority_0);
+        start_fsm(user_task_b_t, &__user_task_b, vsf_prio_0);
     };
 #endif
 }
@@ -217,7 +215,7 @@ int main(void)
     
     vsf_kernel_fsm_simple_demo();
     
-#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);

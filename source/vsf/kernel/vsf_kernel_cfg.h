@@ -118,10 +118,10 @@
 #endif
 
 #if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
-#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
-#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
-#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
-#   endif
+//#   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
+//#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
+//#       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
+//#   endif
 #   ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
 #       define VSF_KERNEL_CFG_SUPPORT_THREAD                ENABLED
 #   elif VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
@@ -251,9 +251,9 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE        VSF_ARCH_STACK_PAGE_SIZE
 #endif
 
-#if     !defined(VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE)                     \
+#if     !defined(VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)                     \
     &&  defined(VSF_ARCH_STACK_GUARDIAN_SIZE)                               
-#   define VSF_KERNEL_CFG_THREAD_STACK_GuARDIAN_SIZE    VSF_ARCH_STACK_GUARDIAN_SIZE
+#   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE    VSF_ARCH_STACK_GUARDIAN_SIZE
 #endif
 
 

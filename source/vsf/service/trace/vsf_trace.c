@@ -36,6 +36,25 @@
 
 #define VSF_TRACE_LINEBUF_SIZE              128
 
+#ifndef VSF_TRACE_CFG_PROTECT_LEVEL
+/*! \note   By default, the driver tries to make all APIs scheduler-safe,
+ *!
+ *!         in the case when you want to disable it,
+ *!         please use following macro:
+ *!         #define VSF_TRACE_CFG_PROTECT_LEVEL none
+ *!         
+ *!         in the case when you want to use interrupt-safe,
+ *!         please use following macro:
+ *!         #define VSF_TRACE_CFG_PROTECT_LEVEL interrupt
+ *!         
+ *!         NOTE: This macro should be defined in vsf_usr_CFG.h
+ */
+#   define VSF_TRACE_CFG_PROTECT_LEVEL      scheduler
+#endif
+
+#define vsf_trace_protect                   vsf_protect(VSF_TRACE_CFG_PROTECT_LEVEL)
+#define vsf_trace_unprotect                 vsf_unprotect(VSF_TRACE_CFG_PROTECT_LEVEL)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -90,9 +109,9 @@ static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
     uint32_t ret = 0;
 
     if (__vsf_trace.stream != NULL) {
-        vsf_protect_t origlevel = vsf_protect_scheduler();
+        vsf_protect_t origlevel = vsf_trace_protect();
             ret = vsf_stream_write(__vsf_trace.stream, (uint8_t *)buff, size);
-        vsf_unprotect_scheduler(origlevel);
+        vsf_trace_unprotect(origlevel);
     }
     return ret;
 }
@@ -119,7 +138,7 @@ void vsf_trace_fini(void)
 
 static void vsf_trace_arg(const char *format, va_list *arg)
 {
-    vsf_protect_t origlevel = vsf_protect_scheduler();
+    vsf_protect_t origlevel = vsf_trace_protect();
     //__vsf_sched_safe(
         uint_fast32_t size = vsnprintf( (char *)__vsf_trace.print_buffer,
                                         sizeof(__vsf_trace.print_buffer),
@@ -127,7 +146,7 @@ static void vsf_trace_arg(const char *format, va_list *arg)
                                         *arg);
         vsf_trace_output((const char *)__vsf_trace.print_buffer, size);
     //)
-    vsf_unprotect_scheduler(origlevel);
+    vsf_trace_unprotect(origlevel);
 }
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED

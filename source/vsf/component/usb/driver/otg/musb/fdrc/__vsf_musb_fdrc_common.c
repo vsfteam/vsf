@@ -36,7 +36,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO: try 16-bit access to the reg
-void vsf_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep)
+void vk_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep)
 {
     VSF_USB_ASSERT(ep < 16);
     if (ep < 8) {
@@ -46,7 +46,7 @@ void vsf_musb_fdrc_set_mask(volatile uint8_t *reg, uint_fast8_t ep)
     }
 }
 
-void vsf_musb_fdrc_clear_mask(volatile uint8_t *reg, uint_fast8_t ep)
+void vk_musb_fdrc_clear_mask(volatile uint8_t *reg, uint_fast8_t ep)
 {
     VSF_USB_ASSERT(ep < 16);
     if (ep < 8) {
@@ -56,13 +56,13 @@ void vsf_musb_fdrc_clear_mask(volatile uint8_t *reg, uint_fast8_t ep)
     }
 }
 
-uint16_t vsf_musb_fdrc_get_mask(volatile uint8_t *reg)
+uint16_t vk_musb_fdrc_get_mask(volatile uint8_t *reg)
 {
     return reg[0] | (reg[1] << 8);
 }
 
 // Common API
-void vsf_musb_fdrc_interrupt_init(vsf_musb_fdrc_reg_t *reg)
+void vk_musb_fdrc_interrupt_init(vk_musb_fdrc_reg_t *reg)
 {
     reg->Common.IntrTx1E = 0;
     reg->Common.IntrTx2E = 0;
@@ -71,24 +71,24 @@ void vsf_musb_fdrc_interrupt_init(vsf_musb_fdrc_reg_t *reg)
     reg->Common.IntrUSBE = 0;
 }
 
-uint_fast16_t vsf_musb_fdrc_rx_fifo_size(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep)
+uint_fast16_t vk_musb_fdrc_rx_fifo_size(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep)
 {
-    uint_fast8_t ep_orig = vsf_musb_fdrc_set_ep(reg, ep);
+    uint_fast8_t ep_orig = vk_musb_fdrc_set_ep(reg, ep);
         uint_fast16_t result;
         if (!ep) {
             result = reg->EP0.Count0;
         } else {
             result = ((reg->EPN.RxCount2 & 7) << 8) | reg->EPN.RxCount1;
         }
-    vsf_musb_fdrc_set_ep(reg, ep_orig);
+    vk_musb_fdrc_set_ep(reg, ep_orig);
     return result;
 }
 
-void vsf_musb_fdrc_read_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+void vk_musb_fdrc_read_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     uint8_t *fifo;
 
-    VSF_USB_ASSERT(size <= vsf_musb_fdrc_rx_fifo_size(reg, ep));
+    VSF_USB_ASSERT(size <= vk_musb_fdrc_rx_fifo_size(reg, ep));
 
     fifo = (uint8_t *)((uint32_t)&reg->FIFO0 + (ep << 2));
     while (size--) {
@@ -96,7 +96,7 @@ void vsf_musb_fdrc_read_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t 
     }
 }
 
-void vsf_musb_fdrc_write_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+void vk_musb_fdrc_write_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     uint8_t *fifo;
 
@@ -107,7 +107,7 @@ void vsf_musb_fdrc_write_fifo(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t
     }
 }
 
-uint_fast8_t vsf_musb_fdrc_set_ep(vsf_musb_fdrc_reg_t *reg, uint_fast8_t ep)
+uint_fast8_t vk_musb_fdrc_set_ep(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep)
 {
     uint_fast8_t ep_orig = reg->Common.Index;
     reg->Common.Index = ep;

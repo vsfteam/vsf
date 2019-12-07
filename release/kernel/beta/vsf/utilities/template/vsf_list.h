@@ -19,14 +19,18 @@
 #define __VSF_LIST_H__
 
 /*============================ INCLUDES ======================================*/
-#include <stdint.h>
+//#include <stdint.h>
+#include "utilities/compiler.h"
 
 /*============================ MACROS ========================================*/
 
-
-
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#define __when(__CON)                           (__CON)
+#define when(__CON)                             __when(__CON)
+#else
 #define __when(...)                             (__VA_ARGS__)
 #define when(...)                               __when(__VA_ARGS__)
+#endif
 
 /*-----------------------------------------------------------------------------*
  * Single Chain List internal macro                                            *
@@ -82,8 +86,33 @@
     } while (0)
 
 
-
-#define __vsf_slist_insert(     __host_type,  /* type of the host object */     \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __vsf_slist_insert(     __host_type,  /* type of the host object */  \
+                                __member,     /* the name of the list */        \
+                                __plist,      /* the address of the list */     \
+                                __pitem,      /* the address of the new item */ \
+                                __CON)        /* how to find insert point */    \
+    do {                                                                        \
+        vsf_slist_init_node(__host_type, __member, __pitem);                    \
+        vsf_slist_node_t *__ = (vsf_slist_node_t *)(__plist);                   \
+        for (; __->next != NULL;){                                              \
+            const __host_type * const _ = (__host_type *)(__->next);            \
+            /* using __VA_ARGS__ so ',' operation could be supported */         \
+            if (__CON) {                                                        \
+                __vsf_slist_insert_next(                                        \
+                    __host_type, __member, __, (__pitem));                      \
+                break;                                                          \
+            }                                                                   \
+            __ = (vsf_slist_node_t *)&(_->__member);                            \
+        }                                                                       \
+        if (NULL == __->next) {                                                 \
+            __vsf_slist_insert_next(                                            \
+                    __host_type, __member, __, (__pitem));                      \
+            break;                                                              \
+        }                                                                       \
+    } while (0)
+#else
+#   define __vsf_slist_insert(     __host_type,  /* type of the host object */  \
                                 __member,     /* the name of the list */        \
                                 __plist,      /* the address of the list */     \
                                 __pitem,      /* the address of the new item */ \
@@ -107,20 +136,24 @@
             break;                                                              \
         }                                                                       \
     } while (0)
+#endif
 
 #define __vsf_slist_foreach_unsafe(                                             \
                             __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist)    /* the address of the list */           \
-    for (__host_type *_ = (__plist)->head; _ != NULL; _ = _->__member.next)
+    for (   __host_type *_ = (__host_type *)((__plist)->head);                  \
+            _ != NULL;                                                          \
+            _ = (__host_type *)(_->__member.next))
 
 #define __vsf_slist_foreach_next_unsafe(                                        \
                             __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist)    /* the address of the list */           \
-    for (__host_type *_ = (__plist)->head, *__ = _ ? _->__member.next : NULL;   \
+    for (   __host_type *_ = (__host_type *)((__plist)->head),                  \
+                *__ = _ ? (__host_type *)(_->__member.next) : NULL;             \
             _ != NULL;                                                          \
-            _ = __, __ = _ ? _->__member.next : NULL)
+            _ = __, __ = _ ? (__host_type *)(_->__member.next) : NULL)
             
 
 #define __vsf_slist_foreach(__host_type,/* the type of the host type */         \
@@ -296,11 +329,37 @@
         }                                                                       \
     } while (0)
 
-#define __vsf_dlist_insert(     __host_type,  /* type of the host object */     \
-                                __member,     /* the name of the list */        \
-                                __plist,      /* the address of the list */     \
-                                __pitem,      /* the address of the new item */ \
-                                ...)          /* how to find insert point */    \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __vsf_dlist_insert(  __host_type,/* type of the host object */       \
+                                __member,   /* the name of the list */          \
+                                __plist,    /* the address of the list */       \
+                                __pitem,    /* the address of the new item */   \
+                                __CON)        /* how to find insert point */    \
+    do {                                                                        \
+        vsf_dlist_node_t *__ = (vsf_dlist_node_t *)(__plist);                   \
+        vsf_dlist_init_node(__host_type, __member, __pitem);                    \
+        for (; __->next != NULL;){                                              \
+            const __host_type * const _ =                                       \
+                __vsf_dlist_get_host(__host_type, __member, __->next);          \
+            /* using __VA_ARGS__ so ',' operation could be supported */         \
+            if (__CON) {                                                        \
+                __vsf_dlist_insert_before_imp(                                  \
+                    (__plist), __->next, &((__pitem)->__member));               \
+                break;                                                          \
+            }                                                                   \
+            __ = __->next;                                                      \
+        }                                                                       \
+        if (NULL == __->next) {                                                 \
+            __vsf_dlist_add_to_tail(                                            \
+                    __host_type, __member, __plist, (__pitem));                 \
+        }                                                                       \
+    } while (0)
+#else
+#   define __vsf_dlist_insert(     __host_type,/* type of the host object */    \
+                                __member,   /* the name of the list */          \
+                                __plist,    /* the address of the list */       \
+                                __pitem,    /* the address of the new item */   \
+                                ...)        /* how to find insert point */      \
     do {                                                                        \
         vsf_dlist_init_node(__host_type, __member, __pitem);                    \
         vsf_dlist_node_t *__ = (vsf_dlist_node_t *)(__plist);                   \
@@ -320,6 +379,17 @@
                     __host_type, __member, __plist, (__pitem));                 \
         }                                                                       \
     } while (0)
+#endif
+    
+#define __vsf_dlist_foreach_unsafe(                                             \
+                            __host_type,    /* the type of the host type */     \
+                            __member,       /* the member name of the list */   \
+                            __plist)        /* the address of the list */       \
+    for (   __host_type *_ = NULL == (__plist)->head ? NULL :                   \
+                __vsf_dlist_get_host(__host_type, __member, (__plist)->head);   \
+            _ != NULL;                                                          \
+            _ = NULL == _->__member.next ? NULL:                                \
+                __vsf_dlist_get_host(__host_type, __member, _->__member.next))
 
 
 /*-----------------------------------------------------------------------------*
@@ -375,20 +445,13 @@
             __vsf_slist_append_imp(                                             \
                 (__plist), (__pitem), offset_of(__host_type, __member))
 
-#define vsf_slist_get_index(__host_type,/* the type of the host type */         \
-                            __member,   /* the member name of the list */       \
-                            __plist,    /* the address of the list */           \
-                            __pitem)    /* the address of the target item */    \
-            __vsf_slist_get_index_imp(                                          \
-                (__plist), (__pitem), offset_of(__host_type, __member))
-
 #define vsf_slist_is_in(    __host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem)    /* the address of the target item */    \
         (   vsf_slist_get_index(                                                \
-                (__plist), (__pitem), offset_of(__host_type, __member))         \
-        >   0)
+                __host_type, __member, (__plist), (__pitem))                    \
+        >=   0)
 
 #define vsf_slist_init_node(__host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
@@ -402,13 +465,23 @@
             __vsf_slist_remove_imp(                                             \
                 (__plist), (__pitem), offset_of(__host_type, __member))
 
-#define vsf_slist_insert(   __host_type,/* the type of the host type */         \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define vsf_slist_insert(   __host_type,/* the type of the host type */      \
+                            __member,   /* the member name of the list */       \
+                            __plist,    /* the address of the list */           \
+                            __pitem,    /* the address of the target item */    \
+                            __CON)        /* when( condition expression ) */    \
+            __vsf_slist_insert(                                                 \
+                __host_type, __member, (__plist), (__pitem), (__CON))
+#else
+#   define vsf_slist_insert(   __host_type,/* the type of the host type */      \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem,    /* the address of the target item */    \
                             ...)        /* when( condition expression ) */      \
             __vsf_slist_insert(                                                 \
                 __host_type, __member, (__plist), (__pitem), __VA_ARGS__)
+#endif
 
 #define vsf_slist_remove_after( __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list*/    \
@@ -499,7 +572,7 @@
             vsf_slist_is_empty(&(__pqueue)->head)
 
 #define vsf_slist_queue_init(__pqueue)                                          \
-            __vsf_slist_queue_init((__pqueue))
+            __vsf_slist_queue_init((__pqueue))  /* the address of the queue */
 
 #define vsf_slist_queue_enqueue(    __host_type,/* the type of the host type */ \
                                     __member,   /* the member name of the list*/\
@@ -604,13 +677,23 @@ NULL<---|backward|<-----|backward|<----------
             __vsf_dlist_remove_tail(                                            \
                     __host_type, __member, (__plist), (__pitem_ref))
 
-#define vsf_dlist_insert(       __host_type,/* the type of the host type */     \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define vsf_dlist_insert(       __host_type,/* the type of the host type */  \
+                                __member,   /* the member name of the list */   \
+                                __plist,    /* the address of the list */       \
+                                __pitem,    /* the address of the target item */\
+                                __CON)      /* when( condition expression ) */  \
+            __vsf_dlist_insert(                                                 \
+                __host_type, __member, (__plist), (__pitem), (__CON))
+#else
+#   define vsf_dlist_insert(       __host_type,/* the type of the host type */  \
                                 __member,   /* the member name of the list */   \
                                 __plist,    /* the address of the list */       \
                                 __pitem,    /* the address of the target item */\
                                 ...)        /* when( condition expression ) */  \
             __vsf_dlist_insert(                                                 \
                 __host_type, __member, (__plist), (__pitem), __VA_ARGS__)
+#endif
 
 #define vsf_dlist_insert_after( __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list*/    \

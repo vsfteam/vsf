@@ -23,7 +23,7 @@
 #include "hal/vsf_hal.h"
 
 //! todo: remove this dependency
-#include "kernel/vsf_os.h"
+#include "kernel/vsf_kernel.h"
 
 #include "./vsf_trace.h"
 #include <stdio.h>
@@ -35,6 +35,25 @@
 #endif
 
 #define VSF_TRACE_LINEBUF_SIZE              128
+
+#ifndef VSF_TRACE_CFG_PROTECT_LEVEL
+/*! \note   By default, the driver tries to make all APIs scheduler-safe,
+ *!
+ *!         in the case when you want to disable it,
+ *!         please use following macro:
+ *!         #define VSF_TRACE_CFG_PROTECT_LEVEL none
+ *!         
+ *!         in the case when you want to use interrupt-safe,
+ *!         please use following macro:
+ *!         #define VSF_TRACE_CFG_PROTECT_LEVEL interrupt
+ *!         
+ *!         NOTE: This macro should be defined in vsf_usr_CFG.h
+ */
+#   define VSF_TRACE_CFG_PROTECT_LEVEL      scheduler
+#endif
+
+#define vsf_trace_protect                   vsf_protect(VSF_TRACE_CFG_PROTECT_LEVEL)
+#define vsf_trace_unprotect                 vsf_unprotect(VSF_TRACE_CFG_PROTECT_LEVEL)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -67,16 +86,19 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-static void vsf_trace_output_string(const char *str);
+static uint_fast32_t vsf_trace_output(const char* buff, uint_fast32_t size);
 
 /*============================ IMPLEMENTATION ================================*/
 
-
+void vsf_trace_output_string(const char* str)
+{
+    vsf_trace_output(str, strlen(str));
+}
 
 static void vsf_trace_set_level(vsf_trace_level_t level)
 {
 #if VSF_TRACE_CFG_COLOR_EN == ENABLED
-    ASSERT(level < dimof(__vsf_trace_color));
+    VSF_SERVICE_ASSERT(level < dimof(__vsf_trace_color));
     vsf_trace_output_string((char *)__vsf_trace_color[level]);
 #endif
 }
@@ -87,9 +109,9 @@ static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
     uint32_t ret = 0;
 
     if (__vsf_trace.stream != NULL) {
-        vsf_protect_t origlevel = vsf_protect_scheduler();
+        vsf_protect_t origlevel = vsf_trace_protect();
             ret = vsf_stream_write(__vsf_trace.stream, (uint8_t *)buff, size);
-        vsf_unprotect_scheduler(origlevel);
+        vsf_trace_unprotect(origlevel);
     }
     return ret;
 }
@@ -116,15 +138,15 @@ void vsf_trace_fini(void)
 
 static void vsf_trace_arg(const char *format, va_list *arg)
 {
-    vsf_protect_t origlevel = vsf_protect_scheduler();
-    //__vsf_sched_safe(  
+    vsf_protect_t origlevel = vsf_trace_protect();
+    //__vsf_sched_safe(
         uint_fast32_t size = vsnprintf( (char *)__vsf_trace.print_buffer,
                                         sizeof(__vsf_trace.print_buffer),
                                         format, 
                                         *arg);
         vsf_trace_output((const char *)__vsf_trace.print_buffer, size);
     //)
-    vsf_unprotect_scheduler(origlevel);
+    vsf_trace_unprotect(origlevel);
 }
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED
@@ -134,7 +156,7 @@ void __vsf_trace_init(vsf_stream_tx_t *ptTX)
         ptTX = (vsf_stream_tx_t *)&VSF_DEBUG_STREAM_TX;
     } 
 
-    //ASSERT(NULL != ptTX);
+    //VSF_SERVICE_ASSERT(NULL != ptTX);
     
     //! initialise stream source
     do {
@@ -201,14 +223,7 @@ static void vsf_trace_arg(const char *format, va_list *arg)
 }
 #endif
 
-/*! \note user can retarget trace to other output device
- */
-WEAK void vsf_trace_output_string(const char *str)
-{
-	vsf_trace_output(str, strlen(str));
-}
-
-WEAK void vsf_trace_string(vsf_trace_level_t level, const char *str)
+void vsf_trace_string(vsf_trace_level_t level, const char *str)
 {
     vsf_trace_set_level(level);
     vsf_trace_output_string(str);

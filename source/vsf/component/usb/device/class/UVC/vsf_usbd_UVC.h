@@ -41,11 +41,11 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbd_uvc_t)
+declare_simple_class(vk_usbd_uvc_t)
 
-typedef struct vsf_usbd_uvc_control_t vsf_usbd_uvc_control_t;
+typedef struct vk_usbd_uvc_control_t vk_usbd_uvc_control_t;
 
-struct vsf_usbd_uvc_control_info_t {
+struct vk_usbd_uvc_control_info_t {
     uint8_t selector;
     uint16_t size;
 
@@ -53,39 +53,39 @@ struct vsf_usbd_uvc_control_info_t {
     vsfav_control_value_t max;
     vsfav_control_value_t def;
 
-    void (*on_set)(vsf_usbd_uvc_control_t *control);
+    void (*on_set)(vk_usbd_uvc_control_t *control);
 };
-typedef struct vsf_usbd_uvc_control_info_t vsf_usbd_uvc_control_info_t;
+typedef struct vk_usbd_uvc_control_info_t vk_usbd_uvc_control_info_t;
 
-struct vsf_usbd_uvc_control_t {
-    const vsf_usbd_uvc_control_info_t *info;
+struct vk_usbd_uvc_control_t {
+    const vk_usbd_uvc_control_info_t *info;
     vsfav_control_value_t cur;
 };
 
-struct vsf_usbd_uvc_entity_t {
+struct vk_usbd_uvc_entity_t {
     uint8_t id;
     uint8_t control_num;
-    vsf_usbd_uvc_control_t *control;
+    vk_usbd_uvc_control_t *control;
 };
-typedef struct vsf_usbd_uvc_entity_t vsf_usbd_uvc_entity_t;
+typedef struct vk_usbd_uvc_entity_t vk_usbd_uvc_entity_t;
 
-def_simple_class(vsf_usbd_uvc_t) {
+def_simple_class(vk_usbd_uvc_t) {
 
     public_member(
         uint8_t ep_in;
         uint16_t control_num;
 
         uint8_t entity_num;
-        vsf_usbd_uvc_entity_t *entity;
+        vk_usbd_uvc_entity_t *entity;
 
-        vsf_usbd_desc_t *desc;
+        vk_usbd_desc_t *desc;
 //        vsf_stream_t *video_stream;
     )
 
     private_member(
-        vsf_usbd_trans_t trans_in;
-        vsf_usbd_dev_t *dev;
-        vsf_usbd_ifs_t *ifs;
+        vk_usbd_trans_t trans_in;
+        vk_usbd_dev_t *dev;
+        vk_usbd_ifs_t *ifs;
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
         uint_fast32_t cur_size;
 #endif
@@ -94,12 +94,12 @@ def_simple_class(vsf_usbd_uvc_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbd_class_op_t vsf_usbd_uvc_control_class;
-extern const vsf_usbd_class_op_t vsf_usbd_uvc_stream_class;
+extern const vk_usbd_class_op_t vk_usbd_uvc_control_class;
+extern const vk_usbd_class_op_t vk_usbd_uvc_stream_class;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_usbd_uvc_send_packet(vsf_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast32_t size);
+extern vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast32_t size);
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
 #endif      // __VSF_USBD_UVC_H__

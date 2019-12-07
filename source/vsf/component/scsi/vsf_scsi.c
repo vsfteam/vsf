@@ -39,19 +39,19 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_scsi_init(vsf_scsi_t *pthis)
+vsf_err_t vk_scsi_init(vk_scsi_t *pthis)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->init != NULL));
     return vsf_eda_call_param_eda(pthis->drv->init, pthis);
 }
 
-vsf_err_t vsf_scsi_fini(vsf_scsi_t *pthis)
+vsf_err_t vk_scsi_fini(vk_scsi_t *pthis)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->fini != NULL));
     return vsf_eda_call_param_eda(pthis->drv->fini, pthis);
 }
 
-bool vsf_scsi_prepare_buffer(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
+bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL));
     if (pthis->drv->buffer != NULL) {
@@ -60,7 +60,7 @@ bool vsf_scsi_prepare_buffer(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
     return false;
 }
 
-vsf_err_t vsf_scsi_execute(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
+vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
     pthis->args.cbd = cbd;
@@ -72,7 +72,7 @@ vsf_err_t vsf_scsi_execute(vsf_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-vsf_err_t vsf_scsi_execute_stream(vsf_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream)
+vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
     pthis->args.cbd = cbd;
@@ -81,7 +81,7 @@ vsf_err_t vsf_scsi_execute_stream(vsf_scsi_t *pthis, uint8_t *cbd, vsf_stream_t 
 }
 #endif
 
-vsf_err_t vsf_scsi_get_errcode(vsf_scsi_t *pthis, uint32_t *reply_len)
+vsf_err_t vk_scsi_get_errcode(vk_scsi_t *pthis, uint32_t *reply_len)
 {
     VSF_SCSI_ASSERT(pthis != NULL);
     if (reply_len != NULL) {

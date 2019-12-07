@@ -121,7 +121,7 @@ static void debug_add_evt(uint32_t evt)
 }
 
 
-static void vsf_dwcotg_usbd_init_regs(vsf_dwcotg_dcd_t *usbd, void *regbase, uint_fast8_t ep_num)
+static void vk_dwcotg_usbd_init_regs(vk_dwcotg_dcd_t *usbd, void *regbase, uint_fast8_t ep_num)
 {
     usbd->reg.global_regs = regbase;
     usbd->reg.dev.global_regs = (void *)((uint8_t *)regbase + 0x800);
@@ -133,32 +133,32 @@ static void vsf_dwcotg_usbd_init_regs(vsf_dwcotg_dcd_t *usbd, void *regbase, uin
     }
 }
 
-static void vsf_dwcotg_usbd_flush_txfifo(vsf_dwcotg_dcd_t *usbd, uint_fast8_t fifo_num)
+static void vk_dwcotg_usbd_flush_txfifo(vk_dwcotg_dcd_t *usbd, uint_fast8_t fifo_num)
 {
     usbd->reg.global_regs->grstctl = (fifo_num << 6U) | USB_OTG_GRSTCTL_TXFFLSH;
     while (usbd->reg.global_regs->grstctl & USB_OTG_GRSTCTL_TXFFLSH);
 }
 
-static void vsf_dwcotg_usbd_flush_rxfifo(vsf_dwcotg_dcd_t *usbd)
+static void vk_dwcotg_usbd_flush_rxfifo(vk_dwcotg_dcd_t *usbd)
 {
     usbd->reg.global_regs->grstctl = USB_OTG_GRSTCTL_RXFFLSH;
     while (usbd->reg.global_regs->grstctl & USB_OTG_GRSTCTL_RXFFLSH);
 }
 
-vsf_err_t vsf_dwcotg_usbd_init(vsf_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
+vsf_err_t vk_dwcotg_usbd_init(vk_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
 {
     VSF_USB_ASSERT((usbd != NULL) && (cfg != NULL));
     VSF_USB_ASSERT((usbd->param != NULL) && (usbd->param->op != NULL));
 
     debug_add_evt(__FUNC_INIT);
 
-    const vsf_dwcotg_dcd_param_t *param = usbd->param;
+    const vk_dwcotg_dcd_param_t *param = usbd->param;
     struct dwcotg_core_global_regs_t *global_regs;
     struct dwcotg_dev_global_regs_t *dev_global_regs;
-    vsf_dwcotg_dc_ip_info_t info;
+    vk_dwcotg_dc_ip_info_t info;
     param->op->GetInfo(&info.use_as__usb_dc_ip_info_t);
 
-    vsf_dwcotg_usbd_init_regs(usbd, info.regbase, info.ep_num);
+    vk_dwcotg_usbd_init_regs(usbd, info.regbase, info.ep_num);
     global_regs = usbd->reg.global_regs;
     dev_global_regs = usbd->reg.dev.global_regs;
 
@@ -168,15 +168,15 @@ vsf_err_t vsf_dwcotg_usbd_init(vsf_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
     {
         usb_dc_ip_cfg_t ip_cfg = {
             .priority       = cfg->priority,
-            .irq_handler    = (usb_ip_irq_handler_t)vsf_dwcotg_usbd_irq,
+            .irq_handler    = (usb_ip_irq_handler_t)vk_dwcotg_usbd_irq,
             .param          = usbd,
         };
         usbd->param->op->Init(&ip_cfg);
     }
 
-    vsf_dwcotg_phy_init(&usbd->use_as__vsf_dwcotg_t,
-                        &param->use_as__vsf_dwcotg_param_t,
-                        &info.use_as__vsf_dwcotg_hw_info_t);
+    vk_dwcotg_phy_init(&usbd->use_as__vk_dwcotg_t,
+                        &param->use_as__vk_dwcotg_param_t,
+                        &info.use_as__vk_dwcotg_hw_info_t);
 
     global_regs->gahbcfg |= USB_OTG_GAHBCFG_TXFELVL;
     if (usbd->dma_en) {
@@ -217,17 +217,17 @@ vsf_err_t vsf_dwcotg_usbd_init(vsf_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
     return VSF_ERR_NONE;
 }
 
-void vsf_dwcotg_usbd_fini(vsf_dwcotg_dcd_t *usbd)
+void vk_dwcotg_usbd_fini(vk_dwcotg_dcd_t *usbd)
 {
     usbd->param->op->Fini();
 }
 
-void vsf_dwcotg_usbd_reset(vsf_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
+void vk_dwcotg_usbd_reset(vk_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
 {
     debug_add_evt(__FUNC_RESET);
 
     struct dwcotg_dev_global_regs_t *dev_global_regs = usbd->reg.dev.global_regs;
-    vsf_dwcotg_dc_ip_info_t info;
+    vk_dwcotg_dc_ip_info_t info;
     usbd->param->op->GetInfo(&info.use_as__usb_dc_ip_info_t);
     usbd->buffer_word_pos = info.buffer_word_size;
     usbd->ep_num = info.ep_num >> 1;
@@ -241,72 +241,72 @@ void vsf_dwcotg_usbd_reset(vsf_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg)
     memset(usbd->trans, 0, sizeof(usbd->trans));
 }
 
-void vsf_dwcotg_usbd_connect(vsf_dwcotg_dcd_t *usbd)
+void vk_dwcotg_usbd_connect(vk_dwcotg_dcd_t *usbd)
 {
     debug_add_evt(__FUNC_CONNECT);
     usbd->reg.dev.global_regs->dctl &= ~USB_OTG_DCTL_SDIS;
 }
 
-void vsf_dwcotg_usbd_disconnect(vsf_dwcotg_dcd_t *usbd)
+void vk_dwcotg_usbd_disconnect(vk_dwcotg_dcd_t *usbd)
 {
     debug_add_evt(__FUNC_DISCONNECT);
     usbd->reg.dev.global_regs->dctl |= USB_OTG_DCTL_SDIS;
 }
 
-void vsf_dwcotg_usbd_wakeup(vsf_dwcotg_dcd_t *usbd)
+void vk_dwcotg_usbd_wakeup(vk_dwcotg_dcd_t *usbd)
 {
 }
 
-void vsf_dwcotg_usbd_set_address(vsf_dwcotg_dcd_t *usbd, uint_fast8_t addr)
+void vk_dwcotg_usbd_set_address(vk_dwcotg_dcd_t *usbd, uint_fast8_t addr)
 {
 
 }
 
-uint_fast8_t vsf_dwcotg_usbd_get_address(vsf_dwcotg_dcd_t *usbd)
+uint_fast8_t vk_dwcotg_usbd_get_address(vk_dwcotg_dcd_t *usbd)
 {
     return (usbd->reg.dev.global_regs->dcfg & USB_OTG_DCFG_DAD) >> 4;
 }
 
-uint_fast16_t vsf_dwcotg_usbd_get_frame_number(vsf_dwcotg_dcd_t *usbd)
+uint_fast16_t vk_dwcotg_usbd_get_frame_number(vk_dwcotg_dcd_t *usbd)
 {
     return (usbd->reg.dev.global_regs->dsts & USB_OTG_DSTS_FNSOF) >> 8;
 }
 
-extern uint_fast8_t vsf_dwcotg_usbd_get_mframe_number(vsf_dwcotg_dcd_t *usbd)
+extern uint_fast8_t vk_dwcotg_usbd_get_mframe_number(vk_dwcotg_dcd_t *usbd)
 {
     return 0;
 }
 
-void vsf_dwcotg_usbd_get_setup(vsf_dwcotg_dcd_t *usbd, uint8_t *buffer)
+void vk_dwcotg_usbd_get_setup(vk_dwcotg_dcd_t *usbd, uint8_t *buffer)
 {
     memcpy(buffer, &usbd->setup, sizeof(usbd->setup));
 }
 
-void vsf_dwcotg_usbd_status_stage(vsf_dwcotg_dcd_t *usbd, bool is_in)
+void vk_dwcotg_usbd_status_stage(vk_dwcotg_dcd_t *usbd, bool is_in)
 {
     debug_add_evt(__FUNC_STATUS_STAGE);
 
     usbd->ctrl_transfer_state = DWCOTG_STATUS_STAGE;
     if (is_in) {
-        vsf_dwcotg_usbd_ep_transfer_send(usbd, 0x80, NULL, 0, true);
+        vk_dwcotg_usbd_ep_transfer_send(usbd, 0x80, NULL, 0, true);
     } else {
-        vsf_dwcotg_usbd_ep_transfer_recv(usbd, 0, NULL, 0);
+        vk_dwcotg_usbd_ep_transfer_recv(usbd, 0, NULL, 0);
     }
 }
 
-uint_fast8_t vsf_dwcotg_usbd_ep_get_feature(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+uint_fast8_t vk_dwcotg_usbd_ep_get_feature(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     return USB_DC_FEATURE_TRANSFER;
 }
 
-static volatile uint32_t * dwcotg_usbd_get_ep_ctrl(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+static volatile uint32_t * dwcotg_usbd_get_ep_ctrl(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     uint_fast8_t is_in = ep & 0x80;
     ep &= 0x0F;
     return is_in ? &usbd->reg.dev.ep.in_regs[ep].diepctl : &usbd->reg.dev.ep.out_regs[ep].doepctl;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_add(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
+vsf_err_t vk_dwcotg_usbd_ep_add(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
 {
     volatile uint32_t *ep_ctrl = dwcotg_usbd_get_ep_ctrl(usbd, ep);
     uint_fast8_t is_in = ep & 0x80;
@@ -366,15 +366,15 @@ vsf_err_t vsf_dwcotg_usbd_ep_add(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep
         usbd->reg.global_regs->grxfsiz &= ~USB_OTG_GRXFSIZ_RXFD;
         usbd->reg.global_regs->grxfsiz |= usbd->buffer_word_pos;
         // flush FIFO to validate fifo settings
-        vsf_dwcotg_usbd_flush_txfifo(usbd, 0x10);
-        vsf_dwcotg_usbd_flush_rxfifo(usbd);
+        vk_dwcotg_usbd_flush_txfifo(usbd, 0x10);
+        vk_dwcotg_usbd_flush_rxfifo(usbd);
 #endif
     }
     usbd->reg.dev.global_regs->daintmsk |= (1 << (is_in ? 0 : 16)) << ep;
     return VSF_ERR_NONE;
 }
 
-uint_fast16_t vsf_dwcotg_usbd_ep_get_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+uint_fast16_t vk_dwcotg_usbd_ep_get_size(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     volatile uint32_t *ep_ctrl = dwcotg_usbd_get_ep_ctrl(usbd, ep);
 
@@ -394,7 +394,7 @@ uint_fast16_t vsf_dwcotg_usbd_ep_get_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t e
     return 0;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_set_stall(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+vsf_err_t vk_dwcotg_usbd_ep_set_stall(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     volatile uint32_t *ep_ctrl = ep & 0x80 ?
         &usbd->reg.dev.ep.in_regs[ep].diepctl : &usbd->reg.dev.ep.out_regs[ep].doepctl;
@@ -405,7 +405,7 @@ vsf_err_t vsf_dwcotg_usbd_ep_set_stall(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
     return VSF_ERR_NONE;
 }
 
-bool vsf_dwcotg_usbd_ep_is_stalled(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+bool vk_dwcotg_usbd_ep_is_stalled(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     volatile uint32_t *ep_ctrl = ep & 0x80 ?
         &usbd->reg.dev.ep.in_regs[ep].diepctl : &usbd->reg.dev.ep.out_regs[ep].doepctl;
@@ -415,7 +415,7 @@ bool vsf_dwcotg_usbd_ep_is_stalled(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
     return !!(*ep_ctrl & USB_OTG_DIEPCTL_STALL);
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_clear_stall(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+vsf_err_t vk_dwcotg_usbd_ep_clear_stall(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     volatile uint32_t *ep_ctrl = ep & 0x80 ?
         &usbd->reg.dev.ep.in_regs[ep].diepctl : &usbd->reg.dev.ep.out_regs[ep].doepctl;
@@ -426,42 +426,42 @@ vsf_err_t vsf_dwcotg_usbd_ep_clear_stall(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_transaction_read_buffer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t vk_dwcotg_usbd_ep_transaction_read_buffer(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_transaction_enable_out(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+vsf_err_t vk_dwcotg_usbd_ep_transaction_enable_out(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_transaction_set_data_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size)
+vsf_err_t vk_dwcotg_usbd_ep_transaction_set_data_size(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size)
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_transaction_write_buffer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
+vsf_err_t vk_dwcotg_usbd_ep_transaction_write_buffer(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;
 }
 
-static vsf_dwcotg_dcd_trans_t * vsf_dwcotg_usbd_get_trans(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+static vk_dwcotg_dcd_trans_t * vk_dwcotg_usbd_get_trans(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
     uint_fast8_t is_in = ep & 0x80;
     ep &= 0x0F;
     return &usbd->trans[(is_in ? VSF_DWCOTG_DCD_CFG_EP_NUM : 0) + ep];
 }
 
-static void vsf_dwcotg_usbd_ep_write(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx)
+static void vk_dwcotg_usbd_ep_write(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx)
 {
     debug_add_evt(__FUNC_EP_WRITE);
 
-    vsf_dwcotg_dcd_trans_t *trans = vsf_dwcotg_usbd_get_trans(usbd, ep_idx | 0x80);
+    vk_dwcotg_dcd_trans_t *trans = vk_dwcotg_usbd_get_trans(usbd, ep_idx | 0x80);
     if (!trans->use_dma) {
         struct dwcotg_dev_global_regs_t *dev_global_regs = usbd->reg.dev.global_regs;
         struct dwcotg_dev_in_ep_regs_t *in_regs = &usbd->reg.dev.ep.in_regs[ep_idx];
@@ -499,13 +499,13 @@ static void vsf_dwcotg_usbd_ep_write(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx
     }
 }
 
-static void vsf_dwcotg_usbd_ep_read(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx, uint_fast16_t size)
+static void vk_dwcotg_usbd_ep_read(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx, uint_fast16_t size)
 {
     debug_add_evt(__FUNC_EP_READ);
 
-    vsf_dwcotg_dcd_trans_t *trans = vsf_dwcotg_usbd_get_trans(usbd, ep_idx);
+    vk_dwcotg_dcd_trans_t *trans = vk_dwcotg_usbd_get_trans(usbd, ep_idx);
     if (!trans->use_dma) {
-        uint_fast16_t ep_size = vsf_dwcotg_usbd_ep_get_size(usbd, ep_idx);
+        uint_fast16_t ep_size = vk_dwcotg_usbd_ep_get_size(usbd, ep_idx);
         uint8_t *buffer = trans->buffer;
         uint32_t data;
 
@@ -523,21 +523,21 @@ static void vsf_dwcotg_usbd_ep_read(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx,
     }
 }
 
-uint_fast32_t vsf_dwcotg_usbd_ep_get_data_size(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+uint_fast32_t vk_dwcotg_usbd_ep_get_data_size(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
 {
-    vsf_dwcotg_dcd_trans_t *trans = vsf_dwcotg_usbd_get_trans(usbd, ep);
+    vk_dwcotg_dcd_trans_t *trans = vk_dwcotg_usbd_get_trans(usbd, ep);
     return trans->size - trans->remain;
 }
 
-static vsf_err_t vsf_dwcotg_usbd_ep_out_transfer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx)
+static vsf_err_t vk_dwcotg_usbd_ep_out_transfer(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx)
 {
     debug_add_evt(__FUNC_EP_OUT_TRANSFER);
 
     VSF_USB_ASSERT(ep_idx < usbd->ep_num);
 
-    uint_fast16_t ep_size = vsf_dwcotg_usbd_ep_get_size(usbd, ep_idx);
+    uint_fast16_t ep_size = vk_dwcotg_usbd_ep_get_size(usbd, ep_idx);
     struct dwcotg_dev_out_ep_regs_t *out_regs = &usbd->reg.dev.ep.out_regs[ep_idx];
-    vsf_dwcotg_dcd_trans_t *trans = &usbd->trans[ep_idx];
+    vk_dwcotg_dcd_trans_t *trans = &usbd->trans[ep_idx];
     uint_fast32_t size = trans->remain, max_size;
     if (0 == ep_idx) {
         max_size = (1 << 7) - 1;
@@ -562,7 +562,7 @@ static vsf_err_t vsf_dwcotg_usbd_ep_out_transfer(vsf_dwcotg_dcd_t *usbd, uint_fa
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_transfer_recv(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
+vsf_err_t vk_dwcotg_usbd_ep_transfer_recv(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
 {
     debug_add_evt(__FUNC_EP_TRANSFER_RECV);
     debug_add_data(0xFF000000 + (ep << 16) + size);
@@ -572,24 +572,24 @@ vsf_err_t vsf_dwcotg_usbd_ep_transfer_recv(vsf_dwcotg_dcd_t *usbd, uint_fast8_t 
 
     VSF_USB_ASSERT(((ep == 0) && usbd->ctrl_transfer_state != DWCOTG_SETUP_STAGE) || (ep > 0));
 
-    vsf_dwcotg_dcd_trans_t *trans = &usbd->trans[ep];
+    vk_dwcotg_dcd_trans_t *trans = &usbd->trans[ep];
     trans->buffer = buffer;
     trans->remain = size;
     trans->size = size;
     trans->zlp = false;
     trans->use_dma = usbd->dma_en && !((uint32_t)trans->buffer & 0x03);
 
-    return vsf_dwcotg_usbd_ep_out_transfer(usbd, ep);
+    return vk_dwcotg_usbd_ep_out_transfer(usbd, ep);
 }
 
-static vsf_err_t vsf_dwcotg_usbd_ep_in_transfer(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx)
+static vsf_err_t vk_dwcotg_usbd_ep_in_transfer(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep_idx)
 {
     debug_add_evt(__FUNC_EP_IN_TRANSFER);
     VSF_USB_ASSERT(ep_idx < usbd->ep_num);
 
-    uint_fast16_t ep_size = vsf_dwcotg_usbd_ep_get_size(usbd, ep_idx | 0x80);
+    uint_fast16_t ep_size = vk_dwcotg_usbd_ep_get_size(usbd, ep_idx | 0x80);
     struct dwcotg_dev_in_ep_regs_t *in_regs = &usbd->reg.dev.ep.in_regs[ep_idx];
-    vsf_dwcotg_dcd_trans_t *trans = &usbd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep_idx];
+    vk_dwcotg_dcd_trans_t *trans = &usbd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep_idx];
 
     uint_fast32_t size = trans->remain, max_size;
     if (0 == ep_idx) {
@@ -614,12 +614,12 @@ static vsf_err_t vsf_dwcotg_usbd_ep_in_transfer(vsf_dwcotg_dcd_t *usbd, uint_fas
         in_regs->diepctl |= USB_OTG_DIEPCTL_EPENA | USB_OTG_DIEPCTL_CNAK;
     } else {
         in_regs->diepctl |= USB_OTG_DIEPCTL_EPENA | USB_OTG_DIEPCTL_CNAK;
-        vsf_dwcotg_usbd_ep_write(usbd, ep_idx);
+        vk_dwcotg_usbd_ep_write(usbd, ep_idx);
     }
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_dwcotg_usbd_ep_transfer_send(vsf_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp)
+vsf_err_t vk_dwcotg_usbd_ep_transfer_send(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp)
 {
     debug_add_evt(__FUNC_EP_TRANSFER_SEND);
 
@@ -628,7 +628,7 @@ vsf_err_t vsf_dwcotg_usbd_ep_transfer_send(vsf_dwcotg_dcd_t *usbd, uint_fast8_t 
     ep &= 0x0F;
     VSF_USB_ASSERT(ep < usbd->ep_num);
 
-    vsf_dwcotg_dcd_trans_t *trans = &usbd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep];
+    vk_dwcotg_dcd_trans_t *trans = &usbd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep];
     trans->buffer = buffer;
     trans->remain = size;
     trans->size = size;
@@ -636,24 +636,24 @@ vsf_err_t vsf_dwcotg_usbd_ep_transfer_send(vsf_dwcotg_dcd_t *usbd, uint_fast8_t 
     // if fifo transfer is not supported in dma mode(for unaligned buffer), add assert here
     trans->use_dma = usbd->dma_en && !((uint32_t)trans->buffer & 0x03);
 
-    return vsf_dwcotg_usbd_ep_in_transfer(usbd, ep);
+    return vk_dwcotg_usbd_ep_in_transfer(usbd, ep);
 }
 
-static void vsf_dwcotg_usbd_notify(vsf_dwcotg_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
+static void vk_dwcotg_usbd_notify(vk_dwcotg_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {
     if (usbd->callback.evt_handler != NULL) {
         usbd->callback.evt_handler(usbd->callback.param, evt, value);
     }
 }
 
-void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
+void vk_dwcotg_usbd_irq(vk_dwcotg_dcd_t *usbd)
 {
     struct dwcotg_core_global_regs_t *global_regs = usbd->reg.global_regs;
     struct dwcotg_dev_global_regs_t *dev_global_regs = usbd->reg.dev.global_regs;
     struct dwcotg_dev_in_ep_regs_t *in_regs = usbd->reg.dev.ep.in_regs;
     struct dwcotg_dev_out_ep_regs_t *out_regs = usbd->reg.dev.ep.out_regs;
     uint_fast32_t intsts = global_regs->gintmsk | USB_OTG_GINTSTS_CMOD;
-    vsf_dwcotg_dcd_trans_t *trans;
+    vk_dwcotg_dcd_trans_t *trans;
 
     intsts &= global_regs->gintsts;
 
@@ -669,7 +669,7 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
     }
     if (intsts & USB_OTG_GINTSTS_USBRST) {
         debug_add_evt(__USB_ON_RST);
-        vsf_dwcotg_usbd_notify(usbd, USB_ON_RESET, 0);
+        vk_dwcotg_usbd_notify(usbd, USB_ON_RESET, 0);
         global_regs->gintsts = USB_OTG_GINTSTS_USBRST;
     }
     if (intsts & USB_OTG_GINTSTS_ENUMDNE) {
@@ -682,17 +682,17 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
     }
     if (intsts & USB_OTG_GINTSTS_USBSUSP) {
         debug_add_evt(__USB_ON_USBSUSP);
-        vsf_dwcotg_usbd_notify(usbd, USB_ON_SUSPEND, 0);
+        vk_dwcotg_usbd_notify(usbd, USB_ON_SUSPEND, 0);
         global_regs->gintsts = USB_OTG_GINTSTS_USBSUSP;
     }
     if (intsts & USB_OTG_GINTSTS_WKUINT) {
         debug_add_evt(__USB_ON_WKUINTP);
-        vsf_dwcotg_usbd_notify(usbd, USB_ON_RESUME, 0);
+        vk_dwcotg_usbd_notify(usbd, USB_ON_RESUME, 0);
         global_regs->gintsts = USB_OTG_GINTSTS_WKUINT;
     }
     if (intsts & USB_OTG_GINTSTS_SOF) {
         debug_add_evt(__USB_ON_SOF);
-        vsf_dwcotg_usbd_notify(usbd, USB_ON_SOF, 0);
+        vk_dwcotg_usbd_notify(usbd, USB_ON_SOF, 0);
         global_regs->gintsts = USB_OTG_GINTSTS_SOF;
     }
 
@@ -714,15 +714,15 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
                     if ((ep_idx == 0) && (usbd->ctrl_transfer_state == DWCOTG_STATUS_STAGE)) {
                         usbd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
                         debug_add_evt(USB_ON_STATUS);
-                        vsf_dwcotg_usbd_notify(usbd, USB_ON_STATUS, 0);
+                        vk_dwcotg_usbd_notify(usbd, USB_ON_STATUS, 0);
                     } else {
                         trans = &usbd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep_idx];
                         if (trans->remain) {
                             debug_add_evt(__USB_ON_ISR_IN_TRANSFER);
-                            vsf_dwcotg_usbd_ep_in_transfer(usbd, ep_idx);
+                            vk_dwcotg_usbd_ep_in_transfer(usbd, ep_idx);
                         } else {
                             debug_add_evt(__USB_ON_IN);
-                            vsf_dwcotg_usbd_notify(usbd, USB_ON_IN, ep_idx);
+                            vk_dwcotg_usbd_notify(usbd, USB_ON_IN, ep_idx);
                         }
                     }
                     in_regs[ep_idx].diepint = USB_OTG_DIEPINT_XFRC;
@@ -738,7 +738,7 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
                 }
                 if (int_status & USB_OTG_DIEPINT_TXFE) {
                     debug_add_evt(__USB_ON_DIEPINT_TXFE);
-                    vsf_dwcotg_usbd_ep_write(usbd, ep_idx);
+                    vk_dwcotg_usbd_ep_write(usbd, ep_idx);
                     in_regs[ep_idx].diepint = USB_OTG_DIEPINT_TXFE;
                 }
             }
@@ -765,15 +765,15 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
                     if ((ep_idx == 0) && (usbd->ctrl_transfer_state == DWCOTG_STATUS_STAGE)) {
                         usbd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
                         debug_add_evt(__USB_ON_STATUS);
-                        vsf_dwcotg_usbd_notify(usbd, USB_ON_STATUS, 0);
+                        vk_dwcotg_usbd_notify(usbd, USB_ON_STATUS, 0);
                     } else if (((ep_idx == 0) && usbd->ctrl_transfer_state == DWCOTG_DATA_STAGE) || (ep_idx > 0)) {
                         trans = &usbd->trans[ep_idx];
                         if (!trans->zlp) {
                             debug_add_evt(__USB_ON_ISR_OUT_TRANSFER);
-                            vsf_dwcotg_usbd_ep_out_transfer(usbd, ep_idx);
+                            vk_dwcotg_usbd_ep_out_transfer(usbd, ep_idx);
                         } else {
                             debug_add_evt(__USB_ON_OUT);
-                            vsf_dwcotg_usbd_notify(usbd, USB_ON_OUT, ep_idx);
+                            vk_dwcotg_usbd_notify(usbd, USB_ON_OUT, ep_idx);
                         }
                     }
                     out_regs[ep_idx].doepint = USB_OTG_DOEPINT_XFRC;
@@ -787,13 +787,13 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
                     // need update address immediately
                     if (    ((((uint32_t *)usbd->setup)[0] & 0xFF00FFFF) == 0x00000500)
                         &&  (((uint32_t *)usbd->setup)[1] == 0x0)) {
-                        VSF_USB_ASSERT(!vsf_dwcotg_usbd_get_address(usbd));
+                        VSF_USB_ASSERT(!vk_dwcotg_usbd_get_address(usbd));
                         dev_global_regs->dcfg |= (usbd->setup[2] & 0x7F) << 4;
                     }
 
                     debug_add_evt(__USB_ON_SETUP);
                     usbd->ctrl_transfer_state = DWCOTG_DATA_STAGE;
-                    vsf_dwcotg_usbd_notify(usbd, USB_ON_SETUP, 0);
+                    vk_dwcotg_usbd_notify(usbd, USB_ON_SETUP, 0);
                     out_regs[ep_idx].doepint = USB_OTG_DOEPINT_STUP;
                 }
                 // back to back setup packets received
@@ -832,8 +832,8 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
         case 6: //RXSTAT_SETUP_UPDT:
             if (!ep_idx && (8 == size) && (0/*DPID_DATA0*/ == pid)) {
                 // In some versions of dwcotg, We can't replace dfifo[0] with grxstsp[0]
-                ((uint32_t *)usbd->setup)[0] = *usbd->use_as__vsf_dwcotg_t.reg.dfifo[0];
-                ((uint32_t *)usbd->setup)[1] = *usbd->use_as__vsf_dwcotg_t.reg.dfifo[0];
+                ((uint32_t *)usbd->setup)[0] = *usbd->use_as__vk_dwcotg_t.reg.dfifo[0];
+                ((uint32_t *)usbd->setup)[1] = *usbd->use_as__vk_dwcotg_t.reg.dfifo[0];
 
                 debug_add_evt(__USB_ON_RXSTAT_SETUP_UPDT);
                 debug_add_data(((uint32_t *)usbd->setup)[0]);
@@ -843,7 +843,7 @@ void vsf_dwcotg_usbd_irq(vsf_dwcotg_dcd_t *usbd)
         case 2: //RXSTAT_DATA_UPDT:
             debug_add_evt(__USB_ON_RXSTAT_DATA_UPDT);
             debug_add_evt(0x80000000 + (ep_idx << 16) + size);
-            vsf_dwcotg_usbd_ep_read(usbd, ep_idx, size);
+            vk_dwcotg_usbd_ep_read(usbd, ep_idx, size);
             break;
         //case RXSTAT_GOUT_NAK:
         //case RXSTAT_SETUP_COMP:

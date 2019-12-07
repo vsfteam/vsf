@@ -21,22 +21,15 @@
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
 
-#if     VSF_USE_SIMPLE_SHELL == ENABLED                                         \
-    &&  VSF_CFG_SYNC_EN == ENABLED                                              \
-    &&  VSF_CFG_BMPEVT_EN == ENABLED
+#if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                         \
+    &&  VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED                                              \
+    &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
     
 #include "../../vsf_eda.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-
-#   define vsf_bmpevt_init              vsf_eda_bmpevt_init
-#   define vsf_bmpevt_set               vsf_eda_bmpevt_set
-#   define vsf_bmpevt_reset             vsf_eda_bmpevt_reset
-#   define vsf_bmpevt_poll              vsf_eda_bmpevt_poll
-
 #   define using_grouped_evt            vsf_bmpevt_pender_t pender
-
 
 #   define __declare_grouped_evts(__NAME)                                       \
             typedef vsf_bmpevt_t __NAME;                                        \
@@ -150,9 +143,6 @@
 
 #   define wait_for_any(__group, __msk)                                         \
             wait_for_any_timeout( __group, (__msk), -1)
-
-#   define on_bmevt_timeout()                                                   \
-                if (VSF_SYNC_TIMEOUT == vsf_eda_get_cur_evt())
                         
 #   define wait_for_one(__group, __msk)                                         \
             wait_for_any((__group), (__msk))
@@ -167,10 +157,10 @@
             wait_for_any_timeout_us((__group), (__msk), (__timeout))
         
 #   define reset_grouped_evts(__group, __msk)                                   \
-            vsf_bmpevt_reset((__group),(__msk))
+            vsf_eda_bmpevt_reset((__group),(__msk))
 
 #   define set_grouped_evts(__group, __msk)                                     \
-            vsf_bmpevt_set((__group),(__msk))
+            vsf_eda_bmpevt_set((__group),(__msk))
 
 
 /*============================ TYPES =========================================*/

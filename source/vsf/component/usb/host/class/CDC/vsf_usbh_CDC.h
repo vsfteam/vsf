@@ -37,28 +37,28 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbh_cdc_t)
+declare_simple_class(vk_usbh_cdc_t)
 
-enum vsf_usbh_cdc_evt_t {
+enum vk_usbh_cdc_evt_t {
     VSF_USBH_CDC_ON_INIT,
     VSF_USBH_CDC_ON_DESC,
     VSF_USBH_CDC_ON_EVENT,
     VSF_USBH_CDC_ON_RX,
     VSF_USBH_CDC_ON_TX,
 };
-typedef enum vsf_usbh_cdc_evt_t vsf_usbh_cdc_evt_t;
+typedef enum vk_usbh_cdc_evt_t vk_usbh_cdc_evt_t;
 
-typedef vsf_err_t (*vsf_usbh_cdc_evthandler_t)(vsf_usbh_cdc_t *cdc,
-                vsf_usbh_cdc_evt_t evt, void *param);
+typedef vsf_err_t (*vk_usbh_cdc_evthandler_t)(vk_usbh_cdc_t *cdc,
+                vk_usbh_cdc_evt_t evt, void *param);
 
-def_simple_class(vsf_usbh_cdc_t) {
+def_simple_class(vk_usbh_cdc_t) {
 
     protected_member(
-        vsf_usbh_t *usbh;
-        vsf_usbh_dev_t *dev;
-        vsf_usbh_ifs_t *ifs;
+        vk_usbh_t *usbh;
+        vk_usbh_dev_t *dev;
+        vk_usbh_ifs_t *ifs;
 
-        vsf_usbh_cdc_evthandler_t evthandler;
+        vk_usbh_cdc_evthandler_t evthandler;
         uint8_t *evt_buffer;
         uint32_t evt_size;
 
@@ -69,9 +69,9 @@ def_simple_class(vsf_usbh_cdc_t) {
     )
 
     private_member(
-        vsf_usbh_urb_t urb_evt;
-        vsf_usbh_eppipe_t pipe_tx;
-        vsf_usbh_eppipe_t pipe_rx;
+        vk_usbh_urb_t urb_evt;
+        vk_usbh_eppipe_t pipe_tx;
+        vk_usbh_eppipe_t pipe_rx;
     )
 };
 
@@ -79,13 +79,13 @@ def_simple_class(vsf_usbh_cdc_t) {
 /*============================ PROTOTYPES ====================================*/
 
 #if defined(VSF_USBH_CDC_IMPLEMENT) || defined(VSF_USBH_CDC_INHERIT)
-extern vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs);
-extern void vsf_usbh_cdc_fini(vsf_usbh_cdc_t *pthis);
-extern void vsf_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
-extern vsf_err_t vsf_usbh_cdc_prepare_urb(vsf_usbh_cdc_t *pthis, bool tx, vsf_usbh_urb_t *urb);
-extern vsf_err_t vsf_usbh_cdc_submit_urb(vsf_usbh_cdc_t *pthis, vsf_usbh_urb_t *urb);
-extern void vsf_usbh_cdc_free_urb(vsf_usbh_cdc_t *pthis, vsf_usbh_urb_t *urb);
+extern vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
+extern void vk_usbh_cdc_fini(vk_usbh_cdc_t *pthis);
+extern void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
+extern vsf_err_t vk_usbh_cdc_prepare_urb(vk_usbh_cdc_t *pthis, bool tx, vk_usbh_urb_t *urb);
+extern vsf_err_t vk_usbh_cdc_submit_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb);
+extern void vk_usbh_cdc_free_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb);
 #endif
 
 #undef VSF_USBH_CDC_IMPLEMENT

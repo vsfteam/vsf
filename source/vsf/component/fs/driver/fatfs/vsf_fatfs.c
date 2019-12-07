@@ -29,13 +29,13 @@
 
 /*============================ MACROS ========================================*/
 
-#define FAT32_FILE_ATTR_LFN                                                     \
-        (VSF_FILE_ATTR_READONLY | VSF_FILE_ATTR_HIDDEN | VSF_FILE_ATTR_SYSTEM | VSF_FILE_ATTR_VOLUMID)
+#define FAT32_FILE_ATTR_LFN             0x0F
+#define FAT32_FILE_VOLUME_ID            0x08
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_fatfs_dentry_t {
+struct vk_fatfs_dentry_t {
     union {
         struct {
             char Name[8];
@@ -123,14 +123,14 @@ struct vsf_fatfs_dentry_t {
         } exfat;
     };
 } PACKED;
-typedef struct vsf_fatfs_dentry_t vsf_fatfs_dentry_t;
+typedef struct vk_fatfs_dentry_t vk_fatfs_dentry_t;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-bool vsf_fatfs_is_lfn(char *name)
+bool vk_fatfs_is_lfn(char *name)
 {
     char *ext = NULL;
     bool has_lower = false, has_upper = false;
@@ -138,7 +138,7 @@ bool vsf_fatfs_is_lfn(char *name)
 
     if (name != NULL) {
         name_len = strlen(name);
-        ext = vsf_file_getfileext(name);
+        ext = vk_file_getfileext(name);
     }
     if (ext != NULL) {
         ext_len = strlen(ext);
@@ -163,9 +163,9 @@ bool vsf_fatfs_is_lfn(char *name)
 //     and the entry_num of entry for current filename parsed
 // lfn is unicode encoded, but we just support ascii
 // if a filename parsed, parser->entry will point to the sfn
-bool vsf_fatfs_parse_dentry_fat(vsf_fatfs_dentry_parser_t *parser)
+bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
 {
-    vsf_fatfs_dentry_t *entry = (vsf_fatfs_dentry_t *)parser->entry;
+    vk_fatfs_dentry_t *entry = (vk_fatfs_dentry_t *)parser->entry;
     bool parsed = false;
 
     while (parser->entry_num-- > 0) {
@@ -210,7 +210,7 @@ bool vsf_fatfs_parse_dentry_fat(vsf_fatfs_dentry_parser_t *parser)
                 if ((index & 0xF0) == 0x40) {
                     *ptr = '\0';
                 }
-            } else if (entry->fat.Attr != VSF_FILE_ATTR_VOLUMID) {
+            } else if (entry->fat.Attr != FAT32_FILE_VOLUME_ID) {
                 bool lower;
                 if (parser->lfn == 1) {
                     // previous lfn parsed, igure sfn and return

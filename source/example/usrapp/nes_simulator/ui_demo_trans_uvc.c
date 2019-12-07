@@ -60,17 +60,17 @@ struct usbd_uvc_const_t {
         uint8_t str_lanid[4];
         uint8_t str_vendor[20];
         uint8_t str_product[14];
-        vsf_usbd_desc_t std_desc[5];
+        vk_usbd_desc_t std_desc[5];
 
         struct {
             struct {
                 usb_uvc_ct_roi_t roi_def;
-                vsf_usbd_uvc_control_info_t control_info[1];
+                vk_usbd_uvc_control_info_t control_info[1];
             } camera;
 
             struct {
                 usb_uvc_vs_t probe_commit;
-                vsf_usbd_uvc_control_info_t control_info[2];
+                vk_usbd_uvc_control_info_t control_info[2];
             } stream;
         } uvc;
     } usbd;
@@ -82,23 +82,23 @@ struct usbd_uvc_t {
         struct {
             struct {
                 usb_uvc_ct_roi_t roi_cur;
-                vsf_usbd_uvc_control_t control[1];
+                vk_usbd_uvc_control_t control[1];
             } camera;
             struct {
                 usb_uvc_vs_t probe_commit;
-                vsf_usbd_uvc_control_t control[2];
+                vk_usbd_uvc_control_t control[2];
             } stream;
-            vsf_usbd_uvc_entity_t entity[3];
-            vsf_usbd_uvc_t param;
+            vk_usbd_uvc_entity_t entity[3];
+            vk_usbd_uvc_t param;
             vsf_teda_t teda;
             uint32_t frame_pos;
             uint16_t cur_size;
             bool stream_started;
             vsf_eda_t *eda_host;
         } uvc;
-        vsf_usbd_ifs_t ifs[2];
-        vsf_usbd_cfg_t config[1];
-        vsf_usbd_dev_t dev;
+        vk_usbd_ifs_t ifs[2];
+        vk_usbd_cfg_t config[1];
+        vk_usbd_dev_t dev;
         vsf_callback_timer_t timer;
     } usbd;
     
@@ -107,7 +107,7 @@ typedef struct usbd_uvc_t usbd_uvc_t;
 
 /*============================ PROTOTYPES ====================================*/
 
-static void vsf_usbd_on_timer(vsf_callback_timer_t *timer);
+static void vk_usbd_on_timer(vsf_callback_timer_t *timer);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -400,9 +400,9 @@ static usbd_uvc_t usbd_uvc = {
             .entity             = usbd_uvc.usbd.uvc.entity,
         },
 
-        .ifs[0].class_op        = &vsf_usbd_uvc_control_class,
+        .ifs[0].class_op        = &vk_usbd_uvc_control_class,
         .ifs[0].class_param     = &usbd_uvc.usbd.uvc.param,
-        .ifs[1].class_op        = &vsf_usbd_uvc_stream_class,
+        .ifs[1].class_op        = &vk_usbd_uvc_stream_class,
         .ifs[1].class_param     = &usbd_uvc.usbd.uvc.param,
 
         .config[0].num_of_ifs   = dimof(usbd_uvc.usbd.ifs),
@@ -411,12 +411,12 @@ static usbd_uvc_t usbd_uvc = {
         .dev.num_of_config      = dimof(usbd_uvc.usbd.config),
         .dev.config             = usbd_uvc.usbd.config,
         .dev.num_of_desc        = dimof(usbd_uvc_const.usbd.std_desc),
-        .dev.desc               = (vsf_usbd_desc_t *)usbd_uvc_const.usbd.std_desc,
+        .dev.desc               = (vk_usbd_desc_t *)usbd_uvc_const.usbd.std_desc,
 
         .dev.speed              = USB_DC_SPEED_HIGH,
         .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
 
-        .timer.on_timer         = vsf_usbd_on_timer,
+        .timer.on_timer         = vk_usbd_on_timer,
     },
 };
 
@@ -426,14 +426,14 @@ static usbd_uvc_t usbd_uvc = {
 WEAK(ui_demo_on_ready)
 void ui_demo_on_ready(void) {}
 
-void vsf_usbd_uvc_stop_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
+void vk_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = false;
     }
 }
 
-void vsf_usbd_uvc_start_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
+void vk_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (!usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = true;
@@ -441,21 +441,21 @@ void vsf_usbd_uvc_start_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
     }
 }
 
-static void vsf_usbd_on_timer(vsf_callback_timer_t *timer)
+static void vk_usbd_on_timer(vsf_callback_timer_t *timer)
 {
-    vsf_usbd_connect(&usbd_uvc.usbd.dev);
+    vk_usbd_connect(&usbd_uvc.usbd.dev);
 }
 
 void ui_demo_trans_disp_line(uint8_t *buffer, uint_fast32_t size)
 {
-    vsf_usbd_uvc_send_packet(&usbd_uvc.usbd.uvc.param, buffer, size);
+    vk_usbd_uvc_send_packet(&usbd_uvc.usbd.uvc.param, buffer, size);
 }
 
 void ui_demo_trans_init(void)
 {
     usbd_uvc.usbd.uvc.stream.probe_commit = usbd_uvc_const.usbd.uvc.stream.probe_commit;
-    vsf_usbd_init(&usbd_uvc.usbd.dev);
-    vsf_usbd_disconnect(&usbd_uvc.usbd.dev);
+    vk_usbd_init(&usbd_uvc.usbd.dev);
+    vk_usbd_disconnect(&usbd_uvc.usbd.dev);
 
     vsf_callback_timer_add_ms(&usbd_uvc.usbd.timer, 200);
 }

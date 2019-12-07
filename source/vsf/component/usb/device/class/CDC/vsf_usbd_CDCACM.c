@@ -35,35 +35,35 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vsf_usbd_cdcacm_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
-static vsf_err_t vsf_usbd_cdcacm_control_request_prepare(
-        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
-static vsf_err_t vsf_usbd_cdcacm_control_request_process(
-        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+static vsf_err_t vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t vk_usbd_cdcacm_control_request_prepare(
+        vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t vk_usbd_cdcacm_control_request_process(
+        vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vsf_usbd_class_op_t vsf_usbd_cdcacm_control =
+const vk_usbd_class_op_t vk_usbd_cdcacm_control =
 {
-    .request_prepare = vsf_usbd_cdcacm_control_request_prepare,
-    .request_process = vsf_usbd_cdcacm_control_request_process,
+    .request_prepare = vk_usbd_cdcacm_control_request_prepare,
+    .request_process = vk_usbd_cdcacm_control_request_process,
 };
 
-const vsf_usbd_class_op_t vsf_usbd_cdcacm_data =
+const vk_usbd_class_op_t vk_usbd_cdcacm_data =
 {
-    .init = vsf_usbd_cdcacm_data_init,
+    .init = vk_usbd_cdcacm_data_init,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_usbd_cdcacm_init( vsf_usbd_cdcacm_t *obj, 
-                                const vsf_usbd_cdcacm_cfg_t *cfg)
+vsf_err_t vk_usbd_cdcacm_init( vk_usbd_cdcacm_t *obj, 
+                                const vk_usbd_cdcacm_cfg_t *cfg)
 {
     VSF_USB_ASSERT(NULL != obj && NULL != cfg);
 
-    memset(obj, 0, sizeof(vsf_usbd_cdcacm_t));
-    this.use_as__vsf_usbd_cdc_t.ep.ep_cfg = cfg->ep.ep_cfg;
+    memset(obj, 0, sizeof(vk_usbd_cdcacm_t));
+    this.use_as__vk_usbd_cdc_t.ep.ep_cfg = cfg->ep.ep_cfg;
 
 
     this.line_coding = (usb_cdcacm_line_coding_t){
@@ -80,40 +80,40 @@ vsf_err_t vsf_usbd_cdcacm_init( vsf_usbd_cdcacm_t *obj,
     this.stream.tx.stream = cfg->tx_stream;
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
-    vsf_stream_usr_init(&(this.use_as__vsf_usbd_cdc_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_usr_t),
+    vsf_stream_usr_init(&(this.use_as__vk_usbd_cdc_t.stream.use_as__vk_usbd_ep_stream_t.use_as__vsf_stream_usr_t),
                         &cfg->stream_usr);
-    vsf_stream_src_init(&(this.use_as__vsf_usbd_cdc_t.stream.use_as__vsf_usbd_ep_stream_t.use_as__vsf_stream_src_t),
+    vsf_stream_src_init(&(this.use_as__vk_usbd_cdc_t.stream.use_as__vk_usbd_ep_stream_t.use_as__vsf_stream_src_t),
                         &cfg->stream_src);
 
     do {
-        vsf_usbd_ep_stream_cfg_t cfg = {
-            .rx_ep = this.use_as__vsf_usbd_cdc_t.ep.out,
-            .tx_ep = this.use_as__vsf_usbd_cdc_t.ep.in,
+        vk_usbd_ep_stream_cfg_t cfg = {
+            .rx_ep = this.use_as__vk_usbd_cdc_t.ep.out,
+            .tx_ep = this.use_as__vk_usbd_cdc_t.ep.in,
         };
-        vsf_usbd_ep_stream_init(&this.use_as__vsf_usbd_cdc_t.stream.use_as__vsf_usbd_ep_stream_t, &cfg);
+        vk_usbd_ep_stream_init(&this.use_as__vk_usbd_cdc_t.stream.use_as__vk_usbd_ep_stream_t, &cfg);
         
     } while(0);
 #endif
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_usbd_cdcacm_data_init(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
-    vsf_usbd_cdcacm_t *acm = ifs->class_param;
+    vk_usbd_cdcacm_t *acm = ifs->class_param;
 
     acm->control_line = 0;
     if (    (acm->callback.set_line_coding != NULL)
         &&  (VSF_ERR_NONE != acm->callback.set_line_coding(&acm->line_coding))) {
         return VSF_ERR_FAIL;
     }
-    return vsf_usbd_cdc_data.init(dev, ifs);
+    return vk_usbd_cdc_data.init(dev, ifs);
 }
 
-static vsf_err_t vsf_usbd_cdcacm_control_request_prepare(
-        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vk_usbd_cdcacm_control_request_prepare(
+        vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
-    vsf_usbd_cdcacm_t *acm = ifs->class_param;
-    vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
+    vk_usbd_cdcacm_t *acm = ifs->class_param;
+    vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
     usb_cdcacm_line_coding_t *line_coding = &acm->line_coding;
     uint8_t *buffer = NULL;
@@ -157,7 +157,7 @@ static vsf_err_t vsf_usbd_cdcacm_control_request_prepare(
         }
         break;
     default:
-        return vsf_usbd_cdc_control.request_prepare(dev, ifs);
+        return vk_usbd_cdc_control.request_prepare(dev, ifs);
     }
 
     ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
@@ -165,11 +165,11 @@ static vsf_err_t vsf_usbd_cdcacm_control_request_prepare(
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_usbd_cdcacm_control_request_process(
-        vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs)
+static vsf_err_t vk_usbd_cdcacm_control_request_process(
+        vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
-    vsf_usbd_cdcacm_t *acm = ifs->class_param;
-    vsf_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
+    vk_usbd_cdcacm_t *acm = ifs->class_param;
+    vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
 
     switch (request->bRequest) {
@@ -179,7 +179,7 @@ static vsf_err_t vsf_usbd_cdcacm_control_request_process(
             &&  (VSF_ERR_NONE != acm->callback.set_line_coding(&acm->line_coding))) {
             return VSF_ERR_FAIL;
         }
-        vsf_usbd_cdc_data_connect(&acm->use_as__vsf_usbd_cdc_t);
+        vk_usbd_cdc_data_connect(&acm->use_as__vk_usbd_cdc_t);
         break;
     case USB_CDCACM_REQ_GET_LINE_CODING:
         le32_to_cpus(&acm->line_coding.bitrate);
@@ -187,7 +187,7 @@ static vsf_err_t vsf_usbd_cdcacm_control_request_process(
     case USB_CDCACM_REQ_SEND_BREAK:
         break;
     default:
-        return vsf_usbd_cdc_control.request_process(dev, ifs);
+        return vk_usbd_cdc_control.request_process(dev, ifs);
     }
     return VSF_ERR_NONE;
 }

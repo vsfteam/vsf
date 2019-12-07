@@ -26,7 +26,7 @@
 struct usrapp_t {
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     struct {
-        vsf_disp_sdl2_t disp;
+        vk_disp_sdl2_t disp;
         vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
     } ui;
 #endif
@@ -42,7 +42,7 @@ static usrapp_t usrapp = {
         .param                  = {
             .height             = VSF_TGUI_VER_MAX,
             .width              = VSF_TGUI_HOR_MAX,
-            .drv                = &vsf_disp_drv_sdl2,
+            .drv                = &vk_disp_drv_sdl2,
             .color              = VSF_DISP_COLOR_ARGB8888,
         },
         .amplifier              = 1,
@@ -54,8 +54,8 @@ static usrapp_t usrapp = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_UI == ENABLED
-extern void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt);
-void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
+extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
+void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
     if (ts_evt->dev == &usrapp.ui.disp) {
         vsf_tgui_on_touchscreen_evt(ts_evt);
@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 
-	extern void vsf_tgui_bind(vsf_disp_t * disp, void* ui_data);
-	vsf_tgui_bind(&(usrapp.ui.disp.use_as__vsf_disp_t), &usrapp.ui.color);
+	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data);
+	vsf_tgui_bind(&(usrapp.ui.disp.use_as__vk_disp_t), &usrapp.ui.color);
 
     extern vsf_err_t tgui_demo_init(void);
     tgui_demo_init();

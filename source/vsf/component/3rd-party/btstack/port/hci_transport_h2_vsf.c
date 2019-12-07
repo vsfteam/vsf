@@ -55,7 +55,7 @@ WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN
 
 #ifndef WEAK_VSF_BLUETOOTH_H2_ON_NEW
 WEAK(vsf_bluetooth_h2_on_new)
-vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
+vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
     return VSF_ERR_NOT_SUPPORT;
 }
@@ -85,7 +85,7 @@ static void hci_transport_h2_register_packet_handler(
 static int hci_transport_h2_can_send_packet_now(uint8_t packet_type)
 {
     if (hci_transport_h2_param.is_opened && (hci_transport_h2_param.dev != NULL)) {
-        return vsf_usbh_bthci_can_send(hci_transport_h2_param.dev, packet_type);
+        return vk_usbh_bthci_can_send(hci_transport_h2_param.dev, packet_type);
     }
     return 0;
 }
@@ -93,12 +93,12 @@ static int hci_transport_h2_can_send_packet_now(uint8_t packet_type)
 static int hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, int size)
 {
     if (hci_transport_h2_param.is_opened && (hci_transport_h2_param.dev != NULL)) {
-        return vsf_usbh_bthci_send(hci_transport_h2_param.dev, packet_type, packet, size);
+        return vk_usbh_bthci_send(hci_transport_h2_param.dev, packet_type, packet, size);
     }
     return 0;
 }
 
-void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id)
+void vk_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
     if (!hci_transport_h2_param.dev) {
         hci_transport_h2_param.dev = dev;
@@ -116,14 +116,14 @@ void vsf_usbh_bthci_on_new(void *dev, vsf_usbh_dev_id_t *id)
     }
 }
 
-void vsf_usbh_bthci_on_del(void *dev)
+void vk_usbh_bthci_on_del(void *dev)
 {
     if (dev == hci_transport_h2_param.dev) {
         hci_transport_h2_param.dev = NULL;
     }
 }
 
-void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size)
+void vk_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size)
 {
     const uint8_t event[] = {HCI_EVENT_TRANSPORT_PACKET_SENT, 0};
 

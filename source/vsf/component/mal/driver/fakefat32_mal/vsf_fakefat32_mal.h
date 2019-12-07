@@ -40,24 +40,15 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_fakefat32_mal_t)
-declare_simple_class(vsf_fakefat32_file_t)
+declare_simple_class(vk_fakefat32_mal_t)
+declare_simple_class(vk_fakefat32_file_t)
 
-struct vsf_fakefat32_cb_t {
-    void (*read)(uintptr_t target, vsf_evt_t evt);
-    void (*write)(uintptr_t target, vsf_evt_t evt);
-};
-typedef struct vsf_fakefat32_cb_t vsf_fakefat32_cb_t;
-
-def_simple_class(vsf_fakefat32_file_t) {
-    implement(vsf_memfs_file_t)
-
-    public_member(
-        vsf_fakefat32_cb_t callback;
-    )
+def_simple_class(vk_fakefat32_file_t) {
+    implement(vk_memfs_file_t)
 
     private_member(
         uint32_t first_cluster;
+        vk_fakefat32_mal_t *mal;
         struct {
             // refer to :
             //  Microsoft Extensible Firmware Initiative FAT32 File System Specification
@@ -74,8 +65,8 @@ def_simple_class(vsf_fakefat32_file_t) {
 };
 
 
-def_simple_class(vsf_fakefat32_mal_t) {
-    implement(vsf_mal_t)
+def_simple_class(vk_fakefat32_mal_t) {
+    implement(vk_mal_t)
 
     public_member(
         uint16_t sector_size;
@@ -85,23 +76,19 @@ def_simple_class(vsf_fakefat32_mal_t) {
         uint32_t volume_id;
         uint32_t disk_id;
 
-        vsf_fakefat32_file_t root;
-
-        struct {
-            vsf_fakefat32_file_t *file;
-            uint64_t addr_offset;
-            uint8_t *buff;
-            uint32_t size;
-            vsf_err_t errcode;
-        } io_ctx;
+        vk_fakefat32_file_t root;
+        vsf_err_t err;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_mal_drv_t vsf_fakefat32_mal_drv;
+extern const i_mal_drv_t VK_FAKEFAT32_MAL_DRV;
 
 /*============================ PROTOTYPES ====================================*/
+
+extern void vk_fakefat32_set_result(vk_fakefat32_file_t *file, vsf_err_t err);
+extern void vk_fakefat32_return(vk_fakefat32_file_t *file, vsf_err_t err);
 
 #endif      // VSF_USE_MAL && VSF_USE_FAKEFAT32_MAL
 #endif      // __VSF_FAKEFAT32_MAL_H__

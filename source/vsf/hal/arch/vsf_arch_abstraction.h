@@ -120,7 +120,6 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 /*----------------------------------------------------------------------------*
  * APIs or Interfaces for users                                               *
  *----------------------------------------------------------------------------*/
-extern uint_fast8_t bswap_8(uint_fast8_t);
 extern uint_fast16_t bswap_16(uint_fast16_t);
 extern uint_fast32_t bswap_32(uint_fast32_t);
 #ifdef UINT64_MAX

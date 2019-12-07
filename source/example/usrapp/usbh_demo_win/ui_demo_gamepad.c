@@ -107,7 +107,7 @@ const static uint8_t hid_dpad_to_mask[16] = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static float ui_demo_calc_joystick_offset(vsf_gamepad_evt_t *gamepad_evt)
+static float ui_demo_calc_joystick_offset(vk_gamepad_evt_t *gamepad_evt)
 {
     uint32_t mask = (1UL << gamepad_evt->bitlen) - 1;
     uint32_t cur = gamepad_evt->cur.valu32 & mask;
@@ -148,7 +148,7 @@ static __ui_demo_gamepad_t * ui_demo_get_gamepad(void *dev)
     return &__ui_demo.gamepad[empty_idx];
 }
 
-void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt)
+void vk_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     __ui_demo_gamepad_t *gamepad = ui_demo_get_gamepad(gamepad_evt->dev);
     ASSERT(gamepad != NULL);
@@ -206,8 +206,7 @@ void vsf_input_on_gamepad(vsf_gamepad_evt_t *gamepad_evt)
         itoa(cur, gamepad->lbl_rt_text, 10);
         lv_label_set_text(gamepad->lbl_rt, gamepad->lbl_rt_text);
         break;
-    case GAMEPAD_ID_DPAD:
-        {
+    case GAMEPAD_ID_DPAD: {
             static uint8_t dpad_orig = 0;
             uint8_t dpad_mask = hid_dpad_to_mask[cur];
             uint8_t dpad_diff = dpad_orig ^ dpad_mask;

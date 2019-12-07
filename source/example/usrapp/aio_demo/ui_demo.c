@@ -40,7 +40,7 @@ struct ui_demo_t {
     volatile uint32_t idletick;
     vsf_callback_timer_t poll_timer;
 
-    vsf_disp_usbd_uvc_t disp;
+    vk_disp_usbd_uvc_t disp;
     struct {
         volatile bool started;
         lv_disp_buf_t disp_buf;
@@ -52,7 +52,7 @@ typedef struct ui_demo_t ui_demo_t;
 /*============================ PROTOTYPES ====================================*/
 
 static void ui_demo_on_timer(vsf_callback_timer_t *timer);
-extern vsf_usbd_uvc_t * usbd_demo_get_uvc(void);
+extern vk_usbd_uvc_t * usbd_demo_get_uvc(void);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -65,7 +65,7 @@ static ui_demo_t ui_demo = {
         .param                  = {
             .height             = LV_VER_RES_MAX,
             .width              = LV_HOR_RES_MAX,
-            .drv                = &vsf_disp_drv_usbd_uvc,
+            .drv                = &vk_disp_drv_usbd_uvc,
             .color              = VSF_DISP_COLOR_RGB565,
         },
     },
@@ -140,7 +140,7 @@ void ui_demo_start(void)
     disp_drv.buffer = &ui_demo.ui.disp_buf;
     ui_demo.disp.uvc = usbd_demo_get_uvc();
     disp = lv_disp_drv_register(&disp_drv);
-    vsf_lvgl_bind(&ui_demo.disp.use_as__vsf_disp_t, &disp->driver);
+    vsf_lvgl_bind(&ui_demo.disp.use_as__vk_disp_t, &disp->driver);
 
     lvgl_create_demo();
     while (1) {

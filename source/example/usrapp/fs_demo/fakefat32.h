@@ -24,60 +24,60 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void usrapp_on_file_read(uintptr_t target, vsf_evt_t evt);
-static void usrapp_on_file_write(uintptr_t target, vsf_evt_t evt);
+static void __usrapp_on_file_read(uintptr_t target, vsf_evt_t evt);
+static void __usrapp_on_file_write(uintptr_t target, vsf_evt_t evt);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const char readme[] = "\
+static const char __readme[] = "\
 readme\r\n\
 ";
-static uint8_t control = 0;
+static uint8_t __control = 0;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-static vsf_fakefat32_file_t fakefat32_root[] = {
+static vk_fakefat32_file_t __fakefat32_root[] = {
     {
         .name               = "FAKEFAT32",
-        .attr               = VSF_FILE_ATTR_VOLUMID,
+        .attr               = (vk_file_attr_t)VSF_FAT32_FILE_ATTR_VOLUMID,
     },
     {
         .name               = "readme.txt",
-        .size               = sizeof(readme),
-        .attr               = VSF_FILE_ATTR_ARCHIVE | VSF_FILE_ATTR_READONLY,
-        .f.buff             = (uint8_t *)readme,
+        .size               = sizeof(__readme),
+        .attr               = VSF_FILE_ATTR_READ,
+        .f.buff             = (uint8_t *)__readme,
     },
     {
         .name               = "control.bin",
         .size               = 1,
-        .attr               = VSF_FILE_ATTR_ARCHIVE,
-        .callback.read      = usrapp_on_file_read,
-        .callback.write     = usrapp_on_file_write,
+        .attr               = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
+        .callback.read      = __usrapp_on_file_read,
+        .callback.write     = __usrapp_on_file_write,
     },
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void usrapp_on_file_read(uintptr_t target, vsf_evt_t evt)
+static void __usrapp_on_file_read(uintptr_t target, vsf_evt_t evt)
 {
-    vsf_fakefat32_mal_t *pthis = (vsf_fakefat32_mal_t *)target;
-    vsf_fakefat32_file_t *file = pthis->io_ctx.file;
-    uint8_t *buff = pthis->io_ctx.buff;
+    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
+    uint8_t *buff = vk_file_get_ctx(&file->use_as__vk_file_t)->io.buff;
 
-    buff[0] = control;
-    vsf_trace(VSF_TRACE_INFO, "read control: %d" VSF_TRACE_CFG_LINEEND, control);
-    vsf_eda_return();
+    buff[0] = __control;
+    vsf_trace(VSF_TRACE_INFO, "read control: %d" VSF_TRACE_CFG_LINEEND, __control);
+    vk_file_set_io_result(&file->use_as__vk_file_t, VSF_ERR_NONE, 1);
+    vk_fakefat32_return(file, VSF_ERR_NONE);
 }
 
-static void usrapp_on_file_write(uintptr_t target, vsf_evt_t evt)
+static void __usrapp_on_file_write(uintptr_t target, vsf_evt_t evt)
 {
-    vsf_fakefat32_mal_t *pthis = (vsf_fakefat32_mal_t *)target;
-    vsf_fakefat32_file_t *file = pthis->io_ctx.file;
-    uint8_t *buff = pthis->io_ctx.buff;
+    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
+    uint8_t *buff = vk_file_get_ctx(&file->use_as__vk_file_t)->io.buff;
 
-    control = buff[0];
-    vsf_trace(VSF_TRACE_INFO, "write control: %d" VSF_TRACE_CFG_LINEEND, control);
-    vsf_eda_return();
+    __control = buff[0];
+    vsf_trace(VSF_TRACE_INFO, "write control: %d" VSF_TRACE_CFG_LINEEND, __control);
+    vk_file_set_io_result(&file->use_as__vk_file_t, VSF_ERR_NONE, 1);
+    vk_fakefat32_return(file, VSF_ERR_NONE);
 }
 
 #endif      // __FAKEFAT32_H__

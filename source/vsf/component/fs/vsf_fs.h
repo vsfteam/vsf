@@ -25,76 +25,237 @@
 #if VSF_USE_FS == ENABLED
 
 #if     defined(VSF_FS_IMPLEMENT)
-#   undef VSF_FS_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT
 #elif   defined(VSF_FS_INHERIT)
-#   undef VSF_FS_INHERIT
 #   define __PLOOC_CLASS_INHERIT
 #endif
 
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_FS_CFG_CACHE == ENABLED
+#   warning cache is not supported now, disable VSF_FS_CFG_CACHE
+#   undef VSF_FS_CFG_CACHE
+#   define VSF_FS_CFG_CACHE             DISABLED
+#endif
+
+#ifndef VSF_FS_CFG_LOCK
+#   define VSF_FS_CFG_LOCK              ENABLED
+#endif
+
+#ifndef VSF_FS_CFG_TIME
+#   define VSF_FS_CFG_TIME              ENABLED
+#endif
+
+#if defined(VSF_FS_CFG_MALLOC) && !defined(VSF_FS_CFG_FREE)
+#   error VSF_FS_CFG_FREE must be defined
+#endif
+#if !defined(VSF_FS_CFG_MALLOC) && defined(VSF_FS_CFG_FREE)
+#   error VSF_FS_CFG_MALLOC must be defined
+#endif
+
+#ifndef VSF_FS_CFG_MALLOC
+#   if VSF_USE_HEAP != ENABLED
+#       error heap is used if VSF_FS_CFG_MALLOC is not defined
+#   endif
+#   define VSF_FS_CFG_MALLOC            vsf_heap_malloc
+#   define VSF_FS_CFG_FREE              vsf_heap_free
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_file_t)
+declare_simple_class(vk_fs_t)
+declare_simple_class(vk_file_t)
+declare_simple_class(vk_vfs_file_t)
 
-enum vsf_file_attr_t {
-    VSF_FILE_ATTR_READONLY      = 1 << 0,
-    VSF_FILE_ATTR_HIDDEN        = 1 << 1,
-    VSF_FILE_ATTR_SYSTEM        = 1 << 2,
-    VSF_FILE_ATTR_VOLUMID       = 1 << 3,
-    VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
-    VSF_FILE_ATTR_ARCHIVE       = 1 << 5,
-    VSF_FILE_ATTR_WRITEONLY     = 1 << 6,
+enum vk_file_attr_t {
+    VSF_FILE_ATTR_READ          = 1 << 0,
+    VSF_FILE_ATTR_WRITE         = 1 << 1,
+    VSF_FILE_ATTR_HIDDEN        = 1 << 2,
+    VSF_FILE_ATTR_DIRECTORY     = 1 << 3,
+    VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
 };
-typedef enum vsf_file_attr_t vsf_file_attr_t;
+typedef enum vk_file_attr_t vk_file_attr_t;
 
-struct vsf_fs_fop_t {
-    void (*close)(vsf_file_t *file, vsf_evt_t evt);
-    void (*read)(vsf_file_t *file, vsf_evt_t evt);
-    void (*write)(vsf_file_t *file, vsf_evt_t evt);
+struct vk_fs_fop_t {
+    void (*close)(uintptr_t, vsf_evt_t);
+    void (*read)(uintptr_t, vsf_evt_t);
+    void (*write)(uintptr_t, vsf_evt_t);
+    void (*truncate)(uintptr_t, vsf_evt_t);
 };
-typedef struct vsf_fs_fop_t vsf_fs_fop_t;
+typedef struct vk_fs_fop_t vk_fs_fop_t;
 
-struct vsf_fs_dop_t {
-    void (*get_child)(vsf_file_t *file, vsf_evt_t evt);
-    void (*add_file)(vsf_file_t *file, vsf_evt_t evt);
-    void (*remove_file)(vsf_file_t *file, vsf_evt_t evt);
+struct vk_fs_dop_t {
+    void (*lookup)(uintptr_t, vsf_evt_t);
+    void (*create)(uintptr_t, vsf_evt_t);
+    void (*unlink)(uintptr_t, vsf_evt_t);
+    void (*chmod)(uintptr_t, vsf_evt_t);
+    void (*rename)(uintptr_t, vsf_evt_t);
 };
-typedef struct vsf_fs_dop_t vsf_fs_dop_t;
+typedef struct vk_fs_dop_t vk_fs_dop_t;
 
-struct vsf_fs_op_t {
-    void (*format)(vsf_file_t *file, vsf_evt_t evt);
-    void (*mount)(vsf_file_t *file, vsf_evt_t evt);
-    void (*umount)(vsf_file_t *file, vsf_evt_t evt);
-    vsf_fs_fop_t fop;
-    vsf_fs_dop_t dop;
+struct vk_fs_op_t {
+    // if succeed, VSF_VFS_FILE_ATTR_MOUNTED should be set in file->attr
+    void (*mount)(uintptr_t, vsf_evt_t);
+    void (*unmount)(uintptr_t, vsf_evt_t);
+#if VSF_FS_CFG_USE_CACHE == ENABLED
+    void (*sync)(uintptr_t, vsf_evt_t);
+#endif
+    vk_fs_fop_t fop;
+    vk_fs_dop_t dop;
 };
-typedef struct vsf_fs_op_t vsf_fs_op_t;
+typedef struct vk_fs_op_t vk_fs_op_t;
 
-def_simple_class(vsf_file_t) {
+struct vk_file_ctx_t {
+    vsf_err_t err;
+    union {
+        struct {
+            uint64_t offset;
+            uint32_t size;
+            uint8_t *buff;
+            int32_t *result;
+        } io;
+        struct {
+            char *name;
+            vk_file_attr_t attr;
+            uint64_t size;
+        } create;
+        struct {
+            char *name;
+        } unlink;
+        struct {
+            char *name;
+            vk_file_t **result;
+        } open;
+        struct {
+            char *name;
+            uint32_t idx;
+            vk_file_t **result;
+        } lookup;
+        struct {
+            char *from_name;
+            char *to_name;
+        } rename;
+    };
+};
+typedef struct vk_file_ctx_t vk_file_ctx_t;
+
+def_simple_class(vk_file_t) {
     public_member(
+        vk_file_attr_t attr;
         char *name;
         uint64_t size;
-        vsf_file_attr_t attr;
-        const vsf_fs_op_t *fs_drv;
-        vsf_file_t *parent;
+
+#if VSF_FS_CFG_TIME == ENABLED
+        struct {
+            uint64_t create;
+            uint64_t access;
+            uint64_t modify;
+        } time;
+#endif
+    )
+
+    protected_member(
+        const vk_fs_op_t *fsop;
+        vk_file_t *parent;
+        // TODO: use pointer here?
+        vk_file_ctx_t ctx;
+    )
+
+    private_member(
+        uint32_t ref;
     )
 };
+
+#if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
+enum vk_vfs_file_attr_t {
+    VSF_VFS_FILE_ATTR_MOUNTED   = VSF_FILE_ATTR_EXT,
+};
+typedef enum vk_file_attr_t vk_file_attr_t;
+
+def_simple_class(vk_vfs_file_t) {
+    implement(vk_file_t)
+    implement(vsf_dlist_node_t)
+
+    protected_member(
+        union {
+            struct {
+                void *data;
+                struct {
+                    void (*read)(uintptr_t target, vsf_evt_t evt);
+                    void (*write)(uintptr_t target, vsf_evt_t evt);
+                } callback;
+            } f;
+            struct {
+                vsf_dlist_t child_list;
+            } d;
+            struct {
+                const vk_fs_op_t *op;
+                void *data;
+                vk_file_t *root;
+            } subfs;
+        };
+    )
+};
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 
 #include "./driver/fatfs/vsf_fatfs.h"
 #include "./driver/memfs/vsf_memfs.h"
+#include "./driver/winfs/vsf_winfs.h"
 
 /*============================ PROTOTYPES ====================================*/
 
-extern char * vsf_file_getfileext(char *fname);
-extern bool vsf_file_is_div(char ch);
+extern void vk_fs_init(void);
+
+extern vsf_err_t vk_fs_mount(vk_file_t *dir, const vk_fs_op_t *fsop, void *fsdata);
+extern vsf_err_t vk_fs_unmount(vk_file_t *dir);
+#if VSF_FS_CFG_USE_CACHE == ENABLED
+extern vsf_err_t vk_fs_sync(vk_file_t *dir);
+#endif
+
+extern vsf_err_t vk_file_open(vk_file_t *dir, char *name, vk_file_t **file);
+extern vsf_err_t vk_file_lookup(vk_file_t *dir, char *name, uint_fast16_t idx, vk_file_t **file);
+extern vsf_err_t vk_file_create(vk_file_t *dir, char *name, vk_file_attr_t attr, uint_fast64_t size);
+extern vsf_err_t vk_file_unlink(vk_file_t *dir, char *name);
+
+extern vsf_err_t vk_file_close(vk_file_t *file);
+extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *rsize);
+extern vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *wsize);
+#if VSF_FS_CFG_USE_CACHE == ENABLED
+extern vsf_err_t vk_file_sync(vk_file_t *file);
+#endif
+
+extern char * vk_file_getfileext(char *fname);
+extern char * vk_file_getfilename(char *path);
+
+extern vk_file_ctx_t * vk_file_get_ctx(vk_file_t *file);
+extern vsf_err_t vk_file_get_errcode(vk_file_t *file);
+extern vk_file_t * vk_file_get_parent(vk_file_t *file);
+
+extern void vk_file_set_result(vk_file_t *file, vsf_err_t err);
+extern void vk_file_set_io_result(vk_file_t *file, vsf_err_t err, int_fast32_t size);
+extern void vk_file_return(vk_file_t *file, vsf_err_t err);
+
+#if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
+extern bool vk_file_is_match(char *path, char *name);
+extern bool vk_file_is_div(char ch);
+
+extern vk_file_t * vk_file_alloc(uint_fast16_t size);
+extern void vk_file_free(vk_file_t *file);
+
+extern void vk_fs_return(vk_file_t *file, vsf_err_t err);
+extern void vk_dummyfs_succeed(uintptr_t target, vsf_evt_t evt);
+extern void vk_dummyfs_not_support(uintptr_t target, vsf_evt_t evt);
+#endif
+
+#undef VSF_FS_IMPLEMENT
+#undef VSF_FS_INHERIT
 
 #endif      // VSF_USE_FS
 #endif      // __VSF_FS_H__

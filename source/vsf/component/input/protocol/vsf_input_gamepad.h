@@ -81,11 +81,11 @@ enum vsf_gamepad_id_t {
 };
 typedef enum vsf_gamepad_id_t vsf_gamepad_id_t;
 
-struct vsf_gamepad_evt_t {
-    implement(vsf_input_evt_t)
-    implement_ex(vsf_input_item_info_t, info)
+struct vk_gamepad_evt_t {
+    implement(vk_input_evt_t)
+    implement_ex(vk_input_item_info_t, info)
 };
-typedef struct vsf_gamepad_evt_t vsf_gamepad_evt_t;
+typedef struct vk_gamepad_evt_t vk_gamepad_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

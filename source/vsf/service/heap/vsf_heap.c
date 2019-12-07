@@ -51,7 +51,7 @@
  *!         please use following macro:
  *!         #define VSF_HEAP_CFG_PROTECT_LEVEL  scheduler
  *!         
- *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h
+ *!         NOTE: This macro should be defined in vsf_usr_cfg.h
  */
 #   define VSF_HEAP_CFG_PROTECT_LEVEL           interrupt
 #endif

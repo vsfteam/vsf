@@ -47,7 +47,7 @@
 //      <h> Kernal event-driven system configuration
 //          <o>Maximum event pool size
 //          <i>Simon, please add description here...
-//#define VSF_OS_CFG_EVTQ_POOL_SIZE                       16
+//#define VSF_OS_CFG_EVTQ_POOL_SIZE                     16
 
 //          <o>Event Bits <4-8>
 //          <i>Simon, please add description here...
@@ -58,7 +58,7 @@
 #define VSF_OS_CFG_PRIORITY_NUM                         10
 //      </h>
 
-#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                         DISABLED
+#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     DISABLED
 
 //      <o>The default eda stack frame pool size <1-65535>
 //      <i>The default eda stack frame pool is shared among all eda tasks.

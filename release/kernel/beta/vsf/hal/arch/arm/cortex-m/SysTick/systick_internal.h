@@ -103,6 +103,9 @@ extern void vsf_systick_enable(void);
  */
 extern bool vsf_systick_disable(void);
 
+extern void vsf_systick_int_enable(void);
+extern void vsf_systick_int_disable(void);
+
 /*!\brief enable
  *! \param void
  *! \retval bool

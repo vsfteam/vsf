@@ -46,13 +46,13 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_disp_usbd_uvc_t)
+declare_simple_class(vk_disp_usbd_uvc_t)
 
-def_simple_class(vsf_disp_usbd_uvc_t) {
-    implement(vsf_disp_t);
+def_simple_class(vk_disp_usbd_uvc_t) {
+    implement(vk_disp_t);
 
     public_member(
-        vsf_usbd_uvc_t  *uvc;
+        vk_usbd_uvc_t  *uvc;
         uint16_t        frame_cnt;
     )
     private_member(
@@ -65,7 +65,7 @@ def_simple_class(vsf_disp_usbd_uvc_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_disp_drv_t vsf_disp_drv_usbd_uvc;
+extern const vk_disp_drv_t vk_disp_drv_usbd_uvc;
 
 /*============================ PROTOTYPES ====================================*/
 

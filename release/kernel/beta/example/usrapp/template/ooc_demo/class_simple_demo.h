@@ -22,10 +22,10 @@
 #include "vsf_cfg.h"
 
 #if     defined(CLASS_SIMPLE_DEMO_IMPLEMENT)
-#   define __VSF_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT
 #   undef CLASS_SIMPLE_DEMO_IMPLEMENT
 #elif   defined(CLASS_SIMPLE_DEMO_INHERIT)
-#   define __VSF_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT
 #   undef CLASS_SIMPLE_DEMO_INHERIT
 #endif
 #include "utilities/ooc_class.h"
@@ -34,10 +34,11 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(class_simple_base_t)
-declare_simple_class(class_simple_demo_t)
+declare_class(class_simple_base_t)
+declare_class(class_simple_demo_t)
 
-def_simple_class(class_simple_base_t) {
+/* You can use the syntax compatible with ooc_class_strict */
+def_class(class_simple_base_t,
     public_member(
         uint8_t public_param_base;
     )
@@ -45,27 +46,76 @@ def_simple_class(class_simple_base_t) {
     private_member(
         uint8_t private_param_base;
     )
-};
+)
 
+/* You can also use the STRUCTURE-OBVIOUSE syntax of ooc_class_simple */
 def_simple_class(class_simple_demo_t) {
-    implement(class_simple_base_t)
-
+    which(
+        implement(class_simple_base_t)
+    )
     public_member(
         uint8_t public_param_demo;
     )
-
     private_member(
         uint8_t private_param_demo;
     )
 };
 
+declare_class(xxxxx_t)
+
+typedef struct xxxxx_cfg_t xxxxx_cfg_t;
+struct xxxxx_cfg_t {
+    uint8_t *pchBuffer;
+    uint32_t wNumber;
+};
+
+def_simple_class(xxxxx_t) {
+    
+    private_member(
+        implement(xxxxx_cfg_t);
+        uint32_t other_private_members;
+    )
+
+};
+/*
+vsf_err_t xxxxx_cfg(xxxxx_t *ptObj, xxxxx_cfg_t *ptCFG)
+{
+    ...
+    ptObj->use_as__xxxxx_cfg_t = (*ptCFG);      //! copy to initialise
+    ...
+}
+*/
+#if defined(__OOC_RELEASE__)
+#define STATIC_XXXXX(__VAR, ...)            \
+        do {                                \
+            xxxxx_t __VAR = {               \
+                .use_as__xxxxx_cfg_t = {    \
+                    __VA_ARGS__             \
+                },                          \
+            };                              \
+        } while(0);
+#else
+#define STATIC_XXXXX(__VAR, ...)            \
+        do {                                \
+            xxxxx_t __VAR;                  \
+            const xxxxx_cfg_t tCFG = {      \
+                __VA_ARGS__                 \
+            };                              \
+            xxxxx_cfg(&(__VAR), &tCFG);     \
+        } while(0);
+#endif
+
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t class_simple_base_init(class_simple_base_t *pthis, uint_fast8_t param);
+extern vsf_err_t class_simple_base_init(class_simple_base_t *pthis, 
+                                        uint_fast8_t param);
 extern uint_fast8_t class_simple_base_get_param(class_simple_base_t *pthis);
 
-extern vsf_err_t class_simple_demo_init(class_simple_demo_t *pthis, uint_fast8_t param, uint_fast8_t param_base);
+extern vsf_err_t class_simple_demo_init(class_simple_demo_t *pthis,
+                                        uint_fast8_t param, 
+                                        uint_fast8_t param_base);
 extern uint_fast8_t class_simple_demo_get_param(class_simple_demo_t *pthis);
 extern uint_fast8_t class_simple_demo_get_base_param(class_simple_demo_t *pthis);
 

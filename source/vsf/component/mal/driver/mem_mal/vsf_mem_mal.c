@@ -32,62 +32,62 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static uint_fast32_t vsf_mem_mal_blksz(vsf_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-static bool vsf_mem_mal_buffer(vsf_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-static void vsf_mem_mal_init(uintptr_t target, vsf_evt_t evt);
-static void vsf_mem_mal_fini(uintptr_t target, vsf_evt_t evt);
-static void vsf_mem_mal_read(uintptr_t target, vsf_evt_t evt);
-static void vsf_mem_mal_write(uintptr_t target, vsf_evt_t evt);
+static uint_fast32_t __vk_mem_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+static bool __vk_mem_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+static void __vk_mem_mal_init(uintptr_t target, vsf_evt_t evt);
+static void __vk_mem_mal_fini(uintptr_t target, vsf_evt_t evt);
+static void __vk_mem_mal_read(uintptr_t target, vsf_evt_t evt);
+static void __vk_mem_mal_write(uintptr_t target, vsf_evt_t evt);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vsf_mal_drv_t vsf_mem_mal_drv = {
-    .blksz          = vsf_mem_mal_blksz,
-    .buffer         = vsf_mem_mal_buffer,
-    .init           = vsf_mem_mal_init,
-    .fini           = vsf_mem_mal_fini,
-    .read           = vsf_mem_mal_read,
-    .write          = vsf_mem_mal_write,
+const i_mal_drv_t VK_MEM_MAL_DRV = {
+    .blksz          = __vk_mem_mal_blksz,
+    .buffer         = __vk_mem_mal_buffer,
+    .init           = __vk_mem_mal_init,
+    .fini           = __vk_mem_mal_fini,
+    .read           = __vk_mem_mal_read,
+    .write          = __vk_mem_mal_write,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static uint_fast32_t vsf_mem_mal_blksz(vsf_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
+static uint_fast32_t __vk_mem_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
 {
-    vsf_mem_mal_t *pthis = (vsf_mem_mal_t *)mal;
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)mal;
     return pthis->blksz;
 }
 
-static bool vsf_mem_mal_buffer(vsf_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
+static bool __vk_mem_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
-    vsf_mem_mal_t *pthis = (vsf_mem_mal_t *)mal;
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)mal;
     mem->pchBuffer = &pthis->mem.pchBuffer[addr];
     mem->nSize = size;
     return true;
 }
 
-static void vsf_mem_mal_init(uintptr_t target, vsf_evt_t evt)
+static void __vk_mem_mal_init(uintptr_t target, vsf_evt_t evt)
 {
-    vsf_mem_mal_t *pthis = (vsf_mem_mal_t *)target;
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
     VSF_MAL_ASSERT(pthis != NULL);
     pthis->result.errcode = VSF_ERR_NONE;
     pthis->result.size = 0;
     vsf_eda_return();
 }
 
-static void vsf_mem_mal_fini(uintptr_t target, vsf_evt_t evt)
+static void __vk_mem_mal_fini(uintptr_t target, vsf_evt_t evt)
 {
-    vsf_mem_mal_t *pthis = (vsf_mem_mal_t *)target;
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
     VSF_MAL_ASSERT(pthis != NULL);
     pthis->result.errcode = VSF_ERR_NONE;
     pthis->result.size = 0;
     vsf_eda_return();
 }
 
-static void vsf_mem_mal_read(uintptr_t target, vsf_evt_t evt)
+static void __vk_mem_mal_read(uintptr_t target, vsf_evt_t evt)
 {
-    vsf_mem_mal_t *pthis = (vsf_mem_mal_t *)target;
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
     uint_fast64_t addr;
     uint_fast32_t size;
 
@@ -104,9 +104,9 @@ static void vsf_mem_mal_read(uintptr_t target, vsf_evt_t evt)
     vsf_eda_return();
 }
 
-static void vsf_mem_mal_write(uintptr_t target, vsf_evt_t evt)
+static void __vk_mem_mal_write(uintptr_t target, vsf_evt_t evt)
 {
-    vsf_mem_mal_t *pthis = (vsf_mem_mal_t *)target;
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
     uint_fast64_t addr;
     uint_fast32_t size;
 

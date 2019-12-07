@@ -33,33 +33,33 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_usbh_cdc_t *pthis = container_of(eda, vsf_usbh_cdc_t, eda);
-    vsf_usbh_t *usbh = pthis->usbh;
-    vsf_usbh_urb_t *urb;
+    vk_usbh_cdc_t *pthis = container_of(eda, vk_usbh_cdc_t, eda);
+    vk_usbh_t *usbh = pthis->usbh;
+    vk_usbh_urb_t *urb;
 
     switch (evt) {
     case VSF_EVT_INIT:
         urb = &pthis->urb_evt;
-        if (vsf_usbh_urb_is_alloced(urb)) {
-            vsf_usbh_urb_set_buffer(urb, pthis->evt_buffer, pthis->evt_size);
-            if (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, urb)) {
+        if (vk_usbh_urb_is_alloced(urb)) {
+            vk_usbh_urb_set_buffer(urb, pthis->evt_buffer, pthis->evt_size);
+            if (VSF_ERR_NONE != vk_usbh_submit_urb(usbh, urb)) {
                 goto failed;
             }
         }
         break;
     case VSF_EVT_MESSAGE:
         do {
-            vsf_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vsf_usbh_eppipe_t pipe = vsf_usbh_urb_get_pipe(&urb);
+            vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
+            vk_usbh_eppipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
             if (USB_ENDPOINT_XFER_INT == pipe.type) {
-                if (vsf_usbh_urb_get_status(&urb) != URB_OK) {
+                if (vk_usbh_urb_get_status(&urb) != URB_OK) {
                     goto failed;
                 } else if (pthis->evthandler != NULL) {
                     pthis->evthandler(pthis, VSF_USBH_CDC_ON_EVENT, NULL);
-                    if (VSF_ERR_NONE != vsf_usbh_submit_urb(usbh, &urb)) {
+                    if (VSF_ERR_NONE != vk_usbh_submit_urb(usbh, &urb)) {
                         goto failed;
                     }
                 }
@@ -80,29 +80,29 @@ void vsf_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     return;
 failed:
-    vsf_usbh_remove_interface(usbh, pthis->dev, pthis->ifs);
+    vk_usbh_remove_interface(usbh, pthis->dev, pthis->ifs);
 }
 
-static void vsf_usbh_cdc_parse_ep(vsf_usbh_cdc_t *pthis, struct usb_endpoint_desc_t *desc_ep)
+static void vk_usbh_cdc_parse_ep(vk_usbh_cdc_t *pthis, struct usb_endpoint_desc_t *desc_ep)
 {
     uint_fast8_t epaddr = desc_ep->bEndpointAddress;
     uint_fast8_t eptype = desc_ep->bmAttributes;
 
     if ((USB_ENDPOINT_XFER_INT == eptype) && (epaddr & USB_ENDPOINT_DIR_MASK)) {
-        vsf_usbh_urb_prepare(&pthis->urb_evt, pthis->dev, desc_ep);
+        vk_usbh_urb_prepare(&pthis->urb_evt, pthis->dev, desc_ep);
     } else if (USB_ENDPOINT_XFER_BULK == eptype) {
         if (epaddr & USB_ENDPOINT_DIR_MASK) {
-            pthis->pipe_rx = vsf_usbh_get_pipe_from_ep_desc(pthis->dev, desc_ep);
+            pthis->pipe_rx = vk_usbh_get_pipe_from_ep_desc(pthis->dev, desc_ep);
         } else {
-            pthis->pipe_tx = vsf_usbh_get_pipe_from_ep_desc(pthis->dev, desc_ep);
+            pthis->pipe_tx = vk_usbh_get_pipe_from_ep_desc(pthis->dev, desc_ep);
         }
     }
 }
 
-vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, vsf_usbh_ifs_parser_t *parser_ifs)
+vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
 {
-    vsf_usbh_ifs_alt_parser_t *parser_alt = &parser_ifs->parser_alt[parser_ifs->ifs->cur_alt];
+    vk_usbh_ifs_alt_parser_t *parser_alt = &parser_ifs->parser_alt[parser_ifs->ifs->cur_alt];
     struct usb_interface_desc_t *desc_ifs = parser_alt->desc_ifs;
     struct usb_endpoint_desc_t *desc_ep = parser_alt->desc_ep;
     struct usb_class_interface_descriptor_t *desc;
@@ -118,7 +118,7 @@ vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
         if (desc_ep->bLength != USB_DT_ENDPOINT_SIZE) {
             return VSF_ERR_FAIL;
         }
-        vsf_usbh_cdc_parse_ep(pthis, desc_ep);
+        vk_usbh_cdc_parse_ep(pthis, desc_ep);
         desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
 
@@ -175,7 +175,7 @@ vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
                     if (desc_ep->bLength != USB_DT_ENDPOINT_SIZE) {
                         return VSF_ERR_FAIL;
                     }
-                    vsf_usbh_cdc_parse_ep(pthis, desc_ep);
+                    vk_usbh_cdc_parse_ep(pthis, desc_ep);
                     desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
                 }
             }
@@ -187,44 +187,44 @@ vsf_err_t vsf_usbh_cdc_init(vsf_usbh_cdc_t *pthis, vsf_usbh_t *usbh,
         pthis->evthandler(pthis, VSF_USBH_CDC_ON_INIT, NULL);
     }
 
-    if (    (   vsf_usbh_urb_is_valid(&pthis->urb_evt)
+    if (    (   vk_usbh_urb_is_valid(&pthis->urb_evt)
             &&  (pthis->evt_size > 0)
             &&  (pthis->evt_buffer != NULL)
-            &&  (VSF_ERR_NONE != vsf_usbh_alloc_urb(usbh, dev, &pthis->urb_evt)))) {
-        vsf_usbh_free_urb(usbh, &pthis->urb_evt);
+            &&  (VSF_ERR_NONE != vk_usbh_alloc_urb(usbh, dev, &pthis->urb_evt)))) {
+        vk_usbh_free_urb(usbh, &pthis->urb_evt);
         return VSF_ERR_FAIL;
     }
 
     return VSF_ERR_NONE;
 }
 
-void vsf_usbh_cdc_fini(vsf_usbh_cdc_t *pthis)
+void vk_usbh_cdc_fini(vk_usbh_cdc_t *pthis)
 {
-    vsf_usbh_free_urb(pthis->usbh, &pthis->urb_evt);
+    vk_usbh_free_urb(pthis->usbh, &pthis->urb_evt);
 }
 
-vsf_err_t vsf_usbh_cdc_prepare_urb(vsf_usbh_cdc_t *pthis, bool tx, vsf_usbh_urb_t *urb)
+vsf_err_t vk_usbh_cdc_prepare_urb(vk_usbh_cdc_t *pthis, bool tx, vk_usbh_urb_t *urb)
 {
-    vsf_usbh_t *usbh = pthis->usbh;
-    vsf_usbh_dev_t *dev = pthis->dev;
+    vk_usbh_t *usbh = pthis->usbh;
+    vk_usbh_dev_t *dev = pthis->dev;
 
     if (tx) {
-        vsf_usbh_urb_prepare_by_pipe(urb, dev, pthis->pipe_tx);
+        vk_usbh_urb_prepare_by_pipe(urb, dev, pthis->pipe_tx);
     } else {
-        vsf_usbh_urb_prepare_by_pipe(urb, dev, pthis->pipe_rx);
+        vk_usbh_urb_prepare_by_pipe(urb, dev, pthis->pipe_rx);
     }
 
-    return vsf_usbh_alloc_urb(usbh, dev, urb);
+    return vk_usbh_alloc_urb(usbh, dev, urb);
 }
 
-vsf_err_t vsf_usbh_cdc_submit_urb(vsf_usbh_cdc_t *pthis, vsf_usbh_urb_t *urb)
+vsf_err_t vk_usbh_cdc_submit_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb)
 {
-    return vsf_usbh_submit_urb_ex(pthis->usbh, urb, 0, &pthis->eda);
+    return vk_usbh_submit_urb_ex(pthis->usbh, urb, 0, &pthis->eda);
 }
 
-void vsf_usbh_cdc_free_urb(vsf_usbh_cdc_t *pthis, vsf_usbh_urb_t *urb)
+void vk_usbh_cdc_free_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb)
 {
-    vsf_usbh_free_urb(pthis->usbh, urb);
+    vk_usbh_free_urb(pthis->usbh, urb);
 }
 
 #endif

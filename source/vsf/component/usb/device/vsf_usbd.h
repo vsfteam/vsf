@@ -74,8 +74,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef union vsf_usbd_ep_cfg_t vsf_usbd_ep_cfg_t;
-union vsf_usbd_ep_cfg_t {
+typedef union vk_usbd_ep_cfg_t vk_usbd_ep_cfg_t;
+union vk_usbd_ep_cfg_t {
     struct {
         uint8_t notify;
         uint8_t out;
@@ -84,39 +84,39 @@ union vsf_usbd_ep_cfg_t {
     uint32_t ep_cfg;
 };
 
-declare_simple_class(vsf_usbd_dev_t)
-declare_simple_class(vsf_usbd_cfg_t)
-declare_simple_class(vsf_usbd_ifs_t)
-declare_simple_class(vsf_usbd_trans_t)
+declare_simple_class(vk_usbd_dev_t)
+declare_simple_class(vk_usbd_cfg_t)
+declare_simple_class(vk_usbd_ifs_t)
+declare_simple_class(vk_usbd_trans_t)
 
-enum vsf_usbd_evt_t {
+enum vk_usbd_evt_t {
     USB_ON_INIT =   USB_USR_EVT + 0,
     USB_ON_FINI =   USB_USR_EVT + 1
 };
-typedef enum vsf_usbd_evt_t vsf_usbd_evt_t;
+typedef enum vk_usbd_evt_t vk_usbd_evt_t;
 
-struct vsf_usbd_desc_t {
+struct vk_usbd_desc_t {
     uint8_t type;
     uint8_t index;
     uint16_t lanid;
     uint16_t size;
     uint8_t *buffer;
 };
-typedef struct vsf_usbd_desc_t vsf_usbd_desc_t;
+typedef struct vk_usbd_desc_t vk_usbd_desc_t;
 
-struct vsf_usbd_class_op_t {
-    vsf_usbd_desc_t * (*get_desc)(vsf_usbd_dev_t *dev, uint_fast8_t type,
+struct vk_usbd_class_op_t {
+    vk_usbd_desc_t * (*get_desc)(vk_usbd_dev_t *dev, uint_fast8_t type,
                 uint_fast8_t index, uint_fast16_t lanid);
 
-    vsf_err_t (*request_prepare)(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
-    vsf_err_t (*request_process)(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+    vsf_err_t (*request_prepare)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+    vsf_err_t (*request_process)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
-    vsf_err_t (*init)(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
-    vsf_err_t (*fini)(vsf_usbd_dev_t *dev, vsf_usbd_ifs_t *ifs);
+    vsf_err_t (*init)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+    vsf_err_t (*fini)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 };
-typedef struct vsf_usbd_class_op_t vsf_usbd_class_op_t;
+typedef struct vk_usbd_class_op_t vk_usbd_class_op_t;
 
-def_simple_class(vsf_usbd_trans_t) {
+def_simple_class(vk_usbd_trans_t) {
     public_member(
         uint8_t ep;
         bool zlp;
@@ -139,17 +139,17 @@ def_simple_class(vsf_usbd_trans_t) {
     )
 };
 
-struct vsf_usbd_ctrl_handler_t {
+struct vk_usbd_ctrl_handler_t {
     struct usb_ctrlrequest_t request;
-    vsf_usbd_trans_t trans;
+    vk_usbd_trans_t trans;
     uint8_t reply_buffer[4];
 };
-typedef struct vsf_usbd_ctrl_handler_t vsf_usbd_ctrl_handler_t;
+typedef struct vk_usbd_ctrl_handler_t vk_usbd_ctrl_handler_t;
 
-def_simple_class(vsf_usbd_ifs_t) {
+def_simple_class(vk_usbd_ifs_t) {
 
     public_member(
-        const vsf_usbd_class_op_t *class_op;
+        const vk_usbd_class_op_t *class_op;
         void *class_param;
     )
 
@@ -159,14 +159,14 @@ def_simple_class(vsf_usbd_ifs_t) {
     )
 };
 
-def_simple_class(vsf_usbd_cfg_t) {
+def_simple_class(vk_usbd_cfg_t) {
 
     public_member(
-        vsf_err_t (*init)(vsf_usbd_dev_t *dev);
-        vsf_err_t (*fini)(vsf_usbd_dev_t *dev);
+        vsf_err_t (*init)(vk_usbd_dev_t *dev);
+        vsf_err_t (*fini)(vk_usbd_dev_t *dev);
 
         uint8_t num_of_ifs;
-        vsf_usbd_ifs_t *ifs;
+        vk_usbd_ifs_t *ifs;
     )
 
     private_member(
@@ -175,15 +175,15 @@ def_simple_class(vsf_usbd_cfg_t) {
     )
 };
 
-def_simple_class(vsf_usbd_dev_t) {
+def_simple_class(vk_usbd_dev_t) {
     public_member(
         uint8_t num_of_config;
         uint8_t num_of_desc;
         uint8_t device_class_ifs;
 
         usb_dc_speed_t speed;
-        vsf_usbd_cfg_t *config;
-        vsf_usbd_desc_t *desc;
+        vk_usbd_cfg_t *config;
+        vk_usbd_desc_t *desc;
 
 #ifdef VSF_USBD_CFG_DRV_INTERFACE
         const i_usb_dc_t *drv;
@@ -191,7 +191,7 @@ def_simple_class(vsf_usbd_dev_t) {
     )
 
     protected_member(
-        vsf_usbd_ctrl_handler_t ctrl_handler;
+        vk_usbd_ctrl_handler_t ctrl_handler;
     )
 
     private_member(
@@ -208,8 +208,8 @@ def_simple_class(vsf_usbd_dev_t) {
 
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-declare_simple_class(vsf_usbd_ep_stream_t)
-def_simple_class(vsf_usbd_ep_stream_t) {
+declare_simple_class(vk_usbd_ep_stream_t)
+def_simple_class(vk_usbd_ep_stream_t) {
 
     public_member(
         vsf_stream_t *stream;
@@ -220,8 +220,8 @@ def_simple_class(vsf_usbd_ep_stream_t) {
     )
 
     protected_member(
-        implement(vsf_usbd_trans_t)
-        vsf_usbd_dev_t *dev;
+        implement(vk_usbd_trans_t)
+        vk_usbd_dev_t *dev;
         uint32_t total_size;
         uint32_t transfered_size;
         uint32_t cur_size;
@@ -230,29 +230,29 @@ def_simple_class(vsf_usbd_ep_stream_t) {
 
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 
-declare_class(vsf_usbd_ep_stream_t)
+declare_class(vk_usbd_ep_stream_t)
 
 
 typedef struct {
     uint8_t rx_ep;
     uint8_t tx_ep;
-    //vsf_usbd_dev_t *dev;
-}vsf_usbd_ep_stream_cfg_t;
+    //vk_usbd_dev_t *dev;
+}vk_usbd_ep_stream_cfg_t;
 
-def_class(vsf_usbd_ep_stream_t,
+def_class(vk_usbd_ep_stream_t,
     which(
         implement(vsf_stream_src_t)
         implement(vsf_stream_usr_t)
     )
     private_member(
-        vsf_usbd_trans_t tx_trans;
-        vsf_usbd_trans_t rx_trans;
+        vk_usbd_trans_t tx_trans;
+        vk_usbd_trans_t rx_trans;
         vsf_pbuf_t     *tx_current;
         vsf_pbuf_t     *rx_current;
-        vsf_usbd_dev_t *dev;
+        vk_usbd_dev_t *dev;
     )
 )
-end_def_class(vsf_usbd_ep_stream_src_t)
+end_def_class(vk_usbd_ep_stream_src_t)
 
 #endif
 #endif
@@ -260,37 +260,37 @@ end_def_class(vsf_usbd_ep_stream_src_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_usbd_init(vsf_usbd_dev_t *dev);
-extern void vsf_usbd_fini(vsf_usbd_dev_t *dev);
-extern void vsf_usbd_connect(vsf_usbd_dev_t *dev);
-extern void vsf_usbd_disconnect(vsf_usbd_dev_t *dev);
-extern void vsf_usbd_wakeup(vsf_usbd_dev_t *dev);
+extern void vk_usbd_init(vk_usbd_dev_t *dev);
+extern void vk_usbd_fini(vk_usbd_dev_t *dev);
+extern void vk_usbd_connect(vk_usbd_dev_t *dev);
+extern void vk_usbd_disconnect(vk_usbd_dev_t *dev);
+extern void vk_usbd_wakeup(vk_usbd_dev_t *dev);
 
 #if defined(VSF_USBD_IMPLEMENT) || defined(VSF_USBD_INHERIT)
-extern vsf_usbd_desc_t * vsf_usbd_get_descriptor(vsf_usbd_desc_t *desc,
+extern vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
         uint_fast8_t desc_num, uint_fast8_t type,
         uint_fast8_t index, uint_fast16_t lanid);
-extern vsf_usbd_cfg_t * vsf_usbd_get_cur_cfg(vsf_usbd_dev_t *dev);
-extern vsf_usbd_ifs_t * vsf_usbd_get_ifs(vsf_usbd_dev_t *dev, uint_fast8_t ifs_no);
+extern vk_usbd_cfg_t * vk_usbd_get_cur_cfg(vk_usbd_dev_t *dev);
+extern vk_usbd_ifs_t * vk_usbd_get_ifs(vk_usbd_dev_t *dev, uint_fast8_t ifs_no);
 
-extern vsf_err_t vsf_usbd_ep_stall(vsf_usbd_dev_t *dev, uint_fast8_t ep);
-extern vsf_err_t vsf_usbd_ep_recv(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans);
-extern vsf_err_t vsf_usbd_ep_send(vsf_usbd_dev_t *dev, vsf_usbd_trans_t *trans);
+extern vsf_err_t vk_usbd_ep_stall(vk_usbd_dev_t *dev, uint_fast8_t ep);
+extern vsf_err_t vk_usbd_ep_recv(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans);
+extern vsf_err_t vk_usbd_ep_send(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans);
 
 
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
-extern vsf_err_t vsf_usbd_ep_recv_stream(vsf_usbd_ep_stream_t *stream, uint_fast32_t size);
-extern vsf_err_t vsf_usbd_ep_send_stream(vsf_usbd_ep_stream_t *stream, uint_fast32_t size);
+extern vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *stream, uint_fast32_t size);
+extern vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *stream, uint_fast32_t size);
 
 #if VSF_USE_SERVICE_STREAM == ENABLED
 
 extern 
-void vsf_usbd_ep_stream_init(   vsf_usbd_ep_stream_t *obj, 
-                                vsf_usbd_ep_stream_cfg_t *cfg);
+void vk_usbd_ep_stream_init(   vk_usbd_ep_stream_t *obj, 
+                                vk_usbd_ep_stream_cfg_t *cfg);
 
 extern 
-void vsf_usbd_ep_stream_connect_dev(vsf_usbd_ep_stream_t *obj, 
-                                    vsf_usbd_dev_t *dev);
+void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj, 
+                                    vk_usbd_dev_t *dev);
 #endif      // VSF_USE_SERVICE_STREAM
 #endif      // VSF_USBD_CFG_STREAM_EN
 

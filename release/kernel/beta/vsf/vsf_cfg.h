@@ -34,12 +34,11 @@
 /* do not modify this */
 #include "vsf_usr_cfg.h"
 
-
 /* compiler abstraction, supports GCC, IAR, Arm Compiler 5, Arm Compiler 6 */
 #include "utilities/compiler.h"
 
 /* minimal OO support for interface definie only, no class support */
-#include "utilities/3rd-party/PLOOC/plooc.h"
+#include "utilities/3rd-party/PLOOC/raw/plooc.h"
 
 /* definition for communication pipe and memory block */
 #include "utilities/communicate.h"       
@@ -47,29 +46,48 @@
 /* template for abstraction data type */
 #include "utilities/template/template.h"
 
+/* other high level language externsion for OOPC */
+#include "utilities/language_extension/language_extension.h"
+
+/*! \note please do not move this including */
+#if VSF_KERNEL_CFG_DEPLOY_IN_LIB_WITH_FULL_FEATURE_SET == ENABLED
+#   include "kernel/lib/__kernel_lib_with_full_feature_set.h"
+#endif
+
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_USE_KERNEL
+#   define VSF_USE_KERNEL                                   ENABLED
+#endif
 
 #ifndef Hz
 #   define Hz                                   ul
 #endif
 
-/*----------------------------------------------------------------------------*
- * DO NOT MODIFY ANYTHING BELOW                                               *
- *----------------------------------------------------------------------------*/
-#define VSF_CFG_SYNC_EN                             ENABLED
-#define VSF_CFG_PREMPT_EN                           ENABLED
-#define VSF_CFG_DYNAMIC_PRIOTIRY_EN                 ENABLED
-#define VSF_CFG_TIMER_EN                            ENABLED
-#define VSF_CFG_QUEUE_EN                            ENABLED
-#define VSF_CFG_BMPEVT_EN                           ENABLED
-#define VSF_USE_SIMPLE_SHELL                        ENABLED
-#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM              ENABLED
-#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL         ENABLED
-#define VSF_KERNEL_CFG_SUPPORT_THREAD               ENABLED
-#define VSF_KERNEL_CFG_EDA_SUPPORT_PT               ENABLED
-#define VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE     ENABLED
-#define VSF_KERNEL_CFG_CALLBACK_TIMER               ENABLED
+#ifndef VSF_USR_SWI_NUM
+#   define VSF_USR_SWI_NUM                      0
+#endif
+
+#if VSF_USE_KERNEL == ENABLED && defined(VSF_OS_CFG_PRIORITY_NUM)
+#   if (VSF_OS_CFG_PRIORITY_NUM < 1)
+#       error VSF_OS_CFG_PRIORITY_NUM MUST be defined to calculate \
+__VSF_HAL_SWI_NUM and its value must at least be 1. 
+#   endif
+
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
+#       if VSF_OS_CFG_PRIORITY_NUM > 1
+#           define __VSF_HAL_SWI_NUM                (VSF_OS_CFG_PRIORITY_NUM - 1)
+#       else
+#           define __VSF_HAL_SWI_NUM                0
+#       endif
+#   else
+#       define __VSF_HAL_SWI_NUM                    (VSF_OS_CFG_PRIORITY_NUM)
+#   endif
+// priority configurations
+#   define __VSF_OS_SWI_NUM                        __VSF_HAL_SWI_NUM
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

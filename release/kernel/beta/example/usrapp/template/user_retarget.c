@@ -131,8 +131,6 @@ typedef struct
 #define CMSDK_UART1             ((CMSDK_UART_TypeDef              *) CMSDK_UART1_BASE       )
 #define CMSDK_UART2             ((CMSDK_UART_TypeDef              *) CMSDK_UART2_BASE       )
 
-
-
 void uart_config(void)
 {
 

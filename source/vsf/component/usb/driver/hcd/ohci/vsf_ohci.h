@@ -36,19 +36,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_ohci_param_t {
+struct vk_ohci_param_t {
     const i_usb_hc_ip_t *op;
     vsf_arch_prio_t priority;
 };
-typedef struct vsf_ohci_param_t vsf_ohci_param_t;
+typedef struct vk_ohci_param_t vk_ohci_param_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_hcd_drv_t vsf_ohci_drv;
+extern const vk_usbh_hcd_drv_t vk_ohci_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-void vsf_ohci_init(void);
+void vk_ohci_init(void);
 
 #endif
 

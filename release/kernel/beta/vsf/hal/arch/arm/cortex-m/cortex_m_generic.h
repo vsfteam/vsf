@@ -20,11 +20,16 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
+
+#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/driver/driver.h"
+#undef  __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
 #include "./SysTick/systick.h"
 /*============================ MACROS ========================================*/
 
-#define __LITTLE_ENDIAN             1
-#define __BYTE_ORDER                __LITTLE_ENDIAN
+#define __LITTLE_ENDIAN                 1
+#define __BYTE_ORDER                    __LITTLE_ENDIAN
 
 #if __ARM_ARCH == 6 || __TARGET_ARCH_6_M == 1 || __TARGET_ARCH_6S_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
@@ -38,15 +43,20 @@
 #   endif
 #elif __ARM_ARCH >= 7 || __TARGET_ARCH_7_M == 1 || __TARGET_ARCH_7E_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
-#       define VSF_ARCH_PRI_NUM         256
+#       define VSF_ARCH_PRI_NUM         16
 #       undef  VSF_ARCH_PRI_BIT         
-#       define VSF_ARCH_PRI_BIT         8
+#       define VSF_ARCH_PRI_BIT         4
 #   endif
 
 #   ifndef VSF_ARCH_PRI_BIT
-#       define VSF_ARCH_PRI_BIT         8
+#       define VSF_ARCH_PRI_BIT         4
 #   endif
 #endif
+
+// software interrupt provided by arch
+#define VSF_ARCH_SWI_NUM                1
+#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#define __VSF_ARCH_SYSTIMER_BITS        24
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -58,18 +68,28 @@ typedef uint64_t vsf_systimer_cnt_t;
 
 enum {
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
+    __vsf_arch_prio_index_number,
 };
 
 #define __VSF_ARCH_PRI(__N, __BIT)                                              \
             VSF_ARCH_PRIO_##__N =                                               \
-                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)           \
-                    << (8- (__BIT))) & 0xFF,
+                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,  \
+            vsf_arch_prio_##__N =                                               \
+                ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,
 
-enum vsf_arch_priority_t {
-    VSF_ARCH_PRIO_IVALID    = -1,
+
+enum vsf_arch_prio_t {
+    // avoid vsf_arch_prio_t to be optimized to 8bit
+    __VSF_ARCH_PRIO_LEAST_MAX       = INT16_MAX,
+    __VSF_ARCH_PRIO_LEAST_MIN       = INT16_MIN,
+    VSF_ARCH_PRIO_IVALID            = -1,
+    vsf_arch_prio_ivalid            = -1,
+
     MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
+
+    vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF ,
 };
-typedef enum vsf_arch_priority_t vsf_arch_priority_t;
+typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

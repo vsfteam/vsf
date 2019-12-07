@@ -38,28 +38,35 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_fatfs_file_t)
+declare_simple_class(vk_fatfs_file_t)
 
-struct vsf_fatfs_dentry_parser_t {
+enum vk_fat32_file_attr_t {
+    VSF_FAT32_FILE_ATTR_VOLUMID = VSF_FILE_ATTR_EXT,
+    VSF_FAT32_FILE_ATTR_SYSTEM  = VSF_FILE_ATTR_EXT << 1,
+    VSF_FAT32_FILE_ATTR_ARCHIVE = VSF_FILE_ATTR_EXT << 2,
+};
+typedef enum vk_fat32_file_attr_t vk_fat32_file_attr_t;
+
+struct vk_fatfs_dentry_parser_t {
     uint8_t *entry;
     uint16_t entry_num;
     uint8_t lfn;
     char *filename;
 };
-typedef struct vsf_fatfs_dentry_parser_t vsf_fatfs_dentry_parser_t;
+typedef struct vk_fatfs_dentry_parser_t vk_fatfs_dentry_parser_t;
 
-def_simple_class(vsf_fatfs_file_t) {
-    implement(vsf_file_t)
+def_simple_class(vk_fatfs_file_t) {
+    implement(vk_file_t)
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_fs_op_t vsf_fatfs_op;
+extern const vk_fs_op_t vk_fatfs_op;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vsf_fatfs_is_lfn(char *name);
-extern bool vsf_fatfs_parse_dentry_fat(vsf_fatfs_dentry_parser_t *parser);
+extern bool vk_fatfs_is_lfn(char *name);
+extern bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser);
 
 #endif      // VSF_USE_FS && VSF_USE_FATFS
 #endif      // __VSF_FATFS_H__

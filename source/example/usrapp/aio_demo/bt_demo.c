@@ -34,7 +34,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 int btstack_main(int argc, const char * argv[]);
-vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vsf_usbh_dev_id_t *id)
+vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
 	if ((id->idVendor == 0x0A12) && (id->idProduct == 0x0001)) {
 		btstack_memory_init();

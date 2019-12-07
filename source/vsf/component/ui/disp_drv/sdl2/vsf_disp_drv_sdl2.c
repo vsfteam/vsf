@@ -46,45 +46,45 @@ WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct __vsf_disp_sdl2_t {
+struct __vk_disp_sdl2_t {
     vsf_arch_irq_thread_t init_thread;
     bool is_init_called;
     bool is_inited;
 };
-typedef struct __vsf_disp_sdl2_t __vsf_disp_sdl2_t;
+typedef struct __vk_disp_sdl2_t __vk_disp_sdl2_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __vsf_disp_sdl2_t __vsf_disp_sdl2 = {
+static __vk_disp_sdl2_t __vk_disp_sdl2 = {
     .is_init_called = false,
     .is_inited      = false,
 };
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vsf_disp_sdl2_init(vsf_disp_t *pthis);
-static vsf_err_t vsf_disp_sdl2_refresh(vsf_disp_t *pthis, vsf_disp_area_t *area, void *disp_buff);
+static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis);
+static vsf_err_t vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vsf_disp_drv_t vsf_disp_drv_sdl2 = {
-    .init       = vsf_disp_sdl2_init,
-    .refresh    = vsf_disp_sdl2_refresh,
+const vk_disp_drv_t vk_disp_drv_sdl2 = {
+    .init       = vk_disp_sdl2_init,
+    .refresh    = vk_disp_sdl2_refresh,
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_disp_sdl2_common_init(void)
+static void __vk_disp_sdl2_common_init(void)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
 }
 
-static void __vsf_disp_sdl2_common_fini(void)
+static void __vk_disp_sdl2_common_fini(void)
 {
     SDL_Quit();
 }
 
-static Uint32 __vsf_disp_sdl2_get_format(vsf_disp_sdl2_t *disp_sdl2)
+static Uint32 __vk_disp_sdl2_get_format(vk_disp_sdl2_t *disp_sdl2)
 {
     switch (disp_sdl2->param.color) {
     default:
@@ -93,12 +93,12 @@ static Uint32 __vsf_disp_sdl2_get_format(vsf_disp_sdl2_t *disp_sdl2)
     }
 }
 
-static uint_fast8_t __vsf_disp_sdl2_get_pixel_size(vsf_disp_sdl2_t *disp_sdl2)
+static uint_fast8_t __vk_disp_sdl2_get_pixel_size(vk_disp_sdl2_t *disp_sdl2)
 {
     return VSF_DISP_GET_PIXEL_SIZE(disp_sdl2);
 }
 
-static void __vsf_disp_sdl2_screen_init(vsf_disp_sdl2_t *disp_sdl2)
+static void __vk_disp_sdl2_screen_init(vk_disp_sdl2_t *disp_sdl2)
 {
     disp_sdl2->window = SDL_CreateWindow("Screen",
                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -107,13 +107,13 @@ static void __vsf_disp_sdl2_screen_init(vsf_disp_sdl2_t *disp_sdl2)
                             0);
     disp_sdl2->renderer = SDL_CreateRenderer(disp_sdl2->window, -1, 0);
     disp_sdl2->texture = SDL_CreateTexture(disp_sdl2->renderer,
-                            __vsf_disp_sdl2_get_format(disp_sdl2),
+                            __vk_disp_sdl2_get_format(disp_sdl2),
                             SDL_TEXTUREACCESS_STATIC,
                             disp_sdl2->param.width, disp_sdl2->param.height);
     SDL_SetTextureBlendMode(disp_sdl2->texture, SDL_BLENDMODE_BLEND);
 }
 
-static void __vsf_disp_sdl2_screen_update(vsf_disp_sdl2_t *disp_sdl2)
+static void __vk_disp_sdl2_screen_update(vk_disp_sdl2_t *disp_sdl2)
 {
     SDL_Rect rect = {
        .x = disp_sdl2->area.pos.x,
@@ -122,53 +122,53 @@ static void __vsf_disp_sdl2_screen_update(vsf_disp_sdl2_t *disp_sdl2)
        .h = disp_sdl2->area.size.y,
     };
     SDL_UpdateTexture(disp_sdl2->texture, &rect, disp_sdl2->disp_buff,
-        disp_sdl2->area.size.x * __vsf_disp_sdl2_get_pixel_size(disp_sdl2) / 8);
+        disp_sdl2->area.size.x * __vk_disp_sdl2_get_pixel_size(disp_sdl2) / 8);
     SDL_RenderClear(disp_sdl2->renderer);
     SDL_RenderCopy(disp_sdl2->renderer, disp_sdl2->texture, NULL, NULL);
     SDL_RenderPresent(disp_sdl2->renderer);
 }
 
-static void __vsf_disp_sdl2_init_thread(void *arg)
+static void __vk_disp_sdl2_init_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
 
     __vsf_arch_irq_set_background(irq_thread);
-        __vsf_disp_sdl2_common_init();
-        __vsf_disp_sdl2.is_inited = true;
+        __vk_disp_sdl2_common_init();
+        __vk_disp_sdl2.is_inited = true;
     __vsf_arch_irq_fini(irq_thread);
 }
 
-static void __vsf_disp_sdl2_thread(void *arg)
+static void __vk_disp_sdl2_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_disp_sdl2_t *disp_sdl2 = container_of(irq_thread, vsf_disp_sdl2_t, thread);
+    vk_disp_sdl2_t *disp_sdl2 = container_of(irq_thread, vk_disp_sdl2_t, thread);
 
     SDL_Event event;
     union {
-        implement(vsf_input_evt_t)
-        vsf_touchscreen_evt_t   ts_evt;
-        vsf_gamepad_evt_t       gamepad_evt;
-        vsf_keyboard_evt_t      keyboard_evt;
+        implement(vk_input_evt_t)
+        vk_touchscreen_evt_t    ts_evt;
+        vk_gamepad_evt_t       gamepad_evt;
+        vk_keyboard_evt_t      keyboard_evt;
     } evt;
-    vsf_input_type_t evt_type;
+    vk_input_type_t evt_type;
 
     uint_fast16_t x = 0, y = 0;
     bool is_down = false, is_to_update = false;
 
-    while (!__vsf_disp_sdl2.is_inited) {
+    while (!__vk_disp_sdl2.is_inited) {
         Sleep(100);
     }
 
     __vsf_arch_irq_set_background(irq_thread);
-        __vsf_disp_sdl2_screen_init(disp_sdl2);
+        __vk_disp_sdl2_screen_init(disp_sdl2);
 
     while (1) {
         if (disp_sdl2->disp_buff != NULL) {
-            __vsf_disp_sdl2_screen_update(disp_sdl2);
+            __vk_disp_sdl2_screen_update(disp_sdl2);
             disp_sdl2->disp_buff = NULL;
 
             __vsf_arch_irq_start(irq_thread);
-                vsf_disp_on_ready(&disp_sdl2->use_as__vsf_disp_t);
+                vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
             __vsf_arch_irq_end(irq_thread, false);
         }
 
@@ -177,20 +177,20 @@ static void __vsf_disp_sdl2_thread(void *arg)
             case SDL_MOUSEBUTTONUP:
                 is_down = false;
                 is_to_update = true;
-                evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
+                evt_type = vk_input_type_tOUCHSCREEN;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 is_down = true;
                 x = event.motion.x / disp_sdl2->amplifier;
                 y = event.motion.y / disp_sdl2->amplifier;
                 is_to_update = true;
-                evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
+                evt_type = vk_input_type_tOUCHSCREEN;
                 break;
             case SDL_MOUSEMOTION:
                 x = event.motion.x / disp_sdl2->amplifier;
                 y = event.motion.y / disp_sdl2->amplifier;
                 is_to_update = is_down;
-                evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
+                evt_type = vk_input_type_tOUCHSCREEN;
                 break;
 
             case SDL_KEYDOWN:
@@ -282,26 +282,26 @@ static void __vsf_disp_sdl2_thread(void *arg)
 
                 __vsf_arch_irq_start(irq_thread);
                     switch (evt_type) {
-                    case VSF_INPUT_TYPE_TOUCHSCREEN:
+                    case vk_input_type_tOUCHSCREEN:
                         evt.ts_evt.info.width = disp_sdl2->param.width;
                         evt.ts_evt.info.height = disp_sdl2->param.height;
                         VSF_INPUT_TOUCHSCREEN_SET(&evt.ts_evt, 0, is_down, x, y);
 #ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
-                        vsf_input_on_touchscreen(&evt.ts_evt);
+                        vk_input_on_touchscreen(&evt.ts_evt);
 #else
                         WEAK_VSF_INPUT_ON_TOUCHSCREEN(&evt.ts_evt);
 #endif
                         break;
                     case VSF_INPUT_TYPE_GAMEPAD:
 #ifndef WEAK_VSF_INPUT_ON_GAMEPAD
-                        vsf_input_on_gamepad(&evt.gamepad_evt);
+                        vk_input_on_gamepad(&evt.gamepad_evt);
 #else
                         WEAK_VSF_INPUT_ON_GAMEPAD(&evt.gamepad_evt);
 #endif
                         break;
                     case VSF_INPUT_TYPE_KEYBOARD:
 #ifndef WEAK_VSF_INPUT_ON_KEYBOARD
-                        vsf_input_on_keyboard(&evt.keyboard_evt);
+                        vk_input_on_keyboard(&evt.keyboard_evt);
 #else
                         WEAK_VSF_INPUT_ON_KEYBOARD( &evt.keyboard_evt);
 #endif
@@ -319,25 +319,25 @@ static void __vsf_disp_sdl2_thread(void *arg)
 
 
 
-static vsf_err_t vsf_disp_sdl2_init(vsf_disp_t *pthis)
+static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis)
 {
-    vsf_disp_sdl2_t *disp_sdl2 = (vsf_disp_sdl2_t *)pthis;
+    vk_disp_sdl2_t *disp_sdl2 = (vk_disp_sdl2_t *)pthis;
     VSF_UI_ASSERT(disp_sdl2 != NULL);
 
-    if (!__vsf_disp_sdl2.is_init_called) {
-        __vsf_disp_sdl2.is_init_called = true;
-        __vsf_disp_sdl2.init_thread.name = "disp_sdl2_init";
-        __vsf_arch_irq_init(&__vsf_disp_sdl2.init_thread, __vsf_disp_sdl2_init_thread, vsf_arch_prio_0, true);
+    if (!__vk_disp_sdl2.is_init_called) {
+        __vk_disp_sdl2.is_init_called = true;
+        __vk_disp_sdl2.init_thread.name = "disp_sdl2_init";
+        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, __vk_disp_sdl2_init_thread, vsf_arch_prio_0, true);
     }
 
     disp_sdl2->thread.name = "disp_sdl2";
-    __vsf_arch_irq_init(&disp_sdl2->thread, __vsf_disp_sdl2_thread, vsf_arch_prio_0, true);
+    __vsf_arch_irq_init(&disp_sdl2->thread, __vk_disp_sdl2_thread, vsf_arch_prio_0, true);
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_disp_sdl2_refresh(vsf_disp_t *pthis, vsf_disp_area_t *area, void *disp_buff)
+static vsf_err_t vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
-    vsf_disp_sdl2_t *disp_sdl2 = (vsf_disp_sdl2_t *)pthis;
+    vk_disp_sdl2_t *disp_sdl2 = (vk_disp_sdl2_t *)pthis;
     VSF_UI_ASSERT(disp_sdl2 != NULL);
 
     if (disp_sdl2->disp_buff != NULL) {

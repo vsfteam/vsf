@@ -41,22 +41,22 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbd_cdc_t)
+declare_simple_class(vk_usbd_cdc_t)
 
-typedef struct vsf_usbd_encapsulate_t vsf_usbd_encapsulate_t;
-struct vsf_usbd_encapsulate_t {
+typedef struct vk_usbd_encapsulate_t vk_usbd_encapsulate_t;
+struct vk_usbd_encapsulate_t {
     uint8_t *buffer;
     uint32_t size;
     union {
-        vsf_err_t (*on_cmd)(vsf_usbd_encapsulate_t *cmd);
-        vsf_err_t (*on_resp)(vsf_usbd_encapsulate_t *resp);
+        vsf_err_t (*on_cmd)(vk_usbd_encapsulate_t *cmd);
+        vsf_err_t (*on_resp)(vk_usbd_encapsulate_t *resp);
     };
 };
 
-def_simple_class(vsf_usbd_cdc_t) {
+def_simple_class(vk_usbd_cdc_t) {
 
     public_member(
-        implement_ex(vsf_usbd_ep_cfg_t, ep)
+        implement_ex(vk_usbd_ep_cfg_t, ep)
         /*uint8_t ep_notify;
         uint8_t ep_out;
         uint8_t ep_in;*/
@@ -65,27 +65,27 @@ def_simple_class(vsf_usbd_cdc_t) {
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             // stream.tx is used for data stream send to USB host
             // stream.rx is used for data stream receive from USB host
-            vsf_usbd_ep_stream_t tx;
-            vsf_usbd_ep_stream_t rx;
+            vk_usbd_ep_stream_t tx;
+            vk_usbd_ep_stream_t rx;
 #elif VSF_USE_SERVICE_STREAM == ENABLED
-            implement (vsf_usbd_ep_stream_t);
+            implement (vk_usbd_ep_stream_t);
 #endif
         } stream;
 
         // no need to initialize below if encapsulate command/response is not used
-        vsf_usbd_encapsulate_t cmd, resp;
+        vk_usbd_encapsulate_t cmd, resp;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const struct vsf_usbd_class_op_t vsf_usbd_cdc_control;
-extern const struct vsf_usbd_class_op_t vsf_usbd_cdc_data;
+extern const struct vk_usbd_class_op_t vk_usbd_cdc_control;
+extern const struct vk_usbd_class_op_t vk_usbd_cdc_data;
 
 /*============================ PROTOTYPES ====================================*/
 
 // helper functions
-extern void vsf_usbd_cdc_data_connect(vsf_usbd_cdc_t *cdc);
+extern void vk_usbd_cdc_data_connect(vk_usbd_cdc_t *cdc);
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDC
 #endif	// __VSF_USBD_CDC_H__

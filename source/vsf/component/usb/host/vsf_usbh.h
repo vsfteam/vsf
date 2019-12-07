@@ -28,26 +28,26 @@
 #include "../common/usb_ch11.h"
 
 #if     defined(VSF_USBH_IMPLEMENT)
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_t
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_urb_t
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_urb_t
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_hcd_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_urb_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_t
 #elif   defined(VSF_USBH_IMPLEMENT_HCD)
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_t
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_hcd_urb_t
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_hcd_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
 #   if  defined(VSF_USBH_IMPLEMENT_HUB)
-#       define VSF_USBH_INHERIT_vsf_usbh_t
+#       define VSF_USBH_INHERIT_vk_usbh_t
 #   endif
 #elif   defined(VSF_USBH_IMPLEMENT_CLASS)
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
-#   define VSF_USBH_INHERIT_vsf_usbh_t
-#   define VSF_USBH_INHERIT_vsf_usbh_urb_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
+#   define VSF_USBH_INHERIT_vk_usbh_t
+#   define VSF_USBH_INHERIT_vk_usbh_urb_t
 #elif   defined(VSF_USBH_IMPLEMENT_HUB)
 #   define VSF_USBH_IMPLEMENT_CLASS
-#   define VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
-#   define VSF_USBH_INHERIT_vsf_usbh_t
+#   define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
+#   define VSF_USBH_INHERIT_vk_usbh_t
 #endif
 
 #include "utilities/ooc_class.h"
@@ -139,45 +139,45 @@
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_usbh_hcd_t)
-declare_simple_class(vsf_usbh_hcd_drv_t)
-declare_simple_class(vsf_usbh_hcd_urb_t)
-declare_simple_class(vsf_usbh_hcd_dev_t)
+declare_simple_class(vk_usbh_hcd_t)
+declare_simple_class(vk_usbh_hcd_drv_t)
+declare_simple_class(vk_usbh_hcd_urb_t)
+declare_simple_class(vk_usbh_hcd_dev_t)
 
-declare_simple_class(vsf_usbh_urb_t)
-declare_simple_class(vsf_usbh_dev_t)
-declare_simple_class(vsf_usbh_t)
+declare_simple_class(vk_usbh_urb_t)
+declare_simple_class(vk_usbh_dev_t)
+declare_simple_class(vk_usbh_t)
 
-typedef struct vsf_usbh_class_drv_t vsf_usbh_class_drv_t;
+typedef struct vk_usbh_class_drv_t vk_usbh_class_drv_t;
 
-struct vsf_usbh_ifs_t {
-    const vsf_usbh_class_drv_t *drv;
+struct vk_usbh_ifs_t {
+    const vk_usbh_class_drv_t *drv;
     void *param;
 
     uint8_t no;
     uint8_t num_of_alt;
     uint8_t cur_alt;
 };
-typedef struct vsf_usbh_ifs_t vsf_usbh_ifs_t;
+typedef struct vk_usbh_ifs_t vk_usbh_ifs_t;
 
-struct vsf_usbh_ifs_alt_parser_t {
+struct vk_usbh_ifs_alt_parser_t {
     struct usb_interface_desc_t *desc_ifs;
     struct usb_endpoint_desc_t *desc_ep;
     uint16_t desc_size;
     uint8_t num_of_ep;
 };
-typedef struct vsf_usbh_ifs_alt_parser_t vsf_usbh_ifs_alt_parser_t;
+typedef struct vk_usbh_ifs_alt_parser_t vk_usbh_ifs_alt_parser_t;
 
-struct vsf_usbh_ifs_parser_t {
-    vsf_usbh_ifs_alt_parser_t *parser_alt;
-    vsf_usbh_ifs_t *ifs;
+struct vk_usbh_ifs_parser_t {
+    vk_usbh_ifs_alt_parser_t *parser_alt;
+    vk_usbh_ifs_t *ifs;
 };
-typedef struct vsf_usbh_ifs_parser_t vsf_usbh_ifs_parser_t;
+typedef struct vk_usbh_ifs_parser_t vk_usbh_ifs_parser_t;
 
-struct vsf_usbh_dev_parser_t {
+struct vk_usbh_dev_parser_t {
     struct usb_device_descriptor_t *desc_device;
     struct usb_config_descriptor_t *desc_config;
-    vsf_usbh_ifs_parser_t *parser_ifs;
+    vk_usbh_ifs_parser_t *parser_ifs;
     uint8_t num_of_ifs;
     uint8_t devnum_temp;
     enum {
@@ -192,9 +192,9 @@ struct vsf_usbh_dev_parser_t {
         VSF_USBH_PROBE_WAIT_SET_CONFIG,
     } probe_state;
 };
-typedef struct vsf_usbh_dev_parser_t vsf_usbh_dev_parser_t;
+typedef struct vk_usbh_dev_parser_t vk_usbh_dev_parser_t;
 
-struct vsf_usbh_dev_id_t {
+struct vk_usbh_dev_id_t {
     uint16_t match_vendor       : 1;
     uint16_t match_product      : 1;
     uint16_t match_dev_lo       : 1;
@@ -218,24 +218,24 @@ struct vsf_usbh_dev_id_t {
     uint8_t bInterfaceProtocol;
     //uint32_t driver_info;
 };
-typedef struct vsf_usbh_dev_id_t vsf_usbh_dev_id_t;
+typedef struct vk_usbh_dev_id_t vk_usbh_dev_id_t;
 
-struct vsf_usbh_class_drv_t {
+struct vk_usbh_class_drv_t {
     const char *name;
     uint8_t dev_id_num;
-    const vsf_usbh_dev_id_t *dev_ids;
-    void * (*probe)(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-                    vsf_usbh_ifs_parser_t *parser_ifs);
-    void (*disconnect)(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, void *param);
+    const vk_usbh_dev_id_t *dev_ids;
+    void * (*probe)(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+                    vk_usbh_ifs_parser_t *parser_ifs);
+    void (*disconnect)(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 };
 
-struct vsf_usbh_class_t {
-    const vsf_usbh_class_drv_t *drv;
+struct vk_usbh_class_t {
+    const vk_usbh_class_drv_t *drv;
     vsf_slist_node_t node;
 };
-typedef struct vsf_usbh_class_t vsf_usbh_class_t;
+typedef struct vk_usbh_class_t vk_usbh_class_t;
 
-struct vsf_usbh_eppipe_t {
+struct vk_usbh_eppipe_t {
     union {
         struct {
             uint32_t is_pipe        : 1;
@@ -250,41 +250,41 @@ struct vsf_usbh_eppipe_t {
         uint32_t value;
     };
 };
-typedef struct vsf_usbh_eppipe_t vsf_usbh_eppipe_t;
+typedef struct vk_usbh_eppipe_t vk_usbh_eppipe_t;
 
-#if     defined(VSF_USBH_IMPLEMENT_vsf_usbh_hcd_t)
-#   undef VSF_USBH_IMPLEMENT_vsf_usbh_hcd_t
+#if     defined(VSF_USBH_IMPLEMENT_vk_usbh_hcd_t)
+#   undef VSF_USBH_IMPLEMENT_vk_usbh_hcd_t
 #   define __PLOOC_CLASS_IMPLEMENT
 #endif
 #include "utilities/ooc_class.h"
 
-def_simple_class(vsf_usbh_hcd_drv_t) {
+def_simple_class(vk_usbh_hcd_drv_t) {
     private_member(
-        vsf_err_t (*init_evthandler)(vsf_eda_t *eda, vsf_evt_t evt, vsf_usbh_hcd_t *hcd);
-        vsf_err_t (*fini)(vsf_usbh_hcd_t *hcd);
-        vsf_err_t (*suspend)(vsf_usbh_hcd_t *hcd);
-        vsf_err_t (*resume)(vsf_usbh_hcd_t *hcd);
-        vsf_err_t (*alloc_device)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
-        void (*free_device)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
-        vsf_usbh_hcd_urb_t * (*alloc_urb)(vsf_usbh_hcd_t *hcd);
-        void (*free_urb)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
-        vsf_err_t (*submit_urb)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
-        vsf_err_t (*relink_urb)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
+        vsf_err_t (*init_evthandler)(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
+        vsf_err_t (*fini)(vk_usbh_hcd_t *hcd);
+        vsf_err_t (*suspend)(vk_usbh_hcd_t *hcd);
+        vsf_err_t (*resume)(vk_usbh_hcd_t *hcd);
+        vsf_err_t (*alloc_device)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+        void (*free_device)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+        vk_usbh_hcd_urb_t * (*alloc_urb)(vk_usbh_hcd_t *hcd);
+        void (*free_urb)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+        vsf_err_t (*submit_urb)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+        vsf_err_t (*relink_urb)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 
         union {
-            int (*rh_control)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_urb_t *urb);
+            int (*rh_control)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
             struct {
                 // for virtual hcd without root hub
-                vsf_err_t (*reset_dev)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
-                bool (*is_dev_reset)(vsf_usbh_hcd_t *hcd, vsf_usbh_hcd_dev_t *dev);
+                vsf_err_t (*reset_dev)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+                bool (*is_dev_reset)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
             };
         };
     )
 };
 
-def_simple_class(vsf_usbh_hcd_t) {
+def_simple_class(vk_usbh_hcd_t) {
     public_member(
-        const vsf_usbh_hcd_drv_t *drv;
+        const vk_usbh_hcd_drv_t *drv;
         void *param;
         enum usb_device_speed_t rh_speed;
     )
@@ -312,13 +312,13 @@ struct iso_packet_t {
 typedef struct iso_packet_t iso_packet_t;
 #endif
 
-#if     defined(VSF_USBH_IMPLEMENT_vsf_usbh_hcd_urb_t)
-#   undef VSF_USBH_IMPLEMENT_vsf_usbh_hcd_urb_t
+#if     defined(VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t)
+#   undef VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t
 #   define __PLOOC_CLASS_IMPLEMENT
 #endif
 #include "utilities/ooc_class.h"
 
-def_simple_class(vsf_usbh_hcd_dev_t) {
+def_simple_class(vk_usbh_hcd_dev_t) {
     private_member(
         union {
             void *dev_priv;
@@ -328,11 +328,11 @@ def_simple_class(vsf_usbh_hcd_dev_t) {
     )
 };
 
-def_simple_class(vsf_usbh_hcd_urb_t) {
+def_simple_class(vk_usbh_hcd_urb_t) {
 
     private_member(
-        vsf_usbh_hcd_dev_t *dev_hcd;
-        vsf_usbh_eppipe_t pipe;
+        vk_usbh_hcd_dev_t *dev_hcd;
+        vk_usbh_eppipe_t pipe;
 
         uint32_t transfer_length;
         uint32_t actual_length;
@@ -359,47 +359,47 @@ def_simple_class(vsf_usbh_hcd_urb_t) {
     )
 };
 
-#if     defined(VSF_USBH_IMPLEMENT_vsf_usbh_urb_t)
-#   undef VSF_USBH_IMPLEMENT_vsf_usbh_urb_t
+#if     defined(VSF_USBH_IMPLEMENT_vk_usbh_urb_t)
+#   undef VSF_USBH_IMPLEMENT_vk_usbh_urb_t
 #   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_USBH_INHERIT_vsf_usbh_urb_t)
-#   undef VSF_USBH_INHERIT_vsf_usbh_urb_t
+#elif   defined(VSF_USBH_INHERIT_vk_usbh_urb_t)
+#   undef VSF_USBH_INHERIT_vk_usbh_urb_t
 #   define __PLOOC_CLASS_INHERIT
 #endif
 #include "utilities/ooc_class.h"
-def_simple_class(vsf_usbh_urb_t) {
+def_simple_class(vk_usbh_urb_t) {
     protected_member(
         union {
-            vsf_usbh_eppipe_t pipe;
-            vsf_usbh_hcd_urb_t *urb_hcd;
+            vk_usbh_eppipe_t pipe;
+            vk_usbh_hcd_urb_t *urb_hcd;
         };
     )
 };
 
-#if     defined(VSF_USBH_IMPLEMENT_vsf_usbh_dev_t)
-#   undef VSF_USBH_IMPLEMENT_vsf_usbh_dev_t
+#if     defined(VSF_USBH_IMPLEMENT_vk_usbh_dev_t)
+#   undef VSF_USBH_IMPLEMENT_vk_usbh_dev_t
 #   define __PLOOC_CLASS_IMPLEMENT
 #endif
 #include "utilities/ooc_class.h"
 
-struct vsf_usbh_ep0_t {
+struct vk_usbh_ep0_t {
     __vsf_crit_npb_t crit;
-    vsf_usbh_urb_t urb;
+    vk_usbh_urb_t urb;
 };
-typedef struct vsf_usbh_ep0_t vsf_usbh_ep0_t;
+typedef struct vk_usbh_ep0_t vk_usbh_ep0_t;
 
-def_simple_class(vsf_usbh_dev_t) {
+def_simple_class(vk_usbh_dev_t) {
 
     public_member(
-        implement(vsf_usbh_hcd_dev_t)
+        implement(vk_usbh_hcd_dev_t)
     )
 
     protected_member(
-        vsf_usbh_ep0_t ep0;
-        vsf_usbh_ifs_t *ifs;
+        vk_usbh_ep0_t ep0;
+        vk_usbh_ifs_t *ifs;
 
 #if VSF_USE_USB_HOST_HUB == ENABLED
-        vsf_usbh_dev_t *dev_parent;
+        vk_usbh_dev_t *dev_parent;
         vsf_slist_node_t child_node;
         vsf_slist_t children_list;
 #endif
@@ -414,34 +414,34 @@ def_simple_class(vsf_usbh_dev_t) {
     )
 };
 
-#if     defined(VSF_USBH_IMPLEMENT_vsf_usbh_t)
-#   undef VSF_USBH_IMPLEMENT_vsf_usbh_t
+#if     defined(VSF_USBH_IMPLEMENT_vk_usbh_t)
+#   undef VSF_USBH_IMPLEMENT_vk_usbh_t
 #   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_USBH_INHERIT_vsf_usbh_t)
-#   undef VSF_USBH_INHERIT_vsf_usbh_t
+#elif   defined(VSF_USBH_INHERIT_vk_usbh_t)
+#   undef VSF_USBH_INHERIT_vk_usbh_t
 #   define __PLOOC_CLASS_INHERIT
 #endif
 #include "utilities/ooc_class.h"
 
-vsf_declare_bitmap(vsf_usbh_devnum_bitmap, VSF_USBH_CFG_MAX_DEVICE + 1);
+vsf_declare_bitmap(vk_usbh_devnum_bitmap, VSF_USBH_CFG_MAX_DEVICE + 1);
 
-def_simple_class(vsf_usbh_t) {
+def_simple_class(vk_usbh_t) {
 
     public_member(
-        implement(vsf_usbh_hcd_t)
+        implement(vk_usbh_hcd_t)
     )
 
     private_member(
-        vsf_bitmap(vsf_usbh_devnum_bitmap) device_bitmap;
+        vsf_bitmap(vk_usbh_devnum_bitmap) device_bitmap;
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
-        vsf_usbh_dev_t *dev_rh;
+        vk_usbh_dev_t *dev_rh;
 #endif
         vsf_slist_t class_list;
     )
 
     protected_member(
-        vsf_usbh_dev_t *dev_new;
-        vsf_usbh_dev_parser_t *parser;
+        vk_usbh_dev_t *dev_new;
+        vk_usbh_dev_parser_t *parser;
 
         vsf_teda_t teda;
     )
@@ -453,73 +453,73 @@ def_simple_class(vsf_usbh_t) {
 
 #if !defined(VSF_USBH_IMPLEMENT_HCD) && !defined(VSF_USBH_IMPLEMENT_CLASS)
 // APIs to be called by user
-extern vsf_err_t vsf_usbh_init(vsf_usbh_t *usbh);
-extern vsf_err_t vsf_usbh_fini(vsf_usbh_t *usbh);
-extern vsf_err_t vsf_usbh_register_class_driver(vsf_usbh_t *usbh,
-        const vsf_usbh_class_drv_t *drv);
-extern void vsf_usbh_register_class(vsf_usbh_t *usbh, vsf_usbh_class_t *class);
+extern vsf_err_t vk_usbh_init(vk_usbh_t *usbh);
+extern vsf_err_t vk_usbh_fini(vk_usbh_t *usbh);
+extern vsf_err_t vk_usbh_register_class_driver(vk_usbh_t *usbh,
+        const vk_usbh_class_drv_t *drv);
+extern void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *class);
 #endif
 
 #if defined(VSF_USBH_IMPLEMENT) || defined(VSF_USBH_IMPLEMENT_HCD)
 // APIs to be called by hcd drivers
-void vsf_usbh_hcd_urb_free_buffer(vsf_usbh_hcd_urb_t *urb_hcd);
+void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd);
 #endif
 
 #if defined(VSF_USBH_IMPLEMENT_HUB)
-extern vsf_usbh_dev_t * vsf_usbh_new_device(vsf_usbh_t *usbh, enum usb_device_speed_t speed,
-            vsf_usbh_dev_t *dev_parent, uint_fast8_t idx);
-extern void vsf_usbh_disconnect_device(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
+extern vk_usbh_dev_t * vk_usbh_new_device(vk_usbh_t *usbh, enum usb_device_speed_t speed,
+            vk_usbh_dev_t *dev_parent, uint_fast8_t idx);
+extern void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 #endif
 
 #if defined(VSF_USBH_IMPLEMENT) || defined(VSF_USBH_IMPLEMENT_CLASS)
 // APIs to be called by class drivers
-extern vsf_usbh_eppipe_t vsf_usbh_get_pipe_from_ep_desc(vsf_usbh_dev_t *dev,
+extern vk_usbh_eppipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
-extern void vsf_usbh_urb_prepare_by_pipe(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
-            vsf_usbh_eppipe_t pipe);
-extern void vsf_usbh_urb_prepare(vsf_usbh_urb_t *urb, vsf_usbh_dev_t *dev,
+extern void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
+            vk_usbh_eppipe_t pipe);
+extern void vk_usbh_urb_prepare(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
-extern bool vsf_usbh_urb_is_valid(vsf_usbh_urb_t *urb);
-extern bool vsf_usbh_urb_is_alloced(vsf_usbh_urb_t *urb);
-extern vsf_usbh_eppipe_t vsf_usbh_urb_get_pipe(vsf_usbh_urb_t *urb);
-extern void vsf_usbh_urb_set_pipe(vsf_usbh_urb_t *urb, vsf_usbh_eppipe_t pipe);
-extern vsf_err_t vsf_usbh_alloc_urb(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev, vsf_usbh_urb_t *urb);
-extern void vsf_usbh_free_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb);
-extern void * vsf_usbh_urb_alloc_buffer(vsf_usbh_urb_t *urb, uint_fast16_t size);
-extern void vsf_usbh_urb_free_buffer(vsf_usbh_urb_t *urb);
-extern void * vsf_usbh_urb_take_buffer(vsf_usbh_urb_t *urb);
-extern void * vsf_usbh_urb_peek_buffer(vsf_usbh_urb_t *urb);
-extern void vsf_usbh_urb_set_buffer(vsf_usbh_urb_t *urb, void *buffer,
+extern bool vk_usbh_urb_is_valid(vk_usbh_urb_t *urb);
+extern bool vk_usbh_urb_is_alloced(vk_usbh_urb_t *urb);
+extern vk_usbh_eppipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb);
+extern void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_eppipe_t pipe);
+extern vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *urb);
+extern void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
+extern void * vk_usbh_urb_alloc_buffer(vk_usbh_urb_t *urb, uint_fast16_t size);
+extern void vk_usbh_urb_free_buffer(vk_usbh_urb_t *urb);
+extern void * vk_usbh_urb_take_buffer(vk_usbh_urb_t *urb);
+extern void * vk_usbh_urb_peek_buffer(vk_usbh_urb_t *urb);
+extern void vk_usbh_urb_set_buffer(vk_usbh_urb_t *urb, void *buffer,
             uint_fast32_t size);
-extern int_fast16_t vsf_usbh_urb_get_status(vsf_usbh_urb_t *urb);
-extern uint_fast32_t vsf_usbh_urb_get_actual_length(vsf_usbh_urb_t *urb);
+extern int_fast16_t vk_usbh_urb_get_status(vk_usbh_urb_t *urb);
+extern uint_fast32_t vk_usbh_urb_get_actual_length(vk_usbh_urb_t *urb);
 
-extern void vsf_usbh_reset_dev(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev);
+extern void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 
-extern vsf_err_t vsf_usbh_submit_urb(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb);
-extern vsf_err_t vsf_usbh_submit_urb_flags(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fast16_t flags);
-extern vsf_err_t vsf_usbh_submit_urb_ex(vsf_usbh_t *usbh, vsf_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda);
+extern vsf_err_t vk_usbh_submit_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
+extern vsf_err_t vk_usbh_submit_urb_flags(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags);
+extern vsf_err_t vk_usbh_submit_urb_ex(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda);
 
-extern void vsf_usbh_remove_interface(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
-        vsf_usbh_ifs_t *ifs);
+extern void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+        vk_usbh_ifs_t *ifs);
 
-extern vsf_err_t vsf_usbh_control_msg(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
+extern vsf_err_t vk_usbh_control_msg(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         struct usb_ctrlrequest_t *req);
-extern vsf_err_t vsf_usbh_control_msg_ex(vsf_usbh_t *usbh, vsf_usbh_dev_t *dev,
+extern vsf_err_t vk_usbh_control_msg_ex(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         struct usb_ctrlrequest_t *req, uint_fast16_t flags, vsf_eda_t *eda);
 
-extern vsf_err_t vsf_usbh_get_descriptor(vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, uint_fast8_t type, uint_fast8_t index,
+extern vsf_err_t vk_usbh_get_descriptor(vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, uint_fast8_t type, uint_fast8_t index,
         uint_fast16_t size);
-extern vsf_err_t vsf_usbh_get_class_descriptor(vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, uint_fast16_t ifnum, uint_fast8_t type,
+extern vsf_err_t vk_usbh_get_class_descriptor(vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, uint_fast16_t ifnum, uint_fast8_t type,
         uint_fast8_t id, uint_fast16_t size);
-extern vsf_err_t vsf_usbh_set_Zuration(vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, uint_fast8_t configuration);
-extern vsf_err_t vsf_usbh_set_interface(vsf_usbh_t *usbh,
-        vsf_usbh_dev_t *dev, uint_fast8_t ifnum, uint_fast8_t alternate);
+extern vsf_err_t vk_usbh_set_Zuration(vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, uint_fast8_t configuration);
+extern vsf_err_t vk_usbh_set_interface(vk_usbh_t *usbh,
+        vk_usbh_dev_t *dev, uint_fast8_t ifnum, uint_fast8_t alternate);
 
-extern vsf_err_t vsf_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
+extern vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         uint_fast8_t type, void **ptr);
 #endif
 

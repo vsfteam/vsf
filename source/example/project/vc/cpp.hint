@@ -1,8 +1,8 @@
 // Hint files help the Visual Studio IDE interpret Visual C++ identifiers
 // such as names of functions and macros.
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
-#define implement_vsf_queue(__NAME, __TYPE, __QUEUE_PROTECT) __implement_vsf_queue(__NAME, __TYPE, __QUEUE_PROTECT)
+#define implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT) __implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT)
 // Hint files help the Visual Studio IDE interpret Visual C++ identifiers
 // such as names of functions and macros.
 // For more information see https://go.microsoft.com/fwlink/?linkid=865984
-#define NO_QUEUE_PROTECT(__VA_ARGS__)
+#define NO_RNG_BUF_PROTECT(__VA_ARGS__)

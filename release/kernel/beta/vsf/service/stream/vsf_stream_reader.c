@@ -61,7 +61,7 @@ vsf_err_t vsf_stream_reader_init(   vsf_stream_reader_t *ptObj,
                                     const vsf_stream_reader_cfg_t *ptCFG)
 {
     class_internal(ptObj, ptThis, vsf_stream_reader_t);
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
 
     memset(ptObj, 0, sizeof(vsf_stream_reader_t));
     return vsf_stream_usr_init(&this.use_as__vsf_stream_usr_t, ptCFG);
@@ -71,7 +71,7 @@ vsf_pbuf_t *vsf_stream_reader_fetch_pbuf ( vsf_stream_reader_t *ptObj)
 {
     class_internal(ptObj, ptThis, vsf_stream_reader_t);
     vsf_pbuf_t *pbuf;
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     
     __SAFE_ATOM_CODE(
         pbuf = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
@@ -98,9 +98,8 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *ptObj,
                                     uint_fast16_t hwSize)
 {
     class_internal(ptObj, ptThis, vsf_stream_reader_t);
-    vsf_pbuf_t *pbuf;
     int_fast32_t nReadSize = -1;
-    ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != ptObj);
     
     do {
         if (NULL == pchBuffer || 0 == hwSize) {

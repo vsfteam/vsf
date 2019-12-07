@@ -63,17 +63,17 @@ struct usbd_demo_const_t {
         uint8_t str_cdc0[16];
         uint8_t str_cdc1[16];
         uint8_t str_uvc[14];
-        vsf_usbd_desc_t std_desc[8];
+        vk_usbd_desc_t std_desc[8];
 
         struct {
             struct {
                 usb_uvc_ct_roi_t roi_def;
-                vsf_usbd_uvc_control_info_t control_info[1];
+                vk_usbd_uvc_control_info_t control_info[1];
             } camera;
 
             struct {
                 usb_uvc_vs_t probe_commit;
-                vsf_usbd_uvc_control_info_t control_info[2];
+                vk_usbd_uvc_control_info_t control_info[2];
             } stream;
         } uvc;
     } usbd;
@@ -83,7 +83,7 @@ typedef struct usbd_demo_const_t usbd_demo_const_t;
 struct usbd_demo_t {
     struct {
         struct {
-            vsf_usbd_cdcacm_t param;
+            vk_usbd_cdcacm_t param;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             struct {
                 vsf_fifo_stream_t tx;
@@ -98,14 +98,14 @@ struct usbd_demo_t {
         struct {
             struct {
                 usb_uvc_ct_roi_t roi_cur;
-                vsf_usbd_uvc_control_t control[1];
+                vk_usbd_uvc_control_t control[1];
             } camera;
             struct {
                 usb_uvc_vs_t probe_commit;
-                vsf_usbd_uvc_control_t control[2];
+                vk_usbd_uvc_control_t control[2];
             } stream;
-            vsf_usbd_uvc_entity_t entity[3];
-            vsf_usbd_uvc_t param;
+            vk_usbd_uvc_entity_t entity[3];
+            vk_usbd_uvc_t param;
             vsf_teda_t teda;
             uint32_t frame_pos;
             uint16_t cur_size;
@@ -113,9 +113,9 @@ struct usbd_demo_t {
             vsf_eda_t *eda_host;
         } uvc;
 
-        vsf_usbd_ifs_t ifs[6];
-        vsf_usbd_cfg_t config[1];
-        vsf_usbd_dev_t dev;
+        vk_usbd_ifs_t ifs[6];
+        vk_usbd_cfg_t config[1];
+        vk_usbd_dev_t dev;
 
         vsf_callback_timer_t connect_timer;
     } usbd;
@@ -685,21 +685,21 @@ static usbd_demo_t usbd_demo = {
         },
 
         // CDC0
-        .ifs[0].class_op        = &vsf_usbd_cdcacm_control,
+        .ifs[0].class_op        = &vk_usbd_cdcacm_control,
         .ifs[0].class_param     = &usbd_demo.usbd.cdc[0].param,
-        .ifs[1].class_op        = &vsf_usbd_cdcacm_data,
+        .ifs[1].class_op        = &vk_usbd_cdcacm_data,
         .ifs[1].class_param     = &usbd_demo.usbd.cdc[0].param,
 
         // CDC1
-        .ifs[2].class_op        = &vsf_usbd_cdcacm_control,
+        .ifs[2].class_op        = &vk_usbd_cdcacm_control,
         .ifs[2].class_param     = &usbd_demo.usbd.cdc[1].param,
-        .ifs[3].class_op        = &vsf_usbd_cdcacm_data,
+        .ifs[3].class_op        = &vk_usbd_cdcacm_data,
         .ifs[3].class_param     = &usbd_demo.usbd.cdc[1].param,
 
         // UVC
-        .ifs[4].class_op        = &vsf_usbd_uvc_control_class,
+        .ifs[4].class_op        = &vk_usbd_uvc_control_class,
         .ifs[4].class_param     = &usbd_demo.usbd.uvc.param,
-        .ifs[5].class_op        = &vsf_usbd_uvc_stream_class,
+        .ifs[5].class_op        = &vk_usbd_uvc_stream_class,
         .ifs[5].class_param     = &usbd_demo.usbd.uvc.param,
 
         .config[0].num_of_ifs   = dimof(usbd_demo.usbd.ifs),
@@ -708,7 +708,7 @@ static usbd_demo_t usbd_demo = {
         .dev.num_of_config      = dimof(usbd_demo.usbd.config),
         .dev.config             = usbd_demo.usbd.config,
         .dev.num_of_desc        = dimof(usbd_demo_const.usbd.std_desc),
-        .dev.desc               = (vsf_usbd_desc_t *)usbd_demo_const.usbd.std_desc,
+        .dev.desc               = (vk_usbd_desc_t *)usbd_demo_const.usbd.std_desc,
 
         .dev.speed              = USB_DC_SPEED_HIGH,
         .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
@@ -720,14 +720,14 @@ static usbd_demo_t usbd_demo = {
 
 static void usbd_demo_on_timer(vsf_callback_timer_t *timer)
 {
-    vsf_usbd_connect(&usbd_demo.usbd.dev);
+    vk_usbd_connect(&usbd_demo.usbd.dev);
 }
 
 void usbd_demo_start(void)
 {
     usbd_demo.usbd.uvc.stream.probe_commit = usbd_demo_const.usbd.uvc.stream.probe_commit;
-    vsf_usbd_init(&usbd_demo.usbd.dev);
-    vsf_usbd_disconnect(&usbd_demo.usbd.dev);
+    vk_usbd_init(&usbd_demo.usbd.dev);
+    vk_usbd_disconnect(&usbd_demo.usbd.dev);
 
     usbd_demo.usbd.connect_timer.on_timer = usbd_demo_on_timer;
     vsf_callback_timer_add_ms(&usbd_demo.usbd.connect_timer, 200);
@@ -737,14 +737,14 @@ void usbd_demo_start(void)
 WEAK(usbd_demo_uvc_on_ready)
 void usbd_demo_uvc_on_ready(void) {}
 
-void vsf_usbd_uvc_stop_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
+void vk_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (usbd_demo.usbd.uvc.stream_started) {
         usbd_demo.usbd.uvc.stream_started = false;
     }
 }
 
-void vsf_usbd_uvc_start_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
+void vk_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (!usbd_demo.usbd.uvc.stream_started) {
         usbd_demo.usbd.uvc.stream_started = true;
@@ -752,7 +752,7 @@ void vsf_usbd_uvc_start_stream(vsf_usbd_uvc_t *uvc, uint_fast8_t ifs)
     }
 }
 
-vsf_usbd_uvc_t * usbd_demo_get_uvc(void)
+vk_usbd_uvc_t * usbd_demo_get_uvc(void)
 {
     return &usbd_demo.usbd.uvc.param;
 }

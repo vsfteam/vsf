@@ -35,7 +35,7 @@ struct line_buffer_t {
 };
 #endif
 
-struct vsf_usbd_uvc_helper_t {
+struct vk_usbd_uvc_helper_t {
     volatile struct {
         uint8_t started     : 1;
         uint8_t flushing    : 1;
@@ -53,7 +53,7 @@ struct vsf_usbd_uvc_helper_t {
     vsf_eda_t eda;
     vsf_callback_timer_t poll_timer;
 };
-typedef struct vsf_usbd_uvc_helper_t vsf_usbd_uvc_helper_t;
+typedef struct vk_usbd_uvc_helper_t vk_usbd_uvc_helper_t;
 
 #if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
 declare_vsf_pool(line_pool);
@@ -67,7 +67,7 @@ static void __uvc_helper_refresh_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static vsf_usbd_uvc_helper_t __uvc_helper = {
+static vk_usbd_uvc_helper_t __uvc_helper = {
     .poll_timer.on_timer    = __uvc_helper_on_statistic_timer,
     //.eda.evthandler         = __uvc_helper_refresh_evthandler,
 };
@@ -124,7 +124,7 @@ void uvc_app_fill_line(void *line_buf, uint_fast16_t size, bool last_line)
 }
 
 #if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED
-static bool __request_transfer(vsf_usbd_uvc_helper_t *pthis)
+static bool __request_transfer(vk_usbd_uvc_helper_t *pthis)
 {
     bool bResult = false;
     vsf_sched_safe() {
@@ -202,7 +202,7 @@ static void __uvc_helper_on_statistic_timer(vsf_callback_timer_t *timer)
     vsf_callback_timer_add_ms(timer, 1000);
 }
 
-vsf_err_t vsf_usbd_uvc_helper_init(void)
+vsf_err_t vk_usbd_uvc_helper_init(void)
 {
     if (VSF_ERR_NONE != vsf_eda_set_evthandler(&__uvc_helper.eda, 
                                                 __uvc_helper_refresh_evthandler)) {
@@ -221,7 +221,7 @@ vsf_err_t vsf_usbd_uvc_helper_init(void)
     return VSF_ERR_NONE;
 }
 
-void vsf_usbd_uvc_helper_task(void)
+void vk_usbd_uvc_helper_task(void)
 {
     __uvc_helper.idletick++;
     if (__uvc_helper.flag.started) {
@@ -244,10 +244,10 @@ int main(void)
 
     demo();
 
-    vsf_usbd_uvc_helper_init();
+    vk_usbd_uvc_helper_init();
 
     while (1) {
-        vsf_usbd_uvc_helper_task();
+        vk_usbd_uvc_helper_task();
     }
     return 0;
 }

@@ -61,7 +61,7 @@ def_pbuf_pool(general_pbuf_pool_t, GENERAL_PBUF_POOL_BLOCK_SIZE)
  *----------------------------------------------------------------------------*/
 declare_class(vsf_stream_src_t);
 
-typedef struct {
+typedef struct vsf_stream_src_cfg_t {
     vsf_stream_tx_t             *ptTX;
     req_pbuf_evt_t              tRequestPBUFEvent;
 #if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
@@ -109,7 +109,7 @@ def_class(vsf_stream_usr_t,,
 )
 end_def_class(vsf_stream_usr_t)
 
-typedef struct {
+typedef struct vsf_stream_usr_cfg_t {
     vsf_stream_rx_t             *ptRX;
 }vsf_stream_usr_cfg_t;
 

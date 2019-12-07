@@ -26,9 +26,9 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_usbh_libusb_dev_t {
-    vsf_usbh_t *usbh;
-    vsf_usbh_dev_t *dev;
+struct vk_usbh_libusb_dev_t {
+    vk_usbh_t *usbh;
+    vk_usbh_dev_t *dev;
 
     uint16_t vid, pid;
     uint8_t ifs;
@@ -36,29 +36,29 @@ struct vsf_usbh_libusb_dev_t {
     bool is_opened;
     bool is_to_remove;
 };
-typedef struct vsf_usbh_libusb_dev_t vsf_usbh_libusb_dev_t;
+typedef struct vk_usbh_libusb_dev_t vk_usbh_libusb_dev_t;
 
-enum vsf_usbh_libusb_evt_t {
+enum vk_usbh_libusb_evt_t {
     VSF_USBH_LIBUSB_EVT_ON_ARRIVED,
     VSF_USBH_LIBUSB_EVT_ON_LEFT,
 };
-typedef enum vsf_usbh_libusb_evt_t vsf_usbh_libusb_evt_t;
+typedef enum vk_usbh_libusb_evt_t vk_usbh_libusb_evt_t;
 
-typedef void (*vsf_usbh_libusb_on_event_t)( void *param,
-                                            vsf_usbh_libusb_dev_t *dev,
-                                            vsf_usbh_libusb_evt_t evt);
+typedef void (*vk_usbh_libusb_on_event_t)( void *param,
+                                            vk_usbh_libusb_dev_t *dev,
+                                            vk_usbh_libusb_evt_t evt);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vsf_usbh_class_drv_t vsf_usbh_libusb_drv;
+extern const vk_usbh_class_drv_t vk_usbh_libusb_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_usbh_libusb_set_evthandler(void *param,
-        vsf_usbh_libusb_on_event_t on_event);
+extern void vk_usbh_libusb_set_evthandler(void *param,
+        vk_usbh_libusb_on_event_t on_event);
 
-extern vsf_err_t vsf_usbh_libusb_open(vsf_usbh_libusb_dev_t *ldev);
-extern void vsf_usbh_libusb_close(vsf_usbh_libusb_dev_t *ldev);
+extern vsf_err_t vk_usbh_libusb_open(vk_usbh_libusb_dev_t *ldev);
+extern void vk_usbh_libusb_close(vk_usbh_libusb_dev_t *ldev);
 
 #endif
 #endif
