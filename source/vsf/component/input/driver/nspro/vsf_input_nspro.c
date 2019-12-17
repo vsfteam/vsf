@@ -88,11 +88,11 @@ WEAK_VSF_INPUT_ON_SENSOR_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_NSPRO_ON_NEW_DEV
-WEAK(vk_nspro_on_new_dev)
-void vk_nspro_on_new_dev(vk_input_nspro_t *dev)
+WEAK(vsf_nspro_on_new_dev)
+void vsf_nspro_on_new_dev(vk_input_nspro_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
-    vk_input_on_new_dev(VSF_INPUT_TYPE_NSPRO, dev);
+    vsf_input_on_new_dev(VSF_INPUT_TYPE_NSPRO, dev);
 #   else
     WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_NSPRO, dev);
 #   endif
@@ -100,11 +100,11 @@ void vk_nspro_on_new_dev(vk_input_nspro_t *dev)
 #endif
 
 #ifndef WEAK_VSF_NSPRO_ON_FREE_DEV
-WEAK(vk_nspro_on_free_dev)
-void vk_nspro_on_free_dev(vk_input_nspro_t *dev)
+WEAK(vsf_nspro_on_free_dev)
+void vsf_nspro_on_free_dev(vk_input_nspro_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
-    vk_input_on_free_dev(VSF_INPUT_TYPE_NSPRO, dev);
+    vsf_input_on_free_dev(VSF_INPUT_TYPE_NSPRO, dev);
 #   else
     WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_NSPRO, dev);
 #   endif
@@ -112,11 +112,11 @@ void vk_nspro_on_free_dev(vk_input_nspro_t *dev)
 #endif
 
 #ifndef WEAK_VSF_NSPRO_ON_REPORT_INPUT
-WEAK(vk_nspro_on_report_input)
-void vk_nspro_on_report_input(vk_gamepad_evt_t *gamepad_evt)
+WEAK(vsf_nspro_on_report_input)
+void vsf_nspro_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 {
 #   ifndef WEAK_VSF_INPUT_ON_GAMEPAD
-    vk_input_on_gamepad(gamepad_evt);
+    vsf_input_on_gamepad(gamepad_evt);
 #   else
     WEAK_VSF_INPUT_ON_GAMEPAD(gamepad_evt);
 #   endif
@@ -124,11 +124,11 @@ void vk_nspro_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 #endif
 
 #ifndef WEAK_VSF_NSPRO_ON_SENSOR
-WEAK(vk_nspro_on_sensor)
-void vk_nspro_on_sensor(vk_sensor_evt_t *sensor_evt)
+WEAK(vsf_nspro_on_sensor)
+void vsf_nspro_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
 #   ifndef WEAK_VSF_INPUT_ON_SENSOR
-    vk_input_on_sensor(sensor_evt);
+    vsf_input_on_sensor(sensor_evt);
 #   else
     WEAK_VSF_INPUT_ON_SENSOR(sensor_evt);
 #   endif
@@ -139,7 +139,7 @@ void vk_nspro_new_dev(vk_input_nspro_t *dev)
 {
     memset(&dev->data, 0, sizeof(dev->data));
 #ifndef WEAK_VSF_NSPRO_ON_NEW_DEV
-    vk_nspro_on_new_dev(dev);
+    vsf_nspro_on_new_dev(dev);
 #else
     WEAK_VSF_NSPRO_ON_NEW_DEV(dev);
 #endif
@@ -148,7 +148,7 @@ void vk_nspro_new_dev(vk_input_nspro_t *dev)
 void vk_nspro_free_dev(vk_input_nspro_t *dev)
 {
 #ifndef WEAK_VSF_NSPRO_ON_FREE_DEV
-    vk_nspro_on_free_dev(dev);
+    vsf_nspro_on_free_dev(dev);
 #else
     WEAK_VSF_NSPRO_ON_FREE_DEV(dev);
 #endif
@@ -182,7 +182,7 @@ void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_repo
             parser.gamepad.evt.pre = parser.gamepad.parser.pre;
             parser.gamepad.evt.cur = parser.gamepad.parser.cur;
 #ifndef WEAK_VSF_NSPRO_ON_REPORT_INPUT
-            vk_nspro_on_report_input(&parser.gamepad.evt);
+            vsf_nspro_on_report_input(&parser.gamepad.evt);
 #else
             WEAK_VSF_NSPRO_ON_REPORT_INPUT(&parser.gamepad.evt);
 #endif
@@ -192,7 +192,7 @@ void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_repo
     if (parser.gamepad.event_sent) {
         parser.gamepad.evt.id = GAMEPAD_ID_DUMMY;
 #ifndef WEAK_VSF_NSPRO_ON_REPORT_INPUT
-        vk_nspro_on_report_input(&parser.gamepad.evt);
+        vsf_nspro_on_report_input(&parser.gamepad.evt);
 #else
         WEAK_VSF_NSPRO_ON_REPORT_INPUT(&parser.gamepad.evt);
 #endif
@@ -203,7 +203,7 @@ void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_repo
     parser.sensor.evt.desc.item_num     = dimof(vk_nspro_sensor_item_info);
     parser.sensor.evt.data              = (uint8_t *)&data->gyro_acc[0];
 #ifndef WEAK_VSF_NSPRO_ON_SENSOR
-    vk_nspro_on_sensor(&parser.sensor.evt);
+    vsf_nspro_on_sensor(&parser.sensor.evt);
 #else
     WEAK_VSF_NSPRO_ON_SENSOR(&parser.sensor.evt);
 #endif

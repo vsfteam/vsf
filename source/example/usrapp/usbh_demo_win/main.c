@@ -148,7 +148,7 @@ extern void ui_demo_start(void);
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
-void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
+void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
     if (0 == VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt)) {
         usrapp.ui.ts_evt = *ts_evt;

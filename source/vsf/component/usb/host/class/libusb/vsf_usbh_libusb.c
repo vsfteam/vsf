@@ -47,7 +47,12 @@ static vk_usbh_libusb_t vk_usbh_libusb;
 static void *vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         vk_usbh_ifs_parser_t *parser_ifs)
 {
+    struct usb_device_descriptor_t *desc_device;
     vk_usbh_libusb_dev_t *ldev;
+
+    if (parser_ifs->ifs->no != 0) {
+        return NULL;
+    }
 
     ldev = VSF_USBH_MALLOC(sizeof(vk_usbh_libusb_dev_t));
     if (ldev == NULL) {
@@ -57,9 +62,13 @@ static void *vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 
     ldev->usbh = usbh;
     ldev->dev = dev;
-    ldev->vid = usbh->parser->desc_device->idVendor;
-    ldev->pid = usbh->parser->desc_device->idProduct;
-    ldev->ifs = parser_ifs->ifs->no;
+    desc_device = usbh->parser->desc_device;
+    ldev->vid = desc_device->idVendor;
+    ldev->pid = desc_device->idProduct;
+    ldev->class = desc_device->bDeviceClass;
+    ldev->subclass = desc_device->bDeviceSubClass;
+    ldev->protocol = desc_device->bDeviceProtocol;
+    ldev->ep0size = desc_device->bMaxPacketSize0;
     ldev->address = dev->devnum;
 
     if (vk_usbh_libusb.cb.on_event != NULL) {

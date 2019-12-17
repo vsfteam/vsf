@@ -211,6 +211,9 @@
     <Filter Include="vsf\component\fs\driver\winfs">
       <UniqueIdentifier>{1a87fa4f-99d7-42fd-9ca0-66fd276b652f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\vsfstream\mem_stream">
+      <UniqueIdentifier>{bb0df0ef-007e-46ca-8541-e100892f6064}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -570,6 +573,9 @@
     <ClInclude Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.h">
       <Filter>vsf\component\fs\driver\winfs</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -756,6 +762,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.c">
       <Filter>vsf\component\fs\driver\winfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

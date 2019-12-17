@@ -235,7 +235,7 @@ struct vk_usbh_class_t {
 };
 typedef struct vk_usbh_class_t vk_usbh_class_t;
 
-struct vk_usbh_eppipe_t {
+struct vk_usbh_pipe_t {
     union {
         struct {
             uint32_t is_pipe        : 1;
@@ -250,7 +250,7 @@ struct vk_usbh_eppipe_t {
         uint32_t value;
     };
 };
-typedef struct vk_usbh_eppipe_t vk_usbh_eppipe_t;
+typedef struct vk_usbh_pipe_t vk_usbh_pipe_t;
 
 #if     defined(VSF_USBH_IMPLEMENT_vk_usbh_hcd_t)
 #   undef VSF_USBH_IMPLEMENT_vk_usbh_hcd_t
@@ -332,7 +332,7 @@ def_simple_class(vk_usbh_hcd_urb_t) {
 
     private_member(
         vk_usbh_hcd_dev_t *dev_hcd;
-        vk_usbh_eppipe_t pipe;
+        vk_usbh_pipe_t pipe;
 
         uint32_t transfer_length;
         uint32_t actual_length;
@@ -370,7 +370,7 @@ def_simple_class(vk_usbh_hcd_urb_t) {
 def_simple_class(vk_usbh_urb_t) {
     protected_member(
         union {
-            vk_usbh_eppipe_t pipe;
+            vk_usbh_pipe_t pipe;
             vk_usbh_hcd_urb_t *urb_hcd;
         };
     )
@@ -473,16 +473,18 @@ extern void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 
 #if defined(VSF_USBH_IMPLEMENT) || defined(VSF_USBH_IMPLEMENT_CLASS)
 // APIs to be called by class drivers
-extern vk_usbh_eppipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
+extern vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
+            uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size);
+extern vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
 extern void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
-            vk_usbh_eppipe_t pipe);
+            vk_usbh_pipe_t pipe);
 extern void vk_usbh_urb_prepare(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep);
 extern bool vk_usbh_urb_is_valid(vk_usbh_urb_t *urb);
 extern bool vk_usbh_urb_is_alloced(vk_usbh_urb_t *urb);
-extern vk_usbh_eppipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb);
-extern void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_eppipe_t pipe);
+extern vk_usbh_pipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb);
+extern void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_pipe_t pipe);
 extern vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *urb);
 extern void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
 extern void * vk_usbh_urb_alloc_buffer(vk_usbh_urb_t *urb, uint_fast16_t size);

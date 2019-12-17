@@ -287,21 +287,21 @@ static void __vk_disp_sdl2_thread(void *arg)
                         evt.ts_evt.info.height = disp_sdl2->param.height;
                         VSF_INPUT_TOUCHSCREEN_SET(&evt.ts_evt, 0, is_down, x, y);
 #ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
-                        vk_input_on_touchscreen(&evt.ts_evt);
+                        vsf_input_on_touchscreen(&evt.ts_evt);
 #else
                         WEAK_VSF_INPUT_ON_TOUCHSCREEN(&evt.ts_evt);
 #endif
                         break;
                     case VSF_INPUT_TYPE_GAMEPAD:
 #ifndef WEAK_VSF_INPUT_ON_GAMEPAD
-                        vk_input_on_gamepad(&evt.gamepad_evt);
+                        vsf_input_on_gamepad(&evt.gamepad_evt);
 #else
                         WEAK_VSF_INPUT_ON_GAMEPAD(&evt.gamepad_evt);
 #endif
                         break;
                     case VSF_INPUT_TYPE_KEYBOARD:
 #ifndef WEAK_VSF_INPUT_ON_KEYBOARD
-                        vk_input_on_keyboard(&evt.keyboard_evt);
+                        vsf_input_on_keyboard(&evt.keyboard_evt);
 #else
                         WEAK_VSF_INPUT_ON_KEYBOARD( &evt.keyboard_evt);
 #endif

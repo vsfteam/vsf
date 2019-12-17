@@ -52,7 +52,7 @@ void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_MESSAGE:
         do {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_eppipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
             if (USB_ENDPOINT_XFER_INT == pipe.type) {
                 if (vk_usbh_urb_get_status(&urb) != URB_OK) {

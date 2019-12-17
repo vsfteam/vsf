@@ -24,4 +24,4 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-//#endif                                /* deliberately comment this out! */
+/*#endif */                                /* deliberately comment this out! */

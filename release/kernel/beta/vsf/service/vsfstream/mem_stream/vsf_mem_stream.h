@@ -63,14 +63,6 @@ extern const vsf_stream_op_t vsf_mem_stream_op;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_mem_init(vsf_mem_t *mem);
-extern uint_fast32_t vsf_mem_write(vsf_mem_t *mem, uint8_t *data, uint_fast32_t size);
-extern uint_fast32_t vsf_mem_read(vsf_mem_t *mem, uint8_t *data, uint_fast32_t size);
-extern uint_fast32_t vsf_mem_peek(vsf_mem_t *mem, uint8_t *data, uint_fast32_t size);
-extern uint_fast32_t vsf_mem_get_wbuf(vsf_mem_t *mem, uint8_t **data);
-extern uint_fast32_t vsf_mem_get_rbuf(vsf_mem_t *mem, uint8_t **data);
-extern uint_fast32_t vsf_mem_get_data_length(vsf_mem_t *mem);
-extern uint_fast32_t vsf_mem_get_avail_length(vsf_mem_t *mem);
 
 #endif      // VSF_USE_SERVICE_VSFSTREAM
 #endif      // __VSF_MEM_STREAM_H__

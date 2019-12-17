@@ -29,7 +29,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static vsf_disp_t* __disp;
+static vk_disp_t* __disp;
 /*============================ PROTOTYPES ====================================*/
 
 /*============================ IMPLEMENTATION ================================*/
@@ -54,6 +54,12 @@ static uint8_t vsf_tgui_font_get_pixel_color(void* ptFont, uint32_t wChar, vsf_t
 
     return 0x55;//_fonts[(wChar - 0x20) * FONT_SIZE * FONT_SIZE + ptLocation->nY * FONT_SIZE + ptLocation->nX];
 }
+
+uint8_t vsf_tgui_proportional_font_get_char_width(const vsf_tgui_font_t* ptFont, uint32_t wChar)
+{
+    return 55;
+}
+
 /********************************************************************************/
 
 void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize, vsf_tgui_color_t tColor)
@@ -210,18 +216,6 @@ static void draw_screen_white(void)
     vsf_tgui_color_t* pixmap = __disp->ui_data;
     memset(pixmap, 0xFF, VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX * sizeof(vsf_tgui_color_t));
 }
-
-static void __refresh_now(void)
-{
-    vsf_tgui_color_t* pixmap = __disp->ui_data;
-    vsf_disp_area_t area = {
-        .pos = {.x = 0, .y = 0},
-        .size = {.x = VSF_TGUI_HOR_MAX, .y = VSF_TGUI_VER_MAX},
-    };
-
-    vsf_disp_refresh(__disp, &area, pixmap);
-}
-
 void refresh_all(void)
 {
     draw_screen_white();
@@ -236,28 +230,49 @@ void refresh_all(void)
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
  */
-vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *ptGUI, 
-                                            vsf_tgui_region_t *ptPlannedRefreshRegion)
+vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(   
+                    vsf_tgui_t *ptGUI, 
+                    const vsf_tgui_region_t *ptPlannedRefreshRegion)
 {
-
-    
+    return (vsf_tgui_region_t *)ptPlannedRefreshRegion;
 }
 
-bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *ptGUI)
+
+volatile static bool __is_ready_to_refresh = true;
+
+bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
 {
-    __refresh_now();
+    vsf_tgui_color_t* pixmap = __disp->ui_data;
+    vk_disp_area_t area = {
+        .pos = {.x = 0, .y = 0},
+        .size = {.x = VSF_TGUI_HOR_MAX, .y = VSF_TGUI_VER_MAX},
+    };
+    __vsf_sched_safe(
+        if (__is_ready_to_refresh) {
+            __is_ready_to_refresh = false;
+            refresh_all();
+        }
+    )
+    return false;
 }
 
-void vsf_tgui_on_ready(vsf_disp_t* disp)
+static void vsf_tgui_on_ready(vk_disp_t* disp)
 {
-    refresh_all();
+    __vsf_sched_safe(
+        if (!__is_ready_to_refresh) {
+            __is_ready_to_refresh = true;
+        }
+        //extern void vsf_tgui_demo_on_ready(void);
+        //vsf_tgui_demo_on_ready();
+    )
 }
 
-void vsf_tgui_bind(vsf_disp_t* disp, void* ui_data)
+
+void vsf_tgui_bind(vk_disp_t* disp, void* ui_data)
 {
     disp->ui_data = ui_data;
     disp->ui_on_ready = vsf_tgui_on_ready;
-    vsf_disp_init(disp);
+    vk_disp_init(disp);
 
     extern void my_stopwatch_init(void);
     my_stopwatch_init();

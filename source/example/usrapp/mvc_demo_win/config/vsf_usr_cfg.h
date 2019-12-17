@@ -164,6 +164,8 @@
 #       define VSF_TGUI_SV_LABEL_ADDITIONAL_TILES       ENABLED
 #       define VSF_TGUI_SV_LABEL_BACKGROUND_COLOR       VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
 
+#       define VSF_TGUI_LOG                             vsf_trace
+
 #   define VSF_USE_MSG_TREE                             ENABLED
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING     ENABLED         /* Enabled for debug */
 #       define VSF_MSGT_NODE_OFFSET_TYPE                int8_t
@@ -236,14 +238,19 @@ enum {
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
         vsf_arch_req___systimer_freq___from_usr()
 
+#define WEAK_VSF_DRIVER_INIT_EXTERN                                             \
+        bool vsf_driver_init(void);
+#define WEAK_VSF_DRIVER_INIT()                                                  \
+        vsf_driver_init()
+
 
 
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+        extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vk_input_on_touchscreen((__TS_EVT))
+        vsf_input_on_touchscreen((__TS_EVT))
 #endif
 
 

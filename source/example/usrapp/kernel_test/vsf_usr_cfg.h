@@ -238,13 +238,18 @@ enum {
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
         vsf_arch_req___systimer_freq___from_usr()
 
+#define WEAK_VSF_DRIVER_INIT_EXTERN                                             \
+        bool vsf_driver_init(void);
+#define WEAK_VSF_DRIVER_INIT()                                                  \
+        vsf_driver_init()
+
 
 
 
 #define WEAK_VSF_INPUT_ON_EVT_EVTERN                                            \
-        extern void vk_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
+        extern void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
 #define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
-        vk_input_on_evt((__TYPE), (__EVT))
+        vsf_input_on_evt((__TYPE), (__EVT))
 
 
 
@@ -257,19 +262,19 @@ enum {
 
 
 #define WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN                                       \
-        extern void vk_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id);
+        extern void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id);
 #define WEAK_VSF_USBH_BTHCI_ON_NEW(__DEV, __ID)                                 \
-        vk_usbh_bthci_on_new((__DEV), (__ID))
+        vsf_usbh_bthci_on_new((__DEV), (__ID))
 
 #define WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN                                       \
-        extern void vk_usbh_bthci_on_del(void *dev);
+        extern void vsf_usbh_bthci_on_del(void *dev);
 #define WEAK_VSF_USBH_BTHCI_ON_DEL(__DEV)                                       \
-        vk_usbh_bthci_on_del((__DEV))
+        vsf_usbh_bthci_on_del((__DEV))
 
 #define WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN                                    \
-        extern void vk_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
+        extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
 #define WEAK_VSF_USBH_BTHCI_ON_PACKET(__DEV, __TYPE, __PACKET, __SIZE)          \
-        vk_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
+        vsf_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
 
 
 #define WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN                                     \

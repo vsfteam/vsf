@@ -73,11 +73,11 @@ WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_XB1_ON_NEW_DEV
-WEAK(vk_xb1_on_new_dev)
-void vk_xb1_on_new_dev(vk_input_xb1_t *dev)
+WEAK(vsf_xb1_on_new_dev)
+void vsf_xb1_on_new_dev(vk_input_xb1_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
-    vk_input_on_new_dev(VSF_INPUT_TYPE_XB1, dev);
+    vsf_input_on_new_dev(VSF_INPUT_TYPE_XB1, dev);
 #   else
     WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_XB1, dev);
 #   endif
@@ -85,11 +85,11 @@ void vk_xb1_on_new_dev(vk_input_xb1_t *dev)
 #endif
 
 #ifndef WEAK_VSF_XB1_ON_FREE_DEV
-WEAK(vk_xb1_on_free_dev)
-void vk_xb1_on_free_dev(vk_input_xb1_t *dev)
+WEAK(vsf_xb1_on_free_dev)
+void vsf_xb1_on_free_dev(vk_input_xb1_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
-    vk_input_on_free_dev(VSF_INPUT_TYPE_XB1, dev);
+    vsf_input_on_free_dev(VSF_INPUT_TYPE_XB1, dev);
 #   else
     WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_XB1, dev);
 #   endif
@@ -97,11 +97,11 @@ void vk_xb1_on_free_dev(vk_input_xb1_t *dev)
 #endif
 
 #ifndef WEAK_VSF_XB1_ON_REPORT_INPUT
-WEAK(vk_xb1_on_report_input)
-void vk_xb1_on_report_input(vk_gamepad_evt_t *gamepad_evt)
+WEAK(vsf_xb1_on_report_input)
+void vsf_xb1_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 {
 #   ifndef WEAK_VSF_INPUT_ON_GAMEPAD
-    vk_input_on_gamepad(gamepad_evt);
+    vsf_input_on_gamepad(gamepad_evt);
 #   else
     WEAK_VSF_INPUT_ON_GAMEPAD(gamepad_evt);
 #   endif
@@ -112,7 +112,7 @@ void vk_xb1_new_dev(vk_input_xb1_t *dev)
 {
     memset(&dev->data, 0, sizeof(dev->data));
 #ifndef WEAK_VSF_XB1_ON_NEW_DEV
-    vk_xb1_on_new_dev(dev);
+    vsf_xb1_on_new_dev(dev);
 #else
     WEAK_VSF_XB1_ON_NEW_DEV(dev);
 #endif
@@ -121,7 +121,7 @@ void vk_xb1_new_dev(vk_input_xb1_t *dev)
 void vk_xb1_free_dev(vk_input_xb1_t *dev)
 {
 #ifndef WEAK_VSF_XB1_ON_FREE_DEV
-    vk_xb1_on_free_dev(dev);
+    vsf_xb1_on_free_dev(dev);
 #else
     WEAK_VSF_XB1_ON_FREE_DEV(dev);
 #endif
@@ -155,7 +155,7 @@ void vk_xb1_process_input(vk_input_xb1_t *dev, vsf_usb_xb1_gamepad_in_report_t *
             parser.gamepad.evt.pre = parser.gamepad.parser.pre;
             parser.gamepad.evt.cur = parser.gamepad.parser.cur;
 #ifndef WEAK_VSF_XB1_ON_REPORT_INPUT
-            vk_xb1_on_report_input(&parser.gamepad.evt);
+            vsf_xb1_on_report_input(&parser.gamepad.evt);
 #else
             WEAK_VSF_XB1_ON_REPORT_INPUT(&parser.gamepad.evt);
 #endif
@@ -165,7 +165,7 @@ void vk_xb1_process_input(vk_input_xb1_t *dev, vsf_usb_xb1_gamepad_in_report_t *
     if (parser.gamepad.event_sent) {
         parser.gamepad.evt.id = GAMEPAD_ID_DUMMY;
 #ifndef WEAK_VSF_XB1_ON_REPORT_INPUT
-        vk_xb1_on_report_input(&parser.gamepad.evt);
+        vsf_xb1_on_report_input(&parser.gamepad.evt);
 #else
         WEAK_VSF_XB1_ON_REPORT_INPUT(&parser.gamepad.evt);
 #endif

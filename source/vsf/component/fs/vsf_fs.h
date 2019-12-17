@@ -24,6 +24,8 @@
 
 #if VSF_USE_FS == ENABLED
 
+#include "kernel/vsf_kernel.h"
+
 #if     defined(VSF_FS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
 #elif   defined(VSF_FS_INHERIT)
@@ -73,8 +75,9 @@ declare_simple_class(vk_vfs_file_t)
 enum vk_file_attr_t {
     VSF_FILE_ATTR_READ          = 1 << 0,
     VSF_FILE_ATTR_WRITE         = 1 << 1,
-    VSF_FILE_ATTR_HIDDEN        = 1 << 2,
-    VSF_FILE_ATTR_DIRECTORY     = 1 << 3,
+    VSF_FILE_ATTR_EXECUTE       = 1 << 2,
+    VSF_FILE_ATTR_HIDDEN        = 1 << 3,
+    VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
     VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
 };
@@ -119,25 +122,21 @@ struct vk_file_ctx_t {
             int32_t *result;
         } io;
         struct {
-            char *name;
+            const char *name;
             vk_file_attr_t attr;
             uint64_t size;
         } create;
         struct {
-            char *name;
+            const char *name;
         } unlink;
         struct {
-            char *name;
-            vk_file_t **result;
-        } open;
-        struct {
-            char *name;
+            const char *name;
             uint32_t idx;
             vk_file_t **result;
         } lookup;
         struct {
-            char *from_name;
-            char *to_name;
+            const char *from_name;
+            const char *to_name;
         } rename;
     };
 };
@@ -203,6 +202,9 @@ def_simple_class(vk_vfs_file_t) {
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern vk_fs_op_t vk_vfs_op;
+
 /*============================ INCLUDES ======================================*/
 
 #include "./driver/fatfs/vsf_fatfs.h"
@@ -219,10 +221,9 @@ extern vsf_err_t vk_fs_unmount(vk_file_t *dir);
 extern vsf_err_t vk_fs_sync(vk_file_t *dir);
 #endif
 
-extern vsf_err_t vk_file_open(vk_file_t *dir, char *name, vk_file_t **file);
-extern vsf_err_t vk_file_lookup(vk_file_t *dir, char *name, uint_fast16_t idx, vk_file_t **file);
-extern vsf_err_t vk_file_create(vk_file_t *dir, char *name, vk_file_attr_t attr, uint_fast64_t size);
-extern vsf_err_t vk_file_unlink(vk_file_t *dir, char *name);
+extern vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file);
+extern vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr, uint_fast64_t size);
+extern vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name);
 
 extern vsf_err_t vk_file_close(vk_file_t *file);
 extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *rsize);

@@ -70,7 +70,9 @@ enum {
     VSFVM_LIBUSB_EXTFUNC_ADDRESS,
     VSFVM_LIBUSB_EXTFUNC_PID,
     VSFVM_LIBUSB_EXTFUNC_VID,
-    VSFVM_LIBUSB_EXTFUNC_IFS,
+    VSFVM_LIBUSB_EXTFUNC_CLASS,
+    VSFVM_LIBUSB_EXTFUNC_SUBCLASS,
+    VSFVM_LIBUSB_EXTFUNC_PROTOCOL,
     VSFVM_LIBUSB_EXTFUNC_NUM,
 };
 
@@ -212,7 +214,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_vid(vsfvm_thread_t *thread)
     return VSFVM_RET_FINISHED;
 }
 
-static vsfvm_ret_t vsfvm_ext_libusb_ifs(vsfvm_thread_t *thread)
+static vsfvm_ret_t vsfvm_ext_libusb_class(vsfvm_thread_t *thread)
 {
     vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
     vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
@@ -223,7 +225,37 @@ static vsfvm_ret_t vsfvm_ext_libusb_ifs(vsfvm_thread_t *thread)
     }
 
     ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
-    vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->ifs);
+    vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->class);
+    return VSFVM_RET_FINISHED;
+}
+
+static vsfvm_ret_t vsfvm_ext_libusb_subclass(vsfvm_thread_t *thread)
+{
+    vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
+    vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
+    vk_usbh_libusb_dev_t *ldev;
+
+    if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
+        return VSFVM_RET_ERROR;
+    }
+
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->subclass);
+    return VSFVM_RET_FINISHED;
+}
+
+static vsfvm_ret_t vsfvm_ext_libusb_protocol(vsfvm_thread_t *thread)
+{
+    vsfvm_var_t *thiz = vsfvm_get_func_argu_ref(thread, 0);
+    vsfvm_var_t *result = vsfvm_get_func_argu(thread, 0);
+    vk_usbh_libusb_dev_t *ldev;
+
+    if (!vsfvm_var_instance_of(thiz, &vsfvm_ext_libusb_dev)) {
+        return VSFVM_RET_ERROR;
+    }
+
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->protocol);
     return VSFVM_RET_FINISHED;
 }
 
@@ -279,7 +311,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
         }
 
         if (epnum != 0) {
-            vk_usbh_eppipe_t pipe = vk_usbh_urb_get_pipe(urb);
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(urb);
             if ((pipe.endpoint == epnum) && ((bool)pipe.dir_in1out0 == is_in)) {
                 vk_usbh_free_urb(ldev->usbh, urb);
                 // TODO: implement pipe array in ldev
@@ -299,7 +331,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
 
         // update address
         if (ext_ldev->cur_address != ldev->dev->devnum) {
-            vk_usbh_eppipe_t pipe = vk_usbh_urb_get_pipe(urb);
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(urb);
             ldev->dev->devnum = pipe.address = ext_ldev->cur_address;
             vk_usbh_urb_set_pipe(urb, pipe);
         }
@@ -385,8 +417,8 @@ static void vsfvm_ext_libusb_dev_print(vsfvm_instance_t *inst)
         vsfvm_ext_libusb_dev_t *ext_ldev = inst->pObj;
         vk_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
 
-        vsf_trace(VSF_TRACE_INFO, "libusb_dev@(%02X_%04X:%04X:%02X)",
-                    ldev->address, ldev->vid, ldev->pid, ldev->ifs);
+        vsf_trace(VSF_TRACE_INFO, "libusb_dev@(%02X_%04X:%04X)",
+                    ldev->address, ldev->vid, ldev->pid);
     }
 }
 
@@ -432,7 +464,9 @@ static const vsfvm_lexer_sym_t vsfvm_ext_libusb_sym[] = {
     VSFVM_LEXERSYM_EXTFUNC("libusb_dev_address", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_ADDRESS),
     VSFVM_LEXERSYM_EXTFUNC("libusb_dev_pid", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_PID),
     VSFVM_LEXERSYM_EXTFUNC("libusb_dev_vid", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_VID),
-    VSFVM_LEXERSYM_EXTFUNC("libusb_dev_ifs", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_IFS),
+    VSFVM_LEXERSYM_EXTFUNC("libusb_dev_class", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_CLASS),
+    VSFVM_LEXERSYM_EXTFUNC("libusb_dev_subclass", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_SUBCLASS),
+    VSFVM_LEXERSYM_EXTFUNC("libusb_dev_protocol", &vsfvm_ext_libusb_op, &vsfvm_ext_libusb_dev, NULL, 1, VSFVM_LIBUSB_EXTFUNC_PROTOCOL),
 };
 #endif
 
@@ -445,7 +479,9 @@ static const vsfvm_extfunc_t vsfvm_ext_libusb_func[VSFVM_LIBUSB_EXTFUNC_NUM] = {
     [VSFVM_LIBUSB_EXTFUNC_ADDRESS] = VSFVM_EXTFUNC(vsfvm_ext_libusb_address, 1),
     [VSFVM_LIBUSB_EXTFUNC_PID] = VSFVM_EXTFUNC(vsfvm_ext_libusb_pid, 1),
     [VSFVM_LIBUSB_EXTFUNC_VID] = VSFVM_EXTFUNC(vsfvm_ext_libusb_vid, 1),
-    [VSFVM_LIBUSB_EXTFUNC_IFS] = VSFVM_EXTFUNC(vsfvm_ext_libusb_ifs, 1),
+    [VSFVM_LIBUSB_EXTFUNC_CLASS] = VSFVM_EXTFUNC(vsfvm_ext_libusb_class, 1),
+    [VSFVM_LIBUSB_EXTFUNC_SUBCLASS] = VSFVM_EXTFUNC(vsfvm_ext_libusb_subclass, 1),
+    [VSFVM_LIBUSB_EXTFUNC_PROTOCOL] = VSFVM_EXTFUNC(vsfvm_ext_libusb_protocol, 1),
 };
 #endif
 

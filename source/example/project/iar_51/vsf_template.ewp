@@ -37,12 +37,12 @@
                 <option>
                     <name>Data Memory Model</name>
                     <version>0</version>
-                    <state>3</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>Data Memory Model slave</name>
                     <version>0</version>
-                    <state>3</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>Use extended stack</name>
@@ -137,7 +137,7 @@
                 </option>
                 <option>
                     <name>RTLibraryPath</name>
-                    <state>$TOOLKIT_DIR$\LIB\DLIB\dl-pli-nlxd-1e16x01n.r51</state>
+                    <state>$TOOLKIT_DIR$\LIB\DLIB\dl-pli-ngxd-1e16x01n.r51</state>
                 </option>
                 <option>
                     <name>Input variant</name>

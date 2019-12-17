@@ -113,11 +113,11 @@ __PLOOC_CLASS_USE_SIMPLE_TEMPLATE__ in ANSI-C89/90.
 #ifndef PLOOC_ALIGN
 #   define PLOOC_ALIGN(__N)             __PLOOC_ALIGN(__N)
 #endif
-
+/*
 #ifndef PLOOC_DEFAULT_OBJ_ALIGN
 #   define PLOOC_DEFAULT_OBJ_ALIGN      sizeof(uint_fast8_t)
 #endif
-
+*/
 #ifndef PLOOC_PACKED
 #   define PLOOC_PACKED                 __attribute__((packed))
 #endif

@@ -55,7 +55,7 @@ static usrapp_t usrapp = {
 
 #if VSF_USE_UI == ENABLED
 extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
-void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
+void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
     if (ts_evt->dev == &usrapp.ui.disp) {
         vsf_tgui_on_touchscreen_evt(ts_evt);

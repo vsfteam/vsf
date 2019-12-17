@@ -44,7 +44,7 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 #   define VSF_SCHED_SAFE_CODE_REGION   DEFAULT_CODE_REGION_NONE
 #   define vsf_sched_lock()             0
 #   define vsf_sched_unlock(__level)    UNUSED_PARAM(__level)
-#   define vsf_sched_safe()             if (0)
+#   define vsf_sched_safe()             if (1)
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #       define __vsf_sched_safe(__CODE) __CODE
 #   else

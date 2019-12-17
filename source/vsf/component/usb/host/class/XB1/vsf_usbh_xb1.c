@@ -94,8 +94,8 @@ WEAK_VSF_USBH_XB1_ON_FREE_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_USBH_XB1_ON_REPORT_INPUT
-WEAK(vk_usbh_xb1_on_report_input)
-void vk_usbh_xb1_on_report_input(vk_usbh_xb1_t *xb1, vsf_usb_xb1_gamepad_in_report_t *report)
+WEAK(vsf_usbh_xb1_on_report_input)
+void vsf_usbh_xb1_on_report_input(vk_usbh_xb1_t *xb1, vsf_usb_xb1_gamepad_in_report_t *report)
 {
 #   if VSF_USE_INPUT_XB1 == ENABLED
     vk_xb1_process_input(&xb1->use_as__vk_input_xb1_t, report);
@@ -104,15 +104,15 @@ void vk_usbh_xb1_on_report_input(vk_usbh_xb1_t *xb1, vsf_usb_xb1_gamepad_in_repo
 #endif
 
 #ifndef WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT
-WEAK(vk_usbh_xb1_on_report_output)
-void vk_usbh_xb1_on_report_output(vk_usbh_xb1_t *xb1)
+WEAK(vsf_usbh_xb1_on_report_output)
+void vsf_usbh_xb1_on_report_output(vk_usbh_xb1_t *xb1)
 {
 }
 #endif
 
 #ifndef WEAK_VSF_USBH_XB1_ON_NEW
-WEAK(vk_usbh_xb1_on_new)
-void vk_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
+WEAK(vsf_usbh_xb1_on_new)
+void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
 {
 #   if VSF_USE_INPUT_XB1 == ENABLED
     vk_xb1_new_dev(&xb1->use_as__vk_input_xb1_t);
@@ -121,8 +121,8 @@ void vk_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
 #endif
 
 #ifndef WEAK_VSF_USBH_XB1_ON_FREE
-WEAK(vk_usbh_xb1_on_free)
-void vk_usbh_xb1_on_free(vk_usbh_xb1_t *xb1)
+WEAK(vsf_usbh_xb1_on_free)
+void vsf_usbh_xb1_on_free(vk_usbh_xb1_t *xb1)
 {
 #   if VSF_USE_INPUT_XB1 == ENABLED
     vk_xb1_free_dev(&xb1->use_as__vk_input_xb1_t);
@@ -175,7 +175,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_eppipe_t pipe;
+            vk_usbh_pipe_t pipe;
 
             pipe = vk_usbh_urb_get_pipe(&urb);
             if (pipe.dir_in1out0) {
@@ -196,7 +196,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     } else if ((data[0] == 0x20) && (data[1] == 0x00)) {
                         if (len >= sizeof(vsf_usb_xb1_gamepad_in_report_t)) {
 #ifndef WEAK_VSF_USBH_XB1_ON_REPORT_INPUT
-                            vk_usbh_xb1_on_report_input(xb1, (vsf_usb_xb1_gamepad_in_report_t *)data);
+                            vsf_usbh_xb1_on_report_input(xb1, (vsf_usb_xb1_gamepad_in_report_t *)data);
 #else
                             WEAK_VSF_USBH_XB1_ON_REPORT_INPUT(xb1, (vsf_usb_xb1_gamepad_in_report_t *)data);
 #endif
@@ -210,7 +210,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     vk_usbh_xb1_ack_home(xb1);
                 } else {
 #ifndef WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT
-                    vk_usbh_xb1_on_report_output(xb1);
+                    vsf_usbh_xb1_on_report_output(xb1);
 #else
                     WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT(xb1);
 #endif
@@ -233,7 +233,7 @@ static void *vk_usbh_xb1_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_
         if (xb1 != NULL) {
             xb1->user_evthandler = vk_usbh_xb1_evthandler;
 #ifndef WEAK_VSF_USBH_XB1_ON_NEW
-            vk_usbh_xb1_on_new(xb1);
+            vsf_usbh_xb1_on_new(xb1);
 #else
             WEAK_VSF_USBH_XB1_ON_NEW(xb1);
 #endif
@@ -246,7 +246,7 @@ static void *vk_usbh_xb1_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_
 static void vk_usbh_xb1_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
 #ifndef WEAK_VSF_USBH_XB1_ON_FREE
-    vk_usbh_xb1_on_free((vk_usbh_xb1_t *)param);
+    vsf_usbh_xb1_on_free((vk_usbh_xb1_t *)param);
 #else
     WEAK_VSF_USBH_XB1_ON_FREE(xb1);
 #endif

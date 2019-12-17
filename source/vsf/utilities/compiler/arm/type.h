@@ -65,7 +65,14 @@ typedef enum {
 #include <assert.h>
 
 #include "../__common/__type.h"
+
+typedef uint_fast8_t        uintalu_t;
+typedef int_fast8_t         intalu_t;  
+
 /*============================ MACROS ========================================*/
+#define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
+#define __optimal_bit_msk       (__optimal_bit_sz - 1)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

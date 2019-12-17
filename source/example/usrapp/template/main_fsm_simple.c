@@ -153,7 +153,7 @@ implement_fsm(user_task_b_t)
         )
         
         state(DELAY){
-            vsf_task_wait_until(vsf_delay_ms(10000))                            //!< wait 10s
+            vsf_task_wait_until(vsf_delay_ms(3000))                            //!< wait 10s
             update_state_to(PRINT);                                             //!< transfer to PRINT without yielding...
         }
         

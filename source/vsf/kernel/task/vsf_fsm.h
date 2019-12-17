@@ -41,11 +41,20 @@
 #include "utilities/compiler.h"
 /*============================ MACROS ========================================*/
 
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   undef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM        DISABLED
+#endif
+
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
     &&  VSF_USE_KERNEL == ENABLED                                               \
     &&  VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
 #ifndef this
 #   define this    (*ptThis)
+#endif
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   error simple_fsm require at least ANSI-C99 support
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -78,7 +87,7 @@
 #define __extern_simple_fsm(__FSM_TYPE, ...)                                    \
         declare_class(__FSM_TYPE)                                               \
         extern_class(__FSM_TYPE)                                                \
-            uint_fast8_t chState;                                               \
+            uint_fast8_t tState;                                               \
             __VA_ARGS__                                                         \
         end_extern_class(__FSM_TYPE)                                
         
@@ -152,7 +161,7 @@
 #define on_start(...)                       {__VA_ARGS__;}
 
 
-#define reset_fsm()         do { ptThis->chState = 0; } while(0);
+#define reset_fsm()         do { ptThis->tState = 0; } while(0);
 #define fsm_cpl()           do {reset_fsm(); return fsm_rt_cpl;} while(0);
 #define fsm_report(__ERROR) do {reset_fsm(); return (fsm_rt_t)(__ERROR); } while(0);
 #define fsm_wait_for_obj()  return fsm_rt_wait_for_obj;
@@ -163,17 +172,17 @@
 
 
 #define update_state_to(__STATE)                                                \
-        { ptThis->chState = (__STATE); goto __state_entry_##__STATE;}
+        { ptThis->tState = (__STATE); goto __state_entry_##__STATE;}
 
 #define transfer_to(__STATE)                                                    \
-         { ptThis->chState = (__STATE); fsm_on_going() } 
+         { ptThis->tState = (__STATE); fsm_on_going() } 
 
 
 #define __fsm_initialiser(__NAME, ...)                                          \
         fsm(__NAME) *__NAME##_init(fsm(__NAME) *ptThis __VA_ARGS__)             \
         {                                                                       \
             VSF_KERNEL_ASSERT (NULL != ptThis);                                 \
-            ptThis->chState = 0;
+            ptThis->tState = 0;
             
 #define fsm_initialiser(__NAME, ...)                                            \
             __fsm_initialiser(__NAME, __VA_ARGS__)
@@ -208,9 +217,9 @@
         }                                               
 
 #define __body(...)                                                             \
-        switch (ptThis->chState) {                                              \
+        switch (ptThis->tState) {                                              \
             case 0:                                                             \
-                ptThis->chState++;                                              \
+                ptThis->tState++;                                              \
             __VA_ARGS__                                                         \
             break;                                                              \
             default:                                                            \
@@ -223,9 +232,9 @@
 #define body(...)               __body(__VA_ARGS__)
 
 #define body_begin()                                                            \
-            switch (ptThis->chState) {                                          \
+            switch (ptThis->tState) {                                          \
                 case 0:                                                         \
-                    ptThis->chState++;                                              
+                    ptThis->tState++;                                              
 
 #define body_end()                                                              \
                 break;                                                          \
@@ -267,7 +276,7 @@
                 do {                                                            \
                     __state(__STATE, __VA_ARGS__)                               \
                 } while(0); /* add extra while(0) to catch the fsm_continue()*/ \
-                if (this.chState != (__STATE)) {                                \
+                if (this.tState != (__STATE)) {                                \
                     break;                                                      \
                 }                                                               \
             } while(1);                                                         
@@ -280,9 +289,9 @@
 
 #define privilege_body(...)                                                     \
         do {                                                                    \
-            switch (ptThis->chState) {                                          \
+            switch (ptThis->tState) {                                          \
                 case 0:                                                         \
-                    ptThis->chState++;                                          \
+                    ptThis->tState++;                                          \
                 __VA_ARGS__                                                     \
             }                                                                   \
         while(1);                                                               \

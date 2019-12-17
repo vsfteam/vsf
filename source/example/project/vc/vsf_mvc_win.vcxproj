@@ -224,11 +224,11 @@
     <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h" />
@@ -320,6 +320,7 @@
     <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h" />
     <ClInclude Include="..\..\..\vsf\service\trace\vsf_trace.h" />
     <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h" />
     <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h" />
@@ -350,7 +351,7 @@
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_usr_cfg.h" />
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.h" />
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images_data.h" />
-    <ClInclude Include="libusb\libusb.h" />
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\stopwatch\stopwatch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c" />
@@ -503,11 +504,11 @@
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c" />
@@ -576,6 +577,7 @@
     <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c" />
     <ClCompile Include="..\..\..\vsf\service\trace\vsf_trace.c" />
     <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />
@@ -585,6 +587,7 @@
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_queue.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\main.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.c" />
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\stopwatch\stopwatch.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_demo.c" />
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_port.c" />
   </ItemGroup>
@@ -670,7 +673,7 @@
       <PreprocessorDefinitions>__OOC_DEBUG__;__CPU_X86__;__WIN__;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\mvc_demo_win;$(ProjectDir)..\..\usrapp\mvc_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-braced-scalar-init -Wno-microsoft-include -Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Wno-unused-value -Wno-braced-scalar-init -Wno-microsoft-include -Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

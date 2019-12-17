@@ -426,14 +426,14 @@ static usbd_uvc_t usbd_uvc = {
 WEAK(ui_demo_on_ready)
 void ui_demo_on_ready(void) {}
 
-void vk_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
+void vsf_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = false;
     }
 }
 
-void vk_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
+void vsf_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
     if (!usbd_uvc.usbd.uvc.stream_started) {
         usbd_uvc.usbd.uvc.stream_started = true;

@@ -78,8 +78,8 @@ const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT
-WEAK(vk_usbh_nspro_on_report_input)
-void vk_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
+WEAK(vsf_usbh_nspro_on_report_input)
+void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
 #   if VSF_USE_INPUT_NSPRO == ENABLED
     vk_nspro_process_input(&nspro->use_as__vk_input_nspro_t, report);
@@ -88,15 +88,15 @@ void vk_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad
 #endif
 
 #ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT
-WEAK(vk_usbh_nspro_on_report_output)
-void vk_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
+WEAK(vsf_usbh_nspro_on_report_output)
+void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
 {
 }
 #endif
 
 #ifndef WEAK_VSF_USBH_NSPRO_ON_NEW
-WEAK(vk_usbh_nspro_on_new)
-void vk_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
+WEAK(vsf_usbh_nspro_on_new)
+void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
 #   if VSF_USE_INPUT_NSPRO == ENABLED
     vk_nspro_new_dev(&nspro->use_as__vk_input_nspro_t);
@@ -105,8 +105,8 @@ void vk_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 #endif
 
 #ifndef WEAK_VSF_USBH_NSPRO_ON_FREE
-WEAK(vk_usbh_nspro_on_free)
-void vk_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
+WEAK(vsf_usbh_nspro_on_free)
+void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
 #   if VSF_USE_INPUT_NSPRO == ENABLED
     vk_nspro_free_dev(&nspro->use_as__vk_input_nspro_t);
@@ -136,7 +136,7 @@ static void vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_eppipe_t pipe;
+            vk_usbh_pipe_t pipe;
 
             pipe = vk_usbh_urb_get_pipe(&urb);
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
@@ -171,7 +171,7 @@ static void vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         case VSF_USBH_NSPRO_RUNNING:
                             if (URB_OK == vk_usbh_urb_get_status(&urb)) {
 #ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT
-                                vk_usbh_nspro_on_report_input(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
+                                vsf_usbh_nspro_on_report_input(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
 #else
                                 WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
 #endif
@@ -184,7 +184,7 @@ static void vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (VSF_USBH_NSPRO_RUNNING == nspro->start_state) {
                         nspro->out_idle = true;
 #ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT
-                        vk_usbh_nspro_on_report_output(nspro);
+                        vsf_usbh_nspro_on_report_output(nspro);
 #else
                         WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT(nspro);
 #endif
@@ -202,7 +202,7 @@ static void * vk_usbh_nspro_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     if (nspro != NULL) {
         nspro->user_evthandler = vk_usbh_nspro_evthandler;
 #ifndef WEAK_VSF_USBH_NSPRO_ON_NEW
-        vk_usbh_nspro_on_new(nspro);
+        vsf_usbh_nspro_on_new(nspro);
 #else
         WEAK_VSF_USBH_NSPRO_ON_NEW(nspro);
 #endif
@@ -213,7 +213,7 @@ static void * vk_usbh_nspro_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 static void vk_usbh_nspro_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
 #ifndef WEAK_VSF_USBH_NSPRO_ON_FREE
-    vk_usbh_nspro_on_free((vk_usbh_nspro_t *)param);
+    vsf_usbh_nspro_on_free((vk_usbh_nspro_t *)param);
 #else
     WEAK_VSF_USBH_NSPRO_ON_FREE(nspro);
 #endif

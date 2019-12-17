@@ -30,6 +30,15 @@
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
+#endif
+
+#if VSF_USE_KERNEL_SIMPLE_SHELL != ENABLED
+#   error VSF_USE_KERNEL_SIMPLE_SHELL must be enabled
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -46,13 +55,13 @@ enum {
 vsf_err_t vk_mal_init(vk_mal_t *pthis)
 {
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->init != NULL));
-    return vsf_eda_call_param_eda(pthis->drv->init, pthis);
+    return __vsf_call_eda(pthis->drv->init, pthis);
 }
 
 vsf_err_t vk_mal_fini(vk_mal_t *pthis)
 {
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->fini != NULL));
-    return vsf_eda_call_param_eda(pthis->drv->fini, pthis);
+    return __vsf_call_eda(pthis->drv->fini, pthis);
 }
 
 uint_fast32_t vk_mal_blksz(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
@@ -76,7 +85,7 @@ vsf_err_t vk_mal_erase(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size)
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->erase != NULL));
     pthis->args.addr = addr;
     pthis->args.size = size;
-    return vsf_eda_call_param_eda(pthis->drv->erase, pthis);
+    return __vsf_call_eda(pthis->drv->erase, pthis);
 }
 
 vsf_err_t vk_mal_read(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
@@ -85,7 +94,7 @@ vsf_err_t vk_mal_read(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, u
     pthis->args.addr = addr;
     pthis->args.size = size;
     pthis->args.buff = buff;
-    return vsf_eda_call_param_eda(pthis->drv->read, pthis);
+    return __vsf_call_eda(pthis->drv->read, pthis);
 }
 
 vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
@@ -94,7 +103,7 @@ vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, 
     pthis->args.addr = addr;
     pthis->args.size = size;
     pthis->args.buff = buff;
-    return vsf_eda_call_param_eda(pthis->drv->write, pthis);
+    return __vsf_call_eda(pthis->drv->write, pthis);
 }
 
 vsf_err_t vk_mal_get_result(vk_mal_t *pthis, uint32_t *size)
@@ -166,7 +175,7 @@ vsf_err_t vk_mal_read_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t 
     pthis->stream.addr = addr;
     pthis->stream.size = size;
     pthis->stream.stream = stream;
-    return vsf_eda_call_param_eda(__vk_mal_read_stream_do, pthis);
+    return __vsf_call_eda(__vk_mal_read_stream_do, pthis);
 }
 
 static void __vk_mal_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
@@ -228,7 +237,7 @@ vsf_err_t vk_mal_write_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t
     pthis->stream.addr = addr;
     pthis->stream.size = size;
     pthis->stream.stream = stream;
-    return vsf_eda_call_param_eda(__vk_mal_write_stream_do, pthis);
+    return __vsf_call_eda(__vk_mal_write_stream_do, pthis);
 }
 #endif
 

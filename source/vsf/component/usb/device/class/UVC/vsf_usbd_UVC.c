@@ -119,15 +119,15 @@ static void vk_usbd_uvc_trace_request_process(vk_usbd_ctrl_handler_t *ctrl_handl
 #endif
 
 #ifndef WEAK_VSF_USBD_UVC_STOP_STREAM
-WEAK(vk_usbd_uvc_stop_stream)
-void vk_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
+WEAK(vsf_usbd_uvc_stop_stream)
+void vsf_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
 }
 #endif
 
 #ifndef WEAK_VSF_USBD_UVC_START_STREAM
-WEAK(vk_usbd_uvc_start_stream)
-void vk_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
+WEAK(vsf_usbd_uvc_start_stream)
+void vsf_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
 }
 #endif
@@ -206,7 +206,7 @@ static vsf_err_t vk_usbd_uvc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: stop stream." VSF_TRACE_CFG_LINEEND);
 #endif
 #ifndef WEAK_VSF_USBD_UVC_STOP_STREAM
-                    vk_usbd_uvc_stop_stream(uvc, request->wValue);
+                    vsf_usbd_uvc_stop_stream(uvc, request->wValue);
 #else
                     WEAK_VSF_USBD_UVC_STOP_STREAM(uvc, request->wValue);
 #endif
@@ -216,7 +216,7 @@ static vsf_err_t vk_usbd_uvc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
                                 request->wValue);
 #endif
 #ifndef WEAK_VSF_USBD_UVC_START_STREAM
-                    vk_usbd_uvc_start_stream(uvc, request->wValue);
+                    vsf_usbd_uvc_start_stream(uvc, request->wValue);
 #else
                     WEAK_VSF_USBD_UVC_START_STREAM(uvc, request->wValue);
 #endif

@@ -253,6 +253,9 @@
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\vsfstream\mem_stream">
+      <UniqueIdentifier>{70f41506-6795-4826-a1fa-e2263a792bb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -891,6 +894,9 @@
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h">
       <Filter>vsf\service\pbuf</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -1377,6 +1383,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
       <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -148,7 +148,7 @@ static __ui_demo_gamepad_t * ui_demo_get_gamepad(void *dev)
     return &__ui_demo.gamepad[empty_idx];
 }
 
-void vk_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
+void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     __ui_demo_gamepad_t *gamepad = ui_demo_get_gamepad(gamepad_evt->dev);
     ASSERT(gamepad != NULL);

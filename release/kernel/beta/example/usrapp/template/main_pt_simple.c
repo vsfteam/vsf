@@ -92,7 +92,7 @@ private implement_vsf_pt(user_pt_task_b_t)
     vsf_pt_begin();
     
     while(1) {
-        vsf_pt_wait_until( vsf_delay_ms(10000));                                //!< wait 10s
+        vsf_pt_wait_until( vsf_delay_ms(3000));                                //!< wait 10s
         printf("post semaphore...   [%08x]\r\n", this.cnt++);
         vsf_sem_post(this.psem);                                                //!< post a semaphore
     }
@@ -116,7 +116,7 @@ void vsf_kernel_pt_simple_demo(void)
 #if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
     uint32_t cnt = 0;
     while(1) {
-        vsf_delay_ms(10000);
+        vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }
@@ -183,7 +183,7 @@ void main(void)
     
     this.cnt = 0;
     while(1) {
-        vsf_pt_wait_until(vsf_delay_ms(10000));
+        vsf_pt_wait_until(vsf_delay_ms(3000));
         printf("post semaphore...   [%08x]\r\n", this.cnt++);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }

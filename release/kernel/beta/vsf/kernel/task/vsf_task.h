@@ -52,7 +52,7 @@
 #   define vsf_task_end()                                                       \
             } return fsm_rt_on_going;
 
-#   define vsf_task_state  (ptThis->chState)
+#   define vsf_task_state  (ptThis->tState)
 
 #else
 #   define __implement_vsf_task(__NAME)                                         \
@@ -61,7 +61,7 @@
 #   define vsf_task_begin()  
 #   define vsf_task_end()           vsf_eda_yield();
                 
-#   define vsf_task_state  (ptThis->chState)
+#   define vsf_task_state  (ptThis->tState)
 #endif
 
 #define implement_vsf_task(__NAME)  __implement_vsf_task(__NAME)
@@ -84,7 +84,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __def_vsf_task(__NAME,__MEMBER)                                      \
         struct task_cb_##__NAME {                                               \
-            uint8_t chState;                                                    \
+            uint8_t tState;                                                    \
             vsf_sync_reason_t reason;                                           \
             __MEMBER                                                            \
         };                                                                      \
@@ -98,7 +98,7 @@
 #else
 #   define __def_vsf_task(__NAME,__MEMBER)                                      \
         struct task_cb_##__NAME {                                               \
-            uint8_t chState;                                                    \
+            uint8_t tState;                                                    \
             vsf_sync_reason_t reason;                                           \
             __MEMBER                                                            \
         };                                                                      \
@@ -112,7 +112,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __def_vsf_task(__NAME,...)                                           \
         struct task_cb_##__NAME {                                               \
-            uint8_t chState;                                                    \
+            uint8_t tState;                                                    \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
@@ -125,7 +125,7 @@
 #else
 #   define __def_vsf_task(__NAME,...)                                           \
         struct task_cb_##__NAME {                                               \
-            uint8_t chState;                                                    \
+            uint8_t tState;                                                    \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
@@ -149,7 +149,7 @@
 #define declare_vsf_task(__NAME)      __declare_vsf_task(__NAME)
 
 #define prepare_vsf_task(__NAME, __TASK)                                        \
-            do {(__TASK)->chState = 0; } while(0)
+            do {(__TASK)->tState = 0; } while(0)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED

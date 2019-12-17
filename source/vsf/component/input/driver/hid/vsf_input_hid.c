@@ -98,11 +98,11 @@ WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_HID_ON_NEW_DEV
-WEAK(vk_hid_on_new_dev)
-void vk_hid_on_new_dev(vk_input_hid_t *dev)
+WEAK(vsf_hid_on_new_dev)
+void vsf_hid_on_new_dev(vk_input_hid_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
-    vk_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
+    vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
 #   else
     WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_HID, dev);
 #   endif
@@ -110,11 +110,11 @@ void vk_hid_on_new_dev(vk_input_hid_t *dev)
 #endif
 
 #ifndef WEAK_VSF_HID_ON_FREE_DEV
-WEAK(vk_hid_on_free_dev)
-void vk_hid_on_free_dev(vk_input_hid_t *dev)
+WEAK(vsf_hid_on_free_dev)
+void vsf_hid_on_free_dev(vk_input_hid_t *dev)
 {
 #   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
-    vk_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
+    vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
 #   else
     WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_HID, dev);
 #   endif
@@ -122,11 +122,11 @@ void vk_hid_on_free_dev(vk_input_hid_t *dev)
 #endif
 
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-WEAK(vk_hid_on_report_input)
-void vk_hid_on_report_input(vk_hid_event_t *hid_evt)
+WEAK(vsf_hid_on_report_input)
+void vsf_hid_on_report_input(vk_hid_event_t *hid_evt)
 {
 #ifndef WEAK_VSF_INPUT_ON_EVT
-    vk_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
+    vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
 #else
     WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
 #endif
@@ -373,7 +373,7 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
 void vk_hid_new_dev(vk_input_hid_t *dev)
 {
 #ifndef WEAK_VSF_HID_ON_NEW_DEV
-    vk_hid_on_new_dev(dev);
+    vsf_hid_on_new_dev(dev);
 #else
     WEAK_VSF_HID_ON_NEW_DEV(dev);
 #endif
@@ -384,7 +384,7 @@ void vk_hid_free_dev(vk_input_hid_t *dev)
     vk_hid_report_t *report;
 
 #ifndef WEAK_VSF_HID_ON_FREE_DEV
-    vk_hid_on_free_dev(dev);
+    vsf_hid_on_free_dev(dev);
 #else
     WEAK_VSF_HID_ON_FREE_DEV(dev);
 #endif
@@ -497,7 +497,7 @@ void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
 
                 reported = true;
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-                vk_hid_on_report_input(&event);
+                vsf_hid_on_report_input(&event);
 #else
                 WEAK_VSF_HID_ON_REPORT_INPUT(&event);
 #endif
@@ -509,7 +509,7 @@ void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
     if (reported) {
         event.id = 0;
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-        vk_hid_on_report_input(&event);
+        vsf_hid_on_report_input(&event);
 #else
         WEAK_VSF_HID_ON_REPORT_INPUT(&event);
 #endif

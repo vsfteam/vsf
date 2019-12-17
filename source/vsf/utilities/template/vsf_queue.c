@@ -43,14 +43,14 @@ void __vsf_rng_buf_init(  vsf_rng_buf_t* ptObj,
 
 int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
 
     ASSERT( NULL != ptObj);
 
     do {
         if ((this.hwHead == this.hwTail) && (this.hwLength > 0)) {
-            //! this queue is full
+            /*! this queue is full */
             break;
         }
         nIndex = this.hwTail++;
@@ -65,14 +65,14 @@ int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *ptObj)
 
 int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
 
     ASSERT(NULL != ptObj);
 
     do {
         if ((this.hwHead == this.hwTail) && (this.hwLength == 0)) {
-            //! this queue is empty
+            /*! this queue is empty */
             break;
         }
         nIndex = this.hwHead++;
@@ -103,15 +103,17 @@ uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* ptObj)
 SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
 int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *ptObj, uint16_t *phwItemCount)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    
     int32_t nIndex = -1;
     uint_fast16_t hwWritten = 0;
     uint_fast16_t hwSpaceLeft;
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    
     ASSERT(NULL != ptObj && NULL != phwItemCount);
 
     do {
         if ((this.hwHead == this.hwTail) && (this.hwLength > 0)) {
-            //! this queue is full
+            /*! this queue is full */
             break;
         }
         nIndex = this.hwTail;
@@ -121,7 +123,7 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *ptObj, uint16_t *phwItemCount
         hwWritten = min((*phwItemCount), hwWritten);
         hwWritten = min(hwWritten, hwSpaceLeft);
 
-        *phwItemCount = hwWritten;          //!< update actual written number
+        *phwItemCount = hwWritten;          /*!< update actual written number */
         
         this.hwTail += hwWritten;
         this.hwLength += hwWritten;
@@ -137,15 +139,16 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *ptObj, uint16_t *phwItemCount
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
 int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    
     int32_t nIndex = -1;
     uint_fast16_t hwRead = 0;
-
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    
     ASSERT(NULL != ptObj && NULL != phwItemCount);
 
     do {
         if ((this.hwHead == this.hwTail) && (this.hwLength == 0)) {
-            //! this queue is empty
+            /*! this queue is empty */
             break;
         }
         nIndex = this.hwHead;
@@ -154,7 +157,7 @@ int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
         hwRead = min((*phwItemCount), hwRead);
         hwRead = min(this.hwLength, hwRead);
 
-        *phwItemCount = hwRead;          //!< update actual written number
+        *phwItemCount = hwRead;          /*!< update actual written number */
 
         this.hwHead += hwRead;
         this.hwLength -= hwRead;
@@ -175,14 +178,14 @@ int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
 int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* ptObj)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
 
     ASSERT(NULL != ptObj);
 
     do {
         if ((this.hwPeek == this.hwTail) && (0 != this.hwPeekCount)) {
-            //! all items have been peeked
+            /*! all items have been peeked */
             break;
         }
         nIndex = this.hwPeek++;
@@ -193,6 +196,27 @@ int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* ptObj)
     } while (0);
 
     return nIndex;
+}
+
+SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
+void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* ptObj)
+{
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    ASSERT(NULL != ptObj);
+
+    this.hwPeek = this.hwHead;
+    this.hwPeekCount = 0;
+}
+
+SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
+void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* ptObj)
+{
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    ASSERT(NULL != ptObj);
+
+    this.hwHead = this.hwPeek;
+    this.hwLength -= this.hwPeekCount;
+    this.hwPeekCount = 0;
 }
 
 
@@ -210,16 +234,16 @@ uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* ptObj)
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
 int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
     int32_t nIndex = -1;
     uint_fast16_t hwItemLeft;
     uint_fast16_t hwPeeked  = 0;
+    class_internal(ptObj, ptThis, vsf_rng_buf_t);
 
     ASSERT(NULL != ptObj && NULL != phwItemCount);
 
     do {
         if ((this.hwPeek == this.hwTail) && (this.hwPeekCount != 0)) {
-            //! this queue is empty
+            /*! this queue is empty */
             break;
         }
         nIndex = this.hwPeek;
@@ -229,7 +253,7 @@ int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount
         hwPeeked = min((*phwItemCount), hwPeeked);
         hwPeeked = min(hwItemLeft, hwPeeked);
 
-        *phwItemCount = hwPeeked;          //!< update actual written number
+        *phwItemCount = hwPeeked;          /*!< update actual written number */
 
         this.hwPeek += hwPeeked;
         this.hwPeekCount += hwPeeked;

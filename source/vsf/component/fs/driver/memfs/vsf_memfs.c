@@ -91,12 +91,12 @@ static void __vk_memfs_lookup(uintptr_t target, vsf_evt_t evt)
 {
     vk_memfs_file_t *dir = (vk_memfs_file_t *)target;
     vk_memfs_file_t *child = dir->d.child;
-    char *name = dir->ctx.lookup.name;
+    const char *name = dir->ctx.lookup.name;
     uint_fast32_t idx = dir->ctx.lookup.idx;
     bool found = false;
 
     for (uint_fast16_t i = 0; i < dir->d.child_num; i++) {
-        if (    (name && vk_file_is_match(name, child->name))
+        if (    (name && vk_file_is_match((char *)name, child->name))
             ||  (!name && !idx)) {
             found = true;
             break;

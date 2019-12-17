@@ -98,7 +98,7 @@ static int hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, in
     return 0;
 }
 
-void vk_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
+void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
     if (!hci_transport_h2_param.dev) {
         hci_transport_h2_param.dev = dev;
@@ -116,14 +116,14 @@ void vk_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
     }
 }
 
-void vk_usbh_bthci_on_del(void *dev)
+void vsf_usbh_bthci_on_del(void *dev)
 {
     if (dev == hci_transport_h2_param.dev) {
         hci_transport_h2_param.dev = NULL;
     }
 }
 
-void vk_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size)
+void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size)
 {
     const uint8_t event[] = {HCI_EVENT_TRANSPORT_PACKET_SENT, 0};
 

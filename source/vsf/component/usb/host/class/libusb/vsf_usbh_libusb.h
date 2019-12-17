@@ -29,9 +29,13 @@
 struct vk_usbh_libusb_dev_t {
     vk_usbh_t *usbh;
     vk_usbh_dev_t *dev;
+    vk_usbh_urb_t urb;
 
     uint16_t vid, pid;
-    uint8_t ifs;
+    uint8_t class;
+    uint8_t subclass;
+    uint8_t protocol;
+    uint8_t ep0size;
     uint8_t address;
     bool is_opened;
     bool is_to_remove;

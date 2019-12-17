@@ -114,16 +114,45 @@ extern void put_unaligned_##__bitlen(uint_fast##__bitlen##_t, void *);          
 extern void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t, void *);        \
 extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
+
+#ifndef ffs
+#   define ffs(__N)        vsf_ffs(__N)
+#endif
+#ifndef ffz
+#   define ffz(__N)        vsf_ffz(__N)
+#endif
+#ifndef msb
+#   define msb(__N)        vsf_msb(__N)
+#endif
+#ifndef clz
+#   define clz(__N)        vsf_clz(__N)
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 
-
 /*----------------------------------------------------------------------------*
- * APIs or Interfaces for users                                               *
+ * Architecture Infrastructure                                                *
  *----------------------------------------------------------------------------*/
 extern uint_fast16_t bswap_16(uint_fast16_t);
 extern uint_fast32_t bswap_32(uint_fast32_t);
 #ifdef UINT64_MAX
 extern uint_fast64_t bswap_64(uint_fast64_t);
+#endif
+
+#ifndef VSF_FFS
+extern int_fast8_t vsf_ffs(uint_fast32_t);
+#endif
+
+#ifndef VSF_FFZ
+extern int_fast8_t vsf_ffz(uint_fast32_t);
+#endif
+
+#ifndef VSF_MSB
+extern int_fast8_t vsf_msb(uint_fast32_t);
+#endif
+
+#ifndef VSF_CLZ
+extern uint_fast8_t vsf_clz(uint_fast32_t);
 #endif
 
 DECLARE_ENDIAN_FUNC(16)
@@ -132,13 +161,24 @@ DECLARE_ENDIAN_FUNC(32)
 DECLARE_ENDIAN_FUNC(64)
 #endif
 
+
+/*----------------------------------------------------------------------------*
+ * SWI                                                                        *
+ *----------------------------------------------------------------------------*/
 extern vsf_err_t vsf_swi_init(  uint_fast8_t idx, 
                                 vsf_arch_prio_t priority,
                                 vsf_swi_handler_t *handler, 
                                 void *param);
 extern void vsf_swi_trigger(uint_fast8_t idx);
 
+/*! \brief trigger a software interrupt
+ *! \param idx the index of the software interrupt
+ */
+extern void vsf_arch_swi_trigger(uint_fast8_t idx);
 
+/*----------------------------------------------------------------------------*
+ * System Timer                                                               *
+ *----------------------------------------------------------------------------*/
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 extern vsf_err_t vsf_systimer_start(void);
 extern vsf_systimer_cnt_t vsf_systimer_get(void);
@@ -154,12 +194,9 @@ extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
 #endif
 
 
-
-/*! \brief trigger a software interrupt
- *! \param idx the index of the software interrupt
- */
-extern void vsf_arch_swi_trigger(uint_fast8_t idx);
-
+/*----------------------------------------------------------------------------*
+ * Interrupt                                                                  *
+ *----------------------------------------------------------------------------*/
 extern vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority);
 
 extern vsf_gint_state_t vsf_get_interrupt(void);

@@ -167,5 +167,37 @@ vsf_evt_t __vsf_yield(void)
     return result;
 }
 
+SECTION("text.vsf.kernel.__vsf_call_eda")
+vsf_err_t __vsf_call_eda(uintptr_t evthandler, uintptr_t param)
+{
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(NULL != eda);
+    
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    if (vsf_eda_is_stack_owner(eda)) {
+        return __vsf_thread_call_eda(evthandler, param);
+    } else 
+#endif
+    {
+        return __vsf_eda_call_eda(evthandler, param);
+    }
+}
+
+SECTION("text.vsf.kernel.__vsf_call_fsm")
+fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param)
+{
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(NULL != eda);
+    
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    if (vsf_eda_is_stack_owner(eda)) {
+        return __vsf_thread_call_fsm(entry, param);
+    } else 
+#endif
+    {
+        return vsf_eda_call_fsm(entry, param);
+    }
+}
+
 #endif
 /*EOF*/

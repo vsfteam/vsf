@@ -51,7 +51,7 @@
                                         __NAME *ptThis)
 #endif
 
-#define __vsf_pt_state()         (ptThis->chState)
+#define __vsf_pt_state()         (ptThis->tState)
 #define __vsf_pt_end()           __vsf_pt_end_common()
 
 
@@ -120,7 +120,7 @@
 
 
 #   define vsf_pt_call_pt(__NAME, __TARGET)                                     \
-            (__TARGET)->chState = 0;                                            \
+            (__TARGET)->tState = 0;                                            \
             vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
 
 #endif
@@ -174,7 +174,7 @@
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define __def_vsf_pt(__NAME,__MEMBER)                                        \
             __def_vsf_pt_common(__NAME,                                         \
-                                    uint8_t chState;                            \
+                                    uint16_t tState;                            \
                                     vsf_sync_reason_t reason;                   \
                                 __MEMBER)           
 
@@ -182,7 +182,7 @@
 #   define end_def_vsf_pt(__NAME)
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
-            __def_vsf_pt_common(__NAME, uint8_t chState; __VA_ARGS__)           
+            __def_vsf_pt_common(__NAME, uint8_t tState; __VA_ARGS__)           
 
 #   define def_vsf_pt(__NAME,...)       __def_vsf_pt(__NAME,__VA_ARGS__)
 #   define end_def_vsf_pt(...)
@@ -205,12 +205,12 @@
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #define __init_vsf_pt(__NAME, __PT, __PRI)                                      \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
-                .fn.evthandler = (vsf_pt_entry_t)__vsf_pt_func(__NAME),         \
-                .priority = (__PRI),                                            \
-                .target = (uintptr_t)&((__PT)->param),                          \
-            };                                                                  \
-            (__PT)->param.chState = 0;                                          \
+            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {0};                     \
+            ATPASTE3(__,__LINE__,tCFG).fn.evthandler =                          \
+                (vsf_pt_entry_t)__vsf_pt_func(__NAME);                          \
+            ATPASTE3(__,__LINE__,tCFG).priority = (__PRI);                      \
+            ATPASTE3(__,__LINE__,tCFG).target = (uintptr_t)&((__PT)->param);    \
+            (__PT)->param.tState = 0;                                          \
             vsf_pt_start( &((__PT)->use_as__vsf_pt_t),                          \
                             &ATPASTE3(__,__LINE__,tCFG));                       \
         } while(0)
@@ -223,7 +223,7 @@
                 .target = (uintptr_t)&((__PT)->param),                          \
                 __VA_ARGS__                                                     \
             };                                                                  \
-            (__PT)->param.chState = 0;                                          \
+            (__PT)->param.tState = 0;                                          \
             vsf_pt_start( &((__PT)->use_as__vsf_pt_t),                          \
                             &ATPASTE3(__,__LINE__,tCFG));                       \
         } while(0)

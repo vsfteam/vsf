@@ -123,7 +123,7 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
     }
 }
 
-void vk_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
+void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
 {
     switch (type) {
 #if VSF_USE_INPUT_HID == ENABLED

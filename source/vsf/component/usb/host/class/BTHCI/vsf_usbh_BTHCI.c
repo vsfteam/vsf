@@ -190,18 +190,18 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
-WEAK(vk_usbh_bthci_on_new)
-void vk_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id) {}
+WEAK(vsf_usbh_bthci_on_new)
+void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id) {}
 #endif
 
 #ifndef WEAK_VSF_USBH_BTHCI_ON_DEL
-WEAK(vk_usbh_bthci_on_del)
-void vk_usbh_bthci_on_del(void *dev) {}
+WEAK(vsf_usbh_bthci_on_del)
+void vsf_usbh_bthci_on_del(void *dev) {}
 #endif
 
 #ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
-WEAK(vk_usbh_bthci_on_packet)
-void vk_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
+WEAK(vsf_usbh_bthci_on_packet)
+void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
 #endif
 
 static vk_usbh_bthci_iocb_t * vk_usbh_bthci_get_iocb(vk_usbh_bthci_t *bthci, vk_usbh_hcd_urb_t *urb_hcd)
@@ -301,7 +301,7 @@ static void vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
 
 #ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
-            vk_usbh_bthci_on_new(bthci, &bthci->id);
+            vsf_usbh_bthci_on_new(bthci, &bthci->id);
 #else
             WEAK_VSF_USBH_BTHCI_ON_NEW(bthci, &bthci->id);
 #endif
@@ -318,7 +318,7 @@ static void vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (iocb->is_icb) {
                 if (URB_OK == status) {
 #ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
-                    vk_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
+                    vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
                         buffer, actual_length);
 #else
                     WEAK_VSF_USBH_BTHCI_ON_PACKET(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
@@ -334,7 +334,7 @@ static void vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 iocb->is_busy = false;
                 if (URB_OK == status) {
 #ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
-                    vk_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
+                    vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
                         buffer, actual_length);
 #else
                     WEAK_VSF_USBH_BTHCI_ON_PACKET(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
@@ -476,7 +476,7 @@ static void vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
     vk_usbh_bthci_t *bthci = param;
 
 #ifndef WEAK_VSF_USBH_BTHCI_ON_DEL
-    vk_usbh_bthci_on_del(bthci);
+    vsf_usbh_bthci_on_del(bthci);
 #else
     WEAK_VSF_USBH_BTHCI_ON_DEL(bthci);
 #endif

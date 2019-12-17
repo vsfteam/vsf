@@ -108,6 +108,7 @@
 #endif
 
 
+
 #define VSF_OS_CFG_MAIN_MODE_NONE               0
 #define VSF_OS_CFG_MAIN_MODE_THREAD             1
 #define VSF_OS_CFG_MAIN_MODE_EDA                2
@@ -256,6 +257,18 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE    VSF_ARCH_STACK_GUARDIAN_SIZE
 #endif
 
+
+
+/*----------------------------------------------------------------------------*
+ * Forced disabled features/modules when C89/90 is used                       *
+ *----------------------------------------------------------------------------*/
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   undef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM            DISABLED
+
+#   undef VSF_KERNEL_CFG_SUPPORT_THREAD
+#   define VSF_KERNEL_CFG_SUPPORT_THREAD                    DISABLED
+#endif
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

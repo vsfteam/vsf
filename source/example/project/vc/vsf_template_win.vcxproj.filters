@@ -88,6 +88,9 @@
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{dbadc4d0-9911-4310-92ff-b945e995481a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\vsfstream\mem_stream">
+      <UniqueIdentifier>{87f7b9b3-0790-4c7b-84f1-ebcaece252aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\usrapp\kernel_test\mutex_test.c">
@@ -206,6 +209,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
       <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -409,6 +415,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h">
       <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

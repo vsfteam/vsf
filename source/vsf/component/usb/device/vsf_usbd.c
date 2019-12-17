@@ -752,8 +752,8 @@ static void vk_usbd_setup_status_callback(void *param)
     vk_usbd_drv_status_stage(out);
 }
 
-WEAK(vk_usbd_notify_user)
-void vk_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
+WEAK(vsf_usbd_notify_user)
+void vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
     
 }
@@ -813,7 +813,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     case USB_ON_ERROR:
     case USB_ON_SOF:
     case USB_ON_NAK:
-        vk_usbd_notify_user(dev, evt, (void *)value);
+        vsf_usbd_notify_user(dev, evt, (void *)value);
         break;
     case USB_ON_RESET:
         {
@@ -852,7 +852,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             }
 #endif
 
-            vk_usbd_notify_user(dev, evt, NULL);
+            vsf_usbd_notify_user(dev, evt, NULL);
             vk_usbd_drv_set_address(0);
             break;
         }
@@ -862,7 +862,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             struct usb_ctrlrequest_t *request = &ctrl_handler->request;
             vk_usbd_trans_t *trans = &ctrl_handler->trans;
 
-            vk_usbd_notify_user(dev, evt, request);
+            vsf_usbd_notify_user(dev, evt, request);
             vk_usbd_drv_get_setup(request);
             if (VSF_ERR_NONE != vk_usbd_ctrl_prepare(dev)) {
                 // fail to get setup request data
@@ -1014,7 +1014,7 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
     }
 
     vk_usbd_hw_init_reset(dev, false);
-    vk_usbd_notify_user(dev, USB_ON_INIT, NULL);
+    vsf_usbd_notify_user(dev, USB_ON_INIT, NULL);
 
 #if VSF_USBD_CFG_USE_EDA == ENABLED
     vsf_eda_set_evthandler(&(dev->eda), vk_usbd_evt_handler);
@@ -1030,7 +1030,7 @@ void vk_usbd_fini(vk_usbd_dev_t *dev)
 
     vk_usbd_drv_disconnect();
     vk_usbd_drv_fini();
-    vk_usbd_notify_user(dev, USB_ON_FINI, NULL);
+    vsf_usbd_notify_user(dev, USB_ON_FINI, NULL);
 }
 
 // TODO: move stream related code into vk_usbd_stream.c

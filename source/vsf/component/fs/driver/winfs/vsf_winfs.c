@@ -38,6 +38,8 @@ static void __vk_winfs_read(uintptr_t, vsf_evt_t);
 static void __vk_winfs_write(uintptr_t, vsf_evt_t);
 static void __vk_winfs_close(uintptr_t, vsf_evt_t);
 
+extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_fs_op_t vk_winfs_op = {
@@ -119,17 +121,20 @@ static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_
 static void __vk_winfs_lookup(uintptr_t target, vsf_evt_t evt)
 {
     vk_winfs_file_t *dir = (vk_winfs_file_t *)target;
-    char *name = dir->ctx.lookup.name;
+    const char *name = dir->ctx.lookup.name;
     uint_fast32_t idx = dir->ctx.lookup.idx;
     vsf_err_t err = VSF_ERR_NONE;
 
-    __vsf_dlist_foreach_unsafe(vk_winfs_file_t, child_node, &dir->d.child_list) {
-        if (    (name && vk_file_is_match(name, _->name))
-            ||  (!name && (_->idx == idx))) {
-            *dir->ctx.lookup.result = &_->use_as__vk_file_t;
-            goto do_return;
+    vsf_protect_t orig = vsf_protect_sched();
+        __vsf_dlist_foreach_unsafe(vk_winfs_file_t, child_node, &dir->d.child_list) {
+            if (    (name && vk_file_is_match((char *)name, _->name))
+                ||  (!name && (_->idx == idx))) {
+                vsf_unprotect_sched(orig);
+                *dir->ctx.lookup.result = &_->use_as__vk_file_t;
+                goto do_return;
+            }
         }
-    }
+    vsf_unprotect_sched(orig);
 
     char path[MAX_PATH];
     uint_fast16_t len = __vk_winfs_file_get_path(&dir->use_as__vk_file_t, path, sizeof(path));
@@ -137,7 +142,7 @@ static void __vk_winfs_lookup(uintptr_t target, vsf_evt_t evt)
 
     *dir->ctx.lookup.result = NULL;
     if (name != NULL) {
-        char *ptr = name;
+        const char *ptr = name;
         while (*ptr != '\0') {
             if (vk_file_is_div(*ptr)) {
                 break;
@@ -243,7 +248,9 @@ static void __vk_winfs_lookup(uintptr_t target, vsf_evt_t evt)
     if (dwAttribute & FILE_ATTRIBUTE_READONLY) {
         winfs_file->attr &= ~VSF_FILE_ATTR_WRITE;
     }
-    vsf_dlist_add_to_head(vk_winfs_file_t, child_node, &dir->d.child_list, winfs_file);
+    orig = vsf_protect_sched();
+        vsf_dlist_add_to_head(vk_winfs_file_t, child_node, &dir->d.child_list, winfs_file);
+    vsf_unprotect_sched(orig);
     *dir->ctx.lookup.result = &winfs_file->use_as__vk_file_t;
     goto do_return;
 
@@ -308,6 +315,7 @@ static void __vk_winfs_write(uintptr_t target, vsf_evt_t evt)
 static void __vk_winfs_close(uintptr_t target, vsf_evt_t evt)
 {
     vk_winfs_file_t *file = (vk_winfs_file_t *)target;
+    vk_winfs_file_t *parent = (vk_winfs_file_t *)__vk_file_get_fs_parent(&file->use_as__vk_file_t);
 
     VSF_FS_ASSERT(file->name != NULL);
     vsf_heap_free(file->name);
@@ -317,6 +325,9 @@ static void __vk_winfs_close(uintptr_t target, vsf_evt_t evt)
     } else {
         CloseHandle(file->f.hFile);
     }
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_remove(vk_winfs_file_t, child_node, &parent->d.child_list, file);
+    vsf_unprotect_sched(orig);
     vk_file_return(&file->use_as__vk_file_t, VSF_ERR_NONE);
 }
 

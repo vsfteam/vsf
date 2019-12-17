@@ -296,4 +296,9 @@ uint_fast32_t bswap_32(uint_fast32_t value32)
     return __REV(value32);
 }
 
+uint_fast8_t __vsf_arch_clz(uintalu_t a)
+{
+    return __CLZ(a);
+}
+
 /* EOF */

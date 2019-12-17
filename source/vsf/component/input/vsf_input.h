@@ -107,14 +107,14 @@ extern void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len
 
 extern vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
 
-extern void vk_input_on_sensor(vk_sensor_evt_t *sensor_evt);
-extern void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
-extern void vk_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
-extern void vk_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
+extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
+extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
+extern void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
 
-extern void vk_input_on_new_dev(vk_input_type_t type, void *dev);
-extern void vk_input_on_free_dev(vk_input_type_t type, void *dev);
-extern void vk_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
+extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
 
 // returns duration
 extern uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp);

@@ -56,16 +56,16 @@ WEAK_VSF_USBH_ON_REMOVE_INTERFACE_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_USBH_ON_DEV_PARSED
-WEAK(vk_usbh_on_dev_parsed)
-void vk_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser)
+WEAK(vsf_usbh_on_dev_parsed)
+void vsf_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser)
 {
     
 }
 #endif
 
 #ifndef WEAK_VSF_USBH_ON_MATCH_INTERFACE
-WEAK(vk_usbh_on_match_interface)
-vsf_err_t vk_usbh_on_match_interface(
+WEAK(vsf_usbh_on_match_interface)
+vsf_err_t vsf_usbh_on_match_interface(
         vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs)
 {
     vsf_trace(VSF_TRACE_INFO, "%s: vid%04X pid%04X interface%d" VSF_TRACE_CFG_LINEEND,
@@ -77,18 +77,18 @@ vsf_err_t vk_usbh_on_match_interface(
 #endif
 
 #ifndef WEAK_VSF_USBH_ON_REMOVE_INTERFACE
-WEAK(vk_usbh_on_remove_interface)
-void vk_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
+WEAK(vsf_usbh_on_remove_interface)
+void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 {
     vsf_trace(VSF_TRACE_INFO, "%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
 }
 #endif
 
-static vk_usbh_eppipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
+vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
             uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size)
 {
     uint_fast8_t direction = endpoint & USB_ENDPOINT_DIR_MASK;
-    vk_usbh_eppipe_t pipe;
+    vk_usbh_pipe_t pipe;
 
     endpoint &= 0x0F;
     pipe.value =   1|   (size << 2)             /* 10-bit size */
@@ -100,7 +100,7 @@ static vk_usbh_eppipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
     return pipe;
 }
 
-vk_usbh_eppipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
+vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
     return vk_usbh_get_pipe(dev, desc_ep->bEndpointAddress,
@@ -108,7 +108,7 @@ vk_usbh_eppipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
 }
 
 void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
-            vk_usbh_eppipe_t pipe)
+            vk_usbh_pipe_t pipe)
 {
     VSF_USB_ASSERT((urb != NULL) && (dev != NULL));
     urb->pipe = pipe;
@@ -133,7 +133,7 @@ bool vk_usbh_urb_is_alloced(vk_usbh_urb_t *urb)
     return !urb->pipe.is_pipe && (urb->urb_hcd != NULL);
 }
 
-vk_usbh_eppipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb)
+vk_usbh_pipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb)
 {
     VSF_USB_ASSERT(urb != NULL);
     if (urb->pipe.is_pipe) {
@@ -143,7 +143,7 @@ vk_usbh_eppipe_t vk_usbh_urb_get_pipe(vk_usbh_urb_t *urb)
     }
 }
 
-void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_eppipe_t pipe)
+void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_pipe_t pipe)
 {
     VSF_USB_ASSERT(urb != NULL && pipe.is_pipe);
     if (urb->pipe.is_pipe) {
@@ -271,7 +271,7 @@ static bool vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 
 vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *urb)
 {
-    vk_usbh_eppipe_t pipe;
+    vk_usbh_pipe_t pipe;
 
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (urb != NULL) && urb->pipe.is_pipe);
     pipe = urb->pipe;
@@ -292,7 +292,7 @@ void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb)
     VSF_USB_ASSERT((usbh != NULL) && (urb != NULL));
 
     if (vk_usbh_urb_is_alloced(urb)) {
-        vk_usbh_eppipe_t pipe = urb->urb_hcd->pipe;
+        vk_usbh_pipe_t pipe = urb->urb_hcd->pipe;
         vk_usbh_urb_free_buffer(urb);
         usbh->drv->free_urb(&usbh->use_as__vk_usbh_hcd_t, urb->urb_hcd);
         urb->pipe = pipe;
@@ -355,7 +355,7 @@ void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     const vk_usbh_class_drv_t *drv = ifs->drv;
     if (drv) {
 #ifndef WEAK_VSF_USBH_ON_REMOVE_INTERFACE
-        vk_usbh_on_remove_interface(ifs);
+        vsf_usbh_on_remove_interface(ifs);
 #else
         WEAK_VSF_USBH_ON_REMOVE_INTERFACE(ifs);
 #endif
@@ -845,7 +845,7 @@ static vsf_err_t vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
                 ifs->param = param;
                 ifs->drv = drv;
 #ifndef WEAK_VSF_USBH_ON_MATCH_INTERFACE
-                if (VSF_ERR_NONE != vk_usbh_on_match_interface(parser, parser_ifs)) {
+                if (VSF_ERR_NONE != vsf_usbh_on_match_interface(parser, parser_ifs)) {
 #else
                 if (VSF_ERR_NONE != WEAK_VSF_USBH_ON_MATCH_INTERFACE(parser, parser_ifs)) {
 #endif
@@ -974,7 +974,7 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
     }
 
 #ifndef WEAK_VSF_USBH_ON_DEV_PARSED
-    vk_usbh_on_dev_parsed(usbh->dev_new, parser);
+    vsf_usbh_on_dev_parsed(usbh->dev_new, parser);
 #else
     WEAK_VSF_USBH_ON_DEV_PARSED(usbh->dev_new, parser);
 #endif

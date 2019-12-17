@@ -153,7 +153,7 @@ implement_fsm(user_task_b_t)
         )
         
         state(DELAY){
-            vsf_task_wait_until(vsf_delay_ms(10000))                            //!< wait 10s
+            vsf_task_wait_until(vsf_delay_ms(3000))                            //!< wait 10s
             update_state_to(PRINT);                                             //!< transfer to PRINT without yielding...
         }
         
@@ -182,7 +182,7 @@ void vsf_kernel_fsm_simple_demo(void)
 #if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
-        vsf_delay_ms(10000);
+        vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_sem_post(&user_sem);            //!< post a semaphore
     }

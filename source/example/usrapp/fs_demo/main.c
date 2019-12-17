@@ -153,7 +153,7 @@ static usrapp_t __usrapp = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
+void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
 }
 
@@ -203,7 +203,7 @@ static void __usrapp_fs_listall_evthandler(uintptr_t target, vsf_evt_t evt)
         if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
             state->idx = 0;
             state->state = LISTALL_STATE_LOOKUP;
-            if (VSF_ERR_NONE != vk_file_lookup(file, NULL, state->idx, &__cur_file)) {
+            if (VSF_ERR_NONE != vk_file_open(file, NULL, state->idx, &__cur_file)) {
                 goto do_return;
             }
         } else {
@@ -235,7 +235,7 @@ static void __usrapp_fs_listall_evthandler(uintptr_t target, vsf_evt_t evt)
                 break;
             case LISTALL_STATE_RECURSION:
                 state->state = LISTALL_STATE_LOOKUP;
-                if (VSF_ERR_NONE != vk_file_lookup(file, NULL, state->idx, &__cur_file)) {
+                if (VSF_ERR_NONE != vk_file_open(file, NULL, state->idx, &__cur_file)) {
                     goto do_return;
                 }
                 break;
@@ -290,7 +290,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vk_fs_init();
         __state = USRAPP_STATE_OPENED_ROOT;
         __froot = NULL;
-        vk_file_open(NULL, "\\", &__froot);
+        vk_file_open(NULL, "\\", 0, &__froot);
         break;
     case VSF_EVT_RETURN:
         switch (__state) {
@@ -301,7 +301,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case USRAPP_STATE_CREATED_MEMFS:
             ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
             __fmemfs = NULL;
-            vk_file_open(__froot, "memfs", &__fmemfs);
+            vk_file_open(__froot, "memfs", 0, &__fmemfs);
             break;
         case USRAPP_STATE_OPENED_MEMFS:
             ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
@@ -316,7 +316,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case USRAPP_STATE_CREATED_WINFS:
             ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
             __fwinfs = NULL;
-            vk_file_open(__froot, "winfs", &__fwinfs);
+            vk_file_open(__froot, "winfs", 0, &__fwinfs);
             break;
         case USRAPP_STATE_OPENED_WINFS:
             ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
@@ -331,7 +331,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         case USRAPP_STATE_LISTALL:
             __fcontrol = NULL;
-            vk_file_open(__fmemfs, "control.bin", &__fcontrol);
+            vk_file_open(__fmemfs, "control.bin", 0, &__fcontrol);
             break;
         case USRAPP_STATE_OPENED_CONTROL:
             ASSERT(vk_file_get_errcode(__fmemfs) == VSF_ERR_NONE);

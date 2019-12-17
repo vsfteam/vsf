@@ -111,6 +111,7 @@
     <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h" />
     <ClInclude Include="..\..\..\vsf\service\trace\vsf_trace.h" />
     <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h" />
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h" />
     <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c" />
     <ClCompile Include="..\..\..\vsf\service\trace\vsf_trace.c" />
     <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />

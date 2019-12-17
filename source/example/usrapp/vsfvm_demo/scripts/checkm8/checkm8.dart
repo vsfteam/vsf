@@ -112,7 +112,6 @@ libusb_on_evt(evt, libusb_dev dev) {
     print('libusb_on_event(', evt, ') : ', dev, '\r\n');
 
     if (    (USB_EVT_ON_ARRIVED == evt)
-        &&  (0 == dev.ifs())
         &&  (0x05AC == dev.vid())
         &&  (0x1227 == dev.pid())
         &&  !exploiting) {

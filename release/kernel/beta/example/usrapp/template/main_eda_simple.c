@@ -68,7 +68,7 @@ static void user_task_b_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch(evt) {
         case VSF_EVT_INIT:
 label_loop_start:
-            vsf_teda_set_timer_ms(10000);
+            vsf_teda_set_timer_ms(3000);
             break;
         case VSF_EVT_TIMER:
             printf("post semaphore...   [%08x]\r\n", cnt++);
@@ -97,7 +97,7 @@ void vsf_kernel_task_simple_demo(void)
 #if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
     uint32_t cnt = 0;
     while(1) {
-        vsf_delay_ms(10000);
+        vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_eda_sem_post(&__user_sem);                                          //!< post a semaphore
     }

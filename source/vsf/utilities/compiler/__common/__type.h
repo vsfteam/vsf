@@ -114,7 +114,7 @@ typedef enum {
     VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT
                                             =-17,   //!< the resource provided by user is not sufficient
     VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED
-                                            =-18,   //!< the provided resource is not aligned to certain size (2^N)
+                                            =-18    //!< the provided resource is not aligned to certain size (2^N)
 } vsf_err_t;
 //! @}
 
@@ -131,7 +131,7 @@ typedef enum {
     fsm_rt_wait_for_evt = 2,    
     fsm_rt_wfe          = 2,
     fsm_rt_asyn         = 3,     //!< fsm asynchronose complete, you can check it later.
-    fsm_rt_user         = 4,
+    fsm_rt_user         = 4
 } fsm_rt_t;
 //! @}
 

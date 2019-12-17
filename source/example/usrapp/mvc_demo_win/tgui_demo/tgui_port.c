@@ -159,7 +159,7 @@ static uint8_t freetype_get_char_height(void)
     return (__face->size->metrics.height >> 6) * 12 / 10;
 }
 
-uint8_t vsf_tgui_proportional_font_get_width(const vsf_tgui_font_t* ptFont, uint32_t wChar)
+uint8_t vsf_tgui_proportional_font_get_char_width(const vsf_tgui_font_t* ptFont, uint32_t wChar)
 {
     if (FT_Err_Ok == FT_Load_Char(__face, wChar, FREETYPE_LOAD_FLAGS)) {
         return __face->glyph->advance.x >> 6;
@@ -319,7 +319,7 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
 const vsf_tgui_sv_panel_tiles_t gPanelAdditionalTiles = {
     .tTopLeft = {
         .tChild = {
-            .ptParent = &bg1_RGB,
+            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tSize = {.nWidth = 12, .nHeight = 12, },
             .tLocation = {.nX = 0, .nY = 0},
         },
@@ -327,21 +327,21 @@ const vsf_tgui_sv_panel_tiles_t gPanelAdditionalTiles = {
     .tTopRight = {
         .tChild = {
             .tSize = {.nWidth = 12, .nHeight = 12, },
-            .ptParent = &bg1_RGB,
+            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.nX = 200 - 12, .nY = 0},
         },
     },
     .tBottomLeft = {
         .tChild = {
             .tSize = {.nWidth = 12, .nHeight = 12, },
-            .ptParent = &bg1_RGB,
+            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.nX = 0, .nY = 200 - 12},
         },
     },
     .tBottomRight = {
         .tChild = {
             .tSize = {.nWidth = 12, .nHeight = 12, },
-            .ptParent = &bg1_RGB,
+            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.nX = 200 - 12, .nY = 200 - 12},
         },
     },
@@ -351,14 +351,14 @@ const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
     .tLeft = {
         .tChild = {
             .tSize = {.nWidth = 16, .nHeight = 32, },
-            .ptParent = &bg3_RGB,
+            .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.nX = 0, .nY = 0},
         },
     },
     .tRight = {
         .tChild = {
             .tSize = {.nWidth = 16, .nHeight = 32, },
-            .ptParent = &bg3_RGB,
+            .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.nX = 16, .nY = 0},
         },
     },
@@ -385,7 +385,7 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
                     vsf_tgui_t *ptGUI, 
                     const vsf_tgui_region_t *ptPlannedRefreshRegion)
 {
-    return ptPlannedRefreshRegion;
+    return (vsf_tgui_region_t *)ptPlannedRefreshRegion;
 }
 
 volatile static bool __is_ready_to_refresh = true;
@@ -454,9 +454,6 @@ void vsf_tgui_bind(vk_disp_t* disp, void* ui_data)
 
     bool result = vsf_tgui_font_init();
     VSF_TGUI_ASSERT(result == true);
-
-    extern void my_stopwatch_init(void);
-    my_stopwatch_init();
 
     __disp = disp;
 }

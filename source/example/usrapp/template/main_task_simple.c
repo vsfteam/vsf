@@ -132,7 +132,7 @@ implement_vsf_task(user_task_b_t)
     
     switch(vsf_task_state) {
         case DELAY:
-            vsf_task_wait_until(vsf_delay_ms(10000));                           //!< wait 10s 
+            vsf_task_wait_until(vsf_delay_ms(3000));                           //!< wait 10s 
             vsf_task_state = PRINT;
             break;
             
@@ -151,7 +151,7 @@ implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_delay_ms(10000);
+        vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_sem_post(&__user_sem);            //!< post a semaphore
     }

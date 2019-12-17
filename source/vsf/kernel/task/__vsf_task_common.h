@@ -26,23 +26,32 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __vsf_pt_begin_common(__state)                                          \
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+
+#   define __vsf_pt_begin_common(__state)                                       \
+            switch ((__state)) {                                                \
+                case 0:
+
+#   define __vsf_pt_entry_common_ex(__state, __CODE)                            \
+            (__state) = __LINE__; __CODE; case __LINE__:
+
+#   define __vsf_pt_entry_common(__state)                                       \
+            (__state) = __LINE__; case __LINE__:
+
+#else
+
+#   define __vsf_pt_begin_common(__state)                                       \
             enum {                                                              \
                 count_offset = __COUNTER__ + 1,                                 \
             };                                                                  \
             switch ((__state)) {                                                \
                 case __COUNTER__ - count_offset:
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __vsf_pt_entry_common(__state, __CODE)                               \
-            (__state) = (__COUNTER__ - count_offset + 1) >> 1;                  \
-            __CODE;                                                             \
-            case (__COUNTER__ - count_offset) >> 1:
-#else
 #   define __vsf_pt_entry_common(__state, ...)                                  \
             (__state) = (__COUNTER__ - count_offset + 1) >> 1;                  \
             __VA_ARGS__;                                                        \
             case (__COUNTER__ - count_offset) >> 1:
+
 #endif
 
 #define __vsf_pt_end_common()       } vsf_eda_return();

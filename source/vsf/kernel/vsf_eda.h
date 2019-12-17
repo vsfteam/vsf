@@ -131,7 +131,6 @@ enum {
     /*!\ note wait for invalid also means wait for any evt */
     VSF_EVT_INVALID             = -1,       //!< compatible with fsm_rt_err 
     VSF_EVT_NONE                = 0,        //!< compatible with fsm_rt_cpl
-    VSF_EVT_RETURN              = 0,        
     VSF_EVT_YIELD               = 1,        //!< compatible with fsm_rt_on_going
 
     VSF_EVT_SYSTEM              = 0x100,
@@ -140,7 +139,8 @@ enum {
     VSF_EVT_FINI                = VSF_EVT_SYSTEM + 2,
     VSF_EVT_ENTER               = VSF_EVT_SYSTEM + 3,
     VSF_EVT_EXIT                = VSF_EVT_SYSTEM + 4,
-
+    VSF_EVT_RETURN              = VSF_EVT_EXIT,        
+    
     // events for time
     VSF_EVT_TIMER               = VSF_EVT_SYSTEM + 5,
 
@@ -175,9 +175,7 @@ typedef void (*vsf_param_eda_evthandler_t)(uintptr_t target, vsf_evt_t evt);
 union __vsf_eda_frame_state_t {
     struct {
         uint_fast8_t is_fsm             : 1;
-#if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
         uint_fast8_t is_stack_owner     : 1;
-#endif
     } bits;
     uint_fast8_t flag;
 };
@@ -216,7 +214,8 @@ def_simple_class(__vsf_eda_frame_t) {
             vsf_fsm_entry_t                 fsm_entry;
         } fn;
         
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
+    ||  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
         __vsf_eda_frame_state_t             state;
 #endif
         union {
@@ -586,7 +585,7 @@ enum vsf_sync_reason_t {
     VSF_SYNC_TIMEOUT,
     VSF_SYNC_PENDING,
     VSF_SYNC_GET,
-    VSF_SYNC_CANCEL,
+    VSF_SYNC_CANCEL
 };
 typedef enum vsf_sync_reason_t vsf_sync_reason_t;
 
@@ -617,7 +616,7 @@ typedef enum vsf_kernel_error_t {
     VSF_KERNEL_ERR_NULL_EDA_PTR,
     VSF_KERNEL_ERR_INVALID_USAGE,
     VSF_KERNEL_ERR_EDA_DOES_NOT_SUPPORT_TIMER,
-    VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR,
+    VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR
 }vsf_kernel_error_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

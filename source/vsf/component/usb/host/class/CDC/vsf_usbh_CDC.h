@@ -70,8 +70,8 @@ def_simple_class(vk_usbh_cdc_t) {
 
     private_member(
         vk_usbh_urb_t urb_evt;
-        vk_usbh_eppipe_t pipe_tx;
-        vk_usbh_eppipe_t pipe_rx;
+        vk_usbh_pipe_t pipe_tx;
+        vk_usbh_pipe_t pipe_rx;
     )
 };
 

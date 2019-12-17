@@ -18,8 +18,8 @@
 
 //! \note Top Level Application Configuration 
 
-#ifndef __TOP_APP_CFG_H__
-#define __TOP_APP_CFG_H__
+#ifndef __TOP_USER_APP_CFG_H__
+#define __TOP_USER_APP_CFG_H__
 
 /*============================ INCLUDES ======================================*/
 #include "vsf.h"

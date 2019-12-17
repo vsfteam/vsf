@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="libusb">
-      <UniqueIdentifier>{3f5c7d93-fa73-4154-8742-7860681b850e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf">
       <UniqueIdentifier>{63b66827-4cc2-4ca5-bd09-c81c8a34cdf6}</UniqueIdentifier>
     </Filter>
@@ -277,11 +274,11 @@
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{d202efd3-dff3-4b76-897b-316d578cef26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\vsfstream\mem_stream">
+      <UniqueIdentifier>{87d6b621-4286-438d-9cc2-c64128ef69ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libusb\libusb.h">
-      <Filter>libusb</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\vsf.h">
       <Filter>vsf</Filter>
     </ClInclude>
@@ -936,6 +933,9 @@
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h">
       <Filter>vsf\service\pbuf</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -1422,6 +1422,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
       <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

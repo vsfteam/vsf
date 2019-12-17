@@ -543,7 +543,7 @@ static void ohci_ed_deschedule(vk_ohci_t *ohci, ohci_urb_t *urb_ohci)
 
 static vsf_err_t ohci_ed_init(ohci_urb_t *urb_ohci, vk_usbh_hcd_urb_t *urb)
 {
-    vk_usbh_eppipe_t pipe;
+    vk_usbh_pipe_t pipe;
     ohci_ed_t *ed;
     ohci_td_t *td;
 

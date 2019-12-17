@@ -33,22 +33,25 @@ static void __default_code_region_none_on_leave(void *pobj,void *plocal);
 /*============================ GLOBAL VARIABLES ==============================*/
 
 static const i_code_region_t __vsf_i_default_code_region_atom_code = {
-    .local_obj_size =   sizeof(vsf_gint_state_t),
-    .OnEnter =          &__default_code_region_atom_code_on_enter,
-    .OnLeave =          &__default_code_region_atom_code_on_leave,
+    sizeof(vsf_gint_state_t),
+    &__default_code_region_atom_code_on_enter,
+    &__default_code_region_atom_code_on_leave
 };
 
 static const i_code_region_t __vsf_i_default_code_region_none = {
-    .OnEnter =          &__default_code_region_none_on_enter,
-    .OnLeave =          &__default_code_region_none_on_leave,
+    0,
+    &__default_code_region_none_on_enter,
+    &__default_code_region_none_on_leave
 };
 
 const code_region_t DEFAULT_CODE_REGION_ATOM_CODE = {
-    .pmethods = (i_code_region_t *)&__vsf_i_default_code_region_atom_code,
+    NULL, 
+    (i_code_region_t *)&__vsf_i_default_code_region_atom_code
 };
 
 const code_region_t DEFAULT_CODE_REGION_NONE = {
-    .pmethods = (i_code_region_t *)&__vsf_i_default_code_region_none,
+    NULL,
+    (i_code_region_t *)&__vsf_i_default_code_region_none,
 };
 
 /*============================ IMPLEMENTATION ================================*/

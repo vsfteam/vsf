@@ -295,6 +295,32 @@
 #   define vsf_thread_wfem     vsf_thread_wait_for_evt_msg
 #endif
 
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   define __vsf_thread_call_sub(__NAME, __TARGET)                              \
+            __vsf_thread_call_eda((uintptr_t)(__NAME), (uintptr_t)(__TARGET))
+
+
+#   define vsf_thread_call_sub(__NAME, __TARGET)                                \
+            __vsf_thread_call_sub(__NAME, (__TARGET))
+
+
+#   define vsf_thread_call_pt(__NAME, __TARGET)                                 \
+            (__TARGET)->tState = 0;                                            \
+            vsf_thread_call_sub(vsf_pt_func(__NAME), (__TARGET))
+
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+
+#   define vsf_thread_call_fsm(__NAME, __TARGET)                                \
+                __vsf_thread_call_fsm(  (vsf_fsm_entry_t)(__NAME),              \
+                                        (uintptr_t)(__TARGET))
+        
+#   define vsf_thread_call_task(__NAME, __TARGET)                               \
+                vsf_thread_call_fsm(vsf_task_func(__NAME), __TARGET)
+#endif
+
 /*============================ TYPES =========================================*/
 
 declare_class(vsf_thread_t)
@@ -306,7 +332,7 @@ typedef void vsf_thread_entry_t(vsf_thread_cb_t *thread);
 
 def_class( vsf_thread_t, 
     which(
-    #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+    #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t);
     #   else
         implement(vsf_eda_t);
@@ -387,8 +413,12 @@ SECTION("text.vsf.kernel.__vsf_thread_call_fsm")
 extern 
 fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param);
 
-SECTION("text.vsf.kernel.__vsf_thread_call_sub")
-extern void __vsf_thread_call_sub(uintptr_t eda_handler, uintptr_t param);
+SECTION("text.vsf.kernel.__vsf_thread_call_eda")
+extern vsf_err_t __vsf_thread_call_eda(uintptr_t eda_handler, uintptr_t param);
+
+SECTION("text.vsf.kernel.vsf_thread_call_thread")
+extern vsf_err_t __vsf_thread_call_thread(  vsf_thread_cb_t *thread_cb,
+                                            vsf_thread_prepare_cfg_t *cfg);
 
 #endif
 
@@ -401,6 +431,9 @@ extern vsf_err_t vsf_thread_start(  vsf_thread_t *thread,
 #else
 extern vsf_err_t vsf_thread_start(vsf_thread_t *ptThis, vsf_prio_t tPriority);
 #endif
+
+SECTION("text.vsf.kernel.vsf_thread_exit")
+extern void vsf_thread_exit(void);
 
 SECTION("text.vsf.kernel.vsf_thread_get_cur")
 extern vsf_thread_t *vsf_thread_get_cur(void);

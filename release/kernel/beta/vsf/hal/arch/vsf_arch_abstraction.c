@@ -168,6 +168,10 @@ extern vsf_err_t vsf_arch_swi_init( uint_fast8_t idx,
 
 /*============================ IMPLEMENTATION ================================*/
 
+
+/*----------------------------------------------------------------------------*
+ * Architecture Infrastructure                                                *
+ *----------------------------------------------------------------------------*/
 WEAK(bswap_16)
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {
@@ -194,6 +198,160 @@ IMPLEMENT_ENDIAN_FUNC(32)
 #ifdef UINT64_MAX
 IMPLEMENT_ENDIAN_FUNC(64)
 #endif
+
+
+#ifndef __VSF_ARCH_CLZ
+WEAK(__vsf_arch_clz)
+uint_fast8_t __vsf_arch_clz(uintalu_t a)
+{
+    uint_fast8_t num = __optimal_bit_sz;
+    uintalu_t bitmask = ((uintalu_t)1 << (__optimal_bit_sz - 1));
+    do {
+        if (a & bitmask) {
+            break;
+        }
+        a <<= 1;
+    } while(--num);
+
+    return __optimal_bit_sz - num;
+}
+#endif
+
+#ifndef VSF_CLZ
+WEAK(vsf_clz)
+uint_fast8_t vsf_clz(uint_fast32_t a)
+{
+    int_fast8_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
+    uint_fast8_t num = 0, temp;
+    uintalu_t* src = (uintalu_t*)&a + (word_size - 1);
+
+    do {
+#ifndef __VSF_ARCH_CLZ
+        temp = __vsf_arch_clz(*src--);
+#else
+        temp = __VSF_ARCH_CLZ(*src--);
+#endif
+        if (temp < __optimal_bit_sz) {
+            num += temp;
+            break;
+        }
+        num += __optimal_bit_sz;
+    } while (--word_size);
+
+    return num;
+}
+#endif
+
+
+#ifndef __VSF_ARCH_MSB
+WEAK(__vsf_arch_msb)
+int_fast8_t __vsf_arch_msb(uintalu_t a)
+{
+    int_fast8_t c = -1;
+    while (a > 0) {
+        c++;
+        a >>= 1;
+    }
+    return c;
+}
+#endif
+
+#ifndef VSF_MSB
+WEAK(vsf_msb)
+int_fast8_t vsf_msb(uint_fast32_t a)
+{
+    int_fast8_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
+    int_fast8_t index = 31, temp;
+    uintalu_t* src = (uintalu_t*)&a + (word_size - 1);
+    
+    do {
+#ifndef __VSF_ARCH_MSB
+        temp = __vsf_arch_msb(*src--);
+#else
+        temp = __VSF_ARCH_MSB(*src--);
+#endif
+        index -= __optimal_bit_sz;
+        if (temp >= 0) {
+            index += temp+1;
+            break;
+        }
+    } while(--word_size);
+
+    return index;
+}
+#endif
+
+#ifndef __VSF_ARCH_FFS
+WEAK(__vsf_arch_ffs)
+int_fast8_t __vsf_arch_ffs(uintalu_t a)
+{
+#   ifndef __VSF_ARCH_MSB
+    return __vsf_arch_msb(a & -(uintalu_t)a);
+#else
+    return __VSF_ARCH_MSB(a & -(uintalu_t)a);
+#endif
+}
+#endif
+
+#ifndef __VSF_ARCH_FFZ
+WEAK(__vsf_arch_ffz)
+int_fast8_t __vsf_arch_ffz(uintalu_t a)
+{
+#   ifndef __VSF_ARCH_FFS
+    return __vsf_arch_ffs(~a);
+#else
+    return __VSF_ARCH_FFS(~a);
+#endif
+}
+#endif
+
+
+#ifndef VSF_FFS
+WEAK(vsf_ffs)
+int_fast8_t vsf_ffs(uint_fast32_t a)
+{
+    int_fast16_t word_size = (32 + __optimal_bit_sz - 1) / __optimal_bit_sz;
+    int_fast16_t index = 0, temp;
+    uintalu_t* src = (uintalu_t*)&a;
+
+    do {
+#   ifndef __VSF_ARCH_FFZ
+        temp = __vsf_arch_ffs(*src++);
+#   else
+        temp = __VSF_ARCH_FFs(*src++);
+#   endif
+        if (temp >= 0) {
+            index += temp;
+            return index;
+        }
+        index += __optimal_bit_sz;
+    } while (--word_size);
+
+    return -1;
+}
+#endif
+
+#ifndef VSF_FFZ
+WEAK(vsf_ffz)
+int_fast8_t vsf_ffz(uint_fast32_t a)
+{
+#   ifndef VSF_FFS
+    return vsf_ffs(~a);
+#   else
+    return VSF_FFS(~a);
+#   endif
+}
+#endif
+
+
+
+
+
+
+
+/*----------------------------------------------------------------------------*
+ * SWI                                                                        *
+ *----------------------------------------------------------------------------*/
 
 WEAK(vsf_drv_usr_swi_trigger)
 void vsf_drv_usr_swi_trigger(uint_fast8_t idx)

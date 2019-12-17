@@ -207,7 +207,6 @@ enum {
 #   define VSF_OS_CFG_PRIORITY_NUM          10
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      DISABLED
 
-#   define VSF_USE_FS                       ENABLED
 #   if VSF_USE_UI == ENABLED
 #       define VSF_USE_DISP_DRV_USBD_UVC    ENABLED
 #   endif
@@ -244,7 +243,7 @@ enum {
 #   define VSF_USE_WINFS                    ENABLED
 
 #   define VSF_HEAP_SIZE                    0x100000
-#   define VSF_HEAP_CFG_MCB_ALIGN_BIT       4
+#   define VSF_HEAP_CFG_MCB_ALIGN_BIT       5
 #else
 #   error Target not supported for this demo
 #endif
@@ -279,15 +278,21 @@ enum {
 #define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
         vsf_arch_req___systimer_freq___from_usr()
 
+#define WEAK_VSF_DRIVER_INIT_EXTERN                                             \
+        bool vsf_driver_init(void);
+#define WEAK_VSF_DRIVER_INIT()                                                  \
+        vsf_driver_init()
+
+
 
 
 
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_TGUI == ENABLED
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vk_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+        extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vk_input_on_touchscreen((__TS_EVT))
+        vsf_input_on_touchscreen((__TS_EVT))
 #endif
 
 

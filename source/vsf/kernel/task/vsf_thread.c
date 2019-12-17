@@ -53,11 +53,15 @@ void vsf_thread_ret(void)
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
+    VSF_KERNEL_ASSERT(NULL != pthis);
 #   else
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
     class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
+    VSF_KERNEL_ASSERT(NULL != pthis);
 #   endif
     longjmp(*(pthis->ret), 0); 
 #else
@@ -65,37 +69,82 @@ void vsf_thread_ret(void)
 #endif
 }
 
+SECTION("text.vsf.kernel.vsf_thread_exit")
+void vsf_thread_exit(void)
+{
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
+    VSF_KERNEL_ASSERT(thread != NULL);
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
+    class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
+                    pthis, vsf_thread_cb_t);
+#   else
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
+    class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
+                    pthis, vsf_thread_cb_t);
+#   endif
+    VSF_KERNEL_ASSERT(NULL != pthis);
+    vsf_eda_return();
+    longjmp(*(pthis->ret), 0);
+#else
+    vsf_eda_return();
+    longjmp(*(thread)->ret, 0);
+#endif
+}
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+SECTION("text.vsf.kernel.vsf_thread_wait")
+static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *cb)
+{
+    vsf_evt_t curevt;
+    jmp_buf pos;
+
+    VSF_KERNEL_ASSERT(cb != NULL);
+    class_internal(cb, pthis, vsf_thread_cb_t);
+
+    pthis->pos = &pos;
+    curevt = setjmp(*(pthis->pos));
+
+    if (!curevt) {
+        longjmp(*(pthis->ret), 0); 
+    }
+    return curevt;
+}
+#endif
+
 SECTION("text.vsf.kernel.vsf_thread_wait")
 vsf_evt_t vsf_thread_wait(void)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
     vsf_evt_t curevt;
-    jmp_buf pos;
+    
 
     VSF_KERNEL_ASSERT(thread != NULL);
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
-                    pthis, vsf_thread_cb_t);
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
+    curevt = __vsf_thread_wait((vsf_thread_cb_t *)thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param);
 #   else
-    class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
-                    pthis, vsf_thread_cb_t);
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
+    curevt = __vsf_thread_wait((vsf_thread_cb_t *)thread->use_as__vsf_eda_t.fn.frame->ptr.param);
 #   endif
-    pthis->pos = &pos;
-    curevt = setjmp(*(pthis->pos));
 #else
+    jmp_buf pos;
+
     thread->pos = &pos;
     curevt = setjmp(*thread->pos);
-    //pthread_obj->current_evt = curevt;
-#endif
     if (!curevt) {
         vsf_thread_ret();
     }
+#endif
+    
     return curevt;
 }
-
 
 SECTION("text.vsf.kernel.vsf_thread_wfe")
 
@@ -112,12 +161,15 @@ void vsf_thread_wait_for_evt(vsf_evt_t evt)
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
 #   else
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
     class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
 #   endif
+    VSF_KERNEL_ASSERT(NULL != pthis);
     pthis->pos = &pos;
     curevt = setjmp(*(pthis->pos));
 #else
@@ -181,20 +233,21 @@ static void __vsf_thread_entry(void)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
     class_internal(thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
     pthis->entry((vsf_thread_cb_t *)thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param);
 #   else
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
     class_internal(thread->use_as__vsf_eda_t.fn.frame->ptr.param,
                     pthis, vsf_thread_cb_t);
     pthis->entry((vsf_thread_cb_t *)thread->use_as__vsf_eda_t.fn.frame->ptr.param);
 #   endif
-  
+    VSF_KERNEL_ASSERT(NULL != pthis);
     vsf_eda_return();
     longjmp(*(pthis->ret), 0);
 #else
     thread->entry(thread_obj);
-    
     vsf_eda_return();
     longjmp(*(thread)->ret, 0);
 #endif
@@ -255,7 +308,12 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
         .fn.param_evthandler    = (vsf_param_eda_evthandler_t)__vsf_thread_evthandler,      
         .priority               = priority,                                            
         .target                 = (uintptr_t)thread_cb,  
-        .is_stack_owner         = true,                                                  
+        .is_stack_owner         = true,    
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED                                              
+        .on_terminate           = thread->use_as__vsf_teda_t.use_as__vsf_eda_t.on_terminate,
+#else
+        .on_terminate           = thread->use_as__vsf_eda_t.on_terminate,
+#endif
     };
     
     if (thread_cb->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)) {
@@ -279,7 +337,10 @@ vsf_err_t __vsf_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,
 {
     VSF_KERNEL_ASSERT(NULL != cfg && NULL != thread_cb);
     class_internal(thread_cb, pthis, vsf_thread_cb_t);
-    
+    VSF_KERNEL_ASSERT(    (NULL != cfg->entry)
+                    &&    (NULL != cfg->stack)
+                    &&    (cfg->stack_size >= 8));
+
     pthis->entry = cfg->entry;
     pthis->stack = cfg->stack;
     pthis->stack_size = cfg->stack_size;
@@ -292,43 +353,98 @@ vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
 {
     VSF_KERNEL_ASSERT(NULL != thread_cb);
     vsf_err_t ret;
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
-    &&  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED 
-        __vsf_eda_frame_state_t state = { .bits = {.is_fsm = false,
-                                          .is_stack_owner = true,}
-                                        };
-        ret = __vsf_eda_call_eda_ex(   (uintptr_t)__vsf_thread_evthandler, 
-                                        (uintptr_t)thread_cb, 
-                                        state, true);
-#else
-    ret =  vsf_eda_call_param_eda(__vsf_thread_evthandler, thread_cb);
-#endif
+    __vsf_eda_frame_state_t state = { .bits = {.is_fsm = false,
+                                      .is_stack_owner = true,}
+                                    };
+    ret = __vsf_eda_call_eda_ex(   (uintptr_t)__vsf_thread_evthandler, 
+                                    (uintptr_t)thread_cb, 
+                                    state, true);
     
     return ret;
 }
 
-SECTION("text.vsf.kernel.__vsf_thread_call_sub")
-void __vsf_thread_call_sub(uintptr_t eda_handler, uintptr_t param)
+
+
+SECTION("text.vsf.kernel.__vsf_thread_call_eda")
+static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler, 
+                                            uintptr_t param, 
+                                            __vsf_eda_frame_state_t state)
 {
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
+    
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
+    vsf_thread_cb_t *cb = (vsf_thread_cb_t *)thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param;
+#   else
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
+    vsf_thread_cb_t *cb = (vsf_thread_cb_t *)thread->use_as__vsf_eda_t.fn.frame->ptr.param;
+#   endif
+    VSF_KERNEL_ASSERT(NULL != cb);
+
     vsf_err_t err;
     vsf_evt_t evt;
 
     while (1) {
-        __vsf_eda_frame_state_t state = { .bits.is_fsm = false,};
         err = __vsf_eda_call_eda_ex(eda_handler, param, state, true);
         if (VSF_ERR_NONE != err) {
             vsf_eda_yield();
         }
-        evt = vsf_thread_wait();
+        
+        evt = __vsf_thread_wait(cb);
+
         if (evt == VSF_EVT_RETURN) {
             break;
         }
     }
+    
+    return err;
+}
+
+SECTION("text.vsf.kernel.__vsf_thread_call_eda")
+vsf_err_t __vsf_thread_call_eda(uintptr_t eda_handler, uintptr_t param)
+{
+    __vsf_eda_frame_state_t state = { .bits.is_fsm = false,};
+    return __vsf_thread_call_eda_ex(eda_handler, param, state);
+}
+
+SECTION("text.vsf.kernel.vsf_thread_call_thread")
+vsf_err_t __vsf_thread_call_thread( vsf_thread_cb_t *thread_cb,
+                                    vsf_thread_prepare_cfg_t *cfg)
+{
+    VSF_KERNEL_ASSERT(NULL != cfg && NULL != thread_cb);
+    class_internal(thread_cb, pthis, vsf_thread_cb_t);
+    
+    __vsf_eda_frame_state_t state = { .bits = {.is_fsm = false,
+                                      .is_stack_owner = true,}
+                                    };
+    VSF_KERNEL_ASSERT(    (NULL != cfg->entry)
+                    &&    (NULL != cfg->stack)
+                    &&    (cfg->stack_size >= 8));
+    
+    pthis->entry = cfg->entry;
+    pthis->stack = cfg->stack;
+    pthis->stack_size = cfg->stack_size;
+    
+    return __vsf_thread_call_eda_ex((uintptr_t)__vsf_thread_evthandler, 
+                                    (uintptr_t)thread_cb, state);
 }
 
 SECTION("text.vsf.kernel.__vsf_thread_call_fsm")
 fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
 {
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    class_internal(thread_obj, thread, vsf_thread_t);
+    
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame);
+    vsf_thread_cb_t *cb = (vsf_thread_cb_t *)thread->use_as__vsf_teda_t.use_as__vsf_eda_t.fn.frame->ptr.param;
+#   else
+    VSF_KERNEL_ASSERT(NULL != thread->use_as__vsf_eda_t.fn.frame);
+    vsf_thread_cb_t *cb = (vsf_thread_cb_t *)thread->use_as__vsf_eda_t.fn.frame->ptr.param;
+#   endif
+    VSF_KERNEL_ASSERT(NULL != cb);
+    
     fsm_rt_t ret;
 
     while (1) {
@@ -338,7 +454,7 @@ fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
         } else {
             break;
         }
-        vsf_thread_wait();
+        __vsf_thread_wait(cb);
     }
     
     return ret;

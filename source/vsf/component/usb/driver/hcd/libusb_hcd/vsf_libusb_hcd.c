@@ -167,7 +167,7 @@ static vsf_libusb_hcd_t __vsf_libusb_hcd = {
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
 static void __vsf_libusb_hcd_trace_urb(vk_usbh_hcd_urb_t *urb, char *msg)
 {
-    vk_usbh_eppipe_t pipe = urb->pipe;
+    vk_usbh_pipe_t pipe = urb->pipe;
     vsf_trace(VSF_TRACE_INFO, "libusb_urb EP%d_%s(%08X): %s\r\n", pipe.endpoint,
         pipe.dir_in1out0 ? "IN" : "OUT", urb, msg);
 }
@@ -186,7 +186,7 @@ static void __vsf_libusb_hcd_trace_hcd_irq(char *msg)
 
 static void __vsf_libusb_hcd_trace_urb_irq(vk_usbh_hcd_urb_t *urb, char *msg)
 {
-    vk_usbh_eppipe_t pipe = urb->pipe;
+    vk_usbh_pipe_t pipe = urb->pipe;
     vsf_trace(VSF_TRACE_INFO, "libusb_urb EP%d_%s(%08X): irq %s\r\n", pipe.endpoint,
         pipe.dir_in1out0 ? "IN" : "OUT", urb, msg);
 }
@@ -219,9 +219,9 @@ static void __vsf_libusb_hcd_on_arrived(vsf_libusb_hcd_dev_t *libusb_dev)
         case LIBUSB_SPEED_SUPER:
             libusb_dev->speed = USB_SPEED_SUPER;
             break;
-        }
-        libusb_dev->evt_mask.is_attaching = true;
-        __vsf_arch_irq_request_send(&libusb_dev->irq_request);
+    }
+    libusb_dev->evt_mask.is_attaching = true;
+    __vsf_arch_irq_request_send(&libusb_dev->irq_request);
 }
 
 static int LIBUSB_CALL __vsf_libusb_hcd_hotplug_cb(libusb_context *ctx, libusb_device *device,
@@ -306,7 +306,7 @@ static int __vsf_libusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
 {
     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
     vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
-    vk_usbh_eppipe_t pipe = urb->pipe;
+    vk_usbh_pipe_t pipe = urb->pipe;
 
     if (NULL == libusb_dev->handle) {
         return LIBUSB_ERROR_NO_DEVICE;
@@ -400,68 +400,68 @@ static void __vsf_libusb_hcd_urb_thread(void *arg)
     while (1) {
         __vsf_arch_irq_request_pend(irq_request);
 
-            while (!libusb_urb->is_msg_processed) {
-                Sleep(1);
-            }
+        while (!libusb_urb->is_msg_processed) {
+            Sleep(1);
+        }
 
-            is_to_free = VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state;
-            if (!is_to_free) {
-                vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
-                vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
+        is_to_free = VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state;
+        if (!is_to_free) {
+            vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
+            vsf_libusb_hcd_dev_t *libusb_dev = dev->dev_priv;
 
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-                __vsf_arch_irq_start(irq_thread);
-                    __vsf_libusb_hcd_trace_urb(urb, "submitting");
-                __vsf_arch_irq_end(irq_thread, false);
+            __vsf_arch_irq_start(irq_thread);
+                __vsf_libusb_hcd_trace_urb(urb, "submitting");
+            __vsf_arch_irq_end(irq_thread, false);
 #endif
-                actual_length = __vsf_libusb_hcd_submit_urb(urb);
+            actual_length = __vsf_libusb_hcd_submit_urb(urb);
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-                __vsf_arch_irq_start(irq_thread);
-                    __vsf_libusb_hcd_trace_urb(urb, "done");
-                __vsf_arch_irq_end(irq_thread, false);
+            __vsf_arch_irq_start(irq_thread);
+                __vsf_libusb_hcd_trace_urb(urb, "done");
+            __vsf_arch_irq_end(irq_thread, false);
 #endif
-                if (actual_length < 0) {
-                    urb->status = actual_length;
-                } else {
-                    urb->status = URB_OK;
-                    urb->actual_length = actual_length;
+            if (actual_length < 0) {
+                urb->status = actual_length;
+            } else {
+                urb->status = URB_OK;
+                urb->actual_length = actual_length;
 
-                    if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
-                        struct usb_ctrlrequest_t *setup = &urb->setup_packet;
+                if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
+                    struct usb_ctrlrequest_t *setup = &urb->setup_packet;
 
-                        // set configuration is handled here
-                        if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
-                            &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
+                    // set configuration is handled here
+                    if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
+                        &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
 
-                            int config = setup->wValue;
-                            struct libusb_config_descriptor *config_desc;
+                        int config = setup->wValue;
+                        struct libusb_config_descriptor *config_desc;
 
-                            if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
-                                        libusb_get_device(libusb_dev->handle), config, &config_desc)) {
-                                for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
-                                    libusb_claim_interface(libusb_dev->handle, i);
-                                }
-                                libusb_free_config_descriptor(config_desc);
+                        if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
+                                    libusb_get_device(libusb_dev->handle), config, &config_desc)) {
+                            for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
+                                libusb_claim_interface(libusb_dev->handle, i);
                             }
+                            libusb_free_config_descriptor(config_desc);
                         }
                     }
                 }
+            }
 
 #if VSF_LIBUSB_HCD_CFG_REMOVE_ON_ERROR == ENABLED
-                if (urb->status == LIBUSB_ERROR_IO) {
-                    // device removed
+            if (urb->status == LIBUSB_ERROR_IO) {
+                // device removed
 #   if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-                    __vsf_arch_irq_start(irq_thread);
-                        __vsf_libusb_hcd_trace_urb(urb, "device removed, to free");
-                    __vsf_arch_irq_end(irq_thread, false);
+                __vsf_arch_irq_start(irq_thread);
+                    __vsf_libusb_hcd_trace_urb(urb, "device removed, to free");
+                __vsf_arch_irq_end(irq_thread, false);
 #   endif
-                    if (libusb_urb->state != VSF_LIBUSB_HCD_URB_STATE_TO_FREE) {
-                        libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_WAIT_TO_FREE;
-                    }
-                    __vsf_libusb_hcd_on_left(libusb_dev);
+                if (libusb_urb->state != VSF_LIBUSB_HCD_URB_STATE_TO_FREE) {
+                    libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_WAIT_TO_FREE;
                 }
-#endif
+                __vsf_libusb_hcd_on_left(libusb_dev);
             }
+#endif
+        }
 
         __vsf_arch_irq_start(irq_thread);
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED

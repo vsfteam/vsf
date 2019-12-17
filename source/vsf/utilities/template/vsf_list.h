@@ -93,8 +93,8 @@
                                 __pitem,      /* the address of the new item */ \
                                 __CON)        /* how to find insert point */    \
     do {                                                                        \
-        vsf_slist_init_node(__host_type, __member, __pitem);                    \
         vsf_slist_node_t *__ = (vsf_slist_node_t *)(__plist);                   \
+        vsf_slist_init_node(__host_type, __member, __pitem);                    \
         for (; __->next != NULL;){                                              \
             const __host_type * const _ = (__host_type *)(__->next);            \
             /* using __VA_ARGS__ so ',' operation could be supported */         \

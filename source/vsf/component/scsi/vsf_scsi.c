@@ -32,6 +32,10 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
 #endif
 
+#if VSF_USE_KERNEL_SIMPLE_SHELL != ENABLED
+#   error VSF_USE_KERNEL_SIMPLE_SHELL must be enabled
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -42,13 +46,13 @@
 vsf_err_t vk_scsi_init(vk_scsi_t *pthis)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->init != NULL));
-    return vsf_eda_call_param_eda(pthis->drv->init, pthis);
+    return __vsf_call_eda(pthis->drv->init, pthis);
 }
 
 vsf_err_t vk_scsi_fini(vk_scsi_t *pthis)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->fini != NULL));
-    return vsf_eda_call_param_eda(pthis->drv->fini, pthis);
+    return __vsf_call_eda(pthis->drv->fini, pthis);
 }
 
 bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
@@ -68,7 +72,7 @@ vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
     pthis->args.stream = NULL;
 #endif
-    return vsf_eda_call_param_eda(pthis->drv->execute, pthis);
+    return __vsf_call_eda(pthis->drv->execute, pthis);
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -77,7 +81,7 @@ vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *s
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
     pthis->args.cbd = cbd;
     pthis->args.stream = stream;
-    return vsf_eda_call_param_eda(pthis->drv->execute_stream, pthis);
+    return __vsf_call_eda(pthis->drv->execute_stream, pthis);
 }
 #endif
 

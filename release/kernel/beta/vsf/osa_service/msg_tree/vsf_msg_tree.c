@@ -42,7 +42,6 @@ implement_vsf_rng_buf(__bfs_node_fifo_t, uint16_t, NO_RNG_BUF_PROTECT)
 void vsf_msgt_init(vsf_msgt_t* ptObj, const vsf_msgt_cfg_t* ptCFG)
 {
     class_internal(ptObj, ptThis, vsf_msgt_t);
-
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj && NULL != ptCFG);
     VSF_OSA_SERVICE_ASSERT(     (NULL != ptCFG->ptInterfaces) 
                             ||  (0 != ptCFG->chTypeNumbers));
@@ -59,11 +58,10 @@ static bool __msgt_shoot(   vsf_msgt_t* ptObj,
                             const vsf_msgt_node_t *ptNode,
                             uintptr_t pBulletInfo)
 {
-    class_internal(ptObj, ptThis, vsf_msgt_t);
-
     uint_fast8_t chID = ptNode->chID;
     bool bResult = false;
     vsf_msgt_method_shoot_t* fnShoot = NULL;
+    class_internal(ptObj, ptThis, vsf_msgt_t);
 
     if (chID < 2) {
         fnShoot = c_tRootNodes[chID].Shoot;
@@ -83,11 +81,12 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t *ptRoot,
                                             uintptr_t pBulletInfo)
 {
+    vsf_msgt_node_t* ptItem = NULL;
     class_internal(ptObj, ptThis, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
 
-    vsf_msgt_node_t* ptItem = NULL;
+    
     do {
         if (NULL == ptRoot) {
             break;
@@ -144,11 +143,12 @@ const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* ptObj,
                                         const vsf_msgt_node_t *ptRoot,
                                         uintptr_t pBulletInfo)
 {
+    const vsf_msgt_node_t* ptItem = NULL;
     class_internal(ptObj, ptThis, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
 
-    const vsf_msgt_node_t* ptItem = NULL;
+    
     do {
         const vsf_msgt_node_t* ptNode = ptRoot;
 
@@ -200,8 +200,6 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
                             vsf_msgt_t* ptObj,
                             const vsf_msgt_node_t* ptNode)
 {
-    class_internal(ptObj, ptThis, vsf_msgt_t);
-
     enum {
         START = 0,
         CHECK_STATUS,
@@ -211,6 +209,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
         HANDLE_SUBCALL,
 #endif
     };
+    class_internal(ptObj, ptThis, vsf_msgt_t);
 
     switch (THIS_FSM_STATE) {
         case START:
@@ -335,13 +334,14 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t *ptNode,
                                             vsf_msgt_msg_t *ptMessage)
 {
-    class_internal(ptObj, ptThis, vsf_msgt_t);
-    fsm_rt_t tfsm = fsm_rt_on_going;
     enum {
         START = 0,
         MSG_HANDLING,
         GET_PARENT,
     };
+    fsm_rt_t tfsm = fsm_rt_on_going;
+    class_internal(ptObj, ptThis, vsf_msgt_t);
+    
 
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
     VSF_OSA_SERVICE_ASSERT(NULL != ptMessage);
@@ -412,13 +412,16 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj,
                                                 uint16_t *phwFIFOBuffer, 
                                                 uint_fast16_t hwBuffSize)
 {
+    class_internal(ptObj, ptThis, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
     VSF_OSA_SERVICE_ASSERT(NULL != phwFIFOBuffer);
     VSF_OSA_SERVICE_ASSERT(hwBuffSize > 2);
 
-    class_internal(ptObj, ptThis, vsf_msgt_t);
     this.FWBFS.chState = 0;
-    VSF_RNG_BUF_PREPARE(__bfs_node_fifo_t, &(this.FWBFS.tFIFO), phwFIFOBuffer, hwBuffSize);
+    VSF_RNG_BUF_PREPARE(__bfs_node_fifo_t, 
+                        &(this.FWBFS.tFIFO), 
+                        phwFIFOBuffer, 
+                        hwBuffSize);
 }
 
 #undef THIS_FSM_STATE
@@ -432,16 +435,16 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage)
 {
-    class_internal(ptObj, ptThis, vsf_msgt_t);
-    fsm_rt_t tfsm = fsm_rt_on_going;
-    uint16_t hwOffset = 0;
-    //vsf_msgt_node_t *ptItem = NULL;
-
     enum {
         START = 0,
         FETCH_ITEM,
         VISIT_ITEM,        
     };
+    fsm_rt_t tfsm = fsm_rt_on_going;
+    uint16_t hwOffset = 0;
+    class_internal(ptObj, ptThis, vsf_msgt_t);
+    
+    //vsf_msgt_node_t *ptItem = NULL;
 
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
     VSF_OSA_SERVICE_ASSERT(NULL != ptMessage);
@@ -457,33 +460,44 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
             }
             VSF_OSA_SERVICE_ASSERT (NULL != this.FWBFS.tFIFO.ptBuffer);
 
-            if (!VSF_RNG_BUF_SEND(__bfs_node_fifo_t, &(this.FWBFS.tFIFO), 0)) {
+            if (!VSF_RNG_BUF_SEND_ONE(  __bfs_node_fifo_t, 
+                                        &(this.FWBFS.tFIFO), 
+                                        0)) {
                 return (fsm_rt_t)VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
             }
 
-            __vsf_msg_handling_init(&this.FWBFS.tMSGHandling, ptObj, ptMessage, true);
+            __vsf_msg_handling_init(&this.FWBFS.tMSGHandling, 
+                                    ptObj, 
+                                    ptMessage, 
+                                    true);
             THIS_FSM_STATE ++;
             // break;
 
         case FETCH_ITEM:
-            if (!VSF_RNG_BUF_GET(__bfs_node_fifo_t, &(this.FWBFS.tFIFO), &hwOffset)) {
+            if (!VSF_RNG_BUF_GET_ONE(   __bfs_node_fifo_t, 
+                                        &(this.FWBFS.tFIFO), 
+                                        &hwOffset)) {
                 //! search complete
                 RESET_MSGT_FW_BFS_PROPAGATE_MSG_FSM();
                 return fsm_rt_cpl;
             }
             //! calculate target item address
-            this.FWBFS.tMSGHandling.ptNode = (vsf_msgt_node_t *)((uintptr_t)ptNode + hwOffset);
+            this.FWBFS.tMSGHandling.ptNode = 
+                (vsf_msgt_node_t *)((uintptr_t)ptNode + hwOffset);
             THIS_FSM_STATE = VISIT_ITEM;
             //break;
 
         case VISIT_ITEM:
-            tfsm = __vsf_msg_handling(&this.FWBFS.tMSGHandling, ptObj, this.FWBFS.tMSGHandling.ptNode);
+            tfsm = __vsf_msg_handling(  &this.FWBFS.tMSGHandling, 
+                                        ptObj, 
+                                        this.FWBFS.tMSGHandling.ptNode);
             if (tfsm < 0 || tfsm == fsm_rt_cpl) {
 
                 THIS_FSM_STATE = FETCH_ITEM;
                 //! add nodes to fifo
                 if (this.FWBFS.tMSGHandling.ptNode->bIsContainer) {
-                    vsf_msgt_container_t* ptContainer = (vsf_msgt_container_t*)this.FWBFS.tMSGHandling.ptNode;
+                    vsf_msgt_container_t* ptContainer = 
+                        (vsf_msgt_container_t*)this.FWBFS.tMSGHandling.ptNode;
                     vsf_msgt_node_t *ptTemp = ptContainer->ptNode;
                     if (NULL == ptTemp) {
                         break;
@@ -491,15 +505,21 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
 
                     //! put all nodes into fifo
                     do {
-                        hwOffset = (uint16_t)((uintptr_t)ptTemp - (uintptr_t)this.FWBFS.tMSGHandling.ptNode);
-                        if (!VSF_RNG_BUF_SEND(__bfs_node_fifo_t, &(this.FWBFS.tFIFO), hwOffset)) {
+                        hwOffset = 
+                            (uint16_t)((uintptr_t)ptTemp 
+                                     - (uintptr_t)this.FWBFS.tMSGHandling.ptNode);
+                        if (!VSF_RNG_BUF_SEND_ONE(  __bfs_node_fifo_t, 
+                                                    &(this.FWBFS.tFIFO), 
+                                                    hwOffset)) {
                             RESET_MSGT_FW_BFS_PROPAGATE_MSG_FSM();
-                            return (fsm_rt_t)VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
+                            return (fsm_rt_t)
+                                VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
                         }
                         if (0 == ptTemp->Offset.iNext) {
                             break;
                         }
-                        ptTemp = (vsf_msgt_node_t*)((intptr_t)ptTemp + ptTemp->Offset.iNext);
+                        ptTemp = (vsf_msgt_node_t*)
+                                    ((intptr_t)ptTemp + ptTemp->Offset.iNext);
                     } while(1);
                 } 
                 break;

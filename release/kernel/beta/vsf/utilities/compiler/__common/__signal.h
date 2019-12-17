@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
-//! \brief The safe ATOM code section macro
+/*! \brief The safe ATOM code section macro */
 #define SAFE_ATOM_CODE()        code_region(&DEFAULT_CODE_REGION_ATOM_CODE)
 
          
@@ -50,11 +50,11 @@
 #define safe_atom_code()                SAFE_ATOM_CODE()
 
 
-//! \name ES_LOCKER value
-//! @{
+/*! \name ES_LOCKER value */
+/*! @{ */
 #define LOCKED          true            //!< locked
 #define UNLOCKED        false           //!< unlocked
-//! @}
+/*! @} */
 
 
 #define LOCK_INIT(__LOCKER)     do {(__LOCKER) = UNLOCKED;}while(false)
@@ -73,7 +73,7 @@
 
 #define INIT_LOCK(__LOCKER)             init_lock(__LOCKER)
                         
-//! \brief exit lock checker structure
+/*! \brief exit lock checker structure */
 #define EXIT_LOCK_CHECKER()             EXIT_SAFE_ATOM_CODE()
 
 /*! \note check specified locker and run code segment
@@ -108,10 +108,11 @@
             }
 #endif
             
-//! \note critical code section protection
-//! \note LOCKER could be only used among FSMs and there should be no ISR involved.
-//! \param __LOCKER ES_LOCKER variable
-//! \param __CODE   target code segment
+/*! \note critical code section protection
+ *! \note LOCKER could be only used among FSMs and there should be no ISR involved.
+ *! \param __LOCKER ES_LOCKER variable
+ *! \param __CODE   target code segment
+ */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define LOCK(__LOCKER,__CODE)                                                \
             LOCK_CHECKER((__LOCKER),                                            \

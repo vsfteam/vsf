@@ -113,7 +113,7 @@ int main(void)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
-        vsf_delay_ms(10000);
+        vsf_delay_ms(3000);
         //vsf_yield();
     }
 #else

@@ -486,8 +486,7 @@ bool vsf_eda_return(void)
         vsf_eda_free_frame(frame);
         frame = pthis->fn.frame;
         
-    #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                           \
-        &&  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+    #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
         if (NULL != frame) {
             pthis->state.bits.is_stack_owner = frame->state.bits.is_stack_owner;
         }
@@ -540,8 +539,7 @@ static vsf_err_t __vsf_eda_ensure_frame_used(vsf_eda_t *pthis)
         pthis->state.bits.is_use_frame = true;
         frame_tmp->fn.evthandler = pthis->fn.evthandler;
         
-    #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                           \
-        &&  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+    #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
         frame_tmp->state.bits.is_stack_owner = pthis->state.bits.is_stack_owner;
     #endif
         //frame_tmp->param = pthis;
@@ -613,14 +611,16 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
     }
 
     frame->fn.func = func;
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
+    ||  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
     frame->state.flag = state.flag;
-    
+#endif    
+
 #   if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
     pthis->state.bits.is_stack_owner = state.bits.is_stack_owner;
 #   endif
 
-#endif
+
     /*! \note please NEVER do following things. If param is NULL, please let
      *        frame->param to be NULL
      *
@@ -833,6 +833,9 @@ vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
     frame->ptr.target = cfg->target;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
     frame->state.bits.is_fsm = cfg->is_fsm;        //!< update is_fsm
+#   endif
+#   if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+    frame->state.bits.is_stack_owner = cfg->is_stack_owner;
 #   endif
 #endif
 

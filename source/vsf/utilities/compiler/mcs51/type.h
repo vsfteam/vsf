@@ -49,9 +49,17 @@ typedef enum {
 #include <stdbool.h>
 #endif
 
+typedef uint_fast8_t        uintalu_t;
+typedef int_fast8_t         intalu_t; 
+
 #include <stddef.h>
 #include <assert.h>
 /*============================ MACROS ========================================*/
+
+
+#define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
+#define __optimal_bit_msk       (__optimal_bit_sz - 1)
+
 /*
 //! \name boolean value
 //! @{
@@ -180,6 +188,7 @@ typedef enum {
     fsm_rt_wait_for_evt = 2,    
     fsm_rt_wfe          = 2,
     fsm_rt_asyn         = 3,     //!< fsm asynchronose complete, you can check it later.
+    fsm_rt_user         = 4,
 } fsm_rt_t;
 //! @}
 

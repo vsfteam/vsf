@@ -359,7 +359,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
       <CpuCode>7</CpuCode>
       <DebugOpt>
@@ -1375,7 +1375,7 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>7</CpuCode>
       <DebugOpt>
@@ -2120,7 +2120,7 @@
 
   <Group>
     <GroupName>vsf/hal/arch</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2208,7 +2208,7 @@
 
   <Group>
     <GroupName>vsf/kernel</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2440,7 +2440,7 @@
 
   <Group>
     <GroupName>vsf/utilities/template</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2848,7 +2848,7 @@
 
   <Group>
     <GroupName>vsf/service/pool</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2944,7 +2944,7 @@
 
   <Group>
     <GroupName>vsf/hal/driver/mps2/cmsdk_m7</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3000,7 +3000,7 @@
 
   <Group>
     <GroupName>vsf/hal/driver/mps2/common</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3032,7 +3032,7 @@
 
   <Group>
     <GroupName>vsf/hal/driver/mps2/cmsdk_m0</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3081,6 +3081,498 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\startup_ARMCM0.c</PathWithFileName>
       <FilenameWithoutPath>startup_ARMCM0.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>c90_cfg</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>18</GroupNumber>
+      <FileNumber>87</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\usrapp\template\c90_cfg\vsf_usr_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_usr_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>vsf/osa_service/msg_tree</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>88</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_msg_tree.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>19</GroupNumber>
+      <FileNumber>89</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_msg_tree.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>component/ui/tgui</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>90</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>91</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>92</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>93</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_common.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>94</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_common.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>95</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</PathWithFileName>
+      <FilenameWithoutPath>__vsf_tgui_mc_common.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>96</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_msg_tree_cfg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>97</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_control.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>98</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_control.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>99</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>100</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>101</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_button.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>102</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_button.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>103</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_label.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>104</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_label.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>105</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_list.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>106</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_list.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>107</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_panel.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>108</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_mc_panel.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>109</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>110</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>111</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_button.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>112</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_button.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>113</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_container.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>114</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_container.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>115</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_control.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>116</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_control.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>117</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_draw.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>118</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_draw.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>119</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_label.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>120</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_label.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>121</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_panel.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>122</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_panel.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>123</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_port.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>124</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_template.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>20</GroupNumber>
+      <FileNumber>125</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</PathWithFileName>
+      <FilenameWithoutPath>vsf_tgui_v_type.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

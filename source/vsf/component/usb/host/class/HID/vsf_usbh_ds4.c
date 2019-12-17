@@ -98,8 +98,8 @@ const vk_usbh_class_drv_t vk_usbh_ds4_drv = {
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
-WEAK(vk_usbh_ds4_on_report_input)
-void vk_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
+WEAK(vsf_usbh_ds4_on_report_input)
+void vsf_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
 {
 #   if VSF_USE_INPUT_DS4 == ENABLED
     vk_ds4u_process_input(&ds4->use_as__vk_input_ds4u_t, report);
@@ -108,15 +108,15 @@ void vk_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_repo
 #endif
 
 #ifndef WEAK_VSF_USBH_DS4_ON_REPORT_OUTPUT
-WEAK(vk_usbh_ds4_on_report_output)
-void vk_usbh_ds4_on_report_output(vk_usbh_ds4_t *ds4)
+WEAK(vsf_usbh_ds4_on_report_output)
+void vsf_usbh_ds4_on_report_output(vk_usbh_ds4_t *ds4)
 {
 }
 #endif
 
 #ifndef WEAK_VSF_USBH_DS4_ON_NEW
-WEAK(vk_usbh_ds4_on_new)
-void vk_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
+WEAK(vsf_usbh_ds4_on_new)
+void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 {
 #   if VSF_USE_INPUT_DS4 == ENABLED
     vk_ds4u_new_dev(&ds4->use_as__vk_input_ds4u_t);
@@ -125,8 +125,8 @@ void vk_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 #endif
 
 #ifndef WEAK_VSF_USBH_DS4_ON_FREE
-WEAK(vk_usbh_ds4_on_free)
-void vk_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
+WEAK(vsf_usbh_ds4_on_free)
+void vsf_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
 {
 #   if VSF_USE_INPUT_DS4 == ENABLED
     vk_ds4u_free_dev(&ds4->use_as__vk_input_ds4u_t);
@@ -152,7 +152,7 @@ static void vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_eppipe_t pipe;
+            vk_usbh_pipe_t pipe;
 
             pipe = vk_usbh_urb_get_pipe(&urb);
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
@@ -163,7 +163,7 @@ static void vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (    (URB_OK == vk_usbh_urb_get_status(&urb))
                         &&  (sizeof(vsf_usb_ds4_gamepad_in_report_t) == vk_usbh_urb_get_actual_length(&urb))) {
 #ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
-                        vk_usbh_ds4_on_report_input(ds4, (vsf_usb_ds4_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
+                        vsf_usbh_ds4_on_report_input(ds4, (vsf_usb_ds4_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
 #else
                         WEAK_VSF_USBH_DS4_ON_REPORT_INPUT(ds4, (vsf_usb_ds4_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
 #endif
@@ -172,7 +172,7 @@ static void vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 } else {
                     ds4->out_idle = true;
 #ifndef WEAK_VSF_USBH_DS4_ON_REPORT_OUTPUT
-                    vk_usbh_ds4_on_report_output(ds4);
+                    vsf_usbh_ds4_on_report_output(ds4);
 #else
                     WEAK_VSF_USBH_DS4_ON_REPORT_OUTPUT(ds4);
 #endif
@@ -195,7 +195,7 @@ static void * vk_usbh_ds4_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs
         ds4->user_evthandler = vk_usbh_ds4_evthandler;
 
 #ifndef WEAK_VSF_USBH_DS4_ON_NEW
-        vk_usbh_ds4_on_new(ds4);
+        vsf_usbh_ds4_on_new(ds4);
 #else
         WEAK_VSF_USBH_DS4_ON_NEW(ds4);
 #endif
@@ -206,7 +206,7 @@ static void * vk_usbh_ds4_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs
 static void vk_usbh_ds4_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
 #ifndef WEAK_VSF_USBH_DS4_ON_FREE
-    vk_usbh_ds4_on_free((vk_usbh_ds4_t *)param);
+    vsf_usbh_ds4_on_free((vk_usbh_ds4_t *)param);
 #else
     WEAK_VSF_USBH_DS4_ON_FREE(ds4);
 #endif

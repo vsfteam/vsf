@@ -140,7 +140,7 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define NO_RNG_BUF_PROTECT(...)               __VA_ARGS__
+
 
 #define __declare_vsf_rng_buf(__NAME)                                           \
     typedef struct __NAME __NAME;                                               \
@@ -148,8 +148,68 @@
 #define declare_vsf_rng_buf(__NAME)       __declare_vsf_rng_buf(__NAME)
 
 
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
-#define __def_vsf_rng_buf(__NAME, __TYPE, ...)                                  \
+#   define NO_RNG_BUF_PROTECT(__CODE)               __CODE
+
+#   define __def_vsf_rng_buf(__NAME, __TYPE)                                    \
+    struct __NAME {                                                             \
+        implement(vsf_rng_buf_t)                                                \
+        __TYPE *ptBuffer;                                                       \
+    };                                                                          \
+                                                                                \
+    struct __NAME##_cfg_t {                                                     \
+        __TYPE *ptBuffer;                                                       \
+        uint16_t hwSize;                                                        \
+        bool     bInitAsFull;                                                   \
+    };                                                                          \
+                                                                                \
+extern                                                                          \
+void __NAME##_init(__NAME* ptQ, __NAME##_cfg_t* ptCFG);                         \
+                                                                                \
+extern                                                                          \
+bool __NAME##_send_one(__NAME* ptQ, __TYPE tItem);                              \
+                                                                                \
+extern                                                                          \
+bool __NAME##_get_one(__NAME* ptQ, __TYPE* ptItem);                             \
+                                                                                \
+SECTION(".text." #__NAME "_item_count")                                         \
+extern                                                                          \
+uint_fast16_t __NAME##_item_count(__NAME* ptQ);                                 \
+                                                                                \
+SECTION(".text." #__NAME "_send_multiple")                                      \
+extern                                                                          \
+int32_t __NAME##_send_multiple(__NAME* ptQ,                                     \
+                                        const __TYPE* ptItem,                   \
+                                        uint16_t hwCount);                      \
+                                                                                \
+SECTION(".text." #__NAME "_get_multiple")                                       \
+extern                                                                          \
+int32_t __NAME##_get_multiple(  __NAME* ptQ,                                    \
+                                    __TYPE* ptItem,                             \
+                                    uint16_t hwCount);                          \
+                                                                                \
+SECTION(".text." #__NAME "_peek_one")                                           \
+extern                                                                          \
+bool __NAME##_peek_one(__NAME* ptQ, const __TYPE** pptItem);                    \
+                                                                                \
+SECTION(".text." #__NAME "_item_count_peekable")                                \
+extern                                                                          \
+uint_fast16_t __NAME##_item_count_peekable(__NAME* ptQ);                        \
+                                                                                \
+SECTION(".text." #__NAME "_peek_multiple")                                      \
+extern                                                                          \
+int32_t __NAME##_peek_multiple( __NAME* ptQ,                                    \
+                                const __TYPE** pptItem,                         \
+                                uint16_t hwCount);
+
+#   define def_vsf_rng_buf(__NAME, __TYPE)                                      \
+            __def_vsf_rng_buf(__NAME, __TYPE) 
+
+#else
+#   define NO_RNG_BUF_PROTECT(...)               __VA_ARGS__
+
+#   define __def_vsf_rng_buf(__NAME, __TYPE, ...)                               \
     struct __NAME {                                                             \
         implement(vsf_rng_buf_t)                                                \
         __TYPE *ptBuffer;                                                       \
@@ -201,9 +261,10 @@ int32_t __NAME##_peek_multiple( __NAME* ptQ,                                    
                                 const __TYPE** pptItem,                         \
                                 uint16_t hwCount);
 
-#define def_vsf_rng_buf(__NAME, __TYPE, ...)                                    \
+#   define def_vsf_rng_buf(__NAME, __TYPE, ...)                                 \
             __def_vsf_rng_buf(__NAME, __TYPE, __VA_ARGS__) 
 
+#endif
 
 #define __implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT)                \
 void __NAME##_init(__NAME* ptQ, __NAME##_cfg_t* ptCFG)                          \
@@ -219,8 +280,8 @@ void __NAME##_init(__NAME* ptQ, __NAME##_cfg_t* ptCFG)                          
                                                                                 \
 bool __NAME##_send_one(__NAME *ptQ, __TYPE tItem)                               \
 {                                                                               \
-    ASSERT(NULL != ptQ);                                                        \
     bool bResult = false;                                                       \
+    ASSERT(NULL != ptQ);                                                        \
     __QUEUE_PROTECT(                                                            \
         do {                                                                    \
             int32_t nIndex =                                                    \
@@ -238,8 +299,8 @@ bool __NAME##_send_one(__NAME *ptQ, __TYPE tItem)                               
                                                                                 \
 bool __NAME##_get_one(__NAME * ptQ, __TYPE *ptItem)                             \
 {                                                                               \
-    ASSERT(NULL != ptQ);                                                        \
     bool bResult = false;                                                       \
+    ASSERT(NULL != ptQ);                                                        \
     __QUEUE_PROTECT(                                                            \
         do {                                                                    \
             int32_t nIndex =                                                    \
@@ -269,14 +330,14 @@ int32_t __NAME##_send_multiple(  __NAME * ptQ,                                  
                                     const __TYPE*ptItem,                        \
                                     uint16_t hwCount)                           \
 {                                                                               \
+    int32_t nResult = -1, nIndex = 0;                                           \
     ASSERT(NULL != ptQ);                                                        \
-    int32_t nResult = -1;                                                       \
     __QUEUE_PROTECT(                                                            \
         do {                                                                    \
             if (NULL == ptItem || 0 == hwCount) {                               \
                 break;                                                          \
             }                                                                   \
-            int32_t nIndex =                                                    \
+            nIndex =                                                            \
                 __vsf_rng_buf_send_multiple(   &(ptQ->use_as__vsf_rng_buf_t),   \
                                                 &hwCount);                      \
             if (nIndex < 0) {                                                   \
@@ -295,14 +356,14 @@ int32_t __NAME##_get_multiple(  __NAME * ptQ,                                   
                                     __TYPE* ptItem,                             \
                                     uint16_t hwCount)                           \
 {                                                                               \
+    int32_t nResult = -1, nIndex = 0;                                           \
     ASSERT(NULL != ptQ);                                                        \
-    int32_t nResult = -1;                                                       \
     __QUEUE_PROTECT(                                                            \
         do {                                                                    \
             if (NULL == ptItem || 0 == hwCount) {                               \
                 break;                                                          \
             }                                                                   \
-            int32_t nIndex =                                                    \
+            nIndex =                                                            \
                 __vsf_rng_buf_get_multiple(   &(ptQ->use_as__vsf_rng_buf_t),    \
                                                 &hwCount);                      \
             if (nIndex < 0) {                                                   \
@@ -319,8 +380,8 @@ int32_t __NAME##_get_multiple(  __NAME * ptQ,                                   
 SECTION(".text." #__NAME "_peek_one")                                           \
 bool __NAME##_peek_one(__NAME *ptQ, const __TYPE** pptItem)                     \
 {                                                                               \
-    ASSERT(NULL != ptQ);                                                        \
     bool bResult = false;                                                       \
+    ASSERT(NULL != ptQ);                                                        \
     __QUEUE_PROTECT(                                                            \
         do {                                                                    \
             int32_t nIndex = __vsf_rng_buf_peek_one(&(ptQ->use_as__vsf_rng_buf_t)); \
@@ -349,14 +410,14 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
                                 const __TYPE** pptItem,                         \
                                 uint16_t hwCount)                               \
 {                                                                               \
+    int32_t nResult = -1, nIndex = 0;                                           \
     ASSERT(NULL != ptQ);                                                        \
-    int32_t nResult = -1;                                                       \
     __QUEUE_PROTECT(                                                            \
         do {                                                                    \
             if (NULL == pptItem || 0 == hwCount) {                              \
                 break;                                                          \
             }                                                                   \
-            int32_t nIndex =                                                    \
+            nIndex =                                                            \
                 __vsf_rng_buf_peek_multiple(  &(ptQ->use_as__vsf_rng_buf_t),    \
                                             &hwCount);                          \
             if (nIndex < 0) {                                                   \
@@ -389,7 +450,23 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
 #define VSF_RNG_BUF_INIT(__NAME, __TYPE, __QADDR, __ITEM_COUNT)                 \
         __VSF_RNG_BUF_INIT(__NAME, __TYPE, (__QADDR), (__ITEM_COUNT))
 
-#define __VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE, ...)           \
+
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+
+#define __VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE)                \
+    do {                                                                        \
+        __NAME##_cfg_t tCFG = {0};                                              \
+        tCFG.ptBuffer = (__BUFFER);                                             \
+        tCFG.hwSize = (__SIZE);                                                 \
+        __NAME##_init((__QADDR), & tCFG);                                       \
+    } while(0)
+
+#   define VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE)               \
+                __VSF_RNG_BUF_PREPARE(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#else
+
+#   define __VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE, ...)        \
     do {                                                                        \
         __NAME##_cfg_t tCFG = {                                                 \
             (__BUFFER),                                                         \
@@ -399,8 +476,9 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
         __NAME##_init((__QADDR), & tCFG);                                       \
     } while(0)
 
-#define VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE, ...)             \
+#   define VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE, ...)          \
         __VSF_RNG_BUF_PREPARE(__NAME, (__QADDR), (__BUFFER), (__SIZE), __VA_ARGS__)
+#endif
 
 #define __VSF_RNG_BUF_SEND_1(__NAME, __QADDR, __ITEM)                           \
             __NAME##_send_one((__QADDR), __ITEM)
@@ -420,17 +498,31 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
 #define __VSF_RNG_BUF_PEEK_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
             __NAME##_peek_multiple((__QADDR), (__BUFFER), (__SIZE))
 
-#define VSF_RNG_BUF_SEND(__NAME, __QADDR, ...)                                  \
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#   define VSF_RNG_BUF_SEND(__NAME, __QADDR, ...)                               \
             __PLOOC_EVAL(__VSF_RNG_BUF_SEND_, __VA_ARGS__)                      \
                 (__NAME, __QADDR, __VA_ARGS__)
 
-#define VSF_RNG_BUF_GET(__NAME, __QADDR, ...)                                   \
+#   define VSF_RNG_BUF_GET(__NAME, __QADDR, ...)                                \
             __PLOOC_EVAL(__VSF_RNG_BUF_GET_, __VA_ARGS__)                       \
                 (__NAME, __QADDR, __VA_ARGS__)
 
-#define VSF_RNG_BUF_PEEK(__NAME, __QADDR, ...)                                  \
+#   define VSF_RNG_BUF_PEEK(__NAME, __QADDR, ...)                               \
             __PLOOC_EVAL(__VSF_QUEUE_PEEK_, __VA_ARGS__)                        \
                 (__NAME, __QADDR, __VA_ARGS__)
+#endif
+
+#define VSF_RNG_BUF_SEND_ONE(__NAME, __QADDR, __ITEM)                           \
+            __VSF_RNG_BUF_SEND_1(__NAME, (__QADDR), (__ITEM))
+            
+#define VSF_RNG_BUF_SEND_BUF(__NAME, __QADDR, __BUFFER, __SIZE)                 \
+            __VSF_RNG_BUF_SEND_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+            
+#define VSF_RNG_BUF_GET_ONE(__NAME, __QADDR, __ITEM)                            \
+            __VSF_RNG_BUF_GET_1(__NAME, (__QADDR), (__ITEM))
+            
+#define VSF_RNG_BUF_GET_BUF(__NAME, __QADDR, __BUFFER, __SIZE)                  \
+            __VSF_RNG_BUF_GET_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
 
 #define __VSF_RNG_BUF_COUNT(__NAME, __QADDR)                                    \
             __NAME##_item_count((__QADDR))

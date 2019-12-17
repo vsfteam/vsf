@@ -3381,7 +3381,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state>Pa082,Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -14245,6 +14245,12 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\utilities\language_extension\language_extension.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\utilities\language_extension\simple_sprintf.c</name>
+                        <excluded>
+                            <configuration>kernel_lib_armv7em_full_size</configuration>
+                        </excluded>
                     </file>
                 </group>
                 <file>

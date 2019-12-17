@@ -1,0 +1,944 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="vsf">
+      <UniqueIdentifier>{0469a8ab-fb5b-464f-b276-179285a33334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities">
+      <UniqueIdentifier>{d1b1430b-8b25-4295-b662-e209f108607e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\3rd-party">
+      <UniqueIdentifier>{7e64394f-807a-41c8-9d49-a19f31f17ccd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\3rd-party\PLOOC">
+      <UniqueIdentifier>{3b46ff9b-58f6-49b7-8545-5cc47d871d11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\compiler">
+      <UniqueIdentifier>{050f77a8-e211-4822-9ad8-02f0511d2178}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\preprocessor">
+      <UniqueIdentifier>{64213cd2-9bcf-4e39-9f6b-a55752c5150e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\template">
+      <UniqueIdentifier>{c8ecc3b0-9279-4815-bfaf-ca2faad955db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\kernel">
+      <UniqueIdentifier>{1e5afc15-8495-446d-93bb-04ba87d73003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal">
+      <UniqueIdentifier>{ce83bca0-746b-470b-b45c-bbd1948088cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch">
+      <UniqueIdentifier>{6f045188-9515-49a9-a783-189202754dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\x86">
+      <UniqueIdentifier>{819ae1ac-77db-4031-9e0a-3c774144180e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\x86\win">
+      <UniqueIdentifier>{25f4336d-0b62-4f17-984e-2e66843d7060}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver">
+      <UniqueIdentifier>{c9df9a5d-4876-4ef7-a01d-db95b9f5073f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\interface">
+      <UniqueIdentifier>{41094f8b-289b-4758-876d-d5b08a45d435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service">
+      <UniqueIdentifier>{352c5383-f2d5-4508-b6bc-e08fe3e2b8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\trace">
+      <UniqueIdentifier>{2be5827e-853c-4e28-b8bd-078ac6d2af65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\pool">
+      <UniqueIdentifier>{87ee7aca-817c-4250-9053-4cdfbff8546a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\vsfstream">
+      <UniqueIdentifier>{f15d66bc-26cb-4a40-beea-94665651b182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\vsfstream\fifo_stream">
+      <UniqueIdentifier>{9595061a-b5f8-49be-ad58-c8047b432a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\stream">
+      <UniqueIdentifier>{631cd5e2-8cb5-497c-aa0f-5c0d0cdc4c67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\stream\pbuf_queue">
+      <UniqueIdentifier>{079583b9-4195-4656-bcf6-ed0c90644204}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\heap">
+      <UniqueIdentifier>{729e011a-7470-4abd-8f0d-f7238adc6e88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp">
+      <UniqueIdentifier>{923bd60b-ab0d-419d-9593-9e5197a6513e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component">
+      <UniqueIdentifier>{14fd5089-ee4f-48ef-86c6-b6a181482b5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb">
+      <UniqueIdentifier>{e1328ffc-17be-4ff7-b12c-411991ea4b4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common">
+      <UniqueIdentifier>{4c415816-3ce1-49a0-ad33-5646302ac3a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class">
+      <UniqueIdentifier>{6a1f3497-ba4b-43b3-8270-bfbe4de18a58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\CDC">
+      <UniqueIdentifier>{3c6bd704-fb59-4c29-ba49-88af0c700ea9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\HID">
+      <UniqueIdentifier>{9eced937-9f8d-4f41-a56f-916e2b223505}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\UVC">
+      <UniqueIdentifier>{206386de-bfee-4d6e-a163-1da1fbf79a03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host">
+      <UniqueIdentifier>{27fad79b-8498-4537-8416-31b0e12aa999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class">
+      <UniqueIdentifier>{2d8cc84c-e86f-4f43-ba04-f89ff6b487a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\BTHCI">
+      <UniqueIdentifier>{f165771f-d763-47a8-adb1-dc49ee1663d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\CDC">
+      <UniqueIdentifier>{eb32e0d7-5f2e-4d57-a159-afc60f82d8ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\HID">
+      <UniqueIdentifier>{b875fb17-0c3d-41b5-8aca-372cc0dacb41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\HUB">
+      <UniqueIdentifier>{afc349a7-f559-4e3e-aa65-d524842f7c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\language_externsion">
+      <UniqueIdentifier>{084aaae4-edd8-4d6b-b43f-b87bcc301d5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\kernel\task">
+      <UniqueIdentifier>{f677e990-98b2-4582-b3a8-c54eebd8f106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\kernel\shell">
+      <UniqueIdentifier>{cfefd934-72e4-4e74-aaa9-64cde2ed8dd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\kernel\shell\simple">
+      <UniqueIdentifier>{7ecb6f44-c773-444d-b026-021d8759fb22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver">
+      <UniqueIdentifier>{7b7965a4-097d-4abd-8990-d440cab94b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd">
+      <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
+      <UniqueIdentifier>{81641b97-4577-45bf-ad6d-8ec4f525ea32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party">
+      <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input">
+      <UniqueIdentifier>{9f6d160e-5145-4e7f-949c-7785b1e92e5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver">
+      <UniqueIdentifier>{a8c1f548-b85a-412d-ac4d-da2b2aba2566}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\ds4">
+      <UniqueIdentifier>{85ca653e-7c11-4251-aef5-48a9edf7ab76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\hid">
+      <UniqueIdentifier>{b4e8d762-c880-4d47-8961-f6d8e5ae5d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\protocol">
+      <UniqueIdentifier>{9e71b4ca-1584-4beb-aaaf-276a6c525d66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui">
+      <UniqueIdentifier>{16b6f51f-2859-4b63-bbc5-277c3de0a84f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp_drv">
+      <UniqueIdentifier>{426a816e-299c-4753-bb8c-19b793f1c00e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp_drv\sdl2">
+      <UniqueIdentifier>{378a9a07-be30-4358-a3a9-fd8351214394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86">
+      <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\nspro">
+      <UniqueIdentifier>{0c8ab9ae-5c34-40fa-a502-d90332fb1d9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\xb360">
+      <UniqueIdentifier>{f73d903e-1d5b-44de-b2ab-11e72b08a958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\XB1">
+      <UniqueIdentifier>{c5736860-f8de-4c04-aa9b-9d592891ccb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\XB1">
+      <UniqueIdentifier>{58afcd2f-0da9-4546-9561-02ad8fcec99a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\xb1">
+      <UniqueIdentifier>{b07d6ff9-5744-4894-b383-7c98a9060a3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\pbuf">
+      <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\linux_demo">
+      <UniqueIdentifier>{9a252175-a1e2-407a-8174-8e1f78a056e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\linux_demo\config">
+      <UniqueIdentifier>{7fbbd8a8-ca65-4650-9b87-2e72c32a1ba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\libusb">
+      <UniqueIdentifier>{6c73c1d1-91ea-43ef-8e57-e7dc8d2505de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell">
+      <UniqueIdentifier>{9aece25a-aeaa-4676-8a73-26787e097a0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys">
+      <UniqueIdentifier>{31e43889-d7d0-4f4f-af4c-d8acfe725d70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux">
+      <UniqueIdentifier>{ce744d31-b25a-456c-95f1-bcbe49ce35be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\lib">
+      <UniqueIdentifier>{ed5b06a0-2bc9-428d-8cbd-e8eea56a8a71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\lib\glibc">
+      <UniqueIdentifier>{435260c2-f5db-4ac1-a7b8-7689459ca826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\lib\libusb">
+      <UniqueIdentifier>{326beba7-f40a-4b1f-84ba-7c1360f85495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs">
+      <UniqueIdentifier>{04e807a5-04e5-4504-8b8c-c1caf58810f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver">
+      <UniqueIdentifier>{6aca8d3a-8a91-486e-b680-1bd6ba0cb5f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver\fatfs">
+      <UniqueIdentifier>{f1e00540-1cb2-4e8a-af1c-8bf6eec67555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver\memfs">
+      <UniqueIdentifier>{2f752fa1-e425-42b9-94b6-17ab81009d4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver\winfs">
+      <UniqueIdentifier>{ddd1648c-67f8-4502-b44e-65958c164dca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\vsfstream\mem_stream">
+      <UniqueIdentifier>{0837a06d-2cd0-4433-90b5-95b58d60a234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\include">
+      <UniqueIdentifier>{fa47e9c8-171e-4416-aa2d-5fd7c91d943c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\sys">
+      <UniqueIdentifier>{d3175b26-a847-4f2e-aaeb-d01f4bc48c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\linux_demo\libusb">
+      <UniqueIdentifier>{b16b9061-b968-444f-8446-a85ae33274cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
+      <UniqueIdentifier>{d5a82037-ce3a-4900-bd1a-45ca168634c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\port">
+      <UniqueIdentifier>{f50f7949-c1dc-4954-9826-ab85f4ab85fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\port\busybox">
+      <UniqueIdentifier>{ceedc494-8e06-4b6f-a17f-89967ec7178d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\port\busybox\shell">
+      <UniqueIdentifier>{573f3a55-cd17-4b23-ab9e-9b2634dba53c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal">
+      <UniqueIdentifier>{01867ecc-5906-45d5-a185-46214fd64bbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver">
+      <UniqueIdentifier>{dcfc2fc1-db79-4332-ae4c-befe8e03b6df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver\mem_mal">
+      <UniqueIdentifier>{4916cd56-8122-4cd5-82d6-9a5f8cac4ddf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver\fakefat32_mal">
+      <UniqueIdentifier>{71f0f8cd-2e7a-4e29-9d96-c6b7b049d5ca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\vsf\vsf.h">
+      <Filter>vsf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\vsf_cfg.h">
+      <Filter>vsf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\communicate.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_black_box.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_simple.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\3rd-party\PLOOC\plooc_class_strict.h">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mrepeat.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\preprocessor.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\tpaste.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\template.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_evtq.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_cfg.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_kernel_common.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal.h">
+      <Filter>vsf\hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\vsf_hal_cfg.h">
+      <Filter>vsf\hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\x86\win\win_generic.h">
+      <Filter>vsf\hal\arch\x86\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\driver.h">
+      <Filter>vsf\hal\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_common.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_io.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_pm.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usart.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usb.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsf_service.h">
+      <Filter>vsf\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h">
+      <Filter>vsf\service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\trace\vsf_trace.h">
+      <Filter>vsf\service\trace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pool\vsf_pool.h">
+      <Filter>vsf\service\pool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h">
+      <Filter>vsf\service\vsfstream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h">
+      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\interface.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_base.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_reader.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\vsf_stream_writer.h">
+      <Filter>vsf\service\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h">
+      <Filter>vsf\service\stream\pbuf_queue</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h">
+      <Filter>vsf\service\heap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\vsf_component.h">
+      <Filter>vsf\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\vsf_component_cfg.h">
+      <Filter>vsf\component</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h">
+      <Filter>vsf\component\usb\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h">
+      <Filter>vsf\component\usb\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h">
+      <Filter>vsf\component\usb\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h">
+      <Filter>vsf\component\usb\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h">
+      <Filter>vsf\component\usb\common\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDCACM.h">
+      <Filter>vsf\component\usb\common\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_ds4.h">
+      <Filter>vsf\component\usb\common\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_HID.h">
+      <Filter>vsf\component\usb\common\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h">
+      <Filter>vsf\component\usb\common\class\UVC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h">
+      <Filter>vsf\component\usb\host\class\BTHCI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\vsf_usbh.h">
+      <Filter>vsf\component\usb\host</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.h">
+      <Filter>vsf\component\usb\host\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDCECM.h">
+      <Filter>vsf\component\usb\host\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_ds4.h">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_HID.h">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.h">
+      <Filter>vsf\component\usb\host\class\HUB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\vsf_usb_cfg.h">
+      <Filter>vsf\component\usb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\task\__vsf_task_common.h">
+      <Filter>vsf\kernel\task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_fsm.h">
+      <Filter>vsf\kernel\task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_pt.h">
+      <Filter>vsf\kernel\task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_task.h">
+      <Filter>vsf\kernel\task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\task\vsf_thread.h">
+      <Filter>vsf\kernel\task</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple.h">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h">
+      <Filter>vsf\kernel\shell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
+      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h">
+      <Filter>vsf\component\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h">
+      <Filter>vsf\component\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_gamepad.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_sensor.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h">
+      <Filter>vsf\component\input\driver\ds4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
+      <Filter>vsf\component\input\driver\hid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h">
+      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h">
+      <Filter>vsf\hal\driver\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h">
+      <Filter>vsf\component\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h">
+      <Filter>vsf\component\ui\disp_drv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h">
+      <Filter>vsf\hal\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_keyboard.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_mouse.h">
+      <Filter>vsf\component\input\protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.h">
+      <Filter>vsf\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_nspro.h">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_nspro.h">
+      <Filter>vsf\component\usb\common\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.h">
+      <Filter>vsf\component\input\driver\nspro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.h">
+      <Filter>vsf\component\input\driver\xb360</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\XB1\vsf_usb_xb1.h">
+      <Filter>vsf\component\usb\common\class\XB1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.h">
+      <Filter>vsf\component\usb\host\class\XB1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.h">
+      <Filter>vsf\component\input\driver\xb1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_xb360.h">
+      <Filter>vsf\component\usb\common\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.h">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\linux_demo\config\vsf_usr_cfg.h">
+      <Filter>usrapp\linux_demo\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.h">
+      <Filter>vsf\component\usb\host\class\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\vsf_linux.h">
+      <Filter>vsf\shell\sys\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\vsf_linux_cfg.h">
+      <Filter>vsf\shell\sys\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\lib\libusb\vsf_linux_libusb.h">
+      <Filter>vsf\shell\sys\linux\lib\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs.h">
+      <Filter>vsf\component\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs_cfg.h">
+      <Filter>vsf\component\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.h">
+      <Filter>vsf\component\fs\driver\fatfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h">
+      <Filter>vsf\component\fs\driver\memfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.h">
+      <Filter>vsf\component\fs\driver\winfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\unistd.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\types.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\time.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\stdio.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\semaphore.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\poll.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\stat.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\fcntl.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\signal.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\pthread.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\time.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\termios.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="libusb\config.h">
+      <Filter>usrapp\linux_demo\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="libusb\libusb.h">
+      <Filter>usrapp\linux_demo\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="libusb\libusbi.h">
+      <Filter>usrapp\linux_demo\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="libusb\version.h">
+      <Filter>usrapp\linux_demo\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="libusb\version_nano.h">
+      <Filter>usrapp\linux_demo\libusb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\port\busybox\busybox.h">
+      <Filter>vsf\shell\sys\linux\port\busybox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\port\busybox\config.h">
+      <Filter>vsf\shell\sys\linux\port\busybox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\wait.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\mal\vsf_mal.h">
+      <Filter>vsf\component\mal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\mal\vsf_mal_cfg.h">
+      <Filter>vsf\component\mal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.h">
+      <Filter>vsf\component\mal\driver\mem_mal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h">
+      <Filter>vsf\component\mal\driver\fakefat32_mal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\mount.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\linux_demo\fakefat32.h">
+      <Filter>usrapp\linux_demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\dirent.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
+      <Filter>vsf\utilities\3rd-party\PLOOC</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c">
+      <Filter>vsf\utilities\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c">
+      <Filter>vsf\utilities\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_array.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\vsf_hal.c">
+      <Filter>vsf\hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.c">
+      <Filter>vsf\hal\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\arch\x86\win\win_generic.c">
+      <Filter>vsf\hal\arch\x86\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsf_service.c">
+      <Filter>vsf\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\trace\vsf_trace.c">
+      <Filter>vsf\service\trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pool\vsf_pool.c">
+      <Filter>vsf\service\pool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c">
+      <Filter>vsf\service\vsfstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c">
+      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_base.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_reader.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream_writer.c">
+      <Filter>vsf\service\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c">
+      <Filter>vsf\service\stream\pbuf_queue</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c">
+      <Filter>vsf\service\heap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\vsf_component.c">
+      <Filter>vsf\component</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c">
+      <Filter>vsf\component\usb\host\class\BTHCI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\vsf_usbh.c">
+      <Filter>vsf\component\usb\host</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.c">
+      <Filter>vsf\component\usb\host\class\CDC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDCECM.c">
+      <Filter>vsf\component\usb\host\class\CDC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_ds4.c">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_HID.c">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.c">
+      <Filter>vsf\component\usb\host\class\HUB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\task\vsf_task.c">
+      <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\task\vsf_thread.c">
+      <Filter>vsf\kernel\task</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\shell\vsf_shell.c">
+      <Filter>vsf\kernel\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c">
+      <Filter>vsf\component\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c">
+      <Filter>vsf\component\input\driver\ds4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
+      <Filter>vsf\component\input\driver\hid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c">
+      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
+      <Filter>vsf\hal\driver\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c">
+      <Filter>vsf\component\ui\disp_drv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
+      <Filter>vsf\kernel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_nspro.c">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.c">
+      <Filter>vsf\component\input\driver\nspro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.c">
+      <Filter>vsf\component\input\driver\xb360</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.c">
+      <Filter>vsf\component\usb\host\class\XB1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.c">
+      <Filter>vsf\component\input\driver\xb1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.c">
+      <Filter>vsf\component\usb\host\class\HID</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c">
+      <Filter>vsf\service\pbuf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\linux_demo\main.c">
+      <Filter>usrapp\linux_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.c">
+      <Filter>vsf\component\usb\host\class\libusb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\vsf_linux.c">
+      <Filter>vsf\shell\sys\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\libusb\vsf_linux_libusb.c">
+      <Filter>vsf\shell\sys\linux\lib\libusb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\vsf_fs.c">
+      <Filter>vsf\component\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.c">
+      <Filter>vsf\component\fs\driver\fatfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c">
+      <Filter>vsf\component\fs\driver\memfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.c">
+      <Filter>vsf\component\fs\driver\winfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdio.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdlib.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\linux_demo\linux_main.c">
+      <Filter>usrapp\linux_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\vsf_linux_socket.c">
+      <Filter>vsf\shell\sys\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\simple_sprintf.c">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClCompile>
+    <ClCompile Include="libusb\descriptor.c">
+      <Filter>usrapp\linux_demo\libusb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\port\busybox\shell\vsh.c">
+      <Filter>vsf\shell\sys\linux\port\busybox\shell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\shell\sys\linux\port\busybox\busybox.c">
+      <Filter>vsf\shell\sys\linux\port\busybox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\mal\vsf_mal.c">
+      <Filter>vsf\component\mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.c">
+      <Filter>vsf\component\mal\driver\mem_mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c">
+      <Filter>vsf\component\mal\driver\fakefat32_mal</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

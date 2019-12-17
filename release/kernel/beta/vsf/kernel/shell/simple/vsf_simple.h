@@ -39,7 +39,7 @@
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define static_task_instance(__MEMBER)                                       \
-        struct {uint_fast8_t __canery;__MEMBER;                                 \
+        struct {uint_fast16_t tState;__MEMBER;                                 \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);
             
@@ -55,7 +55,7 @@
 #   endif
 #else
 #   define static_task_instance(...)                                            \
-        struct {uint_fast8_t chState;__VA_ARGS__;                               \
+        struct {uint_fast8_t tState;__VA_ARGS__;                                \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);
             
@@ -382,6 +382,12 @@ vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *pmtx, int_fast32_t time_out);
 
 SECTION("text.vsf.kernel.vsf_yield")
 extern vsf_evt_t __vsf_yield(void);
+
+SECTION("text.vsf.kernel.__vsf_call_eda")
+extern vsf_err_t __vsf_call_eda(uintptr_t evthandler, uintptr_t param);
+
+SECTION("text.vsf.kernel.__vsf_call_fsm")
+extern fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
 
 #endif
 /* EOF */

@@ -20,13 +20,13 @@
 #include "vsf_bitmap.h"
 
 /*============================ MACROS ========================================*/
-
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+extern int_fast8_t __vsf_arch_ffz(uintalu_t);
+
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -35,41 +35,26 @@
  *! \param pthis    address of the target bitmap
  *! \param biesize  the size of the bitmap in bits
  */
-void __vsf_bitmap_reset(uint_fast8_t *pthis, int_fast16_t bitsize)
+void __vsf_bitmap_reset(uintalu_t *pthis, int_fast16_t bitsize)
 {
     memset(pthis, 0, (bitsize + 7) >> 3);
 }
 
-WEAK(msb)
-int_fast16_t msb(uint_fast8_t a)
-{
-    int_fast16_t c = -1;
-    while (a > 0) {
-        c++;
-        a >>= 1;
-    }
-    return c;
-}
 
-#ifndef VSF_FFZ
-WEAK(ffz)
-int_fast16_t ffz(uint_fast8_t a)
+int_fast16_t __vsf_bitmap_ffz(uintalu_t*pbitmap, int_fast16_t bit_size)
 {
-    a = ~a;
-    return msb(a & -(int_fast8_t)a);
-}
-#endif
+    int_fast16_t word_size = (bit_size + __optimal_bit_sz - 1) / __optimal_bit_sz, i;
+    int_fast16_t index = 0, temp;
 
-int_fast16_t __vsf_bitmap_ffz(uint_fast8_t *pbitmap, int_fast16_t bitsize)
-{
-    int_fast16_t dwordsize = (bitsize + __optimal_bit_sz - 1) / __optimal_bit_sz, i;
-    int_fast16_t index;
-
-    for (i = 0; i < dwordsize; i++) {
-        index = ffz(pbitmap[i]);
-        if (index >= 0) {
+    for (i = 0; i < word_size; i++) {
+        temp = __vsf_arch_ffz(pbitmap[i]);
+        if (temp >= 0) {
+            index += temp;
             return index;
         }
+        index += __optimal_bit_sz;
     }
     return -1;
 }
+
+

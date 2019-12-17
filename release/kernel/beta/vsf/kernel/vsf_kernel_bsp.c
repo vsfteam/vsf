@@ -224,7 +224,9 @@ ROOT void __post_vsf_kernel_init(void)
     main();
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_NONE
 #else
-#   error Please define VSF_OS_CFG_MAIN_MODE!!!
+#   error Please define VSF_OS_CFG_MAIN_MODE!!! and make sure there is no\
+conflict configurations. E.g. When C89/90 is used, VSF_KERNEL_CFG_SUPPORT_THREAD \
+will be forced to DISABLED.
 #endif
 }
 

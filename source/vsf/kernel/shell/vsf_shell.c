@@ -97,7 +97,7 @@ const struct {
     .is_support_fsm =               (VSF_KERNEL_CFG_EDA_SUPPORT_FSM ? (true) : false),
 
     .Major =                        0,
-    .Minor =                        0x98,
+    .Minor =                        0x99,
 };
 
 /*============================ IMPLEMENTATION ================================*/

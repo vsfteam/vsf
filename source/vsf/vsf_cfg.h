@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Configuration 
+/*! \note Top Level Configuration */
 
 #ifndef __VSF_CFG_H__
 #define __VSF_CFG_H__

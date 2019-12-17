@@ -23,12 +23,18 @@
 /*============================ TYPES =========================================*/
 declare_vsf_pt(user_pt_task_t)
 declare_vsf_pt(user_pt_sub_t)
+declare_vsf_pt(user_pt_called_by_thread_t)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 declare_vsf_task(user_sub_task_t)
 #endif
 
 def_vsf_pt(user_pt_sub_t,
+    def_params(
+        uint32_t cnt;
+    ));
+    
+def_vsf_pt(user_pt_called_by_thread_t,
     def_params(
         uint32_t cnt;
     ));
@@ -42,7 +48,10 @@ def_vsf_task(user_sub_task_t,
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(user_thread_b_t)
-def_vsf_thread(user_thread_b_t, 1024);
+def_vsf_thread(user_thread_b_t, 1024,
+    def_params(
+        vsf_pt(user_pt_called_by_thread_t) pt_task;
+    ));
 
 
 #endif
@@ -65,14 +74,15 @@ def_vsf_pt(user_pt_task_t,
 
 
     
-#if VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD
+#if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD                     \
+    ||  VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
         uint32_t cnt;
         vsf_sem_t *psem;
     ));
-#else
+#elif VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(user_thread_a_t)
 
 def_vsf_thread(user_thread_a_t, 1024,
@@ -93,12 +103,28 @@ static NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+implement_vsf_pt(user_pt_called_by_thread_t)
+{
+    vsf_pt_begin();
+    
+    printf("\t\t\trun pt task: delay 1000ms\r\n");
+    vsf_pt_wait_until(vsf_delay_ms(100));
+    this.cnt++;
+    printf("\t\t\tdelay complete [0x%08x]\r\n", this.cnt);
+    
+    vsf_pt_end();
+}
+
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(user_thread_b_t)
 {
-    printf("run thread...delay 100ms...");
+    printf("\trun thread...delay 100ms...");
     vsf_delay_ms(100);
-    printf("cpl\r\n");
+    printf("\tcpl\r\n");
+    
+    printf("\t\tcall pt task\r\n");
+    vsf_thread_call_pt( user_pt_called_by_thread_t, &this.pt_task);
+    printf("\t\treturn from pt task\r\n");
 }
 #endif
 
@@ -189,13 +215,14 @@ private implement_vsf_pt(user_pt_task_t)
     vsf_pt_end();
 }
 
-#if VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD
+#if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD                     \
+    ||  VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 private implement_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
     
     while(1) {
-        vsf_pt_wait_until( vsf_delay_ms(10000) );                               //!< wait 10s
+        vsf_pt_wait_until( vsf_delay_ms(3000) );                               //!< wait 10s
         printf("post semaphore...   [%08x]\r\n", this.cnt++);
         vsf_sem_post(this.psem);                                                //!< post a semaphore
     }
@@ -207,7 +234,7 @@ implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_delay_ms(10000);
+        vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_sem_post(&__user_sem);            //!< post a semaphore
     }
@@ -215,7 +242,7 @@ implement_vsf_thread(user_thread_a_t)
 
 #endif
 
-void vsf_kernel_pt_simple_demo(void)
+void vsf_kernel_cross_call_demo(void)
 {  
     //! initialise semaphore
     vsf_sem_init(&__user_sem, 0); 
@@ -223,6 +250,7 @@ void vsf_kernel_pt_simple_demo(void)
     //! start a user task
     {
         static NO_INIT user_pt_task_t __user_pt;
+        memset(&__user_pt, 0, sizeof(user_pt_task_t));
         __user_pt.param.psem = &__user_sem;
         init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_0);
     };
@@ -261,7 +289,7 @@ int main(void)
 
     vsf_stdio_init();
     
-    vsf_kernel_pt_simple_demo();
+    vsf_kernel_cross_call_demo();
     
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED

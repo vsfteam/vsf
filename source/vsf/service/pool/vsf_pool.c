@@ -35,8 +35,13 @@
 #elif   !defined(VSF_POOL_LOCK) && defined(VSF_POOL_UNLOCK) 
 #   define  VSF_POOL_LOCK()
 #elif   !defined(VSF_POOL_LOCK) && !defined(VSF_POOL_UNLOCK) 
-#   define VSF_POOL_LOCK()      CODE_REGION_START(this.ptRegion)
-#   define VSF_POOL_UNLOCK()    CODE_REGION_END()
+#   if defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 199901L
+#       define VSF_POOL_LOCK()      CODE_REGION_START(this.ptRegion)
+#       define VSF_POOL_UNLOCK()    CODE_REGION_END()
+#   else
+#       define VSF_POOL_LOCK()      CODE_REGION_SIMPLE_START(this.ptRegion)
+#       define VSF_POOL_UNLOCK()    CODE_REGION_SIMPLE_END()
+#   endif
 #   define __VSF_POOL_USE_DEFAULT_ATOM_ACCESS
 #endif
 
