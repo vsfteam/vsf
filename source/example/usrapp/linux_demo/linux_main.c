@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <libusb.h>
 
+#if VSF_USE_LINUX_LIBUSB == ENABLED
 int lsusb_main(int argc, char *argv[])
 {
     bool verbose = (argc == 2) && !strcmp(argv[1], "-v");
@@ -112,3 +113,4 @@ int lsusb_main(int argc, char *argv[])
     libusb_exit(NULL);
     return 0;
 }
+#endif

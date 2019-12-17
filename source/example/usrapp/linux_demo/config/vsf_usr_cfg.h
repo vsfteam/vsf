@@ -159,7 +159,7 @@
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_USE_LINUX_LIBUSB                         ENABLED
+#   define VSF_USE_LINUX_LIBUSB                         DISABLED
 
 
 

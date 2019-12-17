@@ -654,19 +654,7 @@
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\termios.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
-    <ClInclude Include="libusb\config.h">
-      <Filter>usrapp\linux_demo\libusb</Filter>
-    </ClInclude>
     <ClInclude Include="libusb\libusb.h">
-      <Filter>usrapp\linux_demo\libusb</Filter>
-    </ClInclude>
-    <ClInclude Include="libusb\libusbi.h">
-      <Filter>usrapp\linux_demo\libusb</Filter>
-    </ClInclude>
-    <ClInclude Include="libusb\version.h">
-      <Filter>usrapp\linux_demo\libusb</Filter>
-    </ClInclude>
-    <ClInclude Include="libusb\version_nano.h">
       <Filter>usrapp\linux_demo\libusb</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\port\busybox\busybox.h">
@@ -921,9 +909,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\simple_sprintf.c">
       <Filter>vsf\utilities\language_externsion</Filter>
-    </ClCompile>
-    <ClCompile Include="libusb\descriptor.c">
-      <Filter>usrapp\linux_demo\libusb</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\shell\sys\linux\port\busybox\shell\vsh.c">
       <Filter>vsf\shell\sys\linux\port\busybox\shell</Filter>

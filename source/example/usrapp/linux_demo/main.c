@@ -138,19 +138,24 @@ static usrapp_t __usrapp = {
 
 /*============================ PROTOTYPES ====================================*/
 
+#if VSF_USE_LINUX_LIBUSB == ENABLED
 extern int lsusb_main(int argc, char *argv[]);
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
 int vsf_linux_create_fhs(void)
 {
+    int fd;
     busybox_install();
 
-    int fd = creat("/sbin/lsusb", 0);
+#if VSF_USE_LINUX_LIBUSB == ENABLED
+    fd = creat("/sbin/lsusb", 0);
     if (fd >= 0) {
         vsf_linux_fs_bind_executable(fd, lsusb_main);
         close(fd);
     }
+#endif
 
     if (mkdir("/fakefat32", 0)) {
         return -1;
@@ -170,7 +175,9 @@ int vsf_linux_create_fhs(void)
         mount(NULL, "/winfs", &vk_winfs_op, 0, &__usrapp.fs.winfs_info);
     }
 
+#if VSF_USE_LINUX_LIBUSB == ENABLED
     libusb_init(NULL);
+#endif
     return 0;
 }
 

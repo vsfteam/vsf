@@ -17,6 +17,8 @@
 
 /*============================ INCLUDES ======================================*/
 
+// TODO: implement backend for libusb(use LGPL)
+
 #include "../../vsf_linux_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED && VSF_USE_LINUX_LIBUSB == ENABLED
@@ -27,7 +29,6 @@
 
 //#include <stdlib.h>
 #include <libusb.h>
-#include "libusbi.h"
 
 #include <poll.h>
 #include <pthread.h>
@@ -692,76 +693,6 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds)
     if (pollfds != NULL) {
         free(pollfds);
     }
-}
-
-int libusb_get_active_config_descriptor(libusb_device *dev,
-        struct libusb_config_descriptor **config)
-{
-    int config_val, err = LIBUSB_SUCCESS;
-    struct libusb_config_descriptor _config;
-    unsigned char *buff = NULL, tmp[LIBUSB_DT_CONFIG_SIZE];
-    int host_endian = 0;
-
-    *config = NULL;
-    err = libusb_get_configuration((libusb_device_handle *)dev, &config_val);
-    if (err != LIBUSB_SUCCESS) { return err; }
-
-    err = libusb_get_descriptor((libusb_device_handle *)dev, USB_DT_CONFIG,
-            config_val - 1, tmp, LIBUSB_DT_CONFIG_SIZE);
-    if (err < 0) { return err; }
-
-    usbi_parse_descriptor(tmp, "bbw", &_config, host_endian);
-    buff = malloc(_config.wTotalLength);
-    if (!buff) { return LIBUSB_ERROR_NO_MEM; }
-
-    err = libusb_get_descriptor((libusb_device_handle *)dev, USB_DT_CONFIG,
-            config_val - 1, buff, _config.wTotalLength);
-    if (err >= 0) {
-        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
-        __vsf_libusb.curdev = ldev;
-        memset(&ldev->pipe_in[1], 0, sizeof(vk_usbh_pipe_t) * (dimof(ldev->pipe_in) - 1));
-        memset(&ldev->pipe_out[1], 0, sizeof(vk_usbh_pipe_t) * (dimof(ldev->pipe_out) - 1));
-        err = raw_desc_to_config(NULL, buff, err, host_endian, config);
-    }
-
-    free(buff);
-    return err;
-}
-
-int libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
-        struct libusb_config_descriptor **config)
-{
-    struct libusb_config_descriptor _config;
-    unsigned char tmp[LIBUSB_DT_CONFIG_SIZE];
-    unsigned char *buf = NULL;
-    int host_endian = 0;
-    int err;
-
-    err = libusb_get_descriptor((libusb_device_handle *)dev, USB_DT_CONFIG,
-            config_index, tmp, LIBUSB_DT_CONFIG_SIZE);
-    if (err < 0) { return err; }
-    if (err < LIBUSB_DT_CONFIG_SIZE) {
-        usbi_err(dev->ctx, "short config descriptor read %d/%d",
-             r, LIBUSB_DT_CONFIG_SIZE);
-        return LIBUSB_ERROR_IO;
-    }
-
-    usbi_parse_descriptor(tmp, "bbw", &_config, host_endian);
-    buf = malloc(_config.wTotalLength);
-    if (!buf) { return LIBUSB_ERROR_NO_MEM; }
-
-    err = libusb_get_descriptor((libusb_device_handle *)dev, USB_DT_CONFIG,
-            config_index, buf, _config.wTotalLength);
-    if (err >= 0) {
-        vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
-        __vsf_libusb.curdev = ldev;
-        memset(&ldev->pipe_in[1], 0, sizeof(vk_usbh_pipe_t) * (dimof(ldev->pipe_in) - 1));
-        memset(&ldev->pipe_out[1], 0, sizeof(vk_usbh_pipe_t) * (dimof(ldev->pipe_out) - 1));
-        err = raw_desc_to_config(NULL, buf, err, host_endian, config);
-    }
-
-    free(buf);
-    return err;
 }
 
 #endif      // VSF_USE_LINUX
