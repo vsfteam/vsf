@@ -18,14 +18,11 @@
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
+#include "../usrapp_common.h"
 
 #include "component/3rd-party/vsfvm/raw/vsf_vm.h"
 #include "component/3rd-party/vsfvm/extension/vsf/kernel/vsfvm_ext_kernel.h"
 #include "component/3rd-party/vsfvm/extension/vsf/libusb/vsfvm_ext_libusb.h"
-
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-#   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
-#endif
 
 /*============================ MACROS ========================================*/
 
@@ -40,18 +37,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_USB_HOST == ENABLED || VSFVM_CFG_COMPILER_EN == ENABLED
+#if VSFVM_CFG_COMPILER_EN == ENABLED
 struct usrapp_const_t {
-#   if VSF_USE_USB_HOST == ENABLED
-    struct {
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        vk_ohci_param_t ohci_param;
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        vsf_libusb_hcd_param_t libusb_hcd_param;
-#       endif
-    } usbh;
-#   endif
-
 #   if VSFVM_CFG_COMPILER_EN == ENABLED
     struct {
         char *dart_code;
@@ -62,18 +49,6 @@ typedef struct usrapp_const_t usrapp_const_t;
 #endif
 
 struct usrapp_t {
-#if VSF_USE_USB_HOST == ENABLED
-    struct {
-        vk_usbh_t host;
-#   if VSF_USE_USB_HOST_HUB == ENABLED
-        vk_usbh_class_t hub;
-#   endif
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-        vk_usbh_class_t libusb;
-#   endif
-    } usbh;
-#endif
-
     struct {
         vsfvm_runtime_t runtime;
         vsfvm_runtime_script_t script;
@@ -141,28 +116,15 @@ static const vsfvm_bytecode_t vsfvm_bytecode[] = {
 };
 #endif
 
-#if VSF_USE_USB_HOST == ENABLED || VSFVM_CFG_COMPILER_EN == ENABLED
+#if VSFVM_CFG_COMPILER_EN == ENABLED
 static const usrapp_const_t usrapp_const = {
-#   if VSF_USE_USB_HOST == ENABLED
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-    .usbh.ohci_param        = {
-        .op                 = &VSF_USB_HC0_IP,
-        .priority           = vsf_arch_prio_0,
-    },
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-    .usbh.libusb_hcd_param  = {
-        .priority = vsf_arch_prio_0,
-    },
-#       endif
-#   endif
-
 #   if VSFVM_CFG_COMPILER_EN == ENABLED
     .vm.dart_code           = "\
 print(\'vsfvm demo started...\\r\\n\');\r\n"
 #       if VSF_USE_USB_HOST == ENABLED
 "\
 libusb_on_evt(evt, libusb_dev dev) {\r\n\
-    if ((USB_EVT_ON_ARRIVED == evt) && (0 == dev.ifs())) {\r\n\
+    if (USB_EVT_ON_ARRIVED == evt) {\r\n\
         print(\'libusb_dev_on_arrived: \', dev);\r\n\
         var desc = buffer_create(18);\r\n\
         var result;\r\n\
@@ -186,24 +148,6 @@ while (1) {\r\n\
 #endif
 
 static usrapp_t usrapp = {
-#if VSF_USE_USB_HOST == ENABLED
-    .usbh                   = {
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        .host.drv           = &vk_ohci_drv,
-        .host.param         = (void *)&usrapp_const.usbh.ohci_param,
-#   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        .host.drv           = &vsf_libusb_hcd_drv,
-        .host.param         = (void*)&usrapp_const.usbh.libusb_hcd_param,
-#   endif
-#   if VSF_USE_USB_HOST_HUB == ENABLED
-        .hub.drv            = &vk_usbh_hub_drv,
-#   endif
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-        .libusb.drv         = &vk_usbh_libusb_drv,
-#   endif
-    },
-#endif
-
 #if VSFVM_CFG_COMPILER_EN == ENABLED
     .vm.lexer_dart.op       = &vsfvm_lexer_op_dart,
 #else
@@ -386,25 +330,7 @@ int main(void)
 #   endif
 #endif
 
-#if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
-#   if USRAPP_CFG_STDIO_EN == ENABLED
-    vsf_stdio_init();
-#   endif
-#endif
-
-#if VSF_USE_USB_HOST == ENABLED
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-    vk_ohci_init();
-#   endif
-    vk_usbh_init(&usrapp.usbh.host);
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-    vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.libusb);
-#   endif
-#   if VSF_USE_USB_HOST_HUB == ENABLED
-    vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hub);
-#   endif
-#endif
+    __usrapp_common_init();
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
     vsfvm_compiler_t *compiler = &usrapp.vm.compiler;

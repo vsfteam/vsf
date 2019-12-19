@@ -46,13 +46,13 @@
 vsf_err_t vk_scsi_init(vk_scsi_t *pthis)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->init != NULL));
-    return __vsf_call_eda(pthis->drv->init, pthis);
+    return __vsf_call_eda((uintptr_t)pthis->drv->init, (uintptr_t)pthis);
 }
 
 vsf_err_t vk_scsi_fini(vk_scsi_t *pthis)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->fini != NULL));
-    return __vsf_call_eda(pthis->drv->fini, pthis);
+    return __vsf_call_eda((uintptr_t)pthis->drv->fini, (uintptr_t)pthis);
 }
 
 bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
@@ -72,7 +72,7 @@ vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
     pthis->args.stream = NULL;
 #endif
-    return __vsf_call_eda(pthis->drv->execute, pthis);
+    return __vsf_call_eda((uintptr_t)pthis->drv->execute, (uintptr_t)pthis);
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
@@ -81,7 +81,7 @@ vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *s
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
     pthis->args.cbd = cbd;
     pthis->args.stream = stream;
-    return __vsf_call_eda(pthis->drv->execute_stream, pthis);
+    return __vsf_call_eda((uintptr_t)pthis->drv->execute_stream, (uintptr_t)pthis);
 }
 #endif
 

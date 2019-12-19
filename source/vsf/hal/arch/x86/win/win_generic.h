@@ -24,6 +24,9 @@
 #include "hal/vsf_hal_cfg.h"
 
 #include <Windows.h>
+#ifdef interface
+#   undef interface
+#endif
 
 #if     defined(VSF_ARCH_WIN_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -62,7 +65,7 @@ typedef uint64_t vsf_systimer_cnt_t;
 enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_IVALID = -1,
     vsf_arch_prio_ivalid = -1,
-    MREPEAT(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 };
 typedef enum vsf_arch_prio_t vsf_arch_prio_t;

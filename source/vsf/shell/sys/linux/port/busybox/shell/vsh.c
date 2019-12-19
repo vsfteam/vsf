@@ -115,7 +115,7 @@ static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
         }
 
         if (exefd < 0) {
-            printf("%s not found\r\n", ctx->arg.argv[0]);
+            printf("%s not found" VSH_LINEEND, ctx->arg.argv[0]);
             err = -ENOENT;
         fail:
             free(process);
@@ -198,6 +198,9 @@ int vsh_main(int argc, char *argv[])
 
                 switch (ch) {
                 case '\r':
+#if VSH_ECHO
+                    printf(VSH_LINEEND);
+#endif
                     if (strlen(ctx->cmd) > 0) {
                         vsh_run_cmd(ctx);
                     }
@@ -207,12 +210,18 @@ int vsh_main(int argc, char *argv[])
                 case '\b':
                 case 0x7F:
                     ctx->cmd[--ctx->pos] = '\0';
+#if VSH_ECHO
+                    write(STDOUT_FILENO, "\b \b", 3);
+#endif
                     break;
                 default:
                     if (ctx->pos >= VSH_CMD_SIZE - 1) {
                         goto input_too_long;
                     }
                     ctx->cmd[ctx->pos++] = ch;
+#if VSH_ECHO
+                    write(STDOUT_FILENO, &ch, 1);
+#endif
                     break;
                 }
             }
@@ -222,14 +231,14 @@ int vsh_main(int argc, char *argv[])
 
 int pwd_main(int argc, char *argv[])
 {
-    printf("%s\r\n", vsh_working_dir);
+    printf("%s" VSH_LINEEND, vsh_working_dir);
     return 0;
 }
 
 int cd_main(int argc, char *argv[])
 {
     if (argc != 2) {
-        printf("format: cd directory_name\r\n");
+        printf("format: cd directory_name" VSH_LINEEND);
         return -1;
     }
 
@@ -253,7 +262,7 @@ int cd_main(int argc, char *argv[])
         strcat(pathname, "/");
         DIR *dir = opendir(pathname);
         if (NULL == dir) {
-            printf("%s not exists\r\n", argv[1]);
+            printf("%s not exists" VSH_LINEEND, argv[1]);
             return -ENOENT;
         }
         closedir(dir);
@@ -285,11 +294,11 @@ int ls_main(int argc, char *argv[])
         if (err != 0) { return err; }
 
         if (dirnum > 1) {
-            printf("%s:\r\n", dirnames[i]);
+            printf("%s:" VSH_LINEEND, dirnames[i]);
         }
         dir = opendir(dirname);
         if (NULL == dir) {
-            printf("%s not exists\r\n", dirnames[i]);
+            printf("%s not exists" VSH_LINEEND, dirnames[i]);
             continue;
         }
 
@@ -312,7 +321,7 @@ int ls_main(int argc, char *argv[])
         printf(VSH_COLOR_NORMAL);
 #endif
         if (childnum > 0) {
-            printf("\r\n");
+            printf(VSH_LINEEND);
         }
 
         closedir(dir);
@@ -327,14 +336,14 @@ int echo_main(int argc, char *argv[])
     while (argc-- > 0) {
         printf("%s%s", *argv++, argc > 0 ? " " : "");
     }
-    printf("\r\n");
+    printf(VSH_LINEEND);
     return 0;
 }
 
 int cat_main(int argc, char *argv[])
 {
     if (argc != 2) {
-        printf("format: cat file_name\r\n");
+        printf("format: cat file_name" VSH_LINEEND);
         return -1;
     }
 
@@ -344,7 +353,7 @@ int cat_main(int argc, char *argv[])
 
     int fd = open(pathname, 0);
     if (fd < 0) {
-        printf("%s not found\r\n", argv[1]);
+        printf("%s not found" VSH_LINEEND, argv[1]);
         return -ENOENT;
     }
 
@@ -353,7 +362,7 @@ int cat_main(int argc, char *argv[])
     while ((size = read(fd, buf, sizeof(buf))) > 0) {
         write(STDOUT_FILENO, buf, size);
     }
-    printf("\r\n");
+    printf(VSH_LINEEND);
     close(fd);
     return 0;
 }

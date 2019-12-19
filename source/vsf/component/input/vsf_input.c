@@ -145,9 +145,9 @@ WEAK(vsf_input_on_touchscreen)
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
 #ifndef WEAK_VSF_INPUT_ON_EVT
-    vsf_input_on_evt(vk_input_type_tOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
+    vsf_input_on_evt(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
 #else
-    WEAK_VSF_INPUT_ON_EVT(vk_input_type_tOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
+    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
 #endif
 }
 #endif

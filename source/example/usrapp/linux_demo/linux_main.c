@@ -1,8 +1,9 @@
 #include <unistd.h>
 #include <stdio.h>
-#include <libusb.h>
 
 #if VSF_USE_LINUX_LIBUSB == ENABLED
+#include <libusb.h>
+
 int lsusb_main(int argc, char *argv[])
 {
     bool verbose = (argc == 2) && !strcmp(argv[1], "-v");
@@ -16,6 +17,10 @@ int lsusb_main(int argc, char *argv[])
     ssize_t cnt = libusb_get_device_list(NULL, &devs);
     if (cnt < 0) {
         printf("fail to get device list\r\n");
+        return -1;
+    }
+    if (!cnt) {
+        printf("no usb device connected\r\n");
         return -1;
     }
 
@@ -74,7 +79,7 @@ int lsusb_main(int argc, char *argv[])
                 printf("    bConfigurationValue:  %d\n",    config_desc->bConfigurationValue);
                 printf("    iConfiguration:       %d\n",    config_desc->iConfiguration);
                 printf("    bmAttributes:         %02xh\n", config_desc->bmAttributes);
-                printf("    MaxPower:             %d\n",    config_desc->MaxPower);
+                printf("    bMaxPower:            %d\n",    config_desc->bMaxPower);
 
                 for (int j = 0; j < config_desc->bNumInterfaces; j++) {
                     interface = (struct libusb_interface *)&config_desc->interface[j];

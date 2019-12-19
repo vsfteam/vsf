@@ -260,10 +260,7 @@
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_ds4.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_HID.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.h" />
@@ -358,7 +355,6 @@
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\hci_dump_vsf.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\hci_transport_h2_vsf.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.c" />

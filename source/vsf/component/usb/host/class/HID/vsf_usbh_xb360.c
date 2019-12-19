@@ -87,7 +87,7 @@ WEAK_VSF_USBH_XB360_ON_FREE_EXTERN
 WEAK(vsf_usbh_xb360_on_report_input)
 void vsf_usbh_xb360_on_report_input(vk_usbh_xb360_t *xb360, vsf_usb_xb360_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT_XB360 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
     vk_xb360_process_input(&xb360->use_as__vk_input_xb360_t, report);
 #   endif
 }
@@ -104,7 +104,7 @@ void vsf_usbh_xb360_on_report_output(vk_usbh_xb360_t *xb360)
 WEAK(vsf_usbh_xb360_on_new)
 void vsf_usbh_xb360_on_new(vk_usbh_xb360_t *xb360)
 {
-#   if VSF_USE_INPUT_XB360 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
     vk_xb360_new_dev(&xb360->use_as__vk_input_xb360_t);
 #   endif
 }
@@ -114,7 +114,7 @@ void vsf_usbh_xb360_on_new(vk_usbh_xb360_t *xb360)
 WEAK(vsf_usbh_xb360_on_free)
 void vsf_usbh_xb360_on_free(vk_usbh_xb360_t *xb360)
 {
-#   if VSF_USE_INPUT_XB360 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
     vk_xb360_free_dev(&xb360->use_as__vk_input_xb360_t);
 #   endif
 }

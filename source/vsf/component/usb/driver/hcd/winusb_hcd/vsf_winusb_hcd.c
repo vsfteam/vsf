@@ -159,7 +159,7 @@ const vk_usbh_hcd_drv_t vsf_winusb_hcd_drv = {
 
 static vsf_winusb_hcd_t __vsf_winusb_hcd = {
     .devs = {
-        MREPEAT(VSF_WINUSB_HCD_CFG_DEV_NUM, VSF_WINUSB_HCD_DEF_DEV, NULL)
+        REPEAT_MACRO(VSF_WINUSB_HCD_CFG_DEV_NUM, VSF_WINUSB_HCD_DEF_DEV, NULL)
     },
 };
 

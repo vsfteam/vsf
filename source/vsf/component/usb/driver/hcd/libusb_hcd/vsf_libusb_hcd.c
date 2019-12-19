@@ -158,7 +158,7 @@ const vk_usbh_hcd_drv_t vsf_libusb_hcd_drv = {
 
 static vsf_libusb_hcd_t __vsf_libusb_hcd = {
     .devs = {
-        MREPEAT(VSF_LIBUSB_HCD_CFG_DEV_NUM, VSF_LIBUSB_HCD_DEF_DEV, NULL)
+        REPEAT_MACRO(VSF_LIBUSB_HCD_CFG_DEV_NUM, VSF_LIBUSB_HCD_DEF_DEV, NULL)
     },
 };
 

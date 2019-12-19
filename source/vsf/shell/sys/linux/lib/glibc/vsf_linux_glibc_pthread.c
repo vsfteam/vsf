@@ -57,7 +57,7 @@ static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_pthread_priv_t *priv = (vsf_linux_pthread_priv_t *)&thread[1];
-    thread->retval = priv->entry(priv->param);
+    thread->retval = (int)priv->entry(priv->param);
 }
 
 pthread_t pthread_self(void)
@@ -97,7 +97,7 @@ int pthread_join(pthread_t tid, void **retval)
     vsf_thread_wfe(VSF_EVT_USER);
 
     if (retval != NULL) {
-        *retval = thread->retval;
+        *retval = (void *)thread->retval;
     }
     return 0;
 }

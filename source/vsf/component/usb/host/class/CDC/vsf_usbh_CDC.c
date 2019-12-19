@@ -88,10 +88,10 @@ static void vk_usbh_cdc_parse_ep(vk_usbh_cdc_t *pthis, struct usb_endpoint_desc_
     uint_fast8_t epaddr = desc_ep->bEndpointAddress;
     uint_fast8_t eptype = desc_ep->bmAttributes;
 
-    if ((USB_ENDPOINT_XFER_INT == eptype) && (epaddr & USB_ENDPOINT_DIR_MASK)) {
+    if ((USB_ENDPOINT_XFER_INT == eptype) && (epaddr & USB_DIR_MASK)) {
         vk_usbh_urb_prepare(&pthis->urb_evt, pthis->dev, desc_ep);
     } else if (USB_ENDPOINT_XFER_BULK == eptype) {
-        if (epaddr & USB_ENDPOINT_DIR_MASK) {
+        if (epaddr & USB_DIR_MASK) {
             pthis->pipe_rx = vk_usbh_get_pipe_from_ep_desc(pthis->dev, desc_ep);
         } else {
             pthis->pipe_tx = vk_usbh_get_pipe_from_ep_desc(pthis->dev, desc_ep);
@@ -105,7 +105,7 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
     vk_usbh_ifs_alt_parser_t *parser_alt = &parser_ifs->parser_alt[parser_ifs->ifs->cur_alt];
     struct usb_interface_desc_t *desc_ifs = parser_alt->desc_ifs;
     struct usb_endpoint_desc_t *desc_ep = parser_alt->desc_ep;
-    struct usb_class_interface_descriptor_t *desc;
+    struct usb_class_interface_desc_t *desc;
 
     pthis->usbh = usbh;
     pthis->dev = dev;
@@ -122,7 +122,7 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
         desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
 
-    desc = (struct usb_class_interface_descriptor_t *)desc_ifs;
+    desc = (struct usb_class_interface_desc_t *)desc_ifs;
     for (uint_fast8_t parsed_size = 0; parsed_size < parser_alt->desc_size;) {
         if (desc->bDescriptorType == USB_DT_CS_INTERFACE) {
             switch (desc->bDescriptorSubType) {
@@ -146,7 +146,7 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
             }
         }
         parsed_size += desc->bLength;
-        desc = (struct usb_class_interface_descriptor_t *)((uintptr_t)desc + desc->bLength);
+        desc = (struct usb_class_interface_desc_t *)((uintptr_t)desc + desc->bLength);
     }
 
     // parse data interface

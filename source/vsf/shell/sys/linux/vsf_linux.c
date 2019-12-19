@@ -31,8 +31,11 @@
 #include <signal.h>
 #include <poll.h>
 #include <sys/stat.h>
+#include <sys/select.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <errno.h>
+#include <stdarg.h>
 
 /*============================ MACROS ========================================*/
 
@@ -58,7 +61,6 @@ struct vsf_linux_t {
 
     vsf_linux_process_t *kernel_process;
     int sig_pid;
-    int err;
 
     vsf_linux_stdio_stream_t stdio_stream;
 };
@@ -84,15 +86,15 @@ struct vsf_linux_stream_priv_t {
 typedef struct vsf_linux_stream_priv_t vsf_linux_stream_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+int errno;
+
 /*============================ PROTOTYPES ====================================*/
 
 #if     defined(WEAK_VSF_LINUX_CREATE_FHS_EXTERN)                               \
     &&  defined(WEAK_VSF_LINUX_CREATE_FHS)
 WEAK_VSF_LINUX_CREATE_FHS_EXTERN
 #endif
-
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 extern void vsf_linux_glibc_init(void);
 
@@ -147,25 +149,16 @@ int vsf_linux_create_fhs(void)
 }
 #endif
 
-void vsf_linux_set_errno(int err)
-{
-    __vsf_linux.err = err;
-}
-
-int vsf_linux_get_errno(void)
-{
-    return __vsf_linux.err;
-}
-
 static int __vsf_linux_init_thread(int argc, char *argv[])
 {
-    return execl("/sbin/init", NULL);
+    return execl("/sbin/init", "init", NULL);
 }
 
 static int __vsf_linux_kernel_thread(int argc, char *argv[])
 {
     int err;
 
+    __vsf_linux.kernel_process = vsf_linux_get_cur_process();
 #ifndef WEAK_VSF_LINUX_CREATE_FHS
     err = vsf_linux_create_fhs();
 #else
@@ -203,7 +196,7 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
             if (handler != NULL) {
                 siginfo_t siginfo = {
                     .si_signo   = sig,
-                    .si_errno   = vsf_linux_get_errno(),
+                    .si_errno   = errno,
                 };
                 handler->handler(sig, &siginfo, NULL);
             } else if (!((1 << sig) & ((1 << SIGURG) | (1 << SIGCONT) | (1 << SIGWINCH)))) {
@@ -222,9 +215,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     vsf_linux_glibc_init();
 
     // create kernel process(pid0)
-    vsf_linux_process_t *process = vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, vsf_prio_0);
-    if (process != NULL) {
-        __vsf_linux.kernel_process = process;
+    if (NULL != vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, vsf_prio_0)) {
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
@@ -268,16 +259,6 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread)
                         &thread->use_as__vsf_thread_cb_t,
                         thread->process->prio);
     return 0;
-}
-
-static void __vsf_linux_terminate_thread(vsf_linux_thread_t *thread)
-{
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_dlist_remove(vsf_linux_thread_t, thread_node, &thread->process->thread_list, thread);
-    vsf_unprotect_sched(orig);
-
-    __vsf_eda_fini(&thread->use_as__vsf_eda_t);
-    free(thread);
 }
 
 vsf_linux_process_t * vsf_linux_create_process(int stack_size)
@@ -364,7 +345,8 @@ vsf_linux_process_t * vsf_linux_get_cur_process(void)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_linux_process_t *process = thread->process;
-    return process->id.pid != (pid_t)0 ? process : __vsf_linux.kernel_process;
+    return process->id.pid != (pid_t)0 || NULL == __vsf_linux.kernel_process ?
+                process : __vsf_linux.kernel_process;
 }
 
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
@@ -543,7 +525,6 @@ pid_t getppid(void)
 static vk_file_t * __vsf_linux_fs_get_file(const char *pathname)
 {
     vk_file_t *file;
-    vsf_err_t err;
 
     vk_file_open(NULL, pathname, 0, &file);
     return file;
@@ -635,42 +616,54 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
+    uint_fast32_t size = count, cursize;
 
-    vsf_protect_t orig = vsf_protect_sched();
-    if (!vsf_stream_get_data_size(stream)) {
-        stream->rx.evthandler = __vsf_linux_stream_evthandler;
-        stream->rx.param = thread;
-        thread->pending.stream = stream;
-        vsf_stream_connect_rx(stream);
-        vsf_unprotect_sched(orig);
+    while (size > 0) {
+        vsf_protect_t orig = vsf_protect_sched();
+        if (!vsf_stream_get_data_size(stream)) {
+            stream->rx.evthandler = __vsf_linux_stream_evthandler;
+            stream->rx.param = thread;
+            thread->pending.stream = stream;
+            vsf_stream_connect_rx(stream);
+            vsf_unprotect_sched(orig);
 
-        vsf_thread_wfe(VSF_EVT_USER);
-    } else {
-        vsf_unprotect_sched(orig);
+            vsf_thread_wfe(VSF_EVT_USER);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
+
+        cursize = vsf_stream_read(stream, buf, size);
+        size -= cursize;
+        buf = (uint8_t *)buf + cursize;
     }
-
-    return (ssize_t)vsf_stream_read(stream, buf, count);
+    return count;
 }
 
 static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vsf_stream_t *stream = ((vsf_linux_stream_priv_t *)sfd->priv)->stream;
+    uint_fast32_t size = count, cursize;
 
-    vsf_protect_t orig = vsf_protect_sched();
-    if (!vsf_stream_get_free_size(stream)) {
-        stream->tx.evthandler = __vsf_linux_stream_evthandler;
-        stream->tx.param = thread;
-        thread->pending.stream = stream;
-        vsf_stream_connect_tx(stream);
-        vsf_unprotect_sched(orig);
+    while (size > 0) {
+        vsf_protect_t orig = vsf_protect_sched();
+        if (!vsf_stream_get_free_size(stream)) {
+            stream->tx.evthandler = __vsf_linux_stream_evthandler;
+            stream->tx.param = thread;
+            thread->pending.stream = stream;
+            vsf_stream_connect_tx(stream);
+            vsf_unprotect_sched(orig);
 
-        vsf_thread_wfe(VSF_EVT_USER);
-    } else {
-        vsf_unprotect_sched(orig);
+            vsf_thread_wfe(VSF_EVT_USER);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
+
+        cursize = vsf_stream_write(stream, buf, size);
+        size -= cursize;
+        buf = (uint8_t *)buf + cursize;
     }
-
-    return (ssize_t)vsf_stream_write(stream, buf, count);
+    return count;
 }
 
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd)
@@ -698,7 +691,7 @@ int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
     int priv_size = (op != NULL) ? op->priv_size : 0;
     vsf_linux_fd_t *new_sfd = calloc(1, sizeof(vsf_linux_fd_t) + priv_size);
     if (!new_sfd) {
-        vsf_linux_set_errno(ENOMEM);
+        errno = ENOMEM;
         return -1;
     }
 
@@ -730,7 +723,7 @@ void vsf_linux_delete_fd(int fd)
 int vsf_linux_fd_tx_pend(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-    vsf_protect_t *orig = vsf_protect_sched();
+    vsf_protect_t orig = vsf_protect_sched();
     if (sfd->txevt) {
         sfd->txevt = false;
         vsf_unprotect_sched(orig);
@@ -745,7 +738,7 @@ int vsf_linux_fd_tx_pend(int fd)
 int vsf_linux_fd_rx_pend(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
-    vsf_protect_t *orig = vsf_protect_sched();
+    vsf_protect_t orig = vsf_protect_sched();
     if (sfd->rxevt) {
         sfd->rxevt = false;
         vsf_unprotect_sched(orig);
@@ -819,7 +812,7 @@ int unlink(const char *pathname)
 {
     vk_file_t *file = __vsf_linux_fs_get_file(pathname), *dir;
     if (!file) {
-        vsf_linux_set_errno(ENOENT);
+        errno = ENOENT;
         return -1;
     }
 
@@ -932,7 +925,7 @@ static int __vsf_linux_fs_create(const char* pathname, mode_t mode, vk_file_attr
     int err = 0;
     char *path = strdup(pathname);
     if (!path) {
-        vsf_linux_set_errno(ENOENT);
+        errno = ENOENT;
         return -1;
     }
 

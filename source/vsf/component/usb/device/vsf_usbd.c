@@ -355,7 +355,7 @@ static vsf_err_t vk_usbd_auto_init(vk_usbd_dev_t *dev)
     VSF_USBD_DRV_PREPARE(dev);
     vk_usbd_cfg_t *config;
     vk_usbd_desc_t *desc;
-    struct usb_config_descriptor_t *desc_config;
+    struct usb_config_desc_t *desc_config;
 
     uint_fast16_t pos, cur_ifs;
     uint_fast8_t attr, feature;
@@ -365,7 +365,7 @@ static vsf_err_t vk_usbd_auto_init(vk_usbd_dev_t *dev)
     // config other eps according to descriptors
     desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_CONFIG, dev->configuration, 0);
     VSF_USB_ASSERT(desc != NULL);
-    desc_config = (struct usb_config_descriptor_t *)desc->buffer;
+    desc_config = (struct usb_config_desc_t *)desc->buffer;
     VSF_USB_ASSERT(     (desc->size == desc_config->wTotalLength)
            &&   (desc_config->bLength == USB_DT_CONFIG_SIZE)
            &&   (desc_config->bDescriptorType == USB_DT_CONFIG)
@@ -385,22 +385,20 @@ static vsf_err_t vk_usbd_auto_init(vk_usbd_dev_t *dev)
     cur_ifs = -1;
     pos = USB_DT_CONFIG_SIZE;
     while (desc->size > pos) {
-        struct usb_endpoint_descriptor_t *desc_header =
-            (struct usb_endpoint_descriptor_t *)((uint8_t *)desc_config + pos);
+        struct usb_endpoint_desc_t *desc_header =
+            (struct usb_endpoint_desc_t *)((uint8_t *)desc_config + pos);
         VSF_USB_ASSERT((desc_header->bLength > 2) && (desc->size >= (pos + desc_header->bLength)));
 
         switch (desc_header->bDescriptorType) {
-        case USB_DT_INTERFACE:
-            {
-                struct usb_interface_descriptor_t *desc_ifs =
-                        (struct usb_interface_descriptor_t *)desc_header;
+        case USB_DT_INTERFACE: {
+                struct usb_interface_desc_t *desc_ifs =
+                        (struct usb_interface_desc_t *)desc_header;
                 cur_ifs = desc_ifs->bInterfaceNumber;
                 break;
             }
-        case USB_DT_ENDPOINT:
-            {
-                struct usb_endpoint_descriptor_t *desc_ep =
-                        (struct usb_endpoint_descriptor_t *)desc_header;
+        case USB_DT_ENDPOINT: {
+                struct usb_endpoint_desc_t *desc_ep =
+                        (struct usb_endpoint_desc_t *)desc_header;
                 uint_fast8_t ep_addr = desc_ep->bEndpointAddress;
                 uint_fast8_t ep_attr = desc_ep->bmAttributes;
                 uint_fast16_t ep_size = desc_ep->wMaxPacketSize;
@@ -515,8 +513,7 @@ static vsf_err_t vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
             break;
         case USB_REQ_SET_FEATURE:
             break;
-        case USB_REQ_GET_DESCRIPTOR:
-            {
+        case USB_REQ_GET_DESCRIPTOR: {
                 uint_fast8_t type = (request->wValue >> 8) & 0xFF;
                 uint_fast8_t index = request->wValue & 0xFF;
                 vk_usbd_desc_t *desc = NULL;
@@ -616,8 +613,7 @@ static vsf_err_t vk_usbd_stdctrl_process(vk_usbd_dev_t *dev)
             dev->address = (uint8_t)request->wValue;
             vk_usbd_drv_set_address(dev->address);
             break;
-        case USB_REQ_SET_CONFIGURATION:
-            {
+        case USB_REQ_SET_CONFIGURATION: {
                 int_fast16_t config_idx;
 
                 config_idx = vk_usbd_get_config(dev, request->wValue);
@@ -815,8 +811,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     case USB_ON_NAK:
         vsf_usbd_notify_user(dev, evt, (void *)value);
         break;
-    case USB_ON_RESET:
-        {
+    case USB_ON_RESET: {
             vk_usbd_cfg_t *config;
 
             vk_usbd_cfg_fini(dev);
@@ -834,10 +829,10 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
 
 #if VSF_USBD_CFG_AUTOSETUP == ENABLED
             uint_fast16_t ep_size;
-            struct usb_device_descriptor_t *desc_dev;
+            struct usb_device_desc_t *desc_dev;
             vk_usbd_desc_t *desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_DEVICE, 0, 0);
             VSF_USB_ASSERT(desc != NULL);
-            desc_dev = (struct usb_device_descriptor_t *)desc->buffer;
+            desc_dev = (struct usb_device_desc_t *)desc->buffer;
             VSF_USB_ASSERT(     (desc->size == USB_DT_DEVICE_SIZE)
                    &&   (desc_dev->bLength == USB_DT_DEVICE_SIZE)
                    &&   (desc_dev->bDescriptorType == USB_DT_DEVICE)
@@ -856,8 +851,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             vk_usbd_drv_set_address(0);
             break;
         }
-    case USB_ON_SETUP:
-        {
+    case USB_ON_SETUP: {
             vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
             struct usb_ctrlrequest_t *request = &ctrl_handler->request;
             vk_usbd_trans_t *trans = &ctrl_handler->trans;
@@ -891,8 +885,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     case USB_ON_STATUS:
         vk_usbd_ctrl_process(dev);
         break;
-    case USB_ON_IN:
-        {
+    case USB_ON_IN: {
             uint_fast8_t ep = value | USB_DIR_IN;
             vk_usbd_trans_t *trans = vk_usbd_get_trans(dev, ep);
             VSF_USB_ASSERT(trans != NULL);
@@ -907,8 +900,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             }
             break;
         }
-    case USB_ON_OUT:
-        {
+    case USB_ON_OUT: {
             uint_fast8_t ep = value | USB_DIR_OUT;
             vk_usbd_trans_t *trans = vk_usbd_get_trans(dev, ep);
             VSF_USB_ASSERT(trans != NULL);
@@ -993,13 +985,13 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
     vk_usbd_desc_t *desc;
     vk_usbd_cfg_t *config = dev->config;
     vk_usbd_ifs_t *ifs;
-    struct usb_config_descriptor_t *desc_config;
+    struct usb_config_desc_t *desc_config;
 
     for (uint_fast8_t i = 0; i < dev->num_of_config; i++, config++) {
 #if VSF_USBD_CFG_AUTOSETUP == ENABLED
         desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_CONFIG, i, 0);
         VSF_USB_ASSERT(desc != NULL);
-        desc_config = (struct usb_config_descriptor_t *)desc->buffer;
+        desc_config = (struct usb_config_desc_t *)desc->buffer;
         VSF_USB_ASSERT(     (desc->size == le16_to_cpu(desc_config->wTotalLength))
                         &&  (desc_config->bLength == USB_DT_CONFIG_SIZE)
                         &&  (desc_config->bDescriptorType == USB_DT_CONFIG)

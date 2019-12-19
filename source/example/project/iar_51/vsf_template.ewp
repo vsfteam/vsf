@@ -3616,7 +3616,34 @@
                             <name>controls</name>
                         </group>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</name>
@@ -3625,34 +3652,10 @@
                             <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_button.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_control.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_label.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_list.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc_panel.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</name>
                         </file>
                     </group>
                     <group>
@@ -3772,9 +3775,6 @@
                             <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</name>
                         </file>
                     </group>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\__vsf_tgui_control_types.h</name>
-                    </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui.c</name>
                     </file>
@@ -4119,6 +4119,9 @@
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\signal.h</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\type.h</name>
+                </file>
             </group>
             <group>
                 <name>language_extension</name>
@@ -4179,9 +4182,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\utilities\ooc_class.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\vsf\utilities\type.h</name>
             </file>
         </group>
     </group>

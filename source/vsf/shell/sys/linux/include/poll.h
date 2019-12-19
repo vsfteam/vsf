@@ -2,6 +2,7 @@
 #define __POLL_H__
 
 #include <signal.h>
+#include <time.h>
 
 typedef int nfds_t;
 

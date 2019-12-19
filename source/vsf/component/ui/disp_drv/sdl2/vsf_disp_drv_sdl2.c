@@ -28,6 +28,7 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USE_INPUT == ENABLED
 #if     defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN)                           \
     &&  defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN)
 WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN
@@ -41,6 +42,7 @@ WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
 #if     defined(WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN)                              \
     &&  defined(WEAK_VSF_INPUT_ON_KEYBOARD)
 WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN
+#endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -144,6 +146,7 @@ static void __vk_disp_sdl2_thread(void *arg)
     vk_disp_sdl2_t *disp_sdl2 = container_of(irq_thread, vk_disp_sdl2_t, thread);
 
     SDL_Event event;
+#if VSF_USE_INPUT == ENABLED
     union {
         implement(vk_input_evt_t)
         vk_touchscreen_evt_t    ts_evt;
@@ -151,6 +154,7 @@ static void __vk_disp_sdl2_thread(void *arg)
         vk_keyboard_evt_t      keyboard_evt;
     } evt;
     vk_input_type_t evt_type;
+#endif
 
     uint_fast16_t x = 0, y = 0;
     bool is_down = false, is_to_update = false;
@@ -173,24 +177,25 @@ static void __vk_disp_sdl2_thread(void *arg)
         }
 
         while (SDL_PollEvent(&event)) {
+#if VSF_USE_INPUT == ENABLED
             switch (event.type) {
             case SDL_MOUSEBUTTONUP:
                 is_down = false;
                 is_to_update = true;
-                evt_type = vk_input_type_tOUCHSCREEN;
+                evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 is_down = true;
                 x = event.motion.x / disp_sdl2->amplifier;
                 y = event.motion.y / disp_sdl2->amplifier;
                 is_to_update = true;
-                evt_type = vk_input_type_tOUCHSCREEN;
+                evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
                 break;
             case SDL_MOUSEMOTION:
                 x = event.motion.x / disp_sdl2->amplifier;
                 y = event.motion.y / disp_sdl2->amplifier;
                 is_to_update = is_down;
-                evt_type = vk_input_type_tOUCHSCREEN;
+                evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
                 break;
 
             case SDL_KEYDOWN:
@@ -202,7 +207,6 @@ static void __vk_disp_sdl2_thread(void *arg)
                     VSF_INPUT_KEYBOARD_SET(&evt.keyboard_evt, event.key.keysym.sym, SDL_KEYDOWN == event.type);
                 }
                 break;
-
             case SDL_CONTROLLERDEVICEADDED:
                 SDL_GameControllerOpen(event.cdevice.which);
                 break;
@@ -282,7 +286,7 @@ static void __vk_disp_sdl2_thread(void *arg)
 
                 __vsf_arch_irq_start(irq_thread);
                     switch (evt_type) {
-                    case vk_input_type_tOUCHSCREEN:
+                    case VSF_INPUT_TYPE_TOUCHSCREEN:
                         evt.ts_evt.info.width = disp_sdl2->param.width;
                         evt.ts_evt.info.height = disp_sdl2->param.height;
                         VSF_INPUT_TOUCHSCREEN_SET(&evt.ts_evt, 0, is_down, x, y);
@@ -309,6 +313,7 @@ static void __vk_disp_sdl2_thread(void *arg)
                     }
                 __vsf_arch_irq_end(irq_thread, false);
             }
+#endif
         }
         Sleep(30);
     }

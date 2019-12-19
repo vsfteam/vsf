@@ -1,4 +1,3 @@
-#pragma once
 /*****************************************************************************
  *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
@@ -108,11 +107,23 @@ typedef struct vsf_msgt_subcall_t {
 typedef struct vsf_msgt_handler_t vsf_msgt_handler_t;
 struct vsf_msgt_handler_t {
     vsf_msgt_handler_type_t         tType;                                      //!< message handler type
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     union {
-        vsf_msgt_method_fsm_t *fnFSM;                                            //!< message handler
-        vsf_eda_t* ptEDA;                                                       //!< target eda receiver
-        vsf_msgt_subcall_t* ptSubCall;                                          //!< subcall handler
+        union {
+            vsf_msgt_method_fsm_t* fnFSM;                                            //!< message handler
+            vsf_eda_t* ptEDA;                                                       //!< target eda receiver
+            vsf_msgt_subcall_t* ptSubCall;                                          //!< subcall handler
+        };
+#endif
+        union {
+            vsf_msgt_method_fsm_t *fnFSM;                                            //!< message handler
+            vsf_eda_t* ptEDA;                                                       //!< target eda receiver
+            vsf_msgt_subcall_t* ptSubCall;                                          //!< subcall handler
+        } fn;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     };
+#endif
 };
 
 //! \name v-table for tree message node 
@@ -129,18 +140,40 @@ end_def_interface(i_msg_tree_node_t)
 def_structure(vsf_msgt_node_t)
     
     uint8_t         chID;                                                       //!< node ID for lookup table
-    union {
-        struct {
-            uint8_t                 : 6;
 
-            /* \note when it is container, it is possible to make the container 
-                     transparent. When it is not a container, bIsTransparent 
-                     should be ignored. */
-            uint8_t bIsTransparent  : 1;                                        //!< used together with bIsContainer
-            uint8_t bIsContainer    : 1;                                        //!< whether it is a container or not
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+    union {
+        union {
+            struct {
+                uint8_t : 6;
+
+                /* \note when it is container, it is possible to make the container
+                         transparent. When it is not a container, bIsTransparent
+                         should be ignored. */
+                uint8_t bIsTransparent : 1;                                        //!< used together with bIsContainer
+                uint8_t bIsContainer : 1;                                        //!< whether it is a container or not
+            };
+            uint8_t     chAttribute;
         };
-        uint8_t     chAttribute;
+#endif
+        union {
+            struct {
+                uint8_t                 : 6;
+
+                /* \note when it is container, it is possible to make the container 
+                         transparent. When it is not a container, bIsTransparent 
+                         should be ignored. */
+                uint8_t bIsTransparent  : 1;                                        //!< used together with bIsContainer
+                uint8_t bIsContainer    : 1;                                        //!< whether it is a container or not
+            }_;
+            uint8_t     chValue;
+        } tAttribute;
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     };
+#endif
+
+
     vsf_msgt_node_t* ptParent;                                                  //!< parent node
     struct {
 #if VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST == ENABLED

@@ -81,7 +81,7 @@ const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
 WEAK(vsf_usbh_nspro_on_report_input)
 void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT_NSPRO == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
     vk_nspro_process_input(&nspro->use_as__vk_input_nspro_t, report);
 #   endif
 }
@@ -98,7 +98,7 @@ void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
 WEAK(vsf_usbh_nspro_on_new)
 void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
-#   if VSF_USE_INPUT_NSPRO == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
     vk_nspro_new_dev(&nspro->use_as__vk_input_nspro_t);
 #   endif
 }
@@ -108,7 +108,7 @@ void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 WEAK(vsf_usbh_nspro_on_free)
 void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
-#   if VSF_USE_INPUT_NSPRO == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
     vk_nspro_free_dev(&nspro->use_as__vk_input_nspro_t);
 #   endif
 }

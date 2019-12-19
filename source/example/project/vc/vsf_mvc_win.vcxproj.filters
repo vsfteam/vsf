@@ -450,16 +450,7 @@
     <ClInclude Include="..\..\..\vsf\component\vsf_component_cfg.h">
       <Filter>vsf\component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h">
       <Filter>vsf\component\usb\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h">
@@ -1799,7 +1790,6 @@
     <ClCompile Include="..\..\usrapp\mvc_demo_win\main.c">
       <Filter>usrapp\mvc_demo_win</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
       <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
     </ClCompile>

@@ -87,7 +87,7 @@ void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
             uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size)
 {
-    uint_fast8_t direction = endpoint & USB_ENDPOINT_DIR_MASK;
+    uint_fast8_t direction = endpoint & USB_DIR_MASK;
     vk_usbh_pipe_t pipe;
 
     endpoint &= 0x0F;
@@ -104,7 +104,7 @@ vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
     return vk_usbh_get_pipe(dev, desc_ep->bEndpointAddress,
-            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize_Lo));
+            desc_ep->bmAttributes, le16_to_cpu(desc_ep->wMaxPacketSize));
 }
 
 void vk_usbh_urb_prepare_by_pipe(vk_usbh_urb_t *urb, vk_usbh_dev_t *dev,
@@ -549,10 +549,10 @@ static vsf_err_t vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *ur
             switch (urb_hcd->pipe.speed) {
             case USB_SPEED_LOW:
             case USB_SPEED_FULL:
-                ((struct usb_device_descriptor_t *)data)->bcdUSB = cpu_to_le16(0x0110);
+                ((struct usb_device_desc_t *)data)->bcdUSB = cpu_to_le16(0x0110);
                 break;
             case USB_SPEED_HIGH:
-                ((struct usb_device_descriptor_t *)data)->bcdUSB = cpu_to_le16(0x0200);
+                ((struct usb_device_desc_t *)data)->bcdUSB = cpu_to_le16(0x0200);
                 break;
             //case USB_SPEED_VARIABLE:
             //    break;
@@ -863,14 +863,20 @@ static vsf_err_t vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
 static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser)
 {
     vk_usbh_dev_t *dev = usbh->dev_new;
-    struct usb_config_descriptor_t *desc_config = parser->desc_config;
+    struct usb_config_desc_t *desc_config = parser->desc_config;
     struct usb_interface_desc_t *desc_ifs;
     struct usb_descriptor_header_t *desc_header =
                 (struct usb_descriptor_header_t *)desc_config, *header_tmp;
     uint_fast16_t size = desc_config->wTotalLength, len, tmpsize;
     vk_usbh_ifs_parser_t *parser_ifs;
     vk_usbh_ifs_alt_parser_t *parser_alt;
-    uint_fast8_t ifs_no, claiming;
+    uint_fast8_t ifs_no;
+
+    enum {
+        STAGE_NONE = 0,
+        STAGE_ALLOC_ALT,
+        STAGE_PROBE_ALT,
+    } stage;
 
     if (desc_header->bDescriptorType != USB_DT_CONFIG) {
         return VSF_ERR_NONE;
@@ -900,7 +906,7 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
     desc_header = (struct usb_descriptor_header_t *)((uint8_t *)desc_header + desc_header->bLength);
 
     parser_alt = NULL;
-    claiming = desc_header->bDescriptorType == USB_DT_INTERFACE ? 1 : 0;
+    stage = desc_header->bDescriptorType == USB_DT_INTERFACE ? STAGE_ALLOC_ALT : STAGE_NONE;
     ifs_no = 0;
     tmpsize = size;
     header_tmp = desc_header;
@@ -922,7 +928,7 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
                     }
                     memset(parser_ifs->parser_alt, 0, len);
 
-                    claiming = 2;
+                    stage = STAGE_PROBE_ALT;
                     parser_alt = parser_ifs->parser_alt - 1;
                     size = tmpsize;
                     desc_header = header_tmp;
@@ -938,7 +944,7 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
                 probe_alt:
                     parser_alt->desc_size = (uint32_t)desc_ifs - (uint32_t)parser_alt->desc_ifs;
                     parser_alt = NULL;
-                    claiming = size > 0 ? 1 : 0;
+                    stage = size > 0 ? STAGE_ALLOC_ALT : STAGE_NONE;
                     ifs_no++;
                     if (ifs_no < dev->num_of_ifs) {
                         parser_ifs[1].ifs = &parser_ifs[0].ifs[1];
@@ -963,10 +969,10 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
 
         size -= desc_header->bLength;
         desc_header = (struct usb_descriptor_header_t *)((uint8_t *)desc_header + desc_header->bLength);
-        if (!size && claiming) {
-            if (claiming == 1) {
+        if (!size && stage) {
+            if (stage == STAGE_ALLOC_ALT) {
                 goto alloc_alt;
-            } else {
+            } else /*if (stage == STAGE_PROBE_ALT)*/ {
                 desc_ifs = (struct usb_interface_desc_t *)desc_header;
                 goto probe_alt;
             }
@@ -980,14 +986,14 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
 #endif
 
     // probe
-    claiming = 0;
+    size = 0;
     parser_ifs = parser->parser_ifs;
     for (ifs_no = 0; ifs_no < dev->num_of_ifs; ifs_no++, parser_ifs++) {
         if (!vk_usbh_find_intrface_driver(usbh, parser, parser_ifs)) {
-            claiming++;
+            size++;
         }
     }
-    return claiming > 0 ? VSF_ERR_NONE : VSF_ERR_FAIL;
+    return size > 0 ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
 static void vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)

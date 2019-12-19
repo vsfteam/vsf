@@ -147,6 +147,13 @@
 #   define VSF_USE_USB_HOST_ECM                         ENABLED
 #   define VSF_USE_USB_HOST_LIBUSB                      ENABLED
 
+// VSF_USE_USB_DEVICE will be enabled if target chip supports USBD
+//#define VSF_USE_USB_DEVICE                              ENABLED
+#   define VSF_USBD_CFG_USE_EDA                         ENABLED
+#   define VSF_USE_USB_DEVICE_CDCACM                    ENABLED
+#   define APP_CFG_USBD_VID                             0xA7A8
+#   define APP_CFG_USBD_PID                             0x2348
+
 #define VSF_USE_MAL                                     ENABLED
 #   define VSF_USE_MEM_MAL                              ENABLED
 #   define VSF_USE_FAKEFAT32_MAL                        ENABLED
@@ -156,10 +163,10 @@
 #   define VSF_USE_FATFS                                ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
-#define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_USE_LINUX_LIBUSB                         DISABLED
+#   define VSF_USE_LINUX_LIBUSB                         VSF_USE_USB_HOST
+#   define VSF_USE_LINUX_BUSYBOX                        ENABLED
 
 
 
@@ -202,14 +209,33 @@ enum {
 #endif
 
 
+#ifndef USRAPP_CFG_DCD_TYPE_DEFAULT
+#   define USRAPP_CFG_DCD_TYPE_DEFAULT      0
+#   define USRAPP_CFG_DCD_TYPE_DWCOTG       1
+#   define USRAPP_CFG_DCD_TYPE_MUSB_FDRC    2
+#endif
 
 #if     defined(__M484__)
-#   define VSF_HEAP_SIZE                                0x4000
+#   define VSF_HEAP_SIZE                                0x10000
 #   define VSF_SYSTIMER_FREQ                            (192000000ul)
+
+#   define VSF_USE_USB_DEVICE                           ENABLED
+#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_1
+#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_1
+#       define USRAPP_CFG_USBD_SPEED                    USB_SPEED_HIGH
+#       define USRAPP_CFG_CDC_NUM                       1
+#       define USRAPP_CFG_CDC_TX_STREAM_SIZE            1024
+#       define USRAPP_CFG_CDC_RX_STREAM_SIZE            512
+#       define USRAPP_CFG_DCD_TYPE                      USRAPP_CFG_DCD_TYPE_DEFAULT
+#       define USRAPP_CFG_STREAM_ALIGN                  1
 
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
 #   define VSF_USE_USB_HOST_HUB                         ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+
+#   define VSF_LINUX_CFG_STACKSIZE                      2048
+#   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
+#   define VSH_HAS_COLOR                                0
 #elif   defined(__NUC505__)
 #   define VSF_HEAP_SIZE                                0x4000
 #   define VSF_SYSTIMER_FREQ                            (96000000ul)
@@ -235,6 +261,8 @@ enum {
 #   define VSF_USE_WINFS                                ENABLED
 
 #   define VSF_LINUX_CFG_STACKSIZE                      8192
+#   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
+#   define VSH_ECHO                                     0
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *

@@ -185,9 +185,6 @@ extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
 #if defined(VSF_LINUX_IMPLEMENT) || defined(VSF_LINUX_INHERIT)
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
-extern void vsf_linux_set_errno(int err);
-extern int vsf_linux_get_errno(void);
-
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 

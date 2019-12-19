@@ -62,7 +62,7 @@ uint8_t vsf_tgui_proportional_font_get_char_width(const vsf_tgui_font_t* ptFont,
 
 /********************************************************************************/
 
-void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize, vsf_tgui_color_t tColor)
+void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize, vsf_tgui_color_t tRectColor)
 {
     VSF_TGUI_ASSERT(ptLocation != NULL);
     VSF_TGUI_ASSERT((0 <= ptLocation->nX) && (ptLocation->nX < VSF_TGUI_HOR_MAX));  // x_start point in screen
@@ -78,7 +78,7 @@ void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize
         for (uint16_t j = 0; j < ptSize->nWidth; j++) {
             vsf_tgui_location_t tPixelLocation = { .nX = ptLocation->nX + j, .nY = ptLocation->nY + i };
             vsf_tgui_color_t tPixelColor = vsf_tgui_get_pixel(&tPixelLocation);
-            tPixelColor = vsf_tgui_color_mix(tColor, tPixelColor, tColor.chA);
+            tPixelColor = vsf_tgui_color_mix(tRectColor, tPixelColor, tRectColor.tChannel.chA);
             vsf_tgui_set_pixel(&tPixelLocation, tPixelColor);
         }
     }
@@ -125,24 +125,24 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
         for (uint16_t j = 0; j < tDisplay.tSize.nWidth; j++) {
             vsf_tgui_location_t tPixelLocation = { .nX = tDisplay.tLocation.nX + j, .nY = tDisplay.tLocation.nY + i };
             vsf_tgui_color_t tTileColor;
-            tTileColor.chR = *pchData++;
-            tTileColor.chG = *pchData++;
-            tTileColor.chB = *pchData++;
+            tTileColor.tChannel.chR = *pchData++;
+            tTileColor.tChannel.chG = *pchData++;
+            tTileColor.tChannel.chB = *pchData++;
 
             if (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) {
-                tTileColor.chA = *pchData++;
+                tTileColor.tChannel.chA = *pchData++;
                 vsf_tgui_color_t tPixelColor = vsf_tgui_get_pixel(&tPixelLocation);
-                tPixelColor = vsf_tgui_color_mix(tTileColor, tPixelColor, tTileColor.chA);
+                tPixelColor = vsf_tgui_color_mix(tTileColor, tPixelColor, tTileColor.tChannel.chA);
                 vsf_tgui_set_pixel(&tPixelLocation, tPixelColor);
             } else if (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE) {
-                tTileColor.chA = 0xFF;
+                tTileColor.tChannel.chA = 0xFF;
                 vsf_tgui_set_pixel(&tPixelLocation, tTileColor);
             }
         }
     }
 }
 
-void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* ptFontLocation, vsf_tgui_size_t* ptSize, uint32_t wChar, vsf_tgui_color_t tColor)
+void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* ptFontLocation, vsf_tgui_size_t* ptSize, uint32_t wChar, vsf_tgui_color_t tCharColor)
 {
     VSF_TGUI_ASSERT(ptLocation != NULL);
     VSF_TGUI_ASSERT(ptFontLocation != NULL);
@@ -154,7 +154,7 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
             vsf_tgui_location_t tPixelLocation = { .nX = ptLocation->nX + i, .nY = ptLocation->nY + j };
             uint8_t mix = vsf_tgui_font_get_pixel_color(NULL, wChar, &tFontLocation);
             vsf_tgui_color_t tPixelColor = vsf_tgui_get_pixel(&tPixelLocation);
-            tPixelColor = vsf_tgui_color_mix(tColor, tPixelColor, mix);
+            tPixelColor = vsf_tgui_color_mix(tCharColor, tPixelColor, mix);
             vsf_tgui_set_pixel(&tPixelLocation, tPixelColor);
         }
     }

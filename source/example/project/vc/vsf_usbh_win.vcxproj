@@ -143,10 +143,7 @@
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_xb360.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\XB1\vsf_usb_xb1.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.h" />
@@ -232,6 +229,7 @@
     <ClInclude Include="..\..\usrapp\usbh_demo_win\config\btstack_config.h" />
     <ClInclude Include="..\..\usrapp\usbh_demo_win\config\lv_conf.h" />
     <ClInclude Include="..\..\usrapp\usbh_demo_win\config\vsf_usr_cfg.h" />
+    <ClInclude Include="..\..\usrapp\usrapp_common.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md" />

@@ -417,16 +417,7 @@
     <ClInclude Include="..\..\..\vsf\component\vsf_component_cfg.h">
       <Filter>vsf\component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h">
       <Filter>vsf\component\usb\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h">
@@ -896,6 +887,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
       <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\usrapp_common.h">
+      <Filter>usrapp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

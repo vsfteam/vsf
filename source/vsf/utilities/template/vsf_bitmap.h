@@ -52,9 +52,11 @@
 /*============================ MACROS ========================================*/
 #define __vsf_bitmap(__name)        __name##_bitmap_t
 
+#define __vsf_declare_bitmap_ex(__name, __bitsize)                              \
+typedef uintalu_t __name[((__bitsize) + __optimal_bit_sz - 1) / __optimal_bit_sz];
+
 #define __vsf_declare_bitmap(__name, __bitsize)                                 \
-typedef uintalu_t __vsf_bitmap(__name)[                                         \
-            ((__bitsize) + __optimal_bit_sz - 1) / __optimal_bit_sz];
+    __vsf_declare_bitmap_ex(__vsf_bitmap(__name), __bitsize)
 
 
 

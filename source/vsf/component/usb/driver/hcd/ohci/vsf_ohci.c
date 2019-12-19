@@ -1317,7 +1317,7 @@ static vsf_err_t ohci_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 
 static int ohci_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    uint_fast16_t typeReq, wValue, wIndex, wLength;
+    uint_fast16_t tReq, wValue, wIndex, wLength;
     vk_ohci_t *ohci;
     ohci_regs_t *regs;
     struct usb_ctrlrequest_t *req = &urb->setup_packet;
@@ -1331,12 +1331,12 @@ static int ohci_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
     VSF_USB_ASSERT(ohci != NULL);
     regs = ohci->regs;
 
-    typeReq = (req->bRequestType << 8) | req->bRequest;
+    tReq = (req->bRequestType << 8) | req->bRequest;
     wValue = req->wValue;
     wIndex = req->wIndex;
     wLength = req->wLength;
 
-    switch (typeReq) {
+    switch (tReq) {
     case GetHubStatus:
         datadw[0] = regs->roothub.status;
         len = 4;

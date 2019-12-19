@@ -97,7 +97,7 @@ WEAK_VSF_USBH_XB1_ON_FREE_EXTERN
 WEAK(vsf_usbh_xb1_on_report_input)
 void vsf_usbh_xb1_on_report_input(vk_usbh_xb1_t *xb1, vsf_usb_xb1_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT_XB1 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
     vk_xb1_process_input(&xb1->use_as__vk_input_xb1_t, report);
 #   endif
 }
@@ -114,7 +114,7 @@ void vsf_usbh_xb1_on_report_output(vk_usbh_xb1_t *xb1)
 WEAK(vsf_usbh_xb1_on_new)
 void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
 {
-#   if VSF_USE_INPUT_XB1 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
     vk_xb1_new_dev(&xb1->use_as__vk_input_xb1_t);
 #   endif
 }
@@ -124,7 +124,7 @@ void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
 WEAK(vsf_usbh_xb1_on_free)
 void vsf_usbh_xb1_on_free(vk_usbh_xb1_t *xb1)
 {
-#   if VSF_USE_INPUT_XB1 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
     vk_xb1_free_dev(&xb1->use_as__vk_input_xb1_t);
 #   endif
 }

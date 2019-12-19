@@ -7,7 +7,7 @@
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
- *  Unless required by applicable law or agreed to in writing, software      *
+ *  Unless requir by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
@@ -19,10 +19,20 @@
 
 #include "vsf.h"
 
+#if VSF_USE_USB_DEVICE == ENABLED
+
 /*============================ MACROS ========================================*/
 
+#ifndef USRAPP_CFG_CDC_TX_STREAM_SIZE
+#   define USRAPP_CFG_CDC_TX_STREAM_SIZE                1024
+#endif
+
+#ifndef USRAPP_CFG_CDC_RX_STREAM_SIZE
+#   define USRAPP_CFG_CDC_RX_STREAM_SIZE                1024
+#endif
+
 #ifndef USRAPP_CFG_CDC_NUM
-#   define USRAPP_CFG_CDC_NUM               6
+#   define USRAPP_CFG_CDC_NUM                           1
 #endif
 
 #if USRAPP_CFG_CDC_NUM > 8
@@ -85,13 +95,20 @@
 
 /*============================ TYPES =========================================*/
 
-struct usrapp_const_t {
+#if VSF_USE_USB_DEVICE
+struct usrapp_usbd_cdc_const_t {
     struct {
-#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-        vk_dwcotg_dcd_param_t dwcotg_param;
-#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-        vk_musb_fdrc_dcd_param_t musb_fdrc_param;
+#if     USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG                       \
+    ||  USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        struct {
+#   if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+            vk_dwcotg_dcd_param_t dwcotg_param;
+#   elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+            vk_musb_fdrc_dcd_param_t musb_fdrc_param;
+#   endif
+        } dcd;
 #endif
+
         uint8_t dev_desc[18];
         uint8_t config_desc[9 + USRAPP_CFG_CDC_NUM * USB_DESC_CDC_ACM_IAD_LEN];
         uint8_t str_lanid[4];
@@ -101,26 +118,29 @@ struct usrapp_const_t {
         vk_usbd_desc_t std_desc[5 + USRAPP_CFG_CDC_NUM];
     } usbd;
 };
-typedef struct usrapp_const_t usrapp_const_t;
+typedef struct usrapp_usbd_cdc_const_t usrapp_usbd_cdc_const_t;
 
-struct usrapp_t {
+struct usrapp_usbd_cdc_t {
     struct {
-#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-        vk_dwcotg_dcd_t dwcotg_dcd;
-#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-        vk_musb_fdrc_dcd_t musb_fdrc_dcd;
+#if     USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG                       \
+    ||  USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        struct {
+#   if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+            vk_dwcotg_dcd_t dwcotg_dcd;
+#   elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+            vk_musb_fdrc_dcd_t musb_fdrc_dcd;
+#   endif
+        } dcd;
 #endif
+
         struct {
             vk_usbd_cdcacm_t param;
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
             struct {
                 vsf_mem_stream_t tx;
                 vsf_mem_stream_t rx;
-                uint8_t tx_buffer[4 * 1024];
-                uint8_t rx_buffer[4 * 1024];
+                uint8_t tx_buffer[USRAPP_CFG_CDC_TX_STREAM_SIZE];
+                uint8_t rx_buffer[USRAPP_CFG_CDC_RX_STREAM_SIZE];
             } stream;
-#elif VSF_USE_SERVICE_STREAM == ENABLED
-#endif
         } cdc[USRAPP_CFG_CDC_NUM];
 
         vk_usbd_ifs_t ifs[2 * USRAPP_CFG_CDC_NUM];
@@ -130,28 +150,34 @@ struct usrapp_t {
         vsf_callback_timer_t connect_timer;
     } usbd;
 };
-typedef struct usrapp_t usrapp_t;
+typedef struct usrapp_usbd_cdc_t usrapp_usbd_cdc_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const usrapp_const_t usrapp_const = {
+static const usrapp_usbd_cdc_const_t __usrapp_usbd_cdc_const = {
     .usbd                       = {
-#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-        .dwcotg_param           = {
-            .op                 = &VSF_USB_DC0_IP,
-            .speed              = USRAPP_CFG_USBD_SPEED,
+#if     USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG                       \
+    ||  USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        .dcd                    = {
+#   if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+            .dwcotg_param       = {
+                .op             = &VSF_USB_DC0_IP,
+                .speed          = USRAPP_CFG_USBD_SPEED,
+            },
+#   elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+            musb_fdrc_param     = {
+                .op             = &VSF_USB_DC0_IP,
+            },
         },
-#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-        musb_fdrc_param         = {
-            .op                 = &VSF_USB_DC0_IP,
-        },
+#   endif
 #endif
         .dev_desc               = {
             USB_DESC_DEV_IAD(64, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 1, 2, 0, 1)
         },
         .config_desc            = {
-            USB_DESC_CFG(sizeof(usrapp_const.usbd.config_desc), 2 * USRAPP_CFG_CDC_NUM, 1, 0, 0x80, 100)
+            USB_DESC_CFG(sizeof(__usrapp_usbd_cdc_const.usbd.config_desc), 2 * USRAPP_CFG_CDC_NUM, 1, 0, 0x80, 100)
             REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_CFG, NULL)
         },
         .str_lanid              = {
@@ -171,39 +197,44 @@ static const usrapp_const_t usrapp_const = {
         },
         REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING, NULL)
         .std_desc               = {
-            VSF_USBD_DESC_DEVICE(0, usrapp_const.usbd.dev_desc, sizeof(usrapp_const.usbd.dev_desc)),
-            VSF_USBD_DESC_CONFIG(0, 0, usrapp_const.usbd.config_desc, sizeof(usrapp_const.usbd.config_desc)),
-            VSF_USBD_DESC_STRING(0, 0, usrapp_const.usbd.str_lanid, sizeof(usrapp_const.usbd.str_lanid)),
-            VSF_USBD_DESC_STRING(0x0409, 1, usrapp_const.usbd.str_vendor, sizeof(usrapp_const.usbd.str_vendor)),
-            VSF_USBD_DESC_STRING(0x0409, 2, usrapp_const.usbd.str_product, sizeof(usrapp_const.usbd.str_product)),
-            REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING_DECLARE, usrapp_const.usbd)
+            VSF_USBD_DESC_DEVICE(0, __usrapp_usbd_cdc_const.usbd.dev_desc, sizeof(__usrapp_usbd_cdc_const.usbd.dev_desc)),
+            VSF_USBD_DESC_CONFIG(0, 0, __usrapp_usbd_cdc_const.usbd.config_desc, sizeof(__usrapp_usbd_cdc_const.usbd.config_desc)),
+            VSF_USBD_DESC_STRING(0, 0, __usrapp_usbd_cdc_const.usbd.str_lanid, sizeof(__usrapp_usbd_cdc_const.usbd.str_lanid)),
+            VSF_USBD_DESC_STRING(0x0409, 1, __usrapp_usbd_cdc_const.usbd.str_vendor, sizeof(__usrapp_usbd_cdc_const.usbd.str_vendor)),
+            VSF_USBD_DESC_STRING(0x0409, 2, __usrapp_usbd_cdc_const.usbd.str_product, sizeof(__usrapp_usbd_cdc_const.usbd.str_product)),
+            REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING_DECLARE, __usrapp_usbd_cdc_const.usbd)
         },
     },
 };
 
-static usrapp_t usrapp;
+static usrapp_usbd_cdc_t __usrapp_usbd_cdc;
 #if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-VSF_USB_DC_FROM_DWCOTG_IP(0, usrapp.usbd.dwcotg_dcd, VSF_USB_DC0)
+VSF_USB_DC_FROM_DWCOTG_IP(0, __usrapp_usbd_cdc.usbd.dwcotg_dcd, VSF_USB_DC0)
 #elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-VSF_USB_DC_FROM_MUSB_FDRC_IP(0, usrapp.usbd.musb_fdrc_dcd, VSF_USB_DC0)
+VSF_USB_DC_FROM_MUSB_FDRC_IP(0, __usrapp_usbd_cdc.usbd.musb_fdrc_dcd, VSF_USB_DC0)
 #endif
 
-static usrapp_t usrapp = {
+static usrapp_usbd_cdc_t __usrapp_usbd_cdc = {
     .usbd                       = {
-#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
-        .dwcotg_dcd.param       = &usrapp_const.usbd.dwcotg_param,
-#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
-        .musb_fdrc_dcd.param    = &usrapp_const.usbd.musb_fdrc_param,
+#if     USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG                       \
+    ||  USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+        .dcd                    = {
+#   if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+            .dwcotg_dcd.param   = &__usrapp_usbd_cdc_const.usbd.dwcotg_param,
+#   elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+            .musb_fdrc_dcd.param= &__usrapp_usbd_cdc_const.usbd.musb_fdrc_param,
+#   endif
+        },
 #endif
-        REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_CDC_INSTANCE, usrapp.usbd)
+        REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_CDC_INSTANCE, __usrapp_usbd_cdc.usbd)
 
-        .config[0].num_of_ifs   = dimof(usrapp.usbd.ifs),
-        .config[0].ifs          = usrapp.usbd.ifs,
+        .config[0].num_of_ifs   = dimof(__usrapp_usbd_cdc.usbd.ifs),
+        .config[0].ifs          = __usrapp_usbd_cdc.usbd.ifs,
 
-        .dev.num_of_config      = dimof(usrapp.usbd.config),
-        .dev.config             = usrapp.usbd.config,
-        .dev.num_of_desc        = dimof(usrapp_const.usbd.std_desc),
-        .dev.desc               = (vk_usbd_desc_t *)usrapp_const.usbd.std_desc,
+        .dev.num_of_config      = dimof(__usrapp_usbd_cdc.usbd.config),
+        .dev.config             = __usrapp_usbd_cdc.usbd.config,
+        .dev.num_of_desc        = dimof(__usrapp_usbd_cdc_const.usbd.std_desc),
+        .dev.desc               = (vk_usbd_desc_t *)__usrapp_usbd_cdc_const.usbd.std_desc,
 
 #if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
         .dev.speed              = USB_DC_SPEED_HIGH,
@@ -217,27 +248,38 @@ static usrapp_t usrapp = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void usrapp_on_timer(vsf_callback_timer_t *timer)
+static void __usrapp_usbd_on_timer(vsf_callback_timer_t *timer)
 {
-    vk_usbd_connect(&usrapp.usbd.dev);
+    vk_usbd_connect(&__usrapp_usbd_cdc.usbd.dev);
 }
 
-void main(void)
+bool usrapp_usbd_cdc_demo_get_stream(int idx, vsf_stream_t **stream_tx, vsf_stream_t **stream_rx)
 {
-#if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
-    vsf_stdio_init();
-#endif
+    if (idx < USRAPP_CFG_CDC_NUM) {
+        if(stream_tx != NULL) {
+            *stream_tx = &__usrapp_usbd_cdc.usbd.cdc[idx].stream.tx.use_as__vsf_stream_t;
+        }
+        if(stream_rx != NULL) {
+            *stream_rx = &__usrapp_usbd_cdc.usbd.cdc[idx].stream.rx.use_as__vsf_stream_t;
+        }
+        return true;
+    }
+    return false;
+}
 
+void usrapp_usbd_cdc_demo(void)
+{
     for (uint_fast8_t i = 0; i < USRAPP_CFG_CDC_NUM; i++) {
-        vsf_stream_init(&usrapp.usbd.cdc[i].stream.tx.use_as__vsf_stream_t);
-        vsf_stream_init(&usrapp.usbd.cdc[i].stream.rx.use_as__vsf_stream_t);
+        vsf_stream_init(&__usrapp_usbd_cdc.usbd.cdc[i].stream.tx.use_as__vsf_stream_t);
+        vsf_stream_init(&__usrapp_usbd_cdc.usbd.cdc[i].stream.rx.use_as__vsf_stream_t);
     }
 
-    vk_usbd_init(&usrapp.usbd.dev);
-    vk_usbd_disconnect(&usrapp.usbd.dev);
-    usrapp.usbd.connect_timer.on_timer = usrapp_on_timer;
-    vsf_callback_timer_add_ms(&usrapp.usbd.connect_timer, 200);
+    vk_usbd_init(&__usrapp_usbd_cdc.usbd.dev);
+    vk_usbd_disconnect(&__usrapp_usbd_cdc.usbd.dev);
+    __usrapp_usbd_cdc.usbd.connect_timer.on_timer = __usrapp_usbd_on_timer;
+    vsf_callback_timer_add_ms(&__usrapp_usbd_cdc.usbd.connect_timer, 200);
 }
+
+#endif      // VSF_USE_USB_DEVICE
 
 /* EOF */

@@ -112,7 +112,7 @@ void GPIO0_7_Handler        (void) __attribute__ ((weak, alias("Default_Handler"
 #define __DECLARE_SWI_IRQ_HANDLER(__N, __NULL)                                  \
     WEAK_ISR(SWI##__N##_IRQHandler)                                             
 
-MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
+REPEAT_MACRO(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table

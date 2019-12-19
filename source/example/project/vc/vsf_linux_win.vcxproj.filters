@@ -229,9 +229,6 @@
     <Filter Include="vsf\shell\sys\linux\include\sys">
       <UniqueIdentifier>{d3175b26-a847-4f2e-aaeb-d01f4bc48c91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="usrapp\linux_demo\libusb">
-      <UniqueIdentifier>{b16b9061-b968-444f-8446-a85ae33274cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
       <UniqueIdentifier>{d5a82037-ce3a-4900-bd1a-45ca168634c7}</UniqueIdentifier>
     </Filter>
@@ -255,6 +252,9 @@
     </Filter>
     <Filter Include="vsf\component\mal\driver\fakefat32_mal">
       <UniqueIdentifier>{71f0f8cd-2e7a-4e29-9d96-c6b7b049d5ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\linux\include\linux">
+      <UniqueIdentifier>{27677cab-f494-4daf-a1b5-19c342cfd33d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -417,16 +417,7 @@
     <ClInclude Include="..\..\..\vsf\component\vsf_component_cfg.h">
       <Filter>vsf\component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h">
       <Filter>vsf\component\usb\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h">
@@ -654,9 +645,6 @@
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\termios.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
-    <ClInclude Include="libusb\libusb.h">
-      <Filter>usrapp\linux_demo\libusb</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\port\busybox\busybox.h">
       <Filter>vsf\shell\sys\linux\port\busybox</Filter>
     </ClInclude>
@@ -685,6 +673,21 @@
       <Filter>usrapp\linux_demo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\dirent.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\usrapp_common.h">
+      <Filter>usrapp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\libusb.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\linux\limits.h">
+      <Filter>vsf\shell\sys\linux\include\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\select.h">
+      <Filter>vsf\shell\sys\linux\include\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\errno.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
   </ItemGroup>

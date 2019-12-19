@@ -95,8 +95,8 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
         //! shoot the root item
         if (__msgt_shoot(ptObj, ptRoot, pBulletInfo)) {
             ptItem = (vsf_msgt_node_t *)ptRoot;
-        } else if (ptRoot->bIsContainer){
-            if (!ptRoot->bIsTransparent) {
+        } else if (ptRoot->tAttribute._.bIsContainer){
+            if (!ptRoot->tAttribute._.bIsTransparent) {
                 //! not in the range
                 break;
             }
@@ -163,7 +163,7 @@ const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* ptObj,
                 break;
             }
             ptItem = ptNode;
-            if (!ptItem->bIsContainer) {
+            if (!ptItem->tAttribute._.bIsContainer) {
                 //!< the leaf node
                 break;
             } /* else; find a container, check the contained nodes*/
@@ -257,7 +257,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
                 chID -= 2;
                 ptHandler = &this.NodeTypes.ptInterfaces[chID].tMessageHandler;
             }
-            if (NULL == ptHandler->fnFSM) {
+            if (NULL == ptHandler->fn.fnFSM) {
                 //! empty handler
                 RESET_MSGT_HANDLING_FSM();
                 return fsm_rt_err;
@@ -279,7 +279,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
                     break;
     #endif
                 case VSF_MSGT_NODE_HANDLER_TYPE_EDA: {
-                    vsf_err_t tErr = vsf_eda_post_msg(ptHandler->ptEDA, ptFSM->ptMessage);
+                    vsf_err_t tErr = vsf_eda_post_msg(ptHandler->fn.ptEDA, ptFSM->ptMessage);
                     VSF_OSA_SERVICE_ASSERT(tErr == VSF_ERR_NONE);
                     UNUSED_PARAM(tErr);
                     RESET_MSGT_HANDLING_FSM();
@@ -294,7 +294,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
         }
 
         case HANDLE_FSM: {
-            fsm_rt_t tfsm = ptFSM->ptHandler->fnFSM((vsf_msgt_node_t *)ptNode, ptFSM->ptMessage);
+            fsm_rt_t tfsm = ptFSM->ptHandler->fn.fnFSM((vsf_msgt_node_t *)ptNode, ptFSM->ptMessage);
             if (fsm_rt_cpl == tfsm) {
                 //! message has been handled
                 RESET_MSGT_HANDLING_FSM();
@@ -495,7 +495,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
 
                 THIS_FSM_STATE = FETCH_ITEM;
                 //! add nodes to fifo
-                if (this.FWBFS.tMSGHandling.ptNode->bIsContainer) {
+                if (this.FWBFS.tMSGHandling.ptNode->tAttribute._.bIsContainer) {
                     vsf_msgt_container_t* ptContainer = 
                         (vsf_msgt_container_t*)this.FWBFS.tMSGHandling.ptNode;
                     vsf_msgt_node_t *ptTemp = ptContainer->ptNode;

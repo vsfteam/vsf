@@ -1,6 +1,6 @@
 print('vsfvm demo started...\r\n');
 libusb_on_evt(evt, libusb_dev dev) {
-    if ((USB_EVT_ON_ARRIVED == evt) && (0 == dev.ifs())) {
+    if (USB_EVT_ON_ARRIVED == evt) {
         print('libusb_dev_on_arrived: ', dev);
 
         var desc = buffer_create(18);

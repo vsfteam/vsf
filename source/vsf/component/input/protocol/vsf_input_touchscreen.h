@@ -46,7 +46,7 @@
 /*============================ TYPES =========================================*/
 
 enum {
-    vk_input_type_tOUCHSCREEN = VSF_INPUT_USER_TYPE,
+    VSF_INPUT_TYPE_TOUCHSCREEN = VSF_INPUT_USER_TYPE,
 };
 
 struct vk_touchscreen_info_t {

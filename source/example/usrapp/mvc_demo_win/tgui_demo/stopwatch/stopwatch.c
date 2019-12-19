@@ -81,12 +81,10 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
             break;
         }
 
-        ptPanel->use_as__vsf_tgui_panel_t.ptGUI = ptGUI;
-
         describ_tgui_panel(stopwatch_t, *ptPanel,
             tgui_region(
                 tgui_location(100, 100),
-                tgui_size(300, 300),
+                tgui_size(300, 80),
                 ),
             tgui_text(tTitle, "My Stopwatch"),
 
@@ -118,6 +116,9 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
                 ),
         );
 
+
+        ptPanel->use_as__vsf_tgui_panel_t.ptGUI = ptGUI;
+
         vsf_tgui_panel_v_init(  &(ptPanel->use_as__vsf_tgui_panel_t));
         vsf_tgui_label_v_init(  &(ptPanel->time));
         vsf_tgui_button_v_init( &(ptPanel->start_stop));
@@ -136,7 +137,7 @@ implement_vsf_pt(tgui_demo_t)
     stopwatch_t *ptBase = (stopwatch_t*)container_of(ptThis, stopwatch_t, task.param);
     vsf_pt_begin();
 
-    refresh_all();
+    vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.ptGUI);
 
     while(1) {
             
@@ -166,7 +167,6 @@ implement_vsf_pt(tgui_demo_t)
                                 (vsf_tgui_control_t *)&(base.time), 
                                 NULL);
         } while(0);
-
         vsf_pt_wait_until(vsf_delay_ms(1000));
     }
 

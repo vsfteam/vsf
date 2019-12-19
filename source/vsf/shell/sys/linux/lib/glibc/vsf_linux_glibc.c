@@ -23,6 +23,7 @@
 
 #define VSF_LINUX_INHERIT
 #include "../../vsf_linux.h"
+#include <errno.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

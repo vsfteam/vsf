@@ -3,6 +3,7 @@
 
 #include "vsf.h"
 #include "../vsf_linux.h"
+#include <linux/limits.h>
 #include <sys/types.h>
 
 typedef long                off_t;

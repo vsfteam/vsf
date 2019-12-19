@@ -124,18 +124,25 @@ static uint_fast32_t vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, ui
     uint_fast32_t wsize = min(avail_len, size);
 
     VSF_SERVICE_ASSERT(!(mem_stream->wpos & mem_stream->align));
+    mem_stream->is_writing = true;
     if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.pchBuffer[mem_stream->wpos])) {
-        memcpy(mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos, buf, wsize);
+        uint_fast32_t totalsize = wsize;
+        uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->wpos;
+
+        curlen = min(totalsize, curlen);
+        memcpy(mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos, buf, curlen);
+        totalsize -= curlen;
+        buf += curlen;
+        if (totalsize > 0) {
+            memcpy(mem_stream->use_as__vsf_mem_t.pchBuffer, buf, totalsize);
+        }
     }
 
     vsf_protect_t orig = vsf_protect_sched();
         mem_stream->data_size += wsize;
+        mem_stream->wpos += wsize;
+        mem_stream->wpos %= mem_stream->use_as__vsf_mem_t.nSize;
     vsf_unprotect_sched(orig);
-
-    mem_stream->wpos += wsize;
-    if (mem_stream->wpos >= mem_stream->use_as__vsf_mem_t.nSize) {
-        mem_stream->wpos = 0;
-    }
     mem_stream->is_writing = false;
     return wsize;
 }
@@ -151,18 +158,27 @@ static uint_fast32_t vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, uin
         rsize &= ~mem_stream->align;
     }
     if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.pchBuffer[mem_stream->rpos])) {
-        memcpy(buf, mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos, rsize);
+        uint_fast32_t totalsize = rsize;
+        uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->rpos;
+
+        curlen = min(totalsize, curlen);
+        memcpy(buf, mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos, curlen);
+        totalsize -= curlen;
+        buf += curlen;
+        if (totalsize > 0) {
+            memcpy(buf, mem_stream->use_as__vsf_mem_t.pchBuffer, totalsize);
+        }
     }
 
     vsf_protect_t orig = vsf_protect_sched();
         mem_stream->data_size -= rsize;
+        if ((size < data_len) || mem_stream->is_writing) {
+            mem_stream->rpos += rsize;
+            mem_stream->rpos %= mem_stream->use_as__vsf_mem_t.nSize;
+        } else {
+            mem_stream->rpos = mem_stream->wpos = 0;
+        }
     vsf_unprotect_sched(orig);
-
-    if ((size < data_len) || mem_stream->is_writing) {
-        mem_stream->rpos += rsize;
-    } else {
-        mem_stream->rpos = mem_stream->wpos = 0;
-    }
     return rsize;
 }
 

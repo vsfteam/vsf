@@ -67,7 +67,7 @@ typedef uint64_t vsf_systimer_cnt_t;
             __vsf_arch_prio_index_##__N = (__N),
 
 enum {
-    MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
     __vsf_arch_prio_index_number,
 };
 
@@ -85,7 +85,7 @@ enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_IVALID            = -1,
     vsf_arch_prio_ivalid            = -1,
 
-    MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 
     vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF ,
 };

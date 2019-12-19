@@ -101,7 +101,7 @@ const vk_usbh_class_drv_t vk_usbh_ds4_drv = {
 WEAK(vsf_usbh_ds4_on_report_input)
 void vsf_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT_DS4 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
     vk_ds4u_process_input(&ds4->use_as__vk_input_ds4u_t, report);
 #   endif
 }
@@ -118,7 +118,7 @@ void vsf_usbh_ds4_on_report_output(vk_usbh_ds4_t *ds4)
 WEAK(vsf_usbh_ds4_on_new)
 void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 {
-#   if VSF_USE_INPUT_DS4 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
     vk_ds4u_new_dev(&ds4->use_as__vk_input_ds4u_t);
 #   endif
 }
@@ -128,7 +128,7 @@ void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 WEAK(vsf_usbh_ds4_on_free)
 void vsf_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
 {
-#   if VSF_USE_INPUT_DS4 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
     vk_ds4u_free_dev(&ds4->use_as__vk_input_ds4u_t);
 #   endif
 }

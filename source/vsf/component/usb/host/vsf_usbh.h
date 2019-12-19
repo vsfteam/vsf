@@ -25,7 +25,6 @@
 
 #include "kernel/vsf_kernel.h"
 #include "../common/usb_common.h"
-#include "../common/usb_ch11.h"
 
 #if     defined(VSF_USBH_IMPLEMENT)
 #   define VSF_USBH_IMPLEMENT_vk_usbh_hcd_t
@@ -175,8 +174,8 @@ struct vk_usbh_ifs_parser_t {
 typedef struct vk_usbh_ifs_parser_t vk_usbh_ifs_parser_t;
 
 struct vk_usbh_dev_parser_t {
-    struct usb_device_descriptor_t *desc_device;
-    struct usb_config_descriptor_t *desc_config;
+    struct usb_device_desc_t *desc_device;
+    struct usb_config_desc_t *desc_config;
     vk_usbh_ifs_parser_t *parser_ifs;
     uint8_t num_of_ifs;
     uint8_t devnum_temp;

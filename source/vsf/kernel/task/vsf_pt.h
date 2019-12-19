@@ -172,12 +172,19 @@
 #define vsf_pt(__NAME)                  __vsf_pt(__NAME)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __def_vsf_pt(__NAME,__MEMBER)                                        \
+
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#       define __def_vsf_pt(__NAME,__MEMBER)                                    \
             __def_vsf_pt_common(__NAME,                                         \
                                     uint16_t tState;                            \
                                     vsf_sync_reason_t reason;                   \
                                 __MEMBER)           
-
+#   else
+#       define __def_vsf_pt(__NAME,__MEMBER)                                    \
+            __def_vsf_pt_common(__NAME,                                         \
+                                    uint16_t tState;                            \
+                                __MEMBER) 
+#   endif
 #   define def_vsf_pt(__NAME,__MEMBER)       __def_vsf_pt(__NAME, __MEMBER)
 #   define end_def_vsf_pt(__NAME)
 #else

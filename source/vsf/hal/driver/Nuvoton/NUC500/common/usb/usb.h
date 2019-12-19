@@ -42,8 +42,8 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-MREPEAT(USB_HC_COUNT, USB_HC_DEF, NULL)
-MREPEAT(USB_DC_COUNT, USB_DC_DEF, NULL)
+REPEAT_MACRO(USB_HC_COUNT, USB_HC_DEF, NULL)
+REPEAT_MACRO(USB_DC_COUNT, USB_DC_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/

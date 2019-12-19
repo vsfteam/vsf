@@ -140,7 +140,7 @@ void m480_bit_field_set(uint_fast16_t bf, uint32_t *ptr, uint_fast32_t value)
 
 // SWI
 #if __VSF_DEV_SWI_NUM > 0
-MREPEAT(__VSF_DEV_SWI_NUM, __M480_SWI, NULL)
+REPEAT_MACRO(__VSF_DEV_SWI_NUM, __M480_SWI, NULL)
 
 static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 
                                                 vsf_arch_prio_t priority,

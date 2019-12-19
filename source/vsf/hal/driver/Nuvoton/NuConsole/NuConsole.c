@@ -146,6 +146,11 @@ static uint32_t _Get_Data_Size(NUCOSOLE_FIFO *pFIFO)
 		return (pFIFO->uSize - uTail + uHead);
 }
 
+uint32_t NuConsole_Get_Data_Size(void)
+{
+    return _Get_Data_Size(&NuConsole_InfoBlock.aRxFIFO);
+}
+
 static uint32_t _Blocking_Read(NUCOSOLE_FIFO *pFIFO, uint8_t *pucBuffer, uint32_t uNumBytes)
 {
 	uint32_t uHead;

@@ -47,8 +47,8 @@
 declare_simple_class(vk_usbh_ds4_t)
 
 def_simple_class(vk_usbh_ds4_t) {
-	implement(vk_usbh_hid_teda_t)
-#if VSF_USE_INPUT_DS4 == ENABLED
+    implement(vk_usbh_hid_teda_t)
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_DS4 == ENABLED
     implement(vk_input_ds4u_t)
 #endif
 

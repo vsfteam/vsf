@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
-#include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
+#include "../usrapp_common.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
@@ -30,35 +30,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usrapp_const_t {
-    vsf_libusb_hcd_param_t libusb_hcd_param;
-};
-typedef struct usrapp_const_t usrapp_const_t;
-
 struct usrapp_t {
-    vk_usbh_t usbh;
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    vk_usbh_class_t ecm;
-#endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
-    vk_usbh_class_t bthci;
-#endif
-#if VSF_USE_USB_HOST_HID == ENABLED
-    vk_usbh_class_t hid;
-#endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
-    vk_usbh_class_t ds4;
-#endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
-    vk_usbh_class_t nspro;
-#endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
-    vk_usbh_class_t xb360;
-#endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
-    vk_usbh_class_t xb1;
-#endif
-
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
     struct {
         vk_disp_sdl2_t disp;
@@ -82,38 +54,7 @@ typedef struct usrapp_t usrapp_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const usrapp_const_t usrapp_const = {
-    .libusb_hcd_param           = {
-        .priority               = vsf_arch_prio_0,
-    },
-};
-
 static usrapp_t usrapp = {
-    .usbh.drv                   = &vsf_libusb_hcd_drv,
-    .usbh.param                 = (void *)&usrapp_const.libusb_hcd_param,
-
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    .ecm.drv                    = &vk_usbh_ecm_drv,
-#endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
-    .bthci.drv                  = &vk_usbh_bthci_drv,
-#endif
-#if VSF_USE_USB_HOST_HID == ENABLED
-    .hid.drv                    = &vk_usbh_hid_drv,
-#endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
-    .ds4.drv                    = &vk_usbh_ds4_drv,
-#endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
-    .nspro.drv                  = &vk_usbh_nspro_drv,
-#endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
-    .xb360.drv                  = &vk_usbh_xb360_drv,
-#endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
-    .xb1.drv                    = &vk_usbh_xb1_drv,
-#endif
-
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
     .ui.disp                    = {
         .param                  = {
@@ -125,7 +66,6 @@ static usrapp_t usrapp = {
         .amplifier              = 2,
     },
 #endif
-
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     .ui.disp                    = {
         .param                  = {
@@ -174,31 +114,7 @@ static bool usrapp_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
 // TODO: SDL require that main need argc and argv
 int main(int argc, char *argv[])
 {
-    vsf_trace_init(NULL);
-    vsf_stdio_init();
-
-    vk_usbh_init(&usrapp.usbh);
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.ecm);
-#endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.bthci);
-#endif
-#if VSF_USE_USB_HOST_HID == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.hid);
-#endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.ds4);
-#endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.nspro);
-#endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.xb360);
-#endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
-    vk_usbh_register_class(&usrapp.usbh, &usrapp.xb1);
-#endif
+    __usrapp_common_init();
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 #   if USE_LV_LOG

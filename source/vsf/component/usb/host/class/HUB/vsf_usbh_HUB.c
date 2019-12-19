@@ -23,6 +23,7 @@
 
 #define VSF_USBH_IMPLEMENT_HUB
 #include "vsf.h"
+#include "../../../common/class/HUB/vsf_usb_HUB.h"
 
 /*============================ MACROS ========================================*/
 
@@ -40,7 +41,7 @@ struct vk_usbh_hub_t {
     vk_usbh_dev_t *dev;
     vk_usbh_ifs_t *ifs;
 
-    struct usb_hub_descriptor_t desc_hub;
+    struct usb_hub_desc_t desc_hub;
     //struct usb_hub_status_t hub_status;
     struct usb_port_status_t hub_portsts;
 

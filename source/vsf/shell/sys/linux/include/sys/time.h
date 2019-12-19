@@ -8,8 +8,6 @@ struct timeval {
     long    tv_sec;
     long    tv_usec;
 };
-#else
-#include <Windows.h>
 #endif
 
 struct timezone {

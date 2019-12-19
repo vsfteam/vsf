@@ -67,7 +67,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #endif
 #include "utilities/preprocessor/mf_u8_dec2str.h"
     static const vsf_arch_prio_t __vsf_os_swi_priority[] = {
-        MREPEAT(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
+        REPEAT_MACRO(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
 #endif
 

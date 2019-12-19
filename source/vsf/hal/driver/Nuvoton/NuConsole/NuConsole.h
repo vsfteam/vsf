@@ -51,6 +51,7 @@ void NuConsole_Init(void);
 void NuConsole_ConfigBuffer(uint32_t uTxFIFO_Mode);
 uint32_t NuConsole_Write(const uint8_t *pucBuffer, uint32_t uNumBytes);
 uint32_t NuConsole_Read(uint8_t *pucBuffer, uint32_t uNumBytes);
+uint32_t NuConsole_Get_Data_Size(void);
 
 #ifdef __cplusplus
 }

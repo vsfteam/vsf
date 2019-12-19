@@ -50,7 +50,7 @@ declare_simple_class(vk_usbh_xb1_t)
 def_simple_class(vk_usbh_xb1_t) {
 
     implement(vk_usbh_hid_teda_t)
-#if VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
     implement(vk_input_xb1_t)
 #endif
 

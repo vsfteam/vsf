@@ -123,10 +123,12 @@ int fprintf(FILE *file, const char *format, ...)
     return size;
 }
 
+#if !__IS_COMPILER_IAR__
 void perror(const char *str)
 {
     extern int errno;
     fprintf(stderr, "%s: %s\r\n", str, strerror(errno));
 }
+#endif
 
 #endif      // VSF_USE_LINUX

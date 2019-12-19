@@ -189,7 +189,7 @@ enum {
 
 #   define VSF_USE_INPUT                    ENABLED
 #   define VSF_USE_TCPIP                    ENABLED
-#   define VSF_USE_FS                       ENABLED
+#   define VSF_USE_FS                       DISABLED
 #   define VSF_USE_UI                       ENABLED
 #       define VSF_USE_DISP_DRV_USBD_UVC    ENABLED
 #   define VSF_USE_USB_DEVICE               ENABLED
@@ -246,7 +246,7 @@ enum {
 //#   define VSFVM_CFG_RUNTIME_STACK_SIZE     128
 
 #   define VSF_HEAP_SIZE                    0x100000
-#   define VSF_HEAP_CFG_MCB_ALIGN_BIT       4
+#   define VSF_HEAP_CFG_MCB_ALIGN_BIT       5
 #   define USRAPP_CFG_STDIO_EN              ENABLED
 #elif   defined(__CPU_MCS51__)
 #   define VSF_OS_CFG_PRIORITY_NUM          1

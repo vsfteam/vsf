@@ -30,15 +30,15 @@ const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE);
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-MREPEAT(USB_HC_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
-MREPEAT(USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
+REPEAT_MACRO(USB_HC_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
+REPEAT_MACRO(USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
 
 #if USB_HC_COUNT > 0
-MREPEAT(USB_HC_OHCI_COUNT, __USB_HC_INTERFACE_DEF, NULL)
+REPEAT_MACRO(USB_HC_OHCI_COUNT, __USB_HC_INTERFACE_DEF, NULL)
 #endif
 
 #if USB_DC_COUNT > 0
-MREPEAT(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
+REPEAT_MACRO(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -46,13 +46,13 @@ MREPEAT(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
 /*============================ IMPLEMENTATION ================================*/
 
 #if USB_HC_OHCI_COUNT > 0
-MREPEAT(USB_HC_COUNT, __USB_HC_IP_BODY, nuc500_ohci)
+REPEAT_MACRO(USB_HC_COUNT, __USB_HC_IP_BODY, nuc500_ohci)
 #endif
 
 #if USB_DC_HS_COUNT > 0
-MREPEAT(USB_DC_HS_COUNT, __USB_DC_BODY, nuc500_usbd_hs)
+REPEAT_MACRO(USB_DC_HS_COUNT, __USB_DC_BODY, nuc500_usbd_hs)
 #endif
 
 #if USB_DC_FS_COUNT > 0
-MREPEAT(USB_DC_FS_COUNT, __USB_DC_BODY, nuc500_usbd_fs)
+REPEAT_MACRO(USB_DC_FS_COUNT, __USB_DC_BODY, nuc500_usbd_fs)
 #endif

@@ -19,127 +19,38 @@
 
 #include "vsf.h"
 
-#if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-#   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
-#elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-#   include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
+// define USRAPP_CF_XXXX and include usrapp_common.h
+#if VSF_USE_MEMFS == ENABLED
+#   include "fakefat32.h"
+#   define USRAPP_CFG_MEMFS_ROOT    __fakefat32_root
 #endif
+#if VSF_USE_WINFS == ENABLED
+#   define USRAPP_CFG_WINFS_ROOT    "winfs_root"
+#endif
+#include "../usrapp_common.h"
 
 #define VSF_LINUX_INHERIT
 #include "shell/sys/linux/vsf_linux.h"
 #include "shell/sys/linux/port/busybox/busybox.h"
-#include <libusb.h>
+#if VSF_USE_LINUX_LIBUSB == ENABLED
+#   include <libusb.h>
+#endif
 #include <sys/mount.h>
-
-#include "fakefat32.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_const_t {
-#if VSF_USE_USB_HOST == ENABLED
-    struct {
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        vk_ohci_param_t ohci_param;
-#   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        vsf_libusb_hcd_param_t libusb_hcd_param;
-#   elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-        vsf_winusb_hcd_param_t winusb_hcd_param;
-#   endif
-    } usbh;
-#endif
-};
-typedef struct usrapp_const_t usrapp_const_t;
-
-struct usrapp_t {
-#if VSF_USE_USB_HOST == ENABLED
-    struct {
-        vk_usbh_t host;
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-        vk_usbh_class_t libusb;
-#   endif
-#   if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-        vk_usbh_class_t ecm;
-#   endif
-    } usbh;
-#endif
-
-    struct {
-        vk_memfs_info_t memfs_info;
-#if VSF_USE_WINFS == ENABLED
-        vk_winfs_info_t winfs_info;
-#endif
-    } fs;
-};
-typedef struct usrapp_t usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static const usrapp_const_t __usrapp_const = {
-#if VSF_USE_USB_HOST == ENABLED
-    .usbh                   = {
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        .ohci_param         = {
-            .op             = &VSF_USB_HC0_IP,
-            .priority       = vsf_arch_prio_0,
-        },
-#   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        .libusb_hcd_param = {
-            .priority = vsf_arch_prio_0,
-        },
-#   elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-        .winusb_hcd_param = {
-            .priority = vsf_arch_prio_0,
-        },
-#   endif
-    },
-#endif
-};
-
-static usrapp_t __usrapp = {
-#if VSF_USE_USB_HOST == ENABLED
-    .usbh                   = {
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        .host.drv           = &vk_ohci_drv,
-        .host.param         = (void *)&usrapp_const.usbh.ohci_param,
-#   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        .host.drv           = &vsf_libusb_hcd_drv,
-        .host.param         = (void*)&__usrapp_const.usbh.libusb_hcd_param,
-#   elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-        .host.drv           = &vsf_winusb_hcd_drv,
-        .host.param         = (void*)&__usrapp_const.usbh.winusb_hcd_param,
-#   endif
-
-#   if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-        .ecm.drv            = &vk_usbh_ecm_drv,
-#   endif
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-        .libusb.drv         = &vk_usbh_libusb_drv,
-#   endif
-    },
-#endif
-    .fs.memfs_info          = {
-        .root               = {
-            .d.child        = (vk_memfs_file_t *)__fakefat32_root,
-            .d.child_num    = dimof(__fakefat32_root),
-            .d.child_size   = sizeof(vk_fakefat32_file_t),
-        },
-    },
-#if VSF_USE_WINFS == ENABLED
-    .fs.winfs_info          = {
-        .root               = {
-            .name           = "winfs_root",
-        },
-    },
-#endif
-};
-
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_USE_LINUX_LIBUSB == ENABLED
 extern int lsusb_main(int argc, char *argv[]);
+#endif
+
+#if VSF_USE_USB_DEVICE == ENABLED
+extern void usrapp_usbd_cdc_demo(void);
+extern bool usrapp_usbd_cdc_demo_get_stream(int idx, vsf_stream_t **stream_tx, vsf_stream_t **stream_rx);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -147,7 +58,10 @@ extern int lsusb_main(int argc, char *argv[]);
 int vsf_linux_create_fhs(void)
 {
     int fd;
+
+#if VSF_USE_LINUX_BUSYBOX == ENABLED
     busybox_install();
+#endif
 
 #if VSF_USE_LINUX_LIBUSB == ENABLED
     fd = creat("/sbin/lsusb", 0);
@@ -155,55 +69,62 @@ int vsf_linux_create_fhs(void)
         vsf_linux_fs_bind_executable(fd, lsusb_main);
         close(fd);
     }
+    libusb_init(NULL);
 #endif
 
+#if VSF_USE_MEMFS
     if (mkdir("/fakefat32", 0)) {
         return -1;
     }
     fd = open("/fakefat32", 0);
     if (fd >= 0) {
         close(fd);
-        mount(NULL, "/fakefat32", &vk_memfs_op, 0, &__usrapp.fs.memfs_info);
+        mount(NULL, "/fakefat32", &vk_memfs_op, 0, &__usrapp_common.fs.memfs_info);
     }
+#endif
 
+#if VSF_USE_WINFS
     if (mkdir("/winfs", 0)) {
         return -1;
     }
     fd = open("/winfs", 0);
     if (fd >= 0) {
         close(fd);
-        mount(NULL, "/winfs", &vk_winfs_op, 0, &__usrapp.fs.winfs_info);
+        mount(NULL, "/winfs", &vk_winfs_op, 0, &__usrapp_common.fs.winfs_info);
     }
-
-#if VSF_USE_LINUX_LIBUSB == ENABLED
-    libusb_init(NULL);
 #endif
     return 0;
 }
 
-int main(void)
+#if VSF_USE_USB_DEVICE != ENABLED && defined(VSF_DEBUG_STREAM_NEED_POOL)
+void vsf_plug_in_on_kernel_idle(void)
 {
-#if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    VSF_DEBUG_STREAM_POLL();
+}
 #endif
 
-#if VSF_USE_USB_HOST == ENABLED
-    vk_usbh_init(&__usrapp.usbh.host);
-#   if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    vk_usbh_register_class(&usrapp.usbh.host, &usrapp.ecm);
-#   endif
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
-    vk_usbh_register_class(&__usrapp.usbh.host, &__usrapp.usbh.libusb);
-#   endif
+int main(void)
+{
+    __usrapp_common_init();
+#if VSF_USE_USB_DEVICE == ENABLED
+    usrapp_usbd_cdc_demo();
 #endif
 
     vsf_trace(VSF_TRACE_INFO, "start linux..." VSF_TRACE_CFG_LINEEND);
     vk_fs_init();
 
+    vsf_stream_t *stream_tx, *stream_rx;
+#if VSF_USE_USB_DEVICE == ENABLED
+    usrapp_usbd_cdc_demo_get_stream(0, &stream_tx, &stream_rx);
+#else
+    stream_tx = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX;
+    stream_rx = (vsf_stream_t *)&VSF_DEBUG_STREAM_RX;
+#endif
+
     vsf_linux_stdio_stream_t stream = {
-        .in     = (vsf_stream_t *)&VSF_DEBUG_STREAM_RX,
-        .out    = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX,
-        .err    = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX,
+        .in     = stream_rx,
+        .out    = stream_tx,
+        .err    = stream_tx,
     };
     vsf_linux_init(&stream);
     return 0;

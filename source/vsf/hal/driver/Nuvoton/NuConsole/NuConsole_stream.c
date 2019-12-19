@@ -30,6 +30,13 @@
 #endif
 
 /*============================ MACROS ========================================*/
+
+#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   ifndef VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE
+#       define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE         32
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -40,6 +47,11 @@ static struct {
     //vsf_stream_dat_drn_evt_t    tEvent;
 } s_tNuStream = {0};
 */
+
+#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+static uint8_t __vsf_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static void vsf_nu_console_stream_init(vsf_stream_t *stream);
@@ -47,6 +59,7 @@ static uint_fast32_t vsf_nu_console_stream_write(   vsf_stream_t *stream,
                                                     uint8_t *buf, 
                                                     uint_fast32_t size);
 static uint_fast32_t vsf_nu_console_stream_get_data_length(vsf_stream_t *stream);
+static uint_fast32_t vsf_nu_console_stream_get_avail_length(vsf_stream_t *stream);
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
 static vsf_err_t vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *ptObj, 
                                                     vsf_pbuf_t *pblock);
@@ -59,14 +72,21 @@ static vsf_err_t vsf_nu_console_stream_tx_dat_drn_evt_reg(
 #endif
 /*============================ GLOBAL VARIABLES ==============================*/
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
-const vsf_stream_op_t vsf_nu_console_stream_op = {
+const vsf_stream_op_t vsf_nu_console_stream_tx_op = {
     .init               = vsf_nu_console_stream_init,
     .get_data_length    = vsf_nu_console_stream_get_data_length,
+    .get_avail_length   = vsf_nu_console_stream_get_avail_length,
     .write              = vsf_nu_console_stream_write,
 };
 
-vsf_stream_t  VSF_DEBUG_STREAM = {
-    .op = &vsf_nu_console_stream_op,
+vsf_stream_t VSF_DEBUG_STREAM_TX = {
+    .op = &vsf_nu_console_stream_tx_op,
+};
+
+vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
+    .op         = &vsf_mem_stream_op,
+    .pchBuffer  = __vsf_debug_stream_rx_buff,
+    .nSize      = sizeof(__vsf_debug_stream_rx_buff),
 };
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
@@ -122,6 +142,17 @@ int vsf_stdin_getchar(void)
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+void VSF_DEBUG_STREAM_POLL(void)
+{
+    uint_fast32_t size = NuConsole_Get_Data_Size();
+    uint8_t ch;
+
+    while (size-- > 0) {
+        NuConsole_Read(&ch, 1);
+        VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, (uint8_t *)&ch, 1);
+    }
+}
+
 static void vsf_nu_console_stream_init(vsf_stream_t *stream)
 {
     //NuConsole_Init();
@@ -142,6 +173,12 @@ static uint_fast32_t vsf_nu_console_stream_get_data_length(vsf_stream_t *stream)
 {
     return 0;
 }
+
+uint_fast32_t vsf_nu_console_stream_get_avail_length(vsf_stream_t *stream)
+{
+    return -1;
+}
+
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
 
 static vsf_err_t vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *ptObj, 

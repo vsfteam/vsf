@@ -47,7 +47,7 @@ static vk_usbh_libusb_t vk_usbh_libusb;
 static void *vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         vk_usbh_ifs_parser_t *parser_ifs)
 {
-    struct usb_device_descriptor_t *desc_device;
+    struct usb_device_desc_t *desc_device;
     vk_usbh_libusb_dev_t *ldev;
 
     if (parser_ifs->ifs->no != 0) {

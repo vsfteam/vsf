@@ -20,11 +20,15 @@
 #define __VSF_EDA_CLASS_INHERIT
 #include "vsf.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-#   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
+// define USRAPP_CF_XXXX and include usrapp_common.h
+#if VSF_USE_MEMFS == ENABLED
+#   include "fakefat32.h"
+#   define USRAPP_CFG_MEMFS_ROOT    __fakefat32_root
 #endif
-
-#include "fakefat32.h"
+#if VSF_USE_WINFS == ENABLED
+#   define USRAPP_CFG_WINFS_ROOT    "winfs_root"
+#endif
+#include "../usrapp_common.h"
 
 /*============================ MACROS ========================================*/
 
@@ -35,29 +39,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_USB_HOST == ENABLED
-struct usrapp_const_t {
-#   if VSF_USE_USB_HOST == ENABLED
-    struct {
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        vsf_ohci_param_t ohci_param;
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        vsf_libusb_hcd_param_t libusb_hcd_param;
-#       endif
-    } usbh;
-#   endif
-};
-typedef struct usrapp_const_t usrapp_const_t;
-#endif
-
 struct usrapp_t {
-#if VSF_USE_USB_HOST == ENABLED
-    struct {
-        vk_usbh_t host;
-        vk_usbh_class_t msc;
-    } usbh;
-#endif
-
     struct {
         vk_fakefat32_mal_t fakefat32;
     } mal;
@@ -69,10 +51,6 @@ struct usrapp_t {
 
     struct {
         vsf_teda_t task;
-        vk_memfs_info_t memfs_info;
-#if VSF_USE_WINFS == ENABLED
-        vk_winfs_info_t winfs_info;
-#endif
     } fs;
 };
 typedef struct usrapp_t usrapp_t;
@@ -87,37 +65,7 @@ typedef struct usrapp_eda_state_t usrapp_eda_state_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_USE_USB_HOST == ENABLED
-static const usrapp_const_t __usrapp_const = {
-#   if VSF_USE_USB_HOST == ENABLED
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-    .usbh.ohci_param        = {
-        .op                 = &VSF_USB_HC0_IP,
-        .priority           = vsf_arch_prio_0,
-    },
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-    .usbh.libusb_hcd_param  = {
-        .priority = vsf_arch_prio_0,
-    },
-#       endif
-#   endif
-};
-#endif
-
 static usrapp_t __usrapp = {
-#if VSF_USE_USB_HOST == ENABLED
-    .usbh                   = {
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-        .host.drv           = &vsf_ohci_drv,
-        .host.param         = (void *)&__usrapp_const.usbh.ohci_param,
-#   elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        .host.drv           = &vsf_libusb_hcd_drv,
-        .host.param         = (void*)&__usrapp_const.usbh.libusb_hcd_param,
-#   endif
-//        .msc.drv            = &vk_usbh_msc_drv,
-    },
-#endif
-
     .mal                    = {
         .fakefat32          = {
             .drv                = &VK_FAKEFAT32_MAL_DRV,
@@ -133,21 +81,6 @@ static usrapp_t __usrapp = {
             },
         },
     },
-
-    .fs.memfs_info          = {
-        .root               = {
-            .d.child        = (vk_memfs_file_t *)__fakefat32_root,
-            .d.child_num    = dimof(__fakefat32_root),
-            .d.child_size   = sizeof(vk_fakefat32_file_t),
-        },
-    },
-#if VSF_USE_WINFS == ENABLED
-    .fs.winfs_info          = {
-        .root               = {
-            .name           = "winfs_root",
-        },
-    },
-#endif
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -306,7 +239,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case USRAPP_STATE_OPENED_MEMFS:
             ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
             ASSERT(__fmemfs != NULL);
-            vk_fs_mount(__fmemfs, &vk_memfs_op, &__usrapp.fs.memfs_info);
+            vk_fs_mount(__fmemfs, &vk_memfs_op, &__usrapp_common.fs.memfs_info);
             break;
         case USRAPP_STATE_MOUNTED_MEMFS:
             ASSERT(vk_file_get_errcode(__fmemfs) == VSF_ERR_NONE);
@@ -321,7 +254,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case USRAPP_STATE_OPENED_WINFS:
             ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
             ASSERT(__fwinfs != NULL);
-            vk_fs_mount(__fwinfs, &vk_winfs_op, &__usrapp.fs.winfs_info);
+            vk_fs_mount(__fwinfs, &vk_winfs_op, &__usrapp_common.fs.winfs_info);
             break;
         case USRAPP_STATE_MOUNTED_WINFS:
             ASSERT(vk_file_get_errcode(__fwinfs) == VSF_ERR_NONE);
@@ -353,15 +286,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 // TODO: SDL require that main need argc and argv
 int main(int argc, char *argv[])
 {
-#if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
-    vsf_stdio_init();
-#endif
-
-#if VSF_USE_USB_HOST == ENABLED
-    vk_usbh_init(&__usrapp.usbh.host);
-//    vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.msc);
-#endif
+    __usrapp_common_init();
 
     vsf_eda_set_evthandler(&__usrapp.fs.task.use_as__vsf_eda_t, __usrapp_fs_evthandler);
     vsf_teda_init(&__usrapp.fs.task, vsf_prio_0, false);

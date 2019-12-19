@@ -47,10 +47,10 @@ struct my_stopwatch_t {
     union { 
         vsf_msgt_node_t my_stopwatch_t_FirstNode; 
         struct { 
-            vsf_tgui_mc_label_t time; 
-            vsf_tgui_mc_button_t start_stop; 
-            vsf_tgui_mc_button_t lap; 
-            vsf_tgui_mc_label_t history;; 
+            vsf_tgui_label_t time; 
+            vsf_tgui_button_t start_stop; 
+            vsf_tgui_button_t lap; 
+            vsf_tgui_label_t history;; 
         }; 
     };
 };
@@ -59,10 +59,10 @@ declare_tgui_panel(my_stopwatch_t)
 
 def_tgui_panel(my_stopwatch_t,
     tgui_contains(
-        vsf_tgui_mc_label_t     time;
-        vsf_tgui_mc_button_t    start_stop;
-        vsf_tgui_mc_button_t    lap;
-        vsf_tgui_mc_label_t     history;
+        vsf_tgui_label_t     time;
+        vsf_tgui_button_t    start_stop;
+        vsf_tgui_button_t    lap;
+        vsf_tgui_label_t     history;
 	)
 )
 
@@ -72,7 +72,7 @@ end_def_tgui_panel(my_stopwatch_t)
 static NO_INIT vsf_tgui_t __tgui_demo;
 
 /*============================ PROTOTYPES ====================================*/
-static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_mc_button_t* ptNode, vsf_msgt_msg_t* ptMSG);
+static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_button_t* ptNode, vsf_msgt_msg_t* ptMSG);
 
 static char s_chTimeBuffer[] = "00:00";
 
@@ -115,9 +115,9 @@ my_stopwatch_t __my_stopwatch = {
         .chID = ((VSF_TGUI_COMPONENT_ID_BUTTON)),
         .Offset = {
             .iPrevious = ((((sizeof(vsf_tgui_mc_label_t))))),
-            .iNext = ((((0)))) ? 0 : sizeof(vsf_tgui_mc_button_t), 
+            .iNext = ((((0)))) ? 0 : sizeof(vsf_tgui_button_t), 
         },
-        .pchNodeName = "[""vsf_tgui_mc_button_t""][""start_stop""]",
+        .pchNodeName = "[""vsf_tgui_button_t""][""start_stop""]",
         .tRegion = {8, 72, 84, 32},
         .tLabel = {"START", VSF_TGUI_ALIGN_LEFT},
         .tBackground = {&ic_build_black_18dp_RGBA, VSF_TGUI_ALIGN_RIGHT}, 
@@ -127,10 +127,10 @@ my_stopwatch_t __my_stopwatch = {
         .ptParent = &(((((&__my_stopwatch))))->use_as__vsf_msgt_node_t),
         .chID = ((VSF_TGUI_COMPONENT_ID_BUTTON)),
         .Offset = {
-            .iPrevious = ((((sizeof(vsf_tgui_mc_button_t))))),
-            .iNext = ((((0)))) ? 0 : sizeof(vsf_tgui_mc_button_t), 
+            .iPrevious = ((((sizeof(vsf_tgui_button_t))))),
+            .iNext = ((((0)))) ? 0 : sizeof(vsf_tgui_button_t), 
         },
-        .pchNodeName = "[""vsf_tgui_mc_button_t""][""lap""]",
+        .pchNodeName = "[""vsf_tgui_button_t""][""lap""]",
         .tRegion = {100, 72, 64, 32},
         .tLabel = {"LAP", VSF_TGUI_ALIGN_RIGHT}, 
     },
@@ -139,7 +139,7 @@ my_stopwatch_t __my_stopwatch = {
         .ptParent = &(((((&__my_stopwatch))))->use_as__vsf_msgt_node_t),
         .chID = ((VSF_TGUI_COMPONENT_ID_LABEL)),
         .Offset = {
-            .iPrevious = ((((sizeof(vsf_tgui_mc_button_t))))),
+            .iPrevious = ((((sizeof(vsf_tgui_button_t))))),
             .iNext = ((((1)))) ? 0 : sizeof(vsf_tgui_mc_label_t), 
         },
         .pchNodeName = "[""vsf_tgui_mc_label_t""][""history""]",
@@ -171,12 +171,12 @@ implement_tgui_panel(my_stopwatch_t, __my_stopwatch,
         //    &my_stopwatch_start_stop_on_click),
     ),
 
-    tgui_button(lap, &__my_stopwatch, sizeof(vsf_tgui_mc_button_t), false,
+    tgui_button(lap, &__my_stopwatch, sizeof(vsf_tgui_button_t), false,
         tgui_region(100, 72, 64, 32),
         tgui_text(tLabel, "LAP", VSF_TGUI_ALIGN_RIGHT),
     ),
 
-    tgui_label(history, &__my_stopwatch, sizeof(vsf_tgui_mc_button_t), true,
+    tgui_label(history, &__my_stopwatch, sizeof(vsf_tgui_button_t), true,
         tgui_text(tLabel, "\nabdcdef\nABCDEF", VSF_TGUI_ALIGN_LEFT),
         tgui_region(64, 130, 96, 64),
     ),
@@ -190,7 +190,7 @@ implement_tgui_panel(my_stopwatch_t, __my_stopwatch,
 void my_stopwatch_init(void)
 {
     const my_stopwatch_t* ptWatch = &__my_stopwatch;
-    vsf_tgui_panel_v_init((vsf_tgui_panel_t *)&(ptWatch->use_as__vsf_tgui_mc_panel_t));
+    vsf_tgui_panel_v_init((vsf_tgui_panel_t *)&(ptWatch->use_as__vsf_tgui_panel_t));
     vsf_tgui_label_v_init((vsf_tgui_label_t *)&(ptWatch->time));
     vsf_tgui_button_v_init((vsf_tgui_button_t *)&(ptWatch->start_stop));
     vsf_tgui_button_v_init((vsf_tgui_button_t *)&(ptWatch->lap));
@@ -227,7 +227,7 @@ void refresh_my_stopwatch(void)
     vsf_tgui_region_t tRegion;
 
     vsf_tgui_region_init_with_size(&tRegion, &ptWatch->tRegion.tSize);
-    vsf_tgui_panel_v_rendering((vsf_tgui_panel_t *)&ptWatch->use_as__vsf_tgui_mc_panel_t, &tRegion);
+    vsf_tgui_panel_v_rendering((vsf_tgui_panel_t *)&ptWatch->use_as__vsf_tgui_panel_t, &tRegion);
 
     vsf_tgui_region_init_with_size(&tRegion, &ptWatch->time.tRegion.tSize);
     vsf_tgui_label_v_rendering((vsf_tgui_label_t *)&ptWatch->time, &tRegion);
@@ -248,7 +248,7 @@ void refresh_my_stopwatch(void)
 }
 
 
-static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_mc_button_t* ptNode, vsf_msgt_msg_t* ptMSG)
+static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_button_t* ptNode, vsf_msgt_msg_t* ptMSG)
 {
     return fsm_rt_cpl;
 }
@@ -270,7 +270,7 @@ vsf_err_t tgui_demo_init(void)
         },
         .ptRootNode = (vsf_tgui_control_t *)&__my_stopwatch,
     };
-    return vsf_tgui_init(&__tgui_demo, &cfg);
+    return vk_tgui_init(&__tgui_demo, &cfg);
 }
 
 

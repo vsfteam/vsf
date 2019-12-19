@@ -52,7 +52,7 @@ static __w600_common_t __w600_common;
 /*============================ IMPLEMENTATION ================================*/
 
 // SWI
-MREPEAT(SWI_COUNT, __W600_SWI, NULL)
+REPEAT_MACRO(SWI_COUNT, __W600_SWI, NULL)
 
 vsf_err_t vsf_drv_swi_init( uint_fast8_t idx, 
                             vsf_arch_prio_t priority,

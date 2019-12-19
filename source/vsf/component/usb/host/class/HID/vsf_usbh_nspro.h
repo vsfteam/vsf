@@ -61,8 +61,8 @@ enum vk_usbh_nspro_type_t {
 typedef enum vk_usbh_nspro_type_t vk_usbh_nspro_type_t;
 
 def_simple_class(vk_usbh_nspro_t) {
-	implement(vk_usbh_hid_teda_t)
-#if VSF_USE_INPUT_NSPRO == ENABLED
+    implement(vk_usbh_hid_teda_t)
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
     implement(vk_input_nspro_t)
 #endif
 

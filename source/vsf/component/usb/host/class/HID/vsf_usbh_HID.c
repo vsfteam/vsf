@@ -55,7 +55,7 @@ typedef struct usb_hid_descriptor_t usb_hid_descriptor_t;
 
 struct vk_usbh_hid_input_t {
     implement(vk_usbh_hid_eda_t)
-#if VSF_USE_INPUT_HID == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
     implement(vk_input_hid_t)
 #endif
 };
@@ -174,7 +174,7 @@ void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         epaddr = desc_ep->bEndpointAddress;
         switch (desc_ep->bmAttributes) {
         case USB_ENDPOINT_XFER_INT:
-            if (epaddr & USB_ENDPOINT_DIR_MASK) {
+            if (epaddr & USB_DIR_MASK) {
                 vk_usbh_urb_prepare(&hid->urb_in, dev, desc_ep);
             } else {
                 vk_usbh_urb_prepare(&hid->urb_out, dev, desc_ep);
@@ -303,7 +303,7 @@ vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *buffer,
 WEAK(vsf_usbh_hid_input_on_desc)
 int_fast32_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
 {
-#   if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
     return vk_hid_parse_desc(&hid->use_as__vk_input_hid_t, desc_buf, desc_len);
 #   else
     return -1;
@@ -315,7 +315,7 @@ int_fast32_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_
 WEAK(vsf_usbh_hid_input_on_report_input)
 void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len)
 {
-#   if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
     vk_hid_process_input(&hid->use_as__vk_input_hid_t, report, len);
 #   endif
 }
@@ -325,7 +325,7 @@ void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *repor
 WEAK(vsf_usbh_hid_input_on_new)
 void vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
 {
-#   if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
     vk_hid_new_dev(&hid->use_as__vk_input_hid_t);
 #   endif
 }
@@ -335,7 +335,7 @@ void vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
 WEAK(vsf_usbh_hid_input_on_free)
 void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
 {
-#   if VSF_USE_INPUT_HID == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
     vk_hid_free_dev(&hid->use_as__vk_input_hid_t);
 #   endif
 }

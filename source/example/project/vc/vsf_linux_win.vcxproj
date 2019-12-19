@@ -51,10 +51,7 @@
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_xb360.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\XB1\vsf_usb_xb1.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch11.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_ch9.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h" />
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_type.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h" />
@@ -118,13 +115,17 @@
     <ClInclude Include="..\..\..\vsf\service\vsf_service.h" />
     <ClInclude Include="..\..\..\vsf\service\vsf_service_cfg.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\dirent.h" />
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\errno.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\fcntl.h" />
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\libusb.h" />
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\linux\limits.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\poll.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\pthread.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\signal.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\stdio.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\mount.h" />
+    <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\select.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\stat.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\time.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\sys\types.h" />
@@ -161,7 +162,7 @@
     <ClInclude Include="..\..\..\vsf\vsf_cfg.h" />
     <ClInclude Include="..\..\usrapp\linux_demo\config\vsf_usr_cfg.h" />
     <ClInclude Include="..\..\usrapp\linux_demo\fakefat32.h" />
-    <ClInclude Include="libusb\libusb.h" />
+    <ClInclude Include="..\..\usrapp\usrapp_common.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md" />
@@ -322,7 +323,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__VSF__;__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\linux_demo;$(ProjectDir)..\..\usrapp\linux_demo\config;$(ProjectDir)..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)libusb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\linux_demo;$(ProjectDir)..\..\usrapp\linux_demo\config;$(ProjectDir)..\..\..\vsf\shell\sys\linux\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -341,7 +342,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\linux_demo;$(ProjectDir)..\..\usrapp\linux_demo\config;$(ProjectDir)..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)libusb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\linux_demo;$(ProjectDir)..\..\usrapp\linux_demo\config;$(ProjectDir)..\..\..\vsf\shell\sys\linux\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
