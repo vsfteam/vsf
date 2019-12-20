@@ -252,11 +252,13 @@ enum {
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #   define VSF_USE_USB_HOST_HUB                         DISABLED
 #   define VSF_USE_USB_HOST_HCD_WINUSB                  ENABLED
-#       define VSF_WINUSB_HCD_CFG_DEV_NUM               2
+#       define VSF_WINUSB_HCD_CFG_DEV_NUM               3
 #       define VSF_WINUSB_HCD_DEV0_VID                  0x0A12      // CSR8510 bthci
 #       define VSF_WINUSB_HCD_DEV0_PID                  0x0001
 #       define VSF_WINUSB_HCD_DEV1_VID                  0x0A5C      // BCM20702 bthci
 #       define VSF_WINUSB_HCD_DEV1_PID                  0x21E8
+#       define VSF_WINUSB_HCD_DEV2_VID                  0x04F2      // UVC
+#       define VSF_WINUSB_HCD_DEV2_PID                  0xB130
 
 #   define VSF_USE_WINFS                                ENABLED
 

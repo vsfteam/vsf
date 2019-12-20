@@ -102,6 +102,7 @@ struct libusb_interface {
 
 struct libusb_config_descriptor {
     implement(usb_config_desc_t)
+    const unsigned char *desc;
 
     struct libusb_interface *interface;
     const unsigned char *extra;

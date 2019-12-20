@@ -565,6 +565,9 @@ void libusb_free_config_descriptor(struct libusb_config_descriptor *config)
         for (uint_fast8_t i = 0; i < config->bNumInterfaces; i++) {
             free((void *)config->interface[i].altsetting);
         }
+        if (config->desc != NULL) {
+            free(config->desc);
+        }
         free(config);
     }
 }
@@ -598,7 +601,7 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
     struct libusb_endpoint_descriptor *endpoint_desc;
 
     uint_fast16_t size = desc_config->wTotalLength, len, tmpsize;
-    uint_fast8_t ifs_no, alt_num, ep_num;
+    uint_fast8_t ifs_no, alt_num, ep_num, reach_endpoint;
 
     enum {
         STAGE_NONE = 0,
@@ -614,6 +617,7 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
     lconfig = calloc(1, len + sizeof(*lconfig));
     if (NULL == lconfig) { return LIBUSB_ERROR_NO_MEM; }
     interface = lconfig->interface = (struct libusb_interface *)&lconfig[1];
+    lconfig->desc = desc_config;
     lconfig->use_as__usb_config_desc_t = *desc_config;
 
     size -= desc_header->bLength;
@@ -652,6 +656,7 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
                     desc_header = header_tmp;
                     alt_num = 0;
                     ep_num = 0;
+                    reach_endpoint = false;
                     continue;
                 }
             } else {
@@ -676,6 +681,7 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
             }
             break;
         case USB_DT_ENDPOINT:
+            reach_endpoint = true;
             if (endpoint_desc) {
                 endpoint_desc->use_as__usb_endpoint_desc_t = *(struct usb_endpoint_desc_t *)desc_header;
                 if ((endpoint_desc->bEndpointAddress & USB_DIR_MASK) == USB_DIR_IN) {
@@ -690,6 +696,15 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
                 ep_num++;
             }
             break;
+        default:
+            if ((interface_desc != NULL) && (interface_desc >= &interface->altsetting[0])) {
+                if (!reach_endpoint) {
+                    if (NULL == interface_desc->extra) {
+                        interface_desc->extra = desc_header;
+                    }
+                    interface_desc->extra_length += desc_header->bLength;
+                }
+            }
         }
 
         size -= desc_header->bLength;
@@ -745,9 +760,11 @@ int libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
         memset(&ldev->pipe_out[1], 0, sizeof(vk_usbh_pipe_t) * (dimof(ldev->pipe_out) - 1));
 
         err = raw_desc_to_config(ldev, buf, config);
+        if (err < 0) {
+            free(buf);
+        }
     }
 
-    free(buf);
     return err;
 }
 
