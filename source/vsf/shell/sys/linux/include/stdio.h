@@ -1,10 +1,15 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
+#include <sys/types.h>
 #include <stdarg.h>
 
 #define FILE        void
 extern FILE *stdin, *stdout, *stderr;
+
+#ifndef NULL
+#   define NULL     (void *)0
+#endif
 
 int getchar(void);
 int puts(const char *str);

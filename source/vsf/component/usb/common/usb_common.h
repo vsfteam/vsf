@@ -85,6 +85,7 @@ struct usb_ctrlrequest_t {
     uint16_t wIndex;
     uint16_t wLength;
 } PACKED;
+typedef struct usb_ctrlrequest_t usb_ctrlrequest_t;
 
 enum usb_req_t {
     USB_REQ_GET_STATUS          = 0x00,

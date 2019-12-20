@@ -160,7 +160,7 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
     }
 }
 
-const vsf_tgui_sv_panel_tiles_t gPanelAdditionalTiles = {
+const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     .tTopLeft = {
         .tChild = {
             .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
