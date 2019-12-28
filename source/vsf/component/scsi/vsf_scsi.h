@@ -24,6 +24,8 @@
 
 #if VSF_USE_SCSI == ENABLED
 
+#include "kernel/vsf_kernel.h"
+
 #if     defined(VSF_SCSI_IMPLEMENT)
 #   undef VSF_SCSI_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT

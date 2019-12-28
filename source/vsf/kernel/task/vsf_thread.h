@@ -473,8 +473,11 @@ extern vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
 SECTION("text.vsf.kernel.vsf_thread_sem_post")
 extern vsf_err_t vsf_thread_sem_post(vsf_sem_t *sem);
 
-SECTION("text.vsf.kernel.vsf_thread_mutex")
+SECTION("text.vsf.kernel.__vsf_thread_wait_for_sync")
 extern vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, int_fast32_t timeout);
+
+SECTION("text.vsf.kernel.__vsf_thread_wait_for_sync")
+extern vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t *trig, int_fast32_t timeout);
 
 #   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
 SECTION("text.vsf.kernel.vsf_thread_bmpevt_pend")

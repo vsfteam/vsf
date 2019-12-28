@@ -181,16 +181,27 @@ const vsf_tgui_font_t* vsf_tgui_sdl_font_get_default(void)
 void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize, vsf_tgui_color_t tRectColor)
 {
     //vsf_tgui_color_t* ptPixMap = s_tDisp->ui_data;
+    int16_t iHeight = ptSize->nHeight;
+    int16_t iWidth = ptSize->nWidth;
     VSF_TGUI_ASSERT(ptLocation != NULL);
     VSF_TGUI_ASSERT((0 <= ptLocation->nX) && (ptLocation->nX < VSF_TGUI_HOR_MAX));  // x_start point in screen
     VSF_TGUI_ASSERT((0 <= ptLocation->nY) && (ptLocation->nY < VSF_TGUI_VER_MAX));  // y_start point in screen
     VSF_TGUI_ASSERT(0 <= (ptLocation->nX + ptSize->nWidth));                        // x_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->nX + ptSize->nWidth) <= VSF_TGUI_HOR_MAX);
+    
     VSF_TGUI_ASSERT(0 <= (ptLocation->nY + ptSize->nHeight));                       // y_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->nY + ptSize->nHeight) <= VSF_TGUI_VER_MAX);
 
-    for (uint16_t i = 0; i < ptSize->nHeight; i++) {
-        for (uint16_t j = 0; j < ptSize->nWidth; j++) {
+    /* only draw visible part */
+    if ((ptLocation->nY + ptSize->nHeight) > VSF_TGUI_VER_MAX) {
+        iHeight = VSF_TGUI_VER_MAX - ptLocation->nY;
+    }
+
+    if ((ptLocation->nX + ptSize->nWidth) > VSF_TGUI_HOR_MAX) {
+        iWidth = VSF_TGUI_HOR_MAX - ptLocation->nX;
+    }
+
+
+    for (uint16_t i = 0; i < iHeight; i++) {
+        for (uint16_t j = 0; j < iWidth; j++) {
             vsf_tgui_location_t tPixelLocation = { .nX = ptLocation->nX + j, .nY = ptLocation->nY + i };
             vsf_tgui_color_t tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
             tPixelColor = vsf_tgui_color_mix(tRectColor, tPixelColor, tRectColor.tChannel.chA);
@@ -278,7 +289,7 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
         VSF_TGUI_ASSERT(wBaseLine >= wTop);
 
         vsf_tgui_location_t tBitmapStart = {
-            .nX = max(0, wLeft),
+            .nX = max(0, wLeft),    // todo: support negative advance
             .nY = wBaseLine - wTop,
         };
         vsf_tgui_region_t tUpdateRegion = {
@@ -296,15 +307,13 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
 
             for (uint16_t j = 0; j < tRealBitmapRegion.tSize.nHeight; j++) {
                 for (uint16_t i = 0; i < tRealBitmapRegion.tSize.nWidth; i++) {
-                    vsf_tgui_location_t tFontLocation = { 
-                        .nX = wXOffset + i,
-                        .nY = wYOffset + j
-                    };
                     vsf_tgui_location_t tPixelLocation = { 
-                        .nX = ptLocation->nX + tRealBitmapRegion.tLocation.nX + i,
-                        .nY = ptLocation->nY + tRealBitmapRegion.tLocation.nY + j
+                        .nX = ptLocation->nX + i + tRealBitmapRegion.tLocation.nX - tUpdateRegion.tLocation.nX,
+                        .nY = ptLocation->nY + j + tRealBitmapRegion.tLocation.nY - tUpdateRegion.tLocation.nY,
                     };
-                    uint8_t mix = glyph->bitmap.buffer[j * glyph->bitmap.width + i];// vsf_tgui_font_get_pixel_color(NULL, wChar, &tFontLocation);
+                    uint8_t mix = glyph->bitmap.buffer[  (j + tRealBitmapRegion.tLocation.nY - tBitmapRegion.tLocation.nY) * glyph->bitmap.width 
+                                                       + (i + tRealBitmapRegion.tLocation.nX - tBitmapRegion.tLocation.nX)];
+
                     vsf_tgui_color_t tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
                     tPixelColor = vsf_tgui_color_mix(tCharColor, tPixelColor, mix);
                     vk_disp_sdl_set_pixel(&tPixelLocation, tPixelColor);

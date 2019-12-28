@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.h" />
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.h" />
     <ClInclude Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h" />
     <ClInclude Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.h" />
     <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs.h" />
@@ -38,6 +39,7 @@
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h" />
     <ClInclude Include="..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.h" />
+    <ClInclude Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.h" />
     <ClInclude Include="..\..\..\vsf\component\mal\vsf_mal.h" />
     <ClInclude Include="..\..\..\vsf\component\mal\vsf_mal_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
@@ -133,7 +135,6 @@
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\termios.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\time.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\unistd.h" />
-    <ClInclude Include="..\..\..\vsf\shell\sys\linux\lib\libusb\vsf_linux_libusb.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\port\busybox\busybox.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\port\busybox\config.h" />
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\vsf_linux.h" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.c" />
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.c" />
     <ClCompile Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c" />
     <ClCompile Include="..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.c" />
     <ClCompile Include="..\..\..\vsf\component\fs\vsf_fs.c" />
@@ -180,6 +182,7 @@
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c" />
     <ClCompile Include="..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c" />
     <ClCompile Include="..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.c" />
+    <ClCompile Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c" />
     <ClCompile Include="..\..\..\vsf\component\mal\vsf_mal.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />

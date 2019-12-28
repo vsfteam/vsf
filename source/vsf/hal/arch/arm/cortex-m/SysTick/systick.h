@@ -74,6 +74,8 @@ typedef struct {
 //! @}
 */
 
+declare_interface(systick_t)
+
 //! \name systick struct
 //! @{
 def_interface(systick_t)

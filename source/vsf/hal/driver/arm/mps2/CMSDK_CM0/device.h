@@ -163,6 +163,7 @@ typedef struct io_wakeup_cfg_t io_wakeup_cfg_t;
 typedef enum io_port_no_t io_port_no_t;
 typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
 
+declare_interface( i_pm_wakeup_t )
 def_interface( i_pm_wakeup_t )
     struct {
         vsf_err_t (*Enable)(io_wakeup_cfg_t *pcfg, uint_fast8_t size);

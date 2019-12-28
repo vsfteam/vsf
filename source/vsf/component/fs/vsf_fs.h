@@ -87,7 +87,7 @@ struct vk_fs_fop_t {
     void (*close)(uintptr_t, vsf_evt_t);
     void (*read)(uintptr_t, vsf_evt_t);
     void (*write)(uintptr_t, vsf_evt_t);
-    void (*truncate)(uintptr_t, vsf_evt_t);
+    void (*resize)(uintptr_t, vsf_evt_t);
 };
 typedef struct vk_fs_fop_t vk_fs_fop_t;
 

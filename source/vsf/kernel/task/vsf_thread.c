@@ -304,16 +304,18 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
                         &&  (NULL != thread_cb->stack)
                         &&  (NULL != thread_cb->entry));
     
-    vsf_eda_cfg_t cfg = {                        
-        .fn.param_evthandler    = (vsf_param_eda_evthandler_t)__vsf_thread_evthandler,      
-        .priority               = priority,                                            
-        .target                 = (uintptr_t)thread_cb,  
-        .is_stack_owner         = true,    
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED                                              
+    vsf_eda_cfg_t cfg = {
+        .fn.param_evthandler    = (vsf_param_eda_evthandler_t)__vsf_thread_evthandler,
+        .priority               = priority,
+        .target                 = (uintptr_t)thread_cb,
+        .is_stack_owner         = true,
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         .on_terminate           = thread->use_as__vsf_teda_t.use_as__vsf_eda_t.on_terminate,
-#else
+#       else
         .on_terminate           = thread->use_as__vsf_eda_t.on_terminate,
-#endif
+#       endif
+#   endif
     };
     
     if (thread_cb->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)) {
@@ -496,7 +498,7 @@ void vsf_thread_delay(uint_fast32_t tick)
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 
-SECTION("text.vsf.kernel.vsf_thread_mutex")
+SECTION("text.vsf.kernel.__vsf_thread_wait_for_sync")
 static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32_t time_out)
 {
     vsf_err_t err;
@@ -513,16 +515,22 @@ static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32
     //}
 }
 
+SECTION("text.vsf.kernel.__vsf_thread_wait_for_sync")
+vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t* sem, int_fast32_t timeout)
+{
+    return __vsf_thread_wait_for_sync(sem, timeout);
+}
+
+SECTION("text.vsf.kernel.__vsf_thread_wait_for_sync")
+vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t* trig, int_fast32_t timeout)
+{
+    return __vsf_thread_wait_for_sync(trig, timeout);
+}
+
 SECTION("text.vsf.kernel.vsf_thread_mutex")
 vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, int_fast32_t timeout)
 {
     return __vsf_thread_wait_for_sync(&mtx->use_as__vsf_sync_t, timeout);
-}
-
-SECTION("text.vsf.kernel.vsf_thread_mutex")
-vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, int_fast32_t timeout)
-{
-    return __vsf_thread_wait_for_sync(sem, timeout);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_mutex")

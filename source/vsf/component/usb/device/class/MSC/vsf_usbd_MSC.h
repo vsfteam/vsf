@@ -42,6 +42,45 @@
 #   error msc uses scsi!!!
 #endif
 
+
+
+#define USB_MSC_PARAM(__BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
+            .ep_out             = (__BULK_OUT_EP),                              \
+            .ep_in              = (__BULK_IN_EP),                               \
+            .max_lun            = (__MAX_LUN),                                  \
+            .scsi               = (__SCSI_DEV),                                 \
+            .stream             = (__STREAM),
+
+#define USB_MSC_IFS_NUM             1
+#define USB_MSCBOT_IFS_NUM          USB_MSC_IFS_NUM
+#define USB_MSC_IFS(__MSC_PARAM)                                                \
+            {                                                                   \
+                .class_op       = &vk_usbd_msc_class,                           \
+                .class_param  =  &(__MSC_PARAM),                                \
+            },
+
+
+
+#define __implement_msc_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
+            USB_DESC_MSCBOT_IAD((__IFS), 4 + (__I_FUNC), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE))
+
+#define __implement_msc_func(__NAME, __FUNC_ID, __BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
+            vk_usbd_msc_t __##__NAME##_MSC##__FUNC_ID = {                       \
+                USB_MSC_PARAM((__BULK_IN_EP), (__BULK_OUT_EP), (__MAX_LUN), (__SCSI_DEV), (__STREAM))\
+            };
+
+#define __implement_msc_ifs(__NAME, __FUNC_ID)                                  \
+                {                                                               \
+                    USB_MSC_IFS(__##__NAME##_MSC##__FUNC_ID)                    \
+                },
+
+#define implement_msc_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
+            __implement_msc_desc(__NAME, (__IFS), (__I_FUNC), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE))
+#define implement_msc_func(__NAME, __FUNC_ID, __BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
+            __implement_msc_func(__NAME, __FUNC_ID, (__BULK_IN_EP), (__BULK_OUT_EP), (__MAX_LUN), (__SCSI_DEV), (__STREAM))
+#define implement_msc_ifs(__NAME, __FUNC_ID)                                    \
+            __implement_msc_ifs(__NAME, __FUNC_ID)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

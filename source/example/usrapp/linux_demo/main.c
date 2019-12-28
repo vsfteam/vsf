@@ -64,26 +64,35 @@ int vsf_linux_create_fhs(void)
 #endif
 
 #if VSF_USE_LINUX_LIBUSB == ENABLED
-    fd = creat("/sbin/lsusb", 0);
-    if (fd >= 0) {
-        vsf_linux_fs_bind_executable(fd, lsusb_main);
-        close(fd);
-    }
-    libusb_init(NULL);
+    busybox_bind("/sbin/lsusb", lsusb_main);
+    vsf_linux_libusb_startup();
 #endif
 
-#if VSF_USE_MEMFS
-    if (mkdir("/fakefat32", 0)) {
+#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED                  \
+    && VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
+    vk_mal_init(&__usrapp_common.mal.fakefat32.use_as__vk_mal_t);
+    if (mkdir("/fatfs_fakefat32", 0)) {
         return -1;
     }
-    fd = open("/fakefat32", 0);
+    fd = open("/fatfs_fakefat32", 0);
     if (fd >= 0) {
         close(fd);
-        mount(NULL, "/fakefat32", &vk_memfs_op, 0, &__usrapp_common.fs.memfs_info);
+        mount(NULL, "/fatfs_fakefat32", &vk_fatfs_op, 0, &__usrapp_common.fs.fatfs_info_fakefat32.use_as____vk_fatfs_info_t);
     }
 #endif
 
-#if VSF_USE_WINFS
+#if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
+    if (mkdir("/memfs", 0)) {
+        return -1;
+    }
+    fd = open("/memfs", 0);
+    if (fd >= 0) {
+        close(fd);
+        mount(NULL, "/memfs", &vk_memfs_op, 0, &__usrapp_common.fs.memfs_info);
+    }
+#endif
+
+#if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
     if (mkdir("/winfs", 0)) {
         return -1;
     }

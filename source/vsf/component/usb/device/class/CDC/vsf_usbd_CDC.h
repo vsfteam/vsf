@@ -38,6 +38,8 @@
 #   error "CDC need VSF_USBD_CFG_STREAM_EN!!!"
 #endif
 
+#define USB_CDC_IFS_NUM             2
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

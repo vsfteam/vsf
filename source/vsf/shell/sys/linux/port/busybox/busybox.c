@@ -13,7 +13,7 @@ static int init_main(int argc, char *argv[])
     return vsh_main(argc, argv);
 }
 
-static int busybox_bind(char *path, vsf_linux_main_entry_t entry)
+int busybox_bind(char *path, vsf_linux_main_entry_t entry)
 {
     int fd = open(path, 0);
     if (fd < 0) {

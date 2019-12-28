@@ -490,6 +490,8 @@ int kill(pid_t pid, int sig)
 
         vsf_linux_thread_t *thread;
         vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &__vsf_linux.kernel_process->thread_list, thread);
+        // TODO: avoid posting event/message to thread,
+        //  if the thread is not waiting for the dedicated event/message
         vsf_eda_post_msg(&thread->use_as__vsf_eda_t, process);
     }
     return -1;
@@ -696,7 +698,7 @@ int vsf_linux_create_fd(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
     }
 
     new_sfd->op = op;
-    new_sfd->rxpend = new_sfd->txpend = -1;
+    new_sfd->rxpend = new_sfd->txpend = NULL;
     new_sfd->fd = process->cur_fd++;
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -723,14 +725,17 @@ void vsf_linux_delete_fd(int fd)
 int vsf_linux_fd_tx_pend(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_trig_t trig;
+
+    vsf_eda_trig_init(&trig, false, true);
     vsf_protect_t orig = vsf_protect_sched();
     if (sfd->txevt) {
         sfd->txevt = false;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->txpend = vsf_linux_get_cur_thread()->tid;
+        sfd->txpend = &trig;
         vsf_unprotect_sched(orig);
-        vsf_thread_wfe(VSF_EVT_USER);
+        vsf_thread_trig_pend(&trig, -1);
     }
     return 0;
 }
@@ -738,28 +743,31 @@ int vsf_linux_fd_tx_pend(int fd)
 int vsf_linux_fd_rx_pend(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    vsf_trig_t trig;
+
+    vsf_eda_trig_init(&trig, false, true);
     vsf_protect_t orig = vsf_protect_sched();
     if (sfd->rxevt) {
         sfd->rxevt = false;
         vsf_unprotect_sched(orig);
     } else {
-        sfd->rxpend = vsf_linux_get_cur_thread()->tid;
+        sfd->rxpend = &trig;
         vsf_unprotect_sched(orig);
-        vsf_thread_wfe(VSF_EVT_USER);
+        vsf_thread_trig_pend(&trig, -1);
     }
     return 0;
 }
 
 int vsf_linux_fd_tx_trigger(int fd)
 {
-    vsf_linux_thread_t *thread;
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
 
     vsf_protect_t orig = vsf_protect_sched();
-    if (sfd->txpend >= 0) {
+    if (sfd->txpend != NULL) {
         vsf_unprotect_sched(orig);
-        thread = vsf_linux_get_thread(sfd->txpend);
-        vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_trig_t *trig = sfd->txpend;
+        sfd->txpend = NULL;
+        vsf_eda_trig_set(trig);
     } else {
         sfd->txevt = true;
         vsf_unprotect_sched(orig);
@@ -769,14 +777,14 @@ int vsf_linux_fd_tx_trigger(int fd)
 
 int vsf_linux_fd_rx_trigger(int fd)
 {
-    vsf_linux_thread_t *thread;
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
 
     vsf_protect_t orig = vsf_protect_sched();
-    if (sfd->rxpend >= 0) {
+    if (sfd->rxpend != NULL) {
         vsf_unprotect_sched(orig);
-        thread = vsf_linux_get_thread(sfd->rxpend);
-        vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_trig_t *trig = sfd->rxpend;
+        sfd->rxpend = NULL;
+        vsf_eda_trig_set(trig);
     } else {
         sfd->rxevt = true;
         vsf_unprotect_sched(orig);
@@ -793,48 +801,15 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
 }
 #endif
 
-int stat(const char *pathname, struct stat *buf)
-{
-    VSF_LINUX_ASSERT(false);
-    return 0;
-}
-
-int access(const char *pathname, int mode)
-{
-    int fd = open(pathname, mode);
-    if (fd < 0) { return -1; }
-
-    close(fd);
-    return 0;
-}
-
-int unlink(const char *pathname)
-{
-    vk_file_t *file = __vsf_linux_fs_get_file(pathname), *dir;
-    if (!file) {
-        errno = ENOENT;
-        return -1;
-    }
-
-    pathname = &pathname[strlen(pathname) - strlen(file->name)];
-    dir = vk_file_get_parent(file);
-    __vsf_linux_fs_close_do(file);
-
-    vk_file_unlink(dir, pathname);
-
-    vsf_err_t err = vk_file_get_errcode(dir);
-    __vsf_linux_fs_close_do(dir);
-    return VSF_ERR_NONE == err ? 0 : -1;
-}
-
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
-    int tid = vsf_linux_get_cur_thread()->tid;
     vsf_protect_t orig;
     vsf_linux_fd_t *sfd;
     int ret = 0;
     nfds_t i;
+    vsf_trig_t trig;
 
+    vsf_eda_trig_init(&trig, false, true);
     while (1) {
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
@@ -858,29 +833,29 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
             sfd = vsf_linux_get_fd(fds[i].fd);
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
-                    sfd->rxpend = tid;
+                    sfd->rxpend = &trig;
                 }
                 if (fds[i].events & POLLOUT) {
-                    sfd->txpend = tid;
+                    sfd->txpend = &trig;
                 }
             vsf_unprotect_sched(orig);
         }
-        vsf_thread_wfe(VSF_EVT_USER);
+        vsf_thread_trig_pend(&trig, -1);
         for (i = 0; i < nfds; i++) {
             sfd = vsf_linux_get_fd(fds[i].fd);
             orig = vsf_protect_sched();
                 if (fds[i].events & POLLIN) {
-                    if (sfd->rxpend < 0) {
+                    if (NULL == sfd->rxpend) {
                         sfd->rxevt = true;
                     } else {
-                        sfd->rxpend = -1;
+                        sfd->rxpend = NULL;
                     }
                 }
                 if (fds[i].events & POLLOUT) {
-                    if (sfd->txpend < 0) {
+                    if (NULL == sfd->txpend) {
                         sfd->txevt = true;
                     } else {
-                        sfd->txpend = -1;
+                        sfd->txpend = NULL;
                     }
                 }
             vsf_unprotect_sched(orig);
@@ -1035,6 +1010,40 @@ ssize_t write(int fd, void *buf, size_t count)
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
     if (!sfd || (sfd->flags & O_RDONLY)) { return -1; }
     return sfd->op->write(sfd, buf, count);
+}
+
+int stat(const char *pathname, struct stat *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return 0;
+}
+
+int access(const char *pathname, int mode)
+{
+    int fd = open(pathname, mode);
+    if (fd < 0) { return -1; }
+
+    close(fd);
+    return 0;
+}
+
+int unlink(const char *pathname)
+{
+    vk_file_t *file = __vsf_linux_fs_get_file(pathname), *dir;
+    if (!file) {
+        errno = ENOENT;
+        return -1;
+    }
+
+    pathname = &pathname[strlen(pathname) - strlen(file->name)];
+    dir = vk_file_get_parent(file);
+    __vsf_linux_fs_close_do(file);
+
+    vk_file_unlink(dir, pathname);
+
+    vsf_err_t err = vk_file_get_errcode(dir);
+    __vsf_linux_fs_close_do(dir);
+    return VSF_ERR_NONE == err ? 0 : -1;
 }
 
 DIR * opendir(const char *name)

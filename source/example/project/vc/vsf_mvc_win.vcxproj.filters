@@ -1296,6 +1296,9 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -1966,6 +1969,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

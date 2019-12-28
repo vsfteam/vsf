@@ -39,7 +39,7 @@ static uint8_t __control = 0;
 static vk_fakefat32_file_t __fakefat32_root[] = {
     {
         .name               = "FAKEFAT32",
-        .attr               = (vk_file_attr_t)VSF_FAT32_FILE_ATTR_VOLUMID,
+        .attr               = (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID,
     },
     {
         .name               = "readme.txt",

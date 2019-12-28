@@ -25,7 +25,6 @@
 #define VSF_LINUX_INHERIT
 #include "../../vsf_linux.h"
 
-//#include <stdlib.h>
 #include <libusb.h>
 
 #include <poll.h>
@@ -70,7 +69,7 @@ typedef struct vsf_linux_libusb_transfer_t vsf_linux_libusb_transfer_t;
 struct vsf_linux_libusb_dev_t {
     vsf_dlist_node_t devnode;
     vk_usbh_libusb_dev_t *libusb_dev;
-    vk_usbh_urb_t urb;
+    bool is_in_newlist;
     union {
         struct {
             vk_usbh_pipe_t pipe_in[16];
@@ -83,14 +82,20 @@ typedef struct vsf_linux_libusb_dev_t vsf_linux_libusb_dev_t;
 
 struct vsf_linux_libusb_t {
     libusb_hotplug_callback_handle cbhandle;
+    vsf_dlist_t cblist;
 
     int devnum;
+    vsf_trig_t dev_trig;
     vsf_dlist_t devlist;
-    vsf_dlist_t cblist;
-    vsf_dlist_t translist;
+    vsf_dlist_t devlist_new;
+    vsf_dlist_t devlist_del;
+    vsf_linux_thread_t *core_thread;
 
-    vsf_linux_thread_t *thread;
-    vk_usbh_libusb_dev_t *cur_dev;
+    bool is_to_exit;
+    vsf_trig_t trans_trig;
+    vsf_dlist_t translist_done;
+    vsf_linux_thread_t *user_thread;
+
     int fd;
     struct libusb_pollfd pollfd[1];
 };
@@ -108,26 +113,40 @@ extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_linux_libusb_dev_t * __vsf_linux_libusb_get_dev(vk_usbh_libusb_dev_t *dev)
-{
-    vsf_linux_libusb_dev_t *ldev = NULL;
-    vsf_protect_t orig = vsf_protect_sched();
-        __vsf_dlist_foreach_unsafe(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist) {
-            if (_->libusb_dev == dev) {
-                ldev = _;
-                break;
-            }
-        }
-    vsf_unprotect_sched(orig);
-    return ldev;
-}
-
 static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, vk_usbh_libusb_evt_t evt)
 {
+    vsf_linux_libusb_dev_t *ldev;
+    vsf_protect_t orig;
+
     if (VSF_USBH_LIBUSB_EVT_ON_ARRIVED == evt) {
         vk_usbh_libusb_open(dev);
+        ldev = malloc(sizeof(vsf_linux_libusb_dev_t));
+        if (ldev != NULL) {
+            ldev->libusb_dev = dev;
+            ldev->is_in_newlist = true;
+            ldev->pipe_in[0] = vk_usbh_get_pipe(dev->dev, 0x80, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
+            ldev->pipe_out[0] = vk_usbh_get_pipe(dev->dev, 0x00, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
+            dev->user_data = ldev;
+            orig = vsf_protect_sched();
+                vsf_dlist_add_to_tail(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_new, ldev);
+            vsf_unprotect_sched(orig);
+        }
+    } else if (VSF_USBH_LIBUSB_EVT_ON_LEFT) {
+        ldev = (vsf_linux_libusb_dev_t *)dev->user_data;
+        orig = vsf_protect_sched();
+        if (ldev->is_in_newlist) {
+            vsf_dlist_remove(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_new, ldev);
+            vsf_unprotect_sched(orig);
+            return;
+        } else {
+            vsf_dlist_remove(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist, ldev);
+            vsf_dlist_add_to_tail(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_del, ldev);
+            vsf_unprotect_sched(orig);
+        }
+    } else {
+        return;
     }
-    vsf_eda_post_evt_msg(&__vsf_libusb.thread->use_as__vsf_eda_t, VSF_EVT_USER + evt, dev);
+    vsf_eda_trig_set(&__vsf_libusb.dev_trig);
 }
 
 static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_libusb_evt_t evt)
@@ -154,77 +173,112 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
     }
 }
 
-static void * __vsf_libusb_libusb_thread(void *param)
+static void * __vsf_libusb_libusb_core_thread(void *param)
 {
     vsf_linux_libusb_dev_t *ldev;
+    vsf_protect_t orig;
     vk_usbh_libusb_set_evthandler(NULL, __vsf_linux_libusb_on_event);
-    vsf_evt_t evt;
     while (1) {
-        evt = vsf_thread_wait();
-        switch (evt) {
-        case VSF_EVT_USER + VSF_USBH_LIBUSB_EVT_ON_ARRIVED:
-            ldev = malloc(sizeof(vsf_linux_libusb_dev_t));
-            if (ldev != NULL) {
-                ldev->urb.pipe.is_pipe = true;
-                ldev->libusb_dev = (vk_usbh_libusb_dev_t *)vsf_eda_get_cur_msg();
-                ldev->pipe_in[0] = vk_usbh_get_pipe(ldev->libusb_dev->dev, 0x80, USB_ENDPOINT_XFER_CONTROL, ldev->libusb_dev->ep0size);
-                ldev->pipe_out[0] = vk_usbh_get_pipe(ldev->libusb_dev->dev, 0x00, USB_ENDPOINT_XFER_CONTROL, ldev->libusb_dev->ep0size);
-                vsf_dlist_add_to_head(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist, ldev);
-                __vsf_libusb.devnum++;
-                __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_ARRIVED);
-            }
-            break;
-        case VSF_EVT_USER + VSF_USBH_LIBUSB_EVT_ON_LEFT:
-            ldev = __vsf_linux_libusb_get_dev((vk_usbh_libusb_dev_t *)vsf_eda_get_cur_msg());
-            VSF_LINUX_ASSERT(ldev != NULL);
-            vsf_dlist_remove(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist, ldev);
+        vsf_thread_trig_pend(&__vsf_libusb.dev_trig, -1);
+
+        while (!vsf_dlist_is_empty(&__vsf_libusb.devlist_del)) {
+            orig = vsf_protect_sched();
+                vsf_dlist_remove_head(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_del, ldev);
+            vsf_unprotect_sched(orig);
+
             __vsf_libusb.devnum--;
             __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_LEFT);
             vk_usbh_libusb_close(ldev->libusb_dev);
             free(ldev);
-            break;
-        case VSF_EVT_MESSAGE: {
-                vsf_linux_libusb_transfer_t *ltransfer;
-                vsf_protect_t orig = vsf_protect_sched();
-                    vsf_dlist_remove_head(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist, ltransfer);
-                vsf_unprotect_sched(orig);
+        }
+        while (!vsf_dlist_is_empty(&__vsf_libusb.devlist_new)) {
+            orig = vsf_protect_sched();
+                vsf_dlist_remove_head(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_new, ldev);
+                vsf_dlist_add_to_tail(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist, ldev);
+                ldev->is_in_newlist = false;
+            vsf_unprotect_sched(orig);
 
-                if (ltransfer->transfer.callback != NULL) {
-                    ltransfer->transfer.callback(&ltransfer->transfer);
-                }
+            __vsf_libusb.devnum++;
+            __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_ARRIVED);
+        }
+    }
+}
 
-                for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
-                    if (__vsf_libusb.pollfd[i].fd >= 0) {
-                        vsf_linux_fd_rx_trigger(__vsf_libusb.pollfd[i].fd);
-                    }
+static void * __vsf_libusb_libusb_user_thread(void *param)
+{
+    vsf_linux_libusb_transfer_t *ltransfer;
+    vsf_linux_libusb_dev_t *ldev;
+//    vsf_protect_t orig;
+
+    while (1) {
+        vsf_thread_trig_pend(&__vsf_libusb.trans_trig, -1);
+
+        while (!vsf_dlist_is_empty(&__vsf_libusb.translist_done)) {
+            // all thread running under same priority as processor priority
+            //  so no need to protect
+//            orig = vsf_protect_sched();
+                vsf_dlist_remove_head(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
+//            vsf_unprotect_sched(orig);
+
+            if (ltransfer->transfer.callback != NULL) {
+                ltransfer->transfer.callback(&ltransfer->transfer);
+            }
+
+            for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
+                if (__vsf_libusb.pollfd[i].fd >= 0) {
+                    vsf_linux_fd_rx_trigger(__vsf_libusb.pollfd[i].fd);
                 }
             }
-            break;
         }
+
+        if (__vsf_libusb.is_to_exit) {
+            pthread_exit(0);
+        }
+    }
+}
+
+void vsf_linux_libusb_startup(void)
+{
+    if (!__vsf_libusb.cbhandle) {
+        __vsf_libusb.cbhandle = 1;
+        vsf_eda_trig_init(&__vsf_libusb.dev_trig, false, true);
+
+        pthread_t pthread;
+        pthread_create(&pthread, NULL, __vsf_libusb_libusb_core_thread, NULL);
+        __vsf_libusb.core_thread = vsf_linux_get_thread(pthread);
     }
 }
 
 int libusb_init(libusb_context **context)
 {
-    if (!__vsf_libusb.cbhandle) {
-        __vsf_libusb.cbhandle = 1;
-
-        pthread_t pthread;
-        pthread_create(&pthread, NULL, __vsf_libusb_libusb_thread, NULL);
-        __vsf_libusb.thread = vsf_linux_get_thread(pthread);
-
-        __vsf_libusb.fd = vsf_linux_create_fd(NULL, NULL);
-        __vsf_libusb.pollfd[0].fd = __vsf_libusb.fd;
-        __vsf_libusb.pollfd[0].events = POLLIN;
+    if (__vsf_libusb.fd != 0) {
+        VSF_LINUX_ASSERT(false);
     }
+
+    __vsf_libusb.fd = vsf_linux_create_fd(NULL, NULL);
+    __vsf_libusb.pollfd[0].fd = __vsf_libusb.fd;
+    __vsf_libusb.pollfd[0].events = POLLIN;
+
+    __vsf_libusb.is_to_exit = false;
+    vsf_eda_trig_init(&__vsf_libusb.trans_trig, false, true);
+    pthread_t pthread;
+    pthread_create(&pthread, NULL, __vsf_libusb_libusb_user_thread, NULL);
+    __vsf_libusb.user_thread = vsf_linux_get_thread(pthread);
     return LIBUSB_SUCCESS;
 }
 
 void libusb_exit(struct libusb_context *ctx)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    if ((__vsf_libusb.thread == thread) && (__vsf_libusb.fd >= 0)) {
-        vsf_linux_delete_fd(__vsf_libusb.fd);
+    if (__vsf_libusb.fd >= 0) {
+        __vsf_libusb.is_to_exit = true;
+        vsf_eda_trig_set(&__vsf_libusb.trans_trig);
+        pthread_join(__vsf_libusb.user_thread->tid, NULL);
+        __vsf_libusb.user_thread = NULL;
+
+        int fd = __vsf_libusb.fd;
+        __vsf_libusb.fd = 0;
+        vsf_linux_delete_fd(fd);
     }
 }
 
@@ -396,7 +450,7 @@ int libusb_get_device_speed(libusb_device *dev)
 static int __vsf_linux_libusb_submit_urb(vsf_linux_libusb_dev_t *ldev)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    vk_usbh_urb_t *urb = &ldev->urb;
+    vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
 
     if (VSF_ERR_NONE != vk_usbh_submit_urb(ldev->libusb_dev->usbh, urb)) {
         return LIBUSB_ERROR_IO;
@@ -407,13 +461,14 @@ static int __vsf_linux_libusb_submit_urb(vsf_linux_libusb_dev_t *ldev)
 
 static vk_usbh_urb_t * __vsf_linux_libusb_get_urb(vsf_linux_libusb_dev_t *ldev)
 {
-    if (!vk_usbh_urb_is_alloced(&ldev->urb)) {
-        if (VSF_ERR_NONE != vk_usbh_alloc_urb(ldev->libusb_dev->usbh, ldev->libusb_dev->dev, &ldev->urb)) {
+    vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
+    if (!vk_usbh_urb_is_alloced(urb)) {
+        if (VSF_ERR_NONE != vk_usbh_alloc_urb(ldev->libusb_dev->usbh, ldev->libusb_dev->dev, urb)) {
             VSF_LINUX_ASSERT(false);
             return NULL;
         }
     }
-    return &ldev->urb;
+    return urb;
 }
 
 int libusb_control_transfer(libusb_device_handle *dev_handle,
@@ -448,7 +503,7 @@ int libusb_bulk_transfer(libusb_device_handle *dev_handle,
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev_handle;
     vk_usbh_pipe_t *pipe = __vsf_linux_libusb_get_pipe(ldev, endpoint);
-    vk_usbh_urb_t *urb = &ldev->urb;
+    vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
     int ret;
 
     vk_usbh_urb_set_pipe(urb, *pipe);
@@ -470,7 +525,7 @@ int libusb_interrupt_transfer(libusb_device_handle *dev_handle,
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev_handle;
     vk_usbh_pipe_t *pipe = __vsf_linux_libusb_get_pipe(ldev, endpoint);
-    vk_usbh_urb_t *urb = &ldev->urb;
+    vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
     int ret;
 
     vk_usbh_urb_set_pipe(urb, *pipe);
@@ -566,7 +621,7 @@ void libusb_free_config_descriptor(struct libusb_config_descriptor *config)
             free((void *)config->interface[i].altsetting);
         }
         if (config->desc != NULL) {
-            free(config->desc);
+            free((void *)config->desc);
         }
         free(config);
     }
@@ -617,7 +672,7 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
     lconfig = calloc(1, len + sizeof(*lconfig));
     if (NULL == lconfig) { return LIBUSB_ERROR_NO_MEM; }
     interface = lconfig->interface = (struct libusb_interface *)&lconfig[1];
-    lconfig->desc = desc_config;
+    lconfig->desc = (const unsigned char *)desc_config;
     lconfig->use_as__usb_config_desc_t = *desc_config;
 
     size -= desc_header->bLength;
@@ -700,9 +755,14 @@ static int raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf, 
             if ((interface_desc != NULL) && (interface_desc >= &interface->altsetting[0])) {
                 if (!reach_endpoint) {
                     if (NULL == interface_desc->extra) {
-                        interface_desc->extra = desc_header;
+                        interface_desc->extra = (const unsigned char *)desc_header;
                     }
                     interface_desc->extra_length += desc_header->bLength;
+                } else if (endpoint_desc != NULL) {
+                    if (NULL == endpoint_desc->extra) {
+                        endpoint_desc->extra = (const unsigned char *)desc_header;
+                    }
+                    endpoint_desc->extra_length += desc_header->bLength;
                 }
             }
         }
@@ -800,7 +860,7 @@ static void __vsf_linux_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)ltransfer->transfer.dev_handle;
     vk_usbh_pipe_t *pipe = __vsf_linux_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &ltransfer->urb;
-    vsf_protect_t orig;
+//    vsf_protect_t orig;
 
     switch (evt) {
     case VSF_EVT_MESSAGE:
@@ -809,11 +869,13 @@ static void __vsf_linux_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt
         ltransfer->transfer.status = vk_usbh_urb_get_status(urb) == URB_OK ?
                 LIBUSB_TRANSFER_COMPLETED : LIBUSB_TRANSFER_ERROR;
         vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
-        
-        orig = vsf_protect_sched();
-            vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist, ltransfer);
-        vsf_unprotect_sched(orig);
-        vsf_eda_post_msg(&__vsf_libusb.thread->use_as__vsf_eda_t, urb);
+
+        // all thread running under same priority as processor priority
+        //  so no need to protect
+//        orig = vsf_protect_sched();
+            vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
+//        vsf_unprotect_sched(orig);
+        vsf_eda_trig_set(&__vsf_libusb.trans_trig);
         break;
     }
 }
@@ -887,12 +949,8 @@ void libusb_free_transfer(struct libusb_transfer *transfer)
 int libusb_handle_events_timeout_completed(libusb_context *ctx,
     struct timeval *tv, int *completed)
 {
-    vsf_linux_fd_t *sfd;
-    for (int i = 0; i < dimof(__vsf_libusb.pollfd); i++) {
-        sfd = vsf_linux_get_fd(__vsf_libusb.pollfd[i].fd);
-        sfd->rxevt = false;
-        sfd->txpend = sfd->rxpend = -1;
-    }
+    int timeout_ms = tv->tv_sec * 1000 + tv->tv_usec / 1000;
+    poll((struct pollfd *)__vsf_libusb.pollfd, dimof(__vsf_libusb.pollfd), timeout_ms);
     return LIBUSB_SUCCESS;
 }
 

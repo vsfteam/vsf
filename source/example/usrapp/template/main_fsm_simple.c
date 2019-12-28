@@ -41,18 +41,31 @@ def_fsm(user_fsm_task_t,
         vsf_task(user_fsm_sub_task_t) print_task;
     ));
     
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 declare_fsm(user_task_b_t)
 def_fsm(user_task_b_t,
     def_params(
         vsf_sem_t *psem;
         uint8_t cnt;
     ));
+#else
+declare_vsf_thread(user_thread_a_t)
+
+def_vsf_thread(user_thread_a_t, 1024,
+
+    features_used(
+        mem_sharable( )
+        mem_nonsharable( )
+    )
+    
+    def_params(
+        vsf_sem_t *psem;
+    ));
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t user_sem;
+static NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -127,7 +140,7 @@ implement_fsm(user_fsm_task_t)
     body_end();  
 }
 
-#if VSF_OS_RUN_MAIN_AS_THREAD != ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 
 /*! \IMPORTANT You cannot ignore fsm_initialiser at any time
  */
@@ -164,37 +177,45 @@ implement_fsm(user_task_b_t)
         }
         
     )
+#else
+implement_vsf_thread(user_thread_a_t) 
+{
+    uint32_t cnt = 0;
+    while (1) {
+        vsf_delay_ms(3000);
+        printf("post semaphore...   [%08x]\r\n", cnt++);
+        vsf_sem_post(this.psem);            //!< post a semaphore
+    }
+}
+
 #endif
 
 
 void vsf_kernel_fsm_simple_demo(void)
 {   
     //! initialise semaphore
-    vsf_sem_init(&user_sem, 0); 
+    vsf_sem_init(&__user_sem, 0); 
     
     //! start a user task
     {
         static NO_INIT user_fsm_task_t __user_task;
-        init_fsm(user_fsm_task_t, &(__user_task.param), args(&user_sem));
+        init_fsm(user_fsm_task_t, &(__user_task.param), args(&__user_sem));
         start_fsm(user_fsm_task_t, &__user_task, vsf_prio_0);
     };
 
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
-    uint32_t cnt = 0;
-    while(1) {
-        vsf_delay_ms(10000);
-        printf("post semaphore...   [%08x]\r\n", cnt++);
-        vsf_sem_post(&user_sem);            //!< post a semaphore
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    //! start the user task a
+    {
+        static NO_INIT user_thread_a_t __user_task_a;
+        __user_task_a.param.psem = &__user_sem;
+        init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
 #else
     //! in this case, we only use main to initialise vsf_tasks
-
-
-
     //! start a user task b
     {
         static NO_INIT user_task_b_t __user_task_b;
-        init_fsm(user_task_b_t, &(__user_task_b.param), args(&user_sem));
+        init_fsm(user_task_b_t, &(__user_task_b.param), args(&__user_sem));
         start_fsm(user_task_b_t, &__user_task_b, vsf_prio_0);
     };
 #endif
@@ -202,6 +223,7 @@ void vsf_kernel_fsm_simple_demo(void)
 
 
 #if VSF_PROJ_CFG_USE_CUBE != ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
 int main(void)
 {
     static_task_instance(
@@ -215,14 +237,48 @@ int main(void)
     
     vsf_kernel_fsm_simple_demo();
     
-#if VSF_OS_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
     }
-#else
+}
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
+    ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
+void main(void)
+{
+    static_task_instance(
+        features_used(
+            mem_sharable( )
+            mem_nonsharable( )
+        )
+        def_params(
+            uint32_t cnt;
+        )
+    )
+
+    vsf_pt_begin()
+
+    vsf_stdio_init();
+    
+    vsf_kernel_fsm_simple_demo();
+    
+    this.cnt = 0;
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_pt_wait_until(vsf_delay_ms(1000));
+    }
+    vsf_pt_end()
+}
+#else 
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_fsm_simple_demo();
+    
     return 0;
-#endif
 }
 
+#endif
 #endif

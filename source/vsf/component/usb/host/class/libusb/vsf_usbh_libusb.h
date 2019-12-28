@@ -30,6 +30,7 @@ struct vk_usbh_libusb_dev_t {
     vk_usbh_t *usbh;
     vk_usbh_dev_t *dev;
     vk_usbh_urb_t urb;
+    void *user_data;
 
     uint16_t vid, pid;
     uint8_t class;

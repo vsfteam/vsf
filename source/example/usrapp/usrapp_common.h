@@ -18,14 +18,25 @@
 #ifndef __USRAPP_COMMON_H__
 #define __USRAPP_COMMON_H__
 
+/*============================ INCLUDES ======================================*/
+
 #if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
 #   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
 #elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
 #   include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#if USRAPP_CFG_FAKEFAT32 == ENABLED
+#   ifndef USRAPP_CFG_FAKEFAT32_SIZE
+#       define USRAPP_CFG_FAKEFAT32_SIZE                (512 * 0x1040)
+#   endif
+#   if !defined(USRAPP_CFG_FAKEFAT32_ROOT) && defined(USRAPP_CFG_MEMFS_ROOT)
+#       define USRAPP_CFG_FAKEFAT32_ROOT                USRAPP_CFG_MEMFS_ROOT
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -81,10 +92,26 @@ struct usrapp_common_t {
     } usbh;
 #   endif
 
+#   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+    struct {
+#       if VSF_USE_FAKEFAT32_MAL == ENABLED
+        vk_fakefat32_mal_t fakefat32;
+#       endif
+    } mal;
+#   endif
+
 #   if VSF_USE_FS == ENABLED
     struct {
 #       if VSF_USE_MEMFS == ENABLED
         vk_memfs_info_t memfs_info;
+#       endif
+#       if VSF_USE_FATFS == ENABLED
+#           if VSF_USE_FAKEFAT32_MAL == ENABLED
+        struct {
+            vk_mim_mal_t fat32_mal;
+            implement_fatfs_info(512, 1);
+        } fatfs_info_fakefat32;
+#           endif
 #       endif
 #       if VSF_USE_WINFS == ENABLED
         vk_winfs_info_t winfs_info;
@@ -165,6 +192,26 @@ static usrapp_common_t __usrapp_common = {
     },
 #   endif
 
+#   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+    .mal                        = {
+#       if VSF_USE_FAKEFAT32_MAL == ENABLED
+        .fakefat32              = {
+            .drv                = &VK_FAKEFAT32_MAL_DRV,
+            .sector_size        = 512,
+            .sector_number      = USRAPP_CFG_FAKEFAT32_SIZE / 512,
+            .sectors_per_cluster= 8,
+            .volume_id          = 0x12345678,
+            .disk_id            = 0x9ABCEF01,
+            .root               = {
+                .name           = "ROOT",
+                .d.child        = (vk_memfs_file_t *)USRAPP_CFG_FAKEFAT32_ROOT,
+                .d.child_num    = dimof(USRAPP_CFG_FAKEFAT32_ROOT),
+            },
+        },
+#       endif
+    },
+#   endif
+
 #   if VSF_USE_FS == ENABLED
     .fs                         = {
 #       if VSF_USE_MEMFS == ENABLED
@@ -182,6 +229,20 @@ static usrapp_common_t __usrapp_common = {
                 .name           = USRAPP_CFG_WINFS_ROOT,
             },
         },
+#       endif
+#       if VSF_USE_FATFS == ENABLED
+#           if VSF_USE_FAKEFAT32_MAL == ENABLED
+        .fatfs_info_fakefat32   = {
+            .fat32_mal          = {
+                .drv            = &VK_MIM_MAL_DRV,
+                .host_mal       = &__usrapp_common.mal.fakefat32.use_as__vk_mal_t,
+                .offset         = 0x40 * 512,
+                .size           = (USRAPP_CFG_FAKEFAT32_SIZE - 0x40) * 512,
+            },
+            .mal                = &__usrapp_common.fs.fatfs_info_fakefat32.fat32_mal,
+            init_fatfs_info(__usrapp_common.fs.fatfs_info_fakefat32, 512, 1)
+        },
+#           endif
 #       endif
     },
 #   endif

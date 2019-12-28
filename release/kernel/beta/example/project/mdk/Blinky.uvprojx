@@ -2203,7 +2203,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--diag_suppress=64,1,381,177,111,188 --wchar32</MiscControls>
+              <MiscControls>--diag_suppress=951,64,1,381,177,111,188 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>
@@ -3137,7 +3137,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--diag_suppress=64,1,381,177,111,188 --wchar32</MiscControls>
+              <MiscControls>--diag_suppress=951,64,1,381,177,111,188 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include;..\..\usrapp\template\app_cfg</IncludePath>

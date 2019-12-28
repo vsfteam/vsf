@@ -60,7 +60,9 @@ label_loop_start:
     }
 }
 
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD != ENABLED
+#if   VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_EDA                        \
+    &&  !(  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
 static void user_task_b_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     static uint32_t cnt = 0;
@@ -78,7 +80,7 @@ label_loop_start:
 }
 #endif
 
-void vsf_kernel_task_simple_demo(void)
+void vsf_kernel_eda_simple_demo(void)
 {   
     //! initialise semaphore
     vsf_eda_sem_init(&__user_sem, 0);
@@ -94,14 +96,16 @@ void vsf_kernel_task_simple_demo(void)
         vsf_eda_init_ex(&__user_task_t.use_as__vsf_eda_t, (vsf_eda_cfg_t *)&cfg);
     }
 
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
     uint32_t cnt = 0;
     while(1) {
         vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
         vsf_eda_sem_post(&__user_sem);                                          //!< post a semaphore
     }
-#else
+#elif   VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_EDA                        \
+    &&  !(  VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
     //! in this case, we only use main to initialise vsf_tasks
 
     //! start a user task b
@@ -117,6 +121,7 @@ void vsf_kernel_task_simple_demo(void)
 }
 
 #if VSF_PROJ_CFG_USE_CUBE != ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
 int main(void)
 {
     static_task_instance(
@@ -128,16 +133,50 @@ int main(void)
 
     vsf_stdio_init();
     
-    vsf_kernel_task_simple_demo();
+    vsf_kernel_eda_simple_demo();
     
-#if VSF_OS_CFG_RUN_MAIN_AS_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
     }
-#else
+}
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
+    ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
+void main(void)
+{
+    static_task_instance(
+        features_used(
+            mem_sharable( )
+            mem_nonsharable( )
+        )
+        def_params(
+            uint32_t cnt;
+        )
+    )
+
+    vsf_pt_begin()
+
+    vsf_stdio_init();
+    
+    vsf_kernel_eda_simple_demo();
+    
+    this.cnt = 0;
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_pt_wait_until(vsf_delay_ms(1000));
+    }
+    vsf_pt_end()
+}
+#else 
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_eda_simple_demo();
+    
     return 0;
-#endif
 }
 
+#endif
 #endif

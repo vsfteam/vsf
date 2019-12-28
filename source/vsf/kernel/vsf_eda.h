@@ -172,12 +172,24 @@ typedef void (*vsf_eda_on_terminate_t)(vsf_eda_t *eda);
 typedef fsm_rt_t (*vsf_fsm_entry_t)(uintptr_t target, vsf_evt_t evt);
 typedef void (*vsf_param_eda_evthandler_t)(uintptr_t target, vsf_evt_t evt);
 
+#if VSF_KERNEL_CFG_FRAME_USER_BITS <= 6
+#   define __VSF_KERNEL_CFG_FRAME_UINT_TYPE         uint8_t
+#elif VSF_KERNEL_CFG_FRAME_USER_BITS <= 14
+#   define __VSF_KERNEL_CFG_FRAME_UINT_TYPE         uint16_t
+#elif VSF_KERNEL_CFG_FRAME_USER_BITS <= 30
+#   define __VSF_KERNEL_CFG_FRAME_UINT_TYPE         uint32_t
+#else
+#   error  The number of user bits should not exceed 30!!! Please give the macro VSF_KERNEL_CFG_FRAME_USER_BITS a correct value.
+#endif
+
+
 union __vsf_eda_frame_state_t {
     struct {
-        uint_fast8_t is_fsm             : 1;
-        uint_fast8_t is_stack_owner     : 1;
+        __VSF_KERNEL_CFG_FRAME_UINT_TYPE is_fsm             : 1;
+        __VSF_KERNEL_CFG_FRAME_UINT_TYPE is_stack_owner     : 1;
+        __VSF_KERNEL_CFG_FRAME_UINT_TYPE user               : VSF_KERNEL_CFG_FRAME_USER_BITS;
     } bits;
-    uint_fast8_t flag;
+    __VSF_KERNEL_CFG_FRAME_UINT_TYPE flag;
 };
 typedef union __vsf_eda_frame_state_t __vsf_eda_frame_state_t;
 
@@ -687,6 +699,14 @@ extern vsf_err_t vsf_eda_target_set(uintptr_t param);
 
 SECTION(".text.vsf.kernel.vsf_eda_target_get")
 extern uintptr_t vsf_eda_target_get(void);
+
+SECTION(".text.vsf.kernel.vsf_eda_frame_user_value_set")
+extern
+vsf_err_t vsf_eda_frame_user_value_set(__VSF_KERNEL_CFG_FRAME_UINT_TYPE value);
+
+SECTION(".text.vsf.kernel.vsf_eda_frame_user_value_get")
+extern
+vsf_err_t vsf_eda_frame_user_value_get(__VSF_KERNEL_CFG_FRAME_UINT_TYPE* pvalue);
 
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")

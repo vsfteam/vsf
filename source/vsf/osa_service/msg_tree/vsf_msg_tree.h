@@ -66,6 +66,10 @@ declare_vsf_rng_buf(__bfs_node_fifo_t)
 
 def_vsf_rng_buf(__bfs_node_fifo_t, uint16_t)
 
+declare_structure(vsf_msgt_cfg_t)
+declare_structure(vsf_msgt_container_t)
+declare_structure(vsf_msgt_node_t)
+
 //! \name the base class for all other tree messages
 //! @{
 typedef struct vsf_msgt_msg_t {
@@ -78,6 +82,7 @@ typedef enum vsf_msgt_node_status_t {
     VSF_MSGT_NODE_ENABLED               = _BV(1),                               //!< whether the node is enabled or not
     VSF_MSGT_NODE_VISIBLE               = _BV(2),                               //!< whether the node is visible 
     VSF_MSGT_NODE_ACTIVE                = _BV(3),
+    VSF_MSGT_NODE_HIDE_CONTENT          = _BV(4),                               //!< whether hide the content inside container
 }vsf_msgt_node_status_t;
 
 typedef enum vsf_msgt_handler_type_t {
@@ -90,11 +95,12 @@ typedef enum vsf_msgt_handler_type_t {
 }vsf_msgt_handler_type_t;
 
 typedef enum {
+    VSF_MSGT_ERR_REUQEST_VISIT_AGAIN = fsm_rt_user,
+    VSF_MSGT_ERR_REQUEST_VISIT_PARENT,
     VSF_MSGT_ERR_NONE = 0,
     VSF_MSGT_ERR_MSG_NOT_HANDLED = -1,
 } vsf_msgt_err_t;
 
-typedef struct vsf_msgt_node_t vsf_msgt_node_t;
 
 typedef bool vsf_msgt_method_shoot_t(const vsf_msgt_node_t*, uintptr_t);
 typedef vsf_msgt_node_status_t vsf_msgt_method_status_t(vsf_msgt_node_t* );
@@ -107,27 +113,19 @@ typedef struct vsf_msgt_subcall_t {
 typedef struct vsf_msgt_handler_t vsf_msgt_handler_t;
 struct vsf_msgt_handler_t {
     vsf_msgt_handler_type_t         tType;                                      //!< message handler type
-
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-    union {
+    implement_ex(
         union {
             vsf_msgt_method_fsm_t* fnFSM;                                            //!< message handler
             vsf_eda_t* ptEDA;                                                       //!< target eda receiver
             vsf_msgt_subcall_t* ptSubCall;                                          //!< subcall handler
-        };
-#endif
-        union {
-            vsf_msgt_method_fsm_t *fnFSM;                                            //!< message handler
-            vsf_eda_t* ptEDA;                                                       //!< target eda receiver
-            vsf_msgt_subcall_t* ptSubCall;                                          //!< subcall handler
-        } fn;
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-    };
-#endif
+        }, 
+        fn
+    )
 };
 
 //! \name v-table for tree message node 
 //! @{
+declare_interface(i_msg_tree_node_t)
 def_interface(i_msg_tree_node_t)
     vsf_msgt_handler_t          tMessageHandler;
     vsf_msgt_method_status_t    *Status;                                        //!< get status of target node         
@@ -234,6 +232,10 @@ end_def_class(vsf_msgt_t)
 
 extern 
 void vsf_msgt_init( vsf_msgt_t* ptObj, const vsf_msgt_cfg_t *ptCFG);
+
+extern
+const vsf_msgt_node_t* vsf_msgt_get_next_node_within_container(
+                                            const vsf_msgt_node_t* ptNode);
 
 extern 
 const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,

@@ -129,10 +129,11 @@ static void vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_MESSAGE:
+        // hid->ep0 and hid->user_evthandler share the same memory
+        //  so user_evthandler MUST first be used, and then set ep0
+        vsf_eda_set_evthandler(eda, hid->user_evthandler);
         hid->ep0 = &dev->ep0;
-        if (VSF_ERR_NONE != vsf_eda_go_to((uintptr_t)hid->user_evthandler)) {
-            VSF_USB_ASSERT(false);
-        }
+        vsf_eda_post_evt(eda, VSF_EVT_INIT);
         break;
     }
 }

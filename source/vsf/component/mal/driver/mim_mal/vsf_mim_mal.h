@@ -15,25 +15,45 @@
  *                                                                           *
  ****************************************************************************/
 
-
-
-#ifndef __VSF_LINUX_H__
-#define __VSF_LINUX_H__
+#ifndef __VSF_MIM_MAL_H__
+#define __VSF_MIM_MAL_H__
 
 /*============================ INCLUDES ======================================*/
-#include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_USE_LINUX_LIBUSB == ENABLED
+#include "../../vsf_mal_cfg.h"
+
+#if VSF_USE_MAL == ENABLED && VSF_USE_MIM_MAL == ENABLED
+
+#if     defined(VSF_MIM_MAL_IMPLEMENT)
+#   undef VSF_MIM_MAL_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT
+#elif   defined(VSF_MIM_MAL_INHERIT)
+#   undef VSF_MIM_MAL_INHERIT
+#   define __PLOOC_CLASS_INHERIT
+#endif
+
+#include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+declare_simple_class(vk_mim_mal_t)
+
+def_simple_class(vk_mim_mal_t) {
+    implement(vk_mal_t)
+
+    public_member(
+        vk_mal_t *host_mal;
+        uint64_t offset;
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+
+extern const i_mal_drv_t VK_MIM_MAL_DRV;
+
 /*============================ PROTOTYPES ====================================*/
 
-
-
-#endif      // VSF_USE_LINUX
-#endif      // __VSF_LINUX_H__
-/* EOF */
+#endif      // VSF_USE_MAL && VSF_USE_MIM_MAL
+#endif      // __VSF_MIM_MAL_H__

@@ -215,6 +215,8 @@ enum {
 #   define USRAPP_CFG_DCD_TYPE_MUSB_FDRC    2
 #endif
 
+#define USRAPP_CFG_FAKEFAT32                            ENABLED
+
 #if     defined(__M484__)
 #   define VSF_HEAP_SIZE                                0x10000
 #   define VSF_SYSTIMER_FREQ                            (192000000ul)

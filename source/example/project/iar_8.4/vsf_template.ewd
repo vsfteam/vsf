@@ -17774,7 +17774,7 @@
         </debuggerPlugins>
     </configuration>
     <configuration>
-        <name>usbd_demo_6uarts</name>
+        <name>usbd_demo_simplest</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -19147,7 +19147,7 @@
                 <option>
                     <name>CCXds100ProbeList</name>
                     <version>0</version>
-                    <state>2</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>CCXds100SWOPortRadio</name>

@@ -49,7 +49,7 @@ const vk_fs_op_t vk_memfs_op = {
         .read       = __vk_memfs_read,
         .write      = __vk_memfs_write,
         .close      = vk_dummyfs_succeed,
-        .truncate   = vk_dummyfs_not_support,
+        .resize     = vk_dummyfs_not_support,
     },
     .dop            = {
         .lookup     = __vk_memfs_lookup,
@@ -81,7 +81,7 @@ static void __vk_memfs_mount(uintptr_t target, vsf_evt_t evt)
     vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
     vk_memfs_info_t *fsinfo = dir->subfs.data;
     VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->root.d.child_size >= sizeof(vk_memfs_file_t)));
-    fsinfo->root.attr |= VSF_FILE_ATTR_DIRECTORY;
+    fsinfo->root.attr = VSF_FILE_ATTR_DIRECTORY;
     __vk_memfs_init(fsinfo, &fsinfo->root);
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vk_file_return(&dir->use_as__vk_file_t, VSF_ERR_NONE);

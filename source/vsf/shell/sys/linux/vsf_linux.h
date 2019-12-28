@@ -160,7 +160,7 @@ def_simple_class(vsf_linux_fd_t) {
         int flags;
         const vsf_linux_fd_op_t *op;
 
-        int txpend, rxpend;
+        vsf_trig_t *txpend, *rxpend;
         uint_fast8_t txevt      : 1;
         uint_fast8_t rxevt      : 1;
         uint_fast8_t locked     : 1;

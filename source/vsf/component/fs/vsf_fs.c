@@ -77,7 +77,7 @@ vk_fs_op_t vk_vfs_op = {
         .close      = vk_dummyfs_succeed,
         .read       = vk_dummyfs_not_support,
         .write      = vk_dummyfs_not_support,
-        .truncate   = vk_dummyfs_not_support,
+        .resize     = vk_dummyfs_not_support,
     },
     .dop            = {
         .lookup     = __vk_vfs_lookup,
@@ -327,6 +327,7 @@ static void __vk_file_open_imp(vk_file_t *dir, vsf_evt_t evt)
             }
         }
 
+        *__vk_fs.open.file = NULL;
         if (VSF_ERR_NONE != __vk_file_lookup(cur_dir, __vk_fs.open.name, __vk_fs.open.idx, __vk_fs.open.file)) {
             __vk_fs.open.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         do_fail:
@@ -518,7 +519,9 @@ void vk_file_set_result(vk_file_t *file, vsf_err_t err)
 
 void vk_file_return(vk_file_t *file, vsf_err_t err)
 {
-    vk_file_set_result(file, err);
+    if (file != NULL) {
+        vk_file_set_result(file, err);
+    }
     vsf_eda_return();
 }
 
@@ -545,7 +548,9 @@ static void __vk_vfs_mount(uintptr_t target, vsf_evt_t evt)
         dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
     case VSF_EVT_RETURN:
         if (VSF_ERR_NONE == dir->ctx.err) {
+            vk_file_t *root = dir->subfs.root;
             dir->attr |= VSF_VFS_FILE_ATTR_MOUNTED;
+            root->attr |= VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ;
         }
         vsf_eda_return();
         break;

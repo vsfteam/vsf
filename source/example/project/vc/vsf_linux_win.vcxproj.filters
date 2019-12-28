@@ -256,6 +256,12 @@
     <Filter Include="vsf\shell\sys\linux\include\linux">
       <UniqueIdentifier>{27677cab-f494-4daf-a1b5-19c342cfd33d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\fs\driver\malfs">
+      <UniqueIdentifier>{3febe616-9a85-4144-92b3-546a04c2b516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver\mim_mal">
+      <UniqueIdentifier>{f23d0275-0e2b-47c5-8826-646665e344dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -585,9 +591,6 @@
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\vsf_linux_cfg.h">
       <Filter>vsf\shell\sys\linux</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\shell\sys\linux\lib\libusb\vsf_linux_libusb.h">
-      <Filter>vsf\shell\sys\linux\lib\libusb</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs.h">
       <Filter>vsf\component\fs</Filter>
     </ClInclude>
@@ -689,6 +692,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\shell\sys\linux\include\errno.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.h">
+      <Filter>vsf\component\fs\driver\malfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.h">
+      <Filter>vsf\component\mal\driver\mim_mal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -927,6 +936,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c">
       <Filter>vsf\component\mal\driver\fakefat32_mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.c">
+      <Filter>vsf\component\fs\driver\malfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c">
+      <Filter>vsf\component\mal\driver\mim_mal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

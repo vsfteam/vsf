@@ -167,6 +167,7 @@ vsf_evt_t __vsf_yield(void)
     return result;
 }
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 SECTION("text.vsf.kernel.__vsf_call_eda")
 vsf_err_t __vsf_call_eda(uintptr_t evthandler, uintptr_t param)
 {
@@ -198,6 +199,7 @@ fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param)
         return vsf_eda_call_fsm(entry, param);
     }
 }
+#endif
 
 #endif
 /*EOF*/

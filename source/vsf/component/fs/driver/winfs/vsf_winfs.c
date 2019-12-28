@@ -52,7 +52,7 @@ const vk_fs_op_t vk_winfs_op = {
         .read       = __vk_winfs_read,
         .write      = __vk_winfs_write,
         .close      = __vk_winfs_close,
-        .truncate   = vk_dummyfs_not_support,
+        .resize     = vk_dummyfs_not_support,
     },
     .dop            = {
         .lookup     = __vk_winfs_lookup,
@@ -84,7 +84,6 @@ static void __vk_winfs_mount(uintptr_t target, vsf_evt_t evt)
     }
     FindClose(hFind);
 
-    fsinfo->root.attr |= VSF_FILE_ATTR_DIRECTORY;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vk_file_return(&dir->use_as__vk_file_t, VSF_ERR_NONE);
 }

@@ -205,8 +205,9 @@ static void vsf_eda_push(vsf_slist_t *list, __vsf_eda_frame_t *frame)
 static __vsf_eda_frame_t * vsf_eda_peek(vsf_slist_t *list)
 {
     __vsf_eda_frame_t *frame = NULL;
-    vsf_slist_peek_next(__vsf_eda_frame_t, use_as__vsf_slist_node_t,
-                list, frame);
+    vsf_slist_peek_next(__vsf_eda_frame_t,
+                        use_as__vsf_slist_node_t,
+                        list, frame);
     return frame;
 }
 #endif
@@ -550,6 +551,43 @@ static vsf_err_t __vsf_eda_ensure_frame_used(vsf_eda_t *pthis)
     return VSF_ERR_NONE;
 }
 
+SECTION(".text.vsf.kernel.vsf_eda_frame_user_value_set")
+vsf_err_t vsf_eda_frame_user_value_set(__VSF_KERNEL_CFG_FRAME_UINT_TYPE value)
+{
+    vsf_err_t err = VSF_ERR_NONE;
+    vsf_eda_t* pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(NULL != pthis);
+
+    err = __vsf_eda_ensure_frame_used(pthis);
+    if (VSF_ERR_NONE == err) {
+        pthis->fn.frame->state.bits.user = value;
+    }
+
+    return err;
+}
+
+SECTION(".text.vsf.kernel.vsf_eda_frame_user_value_get")
+vsf_err_t vsf_eda_frame_user_value_get(__VSF_KERNEL_CFG_FRAME_UINT_TYPE *pvalue)
+{
+    vsf_err_t err = VSF_ERR_NONE;
+    vsf_eda_t* pthis = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(NULL != pthis);
+
+    do {
+        if (NULL == pvalue) {
+            err = VSF_ERR_INVALID_PTR;
+            break;
+        } else if (!pthis->state.bits.is_use_frame) {
+            err = VSF_ERR_NOT_AVAILABLE;
+            break;
+        }
+        
+        (*pvalue) = pthis->fn.frame->state.bits.user;
+        
+    } while(0);
+    return err;
+}
+
 SECTION(".text.vsf.kernel.vsf_eda_target_set")
 vsf_err_t vsf_eda_target_set(uintptr_t param)
 {
@@ -636,10 +674,14 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
         vsf_eda_push(&pthis->fn.frame_list, frame);
     }
 
+#if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED   //! todo: when the experimental code proved to be stable, remove the old one
+        //! for eda without return value, call evthandler directly
+    __vsf_dispatch_evt(pthis, VSF_EVT_INIT);
+#else
     if (VSF_ERR_NONE != vsf_eda_post_evt(pthis, VSF_EVT_INIT)) {
         VSF_KERNEL_ASSERT(false);
     }
-
+#endif
     return VSF_ERR_NONE;
 }
 

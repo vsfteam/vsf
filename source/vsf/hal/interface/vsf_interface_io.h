@@ -355,6 +355,7 @@ typedef struct vsf_gpio_t vsf_gpio_t;
 
 //! \name gpio control interface
 //! @{
+declare_interface(i_gpio_t)
 def_interface(i_gpio_t)
 
     //! config pin mode
@@ -390,6 +391,7 @@ end_def_interface(i_gpio_t)
 
 //! \name gpio user interface
 //! @{
+declare_interface(i_io_t)
 def_interface(i_io_t)
     //! general io configuration
     vsf_err_t (*Config)(io_cfg_t *cfg_ptr, uint_fast8_t count);

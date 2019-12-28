@@ -49,7 +49,49 @@ void vsf_msgt_init(vsf_msgt_t* ptObj, const vsf_msgt_cfg_t* ptCFG)
     this.NodeTypes = *ptCFG;
 }
 
+const vsf_msgt_node_t* vsf_msgt_get_next_node_within_container(const vsf_msgt_node_t* ptNode)
+{
+    do {
+        if (NULL == ptNode) {
+            break;
+        }
+        //! check offset of next node
+        if (0 == ptNode->Offset.iNext) {
+            //!< the last node
+            ptNode = NULL;
+            break;
+        }
+        //! point to next node with offset 
+        ptNode = (vsf_msgt_node_t*)((intptr_t)ptNode + ptNode->Offset.iNext);
+    } while(0);
+    return ptNode;
+}
 
+static bool __msgt_check_status(vsf_msgt_t* ptObj,
+                                const vsf_msgt_node_t* ptNode,
+                                uint_fast8_t chStatusMask )
+{
+    vsf_msgt_method_status_t* fnStatus = NULL;
+    uint_fast8_t chID = ptNode->chID;
+    class_internal(ptObj, ptThis, vsf_msgt_t);
+
+    if (chID < 2) {
+        fnStatus = c_tRootNodes[chID].Status;
+    } else {
+        chID -= 2;
+        fnStatus = this.NodeTypes.ptInterfaces[chID].Status;
+    }
+
+    if (NULL != fnStatus) {
+        //!< get status
+        vsf_msgt_node_status_t tStatus = (*fnStatus)((vsf_msgt_node_t*)ptNode);
+        if ((tStatus & chStatusMask) != chStatusMask) {
+            return false;
+        }
+    }
+
+    return true;
+}
 /*----------------------------------------------------------------------------*
  * Node shooting algorithm                                                    *
  *----------------------------------------------------------------------------*/
@@ -81,12 +123,11 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t *ptRoot,
                                             uintptr_t pBulletInfo)
 {
-    vsf_msgt_node_t* ptItem = NULL;
+    const vsf_msgt_node_t* ptItem = NULL;
     class_internal(ptObj, ptThis, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
 
-    
     do {
         if (NULL == ptRoot) {
             break;
@@ -107,30 +148,21 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
         }
 
         //! check nodes in this container
-        do {
+        if (!__msgt_check_status(   ptObj, 
+                                    ptItem,
+                                    VSF_MSGT_NODE_HIDE_CONTENT)) {
             vsf_msgt_container_t* ptContainer = (vsf_msgt_container_t*)ptItem;
-            vsf_msgt_node_t * ptNode = ptContainer->ptNode;
+            const vsf_msgt_node_t * ptNode = ptContainer->ptNode;
 
-            if (NULL == ptNode) {
-                //! empty container
-                break;
-            }
-
-            do {
+            while (NULL != ptNode) {
                 if (__msgt_shoot(ptObj, ptNode, pBulletInfo)) {
                     //! shoot a node
                     ptItem = ptNode;
                     break;
                 }
 
-                //! check offset of next node
-                if (0 == ptNode->Offset.iNext) {
-                    //!< the last node
-                    break;
-                }
-                //! point to next node with offset 
-                ptNode = (vsf_msgt_node_t*)((intptr_t)ptNode + ptNode->Offset.iNext);
-            } while(true);
+                ptNode = vsf_msgt_get_next_node_within_container(ptNode);
+            }
 
         } while (0);
 
@@ -226,6 +258,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
                 RESET_MSGT_HANDLING_FSM();
                 return fsm_rt_err;
             } else {
+            #if 0
                 vsf_msgt_method_status_t* fnStatus = NULL;
 
                 uint_fast8_t chID = ptNode->chID;
@@ -239,12 +272,21 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
                 if (NULL != fnStatus) {
                     //!< get status
                     vsf_msgt_node_status_t tStatus = (*fnStatus)((vsf_msgt_node_t *)ptNode);
-                    if (0 == (tStatus & (VSF_MSGT_NODE_VALID | VSF_MSGT_NODE_ENABLED))) {
-                        //! not valid and enabled
+                    if ((VSF_MSGT_NODE_VALID | VSF_MSGT_NODE_ENABLED) != (tStatus & (VSF_MSGT_NODE_VALID | VSF_MSGT_NODE_ENABLED))) {
+                        //! not valid or enabled
                         RESET_MSGT_HANDLING_FSM();
                         return fsm_rt_err;
                     }
                 }
+            #else
+                if (!__msgt_check_status(   ptObj, 
+                                            ptNode, 
+                                            (VSF_MSGT_NODE_VALID | VSF_MSGT_NODE_ENABLED))) {
+                    //! not valid or enabled
+                    RESET_MSGT_HANDLING_FSM();
+                    return fsm_rt_err;
+                }
+            #endif
                 THIS_FSM_STATE = GET_HANDLER;
             }
             //break;
@@ -398,7 +440,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
 {
     class_internal(&ptObj, ptThis, vsf_msgt_t);
 
-    
+    //! todo
 
     return fsm_rt_on_going;
 }
@@ -491,23 +533,22 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
             tfsm = __vsf_msg_handling(  &this.FWBFS.tMSGHandling, 
                                         ptObj, 
                                         this.FWBFS.tMSGHandling.ptNode);
-            if (tfsm < 0 || tfsm == fsm_rt_cpl) {
-
+            if (    tfsm < 0 
+                ||  fsm_rt_cpl == tfsm) {
                 THIS_FSM_STATE = FETCH_ITEM;
-                //! add nodes to fifo
+
                 if (this.FWBFS.tMSGHandling.ptNode->tAttribute._.bIsContainer) {
+                    //! add nodes to fifo
                     vsf_msgt_container_t* ptContainer = 
                         (vsf_msgt_container_t*)this.FWBFS.tMSGHandling.ptNode;
-                    vsf_msgt_node_t *ptTemp = ptContainer->ptNode;
-                    if (NULL == ptTemp) {
-                        break;
-                    }
+                    const vsf_msgt_node_t *ptTemp = 
+                        (const vsf_msgt_node_t *)ptContainer->ptNode;
 
                     //! put all nodes into fifo
-                    do {
+                    while(NULL != ptTemp) {
                         hwOffset = 
                             (uint16_t)((uintptr_t)ptTemp 
-                                     - (uintptr_t)this.FWBFS.tMSGHandling.ptNode);
+                                     - (uintptr_t)ptNode /*this.FWBFS.tMSGHandling.ptNode*/);
                         if (!VSF_RNG_BUF_SEND_ONE(  __bfs_node_fifo_t, 
                                                     &(this.FWBFS.tFIFO), 
                                                     hwOffset)) {
@@ -515,15 +556,51 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                             return (fsm_rt_t)
                                 VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
                         }
-                        if (0 == ptTemp->Offset.iNext) {
-                            break;
-                        }
-                        ptTemp = (vsf_msgt_node_t*)
-                                    ((intptr_t)ptTemp + ptTemp->Offset.iNext);
-                    } while(1);
+                        ptTemp = vsf_msgt_get_next_node_within_container(ptTemp);
+                    } 
                 } 
                 break;
-            } 
+
+            } else if (VSF_MSGT_ERR_REQUEST_VISIT_PARENT == tfsm) {
+                THIS_FSM_STATE = FETCH_ITEM;
+
+                //! visit parent is requrested
+                const vsf_msgt_node_t* ptTemp = NULL;
+                if (NULL != this.FWBFS.tMSGHandling.ptNode->ptParent) {
+                    ptTemp = this.FWBFS.tMSGHandling.ptNode->ptParent;
+                } else {
+                    /* no parent, revisit itself again to maitain the same behaviour*/
+                    ptTemp = this.FWBFS.tMSGHandling.ptNode;
+                }
+
+                hwOffset =
+                    (uint16_t)((uintptr_t)ptTemp - (uintptr_t)ptNode);
+                if (!VSF_RNG_BUF_SEND_ONE(__bfs_node_fifo_t,
+                    &(this.FWBFS.tFIFO),
+                    hwOffset)) {
+                    RESET_MSGT_FW_BFS_PROPAGATE_MSG_FSM();
+                    return (fsm_rt_t)
+                        VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
+                }
+
+                break;
+
+            } else if (VSF_MSGT_ERR_REUQEST_VISIT_AGAIN == tfsm) {
+                THIS_FSM_STATE = FETCH_ITEM;
+
+                const vsf_msgt_node_t* ptTemp = this.FWBFS.tMSGHandling.ptNode;
+                hwOffset =
+                    (uint16_t)((uintptr_t)ptTemp - (uintptr_t)ptNode);
+                if (!VSF_RNG_BUF_SEND_ONE(__bfs_node_fifo_t,
+                    &(this.FWBFS.tFIFO),
+                    hwOffset)) {
+                    RESET_MSGT_FW_BFS_PROPAGATE_MSG_FSM();
+                    return (fsm_rt_t)
+                        VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
+                }
+                break;
+            }
+
             return tfsm;
     }
 

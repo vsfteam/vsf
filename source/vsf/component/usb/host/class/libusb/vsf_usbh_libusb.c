@@ -62,6 +62,7 @@ static void *vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 
     ldev->usbh = usbh;
     ldev->dev = dev;
+    ldev->urb.pipe.is_pipe = true;
     desc_device = usbh->parser->desc_device;
     ldev->vid = desc_device->idVendor;
     ldev->pid = desc_device->idProduct;

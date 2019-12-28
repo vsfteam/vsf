@@ -137,7 +137,7 @@
                 </option>
                 <option>
                     <name>RTLibraryPath</name>
-                    <state>$TOOLKIT_DIR$\LIB\DLIB\dl-pli-ngxd-1e16x01n.r51</state>
+                    <state>$TOOLKIT_DIR$\LIB\DLIB\dl-pli-nlxd-1e16x01n.r51</state>
                 </option>
                 <option>
                     <name>Input variant</name>
@@ -494,7 +494,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>3</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -503,7 +503,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>3</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules04</name>
@@ -549,7 +549,7 @@
                 <option>
                     <name>CCAllowList2</name>
                     <version>0</version>
-                    <state>1111110</state>
+                    <state>0000000</state>
                 </option>
                 <option>
                     <name>CCOptStrategySlave</name>
@@ -3693,6 +3693,12 @@
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c</name>
                             </file>
                             <file>
@@ -3900,9 +3906,6 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c</name>
                     </file>
                 </group>
                 <file>

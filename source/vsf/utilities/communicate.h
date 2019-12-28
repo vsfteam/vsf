@@ -59,6 +59,7 @@ struct vsf_mem_t {
 
 //! \name interface: byte pipe
 //! @{
+declare_interface(i_byte_pipe_t)
 def_interface(i_byte_pipe_t)
     //!< read a byte
     bool (*ReadByte)(uint8_t *pchByte);
@@ -71,6 +72,7 @@ end_def_interface(i_byte_pipe_t)
 
 //! \name interface: pipe
 //! @{
+declare_interface(i_pipe_t)
 def_interface(i_pipe_t) 
 
     implement(i_byte_pipe_t) 

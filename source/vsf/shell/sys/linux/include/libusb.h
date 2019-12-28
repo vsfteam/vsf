@@ -1,6 +1,8 @@
 #ifndef __LIBUSB_H__
 #define __LIBUSB_H__
 
+#include <poll.h>
+
 #define LIBUSB_HOTPLUG_MATCH_ANY    -1
 
 #define libusb_device_descriptor    usb_device_desc_t
@@ -139,9 +141,9 @@ typedef enum {
 typedef int (*libusb_hotplug_callback_fn)(libusb_context *ctx,
         libusb_device *device, libusb_hotplug_event event, void *user_data);
 
+
 struct libusb_pollfd {
-    int fd;
-    short events;
+    struct pollfd;
 };
 
 enum libusb_transfer_status {
@@ -323,5 +325,8 @@ static inline void libusb_set_iso_packet_lengths(
     for (i = 0; i < transfer->num_iso_packets; i++)
         transfer->iso_packet_desc[i].length = length;
 }
+
+
+void vsf_linux_libusb_startup(void);
 
 #endif

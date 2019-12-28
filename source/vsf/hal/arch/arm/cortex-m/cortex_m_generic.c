@@ -301,4 +301,9 @@ uint_fast8_t __vsf_arch_clz(uintalu_t a)
     return __CLZ(a);
 }
 
+int_fast8_t __vsf_arch_msb(uintalu_t a)
+{
+    return 31 - (int_fast8_t)__CLZ(a);
+}
+
 /* EOF */

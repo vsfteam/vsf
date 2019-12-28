@@ -24,6 +24,7 @@
 /*============================ TYPES =========================================*/
 //! \name systick struct
 //! @{
+declare_interface(systick_t)
 def_interface(systick_t)
     bool            (*Init)(systick_cfg_t *);       //!< initialize the systick
     void            (*Enable)(void);                //!< enable

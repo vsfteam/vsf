@@ -55,7 +55,7 @@ static void vsf_tgui_region_init_with_size(vsf_tgui_region_t* ptRegion, vsf_tgui
 
 void refresh_my_stopwatch(void)
 {
-    vk_tgui_refresh(&__tgui_demo);
+    //vk_tgui_refresh(&__tgui_demo);
 }
 
 

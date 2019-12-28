@@ -192,6 +192,8 @@ void vsf_kernel_task_simple_demo(void)
 }
 
 #if VSF_PROJ_CFG_USE_CUBE != ENABLED
+#if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
+
 int main(void)
 {
     static_task_instance(
@@ -200,20 +202,53 @@ int main(void)
             mem_nonsharable( )
         )
     )
-    
+
     vsf_stdio_init();
     
     vsf_kernel_task_simple_demo();
     
-#if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
-    &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
     }
-#else
+}
+#elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
+    ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
+        &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
+void main(void)
+{
+    static_task_instance(
+        features_used(
+            mem_sharable( )
+            mem_nonsharable( )
+        )
+        def_params(
+            uint32_t cnt;
+        )
+    )
+
+    vsf_pt_begin()
+
+    vsf_stdio_init();
+    
+    vsf_kernel_task_simple_demo();
+    
+    this.cnt = 0;
+    while(1) {
+        printf("hello world! \r\n");
+        vsf_pt_wait_until(vsf_delay_ms(1000));
+    }
+    vsf_pt_end()
+}
+#else 
+int main(void)
+{
+    vsf_stdio_init();
+    
+    vsf_kernel_task_simple_demo();
+    
     return 0;
-#endif
 }
 
+#endif
 #endif

@@ -506,6 +506,7 @@ typedef struct vsf_pool_cfg_t {
 
 //! \name vsf pool interface
 //! @{
+declare_interface(i_pool_t)
 def_interface(i_pool_t)
     void (*Init)            (   vsf_pool_t *pObj, 
                                 uint32_t wItemSize, 

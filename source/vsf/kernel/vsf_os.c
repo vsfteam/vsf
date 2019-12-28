@@ -169,15 +169,15 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
     VSF_KERNEL_ASSERT((     pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
-    #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
+#if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
     if (vsf_prio_0 == priority) {
-    #   ifndef WEAK_VSF_KERNEL_ERR_REPORT
+#   ifndef WEAK_VSF_KERNEL_ERR_REPORT
         vsf_kernel_err_report(VSF_KERNEL_ERR_INVALID_USAGE);
-    #   else
+#   else
         WEAK_VSF_KERNEL_ERR_REPORT(VSF_KERNEL_ERR_INVALID_USAGE);
-    #   endif
+#   endif
     }
-    #endif
+#endif
 
 #if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
     if (priority >= __vsf_os.res_ptr->arch.sched_prio.begin) {

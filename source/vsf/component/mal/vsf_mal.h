@@ -107,6 +107,7 @@ def_simple_class(vk_mal_t) {
 
 /*============================ INCLUDES ======================================*/
 
+#include "./driver/mim_mal/vsf_mim_mal.h"
 #include "./driver/mem_mal/vsf_mem_mal.h"
 #include "./driver/fakefat32_mal/vsf_fakefat32_mal.h"
 

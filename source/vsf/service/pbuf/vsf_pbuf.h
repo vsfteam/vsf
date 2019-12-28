@@ -114,6 +114,7 @@ end_def_class(vsf_pbuf_t)
 //! \name special methods for accessing blocks
 //! \note the instance of i_block_methods_t should stored in ROM
 //! @{
+declare_interface(i_pbuf_methods_t)
 def_interface(i_pbuf_methods_t)
 
     /*! \retval NULL    target pbuf has been free-ed
@@ -154,7 +155,7 @@ typedef struct vsf_pbuf_cfg_t {
     uint_fast8_t        AdapterID;
 } vsf_pbuf_cfg_t;
 
-
+declare_interface(i_pbuf_t)
 def_interface(i_pbuf_t)
     
     vsf_pbuf_t *       (*Init)(vsf_pbuf_t *, vsf_pbuf_cfg_t *);

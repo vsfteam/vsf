@@ -23,7 +23,13 @@
 
 /*============================ MACROS ========================================*/
 #ifndef VSF_USE_HEAP
-#   define VSF_USE_HEAP     ENABLED     //!< enable vsf_heap_t by default
+#   define VSF_USE_HEAP         ENABLED     //!< enable vsf_heap_t by default
+#endif
+
+#if VSF_USE_HEAP == ENABLED
+#   ifndef VSF_HEAP_SIZE
+#       define VSF_HEAP_SIZE    (128 * 1024)
+#   endif
 #endif
 
 #if VSF_USE_HEAP == ENABLED
@@ -40,6 +46,8 @@
                                 (__SIZE))
 #endif
 /*============================ TYPES =========================================*/
+
+declare_interface(i_heap_t)
 
 //! \name vsf heap interface
 //! @{

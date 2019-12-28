@@ -34,6 +34,70 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#define USB_CDC_ACM_PARAM(__INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
+            .ep = {                                                             \
+                .notify         = (__INT_IN_EP),                                \
+                .out            = (__BULK_OUT_EP),                              \
+                .in             = (__BULK_IN_EP),                               \
+            },                                                                  \
+            .line_coding        = __VA_ARGS__,                                  \
+            .stream.tx.stream   = (vsf_stream_t *)(__STREAM_TX),                \
+            .stream.rx.stream   = (vsf_stream_t *)(__STREAM_RX),
+
+#define USB_CDC_ACM_PARITY_NONE 0
+#define USB_CDC_ACM_PARITY_ODD  1
+#define USB_CDC_ACM_PARITY_EVEN 2
+
+#define USB_CDC_ACM_STOPBIT_1   0
+#define USB_CDC_ACM_STOPBIT_1P5 1
+#define USB_CDC_ACM_STOPBIT_2   2
+
+#define USB_CDC_ACM_LINECODE(__BAUDRATE, __BITLEN, __PARITY, __STOP)            \
+            {                                                                   \
+                .bitrate        = (__BAUDRATE),                                 \
+                .stop           = (__STOP),                                     \
+                .parity         = (__PARITY),                                   \
+                .datalen        = (__BITLEN),                                   \
+            }
+
+#define USB_CDC_ACM_IFS_NUM     USB_CDC_IFS_NUM
+#define USB_CDC_ACM_IFS_CONTROL(__CDC_ACM_PARAM)                                \
+            {                                                                   \
+                .class_op       = &vk_usbd_cdcacm_control,                      \
+                .class_param    = &__CDC_ACM_PARAM,                             \
+            },
+#define USB_CDC_ACM_IFS_DATA(__CDC_ACM_PARAM)                                   \
+            {                                                                   \
+                .class_op       = &vk_usbd_cdcacm_data,                         \
+                .class_param    = &__CDC_ACM_PARAM,                             \
+            },
+
+
+
+#define __implement_cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
+            USB_DESC_CDC_ACM_IAD((__IFS_START), (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
+
+#define __implement_cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
+            vk_usbd_cdcacm_t __##__NAME##_CDCACM##__FUNC_ID = {                 \
+                USB_CDC_ACM_PARAM((__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)\
+            };
+
+#define __implement_cdc_acm_ifs(__NAME, __FUNC_ID)                              \
+                {                                                               \
+                    USB_CDC_ACM_IFS_CONTROL(__##__NAME##_CDCACM##__FUNC_ID)     \
+                },                                                              \
+                {                                                               \
+                    USB_CDC_ACM_IFS_DATA(__##__NAME##_CDCACM##__FUNC_ID)        \
+                },
+
+#define implement_cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
+            __implement_cdc_acm_desc(__NAME, (__IFS_START), 4 + (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
+#define implement_cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
+            __implement_cdc_acm_func(__NAME, __FUNC_ID, (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)
+#define implement_cdc_acm_ifs(__NAME, __FUNC_ID)                                \
+            __implement_cdc_acm_ifs(__NAME, __FUNC_ID)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

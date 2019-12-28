@@ -134,7 +134,7 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
     case VSF_INPUT_TYPE_SENSOR:
         input_demo_trace_sensor((vk_sensor_evt_t *)event);
         break;
-    case vk_input_type_tOUCHSCREEN:
+    case VSF_INPUT_TYPE_TOUCHSCREEN:
         input_demo_trace_touchscreen((vk_touchscreen_evt_t*)event);
         break;
 #if VSF_USE_INPUT_DS4 == ENABLED

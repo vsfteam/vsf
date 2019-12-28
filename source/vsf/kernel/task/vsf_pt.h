@@ -42,7 +42,18 @@
             __implement_vsf_pt_common(  __FUNC_NAME,                            \
                                         __vsf_pt_common(__NAME) *ptThis)
 
+#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+
+#   define __implement_vsf_pt(__NAME)                                           \
+            __implement_vsf_pt_common(  __NAME,                                 \
+                                        __internal_##__NAME *ptThis)
+
+#   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
+            __implement_vsf_pt_common(  __FUNC_NAME,                            \
+                                        __internal_##__NAME *ptThis)
+
 #else
+
 #   define __implement_vsf_pt(__NAME)                                           \
             __implement_vsf_pt_common(__NAME, __NAME *ptThis)
 
@@ -57,7 +68,7 @@
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define __vsf_pt_entry(__state, __CODE)                                      \
-            __vsf_pt_entry_common(__state, __CODE)
+            __vsf_pt_entry_common_ex(__state, __CODE)
 #   define vsf_pt_entry(__CODE)                                                 \
             __vsf_pt_entry(__vsf_pt_state(), __CODE)
 #else
@@ -120,7 +131,7 @@
 
 
 #   define vsf_pt_call_pt(__NAME, __TARGET)                                     \
-            (__TARGET)->tState = 0;                                            \
+            (__TARGET)->tState = 0;                                             \
             vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
 
 #endif
@@ -173,23 +184,26 @@
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 #       define __def_vsf_pt(__NAME,__MEMBER)                                    \
             __def_vsf_pt_common(__NAME,                                         \
-                                    uint16_t tState;                            \
-                                    vsf_sync_reason_t reason;                   \
+                                uint16_t tState;                                \
+                                vsf_sync_reason_t reason;                       \
                                 __MEMBER)           
 #   else
 #       define __def_vsf_pt(__NAME,__MEMBER)                                    \
             __def_vsf_pt_common(__NAME,                                         \
-                                    uint16_t tState;                            \
+                                uint16_t tState;                                \
                                 __MEMBER) 
 #   endif
+
 #   define def_vsf_pt(__NAME,__MEMBER)       __def_vsf_pt(__NAME, __MEMBER)
 #   define end_def_vsf_pt(__NAME)
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
-            __def_vsf_pt_common(__NAME, uint8_t tState; __VA_ARGS__)           
+            __def_vsf_pt_common(__NAME,                                         \
+                                uint8_t tState;                                 \
+                                __VA_ARGS__)           
 
 #   define def_vsf_pt(__NAME,...)       __def_vsf_pt(__NAME,__VA_ARGS__)
 #   define end_def_vsf_pt(...)
@@ -200,11 +214,15 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
-            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis);
+            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+#elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define __declare_vsf_pt(__NAME)                                             \
+            __declare_vsf_pt_common(__NAME)                                     \
+            __extern_vsf_pt_common(__NAME, __internal_##__NAME *ptThis)
 #else
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
-            __extern_vsf_pt_common(__NAME, __NAME *ptThis);
+            __extern_vsf_pt_common(__NAME, __NAME *ptThis)
 #endif
 
 #define declare_vsf_pt(__NAME)          __declare_vsf_pt(__NAME)

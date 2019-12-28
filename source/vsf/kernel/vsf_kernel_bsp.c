@@ -205,6 +205,9 @@ ROOT void __post_vsf_kernel_init(void)
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     static NO_INIT app_main_thread_t __app_main;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __app_main.on_terminate = NULL;
+#   endif
     init_vsf_thread(app_main_thread_t, &__app_main, vsf_prio_0);
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
     ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
@@ -215,9 +218,15 @@ ROOT void __post_vsf_kernel_init(void)
     };
 #   if  VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     static NO_INIT vsf_teda_t __app_main;
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __app_main.on_terminate = NULL;
+#       endif
     vsf_teda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   else
     static NO_INIT vsf_eda_t __app_main;
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __app_main.on_terminate = NULL;
+#       endif
     vsf_eda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   endif
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE

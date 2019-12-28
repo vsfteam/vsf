@@ -12699,7 +12699,7 @@
         </settings>
     </configuration>
     <configuration>
-        <name>usbd_demo_6uarts</name>
+        <name>usbd_demo_simplest</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -12713,15 +12713,15 @@
                 <debug>1</debug>
                 <option>
                     <name>ExePath</name>
-                    <state>usbd_demo_6uarts\Exe</state>
+                    <state>usbd_demo_simplest\Exe</state>
                 </option>
                 <option>
                     <name>ObjPath</name>
-                    <state>usbd_demo_6uarts\Obj</state>
+                    <state>usbd_demo_simplest\Obj</state>
                 </option>
                 <option>
                     <name>ListPath</name>
-                    <state>usbd_demo_6uarts\List</state>
+                    <state>usbd_demo_simplest\List</state>
                 </option>
                 <option>
                     <name>GEndianMode</name>
@@ -12919,7 +12919,6 @@
                     <name>CCDefines</name>
                     <state>__Nuvoton__</state>
                     <state>__M484__</state>
-                    <state>LV_CONF_INCLUDE_SIMPLE</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -13044,20 +13043,9 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts</state>
-                    <state>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts\config</state>
+                    <state>$PROJ_DIR$\..\..\usrapp\usbd_demo_simplest</state>
                     <state>$PROJ_DIR$\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\NN\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\CMSIS\DSP\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\include</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\include\ipv4</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\nnom\raw\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\nnom\port</state>
-                    <state>$PROJ_DIR$\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -18030,7 +18018,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18085,7 +18073,7 @@
                     <configuration>nes_simulator</configuration>
                     <configuration>kernel_test</configuration>
                     <configuration>demo_bbb</configuration>
-                    <configuration>usbd_demo_6uarts</configuration>
+                    <configuration>usbd_demo_simplest</configuration>
                     <configuration>vsfvm</configuration>
                     <configuration>usbd_demo_msc</configuration>
                     <configuration>linux_m484</configuration>
@@ -18115,7 +18103,7 @@
                 <configuration>nes_simulator</configuration>
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18139,7 +18127,7 @@
                 <configuration>nes_simulator</configuration>
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18182,7 +18170,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18217,7 +18205,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18582,7 +18570,7 @@
                 <configuration>nes_simulator</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18628,7 +18616,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18651,42 +18639,6 @@
             </file>
         </group>
         <group>
-            <name>usbd_demo_6uarts</name>
-            <excluded>
-                <configuration>arm_mps2_m7</configuration>
-                <configuration>kernel_template_cm7</configuration>
-                <configuration>usbh_m484</configuration>
-                <configuration>WinnerMicro_W600</configuration>
-                <configuration>aio_m484</configuration>
-                <configuration>nes_simulator</configuration>
-                <configuration>arm_mps2_m0</configuration>
-                <configuration>kernel_test</configuration>
-                <configuration>demo_bbb</configuration>
-                <configuration>vsfvm</configuration>
-                <configuration>usbh_nuc505</configuration>
-                <configuration>usbd_demo_msc</configuration>
-                <configuration>linux_m484</configuration>
-            </excluded>
-            <group>
-                <name>config</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts\config\btstack_config.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts\config\lv_conf.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts\config\lwipopts.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts\config\vsf_usr_cfg.h</name>
-                </file>
-            </group>
-            <file>
-                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_6uarts\main.c</name>
-            </file>
-        </group>
-        <group>
             <name>usbd_demo_msc</name>
             <excluded>
                 <configuration>arm_mps2_m7</configuration>
@@ -18698,7 +18650,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>linux_m484</configuration>
@@ -18729,6 +18681,30 @@
             </file>
         </group>
         <group>
+            <name>usbd_demo_simplest</name>
+            <excluded>
+                <configuration>arm_mps2_m7</configuration>
+                <configuration>kernel_template_cm7</configuration>
+                <configuration>usbh_m484</configuration>
+                <configuration>WinnerMicro_W600</configuration>
+                <configuration>aio_m484</configuration>
+                <configuration>nes_simulator</configuration>
+                <configuration>arm_mps2_m0</configuration>
+                <configuration>kernel_test</configuration>
+                <configuration>demo_bbb</configuration>
+                <configuration>vsfvm</configuration>
+                <configuration>usbh_nuc505</configuration>
+                <configuration>usbd_demo_msc</configuration>
+                <configuration>linux_m484</configuration>
+            </excluded>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_simplest\main.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\usrapp\usbd_demo_simplest\vsf_usr_cfg.h</name>
+            </file>
+        </group>
+        <group>
             <name>usbh_demo</name>
             <excluded>
                 <configuration>arm_mps2_m7</configuration>
@@ -18739,7 +18715,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbd_demo_msc</configuration>
                 <configuration>linux_m484</configuration>
@@ -18763,7 +18739,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
                 <configuration>linux_m484</configuration>
@@ -18798,7 +18774,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -18832,6 +18808,7 @@
                     <configuration>nes_simulator</configuration>
                     <configuration>kernel_test</configuration>
                     <configuration>demo_bbb</configuration>
+                    <configuration>usbd_demo_simplest</configuration>
                     <configuration>usbh_nuc505</configuration>
                     <configuration>usbd_demo_msc</configuration>
                 </excluded>
@@ -19554,7 +19531,7 @@
                                             <configuration>nes_simulator</configuration>
                                             <configuration>kernel_test</configuration>
                                             <configuration>demo_bbb</configuration>
-                                            <configuration>usbd_demo_6uarts</configuration>
+                                            <configuration>usbd_demo_simplest</configuration>
                                             <configuration>vsfvm</configuration>
                                             <configuration>usbd_demo_msc</configuration>
                                             <configuration>linux_m484</configuration>
@@ -19719,7 +19696,6 @@
                     <name>vsfvm</name>
                     <excluded>
                         <configuration>aio_m484</configuration>
-                        <configuration>usbd_demo_6uarts</configuration>
                         <configuration>usbd_demo_msc</configuration>
                         <configuration>linux_m484</configuration>
                     </excluded>
@@ -20352,7 +20328,7 @@
                             <configuration>nes_simulator</configuration>
                             <configuration>arm_mps2_m0</configuration>
                             <configuration>kernel_test</configuration>
-                            <configuration>usbd_demo_6uarts</configuration>
+                            <configuration>usbd_demo_simplest</configuration>
                             <configuration>vsfvm</configuration>
                             <configuration>usbh_nuc505</configuration>
                             <configuration>usbd_demo_msc</configuration>
@@ -20425,7 +20401,7 @@
                         <configuration>nes_simulator</configuration>
                         <configuration>kernel_test</configuration>
                         <configuration>demo_bbb</configuration>
-                        <configuration>usbd_demo_6uarts</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
                         <configuration>vsfvm</configuration>
                         <configuration>usbh_nuc505</configuration>
                         <configuration>usbd_demo_msc</configuration>
@@ -20721,7 +20697,7 @@
                                             <configuration>aio_m484</configuration>
                                             <configuration>kernel_test</configuration>
                                             <configuration>demo_bbb</configuration>
-                                            <configuration>usbd_demo_6uarts</configuration>
+                                            <configuration>usbd_demo_simplest</configuration>
                                             <configuration>vsfvm</configuration>
                                             <configuration>usbh_nuc505</configuration>
                                             <configuration>usbd_demo_msc</configuration>
@@ -20763,7 +20739,7 @@
                             <configuration>aio_m484</configuration>
                             <configuration>nes_simulator</configuration>
                             <configuration>kernel_test</configuration>
-                            <configuration>usbd_demo_6uarts</configuration>
+                            <configuration>usbd_demo_simplest</configuration>
                             <configuration>vsfvm</configuration>
                             <configuration>usbd_demo_msc</configuration>
                             <configuration>linux_m484</configuration>
@@ -20851,7 +20827,7 @@
                         <configuration>arm_mps2_m0</configuration>
                         <configuration>kernel_test</configuration>
                         <configuration>demo_bbb</configuration>
-                        <configuration>usbd_demo_6uarts</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
                         <configuration>vsfvm</configuration>
                         <configuration>usbh_nuc505</configuration>
                         <configuration>usbd_demo_msc</configuration>
@@ -20893,7 +20869,7 @@
                         <configuration>nes_simulator</configuration>
                         <configuration>arm_mps2_m0</configuration>
                         <configuration>kernel_test</configuration>
-                        <configuration>usbd_demo_6uarts</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
                         <configuration>vsfvm</configuration>
                         <configuration>usbh_nuc505</configuration>
                         <configuration>usbd_demo_msc</configuration>
@@ -20929,7 +20905,7 @@
                         <configuration>arm_mps2_m0</configuration>
                         <configuration>kernel_test</configuration>
                         <configuration>demo_bbb</configuration>
-                        <configuration>usbd_demo_6uarts</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
                         <configuration>vsfvm</configuration>
                         <configuration>usbh_nuc505</configuration>
                         <configuration>usbd_demo_msc</configuration>
@@ -21384,7 +21360,7 @@
                 <configuration>arm_mps2_m0</configuration>
                 <configuration>kernel_test</configuration>
                 <configuration>demo_bbb</configuration>
-                <configuration>usbd_demo_6uarts</configuration>
+                <configuration>usbd_demo_simplest</configuration>
                 <configuration>vsfvm</configuration>
                 <configuration>usbh_nuc505</configuration>
                 <configuration>usbd_demo_msc</configuration>
@@ -21484,9 +21460,6 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\vsf\shell\sys\linux\lib\libusb\vsf_linux_libusb.c</name>
                             </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\shell\sys\linux\lib\libusb\vsf_linux_libusb.h</name>
-                            </file>
                         </group>
                     </group>
                     <group>
@@ -21580,6 +21553,7 @@
                         <configuration>kernel_lib_armv6m_full_size</configuration>
                         <configuration>kernel_lib_armv7em_full_size</configuration>
                         <configuration>arm_mps2_m0</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
                         <configuration>linux_m484</configuration>
                     </excluded>
                     <group>
@@ -21787,7 +21761,7 @@
                         <configuration>arm_mps2_m0</configuration>
                         <configuration>kernel_test</configuration>
                         <configuration>demo_bbb</configuration>
-                        <configuration>usbd_demo_6uarts</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
                         <configuration>vsfvm</configuration>
                         <configuration>usbd_demo_msc</configuration>
                         <configuration>linux_m484</configuration>
@@ -21886,7 +21860,7 @@
             <configuration>arm_mps2_m0</configuration>
             <configuration>kernel_test</configuration>
             <configuration>demo_bbb</configuration>
-            <configuration>usbd_demo_6uarts</configuration>
+            <configuration>usbd_demo_simplest</configuration>
             <configuration>vsfvm</configuration>
             <configuration>usbh_nuc505</configuration>
             <configuration>usbd_demo_msc</configuration>
@@ -21907,7 +21881,7 @@
             <configuration>arm_mps2_m0</configuration>
             <configuration>kernel_test</configuration>
             <configuration>demo_bbb</configuration>
-            <configuration>usbd_demo_6uarts</configuration>
+            <configuration>usbd_demo_simplest</configuration>
             <configuration>vsfvm</configuration>
             <configuration>usbh_nuc505</configuration>
             <configuration>usbd_demo_msc</configuration>
@@ -21929,7 +21903,7 @@
             <configuration>arm_mps2_m0</configuration>
             <configuration>kernel_test</configuration>
             <configuration>demo_bbb</configuration>
-            <configuration>usbd_demo_6uarts</configuration>
+            <configuration>usbd_demo_simplest</configuration>
             <configuration>vsfvm</configuration>
             <configuration>usbh_nuc505</configuration>
             <configuration>usbd_demo_msc</configuration>

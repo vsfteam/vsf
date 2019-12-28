@@ -44,6 +44,10 @@ typedef enum {
     false = 0,
     true = !false,
 } bool;
+
+#define INT16_MAX           32767
+#define INT16_MIN           (-32767-1)
+
 #else
 #include <stdint.h>
 #include <stdbool.h>

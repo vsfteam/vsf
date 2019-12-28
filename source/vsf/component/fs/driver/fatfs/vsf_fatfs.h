@@ -24,6 +24,8 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
 
+#include "../malfs/vsf_malfs.h"
+
 #if     defined(VSF_FATFS_IMPLEMENT)
 #   undef VSF_FATFS_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -35,17 +37,39 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#define implement_fatfs_info(__block_size, __cache_num)                         \
+    implement(__vk_fatfs_info_t)                                                \
+    __implement_malfs_cache(__block_size, __cache_num)
+
+#define init_fatfs_info(__info, __block_size, __cache_num)                      \
+    .block_size = __block_size,                                                 \
+    .cache      = {                                                             \
+        .number = __cache_num,                                                  \
+        .nodes  = __info.__cache_nodes,                                         \
+    },
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vk_fatfs_file_t)
+declare_simple_class(__vk_fatfs_info_t)
 
-enum vk_fat32_file_attr_t {
-    VSF_FAT32_FILE_ATTR_VOLUMID = VSF_FILE_ATTR_EXT,
-    VSF_FAT32_FILE_ATTR_SYSTEM  = VSF_FILE_ATTR_EXT << 1,
-    VSF_FAT32_FILE_ATTR_ARCHIVE = VSF_FILE_ATTR_EXT << 2,
+enum vk_fat_type_t {
+    VSF_FAT_NONE,
+    VSF_FAT_12,
+    VSF_FAT_16,
+    VSF_FAT_32,
+    VSF_FAT_EX,
 };
-typedef enum vk_fat32_file_attr_t vk_fat32_file_attr_t;
+typedef enum vk_fat_type_t vk_fat_type_t;
+
+enum vk_fat_file_attr_t {
+    VSF_FAT_FILE_ATTR_VOLUMID = VSF_FILE_ATTR_EXT,
+    VSF_FAT_FILE_ATTR_SYSTEM  = VSF_FILE_ATTR_EXT << 1,
+    VSF_FAT_FILE_ATTR_ARCHIVE = VSF_FILE_ATTR_EXT << 2,
+};
+typedef enum vk_fat_file_attr_t vk_fat_file_attr_t;
 
 struct vk_fatfs_dentry_parser_t {
     uint8_t *entry;
@@ -56,7 +80,60 @@ struct vk_fatfs_dentry_parser_t {
 typedef struct vk_fatfs_dentry_parser_t vk_fatfs_dentry_parser_t;
 
 def_simple_class(vk_fatfs_file_t) {
-    implement(vk_file_t)
+    implement(__vk_malfs_file_t)
+
+    private_member(
+        uint32_t first_cluster;
+        struct {
+            uint32_t cluster;
+            uint32_t fat_entry;
+        } cur;
+    )
+};
+
+// memory layout:
+//  |-----------------------|
+//  | __vk_fatfs_info_t:    |
+//  |   |---------------|   |
+//  |   |      ...      |   |
+//  |   |---------------|   |
+//  |   |vk_malfs_info_t|   |
+//  |   |---------------|   |
+//  |-----------------------|
+//  | vk_malfs_cache_t[num] |
+//  |-----------------------|
+//  |   cache_buffer[num]   |
+//  |-----------------------|
+def_simple_class(__vk_fatfs_info_t) {
+    private_member(
+        vk_fatfs_file_t root;
+        vk_fat_type_t type;
+        char fat_volume_name[12];
+
+        // fat parameters, will not change after mount
+        uint32_t root_sector;
+        uint32_t root_size;
+        uint32_t fat_sector;
+        uint32_t fat_size;
+        uint32_t data_sector;
+        uint32_t cluster_num;
+        uint8_t sector_size_bits;
+        uint8_t cluster_size_bits;
+        uint8_t fat_num;
+
+        // context
+        uint32_t cur_fat_bit;
+        uint32_t cur_cluster;
+        uint32_t cur_cluster_tmp;
+        uint32_t cur_sector;
+        vsf_err_t err;
+        vk_fatfs_dentry_parser_t dparser;
+    )
+
+    // vk_malfs_info_t must be the last in vk_fatfs_info_t
+    public_member(
+        implement(__vk_malfs_info_t)
+    )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
