@@ -300,6 +300,7 @@
                     <state>__SiliconLabs__</state>
                     <state>__C8051F380__</state>
                     <state>__OOC_DEBUG__</state>
+                    <state>main=__main_51__</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -494,7 +495,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>0</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -503,7 +504,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>0</state>
+                    <state>3</state>
                 </option>
                 <option>
                     <name>CompilerMisraRules04</name>
@@ -549,7 +550,7 @@
                 <option>
                     <name>CCAllowList2</name>
                     <version>0</version>
-                    <state>0000000</state>
+                    <state>1111110</state>
                 </option>
                 <option>
                     <name>CCOptStrategySlave</name>
@@ -1035,11 +1036,12 @@
                 </option>
                 <option>
                     <name>Linker Extra Options Check</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>Linker Extra Options Edit</name>
-                    <state></state>
+                    <state>-e__cmain=main
+</state>
                 </option>
                 <option>
                     <name>CrcAlign</name>
@@ -3817,9 +3819,6 @@
                 <name>arch</name>
                 <group>
                     <name>mcs51</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\hal\arch\mcs51\cstartup.s51</name>
-                    </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\hal\arch\mcs51\mcs51_generic.c</name>
                     </file>

@@ -70,12 +70,11 @@ void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
 #endif
 #endif
 
-int main(void)
+ROOT int main(void)
 {
     vsf_trace_init(NULL);
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-
     extern vsf_err_t tgui_demo_init(void);
     tgui_demo_init();
 

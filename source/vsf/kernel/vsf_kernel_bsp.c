@@ -288,8 +288,20 @@ char __low_level_init(void)
 
 extern void __IAR_STARTUP_DATA_INIT(void);
 extern void exit(int arg);
+
+#   if defined(__CPU_MCS51__)
 __root
-__noreturn __stackless void __cmain(void) 
+__noreturn 
+__stackless void __cmain(void) 
+{
+    __vsf_main_entry();
+    exit(0);
+}
+
+#   else
+__root
+__noreturn
+__stackless void __cmain(void) 
 {
     if (__low_level_init() != 0) {
         __IAR_STARTUP_DATA_INIT();
@@ -297,6 +309,7 @@ __noreturn __stackless void __cmain(void)
     __vsf_main_entry();
     exit(0);
 }
+#   endif
 #elif   __IS_COMPILER_GCC__                                                     \
     ||  __IS_COMPILER_LLVM__                                                    \
     ||  __IS_COMPILER_ARM_COMPILER_5__                                          \

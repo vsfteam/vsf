@@ -205,7 +205,7 @@ static void vsf_tgui_region_init_with_size(vsf_tgui_region_t* ptRegion, vsf_tgui
 }
 
 static uint32_t __cnt = 0;
-
+/*
 void test_only_refresh_time_label(void)
 {
     my_stopwatch_t* ptWatch = &__my_stopwatch;
@@ -218,10 +218,10 @@ void test_only_refresh_time_label(void)
     __cnt++;
     //sprintf(s_chTimeBuffer, "%02d:%02d", __cnt / 99 % 99, __cnt % 99);
 }
-
+*/
 void refresh_my_stopwatch(void)
 {
-
+/*
     my_stopwatch_t* ptWatch = &__my_stopwatch;
 
     vsf_tgui_region_t tRegion;
@@ -242,8 +242,8 @@ void refresh_my_stopwatch(void)
     vsf_tgui_label_v_rendering((vsf_tgui_label_t *)&ptWatch->history, &tRegion);
 
     test_only_refresh_time_label();
-
-    //vsf_tgui_refresh(&__tgui_demo);
+*/
+    vk_tgui_refresh(&__tgui_demo);
 
 }
 

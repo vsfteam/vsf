@@ -473,7 +473,7 @@ static void __vk_fatfs_mount(uintptr_t target, vsf_evt_t evt)
                 return;
             }
 
-            vsf_eda_frame_user_value_get(&state);
+            vsf_eda_frame_user_value_get((uint8_t *)&state);
             switch (state) {
             case MOUNT_STATE_PARSE_DBR:
                 if (VSF_ERR_NONE != __vk_fatfs_parse_dbr(fsinfo, malfs_info->ctx_io.buff)) {
@@ -533,7 +533,7 @@ static void __vk_fatfs_get_fat_entry(uintptr_t target, vsf_evt_t evt)
         // fall through
     case VSF_EVT_RETURN: {
             uint_fast8_t state;
-            vsf_eda_frame_user_value_get(&state);
+            vsf_eda_frame_user_value_get((uint8_t *)&state);
             switch (state) {
             case LOOKUP_FAT_STATE_START:
             read_fat_sector:
@@ -603,7 +603,7 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
         // fall through
     case VSF_EVT_RETURN: {
             uint_fast8_t state;
-            vsf_eda_frame_user_value_get(&state);
+            vsf_eda_frame_user_value_get((uint8_t *)&state);
             switch (state) {
             case LOOKUP_STATE_READ_SECTOR:
             read_sector:

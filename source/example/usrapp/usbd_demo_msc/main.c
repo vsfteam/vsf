@@ -34,6 +34,14 @@
 #   define USRAPP_CFG_MSC_SIZE                  (16 * 1024)
 #endif
 
+#if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
+#   define USRAPP_CFG_USBD_DC_EPSIZE            512
+#   define USRAPP_CFG_USBD_DC_SPEED             USB_DC_SPEED_HIGH
+#elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
+#   define USRAPP_CFG_USBD_DC_EPSIZE            64
+#   define USRAPP_CFG_USBD_DC_SPEED             USB_DC_SPEED_FULL
+#endif
+
 /*============================ INCLUDES ======================================*/
 
 #if USRAPP_CFG_FAKEFAT32 == ENABLED
@@ -44,19 +52,16 @@
 /*============================ TYPES =========================================*/
 
 struct usrapp_const_t {
+#if     USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG                       \
+    ||  USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
     struct {
-#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+#   if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
         vk_dwcotg_dcd_param_t dwcotg_param;
-#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+#   elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
         vk_musb_fdrc_dcd_param_t musb_fdrc_param;
-#endif
-        uint8_t dev_desc[18];
-        uint8_t config_desc[9 + USB_DESC_MSCBOT_IAD_LEN];
-        uint8_t str_lanid[4];
-        uint8_t str_vendor[20];
-        uint8_t str_product[16];
-        vk_usbd_desc_t std_desc[6];
+#   endif
     } usbd;
+#endif
 
     struct {
         vk_virtual_scsi_param_t param;
@@ -71,14 +76,6 @@ struct usrapp_t {
 #elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
         vk_musb_fdrc_dcd_t musb_fdrc_dcd;
 #endif
-        struct {
-            vk_usbd_msc_t param;
-        } msc;
-
-        vk_usbd_ifs_t ifs[1];
-        vk_usbd_cfg_t config[1];
-        vk_usbd_dev_t dev;
-
         vsf_callback_timer_t connect_timer;
     } usbd;
 
@@ -102,57 +99,28 @@ struct usrapp_t {
 typedef struct usrapp_t usrapp_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
 /*============================ PROTOTYPES ====================================*/
+
+static void __usrapp_on_timer(vsf_callback_timer_t *timer);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const usrapp_const_t __usrapp_const = {
+#if     USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG                       \
+    ||  USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
     .usbd                       = {
-#if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
+#   if USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_DWCOTG
         .dwcotg_param           = {
             .op                 = &VSF_USB_DC0_IP,
             .speed              = USRAPP_CFG_USBD_SPEED,
         },
-#elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
+#   elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
         musb_fdrc_param         = {
             .op                 = &VSF_USB_DC0_IP,
         },
-#endif
-
-        .dev_desc               = {
-            USB_DESC_DEV_IAD(64, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 1, 2, 0, 1)
-        },
-        .config_desc            = {
-            USB_DESC_CFG(sizeof(__usrapp_const.usbd.config_desc), 1, 1, 0, 0x80, 100)
-#if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
-            USB_DESC_MSCBOT_IAD(0, 4, 1, 1, 512)
-#elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
-            USB_DESC_MSCBOT_IAD(0, 4, 1, 1, 64)
-#endif
-        },
-        .str_lanid              = {
-            USB_DESC_STRING(2, 0x09, 0x04)
-        },
-        .str_vendor             = {
-            USB_DESC_STRING(18,
-                'S', 0, 'i', 0, 'm', 0, 'o', 0, 'n', 0, 'Q', 0, 'i', 0, 'a', 0,
-                'n', 0
-            )
-        },
-        .str_product            = {
-            USB_DESC_STRING(14,
-                'V', 0, 'S', 0, 'F', 0, '-', 0, 'M', 0, 'S', 0, 'C', 0
-            )
-        },
-        .std_desc               = {
-            VSF_USBD_DESC_DEVICE(0, __usrapp_const.usbd.dev_desc, sizeof(__usrapp_const.usbd.dev_desc)),
-            VSF_USBD_DESC_CONFIG(0, 0, __usrapp_const.usbd.config_desc, sizeof(__usrapp_const.usbd.config_desc)),
-            VSF_USBD_DESC_STRING(0, 0, __usrapp_const.usbd.str_lanid, sizeof(__usrapp_const.usbd.str_lanid)),
-            VSF_USBD_DESC_STRING(0x0409, 1, __usrapp_const.usbd.str_vendor, sizeof(__usrapp_const.usbd.str_vendor)),
-            VSF_USBD_DESC_STRING(0x0409, 2, __usrapp_const.usbd.str_product, sizeof(__usrapp_const.usbd.str_product)),
-            VSF_USBD_DESC_STRING(0x0409, 4, __usrapp_const.usbd.str_product, sizeof(__usrapp_const.usbd.str_product)),
-        },
+#   endif
     },
+#endif
 
     .scsi.param                 = {
         .block_size             = 512,
@@ -178,32 +146,7 @@ static usrapp_t __usrapp = {
 #elif USRAPP_CFG_DCD_TYPE == USRAPP_CFG_DCD_TYPE_MUSB_FDRC
         .musb_fdrc_dcd.param    = &__usrapp_const.usbd.musb_fdrc_param,
 #endif
-
-        .msc.param              = {
-            .ep_out             = 1,
-            .ep_in              = 1,
-            .max_lun            = 1,
-            .scsi               = &__usrapp.scsi.mal_scsi.use_as__vk_scsi_t,
-            .stream             = &__usrapp.stream.mem_stream.use_as__vsf_stream_t,
-        },
-
-        .ifs[0].class_op        = &vk_usbd_msc_class,
-        .ifs[0].class_param     = &__usrapp.usbd.msc.param,
-
-        .config[0].num_of_ifs   = dimof(__usrapp.usbd.ifs),
-        .config[0].ifs          = __usrapp.usbd.ifs,
-
-        .dev.num_of_config      = dimof(__usrapp.usbd.config),
-        .dev.config             = __usrapp.usbd.config,
-        .dev.num_of_desc        = dimof(__usrapp_const.usbd.std_desc),
-        .dev.desc               = (vk_usbd_desc_t *)__usrapp_const.usbd.std_desc,
-
-#if USRAPP_CFG_USBD_SPEED == USB_SPEED_HIGH
-        .dev.speed              = USB_DC_SPEED_HIGH,
-#elif USRAPP_CFG_USBD_SPEED == USB_SPEED_FULL
-        .dev.speed              = USB_DC_SPEED_FULL,
-#endif
-        .dev.drv                = &VSF_USB_DC0,//&VSF_USB.DC[0],
+        .connect_timer.on_timer = __usrapp_on_timer,
     },
 
     .scsi                       = {
@@ -256,9 +199,24 @@ static usrapp_t __usrapp = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+implement_usbd(user_usbd, APP_CFG_USBD_PID, APP_CFG_USBD_VID, 0x0409, USRAPP_CFG_USBD_DC_SPEED)
+    implement_usbd_common_desc(user_usbd, u"VSF-MSC", u"SimonQian", u"1.0.0", 64, USB_DESC_MSCBOT_IAD_LEN, USB_MSCBOT_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
+        implement_mscbot_desc(user_usbd, 0, 0, 1, 1, USRAPP_CFG_USBD_DC_EPSIZE)
+    implement_usbd_func_desc(user_usbd)
+        implement_usbd_func_str_desc(user_usbd, 0, u"VSF-MSC")
+    implement_usbd_std_desc_table(user_usbd)
+        implement_usbd_func_str_desc_table(user_usbd, 0)
+    implement_usbd_device_func(user_usbd)
+        implement_mscbot_func(user_usbd, 0, 1, 1, 1,
+            &__usrapp.scsi.mal_scsi.use_as__vk_scsi_t,
+            &__usrapp.stream.mem_stream.use_as__vsf_stream_t)
+    implement_usbd_device_ifs(user_usbd)
+        implement_mscbot_ifs(user_usbd, 0)
+end_implement_usbd(user_usbd, VSF_USB_DC0)
+
 static void __usrapp_on_timer(vsf_callback_timer_t *timer)
 {
-    vk_usbd_connect(&__usrapp.usbd.dev);
+    vk_usbd_connect(&user_usbd);
 }
 
 int main(void)
@@ -268,9 +226,8 @@ int main(void)
     vsf_stdio_init();
 #endif
 
-    vk_usbd_init(&__usrapp.usbd.dev);
-    vk_usbd_disconnect(&__usrapp.usbd.dev);
-    __usrapp.usbd.connect_timer.on_timer = __usrapp_on_timer;
+    vk_usbd_init(&user_usbd);
+    vk_usbd_disconnect(&user_usbd);
     vsf_callback_timer_add_ms(&__usrapp.usbd.connect_timer, 200);
     return 0;
 }
