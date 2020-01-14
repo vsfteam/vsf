@@ -127,9 +127,6 @@
     <Filter Include="vsf\component\usb\driver\hcd">
       <UniqueIdentifier>{c220b568-932e-4716-91dd-35d1f1ca158a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
-      <UniqueIdentifier>{f4a52188-af3d-4978-b34c-daa218d6c9cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party">
       <UniqueIdentifier>{98c713c1-9153-488f-8f3e-9402ff909487}</UniqueIdentifier>
     </Filter>
@@ -276,6 +273,9 @@
     </Filter>
     <Filter Include="vsf\service\vsfstream\mem_stream">
       <UniqueIdentifier>{87d6b621-4286-438d-9cc2-c64128ef69ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
+      <UniqueIdentifier>{835f5dac-2315-4341-9bfb-d5b2de81d801}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -518,9 +518,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.h">
       <Filter>vsf\component\usb\host\class\HUB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h">
       <Filter>vsf\component\3rd-party\btstack\port</Filter>
@@ -930,6 +927,9 @@
     <ClInclude Include="..\..\usrapp\usrapp_common.h">
       <Filter>usrapp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -1047,9 +1047,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.c">
       <Filter>vsf\component\usb\host\class\HUB</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c">
       <Filter>vsf\component\3rd-party\btstack\port</Filter>
@@ -1419,6 +1416,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
       <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

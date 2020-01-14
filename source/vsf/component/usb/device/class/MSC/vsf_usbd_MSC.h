@@ -61,25 +61,25 @@
 
 
 
-#define __implement_mscbot_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
+#define __mscbot_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
             USB_DESC_MSCBOT_IAD((__IFS), 4 + (__I_FUNC), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE))
 
-#define __implement_mscbot_func(__NAME, __FUNC_ID, __BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
+#define __mscbot_func(__NAME, __FUNC_ID, __BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
             vk_usbd_msc_t __##__NAME##_MSC##__FUNC_ID = {                       \
                 USB_MSC_PARAM((__BULK_IN_EP), (__BULK_OUT_EP), (__MAX_LUN), (__SCSI_DEV), (__STREAM))\
             };
 
-#define __implement_msc_ifs(__NAME, __FUNC_ID)                                  \
+#define __msc_ifs(__NAME, __FUNC_ID)                                            \
                 {                                                               \
                     USB_MSC_IFS(__##__NAME##_MSC##__FUNC_ID)                    \
                 },
 
-#define implement_mscbot_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
-            __implement_mscbot_desc(__NAME, (__IFS), (__I_FUNC), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE))
-#define implement_mscbot_func(__NAME, __FUNC_ID, __BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
-            __implement_mscbot_func(__NAME, __FUNC_ID, (__BULK_IN_EP), (__BULK_OUT_EP), (__MAX_LUN), (__SCSI_DEV), (__STREAM))
-#define implement_mscbot_ifs(__NAME, __FUNC_ID)                                 \
-            __implement_msc_ifs(__NAME, __FUNC_ID)
+#define mscbot_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
+            __mscbot_desc(__NAME, (__IFS), (__I_FUNC), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE))
+#define mscbot_func(__NAME, __FUNC_ID, __BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
+            __mscbot_func(__NAME, __FUNC_ID, (__BULK_IN_EP), (__BULK_OUT_EP), (__MAX_LUN), (__SCSI_DEV), (__STREAM))
+#define mscbot_ifs(__NAME, __FUNC_ID)                                           \
+            __msc_ifs(__NAME, __FUNC_ID)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

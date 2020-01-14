@@ -23,12 +23,42 @@
 
 #include "./vsf_input.h"
 #include "kernel/vsf_kernel.h"
+#include "utilities/template/vsf_list.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_INPUT_CFG_PROTECT_LEVEL
+/*! \note   By default, the driver tries to make all APIs interrupt-safe,
+ *!
+ *!         in the case when you want to disable it,
+ *!         please use following macro:
+ *!         #define VSF_INPUT_CFG_PROTECT_LEVEL  none
+ *!         
+ *!         in the case when you want to use scheduler-safe,
+ *!         please use following macro:
+ *!         #define VSF_INPUT_CFG_PROTECT_LEVEL  scheduler
+ *!         
+ *!         NOTE: This macro should be defined in vsf_usr_cfg.h
+ */
+#   define VSF_INPUT_CFG_PROTECT_LEVEL      interrupt
+#endif
+
+#define vsf_input_protect                   vsf_protect(VSF_INPUT_CFG_PROTECT_LEVEL)
+#define vsf_input_unprotect                 vsf_unprotect(VSF_INPUT_CFG_PROTECT_LEVEL)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+struct vsf_input_t {
+    vsf_slist_t notifier_list;
+};
+typedef struct vsf_input_t vsf_input_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static vsf_input_t __vsf_input;
+
 /*============================ PROTOTYPES ====================================*/
 
 #if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
@@ -194,6 +224,14 @@ void vsf_input_on_free_dev(vk_input_type_t type, void *dev)
 WEAK(vsf_input_on_evt)
 void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
+    vsf_protect_t orig = vsf_input_protect();
+        __vsf_slist_foreach_unsafe(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list) {
+            if (_->mask & (1 << type)) {
+                VSF_INPUT_ASSERT(_->on_evt != NULL);
+                _->on_evt(type, evt);
+            }
+        }
+    vsf_input_unprotect(orig);
 }
 #endif
 
@@ -203,6 +241,22 @@ uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp)
     uint_fast32_t duration = *timestamp > 0 ? vsf_timer_get_duration(*timestamp, cur) : 0;
     *timestamp = cur;
     return duration;
+}
+
+void vk_input_notifier_register(vk_input_notifier_t *notifier)
+{
+    vsf_protect_t orig = vsf_input_protect();
+        VSF_INPUT_ASSERT(!vsf_slist_is_in(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier));
+        vsf_slist_add_to_head(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier);
+    vsf_input_unprotect(orig);
+}
+
+void vk_input_notifier_unregister(vk_input_notifier_t *notifier)
+{
+    vsf_protect_t orig = vsf_input_protect();
+        VSF_INPUT_ASSERT(vsf_slist_is_in(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier));
+        vsf_slist_remove(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier);
+    vsf_input_unprotect(orig);
 }
 
 #endif      // VSF_USE_INPUT

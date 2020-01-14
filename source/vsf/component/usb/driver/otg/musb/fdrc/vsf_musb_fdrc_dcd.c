@@ -123,7 +123,7 @@ extern uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd
 
 void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
 {
-    vk_musb_fdrc_usbd_ep_read_buffer(usbd, 0, buffer, 8);
+    vk_musb_fdrc_read_fifo(usbd->reg, 0, buffer, 8);
 
     VSF_USB_ASSERT(MUSB_FDRC_USBD_EP0_IDLE == usbd->ep0_state);
     usbd->has_data_stage = false;

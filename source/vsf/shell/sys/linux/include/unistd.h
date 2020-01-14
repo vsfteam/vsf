@@ -34,7 +34,7 @@ pid_t getpid(void);
 pid_t getppid(void);
 
 int execl(const char *pathname, const char *arg, ...);
-int execv(const char *pathname, char *const argv[]);
+int execv(const char *pathname, char const* const* argv);
 
 int creat(const char *pathname, mode_t mode);
 int open(const char *pathname, int flags, ...);

@@ -1,0 +1,154 @@
+#include "vsf.h"
+#include "tkc/mem.h"
+#include "tkc/utils.h"
+#include "tkc/thread.h"
+#include "tkc/mutex.h"
+
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *pthis, vsf_prio_t priority);
+extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *pthis);
+#endif
+
+SECTION(".text.vsf.kernel.eda")
+extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
+
+struct _tk_thread_t {
+  implement(vsf_thread_t)
+
+  void* args;
+  tk_thread_entry_t entry;
+
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+  vsf_thread_cb_t cb;
+  bool_t running;
+#endif
+  const char* name;
+  uint32_t priority;
+  tk_mutex_t* mutex;
+};
+
+ret_t tk_thread_set_name(tk_thread_t* thread, const char* name) {
+  return_value_if_fail(thread != NULL && name != NULL, RET_BAD_PARAMS);
+
+  thread->name = name;
+
+  return RET_OK;
+}
+
+ret_t tk_thread_set_stack_size(tk_thread_t* thread, uint32_t stack_size) {
+  return_value_if_fail(thread != NULL && stack_size >= 512, RET_BAD_PARAMS);
+
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+  thread->cb.stack_size = stack_size;
+#else
+  thread->stack_size = stack_size;
+#endif
+
+  return RET_OK;
+}
+
+ret_t tk_thread_set_priority(tk_thread_t* thread, uint32_t priority) {
+  return_value_if_fail(thread != NULL, RET_BAD_PARAMS);
+
+  thread->priority = priority;
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+  if (thread->running) {
+    __vsf_eda_set_priority(&thread->use_as__vsf_eda_t, (vsf_prio_t)priority);
+  }
+#endif
+
+  return RET_OK;
+}
+
+void* tk_thread_get_args(tk_thread_t* thread) {
+  return_value_if_fail(thread != NULL, NULL);
+
+  return thread->args;
+}
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+static void tk_thread_entry(vsf_thread_cb_t *cb) {
+  tk_thread_t* thread = (tk_thread_t*)vsf_eda_get_cur();
+
+  tk_mutex_lock(thread->mutex);
+  thread->running = TRUE;
+  thread->entry(thread->args);
+  thread->running = FALSE;
+  tk_mutex_unlock(thread->mutex);
+}
+#else
+static void tk_thread_entry(vsf_thread_t *vsf_thread) {
+  tk_thread_t* thread = (tk_thread_t*)vsf_thread;
+
+  tk_mutex_lock(thread->mutex);
+  thread->running = TRUE;
+  thread->entry(thread->args);
+  thread->running = FALSE;
+  tk_mutex_unlock(thread->mutex);
+}
+#endif
+
+tk_thread_t* tk_thread_create(tk_thread_entry_t entry, void* args) {
+  tk_thread_t* thread = NULL;
+  return_value_if_fail(entry != NULL, NULL);
+
+  thread = (tk_thread_t*)TKMEM_ZALLOC(tk_thread_t);
+  return_value_if_fail(thread != NULL, NULL);
+
+  thread->args = args;
+  thread->entry = entry;
+  thread->mutex = tk_mutex_create();
+
+  return thread;
+}
+
+ret_t tk_thread_start(tk_thread_t* thread) {
+  return_value_if_fail(thread != NULL && !thread->running, RET_BAD_PARAMS);
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+  thread->cb.entry = tk_thread_entry;
+  thread->cb.stack = TKMEM_ALLOC(thread->cb.stack_size);
+  return_value_if_fail(thread->cb.stack != NULL, RET_OOM);
+  vsf_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->priority);
+#else
+  thread->entry = tk_thread_entry;
+  thread->stack = TKMEM_ALLOC(thread->stack_size);
+  return_value_if_fail(thread->stack != NULL, RET_OOM);
+  vsf_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->priority);
+#endif
+
+  return RET_OK;
+}
+
+ret_t tk_thread_join(tk_thread_t* thread) {
+  return_value_if_fail(thread != NULL, RET_BAD_PARAMS);
+
+  return_value_if_fail(tk_mutex_lock(thread->mutex) == RET_OK, RET_FAIL);
+  tk_mutex_unlock(thread->mutex);
+
+  return RET_OK;
+}
+
+ret_t tk_thread_destroy(tk_thread_t* thread) {
+  return_value_if_fail(thread != NULL, RET_BAD_PARAMS);
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+  if (thread->cb.stack != NULL) {
+    TKMEM_FREE(thread->cb.stack);
+  }
+#else
+  if (thread->stack != NULL) {
+    TKMEM_FREE(thread->stack);
+  }
+#endif
+
+  if (thread->mutex != NULL) {
+    tk_mutex_destroy(thread->mutex);
+  }
+
+  __vsf_eda_fini(&thread->use_as__vsf_eda_t);
+  memset(thread, 0x00, sizeof(tk_thread_t));
+  TKMEM_FREE(thread);
+
+  return RET_OK;
+}

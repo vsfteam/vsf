@@ -239,7 +239,7 @@ static usrapp_common_t __usrapp_common = {
                 .offset         = 0x40 * 512,
                 .size           = (USRAPP_CFG_FAKEFAT32_SIZE - 0x40) * 512,
             },
-            .mal                = &__usrapp_common.fs.fatfs_info_fakefat32.fat32_mal,
+            .mal                = &__usrapp_common.fs.fatfs_info_fakefat32.fat32_mal.use_as__vk_mal_t,
             init_fatfs_info(__usrapp_common.fs.fatfs_info_fakefat32, 512, 1)
         },
 #           endif

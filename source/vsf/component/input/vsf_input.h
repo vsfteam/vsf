@@ -88,6 +88,14 @@ struct vk_input_parser_t {
 };
 typedef struct vk_input_parser_t vk_input_parser_t;
 
+typedef void (*vk_input_on_evt_t)(vk_input_type_t type, vk_input_evt_t *evt);
+struct vk_input_notifier_t {
+    vsf_slist_node_t notifier_node;
+    vk_input_on_evt_t on_evt;
+    uint8_t mask;
+};
+typedef struct vk_input_notifier_t vk_input_notifier_t;
+
 /*============================ INCLUDES ======================================*/
 
 #include "./protocol/vsf_input_gamepad.h"
@@ -106,6 +114,9 @@ extern void vk_input_buf_clear(uint8_t *buf, uint_fast8_t offset, uint_fast8_t l
 extern void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len);
 
 extern vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
+
+extern void vk_input_notifier_register(vk_input_notifier_t *notifier);
+extern void vk_input_notifier_unregister(vk_input_notifier_t *notifier);
 
 extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
 extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);

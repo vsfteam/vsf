@@ -75,15 +75,15 @@
 
 
 
-#define __implement_cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
+#define __cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
             USB_DESC_CDC_ACM_IAD((__IFS_START), (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
 
-#define __implement_cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
+#define __cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
             vk_usbd_cdcacm_t __##__NAME##_CDCACM##__FUNC_ID = {                 \
                 USB_CDC_ACM_PARAM((__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)\
             };
 
-#define __implement_cdc_acm_ifs(__NAME, __FUNC_ID)                              \
+#define __cdc_acm_ifs(__NAME, __FUNC_ID)                                        \
                 {                                                               \
                     USB_CDC_ACM_IFS_CONTROL(__##__NAME##_CDCACM##__FUNC_ID)     \
                 },                                                              \
@@ -91,12 +91,12 @@
                     USB_CDC_ACM_IFS_DATA(__##__NAME##_CDCACM##__FUNC_ID)        \
                 },
 
-#define implement_cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
-            __implement_cdc_acm_desc(__NAME, (__IFS_START), 4 + (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
-#define implement_cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
-            __implement_cdc_acm_func(__NAME, __FUNC_ID, (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)
-#define implement_cdc_acm_ifs(__NAME, __FUNC_ID)                                \
-            __implement_cdc_acm_ifs(__NAME, __FUNC_ID)
+#define cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
+            __cdc_acm_desc(__NAME, (__IFS_START), 4 + (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
+#define cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
+            __cdc_acm_func(__NAME, __FUNC_ID, (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)
+#define cdc_acm_ifs(__NAME, __FUNC_ID)                                          \
+            __cdc_acm_ifs(__NAME, __FUNC_ID)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

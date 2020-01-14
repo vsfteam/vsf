@@ -127,9 +127,6 @@
     <Filter Include="vsf\component\usb\driver\hcd">
       <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
-      <UniqueIdentifier>{81641b97-4577-45bf-ad6d-8ec4f525ea32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party">
       <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
     </Filter>
@@ -495,9 +492,6 @@
     <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h">
       <Filter>vsf\kernel\shell</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h">
       <Filter>vsf\component\input</Filter>
     </ClInclude>
@@ -813,9 +807,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\shell\vsf_shell.c">
       <Filter>vsf\kernel\shell</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c">
       <Filter>vsf\component\input</Filter>

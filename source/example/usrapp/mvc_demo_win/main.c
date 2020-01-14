@@ -61,6 +61,15 @@ void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
         vsf_tgui_on_touchscreen_evt(ts_evt);
     }
 }
+
+extern void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* keyboard_evt);
+void vsf_input_on_keyboard(vk_keyboard_evt_t* keyboard_evt)
+{
+    if (keyboard_evt->dev == &usrapp.ui.disp) {
+        vsf_tgui_on_keyboard_evt(keyboard_evt);
+    }
+}
+
 #endif
 
 // TODO: SDL require that main need argc and argv

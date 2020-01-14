@@ -28,6 +28,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_DISP_DRV_SDL2_CFG_HW_PRIORITY
+#   define VSF_DISP_DRV_SDL2_CFG_HW_PRIORITY            vsf_arch_prio_0
+#endif
+
 #if VSF_USE_INPUT == ENABLED
 #if     defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN)                           \
     &&  defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN)
@@ -332,11 +336,11 @@ static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis)
     if (!__vk_disp_sdl2.is_init_called) {
         __vk_disp_sdl2.is_init_called = true;
         __vk_disp_sdl2.init_thread.name = "disp_sdl2_init";
-        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, __vk_disp_sdl2_init_thread, vsf_arch_prio_0, true);
+        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, __vk_disp_sdl2_init_thread, VSF_DISP_DRV_SDL2_CFG_HW_PRIORITY, true);
     }
 
     disp_sdl2->thread.name = "disp_sdl2";
-    __vsf_arch_irq_init(&disp_sdl2->thread, __vk_disp_sdl2_thread, vsf_arch_prio_0, true);
+    __vsf_arch_irq_init(&disp_sdl2->thread, __vk_disp_sdl2_thread, VSF_DISP_DRV_SDL2_CFG_HW_PRIORITY, true);
     return VSF_ERR_NONE;
 }
 

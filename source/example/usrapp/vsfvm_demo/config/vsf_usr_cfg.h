@@ -148,7 +148,7 @@
 #define VSF_USE_USB_HOST_HID                ENABLED
 #define VSF_USE_USB_HOST_BTHCI              ENABLED
 #define VSF_USE_USB_HOST_DS4                ENABLED
-#define VSF_USE_USB_HOST_LIBUSB             ENABLED
+#define VSF_USE_USB_HOST_WINUSB             ENABLED
 //#define VSF_USE_USB_HOST_HCD_MUSB_FDRC      ENABLED
 
 //#define VSF_USE_USB_DEVICE_DCD_MUSB_FDRC    ENABLED
@@ -227,16 +227,16 @@ enum {
 #   define VSF_USE_USB_DEVICE               DISABLED
 #   define VSF_USE_USB_HOST                 ENABLED
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB     DISABLED
-#       define VSF_USE_USB_HOST_HCD_LIBUSB  ENABLED
-#       define VSF_LIBUSB_HCD_CFG_DEV_NUM   4
-#       define VSF_LIBUSB_HCD_DEV0_VID      0x0A12      // CSR8510 bthci
-#       define VSF_LIBUSB_HCD_DEV0_PID      0x0001
-#       define VSF_LIBUSB_HCD_DEV1_VID      0x054C      // DS4
-#       define VSF_LIBUSB_HCD_DEV1_PID      0x05C4
-#       define VSF_LIBUSB_HCD_DEV2_VID      0x054C      // DS4
-#       define VSF_LIBUSB_HCD_DEV2_PID      0x09CC
-#       define VSF_LIBUSB_HCD_DEV3_VID      0x05AC      // Apple DFU
-#       define VSF_LIBUSB_HCD_DEV3_PID      0x1227
+#       define VSF_USE_USB_HOST_HCD_WINUSB  ENABLED
+#       define VSF_WINUSB_HCD_CFG_DEV_NUM   4
+#       define VSF_WINUSB_HCD_DEV0_VID      0x0A12      // CSR8510 bthci
+#       define VSF_WINUSB_HCD_DEV0_PID      0x0001
+#       define VSF_WINUSB_HCD_DEV1_VID      0x054C      // DS4
+#       define VSF_WINUSB_HCD_DEV1_PID      0x05C4
+#       define VSF_WINUSB_HCD_DEV2_VID      0x054C      // DS4
+#       define VSF_WINUSB_HCD_DEV2_PID      0x09CC
+#       define VSF_WINUSB_HCD_DEV3_VID      0x05AC      // Apple DFU
+#       define VSF_WINUSB_HCD_DEV3_PID      0x1227
 #   define VSF_USE_USB_HOST_HUB             DISABLED
 #   define VSF_USE_TRACE                    ENABLED
 

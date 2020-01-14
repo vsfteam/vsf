@@ -2,6 +2,9 @@
 #define __TIME_H__
 
 typedef long long   time_t;
+typedef long        clock_t;
+
+#define CLOCKS_PER_SEC ((clock_t)1000000)
 
 struct timespec {
     long    tv_sec;
@@ -10,8 +13,10 @@ struct timespec {
 
 typedef enum {
     CLOCK_MONOTONIC,
+    CLOCK_REALTIME,
 } clockid_t;
 
+clock_t clock(void);
 int clock_gettime(clockid_t clk_id, struct timespec *tp);
 
 void usleep(int usec);

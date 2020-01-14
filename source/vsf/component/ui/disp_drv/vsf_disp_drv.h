@@ -94,11 +94,11 @@ typedef void (*vk_disp_on_ready_t)(vk_disp_t *disp);
 
 def_simple_class(vk_disp_t) {
     public_member(
-        const vk_disp_param_t  param;
+        const vk_disp_param_t   param;
         void                    *ui_data;
     )
     protected_member(
-        vk_disp_on_ready_t     ui_on_ready;
+        vk_disp_on_ready_t      ui_on_ready;
     )
 };
 

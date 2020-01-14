@@ -67,7 +67,7 @@ static void vsf_stream_on_read(vsf_stream_t *stream)
 
 uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
-    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->read != NULL));
     uint_fast32_t count = stream->op->read(stream, buf, size);
     vsf_stream_on_read(stream);
     return count;
@@ -75,7 +75,7 @@ uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t 
 
 uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
-    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->write != NULL));
     uint_fast32_t count = stream->op->write(stream, buf, size);
     vsf_stream_on_write(stream);
     return count;
@@ -97,25 +97,25 @@ void vsf_stream_set_rx_threshold(vsf_stream_t *stream, uint_fast32_t threshold)
 
 uint_fast32_t vsf_stream_get_data_size(vsf_stream_t *stream)
 {
-    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_data_length != NULL));
     return stream->op->get_data_length(stream);
 }
 
 uint_fast32_t vsf_stream_get_free_size(vsf_stream_t *stream)
 {
-    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_avail_length != NULL));
     return stream->op->get_avail_length(stream);
 }
 
 uint_fast32_t vsf_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
-    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_wbuf != NULL));
     return stream->op->get_wbuf(stream, ptr);
 }
 
 uint_fast32_t vsf_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
-    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL));
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_rbuf != NULL));
     return stream->op->get_rbuf(stream, ptr);
 }
 

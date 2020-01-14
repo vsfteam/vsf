@@ -65,17 +65,17 @@ void vsf_lvgl_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_colo
     vk_disp_refresh(disp, &disp_area, color_p);
 }
 
-void vsf_lvgl_on_ready(vk_disp_t *disp)
+static void __vsf_lvgl_disp_on_ready(vk_disp_t *disp)
 {
     lv_disp_drv_t *disp_drv = (lv_disp_drv_t *)disp->ui_data;
     lv_disp_flush_ready(disp_drv);
 }
 
-void vsf_lvgl_bind(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
+void vsf_lvgl_disp_bind(vk_disp_t *disp, lv_disp_drv_t *lvgl_disp_drv)
 {
     lvgl_disp_drv->user_data = disp;
     disp->ui_data = lvgl_disp_drv;
-    disp->ui_on_ready = vsf_lvgl_on_ready;
+    disp->ui_on_ready = __vsf_lvgl_disp_on_ready;
     vk_disp_init(disp);
 }
 

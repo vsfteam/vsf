@@ -59,6 +59,8 @@
 #pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
 #pragma clang diagnostic ignored "-Wmissing-braces"
 #pragma clang diagnostic ignored "-Wconstant-conversion"
+#pragma clang diagnostic ignored "-Wmicrosoft-enum-forward-reference"
+#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
 #elif __IS_COMPILER_GCC__
 #else
   #warning Not supported compiler type

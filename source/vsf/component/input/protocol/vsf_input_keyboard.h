@@ -34,7 +34,7 @@
 #define VSF_INPUT_KEYBOARD_GET_KEYCODE(__EVENT)                                 \
             ((uint16_t)(((__EVENT)->id >> 0) & 0xFFFF))
 #define VSF_INPUT_KEYBOARD_IS_DOWN(__EVENT)                                     \
-            (!!((__EVENT)->id >> 16))
+            (((__EVENT)->id >> 16) & 0x01)
 
 /*============================ TYPES =========================================*/
 

@@ -48,7 +48,7 @@ static vsf_err_t vk_usbh_hid_fini(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vk_usbd_class_op_t vk_usbd_HID = {
+const vk_usbd_class_op_t vk_usbd_hid = {
     .get_desc =         vk_usbd_hid_get_desc,
     .request_prepare =  vk_usbd_hid_request_prepare,
     .request_process =  vk_usbd_hid_request_process,

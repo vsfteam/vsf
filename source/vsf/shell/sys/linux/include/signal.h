@@ -53,6 +53,9 @@ typedef struct {
 #define SIG_UNBLOCK     1
 #define SIG_SETMASK     2
 
+#define SIG_DFL         0
+#define SIG_IGN         -1
+
 static inline void sigemptyset(sigset_t *set)
 {
     set->sig[0] = 0;

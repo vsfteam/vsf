@@ -30,24 +30,34 @@
 #include <math.h>
 
 /*============================ MACROS ========================================*/
-#define FREETYPE_FONT_PATH              "../../usrapp/mvc_demo_win/tgui_demo/wqy-microhei.ttc"
+#define FREETYPE_FONT_PATH              "../usrapp/mvc_demo_win/tgui_demo/wqy-microhei.ttc"
 #define FREETYPE_FONT_SIZE              (24)
 #define FREETYPE_LOAD_FLAGS             (FT_LOAD_RENDER)
 #define FREETYPE_DEFAULT_DPI            72
 
 #define TGUI_PORT_DEBAULT_BACKGROUND_COLOR  0xFF
+
+#ifndef VSF_TGUI_SV_CFG_PORT_LOG
+#define VSF_TGUI_SV_CFG_PORT_LOG           DISABLED 
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 declare_vsf_pt(tgui_demo_t)
 def_vsf_pt(tgui_demo_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
+extern vsf_tgui_font_t g_tUserFonts[];
 /*============================ LOCAL VARIABLES ===============================*/
 static vk_disp_t* s_tDisp;
-static FT_Library s_tLibrary;
-static FT_Face s_tFace;
-static vsf_tgui_font_t s_tDefaultFont;
+
+volatile static bool s_bIsReadyToRefresh = true;
+
 /*============================ PROTOTYPES ====================================*/
+bool vsf_tgui_port_is_ready_to_refresh(void);
+
+#ifdef WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN
+WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 static vsf_tgui_color_t vk_disp_sdl_get_pixel(vsf_tgui_location_t* ptLocation)
@@ -103,7 +113,7 @@ char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* ptTile)
 }
 
 /*********************************************************************************/
-static uint8_t freetype_get_char_height(void)
+static uint8_t freetype_get_char_height(FT_Face ptFace)
 {
     /*
      * msyh test
@@ -148,33 +158,40 @@ static uint8_t freetype_get_char_height(void)
         | 48       | 63       | 64       | 68               |
      */
 
-     //return s_tFace->size->metrics.height >> 6;
+     //return ptFace->size->metrics.height >> 6;
 
      // https://stackoverflow.com/questions/26486642/whats-the-proper-way-of-getting-text-bounding-box-in-freetype-2
      // https://github.com/cocos2d/cocos2d-x/blob/b26e1bb08648c11a9482d0736a236aebc345008a/cocos/2d/CCFontFreeType.cpp#L180
-     //return (s_tFace->size->metrics.ascender - s_tFace->size->metrics.descender) >> 6;
+     //return (ptFace->size->metrics.ascender - ptFace->size->metrics.descender) >> 6;
 
      //double pixel_size = FREETYPE_FONT_SIZE * FREETYPE_DEFAULT_DPI / 72;
-     //return round((s_tFace->bbox.yMax - s_tFace->bbox.yMin) * pixel_size / s_tFace->units_per_EM);
+     //return round((ptFace->bbox.yMax - ptFace->bbox.yMin) * pixel_size / ptFace->units_per_EM);
 
-     // Line Spacing: 1.5 * height
-    return (s_tFace->size->metrics.height >> 6) * 12 / 10;
+    //return (ptFace->size->metrics.height >> 6) * 12 / 10;
+    return (ptFace->size->metrics.ascender >> 6) * 12 / 10;
 }
 
-uint8_t vsf_tgui_proportional_font_get_char_width(const vsf_tgui_font_t* ptFont, uint32_t wChar)
+uint8_t vsf_tgui_font_get_char_width(const uint8_t chFontIndex, uint32_t wChar)
 {
-    if (FT_Err_Ok == FT_Load_Char(s_tFace, wChar, FREETYPE_LOAD_FLAGS)) {
-        return s_tFace->glyph->advance.x >> 6;
-    } 
+    const vsf_tgui_font_t* ptFont = vsf_tgui_font_get(chFontIndex);
+    VSF_TGUI_ASSERT(ptFont != NULL);
+
+    FT_Face ptFace = (FT_Face)ptFont->ptData;
+    VSF_TGUI_ASSERT(ptFace != NULL);
+    if (FT_Err_Ok == FT_Load_Char(ptFace, wChar, FREETYPE_LOAD_FLAGS)) {
+        return ptFace->glyph->advance.x >> 6;
+    }
 
     return 0;
 }
 
-const vsf_tgui_font_t* vsf_tgui_sdl_font_get_default(void)
+uint8_t vsf_tgui_font_get_char_height(const uint8_t chFontIndex)
 {
-    return &s_tDefaultFont;
-}
+    const vsf_tgui_font_t* ptFont = vsf_tgui_font_get(chFontIndex);
+    VSF_TGUI_ASSERT(ptFont != NULL);
 
+    return ptFont->chHeight;
+}
 
 /*********************************************************************************/
 
@@ -275,15 +292,27 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
     }
 }
 
-void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* ptFontLocation, vsf_tgui_size_t* ptSize, uint32_t wChar, vsf_tgui_color_t tCharColor)
+void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation,
+                        vsf_tgui_location_t* ptFontLocation,
+                        vsf_tgui_size_t* ptSize,
+                        uint8_t chFontIndex,
+                        uint32_t wChar,
+                        vsf_tgui_color_t tCharColor)
 {
+    const vsf_tgui_font_t* ptFont;
     VSF_TGUI_ASSERT(ptLocation != NULL);
     VSF_TGUI_ASSERT(ptFontLocation != NULL);
     VSF_TGUI_ASSERT(ptSize != NULL);
 
-    if (FT_Err_Ok == FT_Load_Char(s_tFace, wChar, FREETYPE_LOAD_FLAGS)) {
-        FT_GlyphSlot glyph = s_tFace->glyph;
-        uint32_t wBaseLine = s_tFace->size->metrics.ascender >> 6;
+    ptFont = vsf_tgui_font_get(chFontIndex);
+    VSF_TGUI_ASSERT(ptFont != NULL);
+
+    FT_Face ptFace = (FT_Face)ptFont->ptData;
+    VSF_TGUI_ASSERT(ptFace != NULL);
+
+    if (FT_Err_Ok == FT_Load_Char(ptFace, wChar, FREETYPE_LOAD_FLAGS)) {
+        FT_GlyphSlot glyph = ptFace->glyph;
+        uint32_t wBaseLine = ptFace->size->metrics.ascender >> 6;
         int32_t wTop = glyph->bitmap_top;
         int32_t wLeft = glyph->bitmap_left;
         VSF_TGUI_ASSERT(wBaseLine >= wTop);
@@ -326,122 +355,136 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
     }
 }
 
-const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
-    .tTopLeft = {
-        .tChild = {
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tSize = {.nWidth = 12, .nHeight = 12, },
-            .tLocation = {.nX = 0, .nY = 0},
-        },
-    },
-    .tTopRight = {
-        .tChild = {
-            .tSize = {.nWidth = 12, .nHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.nX = 200 - 12, .nY = 0},
-        },
-    },
-    .tBottomLeft = {
-        .tChild = {
-            .tSize = {.nWidth = 12, .nHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.nX = 0, .nY = 200 - 12},
-        },
-    },
-    .tBottomRight = {
-        .tChild = {
-            .tSize = {.nWidth = 12, .nHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.nX = 200 - 12, .nY = 200 - 12},
-        },
-    },
-};
-
-const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
-    .tLeft = {
-        .tChild = {
-            .tSize = {.nWidth = 16, .nHeight = 32, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
-            .tLocation = {.nX = 0, .nY = 0},
-        },
-    },
-    .tRight = {
-        .tChild = {
-            .tSize = {.nWidth = 16, .nHeight = 32, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
-            .tLocation = {.nX = 16, .nY = 0},
-        },
-    },
-};
-
-
 /**********************************************************************************/
 /*! \brief begin a refresh loop
  *! \param ptGUI the tgui object address
  *! \param ptPlannedRefreshRegion the planned refresh region
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
- */
+ *!
+ *! \note When NULL is returned, current refresh iteration (i.e. a refresh activites
+ *!       between vsf_tgui_v_refresh_loop_begin and vsf_tgui_v_refresh_loop_end )
+ *!       will be ignored and vsf_tgui_v_refresh_loop_end is called immediately
+ **********************************************************************************/
 vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(   
                     vsf_tgui_t *ptGUI, 
                     const vsf_tgui_region_t *ptPlannedRefreshRegion)
 {
+    if (!vsf_tgui_port_is_ready_to_refresh()) {
+        return NULL;
+    }
+#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+    VSF_TGUI_LOG(VSF_TRACE_INFO,
+                 "[Simple View Port]Begin Refresh Loop" VSF_TRACE_CFG_LINEEND);
+#endif
+
+
     return (vsf_tgui_region_t *)ptPlannedRefreshRegion;
 }
-
-volatile static bool __is_ready_to_refresh = true;
 
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
 {
     vsf_tgui_color_t* pixmap = s_tDisp->ui_data;
+
     vk_disp_area_t area = {
         .pos = {.x = 0, .y = 0},
         .size = {.x = VSF_TGUI_HOR_MAX, .y = VSF_TGUI_VER_MAX},
     };
-    __vsf_sched_safe(
-        if (__is_ready_to_refresh) {
-            __is_ready_to_refresh = false;
-            vk_disp_refresh(s_tDisp, &area, pixmap);
+
+     __vsf_sched_safe(
+        if (s_bIsReadyToRefresh) {
+            s_bIsReadyToRefresh = false;   
         }
     )
+
+#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+    VSF_TGUI_LOG(VSF_TRACE_INFO,
+                 "[Simple View Port]End Refresh Loop." VSF_TRACE_CFG_LINEEND "\trequest low level refresh start in area, pos(x:0x%d, y:0x%d), size(w:0x%d, h:0x%d)" VSF_TRACE_CFG_LINEEND,
+                 area.pos.x, area.pos.y, area.size.x, area.size.y);
+#endif
+    vk_disp_refresh(s_tDisp, &area, pixmap);
+
     return false;
 }
 
+#ifndef WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
+WEAK(vsf_tgui_low_level_on_ready_to_refresh)
+void vsf_tgui_low_level_on_ready_to_refresh(void)
+{}
+#endif
+
 static void vsf_tgui_on_ready(vk_disp_t* disp)
 {
-    __vsf_sched_safe(
-        if (!__is_ready_to_refresh) {
-            __is_ready_to_refresh = true;
-        }
-        extern void vsf_tgui_demo_on_ready(void);
+#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+    VSF_TGUI_LOG(VSF_TRACE_INFO,
+                 "[Simple View Port] refresh ready" VSF_TRACE_CFG_LINEEND);
+#endif
 
-        vsf_tgui_demo_on_ready();
-        
-    )
+    s_bIsReadyToRefresh = true;
+
+#ifndef WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
+    vsf_tgui_low_level_on_ready_to_refresh();
+#else
+    WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH();
+#endif
 }
 
 bool vsf_tgui_port_is_ready_to_refresh(void)
 {
-    return __is_ready_to_refresh;
+    return s_bIsReadyToRefresh;
 }
 
-static bool vsf_tgui_font_init(void)
+static bool vsf_tgui_sv_fonts_init(vsf_tgui_font_t* ptFont, size_t tSize)
 {
-    if (FT_Err_Ok != FT_Init_FreeType(&s_tLibrary)) {
-        return false;
-    }
+    int i;
+    FT_Library tLibrary;
+    FT_Face ptFace;
+    uint8_t chFontSize;
+    uint8_t chFontHeight;
 
-    if (FT_Err_Ok != FT_New_Face(s_tLibrary, FREETYPE_FONT_PATH, 0, &s_tFace)) {
-        return false;
-    }
+    VSF_TGUI_ASSERT(ptFont != NULL);
 
-    if (FT_Err_Ok != FT_Set_Char_Size(s_tFace, 0, FREETYPE_FONT_SIZE * 64, 0, 0)) {
-        return false;
-    }
+    for (i = 0; i < tSize; i++) {
+        if (FT_Err_Ok != FT_Init_FreeType(&tLibrary)) {
+            VSF_TGUI_ASSERT(0);
+            return false;
+        }
 
-    s_tDefaultFont.chHeight = freetype_get_char_height();
-    s_tDefaultFont.chFlags = VSF_TGUI_FONT_CONTINUOUS | VSF_TGUI_FONT_PROPORTIONAL;
-    s_tDefaultFont.chIndex = 0;
+        if (FT_Err_Ok != FT_New_Face(tLibrary, ptFont->pchFontPath, 0, &ptFace)) {
+            VSF_TGUI_ASSERT(0);
+            return false;
+        }
+
+        if (ptFont->chFontSize != 0) {
+            if (FT_Err_Ok != FT_Set_Char_Size(ptFace, 0, ptFont->chFontSize * 64, 0, 0)) {
+                VSF_TGUI_ASSERT(0);
+                return false;
+            }
+            ptFont->chHeight = freetype_get_char_height(ptFace);
+        } else if (ptFont->chHeight != 0) {
+            chFontSize = ptFont->chHeight;
+            do {
+                if (FT_Err_Ok != FT_Set_Char_Size(ptFace, 0, chFontSize * 64, 0, 0)) {
+                    VSF_TGUI_ASSERT(0);
+                    return false;
+                }
+
+                chFontHeight = freetype_get_char_height(ptFace);
+                if (ptFont->chHeight < chFontHeight) {
+                    chFontSize--;
+                } else {
+                    ptFont->chHeight = chFontHeight;
+                    break;
+                }
+            } while (1);
+        } else {
+            VSF_TGUI_ASSERT(0);
+            return false;
+        }
+        ptFont->ptData = ptFace;
+
+        ptFont++;
+    }
 
     return true;
 }
@@ -453,12 +496,12 @@ void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData)
     memset(ptData, TGUI_PORT_DEBAULT_BACKGROUND_COLOR, VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX * sizeof(vsf_tgui_color_t));
 #endif
 
+    vsf_tgui_sv_fonts_init((vsf_tgui_font_t *)vsf_tgui_font_get(0), 
+                            vsf_tgui_font_number());
+
     ptDisp->ui_data = ptData;
     ptDisp->ui_on_ready = vsf_tgui_on_ready;
     vk_disp_init(ptDisp);
-
-    bool result = vsf_tgui_font_init();
-    VSF_TGUI_ASSERT(result == true);
 
     s_tDisp = ptDisp;
 }

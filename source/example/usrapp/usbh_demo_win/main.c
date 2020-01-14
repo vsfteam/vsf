@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     disp_drv.flush_cb = vsf_lvgl_disp_flush;
     disp_drv.buffer = &usrapp.ui.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
-    vsf_lvgl_bind(&usrapp.ui.disp.use_as__vk_disp_t, &disp->driver);
+    vsf_lvgl_disp_bind(&usrapp.ui.disp.use_as__vk_disp_t, &disp->driver);
 
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;

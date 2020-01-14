@@ -186,9 +186,14 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     arg.ch = va_arg(ap, int);
                     if (!size--) { goto end; }
                     *curpos++ = arg.ch;
+                    break;
                 case 's':
                 case 'S':
                     arg.str = va_arg(ap, char *);
+                    if (!arg.str) {
+                        goto end;
+                    }
+
                     actual_width = strlen(arg.str);
                     width -= actual_width;
                     if (!flags.align_left) {
@@ -199,7 +204,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     }
                     while (*arg.str != '\0') {
                         width--;
-                        if (!size--)    { goto end; }
+                        if (!size--) { goto end; }
                         *curpos++ = *arg.str++;
                     }
                     if (flags.align_left) {

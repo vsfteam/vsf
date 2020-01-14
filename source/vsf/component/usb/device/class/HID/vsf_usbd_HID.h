@@ -99,7 +99,7 @@ def_simple_class(vk_usbd_hid_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_usbd_class_op_t vk_usbd_HID;
+extern const vk_usbd_class_op_t vk_usbd_hid;
 
 /*============================ PROTOTYPES ====================================*/
 

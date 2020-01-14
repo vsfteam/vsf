@@ -53,6 +53,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#   error "USBH require VSF_KERNEL_CFG_EDA_SUPPORT_TIMER"
+#endif
+
 #if !defined(VSF_USBH_CFG_EDA_PRIORITY)
 #   define VSF_USBH_CFG_EDA_PRIORITY        vsf_prio_0
 #endif

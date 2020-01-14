@@ -127,9 +127,6 @@
     <Filter Include="vsf\component\usb\driver\hcd">
       <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
-      <UniqueIdentifier>{81641b97-4577-45bf-ad6d-8ec4f525ea32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party">
       <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
     </Filter>
@@ -213,6 +210,15 @@
     </Filter>
     <Filter Include="vsf\service\vsfstream\mem_stream">
       <UniqueIdentifier>{bb0df0ef-007e-46ca-8541-e100892f6064}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
+      <UniqueIdentifier>{9f00313b-c7d8-4058-ac10-40c014473a5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver\malfs">
+      <UniqueIdentifier>{ca331f3b-aa8f-40d0-a209-1ecbfc252b90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver\mim_mal">
+      <UniqueIdentifier>{5ceadba6-89cb-4dbe-8ad4-fd363663e9c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -447,9 +453,6 @@
     <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h">
       <Filter>vsf\kernel\shell</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h">
       <Filter>vsf\component\input</Filter>
     </ClInclude>
@@ -570,6 +573,15 @@
     <ClInclude Include="..\..\usrapp\usrapp_common.h">
       <Filter>usrapp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.h">
+      <Filter>vsf\component\fs\driver\malfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.h">
+      <Filter>vsf\component\mal\driver\mim_mal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -685,9 +697,6 @@
     <ClCompile Include="..\..\..\vsf\kernel\shell\vsf_shell.c">
       <Filter>vsf\kernel\shell</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c">
       <Filter>vsf\component\input</Filter>
     </ClCompile>
@@ -759,6 +768,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
       <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.c">
+      <Filter>vsf\component\fs\driver\malfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c">
+      <Filter>vsf\component\mal\driver\mim_mal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

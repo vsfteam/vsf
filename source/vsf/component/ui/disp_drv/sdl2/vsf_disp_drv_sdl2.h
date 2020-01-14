@@ -56,7 +56,7 @@ def_simple_class(vk_disp_sdl2_t) {
 
     private_member(
         vsf_arch_irq_thread_t       thread;
-        vk_disp_area_t             area;
+        vk_disp_area_t              area;
         void                        *disp_buff;
 
         SDL_Window                  *window;

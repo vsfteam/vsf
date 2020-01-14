@@ -29,30 +29,23 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static vk_disp_t* __disp;
+extern void vsf_tgui_demo_on_ready(void);
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ IMPLEMENTATION ================================*/
 static vsf_tgui_color_t vsf_tgui_get_pixel(vsf_tgui_location_t* ptLocation)
 {
-    vsf_tgui_color_t* pixmap = __disp->ui_data;
-    return pixmap[ptLocation->nY * VSF_TGUI_HOR_MAX + ptLocation->nX];
+    vsf_tgui_color_t tColor = VSF_TGUI_COLOR_BLACK;
+    return tColor;
 }
 
 static void vsf_tgui_set_pixel(vsf_tgui_location_t* ptLocation, vsf_tgui_color_t tColor)
 {
-    vsf_tgui_color_t* pixmap = __disp->ui_data;
-    pixmap[ptLocation->nY * VSF_TGUI_HOR_MAX + ptLocation->nX] = tColor;
 }
 
 static uint8_t vsf_tgui_font_get_pixel_color(void* ptFont, uint32_t wChar, vsf_tgui_location_t* ptLocation)
 {
-    //VSF_TGUI_ASSERT(font!= NULL);
-    // todo: check wChar
     VSF_TGUI_ASSERT(ptLocation != NULL);
-    // todo: check font location
-
-    return 0x55;//_fonts[(wChar - 0x20) * FONT_SIZE * FONT_SIZE + ptLocation->nY * FONT_SIZE + ptLocation->nX];
+    return 0x55;
 }
 
 uint8_t vsf_tgui_proportional_font_get_char_width(const vsf_tgui_font_t* ptFont, uint32_t wChar)
@@ -71,8 +64,6 @@ void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize
     VSF_TGUI_ASSERT((ptLocation->nX + ptSize->nWidth) <= VSF_TGUI_HOR_MAX);
     VSF_TGUI_ASSERT(0 <= (ptLocation->nY + ptSize->nHeight));                       // y_end   point in screen
     VSF_TGUI_ASSERT((ptLocation->nY + ptSize->nHeight) <= VSF_TGUI_VER_MAX);
-
-    vsf_tgui_color_t* pixmap = __disp->ui_data;
 
     for (uint16_t i = 0; i < ptSize->nHeight; i++) {
         for (uint16_t j = 0; j < ptSize->nWidth; j++) {
@@ -211,19 +202,6 @@ const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
 
 /**********************************************************************************/
 
-static void draw_screen_white(void)
-{
-    vsf_tgui_color_t* pixmap = __disp->ui_data;
-    memset(pixmap, 0xFF, VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX * sizeof(vsf_tgui_color_t));
-}
-void refresh_all(void)
-{
-    draw_screen_white();
-
-    extern void refresh_my_stopwatch(void);
-    refresh_my_stopwatch();
-}
-
 /*! \brief begin a refresh loop
  *! \param ptGUI the tgui object address
  *! \param ptPlannedRefreshRegion the planned refresh region
@@ -238,19 +216,18 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
 }
 
 
-volatile static bool __is_ready_to_refresh = true;
+volatile static bool s_bIsReadyToRefresh = true;
 
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
 {
-    vsf_tgui_color_t* pixmap = __disp->ui_data;
     vk_disp_area_t area = {
         .pos = {.x = 0, .y = 0},
         .size = {.x = VSF_TGUI_HOR_MAX, .y = VSF_TGUI_VER_MAX},
     };
     __vsf_sched_safe(
-        if (__is_ready_to_refresh) {
-            __is_ready_to_refresh = false;
-            refresh_all();
+        if (s_bIsReadyToRefresh) {
+            s_bIsReadyToRefresh = false;
+            // todo: refresh
         }
     )
     return false;
@@ -259,27 +236,18 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
 static void vsf_tgui_on_ready(vk_disp_t* disp)
 {
     __vsf_sched_safe(
-        if (!__is_ready_to_refresh) {
-            __is_ready_to_refresh = true;
+        if (!s_bIsReadyToRefresh) {
+            s_bIsReadyToRefresh = true;
         }
-        //extern void vsf_tgui_demo_on_ready(void);
-        //vsf_tgui_demo_on_ready();
+        vsf_tgui_demo_on_ready();
     )
 }
 
-
-void vsf_tgui_bind(vk_disp_t* disp, void* ui_data)
+bool vsf_tgui_port_is_ready_to_refresh(void)
 {
-    disp->ui_data = ui_data;
-    disp->ui_on_ready = vsf_tgui_on_ready;
-    vk_disp_init(disp);
-
-    extern void my_stopwatch_init(void);
-    my_stopwatch_init();
-
-    __disp = disp;
-    refresh_all();
+    return s_bIsReadyToRefresh;
 }
+
 #endif
 
 /* EOF */

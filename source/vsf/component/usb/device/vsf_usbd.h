@@ -101,7 +101,7 @@
 #   define USB_UNICODE          wchar_t
 #endif
 
-#define __implement_usbd(               __NAME,             /* name of the usbd, eg: user_usbd */\
+#define __describe_usbd(                __NAME,             /* name of the usbd, eg: user_usbd */\
                                         __PID,              /* product id, 0x0000 - 0xFFFF */\
                                         __VID,              /* vendor id, 0x0000 - 0xFFFF */\
                                         __LANG_ID,          /* language id, eg: 0x0409 */\
@@ -119,7 +119,7 @@
 //  multiple configuration is not supported
 //  does not support big endian
 //  to add
-#define __implement_usbd_common_desc(   __NAME,             /* name of the usbd, eg: user_usbd */\
+#define __usbd_common_desc(             __NAME,             /* name of the usbd, eg: user_usbd */\
                                         __STR_PRODUCT,      /* product string in ASCII, eg: "VSF_Board" */\
                                         __STR_VENDOR,       /* vendor string in ASCII, eg: "VSF" */\
                                         __STR_SERIAL,       /* serial string in ASCII, eg: "1.0.0" */\
@@ -175,10 +175,10 @@
             USB_DESC_CFG(USB_DT_CONFIG_SIZE + (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM),\
                         1, 0, USB_CONFIG_ATT_ONE | (__ATTRIBUTE), (__MAX_POWER) >> 1)
 
-#define __implement_usbd_func_desc(__NAME)                                      \
+#define __usbd_func_desc(__NAME)                                                \
         };
 
-#define __implement_usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)           \
+#define __usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)                     \
         struct {                                                                \
             uint8_t bLength;                                                    \
             uint8_t bDescriptorType;                                            \
@@ -189,7 +189,7 @@
             .str                = __STR_FUNC,                                   \
         };
 
-#define __implement_usbd_std_desc_table(__NAME)                                 \
+#define __usbd_std_desc_table(__NAME)                                           \
         const vk_usbd_desc_t __##__NAME##_std_descs[] = {                       \
             VSF_USBD_DESC_DEVICE(0, __##__NAME##_device_desc, sizeof(__##__NAME##_device_desc)),\
             VSF_USBD_DESC_CONFIG(0, 0, __##__NAME_config_desc, sizeof(__##__NAME_config_desc)),\
@@ -198,16 +198,16 @@
             VSF_USBD_DESC_STRING(__##__NAME##_LANGID, 2, &__##__NAME##_str_product, sizeof(__##__NAME##_str_product)),\
             VSF_USBD_DESC_STRING(__##__NAME##_LANGID, 3, &__##__NAME##_str_serial, sizeof(__##__NAME##_str_serial)),
 
-#define __implement_usbd_func_str_desc_table(__NAME, __FUNC_ID)                 \
+#define __usbd_func_str_desc_table(__NAME, __FUNC_ID)                           \
             VSF_USBD_DESC_STRING(__##__NAME##_LANGID, 4 + __FUNC_ID, &__##__NAME##_str_func##__FUNC_ID, sizeof(__##__NAME##_str_func##__FUNC_ID)),
 
-#define __implement_usbd_device_func(__NAME)                                    \
+#define __usbd_func(__NAME)                                                     \
         };
 
-#define __implement_usbd_device_ifs(__NAME)                                     \
+#define __usbd_ifs(__NAME)                                                      \
         vk_usbd_ifs_t __##__NAME##_ifs[__##__NAME##_IFSNUM] = {
 
-#define __end_implement_usbd(__NAME, __DEV)                                     \
+#define __end_describe_usbd(__NAME, __DEV)                                      \
         };                                                                      \
         vk_usbd_cfg_t __##__NAME##_cfg[1] = {                                   \
             {                                                                   \
@@ -225,24 +225,24 @@
         };
 
 
-#define implement_usbd(__NAME, __PID, __VID, __LANG_ID, __SPEED)                \
-        __implement_usbd(__NAME, (__PID), (__VID), (__LANG_ID), (__SPEED))
-#define implement_usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, __EP0_SIZE, __FUNC_DESC_SIZE, __FUNC_IFS_NUM, __ATTRIBUTE, __MAX_POWER)\
-        __implement_usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, (__EP0_SIZE), (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM), (__ATTRIBUTE), (__MAX_POWER))
-#define implement_usbd_func_desc(__NAME)                                        \
-        __implement_usbd_func_desc(__NAME)
-#define implement_usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)             \
-        __implement_usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)
-#define implement_usbd_std_desc_table(__NAME)                                   \
-        __implement_usbd_std_desc_table(__NAME)
-#define implement_usbd_func_str_desc_table(__NAME, __FUNC_ID)                   \
-        __implement_usbd_func_str_desc_table(__NAME, __FUNC_ID)
-#define implement_usbd_device_func(__NAME)                                      \
-        __implement_usbd_device_func(__NAME)
-#define implement_usbd_device_ifs(__NAME)                                       \
-        __implement_usbd_device_ifs(__NAME)
-#define end_implement_usbd(__NAME, __DEV)                                       \
-        __end_implement_usbd(__NAME, (__DEV))
+#define describe_usbd(__NAME, __PID, __VID, __LANG_ID, __SPEED)                 \
+        __describe_usbd(__NAME, (__PID), (__VID), (__LANG_ID), (__SPEED))
+#define usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, __EP0_SIZE, __FUNC_DESC_SIZE, __FUNC_IFS_NUM, __ATTRIBUTE, __MAX_POWER)\
+        __usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, (__EP0_SIZE), (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM), (__ATTRIBUTE), (__MAX_POWER))
+#define usbd_func_desc(__NAME)                                                  \
+        __usbd_func_desc(__NAME)
+#define usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)                       \
+        __usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)
+#define usbd_std_desc_table(__NAME)                                             \
+        __usbd_std_desc_table(__NAME)
+#define usbd_func_str_desc_table(__NAME, __FUNC_ID)                             \
+        __usbd_func_str_desc_table(__NAME, __FUNC_ID)
+#define usbd_func(__NAME)                                                       \
+        __usbd_func(__NAME)
+#define usbd_ifs(__NAME)                                                        \
+        __usbd_ifs(__NAME)
+#define end_describe_usbd(__NAME, __DEV)                                        \
+        __end_describe_usbd(__NAME, (__DEV))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

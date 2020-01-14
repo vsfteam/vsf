@@ -64,6 +64,11 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
     return 0;
 }
 
+clock_t clock(void)
+{
+    return vsf_systimer_tick_to_us(vsf_timer_get_tick());
+}
+
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
     switch (clk_id) {

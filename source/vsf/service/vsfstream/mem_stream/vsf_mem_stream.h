@@ -39,6 +39,23 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#define __describe_mem_stream_ex(__NAME, __BUFFER, __SIZE)                      \
+            vsf_mem_stream_t __NAME = {                                         \
+                .op                 = &vsf_mem_stream_op,                       \
+                .pchBuffer          = (__BUFFER),                               \
+                .nSize              = (__SIZE),                                 \
+            };
+
+#define __describe_mem_stream(__NAME, __SIZE)                                   \
+            uint8_t __##__NAME##_buffer[(__SIZE)];                              \
+            __describe_mem_stream_ex(__NAME, __##__NAME##_buffer, (__SIZE))
+
+#define describe_mem_stream_ex(__NAME, __BUFFER, __SIZE)                        \
+            __describe_mem_stream_ex(__NAME, (__BUFFER), (__SIZE))
+#define describe_mem_stream(__NAME, __SIZE)                                     \
+            __describe_mem_stream(__NAME, (__SIZE))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

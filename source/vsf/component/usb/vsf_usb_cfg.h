@@ -58,9 +58,6 @@
 #endif
 
 #if VSF_USE_USB_HOST == ENABLED
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
-#       error "USBH require VSF_KERNEL_CFG_EDA_SUPPORT_TIMER"
-#   endif
 #   if VSF_USE_USB_HOST_ECM == ENABLED
 #       undef VSF_USE_USB_HOST_CDC
 #       define VSF_USE_USB_HOST_CDC                 ENABLED

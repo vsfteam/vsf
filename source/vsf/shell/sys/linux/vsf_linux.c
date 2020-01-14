@@ -174,6 +174,8 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
     vsf_evt_t evt;
     unsigned long sig_mask;
     int sig;
+    bool found_handler;
+
     while (1) {
         evt = vsf_thread_wait();
         VSF_LINUX_ASSERT(VSF_EVT_MESSAGE == evt);
@@ -184,21 +186,24 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
             sig = ffz(~sig_mask);
             sig_mask &= ~(1 << sig);
 
-            handler = NULL;
+            found_handler = false;
             __vsf_dlist_foreach_unsafe(vsf_linux_sig_handler_t, node, &process->sig.handler_list) {
                 if (_->sig == sig) {
                     handler = _;
+                    found_handler = true;
                     break;
                 }
             }
 
             __vsf_linux.sig_pid = process->id.pid;
-            if (handler != NULL) {
-                siginfo_t siginfo = {
-                    .si_signo   = sig,
-                    .si_errno   = errno,
-                };
-                handler->handler(sig, &siginfo, NULL);
+            if (found_handler && (handler != SIG_DFL)) {
+                if (handler != SIG_IGN) {
+                    siginfo_t siginfo = {
+                        .si_signo   = sig,
+                        .si_errno   = errno,
+                    };
+                    handler->handler(sig, &siginfo, NULL);
+                }
             } else if (!((1 << sig) & ((1 << SIGURG) | (1 << SIGCONT) | (1 << SIGWINCH)))) {
                 // TODO: terminate other thread is not supported in VSF, so just ignore
 //                VSF_LINUX_ASSERT(false);
@@ -212,6 +217,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     VSF_LINUX_ASSERT(stdio_stream != NULL);
     memset(&__vsf_linux, 0, sizeof(__vsf_linux));
     __vsf_linux.stdio_stream = *stdio_stream;
+    vk_fs_init();
     vsf_linux_glibc_init();
 
     // create kernel process(pid0)
@@ -413,7 +419,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     }
 }
 
-int execv(const char *pathname, char *const argv[])
+int execv(const char *pathname, char const* const* argv)
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;

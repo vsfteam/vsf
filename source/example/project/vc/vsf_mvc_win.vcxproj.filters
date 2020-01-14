@@ -124,9 +124,6 @@
     <Filter Include="vsf\component\usb\driver\hcd">
       <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
-      <UniqueIdentifier>{81641b97-4577-45bf-ad6d-8ec4f525ea32}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party">
       <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
     </Filter>
@@ -303,6 +300,9 @@
     </Filter>
     <Filter Include="usrapp\mvc_demo_win\tgui_demo\stopwatch">
       <UniqueIdentifier>{125644a1-849b-44c9-a557-faea05558c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
+      <UniqueIdentifier>{6675a22e-6f54-4682-b420-8f298128daca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -521,9 +521,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h">
       <Filter>vsf\kernel\shell</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h">
       <Filter>vsf\component\3rd-party\btstack\port</Filter>
@@ -939,9 +936,6 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_style.h">
-      <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_usr_cfg.h">
       <Filter>usrapp\mvc_demo_win\config</Filter>
     </ClInclude>
@@ -1299,6 +1293,18 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.h">
       <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_tgui_cfg.h">
+      <Filter>usrapp\mvc_demo_win\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_style.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.h">
+      <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -1408,9 +1414,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\shell\vsf_shell.c">
       <Filter>vsf\kernel\shell</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
-      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c">
       <Filter>vsf\component\3rd-party\btstack\port</Filter>
@@ -1972,6 +1975,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.c">
       <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_style.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.c">
+      <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

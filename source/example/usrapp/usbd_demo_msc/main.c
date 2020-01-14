@@ -197,22 +197,22 @@ static usrapp_t __usrapp = {
 #endif
 };
 
-/*============================ IMPLEMENTATION ================================*/
-
-implement_usbd(user_usbd, APP_CFG_USBD_PID, APP_CFG_USBD_VID, 0x0409, USRAPP_CFG_USBD_DC_SPEED)
-    implement_usbd_common_desc(user_usbd, u"VSF-MSC", u"SimonQian", u"1.0.0", 64, USB_DESC_MSCBOT_IAD_LEN, USB_MSCBOT_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
-        implement_mscbot_desc(user_usbd, 0, 0, 1, 1, USRAPP_CFG_USBD_DC_EPSIZE)
-    implement_usbd_func_desc(user_usbd)
-        implement_usbd_func_str_desc(user_usbd, 0, u"VSF-MSC")
-    implement_usbd_std_desc_table(user_usbd)
-        implement_usbd_func_str_desc_table(user_usbd, 0)
-    implement_usbd_device_func(user_usbd)
-        implement_mscbot_func(user_usbd, 0, 1, 1, 1,
+describe_usbd(user_usbd, APP_CFG_USBD_PID, APP_CFG_USBD_VID, 0x0409, USRAPP_CFG_USBD_DC_SPEED)
+    usbd_common_desc(user_usbd, u"VSF-MSC", u"SimonQian", u"1.0.0", 64, USB_DESC_MSCBOT_IAD_LEN, USB_MSCBOT_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
+        mscbot_desc(user_usbd, 0, 0, 1, 1, USRAPP_CFG_USBD_DC_EPSIZE)
+    usbd_func_desc(user_usbd)
+        usbd_func_str_desc(user_usbd, 0, u"VSF-MSC")
+    usbd_std_desc_table(user_usbd)
+        usbd_func_str_desc_table(user_usbd, 0)
+    usbd_func(user_usbd)
+        mscbot_func(user_usbd, 0, 1, 1, 1,
             &__usrapp.scsi.mal_scsi.use_as__vk_scsi_t,
             &__usrapp.stream.mem_stream.use_as__vsf_stream_t)
-    implement_usbd_device_ifs(user_usbd)
-        implement_mscbot_ifs(user_usbd, 0)
-end_implement_usbd(user_usbd, VSF_USB_DC0)
+    usbd_ifs(user_usbd)
+        mscbot_ifs(user_usbd, 0)
+end_describe_usbd(user_usbd, VSF_USB_DC0)
+
+/*============================ IMPLEMENTATION ================================*/
 
 static void __usrapp_on_timer(vsf_callback_timer_t *timer)
 {

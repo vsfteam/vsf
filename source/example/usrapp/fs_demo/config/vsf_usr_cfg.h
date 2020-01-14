@@ -147,6 +147,7 @@
 #define VSF_USE_MAL                                     ENABLED
 #   define VSF_USE_MEM_MAL                              ENABLED
 #   define VSF_USE_FAKEFAT32_MAL                        ENABLED
+#define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 #define VSF_USE_SCSI                                    ENABLED
 //#   define VSF_USE_MAL_SCSI                             ENABLED
@@ -234,10 +235,10 @@ enum {
 #   endif
 #   if VSF_USE_USB_HOST == ENABLED
 #       define VSF_USBH_CFG_ENABLE_ROOT_HUB DISABLED
-#       define VSF_USE_USB_HOST_HCD_LIBUSB  ENABLED
-#       define VSF_LIBUSB_HCD_CFG_DEV_NUM   1
-#       define VSF_LIBUSB_HCD_DEV0_VID      0x0781      // SanDisk
-#       define VSF_LIBUSB_HCD_DEV0_PID      0x5567
+#       define VSF_USE_USB_HOST_HCD_WINUSB  ENABLED
+#       define VSF_WINUSB_HCD_CFG_DEV_NUM   1
+#       define VSF_WINUSB_HCD_DEV0_VID      0x0781      // SanDisk
+#       define VSF_WINUSB_HCD_DEV0_PID      0x5567
 #   endif
 
 #   define VSF_USE_WINFS                    ENABLED

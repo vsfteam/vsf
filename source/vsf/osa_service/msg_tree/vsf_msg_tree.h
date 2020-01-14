@@ -112,12 +112,13 @@ typedef struct vsf_msgt_subcall_t {
 
 typedef struct vsf_msgt_handler_t vsf_msgt_handler_t;
 struct vsf_msgt_handler_t {
-    vsf_msgt_handler_type_t         tType;                                      //!< message handler type
+    uint16_t    u2Type      : 2;                                                //!< message handler type
+    uint16_t                : 14;
     implement_ex(
         union {
-            vsf_msgt_method_fsm_t* fnFSM;                                            //!< message handler
-            vsf_eda_t* ptEDA;                                                       //!< target eda receiver
-            vsf_msgt_subcall_t* ptSubCall;                                          //!< subcall handler
+            vsf_msgt_method_fsm_t* fnFSM;                                       //!< message handler
+            vsf_eda_t* ptEDA;                                                   //!< target eda receiver
+            vsf_msgt_subcall_t* ptSubCall;                                      //!< subcall handler
         }, 
         fn
     )
@@ -143,26 +144,29 @@ def_structure(vsf_msgt_node_t)
     union {
         union {
             struct {
-                uint8_t : 6;
+                uint8_t                 : 5;
+
+                uint8_t bIsTop          : 1;
 
                 /* \note when it is container, it is possible to make the container
                          transparent. When it is not a container, bIsTransparent
                          should be ignored. */
-                uint8_t bIsTransparent : 1;                                        //!< used together with bIsContainer
-                uint8_t bIsContainer : 1;                                        //!< whether it is a container or not
+                uint8_t bIsTransparent  : 1;                                    //!< used together with bIsContainer
+                uint8_t bIsContainer    :  1;                                   //!< whether it is a container or not
             };
             uint8_t     chAttribute;
         };
 #endif
         union {
             struct {
-                uint8_t                 : 6;
+                uint8_t                 : 5;
 
+                uint8_t bIsTop          : 1;
                 /* \note when it is container, it is possible to make the container 
                          transparent. When it is not a container, bIsTransparent 
                          should be ignored. */
-                uint8_t bIsTransparent  : 1;                                        //!< used together with bIsContainer
-                uint8_t bIsContainer    : 1;                                        //!< whether it is a container or not
+                uint8_t bIsTransparent  : 1;                                    //!< used together with bIsContainer
+                uint8_t bIsContainer    : 1;                                    //!< whether it is a container or not
             }_;
             uint8_t     chValue;
         } tAttribute;
@@ -172,7 +176,7 @@ def_structure(vsf_msgt_node_t)
 #endif
 
 
-    vsf_msgt_node_t* ptParent;                                                  //!< parent node
+    vsf_msgt_container_t* ptParent;                                             //!< parent node
     struct {
 #if VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST == ENABLED
         vsf_msgt_node_offset_t iPrevious;
@@ -196,16 +200,16 @@ end_def_structure(vsf_msgt_container_t)
 
 
 typedef struct __vsf_msgt_msg_handling_fsm_t {
-    uint8_t chState;
-    vsf_msgt_msg_t* ptMessage;
-    const vsf_msgt_node_t *ptNode;
-    const vsf_msgt_handler_t* ptHandler;
-    bool bIgnoreStatus;
+    uint8_t                     chState;
+    vsf_msgt_msg_t             *ptMessage;
+    const vsf_msgt_node_t      *ptNode;
+    const vsf_msgt_handler_t   *ptHandler;
+    uint8_t                    chStatusMask;
 }__vsf_msgt_msg_handling_fsm_t;
 
 def_structure(vsf_msgt_cfg_t)
-    const i_msg_tree_node_t* ptInterfaces;
-    uint8_t                 chTypeNumbers;
+    const i_msg_tree_node_t    *ptInterfaces;
+    uint8_t                     chTypeNumbers;
 end_def_structure(vsf_msgt_cfg_t)
 
 declare_class(vsf_msgt_t)
@@ -222,6 +226,10 @@ def_class(vsf_msgt_t,
             __bfs_node_fifo_t tFIFO;
             __vsf_msgt_msg_handling_fsm_t tMSGHandling;
         } FWBFS;
+        struct {
+            uint8_t chState;
+            __vsf_msgt_msg_handling_fsm_t tMSGHandling;
+        } FWDFS;
     )             
 )
 end_def_class(vsf_msgt_t)
@@ -260,6 +268,17 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj,
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern 
 fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
+                                            const vsf_msgt_node_t* ptNode,
+                                            vsf_msgt_msg_t* ptMessage,
+                                            uint_fast8_t chStatusMask);
+
+SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
+extern
+void vsf_msgt_forward_propagate_msg_dfs_init(vsf_msgt_t* ptObj);
+
+SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
+extern
+fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage);
 #endif

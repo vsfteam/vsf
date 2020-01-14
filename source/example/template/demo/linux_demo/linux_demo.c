@@ -1,0 +1,202 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless requir by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
+#include "vsf.h"
+
+#if APP_CFG_USE_LINUX_DEMO == ENABLED
+
+#include "../usrapp_common.h"
+
+#define VSF_LINUX_INHERIT
+#include "shell/sys/linux/vsf_linux.h"
+#include "shell/sys/linux/port/busybox/busybox.h"
+#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+#   include <libusb.h>
+#endif
+#include <sys/mount.h>
+
+/*============================ MACROS ========================================*/
+
+#if VSF_USE_USB_DEVICE == ENABLED
+#   ifndef USRAPP_CFG_CDC_TX_STREAM_SIZE
+#       define USRAPP_CFG_CDC_TX_STREAM_SIZE            1024
+#   endif
+
+#   ifndef USRAPP_CFG_CDC_RX_STREAM_SIZE
+#       define USRAPP_CFG_CDC_RX_STREAM_SIZE            1024
+#   endif
+#endif
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
+
+#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+extern int lsusb_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_NNOM_DEMO == ENABLED
+extern int nnom_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_AWTK_DEMO == ENABLED
+extern int awtk_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_USBH_DEMO == ENABLED
+extern int usbh_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_LVGL_DEMO == ENABLED
+extern int lvgl_main(int argc, char *argv[]);
+#endif
+
+/*============================ IMPLEMENTATION ================================*/
+
+int vsf_linux_create_fhs(void)
+{
+    int fd;
+
+#if APP_CFG_USE_USBH_DEMO == ENABLED
+    usbh_main(0, NULL);
+#endif
+
+#if VSF_USE_LINUX_BUSYBOX == ENABLED
+    busybox_install();
+#endif
+
+#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED                  \
+    && VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
+    vk_mal_init(&usrapp_common.mal.fakefat32.use_as__vk_mal_t);
+    if (mkdir("/fatfs_fakefat32", 0)) {
+        return -1;
+    }
+    fd = open("/fatfs_fakefat32", 0);
+    if (fd >= 0) {
+        close(fd);
+        mount(NULL, "/fatfs_fakefat32", &vk_fatfs_op, 0, &usrapp_common.fs.fatfs_info_fakefat32.use_as____vk_fatfs_info_t);
+    }
+#endif
+
+#if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
+    if (mkdir("/memfs", 0)) {
+        return -1;
+    }
+    fd = open("/memfs", 0);
+    if (fd >= 0) {
+        close(fd);
+        mount(NULL, "/memfs", &vk_memfs_op, 0, &usrapp_common.fs.memfs_info);
+    }
+#endif
+
+#if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
+    if (mkdir("/winfs", 0)) {
+        return -1;
+    }
+    fd = open("/winfs", 0);
+    if (fd >= 0) {
+        close(fd);
+        mount(NULL, "/winfs", &vk_winfs_op, 0, &usrapp_common.fs.winfs_info);
+    }
+#endif
+
+    // install executables
+#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+    busybox_bind("/sbin/lsusb", lsusb_main);
+    vsf_linux_libusb_startup();
+#endif
+
+#if APP_CFG_USE_NNOM_DEMO == ENABLED
+    busybox_bind("/sbin/nnom", nnom_main);
+#endif
+#if APP_CFG_USE_AWTK_DEMO == ENABLED
+    busybox_bind("/sbin/awtk", awtk_main);
+#endif
+#if APP_CFG_USE_LVGL_DEMO == ENABLED
+    busybox_bind("/sbin/lvgl", lvgl_main);
+#endif
+    return 0;
+}
+
+#if VSF_USE_USB_DEVICE == ENABLED
+implement_mem_stream(user_usbd_cdc_acm_stream_rx, USRAPP_CFG_CDC_RX_STREAM_SIZE)
+implement_mem_stream(user_usbd_cdc_acm_stream_tx, USRAPP_CFG_CDC_TX_STREAM_SIZE)
+
+implement_usbd(user_usbd_cdc, 0x2348, 0xA7A8, 0x0409, USB_DC_SPEED_HIGH)
+    implement_usbd_common_desc(user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
+        implement_cdc_acm_desc(user_usbd_cdc, 0, 0, 1, 2, 2, 512, 16)
+    implement_usbd_func_desc(user_usbd_cdc)
+        implement_usbd_func_str_desc(user_usbd_cdc, 0, u"VSF-CDC")
+    implement_usbd_std_desc_table(user_usbd_cdc)
+        implement_usbd_func_str_desc_table(user_usbd_cdc, 0)
+    implement_usbd_device_func(user_usbd_cdc)
+        implement_cdc_acm_func(user_usbd_cdc, 0, 1, 2, 2, &user_usbd_cdc_acm_stream_rx, &user_usbd_cdc_acm_stream_tx, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
+    implement_usbd_device_ifs(user_usbd_cdc)
+        implement_cdc_acm_ifs(user_usbd_cdc, 0)
+end_implement_usbd(user_usbd_cdc, VSF_USB_DC0)
+
+#elif defined(VSF_DEBUG_STREAM_NEED_POOL)
+void vsf_plug_in_on_kernel_idle(void)
+{
+    VSF_DEBUG_STREAM_POLL();
+}
+#endif
+
+// TODO: SDL require that main need argc and argv
+int main(int argc, char *argv[])
+{
+#if VSF_USE_TRACE == ENABLED
+    vsf_trace_init(NULL);
+#   if USRAPP_CFG_STDIO_EN == ENABLED
+    vsf_stdio_init();
+#   endif
+#endif
+
+#if VSF_USE_USB_DEVICE == ENABLED
+    vsf_stream_init(&user_usbd_cdc_acm_stream_rx.use_as__vsf_stream_t);
+    vsf_stream_init(&user_usbd_cdc_acm_stream_tx.use_as__vsf_stream_t);
+    vk_usbd_init(&user_usbd_cdc);
+    vk_usbd_connect(&user_usbd_cdc);
+#endif
+
+    vsf_trace(VSF_TRACE_INFO, "start linux..." VSF_TRACE_CFG_LINEEND);
+
+    vsf_stream_t *stream_tx, *stream_rx;
+#if VSF_USE_USB_DEVICE == ENABLED
+    stream_tx = (vsf_stream_t *)&user_usbd_cdc_acm_stream_tx.use_as__vsf_stream_t;
+    stream_rx = (vsf_stream_t *)&user_usbd_cdc_acm_stream_rx.use_as__vsf_stream_t;
+#else
+    stream_tx = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX;
+    stream_rx = (vsf_stream_t *)&VSF_DEBUG_STREAM_RX;
+#endif
+
+    vsf_linux_stdio_stream_t stream = {
+        .in     = stream_rx,
+        .out    = stream_tx,
+        .err    = stream_tx,
+    };
+    vsf_linux_init(&stream);
+    return 0;
+}
+
+#endif      // APP_CFG_USE_LINUX_DEMO
+
+/* EOF */

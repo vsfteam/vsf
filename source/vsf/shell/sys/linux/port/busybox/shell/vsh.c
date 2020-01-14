@@ -41,7 +41,7 @@ enum vsh_shell_state_t {
     SHELL_STATE_RIS,
 };
 
-static char vsh_working_dir[MAX_PATH];
+static char vsh_working_dir[PATH_MAX];
 static char **vsh_path;
 
 static enum vsh_shell_state_t
@@ -95,7 +95,7 @@ static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
         while ((*cur != '\0') && isspace(*cur)) { *cur++ = '\0'; }
     } while (*cur != '\0');
 
-    char pathname[MAX_PATH];
+    char pathname[PATH_MAX];
     int err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, (char *)ctx->arg.argv[0]);
     if (err != 0) { goto fail; }
 
@@ -242,7 +242,7 @@ int cd_main(int argc, char *argv[])
         return -1;
     }
 
-    if (strlen(vsh_working_dir) + strlen(argv[1]) + 1 >= MAX_PATH) {
+    if (strlen(vsh_working_dir) + strlen(argv[1]) + 1 >= PATH_MAX) {
         return -ENOMEM;
     }
 
@@ -255,7 +255,7 @@ int cd_main(int argc, char *argv[])
             }
         }
     } else {
-        char pathname[MAX_PATH];
+        char pathname[PATH_MAX];
         int err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, argv[1]);
         if (err != 0) { return err; }
 
@@ -287,7 +287,7 @@ int ls_main(int argc, char *argv[])
 
     DIR *dir;
     struct dirent *ent;
-    char dirname[MAX_PATH];
+    char dirname[PATH_MAX];
     int err;
     for (int i = 0; i < dirnum; i++) {
         err = vsh_generate_path(dirname, sizeof(dirname), vsh_working_dir, dirnames[i]);
@@ -347,7 +347,7 @@ int cat_main(int argc, char *argv[])
         return -1;
     }
 
-    char pathname[MAX_PATH];
+    char pathname[PATH_MAX];
     int err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, argv[1]);
     if (err != 0) { return err; }
 

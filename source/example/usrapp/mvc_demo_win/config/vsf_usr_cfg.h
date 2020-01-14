@@ -148,28 +148,6 @@
 #define VSF_USE_TRACE                                   ENABLED
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 
-#define VSF_USE_UI                                      ENABLED
-#   define VSF_USE_UI_LVGL                              DISABLED
-#   define VSF_USE_DISP_DRV_SDL2                        ENABLED
-
-#   define VSF_USE_TINY_GUI                             ENABLED
-#       define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL      VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
-#       define VSF_TGUI_CFG_COLOR_MODE                  VSF_TGUI_COLOR_ARGB_8888
-#       define VSF_TGUI_CFG_SUPPORT_NAME_STRING         ENABLED         /* Enabled for debug */
-
-#       define VSF_TGUI_CFG_SV_BUTTON_ADDITIONAL_TILES  ENABLED
-#       define VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR  VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_SV_CFG_PANEL_ADDITIONAL_TILES   ENABLED
-#       define VSF_TGUI_SV_CFG_PANEL_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
-#       define VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES   ENABLED
-#       define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-
-#       define VSF_TGUI_LOG                             vsf_trace
-
-#   define VSF_USE_MSG_TREE                             ENABLED
-#       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING     ENABLED         /* Enabled for debug */
-#       define VSF_MSGT_NODE_OFFSET_TYPE                int8_t
-
 #define VSF_USE_PBUF                                    DISABLED
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT                DISABLED
 #define VSF_PBUF_CFG_SUPPORT_REF_COUNTING               DISABLED
@@ -243,38 +221,17 @@ enum {
 #define WEAK_VSF_DRIVER_INIT()                                                  \
         vsf_driver_init()
 
-
-
-
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
-#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vsf_input_on_touchscreen((__TS_EVT))
-#endif
-
-
-
 #define WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN                                     \
         extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
 #define WEAK_VSF_HEAP_MALLOC_ALIGNED(__SIZE, __ALIGNMENT)                       \
         vsf_heap_malloc_aligned((__SIZE), (__ALIGNMENT))
 
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN                             \
-        extern vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE(__PTTILE)                          \
-        vsf_tgui_sdl_idx_root_tile_get_size(__PTTILE)
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
 
-#define WEAK_VSF_TGUI_FONT_GET_DEFAULT_EXTERN                                   \
-        extern const vsf_tgui_font_t* vsf_tgui_sdl_font_get_default(void);
-#define WEAK_VSF_TGUI_FONT_GET_DEFAULT(__PTTILE)                          \
-        vsf_tgui_sdl_font_get_default(__PTTILE)
-
- /*============================ TYPES =========================================*/
- /*============================ GLOBAL VARIABLES ==============================*/
- /*============================ LOCAL VARIABLES ===============================*/
- /*============================ PROTOTYPES ====================================*/
-
-
+/*============================ INCLUDES ======================================*/
+#include "vsf_tgui_cfg.h"
 #endif
 /* EOF */

@@ -18,73 +18,32 @@
 /*============================ INCLUDES ======================================*/
 
 #include "vsf.h"
+#include <stdio.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-struct usrapp_t {
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-    struct {
-        vk_disp_t disp;
-        //vsf_touchscreen_evt_t ts_evt;
-        //vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
-        vsf_tgui_color_t color;
-    } ui;
-#endif
-    uint8_t xxx;
-};
-typedef struct usrapp_t usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static usrapp_t usrapp = {
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED 
-    .ui.disp = {
-        .param                  = {
-            .height             = VSF_TGUI_VER_MAX,
-            .width              = VSF_TGUI_HOR_MAX,
-            //.drv                = &vsf_disp_drv_sdl2,
-            .color              = VSF_DISP_COLOR_ARGB8888,
-        },
-        //.amplifier              = 1,
-    },
-#endif
-    .xxx = 9,
-};
-
 /*============================ PROTOTYPES ====================================*/
-extern void refresh_my_stopwatch(void);
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_UI == ENABLED
-#if 0
-extern void vsf_tgui_on_touchscreen_evt(vsf_touchscreen_evt_t* ts_evt);
-void vsf_input_on_touchscreen(vsf_touchscreen_evt_t *ts_evt)
+static void delay_LED(unsigned int delay)
 {
-    if (ts_evt->dev == &usrapp.ui.disp) {
-        vsf_tgui_on_touchscreen_evt(ts_evt);
-    }
+	unsigned int i, j;
+	for(i = 0; i < delay; i++)
+		for(j = 0; j < 500; j++);
 }
-#endif
-#endif
 
 ROOT int main(void)
 {
-    vsf_trace_init(NULL);
-
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-    extern vsf_err_t tgui_demo_init(void);
-    tgui_demo_init();
-
-	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data);
-	vsf_tgui_bind(&(usrapp.ui.disp), &usrapp.ui.color);
-    
     while(1) {
-        refresh_my_stopwatch();
+        P0_bit.P06 = 0;
+        delay_LED(1000);
+        P0_bit.P06 = 1;
+        delay_LED(1000);
     }
-#endif
+
     return 0;
 }
 
