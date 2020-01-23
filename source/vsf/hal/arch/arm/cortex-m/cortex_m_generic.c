@@ -110,7 +110,7 @@ void vsf_systimer_low_level_int_enable(void)
 
 void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
 {
-    vsf_systick_set_reload(tick_cnt);
+    vsf_systick_set_reload((uint32_t)tick_cnt);
 }
 
 ROOT ISR(SysTick_Handler)
@@ -128,7 +128,7 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
             DISABLE_SYSTICK             |
             SYSTICK_SOURCE_SYSCLK       |
             ENABLE_SYSTICK_INTERRUPT,
-            ticks
+            (uint32_t)ticks
         );
 
         NVIC_ClearPendingIRQ(SysTick_IRQn);
@@ -154,6 +154,11 @@ ROOT ISR(PendSV_Handler)
     }
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#pragma diag_suppress=pe111
+#endif
+
 /*! \brief initialise a software interrupt
  *! \param idx the index of the software interrupt
  *! \return initialization result in vsf_err_t
@@ -177,6 +182,10 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
     return VSF_ERR_INVALID_PARAMETER;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#pragma diag_warning=pe111
+#endif
 
 
 /*! \brief trigger a software interrupt
@@ -221,7 +230,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
             __basepri = __get_BASEPRI();
         }
     
-    return origlevel;
+    return (vsf_arch_prio_t)origlevel;
     
 #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
     // TODO: MUST pass multi-priority test case
@@ -278,6 +287,7 @@ void vsf_enable_interrupt(void)
 
 void vsf_arch_sleep(uint32_t mode)
 {
+    UNUSED_PARAM(mode);
     ENABLE_GLOBAL_INTERRUPT();
     __WFI();
 }

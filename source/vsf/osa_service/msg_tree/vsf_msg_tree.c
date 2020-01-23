@@ -133,6 +133,12 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
             break;
         }
 
+        if (!__msgt_check_status(   ptObj, 
+                                    ptRoot,
+                                    VSF_MSGT_NODE_VALID)) {
+            break;
+        }
+
         //! shoot the root item
         if (__msgt_shoot(ptObj, ptRoot, pBulletInfo)) {
             ptItem = (vsf_msgt_node_t *)ptRoot;
@@ -414,6 +420,15 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
     return fsm_rt_on_going;
 }
 
+const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
+                                                            vsf_msgt_t* ptObj)
+{
+    class_internal(ptObj, ptThis, vsf_msgt_t);
+    VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
+    
+    return this.BW.tMSGHandling.ptNode;
+}
+
 /*----------------------------------------------------------------------------*
  * Forward Message Propagation using DFS algorithm                            *
  *----------------------------------------------------------------------------*/
@@ -475,7 +490,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
                     (const vsf_msgt_container_t *)this.FWDFS.tMSGHandling.ptNode;
 
                 do {
-                    if (!ptItem->tAttribute._.bIsContainer) {
+                    if (!ptItem->use_as__vsf_msgt_node_t.tAttribute._.bIsContainer) {
                         break;
                     } else if (NULL == ptItem->ptNode) {
                         //! this is an empty container

@@ -73,7 +73,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>1</tvExp>
+        <tvExp>0</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -445,7 +445,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\vsf\kernel\vsf_kernel_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../../vsf/kernel/vsf_kernel_bsp.c\192</Expression>
         </Bp>
@@ -461,7 +461,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\example\usrapp\template\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\116</Expression>
         </Bp>
@@ -477,7 +477,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\example\usrapp\template\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\93</Expression>
         </Bp>
@@ -493,7 +493,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\example\usrapp\template\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\84</Expression>
         </Bp>
@@ -509,7 +509,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\vsf\kernel\vsf_kernel_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -1461,7 +1461,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\vsf\hal\driver\arm\mps2\common\__common.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\vsf\hal\driver\arm\mps2\common\__common.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\demo\../../../vsf/hal/driver/arm/mps2/common/__common.c\127</Expression>
         </Bp>
@@ -1767,7 +1767,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</Filename>
+          <Filename>C:\Work\SVN\projects\MCU\vsf\vsf\source\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -2612,7 +2612,7 @@
 
   <Group>
     <GroupName>vsf/utilities</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2703,24 +2703,24 @@
     <File>
       <GroupNumber>8</GroupNumber>
       <FileNumber>61</FileNumber>
-      <FileType>4</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</PathWithFileName>
-      <FilenameWithoutPath>vsf_stdio_lib.a</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>8</GroupNumber>
-      <FileNumber>62</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\vsf\utilities\language_extension\code_region.c</PathWithFileName>
       <FilenameWithoutPath>code_region.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>62</FileNumber>
+      <FileType>4</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</PathWithFileName>
+      <FilenameWithoutPath>vsf_stdio_lib_armv6_m_abv.a</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -3140,7 +3140,7 @@
 
   <Group>
     <GroupName>component/ui/tgui</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

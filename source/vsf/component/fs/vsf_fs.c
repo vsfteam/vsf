@@ -628,6 +628,7 @@ static void __vk_vfs_create(uintptr_t target, vsf_evt_t evt)
 {
     vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
     vk_vfs_file_t *new_file = __vk_vfs_lookup_imp(dir, dir->ctx.create.name, NULL);
+    vsf_protect_t orig;
 
     if (new_file != NULL) {
         dir->ctx.err = VSF_ERR_ALREADY_EXISTS;
@@ -644,7 +645,7 @@ static void __vk_vfs_create(uintptr_t target, vsf_evt_t evt)
     new_file->attr |= dir->ctx.create.attr;
     new_file->fsop = &vk_vfs_op;
 
-    vsf_protect_t orig = vsf_protect_sched();
+    orig = vsf_protect_sched();
         vsf_dlist_add_to_tail(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, new_file);
     vsf_unprotect_sched(orig);
     // avoid to be freed

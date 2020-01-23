@@ -68,14 +68,14 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __def_vsf_thread(__NAME, __STACK, ...)                               \
             struct thread_cb_##__NAME##_t {                                     \
-                implement(vsf_thread_cb_t);                                     \
+                implement(vsf_thread_cb_t)                                      \
                 __VA_ARGS__                                                     \
                 uint32_t canary;                                                \
                 uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__STACK)+7)/8];\
             };                                                                  \
             struct __NAME {                                                     \
                 implement(vsf_thread_t)                                         \
-                implement_ex(thread_cb_##__NAME##_t, param);                    \
+                implement_ex(thread_cb_##__NAME##_t, param)                     \
             }ALIGN(8);                                                          \
             extern void vsf_thread_##__NAME##_start(struct __NAME *task,        \
                                                     vsf_prio_t priority);       \
@@ -125,12 +125,12 @@
 
 #   define __def_vsf_thread_ex(__NAME, ...)                                     \
             struct thread_cb_##__NAME##_t {                                     \
-                implement(vsf_thread_cb_t);                                     \
+                implement(vsf_thread_cb_t)                                      \
                 __VA_ARGS__                                                     \
             };                                                                  \
             struct __NAME {                                                     \
                 implement(vsf_thread_t)                                         \
-                implement_ex(thread_cb_##__NAME##_t, param);                    \
+                implement_ex(thread_cb_##__NAME##_t, param)                     \
             };                                                                  \
             extern void vsf_thread_##__NAME##_start( struct __NAME *task,       \
                                                 vsf_prio_t priority,            \
@@ -333,9 +333,9 @@ typedef void vsf_thread_entry_t(vsf_thread_cb_t *thread);
 def_class( vsf_thread_t, 
     which(
     #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-        implement(vsf_teda_t);
+        implement(vsf_teda_t)
     #   else
-        implement(vsf_eda_t);
+        implement(vsf_eda_t)
     #   endif
     )
 )

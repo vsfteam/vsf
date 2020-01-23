@@ -140,7 +140,7 @@ void ui_demo_start(void)
     disp_drv.buffer = &ui_demo.ui.disp_buf;
     ui_demo.disp.uvc = usbd_demo_get_uvc();
     disp = lv_disp_drv_register(&disp_drv);
-    vsf_lvgl_bind(&ui_demo.disp.use_as__vk_disp_t, &disp->driver);
+    vsf_lvgl_disp_bind(&ui_demo.disp.use_as__vk_disp_t, &disp->driver);
 
     lvgl_create_demo();
     while (1) {

@@ -150,7 +150,7 @@ static NO_INIT user_grouped_evts_t __user_grouped_evts;
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 
-static implement_vsf_task(timer_example_t)
+implement_vsf_task(timer_example_t)
 {
     vsf_task_begin();
     
@@ -223,7 +223,7 @@ implement_vsf_thread(user_task_t)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
 
-static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
+implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
 {
     vsf_pt_begin();
     
@@ -242,7 +242,7 @@ static implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
 
 
 
-static implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
+implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
 {
     vsf_pt_begin();
 

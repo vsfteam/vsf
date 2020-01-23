@@ -23,7 +23,7 @@ struct _tk_thread_t {
   bool_t running;
 #endif
   const char* name;
-  uint32_t priority;
+  uint32_t thread_priority;
   tk_mutex_t* mutex;
 };
 
@@ -50,7 +50,7 @@ ret_t tk_thread_set_stack_size(tk_thread_t* thread, uint32_t stack_size) {
 ret_t tk_thread_set_priority(tk_thread_t* thread, uint32_t priority) {
   return_value_if_fail(thread != NULL, RET_BAD_PARAMS);
 
-  thread->priority = priority;
+  thread->thread_priority = priority;
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
   if (thread->running) {
     __vsf_eda_set_priority(&thread->use_as__vsf_eda_t, (vsf_prio_t)priority);
@@ -109,12 +109,12 @@ ret_t tk_thread_start(tk_thread_t* thread) {
   thread->cb.entry = tk_thread_entry;
   thread->cb.stack = TKMEM_ALLOC(thread->cb.stack_size);
   return_value_if_fail(thread->cb.stack != NULL, RET_OOM);
-  vsf_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->priority);
+  vsf_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->thread_priority);
 #else
   thread->entry = tk_thread_entry;
   thread->stack = TKMEM_ALLOC(thread->stack_size);
   return_value_if_fail(thread->stack != NULL, RET_OOM);
-  vsf_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->priority);
+  vsf_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->thread_priority);
 #endif
 
   return RET_OK;

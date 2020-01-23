@@ -10,7 +10,7 @@
       <TargetName>demo_armv7-m</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6140000::V6.14.0.2 (dev drop 2)::..\..\Program Files\ARMCompiler6.14Internal</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -327,7 +327,7 @@
             <uC99>1</uC99>
             <uGnu>1</uGnu>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
+            <v6Lang>6</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>0</vShortEn>
             <vShortWch>0</vShortWch>
@@ -335,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls> -fms-extensions  -Wno-missing-noreturn -Wno-comment -Wno-implicit-int-conversion -Wno-undef -Wno-extra-semi-stmt -Wno-padded -Wno-main-return-type -Wno-enum-conversion -Wno-empty-body -fomit-frame-pointer -Wno-initializer-overrides -Wno-microsoft-anon-tag -Wno-nonportable-include-path -Wno-tautological-constant-out-of-range-compare</MiscControls>
+              <MiscControls> -fms-extensions </MiscControls>
               <Define>_MSC_VER __ARM__ __MPS2__ __OOC_DEBUG__</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
@@ -1151,33 +1151,14 @@
               <FilePath>..\..\..\vsf\utilities\compiler\arm\retarget_io.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>code_region.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -3503,11 +3484,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
-            </File>
-            <File>
               <FileName>code_region.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
@@ -3562,6 +3538,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -4360,7 +4341,7 @@
       <TargetName>demo_armv6-m</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6140000::V6.14.0.2 (dev drop 2)::..\..\Program Files\ARMCompiler6.14Internal</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -5552,14 +5533,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
-            </File>
-            <File>
               <FileName>code_region.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -7750,11 +7731,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
-            </File>
-            <File>
               <FileName>code_region.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
@@ -7809,6 +7785,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -8607,7 +8588,7 @@
       <TargetName>vsf_stdio_lib</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6130000::V6.13.0.1 (dev drop 1) for Armv8.1-M and MVE::..\..\Program Files\ARMCompiler6.13DevdropforArmv8.1-MandMVE</pCCUsed>
+      <pCCUsed>6140000::V6.14.0.2 (dev drop 2)::..\..\Program Files\ARMCompiler6.14Internal</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -8646,7 +8627,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\lib\</OutputDirectory>
-          <OutputName>vsf_stdio_lib</OutputName>
+          <OutputName>vsf_stdio_lib_armv6_m_abv</OutputName>
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -9900,9 +9881,9 @@
               <FilePath>..\..\..\vsf\utilities\compiler\arm\retarget_io.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
+              <FileName>code_region.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -9920,13 +9901,45 @@
                   <IncludeLibraryModules></IncludeLibraryModules>
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
-                <FileArmAds/>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
               </FileOption>
             </File>
             <File>
-              <FileName>code_region.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -11246,8 +11259,8 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
-            <uGnu>0</uGnu>
+            <uC99>1</uC99>
+            <uGnu>1</uGnu>
             <useXO>0</useXO>
             <v6Lang>4</v6Lang>
             <v6LangP>3</v6LangP>
@@ -12173,11 +12186,6 @@
               <FileName>retarget_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\retarget_io.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -12195,13 +12203,50 @@
                   <IncludeLibraryModules></IncludeLibraryModules>
                   <ComprImg>1</ComprImg>
                 </CommonProperty>
-                <FileArmAds/>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
               </FileOption>
             </File>
             <File>
               <FileName>code_region.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>
@@ -12466,6 +12511,75 @@
         </Group>
         <Group>
           <GroupName>component/ui/tgui</GroupName>
+          <GroupOption>
+            <CommonProperty>
+              <UseCPPCompiler>0</UseCPPCompiler>
+              <RVCTCodeConst>0</RVCTCodeConst>
+              <RVCTZI>0</RVCTZI>
+              <RVCTOtherData>0</RVCTOtherData>
+              <ModuleSelection>0</ModuleSelection>
+              <IncludeInBuild>0</IncludeInBuild>
+              <AlwaysBuild>2</AlwaysBuild>
+              <GenerateAssemblyFile>2</GenerateAssemblyFile>
+              <AssembleAssemblyFile>2</AssembleAssemblyFile>
+              <PublicsOnly>2</PublicsOnly>
+              <StopOnExitCode>11</StopOnExitCode>
+              <CustomArgument></CustomArgument>
+              <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>1</ComprImg>
+            </CommonProperty>
+            <GroupArmAds>
+              <Cads>
+                <interw>2</interw>
+                <Optim>0</Optim>
+                <oTime>2</oTime>
+                <SplitLS>2</SplitLS>
+                <OneElfS>2</OneElfS>
+                <Strict>2</Strict>
+                <EnumInt>2</EnumInt>
+                <PlainCh>2</PlainCh>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <wLevel>0</wLevel>
+                <uThumb>2</uThumb>
+                <uSurpInc>2</uSurpInc>
+                <uC99>2</uC99>
+                <uGnu>2</uGnu>
+                <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>2</vShortEn>
+                <vShortWch>2</vShortWch>
+                <v6Lto>2</v6Lto>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Cads>
+              <Aads>
+                <interw>2</interw>
+                <Ropi>2</Ropi>
+                <Rwpi>2</Rwpi>
+                <thumb>2</thumb>
+                <SplitLS>2</SplitLS>
+                <SwStkChk>2</SwStkChk>
+                <NoWarn>2</NoWarn>
+                <uSurpInc>2</uSurpInc>
+                <useXO>2</useXO>
+                <uClangAs>2</uClangAs>
+                <VariousControls>
+                  <MiscControls></MiscControls>
+                  <Define></Define>
+                  <Undefine></Undefine>
+                  <IncludePath></IncludePath>
+                </VariousControls>
+              </Aads>
+            </GroupArmAds>
+          </GroupOption>
           <Files>
             <File>
               <FileName>vsf_tgui.c</FileName>
@@ -13916,33 +14030,14 @@
               </FileOption>
             </File>
             <File>
-              <FileName>vsf_stdio_lib.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>code_region.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_stdio_lib_armv6_m_abv.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
           </Files>
         </Group>

@@ -22,6 +22,11 @@
 
 #if VSF_USE_KERNEL == ENABLED && defined(__EDA_GADGET__)
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -155,14 +160,14 @@ SECTION(".text.vsf.kernel.vsf_callback_timer_add_ms")
 vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
 {
     vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
-    return vsf_callback_timer_add(timer, tick);
+    return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
 }
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_add_us")
 vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t us)
 {
     vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
-    return vsf_callback_timer_add(timer, tick);
+    return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
 }
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
@@ -186,9 +191,9 @@ SECTION(".text.vsf.kernel.vsf_timer_get_duration")
 uint_fast32_t vsf_timer_get_duration(vsf_timer_tick_t from_time, vsf_timer_tick_t to_time)
 {
     if (to_time >= from_time) {
-        return to_time - from_time;
+        return (uint_fast32_t)(to_time - from_time);
     } else {
-        return to_time + 0xFFFFFFFF - from_time;
+        return (uint_fast32_t)(to_time + 0xFFFFFFFF - from_time);
     }
 }
 
@@ -229,25 +234,40 @@ vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, uint_fast32_t tick)
     return err;
 }
 
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 vsf_err_t vsf_teda_set_timer(uint_fast32_t tick)
 {
     return vsf_teda_set_timer_ex((vsf_teda_t *)vsf_eda_get_cur(), tick);
 }
 
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
+
+
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
 vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
 {
     vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
-    return vsf_teda_set_timer(tick);
+    return vsf_teda_set_timer((uint_fast32_t)tick);
 }
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_us")
 vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
 {
     vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
-    return vsf_teda_set_timer(tick);
+    return vsf_teda_set_timer((uint_fast32_t)tick);
 }
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
 
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis)
@@ -266,8 +286,15 @@ vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis)
     return VSF_ERR_NONE;
 }
 
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
 #endif
 
+#endif
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 #endif

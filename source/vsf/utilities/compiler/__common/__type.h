@@ -144,7 +144,7 @@ typedef volatile uint8_t     reg8_t;
 typedef volatile uint16_t    reg16_t;
 typedef volatile uint32_t    reg32_t;
 
-#if     __IS_COMPILER_IAR__                                                     \
+#if (defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__)                       \
     ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
 
 #undef ____RESERVED

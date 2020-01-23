@@ -242,7 +242,7 @@
               <MiscControls>-fms-extensions -ffunction-sections -fdata-sections --specs=nosys.specs</MiscControls>
               <Define>_MSC_VER __ARM__ __MPS2__</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\vsf;..\..\usrapp\template;C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\Device\ARM\</IncludePath>
+              <IncludePath>..\..\..\vsf;..\..\usrapp\template; ..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
             </VariousControls>
           </Carm>
           <Aarm>
@@ -258,7 +258,7 @@
           <LDarm>
             <umfTarg>1</umfTarg>
             <enaGarb>0</enaGarb>
-            <noStart>1</noStart>
+            <noStart>0</noStart>
             <noStLib>0</noStLib>
             <uMathLib>1</uMathLib>
             <TextAddressRange></TextAddressRange>
@@ -267,7 +267,7 @@
             <IncludeLibs></IncludeLibs>
             <IncludeDir></IncludeDir>
             <Misc>--specs=nosys.specs -Wl,--gc-sections</Misc>
-            <ScatterFile>.\gcc\gcc.ld</ScatterFile>
+            <ScatterFile>.\gcc\gcc_arm.ld</ScatterFile>
           </LDarm>
         </TargetArm>
       </TargetOption>
@@ -286,35 +286,6 @@
               <FilePath>..\..\usrapp\template\user_retarget.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_kernel_armv6m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv6m_full_size.a</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArm/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>vsf_kernel_armv7m_full_size.a</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\iar\kernel_lib\vsf_kernel_armv7m_full_size.a</FilePath>
-            </File>
-            <File>
               <FileName>class_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\ooc_demo\class_demo.c</FilePath>
@@ -330,11 +301,6 @@
           <GroupName>vsf/hal/arch</GroupName>
           <Files>
             <File>
-              <FileName>vsf_arch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\hal\arch\vsf_arch.c</FilePath>
-            </File>
-            <File>
               <FileName>cortex_m_generic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</FilePath>
@@ -348,6 +314,11 @@
               <FileName>systick_internal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick_internal.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_arch_abstraction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -369,26 +340,227 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\vsf\kernel\vsf_kernel_bsp.c</FilePath>
             </File>
+            <File>
+              <FileName>vsf_eda.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_eda.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_eda_slist_queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_eda_slist_queue.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_eda_slist_queue.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_evtq.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_evtq.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_evtq_array.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_evtq_array.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_evtq_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_evtq_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_kernel.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_kernel.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_kernel_cfg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_kernel_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_kernel_common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_kernel_common.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_os.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_os.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_os.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_os.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_timq.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_timq.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_timq_dlist.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\vsf_timq_dlist.h</FilePath>
+            </File>
+            <File>
+              <FileName>__vsf_task_common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\__vsf_task_common.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_fsm.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_fsm.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_pt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_pt.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_thread.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\task\vsf_thread.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_shell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\shell\vsf_shell.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_shell.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\shell\vsf_shell.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_simple.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\shell\simple\vsf_simple.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_simple_bmevt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_simple_bmevt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_simple_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>startup</GroupName>
           <Files>
             <File>
-              <FileName>startup_ARMCM7.S</FileName>
-              <FileType>2</FileType>
-              <FilePath>.\gcc\startup_ARMCM7.S</FilePath>
+              <FileName>startup_ARMCM7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\startup_ARMCM7.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>::Board Support</GroupName>
+          <GroupName>utilities</GroupName>
+          <Files>
+            <File>
+              <FileName>code_region.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\code_region.c</FilePath>
+            </File>
+            <File>
+              <FileName>simple_sprintf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\simple_sprintf.c</FilePath>
+            </File>
+            <File>
+              <FileName>simple_sscanf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\simple_sscanf.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_bitmap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\template\vsf_bitmap.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\template\vsf_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\template\vsf_queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>retarget_io.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\retarget_io.c</FilePath>
+            </File>
+            <File>
+              <FileName>signal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\compiler\arm\signal.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
-          <GroupName>::CMSIS</GroupName>
-        </Group>
-        <Group>
-          <GroupName>::Device</GroupName>
+          <GroupName>service</GroupName>
+          <Files>
+            <File>
+              <FileName>vsf_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\service\vsf_service.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_pool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\service\pool\vsf_pool.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_pool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\service\pool\vsf_pool.h</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_heap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\service\heap\vsf_heap.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_heap.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\service\heap\vsf_heap.h</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
@@ -396,34 +568,13 @@
 
   <RTE>
     <apis/>
-    <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.1.2" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.4.0"/>
-        <targetInfos>
-          <targetInfo name="gcc_template"/>
-        </targetInfos>
-      </component>
-      <component Cbundle="V2M-MPS2" Cclass="Board Support" Cgroup="Common" Cvendor="Keil" Cversion="2.0.0" condition="CMSDK CMSIS">
-        <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
-        <targetInfos>
-          <targetInfo name="gcc_template"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM7 CMSIS">
-        <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
-        <targetInfos>
-          <targetInfo name="gcc_template"/>
-        </targetInfos>
-      </component>
-    </components>
+    <components/>
     <files>
       <file attr="config" category="header" name="CMSIS\Config\RTE_Device.h" version="0.0.0">
-        <instance index="0">RTE\Device\CMSDK_CM7_SP\RTE_Device.h</instance>
+        <instance index="0" removed="1">RTE\Device\CMSDK_CM7_SP\RTE_Device.h</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM7 CMSIS"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
-        <targetInfos>
-          <targetInfo name="gcc_template"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="source" condition="ARMCC" name="Device\CMSDK_CM7\Source\ARM\startup_CMSDK_CM7.s" version="0.0.0">
         <instance index="0" removed="1">RTE\Device\CMSDK_CM7_SP\startup_CMSDK_CM7.s</instance>
@@ -432,12 +583,10 @@
         <targetInfos/>
       </file>
       <file attr="config" category="source" name="Device\CMSDK_CM7\Source\system_CMSDK_CM7.c" version="0.0.0">
-        <instance index="0">RTE\Device\CMSDK_CM7_SP\system_CMSDK_CM7.c</instance>
+        <instance index="0" removed="1">RTE\Device\CMSDK_CM7_SP\system_CMSDK_CM7.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.0.0" condition="CMSDK_CM7 CMSIS"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.7.0"/>
-        <targetInfos>
-          <targetInfo name="gcc_template"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
     </files>
   </RTE>

@@ -114,7 +114,7 @@ vsf_err_t __vk_malfs_alloc_cache(__vk_malfs_info_t *info, __vk_malfs_cache_t *ca
     // TODO: add lock
     cache->ctx.block_addr = block_addr;
     cache->ctx.result = NULL;
-    return __vsf_call_eda((uintptr_t)__vk_malfs_alloc_cache_imp, cache);
+    return __vsf_call_eda((uintptr_t)__vk_malfs_alloc_cache_imp, (uintptr_t)cache);
 }
 
 static void __vk_malfs_read_imp(uintptr_t target, vsf_evt_t evt)
@@ -136,7 +136,7 @@ static void __vk_malfs_read_imp(uintptr_t target, vsf_evt_t evt)
         }
         vsf_eda_frame_user_value_set(STATE_COMMIT_READ);
     case VSF_EVT_RETURN: {
-            uint_fast8_t state;
+            uint8_t state;
             vsf_eda_frame_user_value_get(&state);
             switch (state) {
             case STATE_GET_CACHE:
@@ -164,7 +164,7 @@ vsf_err_t __vk_malfs_read(__vk_malfs_info_t *info, uint_fast64_t block_addr, uin
     info->ctx_io.block_addr = block_addr;
     info->ctx_io.block_num = block_num;
     info->ctx_io.buff = buff;
-    return __vsf_call_eda((uintptr_t)__vk_malfs_read_imp, info);
+    return __vsf_call_eda((uintptr_t)__vk_malfs_read_imp, (uintptr_t)info);
 }
 
 vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, uint_fast32_t block_num, uint8_t *buff)

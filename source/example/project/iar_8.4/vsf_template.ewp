@@ -262,7 +262,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pe064</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -1317,7 +1317,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -2373,7 +2373,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -3429,7 +3429,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -4483,7 +4483,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -5539,7 +5539,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -6596,7 +6596,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pa089,Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -7663,7 +7663,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -8723,7 +8723,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -9781,7 +9781,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pe064</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -10836,7 +10836,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -11893,7 +11893,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -12958,7 +12958,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe177,Pe068,Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -14013,7 +14013,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -14896,7 +14896,7 @@
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
-                    <state>NUC505 series	Nuvoton NUC505 series</state>
+                    <state>Default	None</state>
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
@@ -14952,21 +14952,21 @@
                 <option>
                     <name>CoreVariant</name>
                     <version>27</version>
-                    <state>39</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GFPUDeviceSlave</name>
-                    <state>NUC505 series	Nuvoton NUC505 series</state>
+                    <state>Default	None</state>
                 </option>
                 <option>
                     <name>FPU2</name>
                     <version>0</version>
-                    <state>4</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>NrRegs</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>NEON</name>
@@ -14975,7 +14975,7 @@
                 <option>
                     <name>GFPUCoreSlave2</name>
                     <version>27</version>
-                    <state>39</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGCMSISPackSelectDevice</name>
@@ -15016,7 +15016,7 @@
                 </option>
                 <option>
                     <name>DSPExtension</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>TrustZone</name>
@@ -15079,7 +15079,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -16136,7 +16136,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pa089,Pe177,Pe068,Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -17201,7 +17201,7 @@
                 </option>
                 <option>
                     <name>CCDiagSuppress</name>
-                    <state>Pa089,Pe186,Pe111,pe301,pe128,pe381,Pe188,Pe1866,Pa082,Pe111</state>
+                    <state></state>
                 </option>
                 <option>
                     <name>CCDiagRemark</name>
@@ -19826,6 +19826,15 @@
                         </file>
                     </group>
                     <group>
+                        <name>malfs</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.h</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>memfs</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c</name>
@@ -19946,6 +19955,15 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>mim_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.h</name>
                         </file>
                     </group>
                 </group>
@@ -21733,8 +21751,18 @@
                         <configuration>kernel_lib_armv7m_full_size</configuration>
                         <configuration>kernel_lib_armv6m_full_size</configuration>
                         <configuration>usbh_m484</configuration>
+                        <configuration>WinnerMicro_W600</configuration>
+                        <configuration>aio_m484</configuration>
                         <configuration>kernel_lib_armv7em_full_size</configuration>
+                        <configuration>nes_simulator</configuration>
+                        <configuration>arm_mps2_m0</configuration>
+                        <configuration>kernel_test</configuration>
+                        <configuration>demo_bbb</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
+                        <configuration>vsfvm</configuration>
                         <configuration>usbh_nuc505</configuration>
+                        <configuration>usbd_demo_msc</configuration>
+                        <configuration>linux_m484</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -21750,22 +21778,7 @@
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\type.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib.a</name>
-                    <excluded>
-                        <configuration>kernel_lib_armv7m_full_size</configuration>
-                        <configuration>kernel_lib_armv6m_full_size</configuration>
-                        <configuration>WinnerMicro_W600</configuration>
-                        <configuration>aio_m484</configuration>
-                        <configuration>kernel_lib_armv7em_full_size</configuration>
-                        <configuration>nes_simulator</configuration>
-                        <configuration>arm_mps2_m0</configuration>
-                        <configuration>kernel_test</configuration>
-                        <configuration>demo_bbb</configuration>
-                        <configuration>usbd_demo_simplest</configuration>
-                        <configuration>vsfvm</configuration>
-                        <configuration>usbd_demo_msc</configuration>
-                        <configuration>linux_m484</configuration>
-                    </excluded>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</name>
                 </file>
             </group>
             <group>

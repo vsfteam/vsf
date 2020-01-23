@@ -44,6 +44,11 @@
 
 #define VSF_USE_USB_HOST                                ENABLED
 #   define VSF_USE_USB_HOST_LIBUSB                      ENABLED
+#   define VSF_USE_USB_HOST_HID                         ENABLED
+#   define VSF_USE_USB_HOST_DS4                         ENABLED
+#   define VSF_USE_USB_HOST_NSPRO                       ENABLED
+#   define VSF_USE_USB_HOST_XB360                       ENABLED
+#   define VSF_USE_USB_HOST_XB1                         ENABLED
 
 #if APP_CFG_USE_BTSTACK_DEMO == ENABLED
 #   define VSF_USE_USB_HOST_BTHCI                       ENABLED
@@ -57,7 +62,19 @@
 #if APP_CFG_USE_LVGL_DEMO == ENABLED
 #   define VSF_USE_UI_LVGL                              ENABLED
 #endif
+
+// UI runs in vsf_prio_0, other modules runs above vsf_prio_0
+#if VSF_USE_UI == ENABLED
+#   define VSF_USBH_CFG_EDA_PRIORITY                    vsf_prio_1
+#   define APP_CFG_USBH_HW_PRIO                         vsf_arch_prio_1
+#endif
+
 #define VSF_USE_INPUT                                   ENABLED
+#   define VSF_USE_INPUT_HID                            ENABLED
+#   define VSF_USE_INPUT_DS4                            ENABLED
+#   define VSF_USE_INPUT_NSPRO                          ENABLED
+#   define VSF_USE_INPUT_XB360                          ENABLED
+#   define VSF_USE_INPUT_XB1                            ENABLED
 
 // VSF_USE_USB_DEVICE will be enabled if target chip supports USBD
 //#define VSF_USE_USB_DEVICE                              ENABLED
@@ -129,13 +146,23 @@
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #   define VSF_USE_USB_HOST_HUB                         DISABLED
 #   define VSF_USE_USB_HOST_HCD_WINUSB                  ENABLED
-#       define VSF_WINUSB_HCD_CFG_DEV_NUM               3
+#       define VSF_WINUSB_HCD_CFG_DEV_NUM               8
 #       define VSF_WINUSB_HCD_DEV0_VID                  0x0A12      // CSR8510 bthci
 #       define VSF_WINUSB_HCD_DEV0_PID                  0x0001
 #       define VSF_WINUSB_HCD_DEV1_VID                  0x0A5C      // BCM20702 bthci
 #       define VSF_WINUSB_HCD_DEV1_PID                  0x21E8
 #       define VSF_WINUSB_HCD_DEV2_VID                  0x04F2      // UVC
 #       define VSF_WINUSB_HCD_DEV2_PID                  0xB130
+#       define VSF_WINUSB_HCD_DEV3_VID                  0x054C      // DS4
+#       define VSF_WINUSB_HCD_DEV3_PID                  0x05C4
+#       define VSF_WINUSB_HCD_DEV4_VID                  0x054C      // DS4
+#       define VSF_WINUSB_HCD_DEV4_PID                  0x09CC
+#       define VSF_WINUSB_HCD_DEV5_VID                  0x057E      // NSPRO
+#       define VSF_WINUSB_HCD_DEV5_PID                  0x2009
+#       define VSF_WINUSB_HCD_DEV6_VID                  0x045E      // XB360
+#       define VSF_WINUSB_HCD_DEV6_PID                  0x028E
+#       define VSF_WINUSB_HCD_DEV7_VID                  0x045E      // XB1
+#       define VSF_WINUSB_HCD_DEV7_PID                  0x02EA
 
 #   define VSF_USE_WINFS                                ENABLED
 
@@ -148,7 +175,7 @@
 
 #   define VSF_LINUX_CFG_STACKSIZE                      32768
 #   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
-#   define VSH_ECHO                                     0
+#   define VSH_ECHO                                     1
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *

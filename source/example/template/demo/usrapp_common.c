@@ -36,6 +36,10 @@
 #   endif
 #endif
 
+#ifndef APP_CFG_USBH_HW_PRIO
+#   define APP_CFG_USBH_HW_PRIO                         vsf_arch_prio_0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -47,15 +51,15 @@ const usrapp_common_const_t usrapp_common_const = {
 #       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
         .ohci_param         = {
             .op             = &VSF_USB_HC0_IP,
-            .priority       = vsf_arch_prio_0,
+            .priority       = APP_CFG_USBH_HW_PRIO,
         },
 #       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        .libusb_hcd_param = {
-            .priority = vsf_arch_prio_0,
+        .libusb_hcd_param   = {
+            .priority = APP_CFG_USBH_HW_PRIO,
         },
 #       elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-        .winusb_hcd_param = {
-            .priority = vsf_arch_prio_0,
+        .winusb_hcd_param   = {
+            .priority = APP_CFG_USBH_HW_PRIO,
         },
 #       endif
     },

@@ -63,13 +63,13 @@ WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN
 static vsf_tgui_color_t vk_disp_sdl_get_pixel(vsf_tgui_location_t* ptLocation)
 {
     vsf_tgui_color_t* ptPixMap = s_tDisp->ui_data;
-    return ptPixMap[ptLocation->nY * VSF_TGUI_HOR_MAX + ptLocation->nX];
+    return ptPixMap[ptLocation->iY * VSF_TGUI_HOR_MAX + ptLocation->iX];
 }
 
 static void vk_disp_sdl_set_pixel(vsf_tgui_location_t* ptLocation, vsf_tgui_color_t tColor)
 {
     vsf_tgui_color_t* ptPixMap = s_tDisp->ui_data;
-    ptPixMap[ptLocation->nY * VSF_TGUI_HOR_MAX + ptLocation->nX] = tColor;
+    ptPixMap[ptLocation->iY * VSF_TGUI_HOR_MAX + ptLocation->iX] = tColor;
 }
 
 /********************************************************************************/
@@ -198,28 +198,28 @@ uint8_t vsf_tgui_font_get_char_height(const uint8_t chFontIndex)
 void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize, vsf_tgui_color_t tRectColor)
 {
     //vsf_tgui_color_t* ptPixMap = s_tDisp->ui_data;
-    int16_t iHeight = ptSize->nHeight;
-    int16_t iWidth = ptSize->nWidth;
+    int16_t iHeight = ptSize->iHeight;
+    int16_t iWidth = ptSize->iWidth;
     VSF_TGUI_ASSERT(ptLocation != NULL);
-    VSF_TGUI_ASSERT((0 <= ptLocation->nX) && (ptLocation->nX < VSF_TGUI_HOR_MAX));  // x_start point in screen
-    VSF_TGUI_ASSERT((0 <= ptLocation->nY) && (ptLocation->nY < VSF_TGUI_VER_MAX));  // y_start point in screen
-    VSF_TGUI_ASSERT(0 <= (ptLocation->nX + ptSize->nWidth));                        // x_end   point in screen
+    VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));  // x_start point in screen
+    VSF_TGUI_ASSERT((0 <= ptLocation->iY) && (ptLocation->iY < VSF_TGUI_VER_MAX));  // y_start point in screen
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iX + ptSize->iWidth));                        // x_end   point in screen
     
-    VSF_TGUI_ASSERT(0 <= (ptLocation->nY + ptSize->nHeight));                       // y_end   point in screen
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + ptSize->iHeight));                       // y_end   point in screen
 
     /* only draw visible part */
-    if ((ptLocation->nY + ptSize->nHeight) > VSF_TGUI_VER_MAX) {
-        iHeight = VSF_TGUI_VER_MAX - ptLocation->nY;
+    if ((ptLocation->iY + ptSize->iHeight) > VSF_TGUI_VER_MAX) {
+        iHeight = VSF_TGUI_VER_MAX - ptLocation->iY;
     }
 
-    if ((ptLocation->nX + ptSize->nWidth) > VSF_TGUI_HOR_MAX) {
-        iWidth = VSF_TGUI_HOR_MAX - ptLocation->nX;
+    if ((ptLocation->iX + ptSize->iWidth) > VSF_TGUI_HOR_MAX) {
+        iWidth = VSF_TGUI_HOR_MAX - ptLocation->iX;
     }
 
 
     for (uint16_t i = 0; i < iHeight; i++) {
         for (uint16_t j = 0; j < iWidth; j++) {
-            vsf_tgui_location_t tPixelLocation = { .nX = ptLocation->nX + j, .nY = ptLocation->nY + i };
+            vsf_tgui_location_t tPixelLocation = { .iX = ptLocation->iX + j, .iY = ptLocation->iY + i };
             vsf_tgui_color_t tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
             tPixelColor = vsf_tgui_color_mix(tRectColor, tPixelColor, tRectColor.tChannel.chA);
             vk_disp_sdl_set_pixel(&tPixelLocation, tPixelColor);
@@ -236,23 +236,23 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
     VSF_TGUI_ASSERT(ptTileLocation != NULL);
     VSF_TGUI_ASSERT(ptSize != NULL);
     VSF_TGUI_ASSERT(ptTile != NULL);
-    VSF_TGUI_ASSERT((0 <= ptLocation->nX) && (ptLocation->nX < VSF_TGUI_HOR_MAX));  // x_start point in screen
-    VSF_TGUI_ASSERT((0 <= ptLocation->nY) && (ptLocation->nY < VSF_TGUI_VER_MAX));  // y_start point in screen
-    VSF_TGUI_ASSERT(0 <= (ptLocation->nX + ptSize->nWidth));                        // x_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->nX + ptSize->nWidth) <= VSF_TGUI_HOR_MAX);
-    VSF_TGUI_ASSERT(0 <= (ptLocation->nY + ptSize->nHeight));                       // y_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->nY + ptSize->nHeight) <= VSF_TGUI_VER_MAX);
+    VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));  // x_start point in screen
+    VSF_TGUI_ASSERT((0 <= ptLocation->iY) && (ptLocation->iY < VSF_TGUI_VER_MAX));  // y_start point in screen
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iX + ptSize->iWidth));                        // x_end   point in screen
+    VSF_TGUI_ASSERT((ptLocation->iX + ptSize->iWidth) <= VSF_TGUI_HOR_MAX);
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + ptSize->iHeight));                       // y_end   point in screen
+    VSF_TGUI_ASSERT((ptLocation->iY + ptSize->iHeight) <= VSF_TGUI_VER_MAX);
     VSF_TGUI_ASSERT(vsf_tgui_tile_is_root(ptTile));
 
     vsf_tgui_size_t tTileSize = vsf_tgui_root_tile_get_size(ptTile);
-    VSF_TGUI_ASSERT(ptTileLocation->nX < tTileSize.nWidth);
-    VSF_TGUI_ASSERT(ptTileLocation->nY < tTileSize.nHeight);
+    VSF_TGUI_ASSERT(ptTileLocation->iX < tTileSize.iWidth);
+    VSF_TGUI_ASSERT(ptTileLocation->iY < tTileSize.iHeight);
 
     vsf_tgui_region_t tDisplay;
     tDisplay.tLocation = *ptLocation;
-    tDisplay.tSize.nWidth = min(ptSize->nWidth, tTileSize.nWidth - ptTileLocation->nX);
-    tDisplay.tSize.nHeight = min(ptSize->nHeight, tTileSize.nHeight - ptTileLocation->nY);
-    if (tDisplay.tSize.nHeight <= 0 || tDisplay.tSize.nWidth <= 0) {
+    tDisplay.tSize.iWidth = min(ptSize->iWidth, tTileSize.iWidth - ptTileLocation->iX);
+    tDisplay.tSize.iHeight = min(ptSize->iHeight, tTileSize.iHeight - ptTileLocation->iY);
+    if (tDisplay.tSize.iHeight <= 0 || tDisplay.tSize.iWidth <= 0) {
         return ;
     }
 
@@ -266,12 +266,12 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
     }
     const char* pchPixelmap = vsf_tgui_sdl_tile_get_pixelmap(ptTile);
 
-    for (uint16_t i = 0; i < tDisplay.tSize.nHeight; i++) {
-        uint32_t wOffset = wSize * ((ptTileLocation->nY + i) * tTileSize.nWidth + ptTileLocation->nX);
+    for (uint16_t i = 0; i < tDisplay.tSize.iHeight; i++) {
+        uint32_t wOffset = wSize * ((ptTileLocation->iY + i) * tTileSize.iWidth + ptTileLocation->iX);
         const char* pchData = pchPixelmap + wOffset;
 
-        for (uint16_t j = 0; j < tDisplay.tSize.nWidth; j++) {
-            vsf_tgui_location_t tPixelLocation = { .nX = tDisplay.tLocation.nX + j, .nY = tDisplay.tLocation.nY + i };
+        for (uint16_t j = 0; j < tDisplay.tSize.iWidth; j++) {
+            vsf_tgui_location_t tPixelLocation = { .iX = tDisplay.tLocation.iX + j, .iY = tDisplay.tLocation.iY + i };
             vsf_tgui_color_t tTileColor;
             tTileColor.tChannel.chR = *pchData++;
             tTileColor.tChannel.chG = *pchData++;
@@ -318,8 +318,8 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation,
         VSF_TGUI_ASSERT(wBaseLine >= wTop);
 
         vsf_tgui_location_t tBitmapStart = {
-            .nX = max(0, wLeft),    // todo: support negative advance
-            .nY = wBaseLine - wTop,
+            .iX = max(0, wLeft),    // todo: support negative advance
+            .iY = wBaseLine - wTop,
         };
         vsf_tgui_region_t tUpdateRegion = {
             .tLocation = *ptFontLocation,
@@ -327,21 +327,21 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation,
         };
         vsf_tgui_region_t tBitmapRegion = {
             .tLocation = tBitmapStart,
-            .tSize = {.nWidth = glyph->bitmap.width, .nHeight = glyph->bitmap.rows},
+            .tSize = {.iWidth = glyph->bitmap.width, .iHeight = glyph->bitmap.rows},
         };
         vsf_tgui_region_t tRealBitmapRegion;
         if (vsf_tgui_region_intersect(&tRealBitmapRegion, &tUpdateRegion, &tBitmapRegion)) {
-            uint32_t wXOffset = tRealBitmapRegion.tLocation.nX - tBitmapStart.nX;
-            uint32_t wYOffset = tRealBitmapRegion.tLocation.nY - tBitmapStart.nY;
+            //uint32_t wXOffset = tRealBitmapRegion.tLocation.iX - tBitmapStart.iX;
+            //uint32_t wYOffset = tRealBitmapRegion.tLocation.iY - tBitmapStart.iY;
 
-            for (uint16_t j = 0; j < tRealBitmapRegion.tSize.nHeight; j++) {
-                for (uint16_t i = 0; i < tRealBitmapRegion.tSize.nWidth; i++) {
+            for (uint16_t j = 0; j < tRealBitmapRegion.tSize.iHeight; j++) {
+                for (uint16_t i = 0; i < tRealBitmapRegion.tSize.iWidth; i++) {
                     vsf_tgui_location_t tPixelLocation = { 
-                        .nX = ptLocation->nX + i + tRealBitmapRegion.tLocation.nX - tUpdateRegion.tLocation.nX,
-                        .nY = ptLocation->nY + j + tRealBitmapRegion.tLocation.nY - tUpdateRegion.tLocation.nY,
+                        .iX = ptLocation->iX + i + tRealBitmapRegion.tLocation.iX - tUpdateRegion.tLocation.iX,
+                        .iY = ptLocation->iY + j + tRealBitmapRegion.tLocation.iY - tUpdateRegion.tLocation.iY,
                     };
-                    uint8_t mix = glyph->bitmap.buffer[  (j + tRealBitmapRegion.tLocation.nY - tBitmapRegion.tLocation.nY) * glyph->bitmap.width 
-                                                       + (i + tRealBitmapRegion.tLocation.nX - tBitmapRegion.tLocation.nX)];
+                    uint8_t mix = glyph->bitmap.buffer[  (j + tRealBitmapRegion.tLocation.iY - tBitmapRegion.tLocation.iY) * glyph->bitmap.width 
+                                                       + (i + tRealBitmapRegion.tLocation.iX - tBitmapRegion.tLocation.iX)];
 
                     vsf_tgui_color_t tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
                     tPixelColor = vsf_tgui_color_mix(tCharColor, tPixelColor, mix);

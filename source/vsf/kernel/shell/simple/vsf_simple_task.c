@@ -40,6 +40,12 @@ extern void vsf_eda_polling_state_set(vsf_eda_t *peda, bool state);
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION("text.vsf.kernel.__vsf_delay")
 vsf_evt_t __vsf_delay(uint_fast32_t tick)
 {
@@ -78,6 +84,10 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
     
     return result;
 }
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #endif
 

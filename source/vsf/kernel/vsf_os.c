@@ -193,6 +193,11 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
     return VSF_ERR_FAIL;
 }
 
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-compare"
+#endif
+
 vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
 {
     uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
@@ -223,6 +228,11 @@ vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
     return VSF_ERR_NONE;
 }
 
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#pragma clang diagnostic pop
+#endif
+
+
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 vsf_evt_node_t *__vsf_os_alloc_evt_node(void)
 {
@@ -252,6 +262,9 @@ void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel)
 static void __vsf_code_region_forced_sched_on_enter(void *pobj, void *plocal)
 {
     vsf_sched_lock_status_t *pstate = (vsf_sched_lock_status_t *)plocal;
+    UNUSED_PARAM(pobj);
+    UNUSED_PARAM(plocal);
+    
     VSF_KERNEL_ASSERT(NULL != plocal);
     (*pstate) = vsf_sched_lock();
 }
@@ -259,6 +272,10 @@ static void __vsf_code_region_forced_sched_on_enter(void *pobj, void *plocal)
 static void __vsf_code_region_forced_sched_on_leave(void *pobj,void *plocal)
 {
     vsf_sched_lock_status_t *pstate = (vsf_sched_lock_status_t *)plocal;
+    
+    UNUSED_PARAM(pobj);
+    UNUSED_PARAM(plocal);
+    
     VSF_KERNEL_ASSERT(NULL != plocal);
     vsf_sched_unlock(*pstate);   
 }

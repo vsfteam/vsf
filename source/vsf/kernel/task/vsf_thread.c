@@ -38,11 +38,22 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 /*============================ IMPLEMENTATION ================================*/
 
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION("text.vsf.kernel.vsf_thread_get_cur")
 vsf_thread_t *vsf_thread_get_cur(void)
 {
     return (vsf_thread_t *)vsf_eda_get_cur();
 }
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
+
 
 SECTION("text.vsf.kernel.vsf_thread_ret")
 void vsf_thread_ret(void)
@@ -292,6 +303,11 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 }
 #endif
 
+#if __IS_COMPILER_IAR__
+//! bit mask appears to contain significant bits that do not affect the result 
+#   pragma diag_suppress=pa182
+#endif
+
 SECTION("text.vsf.kernel.vsf_thread")
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 vsf_err_t vsf_thread_start( vsf_thread_t *thread, 
@@ -332,6 +348,11 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
     return vsf_eda_init_ex(&pthis->use_as__vsf_eda_t, &cfg);
 #   endif
 }
+
+#if __IS_COMPILER_IAR__
+//! bit mask appears to contain significant bits that do not affect the result 
+#   pragma diag_warning=pa182
+#endif
 
 SECTION("text.vsf.kernel.__vsf_eda_call_thread_prepare")
 vsf_err_t __vsf_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,

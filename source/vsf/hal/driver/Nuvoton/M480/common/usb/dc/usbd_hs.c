@@ -320,7 +320,9 @@ uint_fast16_t m480_usbd_hs_ep_get_size(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep)
     }
 
     if (idx <= 1) {
-        return reg->CEPBUFEND - reg->CEPBUFST + 1;
+        // make compiler happy
+        uint_fast16_t tmp = reg->CEPBUFEND;
+        return tmp - reg->CEPBUFST + 1;
     } else {
         idx -= 2;
         return M480_USBD_EP_REG(idx, EP[0].EPMPS);

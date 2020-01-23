@@ -47,8 +47,8 @@ static NO_INIT stopwatch_t s_tMyStopwatch;
 
 static void vsf_tgui_region_init_with_size(vsf_tgui_region_t* ptRegion, vsf_tgui_size_t* ptSize)
 {
-    ptRegion->tLocation.nX = 0;
-    ptRegion->tLocation.nY = 0;
+    ptRegion->tLocation.iX = 0;
+    ptRegion->tLocation.iY = 0;
     ptRegion->tSize = *ptSize;
 }
 
@@ -139,8 +139,8 @@ vsf_err_t tgui_demo_init(void)
 //                                ?   VSF_TGUI_EVT_POINTER_DOWN 
 //                                :   VSF_TGUI_EVT_POINTER_UP,
 //            
-//            .nX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-//            .nY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
+//            .iX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
+//            .iY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
 //        },
 //    };
 //

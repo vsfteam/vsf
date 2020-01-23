@@ -72,7 +72,7 @@ struct xxxxx_cfg_t {
 def_simple_class(xxxxx_t) {
     
     private_member(
-        implement(xxxxx_cfg_t);
+        implement(xxxxx_cfg_t)
         uint32_t other_private_members;
     )
 

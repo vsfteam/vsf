@@ -84,3 +84,5 @@ fp-info-cache
 *.kicad_pcb-bak
 *.sch-bak
 *-cache.lib
+*.exe
+source/example/project/mdk/lib/vsf_stdio_lib_armv6_m_abv.lib

@@ -33,7 +33,7 @@
 
 static const vk_usbh_dev_id_t vk_usbh_ds4_id_table[] = {
     {
-        VSF_USBH_MATCH_VID_PID(0x054C, 0x054C)
+        VSF_USBH_MATCH_VID_PID(0x054C, 0x05C4)
         .match_ifs_class = true,
         .bInterfaceClass = USB_CLASS_HID,
     },

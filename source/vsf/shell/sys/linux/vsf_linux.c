@@ -197,7 +197,7 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
 
             __vsf_linux.sig_pid = process->id.pid;
             if (found_handler && (handler != SIG_DFL)) {
-                if (handler != SIG_IGN) {
+                if (handler != (vsf_linux_sig_handler_t *)SIG_IGN) {
                     siginfo_t siginfo = {
                         .si_signo   = sig,
                         .si_errno   = errno,

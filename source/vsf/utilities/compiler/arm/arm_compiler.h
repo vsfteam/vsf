@@ -81,12 +81,14 @@
 #endif
 //! @}
 
-#if __IS_COMPILER_IAR__
+#if defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__
 #   include <intrinsics.h>
 #endif
 
 #include "./type.h"
 #include "../__common/__compiler.h"
+
+
 
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_ARM_COMPILER_5__
@@ -104,6 +106,16 @@
 #else
   #warning Not supported compiler type
 #endif
+
+/*----------------------------------------------------------------------------*
+ * Warning Mitigation                                                         *
+ *----------------------------------------------------------------------------*/
+ 
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
+#endif
+
+
 
 /*============================ MACROS ========================================*/
 
@@ -238,7 +250,7 @@ typedef __istate_t   vsf_gint_state_t;
 #elif __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
 #   define GET_GLOBAL_INTERRUPT_STATE()         __get_PRIMASK()
 #   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_PRIMASK(__STATE)
-typedef int   vsf_gint_state_t;
+typedef uint32_t   vsf_gint_state_t;
 #elif __IS_COMPILER_GCC__
 #   define GET_GLOBAL_INTERRUPT_STATE()         __get_PRIMASK()
 #   define SET_GLOBAL_INTERRUPT_STATE(__STATE)  __set_PRIMASK(__STATE)
@@ -303,7 +315,68 @@ __attribute__((always_inline)) static inline void ____set_PRIMASK(uint32_t priMa
 #   define __INITIAL_SP                 Image$$ARM_LIB_STACK$$ZI$$Limit
 #endif
 #else   //__IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
-#   error Unsupported compiler detected. Please contact vsf team for support.
+#ifndef __PROGRAM_START
+
+/**
+  \brief   Initializes data and bss sections
+  \details This default implementations initialized all data and additional bss
+           sections relying on .copy.table and .zero.table specified properly
+           in the used linker script.
+  
+ */
+__attribute__((always_inline, __noreturn__)) static inline void __cmsis_start(void)
+{
+  extern void _start(void) __attribute__((__noreturn__));
+  
+  typedef struct {
+    uint32_t const* src;
+    uint32_t* dest;
+    uint32_t  wlen;
+  } __copy_table_t;
+  
+  typedef struct {
+    uint32_t* dest;
+    uint32_t  wlen;
+  } __zero_table_t;
+  
+  extern const __copy_table_t __copy_table_start__;
+  extern const __copy_table_t __copy_table_end__;
+  extern const __zero_table_t __zero_table_start__;
+  extern const __zero_table_t __zero_table_end__;
+
+  for (__copy_table_t const* pTable = &__copy_table_start__; pTable < &__copy_table_end__; ++pTable) {
+    for(uint32_t i=0u; i<pTable->wlen; ++i) {
+      pTable->dest[i] = pTable->src[i];
+    }
+  }
+ 
+  for (__zero_table_t const* pTable = &__zero_table_start__; pTable < &__zero_table_end__; ++pTable) {
+    for(uint32_t i=0u; i<pTable->wlen; ++i) {
+      pTable->dest[i] = 0u;
+    }
+  }
+ 
+  _start();
+}
+  
+#define __PROGRAM_START           __cmsis_start
+#endif
+
+#ifndef __INITIAL_SP
+#define __INITIAL_SP              __StackTop
+#endif
+
+#ifndef __STACK_LIMIT
+#define __STACK_LIMIT             __StackLimit
+#endif
+
+#ifndef __VECTOR_TABLE
+#define __VECTOR_TABLE            __Vectors
+#endif
+
+#ifndef __VECTOR_TABLE_ATTRIBUTE
+#define __VECTOR_TABLE_ATTRIBUTE  __attribute((used, section(".vectors")))
+#endif
 #endif
 
 /*============================ TYPES =========================================*/

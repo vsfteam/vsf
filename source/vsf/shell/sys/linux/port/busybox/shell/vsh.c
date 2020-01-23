@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <ctype.h>
 
 #define VSH_PROMPT              ">>>"
 

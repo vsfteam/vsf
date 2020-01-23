@@ -118,8 +118,19 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
 
 static void __vsf_x86_debug_stream_init(void)
 {
+    DWORD mode;
+
     hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     hIn = GetStdHandle(STD_INPUT_HANDLE);
+
+    GetConsoleMode(hIn, &mode);
+    mode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
+    mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+    SetConsoleMode(hIn, mode);
+
+    GetConsoleMode(hOut, &mode);
+    mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, mode);
 
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
     __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq,

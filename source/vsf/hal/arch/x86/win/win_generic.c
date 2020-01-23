@@ -165,7 +165,7 @@ enum __vsf_arch_trace_color_t {
     VSF_ARCH_TRACE_CALLSTACK_COLOR,
     VSF_ARCH_TRACE_IRQ_COLOR,
     VSF_ARCH_TRACE_SYSTIMER_COLOR,
-    VSF_ARCH_TRACE_STSSTATUS_COLOR,
+    VSF_ARCH_TRACE_STATUS_COLOR,
 };
 #endif
 
@@ -218,7 +218,7 @@ static const char *__vsf_x86_trace_color[] = {
     [VSF_ARCH_TRACE_CALLSTACK_COLOR]    = "\033[1;32m",
     [VSF_ARCH_TRACE_IRQ_COLOR]          = "\033[1;33m",
     [VSF_ARCH_TRACE_SYSTIMER_COLOR]     = "\033[1;35m",
-    [VSF_ARCH_TRACE_STSSTATUS_COLOR]    = "\033[1;36m",
+    [VSF_ARCH_TRACE_STATUS_COLOR]       = "\033[1;36m",
 };
 #endif
 
@@ -570,11 +570,19 @@ static void __vsf_arch_irq_activate(vsf_arch_irq_thread_t *irq_thread)
 
             if (__vsf_arch_can_preempt(irq_thread, false)) {
                 __vsf_arch_preempt(VSF_ARCH_IRQ_PP_NORMAL);
+                if (irq_thread->reply != NULL) {
+                    __vsf_arch_irq_request_send(irq_thread->reply);
+                    irq_thread->reply = NULL;
+                }
                 return;
             }
             if (!force) {
                 break;
             } else {
+                if (irq_thread->reply != NULL) {
+                    __vsf_arch_irq_request_send(irq_thread->reply);
+                    irq_thread->reply = NULL;
+                }
                 __vsf_arch_unlock();
                     VSF_ARCH_YIELD();
                 __vsf_arch_lock();
@@ -813,7 +821,8 @@ static void vsf_arch_swi_thread(void *arg)
     while (1) {
         __vsf_arch_irq_request_pend(&ctx->request);
 
-        __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
+        __vsf_arch_irq_activate(&ctx->use_as__vsf_arch_irq_thread_t);
+        __vsf_arch_irq_request_init(&ctx->request);
 
             if (ctx->handler != NULL) {
                 ctx->handler(ctx->param);
@@ -854,7 +863,26 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
 void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
     if (idx < dimof(__vsf_x86.swi)) {
+        vsf_arch_swi_ctx_t *ctx = &__vsf_x86.swi[idx];
+        vsf_arch_irq_request_t reply;
+        bool is_to_pend;
+
+        __vsf_arch_lock();
+            is_to_pend = (__vsf_x86.cur_thread->priority < ctx->priority);
+            if (is_to_pend) {
+                if (ctx->reply != NULL) {
+                    __vsf_arch_irq_request_send(ctx->reply);
+                }
+
+                __vsf_arch_irq_request_init(&reply);
+                ctx->reply = &reply;
+            }
+        __vsf_arch_unlock();
+
         __vsf_arch_irq_request_send(&__vsf_x86.swi[idx].request);
+        if (is_to_pend) {
+            __vsf_arch_irq_request_pend(&reply);
+        }
         return;
     }
     VSF_HAL_ASSERT(false);

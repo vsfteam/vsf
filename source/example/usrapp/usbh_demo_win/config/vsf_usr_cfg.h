@@ -185,6 +185,8 @@
 #   define VSF_USE_UI_LVGL                              ENABLED
 #   define VSF_USE_DISP_DRV_SDL2                        ENABLED
 
+#define VSF_USE_BTSTACK                                 ENABLED
+
 
 
 

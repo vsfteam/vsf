@@ -181,14 +181,14 @@ uint_fast16_t bswap_16(uint_fast16_t value16)
 WEAK(bswap_32)
 uint_fast32_t bswap_32(uint_fast32_t value32)
 {
-    return ((uint_fast32_t)bswap_16(value32) << 16) | (uint_fast32_t)bswap_16(value32 >> 16);
+    return ((uint_fast32_t)bswap_16((uint_fast16_t)value32) << 16) | (uint_fast32_t)bswap_16((uint_fast16_t)(value32 >> 16));
 }
 
 #ifdef UINT64_MAX
 WEAK(bswap_64)
 uint_fast64_t bswap_64(uint_fast64_t value64)
 {
-    return ((uint_fast64_t)bswap_32(value64) << 32) | (uint_fast64_t)bswap_32(value64 >> 32);
+    return ((uint_fast64_t)bswap_32((uint_fast32_t)value64) << 32) | (uint_fast64_t)bswap_32((uint_fast32_t)(value64 >> 32));
 }
 #endif
 
@@ -356,6 +356,7 @@ int_fast8_t vsf_ffz(uint_fast32_t a)
 WEAK(vsf_drv_usr_swi_trigger)
 void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 {
+    UNUSED_PARAM(idx);
     VSF_HAL_ASSERT(false);
 }
 
@@ -407,6 +408,11 @@ vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx,
                                     vsf_swi_handler_t *handler, 
                                     void *param)
 {
+    UNUSED_PARAM(idx);
+    UNUSED_PARAM(priority);
+    UNUSED_PARAM(handler);
+    UNUSED_PARAM(param);
+    
     VSF_HAL_ASSERT(false);
     return VSF_ERR_FAIL;
 }
@@ -446,6 +452,7 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
 WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 {
+    UNUSED_PARAM(tick);
     VSF_HAL_ASSERT(false);
 }
 #   endif
@@ -500,7 +507,7 @@ vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 WEAK(vsf_systimer_tick_to_us)
 uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
 {
-    return tick * 1000000ul / __systimer.tick_freq;
+    return (uint_fast32_t)(tick * 1000000ul / __systimer.tick_freq);
 }
 
 WEAK(vsf_systimer_tick_to_ms)

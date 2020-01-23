@@ -213,7 +213,7 @@ static __vsf_eda_frame_t * vsf_eda_peek(vsf_slist_t *list)
 #endif
 
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t);
+implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
 
 //SECTION(".text.vsf.kernel.eda_frame_pool")
 static __vsf_eda_frame_t * vsf_eda_new_frame(void)
@@ -404,6 +404,7 @@ static vsf_evtq_ctx_t * vsf_evtq_get_cur_ctx(void)
 WEAK(vsf_kernel_err_report)
 void vsf_kernel_err_report(enum vsf_kernel_error_t err)
 {
+    UNUSED_PARAM(err);
     ASSERT(false);
 }
 #endif
@@ -616,6 +617,12 @@ uintptr_t vsf_eda_target_get(void)
     return target;
 }
 
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 SECTION(".text.vsf.kernel.eda_nesting")
 vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func, 
                                 uintptr_t param, 
@@ -684,6 +691,12 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
 #endif
     return VSF_ERR_NONE;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
+
 
 SECTION(".text.vsf.kernel.__vsf_eda_go_to_ex")
 vsf_err_t __vsf_eda_go_to_ex(uintptr_t evthandler, uintptr_t param)
@@ -850,6 +863,11 @@ vsf_err_t vsf_eda_init(vsf_eda_t *pthis, vsf_prio_t priority, bool is_stack_owne
     return vsf_eda_post_evt(pthis, VSF_EVT_INIT);
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 SECTION(".text.vsf.kernel.vsf_eda_init_ex")
 vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
 {
@@ -894,6 +912,17 @@ vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
     return vsf_eda_post_evt(pthis, VSF_EVT_INIT);
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
+
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 /* __vsf_eda_fini() enables you to kill other eda tasks.
    We highly recommend that DO NOT use this api until you 100% sure.
    please make sure that the resources are properly freed when you trying to kill
@@ -913,6 +942,9 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis)
     return VSF_ERR_NONE;
 }
 
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 SECTION(".text.vsf.kernel.eda")
 vsf_err_t vsf_eda_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
@@ -955,6 +987,13 @@ vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg)
 
 
 #if defined(__VSF_KERNEL_TASK_TEDA) || defined(__VSF_KERNEL_TASK_EDA)
+
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -1044,6 +1083,11 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
     }
 }
+
+#if __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
+
 #endif
 
 vsf_err_t __vsf_kernel_start(void)
@@ -1073,5 +1117,6 @@ vsf_err_t __vsf_kernel_start(void)
     return VSF_ERR_NONE;
 #endif
 }
+
 
 #endif

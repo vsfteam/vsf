@@ -24,6 +24,11 @@
 // TODO: use dedicated include
 #include "vsf.h"
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define OHCI_ISO_DELAY          2
@@ -1484,5 +1489,10 @@ const vk_usbh_hcd_drv_t vk_ohci_drv = {
     .relink_urb = ohci_relink_urb,
     .rh_control = ohci_rh_control,
 };
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 #endif

@@ -25,6 +25,11 @@
 #include "vsf_pool.h"  
 #include <stdlib.h>
 
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wvla"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef  this
@@ -118,6 +123,7 @@ WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN
 
 /*============================ IMPLEMENTATION ================================*/
 
+
 /*! \brief initialise target pool
  *! \param ptThis address of the target pool
  *! \param ptCFG configurations
@@ -194,9 +200,17 @@ bool vsf_pool_add_buffer(   vsf_pool_t *ptThis,
 }
 
 #if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 WEAK(vsf_plug_in_on_failed_to_feed_pool_on_heap)
 bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *ptObj)
 {
+    UNUSED_PARAM(ptObj);
+
     /*! \note return true will let the vsf_pool try again. Usually we can use 
      *        this function to print out the heap and pool usage info. You can 
      *        also use this function to allocate more resources to either pool 
@@ -206,12 +220,19 @@ bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *ptObj)
     return false;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 
 #ifndef WEAK_VSF_HEAP_MALLOC_ALIGNED
 WEAK(vsf_heap_malloc_aligned)
 void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
 {
+    UNUSED_PARAM(wSize);
+    UNUSED_PARAM(wAlign);
+
     /*! \note if vsf_heap is enabled in your project, this function will be 
      *        replaced by the function with the same name in vsf_heap. Otherwise
      *        the posix_memalign will be used by default. You can also implement
@@ -347,7 +368,7 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *ptObj,
         }
     #   endif
     #endif
-        ptNode = (__vsf_pool_node_t *)((uint8_t *)ptNode + wItemSize);
+        ptNode = (__vsf_pool_node_t *)((uintptr_t)ptNode + wItemSize);
         wBufferSize -= wItemSize;
     } while (wBufferSize >= wItemSize);
 
@@ -437,5 +458,10 @@ code_region_t *vsf_pool_get_region(vsf_pool_t *ptObj)
     return NULL;
 #endif
 }
+
+
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#pragma clang diagnostic pop
+#endif
 
 #endif

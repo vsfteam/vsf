@@ -50,7 +50,7 @@ static vk_fakefat32_file_t __fakefat32_root[] = {
     {
         .name               = "control.bin",
         .size               = 1,
-        .attr               = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
+        .attr               = (vk_file_attr_t)(VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE),
         .callback.read      = __usrapp_on_file_read,
         .callback.write     = __usrapp_on_file_write,
     },

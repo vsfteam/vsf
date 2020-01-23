@@ -229,6 +229,7 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h" />
@@ -240,6 +241,7 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_style.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_text_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h" />
@@ -333,6 +335,9 @@
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__compiler.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__signal.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__type.h" />
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h" />
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h" />
     <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h" />
@@ -508,6 +513,7 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c" />
@@ -516,6 +522,7 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_style.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_text_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -582,6 +589,7 @@
     <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c" />
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\__common\__retarget_io.c" />
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c" />
@@ -672,10 +680,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__CPU_X86__;__WIN__;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OOC_DEBUG__;__CPU_X86__;__WIN__;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\mvc_demo_win;$(ProjectDir)..\..\usrapp\mvc_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-initializer-overrides -Wno-unused-value -Wno-braced-scalar-init -Wno-microsoft-include -Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions -fmacro-backtrace-limit=0  %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-fms-extensions -fmacro-backtrace-limit=0  -Wno-microsoft-include %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -687,6 +695,12 @@
       <AdditionalLibraryDirectories>$(ProjectDir)\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /B .\vsf_mvc_win\Debug\*.exe .\release\</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>copy exe to source folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

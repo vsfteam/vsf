@@ -75,7 +75,7 @@
 
 #   define vk_usbd_drv_ep_add(__addr, __attr, __size)                          \
         vk_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_add)                    \
-            (&VSF_USBD_CFG_DRV_OBJ, (__addr), (__attr), (__size))
+            (&VSF_USBD_CFG_DRV_OBJ, (__addr), (usb_ep_type_t)(__attr), (__size))
 
 #   define vk_usbd_drv_ep_get_feature(__ep)                                    \
         vk_usbd_drv_func_name(VSF_USBD_CFG_DRV_LV0, ep_get_feature)            \
@@ -168,7 +168,7 @@
 #   define vk_usbd_drv_set_address(__addr)             __drv->SetAddress((__addr))
 #   define vk_usbd_drv_get_setup(__request)            __drv->GetSetup((uint8_t *)(__request))
 #   define vk_usbd_drv_status_stage(__is_in)           __drv->StatusStage((__is_in))
-#   define vk_usbd_drv_ep_add(__addr, __attr, __size)  __drv->Ep.Add((__addr), (__attr), (__size))
+#   define vk_usbd_drv_ep_add(__addr, __attr, __size)  __drv->Ep.Add((__addr), (usb_ep_type_t)(__attr), (__size))
 
 #   define vk_usbd_drv_ep_get_feature(__ep)            __drv->Ep.GetFeature((__ep))
 #   define vk_usbd_drv_ep_get_size(__ep)               __drv->Ep.GetSize((__ep))
@@ -792,7 +792,7 @@ static void vk_usbd_evt_handler(vsf_eda_t *eda, vsf_evt_t evt_eda)
 
     dev = container_of(eda, vk_usbd_dev_t, eda);
     value = evt_eda >> 8;
-    evt = evt_eda & 0xFF;
+    evt = (usb_evt_t)(evt_eda & 0xFF);
 #else
 {
     vk_usbd_dev_t *dev = p;
@@ -1006,7 +1006,7 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
     }
 
     vk_usbd_hw_init_reset(dev, false);
-    vsf_usbd_notify_user(dev, USB_ON_INIT, NULL);
+    vsf_usbd_notify_user(dev, (usb_evt_t)USB_ON_INIT, NULL);
 
 #if VSF_USBD_CFG_USE_EDA == ENABLED
     vsf_eda_set_evthandler(&(dev->eda), vk_usbd_evt_handler);
@@ -1022,7 +1022,7 @@ void vk_usbd_fini(vk_usbd_dev_t *dev)
 
     vk_usbd_drv_disconnect();
     vk_usbd_drv_fini();
-    vsf_usbd_notify_user(dev, USB_ON_FINI, NULL);
+    vsf_usbd_notify_user(dev, (usb_evt_t)USB_ON_FINI, NULL);
 }
 
 // TODO: move stream related code into vk_usbd_stream.c

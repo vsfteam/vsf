@@ -304,6 +304,9 @@
     <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
       <UniqueIdentifier>{6675a22e-6f54-4682-b420-8f298128daca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\utilities\__common">
+      <UniqueIdentifier>{4e7904bd-7ebb-4cb1-b483-428523b16021}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -1305,6 +1308,21 @@
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.h">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_text_list.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__compiler.h">
+      <Filter>vsf\utilities\__common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__signal.h">
+      <Filter>vsf\utilities\__common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__type.h">
+      <Filter>vsf\utilities\__common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -1984,6 +2002,15 @@
     </ClCompile>
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c">
+      <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_text_list.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\compiler\__common\__retarget_io.c">
+      <Filter>vsf\utilities\__common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

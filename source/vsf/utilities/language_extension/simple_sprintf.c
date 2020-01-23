@@ -127,7 +127,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         }
                     } else if (2 == integer_wordsize) {
                         // endian??, not tested
-                        arg.uinteger = va_arg(ap, unsigned int) + ((unsigned long long)va_arg(ap, unsigned int) << 32);
+                        arg.uinteger = va_arg(ap, unsigned int);
+                        arg.uinteger += ((unsigned long long)va_arg(ap, unsigned int) << 32);
                     }
 
                     {

@@ -362,10 +362,15 @@ vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *pthis, vsf_bmpevt_pender_t *pender, 
     return VSF_ERR_NOT_READY;
 }
 
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_poll")
 vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *pthis, vsf_bmpevt_pender_t *pender, vsf_evt_t evt)
 {
-    vsf_sync_reason_t reason;
+    vsf_sync_reason_t reason = VSF_SYNC_FAIL;
     vsf_eda_t *eda;
 
     VSF_KERNEL_ASSERT((pthis != NULL) && (pender != NULL) && (pender->eda_pending == vsf_eda_get_cur()));
@@ -404,6 +409,12 @@ vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *pthis, vsf_bmpevt_pender_t *
     }
     return reason;
 }
+
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
+
+
 #endif      // VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
 
 #endif

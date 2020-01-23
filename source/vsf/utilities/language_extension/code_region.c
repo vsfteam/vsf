@@ -59,6 +59,10 @@ const code_region_t DEFAULT_CODE_REGION_NONE = {
 static void __default_code_region_atom_code_on_enter(void *pobj, void *plocal)
 {
     vsf_gint_state_t *pstate = (vsf_gint_state_t *)plocal;
+    
+    UNUSED_PARAM(pobj);
+    UNUSED_PARAM(plocal);
+    
     ASSERT(NULL != plocal);
     (*pstate) = DISABLE_GLOBAL_INTERRUPT();
 }
@@ -66,16 +70,24 @@ static void __default_code_region_atom_code_on_enter(void *pobj, void *plocal)
 static void __default_code_region_atom_code_on_leave(void *pobj,void *plocal)
 {
     vsf_gint_state_t *pstate = (vsf_gint_state_t *)plocal;
+    
+    UNUSED_PARAM(pobj);
+    UNUSED_PARAM(plocal);
+    
     ASSERT(NULL != plocal);
     SET_GLOBAL_INTERRUPT_STATE(*pstate);
 }
 
 static void __default_code_region_none_on_enter(void *pobj, void *plocal)
 {
+    UNUSED_PARAM(pobj);
+    UNUSED_PARAM(plocal);
 }
 
 static void __default_code_region_none_on_leave(void *pobj,void *plocal)
 {
+    UNUSED_PARAM(pobj);
+    UNUSED_PARAM(plocal);
 }
 
 /* EOF */

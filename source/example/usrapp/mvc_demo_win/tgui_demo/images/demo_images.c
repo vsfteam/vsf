@@ -182,23 +182,23 @@ const vsf_tgui_tile_idx_root_t ic_settings_phone_RGBA  = {
 
 
 vsf_tgui_size_t gIdxRootRGBTileSizes[] = {
-    {.nWidth = 200, .nHeight = 200},
-    {.nWidth = 1280, .nHeight = 718},
-    {.nWidth = 32, .nHeight = 32},
+    {.iWidth = 200, .iHeight = 200},
+    {.iWidth = 1280, .iHeight = 718},
+    {.iWidth = 32, .iHeight = 32},
 
 };
 
 vsf_tgui_size_t gIdxRootRGBATileSizes[] = {
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 24, .nHeight = 24},
-    {.nWidth = 18, .nHeight = 18},
-    {.nWidth = 24, .nHeight = 24},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 24, .iHeight = 24},
+    {.iWidth = 18, .iHeight = 18},
+    {.iWidth = 24, .iHeight = 24},
 
 };
 

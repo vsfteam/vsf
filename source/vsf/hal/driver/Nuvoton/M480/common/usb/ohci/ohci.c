@@ -36,7 +36,7 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
             // TODO: remove later
             uint_fast32_t clk = (384 * 1000 * 1000);
             const pm_periph_asyn_clk_cfg_t cfg = {
-                .clk_src    = 0,
+                .clk_src    = (pm_clk_src_sel_t)0,
                 .div        = clk / (48 * 1000 * 1000) - 1,
             };
             vsf_pm_peripheral_config(hc_cfg->periph_async_clk, &cfg);

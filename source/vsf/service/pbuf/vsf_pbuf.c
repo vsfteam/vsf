@@ -381,7 +381,7 @@ void vsf_pbuf_pool_item_init_event_handler( uintptr_t ptTarget,
                                             uintptr_t pbuf, 
                                             uint_fast32_t nSize)
 {
-    VSF_SERVICE_ASSERT(NULL != ptTarget);
+    VSF_SERVICE_ASSERT(NULL != (void *)ptTarget);
     vsf_pbuf_cfg_t cfg = {
         .pBuffer            = NULL,     //!< use the rest memory of the block as buffer
         .u24BlockSize       = nSize,    //!< total block nSize

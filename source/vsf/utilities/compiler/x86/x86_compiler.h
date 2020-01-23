@@ -52,19 +52,7 @@
 #include "../__common/__compiler.h"
 
 /* -----------------  Start of section using anonymous unions  -------------- */
-#if __IS_COMPILER_LLVM__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-declarations"
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
-#pragma clang diagnostic ignored "-Wmissing-braces"
-#pragma clang diagnostic ignored "-Wconstant-conversion"
-#pragma clang diagnostic ignored "-Wmicrosoft-enum-forward-reference"
-#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
-#elif __IS_COMPILER_GCC__
-#else
-  #warning Not supported compiler type
-#endif
+
 
 /*============================ MACROS ========================================*/
 

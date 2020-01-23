@@ -44,13 +44,13 @@
 #       define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
 
 #       define VSF_TGUI_LOG                             vsf_trace
+#           define VSF_TGUI_SV_CFG_PORT_LOG             DISABLED
+#           define VSF_TGUI_SV_CFG_DRAW_LOG             DISABLED
 
 #   define VSF_USE_MSG_TREE                             ENABLED
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING     ENABLED         /* Enabled for debug */
 #       define VSF_MSGT_NODE_OFFSET_TYPE                int16_t
 
-#define VSF_TGUI_SV_CFG_PORT_LOG                        ENABLED
-#define VSF_TGUI_SV_CFG_DRAW_LOG                        ENABLED
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/

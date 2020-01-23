@@ -34,29 +34,29 @@ const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     .tTopLeft = {
         .tChild = {
             .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tSize = {.nWidth = 12, .nHeight = 12, },
-            .tLocation = {.nX = 0, .nY = 0},
+            .tSize = {.iWidth = 12, .iHeight = 12, },
+            .tLocation = {.iX = 0, .iY = 0},
         },
     },
     .tTopRight = {
         .tChild = {
-            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .tSize = {.iWidth = 12, .iHeight = 12, },
             .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.nX = 200 - 12, .nY = 0},
+            .tLocation = {.iX = 200 - 12, .iY = 0},
         },
     },
     .tBottomLeft = {
         .tChild = {
-            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .tSize = {.iWidth = 12, .iHeight = 12, },
             .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.nX = 0, .nY = 200 - 12},
+            .tLocation = {.iX = 0, .iY = 200 - 12},
         },
     },
     .tBottomRight = {
         .tChild = {
-            .tSize = {.nWidth = 12, .nHeight = 12, },
+            .tSize = {.iWidth = 12, .iHeight = 12, },
             .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.nX = 200 - 12, .nY = 200 - 12},
+            .tLocation = {.iX = 200 - 12, .iY = 200 - 12},
         },
     },
 };
@@ -64,16 +64,16 @@ const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
 const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
     .tLeft = {
         .tChild = {
-            .tSize = {.nWidth = 16, .nHeight = 32, },
+            .tSize = {.iWidth = 16, .iHeight = 32, },
             .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
-            .tLocation = {.nX = 0, .nY = 0},
+            .tLocation = {.iX = 0, .iY = 0},
         },
     },
     .tRight = {
         .tChild = {
-            .tSize = {.nWidth = 16, .nHeight = 32, },
+            .tSize = {.iWidth = 16, .iHeight = 32, },
             .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
-            .tLocation = {.nX = 16, .nY = 0},
+            .tLocation = {.iX = 16, .iY = 0},
         },
     },
 };
@@ -83,25 +83,25 @@ static vsf_tgui_font_t g_tUserFonts[] = {
     [VSF_TGUI_FONT_WQY_MICROHEI_S24] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 24,
-        .pchFontPath = "../../usrapp/mvc_demo_win/tgui_demo/wqy-microhei.ttc",
+        .pchFontPath = "font/wqy-microhei.ttc",
     },
 
     [VSF_TGUI_FONT_WQY_MICROHEI_S20] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 20,
-        .pchFontPath = "../../usrapp/mvc_demo_win/tgui_demo/wqy-microhei.ttc",
+        .pchFontPath = "font/wqy-microhei.ttc",
     },
 
     [VSF_TGUI_FONT_WQY_MICROHEI_S16] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 16,
-        .pchFontPath = "../../usrapp/mvc_demo_win/tgui_demo/wqy-microhei.ttc",
+        .pchFontPath = "font/wqy-microhei.ttc",
     },
 
     [VSF_TGUI_FONT_DEJAVUSERIF_S24] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 24,
-        .pchFontPath = "../../usrapp/mvc_demo_win/tgui_demo/DejaVuSerif.ttf",
+        .pchFontPath = "font/DejaVuSerif.ttf",
     },
 
 };

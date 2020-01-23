@@ -172,11 +172,10 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
              */
         default:
             {
-                vsf_gint_state_t gint_state = vsf_disable_interrupt(); 
+                vsf_disable_interrupt(); 
                 while(1);
-                vsf_set_interrupt(gint_state);
             }
-            break;
+            //break;
             
         case VSF_KERNEL_ERR_NONE:
             break;
@@ -189,6 +188,7 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)
 {
+    UNUSED_PARAM(ptThis);
     main();
 }
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
@@ -196,6 +196,8 @@ implement_vsf_thread(app_main_thread_t)
         &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
 static void __app_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
+    UNUSED_PARAM(eda);
+    UNUSED_PARAM(evt);
     main();
 }
 #endif

@@ -151,6 +151,11 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis)
     return __vsf_os_evtq_init(pthis);
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
 static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, vsf_evt_t evt, void *msg, bool force)
 #else
@@ -197,6 +202,11 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 
     return err;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force)
 {

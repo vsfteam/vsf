@@ -26,6 +26,7 @@
 #define VSF_FS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
+#include <ctype.h>
 
 /*============================ MACROS ========================================*/
 
@@ -352,7 +353,7 @@ static vsf_err_t __vk_fakefat32_init(vk_fakefat32_mal_t *pthis)
     if (!pthis->root.fsop) {
         uint32_t cur_cluster = FAKEFAT32_ROOT_CLUSTER;
 
-        pthis->root.attr = VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
+        pthis->root.attr = (vk_file_attr_t)(VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
         pthis->root.parent = NULL;
         return __vk_fakefat32_init_recursion(pthis, &pthis->root, &cur_cluster);
     }
@@ -528,7 +529,6 @@ return_success:
 static void __vk_fakefat32_dir_write(uintptr_t target, vsf_evt_t evt)
 {
     vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
-    uint_fast64_t addr = file->ctx.io.offset;
     uint8_t *buff = file->ctx.io.buff;
     uint_fast16_t child_num;
 

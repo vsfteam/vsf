@@ -45,7 +45,6 @@ static NO_INIT stopwatch_t s_tMyStopwatch;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-
 void vsf_tgui_low_level_on_ready_to_refresh(void)
 {
     vsf_tgui_low_level_refresh_ready(&s_tTGUIDemo);
@@ -65,12 +64,14 @@ vsf_err_t tgui_demo_init(void)
             .pObj = s_tBFSBuffer,
             .nSize = sizeof(s_tBFSBuffer),
         },
-        .ptRootNode = (vsf_tgui_control_t *)&s_tMyStopwatch,
+        //.ptRootNode = (const vsf_tgui_top_container_t *)&s_tMyStopwatch,
     };
 
     vsf_err_t err = vk_tgui_init(&s_tTGUIDemo, &cfg);
 
     my_stopwatch_init(&s_tMyStopwatch, &s_tTGUIDemo);
+
+    vk_tgui_set_top_container(&s_tTGUIDemo, (vsf_tgui_top_container_t *)&s_tMyStopwatch);
 
     return err;
 }
@@ -106,8 +107,8 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
                                 ?   VSF_TGUI_EVT_POINTER_DOWN 
                                 :   VSF_TGUI_EVT_POINTER_UP,
             
-            .nX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-            .nY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
+            .iX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
+            .iY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
         },
     };
 

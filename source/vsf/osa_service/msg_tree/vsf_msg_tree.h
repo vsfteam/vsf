@@ -258,6 +258,9 @@ extern
 fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t *ptNode,
                                             vsf_msgt_msg_t *ptMessage);
+extern
+const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
+                                                            vsf_msgt_t* ptObj);
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern 

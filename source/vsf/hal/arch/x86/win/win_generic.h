@@ -99,6 +99,7 @@ def_simple_class(vsf_arch_irq_thread_t) {
         vsf_arch_prio_t priority;
         vsf_arch_irq_thread_t *prev;     // call stack
         vsf_arch_irq_state_t state;
+        vsf_arch_irq_request_t *reply;
 
         vsf_irq_handler_t *handler;
         void *param;

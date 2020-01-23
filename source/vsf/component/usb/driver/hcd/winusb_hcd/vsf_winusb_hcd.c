@@ -247,7 +247,7 @@ static void __vsf_winusb_hcd_on_arrived(vsf_winusb_hcd_dev_t *winusb_dev)
     case FullSpeed: winusb_dev->speed = USB_SPEED_FULL;     break;
     case HighSpeed: winusb_dev->speed = USB_SPEED_HIGH;     break;
     default:        winusb_dev->speed = USB_SPEED_UNKNOWN;  break;
-    };
+    }
     winusb_dev->evt_mask.is_attaching = true;
     __vsf_arch_irq_request_send(&winusb_dev->irq_request);
 }

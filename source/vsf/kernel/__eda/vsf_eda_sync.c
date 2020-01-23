@@ -95,11 +95,16 @@ static vsf_err_t __vsf_eda_sync_remove_eda(vsf_sync_t *sync, vsf_eda_t *eda)
     return VSF_ERR_NONE;
 }
 
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION(".text.vsf.kernel.vsf_sync")
 static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t evt, bool dequeue_eda)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
-    vsf_sync_reason_t reason;
+    vsf_sync_reason_t reason = VSF_SYNC_FAIL;
 
     VSF_KERNEL_ASSERT((sync != NULL) && (eda != NULL));
 
@@ -128,6 +133,10 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
     eda->state.bits.is_limitted = false;
     return reason;
 }
+
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 SECTION(".text.vsf.kernel.vsf_sync")
 vsf_err_t vsf_eda_sync_init(vsf_sync_t *pthis, uint_fast16_t cur, uint_fast16_t max)

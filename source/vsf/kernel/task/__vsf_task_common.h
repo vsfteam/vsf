@@ -112,8 +112,8 @@
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
-            implement(vsf_pt_t);                                                \
-            implement_ex(__vsf_pt_common(__NAME), param);                       \
+            implement(vsf_pt_t)                                                 \
+            implement_ex(__vsf_pt_common(__NAME), param)                        \
         };                                                                      
 
 #   define __declare_vsf_pt_common(__NAME)                                      \

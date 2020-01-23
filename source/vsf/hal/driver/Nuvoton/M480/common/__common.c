@@ -18,6 +18,11 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../__device.h"
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if !defined(__VSF_HAL_SWI_NUM)
@@ -253,6 +258,8 @@ vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx,
 }
 #endif
 
+
+
 // USB PHY configuration
 void m480_enable_usbphy(m480_usbphy_t phy, m480_usbphy_role_t role)
 {
@@ -272,3 +279,8 @@ void m480_disable_usbphy(m480_usbphy_t phy)
 {
     SYS->USBPHY &= ~(SYS_USBPHY_USBEN_Msk << phy);
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif

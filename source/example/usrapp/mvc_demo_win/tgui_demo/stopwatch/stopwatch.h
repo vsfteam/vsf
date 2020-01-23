@@ -43,22 +43,25 @@ def_tgui_panel(stopwatch_t,
         vsf_tgui_button_t    tLap;
         vsf_tgui_button_t    tSetting;
 
-        use_tgui_list(tVContainer,
-            tgui_contains(
+        use_tgui_container(tContainerA,
+            use_tgui_list(tVContainer,
+                tgui_contains(
                 
-                vsf_tgui_button_t    tButton1;
-                vsf_tgui_button_t    tButton2;
+                    vsf_tgui_button_t    tButton1;
+                    vsf_tgui_button_t    tButton2;
 
-                use_tgui_list(tHContainer,
-                    tgui_contains(
-                        vsf_tgui_button_t    tButtonA;
-                        vsf_tgui_button_t    tButtonB;
-                        vsf_tgui_button_t    tButtonC;
+                    use_tgui_list(tHContainer,
+                        tgui_contains(
+                            vsf_tgui_button_t    tButtonA;
+                            vsf_tgui_button_t    tButtonB;
+                            vsf_tgui_button_t    tButtonC;
+                        )
                     )
-                )
 
-                vsf_tgui_label_t     tHistory;
+                    vsf_tgui_label_t     tHistory;
+                )
             )
+            vsf_tgui_text_list_t  tNumberList;
         )
 	))
 

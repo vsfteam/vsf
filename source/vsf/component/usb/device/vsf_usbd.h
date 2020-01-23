@@ -220,7 +220,7 @@
             .config             = __##__NAME##_cfg,                             \
             .num_of_desc        = dimof(__##__NAME##_std_descs),                \
             .desc               = (vk_usbd_desc_t *)__##__NAME##_std_descs,     \
-            .speed              = __##__NAME##_SPEED,                           \
+            .speed              = (usb_dc_speed_t)__##__NAME##_SPEED,           \
             .drv                = &(__DEV),                                     \
         };
 

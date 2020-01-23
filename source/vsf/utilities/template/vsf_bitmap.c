@@ -37,14 +37,15 @@ extern int_fast8_t __vsf_arch_ffz(uintalu_t);
  */
 void __vsf_bitmap_reset(uintalu_t *pthis, int_fast16_t bitsize)
 {
-    memset(pthis, 0, (bitsize + 7) >> 3);
+    memset(pthis, 0, ((uint_fast16_t)bitsize + 7) >> 3);
 }
 
 
 int_fast16_t __vsf_bitmap_ffz(uintalu_t*pbitmap, int_fast16_t bit_size)
 {
-    int_fast16_t word_size = (bit_size + __optimal_bit_sz - 1) / __optimal_bit_sz, i;
-    int_fast16_t index = 0, temp;
+    int_fast16_t word_size =    (bit_size + (int_fast16_t)__optimal_bit_sz - 1) 
+                            /   (int_fast16_t)__optimal_bit_sz;
+    int_fast16_t index = 0, temp, i;
 
     for (i = 0; i < word_size; i++) {
         temp = __vsf_arch_ffz(pbitmap[i]);

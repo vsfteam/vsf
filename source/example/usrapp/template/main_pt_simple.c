@@ -29,7 +29,7 @@ declare_vsf_pt(user_pt_sub_task_t)
 def_vsf_pt(user_pt_sub_task_t,
     def_params(
         uint32_t cnt;
-    ));
+    ))
 #endif    
 
 declare_vsf_pt(user_pt_task_t)
@@ -41,7 +41,7 @@ def_vsf_pt(user_pt_task_t,
     #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         vsf_pt(user_pt_sub_task_t) print_task;
     #endif
-    ));
+    ))
     
 #if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 declare_vsf_pt(user_pt_task_b_t)
@@ -62,7 +62,7 @@ def_vsf_thread(user_thread_a_t, 1024,
     
     def_params(
         vsf_sem_t *psem;
-    ));
+    ))
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -71,7 +71,7 @@ static NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-private implement_vsf_pt(user_pt_sub_task_t) 
+implement_vsf_pt(user_pt_sub_task_t) 
 {
     vsf_pt_begin();
    
@@ -83,7 +83,7 @@ private implement_vsf_pt(user_pt_sub_task_t)
 
 #define USER_TASK_RESET_FSM()   do { this.state = 0;} while(0)
 
-private implement_vsf_pt(user_pt_task_t) 
+implement_vsf_pt(user_pt_task_t) 
 {
     vsf_pt_begin();
 
@@ -105,7 +105,7 @@ private implement_vsf_pt(user_pt_task_t)
 }
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-private implement_vsf_pt(user_pt_task_b_t) 
+implement_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
     

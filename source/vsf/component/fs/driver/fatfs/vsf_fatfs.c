@@ -494,7 +494,7 @@ static void __vk_fatfs_mount(uintptr_t target, vsf_evt_t evt)
                     } else if (FAT_ATTR_VOLUME_ID == dentry->fat.Attr) {
                         fsinfo->fat_volume_name[11] = '\0';
                         memcpy(fsinfo->fat_volume_name, dentry->fat.Name, 11);
-                        for (uint_fast8_t i = 10; i >= 0; i--) {
+                        for (int_fast8_t i = 10; i >= 0; i--) {
                             if (fsinfo->fat_volume_name[i] != ' ') {
                                 break;
                             }
@@ -649,7 +649,7 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
 
                                 dentry = (fatfs_dentry_t *)dparser->entry;
                                 strcpy(fatfs_file->name, dparser->filename);
-                                fatfs_file->attr = __vk_fatfs_parse_file_attr(dentry->fat.Attr);
+                                fatfs_file->attr = (vk_file_attr_t)__vk_fatfs_parse_file_attr(dentry->fat.Attr);
                                 fatfs_file->fsop = &vk_fatfs_op;
                                 fatfs_file->size = dentry->fat.FileSize;
                                 fatfs_file->info = fsinfo;

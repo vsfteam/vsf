@@ -405,6 +405,8 @@ void lvgl_application(void)
         __lvgl_demo.cont[i] = obj;
         lvgl_demo_create_gamepad(&__lvgl_demo.gamepad[i], __lvgl_demo.cont[i], margin);
     }
+
+    vk_input_notifier_register(&__lvgl_demo.notifier);
 }
 
 #endif

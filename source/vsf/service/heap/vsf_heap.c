@@ -23,6 +23,13 @@
 #if defined(VSF_HEAP_CFG_ATOM_ACCESS_DEPENDENCY)
 #   include VSF_HEAP_CFG_ATOM_ACCESS_DEPENDENCY
 #endif
+
+
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HEAP_CFG_MCB_ALIGN_BIT
@@ -114,6 +121,9 @@ WEAK_VSF_HEAP_GET_FREELIST_EXTERN
 WEAK(vsf_heap_get_freelist)
 vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
 {
+    UNUSED_PARAM(freelist);
+    UNUSED_PARAM(freelist_num);
+    UNUSED_PARAM(size);
     return &__vsf_heap.freelist[0];
 }
 #endif
@@ -542,7 +552,7 @@ label_first_add:
 
 void vsf_heap_add_memory(vsf_mem_t mem)
 {
-    vsf_heap_add(mem.PTR.pchSrc, mem.nSize);
+    vsf_heap_add(mem.PTR.pchSrc, (uint_fast32_t)mem.nSize);
 }
 
 void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
@@ -554,7 +564,7 @@ void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)
         VSF_SERVICE_ASSERT(!(alignment & (alignment - 1)));
     }
 
-    size = (size + 3) & ~3;
+    size = (size + 3) & ~(uint_fast32_t)3;
     while (!vsf_dlist_is_empty(freelist)) {
         buffer = __vsf_heap_freelist_malloc(freelist, size, alignment);
         if (buffer != NULL) {
@@ -582,7 +592,7 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
     
     mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
     realloc:
-    memory_size = __vsf_mcb_get_size(mcb);
+    memory_size = (uint_fast32_t)__vsf_mcb_get_size(mcb);
     memory_size -= (uint8_t *)buffer - (uint8_t *)mcb;
     
     if(memory_size >= size) {
@@ -716,5 +726,10 @@ bool vsf_heap_partial_free(void *buffer, uint_fast32_t pos, uint_fast32_t size)
     vsf_heap_free((void *)((uint8_t *)mcb_free + sizeof(__vsf_heap_mcb_t)));
     return true;
 }
+
+
+#if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #endif
