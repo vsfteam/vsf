@@ -92,12 +92,12 @@ vsf_err_t tgui_demo_init(void)
 //void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* evt)
 //{
 ///*
-//    VSF_INPUT_KEYBOARD_GET_KEYCODE(evt)
-//    VSF_INPUT_KEYBOARD_IS_DOWN(evt)
+//    vsf_input_keyboard_get_keycode(evt)
+//    vsf_input_keyboard_is_down(evt)
 //*/
 ///*
-//    vsf_trace(VSF_TRACE_INFO, "\r\n Key %08x ", VSF_INPUT_KEYBOARD_GET_KEYCODE(evt));
-//    if (VSF_INPUT_KEYBOARD_IS_DOWN(evt)) {
+//    vsf_trace(VSF_TRACE_INFO, "\r\n Key %08x ", vsf_input_keyboard_get_keycode(evt));
+//    if (vsf_input_keyboard_is_down(evt)) {
 //        vsf_trace(VSF_TRACE_INFO, "is pressed");
 //    } else {
 //        vsf_trace(VSF_TRACE_INFO, "is released");
@@ -106,16 +106,16 @@ vsf_err_t tgui_demo_init(void)
 ////! this block of code is used for test purpose only
 //    vsf_tgui_evt_t tEvent = {
 //        .tKeyEvt = {
-//            .tMSG = VSF_INPUT_KEYBOARD_IS_DOWN(evt)
+//            .tMSG = vsf_input_keyboard_is_down(evt)
 //                                ? VSF_TGUI_EVT_KEY_DOWN
 //                                : VSF_TGUI_EVT_KEY_UP,
-//            .hwKeyValue = VSF_INPUT_KEYBOARD_GET_KEYCODE(evt),
+//            .hwKeyValue = vsf_input_keyboard_get_keycode(evt),
 //        },
 //    };
 //
 //    vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
 //
-//    if (!VSF_INPUT_KEYBOARD_IS_DOWN(evt)) {
+//    if (!vsf_input_keyboard_is_down(evt)) {
 //        tEvent.tKeyEvt.tMSG = VSF_TGUI_EVT_KEY_PRESSED;
 //        vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
 //    }
@@ -126,28 +126,28 @@ vsf_err_t tgui_demo_init(void)
 //{
 ///*
 //    vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
-//        VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt),
-//        VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) ? "down" : "up",
-//        VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-//        VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt));
+//        vsf_input_touchscreen_get_id(ts_evt),
+//        vsf_input_touchscreen_is_down(ts_evt) ? "down" : "up",
+//        vsf_input_touchscreen_get_x(ts_evt),
+//        vsf_input_touchscreen_get_y(ts_evt));
 // */
 //    //! this block of code is used for test purpose only
 //
 //    vsf_tgui_evt_t tEvent = {
 //        .tPointerEvt = {
-//            .tMSG = VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) 
+//            .tMSG = vsf_input_touchscreen_is_down(ts_evt) 
 //                                ?   VSF_TGUI_EVT_POINTER_DOWN 
 //                                :   VSF_TGUI_EVT_POINTER_UP,
 //            
-//            .iX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-//            .iY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
+//            .iX = vsf_input_touchscreen_get_x(ts_evt),
+//            .iY = vsf_input_touchscreen_get_y(ts_evt),
 //        },
 //    };
 //
 //    vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
 //
 //    
-//    if (!VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt)) {
+//    if (!vsf_input_touchscreen_is_down(ts_evt)) {
 //        tEvent.tPointerEvt.tMSG = VSF_TGUI_EVT_POINTER_CLICK;
 //        vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
 //    }

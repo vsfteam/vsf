@@ -29,6 +29,7 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <dirent.h>
 
 #if     defined(VSF_LINUX_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -168,9 +169,28 @@ def_simple_class(vsf_linux_fd_t) {
 
     private_member(
         vsf_dlist_node_t fd_node;
+    )
+
+    protected_member(
+#if __IS_COMPILER_IAR__
+        // make compiler happy by waisting 4 bytes
+        int priv[1];
+#else
         int priv[0];
+#endif
     )
 };
+
+#if defined(VSF_LINUX_IMPLEMENT) || defined(VSF_LINUX_INHERIT)
+struct vsf_linux_fs_priv_t {
+    vk_file_t *file;
+    uint64_t pos;
+
+    struct dirent dir;
+    vk_file_t *child;
+};
+typedef struct vsf_linux_fs_priv_t vsf_linux_fs_priv_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

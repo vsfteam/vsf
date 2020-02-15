@@ -142,7 +142,7 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __vsf_pt_call_fsm(__NAME, __TARGET)                                  \
-            vsf_eda_call_fsm(   (vsf_fsm_entry_t)(__NAME),                      \
+            __vsf_eda_call_fsm(   (vsf_fsm_entry_t)(__NAME),                      \
                                 (uintptr_t)(__TARGET))
 
 

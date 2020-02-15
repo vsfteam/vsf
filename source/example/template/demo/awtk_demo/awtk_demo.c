@@ -20,9 +20,10 @@
 
 #if VSF_USE_UI_AWTK == ENABLED && VSF_USE_UI_AWTK == ENABLED && APP_CFG_USE_AWTK_DEMO == ENABLED
 
-#include "../usrapp_common.h"
+#include "../common/usrapp_common.h"
 
 #include "awtk.h"
+#include "awtk_vsf_port.h"
 #include "component/3rd-party/awtk/port/platforms/vsf/main_loop_vsf.h"
 #include "component/3rd-party/awtk/port/vsf_awtk_port.h"
 
@@ -36,7 +37,17 @@
 
 lcd_t *platform_create_lcd(wh_t w, wh_t h)
 {
-    return vsf_awtk_create_lcd_mem_fragment(&usrapp_common.ui.disp.use_as__vk_disp_t, w, h);
+    return vsf_awtk_create_lcd_mem_fragment(&usrapp_ui_common.disp.use_as__vk_disp_t, w, h);
+}
+
+static void __vsf_awtk_on_evt(vk_input_type_t tpye, vk_touchscreen_evt_t *ts_evt)
+{
+    if (0 == vsf_input_touchscreen_get_id(ts_evt)) {
+        main_loop_post_pointer_event(main_loop(),
+                vsf_input_touchscreen_is_down(ts_evt),
+                vsf_input_touchscreen_get_x(ts_evt),
+                vsf_input_touchscreen_get_y(ts_evt));
+    }
 }
 
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
@@ -46,7 +57,7 @@ int awtk_main(int argc, char *argv[])
 int main(void)
 {
 #   if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_start_trace();
 #       if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #       endif
@@ -55,7 +66,11 @@ int main(void)
     extern void assets_init(void);
     extern void application_init(void);
 
-    vsf_awtk_init(usrapp_common.ui.disp.param.width, usrapp_common.ui.disp.param.height, APP_MOBILE, NULL, NULL);
+    usrapp_ui_common.awtk.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN,
+    usrapp_ui_common.awtk.notifier.on_evt = (vk_input_on_evt_t)__vsf_awtk_on_evt,
+    vk_input_notifier_register(&usrapp_ui_common.awtk.notifier);
+
+    vsf_awtk_init(usrapp_ui_common.disp.param.width, usrapp_ui_common.disp.param.height, APP_MOBILE, NULL, NULL);
 
     assets_init();
     application_init();

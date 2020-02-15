@@ -143,6 +143,7 @@
 //  </h>
 //! @}
 
+#define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 #define VSF_USE_INPUT                                   ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED

@@ -22,7 +22,7 @@
 #if VSF_USE_LINUX == ENABLED
 
 #define VSF_LINUX_INHERIT
-#include "../../vsf_linux.h"
+#include <unistd.h>
 #include <errno.h>
 
 /*============================ MACROS ========================================*/
@@ -51,7 +51,6 @@ int __sync_pend(vsf_sync_t *sem)
     }
 }
 
-#ifndef __WIN__
 char * strdup(const char *str)
 {
     char *newstr = malloc(strlen(str) + 1);
@@ -60,6 +59,5 @@ char * strdup(const char *str)
     }
     return newstr;
 }
-#endif
 
 #endif      // VSF_USE_LINUX

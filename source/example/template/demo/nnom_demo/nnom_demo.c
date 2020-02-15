@@ -21,7 +21,7 @@
 
 #if APP_CFG_USE_NNOM_DEMO == ENABLED
 
-#include "../usrapp_common.h"
+#include "../common/usrapp_common.h"
 #include <stdio.h>
 
 #include "nnom.h"
@@ -98,7 +98,7 @@ int nnom_main(int argc, char *argv[])
 int main(void)
 {
 #   if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_start_trace();
 #       if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #       endif

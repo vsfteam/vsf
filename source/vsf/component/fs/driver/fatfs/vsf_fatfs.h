@@ -42,6 +42,13 @@
     implement(__vk_fatfs_info_t)                                                \
     __implement_malfs_cache(__block_size, __cache_num)
 
+#define init_fatfs_info_ex(__info, __block_size, __cache_num, __fatinfo)        \
+    do {                                                                        \
+        __fatinfo->block_size = __block_size;                                   \
+        __fatinfo->cache.number = __cache_num;                                  \
+        __fatinfo->cache.nodes = __info->__cache_nodes;                         \
+    } while (0)
+
 #define init_fatfs_info(__info, __block_size, __cache_num)                      \
     .block_size = __block_size,                                                 \
     .cache      = {                                                             \
@@ -73,8 +80,9 @@ typedef enum vk_fat_file_attr_t vk_fat_file_attr_t;
 
 struct vk_fatfs_dentry_parser_t {
     uint8_t *entry;
-    uint16_t entry_num;
+    int16_t entry_num;
     uint8_t lfn;
+    bool is_unicode;
     char *filename;
 };
 typedef struct vk_fatfs_dentry_parser_t vk_fatfs_dentry_parser_t;
@@ -93,13 +101,15 @@ def_simple_class(vk_fatfs_file_t) {
 
 // memory layout:
 //  |-----------------------|
-//  | __vk_fatfs_info_t:    |
-//  |   |---------------|   |
-//  |   |      ...      |   |
-//  |   |---------------|   |
-//  |   |vk_malfs_info_t|   |
-//  |   |---------------|   |
-//  |-----------------------|
+//  | __vk_fatfs_info_t:    |<-|
+//  | |-------------------| |  |
+//  | |      ...          | |  |
+//  | |-------------------| |  |
+//  | ||__vk_malfs_info_t|| |  |
+//  | ||-----------------|| |  |
+//  | ||    total_cb     ||-|--- if __vk_fatfs_info_t is dynamicly allocated,
+//  | ||-----------------|| | total_cb in __vk_malfs_info_t points to the __vk_fatfs_info_t.
+//  |-----------------------| so in __vk_malfs_unmount, can free total_cb
 //  | vk_malfs_cache_t[num] |
 //  |-----------------------|
 //  |   cache_buffer[num]   |
@@ -126,8 +136,10 @@ def_simple_class(__vk_fatfs_info_t) {
         uint32_t cur_cluster;
         uint32_t cur_cluster_tmp;
         uint32_t cur_sector;
+        uint32_t cur_sector_in_cluster;
         vsf_err_t err;
         vk_fatfs_dentry_parser_t dparser;
+        char *filename;
     )
 
     // vk_malfs_info_t must be the last in vk_fatfs_info_t

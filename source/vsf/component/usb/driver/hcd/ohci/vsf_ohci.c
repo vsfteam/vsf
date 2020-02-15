@@ -21,6 +21,7 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_OHCI == ENABLED
 
 #define VSF_USBH_IMPLEMENT_HCD
+#define VSF_EDA_CLASS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
 
@@ -353,7 +354,7 @@ struct ohci_urb_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void ohci_free_urb_do(vk_usbh_hcd_urb_t *urb);
+static void __ohci_free_urb_do(vk_usbh_hcd_urb_t *urb);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -1063,7 +1064,7 @@ static void ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
                 urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
                 vk_usbh_hcd_urb_free_buffer(urb);
                 ohci_ed_fini(urb_ohci);
-                ohci_free_urb_do(urb);
+                __ohci_free_urb_do(urb);
             }
         }
         break;
@@ -1126,10 +1127,7 @@ static vsf_err_t ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd
             ohci->state++;
             break;
         case OHCI_HCD_STATE_READY:
-            if (VSF_ERR_NONE != vsf_eda_set_evthandler(&ohci->eda, ohci_ed_free_evthanlder)) {
-                VSF_USB_ASSERT(false);
-            }
-            //ohci->eda.evthandler = ohci_ed_free_evthanlder;
+            ohci->eda.fn.evthandler = ohci_ed_free_evthanlder;
             vsf_eda_init(&ohci->eda, vsf_prio_inherit, false);
             return VSF_ERR_NONE;
         }
@@ -1172,7 +1170,7 @@ static vk_usbh_hcd_urb_t * ohci_alloc_urb(vk_usbh_hcd_t *hcd)
     return urb;
 }
 
-static void ohci_free_urb_do(vk_usbh_hcd_urb_t *urb)
+static void __ohci_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
     VSF_USBH_FREE(urb_ohci->ed);
@@ -1198,7 +1196,7 @@ static void ohci_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
         }
     } else {
         vk_usbh_hcd_urb_free_buffer(urb);
-        ohci_free_urb_do(urb);
+        __ohci_free_urb_do(urb);
     }
 }
 

@@ -159,7 +159,7 @@ static void app_on_libusb_event(void *param,
 int main(void)
 {
 #if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
 #   if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #   endif

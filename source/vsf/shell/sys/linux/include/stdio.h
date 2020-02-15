@@ -24,6 +24,10 @@ int fputs(const char *str, FILE *f);
 int printf(const char *format, ...);
 int fprintf(FILE *file, const char *format, ...);
 
+FILE * fopen(const char *filename, const char *mode);
+int fclose(FILE *f);
+int fseek(FILE *f, long offset, int fromwhere);
+long ftell(FILE *f);
 size_t fread(const void *ptr, size_t size, size_t nmemb, FILE *f);
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f);
 

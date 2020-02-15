@@ -25,14 +25,14 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
+#if 0
 declare_vsf_pt(tgui_demo_t)
 def_vsf_pt(tgui_demo_t,
     def_params(
     )
 )
 end_def_vsf_pt(tgui_demo_t)
-
+#endif
 
 declare_tgui_panel(stopwatch_t)
 
@@ -63,11 +63,13 @@ def_tgui_panel(stopwatch_t,
             )
             vsf_tgui_text_list_t  tNumberList;
         )
+
+        vsf_tgui_timer_t tTimer;
 	))
 
     char        chTimeBuffer[sizeof("00:00:00")];
 
-    tgui_demo_t tTask;
+    //tgui_demo_t tTask;
 
 end_def_tgui_panel(stopwatch_t)
 

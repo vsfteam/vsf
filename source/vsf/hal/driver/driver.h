@@ -45,6 +45,8 @@
 #		define  VSF_DRIVER_HEADER       "./GigaDevice/driver.h"
 #   elif    defined(__TI__)
 #		define  VSF_DRIVER_HEADER       "./TI/driver.h"
+#   elif    defined(__ST__)
+#       define  VSF_DRIVER_HEADER       "./ST/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"
@@ -67,27 +69,10 @@
 #ifndef __HAL_DRIVER_H__
 #define __HAL_DRIVER_H__
 
-#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED 
-#       include "service/vsfstream/vsfstream.h"
-#   elif VSF_USE_SERVICE_STREAM == ENABLED
-#       include "service/stream/vsf_stream.h"
-#   endif
-#endif
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
-#   if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
-extern vsf_stream_t  VSF_DEBUG_STREAM_TX;
-#   elif   VSF_USE_SERVICE_STREAM == ENABLED
-extern const vsf_stream_tx_t VSF_DEBUG_STREAM_TX;
-#   endif
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

@@ -225,37 +225,18 @@
 //#pragma clang diagnostic ignored "-Wunused-variable"  
 
 #elif __IS_COMPILER_GCC__
-// TODO: validate diagnositc ignored for GCC
+
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-//#pragma GCC diagnostic ignored "-Wmicrosoft-anon-tag"
 #pragma GCC diagnostic ignored "-Wmissing-braces"
-//#pragma GCC diagnostic ignored "-Wconstant-conversion"
-//#pragma GCC diagnostic ignored "-Wmicrosoft-enum-forward-reference"
-//#pragma GCC diagnostic ignored "-Wbuiltin-requires-header"
-//#pragma GCC diagnostic ignored "-Winitializer-overrides" 
-//#pragma GCC diagnostic ignored "-Wbraced-scalar-init" 
 #pragma GCC diagnostic ignored "-Wempty-body" 
-//#pragma GCC diagnostic ignored "-Wgnu-empty-struct"
 #pragma GCC diagnostic ignored "-Wint-conversion" 
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast" 
-//#pragma GCC diagnostic ignored "-Wmicrosoft-include"
-//#pragma GCC diagnostic ignored "-Wpragma-pack" 
 #pragma GCC diagnostic ignored "-Wunused-function" 
 #pragma GCC diagnostic ignored "-Wswitch"
-//#pragma GCC diagnostic ignored "-Wembedded-directive"
 #pragma GCC diagnostic ignored "-Wundef"
-//#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #pragma GCC diagnostic ignored "-Wpadded"
-//#pragma GCC diagnostic ignored "-Wnewline-eof"
-//#pragma GCC diagnostic ignored "-Wduplicate-enum"
-//#pragma GCC diagnostic ignored "-Wextra-semi"
-//#pragma GCC diagnostic ignored "-Wextra-semi-stmt"
-//#pragma GCC diagnostic ignored "-Wzero-length-array"
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
-//#pragma GCC diagnostic ignored "-Wimplicit-int-conversion"
-//#pragma GCC diagnostic ignored "-Wnonportable-include-path"
-//#pragma GCC diagnostic ignored "-Wmissing-variable-declarations"
 #pragma GCC diagnostic ignored "-Wc++-compat"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
@@ -263,9 +244,7 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #pragma GCC diagnostic ignored "-Wbad-function-cast"
 #pragma GCC diagnostic ignored "-Wswitch-enum"
-//#pragma GCC diagnostic ignored "-Wdisabled-macro-expansion"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-//#pragma GCC diagnostic ignored "-Wtautological-pointer-compare"
 #pragma GCC diagnostic ignored "-Wunused-value" 
 #pragma GCC diagnostic ignored "-Wcomment"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -309,7 +288,7 @@
 #if defined(__clang__) //__IS_COMPILER_LLVM__
 #pragma clang diagnostic warning "-Wcast-align"
 #elif __IS_COMPILER_GCC__
-
+#pragma GCC diagnostic warning "-Wcast-align"
 #endif
 
 /*----------------------------------------------------------------------------*

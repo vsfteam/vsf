@@ -220,9 +220,9 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #define vsf_task_call_fsm(__NAME, __TARGET)                                     \
-            vsf_eda_call_fsm((vsf_task_entry_t)(__NAME), (uintptr_t)(__TARGET))
+            __vsf_eda_call_fsm((vsf_task_entry_t)(__NAME), (uintptr_t)(__TARGET))
 #define vsf_task_call_task(__NAME, __TARGET)                                    \
-            vsf_eda_call_fsm(   (vsf_task_entry_t)vsf_task_func(__NAME),        \
+            __vsf_eda_call_fsm(   (vsf_task_entry_t)vsf_task_func(__NAME),        \
                                 (uintptr_t)(__TARGET))
 #endif
 

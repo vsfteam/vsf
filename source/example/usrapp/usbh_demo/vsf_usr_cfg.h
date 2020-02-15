@@ -163,6 +163,7 @@
 #define VSFIP_CFG_NETIF_HEADLEN                         64
 
 #define VSF_USE_TRACE                                   ENABLED
+#define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
 #define VSF_USE_SERVICE_STREAM                          DISABLED
 #define VSF_USE_SERVICE_VSFSTREAM                       ENABLED

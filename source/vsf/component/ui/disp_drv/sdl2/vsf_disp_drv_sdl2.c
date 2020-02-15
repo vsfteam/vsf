@@ -71,6 +71,8 @@ static __vk_disp_sdl2_t __vk_disp_sdl2 = {
 static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis);
 static vsf_err_t vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
+extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_disp_drv_t vk_disp_drv_sdl2 = {
@@ -154,14 +156,17 @@ static void __vk_disp_sdl2_thread(void *arg)
     union {
         implement(vk_input_evt_t)
         vk_touchscreen_evt_t    ts_evt;
-        vk_gamepad_evt_t       gamepad_evt;
-        vk_keyboard_evt_t      keyboard_evt;
+        vk_gamepad_evt_t        gamepad_evt;
+        vk_keyboard_evt_t       keyboard_evt;
+        vk_mouse_evt_t          mouse_evt;
     } evt;
     vk_input_type_t evt_type;
-#endif
 
     uint_fast16_t x = 0, y = 0;
     bool is_down = false, is_to_update = false;
+    int_fast16_t wheel_x = 0, wheel_y = 0;
+    int mouse_evt = 0, mouse_button = 0;
+#endif
 
     while (!__vk_disp_sdl2.is_inited) {
         Sleep(100);
@@ -183,6 +188,7 @@ static void __vk_disp_sdl2_thread(void *arg)
         while (SDL_PollEvent(&event)) {
 #if VSF_USE_INPUT == ENABLED
             switch (event.type) {
+#   if VSF_DISP_DRV_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
             case SDL_MOUSEBUTTONUP:
                 is_down = false;
                 is_to_update = true;
@@ -201,6 +207,55 @@ static void __vk_disp_sdl2_thread(void *arg)
                 is_to_update = is_down;
                 evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
                 break;
+#else
+            case SDL_MOUSEBUTTONUP:
+                is_down = false;
+                x = event.button.x / disp_sdl2->amplifier;
+                y = event.button.y / disp_sdl2->amplifier;
+                switch (event.button.button) {
+                case SDL_BUTTON_LEFT:   mouse_button = VSF_INPUT_MOUSE_BUTTON_LEFT;     break;
+                case SDL_BUTTON_MIDDLE: mouse_button = VSF_INPUT_MOUSE_BUTTON_MIDDLE;   break;
+                case SDL_BUTTON_RIGHT:  mouse_button = VSF_INPUT_MOUSE_BUTTON_RIGHT;    break;
+                default:                VSF_UI_ASSERT(false);
+                }
+                mouse_evt = VSF_INPUT_MOUSE_EVT_BUTTON;
+                is_to_update = true;
+                evt_type = VSF_INPUT_TYPE_MOUSE;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                is_down = true;
+                x = event.button.x / disp_sdl2->amplifier;
+                y = event.button.y / disp_sdl2->amplifier;
+                switch (event.button.button) {
+                case SDL_BUTTON_LEFT:   mouse_button = VSF_INPUT_MOUSE_BUTTON_LEFT;     break;
+                case SDL_BUTTON_MIDDLE: mouse_button = VSF_INPUT_MOUSE_BUTTON_MIDDLE;   break;
+                case SDL_BUTTON_RIGHT:  mouse_button = VSF_INPUT_MOUSE_BUTTON_RIGHT;    break;
+                default:                VSF_UI_ASSERT(false);
+                }
+                mouse_evt = VSF_INPUT_MOUSE_EVT_BUTTON;
+                is_to_update = true;
+                evt_type = VSF_INPUT_TYPE_MOUSE;
+                break;
+            case SDL_MOUSEMOTION:
+                x = event.motion.x / disp_sdl2->amplifier;
+                y = event.motion.y / disp_sdl2->amplifier;
+                mouse_evt = VSF_INPUT_MOUSE_EVT_MOVE;
+                is_to_update = true;
+                evt_type = VSF_INPUT_TYPE_MOUSE;
+                break;
+            case SDL_MOUSEWHEEL:
+                if (SDL_MOUSEWHEEL_FLIPPED == event.wheel.direction) {
+                    wheel_x = -event.wheel.x;
+                    wheel_y = -event.wheel.y;
+                } else {
+                    wheel_x = event.wheel.x;
+                    wheel_y = event.wheel.y;
+                }
+                mouse_evt = VSF_INPUT_MOUSE_EVT_WHEEL;
+                is_to_update = true;
+                evt_type = VSF_INPUT_TYPE_MOUSE;
+                break;
+#endif
 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
@@ -208,7 +263,7 @@ static void __vk_disp_sdl2_thread(void *arg)
                     is_to_update = true;
                     evt_type = VSF_INPUT_TYPE_KEYBOARD;
                     // TODO: remap event.key.sym to keycode in VSF
-                    VSF_INPUT_KEYBOARD_SET(&evt.keyboard_evt, event.key.keysym.sym, SDL_KEYDOWN == event.type);
+                    vsf_input_keyboard_set(&evt.keyboard_evt, event.key.keysym.sym, SDL_KEYDOWN == event.type);
                 }
                 break;
             case SDL_CONTROLLERDEVICEADDED:
@@ -293,7 +348,7 @@ static void __vk_disp_sdl2_thread(void *arg)
                     case VSF_INPUT_TYPE_TOUCHSCREEN:
                         evt.ts_evt.info.width = disp_sdl2->param.width;
                         evt.ts_evt.info.height = disp_sdl2->param.height;
-                        VSF_INPUT_TOUCHSCREEN_SET(&evt.ts_evt, 0, is_down, x, y);
+                        vsf_input_touchscreen_set(&evt.ts_evt, 0, is_down, x, y);
 #ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
                         vsf_input_on_touchscreen(&evt.ts_evt);
 #else
@@ -311,8 +366,22 @@ static void __vk_disp_sdl2_thread(void *arg)
 #ifndef WEAK_VSF_INPUT_ON_KEYBOARD
                         vsf_input_on_keyboard(&evt.keyboard_evt);
 #else
-                        WEAK_VSF_INPUT_ON_KEYBOARD( &evt.keyboard_evt);
+                        WEAK_VSF_INPUT_ON_KEYBOARD(&evt.keyboard_evt);
 #endif
+                        break;
+                    case VSF_INPUT_TYPE_MOUSE:
+                        switch (mouse_evt) {
+                        case VSF_INPUT_MOUSE_EVT_BUTTON:
+                            vk_input_mouse_evt_button_set(&evt.mouse_evt, mouse_button, is_down, x, y);
+                            break;
+                        case VSF_INPUT_MOUSE_EVT_MOVE:
+                            vk_input_mouse_evt_move_set(&evt.mouse_evt, x, y);
+                            break;
+                        case VSF_INPUT_MOUSE_EVT_WHEEL:
+                            vk_input_mouse_evt_wheel_set(&evt.mouse_evt, wheel_x, wheel_y);
+                            break;
+                        }
+                        vsf_input_on_mouse(&evt.mouse_evt);
                         break;
                     }
                 __vsf_arch_irq_end(irq_thread, false);

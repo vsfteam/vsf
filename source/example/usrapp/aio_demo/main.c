@@ -42,7 +42,7 @@ extern void ai_demo_mnist(uint_fast8_t index);
 
 void main(void)
 {
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
     vsf_stdio_init();
 
     usbh_demo_start();

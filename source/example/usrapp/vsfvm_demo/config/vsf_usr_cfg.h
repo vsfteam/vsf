@@ -146,7 +146,6 @@
 
 #define VSF_USE_USB_HOST_ECM                ENABLED
 #define VSF_USE_USB_HOST_HID                ENABLED
-#define VSF_USE_USB_HOST_BTHCI              ENABLED
 #define VSF_USE_USB_HOST_DS4                ENABLED
 #define VSF_USE_USB_HOST_WINUSB             ENABLED
 //#define VSF_USE_USB_HOST_HCD_MUSB_FDRC      ENABLED
@@ -197,6 +196,7 @@ enum {
 #       define VSF_USBD_CFG_HW_PRIORITY     vsf_arch_prio_9
 #   define VSF_USE_USB_HOST                 ENABLED
 #       define VSF_USE_USB_HOST_HUB         ENABLED
+#       define VSF_USE_USB_HOST_LIBUSB      ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI        ENABLED
 #       define VSF_OHCI_CFG_SETUP_CONTROL   ENABLED
 #       define VSF_USBH_CFG_EDA_PRIORITY    vsf_prio_8
@@ -210,7 +210,10 @@ enum {
 #   define USRAPP_CFG_VM_BYTECODE_MAX_NUMBER    (16 * 1024)
 #   define USRAPP_CFG_SCRIPT_ADDR           0x00010000
 #   define USRAPP_CFG_BYTECODE_ADDR         0x00010000
+
+#   define VSF_DEBUGGER_CFG_CONSOLE         VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #elif   defined(__WIN__)
+#   define VSF_HAL_USE_DEBUG_STREAM         ENABLED
 #   define VSF_OS_CFG_PRIORITY_NUM          1
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      ENABLED
 #   ifdef __CPU_X86__
@@ -226,7 +229,8 @@ enum {
 #       define VSF_USE_DISP_DRV_SDL2        ENABLED
 #   define VSF_USE_USB_DEVICE               DISABLED
 #   define VSF_USE_USB_HOST                 ENABLED
-#   define VSF_USBH_CFG_ENABLE_ROOT_HUB     DISABLED
+#       define VSF_USE_USB_HOST_LIBUSB      ENABLED
+#       define VSF_USBH_CFG_ENABLE_ROOT_HUB DISABLED
 #       define VSF_USE_USB_HOST_HCD_WINUSB  ENABLED
 #       define VSF_WINUSB_HCD_CFG_DEV_NUM   4
 #       define VSF_WINUSB_HCD_DEV0_VID      0x0A12      // CSR8510 bthci
@@ -266,6 +270,9 @@ enum {
 
 #   define VSF_HEAP_SIZE                    0x1000
 #   define USRAPP_CFG_STDIO_EN              DISABLED
+
+#   define VSF_DEBUGGER_CFG_CONSOLE         VSF_DEBUGGER_CFG_CONSOLE_USER
+#   define VSF_DEBUGGER_CFG_STREAM_TX_T     vsf_stream_t
 #else
 #   define VSF_OS_CFG_PRIORITY_NUM          1
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      ENABLED

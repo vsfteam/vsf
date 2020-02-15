@@ -239,6 +239,11 @@ vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, uint_fast32_t tick)
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 vsf_err_t vsf_teda_set_timer(uint_fast32_t tick)
 {
@@ -249,6 +254,9 @@ vsf_err_t vsf_teda_set_timer(uint_fast32_t tick)
 #   pragma clang diagnostic pop
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
 vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
@@ -267,6 +275,11 @@ vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
@@ -288,6 +301,10 @@ vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
 #endif
 
 #endif

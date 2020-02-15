@@ -1,4 +1,7 @@
+
+#define VSF_EDA_CLASS_INHERIT
 #include "vsf.h"
+
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "tkc/thread.h"
@@ -8,9 +11,6 @@
 extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *pthis, vsf_prio_t priority);
 extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *pthis);
 #endif
-
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 struct _tk_thread_t {
   implement(vsf_thread_t)
@@ -109,12 +109,12 @@ ret_t tk_thread_start(tk_thread_t* thread) {
   thread->cb.entry = tk_thread_entry;
   thread->cb.stack = TKMEM_ALLOC(thread->cb.stack_size);
   return_value_if_fail(thread->cb.stack != NULL, RET_OOM);
-  vsf_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->thread_priority);
+  vk_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->thread_priority);
 #else
   thread->entry = tk_thread_entry;
   thread->stack = TKMEM_ALLOC(thread->stack_size);
   return_value_if_fail(thread->stack != NULL, RET_OOM);
-  vsf_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->thread_priority);
+  vk_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->thread_priority);
 #endif
 
   return RET_OK;
@@ -146,7 +146,7 @@ ret_t tk_thread_destroy(tk_thread_t* thread) {
     tk_mutex_destroy(thread->mutex);
   }
 
-  __vsf_eda_fini(&thread->use_as__vsf_eda_t);
+  vsf_eda_fini(&thread->use_as__vsf_eda_t);
   memset(thread, 0x00, sizeof(tk_thread_t));
   TKMEM_FREE(thread);
 

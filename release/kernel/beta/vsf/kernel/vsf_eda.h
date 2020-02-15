@@ -30,7 +30,7 @@
    
 #if     defined(__VSF_EDA_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(__VSF_EDA_CLASS_INHERIT)
+#elif   defined(VSF_EDA_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #endif
 
@@ -690,7 +690,7 @@ extern uintptr_t vsf_eda_target_get(void);
 
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
-extern fsm_rt_t vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
+extern fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
 #   endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
@@ -827,7 +827,7 @@ extern vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, v
 
 #endif      // VSF_KERNEL_CFG_SUPPORT_SYNC
 
-#undef __VSF_EDA_CLASS_INHERIT
+#undef VSF_EDA_CLASS_INHERIT
 #undef __VSF_EDA_CLASS_IMPLEMENT
 
 #endif

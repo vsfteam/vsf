@@ -21,10 +21,10 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#include "../../vsf_linux.h"
+#define VSF_LINUX_INHERIT
 
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/types.h>
 
 /*============================ MACROS ========================================*/
@@ -37,31 +37,105 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-FILE *stdin, *stdout, *stderr;
+int stdin_fd = 0, stdout_fd = 1, stderr_fd = 2;
+FILE *stdin = (FILE *)&stdin_fd, *stdout = (FILE *)&stdout_fd, *stderr = (FILE *)&stderr_fd;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
+
 /*============================ IMPLEMENTATION ================================*/
+
+static int __get_fd(FILE *f)
+{
+    if (stdin == f) {
+        return STDIN_FILENO;
+    } else if (stdout == f) {
+        return STDOUT_FILENO;
+    } else if (stderr == f) {
+        return STDERR_FILENO;
+    } else {
+        vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
+        VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+        return sfd->fd;
+    }
+}
 
 int getchar(void)
 {
-    int ch;
+    int ch = EOF;
     fread(&ch, 1, 1, stdin);
     return ch;
 }
 
+FILE * fopen(const char *filename, const char *mode)
+{
+    int fd = open(filename, 0);
+    if (fd < 0) {
+        return NULL;
+    }
+    return vsf_linux_get_fd(fd);
+}
+
+int fclose(FILE *f)
+{
+    int fd = __get_fd(f);
+    if (fd < 0) {
+        return EOF;
+    }
+
+    int err = close(fd);
+    return err != 0 ? EOF : 0;
+}
+
+int fseek(FILE *f, long offset, int fromwhere)
+{
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
+    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    uint64_t new_pos;
+
+    switch (fromwhere) {
+    case SEEK_SET:
+        new_pos = 0;
+        break;
+    case SEEK_CUR:
+        new_pos = priv->pos;
+        break;
+    case SEEK_END:
+        new_pos = priv->file->size;
+        break;
+    default:
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
+
+    new_pos += offset;
+    if (new_pos > priv->file->size) {
+        return -1;
+    }
+    priv->pos = new_pos;
+    return 0;
+}
+
+long ftell(FILE *f)
+{
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
+    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+
+    return (long)priv->pos;
+}
+
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 {
-    int fd;
     ssize_t ret;
-
-    if (f == stdout) {
-        fd = STDOUT_FILENO;
-    } else if (f == stderr) {
-        fd = STDERR_FILENO;
-    } else {
-//        fd = ;
+    int fd = __get_fd(f);
+    if (fd < 0) {
+        return EOF;
     }
+
     ret = write(fd, (void *)ptr, size * nmemb);
     if (ret < 0) {
         ret = 0;
@@ -71,14 +145,12 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 
 size_t fread(const void *ptr, size_t size, size_t nmemb, FILE *f)
 {
-    int fd;
     ssize_t ret;
-
-    if (f == stdin) {
-        fd = STDIN_FILENO;
-    } else {
-//        fd = ;
+    int fd = __get_fd(f);
+    if (fd < 0) {
+        return EOF;
     }
+
     ret = read(fd, (void *)ptr, size * nmemb);
     if (ret < 0) {
         ret = 0;

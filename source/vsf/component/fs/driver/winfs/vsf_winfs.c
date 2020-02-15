@@ -94,6 +94,9 @@ static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_
     uint_fast16_t real_len = 0, cur_len;
 
     while (tmp != NULL) {
+        if (&vk_vfs_op == tmp->fsop) {
+            tmp = ((vk_vfs_file_t *)tmp)->subfs.root;
+        }
         real_len += strlen(tmp->name) + 1;
         tmp = tmp->parent;
     }
@@ -106,6 +109,9 @@ static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_
     len = real_len - 1;
     path[len] = '\0';
     while (tmp != NULL) {
+        if (&vk_vfs_op == tmp->fsop) {
+            tmp = ((vk_vfs_file_t *)tmp)->subfs.root;
+        }
         cur_len = strlen(tmp->name);
         len -= cur_len;
         memcpy(&path[len], tmp->name, cur_len);
@@ -230,6 +236,9 @@ static void __vk_winfs_lookup(uintptr_t target, vsf_evt_t evt)
             err = VSF_ERR_NOT_AVAILABLE;
             goto do_free_and_return;
         }
+
+        DWORD sizehigh;
+        winfs_file->size = GetFileSize(winfs_file->f.hFile, &sizehigh) | ((uint64_t)sizehigh << 32);
     }
 
     if (dwAttribute & FILE_ATTRIBUTE_ARCHIVE) {

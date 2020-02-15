@@ -58,9 +58,6 @@ const vk_usbh_class_drv_t vk_usbh_xb360_drv = {
 
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 #if     defined(WEAK_VSF_USBH_XB360_ON_REPORT_INPUT_EXTERN)                     \
     &&  defined(WEAK_VSF_USBH_XB360_ON_REPORT_INPUT)
 WEAK_VSF_USBH_XB360_ON_REPORT_INPUT_EXTERN

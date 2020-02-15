@@ -31,25 +31,25 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vk_usbd_cdc_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t vk_usbd_cdc_control_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_cdc_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_cdc_control_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbd_class_op_t vk_usbd_cdc_control = {
-    .request_prepare = vk_usbd_cdc_control_request_prepare,
-    .request_process = vk_usbd_cdc_control_request_process,
+    .request_prepare = __vk_usbd_cdc_control_request_prepare,
+    .request_process = __vk_usbd_cdc_control_request_process,
 };
 
 const vk_usbd_class_op_t vk_usbd_cdc_data = {
-    .init = vk_usbd_cdc_data_init,
+    .init = __vk_usbd_cdc_data_init,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t vk_usbd_cdc_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_cdc_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdc_t *pthis = (vk_usbd_cdc_t *)ifs->class_param;
 
@@ -94,7 +94,7 @@ void vk_usbd_cdc_data_connect(vk_usbd_cdc_t *cdc)
 #endif
 }
 
-static vsf_err_t vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdc_t *cdc = (vk_usbd_cdc_t *)ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
@@ -126,7 +126,7 @@ static vsf_err_t vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_usbd
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vk_usbd_cdc_control_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_cdc_control_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdc_t *cdc = (vk_usbd_cdc_t *)ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;

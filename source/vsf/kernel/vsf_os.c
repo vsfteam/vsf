@@ -71,7 +71,7 @@ void vsf_kernel_init(   vsf_pool_block(vsf_eda_frame_pool) *frame_buf_ptr,
 void vsf_kernel_init(   vsf_prio_t highest_prio);
 #endif
 
-extern vsf_err_t __vsf_kernel_start(void);
+extern vsf_err_t vk_kernel_start(void);
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
@@ -314,14 +314,14 @@ void __post_vsf_kernel_init(void)
 }
 #endif
 
-void vsf_kernel_os_run_priority(vsf_prio_t priority)
+void __vsf_kernel_os_run_priority(vsf_prio_t priority)
 {
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     __vsf_os_evtq_swi_handler(&__vsf_os.res_ptr->evt_queue.queue_array[priority]);
 #endif
 }
 
-void vsf_kernel_os_start(void)
+void __vsf_kernel_os_start(void)
 {
 #ifndef WEAK_VSF_SERVICE_INIT
     vsf_service_init();
@@ -368,7 +368,7 @@ void vsf_kernel_os_start(void)
         vsf_systimer_prio_set(priorit);
     }
 
-    __vsf_kernel_start();
+    vk_kernel_start();
 
 #ifndef WEAK_VSF_HAL_ADVANCE_INIT
     vsf_hal_advance_init();
@@ -385,11 +385,11 @@ void vsf_kernel_os_start(void)
 void __vsf_main_entry(void)
 {
     vsf_hal_init();
-    vsf_kernel_os_start();
+    __vsf_kernel_os_start();
 
     while (1) {
     #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
-        vsf_kernel_os_run_priority(vsf_prio_0);
+        __vsf_kernel_os_run_priority(vsf_prio_0);
     #endif
     #ifndef WEAK_VSF_PLUG_IN_FOR_KERNEL_DIAGNOSIS
         vsf_plug_in_for_kernel_diagnosis(); //!< customised kernel diagnosis

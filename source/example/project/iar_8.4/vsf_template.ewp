@@ -19813,6 +19813,33 @@
                 </file>
             </group>
             <group>
+                <name>debugger</name>
+                <group>
+                    <name>nulink</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\nulink\NuConsole.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\nulink\NuConsole.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\nulink\NuConsole_Config.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\vsf_debugger.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\component\debugger\vsf_debugger_cfg.h</name>
+                </file>
+            </group>
+            <group>
                 <name>fs</name>
                 <group>
                     <name>driver</name>
@@ -20498,6 +20525,7 @@
                         <configuration>WinnerMicro_W600</configuration>
                         <configuration>arm_mps2_m0</configuration>
                         <configuration>demo_bbb</configuration>
+                        <configuration>linux_m484</configuration>
                     </excluded>
                     <group>
                         <name>M480</name>
@@ -20814,23 +20842,69 @@
                             <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NUC500\__device.h</name>
                         </file>
                     </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\driver.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>ST</name>
+                    <excluded>
+                        <configuration>arm_mps2_m7</configuration>
+                        <configuration>kernel_template_cm7</configuration>
+                        <configuration>usbh_m484</configuration>
+                        <configuration>WinnerMicro_W600</configuration>
+                        <configuration>aio_m484</configuration>
+                        <configuration>nes_simulator</configuration>
+                        <configuration>arm_mps2_m0</configuration>
+                        <configuration>kernel_test</configuration>
+                        <configuration>demo_bbb</configuration>
+                        <configuration>usbd_demo_simplest</configuration>
+                        <configuration>vsfvm</configuration>
+                        <configuration>usbh_nuc505</configuration>
+                        <configuration>usbd_demo_msc</configuration>
+                        <configuration>linux_m484</configuration>
+                    </excluded>
                     <group>
-                        <name>NuConsole</name>
+                        <name>STM32F730</name>
+                        <group>
+                            <name>common</name>
+                            <group>
+                                <name>vendor</name>
+                                <group>
+                                    <name>Include</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\common\vendor\Include\stm32f730xx.h</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\common\__common.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\common\__common.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>STM32F730R8</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\device.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\driver.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\driver.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\startup_STM32F730R8.c</name>
+                            </file>
+                        </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole_Config.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\NuConsole\NuConsole_stream.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\STM32F730\__device.h</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\Nuvoton\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\ST\driver.h</name>
                     </file>
                 </group>
                 <group>

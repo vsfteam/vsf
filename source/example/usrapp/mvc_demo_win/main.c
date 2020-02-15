@@ -70,12 +70,21 @@ void vsf_input_on_keyboard(vk_keyboard_evt_t* keyboard_evt)
     }
 }
 
+extern void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt);
+void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
+{
+    if (mouse_evt->dev == &usrapp.ui.disp) {
+        vsf_tgui_on_mouse_evt(mouse_evt);
+    }
+    
+}
+
 #endif
 
 // TODO: SDL require that main need argc and argv
 int main(int argc, char *argv[])
 {
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
     vsf_stdio_init();
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED

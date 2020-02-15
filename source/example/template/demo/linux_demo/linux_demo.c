@@ -17,13 +17,14 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "vsf.h"
+#include "vsf_cfg.h"
 
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
 
-#include "../usrapp_common.h"
-
 #define VSF_LINUX_INHERIT
+#include "vsf.h"
+
+#include "../common/usrapp_common.h"
 #include "shell/sys/linux/vsf_linux.h"
 #include "shell/sys/linux/port/busybox/busybox.h"
 #if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
@@ -69,6 +70,25 @@ extern int usbh_main(int argc, char *argv[]);
 extern int lvgl_main(int argc, char *argv[]);
 #endif
 
+#if APP_CFG_USE_TGUI_DEMO == ENABLED
+extern int tgui_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_AUDIO_DEMO == ENABLED
+extern int audio_play_main(int argc, char *argv[]);
+#endif
+
+#if     APP_CFG_USE_USBD_DEMO == ENABLED                                        \
+    &&  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
+        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
+            &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
+int usbd_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
+extern int mount_file_main(int argc, char *argv[]);
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 int vsf_linux_create_fhs(void)
@@ -86,13 +106,13 @@ int vsf_linux_create_fhs(void)
 #if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED                  \
     && VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
     vk_mal_init(&usrapp_common.mal.fakefat32.use_as__vk_mal_t);
-    if (mkdir("/fatfs_fakefat32", 0)) {
+    if (mkdir("/fatfs", 0)) {
         return -1;
     }
-    fd = open("/fatfs_fakefat32", 0);
+    fd = open("/fatfs", 0);
     if (fd >= 0) {
         close(fd);
-        mount(NULL, "/fatfs_fakefat32", &vk_fatfs_op, 0, &usrapp_common.fs.fatfs_info_fakefat32.use_as____vk_fatfs_info_t);
+        mount(NULL, "fatfs", NULL, 0, &usrapp_common.mal.fakefat32.use_as__vk_mal_t);
     }
 #endif
 
@@ -118,6 +138,12 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
+#if APP_CFG_USE_SCSI_DEMO == ENABLED
+    if (mkdir("/scsi", 0)) {
+        return -1;
+    }
+#endif
+
     // install executables
 #if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
     busybox_bind("/sbin/lsusb", lsusb_main);
@@ -133,25 +159,41 @@ int vsf_linux_create_fhs(void)
 #if APP_CFG_USE_LVGL_DEMO == ENABLED
     busybox_bind("/sbin/lvgl", lvgl_main);
 #endif
+#if APP_CFG_USE_TGUI_DEMO == ENABLED
+    busybox_bind("/sbin/tgui", tgui_main);
+#endif
+#if APP_CFG_USE_AUDIO_DEMO == ENABLED
+    busybox_bind("/sbin/play_audio", audio_play_main);
+#endif
+#if     APP_CFG_USE_USBD_DEMO == ENABLED                                        \
+    &&  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
+        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
+            &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
+    busybox_bind("/sbin/usbd", usbd_main);
+#endif
+#if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
+    busybox_bind("/sbin/mount_file", mount_file_main);
+#endif
+
     return 0;
 }
 
-#if VSF_USE_USB_DEVICE == ENABLED
-implement_mem_stream(user_usbd_cdc_acm_stream_rx, USRAPP_CFG_CDC_RX_STREAM_SIZE)
-implement_mem_stream(user_usbd_cdc_acm_stream_tx, USRAPP_CFG_CDC_TX_STREAM_SIZE)
+#if VSF_USE_USB_DEVICE == ENABLED && USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_CDC
+describe_mem_stream(user_usbd_cdc_acm_stream_rx, USRAPP_CFG_CDC_RX_STREAM_SIZE)
+describe_mem_stream(user_usbd_cdc_acm_stream_tx, USRAPP_CFG_CDC_TX_STREAM_SIZE)
 
-implement_usbd(user_usbd_cdc, 0x2348, 0xA7A8, 0x0409, USB_DC_SPEED_HIGH)
-    implement_usbd_common_desc(user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
-        implement_cdc_acm_desc(user_usbd_cdc, 0, 0, 1, 2, 2, 512, 16)
-    implement_usbd_func_desc(user_usbd_cdc)
-        implement_usbd_func_str_desc(user_usbd_cdc, 0, u"VSF-CDC")
-    implement_usbd_std_desc_table(user_usbd_cdc)
-        implement_usbd_func_str_desc_table(user_usbd_cdc, 0)
-    implement_usbd_device_func(user_usbd_cdc)
-        implement_cdc_acm_func(user_usbd_cdc, 0, 1, 2, 2, &user_usbd_cdc_acm_stream_rx, &user_usbd_cdc_acm_stream_tx, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
-    implement_usbd_device_ifs(user_usbd_cdc)
-        implement_cdc_acm_ifs(user_usbd_cdc, 0)
-end_implement_usbd(user_usbd_cdc, VSF_USB_DC0)
+describe_usbd(user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0409, USB_DC_SPEED_HIGH)
+    usbd_common_desc(user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
+        cdc_acm_desc(user_usbd_cdc, 0, 0, 1, 2, 2, 512, 16)
+    usbd_func_desc(user_usbd_cdc)
+        usbd_func_str_desc(user_usbd_cdc, 0, u"VSF-CDC")
+    usbd_std_desc_table(user_usbd_cdc)
+        usbd_func_str_desc_table(user_usbd_cdc, 0)
+    usbd_func(user_usbd_cdc)
+        cdc_acm_func(user_usbd_cdc, 0, 1, 2, 2, &user_usbd_cdc_acm_stream_rx, &user_usbd_cdc_acm_stream_tx, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
+    usbd_ifs(user_usbd_cdc)
+        cdc_acm_ifs(user_usbd_cdc, 0)
+end_describe_usbd(user_usbd_cdc, USRAPP_CFG_USBD_DEV)
 
 #elif defined(VSF_DEBUG_STREAM_NEED_POOL)
 void vsf_plug_in_on_kernel_idle(void)
@@ -164,26 +206,32 @@ void vsf_plug_in_on_kernel_idle(void)
 int main(int argc, char *argv[])
 {
 #if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_start_trace();
 #   if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #   endif
 #endif
 
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_CDC
     vsf_stream_init(&user_usbd_cdc_acm_stream_rx.use_as__vsf_stream_t);
     vsf_stream_init(&user_usbd_cdc_acm_stream_tx.use_as__vsf_stream_t);
     vk_usbd_init(&user_usbd_cdc);
     vk_usbd_connect(&user_usbd_cdc);
+#elif USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_UART
+    // TODO: initialize uart stream
 #endif
 
     vsf_trace(VSF_TRACE_INFO, "start linux..." VSF_TRACE_CFG_LINEEND);
 
     vsf_stream_t *stream_tx, *stream_rx;
-#if VSF_USE_USB_DEVICE == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_CDC
     stream_tx = (vsf_stream_t *)&user_usbd_cdc_acm_stream_tx.use_as__vsf_stream_t;
     stream_rx = (vsf_stream_t *)&user_usbd_cdc_acm_stream_rx.use_as__vsf_stream_t;
-#else
+#elif USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_UART
+    // TODO: 
+    stream_tx = (vsf_stream_t *)&UART_STREAM_TX;
+    stream_rx = (vsf_stream_t *)&UART_STREAM_RX;
+#elif USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
     stream_tx = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX;
     stream_rx = (vsf_stream_t *)&VSF_DEBUG_STREAM_RX;
 #endif

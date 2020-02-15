@@ -52,7 +52,7 @@
 /*============================ TYPES =========================================*/
 
 #if __VSF_DEV_SWI_NUM > 0
-static const IRQn_Type m480_soft_irq[VSF_DEV_SWI_NUM] = {
+static const IRQn_Type __m480_soft_irq[VSF_DEV_SWI_NUM] = {
     VSF_DEV_SWI_LIST
 };
 
@@ -157,10 +157,10 @@ static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx,
             __m480_common.swi[idx].handler = handler;
             __m480_common.swi[idx].param = param;
 
-            NVIC_SetPriority(m480_soft_irq[idx], priority);
-            NVIC_EnableIRQ(m480_soft_irq[idx]);
+            NVIC_SetPriority(__m480_soft_irq[idx], priority);
+            NVIC_EnableIRQ(__m480_soft_irq[idx]);
         } else {
-            NVIC_DisableIRQ(m480_soft_irq[idx]);
+            NVIC_DisableIRQ(__m480_soft_irq[idx]);
         }
         return VSF_ERR_NONE;
     }
@@ -171,7 +171,7 @@ static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx,
 static ALWAYS_INLINE void vsf_drv_swi_trigger(uint_fast8_t idx)
 {
     if (idx < __VSF_DEV_SWI_NUM) {
-        NVIC_SetPendingIRQ(m480_soft_irq[idx]);
+        NVIC_SetPendingIRQ(__m480_soft_irq[idx]);
         return;
     }
     VSF_HAL_ASSERT(false);

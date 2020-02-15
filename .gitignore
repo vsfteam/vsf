@@ -70,6 +70,10 @@ source/example/project/vc/x86
 source/example/project/vc/x64
 source/example/project/vc/Debug
 
+source/example/template/project/vc/.vs
+source/example/template/project/vc/vsf_template_win
+source/example/template/project/vc/x64
+
 *.___i
 *.custom_argvars
 

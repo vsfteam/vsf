@@ -37,12 +37,23 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_STREAM_CFG_TICKTOCK
+#   define VSF_STREAM_CFG_TICKTOCK                      ENABLED
+#endif
+
+#ifndef VSF_STREAM_CFG_THRESHOLD
+#   define VSF_STREAM_CFG_THRESHOLD                     ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+// VSF_STREAM_XXX in upper case is compatible with all stream classes
 #define VSF_STREAM_INIT(__stream)                       vsf_stream_init((vsf_stream_t *)(__stream))
 #define VSF_STREAM_FINI(__stream)                       vsf_stream_fini((vsf_stream_t *)(__stream))
 #define VSF_STREAM_WRITE(__stream, __buf, __size)       vsf_stream_write((vsf_stream_t *)(__stream), (__buf), (__size))
 #define VSF_STREAM_READ(__stream, __buf, __size)        vsf_stream_read((vsf_stream_t *)(__stream), (__buf), (__size))
+#define VSF_STREAM_GET_BUFF_SIZE(__stream)              vsf_stream_get_buff_size((vsf_stream_t *)(__stream))
 #define VSF_STREAM_GET_DATA_SIZE(__stream)              vsf_stream_get_data_size((vsf_stream_t *)(__stream))
 #define VSF_STREAM_GET_FREE_SIZE(__stream)              vsf_stream_get_free_size((vsf_stream_t *)(__stream))
 #define VSF_STREAM_GET_WBUF(__stream, p)                vsf_stream_get_wbuf((vsf_stream_t *)(__stream), (p))
@@ -53,8 +64,10 @@
 #define VSF_STREAM_DISCONNECT_TX(__stream)              vsf_stream_disconnect_tx((vsf_stream_t *)(__stream))
 #define VSF_STREAM_IS_RX_CONNECTED(__stream)            vsf_stream_is_rx_connected((vsf_stream_t *)(__stream))
 #define VSF_STREAM_IS_TX_CONNECTED(__stream)            vsf_stream_is_tx_connected((vsf_stream_t *)(__stream))
+#if VSF_STREAM_CFG_THRESHOLD == ENABLED
 #define VSF_STREAM_SET_RX_THRESHOLD(__stream, __thres)  vsf_stream_set_rx_threshold((vsf_stream_t *)(__stream), (__thres))
 #define VSF_STREAM_SET_TX_THRESHOLD(__stream, __thres)  vsf_stream_set_tx_threshold((vsf_stream_t *)(__stream), (__thres))
+#endif
 
 /*============================ TYPES =========================================*/
 
@@ -78,6 +91,7 @@ struct vsf_stream_op_t {
     //         then do dummy read/write of buffer->size
     uint_fast32_t (*write)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
     uint_fast32_t (*read)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+    uint_fast32_t (*get_buff_length)(vsf_stream_t *stream);
     uint_fast32_t (*get_data_length)(vsf_stream_t *stream);
     uint_fast32_t (*get_avail_length)(vsf_stream_t *stream);
     // get consequent buffer for read/write
@@ -94,7 +108,9 @@ def_simple_class(vsf_stream_terminal_t) {
     )
 
     private_member(
+#if VSF_STREAM_CFG_THRESHOLD == ENABLED
         uint32_t threshold;
+#endif
         bool ready;
         bool data_notified;
     )
@@ -104,6 +120,10 @@ def_simple_class(vsf_stream_t) {
 
     public_member(
         vsf_stream_op_t const *op;
+#if VSF_STREAM_CFG_TICKTOCK == ENABLED
+        bool is_ticktock_read;
+        bool is_ticktock_write;
+#endif
     )
 
     protected_member(
@@ -129,8 +149,11 @@ extern vsf_err_t vsf_stream_init(vsf_stream_t *stream);
 extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
 extern uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
 extern uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+#if VSF_STREAM_CFG_THRESHOLD == ENABLED
 extern void vsf_stream_set_tx_threshold(vsf_stream_t *stream, uint_fast32_t threshold);
 extern void vsf_stream_set_rx_threshold(vsf_stream_t *stream, uint_fast32_t threshold);
+#endif
+extern uint_fast32_t vsf_stream_get_buff_size(vsf_stream_t *stream);
 extern uint_fast32_t vsf_stream_get_data_size(vsf_stream_t *stream);
 extern uint_fast32_t vsf_stream_get_free_size(vsf_stream_t *stream);
 extern uint_fast32_t vsf_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr);

@@ -82,7 +82,7 @@ implement_vsf_task(vsf_task_a)
             }
             break;
         case SUB_CALL:
-            if (fsm_rt_cpl == vsf_eda_call_fsm(eda_sub_demo_fsm_b_entry, NULL)) {
+            if (fsm_rt_cpl == __vsf_eda_call_fsm(eda_sub_demo_fsm_b_entry, NULL)) {
                 vsf_trace(VSF_TRACE_DEBUG, "sub fsm A return cpl\r\n");
                 RESET_FSM();
                 return fsm_rt_cpl;
@@ -109,10 +109,10 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_RETURN:
         vsf_trace(VSF_TRACE_DEBUG, "get return from sub eda\r\n");
         /*! \note IMPORTANT 
-         *!       You must call vsf_call_task()/vsf_eda_call_fsm() again to read 
+         *!       You must call vsf_call_task()/__vsf_eda_call_fsm() again to read 
          *        the return value, even you didn't really need the value.
          *!       This read will reset interal status to make sure any 
-         *!       vsf_call_task()/vsf_eda_call_fsm call working correctly
+         *!       vsf_call_task()/__vsf_eda_call_fsm call working correctly
          */
         fsm_rt_t ret = vsf_eda_call_task(vsf_task_a, &this.task_cb);            //! DUMMY CALL
         UNUSED_PARAM(ret);
@@ -157,7 +157,7 @@ static fsm_rt_t eda_sub_demo_fsm_main_entry(void *pthis, vsf_evt_t evt)
         return fsm_rt_cpl;
     case VSF_EVT_INIT:
         vsf_trace(VSF_TRACE_DEBUG, "call sub fsm in main fsm\r\n");
-        vsf_eda_call_fsm(eda_sub_demo_fsm_a_entry, NULL);
+        __vsf_eda_call_fsm(eda_sub_demo_fsm_a_entry, NULL);
         return fsm_rt_wait_for_evt;
     }
     return fsm_rt_yield;

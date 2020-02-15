@@ -3,6 +3,9 @@
 #ifndef VSH_ECHO
 #   define VSH_ECHO                 1
 #endif
+#ifndef VSH_HISTORY_NUM
+#   define VSH_HISTORY_NUM          10
+#endif
 #ifndef VSH_LINEEND
 #   define VSH_LINEEND              "\r\n"
 #endif

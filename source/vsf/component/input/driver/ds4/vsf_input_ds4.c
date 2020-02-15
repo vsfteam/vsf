@@ -224,7 +224,7 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
         if ((dev->data.touch[2] != data->touch[2]) || !(data->touch[2] & 0x80)) {
             x = data->touch[3] + ((data->touch[4] & 0x0F) << 8);
             y = ((data->touch[4] & 0xF0) >> 4) + (data->touch[5] << 4);
-            VSF_INPUT_TOUCHSCREEN_SET(&parser.touch.evt, 0, !(data->touch[2] & 0x80), x, y);
+            vsf_input_touchscreen_set(&parser.touch.evt, 0, !(data->touch[2] & 0x80), x, y);
 #ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
             vsf_input_on_touchscreen(&parser.touch.evt);
 #else
@@ -235,7 +235,7 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
         if ((dev->data.touch[6] != data->touch[6]) || !(data->touch[6] & 0x80)) {
             x = data->touch[7] + ((data->touch[8] & 0x0F) << 8);
             y = ((data->touch[8] & 0xF0) >> 4) + (data->touch[9] << 4);
-            VSF_INPUT_TOUCHSCREEN_SET(&parser.touch.evt, 1, !(data->touch[6] & 0x80), x, y);
+            vsf_input_touchscreen_set(&parser.touch.evt, 1, !(data->touch[6] & 0x80), x, y);
 #ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
             vsf_input_on_touchscreen(&parser.touch.evt);
 #else

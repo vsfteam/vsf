@@ -20,10 +20,12 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-#   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
-#elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-#   include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
+#if VSF_USE_USB_HOST == ENABLED
+#   if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#       include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
+#   elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#       include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
+#   endif
 #endif
 
 /*============================ MACROS ========================================*/
@@ -47,9 +49,9 @@ struct usrapp_common_const_t {
 #       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
         vk_ohci_param_t ohci_param;
 #       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        vsf_libusb_hcd_param_t libusb_hcd_param;
+        vk_libusb_hcd_param_t libusb_hcd_param;
 #       elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-        vsf_winusb_hcd_param_t winusb_hcd_param;
+        vk_winusb_hcd_param_t winusb_hcd_param;
 #       endif
     } usbh;
 #   endif
@@ -155,10 +157,10 @@ static usrapp_common_t __usrapp_common = {
         .host.drv           = &vk_ohci_drv,
         .host.param         = (void *)&__usrapp_common_const.usbh.ohci_param,
 #       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-        .host.drv           = &vsf_libusb_hcd_drv,
+        .host.drv           = &vk_libusb_hcd_drv,
         .host.param         = (void*)&__usrapp_common_const.usbh.libusb_hcd_param,
 #       elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
-        .host.drv           = &vsf_winusb_hcd_drv,
+        .host.drv           = &vk_winusb_hcd_drv,
         .host.param         = (void*)&__usrapp_common_const.usbh.winusb_hcd_param,
 #       endif
 
@@ -256,7 +258,7 @@ static usrapp_common_t __usrapp_common = {
 static inline vsf_err_t __usrapp_common_init(void)
 {
 #if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_start_trace();
 #   if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #   endif

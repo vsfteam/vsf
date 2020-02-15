@@ -53,6 +53,12 @@
 
 /* -----------------  Start of section using anonymous unions  -------------- */
 
+/*! \note it's safe to ignore -Wcast-align in x86 platform */
+#if __IS_COMPILER_LLVM__
+#pragma clang diagnostic ignored "-Wcast-align"
+#elif __IS_COMPILER_GCC__
+#pragma GCC diagnostic ignored "-Wcast-align"
+#endif
 
 /*============================ MACROS ========================================*/
 

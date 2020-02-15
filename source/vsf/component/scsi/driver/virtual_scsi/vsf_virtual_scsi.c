@@ -63,29 +63,6 @@ static void __vk_virtual_scsi_dummy(uintptr_t target, vsf_evt_t evt)
     vsf_eda_return();
 }
 
-static void __vk_virtual_scsi_get_rw_param(uint8_t *cbd, uint64_t *addr, uint32_t *size)
-{
-    scsi_group_code_t group_code = (scsi_group_code_t)(cbd[0] & 0xE0);
-    switch (group_code) {
-    case SCSI_GROUPCODE6:
-        *addr = get_unaligned_be16(&cbd[2]);
-        *size = cbd[4];
-        break;
-    case SCSI_GROUPCODE10_1:
-        *addr = get_unaligned_be32(&cbd[2]);
-        *size = get_unaligned_be16(&cbd[7]);
-        break;
-    case SCSI_GROUPCODE16:
-        *addr = get_unaligned_be64(&cbd[2]);
-        *size = get_unaligned_be32(&cbd[7]);
-        break;
-    case SCSI_GROUPCODE12:
-        *addr = get_unaligned_be32(&cbd[2]);
-        *size = get_unaligned_be32(&cbd[6]);
-        break;
-    }
-}
-
 static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 {
     vk_virtual_scsi_t *virtual_scsi = (vk_virtual_scsi_t *)pthis;
@@ -103,7 +80,7 @@ static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *
         uint64_t addr;
         uint32_t size;
 
-        __vk_virtual_scsi_get_rw_param(cbd, &addr, &size);
+        vk_scsi_get_rw_param(cbd, &addr, &size);
         return virtual_scsi->virtual_scsi_drv->buffer(pthis, is_read, addr, size, mem);
     }
     return false;
@@ -146,7 +123,7 @@ static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis)
     uint64_t addr;
     uint32_t size;
 
-    __vk_virtual_scsi_get_rw_param(cbd, &addr, &size);
+    vk_scsi_get_rw_param(cbd, &addr, &size);
     pthis->addr = addr;
     pthis->size = size;
 

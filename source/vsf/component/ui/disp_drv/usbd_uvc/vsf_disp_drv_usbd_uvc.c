@@ -21,6 +21,7 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_DRV_USBD_UVC == ENABLED
 
+#define VSF_EDA_CLASS_INHERIT
 #define __VSF_DISP_USBD_UVC_CLASS_IMPLEMENT
 #define __VSF_DISP_CLASS_INHERIT
 // TODO: use dedicated include
@@ -32,14 +33,14 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vk_disp_usbd_uvc_init(vk_disp_t *pthis);
-static vsf_err_t vk_disp_usbd_uvc_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+static vsf_err_t __vk_disp_usbd_uvc_init(vk_disp_t *pthis);
+static vsf_err_t __vk_disp_usbd_uvc_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_disp_drv_t vk_disp_drv_usbd_uvc = {
-    .init           = vk_disp_usbd_uvc_init,
-    .refresh        = vk_disp_usbd_uvc_refresh,
+    .init           = __vk_disp_usbd_uvc_init,
+    .refresh        = __vk_disp_usbd_uvc_refresh,
 };
 
 enum {
@@ -48,7 +49,7 @@ enum {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void vk_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_disp_usbd_uvc_t *disp_uvc = container_of(eda, vk_disp_usbd_uvc_t, eda);
 
@@ -74,17 +75,20 @@ static void vk_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t vk_disp_usbd_uvc_init(vk_disp_t *pthis)
+static vsf_err_t __vk_disp_usbd_uvc_init(vk_disp_t *pthis)
 {
     vk_disp_usbd_uvc_t *disp_uvc = (vk_disp_usbd_uvc_t *)pthis;
     VSF_UI_ASSERT(disp_uvc != NULL);
 
-    vsf_eda_set_evthandler(&disp_uvc->eda, vk_disp_usbd_uvc_evthandler);
+    disp_uvc->eda.fn.evthandler = __vk_disp_usbd_uvc_evthandler;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    disp_uvc->eda.on_terminate = NULL;
+#endif
     return vsf_eda_init(&disp_uvc->eda, VSF_USBD_CFG_USE_EDA, false);
 }
 
 // disp_buff MUST be a line_buffer with 2-byte header
-static vsf_err_t vk_disp_usbd_uvc_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
+static vsf_err_t __vk_disp_usbd_uvc_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
     vk_disp_usbd_uvc_t *disp_uvc = (vk_disp_usbd_uvc_t *)pthis;
     uint8_t *buffer = (uint8_t *)disp_buff - 2;

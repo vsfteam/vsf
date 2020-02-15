@@ -303,6 +303,8 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                 ival = *(int16_t *)buf;
             } else if (size == 4) {
                 ival = *(int32_t *)buf;
+            } else {
+                return VSF_ERR_NOT_SUPPORT;
             }
             desc->logical_min = ival;
             break;
@@ -314,6 +316,8 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                 ival = *(int16_t *)buf;
             } else if (size == 4) {
                 ival = *(int32_t *)buf;
+            } else {
+                return VSF_ERR_NOT_SUPPORT;
             }
             desc->logical_max = ival;
             break;

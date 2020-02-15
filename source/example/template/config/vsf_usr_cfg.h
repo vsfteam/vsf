@@ -24,14 +24,19 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
-
 // Application configure
 #define APP_CFG_USE_LINUX_DEMO                          ENABLED
-#define APP_CFG_USE_LINUX_LIBUSB_DEMO                   ENABLED
+#   define APP_CFG_USE_LINUX_LIBUSB_DEMO                ENABLED
+#   define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO            ENABLED
 #define APP_CFG_USE_USBH_DEMO                           ENABLED
+#define APP_CFG_USE_USBD_DEMO                           ENABLED
+//#   define USBD_DEMO_USE_CDC                            ENABLED
+#   define USBD_DEMO_USE_MSC                            ENABLED
+#define APP_CFG_USE_SCSI_DEMO                           ENABLED
+#define APP_CFG_USE_AUDIO_DEMO                          ENABLED
+#define APP_CFG_USE_TGUI_DEMO                           DISABLED
 
+// 3rd-party demos
 #define APP_CFG_USE_AWTK_DEMO                           ENABLED
 #define APP_CFG_USE_NNOM_DEMO                           DISABLED
 #define APP_CFG_USE_LVGL_DEMO                           DISABLED
@@ -49,11 +54,19 @@
 #   define VSF_USE_USB_HOST_NSPRO                       ENABLED
 #   define VSF_USE_USB_HOST_XB360                       ENABLED
 #   define VSF_USE_USB_HOST_XB1                         ENABLED
+#   define VSF_USE_USB_HOST_MSC                         ENABLED
 
 #if APP_CFG_USE_BTSTACK_DEMO == ENABLED
 #   define VSF_USE_USB_HOST_BTHCI                       ENABLED
 #   define VSF_USE_BTSTACK                              ENABLED
 #endif
+
+#define VSF_USE_AUDIO                                   ENABLED
+#   define VSF_USE_DECODER_WAV                          ENABLED
+#   define VSF_AUDIO_CFG_USE_PLAY                       ENABLED
+#   define VSF_AUDIO_CFG_USE_CATURE                     DISABLED
+#   define VSF_USE_WINSOUND                             ENABLED
+#       define VSF_WINSOUND_CFG_TRACE                   DISABLED
 
 #define VSF_USE_UI                                      ENABLED
 #if APP_CFG_USE_AWTK_DEMO == ENABLED
@@ -80,12 +93,18 @@
 //#define VSF_USE_USB_DEVICE                              ENABLED
 #   define VSF_USBD_CFG_USE_EDA                         ENABLED
 #   define VSF_USE_USB_DEVICE_CDCACM                    ENABLED
+#   define VSF_USE_USB_DEVICE_MSC                       ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
 #define VSF_USE_MAL                                     ENABLED
 #   define VSF_USE_MEM_MAL                              ENABLED
 #   define VSF_USE_FAKEFAT32_MAL                        ENABLED
+#   define VSF_USE_SCSI_MAL                             ENABLED
+#   define VSF_USE_FILE_MAL                             ENABLED
+
+#define VSF_USE_SCSI                                    ENABLED
+#   define VSF_USE_MAL_SCSI                             ENABLED
 
 #define VSF_USE_FS                                      ENABLED
 #   define VSF_USE_MEMFS                                ENABLED
@@ -96,6 +115,13 @@
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_USE_LINUX_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_USE_LINUX_BUSYBOX                        ENABLED
+
+#ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
+#   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
+#   define USRAPP_CFG_LINUX_TTY_UART                    1
+#   define USRAPP_CFG_LINUX_TTY_CDC                     2
+#endif
+#   define USRAPP_CFG_LINUX_TTY                         USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 
 #define VSF_USE_SERVICE_STREAM                          DISABLED
 #define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
@@ -110,6 +136,10 @@
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 #if     defined(__M484__)
+#   define ASSERT(...)                                  if (!(__VA_ARGS__)) {while(1);};
+//#   define ASSERT(...)
+
+#   define VSF_DEBUGGER_CFG_CONSOLE                     VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #   define VSF_HEAP_SIZE                                0x10000
 #   define VSF_SYSTIMER_FREQ                            (192000000ul)
 
@@ -127,10 +157,16 @@
 #   define VSF_USE_USB_HOST_HUB                         ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
 
+#   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
+
 #   define VSF_LINUX_CFG_STACKSIZE                      2048
 #   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
 #   define VSH_HAS_COLOR                                0
 #elif   defined(__NUC505__)
+#   define ASSERT(...)                                  if (!(__VA_ARGS__)) {while(1);};
+//#   define ASSERT(...)
+
+#   define VSF_DEBUGGER_CFG_CONSOLE                     VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #   define VSF_HEAP_SIZE                                0x4000
 #   define VSF_SYSTIMER_FREQ                            (96000000ul)
 
@@ -138,10 +174,34 @@
 #   define VSF_USE_USB_HOST_HUB                         ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
 #elif   defined(__WIN__)
-#   define VSF_HEAP_SIZE                                0x100000
-#   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   5
+
+// TODO: include for clang only
+#   pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#   pragma clang diagnostic ignored "-Wmicrosoft-include"
+#   pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#   pragma clang diagnostic ignored "-Wimplicit-function-declaration"
+
+#   ifdef __CPU_X64__
+#       error x64 is currently not supported
+#   endif
+
+#   define ASSERT(...)                                  assert(__VA_ARGS__)
+//#   define ASSERT(...)
+
+#   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
+#   define VSF_HEAP_SIZE                                0x1000000
+#   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   12      // 4K alignment
 
 #   define VSF_SYSTIMER_FREQ                            (0ul)
+
+#   define VSF_USE_USB_DEVICE                           ENABLED
+#       define VSF_USE_USB_DEVICE_DCD_USBIP             ENABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG           ENABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC   DISABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_URB       ENABLED
+#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_1
+#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_1
+#       define USRAPP_CFG_USBD_DEV                      VSF_USB_DC0
 
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #   define VSF_USE_USB_HOST_HUB                         DISABLED
@@ -163,10 +223,15 @@
 #       define VSF_WINUSB_HCD_DEV6_PID                  0x028E
 #       define VSF_WINUSB_HCD_DEV7_VID                  0x045E      // XB1
 #       define VSF_WINUSB_HCD_DEV7_PID                  0x02EA
+// set VSF_WINUSB_HCD_CFG_DEV_NUM to 9 and uncomment DEV8
+//  to test usbh_msc/scsi/mal/fs drivers
+//#       define VSF_WINUSB_HCD_DEV8_VID                  0xA7A8      // usbd_demo
+//#       define VSF_WINUSB_HCD_DEV8_PID                  0x2348
 
 #   define VSF_USE_WINFS                                ENABLED
 
 #   define VSF_USE_DISP_DRV_SDL2                        ENABLED
+#       define VSF_DISP_DRV_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
 #       define VSF_DISP_DRV_SDL2_CFG_HW_PRIORITY        vsf_arch_prio_1
 #       define APP_DISP_SDL2_HEIGHT                     600
 #       define APP_DISP_SDL2_WIDTH                      800
@@ -249,13 +314,20 @@
             vsf_bluetooth_h2_on_new((__DEV), (__ID))
 #   endif
 
+#define WEAK_VSF_SCSI_ON_NEW
+#define WEAK_VSF_SCSI_ON_DELETE
+
 #endif
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ INCLUDES ======================================*/
 
+#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#   include "vsf_tgui_cfg.h"
+#endif
 
 #endif
 /* EOF */

@@ -26,14 +26,14 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_INPUT_KEYBOARD_SET(__EVENT, __KEYCODE,  __IS_DOWN)                  \
+#define vsf_input_keyboard_set(__EVENT, __KEYCODE,  __IS_DOWN)                  \
             do {                                                                \
                 (__EVENT)->id = ((__KEYCODE) | ((__IS_DOWN) << 16));            \
             } while (0)
 
-#define VSF_INPUT_KEYBOARD_GET_KEYCODE(__EVENT)                                 \
+#define vsf_input_keyboard_get_keycode(__EVENT)                                 \
             ((uint16_t)(((__EVENT)->id >> 0) & 0xFFFF))
-#define VSF_INPUT_KEYBOARD_IS_DOWN(__EVENT)                                     \
+#define vsf_input_keyboard_is_down(__EVENT)                                     \
             (((__EVENT)->id >> 16) & 0x01)
 
 /*============================ TYPES =========================================*/

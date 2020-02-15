@@ -41,14 +41,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_winusb_hcd_param_t {
+struct vk_winusb_hcd_param_t {
     vsf_arch_prio_t priority;
 };
-typedef struct vsf_winusb_hcd_param_t vsf_winusb_hcd_param_t;
+typedef struct vk_winusb_hcd_param_t vk_winusb_hcd_param_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_usbh_hcd_drv_t vsf_winusb_hcd_drv;
+extern const vk_usbh_hcd_drv_t vk_winusb_hcd_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

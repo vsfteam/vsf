@@ -35,23 +35,23 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t vk_usbd_cdcacm_control_request_prepare(
+static vsf_err_t __vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_cdcacm_control_request_prepare(
         vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t vk_usbd_cdcacm_control_request_process(
+static vsf_err_t __vk_usbd_cdcacm_control_request_process(
         vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbd_class_op_t vk_usbd_cdcacm_control =
 {
-    .request_prepare = vk_usbd_cdcacm_control_request_prepare,
-    .request_process = vk_usbd_cdcacm_control_request_process,
+    .request_prepare = __vk_usbd_cdcacm_control_request_prepare,
+    .request_process = __vk_usbd_cdcacm_control_request_process,
 };
 
 const vk_usbd_class_op_t vk_usbd_cdcacm_data =
 {
-    .init = vk_usbd_cdcacm_data_init,
+    .init = __vk_usbd_cdcacm_data_init,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -97,7 +97,7 @@ vsf_err_t vk_usbd_cdcacm_init( vk_usbd_cdcacm_t *obj,
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdcacm_t *acm = ifs->class_param;
 
@@ -109,7 +109,7 @@ static vsf_err_t vk_usbd_cdcacm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs
     return vk_usbd_cdc_data.init(dev, ifs);
 }
 
-static vsf_err_t vk_usbd_cdcacm_control_request_prepare(
+static vsf_err_t __vk_usbd_cdcacm_control_request_prepare(
         vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdcacm_t *acm = ifs->class_param;
@@ -165,7 +165,7 @@ static vsf_err_t vk_usbd_cdcacm_control_request_prepare(
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vk_usbd_cdcacm_control_request_process(
+static vsf_err_t __vk_usbd_cdcacm_control_request_process(
         vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdcacm_t *acm = ifs->class_param;

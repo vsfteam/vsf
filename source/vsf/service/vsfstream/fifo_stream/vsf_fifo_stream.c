@@ -29,26 +29,28 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void vsf_fifo_stream_init(vsf_stream_t *stream);
-static uint_fast32_t vsf_fifo_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
-static uint_fast32_t vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
-static uint_fast32_t vsf_fifo_stream_get_data_length(vsf_stream_t *stream);
-static uint_fast32_t vsf_fifo_stream_get_avail_length(vsf_stream_t *stream);
-static uint_fast32_t vsf_fifo_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr);
-static uint_fast32_t vsf_fifo_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr);
+static void __vsf_fifo_stream_init(vsf_stream_t *stream);
+static uint_fast32_t __vsf_fifo_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t __vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t __vsf_fifo_stream_get_buff_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_fifo_stream_get_data_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_fifo_stream_get_avail_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_fifo_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr);
+static uint_fast32_t __vsf_fifo_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_stream_op_t vsf_fifo_stream_op = {
-    .init               = vsf_fifo_stream_init,
-    .fini               = vsf_fifo_stream_init,
-    .write              = vsf_fifo_stream_write,
-    .read               = vsf_fifo_stream_read,
-    .get_data_length    = vsf_fifo_stream_get_data_length,
-    .get_avail_length   = vsf_fifo_stream_get_avail_length,
-    .get_wbuf           = vsf_fifo_stream_get_wbuf,
-    .get_rbuf           = vsf_fifo_stream_get_rbuf,
+    .init               = __vsf_fifo_stream_init,
+    .fini               = __vsf_fifo_stream_init,
+    .write              = __vsf_fifo_stream_write,
+    .read               = __vsf_fifo_stream_read,
+    .get_buff_length    = __vsf_fifo_stream_get_buff_length,
+    .get_data_length    = __vsf_fifo_stream_get_data_length,
+    .get_avail_length   = __vsf_fifo_stream_get_avail_length,
+    .get_wbuf           = __vsf_fifo_stream_get_wbuf,
+    .get_rbuf           = __vsf_fifo_stream_get_rbuf,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -58,6 +60,12 @@ vsf_err_t vsf_fifo_init(vsf_fifo_t *fifo)
     VSF_SERVICE_ASSERT(fifo != NULL);
     fifo->head = fifo->tail = 0;
     return VSF_ERR_NONE;
+}
+
+uint_fast32_t vsf_fifo_get_buff_length(vsf_fifo_t *fifo)
+{
+    VSF_SERVICE_ASSERT(fifo != NULL);
+    return fifo->size;
 }
 
 uint_fast32_t vsf_fifo_get_data_length(vsf_fifo_t *fifo)
@@ -177,43 +185,49 @@ uint_fast32_t vsf_fifo_read(vsf_fifo_t *fifo, uint8_t *buf, uint_fast32_t size)
     return ret;
 }
 
-static void vsf_fifo_stream_init(vsf_stream_t *stream)
+static void __vsf_fifo_stream_init(vsf_stream_t *stream)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     vsf_fifo_init(&fifo_stream->use_as__vsf_fifo_t);
 }
 
-static uint_fast32_t vsf_fifo_stream_get_data_length(vsf_stream_t *stream)
+static uint_fast32_t __vsf_fifo_stream_get_buff_length(vsf_stream_t *stream)
+{
+    vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
+    return vsf_fifo_get_buff_length(&fifo_stream->use_as__vsf_fifo_t);
+}
+
+static uint_fast32_t __vsf_fifo_stream_get_data_length(vsf_stream_t *stream)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_get_data_length(&fifo_stream->use_as__vsf_fifo_t);
 }
 
-static uint_fast32_t vsf_fifo_stream_get_avail_length(vsf_stream_t *stream)
+static uint_fast32_t __vsf_fifo_stream_get_avail_length(vsf_stream_t *stream)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_get_avail_length(&fifo_stream->use_as__vsf_fifo_t);
 }
 
-static uint_fast32_t vsf_fifo_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
+static uint_fast32_t __vsf_fifo_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_get_wbuf(&fifo_stream->use_as__vsf_fifo_t, ptr);
 }
 
-static uint_fast32_t vsf_fifo_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
+static uint_fast32_t __vsf_fifo_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_get_rbuf(&fifo_stream->use_as__vsf_fifo_t, ptr);
 }
 
-static uint_fast32_t vsf_fifo_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
+static uint_fast32_t __vsf_fifo_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_write(&fifo_stream->use_as__vsf_fifo_t, buf, size);
 }
 
-static uint_fast32_t vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
+static uint_fast32_t __vsf_fifo_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_fifo_stream_t *fifo_stream = (vsf_fifo_stream_t *)stream;
     return vsf_fifo_read(&fifo_stream->use_as__vsf_fifo_t, buf, size);

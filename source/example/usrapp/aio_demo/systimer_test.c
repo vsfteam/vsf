@@ -61,7 +61,7 @@ static void one_tick_timer_callback(vsf_callback_timer_t *timer)
 
 int main(void)
 {
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
 
     usrapp.poll_timer.on_timer = usrapp_on_timer;
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);

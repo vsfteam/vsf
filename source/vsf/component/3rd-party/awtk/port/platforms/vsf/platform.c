@@ -1,3 +1,4 @@
+#include "vsf.h"
 #include "tkc/types_def.h"
 #include "base/main_loop.h"
 

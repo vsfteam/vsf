@@ -130,7 +130,7 @@ struct vsf_kernel_resource_t {
         uint16_t                            frame_cnt;
     } frame_stack;
 #endif
-}ALIGN(4);
+};
 
 typedef struct vsf_kernel_resource_t vsf_kernel_resource_t;
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -141,9 +141,9 @@ extern const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION;
 
 /*============================ PROTOTYPES ====================================*/
 
-//! vsf_kernel_os_start and vsf_kernel_os_run_priority are ONLY used when __vsf_main_entry is not used
-extern void vsf_kernel_os_start(void);
-extern void vsf_kernel_os_run_priority(vsf_prio_t priority);
+//! __vsf_kernel_os_start and __vsf_kernel_os_run_priority are ONLY used when __vsf_main_entry is not used
+extern void __vsf_kernel_os_start(void);
+extern void __vsf_kernel_os_run_priority(vsf_prio_t priority);
 #ifndef WEAK_VSF_KERNEL_ERR_REPORT
 extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 #endif

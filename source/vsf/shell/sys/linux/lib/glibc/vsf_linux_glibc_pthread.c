@@ -21,10 +21,10 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 #define VSF_LINUX_INHERIT
-#include "../../vsf_linux.h"
 
+#include <unistd.h>
 #include <time.h>
 #include <pthread.h>
 

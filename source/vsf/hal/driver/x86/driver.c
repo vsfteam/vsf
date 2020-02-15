@@ -19,36 +19,41 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
-
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
-#   include "service/vsf_service.h"
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#       define VSFSTREAM_CLASS_INHERIT
+#       include "service/vsf_service.h"
+#   endif
 #endif
 #include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE
-#   define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE         1024
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#   ifndef VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE
+#       define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE         1024
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t* stream,
             uint8_t* buf, uint_fast32_t size);
 static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t* stream);
 static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t* stream);
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   elif   VSF_USE_SERVICE_STREAM == ENABLED
 
+#   endif
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static const vsf_stream_op_t __vsf_x86_debug_stream_tx_op = {
     .get_data_length = __vsf_x86_debug_stream_tx_get_data_length,
     .get_avail_length = __vsf_x86_debug_stream_tx_get_avail_length,
@@ -56,13 +61,15 @@ static const vsf_stream_op_t __vsf_x86_debug_stream_tx_op = {
 };
 static uint8_t __vsf_x86_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
 static vsf_arch_irq_thread_t __vsf_x86_debug_stream_rx_irq;
-#endif
+#   endif
 
 static HANDLE hOut, hIn;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 vsf_stream_t VSF_DEBUG_STREAM_TX = {
     .op         = &__vsf_x86_debug_stream_tx_op,
 };
@@ -73,13 +80,15 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .nSize      = sizeof(__vsf_x86_debug_stream_rx_buff),
 };
 
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   elif   VSF_USE_SERVICE_STREAM == ENABLED
 
+#   endif
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t* stream,
             uint8_t* buf, uint_fast32_t size)
 {
@@ -136,15 +145,16 @@ static void __vsf_x86_debug_stream_init(void)
     __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq,
         __vsf_x86_debug_stream_rx_irqhandler, vsf_arch_prio_0, true);
 }
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   endif
 #endif
 
 bool vsf_driver_init(void) 
 {
+#if VSF_HAL_USE_DEBUG_STREAM == ENABLED
     __vsf_x86_debug_stream_init();
+#endif
     return true;
 }
-
-#endif
 
 /* EOF */

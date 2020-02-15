@@ -46,6 +46,9 @@
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vk_mal_t)
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+declare_simple_class(vk_mal_stream_t)
+#endif
 
 enum vsf_mal_op_t {
     VSF_MAL_OP_ERASE,
@@ -92,7 +95,15 @@ def_simple_class(vk_mal_t) {
             uint32_t size;
             vsf_err_t errcode;
         } result;
+    )
+};
+
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+def_simple_class(vk_mal_stream_t) {
+    public_member(
+        vk_mal_t *mal;
+    )
+    protected_member(
         struct {
             uint64_t addr;
             uint32_t size;
@@ -101,15 +112,17 @@ def_simple_class(vk_mal_t) {
             uint8_t *cur_buff;
             vsf_eda_t *cur_eda;
         } stream;
-#endif
     )
 };
+#endif
 
 /*============================ INCLUDES ======================================*/
 
 #include "./driver/mim_mal/vsf_mim_mal.h"
 #include "./driver/mem_mal/vsf_mem_mal.h"
 #include "./driver/fakefat32_mal/vsf_fakefat32_mal.h"
+#include "./driver/scsi_mal/vsf_scsi_mal.h"
+#include "./driver/file_mal/vsf_file_mal.h"
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -125,8 +138,8 @@ extern vsf_err_t vk_mal_read(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t 
 extern vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-extern vsf_err_t vk_mal_read_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
-extern vsf_err_t vk_mal_write_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
+extern vsf_err_t vk_mal_read_stream(vk_mal_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
+extern vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 #endif
 
 extern vsf_err_t vk_mal_get_result(vk_mal_t *pthis, uint32_t *size);

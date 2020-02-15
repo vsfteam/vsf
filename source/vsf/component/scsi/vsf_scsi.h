@@ -27,10 +27,8 @@
 #include "kernel/vsf_kernel.h"
 
 #if     defined(VSF_SCSI_IMPLEMENT)
-#   undef VSF_SCSI_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT
 #elif   defined(VSF_SCSI_INHERIT)
-#   undef VSF_SCSI_INHERIT
 #   define __PLOOC_CLASS_INHERIT
 #endif
 
@@ -101,6 +99,19 @@ enum scsi_cmd_code_t {
 };
 typedef enum scsi_cmd_code_t scsi_cmd_code_t;
 
+struct scsi_inquiry_t {
+    uint8_t type;
+    uint8_t removable;
+    uint8_t version;
+    uint8_t data_format;
+    uint8_t additional_length;
+    uint8_t reserved[3];
+    uint8_t vendor[8];
+    uint8_t product[16];
+    uint8_t revision[4];
+} PACKED;
+typedef struct scsi_inquiry_t scsi_inquiry_t;
+
 struct i_scsi_drv_t {
     void (*init)(uintptr_t target, vsf_evt_t evt);
     void (*fini)(uintptr_t target, vsf_evt_t evt);
@@ -135,11 +146,6 @@ def_simple_class(vk_scsi_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ INCLUDES ======================================*/
-
-#include "./driver/virtual_scsi/vsf_virtual_scsi.h"
-#include "./driver/mal_scsi/vsf_mal_scsi.h"
-
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_scsi_init(vk_scsi_t *pthis);
@@ -152,6 +158,20 @@ extern vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stre
 #endif
 
 extern vsf_err_t vk_scsi_get_errcode(vk_scsi_t *pthis, uint32_t *reply_len);
+
+#ifdef VSF_SCSI_INHERIT
+extern void vk_scsi_return(vk_scsi_t *pthis, vsf_err_t err);
+extern bool vk_scsi_get_rw_param(uint8_t *scsi_cmd, uint64_t *addr, uint32_t *size);
+extern uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd);
+#endif
+
+/*============================ INCLUDES ======================================*/
+
+#include "./driver/virtual_scsi/vsf_virtual_scsi.h"
+#include "./driver/mal_scsi/vsf_mal_scsi.h"
+
+#undef VSF_SCSI_IMPLEMENT
+#undef VSF_SCSI_INHERIT
 
 #endif      // VSF_USE_SCSI
 #endif      // __VSF_SCSI_H__

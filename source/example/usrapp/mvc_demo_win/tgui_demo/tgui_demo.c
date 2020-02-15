@@ -52,7 +52,7 @@ void vsf_tgui_low_level_on_ready_to_refresh(void)
 
 vsf_err_t tgui_demo_init(void)
 {
-    NO_INIT static vsf_tgui_evt_t s_tEvtQueueBuffer[16];
+    NO_INIT static vsf_tgui_evt_t s_tEvtQueueBuffer[32];
     NO_INIT static uint16_t s_tBFSBuffer[32];
     
     const vsf_tgui_cfg_t cfg = {
@@ -81,16 +81,16 @@ void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* evt)
 //! this block of code is used for test purpose only
     vsf_tgui_evt_t tEvent = {
         .tKeyEvt = {
-            .tMSG = VSF_INPUT_KEYBOARD_IS_DOWN(evt)
+            .tMSG = vsf_input_keyboard_is_down(evt)
                                 ? VSF_TGUI_EVT_KEY_DOWN
                                 : VSF_TGUI_EVT_KEY_UP,
-            .hwKeyValue = VSF_INPUT_KEYBOARD_GET_KEYCODE(evt),
+            .hwKeyValue = vsf_input_keyboard_get_keycode(evt),
         },
     };
 
     vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
 
-    if (!VSF_INPUT_KEYBOARD_IS_DOWN(evt)) {
+    if (!vsf_input_keyboard_is_down(evt)) {
         tEvent.tKeyEvt.tMSG = VSF_TGUI_EVT_KEY_PRESSED;
         vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
     }
@@ -103,23 +103,113 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 
     vsf_tgui_evt_t tEvent = {
         .tPointerEvt = {
-            .tMSG = VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) 
+            .tMSG = vsf_input_touchscreen_is_down(ts_evt) 
                                 ?   VSF_TGUI_EVT_POINTER_DOWN 
                                 :   VSF_TGUI_EVT_POINTER_UP,
             
-            .iX = VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-            .iY = VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
+            .iX = vsf_input_touchscreen_get_x(ts_evt),
+            .iY = vsf_input_touchscreen_get_y(ts_evt),
         },
     };
 
     vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
 
     
-    if (!VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt)) {
+    if (!vsf_input_touchscreen_is_down(ts_evt)) {
         tEvent.tPointerEvt.tMSG = VSF_TGUI_EVT_POINTER_CLICK;
         vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
     }
 }
+
+void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
+{
+/*
+    switch (vk_input_mouse_evt_get(mouse_evt)) {
+        case VSF_INPUT_MOUSE_EVT_BUTTON:
+            vsf_trace(VSF_TRACE_DEBUG, "mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+                vk_input_mouse_evt_button_get(mouse_evt),
+                vk_input_mouse_evt_button_is_down(mouse_evt) ? "down" : "up",
+                vk_input_mouse_evt_get_x(mouse_evt),
+                vk_input_mouse_evt_get_y(mouse_evt));
+            break;
+        case VSF_INPUT_MOUSE_EVT_MOVE:
+            vsf_trace(VSF_TRACE_DEBUG, "mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+                vk_input_mouse_evt_get_x(mouse_evt),
+                vk_input_mouse_evt_get_y(mouse_evt));
+            break;
+        case VSF_INPUT_MOUSE_EVT_WHEEL:
+            vsf_trace(VSF_TRACE_DEBUG, "mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
+                vk_input_mouse_evt_get_x(mouse_evt),
+                vk_input_mouse_evt_get_y(mouse_evt));
+            break;
+    }
+
+*/
+    //! this block of code is used for test purpose only
+
+    
+
+    switch (vk_input_mouse_evt_get(mouse_evt)) {
+        case VSF_INPUT_MOUSE_EVT_BUTTON: {
+            
+            vsf_tgui_evt_t tEvent = {
+                .tPointerEvt = {
+                    .tMSG = vk_input_mouse_evt_button_is_down(mouse_evt) 
+                                        ?   VSF_TGUI_EVT_POINTER_DOWN 
+                                        :   VSF_TGUI_EVT_POINTER_UP,
+            
+                    .iX = vk_input_mouse_evt_get_x(mouse_evt),
+                    .iY = vk_input_mouse_evt_get_y(mouse_evt),
+                },
+            };
+
+            vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+
+    
+            if (!vk_input_mouse_evt_button_is_down(mouse_evt)) {
+                tEvent.tPointerEvt.tMSG = VSF_TGUI_EVT_POINTER_CLICK;
+                vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+            }
+            break;
+        }
+
+        case VSF_INPUT_MOUSE_EVT_MOVE: {
+            vsf_tgui_evt_t tEvent = {
+                .tPointerEvt = {
+                    .tMSG = VSF_TGUI_EVT_POINTER_MOVE,
+                    .iX = vk_input_mouse_evt_get_x(mouse_evt),
+                    .iY = vk_input_mouse_evt_get_y(mouse_evt),
+                },
+            };
+
+            vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+
+            break;
+        }
+
+        case VSF_INPUT_MOUSE_EVT_WHEEL:  {
+                vsf_tgui_evt_t tEvent = {
+                    .tGestureEvt = {
+                        .tMSG = VSF_TGUI_EVT_GESTURE_SLIDE,
+                        .tDelta = {
+                            .iX = 0,
+                            .iY = vk_input_mouse_evt_get_y(mouse_evt),
+                            .hwMillisecond = 20,            //! 50Hz 
+                        },
+                    },
+                };
+
+                vsf_tgui_control_set_active(vsf_tgui_pointed_control_get(&s_tTGUIDemo));
+                vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+                break;
+            }
+
+        default:
+            break;
+    } 
+
+}
+
 
 #endif
 

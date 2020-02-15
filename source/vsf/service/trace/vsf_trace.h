@@ -61,9 +61,9 @@
 
 #if VSF_USE_TRACE == ENABLED
 #   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#       define vsf_trace_init(__ADDR)  __vsf_trace_init((vsf_stream_t *)(__ADDR))
+#       define vsf_trace_init(__stream) __vsf_trace_init((vsf_stream_t *)(__stream))
 #   elif VSF_USE_SERVICE_STREAM == ENABLED
-#       define vsf_trace_init(__ADDR)  __vsf_trace_init((vsf_stream_tx_t *)(__ADDR))
+#       define vsf_trace_init(__stream) __vsf_trace_init((vsf_stream_tx_t *)(__stream))
 #   endif
 #endif
 
@@ -101,11 +101,11 @@ extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
 #else
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#       define vsf_trace_init(__ARG)
-#       define vsf_trace_fini(__ARG)
-#       define vsf_trace(__ARG)
-#       define vsf_trace_buffer(__ARG)
-#       define vsf_trace_string(__ARG)
+#       define vsf_trace_init(__arg)
+#       define vsf_trace_fini(__arg)
+#       define vsf_trace(__arg)
+#       define vsf_trace_buffer(__arg)
+#       define vsf_trace_string(__arg)
 #   else
 #       define vsf_trace_init(...)
 #       define vsf_trace_fini(...)

@@ -58,7 +58,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USE_KERNEL
-#   define VSF_USE_KERNEL                                   ENABLED
+#   define VSF_USE_KERNEL                       ENABLED
 #endif
 
 #ifndef Hz
@@ -77,16 +77,23 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 
 #   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       if VSF_OS_CFG_PRIORITY_NUM > 1
-#           define __VSF_HAL_SWI_NUM                (VSF_OS_CFG_PRIORITY_NUM - 1)
+#           define __VSF_HAL_SWI_NUM            (VSF_OS_CFG_PRIORITY_NUM - 1)
 #       else
-#           define __VSF_HAL_SWI_NUM                0
+#           define __VSF_HAL_SWI_NUM            0
 #       endif
 #   else
-#       define __VSF_HAL_SWI_NUM                    (VSF_OS_CFG_PRIORITY_NUM)
+#       define __VSF_HAL_SWI_NUM                (VSF_OS_CFG_PRIORITY_NUM)
 #   endif
 // priority configurations
-#   define __VSF_OS_SWI_NUM                        __VSF_HAL_SWI_NUM
+#   define __VSF_OS_SWI_NUM                     __VSF_HAL_SWI_NUM
 #endif
+
+#if     (defined(VSF_DEBUGGER_CFG_CONSOLE) && (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED))\
+    ||  (defined(VSF_CFG_DEBUG_STREAM_TX_T) && (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED))\
+    ||  (defined(VSF_DEBUGGER_CFG_CONSOLE) && defined(VSF_CFG_DEBUG_STREAM_TX_T))
+#   error "please enable one of VSF_HAL_USE_DEBUG_STREAM/VSF_DEBUGGER_CFG_CONSOLE/VSF_CFG_DEBUG_STREAM_TX_T"
+#endif
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

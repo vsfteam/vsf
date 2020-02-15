@@ -41,7 +41,11 @@ static void vsf_stream_on_write(vsf_stream_t *stream)
 
     stream->tx.data_notified = false;
     if (    stream->rx.ready
+#if VSF_STREAM_CFG_THRESHOLD == ENABLED
         &&  (data_len >= stream->rx.threshold)
+#else
+        &&  (data_len >= 0)
+#endif
         &&  !stream->rx.data_notified
         &&  (stream->rx.evthandler != NULL)) {
 
@@ -56,7 +60,11 @@ static void vsf_stream_on_read(vsf_stream_t *stream)
 
     stream->rx.data_notified = false;
     if (    stream->tx.ready
+#if VSF_STREAM_CFG_THRESHOLD == ENABLED
         &&  (avail_len >= stream->tx.threshold)
+#else
+        &&  (avail_len >= 0)
+#endif
         &&  !stream->tx.data_notified
         &&  (stream->tx.evthandler != NULL)) {
 
@@ -81,6 +89,7 @@ uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t
     return count;
 }
 
+#if VSF_STREAM_CFG_THRESHOLD == ENABLED
 void vsf_stream_set_tx_threshold(vsf_stream_t *stream, uint_fast32_t threshold)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
@@ -93,6 +102,13 @@ void vsf_stream_set_rx_threshold(vsf_stream_t *stream, uint_fast32_t threshold)
     VSF_SERVICE_ASSERT(stream != NULL);
     stream->rx.threshold = threshold;
     vsf_stream_on_write(stream);
+}
+#endif
+
+uint_fast32_t vsf_stream_get_buff_size(vsf_stream_t *stream)
+{
+    VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_buff_length != NULL));
+    return stream->op->get_buff_length(stream);
 }
 
 uint_fast32_t vsf_stream_get_data_size(vsf_stream_t *stream)
@@ -110,13 +126,27 @@ uint_fast32_t vsf_stream_get_free_size(vsf_stream_t *stream)
 uint_fast32_t vsf_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_wbuf != NULL));
-    return stream->op->get_wbuf(stream, ptr);
+    uint_fast32_t size = stream->op->get_wbuf(stream, ptr);
+#if VSF_STREAM_CFG_TICKTOCK == ENABLED
+    uint_fast32_t half_buff_size = vsf_stream_get_buff_size(stream) >> 1;
+    if (stream->is_ticktock_write && (size > half_buff_size)) {
+        size = half_buff_size;
+    }
+#endif
+    return size;
 }
 
 uint_fast32_t vsf_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->get_rbuf != NULL));
-    return stream->op->get_rbuf(stream, ptr);
+    uint_fast32_t size = stream->op->get_rbuf(stream, ptr);
+#if VSF_STREAM_CFG_TICKTOCK == ENABLED
+    uint_fast32_t half_buff_size = vsf_stream_get_buff_size(stream) >> 1;
+    if (stream->is_ticktock_read && (size > half_buff_size)) {
+        size = half_buff_size;
+    }
+#endif
+    return size;
 }
 
 static void vsf_stream_connect_terminal(vsf_stream_t *stream, uint_fast8_t terminal)

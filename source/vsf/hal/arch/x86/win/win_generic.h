@@ -24,6 +24,11 @@
 #include "hal/vsf_hal_cfg.h"
 
 #include <Windows.h>
+
+// IMPORTANT for using COM: interface from combaseapi is a macro defined to struct
+//  this will conflicts with some 3rd-party code, eg: libusb, freetype
+//  if windows.h is included in global header file, remove interface define
+//  if user c file need to use com, define interface to struct.
 #ifdef interface
 #   undef interface
 #endif

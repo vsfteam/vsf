@@ -63,9 +63,42 @@
 #   endif
 #endif
 
+#if VSF_USE_TRACE == ENABLED
+#   if      defined(VSF_DEBUGGER_CFG_CONSOLE)                                   \
+        ||  (defined(VSF_HAL_USE_DEBUG_STREAM) && VSF_HAL_USE_DEBUG_STREAM == ENABLED)\
+        ||  defined(VSF_CFG_DEBUG_STREAM_TX_T)
+    // use default debug stream from debugger/hardware debug uart/user
+#       if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#           define vsf_start_trace(...)                                         \
+                vsf_trace_init(((vsf_stream_t *)&VSF_DEBUG_STREAM_TX, ##__VA_ARGS__))
+#       elif VSF_USE_SERVICE_STREAM == ENABLED
+#           define vsf_start_trace(...)                                         \
+                vsf_trace_init(((vsf_stream_tx_t *)&VSF_DEBUG_STREAM_TX, ##__VA_ARGS__))
+#       endif
+#   else
+    // no default debug stream, user should define a stream
+#       if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#           define vsf_start_trace(__stream)                                    \
+                vsf_trace_init((vsf_stream_t *)(__stream))
+#       elif VSF_USE_SERVICE_STREAM == ENABLED
+#           define vsf_start_trace(__stream)                                    \
+                vsf_trace_init((vsf_stream_tx_t *)(__stream))
+#       endif
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#ifdef VSF_CFG_DEBUG_STREAM_TX_T
+extern VSF_CFG_DEBUG_STREAM_TX_T VSF_DEBUG_STREAM_TX;
+#endif
+
+#ifdef VSF_CFG_DEBUG_STREAM_RX_T
+extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

@@ -21,7 +21,7 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#include "../../vsf_linux.h"
+#include <unistd.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -24,7 +24,7 @@
 
 #define VSF_USBH_INHERIT_vk_usbh_urb_t
 #define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT_CLASS
 // TODO: use dedicated include
 #include "vsf.h"
@@ -87,10 +87,6 @@ enum {
 static NO_INIT vsfvm_ext_libusb_t vsfvm_ext_libusb;
 
 /*============================ PROTOTYPES ====================================*/
-
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
@@ -369,7 +365,7 @@ static vsfvm_ret_t vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
         }
         return VSFVM_RET_PEND;
     } else {
-        __vsf_eda_fini(&thread->use_as__vsf_eda_t);
+        vsf_eda_fini(&thread->use_as__vsf_eda_t);
         thread->fn.evthandler = NULL;
 
         vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, vk_usbh_urb_get_status(urb));

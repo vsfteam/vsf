@@ -37,7 +37,7 @@ extern void usrapp_mutex_test_start(void);
 int main(void)
 {
 #if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
     vsf_stdio_init();
 
     printf("hello world\r\n");

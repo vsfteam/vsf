@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 #include "vsf_heap.h"
+#include "utilities/compiler.h"
 
 #if VSF_USE_HEAP == ENABLED
 #if defined(VSF_HEAP_CFG_ATOM_ACCESS_DEPENDENCY)
@@ -28,6 +29,11 @@
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 /*============================ MACROS ========================================*/
@@ -528,7 +534,7 @@ label_first_add:
         offset = (size - sizeof(__vsf_heap_mcb_t))  & ~(VSF_HEAP_CFG_MCB_ALIGN - 1);
 
         VSF_SERVICE_ASSERT(     !(size >> (VSF_HEAP_CFG_MCB_ALIGN_BIT + 16))
-                &&  (size > 2 * sizeof(__vsf_heap_mcb_t)));
+                            &&  (size > 2 * sizeof(__vsf_heap_mcb_t)));
 
         mcb = (__vsf_heap_mcb_t *)((uint8_t *)heap + offset);
         offset >>= VSF_HEAP_CFG_MCB_ALIGN_BIT;
@@ -648,10 +654,10 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
     }
 }
 
-//Adjust the allocated memory size(4-byte alignment)
+//Adjust the allocated memory size(aligned to sizeof(uintalu_t))
 void * vsf_heap_realloc(void *buffer, uint_fast32_t size)
 {
-    return vsf_heap_realloc_aligned(buffer, size, 4);
+    return vsf_heap_realloc_aligned(buffer, size, sizeof(uintalu_t));
 }
 
 void vsf_heap_free(void *buffer)
@@ -730,6 +736,10 @@ bool vsf_heap_partial_free(void *buffer, uint_fast32_t pos, uint_fast32_t size)
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#endif
+
+#if __IS_COMPILER_GCC__ 
+#   pragma GCC diagnostic pop
 #endif
 
 #endif

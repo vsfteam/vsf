@@ -90,20 +90,20 @@ extern void ui_demo_start(void);
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
-    if (0 == VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt)) {
+    if (0 == vsf_input_touchscreen_get_id(ts_evt)) {
         usrapp.ui.ts_evt = *ts_evt;
 //        vsf_trace(VSF_TRACE_DEBUG, "ts: (%d, %d) %s" VSF_TRACE_CFG_LINEEND,
-//                VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-//                VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt),
-//                VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) ? "down" : "up");
+//                vsf_input_touchscreen_get_x(ts_evt),
+//                vsf_input_touchscreen_get_y(ts_evt),
+//                vsf_input_touchscreen_is_down(ts_evt) ? "down" : "up");
     }
 }
 
 static bool usrapp_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-    data->state = VSF_INPUT_TOUCHSCREEN_IS_DOWN(&usrapp.ui.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    data->point.x = VSF_INPUT_TOUCHSCREEN_GET_X(&usrapp.ui.ts_evt);
-    data->point.y = VSF_INPUT_TOUCHSCREEN_GET_Y(&usrapp.ui.ts_evt);
+    data->state = vsf_input_touchscreen_is_down(&usrapp.ui.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+    data->point.x = vsf_input_touchscreen_get_x(&usrapp.ui.ts_evt);
+    data->point.y = vsf_input_touchscreen_get_y(&usrapp.ui.ts_evt);
 //    vsf_trace(VSF_TRACE_DEBUG, "touchscreen: %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
 //        data->state == LV_INDEV_STATE_PR ? "press" : "release",
 //        data->point.x, data->point.y);

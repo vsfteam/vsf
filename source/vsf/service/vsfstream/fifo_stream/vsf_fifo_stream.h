@@ -70,6 +70,7 @@ extern uint_fast32_t vsf_fifo_read(vsf_fifo_t *fifo, uint8_t *data, uint_fast32_
 extern uint_fast32_t vsf_fifo_peek(vsf_fifo_t *fifo, uint8_t *data, uint_fast32_t size);
 extern uint_fast32_t vsf_fifo_get_wbuf(vsf_fifo_t *fifo, uint8_t **data);
 extern uint_fast32_t vsf_fifo_get_rbuf(vsf_fifo_t *fifo, uint8_t **data);
+extern uint_fast32_t vsf_fifo_get_buff_length(vsf_fifo_t *fifo);
 extern uint_fast32_t vsf_fifo_get_data_length(vsf_fifo_t *fifo);
 extern uint_fast32_t vsf_fifo_get_avail_length(vsf_fifo_t *fifo);
 

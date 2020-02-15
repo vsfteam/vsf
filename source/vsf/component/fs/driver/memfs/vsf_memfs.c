@@ -182,4 +182,71 @@ static void __vk_memfs_write(uintptr_t target, vsf_evt_t evt)
     }
 }
 
+void vk_memfs_init(vk_memfs_info_t *memfs)
+{
+    VSF_FS_ASSERT(memfs != NULL);
+    __vk_memfs_init(memfs, &memfs->root);
+}
+
+vk_memfs_file_t * vk_memfs_open(vk_memfs_file_t *dir, const char *path)
+{
+    VSF_FS_ASSERT(dir != NULL);
+    VSF_FS_ASSERT(path != NULL);
+
+    while (path[0] != '\0') {
+        if (!(dir->attr & VSF_FILE_ATTR_DIRECTORY)) {
+            return NULL;
+        }
+        if (vk_file_is_div(path[0])) {
+            path++;
+            if ('\0' == path[0]) {
+                break;
+            }
+        }
+
+        uint16_t child_num = dir->d.child_num, child_size = dir->d.child_size;
+        bool found = false;
+        dir = dir->d.child;
+        for (uint_fast16_t i = 0; i < child_num; i++) {
+            if (vk_file_is_match((char *)path, dir->name)) {
+                path += strlen(dir->name);
+                found = true;
+                break;
+            }
+            dir = (vk_memfs_file_t *)((uintptr_t)dir + child_size);
+        }
+
+        if (!found) {
+            return NULL;
+        }
+    }
+    return dir;
+}
+
+int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
+{
+    VSF_FS_ASSERT(file != NULL);
+    VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
+    if (addr >= file->size) {
+        return -1;
+    }
+
+    int_fast32_t rsize = min(size, file->size - addr);
+    memcpy(buff, &file->f.buff[addr], rsize);
+    return rsize;
+}
+
+int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
+{
+    VSF_FS_ASSERT(file != NULL);
+    VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
+    if (addr >= file->size) {
+        return -1;
+    }
+
+    int_fast32_t wsize = min(size, file->size - addr);
+    memcpy(&file->f.buff[addr], buff, wsize);
+    return wsize;
+}
+
 #endif

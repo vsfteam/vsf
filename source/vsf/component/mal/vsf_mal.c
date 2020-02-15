@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/mal/vsf_mal_cfg.h"
+#include "./vsf_mal_cfg.h"
 
 #if VSF_USE_MAL == ENABLED
 
@@ -42,10 +42,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 enum {
     VSF_EVT_MAL_READ        = VSF_EVT_USER + 0,
     VSF_EVT_MAL_WRITE       = VSF_EVT_USER + 1,
 };
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -118,15 +120,16 @@ vsf_err_t vk_mal_get_result(vk_mal_t *pthis, uint32_t *size)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 static void __vk_mal_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
 {
-    vk_mal_t *pthis = (vk_mal_t *)param;
+    vk_mal_stream_t *pthis = (vk_mal_stream_t *)param;
+    vk_mal_t *mal = pthis->mal;
     vsf_stream_t *stream = pthis->stream.stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_OUT:
         if (pthis->stream.size > 0) {
-            pthis->args.size = vsf_stream_get_wbuf(stream, &pthis->args.buff);
-            if (pthis->args.size < vk_mal_blksz(pthis, pthis->stream.addr, 0, VSF_MAL_OP_READ)) {
+            mal->args.size = vsf_stream_get_wbuf(stream, &mal->args.buff);
+            if (mal->args.size < vk_mal_blksz(mal, pthis->stream.addr, 0, VSF_MAL_OP_READ)) {
                 break;
             }
 
@@ -138,7 +141,8 @@ static void __vk_mal_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
 
 static void __vk_mal_read_stream_do(uintptr_t target, vsf_evt_t evt)
 {
-    vk_mal_t *pthis = (vk_mal_t *)target;
+    vk_mal_stream_t *pthis = (vk_mal_stream_t *)target;
+    vk_mal_t *mal = pthis->mal;
     vsf_stream_t *stream = pthis->stream.stream;
 
     switch (evt) {
@@ -150,26 +154,25 @@ static void __vk_mal_read_stream_do(uintptr_t target, vsf_evt_t evt)
         vsf_stream_connect_tx(stream);
         break;
     case VSF_EVT_RETURN:
-        if (VSF_ERR_NONE == pthis->result.errcode) {
-            pthis->stream.size -= pthis->result.size;
-            pthis->stream.addr += pthis->result.size;
-            pthis->stream.rw_size += pthis->result.size;
-            vsf_stream_write(stream, NULL, pthis->result.size);
+        if (VSF_ERR_NONE == mal->result.errcode) {
+            pthis->stream.size -= mal->result.size;
+            pthis->stream.addr += mal->result.size;
+            pthis->stream.rw_size += mal->result.size;
+            vsf_stream_write(stream, NULL, mal->result.size);
         }
-        if ((pthis->result.errcode != VSF_ERR_NONE) || !pthis->stream.size) {
-            pthis->result.size = pthis->stream.rw_size;
+        if ((mal->result.errcode != VSF_ERR_NONE) || !pthis->stream.size) {
             vsf_stream_disconnect_tx(stream);
             vsf_eda_return();
         }
         break;
     case VSF_EVT_MAL_READ:
-        pthis->args.size = min(pthis->args.size, pthis->stream.size);
-        vk_mal_read(pthis, pthis->stream.addr, pthis->args.size, pthis->args.buff);
+        mal->args.size = min(mal->args.size, pthis->stream.size);
+        vk_mal_read(mal, pthis->stream.addr, mal->args.size, mal->args.buff);
         break;
     }
 }
 
-vsf_err_t vk_mal_read_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
+vsf_err_t vk_mal_read_stream(vk_mal_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
 {
     VSF_MAL_ASSERT(pthis != NULL);
     pthis->stream.addr = addr;
@@ -180,15 +183,16 @@ vsf_err_t vk_mal_read_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t 
 
 static void __vk_mal_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
 {
-    vk_mal_t *pthis = (vk_mal_t *)param;
+    vk_mal_stream_t *pthis = (vk_mal_stream_t *)param;
+    vk_mal_t *mal = pthis->mal;
     vsf_stream_t *stream = pthis->stream.stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
         if (pthis->stream.size > 0) {
-            pthis->args.size = vsf_stream_get_rbuf(stream, &pthis->args.buff);
-            if (pthis->args.size < vk_mal_blksz(pthis, pthis->stream.addr, 0, VSF_MAL_OP_WRITE)) {
+            mal->args.size = vsf_stream_get_rbuf(stream, &mal->args.buff);
+            if (mal->args.size < vk_mal_blksz(mal, pthis->stream.addr, 0, VSF_MAL_OP_WRITE)) {
                 break;
             }
 
@@ -200,7 +204,8 @@ static void __vk_mal_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
 
 static void __vk_mal_write_stream_do(uintptr_t target, vsf_evt_t evt)
 {
-    vk_mal_t *pthis = (vk_mal_t *)target;
+    vk_mal_stream_t *pthis = (vk_mal_stream_t *)target;
+    vk_mal_t *mal = pthis->mal;
     vsf_stream_t *stream = pthis->stream.stream;
 
     switch (evt) {
@@ -212,26 +217,25 @@ static void __vk_mal_write_stream_do(uintptr_t target, vsf_evt_t evt)
         vsf_stream_connect_rx(stream);
         break;
     case VSF_EVT_RETURN:
-        if (VSF_ERR_NONE == pthis->result.errcode) {
-            pthis->stream.size -= pthis->result.size;
-            pthis->stream.addr += pthis->result.size;
-            pthis->stream.rw_size += pthis->result.size;
-            vsf_stream_read(stream, NULL, pthis->result.size);
+        if (VSF_ERR_NONE == mal->result.errcode) {
+            pthis->stream.size -= mal->result.size;
+            pthis->stream.addr += mal->result.size;
+            pthis->stream.rw_size += mal->result.size;
+            vsf_stream_read(stream, NULL, mal->result.size);
         }
-        if ((pthis->result.errcode != VSF_ERR_NONE) || !pthis->stream.size) {
-            pthis->result.size = pthis->stream.rw_size;
+        if ((mal->result.errcode != VSF_ERR_NONE) || !pthis->stream.size) {
             vsf_stream_disconnect_rx(stream);
             vsf_eda_return();
         }
         break;
     case VSF_EVT_MAL_WRITE:
-        pthis->args.size = min(pthis->args.size, pthis->stream.size);
-        vk_mal_write(pthis, pthis->stream.addr, pthis->args.size, pthis->args.buff);
+        mal->args.size = min(mal->args.size, pthis->stream.size);
+        vk_mal_write(mal, pthis->stream.addr, mal->args.size, mal->args.buff);
         break;
     }
 }
 
-vsf_err_t vk_mal_write_stream(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
+vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
 {
     VSF_MAL_ASSERT(pthis != NULL);
     pthis->stream.addr = addr;

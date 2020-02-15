@@ -22,7 +22,7 @@
 
 #include "../../vsf_scsi_cfg.h"
 
-#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL_SCSI == ENABLED
+#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_USE_MAL_SCSI == ENABLED
 
 #if     defined(VSF_MAL_SCSI_IMPLEMENT)
 #   undef VSF_MAL_SCSI_IMPLEMENT
@@ -41,10 +41,15 @@
 declare_simple_class(vk_mal_scsi_t)
 
 def_simple_class(vk_mal_scsi_t) {
-    implement(vk_virtual_scsi_t)
     public_member(
+        implement(vk_virtual_scsi_t)
         vk_mal_t *mal;
     )
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+    private_member(
+        vk_mal_stream_t mal_stream;
+    )
+#endif
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/

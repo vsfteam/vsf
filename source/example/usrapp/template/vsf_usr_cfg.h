@@ -75,6 +75,8 @@
 //  </h>
 //! @}
 
+#define VSF_USE_TRACE           DISABLED
+
 //#define VSF_POOL_LOCK()             
 //#define VSF_POOL_UNLOCK()
 /*============================ TYPES =========================================*/

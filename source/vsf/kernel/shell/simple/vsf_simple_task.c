@@ -21,22 +21,17 @@
 
 
 #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED && VSF_USE_KERNEL == ENABLED
+#define VSF_EDA_CLASS_INHERIT
 #include "../../vsf_kernel_common.h"
 #include "./vsf_simple.h"
 #include "../../task/vsf_thread.h"
+#include "../../vsf_eda.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
-extern bool vsf_eda_polling_state_get(vsf_eda_t *peda);
-
-SECTION(".text.vsf.kernel.vsf_eda_polling_state_set")
-extern void vsf_eda_polling_state_set(vsf_eda_t *peda, bool state);
-
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -44,6 +39,11 @@ extern void vsf_eda_polling_state_set(vsf_eda_t *peda, bool state);
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 SECTION("text.vsf.kernel.__vsf_delay")
@@ -87,6 +87,10 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
 #endif
 
 #endif
@@ -186,7 +190,7 @@ vsf_err_t __vsf_call_eda(uintptr_t evthandler, uintptr_t param)
     
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(eda)) {
-        return __vsf_thread_call_eda(evthandler, param);
+        return vk_thread_call_eda(evthandler, param);
     } else 
 #endif
     {
@@ -202,11 +206,11 @@ fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param)
     
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(eda)) {
-        return __vsf_thread_call_fsm(entry, param);
+        return vk_thread_call_fsm(entry, param);
     } else 
 #endif
     {
-        return vsf_eda_call_fsm(entry, param);
+        return __vsf_eda_call_fsm(entry, param);
     }
 }
 #endif

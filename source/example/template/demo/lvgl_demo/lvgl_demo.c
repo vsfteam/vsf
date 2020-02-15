@@ -20,7 +20,7 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED && APP_CFG_USE_LVGL_DEMO == ENABLED
 
-#include "../usrapp_common.h"
+#include "../common/usrapp_common.h"
 
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
@@ -36,16 +36,16 @@
 
 static void __lvgl_on_touchscreen(vk_input_type_t type, vk_touchscreen_evt_t *ts_evt)
 {
-    if (0 == VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt)) {
-        usrapp_common.ui.lvgl.ts_evt = *ts_evt;
+    if (0 == vsf_input_touchscreen_get_id(ts_evt)) {
+        usrapp_ui_common.lvgl.ts_evt = *ts_evt;
     }
 }
 
 static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-    data->state = VSF_INPUT_TOUCHSCREEN_IS_DOWN(&usrapp_common.ui.lvgl.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    data->point.x = VSF_INPUT_TOUCHSCREEN_GET_X(&usrapp_common.ui.lvgl.ts_evt);
-    data->point.y = VSF_INPUT_TOUCHSCREEN_GET_Y(&usrapp_common.ui.lvgl.ts_evt);
+    data->state = vsf_input_touchscreen_is_down(&usrapp_ui_common.lvgl.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+    data->point.x = vsf_input_touchscreen_get_x(&usrapp_ui_common.lvgl.ts_evt);
+    data->point.y = vsf_input_touchscreen_get_y(&usrapp_ui_common.lvgl.ts_evt);
 
 //    vsf_trace(VSF_TRACE_DEBUG, "touchscreen: %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
 //        data->state == LV_INDEV_STATE_PR ? "press" : "release",
@@ -60,7 +60,7 @@ int lvgl_main(int argc, char *argv[])
 int main(void)
 {
 #   if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_start_trace();
 #       if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #       endif
@@ -71,9 +71,9 @@ int main(void)
     lv_log_register_print(vsf_lvgl_printf);
 #   endif
 
-    usrapp_common.ui.lvgl.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
-    usrapp_common.ui.lvgl.notifier.on_evt = (vk_input_on_evt_t)__lvgl_on_touchscreen;
-    vk_input_notifier_register(&usrapp_common.ui.lvgl.notifier);
+    usrapp_ui_common.lvgl.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
+    usrapp_ui_common.lvgl.notifier.on_evt = (vk_input_on_evt_t)__lvgl_on_touchscreen;
+    vk_input_notifier_register(&usrapp_ui_common.lvgl.notifier);
 
     lv_init();
 
@@ -81,8 +81,8 @@ int main(void)
     lv_indev_drv_t indev_drv;
     lv_disp_t *disp;
 
-    lv_disp_buf_init(   &usrapp_common.ui.lvgl.disp_buf,
-                        &usrapp_common.ui.lvgl.color,
+    lv_disp_buf_init(   &usrapp_ui_common.lvgl.disp_buf,
+                        &usrapp_ui_common.lvgl.color,
                         NULL,
                         LV_HOR_RES_MAX * LV_VER_RES_MAX);
     lv_disp_drv_init(&disp_drv);
@@ -90,9 +90,12 @@ int main(void)
     disp_drv.hor_res = LV_HOR_RES_MAX;
     disp_drv.ver_res = LV_VER_RES_MAX;
     disp_drv.flush_cb = vsf_lvgl_disp_flush;
-    disp_drv.buffer = &usrapp_common.ui.lvgl.disp_buf;
+    disp_drv.buffer = &usrapp_ui_common.lvgl.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
-    vsf_lvgl_disp_bind(&usrapp_common.ui.disp.use_as__vk_disp_t, &disp->driver);
+
+    // insecure operation
+    ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_RGB565;
+    vsf_lvgl_disp_bind(&usrapp_ui_common.disp.use_as__vk_disp_t, &disp->driver);
 
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;

@@ -154,6 +154,7 @@
 //! @}
 
 
+#define VSF_HAL_USE_DEBUG_STREAM            ENABLED
 #define VSF_USE_AV                          ENABLED
 
 #define VSF_USE_INPUT                       ENABLED
@@ -176,6 +177,8 @@
 #define VSF_USE_TRACE                       ENABLED
 #if defined(__WIN__) || defined(__LINUX__)
 #   define VSF_TRACE_CFG_COLOR_EN           ENABLED
+#elif defined(__M484__) || defined(__NUC505__)
+#   define VSF_DEBUGGER_CFG_CONSOLE         VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #endif
 
 #define VSFVM_CFG_RUNTIME_EN                ENABLED

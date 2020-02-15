@@ -57,26 +57,10 @@
 #define __HAL_DRIVER_ARM_MPS2_H__
 
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED || VSF_USE_SERVICE_STREAM == ENABLED
-#include "service/vsf_service.h"
-#endif
-
-
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#define VSF_DEBUG_STREAM_TX     VSF_DEBUG_STREAM
-#define VSF_DEBUG_STREAM_RX     VSF_DEBUG_STREAM
-
-//extern vsf_stream_t  VSF_DEBUG_STREAM;
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
-//extern const vsf_stream_tx_t VSF_DEBUG_STREAM_TX;
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

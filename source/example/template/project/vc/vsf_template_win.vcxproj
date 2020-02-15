@@ -22,7 +22,8 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\awtk\port\vsf_awtk_port.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -75,11 +76,106 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\freetype.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftadvanc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbbox.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbdf.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbitmap.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbzip2.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcache.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftchapters.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcid.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcolor.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftdriver.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrdef.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrors.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftfntfmt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgasp.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftglyph.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgxval.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgzip.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftimage.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftincrem.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlcdfil.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlist.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlzw.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmac.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmm.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmodapi.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmoderr.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftotval.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftoutln.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftparams.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftpfr.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftrender.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsizes.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsnames.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftstroke.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsynth.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsystem.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttrigon.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttypes.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftwinfnt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\autohint.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cffotypes.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cfftypes.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftcalc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdebug.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdrv.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftgloadr.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fthash.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftmemory.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftobjs.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftpsprop.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftrfork.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftserv.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftstream.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fttrace.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftvalid.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\internal.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\psaux.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\pshints.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svbdf.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcfftl.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcid.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svfntfmt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgldict.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgxval.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svkern.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmetric.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmm.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svotval.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpfr.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpostnm.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svprop.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpscmap.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpsinfo.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svsfnt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttcmap.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svtteng.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttglyf.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svwinfnt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\sfnt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\t1types.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\tttypes.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\wofftypes.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\t1tables.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_conf_checker.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -319,12 +415,23 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_version.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\nnom\port\nnom_port.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\av\audio\decoder\wav\vsf_wav.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\av\audio\driver\winsound\vsf_winsound.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\av\audio\vsf_audio.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\av\vsf_av.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\av\vsf_av_cfg.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_Config.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.h" />
     <ClInclude Include="..\..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.h" />
     <ClInclude Include="..\..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h" />
@@ -344,12 +451,123 @@
     <ClInclude Include="..\..\..\..\vsf\component\input\vsf_input.h" />
     <ClInclude Include="..\..\..\..\vsf\component\input\vsf_input_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\mal\driver\file_mal\vsf_file_mal.h" />
     <ClInclude Include="..\..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.h" />
     <ClInclude Include="..\..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\mal\driver\scsi_mal\vsf_scsi_mal.h" />
     <ClInclude Include="..\..\..\..\vsf\component\mal\vsf_mal.h" />
     <ClInclude Include="..\..\..\..\vsf\component\mal\vsf_mal_cfg.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_port.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\ui\vsf_ui_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDCACM.h" />
@@ -357,9 +575,17 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_HID.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_nspro.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_xb360.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\MSC\vsf_usb_MSC.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\XB1\vsf_usb_xb1.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\usb_common.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDC.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM_desc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC_desc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\vsf_usbd.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.h" />
@@ -370,6 +596,7 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\MSC\vsf_usbh_msc.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\vsf_usbh.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\vsf_usb_cfg.h" />
@@ -405,6 +632,9 @@
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_service\vsf_osa_service.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_service\vsf_osa_service_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h" />
@@ -431,6 +661,7 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\signal.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\stdio.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\string.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\mount.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\select.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\stat.h" />
@@ -464,16 +695,26 @@
     <ClInclude Include="..\..\..\..\vsf\utilities\template\template.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_bitmap.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_queue.h" />
     <ClInclude Include="..\..\..\..\vsf\vsf.h" />
     <ClInclude Include="..\..\..\..\vsf\vsf_cfg.h" />
     <ClInclude Include="..\..\config\awtk_config.h" />
     <ClInclude Include="..\..\config\btstack_config.h" />
     <ClInclude Include="..\..\config\lv_conf.h" />
+    <ClInclude Include="..\..\config\vsf_tgui_cfg.h" />
     <ClInclude Include="..\..\config\vsf_usr_cfg.h" />
+    <ClInclude Include="..\..\demo\common\usrapp_audio_common.h" />
+    <ClInclude Include="..\..\demo\common\usrapp_common.h" />
+    <ClInclude Include="..\..\demo\common\usrapp_ui_common.h" />
+    <ClInclude Include="..\..\demo\common\usrapp_usbd_common.h" />
+    <ClInclude Include="..\..\demo\common\usrapp_usbh_common.h" />
     <ClInclude Include="..\..\demo\fakefat32.h" />
     <ClInclude Include="..\..\demo\nnom_demo\model\mnist\image.h" />
     <ClInclude Include="..\..\demo\nnom_demo\model\mnist\weights.h" />
-    <ClInclude Include="..\..\demo\usrapp_common.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\README.md" />
@@ -488,13 +729,16 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\awtk\port\vsf_awtk_port.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\firmware\bcm\bcm20702\bt_firmware_image.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\hci_dump_vsf.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\hci_transport_h2_vsf.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -550,8 +794,132 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\builds\windows\ftdebug.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\autofit\autofit.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbase.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbbox.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbdf.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbitmap.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftcid.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftfstype.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgasp.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftglyph.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgxval.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftinit.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftmm.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftotval.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftpfr.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftstroke.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsynth.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsystem.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\fttype1.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftwinfnt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bdf\bdf.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bzip2\ftbzip2.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cache\ftcache.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cff\cff.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cid\type1cid.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gxvalid\gxvalid.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gzip\ftgzip.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\lzw\ftlzw.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\otvalid\otvalid.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pcf\pcf.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pfr\pfr.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psaux\psaux.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pshinter\pshinter.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psnames\psnames.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\raster\raster.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\sfnt\sfnt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\smooth\smooth.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\truetype\truetype.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type1\type1.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type42\type42.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -817,6 +1185,11 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_utils.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\av\audio\decoder\wav\vsf_wav.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\av\audio\driver\winsound\vsf_winsound.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\av\audio\vsf_audio.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.c" />
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.c" />
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.c" />
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c" />
@@ -829,11 +1202,102 @@
     <ClCompile Include="..\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.c" />
     <ClCompile Include="..\..\..\..\vsf\component\input\vsf_input.c" />
     <ClCompile Include="..\..\..\..\vsf\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\mal\driver\file_mal\vsf_file_mal.c" />
     <ClCompile Include="..\..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.c" />
     <ClCompile Include="..\..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\mal\driver\scsi_mal\vsf_scsi_mal.c" />
     <ClCompile Include="..\..\..\..\vsf\component\mal\vsf_mal.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\scsi\vsf_scsi.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDC.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\vsf_usbd.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.c" />
@@ -844,9 +1308,13 @@
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\libusb\vsf_usbh_libusb.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\MSC\vsf_usbh_msc.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\vsf_usbh.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\vsf_component.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\vsf_component.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\hal\arch\vsf_arch_abstraction.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\driver.c" />
@@ -854,7 +1322,6 @@
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\vsf_shell.c" />
-    <ClCompile Include="..\..\..\..\vsf\kernel\task\vsf_task.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\task\vsf_thread.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_eda.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_eda_slist_queue.c" />
@@ -862,6 +1329,8 @@
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c" />
+    <ClCompile Include="..\..\..\..\vsf\osa_service\vsf_osa_service.c" />
     <ClCompile Include="..\..\..\..\vsf\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c" />
@@ -894,17 +1363,33 @@
     <ClCompile Include="..\..\..\..\vsf\utilities\language_extension\simple_sscanf.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\template\vsf_bitmap.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\template\vsf_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\utilities\template\vsf_queue.c" />
+    <ClCompile Include="..\..\demo\audio_demo\audio_demo.c" />
     <ClCompile Include="..\..\demo\awtk_demo\awtk_application.c" />
     <ClCompile Include="..\..\demo\awtk_demo\awtk_assets.c" />
     <ClCompile Include="..\..\demo\awtk_demo\awtk_demo.c" />
     <ClCompile Include="..\..\demo\btstack_demo\btstack_demo.c" />
+    <ClCompile Include="..\..\demo\common\usrapp_audio_common.c" />
+    <ClCompile Include="..\..\demo\common\usrapp_common.c" />
+    <ClCompile Include="..\..\demo\common\usrapp_ui_common.c" />
+    <ClCompile Include="..\..\demo\common\usrapp_usbd_common.c" />
+    <ClCompile Include="..\..\demo\common\usrapp_usbh_common.c" />
+    <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />
+    <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c" />
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_application.c" />
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_demo.c" />
     <ClCompile Include="..\..\demo\nnom_demo\nnom_demo.c" />
+    <ClCompile Include="..\..\demo\scsi_demo\scsi_demo.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_demo.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_port.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_main.c" />
+    <ClCompile Include="..\..\demo\usbd_demo\usbd_demo.c" />
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c" />
-    <ClCompile Include="..\..\demo\usrapp_common.c" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib" />
@@ -984,9 +1469,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__VSF__;__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__VSF__;__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\config;$(ProjectDir)lib\SDL2\include;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\config;$(ProjectDir)lib\SDL2\include;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -1005,7 +1490,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\config;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\config;$(ProjectDir)lib\SDL2\include;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\freetype\2.10.1\port;$(ProjectDir)lib\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>

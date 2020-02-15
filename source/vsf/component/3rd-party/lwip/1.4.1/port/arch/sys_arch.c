@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
 
@@ -121,7 +121,7 @@ sys_thread_t sys_thread_new(const char *name,
     thread->stack = (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7);
     thread->stack_size = stacksize;
     
-    vsf_thread_start(&(thread->use_as__vsf_thread_t), prio);
+    vk_thread_start(&(thread->use_as__vsf_thread_t), prio);
     */
     return thread;
 }

@@ -560,6 +560,16 @@
               <FileType>5</FileType>
               <FilePath>..\..\..\vsf\service\heap\vsf_heap.h</FilePath>
             </File>
+            <File>
+              <FileName>vsf_trace.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\service\trace\vsf_trace.c</FilePath>
+            </File>
+            <File>
+              <FileName>vsf_trace.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\vsf\service\trace\vsf_trace.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

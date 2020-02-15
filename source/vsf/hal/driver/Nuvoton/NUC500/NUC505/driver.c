@@ -18,7 +18,6 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
-#include "../../NuConsole/NuConsole.h"
 
 /*============================ MACROS ========================================*/
 
@@ -123,10 +122,6 @@ bool vsf_driver_init(void)
         }
         CLK->CLKDIV0 = (CLK->CLKDIV0 & ~CLK_CLKDIV0_PCLKDIV_Msk) | ((div - 1) << CLK_CLKDIV0_PCLKDIV_Pos);
     }
-
-#if VSF_HAL_CFG_SUPPORT_DEVICE_DEBUGGER_SERIAL_PORT == ENABLED
-    NuConsole_Init();
-#endif
 
     return true;
 }

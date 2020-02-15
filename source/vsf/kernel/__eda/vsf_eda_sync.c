@@ -100,6 +100,11 @@ static vsf_err_t __vsf_eda_sync_remove_eda(vsf_sync_t *sync, vsf_eda_t *eda)
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 SECTION(".text.vsf.kernel.vsf_sync")
 static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t evt, bool dequeue_eda)
 {
@@ -136,6 +141,9 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#endif
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
 #endif
 
 SECTION(".text.vsf.kernel.vsf_sync")

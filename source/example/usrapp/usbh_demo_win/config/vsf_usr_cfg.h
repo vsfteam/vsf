@@ -180,10 +180,12 @@
 
 #define VSF_USE_TRACE                                   ENABLED
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
+#define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 
 #define VSF_USE_UI                                      ENABLED
 #   define VSF_USE_UI_LVGL                              ENABLED
 #   define VSF_USE_DISP_DRV_SDL2                        ENABLED
+#       define VSF_DISP_DRV_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
 
 #define VSF_USE_BTSTACK                                 ENABLED
 

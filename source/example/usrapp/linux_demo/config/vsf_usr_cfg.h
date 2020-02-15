@@ -238,6 +238,8 @@ enum {
 #   define VSF_LINUX_CFG_STACKSIZE                      2048
 #   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
 #   define VSH_HAS_COLOR                                0
+
+#   define VSF_DEBUGGER_CFG_CONSOLE                     VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #elif   defined(__NUC505__)
 #   define VSF_HEAP_SIZE                                0x4000
 #   define VSF_SYSTIMER_FREQ                            (96000000ul)
@@ -245,7 +247,19 @@ enum {
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
 #   define VSF_USE_USB_HOST_HUB                         ENABLED
 #   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+
+#   define VSF_DEBUGGER_CFG_CONSOLE                     VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
+#elif   defined(__STM32F730R8__)
+#   define VSF_HEAP_SIZE                                0x4000
+#   define VSF_SYSTIMER_FREQ                            (96000000ul)
+
+#   undef VSF_USE_USB_HOST
+#   define VSF_USE_USB_HOST                             DISABLED
+
+#   define VSF_CFG_DEBUG_STREAM_TX_T                    vsf_mem_stream_t
+#   define VSF_CFG_DEBUG_STREAM_RX_T                    vsf_mem_stream_t
 #elif   defined(__WIN__)
+#   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
 #   define VSF_HEAP_SIZE                                0x100000
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   5
 

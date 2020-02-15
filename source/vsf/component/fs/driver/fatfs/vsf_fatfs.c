@@ -26,8 +26,13 @@
 #define VSF_MALFS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
+#include <ctype.h>
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_FATFS_CFG_MAX_FILENAME
+#   define VSF_FATFS_CFG_MAX_FILENAME   128
+#endif
 
 #define FAT_ATTR_LFN                    0x0F
 #define FAT_ATTR_READ_ONLY              0x01
@@ -142,6 +147,7 @@ typedef struct fatfs_dentry_t fatfs_dentry_t;
 /*============================ PROTOTYPES ====================================*/
 
 static void __vk_fatfs_mount(uintptr_t, vsf_evt_t);
+static void __vk_fatfs_unmount(uintptr_t, vsf_evt_t);
 static void __vk_fatfs_lookup(uintptr_t, vsf_evt_t);
 static void __vk_fatfs_close(uintptr_t, vsf_evt_t);
 static void __vk_fatfs_read(uintptr_t, vsf_evt_t);
@@ -151,7 +157,7 @@ static void __vk_fatfs_write(uintptr_t, vsf_evt_t);
 
 const vk_fs_op_t vk_fatfs_op = {
     .mount          = __vk_fatfs_mount,
-    .unmount        = vk_dummyfs_succeed,
+    .unmount        = __vk_fatfs_unmount,
 #if VSF_FS_CFG_USE_CACHE == ENABLED
     .sync           = vk_file_dummy,
 #endif
@@ -228,44 +234,49 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
             int i;
 
             if (entry->fat.Attr == FAT_ATTR_LFN) {
+                const uint8_t lfn_offsets[] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
                 uint_fast8_t index = entry->fat.Name[0];
                 uint_fast8_t pos = ((index & 0x0F) - 1) * 13;
-                uint8_t *buf;
+                uint_fast16_t uchar;
+                uint8_t *buf = (uint8_t *)entry;
 
                 parser->lfn = index & 0x0F;
-                ptr = parser->filename + pos;
-                buf = (uint8_t *)entry + 1;
-                for (i = 0; i < 5; i++, buf += 2) {
-                    if ((buf[0] == '\0') && (buf[1] == '\0')) {
-                        goto parsed;
+                ptr = parser->filename + (pos << 1);
+
+                for (uint_fast8_t i = 0; i < dimof(lfn_offsets); i++) {
+                    uchar = buf[lfn_offsets[i]] + (buf[lfn_offsets[i] + 1] << 8);
+                    if (0 == uchar) {
+                        break;
+                    } else {
+                        *ptr++ = (char)(uchar >> 0);
+                        *ptr++ = (char)(uchar >> 8);
                     }
-                    *ptr++ = (char)buf[0];
                 }
 
-                buf = (uint8_t *)entry + 14;
-                for (i = 0; i < 6; i++, buf += 2) {
-                    if ((buf[0] == '\0') && (buf[1] == '\0')) {
-                        goto parsed;
-                    }
-                    *ptr++ = (char)buf[0];
-                }
-
-                buf = (uint8_t *)entry + 28;
-                for (i = 0; i < 2; i++, buf += 2) {
-                    if ((buf[0] == '\0') && (buf[1] == '\0')) {
-                        goto parsed;
-                    }
-                    *ptr++ = (char)buf[0];
-                }
-
-            parsed:
                 if ((index & 0xF0) == 0x40) {
+                    *ptr++ = '\0';
                     *ptr = '\0';
                 }
             } else if (entry->fat.Attr != FAT_ATTR_VOLUME_ID) {
                 bool lower;
                 if (parser->lfn == 1) {
                     // previous lfn parsed, igure sfn and return
+                    uint16_t *uchar = (uint16_t *)parser->filename;
+                    parser->is_unicode = false;
+                    while (*uchar != 0) {
+                        if (*uchar++ >= 128) {
+                            parser->is_unicode = true;
+                            break;
+                        }
+                    }
+                    if (!parser->is_unicode) {
+                        char *ptr = parser->filename;
+                        uchar = (uint16_t *)parser->filename;
+                        while (*uchar != 0) {
+                            *ptr++ = *uchar++;
+                        }
+                    }
+
                     parser->lfn = 0;
                     parsed = true;
                     break;
@@ -289,6 +300,7 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
                     }
                 }
                 *ptr = '\0';
+                parser->is_unicode = false;
                 parsed = true;
                 break;
             }
@@ -447,6 +459,16 @@ static bool __vk_fatfs_fat_entry_is_eof(__vk_fatfs_info_t *fsinfo, uint_fast32_t
     return (cluster >= (mask - 8)) && (cluster <= mask);
 }
 
+static void __vk_fatfs_unmount(uintptr_t target, vsf_evt_t evt)
+{
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
+    __vk_fatfs_info_t *fsinfo = dir->subfs.data;
+    __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
+
+    __vk_malfs_unmount(malfs_info);
+    vsf_eda_return();
+}
+
 static void __vk_fatfs_mount(uintptr_t target, vsf_evt_t evt)
 {
     enum {
@@ -465,7 +487,7 @@ static void __vk_fatfs_mount(uintptr_t target, vsf_evt_t evt)
         __vk_malfs_read(malfs_info, 0, 1, NULL);
         break;
     case VSF_EVT_RETURN: {
-            uint_fast8_t state;
+            uint8_t state;
 
             if (malfs_info->ctx_io.err != VSF_ERR_NONE) {
                 VSF_FS_ASSERT(false);
@@ -473,7 +495,7 @@ static void __vk_fatfs_mount(uintptr_t target, vsf_evt_t evt)
                 return;
             }
 
-            vsf_eda_frame_user_value_get((uint8_t *)&state);
+            vsf_eda_frame_user_value_get(&state);
             switch (state) {
             case MOUNT_STATE_PARSE_DBR:
                 if (VSF_ERR_NONE != __vk_fatfs_parse_dbr(fsinfo, malfs_info->ctx_io.buff)) {
@@ -532,8 +554,8 @@ static void __vk_fatfs_get_fat_entry(uintptr_t target, vsf_evt_t evt)
         vsf_eda_frame_user_value_set(LOOKUP_FAT_STATE_START);
         // fall through
     case VSF_EVT_RETURN: {
-            uint_fast8_t state;
-            vsf_eda_frame_user_value_get((uint8_t *)&state);
+            uint8_t state;
+            vsf_eda_frame_user_value_get(&state);
             switch (state) {
             case LOOKUP_FAT_STATE_START:
             read_fat_sector:
@@ -587,6 +609,11 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        fsinfo->filename = vsf_heap_malloc(VSF_FATFS_CFG_MAX_FILENAME);
+        if (NULL == fsinfo->filename) {
+            err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+            goto exit;
+        }
         fsinfo->cur_cluster = dir->first_cluster;
         if (!dir->first_cluster) {
             if ((fsinfo->type != VSF_FAT_12) && (fsinfo->type != VSF_FAT_16)) {
@@ -598,12 +625,14 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
         } else {
             fsinfo->cur_sector = __vk_fatfs_clus2sec(fsinfo, fsinfo->cur_cluster);
         }
+        fsinfo->cur_sector_in_cluster = 0;
+        fsinfo->dparser.lfn = 0;
         vsf_eda_frame_user_value_set(LOOKUP_STATE_READ_SECTOR);
 
         // fall through
     case VSF_EVT_RETURN: {
-            uint_fast8_t state;
-            vsf_eda_frame_user_value_get((uint8_t *)&state);
+            uint8_t state;
+            vsf_eda_frame_user_value_get(&state);
             switch (state) {
             case LOOKUP_STATE_READ_SECTOR:
             read_sector:
@@ -626,8 +655,7 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
 
                     dparser->entry = (uint8_t *)dentry;
                     dparser->entry_num = 1 << (fsinfo->sector_size_bits - 5);
-                    dparser->lfn = 0;
-                    dparser->filename = dentry->fat.Name;
+                    dparser->filename = fsinfo->filename;
                     while (dparser->entry_num) {
                         if (vk_fatfs_parse_dentry_fat(dparser)) {
                             if (    (name && vk_file_is_match((char *)name, dparser->filename))
@@ -641,36 +669,50 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
                                     goto exit;
                                 }
 
-                                fatfs_file->name = vsf_heap_malloc(strlen(dparser->filename) + 1);
+                                uint_fast16_t filename_len;
+                                if (dparser->is_unicode) {
+                                    uint16_t *uchar = (uint16_t *)dparser->filename;
+                                    filename_len = 0;
+                                    while (*uchar++ != 0) {
+                                        filename_len += 2;
+                                    }
+                                    filename_len += 2;
+                                } else {
+                                    filename_len = strlen(dparser->filename) + 1;
+                                }
+
+                                fatfs_file->name = vsf_heap_malloc(filename_len);
                                 if (NULL == fatfs_file->name) {
                                     vk_file_free(&fatfs_file->use_as__vk_file_t);
                                     goto fail_mem;
                                 }
+                                memcpy(fatfs_file->name, dparser->filename, filename_len);
 
                                 dentry = (fatfs_dentry_t *)dparser->entry;
-                                strcpy(fatfs_file->name, dparser->filename);
                                 fatfs_file->attr = (vk_file_attr_t)__vk_fatfs_parse_file_attr(dentry->fat.Attr);
+                                fatfs_file->coding = dparser->is_unicode ? VSF_FILE_NAME_CODING_UCS2 : VSF_FILE_NAME_CODING_UNKNOWN;
                                 fatfs_file->fsop = &vk_fatfs_op;
                                 fatfs_file->size = dentry->fat.FileSize;
                                 fatfs_file->info = fsinfo;
                                 fatfs_file->first_cluster = dentry->fat.FstClusLo + (dentry->fat.FstClusHi << 16);
 
                                 *dir->ctx.lookup.result = &fatfs_file->use_as__vk_file_t;
-                                vk_file_return(&dir->use_as__vk_file_t, VSF_ERR_NONE);
-                                return;
+                                goto exit;
                             }
                             dparser->entry += 32;
-                            dparser->filename = (char *)dentry;
                         } else if (dparser->entry_num > 0) {
                             err = VSF_ERR_NOT_AVAILABLE;
                             goto exit;
+                        } else {
+                            break;
                         }
                     }
 
                     if (    (!fsinfo->cur_cluster && (fsinfo->cur_sector < fsinfo->root_size))
-                        ||  (fsinfo->cur_sector & ((1 << fsinfo->cluster_size_bits) - 1))) {
+                        ||  (fsinfo->cur_sector_in_cluster < ((1 << fsinfo->cluster_size_bits) - 1))) {
                         // not found in current sector, find next sector
                         fsinfo->cur_sector++;
+                        fsinfo->cur_sector_in_cluster++;
                         goto read_sector;
                     } else {
                         // not found in current cluster, find next cluster if exists
@@ -690,6 +732,7 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
                 // remove MSB 4-bit for 32-bit FAT entry
                 fsinfo->cur_cluster &= 0x0FFFFFFF;
                 fsinfo->cur_sector = __vk_fatfs_clus2sec(fsinfo, fsinfo->cur_cluster);
+                fsinfo->cur_sector_in_cluster = 0;
                 goto read_sector;
             }
         }
@@ -697,6 +740,10 @@ static void __vk_fatfs_lookup(uintptr_t target, vsf_evt_t evt)
     }
     return;
 exit:
+    if (fsinfo->filename != NULL) {
+        vsf_heap_free(fsinfo->filename);
+        fsinfo->filename = NULL;
+    }
     vk_file_return(&dir->use_as__vk_file_t, err);
 }
 

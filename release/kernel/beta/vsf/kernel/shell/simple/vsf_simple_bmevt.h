@@ -80,7 +80,7 @@
 
 
 #   define __init_grouped_evts(__NAME, __EVT_GROUP, __AUTO_RESET)               \
-        grouped_evts_init((__EVT_GROUP),                                        \
+        __vsf_grouped_evts_init((__EVT_GROUP),                                        \
             (vsf_bmpevt_adapter_t **)&(__adapters_of_##__NAME),                 \
             UBOUND(__adapters_of_##__NAME),                                     \
             (__AUTO_RESET))
@@ -101,7 +101,7 @@
             this.pender.operator = VSF_BMPEVT_AND;                              \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
-                if ((reason = vsf_bmpevt_wait_for(                              \
+                if ((reason = __vsf_bmpevt_wait_for(                              \
                     (__group),                                                  \
                     (vsf_bmpevt_pender_t *)                                     \
                     &this.pender, (__timeout)),                                 \
@@ -125,7 +125,7 @@
             this.pender.operator = VSF_BMPEVT_OR;                               \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
-                if ((reason = vsf_bmpevt_wait_for(                              \
+                if ((reason = __vsf_bmpevt_wait_for(                              \
                     (__group),                                                  \
                     (vsf_bmpevt_pender_t *)                                     \
                     &this.pender, (__timeout)),                                 \
@@ -168,14 +168,14 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-SECTION("text.vsf.kernel.grouped_evts_init")
-extern void grouped_evts_init(  vsf_bmpevt_t *pthis, 
+SECTION("text.vsf.kernel.__vsf_grouped_evts_init")
+extern void __vsf_grouped_evts_init(  vsf_bmpevt_t *pthis, 
                                 vsf_bmpevt_adapter_t **ppadapters, 
                                 uint_fast8_t adapter_count,
                                 uint_fast32_t auto_reset);
                 
-SECTION("text.vsf.kernel.vsf_bmpevt_wait_for")    
-extern vsf_sync_reason_t vsf_bmpevt_wait_for(
+SECTION("text.vsf.kernel.__vsf_bmpevt_wait_for")    
+extern vsf_sync_reason_t __vsf_bmpevt_wait_for(
                                             vsf_bmpevt_t *pbmpevt,
                                             const vsf_bmpevt_pender_t *ppender,
                                             int_fast32_t time_out);

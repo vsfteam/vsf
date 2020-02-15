@@ -68,7 +68,7 @@ static void usrapp_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 int main(void)
 {
 #if VSF_USE_TRACE
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
     vsf_stdio_init();
     printf("hello world\r\n");
 #endif

@@ -151,6 +151,7 @@
 //! @}
 
 #define VSF_USE_FS                          ENABLED
+#define VSF_USE_VIDEO                       ENABLED
 
 #define VSF_USE_INPUT                       ENABLED
 #define VSF_USE_INPUT_HID                   ENABLED
@@ -190,6 +191,7 @@
 #define VSF_USE_DISP_DRV_USBD_UVC           ENABLED
 
 #define VSF_USE_TRACE                       ENABLED
+#define VSF_DEBUGGER_CFG_CONSOLE            VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
 #define VSF_USE_PBUF                        ENABLED
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT    DISABLED

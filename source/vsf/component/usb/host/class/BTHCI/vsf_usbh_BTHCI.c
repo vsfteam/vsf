@@ -21,6 +21,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
 
+#define VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t
 #define VSF_USBH_IMPLEMENT_CLASS
 #include "vsf.h"
@@ -141,7 +142,7 @@ typedef struct vk_usbh_bthci_t vk_usbh_bthci_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vk_usbh_dev_id_t vk_usbh_bthci_dev_id[] =
+static const vk_usbh_dev_id_t __vk_usbh_bthci_dev_id[] =
 {
     { VSF_USBH_MATCH_DEV_CLASS(USB_CLASS_WIRELESS_CONTROLLER, 0x01, 0x01) },
     // BCM20702
@@ -154,17 +155,17 @@ static const vk_usbh_dev_id_t vk_usbh_bthci_dev_id[] =
 
 /*============================ PROTOTYPES ====================================*/
 
-static void * vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
-static void vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
+static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
+static void __vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbh_class_drv_t vk_usbh_bthci_drv = {
     .name       = "bthci_usb",
-    .dev_id_num = dimof(vk_usbh_bthci_dev_id),
-    .dev_ids    = vk_usbh_bthci_dev_id,
-    .probe      = vk_usbh_bthci_probe,
-    .disconnect = vk_usbh_bthci_disconnect,
+    .dev_id_num = dimof(__vk_usbh_bthci_dev_id),
+    .dev_ids    = __vk_usbh_bthci_dev_id,
+    .probe      = __vk_usbh_bthci_probe,
+    .disconnect = __vk_usbh_bthci_disconnect,
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -184,9 +185,6 @@ WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN
 WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN
 #endif
 
-SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
@@ -204,7 +202,7 @@ WEAK(vsf_usbh_bthci_on_packet)
 void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
 #endif
 
-static vk_usbh_bthci_iocb_t * vk_usbh_bthci_get_iocb(vk_usbh_bthci_t *bthci, vk_usbh_hcd_urb_t *urb_hcd)
+static vk_usbh_bthci_iocb_t * __vk_usbh_bthci_get_iocb(vk_usbh_bthci_t *bthci, vk_usbh_hcd_urb_t *urb_hcd)
 {
     vk_usbh_bthci_iocb_t *iocb = bthci->iocb;
     for (int i = 0; i < dimof(bthci->iocb); i++, iocb++) {
@@ -215,7 +213,7 @@ static vk_usbh_bthci_iocb_t * vk_usbh_bthci_get_iocb(vk_usbh_bthci_t *bthci, vk_
     return NULL;
 }
 
-static vk_usbh_bthci_iocb_t * vk_usbh_bthci_get_ocb(vk_usbh_bthci_t *bthci, uint8_t type)
+static vk_usbh_bthci_iocb_t * __vk_usbh_bthci_get_ocb(vk_usbh_bthci_t *bthci, uint8_t type)
 {
     vk_usbh_bthci_iocb_t *ocb = bthci->ocb;
     for (int i = 0; i < dimof(bthci->ocb); i++, ocb++) {
@@ -240,7 +238,7 @@ static vk_usbh_bthci_iocb_t * vk_usbh_bthci_get_ocb(vk_usbh_bthci_t *bthci, uint
     return NULL;
 }
 
-static void vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_bthci_t *bthci = container_of(eda, vk_usbh_bthci_t, eda);
     vk_usbh_dev_t *dev = bthci->dev;
@@ -306,7 +304,7 @@ static void vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             WEAK_VSF_USBH_BTHCI_ON_NEW(bthci, &bthci->id);
 #endif
         } else {
-            vk_usbh_bthci_iocb_t *iocb = vk_usbh_bthci_get_iocb(bthci, (vk_usbh_hcd_urb_t *)vsf_eda_get_cur_msg());
+            vk_usbh_bthci_iocb_t *iocb = __vk_usbh_bthci_get_iocb(bthci, (vk_usbh_hcd_urb_t *)vsf_eda_get_cur_msg());
             vk_usbh_urb_t *urb;
             VSF_USB_ASSERT(iocb != NULL);
             urb = &iocb->urb;
@@ -351,7 +349,7 @@ static void vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static void vk_usbh_bthci_free_all(vk_usbh_bthci_t *bthci)
+static void __vk_usbh_bthci_free_all(vk_usbh_bthci_t *bthci)
 {
     vk_usbh_t *usbh = bthci->usbh;
     vk_usbh_bthci_iocb_t *iocb = bthci->iocb;
@@ -362,13 +360,13 @@ static void vk_usbh_bthci_free_all(vk_usbh_bthci_t *bthci)
     }
 }
 
-static void vk_usbh_bthci_on_eda_terminate(vsf_eda_t *eda)
+static void __vk_usbh_bthci_on_eda_terminate(vsf_eda_t *eda)
 {
     vk_usbh_bthci_t *bthci = container_of(eda, vk_usbh_bthci_t, eda);
     VSF_USBH_FREE(bthci);
 }
 
-static void * vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
+static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
     struct usb_interface_desc_t *desc_ifs = parser_ifs->parser_alt[ifs->cur_alt].desc_ifs;
@@ -460,18 +458,18 @@ static void * vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     bthci->cmd_ocb.is_icb = false;
     bthci->cmd_ocb.urb.urb_hcd = dev->ep0.urb.urb_hcd;
 
-    vsf_eda_set_evthandler(&(bthci->eda), vk_usbh_bthci_evthandler);
-    bthci->eda.on_terminate = vk_usbh_bthci_on_eda_terminate;
+    bthci->eda.fn.evthandler = __vk_usbh_bthci_evthandler;
+    bthci->eda.on_terminate = __vk_usbh_bthci_on_eda_terminate;
     vsf_eda_init(&bthci->eda, vsf_prio_inherit, false);
     return bthci;
 
 free_all:
-    vk_usbh_bthci_free_all(bthci);
+    __vk_usbh_bthci_free_all(bthci);
     VSF_USBH_FREE(bthci);
     return NULL;
 }
 
-static void vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
+static void __vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
     vk_usbh_bthci_t *bthci = param;
 
@@ -481,14 +479,14 @@ static void vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
     WEAK_VSF_USBH_BTHCI_ON_DEL(bthci);
 #endif
 
-    vk_usbh_bthci_free_all(bthci);
-    __vsf_eda_fini(&bthci->eda);
+    __vk_usbh_bthci_free_all(bthci);
+    vsf_eda_fini(&bthci->eda);
 }
 
 bool vk_usbh_bthci_can_send(void *dev, uint8_t type)
 {
     vk_usbh_bthci_t *bthci = dev;
-    vk_usbh_bthci_iocb_t *ocb = vk_usbh_bthci_get_ocb(bthci, type);
+    vk_usbh_bthci_iocb_t *ocb = __vk_usbh_bthci_get_ocb(bthci, type);
     return ocb != NULL;
 }
 
@@ -496,7 +494,7 @@ vsf_err_t vk_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t 
 {
     vk_usbh_bthci_t *bthci = dev;
     vk_usbh_t *usbh = bthci->usbh;
-    vk_usbh_bthci_iocb_t *ocb = vk_usbh_bthci_get_ocb(bthci, type);
+    vk_usbh_bthci_iocb_t *ocb = __vk_usbh_bthci_get_ocb(bthci, type);
     vk_usbh_urb_t *urb;
     uint_fast16_t flags = 0;
 

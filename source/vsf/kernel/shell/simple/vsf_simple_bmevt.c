@@ -23,8 +23,9 @@
 #if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                  \
     &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED                          \
     &&  VSF_USE_KERNEL == ENABLED
-
+#define VSF_EDA_CLASS_INHERIT
 #   include "../../vsf_kernel_common.h"
+#   include "../../vsf_eda.h" 
 #   include "./vsf_simple.h"
 #   include "../../task/vsf_thread.h"
 /*============================ MACROS ========================================*/
@@ -36,12 +37,6 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
-extern bool vsf_eda_polling_state_get(vsf_eda_t *peda);
-
-SECTION(".text.vsf.kernel.vsf_eda_polling_state_set")
-extern void vsf_eda_polling_state_set(vsf_eda_t *peda, bool state);
-
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -79,8 +74,8 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *pbmpevt,
     return reason;
 }
 
-SECTION("text.vsf.kernel.vsf_bmpevt_wait_for")
-vsf_sync_reason_t vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
+SECTION("text.vsf.kernel.__vsf_bmpevt_wait_for")
+vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
                                         const vsf_bmpevt_pender_t *ppender,
                                         int_fast32_t time_out)
 {
@@ -123,8 +118,8 @@ vsf_sync_reason_t vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
     return result;
 }
 
-SECTION("text.vsf.kernel.grouped_evts_init")
-void grouped_evts_init(vsf_bmpevt_t *ptThis, 
+SECTION("text.vsf.kernel.__vsf_grouped_evts_init")
+void __vsf_grouped_evts_init(vsf_bmpevt_t *ptThis, 
                     vsf_bmpevt_adapter_t **ppadapters, 
                     uint_fast8_t adapter_count,
                     uint_fast32_t auto_reset)

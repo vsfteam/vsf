@@ -30,31 +30,33 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void vsf_mem_stream_init(vsf_stream_t *stream);
-static uint_fast32_t vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
-static uint_fast32_t vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
-static uint_fast32_t vsf_mem_stream_get_data_length(vsf_stream_t *stream);
-static uint_fast32_t vsf_mem_stream_get_avail_length(vsf_stream_t *stream);
-static uint_fast32_t vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr);
-static uint_fast32_t vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr);
+static void __vsf_mem_stream_init(vsf_stream_t *stream);
+static uint_fast32_t __vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t __vsf_mem_stream_get_buff_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_mem_stream_get_data_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_mem_stream_get_avail_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr);
+static uint_fast32_t __vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_stream_op_t vsf_mem_stream_op = {
-    .init               = vsf_mem_stream_init,
-    .fini               = vsf_mem_stream_init,
-    .write              = vsf_mem_stream_write,
-    .read               = vsf_mem_stream_read,
-    .get_data_length    = vsf_mem_stream_get_data_length,
-    .get_avail_length   = vsf_mem_stream_get_avail_length,
-    .get_wbuf           = vsf_mem_stream_get_wbuf,
-    .get_rbuf           = vsf_mem_stream_get_rbuf,
+    .init               = __vsf_mem_stream_init,
+    .fini               = __vsf_mem_stream_init,
+    .write              = __vsf_mem_stream_write,
+    .read               = __vsf_mem_stream_read,
+    .get_buff_length    = __vsf_mem_stream_get_buff_length,
+    .get_data_length    = __vsf_mem_stream_get_data_length,
+    .get_avail_length   = __vsf_mem_stream_get_avail_length,
+    .get_wbuf           = __vsf_mem_stream_get_wbuf,
+    .get_rbuf           = __vsf_mem_stream_get_rbuf,
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void vsf_mem_stream_init(vsf_stream_t *stream)
+static void __vsf_mem_stream_init(vsf_stream_t *stream)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     mem_stream->rpos = mem_stream->wpos = 0;
@@ -67,7 +69,13 @@ static void vsf_mem_stream_init(vsf_stream_t *stream)
     mem_stream->align -= 1;
 }
 
-static uint_fast32_t vsf_mem_stream_get_data_length(vsf_stream_t *stream)
+static uint_fast32_t __vsf_mem_stream_get_buff_length(vsf_stream_t *stream)
+{
+    vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
+    return mem_stream->nSize;
+}
+
+static uint_fast32_t __vsf_mem_stream_get_data_length(vsf_stream_t *stream)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t data_size;
@@ -78,20 +86,20 @@ static uint_fast32_t vsf_mem_stream_get_data_length(vsf_stream_t *stream)
     return data_size;
 }
 
-static uint_fast32_t vsf_mem_stream_get_avail_length(vsf_stream_t *stream)
+static uint_fast32_t __vsf_mem_stream_get_avail_length(vsf_stream_t *stream)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     if (mem_stream->wpos & mem_stream->align) {
         return 0;
     } else {
-        return mem_stream->use_as__vsf_mem_t.nSize - vsf_mem_stream_get_data_length(stream);
+        return mem_stream->use_as__vsf_mem_t.nSize - __vsf_mem_stream_get_data_length(stream);
     }
 }
 
-static uint_fast32_t vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
+static uint_fast32_t __vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
-    uint_fast32_t avail_len = vsf_mem_stream_get_avail_length(stream);
+    uint_fast32_t avail_len = __vsf_mem_stream_get_avail_length(stream);
     uint_fast32_t wlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->wpos;
     uint8_t *p = (avail_len > 0) ?
         mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos : NULL;
@@ -103,10 +111,10 @@ static uint_fast32_t vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr
     return min(wlen, avail_len);
 }
 
-static uint_fast32_t vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
+static uint_fast32_t __vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
-    uint_fast32_t data_len = vsf_mem_stream_get_data_length(stream);
+    uint_fast32_t data_len = __vsf_mem_stream_get_data_length(stream);
     uint_fast32_t rlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->rpos;
     uint8_t *p = (data_len > 0) ?
         mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos : NULL;
@@ -117,10 +125,10 @@ static uint_fast32_t vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr
     return min(rlen, data_len);
 }
 
-static uint_fast32_t vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
+static uint_fast32_t __vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
-    uint_fast32_t avail_len = vsf_mem_stream_get_avail_length(stream);
+    uint_fast32_t avail_len = __vsf_mem_stream_get_avail_length(stream);
     uint_fast32_t wsize = min(avail_len, size);
 
     VSF_SERVICE_ASSERT(!(mem_stream->wpos & mem_stream->align));
@@ -147,10 +155,10 @@ static uint_fast32_t vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, ui
     return wsize;
 }
 
-static uint_fast32_t vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
+static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
-    uint_fast32_t data_len = vsf_mem_stream_get_data_length(stream);
+    uint_fast32_t data_len = __vsf_mem_stream_get_data_length(stream);
     uint_fast32_t rsize = min(data_len, size);
 
     VSF_SERVICE_ASSERT(!(mem_stream->rpos & mem_stream->align));

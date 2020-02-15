@@ -17,6 +17,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "component/vsf_component_cfg.h"
+
+#if VSF_USE_BTSTACK == ENABLED
+
 // TODO: use dedicated include
 #include "vsf.h"
 
@@ -291,3 +295,4 @@ const hci_transport_t * hci_transport_h4_instance(
     return &hci_transport_h4;
 }
 
+#endif      // VSF_USE_BTSTACK

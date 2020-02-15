@@ -25,24 +25,6 @@
     <Filter Include="vsf\kernel">
       <UniqueIdentifier>{1e5afc15-8495-446d-93bb-04ba87d73003}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal">
-      <UniqueIdentifier>{ce83bca0-746b-470b-b45c-bbd1948088cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\arch">
-      <UniqueIdentifier>{6f045188-9515-49a9-a783-189202754dd0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\arch\x86">
-      <UniqueIdentifier>{819ae1ac-77db-4031-9e0a-3c774144180e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\arch\x86\win">
-      <UniqueIdentifier>{25f4336d-0b62-4f17-984e-2e66843d7060}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\driver">
-      <UniqueIdentifier>{c9df9a5d-4876-4ef7-a01d-db95b9f5073f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\interface">
-      <UniqueIdentifier>{41094f8b-289b-4758-876d-d5b08a45d435}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service">
       <UniqueIdentifier>{352c5383-f2d5-4508-b6bc-e08fe3e2b8b6}</UniqueIdentifier>
     </Filter>
@@ -73,42 +55,6 @@
     <Filter Include="vsf\component">
       <UniqueIdentifier>{14fd5089-ee4f-48ef-86c6-b6a181482b5b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb">
-      <UniqueIdentifier>{e1328ffc-17be-4ff7-b12c-411991ea4b4a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common">
-      <UniqueIdentifier>{4c415816-3ce1-49a0-ad33-5646302ac3a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class">
-      <UniqueIdentifier>{6a1f3497-ba4b-43b3-8270-bfbe4de18a58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class\CDC">
-      <UniqueIdentifier>{3c6bd704-fb59-4c29-ba49-88af0c700ea9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class\HID">
-      <UniqueIdentifier>{9eced937-9f8d-4f41-a56f-916e2b223505}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class\UVC">
-      <UniqueIdentifier>{206386de-bfee-4d6e-a163-1da1fbf79a03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host">
-      <UniqueIdentifier>{27fad79b-8498-4537-8416-31b0e12aa999}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class">
-      <UniqueIdentifier>{2d8cc84c-e86f-4f43-ba04-f89ff6b487a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\BTHCI">
-      <UniqueIdentifier>{f165771f-d763-47a8-adb1-dc49ee1663d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\CDC">
-      <UniqueIdentifier>{eb32e0d7-5f2e-4d57-a159-afc60f82d8ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\HID">
-      <UniqueIdentifier>{b875fb17-0c3d-41b5-8aca-372cc0dacb41}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\HUB">
-      <UniqueIdentifier>{afc349a7-f559-4e3e-aa65-d524842f7c73}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\utilities\language_externsion">
       <UniqueIdentifier>{084aaae4-edd8-4d6b-b43f-b87bcc301d5d}</UniqueIdentifier>
     </Filter>
@@ -120,12 +66,6 @@
     </Filter>
     <Filter Include="vsf\kernel\shell\simple">
       <UniqueIdentifier>{7ecb6f44-c773-444d-b026-021d8759fb22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\driver">
-      <UniqueIdentifier>{7b7965a4-097d-4abd-8990-d440cab94b5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd">
-      <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\component\3rd-party">
       <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
@@ -154,29 +94,17 @@
     <Filter Include="vsf\component\ui\disp_drv\sdl2">
       <UniqueIdentifier>{378a9a07-be30-4358-a3a9-fd8351214394}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\driver\x86">
-      <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\input\driver\nspro">
       <UniqueIdentifier>{0c8ab9ae-5c34-40fa-a502-d90332fb1d9d}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\component\input\driver\xb360">
       <UniqueIdentifier>{f73d903e-1d5b-44de-b2ab-11e72b08a958}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\common\class\XB1">
-      <UniqueIdentifier>{c5736860-f8de-4c04-aa9b-9d592891ccb9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\XB1">
-      <UniqueIdentifier>{58afcd2f-0da9-4546-9561-02ad8fcec99a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\input\driver\xb1">
       <UniqueIdentifier>{b07d6ff9-5744-4894-b383-7c98a9060a3c}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\libusb">
-      <UniqueIdentifier>{6c73c1d1-91ea-43ef-8e57-e7dc8d2505de}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\shell">
       <UniqueIdentifier>{9aece25a-aeaa-4676-8a73-26787e097a0a}</UniqueIdentifier>
@@ -219,9 +147,6 @@
     </Filter>
     <Filter Include="vsf\shell\sys\linux\include\sys">
       <UniqueIdentifier>{d3175b26-a847-4f2e-aaeb-d01f4bc48c91}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
-      <UniqueIdentifier>{d5a82037-ce3a-4900-bd1a-45ca168634c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\shell\sys\linux\port">
       <UniqueIdentifier>{f50f7949-c1dc-4954-9826-ab85f4ab85fa}</UniqueIdentifier>
@@ -289,39 +214,6 @@
     <Filter Include="usrapp\demo\usbh_demo">
       <UniqueIdentifier>{efa87ff8-5991-46e7-8333-dd64699e5256}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl">
-      <UniqueIdentifier>{ecf7d1cf-7e1c-41df-8afd-62589d7d3463}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\port">
-      <UniqueIdentifier>{01b4e4b0-01bd-411c-a519-bf07a1c356ba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw">
-      <UniqueIdentifier>{d755b662-09ed-4b38-bf0a-e27d6bcdc3a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src">
-      <UniqueIdentifier>{53981ef2-e463-4129-bc82-be84710f03ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_core">
-      <UniqueIdentifier>{0535b1e8-8a19-47d1-95d3-07af9c296dbe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_draw">
-      <UniqueIdentifier>{48518390-4d9d-4c67-997c-9ed7e2b7e14d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_font">
-      <UniqueIdentifier>{26f23f8d-8976-41e8-a4e7-fef7a34643a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_hal">
-      <UniqueIdentifier>{79de5c39-3dad-4395-9346-b454c7629381}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_misc">
-      <UniqueIdentifier>{8783acfa-5053-4867-97e7-dbbc1e06e20e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_objx">
-      <UniqueIdentifier>{a71ed2e5-41c7-4134-aa7b-b4284a9ec1df}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_themes">
-      <UniqueIdentifier>{53384fa7-74f3-4a8d-8bff-36796374a738}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\demo\lvgl_demo">
       <UniqueIdentifier>{e19d9dc8-f712-4eff-b772-4c2c301014a3}</UniqueIdentifier>
     </Filter>
@@ -372,6 +264,258 @@
     </Filter>
     <Filter Include="vsf\component\3rd-party\nnom\raw\src">
       <UniqueIdentifier>{645ccc87-a3d4-407f-ae7f-63f44a174feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl">
+      <UniqueIdentifier>{ecf7d1cf-7e1c-41df-8afd-62589d7d3463}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\port">
+      <UniqueIdentifier>{01b4e4b0-01bd-411c-a519-bf07a1c356ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw">
+      <UniqueIdentifier>{d755b662-09ed-4b38-bf0a-e27d6bcdc3a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src">
+      <UniqueIdentifier>{53981ef2-e463-4129-bc82-be84710f03ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_core">
+      <UniqueIdentifier>{0535b1e8-8a19-47d1-95d3-07af9c296dbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_draw">
+      <UniqueIdentifier>{48518390-4d9d-4c67-997c-9ed7e2b7e14d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_font">
+      <UniqueIdentifier>{26f23f8d-8976-41e8-a4e7-fef7a34643a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_hal">
+      <UniqueIdentifier>{79de5c39-3dad-4395-9346-b454c7629381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_misc">
+      <UniqueIdentifier>{8783acfa-5053-4867-97e7-dbbc1e06e20e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_objx">
+      <UniqueIdentifier>{a71ed2e5-41c7-4134-aa7b-b4284a9ec1df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_themes">
+      <UniqueIdentifier>{53384fa7-74f3-4a8d-8bff-36796374a738}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal">
+      <UniqueIdentifier>{ce83bca0-746b-470b-b45c-bbd1948088cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch">
+      <UniqueIdentifier>{6f045188-9515-49a9-a783-189202754dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\x86">
+      <UniqueIdentifier>{819ae1ac-77db-4031-9e0a-3c774144180e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\x86\win">
+      <UniqueIdentifier>{25f4336d-0b62-4f17-984e-2e66843d7060}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver">
+      <UniqueIdentifier>{c9df9a5d-4876-4ef7-a01d-db95b9f5073f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86">
+      <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\interface">
+      <UniqueIdentifier>{41094f8b-289b-4758-876d-d5b08a45d435}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\tgui_demo">
+      <UniqueIdentifier>{dc60e992-f62b-421c-8610-457f1521f8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\debugger">
+      <UniqueIdentifier>{56f47ff4-bca5-4b1a-8fe9-539a67c81a9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\debugger\nulink">
+      <UniqueIdentifier>{c17395a3-e90e-42c0-a6e1-2a1f605f3625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\tgui_demo\tgui_demo">
+      <UniqueIdentifier>{c5b8f473-e3f3-4d75-abad-9ce669bae9f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\tgui_demo\tgui_demo\images">
+      <UniqueIdentifier>{50aac73e-c7b9-486f-bdf6-034a15f6d0ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\tgui_demo\tgui_demo\stopwatch">
+      <UniqueIdentifier>{73e23a46-fcf4-49ab-bf6a-afaeb8bfaf81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype">
+      <UniqueIdentifier>{110281bf-aa7f-432c-a0e3-e8cda043e6b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\port">
+      <UniqueIdentifier>{451d6c24-8929-48e0-85c5-4ed76ff2f480}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\port\config">
+      <UniqueIdentifier>{9dc19b0f-9932-43c4-8a50-f65e8b1b3995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw">
+      <UniqueIdentifier>{e0baee1b-5fdd-44a2-8f01-e45c6b2f5fde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw\include">
+      <UniqueIdentifier>{4d5f9860-1bcb-4339-8e46-e705fdfb3ecc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw\include\freetype">
+      <UniqueIdentifier>{31971edb-e4f7-4099-8417-419c06d3a6df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw\include\freetype\internal">
+      <UniqueIdentifier>{8a6c4153-41d7-4cf2-9fe9-103cc026d7ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw\include\freetype\internal\services">
+      <UniqueIdentifier>{8db4e984-2ba4-4320-95b7-3845774eac13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw\src">
+      <UniqueIdentifier>{4eaad3f0-1f31-4fd6-a905-62ccfa007937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\raw\src\FT_MODULES">
+      <UniqueIdentifier>{a330c4cd-915d-45d6-9a4c-970b378d674c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui">
+      <UniqueIdentifier>{f28dc242-956b-433c-a52b-a7faabd182c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_mc">
+      <UniqueIdentifier>{0662c178-b5b4-4946-83c7-692c09d33f92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v">
+      <UniqueIdentifier>{267d3a25-c8cf-44fc-b61f-9a9aabc9a6c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v\simple_view">
+      <UniqueIdentifier>{b22bd13d-e4cf-44c3-845c-33d58dc24d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\utilities">
+      <UniqueIdentifier>{5e78d06f-0fdc-4f5d-9960-b9909087dc4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\gui_v\template">
+      <UniqueIdentifier>{6a11b5b7-e4a3-4866-95f3-7fd83c3bfb78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_service">
+      <UniqueIdentifier>{f78b0915-3ff9-4d5e-990c-3f3ad660ac26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_service\msg_tree">
+      <UniqueIdentifier>{713a8449-b95a-45cd-bc22-b2fd8ca99a76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\common">
+      <UniqueIdentifier>{0c93947b-9457-4311-b604-cec4f89df0bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\av">
+      <UniqueIdentifier>{875c3863-d532-449e-aae1-c5e522bff330}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\av\audio">
+      <UniqueIdentifier>{054aee86-e0e3-4126-9b97-9ded3dfac10b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\av\audio\driver">
+      <UniqueIdentifier>{b9e1467b-97cc-412e-b370-eb2a60b0cd00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\av\audio\driver\winsound">
+      <UniqueIdentifier>{47acd5ff-0299-45b2-80db-253aea8fa9d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\audio_demo">
+      <UniqueIdentifier>{0488413e-72ba-44e1-a77f-ace2c238dd95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb">
+      <UniqueIdentifier>{e1328ffc-17be-4ff7-b12c-411991ea4b4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common">
+      <UniqueIdentifier>{4c415816-3ce1-49a0-ad33-5646302ac3a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class">
+      <UniqueIdentifier>{6a1f3497-ba4b-43b3-8270-bfbe4de18a58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\CDC">
+      <UniqueIdentifier>{3c6bd704-fb59-4c29-ba49-88af0c700ea9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\HID">
+      <UniqueIdentifier>{9eced937-9f8d-4f41-a56f-916e2b223505}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\UVC">
+      <UniqueIdentifier>{206386de-bfee-4d6e-a163-1da1fbf79a03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\XB1">
+      <UniqueIdentifier>{c5736860-f8de-4c04-aa9b-9d592891ccb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host">
+      <UniqueIdentifier>{27fad79b-8498-4537-8416-31b0e12aa999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class">
+      <UniqueIdentifier>{2d8cc84c-e86f-4f43-ba04-f89ff6b487a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\BTHCI">
+      <UniqueIdentifier>{f165771f-d763-47a8-adb1-dc49ee1663d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\CDC">
+      <UniqueIdentifier>{eb32e0d7-5f2e-4d57-a159-afc60f82d8ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\HID">
+      <UniqueIdentifier>{b875fb17-0c3d-41b5-8aca-372cc0dacb41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\HUB">
+      <UniqueIdentifier>{afc349a7-f559-4e3e-aa65-d524842f7c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\XB1">
+      <UniqueIdentifier>{58afcd2f-0da9-4546-9561-02ad8fcec99a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\libusb">
+      <UniqueIdentifier>{6c73c1d1-91ea-43ef-8e57-e7dc8d2505de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver">
+      <UniqueIdentifier>{7b7965a4-097d-4abd-8990-d440cab94b5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd">
+      <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
+      <UniqueIdentifier>{d5a82037-ce3a-4900-bd1a-45ca168634c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\av\audio\decoder">
+      <UniqueIdentifier>{f2ad505f-2a74-45ed-a789-6fc6883fac9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\av\audio\decoder\wav">
+      <UniqueIdentifier>{45a73ec8-9fc2-4ec7-9ab2-df10692ab500}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\dcd">
+      <UniqueIdentifier>{ee00c6d6-ecbc-4c68-bb7d-36e8f1d02d70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\dcd\usbip_dcd">
+      <UniqueIdentifier>{279be1c1-5476-46e1-9ec7-da636ef7793a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\device">
+      <UniqueIdentifier>{f57f6b28-aef5-4a0c-b3b1-0223dac2759c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\device\class">
+      <UniqueIdentifier>{827fb07a-bef4-4e57-8912-725b0f9b3c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\device\class\CDC">
+      <UniqueIdentifier>{fc5743ae-8fd0-40d1-b846-24aae7e4a0ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\usbd_demo">
+      <UniqueIdentifier>{53364fac-f176-4e18-af42-6689e7ca3d1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\device\class\MSC">
+      <UniqueIdentifier>{6bd7be68-e9a4-456f-9496-c996bb42bc12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\scsi">
+      <UniqueIdentifier>{9116aa18-4f45-4f92-84f8-d8a90d4e31c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\scsi\driver">
+      <UniqueIdentifier>{925ec071-6914-4682-976a-b8d947c9627e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\scsi\driver\mal_scsi">
+      <UniqueIdentifier>{5c288fa1-84a1-4d1d-961d-035c7231d818}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\scsi\driver\virtual_scsi">
+      <UniqueIdentifier>{81358e5b-6e71-4fdb-96d0-046ce7430e12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\MSC">
+      <UniqueIdentifier>{3cbd02be-82a8-436c-8689-5e78fbf59bb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\MSC">
+      <UniqueIdentifier>{b5b87428-cdbc-421b-bf67-f2c9691af833}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver\scsi_mal">
+      <UniqueIdentifier>{e12fcc47-f6ca-4c2e-b927-23a48031dda3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\scsi_demo">
+      <UniqueIdentifier>{c01b0e6f-49aa-43bb-9b19-f185fa6836ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\mal\driver\file_mal">
+      <UniqueIdentifier>{a90594d6-2307-431c-863e-3ac57aeaa592}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -825,9 +969,6 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.h">
       <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\demo\usrapp_common.h">
-      <Filter>usrapp\demo</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\demo\fakefat32.h">
       <Filter>usrapp\demo</Filter>
     </ClInclude>
@@ -1131,6 +1272,510 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.h">
       <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger.h">
+      <Filter>vsf\component\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger_cfg.h">
+      <Filter>vsf\component\debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.h">
+      <Filter>vsf\component\debugger\nulink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_Config.h">
+      <Filter>vsf\component\debugger\nulink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.h">
+      <Filter>vsf\component\debugger\nulink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\images</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\images</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\stopwatch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h">
+      <Filter>vsf\component\3rd-party\freetype\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h">
+      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h">
+      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h">
+      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h">
+      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h">
+      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\autohint.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cffotypes.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cfftypes.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftcalc.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdebug.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdrv.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftgloadr.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fthash.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftmemory.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftobjs.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftpsprop.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftrfork.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftserv.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftstream.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fttrace.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftvalid.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\internal.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\psaux.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\pshints.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\sfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\t1types.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\tttypes.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\wofftypes.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svbdf.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcfftl.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcid.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svfntfmt.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgldict.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgxval.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svkern.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmetric.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmm.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svotval.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpfr.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpostnm.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svprop.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpscmap.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpsinfo.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svsfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttcmap.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svtteng.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttglyf.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svwinfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\freetype.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftadvanc.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbbox.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbdf.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbitmap.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbzip2.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcache.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftchapters.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcid.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcolor.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftdriver.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrdef.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrors.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftfntfmt.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgasp.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftglyph.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgxval.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgzip.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftimage.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftincrem.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlcdfil.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlist.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlzw.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmac.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmm.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmodapi.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmoderr.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftotval.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftoutln.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftparams.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftpfr.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftrender.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsizes.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsnames.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftstroke.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsynth.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsystem.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttrigon.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttypes.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftwinfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\t1tables.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h">
+      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h">
+      <Filter>vsf\component\ui\tgui\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h">
+      <Filter>vsf\component\ui\tgui\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
+      <Filter>vsf\component\ui\tgui\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h">
+      <Filter>vsf\component\ui\tgui\gui_v</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.h">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\vsf_tgui_cfg.h">
+      <Filter>usrapp\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_service\vsf_osa_service.h">
+      <Filter>vsf\osa_service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_service\vsf_osa_service_cfg.h">
+      <Filter>vsf\osa_service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h">
+      <Filter>vsf\osa_service\msg_tree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_queue.h">
+      <Filter>vsf\utilities\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_port.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\common\usrapp_common.h">
+      <Filter>usrapp\demo\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\common\usrapp_usbh_common.h">
+      <Filter>usrapp\demo\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\common\usrapp_ui_common.h">
+      <Filter>usrapp\demo\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\av\vsf_av.h">
+      <Filter>vsf\component\av</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\av\vsf_av_cfg.h">
+      <Filter>vsf\component\av</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\av\audio\driver\winsound\vsf_winsound.h">
+      <Filter>vsf\component\av\audio\driver\winsound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\av\audio\vsf_audio.h">
+      <Filter>vsf\component\av\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\common\usrapp_audio_common.h">
+      <Filter>usrapp\demo\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\av\audio\decoder\wav\vsf_wav.h">
+      <Filter>vsf\component\av\audio\decoder\wav</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\string.h">
+      <Filter>vsf\shell\sys\linux\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.h">
+      <Filter>vsf\component\usb\driver\dcd\usbip_dcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\vsf_usbd.h">
+      <Filter>vsf\component\usb\device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDC.h">
+      <Filter>vsf\component\usb\device\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM.h">
+      <Filter>vsf\component\usb\device\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM_desc.h">
+      <Filter>vsf\component\usb\device\class\CDC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\common\usrapp_usbd_common.h">
+      <Filter>usrapp\demo\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC.h">
+      <Filter>vsf\component\usb\device\class\MSC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC_desc.h">
+      <Filter>vsf\component\usb\device\class\MSC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.h">
+      <Filter>vsf\component\scsi\driver\mal_scsi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.h">
+      <Filter>vsf\component\scsi\driver\virtual_scsi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi.h">
+      <Filter>vsf\component\scsi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi_cfg.h">
+      <Filter>vsf\component\scsi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\MSC\vsf_usbh_msc.h">
+      <Filter>vsf\component\usb\host\class\MSC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\MSC\vsf_usb_MSC.h">
+      <Filter>vsf\component\usb\common\class\MSC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\mal\driver\scsi_mal\vsf_scsi_mal.h">
+      <Filter>vsf\component\mal\driver\scsi_mal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\mal\driver\file_mal\vsf_file_mal.h">
+      <Filter>vsf\component\mal\driver\file_mal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -1230,9 +1875,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\utilities\language_extension\code_region.c">
       <Filter>vsf\utilities\language_externsion</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\kernel\task\vsf_task.c">
-      <Filter>vsf\kernel\task</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\kernel\task\vsf_thread.c">
       <Filter>vsf\kernel\task</Filter>
@@ -1351,9 +1993,6 @@
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\port\busybox\busybox.c">
       <Filter>vsf\shell\sys\linux\port\busybox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\mal\vsf_mal.c">
-      <Filter>vsf\component\mal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\mal\driver\mem_mal\vsf_mem_mal.c">
       <Filter>vsf\component\mal\driver\mem_mal</Filter>
     </ClCompile>
@@ -1419,9 +2058,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\awtk\port\platforms\vsf\thread.c">
       <Filter>vsf\component\3rd-party\awtk\port\platforms\vsf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\usrapp_common.c">
-      <Filter>usrapp\demo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\awtk_demo\awtk_demo.c">
       <Filter>usrapp\demo\awtk_demo</Filter>
@@ -1755,6 +2391,318 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\awtk_demo\awtk_assets.c">
       <Filter>usrapp\demo\awtk_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.c">
+      <Filter>vsf\component\debugger\nulink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.c">
+      <Filter>vsf\component\debugger\nulink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_main.c">
+      <Filter>usrapp\demo\tgui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\images</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\stopwatch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_demo.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_port.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\autofit\autofit.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bdf\bdf.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cff\cff.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbase.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bzip2\ftbzip2.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gzip\ftgzip.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftinit.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\lzw\ftlzw.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsystem.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gxvalid\gxvalid.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\otvalid\otvalid.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pcf\pcf.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pfr\pfr.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psaux\psaux.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pshinter\pshinter.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psnames\psnames.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\raster\raster.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\sfnt\sfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\smooth\smooth.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\truetype\truetype.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type1\type1.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cid\type1cid.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type42\type42.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\builds\windows\ftdebug.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbbox.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbdf.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbitmap.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftcid.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftfstype.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgasp.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftglyph.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgxval.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftmm.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftotval.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftpfr.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftstroke.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsynth.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\fttype1.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftwinfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cache\ftcache.c">
+      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c">
+      <Filter>vsf\component\ui\tgui\gui_mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c">
+      <Filter>vsf\component\ui\tgui\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c">
+      <Filter>vsf\component\ui\tgui\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
+      <Filter>vsf\component\ui\tgui\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c">
+      <Filter>vsf\component\ui\tgui\gui_v</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.c">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\osa_service\vsf_osa_service.c">
+      <Filter>vsf\osa_service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c">
+      <Filter>vsf\osa_service\msg_tree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\utilities\template\vsf_queue.c">
+      <Filter>vsf\utilities\template</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\fakefat32.c">
+      <Filter>usrapp\demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\common\usrapp_common.c">
+      <Filter>usrapp\demo\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\common\usrapp_usbh_common.c">
+      <Filter>usrapp\demo\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\common\usrapp_ui_common.c">
+      <Filter>usrapp\demo\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\av\audio\driver\winsound\vsf_winsound.c">
+      <Filter>vsf\component\av\audio\driver\winsound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\av\audio\vsf_audio.c">
+      <Filter>vsf\component\av\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\mal\vsf_mal.c">
+      <Filter>vsf\component\mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\audio_demo\audio_demo.c">
+      <Filter>usrapp\demo\audio_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\common\usrapp_audio_common.c">
+      <Filter>usrapp\demo\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\av\audio\decoder\wav\vsf_wav.c">
+      <Filter>vsf\component\av\audio\decoder\wav</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.c">
+      <Filter>vsf\component\usb\driver\dcd\usbip_dcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\vsf_usbd.c">
+      <Filter>vsf\component\usb\device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDC.c">
+      <Filter>vsf\component\usb\device\class\CDC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM.c">
+      <Filter>vsf\component\usb\device\class\CDC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\common\usrapp_usbd_common.c">
+      <Filter>usrapp\demo\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\usbd_demo\usbd_demo.c">
+      <Filter>usrapp\demo\usbd_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC.c">
+      <Filter>vsf\component\usb\device\class\MSC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.c">
+      <Filter>vsf\component\scsi\driver\mal_scsi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.c">
+      <Filter>vsf\component\scsi\driver\virtual_scsi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\scsi\vsf_scsi.c">
+      <Filter>vsf\component\scsi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\MSC\vsf_usbh_msc.c">
+      <Filter>vsf\component\usb\host\class\MSC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\mal\driver\scsi_mal\vsf_scsi_mal.c">
+      <Filter>vsf\component\mal\driver\scsi_mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\scsi_demo\scsi_demo.c">
+      <Filter>usrapp\demo\scsi_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\mal\driver\file_mal\vsf_file_mal.c">
+      <Filter>vsf\component\mal\driver\file_mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c">
+      <Filter>usrapp\demo\linux_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

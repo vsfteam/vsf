@@ -22,11 +22,11 @@
 
 #define VSF_USBH_IMPLEMENT_HCD
 #define VSF_USBH_IMPLEMENT_HUB
+#define VSF_EDA_CLASS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
 #include "./vsf_winusb_hcd.h"
 
-#include <Windows.h>
 #include <SetupAPI.h>
 #include <winusb.h>
 
@@ -50,7 +50,7 @@
 
 /*============================ TYPES =========================================*/
 
-struct vsf_winusb_hcd_dev_t {
+struct vk_winusb_hcd_dev_t {
     uint16_t vid, pid;
     HANDLE hDev;
     WINUSB_INTERFACE_HANDLE hUsbDev;
@@ -78,10 +78,10 @@ struct vsf_winusb_hcd_dev_t {
     vsf_arch_irq_request_t irq_request;
     vsf_dlist_t urb_pending_list;
 };
-typedef struct vsf_winusb_hcd_dev_t vsf_winusb_hcd_dev_t;
+typedef struct vk_winusb_hcd_dev_t vk_winusb_hcd_dev_t;
 
-struct vsf_winusb_hcd_t {
-    vsf_winusb_hcd_dev_t devs[VSF_WINUSB_HCD_CFG_DEV_NUM];
+struct vk_winusb_hcd_t {
+    vk_winusb_hcd_dev_t devs[VSF_WINUSB_HCD_CFG_DEV_NUM];
     vk_usbh_hcd_t *hcd;
     uint32_t new_mask;
     uint8_t cur_dev_idx;
@@ -92,9 +92,9 @@ struct vsf_winusb_hcd_t {
     vsf_sem_t sem;
     vsf_dlist_t urb_list;
 };
-typedef struct vsf_winusb_hcd_t vsf_winusb_hcd_t;
+typedef struct vk_winusb_hcd_t vk_winusb_hcd_t;
 
-struct vsf_winusb_hcd_urb_t {
+struct vk_winusb_hcd_urb_t {
     vsf_dlist_node_t urb_node;
     vsf_dlist_node_t urb_pending_node;
 
@@ -112,52 +112,52 @@ struct vsf_winusb_hcd_urb_t {
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
 };
-typedef struct vsf_winusb_hcd_urb_t vsf_winusb_hcd_urb_t;
+typedef struct vk_winusb_hcd_urb_t vk_winusb_hcd_urb_t;
 
-enum vsf_winusb_hcd_evt_t {
+enum vk_winusb_hcd_evt_t {
     VSF_EVT_WINUSB_HCD_ATTACH           = VSF_EVT_WINUSB_HCD_BASE + 0x100,
     VSF_EVT_WINUSB_HCD_DETACH           = VSF_EVT_WINUSB_HCD_BASE + 0x200,
     VSF_EVT_WINUSB_HCD_READY            = VSF_EVT_WINUSB_HCD_BASE + 0x300,
 };
-typedef enum vsf_winusb_hcd_evt_t vsf_winusb_hcd_evt_t;
+typedef enum vk_winusb_hcd_evt_t vk_winusb_hcd_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vsf_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
-static vsf_err_t vsf_winusb_hcd_fini(vk_usbh_hcd_t *hcd);
-static vsf_err_t vsf_winusb_hcd_suspend(vk_usbh_hcd_t *hcd);
-static vsf_err_t vsf_winusb_hcd_resume(vk_usbh_hcd_t *hcd);
-static vsf_err_t vsf_winusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
-static void vsf_winusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
-static vk_usbh_hcd_urb_t * vsf_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
-static void vsf_winusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
-static vsf_err_t vsf_winusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
-static vsf_err_t vsf_winusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
-static vsf_err_t vsf_winusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
-static bool vsf_winusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static vsf_err_t __vk_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
+static vsf_err_t __vk_winusb_hcd_fini(vk_usbh_hcd_t *hcd);
+static vsf_err_t __vk_winusb_hcd_suspend(vk_usbh_hcd_t *hcd);
+static vsf_err_t __vk_winusb_hcd_resume(vk_usbh_hcd_t *hcd);
+static vsf_err_t __vk_winusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static void __vk_winusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static vk_usbh_hcd_urb_t * __vk_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
+static void __vk_winusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t __vk_winusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t __vk_winusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t __vk_winusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static bool __vk_winusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 
-static void __vsf_winusb_hcd_dev_thread(void *arg);
+static void __vk_winusb_hcd_dev_thread(void *arg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vk_usbh_hcd_drv_t vsf_winusb_hcd_drv = {
-    .init_evthandler    = vsf_winusb_hcd_init_evthandler,
-    .fini               = vsf_winusb_hcd_fini,
-    .suspend            = vsf_winusb_hcd_suspend,
-    .resume             = vsf_winusb_hcd_resume,
-    .alloc_device       = vsf_winusb_hcd_alloc_device,
-    .free_device        = vsf_winusb_hcd_free_device,
-    .alloc_urb          = vsf_winusb_hcd_alloc_urb,
-    .free_urb           = vsf_winusb_hcd_free_urb,
-    .submit_urb         = vsf_winusb_hcd_submit_urb,
-    .relink_urb         = vsf_winusb_hcd_relink_urb,
-    .reset_dev          = vsf_winusb_hcd_reset_dev,
-    .is_dev_reset       = vsf_winusb_hcd_is_dev_reset,
+const vk_usbh_hcd_drv_t vk_winusb_hcd_drv = {
+    .init_evthandler    = __vk_winusb_hcd_init_evthandler,
+    .fini               = __vk_winusb_hcd_fini,
+    .suspend            = __vk_winusb_hcd_suspend,
+    .resume             = __vk_winusb_hcd_resume,
+    .alloc_device       = __vk_winusb_hcd_alloc_device,
+    .free_device        = __vk_winusb_hcd_free_device,
+    .alloc_urb          = __vk_winusb_hcd_alloc_urb,
+    .free_urb           = __vk_winusb_hcd_free_urb,
+    .submit_urb         = __vk_winusb_hcd_submit_urb,
+    .relink_urb         = __vk_winusb_hcd_relink_urb,
+    .reset_dev          = __vk_winusb_hcd_reset_dev,
+    .is_dev_reset       = __vk_winusb_hcd_is_dev_reset,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static vsf_winusb_hcd_t __vsf_winusb_hcd = {
+static vk_winusb_hcd_t __vk_winusb_hcd = {
     .devs = {
         REPEAT_MACRO(VSF_WINUSB_HCD_CFG_DEV_NUM, VSF_WINUSB_HCD_DEF_DEV, NULL)
     },
@@ -165,7 +165,7 @@ static vsf_winusb_hcd_t __vsf_winusb_hcd = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static HANDLE __vsf_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
+static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
 {
     HANDLE hDev = INVALID_HANDLE_VALUE;
     HDEVINFO hDeviceInfo = SetupDiGetClassDevsA(NULL, NULL, NULL, DIGCF_ALLCLASSES | DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
@@ -231,13 +231,13 @@ done:
     return hDev;
 }
 
-static void __vsf_winusb_hcd_on_left(vsf_winusb_hcd_dev_t *winusb_dev)
+static void __vk_winusb_hcd_on_left(vk_winusb_hcd_dev_t *winusb_dev)
 {
     winusb_dev->evt_mask.is_detaching = true;
     __vsf_arch_irq_request_send(&winusb_dev->irq_request);
 }
 
-static void __vsf_winusb_hcd_on_arrived(vsf_winusb_hcd_dev_t *winusb_dev)
+static void __vk_winusb_hcd_on_arrived(vk_winusb_hcd_dev_t *winusb_dev)
 {
     UCHAR speed;
     ULONG length = sizeof(speed);
@@ -253,13 +253,13 @@ static void __vsf_winusb_hcd_on_arrived(vsf_winusb_hcd_dev_t *winusb_dev)
 }
 
 // return 0 on success, non-0 otherwise
-static int __vsf_winusb_hcd_init(void)
+static int __vk_winusb_hcd_init(void)
 {
-    vsf_winusb_hcd_param_t *param = __vsf_winusb_hcd.hcd->param;
-    vsf_winusb_hcd_dev_t *winusb_dev;
+    vk_winusb_hcd_param_t *param = __vk_winusb_hcd.hcd->param;
+    vk_winusb_hcd_dev_t *winusb_dev;
 
-    for (int i = 0; i < dimof(__vsf_winusb_hcd.devs); i++) {
-        winusb_dev = &__vsf_winusb_hcd.devs[i];
+    for (int i = 0; i < dimof(__vk_winusb_hcd.devs); i++) {
+        winusb_dev = &__vk_winusb_hcd.devs[i];
         winusb_dev->state = VSF_WINUSB_HCD_DEV_STATE_DETACHED;
         winusb_dev->evt_mask.value = 0;
         winusb_dev->hDev = INVALID_HANDLE_VALUE;
@@ -267,15 +267,15 @@ static int __vsf_winusb_hcd_init(void)
 
         __vsf_arch_irq_request_init(&winusb_dev->irq_request);
         winusb_dev->irq_thread.name = "winusb_hcd_dev";
-        __vsf_arch_irq_init(&winusb_dev->irq_thread, __vsf_winusb_hcd_dev_thread, param->priority, true);
+        __vsf_arch_irq_init(&winusb_dev->irq_thread, __vk_winusb_hcd_dev_thread, param->priority, true);
     }
     return 0;
 }
 
-static int __vsf_winusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
+static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
-    vsf_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
+    vk_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
     vk_usbh_pipe_t pipe = urb->pipe;
     ULONG real_size;
 
@@ -286,7 +286,7 @@ static int __vsf_winusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
     switch (pipe.type) {
     case USB_ENDPOINT_XFER_CONTROL:
         if (pipe.endpoint != 0) {
-            return VSF_ERR_FAIL;
+            return VSF_ERR_INVALID_PARAMETER;
         } else {
             struct usb_ctrlrequest_t *setup = &urb->setup_packet;
             WINUSB_SETUP_PACKET SetupPacket = {
@@ -299,7 +299,7 @@ static int __vsf_winusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
 
             if (!WinUsb_ControlTransfer(winusb_dev->hUsbDev, SetupPacket, urb->buffer,
                         setup->wLength, &real_size, NULL)) {
-                return VSF_ERR_FAIL;
+                return -GetLastError();
             }
             return real_size;
         }
@@ -317,7 +317,7 @@ static int __vsf_winusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
                             urb->buffer, urb->transfer_length, &real_size, NULL);
             }
             if (!result) {
-                return VSF_ERR_FAIL;
+                return -GetLastError();
             }
             return real_size;
         }
@@ -325,12 +325,12 @@ static int __vsf_winusb_hcd_submit_urb(vk_usbh_hcd_urb_t *urb)
     return VSF_ERR_INVALID_PARAMETER;
 }
 
-static void __vsf_winusb_hcd_dev_thread(void *arg)
+static void __vk_winusb_hcd_dev_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_winusb_hcd_dev_t *winusb_dev = container_of(irq_thread, vsf_winusb_hcd_dev_t, irq_thread);
+    vk_winusb_hcd_dev_t *winusb_dev = container_of(irq_thread, vk_winusb_hcd_dev_t, irq_thread);
     vsf_arch_irq_request_t *irq_request = &winusb_dev->irq_request;
-    int idx = winusb_dev - &__vsf_winusb_hcd.devs[0];
+    int idx = winusb_dev - &__vk_winusb_hcd.devs[0];
 
     __vsf_arch_irq_set_background(irq_thread);
     while (1) {
@@ -339,12 +339,12 @@ static void __vsf_winusb_hcd_dev_thread(void *arg)
         if (winusb_dev->evt_mask.is_attaching) {
             winusb_dev->evt_mask.is_attaching = false;
             __vsf_arch_irq_start(irq_thread);
-                vsf_eda_post_evt(&__vsf_winusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_WINUSB_HCD_ATTACH | idx);
+                vsf_eda_post_evt(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_WINUSB_HCD_ATTACH | idx);
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (winusb_dev->evt_mask.is_detaching) {
             __vsf_arch_irq_start(irq_thread);
-                vsf_eda_post_evt(&__vsf_winusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_WINUSB_HCD_DETACH | idx);
+                vsf_eda_post_evt(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, VSF_EVT_WINUSB_HCD_DETACH | idx);
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (winusb_dev->evt_mask.is_detached) {
@@ -361,10 +361,10 @@ static void __vsf_winusb_hcd_dev_thread(void *arg)
     }
 }
 
-static void __vsf_winusb_hcd_urb_thread(void *arg)
+static void __vk_winusb_hcd_urb_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_winusb_hcd_urb_t *winusb_urb = container_of(irq_thread, vsf_winusb_hcd_urb_t, irq_thread);
+    vk_winusb_hcd_urb_t *winusb_urb = container_of(irq_thread, vk_winusb_hcd_urb_t, irq_thread);
     vk_usbh_hcd_urb_t *urb = container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
     vsf_arch_irq_request_t *irq_request = &winusb_urb->irq_request;
     bool is_to_free;
@@ -380,10 +380,7 @@ static void __vsf_winusb_hcd_urb_thread(void *arg)
 
         is_to_free = VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state;
         if (!is_to_free) {
-            vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
-            vsf_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
-
-            actual_length = __vsf_winusb_hcd_submit_urb(urb);
+            actual_length = __vk_winusb_hcd_submit_urb_do(urb);
             if (actual_length < 0) {
                 urb->status = actual_length;
             } else {
@@ -397,7 +394,7 @@ static void __vsf_winusb_hcd_urb_thread(void *arg)
                 winusb_urb->is_irq_enabled = false;
             }
             winusb_urb->is_msg_processed = false;
-            vsf_eda_post_msg(&__vsf_winusb_hcd.teda.use_as__vsf_eda_t, urb);
+            vsf_eda_post_msg(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, urb);
         __vsf_arch_irq_end(irq_thread, false);
 
         if (is_to_free) {
@@ -408,24 +405,24 @@ static void __vsf_winusb_hcd_urb_thread(void *arg)
     }
 }
 
-static void __vsf_winusb_hcd_init_thread(void *arg)
+static void __vk_winusb_hcd_init_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
 
     __vsf_arch_irq_set_background(irq_thread);
-        __vsf_winusb_hcd_init();
+        __vk_winusb_hcd_init();
     __vsf_arch_irq_start(irq_thread);
-        vsf_eda_post_evt(__vsf_winusb_hcd.init_eda, VSF_EVT_WINUSB_HCD_READY);
+        vsf_eda_post_evt(__vk_winusb_hcd.init_eda, VSF_EVT_WINUSB_HCD_READY);
     __vsf_arch_irq_end(irq_thread, false);
 
     while (1) {
-        vsf_winusb_hcd_dev_t *winusb_dev = &__vsf_winusb_hcd.devs[0];
-        for (int i = 0; i < dimof(__vsf_winusb_hcd.devs); i++, winusb_dev++) {
+        vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[0];
+        for (int i = 0; i < dimof(__vk_winusb_hcd.devs); i++, winusb_dev++) {
             if ((INVALID_HANDLE_VALUE == winusb_dev->hDev) && (0 == winusb_dev->evt_mask.value)) {
-                winusb_dev->hDev = __vsf_winusb_open_device(winusb_dev->vid, winusb_dev->pid);
+                winusb_dev->hDev = __vk_winusb_open_device(winusb_dev->vid, winusb_dev->pid);
                 if (winusb_dev->hDev != INVALID_HANDLE_VALUE) {
                     if (WinUsb_Initialize(winusb_dev->hDev, &winusb_dev->hUsbDev)) {
-                        __vsf_winusb_hcd_on_arrived(winusb_dev);
+                        __vk_winusb_hcd_on_arrived(winusb_dev);
                     } else {
                         CloseHandle(winusb_dev->hDev);
                         winusb_dev->hDev = INVALID_HANDLE_VALUE;
@@ -443,9 +440,9 @@ static void __vsf_winusb_hcd_init_thread(void *arg)
 
 
 
-static bool vsf_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
+static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
-    vsf_winusb_hcd_urb_t *winusb_urb = (vsf_winusb_hcd_urb_t *)urb->priv;
+    vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
     if (winusb_urb->is_irq_enabled) {
         VSF_USB_ASSERT(VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state);
         __vsf_arch_irq_request_send(&winusb_urb->irq_request);
@@ -456,36 +453,36 @@ static bool vsf_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
     }
 }
 
-static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_winusb_hcd_t *winusb = container_of(eda, vsf_winusb_hcd_t, teda);
+    vk_winusb_hcd_t *winusb = container_of(eda, vk_winusb_hcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_dlist_init(&__vsf_winusb_hcd.urb_list);
-        vsf_eda_sem_init(&__vsf_winusb_hcd.sem, 0);
+        vsf_dlist_init(&__vk_winusb_hcd.urb_list);
+        vsf_eda_sem_init(&__vk_winusb_hcd.sem, 0);
         vsf_teda_set_timer_ms(100);
 
     wait_next_urb:
-        if (vsf_eda_sem_pend(&__vsf_winusb_hcd.sem, -1)) {
+        if (vsf_eda_sem_pend(&__vk_winusb_hcd.sem, -1)) {
             break;
         }
         // fall through
     case VSF_EVT_SYNC: {
-            vsf_winusb_hcd_urb_t *winusb_urb;
+            vk_winusb_hcd_urb_t *winusb_urb;
             vsf_protect_t orig = vsf_protect_sched();
-                vsf_dlist_remove_head(vsf_winusb_hcd_urb_t, urb_node,
-                        &__vsf_winusb_hcd.urb_list, winusb_urb);
+                vsf_dlist_remove_head(vk_winusb_hcd_urb_t, urb_node,
+                        &__vk_winusb_hcd.urb_list, winusb_urb);
             vsf_unprotect_sched(orig);
 
             if (winusb_urb != NULL) {
                 vk_usbh_hcd_urb_t *urb = container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
 
                 if (VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state) {
-                    vsf_winusb_hcd_free_urb_do(urb);
+                    __vk_winusb_hcd_free_urb_do(urb);
                 } else {
                     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
-                    vsf_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
+                    vk_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
 
                     if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
                         struct usb_ctrlrequest_t *setup = &urb->setup_packet;
@@ -500,19 +497,19 @@ static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             urb->actual_length = 0;
 
                             VSF_USB_ASSERT(vsf_dlist_is_empty(&winusb_dev->urb_pending_list));
-                            vsf_dlist_add_to_tail(vsf_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
-                            vsf_eda_post_msg(&__vsf_winusb_hcd.teda.use_as__vsf_eda_t, urb);
+                            vsf_dlist_add_to_tail(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
+                            vsf_eda_post_msg(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, urb);
                             goto wait_next_urb;
                         }
                     }
 
                     if (!urb->pipe.dir_in1out0) {
-                        vsf_winusb_hcd_urb_t *winusb_urb_head;
+                        vk_winusb_hcd_urb_t *winusb_urb_head;
 
                         // add to urb_pending_list for out transfer
-                        vsf_dlist_add_to_tail(vsf_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
+                        vsf_dlist_add_to_tail(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
 
-                        vsf_dlist_peek_head(vsf_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                        vsf_dlist_peek_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
                         if (winusb_urb_head != winusb_urb) {
                             goto wait_next_urb;
                         }
@@ -527,15 +524,15 @@ static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_TIMER:
-        if (__vsf_winusb_hcd.new_mask != 0) {
+        if (__vk_winusb_hcd.new_mask != 0) {
             vk_usbh_t *usbh = (vk_usbh_t *)winusb->hcd;
             if (NULL == usbh->dev_new) {
-                int idx = ffz(~__vsf_winusb_hcd.new_mask);
-                VSF_USB_ASSERT(idx < dimof(__vsf_winusb_hcd.devs));
-                vsf_winusb_hcd_dev_t *winusb_dev = &__vsf_winusb_hcd.devs[idx];
+                int idx = ffz(~__vk_winusb_hcd.new_mask);
+                VSF_USB_ASSERT(idx < dimof(__vk_winusb_hcd.devs));
+                vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[idx];
                 VSF_USB_ASSERT(vsf_dlist_is_empty(&winusb_dev->urb_pending_list));
-                __vsf_winusb_hcd.cur_dev_idx = idx;
-                __vsf_winusb_hcd.new_mask &= ~(1 << idx);
+                __vk_winusb_hcd.cur_dev_idx = idx;
+                __vk_winusb_hcd.new_mask &= ~(1 << idx);
                 winusb_dev->addr = 0;
                 winusb_dev->dev = vk_usbh_new_device((vk_usbh_t *)winusb->hcd, winusb_dev->speed, NULL, 0);
                 winusb_dev->state = VSF_WINUSB_HCD_DEV_STATE_ATTACHED;
@@ -546,20 +543,20 @@ static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_MESSAGE: {
             vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
             VSF_USB_ASSERT((urb != NULL) && urb->pipe.is_pipe);
-            vsf_winusb_hcd_urb_t *winusb_urb = (vsf_winusb_hcd_urb_t *)urb->priv;
+            vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
 
             do {
                 if (!urb->pipe.dir_in1out0) {
                     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
                     if (NULL == dev) { break; }
-                    vsf_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
+                    vk_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
                     if (NULL == winusb_dev) { break; }
-                    vsf_winusb_hcd_urb_t *winusb_urb_head;
+                    vk_winusb_hcd_urb_t *winusb_urb_head;
 
                     if (VSF_WINUSB_HCD_DEV_STATE_ATTACHED == winusb_dev->state) {
-                        vsf_dlist_remove_head(vsf_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                        vsf_dlist_remove_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
                         VSF_USB_ASSERT(winusb_urb_head == winusb_urb);
-                        vsf_dlist_peek_head(vsf_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
+                        vsf_dlist_peek_head(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb_head);
                         if (winusb_urb_head != NULL) {
                             winusb_urb_head->state = VSF_WINUSB_HCD_URB_STATE_SUBMITTING;
                             __vsf_arch_irq_request_send(&winusb_urb_head->irq_request);
@@ -569,7 +566,7 @@ static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             } while (0);
 
             if (VSF_WINUSB_HCD_URB_STATE_TO_FREE == winusb_urb->state) {
-                if (!vsf_winusb_hcd_free_urb_do(urb)) {
+                if (!__vk_winusb_hcd_free_urb_do(urb)) {
                     winusb_urb->is_msg_processed = true;
                 }
             } else {
@@ -581,13 +578,13 @@ static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     default: {
             int idx = evt & 0xFF;
-            VSF_USB_ASSERT(idx < dimof(__vsf_winusb_hcd.devs));
-            vsf_winusb_hcd_dev_t *winusb_dev = &__vsf_winusb_hcd.devs[idx];
+            VSF_USB_ASSERT(idx < dimof(__vk_winusb_hcd.devs));
+            vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[idx];
 
             switch (evt & ~0xFF) {
             case VSF_EVT_WINUSB_HCD_ATTACH:
                 if (winusb_dev->state != VSF_WINUSB_HCD_DEV_STATE_ATTACHED) {
-                    __vsf_winusb_hcd.new_mask |= 1 << idx;
+                    __vk_winusb_hcd.new_mask |= 1 << idx;
                 }
                 break;
             case VSF_EVT_WINUSB_HCD_DETACH:
@@ -607,22 +604,22 @@ static void vsf_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t vsf_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
+static vsf_err_t __vk_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
 {
-    vsf_winusb_hcd_param_t *param = hcd->param;
+    vk_winusb_hcd_param_t *param = hcd->param;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        __vsf_winusb_hcd.hcd = hcd;
-        __vsf_winusb_hcd.new_mask = 0;
-        __vsf_winusb_hcd.cur_dev_idx = 0;
+        __vk_winusb_hcd.hcd = hcd;
+        __vk_winusb_hcd.new_mask = 0;
+        __vk_winusb_hcd.cur_dev_idx = 0;
 
-        vsf_eda_set_evthandler(&__vsf_winusb_hcd.teda.use_as__vsf_eda_t, vsf_winusb_hcd_evthandler);
-        vsf_teda_init(&__vsf_winusb_hcd.teda, vsf_prio_inherit, false);
+        __vk_winusb_hcd.teda.fn.evthandler = __vk_winusb_hcd_evthandler;
+        vsf_teda_init(&__vk_winusb_hcd.teda, vsf_prio_inherit, false);
 
-        __vsf_winusb_hcd.init_eda = eda;
-        __vsf_winusb_hcd.init_thread.name = "winusb_hcd_init";
-        __vsf_arch_irq_init(&__vsf_winusb_hcd.init_thread, __vsf_winusb_hcd_init_thread, param->priority, true);
+        __vk_winusb_hcd.init_eda = eda;
+        __vk_winusb_hcd.init_thread.name = "winusb_hcd_init";
+        __vsf_arch_irq_init(&__vk_winusb_hcd.init_thread, __vk_winusb_hcd_init_thread, param->priority, true);
         break;
     case VSF_EVT_WINUSB_HCD_READY:
         return VSF_ERR_NONE;
@@ -630,55 +627,55 @@ static vsf_err_t vsf_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, v
     return VSF_ERR_NOT_READY;
 }
 
-static vsf_err_t vsf_winusb_hcd_fini(vk_usbh_hcd_t *hcd)
+static vsf_err_t __vk_winusb_hcd_fini(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_winusb_hcd_suspend(vk_usbh_hcd_t *hcd)
+static vsf_err_t __vk_winusb_hcd_suspend(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_winusb_hcd_resume(vk_usbh_hcd_t *hcd)
+static vsf_err_t __vk_winusb_hcd_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_winusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+static vsf_err_t __vk_winusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
-    VSF_USB_ASSERT(__vsf_winusb_hcd.cur_dev_idx < dimof(__vsf_winusb_hcd.devs));
-    dev->dev_priv = &__vsf_winusb_hcd.devs[__vsf_winusb_hcd.cur_dev_idx];
+    VSF_USB_ASSERT(__vk_winusb_hcd.cur_dev_idx < dimof(__vk_winusb_hcd.devs));
+    dev->dev_priv = &__vk_winusb_hcd.devs[__vk_winusb_hcd.cur_dev_idx];
     return VSF_ERR_NONE;
 }
 
-static void vsf_winusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+static void __vk_winusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     dev->dev_priv = NULL;
 }
 
-static vk_usbh_hcd_urb_t * vsf_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
+static vk_usbh_hcd_urb_t * __vk_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
-    uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vsf_winusb_hcd_urb_t);
+    uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vk_winusb_hcd_urb_t);
     vk_usbh_hcd_urb_t *urb = VSF_USBH_MALLOC(size);
 
     if (urb != NULL) {
         memset(urb, 0, size);
 
-        vsf_winusb_hcd_urb_t *winusb_urb = (vsf_winusb_hcd_urb_t *)urb->priv;
-        vsf_winusb_hcd_param_t *param = __vsf_winusb_hcd.hcd->param;
+        vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
+        vk_winusb_hcd_param_t *param = __vk_winusb_hcd.hcd->param;
         __vsf_arch_irq_request_init(&winusb_urb->irq_request);
         winusb_urb->irq_thread.name = "winusb_hcd_urb";
         winusb_urb->is_msg_processed = true;
         winusb_urb->is_irq_enabled = true;
-        __vsf_arch_irq_init(&winusb_urb->irq_thread, __vsf_winusb_hcd_urb_thread, param->priority, true);
+        __vsf_arch_irq_init(&winusb_urb->irq_thread, __vk_winusb_hcd_urb_thread, param->priority, true);
     }
     return urb;
 }
 
-static void vsf_winusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
+static void __vk_winusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    vsf_winusb_hcd_urb_t *winusb_urb = (vsf_winusb_hcd_urb_t *)urb->priv;
+    vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
     if (VSF_WINUSB_HCD_URB_STATE_TO_FREE != winusb_urb->state) {
         vsf_protect_t orig = vsf_protect_int();
             winusb_urb->state = VSF_WINUSB_HCD_URB_STATE_TO_FREE;
@@ -691,35 +688,35 @@ static void vsf_winusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
     }
 }
 
-static vsf_err_t vsf_winusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
+static vsf_err_t __vk_winusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    vsf_winusb_hcd_urb_t *winusb_urb = (vsf_winusb_hcd_urb_t *)urb->priv;
-    vsf_dlist_init_node(vsf_winusb_hcd_urb_t, urb_node, winusb_urb);
-    vsf_dlist_init_node(vsf_winusb_hcd_urb_t, urb_pending_node, winusb_urb);
+    vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
+    vsf_dlist_init_node(vk_winusb_hcd_urb_t, urb_node, winusb_urb);
+    vsf_dlist_init_node(vk_winusb_hcd_urb_t, urb_pending_node, winusb_urb);
     vsf_protect_t orig = vsf_protect_sched();
-        vsf_dlist_add_to_tail(vsf_winusb_hcd_urb_t, urb_node, &__vsf_winusb_hcd.urb_list, winusb_urb);
+        vsf_dlist_add_to_tail(vk_winusb_hcd_urb_t, urb_node, &__vk_winusb_hcd.urb_list, winusb_urb);
         winusb_urb->state = VSF_WINUSB_HCD_URB_STATE_QUEUED;
     vsf_unprotect_sched(orig);
-    vsf_eda_sem_post(&__vsf_winusb_hcd.sem);
+    vsf_eda_sem_post(&__vk_winusb_hcd.sem);
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsf_winusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
+static vsf_err_t __vk_winusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    return vsf_winusb_hcd_submit_urb(hcd, urb);
+    return __vk_winusb_hcd_submit_urb(hcd, urb);
 }
 
-static vsf_err_t vsf_winusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+static vsf_err_t __vk_winusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
-    vsf_winusb_hcd_dev_t *winusb_dev = (vsf_winusb_hcd_dev_t *)dev->dev_priv;
+    vk_winusb_hcd_dev_t *winusb_dev = (vk_winusb_hcd_dev_t *)dev->dev_priv;
     winusb_dev->evt_mask.is_resetting = true;
     __vsf_arch_irq_request_send(&winusb_dev->irq_request);
     return VSF_ERR_NONE;
 }
 
-static bool vsf_winusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+static bool __vk_winusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
-    vsf_winusb_hcd_dev_t *winusb_dev = (vsf_winusb_hcd_dev_t *)dev->dev_priv;
+    vk_winusb_hcd_dev_t *winusb_dev = (vk_winusb_hcd_dev_t *)dev->dev_priv;
     return winusb_dev->evt_mask.is_resetting;
 }
 

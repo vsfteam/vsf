@@ -71,6 +71,9 @@
 declare_simple_class(vk_fs_t)
 declare_simple_class(vk_file_t)
 declare_simple_class(vk_vfs_file_t)
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+declare_simple_class(vk_file_stream_t)
+#endif
 
 enum vk_file_attr_t {
     VSF_FILE_ATTR_READ          = 1 << 0,
@@ -142,9 +145,18 @@ struct vk_file_ctx_t {
 };
 typedef struct vk_file_ctx_t vk_file_ctx_t;
 
+// (bytelen << 6) | index
+enum vk_file_name_coding_t {
+    VSF_FILE_NAME_CODING_UNKNOWN    = 0,
+    VSF_FILE_NAME_CODING_ASCII      = (1 << 6) | 0,
+    VSF_FILE_NAME_CODING_UCS2       = (2 << 6) | 1,
+};
+typedef enum vk_file_name_coding_t vk_file_name_coding_t;
+
 def_simple_class(vk_file_t) {
     public_member(
         vk_file_attr_t attr;
+        vk_file_name_coding_t coding;
         char *name;
         uint64_t size;
 
@@ -201,6 +213,24 @@ def_simple_class(vk_vfs_file_t) {
 };
 #endif
 
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+def_simple_class(vk_file_stream_t) {
+    public_member(
+        vk_file_t *file;
+    )
+    protected_member(
+        struct {
+            uint64_t addr;
+            uint32_t size;
+            uint32_t rw_size;
+            vsf_stream_t *stream;
+            uint8_t *cur_buff;
+            vsf_eda_t *cur_eda;
+        } stream;
+    )
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern vk_fs_op_t vk_vfs_op;
@@ -232,6 +262,8 @@ extern vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_
 extern vsf_err_t vk_file_sync(vk_file_t *file);
 #endif
 
+extern uint_fast16_t vk_file_get_name_length(vk_file_t *file);
+
 extern char * vk_file_getfileext(char *fname);
 extern char * vk_file_getfilename(char *path);
 
@@ -253,6 +285,11 @@ extern void vk_file_free(vk_file_t *file);
 extern void vk_fs_return(vk_file_t *file, vsf_err_t err);
 extern void vk_dummyfs_succeed(uintptr_t target, vsf_evt_t evt);
 extern void vk_dummyfs_not_support(uintptr_t target, vsf_evt_t evt);
+#endif
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+extern vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
+extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 #endif
 
 #undef VSF_FS_IMPLEMENT

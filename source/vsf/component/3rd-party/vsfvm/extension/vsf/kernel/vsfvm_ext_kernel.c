@@ -16,12 +16,11 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
 #include "vsf_vm_cfg.h"
 
 #if (VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED)
 
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
 
@@ -51,10 +50,6 @@ enum {
 static NO_INIT vsfvm_ext_kernel_t vsfvm_ext_kernel;
 
 /*============================ PROTOTYPES ====================================*/
-
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
@@ -76,7 +71,7 @@ static vsfvm_ret_t vsfvm_ext_kernel_delay_ms(vsfvm_thread_t *thread)
         vsf_teda_set_timer_ex(&thread->use_as__vsf_teda_t, vsf_systimer_ms_to_tick(timeout->uval32));
         return VSFVM_RET_PEND;
     } else {
-        __vsf_eda_fini(&thread->use_as__vsf_eda_t);
+        vsf_eda_fini(&thread->use_as__vsf_eda_t);
         thread->fn.evthandler = NULL;
         return VSFVM_RET_FINISHED;
     }

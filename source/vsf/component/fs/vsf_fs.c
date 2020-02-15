@@ -21,8 +21,11 @@
 
 #if VSF_USE_FS == ENABLED
 
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   define VSFSTREAM_CLASS_INHERIT
+#endif
 #define VSF_FS_IMPLEMENT
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 // TODO: use dedicated include
 #include "vsf.h"
 
@@ -53,6 +56,13 @@ struct __vk_fs_t {
     vk_vfs_file_t rootfs;
 };
 typedef struct __vk_fs_t __vk_fs_t;
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+enum {
+    VSF_EVT_FILE_READ       = VSF_EVT_USER + 0,
+    VSF_EVT_FILE_WRITE      = VSF_EVT_USER + 1,
+};
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -551,6 +561,7 @@ static void __vk_vfs_mount(uintptr_t target, vsf_evt_t evt)
             vk_file_t *root = dir->subfs.root;
             dir->attr |= VSF_VFS_FILE_ATTR_MOUNTED;
             root->attr |= VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ;
+            root->fsop = dir->subfs.op;
         }
         vsf_eda_return();
         break;
@@ -695,5 +706,151 @@ static void __vk_vfs_unlink(uintptr_t target, vsf_evt_t evt)
         break;
     }
 }
+
+uint_fast16_t vk_file_get_name_length(vk_file_t *file)
+{
+    uint_fast16_t result = 0;
+    switch (file->coding >> 6) {
+    case 0:
+    case 1:
+        result = strlen(file->name);
+        break;
+    case 2: {
+            uint16_t *u16char = (uint16_t *)file->name;
+            while (*u16char++ != 0) {
+                result += 2;
+            }
+        }
+        break;
+    case 4: {
+            uint32_t *u32char = (uint32_t *)file->name;
+            while (*u32char++ != 0) {
+                result += 4;
+            }
+        }
+        break;
+    }
+    return result;
+}
+
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+static void __vk_file_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
+{
+    vk_file_stream_t *pthis = (vk_file_stream_t *)param;
+    vk_file_t *file = pthis->file;
+    vsf_stream_t *stream = pthis->stream.stream;
+
+    switch (evt) {
+    case VSF_STREAM_ON_CONNECT:
+    case VSF_STREAM_ON_OUT:
+        if (pthis->stream.size > 0) {
+            file->ctx.io.size = vsf_stream_get_wbuf(stream, &file->ctx.io.buff);
+            vsf_eda_post_evt(pthis->stream.cur_eda, VSF_EVT_FILE_READ);
+        }
+        break;
+    }
+}
+
+static void __vk_file_read_stream_do(uintptr_t target, vsf_evt_t evt)
+{
+    vk_file_stream_t *pthis = (vk_file_stream_t *)target;
+    vk_file_t *file = pthis->file;
+    vsf_stream_t *stream = pthis->stream.stream;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        pthis->stream.rw_size = 0;
+        pthis->stream.cur_eda = vsf_eda_get_cur();
+        stream->tx.param = pthis;
+        stream->tx.evthandler = __vk_file_stream_tx_evthandler;
+        vsf_stream_connect_tx(stream);
+        break;
+    case VSF_EVT_RETURN:
+        if (VSF_ERR_NONE == file->ctx.err) {
+            pthis->stream.size -= file->ctx.io.size;
+            pthis->stream.addr += file->ctx.io.size;
+            pthis->stream.rw_size += file->ctx.io.size;
+            vsf_stream_write(stream, NULL, file->ctx.io.size);
+        }
+        if ((file->ctx.err != VSF_ERR_NONE) || !pthis->stream.size) {
+            vsf_stream_disconnect_tx(stream);
+            vsf_eda_return();
+        }
+        break;
+    case VSF_EVT_FILE_READ:
+        file->ctx.io.size = min(file->ctx.io.size, pthis->stream.size);
+        vk_file_read(file, pthis->stream.addr, file->ctx.io.size, file->ctx.io.buff, NULL);
+        break;
+    }
+}
+
+vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
+{
+    VSF_FS_ASSERT(pthis != NULL);
+    pthis->stream.addr = addr;
+    pthis->stream.size = size;
+    pthis->stream.stream = stream;
+    return __vsf_call_eda((uintptr_t)__vk_file_read_stream_do, (uintptr_t)pthis);
+}
+
+static void __vk_file_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
+{
+    vk_file_stream_t *pthis = (vk_file_stream_t *)param;
+    vk_file_t *file = pthis->file;
+    vsf_stream_t *stream = pthis->stream.stream;
+
+    switch (evt) {
+    case VSF_STREAM_ON_CONNECT:
+    case VSF_STREAM_ON_IN:
+        if (pthis->stream.size > 0) {
+            file->ctx.io.size = vsf_stream_get_rbuf(stream, &file->ctx.io.buff);
+            vsf_eda_post_evt(pthis->stream.cur_eda, VSF_EVT_FILE_WRITE);
+        }
+        break;
+    }
+}
+
+static void __vk_file_write_stream_do(uintptr_t target, vsf_evt_t evt)
+{
+    vk_file_stream_t *pthis = (vk_file_stream_t *)target;
+    vk_file_t *file = pthis->file;
+    vsf_stream_t *stream = pthis->stream.stream;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        pthis->stream.rw_size = 0;
+        pthis->stream.cur_eda = vsf_eda_get_cur();
+        stream->rx.param = pthis;
+        stream->rx.evthandler = __vk_file_stream_rx_evthandler;
+        vsf_stream_connect_rx(stream);
+        break;
+    case VSF_EVT_RETURN:
+        if (VSF_ERR_NONE == file->ctx.err) {
+            pthis->stream.size -= file->ctx.io.size;
+            pthis->stream.addr += file->ctx.io.size;
+            pthis->stream.rw_size += file->ctx.io.size;
+            vsf_stream_read(stream, NULL, file->ctx.io.size);
+        }
+        if ((file->ctx.err != VSF_ERR_NONE) || !pthis->stream.size) {
+            vsf_stream_disconnect_rx(stream);
+            vsf_eda_return();
+        }
+        break;
+    case VSF_EVT_FILE_WRITE:
+        file->ctx.io.size = min(file->ctx.io.size, pthis->stream.size);
+        vk_file_write(file, pthis->stream.addr, file->ctx.io.size, file->ctx.io.buff, NULL);
+        break;
+    }
+}
+
+vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
+{
+    VSF_FS_ASSERT(pthis != NULL);
+    pthis->stream.addr = addr;
+    pthis->stream.size = size;
+    pthis->stream.stream = stream;
+    return __vsf_call_eda((uintptr_t)__vk_file_write_stream_do, (uintptr_t)pthis);
+}
+#endif
 
 #endif

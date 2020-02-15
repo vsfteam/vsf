@@ -37,6 +37,12 @@
 static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* ptNode,
                                     vsf_msgt_msg_t* ptMSG);
 
+static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* ptNode,
+                                    vsf_msgt_msg_t* ptMSG);
+
+static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* ptNode,
+                                    vsf_msgt_msg_t* ptMSG);
+
 static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* ptNode, 
                                                 vsf_msgt_msg_t* ptMSG);
 static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_control_t* ptNode,
@@ -55,6 +61,8 @@ describe_tgui_msgmap(tStartStopMSGMap,
 
 describe_tgui_msgmap(tStopWatchMSGMap,
     tgui_msg_handler(VSF_TGUI_EVT_ON_LOAD,          __on_top_panel_load),
+    tgui_msg_handler(VSF_TGUI_EVT_ON_DEPOSE,        __on_top_panel_depose),
+    tgui_msg_handler(VSF_TGUI_EVT_ON_TIME,          __on_top_panel_time),
 )
 
 describe_tgui_msgmap(tLapMSGMap,
@@ -78,6 +86,8 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
             tgui_padding(16,16,16,16),
 
             tgui_msgmap(tStopWatchMSGMap),
+
+            tgui_timer(tTimer, 50, false),
 
             tgui_label(tTime, ptPanel, tTime, tStartStop,
                 tgui_region(0, 48, 228, 32),
@@ -170,13 +180,14 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
                     ),
 
                     tgui_text_list(tNumberList, &(ptPanel->tContainerA), tVContainer, tNumberList,
-                        tgui_size(150, 130),
+                        tgui_size(100, 100),
                         tgui_margin(8, 0, 8, 0),                                            
 
                         tgui_text_list_content(
 
                             tgui_size(100, 0),
-                            tgui_text(tLabel, "1\n2\n3\n4\n5"),
+                            tgui_text(tLabel, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n"),
+                            tgui_line_space(tLabel, 8),
                             tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
                         )
                     ),
@@ -191,7 +202,42 @@ static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* ptNode,
                                     vsf_msgt_msg_t* ptMSG)
 {
     stopwatch_t *ptPanel = (stopwatch_t *)ptNode;
-    init_vsf_pt(tgui_demo_t, &(ptPanel->tTask), vsf_prio_0);
+
+    vsf_tgui_timer_init(&ptPanel->tTimer, 
+                        (const vsf_tgui_control_t *)ptPanel);
+
+    //vsf_tgui_text_list_select_set(&(ptPanel->tContainerA.tNumberList), 6);
+
+    //init_vsf_pt(tgui_demo_t, &(ptPanel->tTask), vsf_prio_0);
+    vsf_tgui_control_refresh(ptNode, NULL);
+    return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
+}
+
+static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* ptNode,
+                                    vsf_msgt_msg_t* ptMSG)
+{
+    stopwatch_t *ptPanel = (stopwatch_t *)ptNode;
+
+    vsf_systimer_cnt_t tTimeElapsedInMS = vsf_systimer_tick_to_ms( vsf_systimer_get());
+    uint8_t ch10Ms = (tTimeElapsedInMS / 10) % 100;
+    uint8_t chSecond = (tTimeElapsedInMS / 1000) % 60;
+    uint8_t chMinute = (tTimeElapsedInMS / 60000) % 60;
+    sprintf(ptPanel->chTimeBuffer, "%02d:%02d:%02d",  chMinute, chSecond, ch10Ms);
+
+    //! update existing text content
+    vsf_tgui_text_set(&(ptPanel->tTime.tLabel), &(ptPanel->tTime.tLabel.tString));
+
+    vk_tgui_refresh_ex(ptPanel->use_as__vsf_tgui_panel_t.ptGUI, 
+                        (vsf_tgui_control_t *)&(ptPanel->tTime), NULL);
+
+    vsf_tgui_timer_enable(&ptPanel->tTimer);
+
+    return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
+}
+
+static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* ptNode,
+                                    vsf_msgt_msg_t* ptMSG)
+{
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 
@@ -222,10 +268,13 @@ static vsf_tgui_region_t s_tRefreshRegion = {
                             tgui_size(300, 80),
                         };
 
+#if 0
 implement_vsf_pt(tgui_demo_t)
 {
     stopwatch_t *ptBase = (stopwatch_t*)container_of(ptThis, stopwatch_t, tTask.param);
     vsf_pt_begin();
+
+    UNUSED_PARAM(s_tRefreshRegion);
 
     //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.ptGUI, NULL, &s_tRefreshRegion);
     vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.ptGUI);
@@ -238,6 +287,10 @@ implement_vsf_pt(tgui_demo_t)
             uint8_t chSecond = (tTimeElapsedInMS / 1000) % 60;
             uint8_t chMinute = (tTimeElapsedInMS / 60000) % 60;
             sprintf(base.chTimeBuffer, "%02d:%02d:%02d",  chMinute, chSecond, ch10Ms);
+
+            //! update existing text content
+            vsf_tgui_text_set(&(base.tTime.tLabel), &(base.tTime.tLabel.tString));
+
             vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.ptGUI, 
                                 (vsf_tgui_control_t *)&(base.tTime), NULL);
                                 //&s_tRefreshRegion);
@@ -248,6 +301,7 @@ implement_vsf_pt(tgui_demo_t)
 
     vsf_pt_end();
 }
+#endif
 
 #endif
 

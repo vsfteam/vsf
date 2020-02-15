@@ -26,6 +26,11 @@
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __vsf_get_slist_address(__pnode, __offset)                              \
@@ -288,4 +293,8 @@ void __vsf_dlist_remove_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node)
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
 #endif

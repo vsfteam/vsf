@@ -219,6 +219,7 @@ enum {
 
 #   define VSF_HEAP_SIZE                    0x8000
 #elif   defined(__WIN__)
+#   define VSF_HAL_USE_DEBUG_STREAM         ENABLED
 #   define VSF_OS_CFG_PRIORITY_NUM          1
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE      ENABLED
 

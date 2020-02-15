@@ -21,6 +21,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_XB1 == ENABLED
 
+#define VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT_CLASS
 #define VSF_USBH_XB1_IMPLEMENT
 #define VSF_USBH_HID_INHERIT
@@ -67,9 +68,6 @@ const vk_usbh_class_drv_t vk_usbh_xb1_drv = {
 };
 
 /*============================ PROTOTYPES ====================================*/
-
-SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 #if     defined(WEAK_VSF_USBH_XB1_ON_REPORT_INPUT_EXTERN)                     \
     &&  defined(WEAK_VSF_USBH_XB1_ON_REPORT_INPUT)

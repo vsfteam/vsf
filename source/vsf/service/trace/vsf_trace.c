@@ -30,6 +30,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USE_SERVICE_VSFSTREAM != ENABLED && VSF_USE_SERVICE_STREAM != ENABLED
+#   error stream MUST be enabled to use trace
+#endif
+
 #ifndef VSF_TRACE_CFG_BUFSIZE
 #   define VSF_TRACE_CFG_BUFSIZE            1024
 #endif
@@ -118,10 +122,6 @@ static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
 
 void __vsf_trace_init(vsf_stream_t *stream)
 {
-    if (NULL == stream) {
-        stream = (vsf_stream_t *)&VSF_DEBUG_STREAM_TX;
-    }
-
     __vsf_trace.stream = stream;
     if (stream) {
         vsf_stream_connect_tx(stream);
@@ -152,10 +152,6 @@ static void vsf_trace_arg(const char *format, va_list *arg)
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 void __vsf_trace_init(vsf_stream_tx_t *ptTX)
 {
-    if (NULL == ptTX) {
-        ptTX = (vsf_stream_tx_t *)&VSF_DEBUG_STREAM_TX;
-    } 
-
     //VSF_SERVICE_ASSERT(NULL != ptTX);
     
     //! initialise stream source

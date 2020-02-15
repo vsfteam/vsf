@@ -21,9 +21,11 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_USE_LINUX_LIBUSB == ENABLED
 
+#define VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT
 #define VSF_LINUX_INHERIT
-#include "../../vsf_linux.h"
+
+#include <unistd.h>
 
 #include <libusb.h>
 
@@ -107,10 +109,6 @@ typedef struct vsf_linux_libusb_t vsf_linux_libusb_t;
 static vsf_linux_libusb_t __vsf_libusb = { 0 };
 
 /*============================ PROTOTYPES ====================================*/
-
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 /*============================ IMPLEMENTATION ================================*/
 
 static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, vk_usbh_libusb_evt_t evt)
@@ -207,7 +205,6 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
 static void * __vsf_libusb_libusb_user_thread(void *param)
 {
     vsf_linux_libusb_transfer_t *ltransfer;
-    vsf_linux_libusb_dev_t *ldev;
 //    vsf_protect_t orig;
 
     while (1) {
@@ -918,12 +915,12 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
         break;
     }
 
-    vsf_eda_set_evthandler(&ltransfer->eda, __vsf_linux_libusb_transfer_evthandler);
+    ltransfer->eda.fn.evthandler = __vsf_linux_libusb_transfer_evthandler;
     vsf_eda_init(&ltransfer->eda, vsf_prio_inherit, false);
 
     if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
         err = LIBUSB_ERROR_IO;
-        __vsf_eda_fini(&ltransfer->eda);
+        vsf_eda_fini(&ltransfer->eda);
     }
     return err;
 }

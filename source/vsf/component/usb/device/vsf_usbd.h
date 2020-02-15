@@ -101,12 +101,12 @@
 #   define USB_UNICODE          wchar_t
 #endif
 
-#define __describe_usbd(                __NAME,             /* name of the usbd, eg: user_usbd */\
-                                        __PID,              /* product id, 0x0000 - 0xFFFF */\
-                                        __VID,              /* vendor id, 0x0000 - 0xFFFF */\
-                                        __LANG_ID,          /* language id, eg: 0x0409 */\
-                                        __SPEED             /* usb speed, USB_DC_SPEED_[LOW/FULL/HIGH/SUPER]*/\
-                                        )                                       \
+#define __describe_usbd(        __NAME,     /* name of the usbd, eg: user_usbd */\
+                                __VID,      /* vendor id, 0x0000 - 0xFFFF */    \
+                                __PID,      /* product id, 0x0000 - 0xFFFF */   \
+                                __LANG_ID,  /* language id, eg: 0x0409 */       \
+                                __SPEED     /* usb speed, USB_DC_SPEED_[LOW/FULL/HIGH/SUPER]*/\
+                                )                                               \
         enum {                                                                  \
             __##__NAME##_PID    = (__PID),                                      \
             __##__NAME##_VID    = (__VID),                                      \
@@ -120,14 +120,14 @@
 //  does not support big endian
 //  to add
 #define __usbd_common_desc(             __NAME,             /* name of the usbd, eg: user_usbd */\
-                                        __STR_PRODUCT,      /* product string in ASCII, eg: "VSF_Board" */\
-                                        __STR_VENDOR,       /* vendor string in ASCII, eg: "VSF" */\
-                                        __STR_SERIAL,       /* serial string in ASCII, eg: "1.0.0" */\
+                                        __STR_PRODUCT,      /* product string in UTF16, eg: u"VSF_Board" */\
+                                        __STR_VENDOR,       /* vendor string in UTF16, eg: u"VSF" */\
+                                        __STR_SERIAL,       /* serial string in UTF16, eg: u"1.0.0" */\
                                         __EP0_SIZE,         /* size of endpoint 0, 0 - 64 */\
                                         __FUNC_DESC_SIZE,   /* size of all func descriptors, eg: USB_DESC_CDC_ACM_IAD_LEN + USB_DESC_MSCBOT_IAD_LEN */\
                                         __FUNC_IFS_NUM,     /* number of all func interfaces, eg: USB_CDC_ACM_IFS_NUM + USB_MSC_IFS_NUM */\
                                         __ATTRIBUTE,        /* mask attributes, eg: USB_CONFIG_ATT_[SELFPOWER/WAKEUP/BATTERY] */\
-                                        __MAX_POWER         /* power consumption from USB host in mA, eg: 500 */\
+                                        __MAX_POWER_MA      /* power consumption from USB host in mA, eg: 500 */\
                                         )                                       \
         enum {                                                                  \
             __##__NAME##_IFSNUM = (__FUNC_IFS_NUM),                             \
@@ -173,7 +173,7 @@
         };                                                                      \
         const uint8_t __##__NAME_config_desc[USB_DT_CONFIG_SIZE + (__FUNC_DESC_SIZE)] = {\
             USB_DESC_CFG(USB_DT_CONFIG_SIZE + (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM),\
-                        1, 0, USB_CONFIG_ATT_ONE | (__ATTRIBUTE), (__MAX_POWER) >> 1)
+                        1, 0, USB_CONFIG_ATT_ONE | (__ATTRIBUTE), (__MAX_POWER_MA) >> 1)
 
 #define __usbd_func_desc(__NAME)                                                \
         };
@@ -225,10 +225,10 @@
         };
 
 
-#define describe_usbd(__NAME, __PID, __VID, __LANG_ID, __SPEED)                 \
-        __describe_usbd(__NAME, (__PID), (__VID), (__LANG_ID), (__SPEED))
-#define usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, __EP0_SIZE, __FUNC_DESC_SIZE, __FUNC_IFS_NUM, __ATTRIBUTE, __MAX_POWER)\
-        __usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, (__EP0_SIZE), (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM), (__ATTRIBUTE), (__MAX_POWER))
+#define describe_usbd(__NAME, __VID, __PID, __LANG_ID, __SPEED)                 \
+        __describe_usbd(__NAME, (__VID), (__PID), (__LANG_ID), (__SPEED))
+#define usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, __EP0_SIZE, __FUNC_DESC_SIZE, __FUNC_IFS_NUM, __ATTRIBUTE, __MAX_POWER_MA)\
+        __usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, (__EP0_SIZE), (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM), (__ATTRIBUTE), (__MAX_POWER_MA))
 #define usbd_func_desc(__NAME)                                                  \
         __usbd_func_desc(__NAME)
 #define usbd_func_str_desc(__NAME, __FUNC_ID, __STR_FUNC)                       \

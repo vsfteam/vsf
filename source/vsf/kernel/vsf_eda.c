@@ -91,9 +91,6 @@ extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *pthis, vsf_prio_t priority);
 extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *pthis);
 #endif
 
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 extern vsf_evtq_t * __vsf_os_evtq_get(vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority);
@@ -426,6 +423,7 @@ vsf_eda_t * vsf_eda_get_cur(void)
 }
 
 #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+
 SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
 bool vsf_eda_polling_state_get(vsf_eda_t *pthis)
 {
@@ -514,7 +512,7 @@ bool vsf_eda_return(void)
         return false;
     }
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
-    __vsf_eda_fini(pthis);
+    vsf_eda_fini(pthis);
     return true;
 }
 
@@ -528,7 +526,7 @@ void vsf_eda_yield(void)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 
 SECTION(".text.vsf.kernel.eda_nesting")
-static vsf_err_t __vsf_eda_ensure_frame_used(vsf_eda_t *pthis)
+static vsf_err_t __vsf_eda_ensure_frame_used(vsf_eda_t *pthis, uintptr_t param)
 {
     if (!pthis->state.bits.is_use_frame) {
         __vsf_eda_frame_t *frame_tmp = vsf_eda_new_frame();
@@ -544,7 +542,7 @@ static vsf_err_t __vsf_eda_ensure_frame_used(vsf_eda_t *pthis)
     #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
         frame_tmp->state.bits.is_stack_owner = pthis->state.bits.is_stack_owner;
     #endif
-        //frame_tmp->param = pthis;
+        frame_tmp->ptr.target = param;
         vsf_slist_init(&pthis->fn.frame_list);
         vsf_eda_push(&pthis->fn.frame_list, frame_tmp);
     }
@@ -559,7 +557,7 @@ vsf_err_t vsf_eda_frame_user_value_set(__VSF_KERNEL_CFG_FRAME_UINT_TYPE value)
     vsf_eda_t* pthis = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != pthis);
 
-    err = __vsf_eda_ensure_frame_used(pthis);
+    err = __vsf_eda_ensure_frame_used(pthis, (uintptr_t)pthis);
     if (VSF_ERR_NONE == err) {
         pthis->fn.frame->state.bits.user = value;
     }
@@ -595,7 +593,7 @@ vsf_err_t vsf_eda_target_set(uintptr_t param)
     vsf_eda_t *pthis = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != pthis);
 
-    vsf_err_t err = __vsf_eda_ensure_frame_used(pthis);
+    vsf_err_t err = __vsf_eda_ensure_frame_used(pthis, param);
     if (VSF_ERR_NONE == err) {
         pthis->fn.frame->ptr.target = param;
     }
@@ -643,7 +641,7 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
     } 
     VSF_KERNEL_ASSERT((uintptr_t)0 != func);
     
-    err =  __vsf_eda_ensure_frame_used(pthis);
+    err =  __vsf_eda_ensure_frame_used(pthis, 0);
     if (VSF_ERR_NONE != err) {
         /* 1. if is_sub_call is true, frame will not be NULL. 
            2. vsf_eda_free_frame can accept NULL as input*/
@@ -714,7 +712,7 @@ vsf_err_t __vsf_eda_call_eda(uintptr_t evthandler, uintptr_t param)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
-fsm_rt_t vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param)
+fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param)
 {
     vsf_eda_t *pthis = vsf_eda_get_cur();
     
@@ -923,14 +921,19 @@ vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg)
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-/* __vsf_eda_fini() enables you to kill other eda tasks.
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
+/* vsf_eda_fini() enables you to kill other eda tasks.
    We highly recommend that DO NOT use this api until you 100% sure.
    please make sure that the resources are properly freed when you trying to kill
    an eda other than your own. We highly recommend that please send a semaphore to
    the target eda to ask it killing itself after properly freeing all the resources.
  */
 SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis)
+vsf_err_t vsf_eda_fini(vsf_eda_t *pthis)
 {
     pthis = (vsf_eda_t *)__vsf_eda_get_valid_eda(pthis);
     VSF_KERNEL_ASSERT(pthis != NULL);
@@ -945,6 +948,11 @@ vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis)
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
+
 
 SECTION(".text.vsf.kernel.eda")
 vsf_err_t vsf_eda_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
@@ -1090,7 +1098,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 #endif
 
-vsf_err_t __vsf_kernel_start(void)
+vsf_err_t vk_kernel_start(void)
 {
 #if defined(__VSF_KERNEL_TASK_TEDA) || defined(__VSF_KERNEL_TASK_EDA)
     vsf_err_t err;

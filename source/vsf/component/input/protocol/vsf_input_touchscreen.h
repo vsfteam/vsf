@@ -28,19 +28,19 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_INPUT_TOUCHSCREEN_SET(__EVENT, __ID, __IS_DOWN, __X, __Y)           \
+#define vsf_input_touchscreen_set(__EVENT, __ID, __IS_DOWN, __X, __Y)           \
             do {                                                                \
                 (__EVENT)->id = ((__ID) | ((__IS_DOWN) << 8));                  \
                 (__EVENT)->cur.valu32 = ((__X) | ((__Y) << 16));                \
             } while (0)
 
-#define VSF_INPUT_TOUCHSCREEN_GET_ID(__EVENT)                                   \
+#define vsf_input_touchscreen_get_id(__EVENT)                                   \
             ((uint8_t)(((__EVENT)->id >> 0) & 0xFF))
-#define VSF_INPUT_TOUCHSCREEN_IS_DOWN(__EVENT)                                  \
+#define vsf_input_touchscreen_is_down(__EVENT)                                  \
             (!!(((__EVENT)->id >> 8) & 0xFF))
-#define VSF_INPUT_TOUCHSCREEN_GET_X(__EVENT)                                    \
+#define vsf_input_touchscreen_get_x(__EVENT)                                    \
             ((uint16_t)(((__EVENT)->cur.valu32 >> 0) & 0xFFFF))
-#define VSF_INPUT_TOUCHSCREEN_GET_Y(__EVENT)                                    \
+#define vsf_input_touchscreen_get_y(__EVENT)                                    \
             ((uint16_t)(((__EVENT)->cur.valu32 >> 16) & 0xFFFF))
 
 /*============================ TYPES =========================================*/

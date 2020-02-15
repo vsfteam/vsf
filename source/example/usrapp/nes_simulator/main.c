@@ -240,7 +240,7 @@ static void demo(void)
 
 int main(void)
 {
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
 
     demo();
 

@@ -21,7 +21,7 @@
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_USE_KERNEL == ENABLED
 
 #define __VSF_THREAD_CLASS_IMPLEMENT
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 #include "../vsf_kernel_common.h"
 #include "./vsf_thread.h"
 #include "../vsf_os.h"
@@ -32,10 +32,6 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
-
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -310,7 +306,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 SECTION("text.vsf.kernel.vsf_thread")
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-vsf_err_t vsf_thread_start( vsf_thread_t *thread, 
+vsf_err_t vk_thread_start( vsf_thread_t *thread, 
                             vsf_thread_cb_t *thread_cb, 
                             vsf_prio_t priority)
 {
@@ -354,8 +350,8 @@ vsf_err_t vsf_thread_start( vsf_thread_t *thread,
 #   pragma diag_warning=pa182
 #endif
 
-SECTION("text.vsf.kernel.__vsf_eda_call_thread_prepare")
-vsf_err_t __vsf_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,
+SECTION("text.vsf.kernel.vk_eda_call_thread_prepare")
+vsf_err_t vk_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,
                                         vsf_thread_prepare_cfg_t *cfg)
 {
     VSF_KERNEL_ASSERT(NULL != cfg && NULL != thread_cb);
@@ -371,8 +367,8 @@ vsf_err_t __vsf_eda_call_thread_prepare(vsf_thread_cb_t *thread_cb,
     return VSF_ERR_NONE;
 }
 
-SECTION("text.vsf.kernel.__vsf_eda_call_thread")
-vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
+SECTION("text.vsf.kernel.vk_eda_call_thread")
+vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb)
 {
     VSF_KERNEL_ASSERT(NULL != thread_cb);
     vsf_err_t ret;
@@ -388,7 +384,7 @@ vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb)
 
 
 
-SECTION("text.vsf.kernel.__vsf_thread_call_eda")
+SECTION("text.vsf.kernel.vk_thread_call_eda")
 static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler, 
                                             uintptr_t param, 
                                             __vsf_eda_frame_state_t state)
@@ -424,15 +420,15 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
     return err;
 }
 
-SECTION("text.vsf.kernel.__vsf_thread_call_eda")
-vsf_err_t __vsf_thread_call_eda(uintptr_t eda_handler, uintptr_t param)
+SECTION("text.vsf.kernel.vk_thread_call_eda")
+vsf_err_t vk_thread_call_eda(uintptr_t eda_handler, uintptr_t param)
 {
     __vsf_eda_frame_state_t state = { .bits.is_fsm = false,};
     return __vsf_thread_call_eda_ex(eda_handler, param, state);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_call_thread")
-vsf_err_t __vsf_thread_call_thread( vsf_thread_cb_t *thread_cb,
+vsf_err_t vk_thread_call_thread( vsf_thread_cb_t *thread_cb,
                                     vsf_thread_prepare_cfg_t *cfg)
 {
     VSF_KERNEL_ASSERT(NULL != cfg && NULL != thread_cb);
@@ -453,8 +449,8 @@ vsf_err_t __vsf_thread_call_thread( vsf_thread_cb_t *thread_cb,
                                     (uintptr_t)thread_cb, state);
 }
 
-SECTION("text.vsf.kernel.__vsf_thread_call_fsm")
-fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
+SECTION("text.vsf.kernel.vk_thread_call_fsm")
+fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
@@ -471,7 +467,7 @@ fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
     fsm_rt_t ret;
 
     while (1) {
-        ret = vsf_eda_call_fsm(eda_handler, param);
+        ret = __vsf_eda_call_fsm(eda_handler, param);
         if (fsm_rt_on_going == ret) {
             vsf_eda_yield();
         } else {
@@ -483,7 +479,7 @@ fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
     return ret;
 }
 #else
-vsf_err_t vsf_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
+vsf_err_t vk_thread_start(vsf_thread_t *thread, vsf_prio_t priority)
 {
     class_internal(thread, pthis, vsf_thread_t)
     VSF_KERNEL_ASSERT(pthis != NULL);

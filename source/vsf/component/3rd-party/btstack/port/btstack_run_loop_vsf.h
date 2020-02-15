@@ -20,6 +20,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "component/vsf_component_cfg.h"
+
+#if VSF_USE_BTSTACK == ENABLED
+
 #include "btstack_config.h"
 #include "btstack_run_loop.h"
 
@@ -31,4 +35,5 @@
 
 extern const btstack_run_loop_t * btstack_run_loop_vsf_get_instance(void);
 
-#endif	// __BTSTACK_RUN_LOOP_VSF_H__
+#endif      // VSF_USE_BTSTACK
+#endif      // __BTSTACK_RUN_LOOP_VSF_H__

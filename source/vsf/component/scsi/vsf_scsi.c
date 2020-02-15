@@ -68,7 +68,12 @@ vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 {
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
     pthis->args.cbd = cbd;
-    pthis->args.mem = *mem;
+    if (mem != NULL) {
+        pthis->args.mem = *mem;
+    } else {
+        pthis->args.mem.pchBuffer = NULL;
+        pthis->args.mem.nSize = 0;
+    }
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
     pthis->args.stream = NULL;
 #endif
@@ -92,6 +97,56 @@ vsf_err_t vk_scsi_get_errcode(vk_scsi_t *pthis, uint32_t *reply_len)
         *reply_len = pthis->result.reply_len;
     }
     return pthis->result.errcode;
+}
+
+void vk_scsi_return(vk_scsi_t *pthis, vsf_err_t err)
+{
+    VSF_SCSI_ASSERT(pthis != NULL);
+    pthis->result.errcode = err;
+    vsf_eda_return();
+}
+
+uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd)
+{
+    scsi_group_code_t group_code = (scsi_group_code_t)(cbd[0] & 0xE0);
+    switch (group_code) {
+    case SCSI_GROUPCODE6:       return 6;
+    case SCSI_GROUPCODE10_1:
+    case SCSI_GROUPCODE10_2:    return 10;
+    case SCSI_GROUPCODE16:      return 16;
+    case SCSI_GROUPCODE12:      return 12;
+    }
+    VSF_SCSI_ASSERT(false);
+}
+
+bool vk_scsi_get_rw_param(uint8_t *cbd, uint64_t *addr, uint32_t *size)
+{
+    scsi_group_code_t group_code = (scsi_group_code_t)(cbd[0] & 0xE0);
+    scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
+    if ((SCSI_CMDCODE_READ == cmd_code) || (SCSI_CMDCODE_WRITE == cmd_code)) {
+        switch (group_code) {
+        case SCSI_GROUPCODE6:
+            *addr = get_unaligned_be16(&cbd[2]);
+            *size = cbd[4];
+            break;
+        case SCSI_GROUPCODE10_1:
+            *addr = get_unaligned_be32(&cbd[2]);
+            *size = get_unaligned_be16(&cbd[7]);
+            break;
+        case SCSI_GROUPCODE16:
+            *addr = get_unaligned_be64(&cbd[2]);
+            *size = get_unaligned_be32(&cbd[7]);
+            break;
+        case SCSI_GROUPCODE12:
+            *addr = get_unaligned_be32(&cbd[2]);
+            *size = get_unaligned_be32(&cbd[6]);
+            break;
+        default:
+            return false;
+        }
+        return true;
+    }
+    return false;
 }
 
 #endif

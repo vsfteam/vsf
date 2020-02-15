@@ -31,7 +31,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void __vsf_rng_buf_init(  vsf_rng_buf_t* ptObj, 
+void __vsf_rng_buf_init_ex(  vsf_rng_buf_t* ptObj, 
                         uint_fast16_t hwBufferItemCount, 
                         bool bInitAsFull)
 {

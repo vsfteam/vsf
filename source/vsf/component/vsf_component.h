@@ -27,7 +27,7 @@
 #include "./scsi/vsf_scsi.h"
 #include "./fs/vsf_fs.h"
 
-#include "./av/vsfav.h"
+#include "./av/vsf_av.h"
 
 #include "./input/vsf_input.h"
 #include "./input/driver/hid/vsf_input_hid.h"
@@ -39,6 +39,7 @@
 #include "./usb/driver/hcd/ohci/vsf_ohci.h"
 #include "./usb/driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
 #include "./usb/driver/otg/dwcotg/vsf_dwcotg_dcd.h"
+#include "./usb/driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
 
 #include "./usb/host/vsf_usbh.h"
 #include "./usb/host/class/HUB/vsf_usbh_HUB.h"
@@ -52,6 +53,7 @@
 #include "./usb/host/class/HID/vsf_usbh_xb360.h"
 #include "./usb/host/class/XB1/vsf_usbh_xb1.h"
 #include "./usb/host/class/libusb/vsf_usbh_libusb.h"
+#include "./usb/host/class/MSC/vsf_usbh_msc.h"
 
 #include "./usb/device/vsf_usbd.h"
 #include "./usb/device/class/CDC/vsf_usbd_CDC.h"
@@ -64,6 +66,8 @@
 
 #include "./ui/disp_drv/vsf_disp_drv.h"
 //#include "./ui/tgui/vsf_tgui.h"
+
+#include "./debugger/vsf_debugger.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

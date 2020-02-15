@@ -25,8 +25,6 @@
 #include <unistd.h>
 #include <semaphore.h>
 
-#include "../../vsf_linux.h"
-
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_LINUX_CFG_PRINT_BUFF_SIZE

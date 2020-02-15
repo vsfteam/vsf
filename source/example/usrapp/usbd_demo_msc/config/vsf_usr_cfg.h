@@ -231,6 +231,7 @@ enum {
 #   define USRAPP_CFG_DCD_TYPE              USRAPP_CFG_DCD_TYPE_DWCOTG
 #elif   defined(__M484__)
 #   define VSF_USE_TRACE                    ENABLED
+#   define VSF_DEBUGGER_CFG_CONSOLE         VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
 #   define VSF_OS_CFG_PRIORITY_NUM          10
 

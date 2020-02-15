@@ -48,20 +48,43 @@ static void input_demo_trace_gamepad(vk_gamepad_evt_t *gamepad_evt)
     }
 }
 
-static void input_demo_trace_touchscreen(vk_touchscreen_evt_t* ts_evt)
+static void input_demo_trace_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
     vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
-        VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt),
-        VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt) ? "down" : "up",
-        VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-        VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt));
+        vsf_input_touchscreen_get_id(ts_evt),
+        vsf_input_touchscreen_is_down(ts_evt) ? "down" : "up",
+        vsf_input_touchscreen_get_x(ts_evt),
+        vsf_input_touchscreen_get_y(ts_evt));
 }
 
-static void input_demo_trace_keyboard(vk_keyboard_evt_t* kb_evt)
+static void input_demo_trace_keyboard(vk_keyboard_evt_t *kb_evt)
 {
     vsf_trace(VSF_TRACE_DEBUG, "keyboard: %d %s" VSF_TRACE_CFG_LINEEND,
-        VSF_INPUT_KEYBOARD_GET_KEYCODE(kb_evt),
-        VSF_INPUT_KEYBOARD_IS_DOWN(kb_evt) ? "down" : "up");
+        vsf_input_keyboard_get_keycode(kb_evt),
+        vsf_input_keyboard_is_down(kb_evt) ? "down" : "up");
+}
+
+static void input_demo_trace_mouse(vk_mouse_evt_t *mouse_evt)
+{
+    switch (vk_input_mouse_evt_get(mouse_evt)) {
+    case VSF_INPUT_MOUSE_EVT_BUTTON:
+        vsf_trace(VSF_TRACE_DEBUG, "mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+            vk_input_mouse_evt_button_get(mouse_evt),
+            vk_input_mouse_evt_button_is_down(mouse_evt) ? "down" : "up",
+            vk_input_mouse_evt_get_x(mouse_evt),
+            vk_input_mouse_evt_get_y(mouse_evt));
+        break;
+    case VSF_INPUT_MOUSE_EVT_MOVE:
+        vsf_trace(VSF_TRACE_DEBUG, "mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+            vk_input_mouse_evt_get_x(mouse_evt),
+            vk_input_mouse_evt_get_y(mouse_evt));
+        break;
+    case VSF_INPUT_MOUSE_EVT_WHEEL:
+        vsf_trace(VSF_TRACE_DEBUG, "mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
+            vk_input_mouse_evt_get_x(mouse_evt),
+            vk_input_mouse_evt_get_y(mouse_evt));
+        break;
+    }
 }
 
 static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
@@ -144,6 +167,9 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
 #endif
     case VSF_INPUT_TYPE_KEYBOARD:
         input_demo_trace_keyboard((vk_keyboard_evt_t*)event);
+        break;
+    case VSF_INPUT_TYPE_MOUSE:
+        input_demo_trace_mouse((vk_mouse_evt_t *)event);
         break;
     default:
         break;

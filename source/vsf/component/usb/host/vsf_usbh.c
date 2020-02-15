@@ -21,6 +21,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED
 
+#define VSF_EDA_CLASS_INHERIT
 #define VSF_USBH_IMPLEMENT
 // TODO: use dedicated include
 #include "vsf.h"
@@ -29,14 +30,88 @@
 
 #define USB_DEFAULT_TIMEOUT         50    // 50ms
 
+#if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
+#define VSF_USBH_REL    0
+#define VSF_USBH_VER    0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
+/* usb 2.0 root hub device descriptor */
+static const uint8_t __vk_usb_rh_dev_descriptor[18] = {
+    0x12,       /*  __u8  bLength; */
+    0x01,       /*  __u8  bDescriptorType; Device */
+    0x00, 0x00, /*  __le16 bcdUSB: to be patched */
+
+    0x09,        /*  __u8  bDeviceClass; HUB_CLASSCODE */
+    0x00,        /*  __u8  bDeviceSubClass; */
+    0x00,       /*  __u8  bDeviceProtocol; [ usb 2.0 no TT ] */
+    0x40,       /*  __u8  bMaxPacketSize0; 64 Bytes */
+
+    0x6b, 0x1d, /*  __le16 idVendor; Linux Foundation 0x1d6b */
+    0x02, 0x00, /*  __le16 idProduct; device 0x0002 */
+    VSF_USBH_VER, VSF_USBH_REL, /*  __le16 bcdDevice */
+
+    0x00,       /*  __u8  iManufacturer; */
+    0x00,       /*  __u8  iProduct; */
+    0x00,       /*  __u8  iSerialNumber; */
+    0x01        /*  __u8  bNumConfigurations; */
+};
+
+/* no usb 2.0 root hub "device qualifier" descriptor: one speed only */
+
+static const uint8_t __vk_usbh_rh_config_descriptor[] = {
+    /* one configuration */
+    0x09,       /*  __u8  bLength; */
+    0x02,       /*  __u8  bDescriptorType; Configuration */
+    0x19, 0x00, /*  __le16 wTotalLength; */
+    0x01,       /*  __u8  bNumInterfaces; (1) */
+    0x01,       /*  __u8  bConfigurationValue; */
+    0x00,       /*  __u8  iConfiguration; */
+    0xc0,       /*  __u8  bmAttributes;
+                 Bit 7: must be set,
+                     6: Self-powered,
+                     5: Remote wakeup,
+                     4..0: resvd */
+    0x00,       /*  __u8  MaxPower; */
+
+    /* USB 1.1:
+     * USB 2.0, single TT organization (mandatory):
+     *    one interface, protocol 0
+     *
+     * USB 2.0, multiple TT organization (optional):
+     *    two interfaces, protocols 1 (like single TT)
+     *    and 2 (multiple TT mode) ... config is
+     *    sometimes settable
+     *    NOT IMPLEMENTED
+     */
+
+    /* one interface */
+    0x09,       /*  __u8  if_bLength; */
+    0x04,       /*  __u8  if_bDescriptorType; Interface */
+    0x00,       /*  __u8  if_bInterfaceNumber; */
+    0x00,       /*  __u8  if_bAlternateSetting; */
+    0x01,       /*  __u8  if_bNumEndpoints; */
+    0x09,       /*  __u8  if_bInterfaceClass; HUB_CLASSCODE */
+    0x00,       /*  __u8  if_bInterfaceSubClass; */
+    0x00,       /*  __u8  if_bInterfaceProtocol; [usb1.1 or single tt] */
+    0x00,       /*  __u8  if_iInterface; */
+
+    /* one endpoint (status change endpoint) */
+    0x07,       /*  __u8  ep_bLength; */
+    0x05,       /*  __u8  ep_bDescriptorType; Endpoint */
+    0x81,       /*  __u8  ep_bEndpointAddress; IN Endpoint 1 */
+    0x03,       /*  __u8  ep_bmAttributes; Interrupt */
+    (15 + 1 + 7) / 8, 0x00, /*  __le16 ep_wMaxPacketSize; 1 + (MAX_ROOT_PORTS / 8) */
+    0xff        /*  __u8  ep_bInterval; (255ms -- usb 2.0 spec) */
+};
+#endif
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_fini(vsf_eda_t *pthis);
 
 #if     defined(WEAK_VSF_USBH_ON_DEV_PARSED_EXTERN)                             \
     &&  defined(WEAK_VSF_USBH_ON_DEV_PARSED)
@@ -153,7 +228,7 @@ void vk_usbh_urb_set_pipe(vk_usbh_urb_t *urb, vk_usbh_pipe_t pipe)
     }
 }
 
-static void vk_usbh_urb_reset_buffer(vk_usbh_hcd_urb_t *urb_hcd)
+static void __vk_usbh_urb_reset_buffer(vk_usbh_hcd_urb_t *urb_hcd)
 {
     urb_hcd->buffer = NULL;
     urb_hcd->transfer_length = 0;
@@ -166,10 +241,10 @@ void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd)
     if (urb_hcd->buffer && (urb_hcd->free_buffer != NULL)) {
         urb_hcd->free_buffer(urb_hcd->free_buffer_param);
     }
-    vk_usbh_urb_reset_buffer(urb_hcd);
+    __vk_usbh_urb_reset_buffer(urb_hcd);
 }
 
-static void vk_usbh_free_buffer(void *buffer)
+static void __vk_usbh_free_buffer(void *buffer)
 {
     VSF_USBH_FREE(buffer);
 }
@@ -180,12 +255,12 @@ void * vk_usbh_hcd_urb_alloc_buffer(vk_usbh_hcd_urb_t *urb_hcd, uint_fast16_t si
     vk_usbh_hcd_urb_free_buffer(urb_hcd);
     urb_hcd->buffer = VSF_USBH_MALLOC(size);
     urb_hcd->transfer_length = size;
-    urb_hcd->free_buffer = vk_usbh_free_buffer;
+    urb_hcd->free_buffer = __vk_usbh_free_buffer;
     urb_hcd->free_buffer_param = urb_hcd->buffer;
     return urb_hcd->buffer;
 }
 
-static vk_usbh_dev_t * vk_usbh_alloc_device(vk_usbh_t *usbh)
+static vk_usbh_dev_t * __vk_usbh_alloc_device(vk_usbh_t *usbh)
 {
     vk_usbh_dev_t *dev;
 
@@ -211,7 +286,7 @@ free_dev:
 vk_usbh_dev_t * vk_usbh_new_device(vk_usbh_t *usbh, enum usb_device_speed_t speed,
             vk_usbh_dev_t *dev_parent, uint_fast8_t idx)
 {
-    vk_usbh_dev_t *dev_new = vk_usbh_alloc_device(usbh);
+    vk_usbh_dev_t *dev_new = __vk_usbh_alloc_device(usbh);
     if (dev_new != NULL) {
         dev_new->speed = speed;
         if (dev_parent != NULL) {
@@ -231,7 +306,7 @@ vk_usbh_dev_t * vk_usbh_new_device(vk_usbh_t *usbh, enum usb_device_speed_t spee
     return dev_new;
 }
 
-static void vk_usbh_clean_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
+static void __vk_usbh_clean_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
     vk_usbh_free_urb(usbh, &dev->ep0.urb);
@@ -256,7 +331,7 @@ void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
     }
 }
 
-static bool vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
+static bool __vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
 #if VSF_USE_USB_HOST_HUB == ENABLED
     if (dev->dev_parent != NULL) {
@@ -322,7 +397,7 @@ void * vk_usbh_urb_take_buffer(vk_usbh_urb_t *urb)
 {
     VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
     void *buffer = vk_usbh_urb_peek_buffer(urb);
-    vk_usbh_urb_reset_buffer(urb->urb_hcd);
+    __vk_usbh_urb_reset_buffer(urb->urb_hcd);
     return buffer;
 }
 
@@ -366,7 +441,7 @@ void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     }
 }
 
-static void vk_usbh_reset_parser(vk_usbh_dev_parser_t *parser)
+static void __vk_usbh_reset_parser(vk_usbh_dev_parser_t *parser)
 {
     if (parser->desc_config != NULL) {
         VSF_USBH_FREE(parser->desc_config);
@@ -383,11 +458,11 @@ static void vk_usbh_reset_parser(vk_usbh_dev_parser_t *parser)
     }
 }
 
-static void vk_usbh_free_parser(vk_usbh_t *usbh)
+static void __vk_usbh_free_parser(vk_usbh_t *usbh)
 {
     vk_usbh_dev_parser_t *parser = usbh->parser;
     if (parser != NULL) {
-        vk_usbh_reset_parser(parser);
+        __vk_usbh_reset_parser(parser);
         if (parser->desc_device != NULL) {
             VSF_USBH_FREE(parser->desc_device);
         }
@@ -418,94 +493,22 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         vk_usbh_disconnect_device(usbh, dev_child);
     }
 #endif
-    vk_usbh_clean_device(usbh, dev);
+    __vk_usbh_clean_device(usbh, dev);
 
     if (dev->devnum != 0) {
         vsf_bitmap_clear(&usbh->device_bitmap, dev->devnum);
     }
 
     if (usbh->dev_new == dev) {
-        vk_usbh_free_parser(usbh);
-        __vsf_eda_fini(&usbh->teda.use_as__vsf_eda_t);
+        __vk_usbh_free_parser(usbh);
+        vsf_eda_fini(&usbh->teda.use_as__vsf_eda_t);
         usbh->dev_new = NULL;
     }
     VSF_USBH_FREE(dev);
 }
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
-#define VSF_USBH_REL    0
-#define VSF_USBH_VER    0
-
-/* usb 2.0 root hub device descriptor */
-static const uint8_t usb_rh_dev_descriptor[18] = {
-    0x12,       /*  __u8  bLength; */
-    0x01,       /*  __u8  bDescriptorType; Device */
-    0x00, 0x00, /*  __le16 bcdUSB: to be patched */
-
-    0x09,        /*  __u8  bDeviceClass; HUB_CLASSCODE */
-    0x00,        /*  __u8  bDeviceSubClass; */
-    0x00,       /*  __u8  bDeviceProtocol; [ usb 2.0 no TT ] */
-    0x40,       /*  __u8  bMaxPacketSize0; 64 Bytes */
-
-    0x6b, 0x1d, /*  __le16 idVendor; Linux Foundation 0x1d6b */
-    0x02, 0x00, /*  __le16 idProduct; device 0x0002 */
-    VSF_USBH_VER, VSF_USBH_REL, /*  __le16 bcdDevice */
-
-    0x00,       /*  __u8  iManufacturer; */
-    0x00,       /*  __u8  iProduct; */
-    0x00,       /*  __u8  iSerialNumber; */
-    0x01        /*  __u8  bNumConfigurations; */
-};
-
-/* no usb 2.0 root hub "device qualifier" descriptor: one speed only */
-
-static const uint8_t rh_config_descriptor[] = {
-    /* one configuration */
-    0x09,       /*  __u8  bLength; */
-    0x02,       /*  __u8  bDescriptorType; Configuration */
-    0x19, 0x00, /*  __le16 wTotalLength; */
-    0x01,       /*  __u8  bNumInterfaces; (1) */
-    0x01,       /*  __u8  bConfigurationValue; */
-    0x00,       /*  __u8  iConfiguration; */
-    0xc0,       /*  __u8  bmAttributes;
-                 Bit 7: must be set,
-                     6: Self-powered,
-                     5: Remote wakeup,
-                     4..0: resvd */
-    0x00,       /*  __u8  MaxPower; */
-
-    /* USB 1.1:
-     * USB 2.0, single TT organization (mandatory):
-     *    one interface, protocol 0
-     *
-     * USB 2.0, multiple TT organization (optional):
-     *    two interfaces, protocols 1 (like single TT)
-     *    and 2 (multiple TT mode) ... config is
-     *    sometimes settable
-     *    NOT IMPLEMENTED
-     */
-
-    /* one interface */
-    0x09,       /*  __u8  if_bLength; */
-    0x04,       /*  __u8  if_bDescriptorType; Interface */
-    0x00,       /*  __u8  if_bInterfaceNumber; */
-    0x00,       /*  __u8  if_bAlternateSetting; */
-    0x01,       /*  __u8  if_bNumEndpoints; */
-    0x09,       /*  __u8  if_bInterfaceClass; HUB_CLASSCODE */
-    0x00,       /*  __u8  if_bInterfaceSubClass; */
-    0x00,       /*  __u8  if_bInterfaceProtocol; [usb1.1 or single tt] */
-    0x00,       /*  __u8  if_iInterface; */
-
-    /* one endpoint (status change endpoint) */
-    0x07,       /*  __u8  ep_bLength; */
-    0x05,       /*  __u8  ep_bDescriptorType; Endpoint */
-    0x81,       /*  __u8  ep_bEndpointAddress; IN Endpoint 1 */
-    0x03,       /*  __u8  ep_bmAttributes; Interrupt */
-    (15 + 1 + 7) / 8, 0x00, /*  __le16 ep_wMaxPacketSize; 1 + (MAX_ROOT_PORTS / 8) */
-    0xff        /*  __u8  ep_bInterval; (255ms -- usb 2.0 spec) */
-};
-
-static vsf_err_t vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb_hcd)
+static vsf_err_t __vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb_hcd)
 {
     uint_fast16_t typeReq, wValue, wLength;
     struct usb_ctrlrequest_t *req = &urb_hcd->setup_packet;
@@ -545,7 +548,7 @@ static vsf_err_t vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *ur
     case DeviceRequest | USB_REQ_GET_DESCRIPTOR:
         switch ((wValue & 0xff00) >> 8) {
         case USB_DT_DEVICE:
-            memcpy(data, usb_rh_dev_descriptor, sizeof(usb_rh_dev_descriptor));
+            memcpy(data, __vk_usb_rh_dev_descriptor, sizeof(__vk_usb_rh_dev_descriptor));
             switch (urb_hcd->pipe.speed) {
             case USB_SPEED_LOW:
             case USB_SPEED_FULL:
@@ -561,11 +564,11 @@ static vsf_err_t vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *ur
             default:
                 goto error;
             }
-            len = sizeof(usb_rh_dev_descriptor);
+            len = sizeof(__vk_usb_rh_dev_descriptor);
             break;
         case USB_DT_CONFIG:
-            len = sizeof(rh_config_descriptor);
-            memcpy(data, rh_config_descriptor, len);
+            len = sizeof(__vk_usbh_rh_config_descriptor);
+            memcpy(data, __vk_usbh_rh_config_descriptor, len);
             break;
         default:
             goto error;
@@ -630,7 +633,7 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
     if (urb_hcd->dev_hcd == &usbh->dev_rh->use_as__vk_usbh_hcd_dev_t) {
-        return vk_usbh_rh_submit_urb(&usbh->use_as__vk_usbh_hcd_t, urb_hcd);
+        return __vk_usbh_rh_submit_urb(&usbh->use_as__vk_usbh_hcd_t, urb_hcd);
     }
 #endif
 
@@ -664,7 +667,7 @@ vsf_err_t vk_usbh_submit_urb_ex(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16
     return __vk_usbh_submit_urb_imp(usbh, urb, eda);
 }
 
-static vk_usbh_urb_t * vk_usbh_control_msg_common(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
+static vk_usbh_urb_t * __vk_usbh_control_msg_common(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             struct usb_ctrlrequest_t *req)
 {
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (req != NULL));
@@ -696,7 +699,7 @@ static vk_usbh_urb_t * vk_usbh_control_msg_common(vk_usbh_t *usbh, vk_usbh_dev_t
 vsf_err_t vk_usbh_control_msg(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             struct usb_ctrlrequest_t *req)
 {
-    vk_usbh_urb_t * urb = vk_usbh_control_msg_common(usbh, dev, req);
+    vk_usbh_urb_t * urb = __vk_usbh_control_msg_common(usbh, dev, req);
     if (urb != NULL) {
         return vk_usbh_submit_urb(usbh, urb);
     }
@@ -706,7 +709,7 @@ vsf_err_t vk_usbh_control_msg(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 vsf_err_t vk_usbh_control_msg_ex(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         struct usb_ctrlrequest_t *req, uint_fast16_t flags, vsf_eda_t *eda)
 {
-    vk_usbh_urb_t * urb = vk_usbh_control_msg_common(usbh, dev, req);
+    vk_usbh_urb_t * urb = __vk_usbh_control_msg_common(usbh, dev, req);
     if (urb != NULL) {
         return vk_usbh_submit_urb_ex(usbh, urb, flags, eda);
     }
@@ -779,7 +782,7 @@ vsf_err_t vk_usbh_set_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     return vk_usbh_control_msg(usbh, dev, &req);
 }
 
-static bool vk_usbh_match_id(vk_usbh_dev_parser_t *parser,
+static bool __vk_usbh_match_id(vk_usbh_dev_parser_t *parser,
         vk_usbh_ifs_parser_t *parser_ifs, const vk_usbh_dev_id_t *dev_id)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
@@ -802,7 +805,7 @@ static bool vk_usbh_match_id(vk_usbh_dev_parser_t *parser,
 }
 
 static const vk_usbh_class_drv_t *
-vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
+__vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
         vk_usbh_ifs_parser_t *parser_ifs)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
@@ -818,7 +821,7 @@ vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
         for (uint_fast8_t id_idx = 0; id_idx < drv->dev_id_num; id_idx++, dev_id++) {
             for (uint_fast8_t i = 0; i < ifs->num_of_alt; i++) {
                 ifs->cur_alt = i;
-                if (vk_usbh_match_id(parser, parser_ifs, dev_id)) {
+                if (__vk_usbh_match_id(parser, parser_ifs, dev_id)) {
                     goto end;
                 }
             }
@@ -830,7 +833,7 @@ end:
     return drv;
 }
 
-static vsf_err_t vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
+static vsf_err_t __vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
         vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
@@ -838,7 +841,7 @@ static vsf_err_t vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
     void *param;
 
     do {
-        drv = vk_usbh_match_interface_driver(usbh, parser, parser_ifs);
+        drv = __vk_usbh_match_interface_driver(usbh, parser, parser_ifs);
         if (drv != NULL) {
             param = drv->probe(usbh, usbh->dev_new, parser_ifs);
             if (param != NULL) {
@@ -860,7 +863,7 @@ static vsf_err_t vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
     return VSF_ERR_FAIL;
 }
 
-static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser)
+static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser)
 {
     vk_usbh_dev_t *dev = usbh->dev_new;
     struct usb_config_desc_t *desc_config = parser->desc_config;
@@ -989,14 +992,14 @@ static vsf_err_t vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *par
     size = 0;
     parser_ifs = parser->parser_ifs;
     for (ifs_no = 0; ifs_no < dev->num_of_ifs; ifs_no++, parser_ifs++) {
-        if (!vk_usbh_find_intrface_driver(usbh, parser, parser_ifs)) {
+        if (!__vk_usbh_find_intrface_driver(usbh, parser, parser_ifs)) {
             size++;
         }
     }
     return size > 0 ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
-static void vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_t *usbh = container_of(eda, vk_usbh_t, teda);
     vk_usbh_dev_parser_t *parser = NULL;
@@ -1033,7 +1036,7 @@ static void vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case VSF_USBH_PROBE_WAIT_DEVICE_DESC:
             buffer = vk_usbh_urb_take_buffer(urb);
             urb->urb_hcd->pipe.size = buffer[7];
-            vk_usbh_free_buffer(buffer);
+            __vk_usbh_free_buffer(buffer);
             vk_usbh_reset_dev(usbh, dev);
             goto check_device_reset;
         case VSF_USBH_PROBE_WAIT_SET_ADDRESS:
@@ -1067,13 +1070,13 @@ static void vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto parse_failed;
             }
 
-            vk_usbh_free_buffer(parser->desc_config);
+            __vk_usbh_free_buffer(parser->desc_config);
             parser->desc_config = vk_usbh_urb_take_buffer(urb);
             err = vk_usbh_set_configuration(usbh, dev, parser->desc_config->bConfigurationValue);
             break;
         case VSF_USBH_PROBE_WAIT_SET_CONFIG:
-            if (vk_usbh_parse_config(usbh, parser) < 0) {
-                vk_usbh_reset_parser(parser);
+            if (__vk_usbh_parse_config(usbh, parser) < 0) {
+                __vk_usbh_reset_parser(parser);
                 dev->cur_config++;
                 goto parse_next_config;
             }
@@ -1085,7 +1088,7 @@ static void vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         switch (parser->probe_state) {
         case VSF_USBH_PROBE_WAIT_DEVICE_RESET:
         check_device_reset:
-            if (vk_usbh_is_dev_resetting(usbh, dev)) {
+            if (__vk_usbh_is_dev_resetting(usbh, dev)) {
                 vsf_teda_set_timer_ms(20);
                 return;
             } else {
@@ -1111,27 +1114,24 @@ static void vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 parse_failed:
     if (dev != NULL) {
-        vk_usbh_clean_device(usbh, dev);
+        __vk_usbh_clean_device(usbh, dev);
     }
 parse_ok:
     vk_usbh_urb_free_buffer(urb);
-    vk_usbh_free_parser(usbh);
+    __vk_usbh_free_parser(usbh);
     usbh->dev_new = NULL;
 }
 
-static void vk_usbh_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_usbh_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_t *usbh = container_of(eda, vk_usbh_t, teda);
     vsf_err_t err = usbh->drv->init_evthandler(eda, evt, &usbh->use_as__vk_usbh_hcd_t);
 
     VSF_USB_ASSERT(err >= 0);
     if (VSF_ERR_NONE == err) {
-        if (VSF_ERR_NONE != vsf_eda_set_evthandler(
-                                &(usbh->teda.use_as__vsf_eda_t), 
-                                vk_usbh_probe_evthandler)) {
-            VSF_USB_ASSERT(false);
-        }
-        //usbh->teda.evthandler = vk_usbh_probe_evthandler;
+        // init_evthandler should not use frame
+        VSF_USB_ASSERT(!eda->state.bits.is_use_frame);
+        eda->fn.evthandler = __vk_usbh_probe_evthandler;
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
         if (usbh->drv->rh_control != NULL) {
@@ -1150,13 +1150,10 @@ vsf_err_t vk_usbh_init(vk_usbh_t *usbh)
     vsf_bitmap_reset(&usbh->device_bitmap, VSF_USBH_CFG_MAX_DEVICE);
     vsf_bitmap_set(&usbh->device_bitmap, 0);
 
-    if (VSF_ERR_NONE != vsf_eda_set_evthandler(
-                            &(usbh->teda.use_as__vsf_eda_t), 
-                            vk_usbh_init_evthandler)) {
-        VSF_USB_ASSERT(false);
-    }
-    //usbh->teda.evthandler = vk_usbh_init_evthandler;
-    
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    usbh->teda.on_terminate = NULL;
+#endif
+    usbh->teda.fn.evthandler = __vk_usbh_init_evthandler;
     return vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY, false);
 }
 

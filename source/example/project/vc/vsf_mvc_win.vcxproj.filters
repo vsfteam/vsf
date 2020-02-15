@@ -915,24 +915,6 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h">
       <Filter>vsf\component\ui\tgui\gui_v</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
     </ClInclude>
@@ -960,9 +942,6 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h">
       <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\images\demo_images.h">
       <Filter>usrapp\mvc_demo_win\tgui_demo\images</Filter>
     </ClInclude>
@@ -971,12 +950,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h">
       <Filter>vsf\component\ui\tgui\gui_v\template</Filter>
@@ -1293,26 +1266,17 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_tgui_cfg.h">
       <Filter>usrapp\mvc_demo_win\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_style.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.h">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_text_list.h">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__compiler.h">
       <Filter>vsf\utilities\__common</Filter>
@@ -1322,6 +1286,42 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__type.h">
       <Filter>vsf\utilities\__common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_port.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1784,21 +1784,6 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c">
       <Filter>vsf\component\ui\tgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
     </ClCompile>
@@ -1837,9 +1822,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
       <Filter>vsf\component\ui\tgui\gui_v\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c">
       <Filter>vsf\service\pbuf</Filter>
@@ -1991,14 +1973,8 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_style.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClCompile>
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
@@ -2006,11 +1982,35 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c">
       <Filter>vsf\component\ui\tgui\gui_mc\controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_text_list.c">
-      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\__common\__retarget_io.c">
       <Filter>vsf\utilities\__common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.c">
+      <Filter>vsf\component\ui\tgui\gui_v\simple_view</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

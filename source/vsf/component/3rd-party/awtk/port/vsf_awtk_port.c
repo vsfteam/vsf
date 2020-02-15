@@ -29,6 +29,7 @@
 #include "./platforms/vsf/main_loop_vsf.h"
 #include "awtk_vsf_port.h"
 #include <stdio.h>
+#include <string.h>
 
 /*============================ MACROS ========================================*/
 
@@ -47,32 +48,13 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __vsf_awtk_on_evt(vk_input_type_t tpye, vk_touchscreen_evt_t *ts_evt);
 extern ret_t platform_prepare(void);
 
 /*============================ LOCAL VARIABLES ===============================*/
-
-static vk_input_notifier_t __vsf_awtk_notifier = {
-    .mask       = 1 << VSF_INPUT_TYPE_TOUCHSCREEN,
-    .on_evt     = (vk_input_on_evt_t)__vsf_awtk_on_evt,
-};
-
 /*============================ IMPLEMENTATION ================================*/
-
-static void __vsf_awtk_on_evt(vk_input_type_t tpye, vk_touchscreen_evt_t *ts_evt)
-{
-    if (0 == VSF_INPUT_TOUCHSCREEN_GET_ID(ts_evt)) {
-        main_loop_post_pointer_event(main_loop(),
-                VSF_INPUT_TOUCHSCREEN_IS_DOWN(ts_evt),
-                VSF_INPUT_TOUCHSCREEN_GET_X(ts_evt),
-                VSF_INPUT_TOUCHSCREEN_GET_Y(ts_evt));
-    }
-}
 
 ret_t vsf_awtk_init(wh_t w, wh_t h, app_type_t app_type, const char* app_name, const char* app_root)
 {
-    vk_input_notifier_register(&__vsf_awtk_notifier);
-
     vsf_awtk_op_t op = {
         .malloc_impl = malloc,
         .realloc_impl = realloc,

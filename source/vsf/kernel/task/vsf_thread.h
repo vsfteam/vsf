@@ -96,7 +96,7 @@
                 pthis->use_as__vsf_thread_cb_t.stack_size =                     \
                     sizeof(task->param.stack_arr);                              \
                 pthis->canary = 0xDEADBEEF;                                     \
-                vsf_thread_start(   &(task->use_as__vsf_thread_t),              \
+                vk_thread_start(   &(task->use_as__vsf_thread_t),              \
                                     &(task->param.use_as__vsf_thread_cb_t),     \
                                     priority);                                  \
             }                                                                   \
@@ -112,7 +112,7 @@
                     .stack = (__THREAD_CB)->stack_arr,                          \
                     .stack_size = sizeof((__THREAD_CB)->stack_arr),             \
                 };                                                              \
-                __vsf_eda_call_thread_prepare(&(pthis->use_as__vsf_thread_cb_t),\
+                vk_eda_call_thread_prepare(&(pthis->use_as__vsf_thread_cb_t),\
                                               (vsf_thread_prepare_cfg_t *)&cfg);\
             } while(0)
 
@@ -120,7 +120,7 @@
                 __vsf_eda_call_thread_prepare__(__NAME, __THREAD_CB)
 
 #   define vsf_eda_call_thread(__THREAD_CB)                                     \
-                __vsf_eda_call_thread(&((__THREAD_CB)->use_as__vsf_thread_cb_t))
+                vk_eda_call_thread(&((__THREAD_CB)->use_as__vsf_thread_cb_t))
      
 
 #   define __def_vsf_thread_ex(__NAME, ...)                                     \
@@ -154,7 +154,7 @@
                                     &vsf_thread_##__NAME##_entry;               \
                 pthis->use_as__vsf_thread_cb_t.stack = stack;                   \
                 pthis->use_as__vsf_thread_cb_t.stack_size = size;               \
-                vsf_thread_start(   &(task->use_as__vsf_thread_t),              \
+                vk_thread_start(   &(task->use_as__vsf_thread_t),              \
                                     &(task->param.use_as__vsf_thread_cb_t),     \
                                     priority);                                  \
             }                                                                   \
@@ -174,7 +174,7 @@
                     .stack = (__STACK),                                         \
                     .stack_size = (__SIZE),                                     \
                 };                                                              \
-                __vsf_eda_call_thread_prepare(&(pthis->use_as__vsf_thread_cb_t),\
+                vk_eda_call_thread_prepare(&(pthis->use_as__vsf_thread_cb_t),\
                                               (vsf_thread_prepare_cfg_t *)&cfg);\
             } while(0)
 
@@ -189,7 +189,7 @@
                                                     (__SIZE))
 
 #   define vsf_eda_call_thread_ex(__THREAD_CB)                                  \
-                __vsf_eda_call_thread(&((__THREAD_CB)->use_as__vsf_thread_cb_t))
+                vk_eda_call_thread(&((__THREAD_CB)->use_as__vsf_thread_cb_t))
 
 #else
 #   define __def_vsf_thread(__NAME, __STACK, ...)                               \
@@ -219,7 +219,7 @@
                                     &vsf_thread_##__NAME##_entry;               \
                 pthis->stack = task->stack_arr;                                 \
                 pthis->stack_size = sizeof(task->stack_arr);                    \
-                vsf_thread_start(pthis, priority);                              \
+                vk_thread_start(pthis, priority);                              \
             }                                                                   \
             void vsf_thread_##__NAME##_entry(                                   \
                         struct thread_cb_##__NAME##_t *ptThis)
@@ -253,7 +253,7 @@
                                     &vsf_thread_##__NAME##_entry;               \
                 pthis->stack = stack;                                           \
                 pthis->stack_size = size;                                       \
-                vsf_thread_start(pthis, priority);                              \
+                vk_thread_start(pthis, priority);                              \
             }                                                                   \
             void vsf_thread_##__NAME##_entry(                                   \
                         struct thread_cb_##__NAME##_t *ptThis)
@@ -298,7 +298,7 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __vsf_thread_call_sub(__NAME, __TARGET)                              \
-            __vsf_thread_call_eda((uintptr_t)(__NAME), (uintptr_t)(__TARGET))
+            vk_thread_call_eda((uintptr_t)(__NAME), (uintptr_t)(__TARGET))
 
 
 #   define vsf_thread_call_sub(__NAME, __TARGET)                                \
@@ -314,7 +314,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 
 #   define vsf_thread_call_fsm(__NAME, __TARGET)                                \
-                __vsf_thread_call_fsm(  (vsf_fsm_entry_t)(__NAME),              \
+                vk_thread_call_fsm(  (vsf_fsm_entry_t)(__NAME),              \
                                         (uintptr_t)(__TARGET))
         
 #   define vsf_thread_call_task(__NAME, __TARGET)                               \
@@ -402,22 +402,22 @@ end_def_class(vsf_thread_t)
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-SECTION("text.vsf.kernel.__vsf_eda_call_thread_prepare")
-extern vsf_err_t __vsf_eda_call_thread_prepare( vsf_thread_cb_t *thread_cb,
+SECTION("text.vsf.kernel.vk_eda_call_thread_prepare")
+extern vsf_err_t vk_eda_call_thread_prepare( vsf_thread_cb_t *thread_cb,
                                                 vsf_thread_prepare_cfg_t *cfg);
 
-SECTION("text.vsf.kernel.__vsf_eda_call_thread")
-extern vsf_err_t __vsf_eda_call_thread(vsf_thread_cb_t *thread_cb);
+SECTION("text.vsf.kernel.vk_eda_call_thread")
+extern vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb);
 
-SECTION("text.vsf.kernel.__vsf_thread_call_fsm")
+SECTION("text.vsf.kernel.vk_thread_call_fsm")
 extern 
-fsm_rt_t __vsf_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param);
+fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param);
 
-SECTION("text.vsf.kernel.__vsf_thread_call_eda")
-extern vsf_err_t __vsf_thread_call_eda(uintptr_t eda_handler, uintptr_t param);
+SECTION("text.vsf.kernel.vk_thread_call_eda")
+extern vsf_err_t vk_thread_call_eda(uintptr_t eda_handler, uintptr_t param);
 
 SECTION("text.vsf.kernel.vsf_thread_call_thread")
-extern vsf_err_t __vsf_thread_call_thread(  vsf_thread_cb_t *thread_cb,
+extern vsf_err_t vk_thread_call_thread(  vsf_thread_cb_t *thread_cb,
                                             vsf_thread_prepare_cfg_t *cfg);
 
 #endif
@@ -425,11 +425,11 @@ extern vsf_err_t __vsf_thread_call_thread(  vsf_thread_cb_t *thread_cb,
 
 SECTION("text.vsf.kernel.vsf_thread")
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-extern vsf_err_t vsf_thread_start(  vsf_thread_t *thread, 
+extern vsf_err_t vk_thread_start(  vsf_thread_t *thread, 
                                     vsf_thread_cb_t *thread_cb, 
                                     vsf_prio_t priority);
 #else
-extern vsf_err_t vsf_thread_start(vsf_thread_t *ptThis, vsf_prio_t tPriority);
+extern vsf_err_t vk_thread_start(vsf_thread_t *ptThis, vsf_prio_t tPriority);
 #endif
 
 SECTION("text.vsf.kernel.vsf_thread_exit")

@@ -67,7 +67,7 @@ static uint_fast32_t vsf_stdio_console_stream_get_data_length(vsf_stream_t *stre
 int main(void)
 {
 #if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
 #endif
 
     usrapp_sem_test_start();

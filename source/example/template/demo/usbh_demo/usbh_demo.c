@@ -21,7 +21,7 @@
 
 #if VSF_USE_USB_HOST == ENABLED && APP_CFG_USE_USBH_DEMO == ENABLED
 
-#include "../usrapp_common.h"
+#include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -38,44 +38,14 @@ int usbh_main(int argc, char *argv[])
 int main(void)
 {
 #   if VSF_USE_TRACE == ENABLED
-    vsf_trace_init(NULL);
+    vsf_start_trace();
 #       if USRAPP_CFG_STDIO_EN == ENABLED
     vsf_stdio_init();
 #       endif
 #   endif
 #endif
 
-#if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
-    vk_ohci_init();
-#endif
-    vk_usbh_init(&usrapp_common.usbh.host);
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.libusb);
-#endif
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.ecm);
-#endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.bthci);
-#endif
-#if VSF_USE_USB_HOST_HID == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.hid);
-#endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.ds4);
-#endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.nspro);
-#endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.xb360);
-#endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.xb1);
-#endif
-#if VSF_USE_USB_HOST_HUB == ENABLED
-    vk_usbh_register_class(&usrapp_common.usbh.host, &usrapp_common.usbh.hub);
-#endif
+    usrapp_usbh_common_init();
     return 0;
 }
 

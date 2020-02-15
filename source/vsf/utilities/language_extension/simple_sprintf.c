@@ -196,15 +196,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     }
 
                     actual_width = strlen(arg.str);
-                    width -= actual_width;
+                    if (width < 0) {
+                        width = actual_width;
+                    }
                     if (!flags.align_left) {
-                        while (width-- > 0) {
+                        while (actual_width < width) {
+                            width--;
                             if (!size--) { goto end; }
-                            *curpos++ = flags.has_prefix0 ? '0' : ' ';
+                            *curpos++ = ' ';
                         }
                     }
-                    while (*arg.str != '\0') {
-                        width--;
+                    while ((*arg.str != '\0') && (width-- > 0)) {
                         if (!size--) { goto end; }
                         *curpos++ = *arg.str++;
                     }

@@ -49,9 +49,9 @@ struct vk_usbd_uvc_control_info_t {
     uint8_t selector;
     uint16_t size;
 
-    vsfav_control_value_t min;
-    vsfav_control_value_t max;
-    vsfav_control_value_t def;
+    vk_av_control_value_t min;
+    vk_av_control_value_t max;
+    vk_av_control_value_t def;
 
     void (*on_set)(vk_usbd_uvc_control_t *control);
 };
@@ -59,7 +59,7 @@ typedef struct vk_usbd_uvc_control_info_t vk_usbd_uvc_control_info_t;
 
 struct vk_usbd_uvc_control_t {
     const vk_usbd_uvc_control_info_t *info;
-    vsfav_control_value_t cur;
+    vk_av_control_value_t cur;
 };
 
 struct vk_usbd_uvc_entity_t {

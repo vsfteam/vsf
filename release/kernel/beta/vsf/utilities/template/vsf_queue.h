@@ -39,38 +39,38 @@
     NO_INIT static <ring buffer name> <ring buffer var>;
 
     // 5. Initialise a ring buffer with specific ring buffer buffer 
-    VSF_RNG_BUF_INIT( <ring buffer name>, <item type>, <address of ring buffer var>, <item count>);
+    vsf_rng_buf_init( <ring buffer name>, <item type>, <address of ring buffer var>, <item count>);
 
-    // 6. If you want to initialise a ring buffer with a given buffer, use VSF_RNG_BUF_PREPARE
-          rather than VSF_RNG_BUF_INIT above:
-    VSF_RNG_BUF_PREPARE(  <ring buffer name>, 
+    // 6. If you want to initialise a ring buffer with a given buffer, use vsf_rng_buf_prepare
+          rather than vsf_rng_buf_init above:
+    vsf_rng_buf_prepare(  <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of buffer>, 
                         <size of ring buffer buffer> );
 
     // 7. Use following macro for enqueue, dequeue and peek one item:
-    VSF_RNG_BUF_SEND(  <ring buffer name>, 
+    vsf_rng_buf_send(  <ring buffer name>, 
                         <address of ring buffer var>, 
                         <Item>);
-    VSF_RNG_BUF_GET(  <ring buffer name>, 
+    vsf_rng_buf_get(  <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of item buffer>);
-    VSF_RNG_BUF_PEEK(     <ring buffer name>, 
+    vsf_rng_buf_peek(     <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of item pointer>);
 
     NOTE: Peek returns a refrence to existing data in the ring buffer, there is no copy access
 
     // 8. Use following macro for enqueue, dequeue and peek multile items:
-    VSF_RNG_BUF_SEND(  <ring buffer name>, 
+    vsf_rng_buf_send(  <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of item buffer>, 
                         <number of Items>);
-    VSF_RNG_BUF_GET(  <ring buffer name>, 
+    vsf_rng_buf_get(  <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of item buffer>, 
                         <number of Items>);
-    VSF_RNG_BUF_PEEK(     <ring buffer name>, 
+    vsf_rng_buf_peek(     <ring buffer name>, 
                         <address of ring buffer var>, 
                         <address of item pointer>, 
                         <number of Items>);
@@ -78,10 +78,10 @@
     NOTE: Peek returns a refrence to existing data in the ring buffer, there is no copy access
 
     // 9. You can get the number of items within a ring buffer:
-    VSF_RNG_BUF_COUNT( <ring buffer name>, <address of ring buffer var> )
+    vsf_rng_buf_count( <ring buffer name>, <address of ring buffer var> )
 
     // 10. You can get the number of peekable items withi a ring buffer
-    VSF_RNG_BUF_PEEKABLE_COUNT( <ring buffer name>, <address of ring buffer var> )
+    vsf_rng_buf_peekable_count( <ring buffer name>, <address of ring buffer var> )
 
     Example:
 
@@ -100,21 +100,21 @@
         static uint16_t s_hwItem;
 
         //NO_INIT static uint8_t s_chQueueBuffer[1024];
-        //VSF_RNG_BUF_PREPARE(my_hword_queue_t, &s_tQueue, &s_chQueueBuffer, sizeof(s_chQueueBuffer));
+        //vsf_rng_buf_prepare(my_hword_queue_t, &s_tQueue, &s_chQueueBuffer, sizeof(s_chQueueBuffer));
 
-        VSF_RNG_BUF_INIT(my_hword_queue_t, uint16_t, &s_tQueue, 32);
+        vsf_rng_buf_init(my_hword_queue_t, uint16_t, &s_tQueue, 32);
 
-        VSF_RNG_BUF_SEND(my_hword_queue_t, &s_tQueue, 0x1234);
+        vsf_rng_buf_send(my_hword_queue_t, &s_tQueue, 0x1234);
 
 
-        VSF_RNG_BUF_SEND(my_hword_queue_t, &s_tQueue, s_hwTemp, UBOUND(s_hwTemp));
+        vsf_rng_buf_send(my_hword_queue_t, &s_tQueue, s_hwTemp, UBOUND(s_hwTemp));
 
-        VSF_RNG_BUF_GET(my_hword_queue_t, &s_tQueue, s_hwTemp, UBOUND(s_hwTemp));
-        VSF_RNG_BUF_GET(my_hword_queue_t, &s_tQueue, &s_hwItem);
+        vsf_rng_buf_get(my_hword_queue_t, &s_tQueue, s_hwTemp, UBOUND(s_hwTemp));
+        vsf_rng_buf_get(my_hword_queue_t, &s_tQueue, &s_hwItem);
 
         const uint16_t* phwItemRef = NULL;
-        VSF_RNG_BUF_PEEK(my_hword_queue_t, &s_tQueue, &phwItemRef, 2);    
-        VSF_RNG_BUF_PEEK(my_hword_queue_t, &s_tQueue, &phwItemRef);
+        vsf_rng_buf_peek(my_hword_queue_t, &s_tQueue, &phwItemRef, 2);    
+        vsf_rng_buf_peek(my_hword_queue_t, &s_tQueue, &phwItemRef);
     }
 
  */
@@ -151,6 +151,7 @@
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
 #   define NO_RNG_BUF_PROTECT(__CODE)               __CODE
+#   define no_rng_buf_protect(__code)               __code
 
 #   define __def_vsf_rng_buf(__NAME, __TYPE)                                    \
     struct __NAME {                                                             \
@@ -208,6 +209,7 @@ int32_t __NAME##_peek_multiple( __NAME* ptQ,                                    
 
 #else
 #   define NO_RNG_BUF_PROTECT(...)               __VA_ARGS__
+#   define no_rng_buf_protect(...)               __VA_ARGS__
 
 #   define __def_vsf_rng_buf(__NAME, __TYPE, ...)                               \
     struct __NAME {                                                             \
@@ -437,7 +439,7 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
             __implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT) 
 
 
-#define __VSF_RNG_BUF_INIT(__NAME, __TYPE, __QADDR, __ITEM_COUNT)               \
+#define __vsf_rng_buf_init(__NAME, __TYPE, __QADDR, __ITEM_COUNT)               \
     do {                                                                        \
         NO_INIT static uint16_t s_hwBuffer[(__ITEM_COUNT)];                     \
         __NAME##_cfg_t tCFG = {                                                 \
@@ -447,14 +449,14 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
         __NAME##_init((__QADDR), & tCFG);                                       \
     } while(0)
 
-#define VSF_RNG_BUF_INIT(__NAME, __TYPE, __QADDR, __ITEM_COUNT)                 \
-        __VSF_RNG_BUF_INIT(__NAME, __TYPE, (__QADDR), (__ITEM_COUNT))
+#define vsf_rng_buf_init(__NAME, __TYPE, __QADDR, __ITEM_COUNT)                 \
+        __vsf_rng_buf_init(__NAME, __TYPE, (__QADDR), (__ITEM_COUNT))
 
 
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
-#define __VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE)                \
+#define __vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE)                \
     do {                                                                        \
         __NAME##_cfg_t tCFG = {0};                                              \
         tCFG.ptBuffer = (__BUFFER);                                             \
@@ -462,11 +464,11 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
         __NAME##_init((__QADDR), & tCFG);                                       \
     } while(0)
 
-#   define VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE)               \
-                __VSF_RNG_BUF_PREPARE(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#   define vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE)               \
+                __vsf_rng_buf_prepare(__NAME, (__QADDR), (__BUFFER), (__SIZE))
 #else
 
-#   define __VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE, ...)        \
+#   define __vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE, ...)        \
     do {                                                                        \
         __NAME##_cfg_t tCFG = {                                                 \
             (__BUFFER),                                                         \
@@ -476,63 +478,63 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
         __NAME##_init((__QADDR), & tCFG);                                       \
     } while(0)
 
-#   define VSF_RNG_BUF_PREPARE(__NAME, __QADDR, __BUFFER, __SIZE, ...)          \
-        __VSF_RNG_BUF_PREPARE(__NAME, (__QADDR), (__BUFFER), (__SIZE), __VA_ARGS__)
+#   define vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE, ...)          \
+        __vsf_rng_buf_prepare(__NAME, (__QADDR), (__BUFFER), (__SIZE), __VA_ARGS__)
 #endif
 
-#define __VSF_RNG_BUF_SEND_1(__NAME, __QADDR, __ITEM)                           \
+#define __vsf_rng_buf_send_1(__NAME, __QADDR, __ITEM)                           \
             __NAME##_send_one((__QADDR), __ITEM)
 
-#define __VSF_RNG_BUF_SEND_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
+#define __vsf_rng_buf_send_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
             __NAME##_send_multiple((__QADDR), (__BUFFER), (__SIZE))
 
-#define __VSF_RNG_BUF_GET_1(__NAME, __QADDR, __ITEM)                            \
+#define __vsf_rng_buf_get_1(__NAME, __QADDR, __ITEM)                            \
             __NAME##_get_one((__QADDR), __ITEM)
 
-#define __VSF_RNG_BUF_GET_2(__NAME, __QADDR, __BUFFER, __SIZE)                  \
+#define __vsf_rng_buf_get_2(__NAME, __QADDR, __BUFFER, __SIZE)                  \
             __NAME##_get_multiple((__QADDR), (__BUFFER), (__SIZE))
 
-#define __VSF_RNG_BUF_PEEK_1(__NAME, __QADDR, __ITEM)                           \
+#define __vsf_rng_buf_peek_1(__NAME, __QADDR, __ITEM)                           \
             __NAME##_peek_one((__QADDR), __ITEM)
 
-#define __VSF_RNG_BUF_PEEK_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
+#define __vsf_rng_buf_peek_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
             __NAME##_peek_multiple((__QADDR), (__BUFFER), (__SIZE))
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#   define VSF_RNG_BUF_SEND(__NAME, __QADDR, ...)                               \
+#   define vsf_rng_buf_send(__NAME, __QADDR, ...)                               \
             __PLOOC_EVAL(__VSF_RNG_BUF_SEND_, __VA_ARGS__)                      \
                 (__NAME, __QADDR, __VA_ARGS__)
 
-#   define VSF_RNG_BUF_GET(__NAME, __QADDR, ...)                                \
-            __PLOOC_EVAL(__VSF_RNG_BUF_GET_, __VA_ARGS__)                       \
+#   define vsf_rng_buf_get(__NAME, __QADDR, ...)                                \
+            __PLOOC_EVAL(__vsf_rng_buf_get_, __VA_ARGS__)                       \
                 (__NAME, __QADDR, __VA_ARGS__)
 
-#   define VSF_RNG_BUF_PEEK(__NAME, __QADDR, ...)                               \
+#   define vsf_rng_buf_peek(__NAME, __QADDR, ...)                               \
             __PLOOC_EVAL(__VSF_QUEUE_PEEK_, __VA_ARGS__)                        \
                 (__NAME, __QADDR, __VA_ARGS__)
 #endif
 
-#define VSF_RNG_BUF_SEND_ONE(__NAME, __QADDR, __ITEM)                           \
-            __VSF_RNG_BUF_SEND_1(__NAME, (__QADDR), (__ITEM))
+#define vsf_rng_buf_send_one(__NAME, __QADDR, __ITEM)                           \
+            __vsf_rng_buf_send_1(__NAME, (__QADDR), (__ITEM))
             
-#define VSF_RNG_BUF_SEND_BUF(__NAME, __QADDR, __BUFFER, __SIZE)                 \
-            __VSF_RNG_BUF_SEND_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#define vsf_rng_buf_send_buf(__NAME, __QADDR, __BUFFER, __SIZE)                 \
+            __vsf_rng_buf_send_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
             
-#define VSF_RNG_BUF_GET_ONE(__NAME, __QADDR, __ITEM)                            \
-            __VSF_RNG_BUF_GET_1(__NAME, (__QADDR), (__ITEM))
+#define vsf_rng_buf_get_one(__NAME, __QADDR, __ITEM)                            \
+            __vsf_rng_buf_get_1(__NAME, (__QADDR), (__ITEM))
             
-#define VSF_RNG_BUF_GET_BUF(__NAME, __QADDR, __BUFFER, __SIZE)                  \
-            __VSF_RNG_BUF_GET_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#define vsf_rng_buf_get_buf(__NAME, __QADDR, __BUFFER, __SIZE)                  \
+            __vsf_rng_buf_get_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
 
-#define __VSF_RNG_BUF_COUNT(__NAME, __QADDR)                                    \
+#define __vsf_rng_buf_count(__NAME, __QADDR)                                    \
             __NAME##_item_count((__QADDR))
-#define VSF_RNG_BUF_COUNT(__NAME, __QADDR)                                      \
-            __VSF_RNG_BUF_COUNT(__NAME, __QADDR)
+#define vsf_rng_buf_count(__NAME, __QADDR)                                      \
+            __vsf_rng_buf_count(__NAME, __QADDR)
 
-#define __VSF_RNG_BUF_PEEKABLE_COUNT(__NAME, __QADDR)                           \
+#define __vsf_rng_buf_peekable_count(__NAME, __QADDR)                           \
             __NAME##_item_count_peekable((__QADDR))
-#define VSF_RNG_BUF_PEEKABLE_COUNT(__NAME, __QADDR)                             \
-            __VSF_RNG_BUF_PEEKABLE_COUNT(__NAME, __QADDR)
+#define vsf_rng_buf_peekable_count(__NAME, __QADDR)                             \
+            __vsf_rng_buf_peekable_count(__NAME, __QADDR)
 
 /*============================ TYPES =========================================*/
 

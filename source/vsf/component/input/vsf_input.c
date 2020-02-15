@@ -66,6 +66,8 @@ static vsf_input_t __vsf_input;
 WEAK_VSF_INPUT_ON_EVT_EXTERN
 #endif
 
+extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
+
 /*============================ IMPLEMENTATION ================================*/
 
 void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len)
@@ -191,6 +193,14 @@ void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 #else
     WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vk_input_evt_t);
 #endif
+}
+#endif
+
+#ifndef WEAK_VSF_INPUT_ON_MOUSE
+WEAK(vsf_input_on_mouse)
+void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
+{
+    vsf_input_on_evt(VSF_INPUT_TYPE_MOUSE, &mouse_evt->use_as__vk_input_evt_t);
 }
 #endif
 

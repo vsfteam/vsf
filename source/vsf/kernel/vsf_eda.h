@@ -30,7 +30,7 @@
    
 #if     defined(__VSF_EDA_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(__VSF_EDA_CLASS_INHERIT)
+#elif   defined(VSF_EDA_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #endif
 
@@ -302,13 +302,14 @@ typedef union __vsf_eda_state_t __vsf_eda_state_t;
 def_simple_class(vsf_eda_t) {
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    public_member(
+    protected_member(
         vsf_eda_on_terminate_t      on_terminate;
     )
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     protected_member(
+
         union {
             vsf_eda_evthandler_t    evthandler;
             vsf_slist_t             frame_list;
@@ -646,17 +647,30 @@ extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
 
 #endif
 
+#if defined(VSF_EDA_CLASS_INHERIT) || defined(__VSF_EDA_CLASS_IMPLEMENT)
 SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
 extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *pthis, 
                                         vsf_eda_evthandler_t evthandler);
-
-SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
-extern vsf_err_t vsf_eda_go_to(uintptr_t evthandler);
 
 SECTION(".text.vsf.kernel.eda")
 extern vsf_err_t vsf_eda_init(  vsf_eda_t *pthis, 
                                 vsf_prio_t priotiry, 
                                 bool is_stack_owner);
+
+#   if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+
+SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
+extern bool vsf_eda_polling_state_get(vsf_eda_t *pthis);
+
+SECTION(".text.vsf.kernel.vsf_eda_polling_state_set")
+extern void vsf_eda_polling_state_set(vsf_eda_t *pthis, bool state);
+
+#   endif
+
+#endif
+
+SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
+extern vsf_err_t vsf_eda_go_to(uintptr_t evthandler);
 
 SECTION(".text.vsf.kernel.vsf_eda_init_ex")
 vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg);
@@ -680,6 +694,17 @@ extern bool vsf_eda_return(void);
 
 SECTION(".text.vsf.kernel.vsf_eda_yield")
 extern void vsf_eda_yield(void);
+
+#if defined(VSF_EDA_CLASS_INHERIT) || defined(__VSF_EDA_CLASS_IMPLEMENT)
+/* vsf_eda_fini() enables you to kill other eda tasks.
+   We highly recommend that DO NOT use this api until you 100% sure.
+   please make sure that the resources are properly freed when you trying to kill
+   an eda other than your own. We highly recommend that please send a semaphore to
+   the target eda to ask it killing itself after properly freeing all the resources.
+ */
+SECTION(".text.vsf.kernel.eda")
+extern vsf_err_t vsf_eda_fini(vsf_eda_t *pthis);
+#endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 SECTION(".text.vsf.kernel.__vsf_eda_call_eda")
@@ -710,7 +735,7 @@ vsf_err_t vsf_eda_frame_user_value_get(__VSF_KERNEL_CFG_FRAME_UINT_TYPE* pvalue)
 
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
-extern fsm_rt_t vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
+extern fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
 #   endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
@@ -847,7 +872,7 @@ extern vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, v
 
 #endif      // VSF_KERNEL_CFG_SUPPORT_SYNC
 
-#undef __VSF_EDA_CLASS_INHERIT
+#undef VSF_EDA_CLASS_INHERIT
 #undef __VSF_EDA_CLASS_IMPLEMENT
 
 #endif

@@ -21,9 +21,7 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#include "../../vsf_linux.h"
-
-#include "vsf.h"
+#include <unistd.h>
 #include <sys/time.h>
 
 /*============================ MACROS ========================================*/

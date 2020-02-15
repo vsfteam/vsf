@@ -17,6 +17,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "component/vsf_component_cfg.h"
+
+#if VSF_USE_BTSTACK == ENABLED
+
 // TODO: use dedicated include
 #include "vsf.h"
 
@@ -127,3 +131,4 @@ const btstack_run_loop_t * btstack_run_loop_vsf_get_instance(void)
     return &btstack_run_loop_vsf;
 }
 
+#endif      // VSF_USE_BTSTACK

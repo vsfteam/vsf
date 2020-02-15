@@ -19,7 +19,7 @@
 
 #include "../../vsf_scsi_cfg.h"
 
-#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL_SCSI == ENABLED
+#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_USE_MAL_SCSI == ENABLED
 
 #define VSF_SCSI_INHERIT
 #define VSF_VIRTUAL_SCSI_INHERIT
@@ -74,6 +74,9 @@ static void __vk_mal_scsi_init(uintptr_t target, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
+#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+        mal_scsi->mal_stream.mal = mal_scsi->mal;
+#endif
         vk_mal_init(mal_scsi->mal);
         break;
     case VSF_EVT_RETURN:
@@ -91,7 +94,7 @@ static void __vk_mal_scsi_read(uintptr_t target, vsf_evt_t evt)
     case VSF_EVT_INIT:
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         if (mal_scsi->is_stream) {
-            vk_mal_read_stream(mal_scsi->mal,
+            vk_mal_read_stream(&mal_scsi->mal_stream,
                 mal_scsi->addr * param->block_size, mal_scsi->size * param->block_size,
                 mal_scsi->args.stream);
         } else {
@@ -118,7 +121,7 @@ static void __vk_mal_scsi_write(uintptr_t target, vsf_evt_t evt)
     case VSF_EVT_INIT:
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         if (mal_scsi->is_stream) {
-            vk_mal_write_stream(mal_scsi->mal,
+            vk_mal_write_stream(&mal_scsi->mal_stream,
                 mal_scsi->addr * param->block_size, mal_scsi->size * param->block_size,
                 mal_scsi->args.stream);
         } else {

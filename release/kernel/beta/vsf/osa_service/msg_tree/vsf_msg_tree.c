@@ -418,7 +418,7 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj,
     VSF_OSA_SERVICE_ASSERT(hwBuffSize > 2);
 
     this.FWBFS.chState = 0;
-    VSF_RNG_BUF_PREPARE(__bfs_node_fifo_t, 
+    vsf_rng_buf_prepare(__bfs_node_fifo_t, 
                         &(this.FWBFS.tFIFO), 
                         phwFIFOBuffer, 
                         hwBuffSize);
@@ -460,7 +460,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
             }
             VSF_OSA_SERVICE_ASSERT (NULL != this.FWBFS.tFIFO.ptBuffer);
 
-            if (!VSF_RNG_BUF_SEND_ONE(  __bfs_node_fifo_t, 
+            if (!vsf_rng_buf_send_one(  __bfs_node_fifo_t, 
                                         &(this.FWBFS.tFIFO), 
                                         0)) {
                 return (fsm_rt_t)VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT;
@@ -474,7 +474,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
             // break;
 
         case FETCH_ITEM:
-            if (!VSF_RNG_BUF_GET_ONE(   __bfs_node_fifo_t, 
+            if (!vsf_rng_buf_get_one(   __bfs_node_fifo_t, 
                                         &(this.FWBFS.tFIFO), 
                                         &hwOffset)) {
                 //! search complete
@@ -508,7 +508,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                         hwOffset = 
                             (uint16_t)((uintptr_t)ptTemp 
                                      - (uintptr_t)this.FWBFS.tMSGHandling.ptNode);
-                        if (!VSF_RNG_BUF_SEND_ONE(  __bfs_node_fifo_t, 
+                        if (!vsf_rng_buf_send_one(  __bfs_node_fifo_t, 
                                                     &(this.FWBFS.tFIFO), 
                                                     hwOffset)) {
                             RESET_MSGT_FW_BFS_PROPAGATE_MSG_FSM();

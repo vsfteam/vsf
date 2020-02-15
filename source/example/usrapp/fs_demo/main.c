@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_EDA_CLASS_INHERIT
+#define VSF_EDA_CLASS_INHERIT
 #include "vsf.h"
 
 // define USRAPP_CF_XXXX and include usrapp_common.h
@@ -216,7 +216,6 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     static vk_file_t *__fwinfs;
 #endif
     static uint8_t __control = 0;
-    static int32_t __size;
 
     switch (evt) {
     case VSF_EVT_INIT:

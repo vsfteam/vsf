@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/arch/vsf_arch_abstraction.h"
-#include "systick/systick.h"
+#include "SysTick/systick.h"
 #include "hal/driver/driver.h"
 #include "hal/arch/__vsf_arch_interface.h"
 /*============================ MACROS ========================================*/
