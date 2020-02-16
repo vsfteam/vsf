@@ -219,7 +219,6 @@ static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
 int vsh_main(int argc, char *argv[])
 {
     struct vsh_cmd_ctx_t ctx = { 0 };
-    int ret;
     char ch;
     enum vsh_shell_state_t state;
 

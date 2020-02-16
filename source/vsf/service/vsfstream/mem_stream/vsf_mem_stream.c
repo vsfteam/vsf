@@ -26,7 +26,28 @@
 #include "kernel/vsf_kernel.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_MEM_STREAM_CFG_PROTECT_LEVEL
+/*! \note   By default, the driver tries to make all APIs interrupt-safe,
+ *!
+ *!         in the case when you want to disable it,
+ *!         please use following macro:
+ *!         #define VSF_MEM_STREAM_CFG_PROTECT_LEVEL    none
+ *!         
+ *!         in the case when you want to use scheduler-safe,
+ *!         please use following macro:
+ *!         #define VSF_MEM_STREAM_CFG_PROTECT_LEVEL    scheduler
+ *!         
+ *!         NOTE: This macro should be defined in vsf_usr_cfg.h
+ */
+#   define VSF_MEM_STREAM_CFG_PROTECT_LEVEL     interrupt
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __vsf_mem_stream_protect                vsf_protect(VSF_MEM_STREAM_CFG_PROTECT_LEVEL)
+#define __vsf_mem_stream_unprotect              vsf_unprotect(VSF_MEM_STREAM_CFG_PROTECT_LEVEL)
+
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -80,9 +101,9 @@ static uint_fast32_t __vsf_mem_stream_get_data_length(vsf_stream_t *stream)
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t data_size;
 
-    vsf_protect_t orig = vsf_protect_sched();
+    vsf_protect_t orig = __vsf_mem_stream_protect();
         data_size = mem_stream->data_size;
-    vsf_unprotect_sched(orig);
+    __vsf_mem_stream_unprotect(orig);
     return data_size;
 }
 
@@ -146,11 +167,11 @@ static uint_fast32_t __vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, 
         }
     }
 
-    vsf_protect_t orig = vsf_protect_sched();
+    vsf_protect_t orig = __vsf_mem_stream_protect();
         mem_stream->data_size += wsize;
         mem_stream->wpos += wsize;
         mem_stream->wpos %= mem_stream->use_as__vsf_mem_t.nSize;
-    vsf_unprotect_sched(orig);
+    __vsf_mem_stream_unprotect(orig);
     mem_stream->is_writing = false;
     return wsize;
 }
@@ -178,7 +199,7 @@ static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, u
         }
     }
 
-    vsf_protect_t orig = vsf_protect_sched();
+    vsf_protect_t orig = __vsf_mem_stream_protect();
         mem_stream->data_size -= rsize;
         if ((size < data_len) || mem_stream->is_writing) {
             mem_stream->rpos += rsize;
@@ -186,7 +207,7 @@ static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, u
         } else {
             mem_stream->rpos = mem_stream->wpos = 0;
         }
-    vsf_unprotect_sched(orig);
+    __vsf_mem_stream_unprotect(orig);
     return rsize;
 }
 
