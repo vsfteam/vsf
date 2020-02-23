@@ -150,6 +150,7 @@
 //  </h>
 //! @}
 
+#define VSF_USE_BTSTACK                     ENABLED
 #define VSF_USE_FS                          ENABLED
 #define VSF_USE_VIDEO                       ENABLED
 

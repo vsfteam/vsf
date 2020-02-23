@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<flash_board>
-    <pass>
-        <loader>$PROJ_DIR$\M481_APROM.flash</loader>
-        <range>CODE 0x0 0x7ffff</range>
-    </pass>
-</flash_board>

@@ -89,6 +89,18 @@
 #   define  __IS_COMPILER_SUPPORT_GNUC_EXTENSION__      1
 #endif
 
+#ifndef __IS_COMPILER_LLVM__
+#   define __IS_COMPILER_LLVM__     0
+#endif
+
+#ifndef __IS_COMPILER_GCC__
+#   define __IS_COMPILER_GCC__      0
+#endif
+
+#ifndef __IS_COMPILER_IAR__
+#   define __IS_COMPILER_IAR__      0
+#endif
+
 //! \brief none standard memory types
 #if __IS_COMPILER_LLVM__
 #   define ROM_FLASH            __attribute__(( __section__( ".rom.flash"))) const
@@ -156,6 +168,129 @@
 #define ALIGN_WITH(...)     ALIGN(ALIGN_OF(__VA_ARGS__))
 #define ISR(...)            __ISR(__VA_ARGS__)
 #endif
+
+
+/*----------------------------------------------------------------------------*
+ * Warning Mitigation                                                         *
+ *----------------------------------------------------------------------------*/
+#if defined(__clang__) //__IS_COMPILER_LLVM__
+#pragma clang diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#pragma clang diagnostic ignored "-Wconstant-conversion"
+#pragma clang diagnostic ignored "-Wmicrosoft-enum-forward-reference"
+#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#pragma clang diagnostic ignored "-Winitializer-overrides" 
+#pragma clang diagnostic ignored "-Wbraced-scalar-init" 
+#pragma clang diagnostic ignored "-Wempty-body" 
+#pragma clang diagnostic ignored "-Wgnu-empty-struct"
+#pragma clang diagnostic ignored "-Wint-conversion" 
+#pragma clang diagnostic ignored "-Wint-to-pointer-cast" 
+#pragma clang diagnostic ignored "-Wmicrosoft-include"
+#pragma clang diagnostic ignored "-Wpragma-pack" 
+#pragma clang diagnostic ignored "-Wunused-function" 
+#pragma clang diagnostic ignored "-Wswitch"
+#pragma clang diagnostic ignored "-Wembedded-directive"
+#pragma clang diagnostic ignored "-Wundef"
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma clang diagnostic ignored "-Wpadded"
+#pragma clang diagnostic ignored "-Wnewline-eof"
+#pragma clang diagnostic ignored "-Wduplicate-enum"
+#pragma clang diagnostic ignored "-Wextra-semi"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma clang diagnostic ignored "-Wzero-length-array"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+#pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#pragma clang diagnostic ignored "-Wnonportable-include-path"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wc++-compat"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#pragma clang diagnostic ignored "-Wcast-qual"
+#pragma clang diagnostic ignored "-Wbad-function-cast"
+#pragma clang diagnostic ignored "-Wswitch-enum"
+#pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+#pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+#pragma clang diagnostic ignored "-Wunused-value" 
+#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+/*! \NOTE do not ignore following warning unless you take the risk by yourself */
+//#pragma clang diagnostic ignored "-Wbitfield-constant-conversion"
+//#pragma clang diagnostic ignored "-Wpointer-integer-compare" 
+
+//#pragma clang diagnostic ignored "-Wno-sometimes-uninitialized" 
+//#pragma clang diagnostic ignored "-Wdeprecated-declarations" 
+//#pragma clang diagnostic ignored "-Wunused-variable"  
+
+#elif __IS_COMPILER_GCC__
+
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#pragma GCC diagnostic ignored "-Wempty-body" 
+#pragma GCC diagnostic ignored "-Wint-conversion" 
+#pragma GCC diagnostic ignored "-Wint-to-pointer-cast" 
+#pragma GCC diagnostic ignored "-Wunused-function" 
+#pragma GCC diagnostic ignored "-Wswitch"
+#pragma GCC diagnostic ignored "-Wundef"
+#pragma GCC diagnostic ignored "-Wpadded"
+#pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#pragma GCC diagnostic ignored "-Wc++-compat"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#pragma GCC diagnostic ignored "-Wmissing-noreturn"
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic ignored "-Wbad-function-cast"
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#pragma GCC diagnostic ignored "-Wunused-value" 
+#pragma GCC diagnostic ignored "-Wcomment"
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#pragma GCC diagnostic ignored "-Wnonnull-compare"
+
+/*! \NOTE do not ignore following warning unless you take the risk by yourself */
+//#pragma GCC diagnostic ignored "-Wbitfield-constant-conversion"
+//#pragma GCC diagnostic ignored "-Wpointer-integer-compare" 
+//
+//#pragma GCC diagnostic ignored "-Wno-sometimes-uninitialized" 
+//#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
+//#pragma GCC diagnostic ignored "-Wunused-variable"  
+
+#elif __IS_COMPILER_IAR__
+
+//! undefined behavior: the order of volatile accesses is undefined in this statement 
+#pragma diag_suppress=Pa082
+
+//! Typedef name has already been declared (with same type)
+#pragma diag_suppress=pe301
+
+//! enumerated type mixed with another type
+#pragma diag_suppress=pe188
+
+//! extra ";" ignored
+#pragma diag_suppress=pe381
+
+//! enumerated type mixed with another enumerated type 
+#pragma diag_suppress=pa089
+
+//! use of address of unaligned structure member 
+#pragma diag_suppress=pa039
+
+//,Pe186,Pe111,,pe128,,,Pe1866,Pe064,Pa039
+
+#endif
+
+/*----------------------------------------------------------------------------*
+ * Warning Emphasize                                                          *
+ *----------------------------------------------------------------------------*/
+#if defined(__clang__) //__IS_COMPILER_LLVM__
+#pragma clang diagnostic warning "-Wcast-align"
+#elif __IS_COMPILER_GCC__
+#pragma GCC diagnostic warning "-Wcast-align"
+#endif
+
 /*----------------------------------------------------------------------------*
  * Signal & Interrupt Definition                                              *
  *----------------------------------------------------------------------------*/

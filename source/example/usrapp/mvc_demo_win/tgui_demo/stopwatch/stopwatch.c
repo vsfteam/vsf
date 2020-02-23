@@ -87,7 +87,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
 
             tgui_msgmap(tStopWatchMSGMap),
 
-            tgui_timer(tTimer, 50, false),
+            tgui_timer(tTimer, 300, false),
 
             tgui_label(tTime, ptPanel, tTime, tStartStop,
                 tgui_region(0, 48, 228, 32),

@@ -1,6 +1,11 @@
 #ifndef __STDIO_H__
 #define __STDIO_H__
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#endif
+
 #include <sys/types.h>
 #include <stdarg.h>
 
@@ -38,5 +43,10 @@ int vsnprintf(char* str, size_t size, const char* format, va_list ap);
 int vsscanf(const char *str, const char *format, va_list ap);
 int snscanf(const char *str, size_t size, const char *format, ...);
 int sscanf(const char *str, const char *format, ...);
+
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif

@@ -310,8 +310,8 @@ static const usbd_uvc_const_t usbd_uvc_const = {
             'V', 0, 'S', 0, 'F', 0, 'U', 0, 'V', 0, 'C', 0,
         },
         .std_desc               = {
-            VSF_USBD_DESC_DEVICE(0, usbd_uvc_const.usbd.dev_desc, sizeof(usbd_uvc_const.usbd.dev_desc)),
-            VSF_USBD_DESC_CONFIG(0, 0, usbd_uvc_const.usbd.config_desc, sizeof(usbd_uvc_const.usbd.config_desc)),
+            VSF_USBD_DESC_DEVICE(usbd_uvc_const.usbd.dev_desc, sizeof(usbd_uvc_const.usbd.dev_desc)),
+            VSF_USBD_DESC_CONFIG(0, usbd_uvc_const.usbd.config_desc, sizeof(usbd_uvc_const.usbd.config_desc)),
             VSF_USBD_DESC_STRING(0, 0, usbd_uvc_const.usbd.str_lanid, sizeof(usbd_uvc_const.usbd.str_lanid)),
             VSF_USBD_DESC_STRING(0x0409, 1, usbd_uvc_const.usbd.str_vendor, sizeof(usbd_uvc_const.usbd.str_vendor)),
             VSF_USBD_DESC_STRING(0x0409, 2, usbd_uvc_const.usbd.str_product, sizeof(usbd_uvc_const.usbd.str_product)),

@@ -50,10 +50,10 @@
             (__IFS_START),                      /* bMasterInterface: Communication class interface */\
             1 + (__IFS_START),                  /* bSlaveInterface0: Data Class Interface */\
                                                                                 \
-            USB_DESC_EP(USB_DIR_IN | (__INT_IN_EP), USB_ENDPOINT_XFER_INT, 8, __INT_EP_INTERVAL)\
+            USB_DESC_EP(USB_DIR_IN | (__INT_IN_EP), USB_ENDPOINT_XFER_INT, 8, (__INT_EP_INTERVAL))\
             USB_DESC_IFS((__IFS_START) + 1, 0, 2, USB_CLASS_CDC_DATA, 0x00, 0x00, (__I_FUNC))\
-            USB_DESC_EP(USB_DIR_IN | (__BULK_IN_EP), USB_ENDPOINT_XFER_BULK, __BULK_EP_SIZE, 0x00)\
-            USB_DESC_EP(USB_DIR_OUT | (__BULK_OUT_EP), USB_ENDPOINT_XFER_BULK, __BULK_EP_SIZE, 0x00)
+            USB_DESC_EP(USB_DIR_IN | (__BULK_IN_EP), USB_ENDPOINT_XFER_BULK, (__BULK_EP_SIZE), 0x00)\
+            USB_DESC_EP(USB_DIR_OUT | (__BULK_OUT_EP), USB_ENDPOINT_XFER_BULK, (__BULK_EP_SIZE), 0x00)
 
 #define USB_DESC_CDC_ACM_IAD_LEN                                                \
             (   USB_DT_INTERFACE_ASSOCIATION_SIZE +                             \

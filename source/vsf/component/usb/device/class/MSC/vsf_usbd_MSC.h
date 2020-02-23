@@ -55,7 +55,7 @@
 #define USB_MSCBOT_IFS_NUM          USB_MSC_IFS_NUM
 #define USB_MSC_IFS(__MSC_PARAM)                                                \
             {                                                                   \
-                .class_op       = &vk_usbd_msc_class,                           \
+                .class_op       = &vk_usbd_msc,                                 \
                 .class_param  =  &(__MSC_PARAM),                                \
             },
 
@@ -120,7 +120,7 @@ def_simple_class(vk_usbd_msc_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_usbd_class_op_t vk_usbd_msc_class;
+extern const vk_usbd_class_op_t vk_usbd_msc;
 
 /*============================ PROTOTYPES ====================================*/
 

@@ -27,6 +27,7 @@
 # define UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
 #endif
 
+#define __USE_COMMON_RETARGET_IO_C__
 #include "../__common/__retarget_io.c"
 
  

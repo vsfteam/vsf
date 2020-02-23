@@ -38,13 +38,13 @@ enum {
 /*============================ PROTOTYPES ====================================*/
 
 static vsf_err_t __vk_usbd_msc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_msc_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+static vsf_err_t __vk_usbd_msc_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vk_usbd_class_op_t vk_usbd_msc_class = {
+const vk_usbd_class_op_t vk_usbd_msc = {
     .request_prepare = __vk_usbd_msc_request_prepare,
-    .init = __vk_usbd_msc_class_init,
+    .init = __vk_usbd_msc_init,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -223,7 +223,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t __vk_usbd_msc_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+static vsf_err_t __vk_usbd_msc_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_msc_t *msc = ifs->class_param;
 

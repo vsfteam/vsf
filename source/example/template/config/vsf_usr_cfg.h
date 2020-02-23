@@ -34,7 +34,7 @@
 #   define USBD_DEMO_USE_MSC                            ENABLED
 #define APP_CFG_USE_SCSI_DEMO                           ENABLED
 #define APP_CFG_USE_AUDIO_DEMO                          ENABLED
-#define APP_CFG_USE_TGUI_DEMO                           DISABLED
+#define APP_CFG_USE_TGUI_DEMO                           ENABLED
 
 // 3rd-party demos
 #define APP_CFG_USE_AWTK_DEMO                           ENABLED

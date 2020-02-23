@@ -197,7 +197,7 @@ static usrapp_t __usrapp = {
 #endif
 };
 
-describe_usbd(user_usbd, APP_CFG_USBD_PID, APP_CFG_USBD_VID, 0x0409, USRAPP_CFG_USBD_DC_SPEED)
+describe_usbd(user_usbd, APP_CFG_USBD_PID, APP_CFG_USBD_VID, USRAPP_CFG_USBD_DC_SPEED)
     usbd_common_desc(user_usbd, u"VSF-MSC", u"SimonQian", u"1.0.0", 64, USB_DESC_MSCBOT_IAD_LEN, USB_MSCBOT_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
         mscbot_desc(user_usbd, 0, 0, 1, 1, USRAPP_CFG_USBD_DC_EPSIZE)
     usbd_func_desc(user_usbd)

@@ -258,6 +258,12 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #endif
 
 
+#ifndef VSF_KERNEL_CFG_FRAME_USER_BITS
+#   define VSF_KERNEL_CFG_FRAME_USER_BITS           6
+#elif VSF_KERNEL_CFG_FRAME_USER_BITS <= 0
+#   undef VSF_KERNEL_CFG_FRAME_USER_BITS
+#   define VSF_KERNEL_CFG_FRAME_USER_BITS           6
+#endif
 
 /*----------------------------------------------------------------------------*
  * Forced disabled features/modules when C89/90 is used                       *

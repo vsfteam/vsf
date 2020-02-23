@@ -37,7 +37,7 @@
 describe_mem_stream(__user_usbd_stream0, 1024)
 describe_mem_stream(__user_usbd_stream1, 1024)
 
-describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0409, USB_DC_SPEED_HIGH)
+describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_HIGH)
     usbd_common_desc(__user_usbd, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, 2 * USB_DESC_CDC_ACM_IAD_LEN, 2 * USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
         cdc_acm_desc(__user_usbd, 0 * USB_CDC_ACM_IFS_NUM, 0, 1, 2, 2, 512, 16)
         cdc_acm_desc(__user_usbd, 1 * USB_CDC_ACM_IFS_NUM, 1, 3, 4, 4, 512, 16)
@@ -73,7 +73,7 @@ static vk_mal_scsi_t __usrapp_mal_scsi = {
     .mal                = &usrapp_common.mal.fakefat32.use_as__vk_mal_t,
 };
 
-describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0409, USB_DC_SPEED_HIGH)
+describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_HIGH)
     usbd_common_desc(__user_usbd, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_MSCBOT_IAD_LEN, USB_MSCBOT_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
         mscbot_desc(__user_usbd, 0, 0, 1, 1, 512)
     usbd_func_desc(__user_usbd)
@@ -81,7 +81,7 @@ describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0409, USB_DC_SP
     usbd_std_desc_table(__user_usbd)
         usbd_func_str_desc_table(__user_usbd, 0)
     usbd_func(__user_usbd)
-        mscbot_func(__user_usbd, 0, 1, 1, 1,
+        mscbot_func(__user_usbd, 0, 1, 1, 0,
             &__usrapp_mal_scsi.use_as__vk_scsi_t,
             &__user_usbd_stream.use_as__vsf_stream_t)
     usbd_ifs(__user_usbd)

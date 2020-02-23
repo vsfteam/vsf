@@ -47,6 +47,10 @@
 #   define VSF_LINUX_CFG_STACKSIZE          1024
 #endif
 
+#ifndef VSF_LINUX_CFG_PRIO_LOWEST
+#   define VSF_LINUX_CFG_PRIO_LOWEST        vsf_prio_0
+#endif
+
 #ifndef VSF_LINUX_CFG_PRIO_HIGHEST
 #   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_1
 #endif
@@ -210,7 +214,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     vsf_linux_glibc_init();
 
     // create kernel process(pid0)
-    if (NULL != vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, vsf_prio_0)) {
+    if (NULL != vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
@@ -260,7 +264,7 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size)
 {
     vsf_linux_process_t *process = calloc(1, sizeof(vsf_linux_process_t));
     if (process != NULL) {
-        process->prio = vsf_prio_0;
+        process->prio = vsf_prio_inherit;
         process->stdio_stream = __vsf_linux.stdio_stream;
 
         vsf_linux_thread_t *thread = vsf_linux_create_thread(process, stack_size, &__vsf_linux_main_op);
@@ -294,7 +298,7 @@ int vsf_linux_start_process(vsf_linux_process_t *process)
 static vsf_linux_process_t * vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio)
 {
-    VSF_LINUX_ASSERT(prio <= VSF_LINUX_CFG_PRIO_HIGHEST);
+    VSF_LINUX_ASSERT((prio >= VSF_LINUX_CFG_PRIO_LOWEST) && (prio <= VSF_LINUX_CFG_PRIO_HIGHEST));
     vsf_linux_process_t *process = vsf_linux_create_process(stack_size);
     if (process != NULL) {
         process->prio = prio;

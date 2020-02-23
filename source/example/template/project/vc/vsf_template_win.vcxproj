@@ -463,110 +463,50 @@
     <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_port.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_msg_tree_cfg.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_label.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\__vsf_tgui_controls_common.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_port.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_button.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_container.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_control.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_label.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_panel.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\view\vsf_tgui_v.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\ui\vsf_ui_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h" />
@@ -1212,86 +1152,39 @@
     <ClCompile Include="..\..\..\..\vsf\component\scsi\vsf_scsi.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls_common.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_label.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_button.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_container.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_control.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_label.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_panel.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\vsf_tgui_v.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDC.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM.c" />
@@ -1473,6 +1366,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\config;$(ProjectDir)lib\SDL2\include;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

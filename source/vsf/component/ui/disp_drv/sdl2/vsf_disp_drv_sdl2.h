@@ -52,10 +52,13 @@ def_simple_class(vk_disp_sdl2_t) {
 
     public_member(
         uint8_t                     amplifier;
+        uint8_t                     flush_delay_ms;
     )
 
     private_member(
-        vsf_arch_irq_thread_t       thread;
+        vsf_arch_irq_thread_t       event_thread;
+        vsf_arch_irq_thread_t       flush_thread;
+        vsf_arch_irq_request_t      flush_request;
         vk_disp_area_t              area;
         void                        *disp_buff;
 

@@ -93,29 +93,42 @@
             __MEMBER                                                            \
         };                                                                      \
         struct __NAME {                                                         \
-            implement(vsf_pt_t);                                                \
-            implement_ex(__vsf_pt_common(__NAME), param);                       \
-        }; 
+            implement(vsf_pt_t)                                                 \
+            implement_ex(__vsf_pt_common(__NAME), param)                        \
+        };                                                                      \
+        struct __internal_##__NAME {                                            \
+            implement(vsf_pt_t)                                                 \
+            __MEMBER                                                            \
+        };
+
+#   define __declare_vsf_pt_common(__NAME)                                      \
+            typedef struct __NAME __NAME;                                       \
+            typedef struct __vsf_pt_common(__NAME) __vsf_pt_common(__NAME);     \
+            typedef struct __internal_##__NAME __internal_##__NAME;             
+
 #else
 #   define __def_vsf_pt_common(__NAME, ...)                                     \
         struct __vsf_pt_common(__NAME) {                                        \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
-            implement(vsf_pt_t);                                                \
-            implement_ex(__vsf_pt_common(__NAME), param);                       \
+            implement(vsf_pt_t)                                                 \
+            implement_ex(__vsf_pt_common(__NAME), param)                        \
         };                                                                      
-#endif
 
-#define __declare_vsf_pt_common(__NAME)                                         \
+#   define __declare_vsf_pt_common(__NAME)                                      \
             typedef struct __NAME __NAME;                                       \
             typedef struct __vsf_pt_common(__NAME) __vsf_pt_common(__NAME);
 
-#define __implement_vsf_pt_common(__NAME, __ARG0)                               \
+#endif
+
+#   define __implement_vsf_pt_common(__NAME, __ARG0)                            \
         void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt)
 
-#define __extern_vsf_pt_common(__NAME, __ARG0)                                  \
-        extern void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt);        
+#   define __extern_vsf_pt_common(__NAME, __ARG0)                               \
+        extern void __vsf_pt_func_common(__NAME)(__ARG0, vsf_evt_t evt); 
+
+       
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

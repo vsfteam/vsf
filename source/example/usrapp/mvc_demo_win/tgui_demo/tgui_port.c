@@ -28,6 +28,7 @@
 #include FT_FREETYPE_H
 
 #include <math.h>
+#include <string.h>
 
 /*============================ MACROS ========================================*/
 #define FREETYPE_FONT_PATH              "../usrapp/mvc_demo_win/tgui_demo/wqy-microhei.ttc"
@@ -38,7 +39,11 @@
 #define TGUI_PORT_DEBAULT_BACKGROUND_COLOR  0xFF
 
 #ifndef VSF_TGUI_SV_CFG_PORT_LOG
-#define VSF_TGUI_SV_CFG_PORT_LOG           DISABLED 
+#define VSF_TGUI_SV_CFG_PORT_LOG            DISABLED 
+#endif
+
+#ifndef VSF_TGUI_SV_CFG_REFRESH_RATE
+#define VSF_TGUI_SV_CFG_REFRESH_RATE        ENABLED
 #endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -51,7 +56,14 @@ extern vsf_tgui_font_t g_tUserFonts[];
 static vk_disp_t* s_tDisp;
 
 volatile static bool s_bIsReadyToRefresh = true;
+static const vsf_tgui_region_t *s_ptRequestedRegion = NULL;
+static vsf_tgui_color_t* s_ptBuffer = NULL;
 
+#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+static vsf_systimer_cnt_t s_tStartTimerCnt;
+static uint16_t s_tRefreshCnt;
+static uint16_t s_tFPS;
+#endif
 /*============================ PROTOTYPES ====================================*/
 bool vsf_tgui_port_is_ready_to_refresh(void);
 
@@ -366,6 +378,7 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation,
  *!       between vsf_tgui_v_refresh_loop_begin and vsf_tgui_v_refresh_loop_end )
  *!       will be ignored and vsf_tgui_v_refresh_loop_end is called immediately
  **********************************************************************************/
+
 vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(   
                     vsf_tgui_t *ptGUI, 
                     const vsf_tgui_region_t *ptPlannedRefreshRegion)
@@ -377,17 +390,33 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port]Begin Refresh Loop" VSF_TRACE_CFG_LINEEND);
 #endif
+    s_ptRequestedRegion = ptPlannedRefreshRegion;
 
 
     return (vsf_tgui_region_t *)ptPlannedRefreshRegion;
 }
+
+
+static void __vk_2d_rgb32_mem_copy( uint32_t *pwSource,
+                                    int16_t iSourceStride,
+                                    uint32_t *pwTarget,
+                                    int16_t iTargetStride,
+                                    vsf_tgui_size_t *ptCopySize)
+{
+    for (int_fast16_t y = 0; y < ptCopySize->iHeight; y++) {
+        memcpy(pwTarget, pwSource, ptCopySize->iWidth * sizeof(uint32_t));
+        pwSource += iSourceStride;
+        pwTarget += iTargetStride;
+    }
+}
+
 
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
 {
     vsf_tgui_color_t* pixmap = s_tDisp->ui_data;
 
     vk_disp_area_t area = {
-        .pos = {.x = 0, .y = 0},
+        .pos = {.x = 50, .y = 50},
         .size = {.x = VSF_TGUI_HOR_MAX, .y = VSF_TGUI_VER_MAX},
     };
 
@@ -402,8 +431,36 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
                  "[Simple View Port]End Refresh Loop." VSF_TRACE_CFG_LINEEND "\trequest low level refresh start in area, pos(x:0x%d, y:0x%d), size(w:0x%d, h:0x%d)" VSF_TRACE_CFG_LINEEND,
                  area.pos.x, area.pos.y, area.size.x, area.size.y);
 #endif
-    vk_disp_refresh(s_tDisp, &area, pixmap);
 
+#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+    if (0 == s_tRefreshCnt) {
+        s_tStartTimerCnt = vsf_systimer_get();
+    }
+#endif
+
+    if (NULL == s_ptBuffer) {
+        vk_disp_refresh(s_tDisp, 
+                        &area, 
+                        pixmap);
+    } else {
+        int_fast16_t iSourceX = s_ptRequestedRegion->tLocation.iX;
+        int_fast16_t iSourceY = s_ptRequestedRegion->tLocation.iX;
+        
+        vsf_tgui_color_t *ptPixalBased = &(pixmap[iSourceY * VSF_TGUI_HOR_MAX + iSourceX]);
+
+        uint32_t n = sizeof(vsf_tgui_color_t);
+
+        __vk_2d_rgb32_mem_copy((uint32_t *)ptPixalBased,
+                                VSF_TGUI_HOR_MAX,
+                                (uint32_t *)s_ptBuffer,
+                                s_ptRequestedRegion->tSize.iWidth,
+                                (vsf_tgui_size_t *)&(s_ptRequestedRegion->tSize));
+
+
+        vk_disp_refresh(s_tDisp, 
+                        (vk_disp_area_t *)s_ptRequestedRegion,//&area, 
+                        s_ptBuffer);
+    }
     return false;
 }
 
@@ -427,7 +484,28 @@ static void vsf_tgui_on_ready(vk_disp_t* disp)
 #else
     WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH();
 #endif
+
+#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+    {
+        uint32_t tElapse;
+
+        s_tRefreshCnt++;
+        tElapse = vsf_systimer_tick_to_ms(vsf_systimer_get() - s_tStartTimerCnt);
+
+        if (tElapse >= 1000) {
+            s_tFPS = s_tRefreshCnt;
+            s_tRefreshCnt = 0;
+        }
+    }
+#endif
 }
+
+#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+uint32_t vsf_tgui_port_get_refresh_rate(void)
+{
+    return s_tFPS;
+}
+#endif
 
 bool vsf_tgui_port_is_ready_to_refresh(void)
 {
@@ -489,11 +567,11 @@ static bool vsf_tgui_sv_fonts_init(vsf_tgui_font_t* ptFont, size_t tSize)
     return true;
 }
 
-void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData)
+void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData, void *ptBuffer)
 {
 #ifdef TGUI_PORT_DEBAULT_BACKGROUND_COLOR
     VSF_TGUI_ASSERT(ptData)
-    memset(ptData, TGUI_PORT_DEBAULT_BACKGROUND_COLOR, VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX * sizeof(vsf_tgui_color_t));
+    memset(ptData, TGUI_PORT_DEBAULT_BACKGROUND_COLOR, (VSF_TGUI_HOR_MAX - 100) * (VSF_TGUI_VER_MAX - 100) * sizeof(vsf_tgui_color_t));
 #endif
 
     vsf_tgui_sv_fonts_init((vsf_tgui_font_t *)vsf_tgui_font_get(0), 
@@ -501,6 +579,8 @@ void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData)
 
     ptDisp->ui_data = ptData;
     ptDisp->ui_on_ready = vsf_tgui_on_ready;
+    s_ptBuffer = (vsf_tgui_color_t *)ptBuffer;
+
     vk_disp_init(ptDisp);
 
     s_tDisp = ptDisp;

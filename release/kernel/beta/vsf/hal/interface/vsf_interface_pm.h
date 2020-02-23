@@ -61,6 +61,7 @@ typedef uint_fast32_t pm_power_status_t;
 
 //! \name power
 //! @{
+declare_interface(i_pm_power_t)
 def_interface(i_pm_power_t)
     //! \brief Enable specific power domains with masks defined in 
     //!        em_power_cfg_msk_t
@@ -143,7 +144,7 @@ declare_interface(i_pm_wakeup_t)
         ...
     end_def_interface( i_pm_wakeup_t )
 */
-
+declare_interface(i_pm_sleep_t)
 def_interface(i_pm_sleep_t)
     vsf_err_t (*TryToSleep)(pm_sleep_cfg_t *ptCfg);
     i_pm_wakeup_t WakeUp;
@@ -185,6 +186,7 @@ typedef struct pm_periph_asyn_clk_cfg_t pm_periph_asyn_clk_cfg_t;
 
 //! \name pclk
 //! @{
+declare_interface(i_pm_periph_asyn_clk_t)
 def_interface(i_pm_periph_asyn_clk_t)
     pm_periph_async_clk_status_t    
                         (*Config)(   pm_periph_async_clk_no_t index , 
@@ -241,6 +243,7 @@ typedef uint_fast32_t pm_ahbclk_status_t;
 
 //! \name AHB Clock Management
 //! @{
+declare_interface(i_pm_ahb_clk_t)
 def_interface(i_pm_ahb_clk_t)
     pm_ahbclk_status_t  (*Enable)(pm_ahb_clk_no_t index);
     pm_ahbclk_status_t  (*Disable)(pm_ahb_clk_no_t index);
@@ -289,7 +292,7 @@ typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
 //! \name main clock prescaler
 //! @{
 typedef enum {
-    MREPEAT(255,DIV_,0)
+    REPEAT_MACRO(255,DIV_,0)
 } pm_divider_t;
 //! @}
 
@@ -336,6 +339,7 @@ enum pm_main_clk_no_t {
 
 //! \name main clock struct type
 //! @{
+declare_interface(i_pm_main_clk_t)
 def_interface(i_pm_main_clk_t)
     fsm_rt_t            (*Init)         (pm_main_clk_cfg_t *tCfg);
     uint_fast32_t       (*GetClock)     (pm_main_clk_no_t tSelect);
@@ -391,6 +395,7 @@ enum pm_pll_post_div_t {
 
 //! \name pll struct type
 //! @{
+declare_interface(i_pm_pll_t)
 def_interface(i_pm_pll_t)
     //! Pll config
     fsm_rt_t                    (*Init)(pm_pll_sel_t pll, pm_pll_cfg_t *pcfg);
@@ -433,6 +438,7 @@ typedef struct pm_lposc_cfg_t pm_lposc_cfg_t;
 
 //! \name low power oscillator 
 //! @{
+declare_interface(i_pm_lposc_t)
 def_interface(i_pm_lposc_t)
     vsf_err_t       (*Init)     (pm_lposc_sel_t lposc, pm_lposc_cfg_t *ptCFG);
     void            (*Enable)   (pm_lposc_sel_t lposc);
@@ -455,7 +461,7 @@ typedef struct {
 } pm_clock_out_cfg_t;
 //! @}
 
-
+declare_interface(i_pm_clk_t)
 def_interface(i_pm_clk_t)
 
     i_pm_main_clk_t         Main;
@@ -475,6 +481,7 @@ end_def_interface(i_pm_clk_t)
 
 //! \name pmu struct
 //! @{
+declare_interface(i_pm_t) 
 def_interface(i_pm_t)   
     //! \brief set the clock auto . the main clock frequency and the div is needed
     fsm_rt_t            (*AutoClock)(   pm_clk_src_sel_t clk_src,

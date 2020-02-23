@@ -19,22 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h" />
@@ -128,89 +112,6 @@
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\lvgl.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_conf_checker.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_group.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_indev.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_obj.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_refr.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_style.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_arc.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_basic.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_img.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_label.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_line.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_rect.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_triangle.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_cache.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_decoder.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_fmt_txt.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_symbol_def.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_disp.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_indev.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_tick.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_anim.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_area.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_circ.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_color.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_fs.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_gc.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_ll.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_log.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_math.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_mem.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_task.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_templ.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_txt.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_types.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_utils.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_arc.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_bar.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btn.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btnm.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_calendar.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_canvas.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cb.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_chart.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cont.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ddlist.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_gauge.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_img.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_imgbtn.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_kb.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_label.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_led.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_line.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_lmeter.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_mbox.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_objx_templ.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_page.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_preload.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_roller.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_slider.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_spinbox.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_sw.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ta.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_table.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tabview.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tileview.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_win.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_alien.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_default.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_material.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_mono.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_nemo.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_night.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_templ.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_zen.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_version.h" />
     <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h" />
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h" />
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_gamepad.h" />
@@ -222,38 +123,39 @@
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_port.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_type.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_msg_tree_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_label.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_list.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\__vsf_tgui_controls_common.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_port.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_container.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_control.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_label.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_panel.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\vsf_tgui_v.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h" />
@@ -359,24 +261,6 @@
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\hci_dump_vsf.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\port\hci_transport_h2_vsf.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\builds\windows\ftdebug.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\autofit\autofit.c" />
     <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbase.c" />
@@ -420,128 +304,37 @@
     <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c">
       <FileType>CppCode</FileType>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\port\vsf_lvgl_port.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_group.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_indev.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_obj.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_refr.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_style.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_arc.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_basic.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_img.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_label.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_line.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_rect.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_draw_triangle.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_cache.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_draw\lv_img_decoder.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_fmt_txt.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_12.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_16.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_22.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_roboto_28.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_font\lv_font_unscii_8.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_disp.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_indev.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_hal\lv_hal_tick.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_anim.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_area.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_circ.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_color.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_fs.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_gc.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_ll.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_log.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_math.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_mem.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_task.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_templ.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_txt.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_misc\lv_utils.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_arc.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_bar.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btn.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_btnm.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_calendar.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_canvas.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cb.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_chart.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_cont.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ddlist.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_gauge.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_img.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_imgbtn.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_kb.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_label.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_led.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_line.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_lmeter.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_mbox.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_objx_templ.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_page.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_preload.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_roller.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_slider.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_spinbox.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_sw.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_ta.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_table.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tabview.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_tileview.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_objx\lv_win.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_alien.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_default.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_material.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_mono.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_nemo.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_night.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_templ.c" />
-    <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_themes\lv_theme_zen.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c" />
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_text_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_button.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_container.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_control.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_draw.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_label.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_panel.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_style.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_sv_text_list.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls_common.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_label.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_list.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_button.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_container.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_control.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_label.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_panel.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\vsf_tgui_v.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c" />
@@ -680,14 +473,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__OOC_DEBUG__;__CPU_X86__;__WIN__;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>__OOC_DEBUG__;__CPU_X86__;__WIN__;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\mvc_demo_win;$(ProjectDir)..\..\usrapp\mvc_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions -fmacro-backtrace-limit=0  -Wno-microsoft-include %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <IntrinsicFunctions>false</IntrinsicFunctions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

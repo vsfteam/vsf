@@ -64,14 +64,6 @@
 
 /*============================ MACROS ========================================*/
 
-
-//! \brief 1 cycle nop operation
-#ifndef NOP
-    #define NOP()                       __asm__ __volatile__ ("nop");
-#endif
-
-
-
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
 #   define ROM_FLASH            _Pragma(__STR(location=".rom.flash")) const
@@ -101,7 +93,13 @@
 //! TODO: Need further investigation about the negative effect
 #   define __stackless
 
-#   define __IAR_STARTUP_DATA_INIT  __INIT_XDATA_I
+#   define __IAR_STARTUP_DATA_INIT  __INIT_XDATA_Z
+          
+//! \brief 1 cycle nop operation
+#ifndef NOP
+    #define NOP()                       __no_operation()
+#endif          
+          
 #elif __IS_COMPILER_51_KEIL__
 #   define ROM_FLASH            const
 #   define ROM_EEPROM           const

@@ -51,6 +51,8 @@
 
 /*! \note add which macro to support multiple inheriting and implementations
  *!
+ *!       declare_interface( i_lv0_abc_t )
+ *!       declare_interface( i_lv0_efg_t )
  *!       def_interface( i_lv0_abc_t )
  *!           ...
  *!       end_def_interface( i_lv0_abc_t )
@@ -59,56 +61,58 @@
  *!           ...
  *!       end_def_interface( i_lv0_efg_t )
  *!     
+ *!       declare_interface( i_lv1_t )
  *!       def_interface( i_lv1_t, which( inherit( i_lv0_abc_t ) 
  *!                                      inherit( i_lv0_efg_t ) ) )
  *!           ...
  *!       end_def_interface( i_lv1_t )
   */
 
-#define DECLARE_INTERFACE(__NAME)   typedef struct __NAME __NAME;
+#define __declare_interface(__NAME)   typedef struct __NAME __NAME;
+#define __declare_structure(__NAME)   typedef struct __NAME __NAME;
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
 //! \name interface definition
 //! @{
-#define DEF_INTERFACE(__NAME)                                                   \
-            typedef struct __NAME __NAME;                                       \
+#define __def_interface(__NAME)                                                 \
+            /*typedef struct __NAME __NAME;*/                                   \
             struct __NAME {
 
-#define END_DEF_INTERFACE(__NAME)                                               \
+#define __end_def_interface(__NAME)                                             \
             };
 //! @}
 
 //! \name structure definition
 //! @{
-#define DEF_STRUCTURE(__NAME)                                                   \
-            typedef struct __NAME __NAME;                                       \
+#define __def_structure(__NAME)                                                 \
+            /*typedef struct __NAME __NAME; */                                  \
             struct __NAME {
 
-#define END_DEF_STRUCTURE(__NAME)                                               \
+#define __end_def_structure(__NAME)                                             \
             };
 //! @}
 
 #else
 //! \name interface definition
 //! @{
-#define DEF_INTERFACE(__NAME,...)                                               \
+#define __def_interface(__NAME,...)                                             \
             typedef struct __NAME __NAME;                                       \
             __VA_ARGS__                                                         \
             struct __NAME {
 
-#define END_DEF_INTERFACE(__NAME)                                               \
+#define __end_def_interface(__NAME)                                             \
             };
 //! @}
 
 //! \name structure definition
 //! @{
-#define DEF_STRUCTURE(__NAME,...)                                               \
+#define __def_structure(__NAME,...)                                             \
             typedef struct __NAME __NAME;                                       \
             __VA_ARGS__                                                         \
             struct __NAME {
 
-#define END_DEF_STRUCTURE(__NAME)                                               \
+#define __end_def_structure(__NAME)                                             \
             };
 //! @}
 #endif
@@ -185,12 +189,12 @@
  * new standard (lower case)                                                  *
  *----------------------------------------------------------------------------*/
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define def_interface(__NAME)            DEF_INTERFACE(__NAME)
-#   define def_structure(__NAME)            DEF_STRUCTURE(__NAME)
+#   define def_interface(__NAME)            __def_interface(__NAME)
+#   define def_structure(__NAME)            __def_structure(__NAME)
 #   define def_params(__CODE)               __CODE
 #else
-#   define def_interface(__NAME, ...)       DEF_INTERFACE(__NAME, __VA_ARGS__)
-#   define def_structure(__NAME, ...)       DEF_STRUCTURE(__NAME, __VA_ARGS__)
+#   define def_interface(__NAME, ...)       __def_interface(__NAME, __VA_ARGS__)
+#   define def_structure(__NAME, ...)       __def_structure(__NAME, __VA_ARGS__)
 #   define def_params(...)                  __VA_ARGS__
 #endif
 
@@ -203,11 +207,11 @@
 #define obj_convert_as(__OBJ, __TYPE)       OBJ_CONVERT_AS(__OBJ, __TYPE)       /*  obsolete */
 #define ref_obj_as(__OBJ, __TYPE)           REF_OBJ_AS(__OBJ, __TYPE)
 
-#define end_def_interface(__NAME)           END_DEF_INTERFACE(__NAME)
-#define declare_interface(__NAME)           DECLARE_INTERFACE(__NAME)
+#define end_def_interface(__NAME)           __end_def_interface(__NAME)
+#define declare_interface(__NAME)           __declare_interface(__NAME)
 
-#define end_def_structure(__NAME)           END_DEF_STRUCTURE(__NAME)
-
+#define end_def_structure(__NAME)           __end_def_structure(__NAME)
+#define declare_structure(__NAME)           __declare_structure(__NAME)
 
 #define this_interface(__INTERFACE)         convert_obj_as(this, __INTERFACE)
 #define base_obj(__TYPE)                    convert_obj_as(this, __TYPE)
@@ -218,6 +222,7 @@
 
 //! \name interface: u32_property_t
 //! @{
+declare_interface(u32_property_t)
 def_interface(u32_property_t)
     bool (*Set)(uint32_t wValue);
     uint32_t (*Get)(void);
@@ -226,6 +231,7 @@ end_def_interface(u32_property_t)
 
 //! \name interface: u16_property_t
 //! @{
+declare_interface(u16_property_t)
 def_interface(u16_property_t)
     bool (*Set)(uint_fast16_t wValue);
     uint_fast16_t (*Get)(void);
@@ -234,6 +240,7 @@ end_def_interface(u16_property_t)
 
 //! \name interface: u8_property_t
 //! @{
+declare_interface(u8_property_t)
 def_interface(u8_property_t)
     bool (*Set)(uint_fast8_t wValue);
     uint_fast8_t (*Get)(void);
@@ -243,6 +250,7 @@ end_def_interface(u8_property_t)
 
 //! \name interface: i32_property_t
 //! @{
+declare_interface(i32_property_t)
 def_interface(i32_property_t)
     bool (*Set)(int32_t wValue);
     int32_t (*Get)(void);
@@ -251,6 +259,7 @@ end_def_interface(i32_property_t)
 
 //! \name interface: i16_property_t
 //! @{
+declare_interface(i16_property_t)
 def_interface(i16_property_t)
     bool (*Set)(int_fast16_t wValue);
     int_fast16_t (*Get)(void);
@@ -259,6 +268,7 @@ end_def_interface(i16_property_t)
 
 //! \name interface: u8_property_t
 //! @{
+declare_interface(i8_property_t)
 def_interface(i8_property_t)
     bool (*Set)(int_fast8_t wValue);
     int_fast8_t (*Get)(void);
@@ -267,6 +277,7 @@ end_def_interface(i8_property_t)
 
 //! \name interface: bool_property_t
 //! @{
+declare_interface(bool_property_t)
 def_interface(bool_property_t)
     bool (*Set)(bool bValue);
     bool (*Get)(void);
@@ -275,6 +286,7 @@ end_def_interface(bool_property_t)
 
 //! \name interface: bool_property_t
 //! @{
+declare_interface(en_property_t)
 def_interface(en_property_t)
     bool (*Enable)(void);
     bool (*Disable)(void);

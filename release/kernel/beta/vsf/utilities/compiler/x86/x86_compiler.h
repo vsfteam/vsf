@@ -52,16 +52,12 @@
 #include "../__common/__compiler.h"
 
 /* -----------------  Start of section using anonymous unions  -------------- */
+
+/*! \note it's safe to ignore -Wcast-align in x86 platform */
 #if __IS_COMPILER_LLVM__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-declarations"
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wmicrosoft-anon-tag"
-#pragma clang diagnostic ignored "-Wmissing-braces"
-#pragma clang diagnostic ignored "-Wconstant-conversion"
+#pragma clang diagnostic ignored "-Wcast-align"
 #elif __IS_COMPILER_GCC__
-#else
-  #warning Not supported compiler type
+#pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 /*============================ MACROS ========================================*/

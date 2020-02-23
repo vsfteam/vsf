@@ -63,6 +63,11 @@
         (ptr ? container_of(ptr, type, member) : NULL)
 #endif
 
+#ifndef SIGN
+#   define SIGN(__N)        ((int)((int)((int)(__N) > 0) - (int)((int)(__N) < 0)))
+#endif
+#undef sign
+#define sign(__n)           SIGN(__n)
 
 #define ABS(__NUM)          (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
 

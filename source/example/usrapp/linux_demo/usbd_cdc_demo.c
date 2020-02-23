@@ -197,8 +197,8 @@ static const usrapp_usbd_cdc_const_t __usrapp_usbd_cdc_const = {
         },
         REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING, NULL)
         .std_desc               = {
-            VSF_USBD_DESC_DEVICE(0, __usrapp_usbd_cdc_const.usbd.dev_desc, sizeof(__usrapp_usbd_cdc_const.usbd.dev_desc)),
-            VSF_USBD_DESC_CONFIG(0, 0, __usrapp_usbd_cdc_const.usbd.config_desc, sizeof(__usrapp_usbd_cdc_const.usbd.config_desc)),
+            VSF_USBD_DESC_DEVICE(__usrapp_usbd_cdc_const.usbd.dev_desc, sizeof(__usrapp_usbd_cdc_const.usbd.dev_desc)),
+            VSF_USBD_DESC_CONFIG(0, __usrapp_usbd_cdc_const.usbd.config_desc, sizeof(__usrapp_usbd_cdc_const.usbd.config_desc)),
             VSF_USBD_DESC_STRING(0, 0, __usrapp_usbd_cdc_const.usbd.str_lanid, sizeof(__usrapp_usbd_cdc_const.usbd.str_lanid)),
             VSF_USBD_DESC_STRING(0x0409, 1, __usrapp_usbd_cdc_const.usbd.str_vendor, sizeof(__usrapp_usbd_cdc_const.usbd.str_vendor)),
             VSF_USBD_DESC_STRING(0x0409, 2, __usrapp_usbd_cdc_const.usbd.str_product, sizeof(__usrapp_usbd_cdc_const.usbd.str_product)),

@@ -63,6 +63,11 @@
         (ptr ? container_of(ptr, type, member) : NULL)
 #endif
 
+#ifndef SIGN
+#   define SIGN(__N)        ((int)((int)((int)(__N) > 0) - (int)((int)(__N) < 0)))
+#endif
+#undef sign
+#define sign(__n)           SIGN(__n)
 
 #define ABS(__NUM)          (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
 
@@ -143,6 +148,146 @@ typedef enum {
 typedef volatile uint8_t     reg8_t;
 typedef volatile uint16_t    reg16_t;
 typedef volatile uint32_t    reg32_t;
+
+#if (defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__)                       \
+    ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
+
+#undef ____RESERVED
+#undef __RESERVED
+#define ____RESERVED(__BIT, __NAME)                                             \
+        uint##__BIT##_t __unused_##__NAME : __BIT;
+#define __RESERVED(__BIT, __NAME)                                               \
+            ____RESERVED(__BIT, __NAME)
+
+#   ifndef RESERVED_U8           
+#       define RESERVED_U8          __RESERVED( 8, __LINE__ )
+#   endif
+
+#   ifndef RESERVED_U16            
+#       define RESERVED_U16         __RESERVED( 16, __LINE__ )
+#   endif
+
+#   ifndef RESERVED_U32             
+#       define RESERVED_U32         __RESERVED( 32, __LINE__ )
+#   endif
+
+#   ifndef RESERVED_16B             
+#       define RESERVED_16B         uint32_t __unused_##__LINE__[4];
+#   endif
+
+#   ifndef RESERVED_64B             
+#       define RESERVED_64B         uint32_t __unused_##__LINE__[16];
+#   endif
+
+#   ifndef RESERVED_256B             
+#       define RESERVED_256B        uint32_t __unused_##__LINE__[64];
+#   endif
+
+#   ifndef RESERVED_1K             
+#       define RESERVED_1K          uint32_t __unused_##__LINE__[256];
+#   endif
+
+#   ifndef RESERVED_4K             
+#       define RESERVED_4K          uint32_t __unused_##__LINE__[1024];
+#   endif
+
+#   ifndef RESERVED_16K             
+#       define RESERVED_16K         uint32_t __unused_##__LINE__[4 * 1024];
+#   endif
+
+#   ifndef RESERVED_64K             
+#       define RESERVED_64K         uint32_t __unused_##__LINE__[16 * 1024];
+#   endif
+
+#   ifndef RESERVED_256K             
+#       define RESERVED_256K        uint32_t __unused_##__LINE__[64 * 1024];
+#   endif
+
+
+#   ifndef RESERVED_1M             
+#       define RESERVED_1M          uint32_t __unused_##__LINE__[256 * 1024];
+#   endif
+
+#else
+#   ifndef RESERVED_U8           
+#       define RESERVED_U8          uint8_t  : 8;
+#   endif
+
+#   ifndef RESERVED_U16            
+#       define RESERVED_U16         uint16_t : 16;
+#   endif
+
+#   ifndef RESERVED_U32             
+#       define RESERVED_U32         uint32_t : 32;
+#   endif
+
+#   ifndef RESERVED_16B             
+#       define RESERVED_16B         RESERVED_U32                                \
+                                RESERVED_U32                                    \
+                                RESERVED_U32                                    \
+                                RESERVED_U32
+#   endif
+
+#   ifndef RESERVED_64B             
+#       define RESERVED_64B         RESERVED_16B                                \
+                                RESERVED_16B                                    \
+                                RESERVED_16B                                    \
+                                RESERVED_16B
+#   endif
+
+#   ifndef RESERVED_256B             
+#       define RESERVED_256B        RESERVED_64B                                \
+                                RESERVED_64B                                    \
+                                RESERVED_64B                                    \
+                                RESERVED_64B
+#   endif
+
+#   ifndef RESERVED_1K             
+#       define RESERVED_1K          RESERVED_256B                               \
+                                RESERVED_256B                                   \
+                                RESERVED_256B                                   \
+                                RESERVED_256B
+#   endif
+
+#   ifndef RESERVED_4K             
+#       define RESERVED_4K          RESERVED_1K                                 \
+                                RESERVED_1K                                     \
+                                RESERVED_1K                                     \
+                                RESERVED_1K
+#   endif
+
+#   ifndef RESERVED_16K             
+#       define RESERVED_16K         RESERVED_4K                                 \
+                                RESERVED_4K                                     \
+                                RESERVED_4K                                     \
+                                RESERVED_4K
+#   endif
+
+#   ifndef RESERVED_64K             
+#       define RESERVED_64K         RESERVED_16K                                \
+                                RESERVED_16K                                    \
+                                RESERVED_16K                                    \
+                                RESERVED_16K
+#   endif
+
+#   ifndef RESERVED_256K             
+#       define RESERVED_256K        RESERVED_64K                                \
+                                RESERVED_64K                                    \
+                                RESERVED_64K                                    \
+                                RESERVED_64K
+#   endif
+
+
+#   ifndef RESERVED_1M             
+#       define RESERVED_1M          RESERVED_256K                               \
+                                RESERVED_256K                                   \
+                                RESERVED_256K                                   \
+                                RESERVED_256K
+#   endif
+
+#endif
+
+
 
 
 /*============================ GLOBAL VARIABLES ==============================*/

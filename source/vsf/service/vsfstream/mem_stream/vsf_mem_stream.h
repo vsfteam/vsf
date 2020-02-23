@@ -40,6 +40,18 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_MEM_STREAM_CFG_SUPPORT_BLOCK
+#   define VSF_MEM_STREAM_CFG_SUPPORT_BLOCK      ENABLED
+#endif
+
+#ifndef VSF_MEM_STREAM_CFG_SUPPORT_STREAM
+#   define VSF_MEM_STREAM_CFG_SUPPORT_STREAM    ENABLED
+#endif
+
+#if VSF_MEM_STREAM_CFG_SUPPORT_BLOCK != ENABLED && VSF_MEM_STREAM_CFG_SUPPORT_STREAM != ENABLED
+#   error why do people need me?
+#endif
+
 #define __describe_mem_stream_ex(__NAME, __BUFFER, __SIZE)                      \
             vsf_mem_stream_t __NAME = {                                         \
                 .op                 = &vsf_mem_stream_op,                       \
@@ -51,6 +63,11 @@
             uint8_t __##__NAME##_buffer[(__SIZE)];                              \
             __describe_mem_stream_ex(__NAME, __##__NAME##_buffer, (__SIZE))
 
+#define __declare_mem_stream(__name)                                            \
+            extern vsf_mem_stream_t __name;
+
+#define declare_mem_stream(__name)                                              \
+            __declare_mem_stream(__name)
 #define describe_mem_stream_ex(__NAME, __BUFFER, __SIZE)                        \
             __describe_mem_stream_ex(__NAME, (__BUFFER), (__SIZE))
 #define describe_mem_stream(__NAME, __SIZE)                                     \
@@ -64,13 +81,39 @@ def_simple_class(vsf_mem_stream_t) {
     public_member(
         implement(vsf_stream_t)
         implement(vsf_mem_t)
-        uint32_t align;
+
+        union {
+#if VSF_MEM_STREAM_CFG_SUPPORT_BLOCK == ENABLED
+            uint16_t block_size;
+#endif
+#if VSF_MEM_STREAM_CFG_SUPPORT_STREAM == ENABLED
+            uint16_t align;
+#endif
+        };
+#if VSF_MEM_STREAM_CFG_SUPPORT_BLOCK == ENABLED && VSF_MEM_STREAM_CFG_SUPPORT_STREAM == ENABLED
+        bool is_block;
+#endif
     )
     private_member(
-        bool is_writing;
-        uint32_t data_size;
-        uint32_t rpos;
-        uint32_t wpos;
+        union {
+            uint32_t state;
+#if VSF_MEM_STREAM_CFG_SUPPORT_BLOCK == ENABLED
+            struct {
+                uint8_t rblock_idx;
+                uint8_t rblock_num;
+                uint8_t wblock_idx;
+                uint32_t *block_size_arr;
+            };
+#endif
+#if VSF_MEM_STREAM_CFG_SUPPORT_STREAM == ENABLED
+            struct {
+                bool is_writing;
+                uint32_t data_size;
+                uint32_t rpos;
+                uint32_t wpos;
+            };
+#endif
+        };
     )
 };
 
@@ -80,6 +123,8 @@ extern const vsf_stream_op_t vsf_mem_stream_op;
 
 /*============================ PROTOTYPES ====================================*/
 
+extern uint_fast32_t vsf_mem_stream_get_buffer_len(vsf_mem_stream_t *stream, uint8_t *buf);
+extern void vsf_mem_stream_set_buffer_len(vsf_mem_stream_t *stream, uint8_t *buf, uint_fast32_t len);
 
 #endif      // VSF_USE_SERVICE_VSFSTREAM
 #endif      // __VSF_MEM_STREAM_H__

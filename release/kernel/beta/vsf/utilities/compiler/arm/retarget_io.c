@@ -35,7 +35,7 @@
 #include "arm_compiler.h"
 
 
-#if !__IS_COMPILER_IAR__
+#if !__IS_COMPILER_IAR__ && !__IS_COMPILER_GCC__
 #include <rt_sys.h>
 #endif
 
@@ -43,6 +43,7 @@
 # define UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
 #endif
 
+#define __USE_COMMON_RETARGET_IO_C__
 #include "../__common/__retarget_io.c"
 
 #if __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__

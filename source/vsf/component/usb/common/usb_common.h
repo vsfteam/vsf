@@ -46,7 +46,9 @@
 #define USB_DT_INTERFACE_SIZE               9
 #define USB_DT_ENDPOINT_SIZE                7
 #define USB_DT_ENDPOINT_AUDIO_SIZE          9
+#define USB_DT_DEVICE_QUALIFIER_SIZE        10
 #define USB_DT_INTERFACE_ASSOCIATION_SIZE   8
+#define USB_DT_BOS_SIZE                     5
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

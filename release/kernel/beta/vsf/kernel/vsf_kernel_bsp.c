@@ -20,6 +20,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
+#define VSF_EDA_CLASS_INHERIT
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
@@ -67,7 +68,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #endif
 #include "utilities/preprocessor/mf_u8_dec2str.h"
     static const vsf_arch_prio_t __vsf_os_swi_priority[] = {
-        MREPEAT(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
+        REPEAT_MACRO(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
 #endif
 
@@ -172,11 +173,10 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
              */
         default:
             {
-                vsf_gint_state_t gint_state = vsf_disable_interrupt(); 
+                vsf_disable_interrupt(); 
                 while(1);
-                vsf_set_interrupt(gint_state);
             }
-            break;
+            //break;
             
         case VSF_KERNEL_ERR_NONE:
             break;
@@ -189,6 +189,7 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)
 {
+    UNUSED_PARAM(ptThis);
     main();
 }
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
@@ -196,6 +197,8 @@ implement_vsf_thread(app_main_thread_t)
         &&  VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED)
 static void __app_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
+    UNUSED_PARAM(eda);
+    UNUSED_PARAM(evt);
     main();
 }
 #endif
@@ -205,6 +208,12 @@ ROOT void __post_vsf_kernel_init(void)
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     static NO_INIT app_main_thread_t __app_main;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __app_main  .use_as__vsf_thread_t
+                .use_as__vsf_teda_t
+                .use_as__vsf_eda_t
+                .on_terminate = NULL;
+#   endif
     init_vsf_thread(app_main_thread_t, &__app_main, vsf_prio_0);
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
     ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
@@ -215,9 +224,21 @@ ROOT void __post_vsf_kernel_init(void)
     };
 #   if  VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     static NO_INIT vsf_teda_t __app_main;
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __app_main  .use_as__vsf_thread_t
+                .use_as__vsf_teda_t
+                .use_as__vsf_eda_t
+                .on_terminate = NULL;
+#       endif
     vsf_teda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   else
     static NO_INIT vsf_eda_t __app_main;
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __app_main  .use_as__vsf_thread_t
+                .use_as__vsf_teda_t
+                .use_as__vsf_eda_t
+                .on_terminate = NULL;
+#       endif
     vsf_eda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   endif
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE
@@ -279,8 +300,20 @@ char __low_level_init(void)
 
 extern void __IAR_STARTUP_DATA_INIT(void);
 extern void exit(int arg);
+
+#   if defined(__CPU_MCS51__)
 __root
-__noreturn __stackless void __cmain(void) 
+__noreturn 
+__stackless void __cmain(void) 
+{
+    __vsf_main_entry();
+    exit(0);
+}
+
+#   else
+__root
+__noreturn
+__stackless void __cmain(void) 
 {
     if (__low_level_init() != 0) {
         __IAR_STARTUP_DATA_INIT();
@@ -288,6 +321,7 @@ __noreturn __stackless void __cmain(void)
     __vsf_main_entry();
     exit(0);
 }
+#   endif
 #elif   __IS_COMPILER_GCC__                                                     \
     ||  __IS_COMPILER_LLVM__                                                    \
     ||  __IS_COMPILER_ARM_COMPILER_5__                                          \

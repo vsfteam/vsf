@@ -29,7 +29,7 @@ struct __vsf_cm_t {
     struct {
         vsf_swi_handler_t *handler;
         void *param;
-#if __ARM_ARCH == 6
+#if __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
         bool enabled;
         bool sw_pending_bit;
 #endif

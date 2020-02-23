@@ -31,6 +31,8 @@
 
 #define VSF_USBIP_VERSION                       0x0111
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
 #if VSF_USBIP_SERVER_CFG_DEBUG == ENABLED
 #   define __vk_usbip_server_trace(...)                                         \
             vsf_trace(VSF_TRACE_DEBUG, "usbip_server: " __VA_ARGS__)
@@ -99,7 +101,6 @@
 #   define __vk_usbip_server_trace_urb_unlink(__urb)
 #endif
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 enum {

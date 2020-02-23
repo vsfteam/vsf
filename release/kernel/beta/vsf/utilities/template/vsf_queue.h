@@ -83,6 +83,12 @@
     // 10. You can get the number of peekable items withi a ring buffer
     vsf_rng_buf_peekable_count( <ring buffer name>, <address of ring buffer var> )
 
+    // 11. You can reset the peek access
+    vsf_rng_buf_reset_peek( <ring buffer name>, <address of ring buffer var> )
+
+    // 12. You can also remove all peeked items from the queue
+    vsf_rng_buf_get_all_peeked( <ring buffer name>, <address of ring buffer var> )
+
     Example:
 
 
@@ -142,10 +148,10 @@
 
 
 
-#define __declare_vsf_rng_buf(__NAME)                                           \
-    typedef struct __NAME __NAME;                                               \
-    typedef struct __NAME##_cfg_t __NAME##_cfg_t;
-#define declare_vsf_rng_buf(__NAME)       __declare_vsf_rng_buf(__NAME)
+#define __declare_vsf_rng_buf(__name)                                           \
+    typedef struct __name __name;                                               \
+    typedef struct __name##_cfg_t __name##_cfg_t;
+#define declare_vsf_rng_buf(__name)       __declare_vsf_rng_buf(__name)
 
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
@@ -153,138 +159,154 @@
 #   define NO_RNG_BUF_PROTECT(__CODE)               __CODE
 #   define no_rng_buf_protect(__code)               __code
 
-#   define __def_vsf_rng_buf(__NAME, __TYPE)                                    \
-    struct __NAME {                                                             \
+#   define __def_vsf_rng_buf(__name, __type)                                    \
+    struct __name {                                                             \
         implement(vsf_rng_buf_t)                                                \
-        __TYPE *ptBuffer;                                                       \
+        __type *ptBuffer;                                                       \
     };                                                                          \
                                                                                 \
-    struct __NAME##_cfg_t {                                                     \
-        __TYPE *ptBuffer;                                                       \
+    struct __name##_cfg_t {                                                     \
+        __type *ptBuffer;                                                       \
         uint16_t hwSize;                                                        \
         bool     bInitAsFull;                                                   \
     };                                                                          \
                                                                                 \
 extern                                                                          \
-void __NAME##_init(__NAME* ptQ, __NAME##_cfg_t* ptCFG);                         \
+void __name##_init(__name* ptQ, __name##_cfg_t* ptCFG);                         \
                                                                                 \
 extern                                                                          \
-bool __NAME##_send_one(__NAME* ptQ, __TYPE tItem);                              \
+bool __name##_send_one(__name* ptQ, __type tItem);                              \
                                                                                 \
 extern                                                                          \
-bool __NAME##_get_one(__NAME* ptQ, __TYPE* ptItem);                             \
+bool __name##_get_one(__name* ptQ, __type* ptItem);                             \
                                                                                 \
-SECTION(".text." #__NAME "_item_count")                                         \
+SECTION(".text." #__name "_item_count")                                         \
 extern                                                                          \
-uint_fast16_t __NAME##_item_count(__NAME* ptQ);                                 \
+uint_fast16_t __name##_item_count(__name* ptQ);                                 \
                                                                                 \
-SECTION(".text." #__NAME "_send_multiple")                                      \
+SECTION(".text." #__name "_send_multiple")                                      \
 extern                                                                          \
-int32_t __NAME##_send_multiple(__NAME* ptQ,                                     \
-                                        const __TYPE* ptItem,                   \
+int32_t __name##_send_multiple(__name* ptQ,                                     \
+                                        const __type* ptItem,                   \
                                         uint16_t hwCount);                      \
                                                                                 \
-SECTION(".text." #__NAME "_get_multiple")                                       \
+SECTION(".text." #__name "_get_multiple")                                       \
 extern                                                                          \
-int32_t __NAME##_get_multiple(  __NAME* ptQ,                                    \
-                                    __TYPE* ptItem,                             \
+int32_t __name##_get_multiple(  __name* ptQ,                                    \
+                                    __type* ptItem,                             \
                                     uint16_t hwCount);                          \
                                                                                 \
-SECTION(".text." #__NAME "_peek_one")                                           \
+SECTION(".text." #__name "_peek_one")                                           \
 extern                                                                          \
-bool __NAME##_peek_one(__NAME* ptQ, const __TYPE** pptItem);                    \
+bool __name##_peek_one(__name* ptQ, const __type** pptItem);                    \
                                                                                 \
-SECTION(".text." #__NAME "_item_count_peekable")                                \
+SECTION(".text." #__name "_reset_peek")                                         \
 extern                                                                          \
-uint_fast16_t __NAME##_item_count_peekable(__NAME* ptQ);                        \
+void __name##_reset_peek(__name *ptQ);                                          \
                                                                                 \
-SECTION(".text." #__NAME "_peek_multiple")                                      \
+SECTION(".text." #__name "_get_all_peeked")                                     \
 extern                                                                          \
-int32_t __NAME##_peek_multiple( __NAME* ptQ,                                    \
-                                const __TYPE** pptItem,                         \
+void __name##_get_all_peeked(__name *ptQ);                                      \
+                                                                                \
+SECTION(".text." #__name "_item_count_peekable")                                \
+extern                                                                          \
+uint_fast16_t __name##_item_count_peekable(__name* ptQ);                        \
+                                                                                \
+SECTION(".text." #__name "_peek_multiple")                                      \
+extern                                                                          \
+int32_t __name##_peek_multiple( __name* ptQ,                                    \
+                                const __type** pptItem,                         \
                                 uint16_t hwCount);
 
-#   define def_vsf_rng_buf(__NAME, __TYPE)                                      \
-            __def_vsf_rng_buf(__NAME, __TYPE) 
+#   define def_vsf_rng_buf(__name, __type)                                      \
+            __def_vsf_rng_buf(__name, __type) 
 
 #else
 #   define NO_RNG_BUF_PROTECT(...)               __VA_ARGS__
 #   define no_rng_buf_protect(...)               __VA_ARGS__
 
-#   define __def_vsf_rng_buf(__NAME, __TYPE, ...)                               \
-    struct __NAME {                                                             \
+#   define __def_vsf_rng_buf(__name, __type, ...)                               \
+    struct __name {                                                             \
         implement(vsf_rng_buf_t)                                                \
-        __TYPE *ptBuffer;                                                       \
+        __type *ptBuffer;                                                       \
         __VA_ARGS__                                                             \
     };                                                                          \
                                                                                 \
-    struct __NAME##_cfg_t {                                                     \
-        __TYPE *ptBuffer;                                                       \
+    struct __name##_cfg_t {                                                     \
+        __type *ptBuffer;                                                       \
         uint16_t hwSize;                                                        \
         bool     bInitAsFull;                                                   \
     };                                                                          \
                                                                                 \
 extern                                                                          \
-void __NAME##_init(__NAME* ptQ, __NAME##_cfg_t* ptCFG);                         \
+void __name##_init(__name* ptQ, __name##_cfg_t* ptCFG);                         \
                                                                                 \
 extern                                                                          \
-bool __NAME##_send_one(__NAME* ptQ, __TYPE tItem);                              \
+bool __name##_send_one(__name* ptQ, __type tItem);                              \
                                                                                 \
 extern                                                                          \
-bool __NAME##_get_one(__NAME* ptQ, __TYPE* ptItem);                             \
+bool __name##_get_one(__name* ptQ, __type* ptItem);                             \
                                                                                 \
-SECTION(".text." #__NAME "_item_count")                                         \
+SECTION(".text." #__name "_item_count")                                         \
 extern                                                                          \
-uint_fast16_t __NAME##_item_count(__NAME* ptQ);                                 \
+uint_fast16_t __name##_item_count(__name* ptQ);                                 \
                                                                                 \
-SECTION(".text." #__NAME "_send_multiple")                                      \
+SECTION(".text." #__name "_send_multiple")                                      \
 extern                                                                          \
-int32_t __NAME##_send_multiple(__NAME* ptQ,                                     \
-                                        const __TYPE* ptItem,                   \
+int32_t __name##_send_multiple(__name* ptQ,                                     \
+                                        const __type* ptItem,                   \
                                         uint16_t hwCount);                      \
                                                                                 \
-SECTION(".text." #__NAME "_get_multiple")                                       \
+SECTION(".text." #__name "_get_multiple")                                       \
 extern                                                                          \
-int32_t __NAME##_get_multiple(  __NAME* ptQ,                                    \
-                                    __TYPE* ptItem,                             \
+int32_t __name##_get_multiple(  __name* ptQ,                                    \
+                                    __type* ptItem,                             \
                                     uint16_t hwCount);                          \
                                                                                 \
-SECTION(".text." #__NAME "_peek_one")                                           \
+SECTION(".text." #__name "_peek_one")                                           \
 extern                                                                          \
-bool __NAME##_peek_one(__NAME* ptQ, const __TYPE** pptItem);                    \
+bool __name##_peek_one(__name* ptQ, const __type** pptItem);                    \
                                                                                 \
-SECTION(".text." #__NAME "_item_count_peekable")                                \
+SECTION(".text." #__name "_reset_peek")                                         \
 extern                                                                          \
-uint_fast16_t __NAME##_item_count_peekable(__NAME* ptQ);                        \
+void __name##_reset_peek(__name *ptQ);                                          \
                                                                                 \
-SECTION(".text." #__NAME "_peek_multiple")                                      \
+SECTION(".text." #__name "_get_all_peeked")                                     \
 extern                                                                          \
-int32_t __NAME##_peek_multiple( __NAME* ptQ,                                    \
-                                const __TYPE** pptItem,                         \
+void __name##_get_all_peeked(__name *ptQ);                                      \
+                                                                                \
+SECTION(".text." #__name "_item_count_peekable")                                \
+extern                                                                          \
+uint_fast16_t __name##_item_count_peekable(__name* ptQ);                        \
+                                                                                \
+SECTION(".text." #__name "_peek_multiple")                                      \
+extern                                                                          \
+int32_t __name##_peek_multiple( __name* ptQ,                                    \
+                                const __type** pptItem,                         \
                                 uint16_t hwCount);
 
-#   define def_vsf_rng_buf(__NAME, __TYPE, ...)                                 \
-            __def_vsf_rng_buf(__NAME, __TYPE, __VA_ARGS__) 
+#   define def_vsf_rng_buf(__name, __type, ...)                                 \
+            __def_vsf_rng_buf(__name, __type, __VA_ARGS__) 
 
 #endif
 
-#define __implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT)                \
-void __NAME##_init(__NAME* ptQ, __NAME##_cfg_t* ptCFG)                          \
+#define __implement_vsf_rng_buf(__name, __type, __queue_protect)                \
+void __name##_init(__name* ptQ, __name##_cfg_t* ptCFG)                          \
 {                                                                               \
     ASSERT(NULL != ptQ && NULL != ptCFG);                                       \
     ASSERT(NULL != ptCFG->ptBuffer);                                            \
-    ASSERT(ptCFG->hwSize >= sizeof(__TYPE));                                    \
+    ASSERT(ptCFG->hwSize >= sizeof(__type));                                    \
     ptQ->ptBuffer = ptCFG->ptBuffer;                                            \
-    __vsf_rng_buf_init(&(ptQ->use_as__vsf_rng_buf_t),                           \
-        ptCFG->hwSize / sizeof(__TYPE),                                         \
+    __vsf_rng_buf_init_ex(&(ptQ->use_as__vsf_rng_buf_t),                        \
+        ptCFG->hwSize / sizeof(__type),                                         \
         ptCFG->bInitAsFull);                                                    \
 }                                                                               \
                                                                                 \
-bool __NAME##_send_one(__NAME *ptQ, __TYPE tItem)                               \
+bool __name##_send_one(__name *ptQ, __type tItem)                               \
 {                                                                               \
     bool bResult = false;                                                       \
     ASSERT(NULL != ptQ);                                                        \
-    __QUEUE_PROTECT(                                                            \
+    __queue_protect(                                                            \
         do {                                                                    \
             int32_t nIndex =                                                    \
                 __vsf_rng_buf_send_one(&(ptQ->use_as__vsf_rng_buf_t));          \
@@ -299,11 +321,11 @@ bool __NAME##_send_one(__NAME *ptQ, __TYPE tItem)                               
     return bResult;                                                             \
 }                                                                               \
                                                                                 \
-bool __NAME##_get_one(__NAME * ptQ, __TYPE *ptItem)                             \
+bool __name##_get_one(__name * ptQ, __type *ptItem)                             \
 {                                                                               \
     bool bResult = false;                                                       \
     ASSERT(NULL != ptQ);                                                        \
-    __QUEUE_PROTECT(                                                            \
+    __queue_protect(                                                            \
         do {                                                                    \
             int32_t nIndex =                                                    \
                 __vsf_rng_buf_get_one(&(ptQ->use_as__vsf_rng_buf_t));           \
@@ -320,21 +342,21 @@ bool __NAME##_get_one(__NAME * ptQ, __TYPE *ptItem)                             
     return bResult;                                                             \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__NAME "_item_count")                                         \
-uint_fast16_t __NAME##_item_count(__NAME * ptQ)                                 \
+SECTION(".text." #__name "_item_count")                                         \
+uint_fast16_t __name##_item_count(__name * ptQ)                                 \
 {                                                                               \
     ASSERT(NULL != ptQ);                                                        \
     return __vsf_rng_buf_item_count(&(ptQ->use_as__vsf_rng_buf_t));             \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__NAME "_send_multiple")                                      \
-int32_t __NAME##_send_multiple(  __NAME * ptQ,                                  \
-                                    const __TYPE*ptItem,                        \
+SECTION(".text." #__name "_send_multiple")                                      \
+int32_t __name##_send_multiple(  __name * ptQ,                                  \
+                                    const __type*ptItem,                        \
                                     uint16_t hwCount)                           \
 {                                                                               \
     int32_t nResult = -1, nIndex = 0;                                           \
     ASSERT(NULL != ptQ);                                                        \
-    __QUEUE_PROTECT(                                                            \
+    __queue_protect(                                                            \
         do {                                                                    \
             if (NULL == ptItem || 0 == hwCount) {                               \
                 break;                                                          \
@@ -346,21 +368,21 @@ int32_t __NAME##_send_multiple(  __NAME * ptQ,                                  
                 break;                                                          \
             }                                                                   \
                                                                                 \
-            memcpy(&(ptQ->ptBuffer[nIndex]), ptItem, hwCount * sizeof(__TYPE)); \
+            memcpy(&(ptQ->ptBuffer[nIndex]), ptItem, hwCount * sizeof(__type)); \
             nResult = hwCount;                                                  \
         } while(0);                                                             \
     )                                                                           \
     return nResult;                                                             \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__NAME "_get_multiple")                                       \
-int32_t __NAME##_get_multiple(  __NAME * ptQ,                                   \
-                                    __TYPE* ptItem,                             \
+SECTION(".text." #__name "_get_multiple")                                       \
+int32_t __name##_get_multiple(  __name * ptQ,                                   \
+                                    __type* ptItem,                             \
                                     uint16_t hwCount)                           \
 {                                                                               \
     int32_t nResult = -1, nIndex = 0;                                           \
     ASSERT(NULL != ptQ);                                                        \
-    __QUEUE_PROTECT(                                                            \
+    __queue_protect(                                                            \
         do {                                                                    \
             if (NULL == ptItem || 0 == hwCount) {                               \
                 break;                                                          \
@@ -372,26 +394,27 @@ int32_t __NAME##_get_multiple(  __NAME * ptQ,                                   
                 break;                                                          \
             }                                                                   \
                                                                                 \
-            memcpy(ptItem, &(ptQ->ptBuffer[nIndex]), hwCount * sizeof(__TYPE)); \
+            memcpy(ptItem, &(ptQ->ptBuffer[nIndex]), hwCount * sizeof(__type)); \
             nResult = hwCount;                                                  \
         } while(0);                                                             \
     )                                                                           \
     return nResult;                                                             \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__NAME "_peek_one")                                           \
-bool __NAME##_peek_one(__NAME *ptQ, const __TYPE** pptItem)                     \
+SECTION(".text." #__name "_peek_one")                                           \
+bool __name##_peek_one(__name *ptQ, const __type** pptItem)                     \
 {                                                                               \
     bool bResult = false;                                                       \
     ASSERT(NULL != ptQ);                                                        \
-    __QUEUE_PROTECT(                                                            \
+    __queue_protect(                                                            \
         do {                                                                    \
-            int32_t nIndex = __vsf_rng_buf_peek_one(&(ptQ->use_as__vsf_rng_buf_t)); \
+            int32_t nIndex = __vsf_rng_buf_peek_one(                            \
+                                &(ptQ->use_as__vsf_rng_buf_t));                 \
             if (nIndex < 0) {                                                   \
                 break;                                                          \
             }                                                                   \
             if (NULL != pptItem) {                                              \
-                (*pptItem) = (const __TYPE*)&ptQ->ptBuffer[nIndex];             \
+                (*pptItem) = (const __type*)&ptQ->ptBuffer[nIndex];             \
             }                                                                   \
             bResult = true;                                                     \
         } while (0);                                                            \
@@ -400,21 +423,39 @@ bool __NAME##_peek_one(__NAME *ptQ, const __TYPE** pptItem)                     
     return bResult;                                                             \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__NAME "_item_count_peekable")                                \
-uint_fast16_t __NAME##_item_count_peekable(__NAME *ptQ)                         \
+SECTION(".text." #__name "_reset_peek")                                         \
+void __name##_reset_peek(__name *ptQ)                                           \
+{                                                                               \
+    ASSERT(NULL != ptQ);                                                        \
+    __queue_protect(                                                            \
+        __vsf_rng_buf_reset_peek(&(ptQ->use_as__vsf_rng_buf_t));                \
+    )                                                                           \
+}                                                                               \
+                                                                                \
+SECTION(".text." #__name "_get_all_peeked")                                     \
+void __name##_get_all_peeked(__name *ptQ)                                       \
+{                                                                               \
+    ASSERT(NULL != ptQ);                                                        \
+    __queue_protect(                                                            \
+        __vsf_rng_buf_get_all_peeked(&(ptQ->use_as__vsf_rng_buf_t));            \
+    )                                                                           \
+}                                                                               \
+                                                                                \
+SECTION(".text." #__name "_item_count_peekable")                                \
+uint_fast16_t __name##_item_count_peekable(__name *ptQ)                         \
 {                                                                               \
     ASSERT(NULL != ptQ);                                                        \
     return __vsf_rng_buf_item_count_peekable(&ptQ->use_as__vsf_rng_buf_t);      \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__NAME "_peek_multiple")                                      \
-int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   \
-                                const __TYPE** pptItem,                         \
+SECTION(".text." #__name "_peek_multiple")                                      \
+int32_t __name##_peek_multiple( __name * ptQ,                                   \
+                                const __type** pptItem,                         \
                                 uint16_t hwCount)                               \
 {                                                                               \
     int32_t nResult = -1, nIndex = 0;                                           \
     ASSERT(NULL != ptQ);                                                        \
-    __QUEUE_PROTECT(                                                            \
+    __queue_protect(                                                            \
         do {                                                                    \
             if (NULL == pptItem || 0 == hwCount) {                              \
                 break;                                                          \
@@ -426,8 +467,8 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
                 break;                                                          \
             }                                                                   \
                                                                                 \
-/*memcpy(ptItem, &(ptQ->ptBuffer[nIndex]), hwCount * sizeof(__TYPE));*/         \
-            (*pptItem) = (const __TYPE*)&(ptQ->ptBuffer[nIndex]);               \
+/*memcpy(ptItem, &(ptQ->ptBuffer[nIndex]), hwCount * sizeof(__type));*/         \
+            (*pptItem) = (const __type*)&(ptQ->ptBuffer[nIndex]);               \
             nResult = hwCount;                                                  \
         } while(0);                                                             \
     )                                                                           \
@@ -435,106 +476,116 @@ int32_t __NAME##_peek_multiple( __NAME * ptQ,                                   
 }
 
 
-#define implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT)                  \
-            __implement_vsf_rng_buf(__NAME, __TYPE, __QUEUE_PROTECT) 
+#define implement_vsf_rng_buf(__name, __type, __queue_protect)                  \
+            __implement_vsf_rng_buf(__name, __type, __queue_protect) 
 
 
-#define __vsf_rng_buf_init(__NAME, __TYPE, __QADDR, __ITEM_COUNT)               \
+#define __vsf_rng_buf_init(__name, __type, __qaddr, __item_count)               \
     do {                                                                        \
-        NO_INIT static uint16_t s_hwBuffer[(__ITEM_COUNT)];                     \
-        __NAME##_cfg_t tCFG = {                                                 \
+        NO_INIT static uint16_t s_hwBuffer[(__item_count)];                     \
+        __name##_cfg_t tCFG = {                                                 \
             s_hwBuffer,                                                         \
             sizeof(s_hwBuffer),                                                 \
         };                                                                      \
-        __NAME##_init((__QADDR), & tCFG);                                       \
+        __name##_init((__qaddr), & tCFG);                                       \
     } while(0)
 
-#define vsf_rng_buf_init(__NAME, __TYPE, __QADDR, __ITEM_COUNT)                 \
-        __vsf_rng_buf_init(__NAME, __TYPE, (__QADDR), (__ITEM_COUNT))
+#define vsf_rng_buf_init(__name, __type, __qaddr, __item_count)                 \
+        __vsf_rng_buf_init(__name, __type, (__qaddr), (__item_count))
 
 
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
-#define __vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE)                \
+#define __vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size)                \
     do {                                                                        \
-        __NAME##_cfg_t tCFG = {0};                                              \
-        tCFG.ptBuffer = (__BUFFER);                                             \
-        tCFG.hwSize = (__SIZE);                                                 \
-        __NAME##_init((__QADDR), & tCFG);                                       \
+        __name##_cfg_t tCFG = {0};                                              \
+        tCFG.ptBuffer = (__buffer);                                             \
+        tCFG.hwSize = (__size);                                                 \
+        __name##_init((__qaddr), & tCFG);                                       \
     } while(0)
 
-#   define vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE)               \
-                __vsf_rng_buf_prepare(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#   define vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size)               \
+                __vsf_rng_buf_prepare(__name, (__qaddr), (__buffer), (__size))
 #else
 
-#   define __vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE, ...)        \
+#   define __vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size, ...)        \
     do {                                                                        \
-        __NAME##_cfg_t tCFG = {                                                 \
-            (__BUFFER),                                                         \
-            (__SIZE),                                                           \
+        __name##_cfg_t tCFG = {                                                 \
+            (__buffer),                                                         \
+            (__size),                                                           \
             __VA_ARGS__                                                         \
         };                                                                      \
-        __NAME##_init((__QADDR), & tCFG);                                       \
+        __name##_init((__qaddr), & tCFG);                                       \
     } while(0)
 
-#   define vsf_rng_buf_prepare(__NAME, __QADDR, __BUFFER, __SIZE, ...)          \
-        __vsf_rng_buf_prepare(__NAME, (__QADDR), (__BUFFER), (__SIZE), __VA_ARGS__)
+#   define vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size, ...)          \
+        __vsf_rng_buf_prepare(__name, (__qaddr), (__buffer), (__size), __VA_ARGS__)
 #endif
 
-#define __vsf_rng_buf_send_1(__NAME, __QADDR, __ITEM)                           \
-            __NAME##_send_one((__QADDR), __ITEM)
+#define __vsf_rng_buf_send_1(__name, __qaddr, __item)                           \
+            __name##_send_one((__qaddr), __item)
 
-#define __vsf_rng_buf_send_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
-            __NAME##_send_multiple((__QADDR), (__BUFFER), (__SIZE))
+#define __vsf_rng_buf_send_2(__name, __qaddr, __buffer, __size)                 \
+            __name##_send_multiple((__qaddr), (__buffer), (__size))
 
-#define __vsf_rng_buf_get_1(__NAME, __QADDR, __ITEM)                            \
-            __NAME##_get_one((__QADDR), __ITEM)
+#define __vsf_rng_buf_get_1(__name, __qaddr, __item)                            \
+            __name##_get_one((__qaddr), __item)
 
-#define __vsf_rng_buf_get_2(__NAME, __QADDR, __BUFFER, __SIZE)                  \
-            __NAME##_get_multiple((__QADDR), (__BUFFER), (__SIZE))
+#define __vsf_rng_buf_get_2(__name, __qaddr, __buffer, __size)                  \
+            __name##_get_multiple((__qaddr), (__buffer), (__size))
 
-#define __vsf_rng_buf_peek_1(__NAME, __QADDR, __ITEM)                           \
-            __NAME##_peek_one((__QADDR), __ITEM)
+#define __vsf_rng_buf_peek_1(__name, __qaddr, __item)                           \
+            __name##_peek_one((__qaddr), __item)
 
-#define __vsf_rng_buf_peek_2(__NAME, __QADDR, __BUFFER, __SIZE)                 \
-            __NAME##_peek_multiple((__QADDR), (__BUFFER), (__SIZE))
+#define __vsf_rng_buf_peek_2(__name, __qaddr, __buffer, __size)                 \
+            __name##_peek_multiple((__qaddr), (__buffer), (__size))
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#   define vsf_rng_buf_send(__NAME, __QADDR, ...)                               \
+#   define vsf_rng_buf_send(__name, __qaddr, ...)                               \
             __PLOOC_EVAL(__VSF_RNG_BUF_SEND_, __VA_ARGS__)                      \
-                (__NAME, __QADDR, __VA_ARGS__)
+                (__name, __qaddr, __VA_ARGS__)
 
-#   define vsf_rng_buf_get(__NAME, __QADDR, ...)                                \
+#   define vsf_rng_buf_get(__name, __qaddr, ...)                                \
             __PLOOC_EVAL(__vsf_rng_buf_get_, __VA_ARGS__)                       \
-                (__NAME, __QADDR, __VA_ARGS__)
+                (__name, __qaddr, __VA_ARGS__)
 
-#   define vsf_rng_buf_peek(__NAME, __QADDR, ...)                               \
+#   define vsf_rng_buf_peek(__name, __qaddr, ...)                               \
             __PLOOC_EVAL(__VSF_QUEUE_PEEK_, __VA_ARGS__)                        \
-                (__NAME, __QADDR, __VA_ARGS__)
+                (__name, __qaddr, __VA_ARGS__)
 #endif
 
-#define vsf_rng_buf_send_one(__NAME, __QADDR, __ITEM)                           \
-            __vsf_rng_buf_send_1(__NAME, (__QADDR), (__ITEM))
+#define vsf_rng_buf_send_one(__name, __qaddr, __item)                           \
+            __vsf_rng_buf_send_1(__name, (__qaddr), (__item))
             
-#define vsf_rng_buf_send_buf(__NAME, __QADDR, __BUFFER, __SIZE)                 \
-            __vsf_rng_buf_send_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#define vsf_rng_buf_send_buf(__name, __qaddr, __buffer, __size)                 \
+            __vsf_rng_buf_send_2(__name, (__qaddr), (__buffer), (__size))
             
-#define vsf_rng_buf_get_one(__NAME, __QADDR, __ITEM)                            \
-            __vsf_rng_buf_get_1(__NAME, (__QADDR), (__ITEM))
+#define vsf_rng_buf_get_one(__name, __qaddr, __item)                            \
+            __vsf_rng_buf_get_1(__name, (__qaddr), (__item))
             
-#define vsf_rng_buf_get_buf(__NAME, __QADDR, __BUFFER, __SIZE)                  \
-            __vsf_rng_buf_get_2(__NAME, (__QADDR), (__BUFFER), (__SIZE))
+#define vsf_rng_buf_get_buf(__name, __qaddr, __buffer, __size)                  \
+            __vsf_rng_buf_get_2(__name, (__qaddr), (__buffer), (__size))
 
-#define __vsf_rng_buf_count(__NAME, __QADDR)                                    \
-            __NAME##_item_count((__QADDR))
-#define vsf_rng_buf_count(__NAME, __QADDR)                                      \
-            __vsf_rng_buf_count(__NAME, __QADDR)
+#define __vsf_rng_buf_count(__name, __qaddr)                                    \
+            __name##_item_count((__qaddr))
+#define vsf_rng_buf_count(__name, __qaddr)                                      \
+            __vsf_rng_buf_count(__name, __qaddr)
 
-#define __vsf_rng_buf_peekable_count(__NAME, __QADDR)                           \
-            __NAME##_item_count_peekable((__QADDR))
-#define vsf_rng_buf_peekable_count(__NAME, __QADDR)                             \
-            __vsf_rng_buf_peekable_count(__NAME, __QADDR)
+#define ____vsf_rng_buf_reset_peek(__name, __qaddr)                             \
+            __name##_reset_peek((__qaddr))
+#define vsf_rng_buf_reset_peek(__name, __qaddr)                                 \
+            ____vsf_rng_buf_reset_peek(__name, __qaddr)
+
+#define ____vsf_rng_buf_get_all_peeked(__name, __qaddr)                         \
+            __name##_get_all_peeked((__qaddr))
+#define vsf_rng_buf_get_all_peeked(__name, __qaddr)                             \
+            ____vsf_rng_buf_get_all_peeked(__name, __qaddr)
+
+#define __vsf_rng_buf_peekable_count(__name, __qaddr)                           \
+            __name##_item_count_peekable((__qaddr))
+#define vsf_rng_buf_peekable_count(__name, __qaddr)                             \
+            __vsf_rng_buf_peekable_count(__name, __qaddr)
 
 /*============================ TYPES =========================================*/
 
@@ -557,7 +608,7 @@ end_def_class(vsf_rng_buf_t)
 /*============================ PROTOTYPES ====================================*/
 
 extern 
-void __vsf_rng_buf_init(  vsf_rng_buf_t* ptObj, 
+void __vsf_rng_buf_init_ex(  vsf_rng_buf_t* ptObj, 
                         uint_fast16_t hwBufferItemCount, 
                         bool bInitAsFull);
 
@@ -582,6 +633,14 @@ uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* ptObj);
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
 extern 
 int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* ptObj);
+
+SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
+extern 
+void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* ptObj);
+
+SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
+extern
+void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* ptObj);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
 extern

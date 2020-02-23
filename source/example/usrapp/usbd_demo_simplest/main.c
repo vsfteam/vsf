@@ -1,6 +1,6 @@
 #include "vsf.h"
 
-describe_usbd(user_usbd, 0x2348, 0xA7A8, 0x0409, USB_DC_SPEED_HIGH)
+describe_usbd(user_usbd, 0x2348, 0xA7A8, USB_DC_SPEED_HIGH)
     usbd_common_desc(user_usbd, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
         cdc_acm_desc(user_usbd, 0, 0, 1, 2, 2, 512, 16)
     usbd_func_desc(user_usbd)

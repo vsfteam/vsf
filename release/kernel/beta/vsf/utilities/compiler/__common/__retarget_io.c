@@ -20,6 +20,9 @@
 //#include <rt_sys.h>
 //#endif
 
+#ifdef __USE_COMMON_RETARGET_IO_C__
+#undef __USE_COMMON_RETARGET_IO_C__
+
 #include <stdio.h>
 
 #ifndef UNUSED_PARAM
@@ -62,6 +65,7 @@ void _ttywrch (int ch)
 WEAK(_sys_exit)
 void _sys_exit(int ch)
 {
+    UNUSED_PARAM(ch);
     while(1);
 }
 
@@ -127,3 +131,4 @@ int _read (int handle, char *buf, int bufSize)
     return __read(handle, (unsigned char *)buf, bufSize);
 }
 
+#endif

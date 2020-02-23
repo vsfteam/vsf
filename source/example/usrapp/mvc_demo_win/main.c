@@ -28,6 +28,7 @@ struct usrapp_t {
     struct {
         vk_disp_sdl2_t disp;
         vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
+        vsf_tgui_color_t buffer[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
     } ui;
 #endif
 };
@@ -89,8 +90,8 @@ int main(int argc, char *argv[])
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 
-	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data);
-	vsf_tgui_bind(&(usrapp.ui.disp.use_as__vk_disp_t), &usrapp.ui.color);
+	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data, void* buffer);
+	vsf_tgui_bind(&(usrapp.ui.disp.use_as__vk_disp_t), &usrapp.ui.color, &usrapp.ui.buffer);
 
     extern vsf_err_t tgui_demo_init(void);
     tgui_demo_init();

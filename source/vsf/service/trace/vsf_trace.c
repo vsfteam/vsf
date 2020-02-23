@@ -225,8 +225,8 @@ void vsf_trace_string(vsf_trace_level_t level, const char *str)
     vsf_trace_output_string(str);
 }
 
-SECTION(".text.vsf.trace.vsf_trace_buffer")
-void vsf_trace_buffer(  vsf_trace_level_t level, 
+SECTION(".text.vsf.trace.__vsf_trace_buffer")
+void __vsf_trace_buffer(  vsf_trace_level_t level, 
                         void *buffer, 
                         uint_fast16_t len, 
                         uint_fast32_t flag)

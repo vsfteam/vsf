@@ -215,7 +215,7 @@
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wtautological-pointer-compare"
 #pragma clang diagnostic ignored "-Wunused-value" 
-
+#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma clang diagnostic ignored "-Wbitfield-constant-conversion"
 //#pragma clang diagnostic ignored "-Wpointer-integer-compare" 

@@ -199,6 +199,9 @@
 
 static void __vk_usbd_hal_evthandler(void *, usb_evt_t, uint_fast8_t);
 
+extern vsf_err_t vsf_usbd_vendor_prepare(vk_usbd_dev_t *dev);
+extern void vsf_usbd_vendor_process(vk_usbd_dev_t *dev);
+
 /*============================ IMPLEMENTATION ================================*/
 
 vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
@@ -461,8 +464,7 @@ static vsf_err_t __vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
                 return VSF_ERR_FAIL;
             }
             break;
-        case USB_REQ_GET_DESCRIPTOR:
-            {
+        case USB_REQ_GET_DESCRIPTOR: {
                 uint_fast8_t type = (request->wValue >> 8) & 0xFF;
                 uint_fast8_t index = request->wValue & 0xFF;
                 uint_fast16_t lanid = request->wIndex;
@@ -673,6 +675,21 @@ static vsf_err_t __vk_usbd_stdctrl_process(vk_usbd_dev_t *dev)
     return VSF_ERR_NONE;
 }
 
+#ifndef WEAK_VSF_USBD_VENDOR_PREPARE
+WEAK(vsf_usbd_vendor_prepare)
+vsf_err_t vsf_usbd_vendor_prepare(vk_usbd_dev_t *dev)
+{
+    return VSF_ERR_FAIL;
+}
+#endif
+
+#ifndef WEAK_VSF_USBD_VENDOR_PROCESS
+WEAK(vsf_usbd_vendor_process)
+void vsf_usbd_vendor_process(vk_usbd_dev_t *dev)
+{
+}
+#endif
+
 static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
 {
     vk_usbd_cfg_t *config = &dev->config[dev->configuration];
@@ -683,13 +700,11 @@ static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
 
     if (USB_TYPE_STANDARD == type) {
         err = __vk_usbd_stdctrl_prepare(dev);
-    } else if ((USB_TYPE_CLASS == type) || (USB_TYPE_VENDOR == type)) {
+    } else if (USB_TYPE_CLASS == type) {
         uint_fast8_t tmp = request->wIndex & 0xFF;
         vk_usbd_ifs_t *ifs = NULL;
 
         switch (request->bRequestType & USB_RECIP_MASK) {
-        case USB_RECIP_DEVICE:
-            tmp = dev->device_class_ifs;
         case USB_RECIP_INTERFACE:
             if (tmp < config->num_of_ifs) {
                 ifs = &config->ifs[tmp];
@@ -698,10 +713,15 @@ static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
         case USB_RECIP_ENDPOINT:
             ifs = __vk_usbd_get_ifs_byep(config, tmp);
             break;
+        default:
+            VSF_USB_ASSERT(false);
+            return VSF_ERR_FAIL;
         }
         if (ifs && ifs->class_op->request_prepare != NULL) {
             err = ifs->class_op->request_prepare(dev, ifs);
         }
+    } else if (USB_TYPE_VENDOR == type) {
+        err = vsf_usbd_vendor_prepare(dev);
     }
 
     return err;
@@ -721,8 +741,6 @@ static void __vk_usbd_ctrl_process(vk_usbd_dev_t *dev)
         vk_usbd_ifs_t *ifs = NULL;
 
         switch (request->bRequestType & USB_RECIP_MASK) {
-        case USB_RECIP_DEVICE:
-            tmp = dev->device_class_ifs;
         case USB_RECIP_INTERFACE:
             if (tmp < config->num_of_ifs) {
                 ifs = &config->ifs[tmp];
@@ -731,10 +749,15 @@ static void __vk_usbd_ctrl_process(vk_usbd_dev_t *dev)
         case USB_RECIP_ENDPOINT:
             ifs = __vk_usbd_get_ifs_byep(config, tmp);
             break;
+        default:
+            VSF_USB_ASSERT(false);
+            return;
         }
         if (ifs && ifs->class_op->request_process != NULL) {
             ifs->class_op->request_process(dev, ifs);
         }
+    } else if (USB_TYPE_VENDOR == type) {
+        vsf_usbd_vendor_process(dev);
     }
 }
 
@@ -863,6 +886,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 // fail to get setup request data
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
+                break;
             }
 
             if (ctrl_handler->trans.use_as__vsf_mem_t.nSize > request->wLength) {

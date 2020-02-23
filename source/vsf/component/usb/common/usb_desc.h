@@ -8,17 +8,17 @@
             ((__VALUE) >> 0) & 0xFF, ((__VALUE) >> 8) & 0xFF,                   \
             ((__VALUE) >> 16) & 0xFF, ((__VALUE) >> 24) & 0xFF
 
-#define USB_DESC_DEV_IAD(__EP0_SIZE, __VID, __PID, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
+#define USB_DESC_DEV_IAD(__VERSION, __EP0_SIZE, __VID, __PID, __BCD_VER, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
             USB_DT_DEVICE_SIZE,                                                 \
             USB_DT_DEVICE,                                                      \
-            0x00, 0x02,                         /* bcdUSB */                    \
+            USB_DESC_WORD(__VERSION),           /* bcdUSB */                    \
             0xEF,                               /* device class: IAD */         \
             0x02,                               /* device sub class */          \
             0x01,                               /* device protocol */           \
-            64,                                 /* max packet size */           \
+            (__EP0_SIZE),                       /* max packet size */           \
             USB_DESC_WORD(__VID),               /* vendor */                    \
             USB_DESC_WORD(__PID),               /* product */                   \
-            USB_DESC_WORD(0x2000),              /* bcdDevice */                 \
+            USB_DESC_WORD(__BCD_VER),           /* bcdDevice */                 \
             (__I_MANUFACTURER),                 /* manufacturer */              \
             (__I_PRODUCT),                      /* product */                   \
             (__I_SERIAL_NUM),                   /* serial number */             \
@@ -52,6 +52,17 @@
             (__EP_ATTR),                        /* bmAttributes: */             \
             USB_DESC_WORD(__EP_SIZE),           /* wMaxPacketSize: */           \
             (__EP_INTERVAL),                    /* bInterval: */
+
+#define USB_DESC_QUALIFIER(__VERSION, __CLASS, __SUB_CLASS, __PROTOCOL, __EP0_SIZE, __CONFIG_NUM)\
+            USB_DT_DEVICE_QUALIFIER_SIZE,                                       \
+            USB_DT_DEVICE_QUALIFIER,                                            \
+            USB_DESC_WORD(__VERSION),           /* bcdUSB */                    \
+            (__CLASS),                          /* bDeviceClass */              \
+            (__SUB_CLASS),                      /* bDeviceSubClass */           \
+            (__PROTOCOL),                       /* bDeviceProtocol */           \
+            (__EP0_SIZE),                       /* bMaxPacketSize0 */           \
+            (__CONFIG_NUM),                     /* bNumConfigurations */        \
+            0,                                  /* bReserved */
 
 #define USB_DESC_IAD(__IFS_START, __IFS_NUM, __CLASS, __SUBCLASS, __PROTOCOL, __I_FUNC)\
             USB_DT_INTERFACE_ASSOCIATION_SIZE,  /* IDA for CDC */               \
