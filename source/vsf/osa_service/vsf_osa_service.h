@@ -22,6 +22,9 @@
 #include "osa_service/vsf_osa_service_cfg.h"
 #include "./msg_tree/vsf_msg_tree.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -29,6 +32,10 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_osa_service_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

@@ -23,9 +23,7 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 
-#include "utilities/vsf_tgui_font.h"
 #include "utilities/vsf_tgui_text.h"
-#include "utilities/vsf_tgui_color.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
@@ -96,7 +94,10 @@ end_def_class(vsf_tgui_t)
 
 typedef struct vsf_tgui_cfg_t {
     vsf_mem_t tEVTQueue;
+
+#if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
     vsf_mem_t tBFSQueue;
+#endif
 
     const vsf_tgui_top_container_t* ptRootNode;
     vsf_prio_t                      tPriority;
@@ -116,7 +117,7 @@ vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI,
                                     vsf_tgui_top_container_t *ptRootNode);
 
 extern 
-bool vsf_tgui_send_message(vsf_tgui_t *ptGUI, vsf_tgui_evt_t tEvent);
+bool vk_tgui_send_message(vsf_tgui_t *ptGUI, vsf_tgui_evt_t tEvent);
 
 extern 
 bool vk_tgui_update(vsf_tgui_t *ptGUI, 
@@ -138,7 +139,7 @@ extern
 const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *ptGUI);
 #endif
 
-#if VSF_TGUI_CFG_SUPPORT_REFRESH_SCHEME == ENABLED
+#if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
 extern
 bool vk_tgui_refresh(vsf_tgui_t *ptGUI);
 

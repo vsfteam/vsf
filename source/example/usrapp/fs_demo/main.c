@@ -101,12 +101,11 @@ static void __usrapp_fs_listall_evthandler(uintptr_t target, vsf_evt_t evt)
 {
     usrapp_eda_state_t *state = (usrapp_eda_state_t *)&vsf_eda_get_cur()->fn.frame->state;
     vk_file_t *file = (vk_file_t *)target;
-    vsf_err_t err;
+    int32_t result;
 
     static int __cur_indent = 0;
     static vk_file_t *__cur_file = NULL;
     static uint8_t __buff[256];
-    static int32_t __rsize = 0;
     enum {
         // for directory
         LISTALL_STATE_LOOKUP,
@@ -142,7 +141,7 @@ static void __usrapp_fs_listall_evthandler(uintptr_t target, vsf_evt_t evt)
         } else {
             if (file->attr & VSF_FILE_ATTR_READ) {
                 state->state = LISTALL_STATE_READ;
-                if (VSF_ERR_NONE != vk_file_read(file, 0, sizeof(__buff), __buff, &__rsize)) {
+                if (VSF_ERR_NONE != vk_file_read(file, 0, sizeof(__buff), __buff)) {
                     goto do_return;
                 }
             } else {
@@ -151,11 +150,11 @@ static void __usrapp_fs_listall_evthandler(uintptr_t target, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_RETURN:
-        err = vk_file_get_errcode(file);
+        result = (int32_t)vsf_eda_get_return_value();
         if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
             switch (state->state) {
             case LISTALL_STATE_LOOKUP:
-                if ((err != VSF_ERR_NONE) || (NULL == __cur_file)) {
+                if ((result < 0) || (NULL == __cur_file)) {
                     goto do_close;
                 }
 
@@ -174,12 +173,12 @@ static void __usrapp_fs_listall_evthandler(uintptr_t target, vsf_evt_t evt)
                 break;
             }
         } else {
-            if (VSF_ERR_NONE != err) {
+            if (result < 0) {
                 __usrapp_print_indent(__cur_indent);
                 vsf_trace(VSF_TRACE_INFO, "fail to read %s, err is %d" VSF_TRACE_CFG_LINEEND,
-                        file->name, err);
+                        file->name, result);
             } else {
-                vsf_trace_buffer(VSF_TRACE_INFO, __buff, __rsize, VSF_TRACE_DF_DEFAULT);
+                vsf_trace_buffer(VSF_TRACE_INFO, __buff, result, VSF_TRACE_DF_DEFAULT);
             }
         do_close:
             state->state = LISTALL_STATE_CLOSE;
@@ -216,6 +215,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     static vk_file_t *__fwinfs;
 #endif
     static uint8_t __control = 0;
+    int32_t result;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -225,38 +225,39 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vk_file_open(NULL, "\\", 0, &__froot);
         break;
     case VSF_EVT_RETURN:
+        result = (int32_t)vsf_eda_get_return_value();
         switch (__state) {
         case USRAPP_STATE_OPENED_ROOT:
             ASSERT(__froot != NULL);
             vk_file_create(__froot, "memfs", VSF_FILE_ATTR_DIRECTORY, 0);
             break;
         case USRAPP_STATE_CREATED_MEMFS:
-            ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
             __fmemfs = NULL;
             vk_file_open(__froot, "memfs", 0, &__fmemfs);
             break;
         case USRAPP_STATE_OPENED_MEMFS:
-            ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
             ASSERT(__fmemfs != NULL);
             vk_fs_mount(__fmemfs, &vk_memfs_op, &__usrapp_common.fs.memfs_info);
             break;
         case USRAPP_STATE_MOUNTED_MEMFS:
-            ASSERT(vk_file_get_errcode(__fmemfs) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
 #if VSF_USE_WINFS == ENABLED
             vk_file_create(__froot, "winfs", VSF_FILE_ATTR_DIRECTORY, 0);
             break;
         case USRAPP_STATE_CREATED_WINFS:
-            ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
             __fwinfs = NULL;
             vk_file_open(__froot, "winfs", 0, &__fwinfs);
             break;
         case USRAPP_STATE_OPENED_WINFS:
-            ASSERT(vk_file_get_errcode(__froot) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
             ASSERT(__fwinfs != NULL);
             vk_fs_mount(__fwinfs, &vk_winfs_op, &__usrapp_common.fs.winfs_info);
             break;
         case USRAPP_STATE_MOUNTED_WINFS:
-            ASSERT(vk_file_get_errcode(__fwinfs) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
 #endif
             if (VSF_ERR_NONE == vsf_eda_call_param_eda(__usrapp_fs_listall_evthandler, __froot)) {
                 break;
@@ -266,17 +267,17 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_file_open(__fmemfs, "control.bin", 0, &__fcontrol);
             break;
         case USRAPP_STATE_OPENED_CONTROL:
-            ASSERT(vk_file_get_errcode(__fmemfs) == VSF_ERR_NONE);
+            ASSERT(result == VSF_ERR_NONE);
             ASSERT(__fcontrol != NULL);
         case USRAPP_STATE_WRITTEN_CONTROL:
-            ASSERT(vk_file_get_errcode(__fcontrol) == VSF_ERR_NONE);
+            ASSERT(result == 1);
             vsf_teda_set_timer_ms(1000);
             return;
         }
         __state++;
         break;
     case VSF_EVT_TIMER:
-        vk_file_write(__fcontrol, 0, 1, &__control, NULL);
+        vk_file_write(__fcontrol, 0, 1, &__control);
         __control++;
         break;
     }

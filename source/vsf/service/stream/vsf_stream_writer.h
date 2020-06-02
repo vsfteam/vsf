@@ -46,6 +46,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -117,6 +121,10 @@ bool vsf_stream_writer_write_byte(  vsf_stream_writer_t *ptObj,
 
 extern
 fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *ptObj);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

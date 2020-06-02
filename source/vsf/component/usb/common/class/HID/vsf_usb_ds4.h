@@ -18,6 +18,10 @@
 #ifndef __VSF_USB_DS4_H__
 #define __VSF_USB_DS4_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -83,6 +87,10 @@ typedef struct vsf_usb_ds4_gamepad_out_report_t vsf_usb_ds4_gamepad_out_report_t
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif    // __VSF_USB_DS4_H__
 

@@ -148,12 +148,6 @@
     <Filter Include="vsf\component\ui">
       <UniqueIdentifier>{16b6f51f-2859-4b63-bbc5-277c3de0a84f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\ui\disp_drv">
-      <UniqueIdentifier>{426a816e-299c-4753-bb8c-19b793f1c00e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\ui\disp_drv\sdl2">
-      <UniqueIdentifier>{378a9a07-be30-4358-a3a9-fd8351214394}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\driver\x86">
       <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
     </Filter>
@@ -219,6 +213,15 @@
     </Filter>
     <Filter Include="vsf\component\mal\driver\mim_mal">
       <UniqueIdentifier>{5ceadba6-89cb-4dbe-8ad4-fd363663e9c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp">
+      <UniqueIdentifier>{20e4184c-7a72-4178-82b8-6a30f0f5f17a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver">
+      <UniqueIdentifier>{cdd765c5-aea5-41ab-a2ed-8edfea836efd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\sdl2">
+      <UniqueIdentifier>{1bcb0413-8f9c-4bd0-bb10-77c9a7b23c2a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -471,17 +474,11 @@
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h">
       <Filter>vsf\hal\driver\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h">
       <Filter>vsf\component\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h">
-      <Filter>vsf\component\ui\disp_drv</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
       <Filter>vsf\utilities\compiler</Filter>
@@ -581,6 +578,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.h">
       <Filter>vsf\component\mal\driver\mim_mal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -706,14 +709,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
       <Filter>vsf\hal\driver\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c">
-      <Filter>vsf\component\ui\disp_drv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
@@ -777,6 +774,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c">
       <Filter>vsf\component\mal\driver\mim_mal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

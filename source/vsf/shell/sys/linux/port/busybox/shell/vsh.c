@@ -13,6 +13,9 @@
 
 #define VSH_PROMPT                  ">>>"
 
+#ifndef PATH_MAX
+#   define PATH_MAX                 256
+#endif
 #ifndef VSH_CMD_SIZE
 #   define VSH_CMD_SIZE             128
 #endif
@@ -59,8 +62,24 @@ enum vsh_shell_state_t {
     SHELL_STATE_RIS,
 };
 
+// TODO: working dir should not be maintained in vsh
 static char vsh_working_dir[PATH_MAX];
 static char **vsh_path;
+
+char * getcwd(char * buffer, int maxlen)
+{
+    int len = strlen(vsh_working_dir) + 1;
+
+    if ((NULL == buffer) && !maxlen) {
+        buffer = malloc(len);
+    }
+    if (len > maxlen) {
+        // TODO: set errno to ERANGE
+        return NULL;
+    }
+    strcpy(buffer, vsh_working_dir);
+    return buffer;
+}
 
 #if VSH_HISTORY_NUM > 0
 static void vsh_history_apply(struct vsh_cmd_ctx_t *ctx, uint8_t history_entry)
@@ -151,15 +170,15 @@ int vsh_generate_path(char *path, int pathlen, char *dir, char *path_in)
 
     // process .. an .
     char *tmp, *tmp_replace;
-    while ((tmp = strstr(path, "/..")) != NULL) {
+    while ((tmp = (char *)strstr(path, "/..")) != NULL) {
         tmp[0] = '\0';
-        tmp_replace = strrchr(path, '/');
+        tmp_replace = (char *)strrchr(path, '/');
         if (NULL == tmp_replace) {
             return -ENOENT;
         }
         strcpy(tmp_replace, &tmp[3]);
     }
-    while ((tmp = strstr(path, "/./")) != NULL) {
+    while ((tmp = (char *)strstr(path, "/./")) != NULL) {
         strcpy(tmp, &tmp[2]);
     }
     return 0;

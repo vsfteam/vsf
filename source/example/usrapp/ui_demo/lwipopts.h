@@ -54,9 +54,9 @@
 #define LWIP_DNS                        1
 
 #define TCPIP_THREAD_STACKSIZE          (8 * 1024)
-#define TCPIP_THREAD_PRIO               vsf_priority_0
+#define TCPIP_THREAD_PRIO               vsf_prio_0
 #define TCPIP_MBOX_SIZE                 4
 #define DEFAULT_THREAD_STACKSIZE        (8 * 1024)
-#define DEFAULT_THREAD_PRIO             vsf_priority_0
+#define DEFAULT_THREAD_PRIO             vsf_prio_0
 
 #endif /* __LWIPOPTS_H__ */

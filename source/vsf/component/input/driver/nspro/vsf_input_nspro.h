@@ -27,6 +27,10 @@
 #include "component/usb/common/class/HID/vsf_usb_nspro.h"
 #include "../../vsf_input_get_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -51,6 +55,10 @@ extern const vk_sensor_item_info_t vk_nspro_sensor_item_info[6];
 extern void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data);
 extern void vk_nspro_new_dev(vk_input_nspro_t *dev);
 extern void vk_nspro_free_dev(vk_input_nspro_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_INPUT && VSF_USE_INPUT_NSPRO
 #endif      // __VSF_INPUT_NSPRO_H__

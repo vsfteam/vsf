@@ -18,10 +18,15 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "../vsf_utilities_cfg.h"
+
+#if VSF_USE_SIMPLE_SSCANF == ENABLED
+
 #include <stdarg.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -174,5 +179,6 @@ int sscanf(const char *str, const char *format, ...)
     return result;
 }
 
-/* EOF */
+#endif      // VSF_USE_SIMPLE_SSCANF
 
+/* EOF */

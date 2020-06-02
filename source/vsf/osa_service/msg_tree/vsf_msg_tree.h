@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "osa_service/vsf_osa_service_cfg.h"
 
-#if     VSF_USE_MSG_TREE == ENABLED                                         
+#if     VSF_USE_MSG_TREE == ENABLED
 
 #include "kernel/vsf_kernel.h"
 
@@ -38,16 +38,18 @@
 #elif   defined(__VSF_MSG_TREE_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #   undef __VSF_MSG_TREE_CLASS_INHERIT
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 #ifndef VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING
 #   define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING         DISABLED
 #endif
-
-#define VSF_MSGT_NODE_ID_USER                           2
 
 #ifndef VSF_MSGT_NODE_OFFSET_TYPE
 #   define VSF_MSGT_NODE_OFFSET_TYPE                    int16_t
@@ -78,9 +80,13 @@ typedef struct vsf_msgt_msg_t {
 //! @}
 
 typedef enum vsf_msgt_node_status_t {
+    // avoid vsf_msgt_node_status_t to be optimized to 8bit
+    __VSF_MSGT_NODE_STATUS_LEAST_MAX    = INT16_MAX,
+    __VSF_MSGT_NODE_STATUS_LEAST_MIN    = INT16_MIN,
+
     VSF_MSGT_NODE_VALID                 = _BV(0),                               //!< whether the node is valid/initialised or not
     VSF_MSGT_NODE_ENABLED               = _BV(1),                               //!< whether the node is enabled or not
-    VSF_MSGT_NODE_VISIBLE               = _BV(2),                               //!< whether the node is visible 
+    VSF_MSGT_NODE_VISIBLE               = _BV(2),                               //!< whether the node is visible
     VSF_MSGT_NODE_ACTIVE                = _BV(3),
     VSF_MSGT_NODE_HIDE_CONTENT          = _BV(4),                               //!< whether hide the content inside container
 }vsf_msgt_node_status_t;
@@ -119,17 +125,17 @@ struct vsf_msgt_handler_t {
             vsf_msgt_method_fsm_t* fnFSM;                                       //!< message handler
             vsf_eda_t* ptEDA;                                                   //!< target eda receiver
             vsf_msgt_subcall_t* ptSubCall;                                      //!< subcall handler
-        }, 
+        },
         fn
     )
 };
 
-//! \name v-table for tree message node 
+//! \name v-table for tree message node
 //! @{
 declare_interface(i_msg_tree_node_t)
 def_interface(i_msg_tree_node_t)
     vsf_msgt_handler_t          tMessageHandler;
-    vsf_msgt_method_status_t    *Status;                                        //!< get status of target node         
+    vsf_msgt_method_status_t    *Status;                                        //!< get status of target node
     vsf_msgt_method_shoot_t     *Shoot;                                         //!< range check
 end_def_interface(i_msg_tree_node_t)
 //! @}
@@ -137,14 +143,15 @@ end_def_interface(i_msg_tree_node_t)
 //! \name abstract class for message tree node
 //! @{
 def_structure(vsf_msgt_node_t)
-    
+
     uint8_t         chID;                                                       //!< node ID for lookup table
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
     union {
         union {
             struct {
-                uint8_t                 : 5;
+                uint8_t bVisited        : 1;
+                uint8_t                 : 4;
 
                 uint8_t bIsTop          : 1;
 
@@ -159,11 +166,12 @@ def_structure(vsf_msgt_node_t)
 #endif
         union {
             struct {
-                uint8_t                 : 5;
+                uint8_t bVisited        : 1;
+                uint8_t                 : 4;
 
                 uint8_t bIsTop          : 1;
-                /* \note when it is container, it is possible to make the container 
-                         transparent. When it is not a container, bIsTransparent 
+                /* \note when it is container, it is possible to make the container
+                         transparent. When it is not a container, bIsTransparent
                          should be ignored. */
                 uint8_t bIsTransparent  : 1;                                    //!< used together with bIsContainer
                 uint8_t bIsContainer    : 1;                                    //!< whether it is a container or not
@@ -189,12 +197,12 @@ def_structure(vsf_msgt_node_t)
 end_def_structure(vsf_msgt_node_t)
 //! @}
 
-//! \name abstract class for container 
+//! \name abstract class for container
 //! @{
 def_structure(vsf_msgt_container_t)
     implement(vsf_msgt_node_t)
 
-    vsf_msgt_node_t* ptNode;                                            
+    vsf_msgt_node_t* ptNode;
 end_def_structure(vsf_msgt_container_t)
 //! @}
 
@@ -223,14 +231,20 @@ def_class(vsf_msgt_t,
         } BW;
         struct {
             uint8_t chState;
+            __vsf_msgt_msg_handling_fsm_t tMSGHandling;
+            bool bSupportContainerPostHandling;
+        } FWPOT;
+        struct {
+            uint8_t chState;
             __bfs_node_fifo_t tFIFO;
             __vsf_msgt_msg_handling_fsm_t tMSGHandling;
+            bool bSupportContainerPostHandling;
         } FWBFS;
         struct {
             uint8_t chState;
             __vsf_msgt_msg_handling_fsm_t tMSGHandling;
         } FWDFS;
-    )             
+    )
 )
 end_def_class(vsf_msgt_t)
 
@@ -238,18 +252,18 @@ end_def_class(vsf_msgt_t)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern 
+extern
 void vsf_msgt_init( vsf_msgt_t* ptObj, const vsf_msgt_cfg_t *ptCFG);
 
 extern
 const vsf_msgt_node_t* vsf_msgt_get_next_node_within_container(
                                             const vsf_msgt_node_t* ptNode);
 
-extern 
+extern
 const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t *ptRoot,
                                             uintptr_t pBulletInfo);
-extern 
+extern
 const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* ptObj,
                                         const vsf_msgt_node_t *ptRoot,
                                         uintptr_t pBulletInfo);
@@ -262,14 +276,42 @@ extern
 const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
                                                             vsf_msgt_t* ptObj);
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
-extern 
-void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj, 
-                                                uint16_t *phwFIFOBuffer, 
-                                                uint_fast16_t hwBuffSize);
+
+SECTION(".text.vsf.osa_service.msg_tree"
+        ".vsf_msgt_forward_propagate_msg_pre_order_traversal_init")
+extern
+void vsf_msgt_forward_propagate_msg_pre_order_traversal_init(vsf_msgt_t* ptObj,
+                                             bool bSupportContainerPostHandling);
+
+SECTION(".text.vsf.osa_service.msg_tree"
+        ".vsf_msgt_forward_propagate_msg_pre_order_traversal_setting")
+extern
+void vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(vsf_msgt_t* ptObj, 
+                                                bool bSupportContainerPostHandling);
+
+SECTION(".text.vsf.osa_service.msg_tree"
+        ".vsf_msgt_forward_propagate_msg_pre_order_traversal")
+extern
+fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
+                                            vsf_msgt_t* ptObj,
+                                            const vsf_msgt_node_t* ptRoot,
+                                            vsf_msgt_msg_t* ptMessage,
+                                            uint_fast8_t chStatusMask);
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
-extern 
+extern
+void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj, 
+                                                uint16_t *phwFIFOBuffer, 
+                                                uint_fast16_t hwBuffSize,
+                                                bool bSupportContainerPostHandling);
+
+SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs_setting")
+extern
+void vsf_msgt_forward_propagate_msg_bfs_setting(vsf_msgt_t* ptObj, 
+                                                bool bSupportContainerPostHandling);
+
+SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
+extern
 fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage,
@@ -284,6 +326,11 @@ extern
 fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
                                             const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 #endif

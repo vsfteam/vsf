@@ -25,6 +25,10 @@
 //! all service modules use this configuation file
 
 /*============================ INCLUDES ======================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_OSA_SERVICE_ASSERT
@@ -37,6 +41,8 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 /* EOF */

@@ -25,6 +25,9 @@
 #include "hal/driver/driver.h"
 #undef  __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #define __LITTLE_ENDIAN                 1
@@ -94,6 +97,10 @@ static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
 {
     VSF_HAL_ASSERT(false);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

@@ -1,4 +1,4 @@
-update=2019/10/1 0:56:42
+update=2020/3/20 12:28:17
 version=1
 last_client=kicad
 [cvpcb]
@@ -6,14 +6,6 @@ version=1
 NetIExt=net
 [general]
 version=1
-[eeschema]
-version=1
-LibDir=C:/Users/simonqian/Desktop/VSF/hw/library
-[eeschema/libraries]
-LibName1=power
-LibName2=device
-LibName3=interface
-LibName4=simonqian
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
@@ -251,3 +243,6 @@ uViaDrill=0.1
 dPairWidth=0.2
 dPairGap=0.25
 dPairViaGap=0.25
+[eeschema]
+version=1
+LibDir=

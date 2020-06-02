@@ -33,6 +33,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -122,6 +126,10 @@ extern int vsf_json_set_string(vsf_json_constructor_t *c, char *key, char *value
 extern int vsf_json_set_number(vsf_json_constructor_t *c, char *key, double value);
 extern int vsf_json_set_boolean(vsf_json_constructor_t *c, char *key, bool value);
 extern int vsf_json_set_null(vsf_json_constructor_t *c, char *key);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_JSON
 #endif      // __VSF_JSON_H__

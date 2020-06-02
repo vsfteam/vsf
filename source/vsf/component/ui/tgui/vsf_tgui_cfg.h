@@ -25,114 +25,231 @@
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_TGUI_ASSERT
-#   define VSF_TGUI_ASSERT               ASSERT
+/*----------------------------------------------------------------------------*
+ *  Rendering                                                                 *
+ *----------------------------------------------------------------------------*/
+
+#define VSF_TGUI_V_TEMPLATE_EXAMPLE                             1
+#define VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW                         2
+
+#ifndef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
+#   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL                  VSF_TGUI_V_TEMPLATE_EXAMPLE
 #endif
 
-#define VSF_TGUI_V_TEMPLATE_EXAMPLE         1
-#define VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW     2
+/*----------------------------------------------------------------------------*
+ *  Colour Space                                                              *
+ *----------------------------------------------------------------------------*/
+
+#define VSF_TGUI_COLOR_RGB_565                                  0
+#define VSF_TGUI_COLOR_BGR_565                                  1
+#define VSF_TGUI_COLOR_ARGB_8888                                2
+#define VSF_TGUI_COLOR_RGB8_USER_TEMPLATE                       3
+
+#ifndef VSF_TGUI_CFG_COLOR_MODE
+#   define VSF_TGUI_CFG_COLOR_MODE                              VSF_TGUI_COLOR_ARGB_8888
+#endif
+
+#undef __VSF_TGUI_IS_COLOR_SUPPORT_ALPHA__
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+#   define __VSF_TGUI_IS_COLOR_SUPPORT_ALPHA__                  1
+#else
+#   define __VSF_TGUI_IS_COLOR_SUPPORT_ALPHA__                  0
+#endif
+
+/*----------------------------------------------------------------------------*
+ *  Designer & Layout                                                         *
+ *----------------------------------------------------------------------------*/
 
 #ifndef VSF_TGUI_HOR_MAX
-#	define VSF_TGUI_HOR_MAX					800
+#	define VSF_TGUI_HOR_MAX					                    800
 #endif
 
 #ifndef VSF_TGUI_VER_MAX
-#	define VSF_TGUI_VER_MAX					600
+#	define VSF_TGUI_VER_MAX					                    600
 #endif
 
-#define VSF_TGUI_COLOR_RGB16_565            0
-#define VSF_TGUI_COLOR_ARGB_8888            1
-#define VSF_TGUI_COLOR_RGB8_USER_TEMPLATE   2
-
-#ifndef VSF_TGUI_CFG_COLOR_MODE
-#   define VSF_TGUI_CFG_COLOR_MODE          VSF_TGUI_COLOR_RGB16_565
-#endif
-
-#define VSF_TGUI_TEXT_ASCII                 0
-#define VSF_TGUI_TEXT_UTF8                  1
-
-#ifndef VST_TGUI_CFG_TEXT_MODE
-#   define VSF_TGUI_CFG_TEXT_MODE           VSF_TGUI_TEXT_UTF8
-#endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR   DISABLED
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR           DISABLED
 #endif
 
 #ifndef  VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK     DISABLED
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK             DISABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN    DISABLED
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN            DISABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING   ENABLED
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING          ENABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN    ENABLED
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN           ENABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
-#   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL          VSF_TGUI_V_TEMPLATE_EXAMPLE
+/*----------------------------------------------------------------------------*
+ *  Font and Text                                                             *
+ *----------------------------------------------------------------------------*/
+#define VSF_TGUI_TEXT_ASCII                                     0
+#define VSF_TGUI_TEXT_UTF8                                      1
+
+#ifndef VSF_TGUI_CFG_TEXT_MODE
+#   define VSF_TGUI_CFG_TEXT_MODE                               VSF_TGUI_TEXT_UTF8
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_NAME_STRING
-#   define VSF_TGUI_CFG_SUPPORT_NAME_STRING             DISABLED
+#   define VSF_TGUI_CFG_SUPPORT_NAME_STRING                     ENABLED
 #endif
-
-#ifndef VSF_TGUI_CFG_SUPPORT_REFRESH_SCHEME
-#   define VSF_TGUI_CFG_SUPPORT_REFRESH_SCHEME          ENABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME
-#   define VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME       ENABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME
-#   define VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME      ENABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL
-#   define VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL     ENABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SUPPORT_DIRTY_REGION
-#   define VSF_TGUI_CFG_SUPPORT_DIRTY_REGION            ENABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SAFE_STRING_MODE
-#   define VSF_TGUI_CFG_SAFE_STRING_MODE                DISABLED
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+#   if VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING != ENABLED
+#       warning "VSF_TGUI_CFG_SUPPORT_NAME_STRING is ENABLED and depends \
+on VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING, but it is set to DISABLED. \
+In order to continue the compilation process, this macro \
+VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING is forced to be ENABLED. Please \
+enable it in vsf_usr_cfg.h or top vsf_tgui_cfg.h to supress this \
+warning."
+#       undef VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING
+#       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING             ENABLED
+#   endif
 #endif
 
 #ifndef VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING
-#   define VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING          ENABLED
+#   define VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING                  ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SAFE_STRING_MODE
+#   define VSF_TGUI_CFG_SAFE_STRING_MODE                        DISABLED
+#endif
+
+/*----------------------------------------------------------------------------*
+ *  Refresh Control                                                           *
+ *----------------------------------------------------------------------------*/
+#define VSF_TGUI_REFRESH_SCHEME_NONE                            0
+#define VSF_TGUI_REFRESH_SCHEME_Z_ORDER                         1
+#define VSF_TGUI_REFRESH_SCHEME_PRE_ORDER_TRAVERSAL             1
+#define VSF_TGUI_REFRESH_SCHEME_LAYER_BY_LAYER                  2
+#define VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL         2
+
+#ifndef VSF_TGUI_CFG_REFRESH_SCHEME
+#   define VSF_TGUI_CFG_REFRESH_SCHEME                          VSF_TGUI_REFRESH_SCHEME_Z_ORDER
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL
+#   define VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL             ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_DIRTY_REGION
+#   define VSF_TGUI_CFG_SUPPORT_DIRTY_REGION                    ENABLED
+#endif
+
+/*----------------------------------------------------------------------------*
+ *  Message Handling Control                                                  *
+ *----------------------------------------------------------------------------*/
+#ifndef VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME
+#   define VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME               ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME
+#   define VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME              ENABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_MOUSE
-#   define VSF_TGUI_CFG_SUPPORT_MOUSE                   ENABLED
+#   define VSF_TGUI_CFG_SUPPORT_MOUSE                           ENABLED
 #endif
 #ifndef VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING
-#   define VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING     DISABLED
+#   define VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING             DISABLED
 #endif
+
+/*----------------------------------------------------------------------------*
+ * Control Features                                                           *
+ *----------------------------------------------------------------------------*/
 
 #ifndef VSF_TGUI_CFG_SUPPORT_TIMER
-#   define VSF_TGUI_CFG_SUPPORT_TIMER                   ENABLED
-#endif
-#ifndef VSF_TGUI_CFG_SHOW_REFRESH_LOG
-#   define VSF_TGUI_CFG_SHOW_REFRESH_LOG                DISABLED
-#endif
-#ifndef VSF_TGUI_CFG_SHOW_ON_TIME_LOG
-#   define VSF_TGUI_CFG_SHOW_ON_TIME_LOG                DISABLED
+#   define VSF_TGUI_CFG_SUPPORT_TIMER                           ENABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE
-#   define VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE         ENABLED
+#ifndef VSF_TGUI_CFG_SUPPORT_STREAM_CONTAINER
+#   define VSF_TGUI_CFG_SUPPORT_STREAM_CONTAINER                DISABLED        /*!< haven't implemented yet*/
 #endif
-#ifndef VSF_TGUI_CFG_LIST_SUPPORT_SLIDE
-#   define VSF_TGUI_CFG_LIST_SUPPORT_SLIDE              ENABLED
+
+#ifndef VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER
+#   define VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER           ENABLED
+#endif 
+
+#ifndef VSF_TGUI_CFG_SUPPORT_SLIDER
+#   define VSF_TGUI_CFG_SUPPORT_SLIDER                          ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_TEXT_LIST
+#   define VSF_TGUI_CFG_SUPPORT_TEXT_LIST                       ENABLED
+#endif
+
+#if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
+#   ifndef VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE
+#       define VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE             ENABLED
+#   endif
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_LIST
+#   define VSF_TGUI_CFG_SUPPORT_LIST                            ENABLED
+#endif
+
+#if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
+#   ifndef VSF_TGUI_CFG_LIST_SUPPORT_SLIDE
+#       define VSF_TGUI_CFG_LIST_SUPPORT_SLIDE                  ENABLED
+#   endif
+#endif
+
+#ifndef VSF_TGUI_CFG_REFRESH_CONTROL_ON_ACTIVE_STATE_CHANGE
+#   define VSF_TGUI_CFG_REFRESH_CONTROL_ON_ACTIVE_STATE_CHANGE  DISABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR
+#   define VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR                  ENABLED
+#endif
+
+/*----------------------------------------------------------------------------*
+ * miscellaneous                                                              *
+ *----------------------------------------------------------------------------*/
+#ifndef VSF_TGUI_ASSERT
+#   define VSF_TGUI_ASSERT                                      ASSERT
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG                    DISABLED
+#endif
+#ifndef VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG                    DISABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG                    ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_KEY_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_KEY_EVT_LOG                        ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG                    ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG           ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_USER_INPUT_LOG
+#   define VSF_TGUI_CFG_SHOW_USER_INPUT_LOG                     ENABLED
+#endif
+#if VSF_TGUI_CFG_SHOW_USER_INPUT_LOG != ENABLED
+#   undef   VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG
+#   undef   VSF_TGUI_CFG_SHOW_KEY_EVT_LOG
+#   undef   VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG
+#   define  VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG                   DISABLED
+#   define  VSF_TGUI_CFG_SHOW_KEY_EVT_LOG                       DISABLED
+#   define  VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG                   DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -175,12 +175,6 @@
     <Filter Include="vsf\component\ui">
       <UniqueIdentifier>{16b6f51f-2859-4b63-bbc5-277c3de0a84f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\ui\disp_drv">
-      <UniqueIdentifier>{426a816e-299c-4753-bb8c-19b793f1c00e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\ui\disp_drv\sdl2">
-      <UniqueIdentifier>{378a9a07-be30-4358-a3a9-fd8351214394}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\driver\x86">
       <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
     </Filter>
@@ -255,6 +249,27 @@
     </Filter>
     <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
       <UniqueIdentifier>{3de4595f-803c-4fc3-9c45-b95389aa1571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp">
+      <UniqueIdentifier>{3244ba13-4086-44d1-b96d-68bd1e788d8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver">
+      <UniqueIdentifier>{1408d4ea-28e9-483d-869d-512c800a99e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\sdl2">
+      <UniqueIdentifier>{51fa0eb1-9898-431c-8fda-4387201b06a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal">
+      <UniqueIdentifier>{9122004d-62c4-4d02-bd65-b2846b616237}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral">
+      <UniqueIdentifier>{0f58609d-655f-4c9a-9da2-d9b1191a6674}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral">
+      <UniqueIdentifier>{c9d228fe-7b65-47dc-b3e8-49486b15be6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral\spi">
+      <UniqueIdentifier>{c2fd44e3-9591-4fd2-8bfa-48da63a582b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -561,17 +576,11 @@
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h">
       <Filter>vsf\hal\driver\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h">
       <Filter>vsf\component\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h">
-      <Filter>vsf\component\ui\disp_drv</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.h">
       <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
@@ -891,6 +900,33 @@
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal.h">
+      <Filter>vsf\osa_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h">
+      <Filter>vsf\osa_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_periperhal_cfg.h">
+      <Filter>vsf\osa_hal\sw_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_peripheral.h">
+      <Filter>vsf\osa_hal\sw_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\README.md">
@@ -1081,14 +1117,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
       <Filter>vsf\hal\driver\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c">
-      <Filter>vsf\component\ui\disp_drv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw\lvgl\src\lv_core\lv_disp.c">
       <Filter>vsf\component\3rd-party\littlevgl\6.0\raw\src\lv_core</Filter>
@@ -1380,6 +1410,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_hal\vsf_osa_hal.c">
+      <Filter>vsf\osa_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

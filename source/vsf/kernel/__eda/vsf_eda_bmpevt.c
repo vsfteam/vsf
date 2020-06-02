@@ -162,7 +162,7 @@ static bool __vsf_eda_bmpevt_poll(vsf_bmpevt_t *pthis, vsf_bmpevt_pender_t *pend
     VSF_KERNEL_ASSERT((pthis != NULL) && (pender != NULL));
 
     cur_mask = pthis->value & pender->mask;
-    if (pender->operator == VSF_BMPEVT_AND) {
+    if (pender->op == VSF_BMPEVT_AND) {
         if (cur_mask == pender->mask) {
             err = VSF_ERR_NONE;
         }

@@ -78,7 +78,7 @@ static __mps2_common_t __mps2_common;
 
 #if __VSF_DEV_SWI_NUM > 0
 // SWI
-MREPEAT(__VSF_DEV_SWI_NUM, __MPS2_SWI, NULL)
+REPEAT_MACRO(__VSF_DEV_SWI_NUM, __MPS2_SWI, NULL)
 #endif
 
 static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 

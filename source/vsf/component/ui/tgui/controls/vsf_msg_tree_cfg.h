@@ -26,7 +26,7 @@
 /*============================ TYPES =========================================*/
 typedef enum vsf_msgt_node_id_t {
 /*-------------Add your own gui element below-------------*/
-    VSF_TGUI_COMPONENT_ID_CONTROL   = VSF_MSGT_NODE_ID_USER,
+    VSF_TGUI_COMPONENT_ID_CONTROL   = 0,
     VSF_TGUI_COMPONENT_ID_CONTAINER,
     VSF_TGUI_COMPONENT_ID_LABEL,
     VSF_TGUI_COMPONENT_ID_BUTTON,
@@ -39,9 +39,9 @@ typedef enum vsf_msgt_node_id_t {
 
 
 /*============================ GLOBAL VARIABLES ==============================*/
-extern 
-const i_msg_tree_node_t 
-c_tControlInterfaces[__VSF_TGUI_COMPONENT_TYPE_NUM - VSF_MSGT_NODE_ID_USER];
+extern
+const i_msg_tree_node_t
+c_tControlInterfaces[__VSF_TGUI_COMPONENT_TYPE_NUM];
 
 /*============================ PROTOTYPES ====================================*/
 

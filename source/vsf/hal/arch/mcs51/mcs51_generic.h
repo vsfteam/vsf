@@ -25,6 +25,10 @@
 #include "hal/driver/driver.h"
 #undef  __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define __LITTLE_ENDIAN                 1
@@ -35,12 +39,13 @@
 
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                0
-#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+//#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 #define __VSF_ARCH_SYSTIMER_BITS        16
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef uint32_t vsf_systimer_cnt_t;
+typedef  int32_t vsf_systimer_cnt_signed_t;
 
 #define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
             __vsf_arch_prio_index_##__N = (__N),
@@ -64,6 +69,10 @@ typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

@@ -36,6 +36,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -48,17 +52,17 @@ def_simple_class(vk_file_mal_t) {
         vk_file_t *file;
         uint32_t block_size;
     )
-    private_member(
-        int32_t rw_size;
-    )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const i_mal_drv_t VK_FILE_MAL_DRV;
+extern const vk_mal_drv_t VK_FILE_MAL_DRV;
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_MAL && VSF_USE_FS
 #endif      // __VSF_FILE_MAL_H__

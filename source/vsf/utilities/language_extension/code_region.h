@@ -81,6 +81,10 @@ Output:
  */
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 #ifndef COMPILER_PATCH_CODE_REGION_LOCAL_SIZE
 #   define COMPILER_PATCH_CODE_REGION_LOCAL_SIZE     4
@@ -93,7 +97,7 @@ Output:
     for(code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
         NULL != pcode_region;                                                   \
         pcode_region = NULL)                                                    \
-        for(uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE],                    \
+        for(uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE],               \
                 TPASTE2(__code_region_, __LINE__) = 1;                          \
             TPASTE2(__code_region_, __LINE__)-- ?                               \
                 (pcode_region->pmethods->OnEnter(  pcode_region->ptarget, local)\
@@ -107,7 +111,7 @@ Output:
 #   define __CODE_REGION_SIMPLE(__REGION_ADDR, ...)                             \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
-        uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                        \
+        uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
         pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          \
         __VA_ARGS__;                                                            \
         pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
@@ -116,7 +120,7 @@ Output:
 #   define __CODE_REGION_SIMPLE_START(__REGION_ADDR, ...)                       \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
-        uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                        \
+        uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
         pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          
 
 #   define __CODE_REGION_SIMPLE_END(__REGION_ADDR, ...)                         \
@@ -240,5 +244,9 @@ typedef struct {
 extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
 extern const code_region_t DEFAULT_CODE_REGION_NONE;
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

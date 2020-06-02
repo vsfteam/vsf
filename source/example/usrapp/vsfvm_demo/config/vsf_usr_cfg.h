@@ -71,7 +71,7 @@
 //      <h> Schedule Policy 
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_PREMPT               ENABLED
+#define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED               ENABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
@@ -190,7 +190,7 @@ enum {
 #   define VSF_USE_TCPIP                    ENABLED
 #   define VSF_USE_FS                       DISABLED
 #   define VSF_USE_UI                       ENABLED
-#       define VSF_USE_DISP_DRV_USBD_UVC    ENABLED
+#       define VSF_USE_DISP_USBD_UVC        ENABLED
 #   define VSF_USE_USB_DEVICE               ENABLED
 #       define VSF_USBD_CFG_EDA_PRIORITY    vsf_prio_9
 #       define VSF_USBD_CFG_HW_PRIORITY     vsf_arch_prio_9
@@ -226,7 +226,7 @@ enum {
 #   define VSF_USE_TCPIP                    DISABLED
 #   define VSF_USE_FS                       DISABLED
 #   define VSF_USE_UI                       ENABLED
-#       define VSF_USE_DISP_DRV_SDL2        ENABLED
+#       define VSF_USE_DISP_SDL2            ENABLED
 #   define VSF_USE_USB_DEVICE               DISABLED
 #   define VSF_USE_USB_HOST                 ENABLED
 #       define VSF_USE_USB_HOST_LIBUSB      ENABLED

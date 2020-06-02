@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -112,38 +116,42 @@ struct scsi_inquiry_t {
 } PACKED;
 typedef struct scsi_inquiry_t scsi_inquiry_t;
 
-struct i_scsi_drv_t {
-    void (*init)(uintptr_t target, vsf_evt_t evt);
-    void (*fini)(uintptr_t target, vsf_evt_t evt);
-    bool (*buffer)(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
-    void (*execute)(uintptr_t target, vsf_evt_t evt);
+struct vk_scsi_drv_t {
+    vsf_peda_evthandler_t init;
+    vsf_peda_evthandler_t fini;
+    vsf_peda_evthandler_t execute;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    void (*execute_stream)(uintptr_t target, vsf_evt_t evt);
+    vsf_peda_evthandler_t execute_stream;
 #endif
+    bool (*buffer)(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
 };
-typedef struct i_scsi_drv_t i_scsi_drv_t;
+typedef struct vk_scsi_drv_t vk_scsi_drv_t;
 
 
 def_simple_class(vk_scsi_t) {
     public_member(
-        const i_scsi_drv_t *drv;
+        const vk_scsi_drv_t *drv;
         void *param;
     )
-
-    protected_member(
-        struct {
-            uint8_t *cbd;
-            vsf_mem_t mem;
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-            vsf_stream_t *stream;
-#endif
-        } args;
-        struct {
-            uint32_t reply_len;
-            vsf_err_t errcode;
-        } result;
-    )
 };
+
+#if defined(VSF_SCSI_IMPLEMENT) || defined(VSF_SCSI_INHERIT)
+__vsf_component_peda_ifs(vk_scsi_init)
+__vsf_component_peda_ifs(vk_scsi_fini)
+__vsf_component_peda_ifs(vk_scsi_execute,
+    uint8_t *cbd;
+    vsf_mem_t mem;
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+    vsf_stream_t *stream;
+#   endif
+)
+#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+__vsf_component_peda_ifs(vk_scsi_execute_stream,
+    uint8_t *cbd;
+    vsf_stream_t *stream;
+)
+#   endif
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -157,12 +165,13 @@ extern vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 extern vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream);
 #endif
 
-extern vsf_err_t vk_scsi_get_errcode(vk_scsi_t *pthis, uint32_t *reply_len);
-
 #ifdef VSF_SCSI_INHERIT
-extern void vk_scsi_return(vk_scsi_t *pthis, vsf_err_t err);
 extern bool vk_scsi_get_rw_param(uint8_t *scsi_cmd, uint64_t *addr, uint32_t *size);
 extern uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /*============================ INCLUDES ======================================*/

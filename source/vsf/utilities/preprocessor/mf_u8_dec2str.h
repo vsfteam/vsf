@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -18,6 +18,10 @@
 /*============================ INCLUDES ======================================*/
 #include "tpaste.h"
 /*============================ MACROS ========================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef MFUNC_IN_U8_DEC_VALUE
 #   error Please define the MFUNC_IN_U8_DEC_VALUE as the input value. It must be \
@@ -107,4 +111,7 @@ a compile-time constant value.
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+
+#ifdef __cplusplus
+}
+#endif

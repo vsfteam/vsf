@@ -26,6 +26,10 @@
 
 #include "utilities/compiler.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -83,6 +87,10 @@ typedef struct usb_uvc_ct_roi_t usb_uvc_ct_roi_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
 #endif      // __VSFUSB_UVC_H__

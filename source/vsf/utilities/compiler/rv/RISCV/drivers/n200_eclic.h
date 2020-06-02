@@ -5,6 +5,10 @@
 
 #include "riscv_const.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define ECLICINTCTLBITS  4
 
 //ECLIC memory map
@@ -44,5 +48,9 @@
 #define MTIME_HANDLER   eclic_mtip_handler
 #define BWEI_HANDLER    eclic_bwei_handler
 #define PMOVI_HANDLER   eclic_pmovi_handler
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

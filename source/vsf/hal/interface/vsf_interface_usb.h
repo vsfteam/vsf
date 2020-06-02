@@ -19,12 +19,14 @@
 #define __HAL_DRIVER_USB_INTERFACE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "hal/arch/vsf_arch.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
-
-#define USB_DC_FEATURE_TRANSFER             (1 << 0)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __USB_HC_IP_FUNC_DEF(__N, __VALUE)                                      \
@@ -115,7 +117,7 @@ static uint_fast8_t usb_dc##__N##_get_mframe_number(void);                      
 static void         usb_dc##__N##_get_setup(uint8_t *buffer);                   \
 static void         usb_dc##__N##_status_stage(bool is_in);                     \
                                                                                 \
-static uint_fast8_t usb_dc##__N##_ep_get_feature(uint_fast8_t ep);              \
+static uint_fast8_t usb_dc##__N##_ep_get_feature(uint_fast8_t ep, uint_fast8_t feature);\
 static vsf_err_t    usb_dc##__N##_ep_add(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);\
 static uint_fast16_t    usb_dc##__N##_ep_get_size(uint_fast8_t ep);             \
                                                                                 \
@@ -192,8 +194,8 @@ static void usb_dc##__N##_get_setup(uint8_t *buffer)                            
 { __HEADER##_get_setup(&(__OBJ), buffer); }                                     \
 static void usb_dc##__N##_status_stage(bool is_in)                              \
 { __HEADER##_status_stage(&(__OBJ), is_in); }                                   \
-static uint_fast8_t usb_dc##__N##_ep_get_feature(uint_fast8_t ep)               \
-{ return __HEADER##_ep_get_feature(&(__OBJ), ep); }                             \
+static uint_fast8_t usb_dc##__N##_ep_get_feature(uint_fast8_t ep, uint_fast8_t feature)\
+{ return __HEADER##_ep_get_feature(&(__OBJ), ep, feature); }                    \
 static vsf_err_t usb_dc##__N##_ep_add(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)\
 { return __HEADER##_ep_add(&(__OBJ), ep, type, size); }                         \
 static uint_fast16_t usb_dc##__N##_ep_get_size(uint_fast8_t ep)                 \
@@ -225,6 +227,11 @@ static void usb_dc##__N##_irq(void)                                             
         __USB_DC_BODY_EX(__N, __HEADER, USB_DC##__N)
 
 /*============================ TYPES =========================================*/
+
+enum usb_dc_feature_t {
+    USB_DC_FEATURE_TRANSFER = 1 << 0,
+};
+typedef enum usb_dc_feature_t usb_dc_feature_t;
 
 enum usb_ep_type_t {
     USB_EP_TYPE_CONTROL     = 0,
@@ -306,7 +313,7 @@ def_interface(i_usb_dc_t)
     void            (*StatusStage)      (bool is_in);
 
     struct {
-        uint_fast8_t    (*GetFeature)       (uint_fast8_t ep);
+        uint_fast8_t    (*GetFeature)       (uint_fast8_t ep, uint_fast8_t feature);
 
         vsf_err_t       (*Add)              (uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
         uint_fast16_t   (*GetSize)          (uint_fast8_t ep);
@@ -424,6 +431,10 @@ end_def_interface(i_usb_hc_ip_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

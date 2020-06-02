@@ -123,6 +123,7 @@ static void vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        __vsf_eda_crit_npb_leave(&xb360->dev->ep0.crit);
         vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t));
         xb360->gamepad_out_buf.buffer[1] = 0x08;
         vk_usbh_hid_send_report((vk_usbh_hid_eda_t *)&xb360->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb360->gamepad_out_buf, 8);

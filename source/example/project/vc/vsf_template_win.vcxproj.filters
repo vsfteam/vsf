@@ -91,6 +91,18 @@
     <Filter Include="vsf\service\vsfstream\mem_stream">
       <UniqueIdentifier>{87f7b9b3-0790-4c7b-84f1-ebcaece252aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\osa_hal">
+      <UniqueIdentifier>{d6cf28b1-f924-47fe-9bb2-e6dff2e96ebe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral">
+      <UniqueIdentifier>{95e4c040-745d-4f53-b172-2b5b83696f29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral">
+      <UniqueIdentifier>{a7fff7b0-7555-4b04-98b2-968ddf541c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral\spi">
+      <UniqueIdentifier>{8ec19b37-55ce-45cc-8b85-9c0182ae059d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\usrapp\kernel_test\mutex_test.c">
@@ -212,6 +224,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
       <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_hal\vsf_osa_hal.c">
+      <Filter>vsf\osa_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -418,6 +436,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
       <Filter>vsf\service\vsfstream\mem_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal.h">
+      <Filter>vsf\osa_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h">
+      <Filter>vsf\osa_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_periperhal_cfg.h">
+      <Filter>vsf\osa_hal\sw_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_peripheral.h">
+      <Filter>vsf\osa_hal\sw_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

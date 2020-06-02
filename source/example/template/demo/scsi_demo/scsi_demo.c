@@ -64,7 +64,7 @@ void __user_scsi_mounter(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_RETURN:
         switch (mounter->state) {
         case STATE_INIT:
-            if (vk_mal_get_result(&mounter->use_as__vk_mal_t, NULL) != VSF_ERR_NONE) {
+            if (vsf_eda_get_return_value() != VSF_ERR_NONE) {
                 break;
             }
             mounter->state = STATE_OPEN_DIR;

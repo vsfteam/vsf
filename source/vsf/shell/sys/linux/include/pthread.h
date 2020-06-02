@@ -5,6 +5,10 @@
 
 #include <time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // PTHREAD_MUTEX_INITIALIZER is not support, please use pthread_mutex_init
 //#define PTHREAD_MUTEX_INITIALIZER       { 0 }
 
@@ -56,6 +60,8 @@ int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
 int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
 		const struct timespec *abstime);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,7 +1,9 @@
-#include <unistd.h>
-#include <stdio.h>
+#include <vsf.h>
 
 #if VSF_USE_LINUX == ENABLED
+
+#include <unistd.h>
+#include <stdio.h>
 
 extern void vsh_set_path(char **path);
 extern int vsh_main(int argc, char *argv[]);

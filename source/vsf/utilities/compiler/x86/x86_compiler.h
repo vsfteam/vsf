@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -47,9 +47,12 @@
 #endif
 //! @}
 
-
 #include "./type.h"
 #include "../__common/__compiler.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* -----------------  Start of section using anonymous unions  -------------- */
 
@@ -94,5 +97,9 @@ extern void vsf_set_interrupt(vsf_gint_state_t level);
 extern vsf_gint_state_t vsf_disable_interrupt(void);
 
 extern void vsf_enable_interrupt(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

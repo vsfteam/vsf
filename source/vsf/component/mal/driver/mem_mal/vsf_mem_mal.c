@@ -34,20 +34,20 @@
 
 static uint_fast32_t __vk_mem_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_mem_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-static void __vk_mem_mal_init(uintptr_t target, vsf_evt_t evt);
-static void __vk_mem_mal_fini(uintptr_t target, vsf_evt_t evt);
-static void __vk_mem_mal_read(uintptr_t target, vsf_evt_t evt);
-static void __vk_mem_mal_write(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_mem_mal_init)
+dcl_vsf_peda_methods(static, __vk_mem_mal_fini)
+dcl_vsf_peda_methods(static, __vk_mem_mal_read)
+dcl_vsf_peda_methods(static, __vk_mem_mal_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const i_mal_drv_t VK_MEM_MAL_DRV = {
+const vk_mal_drv_t VK_MEM_MAL_DRV = {
     .blksz          = __vk_mem_mal_blksz,
     .buffer         = __vk_mem_mal_buffer,
-    .init           = __vk_mem_mal_init,
-    .fini           = __vk_mem_mal_fini,
-    .read           = __vk_mem_mal_read,
-    .write          = __vk_mem_mal_write,
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_init),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_fini),
+    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_read),
+    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mem_mal_write),
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -67,60 +67,60 @@ static bool __vk_mem_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t
     return true;
 }
 
-static void __vk_mem_mal_init(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mem_mal_init, vk_mal_init)
 {
-    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
+    vsf_peda_begin();
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
-    pthis->result.errcode = VSF_ERR_NONE;
-    pthis->result.size = 0;
-    vsf_eda_return();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_mem_mal_fini(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mem_mal_fini, vk_mal_fini)
 {
-    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
+    vsf_peda_begin();
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
-    pthis->result.errcode = VSF_ERR_NONE;
-    pthis->result.size = 0;
-    vsf_eda_return();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_mem_mal_read(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mem_mal_read, vk_mal_read)
 {
-    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
+    vsf_peda_begin();
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)&vsf_this;
     uint_fast64_t addr;
     uint_fast32_t size;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    addr = pthis->args.addr;
-    size = pthis->args.size;
+    addr = vsf_local.addr;
+    size = vsf_local.size;
     VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.nSize));
 
-    if (pthis->args.buff != &pthis->mem.pchBuffer[addr]) {
-        memcpy(pthis->args.buff, &pthis->mem.pchBuffer[addr], size);
+    if (vsf_local.buff != &pthis->mem.pchBuffer[addr]) {
+        memcpy(vsf_local.buff, &pthis->mem.pchBuffer[addr], size);
     }
-    pthis->result.errcode = VSF_ERR_NONE;
-    pthis->result.size = size;
-    vsf_eda_return();
+    vsf_eda_return(size);
+    vsf_peda_end();
 }
 
-static void __vk_mem_mal_write(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mem_mal_write, vk_mal_write)
 {
-    vk_mem_mal_t *pthis = (vk_mem_mal_t *)target;
+    vsf_peda_begin();
+    vk_mem_mal_t *pthis = (vk_mem_mal_t *)&vsf_this;
     uint_fast64_t addr;
     uint_fast32_t size;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    addr = pthis->args.addr;
-    size = pthis->args.size;
+    addr = vsf_local.addr;
+    size = vsf_local.size;
     VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.nSize));
 
-    if (pthis->args.buff != &pthis->mem.pchBuffer[addr]) {
-        memcpy(&pthis->mem.pchBuffer[addr], pthis->args.buff, size);
+    if (vsf_local.buff != &pthis->mem.pchBuffer[addr]) {
+        memcpy(&pthis->mem.pchBuffer[addr], vsf_local.buff, size);
     }
-    pthis->result.errcode = VSF_ERR_NONE;
-    pthis->result.size = size;
-    vsf_eda_return();
+    vsf_eda_return(size);
+    vsf_peda_end();
 }
 
 #endif

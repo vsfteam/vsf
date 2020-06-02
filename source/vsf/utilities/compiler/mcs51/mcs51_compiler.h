@@ -52,6 +52,11 @@
 
 #include "./type.h"
 #include "../__common/__compiler.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_51_KEIL__
   //#pragma push
@@ -178,12 +183,17 @@ typedef uint8_t   vsf_gint_state_t;
 
 
 /*============================ TYPES =========================================*/
+/*============================ PROTOTYPES ====================================*/
+extern void vsf_stdio_init(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 /*============================ INCLUDES ======================================*/
 
 //! \brief for interrupt 
 #include "./signal.h"
 
-/*============================ PROTOTYPES ====================================*/
-extern void vsf_stdio_init(void);
 
 #endif

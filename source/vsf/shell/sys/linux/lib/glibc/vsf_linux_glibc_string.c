@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
 
 #include <unistd.h>
 

@@ -262,12 +262,14 @@ static void __vsf_thread_entry(void)
 
 SECTION("text.vsf.kernel.vsf_thread")
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-static void __vsf_thread_evthandler(vsf_thread_cb_t *target, vsf_evt_t evt)
+//static void __vsf_thread_evthandler(vsf_thread_cb_t *target, vsf_evt_t evt)
+static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
 {
     jmp_buf ret;
 
-    VSF_KERNEL_ASSERT(target != NULL);
-    class_internal(target, pthis, vsf_thread_cb_t);
+    VSF_KERNEL_ASSERT(local != NULL);
+    class_internal( *(void **)((uintptr_t)local - sizeof(uintptr_t)), 
+                    pthis, vsf_thread_cb_t);
     pthis->ret = &ret;
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
@@ -280,6 +282,15 @@ static void __vsf_thread_evthandler(vsf_thread_cb_t *target, vsf_evt_t evt)
     } 
 }
 #else
+
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-align"
+#elif __IS_COMPILER_GCC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     class_internal((vsf_thread_t *)eda, thread, vsf_thread_t);
@@ -297,6 +308,13 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
     }
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif __IS_COMPILER_GCC__
+#pragma GCC diagnostic pop
+#endif
+
 #endif
 
 #if __IS_COMPILER_IAR__
@@ -383,11 +401,12 @@ vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb)
 }
 
 
-
-SECTION("text.vsf.kernel.vk_thread_call_eda")
+SECTION("text.vsf.kernel.__vsf_thread_call_eda_ex")
 static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler, 
                                             uintptr_t param, 
-                                            __vsf_eda_frame_state_t state)
+                                            __vsf_eda_frame_state_t state,
+                                            uintptr_t local_buff,
+                                            size_t local_buff_size)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
@@ -404,10 +423,22 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
     vsf_err_t err;
     vsf_evt_t evt;
 
+    enum {
+        VSF_THREAD_CALL_PEDA = 0,
+        VSF_THREAD_WAIT_RETURN,
+    };
+
     while (1) {
         err = __vsf_eda_call_eda_ex(eda_handler, param, state, true);
         if (VSF_ERR_NONE != err) {
             vsf_eda_yield();
+        } else if ((uintptr_t)NULL != local_buff) {
+            //! initialise local
+            size_t size = min(state.local_size, local_buff_size);
+            if (size > 0) {
+                uintptr_t local = vsf_eda_get_local();
+                memcpy((void *)local, (void *)local_buff, size);
+            }
         }
         
         evt = __vsf_thread_wait(cb);
@@ -416,26 +447,32 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
             break;
         }
     }
-    
+
     return err;
 }
 
+
 SECTION("text.vsf.kernel.vk_thread_call_eda")
-vsf_err_t vk_thread_call_eda(uintptr_t eda_handler, uintptr_t param)
+vsf_err_t vk_thread_call_eda(   uintptr_t eda_handler, 
+                                uintptr_t param, 
+                                size_t local_size,
+                                size_t local_buff_size,
+                                uintptr_t local_buff)
 {
-    __vsf_eda_frame_state_t state = { .bits.is_fsm = false,};
-    return __vsf_thread_call_eda_ex(eda_handler, param, state);
+    __vsf_eda_frame_state_t state = { .bits.is_fsm = false,.local_size = local_size};
+    return __vsf_thread_call_eda_ex(eda_handler, param, state, local_buff, local_buff_size);
 }
 
 SECTION("text.vsf.kernel.vsf_thread_call_thread")
-vsf_err_t vk_thread_call_thread( vsf_thread_cb_t *thread_cb,
-                                    vsf_thread_prepare_cfg_t *cfg)
+vsf_err_t vk_thread_call_thread(vsf_thread_cb_t *thread_cb,
+                                vsf_thread_prepare_cfg_t *cfg)
 {
     VSF_KERNEL_ASSERT(NULL != cfg && NULL != thread_cb);
     class_internal(thread_cb, pthis, vsf_thread_cb_t);
     
     __vsf_eda_frame_state_t state = { .bits = {.is_fsm = false,
-                                      .is_stack_owner = true,}
+                                      .is_stack_owner = true,
+                                      },
                                     };
     VSF_KERNEL_ASSERT(    (NULL != cfg->entry)
                     &&    (NULL != cfg->stack)
@@ -446,11 +483,11 @@ vsf_err_t vk_thread_call_thread( vsf_thread_cb_t *thread_cb,
     pthis->stack_size = cfg->stack_size;
     
     return __vsf_thread_call_eda_ex((uintptr_t)__vsf_thread_evthandler, 
-                                    (uintptr_t)thread_cb, state);
+                                    (uintptr_t)thread_cb, state, (uintptr_t)NULL, 0);
 }
 
 SECTION("text.vsf.kernel.vk_thread_call_fsm")
-fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
+fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t local_size)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
@@ -467,7 +504,7 @@ fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param)
     fsm_rt_t ret;
 
     while (1) {
-        ret = __vsf_eda_call_fsm(eda_handler, param);
+        ret = __vsf_eda_call_fsm(eda_handler, param, local_size);
         if (fsm_rt_on_going == ret) {
             vsf_eda_yield();
         } else {

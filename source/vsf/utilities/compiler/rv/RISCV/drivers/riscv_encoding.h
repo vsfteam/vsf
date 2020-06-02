@@ -1,5 +1,9 @@
 // See LICENSE for license details.
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef RISCV_CSR_ENCODING_H
 #define RISCV_CSR_ENCODING_H
 
@@ -1364,5 +1368,9 @@ DECLARE_CAUSE("user_ecall", CAUSE_USER_ECALL)
 DECLARE_CAUSE("supervisor_ecall", CAUSE_SUPERVISOR_ECALL)
 DECLARE_CAUSE("hypervisor_ecall", CAUSE_HYPERVISOR_ECALL)
 DECLARE_CAUSE("machine_ecall", CAUSE_MACHINE_ECALL)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 

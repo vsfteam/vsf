@@ -1,0 +1,77 @@
+// Called once before the flash loader is downloaded to RAM. Implement this macro
+// typically for setting up the memory map required by the flash loader. This macro is only
+// called when you are programming flash, and it should only be used for flash loader functionality.
+execUserFlashInit()
+{
+    //__message "execUserFlashInit() get called.\n";
+}
+
+// Called once after the flash loader is downloaded to RAM, but before execution of the flash loader.
+// This macro is only called when you are programming flash, and it should only be used for flash loader functionality.
+execUserFlashReset()
+{
+    //__message "execUserFlashReset() get called.\n";
+}
+
+// Called once when the flash programming ends.
+// Implement this macro to save status data etc. This macro is useful for flash loader functionality.
+execUserFlashExit()
+{
+    //__message "execUserFlashExit() get called.\n";
+}
+
+// Called after communication with the target system is established but before downloading the target application.
+// Implement this macro to initialize memory locations and/or registers which are vital for loading data properly.
+execUserPreload()
+{
+    __message "execUserPreload() get called.\n";
+    
+    //__hwReset(0);   // CPU is automatically halted after the reset.
+    
+    // VECMAP function is used to map the specified start address to memory address 0x0000-0000.
+    // This initialize file maps the SRAM (0x2000-0000) to address 0x0000_0000 through VECMAP function.
+    __writeMemory32(0x20000000, 0x40000050, "Memory");  // Specify the load VECMAP address   (reg : SYS_LVMPADDR)
+    __writeMemory32(0x00000080, 0x40000054, "Memory");  // Specify the VECMAP length : 128KB (reg : SYS_LVMPLEN)
+    __writeMemory32(0x00000001, 0x4000005C, "Memory");  // // Load VECMAP address and length    (reg : SYS_RVMPLEN)
+}
+
+// Called each time just before the reset command is issued. Implement this macro to set up any required device state.
+execUserPreReset()
+{
+    //__message "execUserPreReset() get called.\n";
+}
+
+// Called each time just after the reset command is issued. Implement this macro to set up and restore data.
+execUserReset()
+{
+    //__message "execUserReset() get called.\n";
+}
+
+// Called once after the target application is downloaded.
+// Implement this macro to set up the memory map, breakpoints, interrupts, register macro files, etc.
+execUserSetup()
+{
+    //__message "execUserSetup() get called.\n";
+}
+
+// Called when the debugger is about to start or resume execution.
+// The macro is not called when performing a one-instruction assembler step, in other words, 
+// Step or Step Into in the Disassembly window.
+execUserExecutionStarted()
+{
+    //__message "execUserExecutionStarted() get called.\n";
+}
+
+// Called when the debugger has stopped execution.
+// The macro is not called when performing a one-instruction assembler step, in other words, 
+// Step or Step Into in the Disassembly window.
+execUserExecutionStopped()
+{
+    //__message "execUserExecutionStopped() get called.\n";
+}
+
+// Called once when the debug session ends. Implement this macro to save status data etc.
+execUserExit()
+{
+    //__message "execUserExit() get called.\n";
+}

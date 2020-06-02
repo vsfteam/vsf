@@ -46,6 +46,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -110,6 +114,10 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *ptObj,
 extern
 bool vsf_stream_reader_read_byte(   vsf_stream_reader_t *ptObj, 
                                     uint8_t *pchByte);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

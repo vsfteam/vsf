@@ -20,6 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
+#include "utilities/vsf_utilities.h"
 
 #if VSF_USE_DYNARR == ENABLED
 
@@ -32,6 +33,10 @@
 #endif
 
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
@@ -68,6 +73,10 @@ extern void vsf_dynarr_fini(vsf_dynarr_t *dynarr);
 extern uint_fast32_t vsf_dynarr_get_size(vsf_dynarr_t *dynarr);
 extern vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size);
 extern void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_DYNARR
 #endif      // __VSF_DYNARR_H__

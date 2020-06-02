@@ -4,6 +4,10 @@
 #include <signal.h>
 #include <time.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int nfds_t;
 
 #define POLLIN          (1 << 0)
@@ -17,5 +21,9 @@ struct pollfd {
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout);
 int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

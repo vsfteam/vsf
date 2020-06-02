@@ -260,7 +260,7 @@ typedef struct vsf_eda_cfg_t vsf_eda_cfg_t;
 
 union __vsf_eda_state_t {
     struct {
-#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #   if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
         uint8_t         is_ready        : 1;
         uint8_t         is_new_prio     : 1;
@@ -337,7 +337,7 @@ def_simple_class(vsf_eda_t) {
     )
 #   endif
 
-#   if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#   if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #       if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
     protected_member(
         vsf_dlist_node_t    rdy_node;
@@ -371,7 +371,7 @@ def_simple_class(vsf_eda_t) {
         fsm_rt_t            fsm_return_state;
 #   endif
 
-#   if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#   if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #       if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
         vsf_dlist_node_t    rdy_node;
         vsf_slist_queue_t   evt_list;

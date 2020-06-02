@@ -152,7 +152,7 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
     __vsf_dlist_foreach_unsafe(vsf_linux_libusb_cb_t, cbnode, &__vsf_libusb.cblist) {
         if (    ((_->vendor_id == LIBUSB_HOTPLUG_MATCH_ANY) || (_->vendor_id == ldev->libusb_dev->vid))
             &&  ((_->product_id == LIBUSB_HOTPLUG_MATCH_ANY) || (_->product_id == ldev->libusb_dev->pid))
-            &&  ((_->dev_class == LIBUSB_HOTPLUG_MATCH_ANY) || (_->dev_class == ldev->libusb_dev->class))
+            &&  ((_->dev_class == LIBUSB_HOTPLUG_MATCH_ANY) || (_->dev_class == ldev->libusb_dev->c))
             &&  (_->cb_fn != NULL)) {
 
             switch (evt) {
@@ -904,11 +904,11 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
         }
         break;
     case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
-#ifndef VSFHAL_HCD_ISO_EN
-        return -1;
-#else
+#if VSF_USBH_CFG_ISO_EN == ENABLED
         urb->urb_hcd->iso_packet.number_of_packets = transfer->num_iso_packets;
         break;
+#else
+        return -1;
 #endif
     case LIBUSB_TRANSFER_TYPE_BULK:
     case LIBUSB_TRANSFER_TYPE_INTERRUPT:

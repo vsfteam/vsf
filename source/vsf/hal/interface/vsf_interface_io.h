@@ -21,6 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -515,6 +518,10 @@ extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 extern void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
 
 extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, uint32_t pin_mask);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

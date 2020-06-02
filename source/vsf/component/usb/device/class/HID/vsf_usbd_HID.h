@@ -35,6 +35,10 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define VSF_USBD_DESC_HID_REPORT(__ptr, __size)                                 \
@@ -106,6 +110,10 @@ extern const vk_usbd_class_op_t vk_usbd_hid;
 extern bool vk_usbh_hid_in_report_can_update(vk_usbd_hid_report_t *report);
 extern void vk_usbd_hid_in_report_changed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
 extern void vk_usbh_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_HID
 #endif      // __VSF_USBD_HID_H__

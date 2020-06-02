@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_EDA_CLASS_INHERIT
 #include "vsf.h"
 
 #include "lvgl/lvgl.h"
@@ -175,7 +176,7 @@ static void usrapp_on_timer(vsf_callback_timer_t *timer)
 
 int main(void)
 {
-    vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
+    vsf_start_trace();
     usrapp_trans_init();
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
 

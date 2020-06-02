@@ -83,7 +83,7 @@ WEAK_VSF_USR_SWI_TRIGGER_EXTERN
 
 // SWI
 #if __VSF_DEV_SWI_NUM > 0
-MREPEAT(__VSF_DEV_SWI_NUM, __NUC500_SWI, NULL)
+REPEAT_MACRO(__VSF_DEV_SWI_NUM, __NUC500_SWI, NULL)
 
 static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 
                                                 vsf_arch_prio_t priority,

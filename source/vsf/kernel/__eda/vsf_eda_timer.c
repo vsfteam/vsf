@@ -33,11 +33,29 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if     VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   if      VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS     \
+        &&  !defined(VSF_SYSTIMER_CFG_IMPL_MODE)
+extern bool vsf_systimer_is_due(vsf_systimer_cnt_t due);
+extern vsf_err_t vsf_systimer_start(void);
+extern vsf_systimer_cnt_t vsf_systimer_get(void);
+extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
+extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
+extern vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
+extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
+#   endif
+
+SECTION(".text.vsf.kernel.teda")
+static void vsf_teda_timer_enqueue(vsf_teda_t *pthis, vsf_timer_tick_t due);
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 
-static void vsf_timer_wakeup(void)
+static void __vsf_timer_wakeup(void)
 {
     if (!__vsf_eda.timer.processing) {
         __vsf_eda.timer.processing = true;
@@ -52,7 +70,7 @@ static void vsf_timer_wakeup(void)
 }
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-static void vsf_timer_update(bool force)
+static void __vsf_timer_update(bool force)
 {
     vsf_teda_t *teda;
 
@@ -62,34 +80,102 @@ static void vsf_timer_update(bool force)
     } else if (force || (teda->due != __vsf_eda.timer.pre_tick)) {
         __vsf_eda.timer.pre_tick = teda->due;
         if (!vsf_systimer_set(teda->due)) {
-            vsf_timer_wakeup();
+            __vsf_timer_wakeup();
         }
     }
 }
 #else
-static void vsf_timer_update(bool force)
+static void __vsf_timer_update(bool force)
 {
     
 }
 #endif
 
 SECTION(".text.vsf.kernel.teda")
+static bool __vsf_timer_is_due(vsf_systimer_cnt_t due)
+{
+    return vsf_systimer_is_due(due);
+}
+
+SECTION(".text.vsf.kernel.teda")
 static void __vsf_timer_start(void)
 {
+    vsf_systimer_prio_set(__vsf_eda.timer.arch_prio);
+
     vsf_systimer_start();
 }
 
-//SECTION(".text.vsf.kernel.teda")
+SECTION(".text.vsf.kernel.teda")
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 {
     UNUSED_PARAM(tick);
-    vsf_timer_wakeup();
+    __vsf_timer_wakeup();
+}
+
+SECTION(".text.vsf.kernel.teda")
+static vsf_err_t vsf_teda_set_timer_imp(vsf_teda_t *pthis, vsf_timer_tick_t due)
+{
+    vsf_teda_timer_enqueue(pthis, due);
+    __vsf_timer_update(false);
+    return VSF_ERR_NONE;
 }
 
 SECTION(".text.vsf.kernel.teda")
 vsf_timer_tick_t vsf_timer_get_tick(void)
 {
     return vsf_systimer_get();
+}
+#else       // VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+SECTION(".text.vsf.kernel.teda")
+static void __vsf_timer_start(void)
+{
+    // in tick timer mode, user will initialize timer and 
+}
+
+SECTION(".text.vsf.kernel.teda")
+static bool __vsf_timer_is_due(vsf_systimer_cnt_t due)
+{
+    return ((vsf_systimer_cnt_signed_t)(vsf_timer_get_tick() - due) >= 0);
+}
+
+SECTION(".text.vsf.kernel.teda")
+void vsf_timer_on_tick(void)
+{
+    vsf_protect_t orig = vsf_protect_int();
+        __vsf_eda.timer.cur_tick++;
+    vsf_unprotect_int(orig);
+    vsf_eda_post_evt(&__vsf_eda.teda.use_as__vsf_eda_t, VSF_EVT_TIMER);
+}
+
+SECTION(".text.vsf.kernel.teda")
+static vsf_err_t vsf_teda_set_timer_imp(vsf_teda_t *pthis, vsf_timer_tick_t due)
+{
+    vsf_teda_timer_enqueue(pthis, due);
+    return VSF_ERR_NONE;
+}
+
+SECTION(".text.vsf.kernel.teda")
+vsf_timer_tick_t vsf_timer_get_tick(void)
+{
+    vsf_timer_tick_t tick;
+    vsf_protect_t orig = vsf_protect_int();
+        tick = __vsf_eda.timer.cur_tick;
+    vsf_unprotect_int(orig);
+    return tick;
+}
+#endif      // VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+
+SECTION(".text.vsf.kernel.teda")
+static void __vsf_timer_init(void)
+{
+#if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+    __vsf_eda.timer.processing = false;
+#endif
+    vsf_timq_init(&__vsf_eda.timer.timq);
+#if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
+    vsf_callback_timq_init(&__vsf_eda.timer.callback_timq);
+    vsf_callback_timq_init(&__vsf_eda.timer.callback_timq_done);
+#endif
 }
 
 SECTION(".text.vsf.kernel.teda")
@@ -104,25 +190,6 @@ static void vsf_teda_timer_enqueue(vsf_teda_t *pthis, vsf_timer_tick_t due)
     &&  (   VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                       \
         ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
     pthis->use_as__vsf_eda_t.state.bits.is_evt_incoming = true;
-#endif
-}
-
-SECTION(".text.vsf.kernel.teda")
-static vsf_err_t vsf_teda_set_timer_imp(vsf_teda_t *pthis, vsf_timer_tick_t due)
-{
-    vsf_teda_timer_enqueue(pthis, due);
-    vsf_timer_update(false);
-    return VSF_ERR_NONE;
-}
-
-SECTION(".text.vsf.kernel.teda")
-static void __vsf_timer_init(void)
-{
-    __vsf_eda.timer.processing = false;
-    vsf_timq_init(&__vsf_eda.timer.timq);
-#if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
-    vsf_callback_timq_init(&__vsf_eda.timer.callback_timq);
-    vsf_callback_timq_init(&__vsf_eda.timer.callback_timq_done);
 #endif
 }
 
@@ -156,6 +223,7 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
     return VSF_ERR_NONE;
 }
 
+#if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 SECTION(".text.vsf.kernel.vsf_callback_timer_add_ms")
 vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
 {
@@ -169,6 +237,7 @@ vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t u
     vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
     return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
 }
+#endif
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
 vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer)
@@ -258,6 +327,7 @@ vsf_err_t vsf_teda_set_timer(uint_fast32_t tick)
 #   pragma GCC diagnostic pop
 #endif
 
+#if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
 vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
 {
@@ -271,6 +341,7 @@ vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
     vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
     return vsf_teda_set_timer((uint_fast32_t)tick);
 }
+#endif
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push

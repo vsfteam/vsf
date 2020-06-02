@@ -36,6 +36,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -43,8 +47,23 @@
 declare_simple_class(vk_winsound_dev_t)
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+
+// avoid to use windows.h, fix if any conflicts
+#define HWAVEOUT                        HANDLE
+/* wave data block header */
+typedef struct __wavehdr_tag {
+    LPSTR       lpData;                 /* pointer to locked data buffer */
+    DWORD       dwBufferLength;         /* length of data buffer */
+    DWORD       dwBytesRecorded;        /* used for input only */
+    DWORD_PTR   dwUser;                 /* for client's use */
+    DWORD       dwFlags;                /* assorted flags (see defines) */
+    DWORD       dwLoops;                /* loop control counter */
+    struct __wavehdr_tag FAR *lpNext;   /* reserved for driver */
+    DWORD_PTR   reserved;               /* reserved for driver */
+} __WAVEHDR;
+
 struct vk_winsound_play_buffer_t {
-    WAVEHDR header;
+    __WAVEHDR header;
     uint8_t *buffer;
 };
 typedef struct vk_winsound_play_buffer_t vk_winsound_play_buffer_t;
@@ -63,6 +82,8 @@ struct vk_winsound_play_ctx_t {
     uint8_t buffer_taken;
 };
 typedef struct vk_winsound_play_ctx_t vk_winsound_play_ctx_t;
+
+#undef HWAVEOUT
 #endif
 
 def_simple_class(vk_winsound_dev_t) {
@@ -71,7 +92,7 @@ def_simple_class(vk_winsound_dev_t) {
     private_member(
         bool is_inited;
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-        vk_winsound_play_ctx_t play;
+        vk_winsound_play_ctx_t play_ctx;
 #endif
     )
 };
@@ -81,6 +102,10 @@ def_simple_class(vk_winsound_dev_t) {
 extern const vk_audio_drv_t vk_winsound_drv;
 
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_AUDIO && VSF_USE_WINSOUND
 #endif      // __VSF_WINSOUND_H__

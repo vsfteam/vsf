@@ -34,20 +34,20 @@
 
 static uint_fast32_t __vk_mim_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_mim_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-static void __vk_mim_mal_init(uintptr_t target, vsf_evt_t evt);
-static void __vk_mim_mal_fini(uintptr_t target, vsf_evt_t evt);
-static void __vk_mim_mal_read(uintptr_t target, vsf_evt_t evt);
-static void __vk_mim_mal_write(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_mim_mal_init)
+dcl_vsf_peda_methods(static, __vk_mim_mal_fini)
+dcl_vsf_peda_methods(static, __vk_mim_mal_read)
+dcl_vsf_peda_methods(static, __vk_mim_mal_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const i_mal_drv_t VK_MIM_MAL_DRV = {
+const vk_mal_drv_t VK_MIM_MAL_DRV = {
     .blksz          = __vk_mim_mal_blksz,
     .buffer         = __vk_mim_mal_buffer,
-    .init           = __vk_mim_mal_init,
-    .fini           = __vk_mim_mal_fini,
-    .read           = __vk_mim_mal_read,
-    .write          = __vk_mim_mal_write,
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_init),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_fini),
+    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_read),
+    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_write),
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -65,44 +65,50 @@ static bool __vk_mim_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t
     return vk_mal_prepare_buffer(pthis->host_mal, addr + pthis->offset, size, op, mem);
 }
 
-static void __vk_mim_mal_init(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mim_mal_init, vk_mal_init)
 {
-    vsf_eda_return();
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_mim_mal_fini(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mim_mal_fini, vk_mal_fini)
 {
-    vsf_eda_return();
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_mim_mal_read(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mim_mal_read, vk_mal_read)
 {
-    vk_mim_mal_t *pthis = (vk_mim_mal_t *)target;
+    vsf_peda_begin();
+    vk_mim_mal_t *pthis = (vk_mim_mal_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_mal_read(pthis->host_mal, pthis->args.addr + pthis->offset, pthis->args.size, pthis->args.buff);
+        vk_mal_read(pthis->host_mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         break;
     case VSF_EVT_RETURN:
-        pthis->result.errcode = pthis->host_mal->result.errcode;
-        vsf_eda_return();
+        vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
+    vsf_peda_end();
 }
 
-static void __vk_mim_mal_write(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_mim_mal_write, vk_mal_write)
 {
-    vk_mim_mal_t *pthis = (vk_mim_mal_t *)target;
+    vsf_peda_begin();
+    vk_mim_mal_t *pthis = (vk_mim_mal_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vk_mal_write(pthis->host_mal, pthis->args.addr + pthis->offset, pthis->args.size, pthis->args.buff);
+        vk_mal_write(pthis->host_mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         break;
     case VSF_EVT_RETURN:
-        pthis->result.errcode = pthis->host_mal->result.errcode;
-        vsf_eda_return();
+        vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
+    vsf_peda_end();
 }
 
 #endif

@@ -24,8 +24,7 @@
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
-#include "../../controls/vsf_tgui_controls.h"
-
+#include "./vsf_tgui_sv_control.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -47,22 +46,30 @@ typedef union {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* ptContainer);
+extern 
+fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* ptContainer);
 
-extern fsm_rt_t vsf_tgui_container_v_rendering( 
+extern 
+fsm_rt_t vsf_tgui_container_v_rendering(
                                             vsf_tgui_container_t* ptContainer,
-                                            vsf_tgui_region_t* ptDirtyRegion,      
+                                            vsf_tgui_region_t* ptDirtyRegion,
+                                            vsf_tgui_control_refresh_mode_t tMode);
+extern
+fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_container_t* ptContainer,
+                                            vsf_tgui_region_t* ptDirtyRegion,       
                                             vsf_tgui_control_refresh_mode_t tMode);
 
-extern fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* ptContainer);
+extern 
+fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* ptContainer);
 
-extern fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_container_t* ptContainer);
+extern 
+fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_container_t* ptContainer);
 
 extern
 fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* ptContainer,
-                                        vsf_tgui_region_t* ptDirtyRegion,      
+                                        vsf_tgui_region_t* ptDirtyRegion,
                                         vsf_tgui_control_refresh_mode_t tMode,
-                                        vsf_tgui_color_t tBackground);
+                                        vsf_tgui_sv_color_t tBackground);
 #endif
 
 #endif

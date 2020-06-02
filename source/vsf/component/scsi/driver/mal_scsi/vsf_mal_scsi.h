@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -58,6 +62,9 @@ extern const i_virtual_scsi_drv_t VK_MAL_VIRTUAL_SCSI_DRV;
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_SCSI && VSF_USE_MAL_SCSI
 #endif      // __VSF_MAL_SCSI_H__

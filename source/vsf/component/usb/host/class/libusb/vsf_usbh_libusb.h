@@ -22,6 +22,11 @@
 #include "component/usb/vsf_usb_cfg.h"
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_LIBUSB == ENABLED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -33,8 +38,8 @@ struct vk_usbh_libusb_dev_t {
     void *user_data;
 
     uint16_t vid, pid;
-    uint8_t class;
-    uint8_t subclass;
+    uint8_t c;
+    uint8_t subc;
     uint8_t protocol;
     uint8_t ep0size;
     uint8_t address;
@@ -64,6 +69,10 @@ extern void vk_usbh_libusb_set_evthandler(void *param,
 
 extern vsf_err_t vk_usbh_libusb_open(vk_usbh_libusb_dev_t *ldev);
 extern void vk_usbh_libusb_close(vk_usbh_libusb_dev_t *ldev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

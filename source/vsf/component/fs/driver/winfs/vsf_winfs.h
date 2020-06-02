@@ -24,8 +24,6 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
 
-#include <windows.h>
-
 #if     defined(VSF_WINFS_IMPLEMENT)
 #   undef VSF_WINFS_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -35,6 +33,10 @@
 #endif
 
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -74,6 +76,10 @@ typedef struct vk_winfs_info_t vk_winfs_info_t;
 extern const vk_fs_op_t vk_winfs_op;
 
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_FS && VSF_USE_FATFS
 #endif      // __VSF_WINFS_H__

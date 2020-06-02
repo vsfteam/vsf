@@ -32,26 +32,26 @@
 #elif   defined(__VSF_TGUI_CONTROLS_BUTTON_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #   undef __VSF_TGUI_CONTROLS_BUTTON_CLASS_INHERIT
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __VSF_TGUI_INTERFACE_CONTROLS_BUTTON         {                             \
+#   define __VSF_TGUI_INTERFACE_CONTROLS_BUTTON         {                       \
             {                                                                   \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_mc_button_msg_handler        \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_button_msg_handler           \
             },                                                                  \
             (vsf_msgt_method_status_t *)&vsf_tgui_control_status_get,           \
             (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
         }
 #else
-#   define __VSF_TGUI_INTERFACE_CONTROLS_BUTTON         {                             \
+#   define __VSF_TGUI_INTERFACE_CONTROLS_BUTTON         {                       \
             .tMessageHandler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_mc_button_msg_handler,       \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_button_msg_handler,          \
             },                                                                  \
             .Status = (vsf_msgt_method_status_t *)                              \
                         &vsf_tgui_control_status_get,                           \
@@ -69,14 +69,16 @@
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            VSF_TGUI_V_BUTTON_STATIC_INIT_DEFAULT               \
+                            __VA_ARGS__                                         \
+                            VSF_TGUI_V_BUTTON_STATIC_INIT_OVERRIDE)
 
 #define tgui_button(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)             \
             __tgui_button(  __NAME,                                             \
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            __VA_ARGS__)
 
 #define __tgui_set_internal_button( __OWNER_ADDR,                               \
                                 __MEMBER,                                       \
@@ -97,7 +99,7 @@
                                     __MEMBER,                                   \
                                     __PREVIOUS,                                 \
                                     __NEXT,                                     \
-                                    __VA_ARGS__)                               
+                                    __VA_ARGS__)
 
 
 #define tgui_set_priv_button( __OWNER_ADDR ,                                    \
@@ -107,7 +109,7 @@
                                     __MEMBER,                                   \
                                     __MEMBER,                                   \
                                     __MEMBER,                                   \
-                                    __VA_ARGS__)  
+                                    __VA_ARGS__)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -141,11 +143,11 @@ end_def_class(vsf_tgui_button_t)
 extern
 fsm_rt_t vk_tgui_button_init(vsf_tgui_button_t* ptButton);
 
-extern 
+extern
 fsm_rt_t vk_tgui_button_update(vsf_tgui_button_t* ptButton);
 
-extern 
-fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptControl, 
+extern
+fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptControl,
                                         vsf_tgui_msg_t* ptMSG);
 
 #endif

@@ -69,11 +69,11 @@ typedef struct vk_usbh_msc_t vk_usbh_msc_t;
 static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
 static void __vk_usbh_msc_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 
-static void __vk_usbh_msc_scsi_init(uintptr_t target, vsf_evt_t evt);
-static void __vk_usbh_msc_scsi_fini(uintptr_t target, vsf_evt_t evt);
-static void __vk_usbh_msc_scsi_execute(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_init)
+dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_fini)
+dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_execute)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-static void __vk_usbh_msc_scsi_execute_stream(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_execute_stream)
 #endif
 
 extern void vsf_scsi_on_new(vk_scsi_t *scsi);
@@ -85,16 +85,16 @@ static const vk_usbh_dev_id_t __vk_usbh_msc_dev_id[] = {
     { VSF_USBH_MATCH_IFS_CLASS(USB_CLASS_MASS_STORAGE, 6, 0x50) },
 };
 
-const i_scsi_drv_t __vk_usbh_msc_scsi_drv = {
-    .init           = __vk_usbh_msc_scsi_init,
-    .fini           = __vk_usbh_msc_scsi_fini,
+const vk_scsi_drv_t __vk_usbh_msc_scsi_drv = {
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_init),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_fini),
     .buffer         = NULL,
-    .execute        = __vk_usbh_msc_scsi_execute,
+    .execute        = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_execute),
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    .execute_stream = __vk_usbh_msc_scsi_execute_stream,
+    .execute_stream = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_execute_stream),
 #endif
 };
-typedef struct i_scsi_drv_t i_scsi_drv_t;
+typedef struct vk_scsi_drv_t vk_scsi_drv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -122,28 +122,25 @@ void vsf_scsi_on_delete(vk_scsi_t *scsi)
 }
 #endif
 
-static void __vk_usbh_msc_scsi_init(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_init, vk_scsi_init)
 {
-    vk_scsi_return((vk_scsi_t *)target, VSF_ERR_NONE);
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_usbh_msc_scsi_fini(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_fini, vk_scsi_fini)
 {
-    vk_scsi_return((vk_scsi_t *)target, VSF_ERR_NONE);
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_usbh_msc_scsi_execute_do(uintptr_t target, vsf_evt_t evt, bool is_stream)
+static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uint8_t *cbd, bool is_stream, void *mem_stream)
 {
-    vk_usbh_msc_t *msc = container_of(target, vk_usbh_msc_t, scsi);
-    vsf_mem_t *mem = &msc->scsi.args.mem;
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    vsf_stream_t *stream = msc->scsi.args.stream;
-#endif
-
     switch (evt) {
     case VSF_EVT_INIT: {
             // TODO: add mutex for protection
-            uint8_t *cbd = msc->scsi.args.cbd;
             uint_fast8_t cbd_len = vk_scsi_get_command_len(cbd);
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
             bool is_rw = vk_scsi_get_rw_param(cbd, &msc->addr, &msc->size);
@@ -155,14 +152,13 @@ static void __vk_usbh_msc_scsi_execute_do(uintptr_t target, vsf_evt_t evt, bool 
             if (is_stream) {
                 VSF_USB_ASSERT(is_rw);
             } else {
-                msc->size = mem->nSize;
+                msc->size = ((vsf_mem_t *)mem_stream)->nSize;
             }
-            msc->scsi.result.reply_len = msc->size;
             msc->buffer.cbw.dCBWDataTransferLength = cpu_to_le32(msc->size);
             msc->buffer.cbw.bmCBWFlags = (SCSI_CMDCODE_WRITE == cmd_code) ? 0x00 : 0x80;
             msc->buffer.cbw.bCBWLUN = 0;
             msc->buffer.cbw.bCBWCBLength = cbd_len;
-            memcpy(msc->buffer.cbw.CBWCB, msc->scsi.args.cbd, cbd_len);
+            memcpy(msc->buffer.cbw.CBWCB, cbd, cbd_len);
 
             vk_usbh_urb_set_buffer(&msc->urb_out, &msc->buffer.cbw, sizeof(msc->buffer.cbw));
             vk_usbh_submit_urb(msc->usbh, &msc->urb_out);
@@ -171,7 +167,7 @@ static void __vk_usbh_msc_scsi_execute_do(uintptr_t target, vsf_evt_t evt, bool 
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
             if (URB_OK != vk_usbh_urb_get_status(&urb)) {
-                vk_scsi_return(&msc->scsi, VSF_ERR_FAIL);
+                vsf_eda_return(VSF_ERR_FAIL);
                 break;
             }
 
@@ -186,9 +182,9 @@ static void __vk_usbh_msc_scsi_execute_do(uintptr_t target, vsf_evt_t evt, bool 
                     // TODO: add stream support
                     VSF_USB_ASSERT(false);
                 } else {
-                    if (msc->scsi.args.mem.nSize > 0) {
+                    if (((vsf_mem_t *)mem_stream)->nSize > 0) {
                         vk_usbh_urb_t * urb = (msc->buffer.cbw.bmCBWFlags & 0x80) ? &msc->urb_in : &msc->urb_out;
-                        vk_usbh_urb_set_buffer(urb, msc->scsi.args.mem.pchBuffer, msc->scsi.args.mem.nSize);
+                        vk_usbh_urb_set_buffer(urb, ((vsf_mem_t *)mem_stream)->pchBuffer, ((vsf_mem_t *)mem_stream)->nSize);
                         vk_usbh_submit_urb(msc->usbh, urb);
                     } else {
                         goto reply_stage;
@@ -220,8 +216,8 @@ static void __vk_usbh_msc_scsi_execute_do(uintptr_t target, vsf_evt_t evt, bool 
                 }
                 break;
             case VSF_USBH_MSC_STATE_REPLY:
-                msc->scsi.result.reply_len -= msc->buffer.csw.dCSWDataResidue;
-                vk_scsi_return((vk_scsi_t *)target, msc->buffer.csw.dCSWStatus == 0 ? VSF_ERR_NONE : VSF_ERR_FAIL);
+                msc->size -= msc->buffer.csw.dCSWDataResidue;
+                vsf_eda_return(msc->buffer.csw.dCSWStatus == 0 ? msc->size : VSF_ERR_FAIL);
                 break;
             }
         }
@@ -229,17 +225,23 @@ static void __vk_usbh_msc_scsi_execute_do(uintptr_t target, vsf_evt_t evt, bool 
     }
 }
 
-static void __vk_usbh_msc_scsi_execute(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute, vk_scsi_execute)
 {
-    __vk_usbh_msc_scsi_execute_do(target, evt, false);
+    vsf_peda_begin();
+    vk_usbh_msc_t *msc = container_of(&vsf_this, vk_usbh_msc_t, scsi);
+    __vk_usbh_msc_scsi_execute_do(msc, evt, vsf_local.cbd, false, &vsf_local.mem);
+    vsf_peda_end();
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-static void __vk_usbh_msc_scsi_execute_stream(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute_stream, vk_scsi_execute_stream)
 {
+    vsf_peda_begin();
     VSF_USB_ASSERT(false);
     // not supported yet
-//    __vk_usbh_msc_scsi_execute_do(target, evt, true);
+//    vk_usbh_msc_t *msc = container_of(&vsf_this, vk_usbh_msc_t, scsi);
+//    __vk_usbh_msc_scsi_execute_do(msc, evt, vsf_local.cbd, true, &vsf_local.stream);
+    vsf_peda_end();
 }
 #endif
 

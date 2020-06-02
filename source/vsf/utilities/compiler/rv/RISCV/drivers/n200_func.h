@@ -8,6 +8,10 @@
 #include "n200_timer.h"
 #include "n200_eclic.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define	ECLIC_GROUP_LEVEL0_PRIO4	0
 #define	ECLIC_GROUP_LEVEL1_PRIO3	1
 #define	ECLIC_GROUP_LEVEL2_PRIO2	2
@@ -105,5 +109,8 @@ __attribute__( ( always_inline ) ) static inline  void __WFE(void) {
 	__asm volatile ("csrc 0x810, 0x1");
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

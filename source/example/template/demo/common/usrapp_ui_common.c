@@ -19,7 +19,8 @@
 
 #include "./usrapp_ui_common.h"
 
-#if VSF_USE_UI == ENABLED
+#if     VSF_USE_UI == ENABLED                                                   \
+    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -27,7 +28,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 
 usrapp_ui_common_t usrapp_ui_common = {
-#if VSF_USE_DISP_DRV_SDL2 == ENABLED
+#if VSF_USE_DISP_SDL2 == ENABLED
         .disp                       = {
             .param                  = {
                 .height             = APP_DISP_SDL2_HEIGHT,

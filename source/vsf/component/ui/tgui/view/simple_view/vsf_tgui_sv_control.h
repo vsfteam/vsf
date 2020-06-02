@@ -25,14 +25,12 @@
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
 #include "../../controls/vsf_tgui_controls.h"
-
+#include "./vsf_tgui_sv_color.h"
+#include "./vsf_tgui_sv_font.h"
+#include "./vsf_tgui_sv_draw.h"
+#include "./vsf_tgui_sv_style.h"
 
 /*============================ MACROS ========================================*/
-// Support for partial refresh in on control
-#ifndef VSF_TGUI_V_CFG_PARTIAL_REFRESH
-#define VSF_TGUI_V_CFG_PARTIAL_REFRESH 	        VSF_TGUI_CFG_SUPPORT_DIRTY_REGION
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -41,7 +39,7 @@
 extern fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* ptControl);
 
 extern fsm_rt_t vsf_tgui_control_v_rendering(vsf_tgui_control_t* ptControl,
-                                            vsf_tgui_region_t* ptDirtyRegion,      
+                                            vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 
 extern fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* ptControl);
@@ -52,6 +50,9 @@ extern bool vsf_tgui_get_child_dirty_region(const vsf_tgui_control_t* ptControl,
                                             const vsf_tgui_region_t* ptParentDirtyRegion,
                                             vsf_tgui_region_t* ptChildDirtyRegion);
 
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+extern const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* ptControl);
+#endif
 
 #endif
 

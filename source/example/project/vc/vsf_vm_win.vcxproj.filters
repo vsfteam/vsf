@@ -205,12 +205,6 @@
     <Filter Include="vsf\component\ui">
       <UniqueIdentifier>{9e72c061-6b3a-4efc-914d-68b2c68e9342}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\ui\disp_drv">
-      <UniqueIdentifier>{937ecf11-e589-47ba-b32c-05bc811759b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\ui\disp_drv\sdl2">
-      <UniqueIdentifier>{b5bbaf73-c909-4ad2-ad27-7e6f7e2c75e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party\vsfvm">
       <UniqueIdentifier>{b6545577-f66e-4f07-be0d-9726d2224ac8}</UniqueIdentifier>
     </Filter>
@@ -276,6 +270,15 @@
     </Filter>
     <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
       <UniqueIdentifier>{835f5dac-2315-4341-9bfb-d5b2de81d801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp">
+      <UniqueIdentifier>{60f1f025-0f93-4a87-b9e4-b8ffd2c03a7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver">
+      <UniqueIdentifier>{8b7eddbe-b61d-4305-a34b-465246f138d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\sdl2">
+      <UniqueIdentifier>{09d2a1ee-7500-467c-b775-e76ca31df046}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -846,12 +849,6 @@
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h">
       <Filter>vsf\component\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h">
-      <Filter>vsf\component\ui\disp_drv</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.h">
       <Filter>vsf\component\3rd-party\vsfvm\extension\vsf\kernel</Filter>
     </ClInclude>
@@ -929,6 +926,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1357,12 +1360,6 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c">
-      <Filter>vsf\component\ui\disp_drv</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.c">
       <Filter>vsf\component\3rd-party\vsfvm\extension\vsf\kernel</Filter>
     </ClCompile>
@@ -1419,6 +1416,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

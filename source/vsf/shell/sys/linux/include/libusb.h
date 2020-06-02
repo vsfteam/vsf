@@ -3,6 +3,10 @@
 
 #include <poll.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LIBUSB_HOTPLUG_MATCH_ANY    -1
 
 #define libusb_device_descriptor    usb_device_desc_t
@@ -216,7 +220,8 @@ static inline void libusb_fill_control_transfer(
     unsigned char *buffer, libusb_transfer_cb_fn callback, void *user_data,
     unsigned int timeout)
 {
-    struct libusb_control_setup *setup = (struct libusb_control_setup *)(void *) buffer;
+    // no idea why libusb_control_setup can not be used for c++ here
+    struct usb_ctrlrequest_t *setup = (struct usb_ctrlrequest_t *)(void *)buffer;
     transfer->dev_handle = dev_handle;
     transfer->endpoint = 0;
     transfer->type = LIBUSB_TRANSFER_TYPE_CONTROL;
@@ -328,5 +333,9 @@ static inline void libusb_set_iso_packet_lengths(
 
 
 void vsf_linux_libusb_startup(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

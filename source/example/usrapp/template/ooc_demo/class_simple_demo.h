@@ -20,6 +20,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "vsf_cfg.h"
+#include "utilities/vsf_utilities.h"
 
 #if     defined(CLASS_SIMPLE_DEMO_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT

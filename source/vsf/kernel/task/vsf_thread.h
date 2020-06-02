@@ -42,6 +42,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 #ifndef VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE
 #   define VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE	    1
@@ -297,28 +301,32 @@
 
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   define __vsf_thread_call_sub(__NAME, __TARGET)                              \
-            vk_thread_call_eda((uintptr_t)(__NAME), (uintptr_t)(__TARGET))
+#   define __vsf_thread_call_sub(__NAME, __TARGET, ...)                         \
+            vk_thread_call_eda( (uintptr_t)(__NAME),                            \
+                                (uintptr_t)(__TARGET),                          \
+                                (0, ##__VA_ARGS__),                             \
+                                0,                                              \
+                                0)
 
 
-#   define vsf_thread_call_sub(__NAME, __TARGET)                                \
-            __vsf_thread_call_sub(__NAME, (__TARGET))
+#   define vsf_thread_call_sub(__NAME, __TARGET, ...)                           \
+            __vsf_thread_call_sub(__NAME, (__TARGET), (0, ##__VA_ARGS__))
 
 
-#   define vsf_thread_call_pt(__NAME, __TARGET)                                 \
-            (__TARGET)->tState = 0;                                            \
-            vsf_thread_call_sub(vsf_pt_func(__NAME), (__TARGET))
+#   define vsf_thread_call_pt(__NAME, __TARGET, ...)                            \
+            (__TARGET)->tState = 0;                                             \
+            vsf_thread_call_sub(vsf_pt_func(__NAME), (__TARGET), (0, ##__VA_ARGS__))
 
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 
-#   define vsf_thread_call_fsm(__NAME, __TARGET)                                \
-                vk_thread_call_fsm(  (vsf_fsm_entry_t)(__NAME),              \
-                                        (uintptr_t)(__TARGET))
+#   define vsf_thread_call_fsm(__NAME, __TARGET, ...)                           \
+                vk_thread_call_fsm(  (vsf_fsm_entry_t)(__NAME),                 \
+                                        (uintptr_t)(__TARGET), (0, ##__VA_ARGS__))
         
-#   define vsf_thread_call_task(__NAME, __TARGET)                               \
-                vsf_thread_call_fsm(vsf_task_func(__NAME), __TARGET)
+#   define vsf_thread_call_task(__NAME, __TARGET, ...)                          \
+                vsf_thread_call_fsm(vsf_task_func(__NAME), __TARGET, (0, ##__VA_ARGS__))
 #endif
 
 /*============================ TYPES =========================================*/
@@ -411,10 +419,15 @@ extern vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb);
 
 SECTION("text.vsf.kernel.vk_thread_call_fsm")
 extern 
-fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param);
+fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t local_size);
 
 SECTION("text.vsf.kernel.vk_thread_call_eda")
-extern vsf_err_t vk_thread_call_eda(uintptr_t eda_handler, uintptr_t param);
+extern 
+vsf_err_t vk_thread_call_eda(   uintptr_t eda_handler, 
+                                uintptr_t param, 
+                                size_t local_size,
+                                size_t local_buff_size,
+                                uintptr_t local_buff);
 
 SECTION("text.vsf.kernel.vsf_thread_call_thread")
 extern vsf_err_t vk_thread_call_thread(  vsf_thread_cb_t *thread_cb,
@@ -488,6 +501,9 @@ extern vsf_sync_reason_t vsf_thread_bmpevt_pend(
 #   endif
 #endif
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif

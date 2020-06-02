@@ -19,7 +19,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-
+#include "utilities/vsf_utilities.h"
 /*! \note User can define VSF_DRIVER_HEADER to specify the targer device driver 
  *!       header file. If it is not specified, this driver abstraction header 
  *!       file will use predefined device-specific macros to decide which device
@@ -47,6 +47,8 @@
 #		define  VSF_DRIVER_HEADER       "./TI/driver.h"
 #   elif    defined(__ST__)
 #       define  VSF_DRIVER_HEADER       "./ST/driver.h"
+#   elif    defined(__WCH__)
+#       define  VSF_DRIVER_HEADER       "./WCH/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"
@@ -69,6 +71,10 @@
 #ifndef __HAL_DRIVER_H__
 #define __HAL_DRIVER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -82,6 +88,10 @@
  *  \retval false initialization failed
  */
 extern bool vsf_driver_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

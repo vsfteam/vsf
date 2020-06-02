@@ -32,6 +32,10 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USBD_CFG_STREAM_EN != ENABLED
@@ -88,6 +92,10 @@ extern const struct vk_usbd_class_op_t vk_usbd_cdc_data;
 
 // helper functions
 extern void vk_usbd_cdc_data_connect(vk_usbd_cdc_t *cdc);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDC
 #endif	// __VSF_USBD_CDC_H__

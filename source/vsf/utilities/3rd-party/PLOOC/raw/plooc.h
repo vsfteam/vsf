@@ -19,7 +19,7 @@
 #define __PROTECTED_LOW_OVERHEAD_OBJECT_ORIENTED_C_H__
 
 /*============================ INCLUDES ======================================*/
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 //! you have to define this by yourselves
 #else
 #include <stdint.h>
@@ -35,15 +35,20 @@
           d. if the target processor is 64 bits, define it as either uint32_t or 
              uint64_t
  */
-
-/*============================ MACROS ========================================*/
-
-#ifndef private
-#   define private    static
+ 
+ #ifdef __cplusplus
+extern "C" {
 #endif
 
-#ifndef public
-#   define public      
+/*============================ MACROS ========================================*/
+#ifndef __cplusplus
+#   ifndef private
+#       define private    static
+#   endif
+
+#   ifndef public
+#       define public      
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -71,7 +76,7 @@
 #define __declare_interface(__NAME)   typedef struct __NAME __NAME;
 #define __declare_structure(__NAME)   typedef struct __NAME __NAME;
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 
 //! \name interface definition
 //! @{
@@ -119,7 +124,7 @@
 
 //! \brief macro for inheritance
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define __IMPLEMENT_EX(__TYPE, __NAME)                                          \
             __TYPE  __NAME;                                                 
 #else
@@ -158,18 +163,28 @@
 #define REF_OBJ_AS(__OBJ, __TYPE)               __REF_OBJ_AS((__OBJ), __TYPE)
            
            
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus)
 /*! \brief You can use __PLOOC_EVAL() to dynamically select the right API which
  *!        has the right number of parameters (no more than 8).
  */
 //! @{
-#define __PLOOC_VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,_6,_7, _8, __N,...)      __N
+#define __PLOOC_VA_NUM_ARGS_IMPL(   _0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,  \
+                                    _13,_14,_15,_16,__N,...)      __N
 #define __PLOOC_VA_NUM_ARGS(...)                                                \
-            __PLOOC_VA_NUM_ARGS_IMPL(__VA_ARGS__, 8,7,6,5,4,3,2,1)
+            __PLOOC_VA_NUM_ARGS_IMPL( 0,##__VA_ARGS__,16,15,14,13,12,11,10,9,   \
+                                      8,7,6,5,4,3,2,1,0)
 
+#define __16_PLOOC_EVAL(__FUNC, __NO_ARGS)  __FUNC##__NO_ARGS
+#define __15_PLOOC_EVAL(__FUNC, __NO_ARGS)  __16_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __14_PLOOC_EVAL(__FUNC, __NO_ARGS)  __16_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __13_PLOOC_EVAL(__FUNC, __NO_ARGS)  __14_PLOOC_EVAL(__FUNC, __NO_ARGS)
 
+#define __12_PLOOC_EVAL(__FUNC, __NO_ARGS)  __13_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __11_PLOOC_EVAL(__FUNC, __NO_ARGS)  __12_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __10_PLOOC_EVAL(__FUNC, __NO_ARGS)  __11_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __9_PLOOC_EVAL(__FUNC, __NO_ARGS)   __10_PLOOC_EVAL(__FUNC, __NO_ARGS)
+#define __8_PLOOC_EVAL(__FUNC, __NO_ARGS)   __9_PLOOC_EVAL(__FUNC, __NO_ARGS)
 
-#define __8_PLOOC_EVAL(__FUNC, __NO_ARGS)   __FUNC##__NO_ARGS
 #define __7_PLOOC_EVAL(__FUNC, __NO_ARGS)   __8_PLOOC_EVAL(__FUNC, __NO_ARGS)
 #define __6_PLOOC_EVAL(__FUNC, __NO_ARGS)   __7_PLOOC_EVAL(__FUNC, __NO_ARGS)
 #define __5_PLOOC_EVAL(__FUNC, __NO_ARGS)   __6_PLOOC_EVAL(__FUNC, __NO_ARGS)
@@ -189,13 +204,31 @@
  * new standard (lower case)                                                  *
  *----------------------------------------------------------------------------*/
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define def_interface(__NAME)            __def_interface(__NAME)
-#   define def_structure(__NAME)            __def_structure(__NAME)
-#   define def_params(__CODE)               __CODE
+#   define def_interface(__name)            __def_interface(__name)
+#   define define_interface(__name)         __def_interface(__name)
+#   define def_structure(__name)            __def_structure(__name)
+#   define define_structure(__name)         __def_structure(__name)
+#   define def_params(__code)               __code
+#   define define_params(__code)            __code
+#   define end_def_params()
+#   define end_define_params()
+#   define def_members(__code)              __code
+#   define define_members(__code)           __code
+#   define end_def_members()
+#   define end_define_members()
 #else
-#   define def_interface(__NAME, ...)       __def_interface(__NAME, __VA_ARGS__)
-#   define def_structure(__NAME, ...)       __def_structure(__NAME, __VA_ARGS__)
+#   define def_interface(__name, ...)       __def_interface(__name, __VA_ARGS__)
+#   define define_interface(__name, ...)    __def_interface(__name, __VA_ARGS__)
+#   define def_structure(__name, ...)       __def_structure(__name, __VA_ARGS__)
+#   define define_structure(__name, ...)       __def_structure(__name, __VA_ARGS__)
 #   define def_params(...)                  __VA_ARGS__
+#   define define_params(...)               __VA_ARGS__
+#   define end_def_params(...)
+#   define end_define_params(...)
+#   define def_members(...)                 __VA_ARGS__
+#   define define_members(...)              __VA_ARGS__
+#   define end_def_members(...)
+#   define end_define_members(...)
 #endif
 
 #define implement(__TYPE)                   IMPLEMENT(__TYPE)
@@ -207,11 +240,14 @@
 #define obj_convert_as(__OBJ, __TYPE)       OBJ_CONVERT_AS(__OBJ, __TYPE)       /*  obsolete */
 #define ref_obj_as(__OBJ, __TYPE)           REF_OBJ_AS(__OBJ, __TYPE)
 
-#define end_def_interface(__NAME)           __end_def_interface(__NAME)
-#define declare_interface(__NAME)           __declare_interface(__NAME)
-
-#define end_def_structure(__NAME)           __end_def_structure(__NAME)
-#define declare_structure(__NAME)           __declare_structure(__NAME)
+#define end_def_interface(__name)           __end_def_interface(__name)
+#define end_define_interface(__name)        __end_def_interface(__name)
+#define dcl_interface(__name)               __declare_interface(__name)
+#define declare_interface(__name)           __declare_interface(__name)
+#define end_def_structure(__name)           __end_def_structure(__name)
+#define end_define_structure(__name)        __end_def_structure(__name)
+#define dcl_structure(__name)               __declare_structure(__name)
+#define declare_structure(__name)           __declare_structure(__name)
 
 #define this_interface(__INTERFACE)         convert_obj_as(this, __INTERFACE)
 #define base_obj(__TYPE)                    convert_obj_as(this, __TYPE)
@@ -222,7 +258,7 @@
 
 //! \name interface: u32_property_t
 //! @{
-declare_interface(u32_property_t)
+dcl_interface(u32_property_t)
 def_interface(u32_property_t)
     bool (*Set)(uint32_t wValue);
     uint32_t (*Get)(void);
@@ -231,7 +267,7 @@ end_def_interface(u32_property_t)
 
 //! \name interface: u16_property_t
 //! @{
-declare_interface(u16_property_t)
+dcl_interface(u16_property_t)
 def_interface(u16_property_t)
     bool (*Set)(uint_fast16_t wValue);
     uint_fast16_t (*Get)(void);
@@ -240,7 +276,7 @@ end_def_interface(u16_property_t)
 
 //! \name interface: u8_property_t
 //! @{
-declare_interface(u8_property_t)
+dcl_interface(u8_property_t)
 def_interface(u8_property_t)
     bool (*Set)(uint_fast8_t wValue);
     uint_fast8_t (*Get)(void);
@@ -250,7 +286,7 @@ end_def_interface(u8_property_t)
 
 //! \name interface: i32_property_t
 //! @{
-declare_interface(i32_property_t)
+dcl_interface(i32_property_t)
 def_interface(i32_property_t)
     bool (*Set)(int32_t wValue);
     int32_t (*Get)(void);
@@ -259,7 +295,7 @@ end_def_interface(i32_property_t)
 
 //! \name interface: i16_property_t
 //! @{
-declare_interface(i16_property_t)
+dcl_interface(i16_property_t)
 def_interface(i16_property_t)
     bool (*Set)(int_fast16_t wValue);
     int_fast16_t (*Get)(void);
@@ -268,7 +304,7 @@ end_def_interface(i16_property_t)
 
 //! \name interface: u8_property_t
 //! @{
-declare_interface(i8_property_t)
+dcl_interface(i8_property_t)
 def_interface(i8_property_t)
     bool (*Set)(int_fast8_t wValue);
     int_fast8_t (*Get)(void);
@@ -277,7 +313,7 @@ end_def_interface(i8_property_t)
 
 //! \name interface: bool_property_t
 //! @{
-declare_interface(bool_property_t)
+dcl_interface(bool_property_t)
 def_interface(bool_property_t)
     bool (*Set)(bool bValue);
     bool (*Get)(void);
@@ -286,7 +322,7 @@ end_def_interface(bool_property_t)
 
 //! \name interface: bool_property_t
 //! @{
-declare_interface(en_property_t)
+dcl_interface(en_property_t)
 def_interface(en_property_t)
     bool (*Enable)(void);
     bool (*Disable)(void);
@@ -297,6 +333,9 @@ end_def_interface(en_property_t)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

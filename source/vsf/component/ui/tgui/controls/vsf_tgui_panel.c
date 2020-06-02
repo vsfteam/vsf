@@ -44,6 +44,7 @@ static const i_tgui_control_methods_t c_tVPanel= {
         (vsf_tgui_method_t *)&vsf_tgui_panel_v_init,
         (vsf_tgui_method_t *)&vsf_tgui_panel_v_depose,
         (vsf_tgui_v_method_render_t *)&__vsf_tgui_panel_v_rendering,
+        (vsf_tgui_v_method_render_t *)&vsf_tgui_panel_v_post_rendering,
         (vsf_tgui_method_t *)&vsf_tgui_panel_v_update,
     },
     (vsf_tgui_method_t*)&vk_tgui_panel_init,
@@ -53,6 +54,7 @@ static const i_tgui_control_methods_t c_tVPanel= {
         .Init =     (vsf_tgui_method_t*)&vsf_tgui_panel_v_init,
         .Depose =   (vsf_tgui_method_t*)&vsf_tgui_panel_v_depose,
         .Render =   (vsf_tgui_v_method_render_t *)&__vsf_tgui_panel_v_rendering,
+        .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_panel_v_post_rendering,
         .Update =   (vsf_tgui_method_t *)&vsf_tgui_panel_v_update,
     },
     .Init =     (vsf_tgui_method_t*)&vk_tgui_panel_init,
@@ -62,11 +64,11 @@ static const i_tgui_control_methods_t c_tVPanel= {
 
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_mc_panel_msg_handler( vsf_tgui_panel_t* ptControl, 
+fsm_rt_t vsf_tgui_panel_msg_handler( vsf_tgui_panel_t* ptControl,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)ptControl, 
-                                            ptMSG, 
+    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)ptControl,
+                                            ptMSG,
                                             &c_tVPanel);
 }
 
@@ -76,7 +78,7 @@ fsm_rt_t vk_tgui_panel_update(vsf_tgui_panel_t* ptPanel)
                 &(ptPanel->
                     use_as__vsf_tgui_top_container_t.
                         use_as__vsf_tgui_container_t))) {
-        
+
         ptPanel->tTitleLabel.tLabel = ptPanel->tTitle;
 
         vk_tgui_label_update(&(ptPanel->tTitleLabel));
@@ -94,6 +96,13 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
 
         vk_tgui_label_init(&(ptPanel->tTitleLabel));
 
+        do {
+            vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptPanel);
+            tStatus.tValues.__bContainBuiltInStructure = true;
+
+            vsf_tgui_control_status_set((vsf_tgui_control_t*)ptPanel, tStatus);
+        } while(0);
+
         return fsm_rt_cpl;
     }
 
@@ -101,7 +110,7 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
 }
 
 static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
-                                            vsf_tgui_region_t* ptDirtyRegion,  
+                                            vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode)
 {
     if (fsm_rt_cpl == vsf_tgui_panel_v_rendering(ptPanel, ptDirtyRegion, tMode)) {
@@ -113,15 +122,17 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
             ) {
 
             vsf_tgui_region_t tRegion;
-            vsf_tgui_control_generate_dirty_region_from_parent_dirty_region(
+            if (NULL != vsf_tgui_control_generate_dirty_region_from_parent_dirty_region(
                                                 (const vsf_tgui_control_t *)ptPanel,
                                                 ptDirtyRegion,
                                                 (const vsf_tgui_control_t *)ptLabel,
-                                                &tRegion);
+                                                &tRegion)) {
 
-            return vsf_tgui_label_v_rendering(  ptLabel, 
-                                                &tRegion, 
+                return vsf_tgui_label_v_rendering(  ptLabel,
+                                                &tRegion,
                                                 VSF_TGUI_CONTROL_REFRESHED_BY_PARENT);
+            }
+
         }
         return fsm_rt_cpl;
     }

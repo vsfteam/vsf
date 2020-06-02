@@ -30,6 +30,7 @@
 struct usrapp_t {
     struct {
         vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
+        vsf_tgui_color_t buffer[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
     } ui;
 };
 typedef struct usrapp_t usrapp_t;
@@ -82,8 +83,8 @@ int main(void)
 
     // insecure operation
     ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_ARGB8888;
-	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data);
-	vsf_tgui_bind(&usrapp_ui_common.disp.use_as__vk_disp_t, &__usrapp.ui.color);
+	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data, void* buffer);
+	vsf_tgui_bind(&(usrapp_ui_common.disp.use_as__vk_disp_t), &__usrapp.ui.color, &__usrapp.ui.buffer);
 
     extern vsf_err_t tgui_demo_init(void);
     tgui_demo_init();

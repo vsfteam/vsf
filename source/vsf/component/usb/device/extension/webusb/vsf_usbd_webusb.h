@@ -24,6 +24,10 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define USB_BOS_CAP_WEBUSB_LEN              USB_DESC_BOS_CAPABILITY_LEN(4)
@@ -85,6 +89,10 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif    // VSF_USE_USB_DEVICE
 #endif    // __VSF_USBD_WEBUSB_H__

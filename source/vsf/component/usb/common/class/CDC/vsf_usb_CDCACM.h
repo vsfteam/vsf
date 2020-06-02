@@ -18,6 +18,10 @@
 #ifndef __VSF_USB_CDCACM_H__
 #define __VSF_USB_CDCACM_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -45,5 +49,9 @@ typedef enum usb_cdcacm_req_t usb_cdcacm_req_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // __VSF_USB_CDCACM_H__

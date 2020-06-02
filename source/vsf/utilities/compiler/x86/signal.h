@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,15 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef _USE_SIGNAL_H_
-#define _USE_SIGNAL_H_
+#ifndef __USE_SIGNAL_H__
+#define __USE_SIGNAL_H__
 
  /*============================ INCLUDES ======================================*/
 #include "../__common/__signal.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

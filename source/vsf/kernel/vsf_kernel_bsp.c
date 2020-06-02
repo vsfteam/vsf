@@ -33,7 +33,7 @@
 
 #if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
 #   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
-#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, define to 4K by default
+#       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, set to 4K by default
 #       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
 #   endif
 #endif
@@ -59,14 +59,33 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 
 #if __VSF_OS_SWI_NUM > 0
 
-#if __VSF_OS_SWI_NUM < VSF_ARCH_PRI_NUM
+/*! \note it is important to understand the differences between following 
+ *!       configurations when __VSF_OS_SWI_NUM == 1
+ *!       
+ *!       1. VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
+ *!          This configuration means user interrupt handlers and systimer
+ *!          can have higher priorities and preempt the kernel and kernel
+ *!          managed tasks.
+ *!
+ *!       2. VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED != ENABLED
+ *!          This configuration assumes that all system works in cooperative
+ *!          way, no user interrupt or systimer interrupt can have priority
+ *!          different from the one used by kernel.
+ *!          NOTE: This configuration doesn't stop kernel managed tasks from
+ *!          preempting idle task.
+ */
+
+#   if  (__VSF_OS_SWI_NUM < VSF_ARCH_PRI_NUM)                                   \
+    &&  (   (__VSF_OS_SWI_NUM > 1)                                              \
+        ||  (__VSF_OS_SWI_NUM == 1 && VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED))
 /*! \note including (vsf_prio_highest + 1) into the lookup table
  */
-#   define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM+1)
-#else
-#   define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM)
-#endif
-#include "utilities/preprocessor/mf_u8_dec2str.h"
+#       define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM+1)
+#   else
+#       define MFUNC_IN_U8_DEC_VALUE                   (__VSF_OS_SWI_NUM)
+#   endif
+
+#   include "utilities/preprocessor/mf_u8_dec2str.h"
     static const vsf_arch_prio_t __vsf_os_swi_priority[] = {
         REPEAT_MACRO(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
@@ -232,8 +251,7 @@ ROOT void __post_vsf_kernel_init(void)
 #   else
     static NO_INIT vsf_eda_t __app_main;
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    __app_main  .use_as__vsf_eda_t
-                .on_terminate = NULL;
+    __app_main  .on_terminate = NULL;
 #       endif
     vsf_eda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   endif

@@ -1,6 +1,10 @@
 #ifndef __FCNTL_H__
 #define __FCNTL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define O_RDONLY        0x0000
 #define O_WRONLY        0x0001
 #define O_RDWR          0x0002
@@ -13,5 +17,9 @@
 #define O_EXCL          0x0800
 
 int fcntl(int fd, int cmd, ...);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

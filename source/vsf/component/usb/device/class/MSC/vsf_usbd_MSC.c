@@ -156,8 +156,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     usb_msc_cbw_t *cbw = &msc->ctx.cbw;
     bool is_in = (cbw->bmCBWFlags & USB_DIR_MASK) == USB_DIR_IN;
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
-    vsf_err_t errcode;
-    uint32_t reply_len;
+    int_fast32_t reply_len;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -165,9 +164,9 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         vk_scsi_init(msc->scsi);
         break;
     case VSF_EVT_RETURN:
-        errcode = vk_scsi_get_errcode(msc->scsi, &reply_len);
+        reply_len = vsf_eda_get_return_value();
         if (!msc->is_inited) {
-            if (errcode) {
+            if (reply_len < 0) {
                 // fail to initialize scsi
                 VSF_USB_ASSERT(false);
                 return;
@@ -175,7 +174,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             msc->is_inited = true;
             __vk_usbd_msc_on_idle(msc);
         } else {
-            if (errcode) {
+            if (reply_len < 0) {
                 __vk_usbd_msc_error(msc, USB_MSC_CSW_FAIL);
                 break;
             }

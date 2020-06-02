@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
+#include "utilities/vsf_utilities.h"
 #include "./i_io_systick.h"
 
 /*============================ MACROS ========================================*/

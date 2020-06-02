@@ -2,6 +2,8 @@
 #define VSF_EDA_CLASS_INHERIT
 #include "vsf.h"
 
+#if VSF_USE_UI_AWTK == ENABLED
+
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "tkc/thread.h"
@@ -152,3 +154,5 @@ ret_t tk_thread_destroy(tk_thread_t* thread) {
 
   return RET_OK;
 }
+
+#endif      // VSF_USE_UI_AWTK

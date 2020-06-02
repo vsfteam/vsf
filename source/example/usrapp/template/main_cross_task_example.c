@@ -122,9 +122,11 @@ implement_vsf_thread(user_thread_b_t)
     vsf_delay_ms(100);
     printf("\tcpl\r\n");
     
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     printf("\t\tcall pt task\r\n");
     vsf_thread_call_pt( user_pt_called_by_thread_t, &this.pt_task);
     printf("\t\treturn from pt task\r\n");
+#endif
 }
 #endif
 

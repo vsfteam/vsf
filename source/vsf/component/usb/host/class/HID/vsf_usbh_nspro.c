@@ -141,6 +141,7 @@ static void vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             pipe = vk_usbh_urb_get_pipe(&urb);
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
                 nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
+                __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
                 vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
                 vk_usbh_nspro_send_usb_cmd(nspro, 1);
             } else /* if (USB_ENDPOINT_XFER_INT == pipe.type) */ {

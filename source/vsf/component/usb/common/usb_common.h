@@ -23,6 +23,10 @@
 #include "utilities/compiler.h"
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define DeviceRequest           ((USB_DIR_IN  | USB_TYPE_STANDARD | USB_RECIP_DEVICE) << 8)
@@ -299,5 +303,9 @@ enum usb_endpoint_xfer_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __USB_COMMON_H__

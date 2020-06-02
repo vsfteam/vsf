@@ -24,6 +24,10 @@
 #include "./vsf_pbuf.h"
 #include "service/pool/vsf_pool.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 #define __declare_pbuf_pool(__NAME)                                             \
@@ -178,7 +182,11 @@ extern code_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *);
          
 SECTION(".text." "vsf_pbuf" "_pool_get_target")                                     
 extern uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *);        
-            
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 #endif
 /* EOF */

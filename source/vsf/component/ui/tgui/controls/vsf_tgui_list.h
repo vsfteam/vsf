@@ -23,6 +23,7 @@
 #include "./vsf_tgui_control.h"
 #include "./__vk_tgui_slider.h"
 
+#if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
@@ -34,7 +35,7 @@
 #elif   defined(__VSF_TGUI_CONTROLS_LIST_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #   undef __VSF_TGUI_CONTROLS_LIST_CLASS_INHERIT
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
@@ -42,19 +43,19 @@
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __VSF_TGUI_INTERFACE_CONTROLS_LIST           {                             \
+#   define __VSF_TGUI_INTERFACE_CONTROLS_LIST           {                       \
             {                                                                   \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_mc_list_msg_handler          \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_list_msg_handler             \
             },                                                                  \
             (vsf_msgt_method_status_t *)&vsf_tgui_control_status_get,           \
             (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
         }
 #else
-#   define __VSF_TGUI_INTERFACE_CONTROLS_LIST           {                             \
+#   define __VSF_TGUI_INTERFACE_CONTROLS_LIST           {                       \
             .tMessageHandler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_mc_list_msg_handler,         \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_list_msg_handler,            \
             },                                                                  \
             .Status = (vsf_msgt_method_status_t *)                              \
                         &vsf_tgui_control_status_get,                           \
@@ -78,48 +79,9 @@
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
+                            VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT                 \
                             __VA_ARGS__                                         \
-                                                                                \
-                            .bIsContainer = true,                               \
-                            .ptNode =                                           \
-                                (vsf_msgt_node_t*)                              \
-                                    ((__PARENT_ADDR)->__NAME.ptList),           \
-                            .pchNodeName =                                      \
-                                "[vsf_tgui_list_t]["#__NAME"]",                 \
-                            .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,            \
-                            .bIsAutoSize = false,                               \
-                            .bIsHideContentInsideContainer = false,             \
-                                                                                \
-                            .list.ptParent =                                    \
-                                (vsf_msgt_container_t *)&((__PARENT_ADDR)->     \
-                                    __NAME.use_as__vsf_msgt_node_t),            \
-                            .list.chID = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
-                            .list.Offset = {0},                                 \
-                            .list.bIsContainer = true,                          \
-                            .list.bIsControlTransparent = true,                 \
-                            .list.bIsAutoSize = true,                           \
-                            .list.bIsEnabled = true,                            \
-                            .list.bIsVisible = true,                            \
-                            .list.ptNode =                                      \
-                                (vsf_msgt_node_t*)                              \
-                                    &((__PARENT_ADDR)->                         \
-                                        __NAME.list.list_FirstNode),            \
-                            .list.pchNodeName =                                 \
-                                "[vsf_tgui_list_t]["#__NAME".list]",            \
-                        )                                                      
-
-#else
-#   define __tgui_list(     __NAME,                                             \
-                            __PARENT_ADDR,                                      \
-                            __PREVIOUS,                                         \
-                            __NEXT, ...)                                        \
-            tgui_control_base(   __NAME,                                        \
-                            VSF_TGUI_COMPONENT_ID_LIST,                         \
-                            vsf_tgui_list_t,                                    \
-                            (__PARENT_ADDR),                                    \
-                            __PREVIOUS,                                         \
-                            __NEXT,                                             \
-                            __VA_ARGS__                                         \
+                            VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE                \
                                                                                 \
                             .bIsContainer = true,                               \
                             .ptNode =                                           \
@@ -148,6 +110,45 @@
                             .list.pchNodeName =                                 \
                                 "[vsf_tgui_list_t]["#__NAME".list]",            \
                         )
+
+#else
+#   define __tgui_list(     __NAME,                                             \
+                            __PARENT_ADDR,                                      \
+                            __PREVIOUS,                                         \
+                            __NEXT, ...)                                        \
+            tgui_control_base(   __NAME,                                        \
+                            VSF_TGUI_COMPONENT_ID_LIST,                         \
+                            vsf_tgui_list_t,                                    \
+                            (__PARENT_ADDR),                                    \
+                            __PREVIOUS,                                         \
+                            __NEXT,                                             \
+                            VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT                 \
+                            __VA_ARGS__                                         \
+                            VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE                \
+                                                                                \
+                            .bIsContainer = true,                               \
+                            .ptNode =                                           \
+                                (vsf_msgt_node_t*)                              \
+                                    ((__PARENT_ADDR)->__NAME.ptList),           \
+                            .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,            \
+                            .bIsAutoSize = false,                               \
+                            .bIsHideContentInsideContainer = false,             \
+                                                                                \
+                            .list.ptParent =                                    \
+                                (vsf_msgt_container_t *)&((__PARENT_ADDR)->     \
+                                    __NAME.use_as__vsf_msgt_node_t),            \
+                            .list.chID = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
+                            .list.Offset = {0},                                 \
+                            .list.bIsContainer = true,                          \
+                            .list.bIsControlTransparent = true,                 \
+                            .list.bIsAutoSize = true,                           \
+                            .list.bIsEnabled = true,                            \
+                            .list.bIsVisible = true,                            \
+                            .list.ptNode =                                      \
+                                (vsf_msgt_node_t*)                              \
+                                    &((__PARENT_ADDR)->                         \
+                                        __NAME.list.list_FirstNode),            \
+                        )
 #endif
 
 #define tgui_list(  __NAME,                                                     \
@@ -162,7 +163,7 @@
                             __VA_ARGS__)
 
 #   define tgui_list_items(...)             .list = {__VA_ARGS__},
-                    
+
 
 #define __use_tgui_list(__NAME, ...)                                            \
     struct {                                                                    \
@@ -178,6 +179,18 @@
 
 /*============================ TYPES =========================================*/
 
+typedef enum {
+    VSF_TGUI_LIST_MODE_FREE_MOVE_STICK_TO_ITEM      ,
+    VSF_TGUI_LIST_MODE_FREE_MOVE                    ,   /* reserve for future */
+    VSF_TGUI_LIST_MODE_ITEM_SELECTION               ,   /* reserve for future */
+    VSF_TGUI_LIST_MODE_ITEM_SELECTION_CENTER_ALIGN  ,   /* reserve for future */
+} vsf_tgui_list_work_mode_t;
+
+typedef struct vsf_tgui_list_scrollbar_region_t {
+    vsf_tgui_region_t tTrack;
+    vsf_tgui_region_t tBar;
+} vsf_tgui_list_scrollbar_region_t;
+
 declare_class(vsf_tgui_list_t)
 
 def_class(vsf_tgui_list_t,
@@ -185,16 +198,47 @@ def_class(vsf_tgui_list_t,
         implement(vsf_tgui_container_t)
         implement(vsf_tgui_v_list_t)
     )
-
-    private_member(
-        uint8_t chStartIndex;
-        uint8_t chSelectIndex;
-
 #if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABLED
-        implement_ex(__vk_tgui_slider_t, tSlider);
+    union {
+        private_member(
+            implement(__vk_tgui_slider_t)
+            /* use vsf_tgui_list_work_mode_t value*/
+            struct {
+                uint8_t u2WorkMode          : 2;
+                uint8_t bIsSliding          : 1;
+                uint8_t                     : 5;
+            }tMode;
+            union {
+                uint8_t chStartIndex;
+                uint8_t chSelectIndex;
+            };
+        )
+        struct {
+            inherit_ex(__vk_tgui_slider_t, tSlider)
+            /* use vsf_tgui_list_work_mode_t value*/
+            uint8_t u2WorkMode              : 2;
+        };
+    };
+#else
+    union {
+        private_member(
+            /* use vsf_tgui_list_work_mode_t value*/
+            struct {
+                uint8_t u2WorkMode          : 2;
+                uint8_t bIsSliding          : 1;
+                uint8_t                     : 5;
+            }tMode;
+            union {
+                uint8_t chStartIndex;
+                uint8_t chSelectIndex;
+            };
+        )
+        struct {
+            /* use vsf_tgui_list_work_mode_t value*/
+            uint8_t u2WorkMode              : 2;
+        };
+    };
 #endif
-    )
-
     vsf_tgui_container_t ptList[];
 )
 
@@ -209,16 +253,40 @@ fsm_rt_t vk_tgui_list_update(vsf_tgui_list_t* ptList);
 extern
 fsm_rt_t vk_tgui_list_init(vsf_tgui_list_t* ptList);
 
-extern 
-fsm_rt_t vsf_tgui_mc_list_msg_handler( vsf_tgui_list_t* ptControl, 
+extern
+fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_list_t* ptControl,
                                         vsf_tgui_msg_t* ptMSG);
 
-extern 
-uint_fast8_t vk_tgui_list_display_item_start_get(vsf_tgui_list_t* ptList);
+#if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
+SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate");
+extern
+vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
+                            const vsf_tgui_control_t* ptControl,
+                            const vsf_tgui_list_t* ptList, 
+                            uint_fast8_t chScalingRatio, 
+                            vsf_tgui_list_scrollbar_region_t *ptOutputBuffer);
+#endif
+
+/*----------------------------------------------------------------------------*
+ *  APIs for VSF_TGUI_LIST_MODE_FREE_MOVE_STICK_TO_ITEM mode                  *
+ *----------------------------------------------------------------------------*/
+extern
+int_fast16_t vk_tgui_list_display_item_start_get(vsf_tgui_list_t* ptList);
 
 extern
-uint_fast8_t vk_tgui_list_display_item_start_set(vsf_tgui_list_t* ptList, 
-                                                uint_fast8_t chStartIndex);
+int_fast16_t vk_tgui_list_display_item_start_set(vsf_tgui_list_t* ptList,
+                                                 uint_fast8_t chStartIndex);
 
+/*----------------------------------------------------------------------------*
+ *  APIs for VSF_TGUI_LIST_MODE_ITEM_SELECTION(_*) mode                       *
+ *----------------------------------------------------------------------------*/
+extern
+int_fast16_t vk_tgui_list_selected_item_get(vsf_tgui_list_t* ptList);
+
+extern
+int_fast16_t vk_tgui_list_selected_item_set(vsf_tgui_list_t* ptList,
+                                            uint_fast8_t chSelectIndex);
+
+#endif
 #endif
 /* EOF */

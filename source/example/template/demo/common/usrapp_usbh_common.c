@@ -30,15 +30,15 @@ const usrapp_usbh_common_const_t usrapp_usbh_common_const = {
 #if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
     .ohci_param         = {
         .op             = &VSF_USB_HC0_IP,
-        .priority       = vsf_arch_prio_0,
+        .priority       = APP_CFG_USBH_HW_PRIO,
     },
 #elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
     .libusb_hcd_param   = {
-        .priority       = vsf_arch_prio_0,
+        .priority       = APP_CFG_USBH_HW_PRIO,
     },
 #elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
     .winusb_hcd_param   = {
-        .priority       = vsf_arch_prio_0,
+        .priority       = APP_CFG_USBH_HW_PRIO,
     },
 #endif
 };
@@ -85,6 +85,9 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #if VSF_USE_USB_HOST_XB1 == ENABLED
     .xb1.drv            = &vk_usbh_xb1_drv,
 #endif
+#if VSF_USE_USB_HOST_UAC == ENABLED
+    .uac                = &vk_usbh_uac_drv,
+#endif
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -128,6 +131,9 @@ vsf_err_t usrapp_usbh_common_init(void)
 #   if VSF_USE_USB_HOST_HUB == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.hub);
 #   endif
+#if VSF_USE_USB_HOST_UAC == ENABLED
+    vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.uac);
+#endif
 
     return VSF_ERR_NONE;
 }

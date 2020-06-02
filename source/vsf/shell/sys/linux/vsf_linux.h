@@ -39,6 +39,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
@@ -47,6 +51,14 @@
 
 #ifndef VSF_LINUX_CFG_MAX_ARG_NUM
 #   define VSF_LINUX_CFG_MAX_ARG_NUM        31
+#endif
+
+#if VSF_LINUX_CFG_STACKSIZE > 0xFFFF
+#   error VSF_LINUX_CFG_STACKSIZE should be 16-bit
+#endif
+#if     (VSF_LINUX_CFG_STACKSIZE < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE))\
+    ||  VSF_LINUX_CFG_STACKSIZE & (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE - 1)
+#   error invalid VSF_LINUX_CFG_STACKSIZE
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -228,6 +240,10 @@ extern int vsf_linux_fd_tx_trigger(int fd);
 extern int vsf_linux_fd_rx_trigger(int fd);
 
 extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #undef VSF_LINUX_IMPLEMENT

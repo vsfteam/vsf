@@ -36,6 +36,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define implement_fatfs_info(__block_size, __cache_num)                         \
@@ -130,16 +134,6 @@ def_simple_class(__vk_fatfs_info_t) {
         uint8_t sector_size_bits;
         uint8_t cluster_size_bits;
         uint8_t fat_num;
-
-        // context
-        uint32_t cur_fat_bit;
-        uint32_t cur_cluster;
-        uint32_t cur_cluster_tmp;
-        uint32_t cur_sector;
-        uint32_t cur_sector_in_cluster;
-        vsf_err_t err;
-        vk_fatfs_dentry_parser_t dparser;
-        char *filename;
     )
 
     // vk_malfs_info_t must be the last in vk_fatfs_info_t
@@ -156,6 +150,10 @@ extern const vk_fs_op_t vk_fatfs_op;
 
 extern bool vk_fatfs_is_lfn(char *name);
 extern bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_FS && VSF_USE_FATFS
 #endif      // __VSF_FATFS_H__

@@ -26,6 +26,7 @@
 #   endif
 #endif
 #include "hal/arch/vsf_arch.h"
+#include <Windows.h>
 
 /*============================ MACROS ========================================*/
 

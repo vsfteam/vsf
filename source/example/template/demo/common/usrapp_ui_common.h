@@ -22,7 +22,8 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED
+#if     VSF_USE_UI == ENABLED                                                   \
+    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
 
 #if VSF_USE_UI_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
@@ -35,7 +36,7 @@
 /*============================ TYPES =========================================*/
 
 struct usrapp_ui_common_t {
-#if VSF_USE_DISP_DRV_SDL2 == ENABLED
+#if VSF_USE_DISP_SDL2 == ENABLED
     vk_disp_sdl2_t disp;
 #endif
 

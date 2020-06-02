@@ -35,6 +35,10 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_USB_HOST_HID != ENABLED
@@ -69,6 +73,9 @@ extern const vk_usbh_class_drv_t vk_usbh_xb1_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif

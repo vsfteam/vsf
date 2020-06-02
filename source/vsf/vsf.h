@@ -16,13 +16,19 @@
  ****************************************************************************/
 
 
+
 //! \note Top Level Configuration 
 
 #ifndef __VSF_H__
 #define __VSF_H__
 
+#if defined(__cplusplus) && !defined(__IAR_SYSTEMS_ICC__)
+#   define __STDC_VERSION__   201112L
+#endif
+
 /*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
+#include "utilities/vsf_utilities.h"
 #include "hal/vsf_hal.h"
 #include "service/vsf_service.h"
 
@@ -31,10 +37,11 @@
 #endif
 
 #include "osa_service/vsf_osa_service.h"
+#include "osa_hal/vsf_osa_hal.h"
 #include "component/vsf_component.h"
 
-#ifdef VSF_CFG_USER_HEADER
-#   include VSF_CFG_USER_HEADER
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
@@ -102,6 +109,25 @@ extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+/*============================ INCLUDES ======================================*/
 
+/*£¡\note If you have one or more private header files with which you want to  
+ *!       cover all the range where vsf.h is included directly or indirectly, you
+ *!       can define the macro VSF_CFG_USR_HEADER with a path string in 
+ *!       vsf_usr_cfg.h.
+ *!
+ *!       e.g. some customised VSF contains a set of private definition, usually 
+ *!            those private definitions are defined in a private header file and
+ *!            inserted here with VSF_CFG_USER_HEADER
+ *!       e.g. in some application scenarios, users want to insert some header file
+ *!            together with vsf.h, then it can be handled with VSF_CFG_USER_HEADER
+ */
+#ifdef VSF_CFG_USER_HEADER
+#   include VSF_CFG_USER_HEADER
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 #endif
 /* EOF */

@@ -18,6 +18,10 @@
 #ifndef __VSF_USB_CDC_H__
 #define __VSF_USB_CDC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -57,5 +61,9 @@ typedef struct usb_cdc_ecm_descriptor_t usb_cdc_ecm_descriptor_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif    // __VSF_USB_CDC_H__

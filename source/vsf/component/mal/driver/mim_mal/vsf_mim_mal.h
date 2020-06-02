@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -51,9 +55,13 @@ def_simple_class(vk_mim_mal_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const i_mal_drv_t VK_MIM_MAL_DRV;
+extern const vk_mal_drv_t VK_MIM_MAL_DRV;
 
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_MAL && VSF_USE_MIM_MAL
 #endif      // __VSF_MIM_MAL_H__

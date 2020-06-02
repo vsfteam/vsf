@@ -65,7 +65,7 @@ typedef struct gd32vf103_usb_t gd32vf103_usb_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-MREPEAT(USB_OTG_COUNT, USB_OTG_DEF, NULL)
+REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/

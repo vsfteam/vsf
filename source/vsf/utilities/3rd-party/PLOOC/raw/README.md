@@ -76,13 +76,25 @@ If you have any questions or suggestions, please feel free to let us know.
 
 ## Update Log
 ---
-- [21/01/2020] Misc update for C90, version 4.51
-- [09/06/2019] Add support for C89/90, version 4.50
+- \[18/05/2020\] Introduce both short- and long- style of macro, version 4.5.5
+    - dcl_xxxxx/declare_xxxxx
+    - def_xxxx/define_xxxxx; end_def_xxxx/end_define_xxxx
+- \[16/05/2020\] Minor Update, version 4.5.4a
+    - Introduce \_\_OOC\_CPP\_\_ to replace \_\_OOC\_DEBUG\_\_ when you want to mix C source code with C++ source code. Please put it in the project global configuration. 
+- \[11/05/2020\] Minor Update, version 4.5.4
+    - Make it possible to use PLOOC based C source code in C++ project
+        - Please make sure \_\_OOC\_DEBUG\_\_ is defined in the project 
+- \[15/04/2020\] Update __PLOOC_EVAL, version 4.5.3
+    - Increase the range of number of arguments, from 1~8 to 0~16.
+- [19/02/2020] Minor update to enable RAM footprint optimisation, version 4.52
+    - Introducing macro PLOOC_CFG_REMOVE_MEMORY_LAYOUT_BOUNDARY___USE_WITH_CAUTION which removes structure layout boundaries for PLOOC_VISIBLE. It can save RAM when certain condition is met and \_\_OOC\_DEBUG\_\_ is defined. Please use it with caution as it will cause different memory layouts when \_\_OOC\_DEBUG\_\_ is not defined. 
+- \[21/01/2020\] Misc update for C90, version 4.51
+- \[09/06/2019\] Add support for C89/90, version 4.50
     - Add full support for overload \(require C11\)
-- \[09/05/2019] Add support for C89/90, version 4.40
+- \[09/05/2019\] Add support for C89/90, version 4.40
     - When C89/90 is enforced, \_\_OOC_DEBUG\_\_ should always be defined. 
     - The protection for private and protected members is turned off.
-- \[08/15/2019] Update plooc_class_strict.h to use more soften syntax, version 4.31
+- \[08/15/2019\] Update plooc_class_strict.h to use more soften syntax, version 4.31
     - Users now can use arbitrary order for public_member, private_member and protected_member.
     - The separator "," can be ignored. 
     - Simplified the plooc_class_strict.h template. Some common macros are moved to plooc_class.h, which will be shared by other template later. 

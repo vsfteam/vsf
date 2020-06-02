@@ -19,12 +19,18 @@
 #define __I_IO_SYS_TICK_H__
 
 /*============================ INCLUDES ======================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*============================ MACROS ========================================*/
+
 //! \brief SysTick timer register base address
 #define SYSTICK_BASE_ADDRESS        (0xE000E010UL)
 
 //! \brief define the System Tick Timer register page
 #define ARM_SYSTICK                 (*(systick_reg_t *)SYSTICK_BASE_ADDRESS)
-/*============================ MACROS ========================================*/
 
 #ifndef __REG_MACRO__
 #define __REG_MACRO__
@@ -144,6 +150,9 @@ typedef struct {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

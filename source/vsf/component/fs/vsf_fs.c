@@ -46,11 +46,6 @@
 
 struct __vk_fs_t {
     struct {
-        uint16_t idx;
-        const char *name;
-        vk_file_t *dir;
-        vk_file_t **file;
-        vsf_err_t err;
         vsf_crit_t lock;
     } open;
     vk_vfs_file_t rootfs;
@@ -66,11 +61,11 @@ enum {
 
 /*============================ PROTOTYPES ====================================*/
 
-static void __vk_vfs_mount(uintptr_t, vsf_evt_t);
-static void __vk_vfs_unmount(uintptr_t, vsf_evt_t);
-static void __vk_vfs_lookup(uintptr_t, vsf_evt_t);
-static void __vk_vfs_create(uintptr_t, vsf_evt_t);
-static void __vk_vfs_unlink(uintptr_t, vsf_evt_t);
+dcl_vsf_peda_methods(static, __vk_vfs_mount)
+dcl_vsf_peda_methods(static, __vk_vfs_unmount)
+dcl_vsf_peda_methods(static, __vk_vfs_lookup)
+dcl_vsf_peda_methods(static, __vk_vfs_create)
+dcl_vsf_peda_methods(static, __vk_vfs_unlink)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -78,27 +73,42 @@ static void __vk_vfs_unlink(uintptr_t, vsf_evt_t);
 static NO_INIT __vk_fs_t __vk_fs;
 
 vk_fs_op_t vk_vfs_op = {
-    .mount          = __vk_vfs_mount,
-    .unmount        = __vk_vfs_unmount,
+    .mount          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_mount),
+    .unmount        = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_unmount),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .sync           = vk_dummyfs_succeed,
+    .sync           = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #endif
     .fop            = {
-        .close      = vk_dummyfs_succeed,
-        .read       = vk_dummyfs_not_support,
-        .write      = vk_dummyfs_not_support,
-        .resize     = vk_dummyfs_not_support,
+        .close      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+        .read       = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .write      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .resize     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
     .dop            = {
-        .lookup     = __vk_vfs_lookup,
-        .create     = __vk_vfs_create,
-        .unlink     = __vk_vfs_unlink,
-        .chmod      = vk_dummyfs_not_support,
-        .rename     = vk_dummyfs_not_support,
+        .lookup     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_lookup),
+        .create     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_create),
+        .unlink     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_unlink),
+        .chmod      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .rename     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
 };
 
 /*============================ IMPLEMENTATION ================================*/
+
+// dummy
+__vsf_component_peda_public_entry(vk_dummyfs_succeed)
+{
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
+}
+
+__vsf_component_peda_public_entry(vk_dummyfs_not_support)
+{
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NOT_SUPPORT);
+    vsf_peda_end();
+}
 
 static void __vk_file_ref(vk_file_t *file)
 {
@@ -159,7 +169,7 @@ void vk_file_free(vk_file_t *file)
 
 char * vk_file_getfileext(char *fname)
 {
-    char *ext = strrchr(fname, '.');
+    char *ext = (char *)strrchr(fname, '.');
     if (ext != NULL) {
         ext++;
     }
@@ -168,8 +178,8 @@ char * vk_file_getfileext(char *fname)
 
 char * vk_file_getfilename(char *path)
 {
-    char *name0 = strrchr(path, '\\');
-    char *name1 = strrchr(path, '/');
+    char *name0 = (char *)strrchr(path, '\\');
+    char *name1 = (char *)strrchr(path, '/');
     char *name = (char *)max((uintptr_t)name0, (uintptr_t)name1);
     if ((name != NULL) && (vk_file_is_div(*name))) {
         name++;
@@ -191,17 +201,6 @@ bool vk_file_is_match(char *path, char *name)
         }
     }
     return false;
-}
-
-vk_file_ctx_t * vk_file_get_ctx(vk_file_t *file)
-{
-    VSF_FS_ASSERT(file != NULL);
-    return &file->ctx;
-}
-
-vsf_err_t vk_file_get_errcode(vk_file_t *file)
-{
-    return file->ctx.err;
 }
 
 vk_file_t * vk_file_get_parent(vk_file_t *file)
@@ -235,26 +234,37 @@ void vk_fs_init(void)
     vsf_eda_crit_init(&__vk_fs.open.lock);
 }
 
-static void __vk_file_lookup_imp(uintptr_t target, vsf_evt_t evt)
-{
-    vk_file_t *dir = (vk_file_t *)target;
+__vsf_component_peda_private_entry(__vk_file_lookup,
+    const char *name;
+    uint32_t idx;
+    vk_file_t **result;
+) {
+    vsf_peda_begin();
+    vsf_err_t err = VSF_ERR_NONE;
+    vk_file_t *dir = (vk_file_t *)&vsf_this;
     switch (evt) {
     case VSF_EVT_INIT:
-        if (VSF_ERR_NONE == vsf_eda_call_param_eda(dir->fsop->dop.lookup, dir)) {
+        __vsf_component_call_peda_ifs(vk_file_lookup, err, dir->fsop->dop.lookup, dir->fsop->dop.lookup_local_size, dir,
+            .name       = vsf_local.name,
+            .idx        = vsf_local.idx,
+            .result     = vsf_local.result);
+        if (VSF_ERR_NONE == err) {
             break;
         }
-        dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
     case VSF_EVT_RETURN:
-        if ((VSF_ERR_NONE == dir->ctx.err) && (*dir->ctx.lookup.result != NULL)) {
-            (*dir->ctx.lookup.result)->parent = dir;
+        if ((VSF_ERR_NONE == err) && (*vsf_local.result != NULL)) {
+            (*vsf_local.result)->parent = dir;
         }
-        vsf_eda_return();
+        vsf_eda_return(err);
         break;
     }
+    vsf_peda_end();
 }
 
-vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file)
+static vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file)
 {
+    vsf_err_t err;
     if (NULL == dir) {
         VSF_FS_ASSERT((name != NULL) && (*name != '\0'));
         dir = &__vk_fs.rootfs.use_as__vk_file_t;
@@ -263,72 +273,88 @@ vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, uint_fast16_t idx, 
         }
         if (('\0' == *name) && (file != NULL)) {
             *file = dir;
-            return vsf_eda_call_param_eda(vk_dummyfs_succeed, dir);
+            __vsf_component_call_peda(vk_dummyfs_succeed, err, dir)
+            return err;
         }
     }
 
     VSF_FS_ASSERT(dir->fsop != NULL);
     VSF_FS_ASSERT(dir->fsop->dop.lookup != NULL);
 
-    dir->ctx.lookup.name = name;
-    dir->ctx.lookup.idx = idx;
-    dir->ctx.lookup.result = file;
-    return __vsf_call_eda((uintptr_t)__vk_file_lookup_imp, (uintptr_t)dir);
+    __vsf_component_call_peda(__vk_file_lookup, err, dir,
+        .name   = name,
+        .idx    = idx,
+        .result = file,
+    )
+    return err;
 }
 
 vsf_err_t vk_fs_mount(vk_file_t *dir, const vk_fs_op_t *fsop, void *fsdata)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(  (dir->attr & VSF_FILE_ATTR_DIRECTORY)
                 &&  (dir->fsop == &vk_vfs_op)
                 &&  !(dir->attr & VSF_VFS_FILE_ATTR_MOUNTED));
 
     ((vk_vfs_file_t *)dir)->subfs.op = fsop;
     ((vk_vfs_file_t *)dir)->subfs.data = fsdata;
-    return __vsf_call_eda((uintptr_t)dir->fsop->mount, (uintptr_t)dir);
+    __vsf_component_call_peda_ifs(vk_fs_mount, err, dir->fsop->mount, dir->fsop->mount_local_size, dir);
+    return err;
 }
 
 vsf_err_t vk_fs_unmount(vk_file_t *dir)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(  (dir->attr & VSF_FILE_ATTR_DIRECTORY)
                 &&  (dir->fsop == &vk_vfs_op)
                 &&  (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED));
 
     dir->attr &= ~VSF_VFS_FILE_ATTR_MOUNTED;
-    return __vsf_call_eda((uintptr_t)dir->fsop->unmount, (uintptr_t)dir);
+    __vsf_component_call_peda_ifs(vk_fs_unmount, err, dir->fsop->unmount, dir->fsop->unmount_local_size, dir);
+    return err;
 }
 
 #if VSF_FS_CFG_USE_CACHE == ENABLED
 vsf_err_t vk_fs_sync(vk_file_t *dir)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(dir != NULL);
     VSF_FS_ASSERT(dir->fsop != NULL);
     VSF_FS_ASSERT(dir->fsop->sync != NULL);
-    return __vsf_call_eda(dir->fsop->sync, dir);
+
+    __vsf_component_call_peda_ifs(vk_fs_sync, err, dir->fsop->sync, dir->fsop->sync_local_size, dir);
+    return err;
 }
 #endif
 
-static void __vk_file_open_imp(vk_file_t *dir, vsf_evt_t evt)
-{
-    vk_file_t *cur_dir = __vk_fs.open.dir;
-    vk_file_t *cur_file = *__vk_fs.open.file;
+__vsf_component_peda_private_entry(__vk_file_open,
+    uint16_t    idx;
+    const char  *name;
+    vk_file_t   *dir;
+    vk_file_t   **file;
+    vsf_err_t   err;
+) {
+    vsf_peda_begin();
+    vk_file_t *cur_dir = vsf_local.dir;
+    vk_file_t *cur_file = *vsf_local.file;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        __vk_fs.open.err = VSF_ERR_NONE;
+        vsf_local.err = VSF_ERR_NONE;
         if (VSF_ERR_NONE != vsf_eda_crit_enter(&__vk_fs.open.lock)) {
             break;
         }
     case VSF_EVT_SYNC:
     do_lookup_child:
-        if (__vk_fs.open.name != NULL) {
-            if (*__vk_fs.open.name != '\0') {
-                if (vk_file_is_div(*__vk_fs.open.name)) {
+        if (vsf_local.name != NULL) {
+            if (*vsf_local.name != '\0') {
+                if (vk_file_is_div(*vsf_local.name)) {
                     if (!(cur_dir->attr & VSF_FILE_ATTR_DIRECTORY)) {
-                        __vk_fs.open.err = VSF_ERR_INVALID_PARAMETER;
+                        vsf_local.err = VSF_ERR_INVALID_PARAMETER;
                         goto do_fail;
                     }
-                    __vk_fs.open.name++;
-                    if ('\0' == *__vk_fs.open.name) {
+                    vsf_local.name++;
+                    if ('\0' == *vsf_local.name) {
                         goto do_return;
                     }
                 }
@@ -337,12 +363,12 @@ static void __vk_file_open_imp(vk_file_t *dir, vsf_evt_t evt)
             }
         }
 
-        *__vk_fs.open.file = NULL;
-        if (VSF_ERR_NONE != __vk_file_lookup(cur_dir, __vk_fs.open.name, __vk_fs.open.idx, __vk_fs.open.file)) {
-            __vk_fs.open.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        *vsf_local.file = NULL;
+        if (VSF_ERR_NONE != __vk_file_lookup(cur_dir, vsf_local.name, vsf_local.idx, vsf_local.file)) {
+            vsf_local.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         do_fail:
             if (cur_dir != NULL) {
-                __vk_fs.open.dir = NULL;
+                vsf_local.dir = NULL;
                 if (VSF_ERR_NONE != vk_file_close(cur_dir)) {
                     goto do_return;
                 }
@@ -353,29 +379,32 @@ static void __vk_file_open_imp(vk_file_t *dir, vsf_evt_t evt)
         break;
     do_return:
         vsf_eda_crit_leave(&__vk_fs.open.lock);
-        vsf_eda_return();
+        vsf_eda_return(vsf_local.err);
         break;
     case VSF_EVT_RETURN:
-        if (__vk_fs.open.err != VSF_ERR_NONE) {
+        if (vsf_local.err != VSF_ERR_NONE) {
             goto do_fail;
         }
         if (NULL == cur_file) {
-            __vk_fs.open.err = VSF_ERR_NOT_AVAILABLE;
+            vsf_local.err = VSF_ERR_NOT_AVAILABLE;
             goto do_fail;
         }
         __vk_file_ref(cur_file);
-        if (__vk_fs.open.name != NULL) {
-            __vk_fs.open.name += strlen(cur_file->name);
-            cur_dir = __vk_fs.open.dir = cur_file;
+        if (vsf_local.name != NULL) {
+            vsf_local.name += strlen(cur_file->name);
+            cur_dir = vsf_local.dir = cur_file;
             goto do_lookup_child;
         } else {
             goto do_return;
         }
     }
+
+    vsf_peda_end();
 }
 
 vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_file_t **file)
 {
+    vsf_err_t err;
 #if VSF_FS_REF_TRACE == ENABLED
     char intbuf[32];
     vsf_trace(VSF_TRACE_DEBUG, "open %s" VSF_TRACE_CFG_LINEEND, name ? name : itoa(idx, intbuf, 10));
@@ -388,18 +417,24 @@ vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_f
 
     VSF_FS_ASSERT(  (dir != NULL) && (dir->attr & VSF_FILE_ATTR_DIRECTORY)
                 &&  (dir->fsop != NULL) && (dir->fsop->dop.lookup != NULL));
-    __vk_fs.open.name = name;
-    __vk_fs.open.idx = idx;
-    __vk_fs.open.dir = dir;
     *file = dir;
     __vk_file_ref(dir);
     __vk_file_ref_parent(dir);
-    __vk_fs.open.file = file;
-    return __vsf_call_eda((uintptr_t)__vk_file_open_imp, (uintptr_t)dir);
+
+    __vsf_component_call_peda(__vk_file_open, err, dir,
+        .name   = name,
+        .idx    = idx,
+        .dir    = dir,
+        .file   = file,
+    )
+    return err;
 }
 
-static void __vk_file_close_imp(vk_file_t *file, vsf_evt_t evt)
+__vsf_component_peda_private_entry(__vk_file_close)
 {
+    vsf_peda_begin();
+    vsf_err_t err;
+    vk_file_t *file = (vk_file_t *)&vsf_this;
     VSF_FS_ASSERT(file != NULL);
 
     switch (evt) {
@@ -412,7 +447,8 @@ static void __vk_file_close_imp(vk_file_t *file, vsf_evt_t evt)
 
         VSF_FS_ASSERT(file->fsop != NULL);
         VSF_FS_ASSERT(file->fsop->fop.close != NULL);
-        if (VSF_ERR_NONE != vsf_eda_call_param_eda(file->fsop->fop.close, file)) {
+        __vsf_component_call_peda_ifs(vk_file_close, err, file->fsop->fop.close, file->fsop->fop.close_local_size, file);
+        if (VSF_ERR_NONE != err) {
         do_return:
             vsf_eda_return();
         }
@@ -430,47 +466,55 @@ static void __vk_file_close_imp(vk_file_t *file, vsf_evt_t evt)
         }
         break;
     }
+    vsf_peda_end();
 }
 
 vsf_err_t vk_file_close(vk_file_t *file)
 {
+    vsf_err_t err;
 #if VSF_FS_REF_TRACE == ENABLED
     vsf_trace(VSF_TRACE_DEBUG, "close %s" VSF_TRACE_CFG_LINEEND, file->name ? file->name : "ROOT");
 #endif
     VSF_FS_ASSERT(file != NULL);
-    return __vsf_call_eda((uintptr_t)__vk_file_close_imp, (uintptr_t)file);
+    __vsf_component_call_peda(__vk_file_close, err, file)
+    return err;
 }
 
-vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *rsize)
+vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(file != NULL);
     VSF_FS_ASSERT(file->attr & VSF_FILE_ATTR_READ);
     VSF_FS_ASSERT(file->fsop != NULL);
     VSF_FS_ASSERT(file->fsop->fop.read != NULL);
 
-    file->ctx.io.offset = addr;
-    file->ctx.io.size = size;
-    file->ctx.io.buff = buff;
-    file->ctx.io.result = rsize;
-    return __vsf_call_eda((uintptr_t)file->fsop->fop.read, (uintptr_t)file);
+    __vsf_component_call_peda_ifs(vk_file_read, err, file->fsop->fop.read, file->fsop->fop.read_local_size, file,
+        .offset     = addr,
+        .size       = size,
+        .buff       = buff,
+    );
+    return err;
 }
 
-vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *wsize)
+vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(file != NULL);
     VSF_FS_ASSERT(file->attr & VSF_FILE_ATTR_WRITE);
     VSF_FS_ASSERT(file->fsop != NULL);
     VSF_FS_ASSERT(file->fsop->fop.write != NULL);
 
-    file->ctx.io.offset = addr;
-    file->ctx.io.size = size;
-    file->ctx.io.buff = buff;
-    file->ctx.io.result = wsize;
-    return __vsf_call_eda((uintptr_t)file->fsop->fop.write, (uintptr_t)file);
+    __vsf_component_call_peda_ifs(vk_file_write, err, file->fsop->fop.write, file->fsop->fop.write_local_size, file,
+        .offset     = addr,
+        .size       = size,
+        .buff       = buff,
+    );
+    return err;
 }
 
 vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr, uint_fast64_t size)
 {
+    vsf_err_t err;
     if (NULL == dir) {
         dir = &__vk_fs.rootfs.use_as__vk_file_t;
     }
@@ -480,14 +524,17 @@ vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t attr, 
     VSF_FS_ASSERT(dir->fsop != NULL);
     VSF_FS_ASSERT(dir->fsop->dop.create != NULL);
 
-    dir->ctx.create.name = name;
-    dir->ctx.create.attr = attr;
-    dir->ctx.create.size = size;
-    return __vsf_call_eda((uintptr_t)dir->fsop->dop.create, (uintptr_t)dir);
+    __vsf_component_call_peda_ifs(vk_file_create, err, dir->fsop->dop.create, dir->fsop->dop.create_local_size, dir,
+        .name       = name,
+        .attr       = attr,
+        .size       = size,
+    );
+    return err;
 }
 
 vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name)
 {
+    vsf_err_t err;
     if (NULL == dir) {
         dir = &__vk_fs.rootfs.use_as__vk_file_t;
     }
@@ -497,92 +544,72 @@ vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name)
     VSF_FS_ASSERT(dir->fsop != NULL);
     VSF_FS_ASSERT(dir->fsop->dop.unlink != NULL);
 
-    dir->ctx.unlink.name = name;
-    return __vsf_call_eda((uintptr_t)dir->fsop->dop.unlink, (uintptr_t)dir);
+    __vsf_component_call_peda_ifs(vk_file_unlink, err, dir->fsop->dop.unlink, dir->fsop->dop.unlink_local_size, dir,
+        .name       = name,
+    );
+    return err;
 }
 
 #if VSF_FS_CFG_USE_CACHE == ENABLED
 vsf_err_t vk_file_sync(vk_file_t *file)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(file != NULL);
     VSF_FS_ASSERT(file->fsop != NULL);
     VSF_FS_ASSERT(file->fsop->fop.sync != NULL);
-    return __vsf_call_eda(dir->fsop->fop.sync, file);
+
+    __vsf_component_call_peda_ifs(vk_file_sync, err, dir->fsop->fop.sync, dir->fsop->fop.sync_local_size, file);
+    return err;
 }
 #endif
 
-// dummy
-void vk_file_set_io_result(vk_file_t *file, vsf_err_t err, int_fast32_t size)
-{
-    VSF_FS_ASSERT(file != NULL);
-    vk_file_set_result(file, err);
-    if (file->ctx.io.result != NULL) {
-        *file->ctx.io.result = size;
-    }
-}
-
-void vk_file_set_result(vk_file_t *file, vsf_err_t err)
-{
-    VSF_FS_ASSERT(file != NULL);
-    file->ctx.err = err;
-}
-
-void vk_file_return(vk_file_t *file, vsf_err_t err)
-{
-    if (file != NULL) {
-        vk_file_set_result(file, err);
-    }
-    vsf_eda_return();
-}
-
-void vk_dummyfs_succeed(uintptr_t target, vsf_evt_t evt)
-{
-    vk_file_return((vk_file_t *)target, VSF_ERR_NONE);
-}
-
-void vk_dummyfs_not_support(uintptr_t target, vsf_evt_t evt)
-{
-    vk_file_return((vk_file_t *)target, VSF_ERR_NOT_SUPPORT);
-}
-
 // vfs
-static void __vk_vfs_mount(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_vfs_mount, vk_fs_mount)
 {
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
+    vsf_peda_begin();
+    vsf_err_t err = VSF_ERR_NONE;
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
+
     switch (evt) {
     case VSF_EVT_INIT:
-        if (VSF_ERR_NONE == vsf_eda_call_param_eda(dir->subfs.op->mount, dir)) {
+        __vsf_component_call_peda_ifs(vk_fs_mount, err, dir->subfs.op->mount, dir->subfs.op->mount_local_size, dir);
+        if (VSF_ERR_NONE == err) {
             break;
         }
 
-        dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
     case VSF_EVT_RETURN:
-        if (VSF_ERR_NONE == dir->ctx.err) {
+        if (VSF_ERR_NONE == err) {
             vk_file_t *root = dir->subfs.root;
             dir->attr |= VSF_VFS_FILE_ATTR_MOUNTED;
             root->attr |= VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ;
             root->fsop = dir->subfs.op;
         }
-        vsf_eda_return();
+        vsf_eda_return(err);
         break;
     }
+    vsf_peda_end();
 }
 
-static void __vk_vfs_unmount(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_vfs_unmount, vk_fs_unmount)
 {
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
+    vsf_peda_begin();
+    vsf_err_t err = VSF_ERR_NONE;
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
     switch (evt) {
     case VSF_EVT_INIT:
-        if (VSF_ERR_NONE == vsf_eda_call_param_eda(dir->subfs.op->unmount, dir)) {
+        __vsf_component_call_peda_ifs(vk_fs_unmount, err, dir->subfs.op->unmount, dir->subfs.op->unmount_local_size, dir);
+        if (VSF_ERR_NONE == err) {
             break;
         }
 
-        dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
     case VSF_EVT_RETURN:
         dir->attr &= ~VSF_VFS_FILE_ATTR_MOUNTED;
-        vsf_eda_return();
+        vsf_eda_return(err);
         break;
     }
+    vsf_peda_end();
 }
 
 static vk_vfs_file_t * __vk_vfs_lookup_imp(vk_vfs_file_t *dir, const char *name, uint32_t *idx)
@@ -609,51 +636,59 @@ static vk_vfs_file_t * __vk_vfs_lookup_imp(vk_vfs_file_t *dir, const char *name,
     return child;
 }
 
-static void __vk_vfs_lookup(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_vfs_lookup, vk_file_lookup)
 {
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
+    vsf_peda_begin();
+    vsf_err_t err = VSF_ERR_NONE;
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
     switch (evt) {
     case VSF_EVT_INIT:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
-            dir->subfs.root->ctx.lookup = dir->ctx.lookup;
-            if (VSF_ERR_NONE == vsf_eda_call_param_eda(dir->subfs.op->dop.lookup, dir->subfs.root)) {
+            __vsf_component_call_peda_ifs(vk_file_lookup, err, dir->subfs.op->dop.lookup, dir->subfs.op->dop.lookup_local_size, dir->subfs.root,
+                .name       = vsf_local.name,
+                .idx        = vsf_local.idx,
+                .result     = vsf_local.result,
+            );
+            if (VSF_ERR_NONE == err) {
                 break;
             }
 
-            dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+            err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         } else {
-            *dir->ctx.lookup.result = (vk_file_t *)__vk_vfs_lookup_imp(dir, dir->ctx.lookup.name, &dir->ctx.lookup.idx);
-            dir->ctx.err = (*dir->ctx.lookup.result != NULL) ? VSF_ERR_NONE : VSF_ERR_NOT_AVAILABLE;
+            *vsf_local.result = (vk_file_t *)__vk_vfs_lookup_imp(dir, vsf_local.name, &vsf_local.idx);
+            err = (*vsf_local.result != NULL) ? VSF_ERR_NONE : VSF_ERR_NOT_AVAILABLE;
         }
     case VSF_EVT_RETURN:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
-            dir->ctx.err = dir->subfs.root->ctx.err;
-            dir->ctx.lookup = dir->subfs.root->ctx.lookup;
+            err = (vsf_err_t)vsf_eda_get_return_value();
         }
-        vsf_eda_return();
+        vsf_eda_return(err);
         break;
     }
+    vsf_peda_end();
 }
 
-static void __vk_vfs_create(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_vfs_create, vk_file_create)
 {
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
-    vk_vfs_file_t *new_file = __vk_vfs_lookup_imp(dir, dir->ctx.create.name, NULL);
+    vsf_peda_begin();
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
+    vk_vfs_file_t *new_file = __vk_vfs_lookup_imp(dir, vsf_local.name, NULL);
     vsf_protect_t orig;
+    vsf_err_t err = VSF_ERR_NONE;
 
     if (new_file != NULL) {
-        dir->ctx.err = VSF_ERR_ALREADY_EXISTS;
+        err = VSF_ERR_ALREADY_EXISTS;
         goto do_return;
     }
 
     new_file = (vk_vfs_file_t *)vk_file_alloc(sizeof(vk_vfs_file_t));
     if (NULL == new_file) {
-        dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+        err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         goto do_return;
     }
 
-    new_file->name = (char *)dir->ctx.create.name;
-    new_file->attr |= dir->ctx.create.attr;
+    new_file->name = (char *)vsf_local.name;
+    new_file->attr |= vsf_local.attr;
     new_file->fsop = &vk_vfs_op;
 
     orig = vsf_protect_sched();
@@ -664,26 +699,29 @@ static void __vk_vfs_create(uintptr_t target, vsf_evt_t evt)
     vsf_trace(VSF_TRACE_DEBUG, "create vfs %s" VSF_TRACE_CFG_LINEEND, new_file->name);
 #endif
     __vk_file_ref(&new_file->use_as__vk_file_t);
-    dir->ctx.err = VSF_ERR_NONE;
 
 do_return:
-    vsf_eda_return();
+    vsf_eda_return(err);
+    vsf_peda_end();
 }
 
-static void __vk_vfs_unlink(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
 {
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)target;
+    vsf_peda_begin();
+    vsf_err_t err;
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
     switch (evt) {
     case VSF_EVT_INIT:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
-            dir->subfs.root->ctx.unlink = dir->ctx.unlink;
-            if (VSF_ERR_NONE == vsf_eda_call_param_eda(dir->subfs.op->dop.unlink, dir->subfs.root)) {
+            __vsf_component_call_peda_ifs(vk_file_unlink, err, dir->subfs.op->dop.unlink, dir->subfs.op->dop.unlink_local_size, dir->subfs.root,
+                .name = vsf_local.name);
+            if (VSF_ERR_NONE == err) {
                 break;
             }
 
-            dir->ctx.err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+            err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         } else {
-            vk_vfs_file_t *child = __vk_vfs_lookup_imp(dir, dir->ctx.unlink.name, NULL);
+            vk_vfs_file_t *child = __vk_vfs_lookup_imp(dir, vsf_local.name, NULL);
             if (child != NULL) {
                 VSF_FS_ASSERT(1 == child->ref);
 #if VSF_FS_REF_TRACE == ENABLED
@@ -695,16 +733,16 @@ static void __vk_vfs_unlink(uintptr_t target, vsf_evt_t evt)
                 vsf_unprotect_sched(orig);
                 vk_file_free(&child->use_as__vk_file_t);
             }
-            dir->ctx.err = (NULL == child) ? VSF_ERR_NOT_AVAILABLE : VSF_ERR_NONE;
+            err = (NULL == child) ? VSF_ERR_NOT_AVAILABLE : VSF_ERR_NONE;
         }
     case VSF_EVT_RETURN:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
-            dir->ctx.err = dir->subfs.root->ctx.err;
-            dir->ctx.unlink = dir->subfs.root->ctx.unlink;
+            err = (vsf_err_t)vsf_eda_get_return_value();
         }
-        vsf_eda_return();
+        vsf_eda_return(err);
         break;
     }
+    vsf_peda_end();
 }
 
 uint_fast16_t vk_file_get_name_length(vk_file_t *file)
@@ -737,119 +775,129 @@ uint_fast16_t vk_file_get_name_length(vk_file_t *file)
 static void __vk_file_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vk_file_stream_t *pthis = (vk_file_stream_t *)param;
-    vk_file_t *file = pthis->file;
-    vsf_stream_t *stream = pthis->stream.stream;
+    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_OUT:
-        if (pthis->stream.size > 0) {
-            file->ctx.io.size = vsf_stream_get_wbuf(stream, &file->ctx.io.buff);
-            vsf_eda_post_evt(pthis->stream.cur_eda, VSF_EVT_FILE_READ);
+        if (pthis->size > 0) {
+            pthis->cur_size = vsf_stream_get_wbuf(stream, &pthis->cur_buff);
+            vsf_eda_post_evt(pthis->cur_eda, VSF_EVT_FILE_READ);
         }
         break;
     }
 }
 
-static void __vk_file_read_stream_do(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_private_entry(__vk_file_read_stream)
 {
-    vk_file_stream_t *pthis = (vk_file_stream_t *)target;
+    vsf_peda_begin();
+    vk_file_stream_t *pthis = (vk_file_stream_t *)&vsf_this;
     vk_file_t *file = pthis->file;
-    vsf_stream_t *stream = pthis->stream.stream;
+    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->stream.rw_size = 0;
-        pthis->stream.cur_eda = vsf_eda_get_cur();
+        pthis->rw_size = 0;
+        pthis->cur_eda = vsf_eda_get_cur();
         stream->tx.param = pthis;
         stream->tx.evthandler = __vk_file_stream_tx_evthandler;
         vsf_stream_connect_tx(stream);
         break;
-    case VSF_EVT_RETURN:
-        if (VSF_ERR_NONE == file->ctx.err) {
-            pthis->stream.size -= file->ctx.io.size;
-            pthis->stream.addr += file->ctx.io.size;
-            pthis->stream.rw_size += file->ctx.io.size;
-            vsf_stream_write(stream, NULL, file->ctx.io.size);
-        }
-        if ((file->ctx.err != VSF_ERR_NONE) || !pthis->stream.size) {
-            vsf_stream_disconnect_tx(stream);
-            vsf_eda_return();
+    case VSF_EVT_RETURN: {
+            int32_t result = (int32_t)vsf_eda_get_return_value();
+            if (result > 0) {
+                pthis->size -= result;
+                pthis->addr += result;
+                pthis->rw_size += result;
+                vsf_stream_write(stream, NULL, result);
+            }
+            if ((result < 0) || !pthis->size) {
+                vsf_stream_disconnect_tx(stream);
+                vsf_eda_return();
+            }
         }
         break;
     case VSF_EVT_FILE_READ:
-        file->ctx.io.size = min(file->ctx.io.size, pthis->stream.size);
-        vk_file_read(file, pthis->stream.addr, file->ctx.io.size, file->ctx.io.buff, NULL);
+        pthis->cur_size = min(pthis->cur_size, pthis->size);
+        vk_file_read(file, pthis->addr, pthis->cur_size, pthis->cur_buff);
         break;
     }
+    vsf_peda_end();
 }
 
 vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(pthis != NULL);
-    pthis->stream.addr = addr;
-    pthis->stream.size = size;
-    pthis->stream.stream = stream;
-    return __vsf_call_eda((uintptr_t)__vk_file_read_stream_do, (uintptr_t)pthis);
+    pthis->addr = addr;
+    pthis->size = size;
+    pthis->stream = stream;
+    __vsf_component_call_peda(__vk_file_read_stream, err, pthis)
+    return err;
 }
 
 static void __vk_file_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vk_file_stream_t *pthis = (vk_file_stream_t *)param;
-    vk_file_t *file = pthis->file;
-    vsf_stream_t *stream = pthis->stream.stream;
+    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
-        if (pthis->stream.size > 0) {
-            file->ctx.io.size = vsf_stream_get_rbuf(stream, &file->ctx.io.buff);
-            vsf_eda_post_evt(pthis->stream.cur_eda, VSF_EVT_FILE_WRITE);
+        if (pthis->size > 0) {
+            pthis->cur_size = vsf_stream_get_rbuf(stream, &pthis->cur_buff);
+            vsf_eda_post_evt(pthis->cur_eda, VSF_EVT_FILE_WRITE);
         }
         break;
     }
 }
 
-static void __vk_file_write_stream_do(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_private_entry(__vk_file_write_stream)
 {
-    vk_file_stream_t *pthis = (vk_file_stream_t *)target;
+    vsf_peda_begin();
+    vk_file_stream_t *pthis = (vk_file_stream_t *)&vsf_this;
     vk_file_t *file = pthis->file;
-    vsf_stream_t *stream = pthis->stream.stream;
+    vsf_stream_t *stream = pthis->stream;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->stream.rw_size = 0;
-        pthis->stream.cur_eda = vsf_eda_get_cur();
+        pthis->rw_size = 0;
+        pthis->cur_eda = vsf_eda_get_cur();
         stream->rx.param = pthis;
         stream->rx.evthandler = __vk_file_stream_rx_evthandler;
         vsf_stream_connect_rx(stream);
         break;
-    case VSF_EVT_RETURN:
-        if (VSF_ERR_NONE == file->ctx.err) {
-            pthis->stream.size -= file->ctx.io.size;
-            pthis->stream.addr += file->ctx.io.size;
-            pthis->stream.rw_size += file->ctx.io.size;
-            vsf_stream_read(stream, NULL, file->ctx.io.size);
-        }
-        if ((file->ctx.err != VSF_ERR_NONE) || !pthis->stream.size) {
-            vsf_stream_disconnect_rx(stream);
-            vsf_eda_return();
+    case VSF_EVT_RETURN: {
+            int32_t result = (int32_t)vsf_eda_get_return_value();
+            if (result > 0) {
+                pthis->size -= result;
+                pthis->addr += result;
+                pthis->rw_size += result;
+                vsf_stream_read(stream, NULL, result);
+            }
+            if ((result < 0) || !pthis->size) {
+                vsf_stream_disconnect_rx(stream);
+                vsf_eda_return();
+            }
         }
         break;
     case VSF_EVT_FILE_WRITE:
-        file->ctx.io.size = min(file->ctx.io.size, pthis->stream.size);
-        vk_file_write(file, pthis->stream.addr, file->ctx.io.size, file->ctx.io.buff, NULL);
+        pthis->cur_size = min(pthis->cur_size, pthis->size);
+        vk_file_write(file, pthis->addr, pthis->cur_size, pthis->cur_buff);
         break;
     }
+    vsf_peda_end();
 }
 
 vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT(pthis != NULL);
-    pthis->stream.addr = addr;
-    pthis->stream.size = size;
-    pthis->stream.stream = stream;
-    return __vsf_call_eda((uintptr_t)__vk_file_write_stream_do, (uintptr_t)pthis);
+    pthis->addr = addr;
+    pthis->size = size;
+    pthis->stream = stream;
+    __vsf_component_call_peda(__vk_file_write_stream, err, pthis)
+    return err;
 }
 #endif
 

@@ -1,5 +1,7 @@
 #include "vsf.h"
 
+#if VSF_USE_UI_AWTK == ENABLED
+
 #include "tkc/mem.h"
 #include "tkc/mutex.h"
 
@@ -40,3 +42,5 @@ ret_t tk_mutex_destroy(tk_mutex_t* mutex) {
 
   return RET_OK;
 }
+
+#endif

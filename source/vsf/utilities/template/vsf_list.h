@@ -22,11 +22,15 @@
 //#include <stdint.h>
 #include "utilities/compiler.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define __when(__CON)                           (__CON)
-#define when(__CON)                             __when(__CON)
+#define __when(__cond)                          (__cond)
+#define when(__cond)                            __when(__cond)
 #else
 #define __when(...)                             (__VA_ARGS__)
 #define when(...)                               __when(__VA_ARGS__)
@@ -87,18 +91,18 @@
 
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __vsf_slist_insert(     __host_type,  /* type of the host object */  \
+#   define __vsf_slist_insert(  __host_type,  /* type of the host object */     \
                                 __member,     /* the name of the list */        \
                                 __plist,      /* the address of the list */     \
                                 __pitem,      /* the address of the new item */ \
-                                __CON)        /* how to find insert point */    \
+                                __cond)       /* how to find insert point */    \
     do {                                                                        \
         vsf_slist_node_t *__ = (vsf_slist_node_t *)(__plist);                   \
         vsf_slist_init_node(__host_type, __member, __pitem);                    \
         for (; __->next != NULL;){                                              \
             const __host_type * const _ = (__host_type *)(__->next);            \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
-            if (__CON) {                                                        \
+            if (__cond) {                                                       \
                 __vsf_slist_insert_next(                                        \
                     __host_type, __member, __, (__pitem));                      \
                 break;                                                          \
@@ -334,7 +338,7 @@
                                 __member,   /* the name of the list */          \
                                 __plist,    /* the address of the list */       \
                                 __pitem,    /* the address of the new item */   \
-                                __CON)        /* how to find insert point */    \
+                                __cond)     /* how to find insert point */      \
     do {                                                                        \
         vsf_dlist_node_t *__ = (vsf_dlist_node_t *)(__plist);                   \
         vsf_dlist_init_node(__host_type, __member, __pitem);                    \
@@ -342,7 +346,7 @@
             const __host_type * const _ =                                       \
                 __vsf_dlist_get_host(__host_type, __member, __->next);          \
             /* using __VA_ARGS__ so ',' operation could be supported */         \
-            if (__CON) {                                                        \
+            if (__cond) {                                                       \
                 __vsf_dlist_insert_before_imp(                                  \
                     (__plist), __->next, &((__pitem)->__member));               \
                 break;                                                          \
@@ -466,15 +470,15 @@
                 (__plist), (__pitem), offset_of(__host_type, __member))
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define vsf_slist_insert(   __host_type,/* the type of the host type */      \
+#   define vsf_slist_insert(__host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem,    /* the address of the target item */    \
-                            __CON)        /* when( condition expression ) */    \
+                            __cond)     /* when( condition expression ) */      \
             __vsf_slist_insert(                                                 \
-                __host_type, __member, (__plist), (__pitem), (__CON))
+                __host_type, __member, (__plist), (__pitem), (__cond))
 #else
-#   define vsf_slist_insert(   __host_type,/* the type of the host type */      \
+#   define vsf_slist_insert(__host_type,/* the type of the host type */         \
                             __member,   /* the member name of the list */       \
                             __plist,    /* the address of the list */           \
                             __pitem,    /* the address of the target item */    \
@@ -682,9 +686,9 @@ NULL<---|backward|<-----|backward|<----------
                                 __member,   /* the member name of the list */   \
                                 __plist,    /* the address of the list */       \
                                 __pitem,    /* the address of the target item */\
-                                __CON)      /* when( condition expression ) */  \
+                                __cond)     /* when( condition expression ) */  \
             __vsf_dlist_insert(                                                 \
-                __host_type, __member, (__plist), (__pitem), (__CON))
+                __host_type, __member, (__plist), (__pitem), (__cond))
 #else
 #   define vsf_dlist_insert(       __host_type,/* the type of the host type */  \
                                 __member,   /* the member name of the list */   \
@@ -878,5 +882,9 @@ extern void __vsf_dlist_insert_before_imp(  vsf_dlist_t *pthis,
                                             vsf_dlist_node_t *node);
                                                 
 extern void __vsf_dlist_remove_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

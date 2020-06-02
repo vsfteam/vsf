@@ -38,13 +38,13 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vsf_tgui_region_intersect(  vsf_tgui_region_t* ptRegionOut, 
-                                        const vsf_tgui_region_t* ptRegionIn0, 
+extern bool vsf_tgui_region_intersect(  vsf_tgui_region_t* ptRegionOut,
+                                        const vsf_tgui_region_t* ptRegionIn0,
                                         const vsf_tgui_region_t* ptRegionIn1);
-extern 
+extern
 vsf_tgui_region_t * vsf_tgui_region_get_relative_region(
                                         vsf_tgui_region_t *ptOutRegion,
-                                        vsf_tgui_region_t *ptReferenceRegion, 
+                                        vsf_tgui_region_t *ptReferenceRegion,
                                         vsf_tgui_region_t *ptAbsoluteRegion);
 extern
 vsf_tgui_location_t * vsf_tgui_region_get_relative_location(

@@ -29,6 +29,10 @@
 
 #include "hal/interface/vsf_interface_usb.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 // Common.Power
@@ -174,9 +178,9 @@ struct vk_musb_fdrc_reg_t {
             volatile uint8_t RxCount1;
             volatile uint8_t RxCount2;
             volatile uint8_t TxType;        // for host onkly
-            volatile uint8_t TxIntterval;   // for host only
+            volatile uint8_t TxInterval;    // for host only
             volatile uint8_t RxType;        // for host onkly
-            volatile uint8_t RxIntterval;   // for host only
+            volatile uint8_t RxInterval;    // for host only
             volatile uint8_t TxFIFO1;
             volatile uint8_t TxFIFO2;
             volatile uint8_t RxFIFO1;
@@ -214,6 +218,10 @@ extern void vk_musb_fdrc_interrupt_init(vk_musb_fdrc_reg_t *reg);
 extern uint_fast16_t vk_musb_fdrc_rx_fifo_size(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep);
 extern void vk_musb_fdrc_read_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 extern void vk_musb_fdrc_write_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif      // __VSF_MUSB_FDRC_COMMON_H__

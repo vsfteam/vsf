@@ -22,16 +22,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-
-#include <Windows.h>
-
-// IMPORTANT for using COM: interface from combaseapi is a macro defined to struct
-//  this will conflicts with some 3rd-party code, eg: libusb, freetype
-//  if windows.h is included in global header file, remove interface define
-//  if user c file need to use com, define interface to struct.
-#ifdef interface
-#   undef interface
-#endif
+#include "utilities/vsf_utilities.h"
 
 #if     defined(VSF_ARCH_WIN_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -41,6 +32,9 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #define __LITTLE_ENDIAN                 1
@@ -60,6 +54,21 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+// avoid to use windows.h, fix if any conflicts
+typedef void *              HANDLE;
+typedef unsigned long       DWORD;
+typedef unsigned int        UINT;
+typedef unsigned char       BYTE;
+#define FAR                 
+#define NEAR                
+typedef char *              LPSTR;
+#if defined(__WIN__) && defined(__CPU_X64__)
+typedef unsigned long long  ULONG_PTR, *PULONG_PTR;
+#else
+typedef unsigned long       ULONG_PTR, *PULONG_PTR;
+#endif
+typedef ULONG_PTR           DWORD_PTR, *PDWORD_PTR;
 
 typedef uint64_t vsf_systimer_cnt_t;
 
@@ -151,6 +160,10 @@ static ALWAYS_INLINE uintptr_t vsf_arch_get_lr(void)
     VSF_HAL_ASSERT(false);
     return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

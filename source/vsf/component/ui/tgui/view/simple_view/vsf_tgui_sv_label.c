@@ -25,12 +25,8 @@
 
 #define __VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT
 declare_class(vsf_tgui_t)
+
 #include "./vsf_tgui_sv_label.h"
-#include "./vsf_tgui_sv_draw.h"
-#include "./vsf_tgui_sv_style.h"
-#include "../../utilities/vsf_tgui_text.h"
-#include "../../utilities/vsf_tgui_color.h"
-#include "vsf_tgui_sv_port.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -50,8 +46,9 @@ static const vsf_tgui_align_mode_t sTilesAlign[] = {
 
 fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_label_t* ptLabel)
 {
-#if VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]label init" VSF_TRACE_CFG_LINEEND);
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label init" VSF_TRACE_CFG_LINEEND,
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptLabel), ptLabel);
 #endif
     return vsf_tgui_control_v_init(&ptLabel->use_as__vsf_tgui_control_t);
 }
@@ -63,8 +60,9 @@ void __vsf_tgui_label_v_rendering(  vsf_tgui_label_t* ptLabel,
     VSF_TGUI_ASSERT(ptLabel != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]label rendering" VSF_TRACE_CFG_LINEEND);
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label rendering" VSF_TRACE_CFG_LINEEND,
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptLabel), ptLabel);
 #endif
 
     vsf_tgui_control_v_rendering((vsf_tgui_control_t *)ptLabel, ptDirtyRegion, tMode);
@@ -86,7 +84,7 @@ void __vsf_tgui_label_v_rendering(  vsf_tgui_label_t* ptLabel,
 int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* ptLabel)
 {
     VSF_TGUI_ASSERT(NULL != ptLabel);
-    
+
     return (int_fast16_t)
         vsf_tgui_font_get_char_height(
             ptLabel->use_as__vsf_tgui_v_label_t.chFontIndex);
@@ -98,11 +96,11 @@ vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* ptLabel,
                                                 uint16_t *phwLineCount)
 {
     VSF_TGUI_ASSERT(ptLabel != NULL);
-    vsf_tgui_size_t tSize = vsf_tgui_text_get_size(  
+    vsf_tgui_size_t tSize = vsf_tgui_text_get_size(
                                     ptLabel->use_as__vsf_tgui_v_label_t.chFontIndex,
                                     &(ptLabel->tLabel.tString),
                                     phwLineCount,
-                                    ptLabel->tLabel.chInterLineSpace);    
+                                    ptLabel->tLabel.chInterLineSpace);
     return tSize;
 }
 
@@ -121,7 +119,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* p
         for (int i = 0; i < dimof(sTilesAlign); i++) {
             vsf_tgui_region_t tRegion;
             vsf_tgui_tile_get_root( &c_tLabelAdditionalTiles.tTiles[i], &tRegion);
-            
+
             switch (sTilesAlign[i]) {
                 case VSF_TGUI_ALIGN_RIGHT:
                 case VSF_TGUI_ALIGN_LEFT:
@@ -133,7 +131,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* p
                     break;
                 case VSF_TGUI_ALIGN_BOTTOM:
                     break;
-    
+
                 case VSF_TGUI_ALIGN_TOP | VSF_TGUI_ALIGN_LEFT:
                     break;
                 case VSF_TGUI_ALIGN_TOP | VSF_TGUI_ALIGN_RIGHT:
@@ -147,7 +145,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* p
             }
         }
     }
-#endif    
+#endif
 
     return tSize;
 }
@@ -159,28 +157,64 @@ fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* ptLabel,
     VSF_TGUI_ASSERT(ptLabel != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label rendering" VSF_TRACE_CFG_LINEEND,
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptLabel), ptLabel);
+#endif
+
 #ifdef VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR
     if (!ptLabel->use_as__vsf_tgui_v_label_t.bIsNoBackgroundColor) {
         vsf_tgui_control_t* ptControl = (vsf_tgui_control_t*)ptLabel;
-        vsf_tgui_color_t tColor = VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR;
+        vsf_tgui_sv_color_t tColor = VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR;
         vsf_tgui_region_t tRegion = { 0 };
 
-        tRegion.tSize = vsf_tgui_control_get_size(ptControl);
+        tRegion.tSize = *vsf_tgui_control_get_size(ptControl);
+
+#if VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES == ENABLED
+        do {
+            vsf_tgui_tile_t* ptTile;
+            vsf_tgui_region_t tLeftRegion;
+            vsf_tgui_region_t tRightRegion;
+
+            ptTile = vsf_tgui_tile_get_root(&c_tLabelAdditionalTiles._.tLeft, &tLeftRegion);
+            VSF_TGUI_ASSERT(ptTile != NULL);
+
+            ptTile = vsf_tgui_tile_get_root(&c_tLabelAdditionalTiles._.tRight, &tRightRegion);
+            VSF_TGUI_ASSERT(ptTile != NULL);
+
+            tRegion.tLocation.iX += tLeftRegion.tSize.iWidth;
+            tRegion.tSize.iWidth -= tLeftRegion.tSize.iWidth + tRightRegion.tSize.iWidth;
+        } while (0);
+#endif
+
         vsf_tgui_control_v_draw_rect(   ptControl,
                                         ptDirtyRegion,
                                         &tRegion,
                                         tColor);
-    } 
+    }
 #endif
 
     if (!ptLabel->use_as__vsf_tgui_v_label_t.bIsUseRawView) {
 #if VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES == ENABLED
+        vsf_tgui_control_t* ptControl = &ptLabel->use_as__vsf_tgui_control_t;
+#ifdef VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR
+        uint_fast8_t tRate = vsf_tgui_control_v_get_tile_trans_rate(ptControl);
+        uint_fast8_t tBackGroundRate = vsf_tgui_sv_color_get_trans_rate(VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR);
+        vsf_tgui_control_v_set_tile_trans_rate(ptControl, tBackGroundRate);
+#endif
+
+
         for (int i = 0; i < dimof(sTilesAlign); i++) {
-            vsf_tgui_control_v_draw_tile(   (vsf_tgui_control_t *)ptLabel,
+            vsf_tgui_control_v_draw_tile(   ptControl,
                                             ptDirtyRegion,
                                             &c_tLabelAdditionalTiles.tTiles[i],
                                             sTilesAlign[i]);
         }
+
+#ifdef VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR
+        vsf_tgui_control_v_set_tile_trans_rate(ptControl, tRate);
+#endif
+
 #endif
     }
 

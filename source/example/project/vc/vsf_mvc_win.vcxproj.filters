@@ -145,12 +145,6 @@
     <Filter Include="vsf\component\ui">
       <UniqueIdentifier>{16b6f51f-2859-4b63-bbc5-277c3de0a84f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\ui\disp_drv">
-      <UniqueIdentifier>{426a816e-299c-4753-bb8c-19b793f1c00e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\ui\disp_drv\sdl2">
-      <UniqueIdentifier>{378a9a07-be30-4358-a3a9-fd8351214394}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\driver\x86">
       <UniqueIdentifier>{6839995b-5b02-421e-b703-23f6b9c984d1}</UniqueIdentifier>
     </Filter>
@@ -229,9 +223,6 @@
     <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
       <UniqueIdentifier>{6675a22e-6f54-4682-b420-8f298128daca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\utilities\__common">
-      <UniqueIdentifier>{4e7904bd-7ebb-4cb1-b483-428523b16021}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\ui\tgui\view">
       <UniqueIdentifier>{d51c94c5-faa8-4566-97c1-aeb0c7526045}</UniqueIdentifier>
     </Filter>
@@ -249,6 +240,33 @@
     </Filter>
     <Filter Include="vsf\component\ui\tgui\utilities">
       <UniqueIdentifier>{7be3a088-0e82-47b3-af7f-c69f0e8e195e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\common">
+      <UniqueIdentifier>{f8c99c3c-f200-42c8-bbad-94762ca68af6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp">
+      <UniqueIdentifier>{ef51b5a7-0d2a-4fea-b4af-123e6d999006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver">
+      <UniqueIdentifier>{311d03cb-dabb-46d4-99b3-00d314f1a8af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\sdl2">
+      <UniqueIdentifier>{3dc5b540-39c0-469f-8936-c8e1d55dab41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\utilities\compiler\__common">
+      <UniqueIdentifier>{4e7904bd-7ebb-4cb1-b483-428523b16021}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal">
+      <UniqueIdentifier>{2ece4a84-a3a2-4dff-b693-7bc046ea2d96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral">
+      <UniqueIdentifier>{6e9f86a3-989c-4a4e-acce-c6e6e8440a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral">
+      <UniqueIdentifier>{7263f07f-856c-42ff-b48c-549ca1d2fb64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral\spi">
+      <UniqueIdentifier>{0cd1bbf5-4abf-4c6c-a4d3-fc4908210655}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -486,17 +504,11 @@
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h">
       <Filter>vsf\hal\driver\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h">
       <Filter>vsf\component\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h">
-      <Filter>vsf\component\ui\disp_drv</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\type.h">
       <Filter>vsf\utilities\compiler</Filter>
@@ -551,12 +563,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_queue.h">
       <Filter>vsf\utilities\template</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h">
-      <Filter>vsf\component\ui\tgui\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h">
-      <Filter>vsf\component\ui\tgui\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_usr_cfg.h">
       <Filter>usrapp\mvc_demo_win\config</Filter>
@@ -874,13 +880,13 @@
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__compiler.h">
-      <Filter>vsf\utilities\__common</Filter>
+      <Filter>vsf\utilities\compiler\__common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__signal.h">
-      <Filter>vsf\utilities\__common</Filter>
+      <Filter>vsf\utilities\compiler\__common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__type.h">
-      <Filter>vsf\utilities\__common</Filter>
+      <Filter>vsf\utilities\compiler\__common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\__vsf_tgui_controls_common.h">
       <Filter>vsf\component\ui\tgui\controls</Filter>
@@ -971,6 +977,51 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.h">
       <Filter>vsf\component\ui\tgui\controls\controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.h">
+      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.h">
+      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\common\common.h">
+      <Filter>vsf\hal\driver\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal.h">
+      <Filter>vsf\osa_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h">
+      <Filter>vsf\osa_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_periperhal_cfg.h">
+      <Filter>vsf\osa_hal\sw_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_peripheral.h">
+      <Filter>vsf\osa_hal\sw_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_spi.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\vsf_utilities_cfg.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\vsf_utlities.h">
+      <Filter>vsf\utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1091,14 +1142,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c">
-      <Filter>vsf\component\ui\disp_drv\sdl2</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
       <Filter>vsf\hal\driver\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c">
-      <Filter>vsf\component\ui\disp_drv</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\osa_service\vsf_osa_service.c">
       <Filter>vsf\osa_service</Filter>
@@ -1126,12 +1171,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c">
       <Filter>vsf\component\ui\tgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c">
-      <Filter>vsf\component\ui\tgui\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c">
-      <Filter>vsf\component\ui\tgui\utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_demo.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
@@ -1293,7 +1332,7 @@
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\__common\__retarget_io.c">
-      <Filter>vsf\utilities\__common</Filter>
+      <Filter>vsf\utilities\compiler\__common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls_common.c">
       <Filter>vsf\component\ui\tgui\controls</Filter>
@@ -1363,6 +1402,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.c">
       <Filter>vsf\component\ui\tgui\controls\controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.c">
+      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c">
+      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c">
+      <Filter>vsf\component\ui\disp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c">
+      <Filter>vsf\component\ui\disp\driver\sdl2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_hal\vsf_osa_hal.c">
+      <Filter>vsf\osa_hal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c">
+      <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

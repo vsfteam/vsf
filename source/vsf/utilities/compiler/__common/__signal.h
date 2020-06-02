@@ -18,6 +18,10 @@
 #ifndef __USE_COMMON_SIGNAL_H__
 #define __USE_COMMON_SIGNAL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -191,4 +195,9 @@ extern bool check_lock(locker_t *plock);
  *! \return none
  */
 extern void init_lock(locker_t *plock);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

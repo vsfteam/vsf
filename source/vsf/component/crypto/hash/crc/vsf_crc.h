@@ -24,6 +24,10 @@
 
 #if VSF_USE_CRC == ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -45,6 +49,10 @@ extern const vsf_crc_t vsf_crc8_ccitt;
 /*============================ PROTOTYPES ====================================*/
 
 extern uint_fast32_t vsf_crc(const vsf_crc_t *crc, uint_fast32_t initial, uint8_t *buff, uint_fast32_t bytesize);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

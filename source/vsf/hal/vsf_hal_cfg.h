@@ -25,6 +25,10 @@
 //! all hal modules use this configuation file
 
 /*============================ INCLUDES ======================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
@@ -55,6 +59,8 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 /* EOF */

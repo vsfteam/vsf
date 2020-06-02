@@ -33,6 +33,9 @@ struct __vsf_mcs51_t {
     uint8_t ie;
     vsf_arch_prio_t base_prio;
     vsf_systimer_cnt_t systimer_reload;
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+    uint8_t tf0 : 1;
+#endif
 };
 typedef struct __vsf_mcs51_t __vsf_mcs51_t;
 
@@ -47,7 +50,7 @@ NO_INIT static __vsf_mcs51_t __vsf_mcs51;
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
@@ -56,6 +59,8 @@ bool vsf_arch_low_level_init(void)
 {
     //memset(&__vsf_mcs51, 0, sizeof(__vsf_mcs51));
     //vsf_systimer_init();
+    __enable_interrupt();
+
     return true;
 }
 
@@ -63,11 +68,19 @@ bool vsf_arch_low_level_init(void)
 /*----------------------------------------------------------------------------*
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
-
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
 {
-    return (((uint32_t)TH0 << 8) + TL0) - __vsf_mcs51.systimer_reload;
+    vsf_systimer_cnt_t value = ((uint32_t)TH0 << 8) + TL0;
+    vsf_systimer_cnt_t reload = __vsf_mcs51.systimer_reload;
+
+    if (value >= reload) {
+        value -= reload;
+    } else {
+        value += 0x10000 - reload;
+    }
+
+    return value;
 }
 
 void vsf_systimer_clear_int_pending_bit(void)
@@ -92,13 +105,14 @@ void vsf_systimer_reset_counter_value(void)
  */
 bool vsf_systimer_low_level_disable(void)
 {
+    bool tf0 = __vsf_mcs51.tf0;
+    __vsf_mcs51.tf0 = 0;
 #if __IS_COMPILER_IAR__
     TCON_bit.TR0 = 0;
-    return TCON_bit.TF0;
 #elif __IS_COMPILER_51_KEIL__
     TR0 = 0;
-    return TF0;
 #endif
+    return tf0;
 }
 
 /*! \brief only enable systimer without clearing any flags
@@ -135,27 +149,28 @@ void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
     __vsf_mcs51.systimer_reload = 0x10000 - tick_cnt;
 }
 
-#if __IS_COMPILER_IAR__
-ISR(timer0)
-#elif __IS_COMPILER_51_KEIL__
-ISR(1)
-#endif
-{
-    vsf_systimer_reset_counter_value();
-    vsf_systimer_ovf_evt_hanlder();
-}
 
-/*! \brief initialise systimer without enable it 
+/*! \brief initialise systimer without enable it
  */
 vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 {
-    TMOD = 1;
+    TMOD = (TMOD & 0xF0) | 0x01;
     vsf_systimer_set_reload_value(ticks);
     vsf_systimer_reset_counter_value();
 
     return VSF_ERR_NONE;
 }
 
+#if __IS_COMPILER_IAR__
+ISR(timer0)
+#elif __IS_COMPILER_51_KEIL__
+ISR(1)
+#endif
+{
+    __vsf_mcs51.tf0 = 1;
+    vsf_systimer_reset_counter_value();
+    vsf_systimer_ovf_evt_hanlder();
+}
 
 #warning "todo: implement vsf_systimer_prio_set()"
 void vsf_systimer_prio_set(vsf_arch_prio_t priority)
@@ -240,7 +255,17 @@ void vsf_enable_interrupt(void)
 void vsf_arch_sleep(uint32_t mode)
 {
     ENABLE_GLOBAL_INTERRUPT();
-    PCON = mode;
+    //PCON = (PCON & 0xFC ) | mode;
+    // PCON.0 : Setting this bit activates the Idle Mode. This bit is always read as 0
+    //          In the IDLE mode clock for peripherals is running
+    //          The CPU can exit the IDLE state with any interrupt or reset.
+
+    // PCON.1 : Setting this bit activates the Stop Mode. This bit is always read as 0
+    //          Both clocks for the CPU and peripherals are stopped in this mode.
+    //          The CPU can exit this state with an external interrupt (¡°int0¡± or ¡°int1¡±) or reset.
+    //          Internally generated interrupts (timer, serial port¡­) cannot be used since they require clock activity to operate
+
+    PCON = (PCON & 0xFC ) | 0x01;
 }
 
 /* EOF */

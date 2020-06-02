@@ -20,7 +20,7 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 
-
+#if VSF_TGUI_CFG_SUPPORT_SLIDER == ENABLED
 declare_class(vsf_tgui_t)
 
 #define __VK_TGUI_CONTROLS_SLIDER_CLASS_IMPLEMENT
@@ -38,7 +38,7 @@ declare_class(vsf_tgui_t)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vk_tgui_slider_init(   __vk_tgui_slider_t *ptSlider, 
+void vk_tgui_slider_init(   __vk_tgui_slider_t *ptSlider,
                             const vsf_tgui_control_t *ptHost,
                             uint_fast8_t chFPS)
 {
@@ -64,7 +64,13 @@ static void __vk_tgui_slider_update(__vk_tgui_slider_t *ptSlider)
             ptSlider->tOldTimeTick = vsf_systimer_tick_to_ms( vsf_systimer_get());
             vsf_tgui_timer_enable(&ptSlider->tSlideTimer);
         }
-    } 
+    }
+}
+
+bool vk_tgui_slider_is_working(__vk_tgui_slider_t *ptSlider)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+    return vsf_tgui_timer_is_working(&(ptSlider->tSlideTimer));
 }
 
 int_fast16_t vk_tgui_slider_on_timer_event_handler(__vk_tgui_slider_t *ptSlider)
@@ -77,24 +83,61 @@ int_fast16_t vk_tgui_slider_on_timer_event_handler(__vk_tgui_slider_t *ptSlider)
     uint_fast32_t wStep = tElapsed * ptSlider->hwSpeed;
     ptSlider->tPosition.iResidual = (wStep & (_BV(10) - 1)) / ptSlider->hwSpeed;
     wStep >>= 10;
-    
+
     int_fast16_t nDelta = ptSlider->tPosition.iTarget - ptSlider->tPosition.iCurrent;
-    
+
     wStep = min(ABS(nDelta), wStep);
 
     ptSlider->tPosition.iCurrent += ((int16_t)wStep * sign(nDelta));
-    
+
     __vk_tgui_slider_update(ptSlider);
 
     return ptSlider->tPosition.iCurrent;
 }
 
-int_fast16_t vk_tgui_slider_location_target_set(  __vk_tgui_slider_t *ptSlider, 
+int_fast16_t vk_tgui_slider_reset(__vk_tgui_slider_t *ptSlider)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+    ptSlider->tPosition.iCurrent = ptSlider->tPosition.iTarget;
+    return ptSlider->tPosition.iCurrent;
+}
+
+int_fast16_t vk_tgui_slider_location_target_set(  __vk_tgui_slider_t *ptSlider,
                                                     int_fast16_t iLocation)
 {
     VSF_TGUI_ASSERT(NULL != ptSlider);
 
     ptSlider->tPosition.iTarget = iLocation;
+
+    __vk_tgui_slider_update(ptSlider);
+    return ptSlider->tPosition.iCurrent;
+}
+
+int_fast16_t vk_tgui_slider_location_set(   __vk_tgui_slider_t *ptSlider,
+                                            int_fast16_t iTarget,
+                                            int_fast16_t iCurrent)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+
+    ptSlider->tPosition.iTarget = iTarget;
+    ptSlider->tPosition.iCurrent = iCurrent;
+
+    __vk_tgui_slider_update(ptSlider);
+    return ptSlider->tPosition.iCurrent;
+}
+
+int_fast16_t vk_tgui_slider_location_target_get( __vk_tgui_slider_t *ptSlider)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+    return ptSlider->tPosition.iTarget;
+}
+
+
+int_fast16_t vk_tgui_slider_location_target_increase( __vk_tgui_slider_t *ptSlider,
+                                                        int_fast16_t iOffset)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+    ptSlider->tPosition.iTarget += iOffset;
 
     __vk_tgui_slider_update(ptSlider);
     return ptSlider->tPosition.iCurrent;
@@ -116,7 +159,24 @@ int_fast16_t vk_tgui_slider_location_current_set( __vk_tgui_slider_t *ptSlider,
     return iLocation;
 }
 
+int_fast16_t vk_tgui_slider_location_current_increase( __vk_tgui_slider_t *ptSlider,
+                                                        int_fast16_t iOffset)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+    ptSlider->tPosition.iCurrent += iOffset;
 
+    __vk_tgui_slider_update(ptSlider);
+    return ptSlider->tPosition.iCurrent;
+}
+
+
+int_fast16_t vk_tgui_slider_location_get_distance( __vk_tgui_slider_t *ptSlider)
+{
+    VSF_TGUI_ASSERT(NULL != ptSlider);
+    return ptSlider->tPosition.iTarget - ptSlider->tPosition.iCurrent;
+}
+
+#endif
 #endif
 
 

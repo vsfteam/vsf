@@ -56,9 +56,22 @@ static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
 int lvgl_main(int argc, char *argv[])
 {
+    uint_fast8_t gamepad_num = 1;
+    if (argc > 2) {
+        printf("format: %s [GAMEPAD_NUM<1..4>]", argv[1]);
+        return -1;
+    } else if (argc > 1) {
+        gamepad_num = strtoul(argv[1], NULL, 0);
+    }
+
+    if ((gamepad_num <= 0) || (gamepad_num > 4)) {
+        printf("invalid gamepad_num %d", gamepad_num);
+        return -1;
+    }
 #else
 int main(void)
 {
+    uint_fast8_t gamepad_num = 1;
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();
 #       if USRAPP_CFG_STDIO_EN == ENABLED
@@ -103,8 +116,8 @@ int main(void)
     indev_drv.read_cb = __lvgl_touchscreen_read;
     lv_indev_drv_register(&indev_drv);
 
-    extern void lvgl_application(void);
-    lvgl_application();
+    extern void lvgl_application(uint_fast8_t);
+    lvgl_application(gamepad_num);
 
     while (1) {
         lv_task_handler();

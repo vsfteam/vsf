@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,11 +15,15 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef _REPEAT_MACRO_H_
-#define _REPEAT_MACRO_H_
+#ifndef __REPEAT_MACRO_H__
+#define __REPEAT_MACRO_H__
 
 #include "preprocessor.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //! Maximal number of repetitions supported by REPEAT_MACRO.
 #define REPEAT_MACRO_LIMIT   256
@@ -295,5 +299,9 @@
 #define REPEAT_MACRO255(macro, data)       REPEAT_MACRO254(macro, data)   macro(254, data)
 #define REPEAT_MACRO256(macro, data)       REPEAT_MACRO255(macro, data)   macro(255, data)
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // _REPEAT_MACRO_H_

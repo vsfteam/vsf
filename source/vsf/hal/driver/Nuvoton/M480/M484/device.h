@@ -43,6 +43,27 @@
 
 /*============================ MACROS ========================================*/
 
+// user configurations with default value
+#ifndef M480_PLL_FREQ_HZ
+#   define M480_PLL_FREQ_HZ                 (384 * 1000 * 1000)
+#endif
+
+#ifndef M480_HCLK_FREQ_HZ
+#   define M480_HCLK_FREQ_HZ                (192 * 1000 * 1000)
+#endif
+
+#ifndef M480_HXT_FREQ_HZ
+#   define M480_HXT_FREQ_HZ                 (12 * 1000 * 1000)
+#endif
+
+#ifndef M480_PCLK0_FREQ_HZ
+#   define M480_PCLK0_FREQ_HZ               (96 * 1000 * 1000)
+#endif
+
+#ifndef M480_PCLK1_FREQ_HZ
+#   define M480_PCLK1_FREQ_HZ               (96 * 1000 * 1000)
+#endif
+
 // bit0 - bit7  : __bit_offset  (0 .. 255)
 // bit8 - bit12 : __bit_len     (0 .. 31)
 // bit13        : __is_wprotect
@@ -126,27 +147,27 @@
 
 //! \name power set index
 //! @{
-enum pm_power_cfg_no_t{
+typedef enum pm_power_cfg_no_t{
     __def_idx(POWER_HXT, 0),
     __def_idx(POWER_LXT, 1),
     __def_idx(POWER_HIRC, 2),
     __def_idx(POWER_LIRC, 3),
-};
+} pm_power_cfg_no_t;
 //! @}
 
 //! \name power set mask
 //! @{
-enum pm_power_cfg_msk_t {
+typedef enum pm_power_cfg_msk_t {
     __def_msk(POWER_HXT),
     __def_msk(POWER_LXT),
     __def_msk(POWER_HIRC),
     __def_msk(POWER_LIRC),
-} ;
+} pm_power_cfg_msk_t;
 //! @}
 
 //! \name the lowpower mode
 //! @{
-enum pm_sleep_mode_t{
+typedef enum pm_sleep_mode_t{
     PM_NPD          = 0,
     PM_LLPD         = 1,
     PM_FWPD         = 2,
@@ -158,10 +179,10 @@ enum pm_sleep_mode_t{
     PM_SLEEP        = PM_NPD,
     PM_DEEP_SLEEP   = PM_DPD,
     PM_POWER_OFF    = PM_DPD,
-} ;
+} pm_sleep_mode_t;
 //! @}
 
-enum pm_periph_clksrc_t {
+typedef enum pm_periph_clksrc_t {
     CLKSRC_HXT,
     CLKSRC_HXTD2,
     CLKSRC_LXT,
@@ -180,10 +201,9 @@ enum pm_periph_clksrc_t {
     CLKSRC_TM1_PIN,
     CLKSRC_TM2_PIN,
     CLKSRC_TM3_PIN,
-};
-typedef enum pm_periph_clksrc_t pm_periph_clksrc_t;
+}pm_periph_clksrc_t;
 
-enum pm_periph_clksel_t {
+typedef enum pm_periph_clksel_t {
     SDH_CLKSEL_MAP_IDX  = 0,
     SDH_CLKSEL_MAP      = (CLKSRC_HXT << 0) | (CLKSRC_PLL << 4) | (CLKSRC_HCLK << 8) | (CLKSRC_HIRC << 12),
     STCLK_CLKSEL_MAP_IDX= 1,
@@ -236,12 +256,11 @@ enum pm_periph_clksel_t {
     SC0_CLKSEL_MAP_IDX  = SPI13_CLKSEL_MAP_IDX,
     SC1_CLKSEL_MAP_IDX  = SPI02_CLKSEL_MAP_IDX,
     SC2_CLKSEL_MAP_IDX  = SPI13_CLKSEL_MAP_IDX,
-};
-typedef enum pm_periph_clksel_t pm_periph_clksel_t;
+}pm_periph_clksel_t;
 
 //! \name peripheral clock index
 //! @{
-enum pm_periph_async_clk_no_t{
+typedef enum pm_periph_async_clk_no_t{
                         // NAME         BF_CLKSEL,      BF_CLKDIV,      CLKSEL_MAP_IDX
     M480_BIT_FIELD(     HCLK_CLKSEL,    0,  3,  true),
     M480_BIT_FIELD(     SYSTICK_CLKSEL, 3,  3,  true),
@@ -323,16 +342,16 @@ enum pm_periph_async_clk_no_t{
     __def_periph_clk(   PCLK_BPWM0,     BPWM0_CLKSEL,   0,              BPWM0_CLKSEL_MAP_IDX),
     M480_BIT_FIELD(     BPWM1_CLKSEL,   73, 1,  false),
     __def_periph_clk(   PCLK_BPWM1,     BPWM1_CLKSEL,   0,              BPWM1_CLKSEL_MAP_IDX),
-};
+}pm_periph_async_clk_no_t;
 //! @}
 
-enum pm_main_clk_no_t {
+typedef enum pm_main_clk_no_t {
     MCLK_CORE_idx = 0,
-};
+}pm_main_clk_no_t;
 
 //! \name Peripheral AHB Clock Macros
 //! @{
-enum pm_ahb_clk_no_t { 
+typedef enum pm_ahb_clk_no_t { 
                         // NAME         BUS_IDX,BIT_IDX
     // AHB
     __def_ahbclk_idx(   AHBCLK_DMA,     0,      1   ),
@@ -395,9 +414,9 @@ enum pm_ahb_clk_no_t {
     __def_ahbclk_idx(   AHBCLK_CAP0,    2,      26  ),
     __def_ahbclk_idx(   AHBCLK_CAP1,    2,      27  ),
     __def_ahbclk_idx(   AHBCLK_OP,      2,      30  ),
-};
+}pm_ahb_clk_no_t;
 
-enum pm_ahb_clk_msk_t { 
+typedef enum pm_ahb_clk_msk_t { 
     // AHB
     __def_msk(AHBCLK_DMA),
     __def_msk(AHBCLK_ISP),
@@ -459,11 +478,11 @@ enum pm_ahb_clk_msk_t {
     __def_msk(AHBCLK_CAP0),
     __def_msk(AHBCLK_CAP1),
     __def_msk(AHBCLK_OP),
-};
+}pm_ahb_clk_msk_t;
 //! @}
 
 //! @{
-enum pm_clk_src_sel_t {
+typedef enum pm_clk_src_sel_t {
     // CLK->CLKSEL0
     __def_clk_src(  HCLK_CLKSRC_HXT,        0),
     __def_clk_src(  HCLK_CLKSRC_LXT,        1),
@@ -619,27 +638,28 @@ enum pm_clk_src_sel_t {
     __def_clk_src(  UART5_CLKSRC_PLL,       1),
     __def_clk_src(  UART5_CLKSRC_LXT,       2),
     __def_clk_src(  UART5_CLKSRC_HIRC,      3),
-};
+} pm_clk_src_sel_t;
 //! @}
 
-enum pm_pll_sel_t {
+typedef enum pm_pll_sel_t {
     PLL0_idx,
-};
+}pm_pll_sel_t;
 
 struct io_wakeup_cfg_t {
     uint32_t dummy;
 };
 typedef struct io_wakeup_cfg_t io_wakeup_cfg_t;
 
-typedef enum io_port_no_t io_port_no_t;
-typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
+
+//typedef enum io_port_no_t io_port_no_t;
 
 def_interface( i_pm_wakeup_t )
     struct {
         vsf_err_t (*Enable)(io_wakeup_cfg_t *pcfg, uint_fast8_t size);
-        vsf_err_t (*Disable)(io_port_no_t port, uint_fast32_t msk);
+        //vsf_err_t (*Disable)(io_port_no_t port, uint_fast32_t msk);
     }UseIO;
 end_def_interface( i_pm_wakeup_t )
+
 
 struct pm_periph_asyn_clk_cfg_t {
     pm_clk_src_sel_t    clk_src;

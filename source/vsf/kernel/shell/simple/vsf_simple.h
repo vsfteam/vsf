@@ -24,6 +24,11 @@
 #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
 #include "../../vsf_eda.h"
 #include "./vsf_simple_bmevt.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
@@ -42,6 +47,8 @@
         struct {uint_fast16_t tState;__MEMBER;                                  \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);                           \
+             vsf_evt_t evt = vsf_eda_get_cur_evt();                             \
+             UNUSED_PARAM(evt);                                                 \
              UNUSED_PARAM(ptThis);
              
 #   if __IS_COMPILER_IAR__
@@ -59,6 +66,8 @@
         struct {uint_fast8_t tState;__VA_ARGS__                                 \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);                           \
+             vsf_evt_t evt = vsf_eda_get_cur_evt();                             \
+             UNUSED_PARAM(evt);                                                 \
              UNUSED_PARAM(ptThis);
             
 #   if __IS_COMPILER_IAR__
@@ -72,10 +81,6 @@
 #       define mem_nonsharable(...)            __VA_ARGS__
 #   endif
 #endif
-
-
-
-
 
 #define vsf_yield(__pevt)                                                       \
             for (   vsf_evt_t result = VSF_EVT_INVALID;                         \
@@ -358,6 +363,79 @@
                     (reason == VSF_SYNC_GET || reason == VSF_SYNC_TIMEOUT)))
 #endif
 
+
+/*----------------------------------------------------------------------------*
+ * sub call                                                                   *
+ *----------------------------------------------------------------------------*/
+
+#define vsf_call_eda(__entry, __param_addr)                                     \
+            __vsf_call_eda( (vsf_fsm_entry_t)(__entry),                         \
+                            (__param_addr),                                     \
+                            0, 0, 0)
+
+#define vsf_call_fsm(__entry, __param_addr, ...)                                \
+            __vsf_call_fsm( (vsf_fsm_entry_t)(__entry),                         \
+                            (__param_addr),                                     \
+                            (0, ##__VA_ARGS__))
+
+#define vsf_call_peda4( __peda_name,                                            \
+                        __entry,                                                \
+                        __private_local_size,                                   \
+                        __peda_param_addr,                                      \
+                        __buff)                                                 \
+            __vsf_call_eda((uintptr_t)__entry,                                  \
+                (uintptr_t)(__peda_param_addr),                                 \
+                sizeof(vsf_peda_local(__peda_name)) + (__private_local_size),   \
+                sizeof(vsf_peda_arg(__peda_name)),                              \
+                (uintptr_t)(__buff))
+
+#define vsf_call_peda3( __peda_name,                                            \
+                        __entry,                                                \
+                        __private_local_size,                                   \
+                        __peda_param_addr)                                      \
+            __vsf_call_eda((uintptr_t)__entry,                                  \
+                (uintptr_t)(__peda_param_addr),                                 \
+                sizeof(vsf_peda_local(__peda_name)) + (__private_local_size),   \
+                sizeof(vsf_peda_arg(__peda_name)),                              \
+                0)
+
+#define vsf_call_peda2( __peda_name,                                            \
+                        __peda_param_addr,                                      \
+                        __buff)                                                 \
+            __vsf_call_eda((uintptr_t)vsf_peda_func(__peda_name),               \
+                        (uintptr_t)(__peda_param_addr),                         \
+                        sizeof(vsf_peda_local(__peda_name)),                    \
+                        sizeof(vsf_peda_arg(__peda_name)),                      \
+                        (uintptr_t)(__buff))
+
+
+#define vsf_call_peda1( __peda_name,                                            \
+                        __peda_param_addr)                                      \
+            __vsf_call_eda((uintptr_t)vsf_peda_func(__peda_name),               \
+                        (uintptr_t)(__peda_param_addr),                         \
+                        sizeof(vsf_peda_local(__peda_name)),                    \
+                        sizeof(vsf_peda_arg(__peda_name)),                      \
+                        0)
+
+#define vsf_call_peda(__peda_name, ...)                                         \
+            __PLOOC_EVAL(vsf_call_peda, __VA_ARGS__) (__peda_name, __VA_ARGS__)
+
+#if 0
+#define vsf_call_peda_ex(__peda_name, __entry, __local_size, __peda_param_addr, ...)\
+            __vsf_call_eda(__entry,                                             \
+                            (__peda_param_addr),                                \
+                            sizeof(vsf_peda_local(__peda_name)) + (__local_size),\
+                            sizeof(vsf_peda_local(__peda_name)),                \
+                            (uintptr_t)(0, ##__VA_ARGS__))
+
+#define vsf_call_peda(__peda_name, __peda_param_addr, ...)                      \
+            __vsf_call_eda( vsf_peda_func(__peda_name),                         \
+                            (__peda_param_addr),                                \
+                            sizeof(vsf_peda_local(__peda_name)),                \
+                            sizeof(vsf_peda_local(__peda_name)),                \
+                            (uintptr_t)(0, ##__VA_ARGS__))
+#endif
+
 #endif
 
 /*============================ TYPES =========================================*/
@@ -386,11 +464,22 @@ SECTION("text.vsf.kernel.vsf_yield")
 extern vsf_evt_t __vsf_yield(void);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-SECTION("text.vsf.kernel.__vsf_call_eda")
-extern vsf_err_t __vsf_call_eda(uintptr_t evthandler, uintptr_t param);
+SECTION("text.vsf.kernel.vsf_call_eda_ex")
+extern vsf_err_t __vsf_call_eda(uintptr_t evthandler, 
+                                uintptr_t param, 
+                                size_t local_size,
+                                size_t local_buff_size,
+                                uintptr_t local_buff);
 
 SECTION("text.vsf.kernel.__vsf_call_fsm")
-extern fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param);
+extern fsm_rt_t __vsf_call_fsm( vsf_fsm_entry_t entry, 
+                                uintptr_t param, 
+                                size_t local_size);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 #endif
 /* EOF */

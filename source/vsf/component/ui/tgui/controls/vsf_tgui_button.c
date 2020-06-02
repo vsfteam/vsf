@@ -38,6 +38,7 @@ static const i_tgui_control_methods_t c_tVLabel= {
         (vsf_tgui_method_t *)&vsf_tgui_button_v_init,
         (vsf_tgui_method_t *)&vsf_tgui_button_v_depose,
         (vsf_tgui_v_method_render_t *)&vsf_tgui_button_v_rendering,
+        NULL,
         (vsf_tgui_method_t *)&vsf_tgui_button_v_update
     },
     (vsf_tgui_method_t *)vk_tgui_button_init,
@@ -59,11 +60,11 @@ static const i_tgui_control_methods_t c_tVLabel= {
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t* ptMSG)
+fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm = __vsf_tgui_control_msg_handler(
-                        &(ptButton->use_as__vsf_tgui_label_t.use_as__vsf_tgui_control_t), 
-                        ptMSG, 
+                        &(ptButton->use_as__vsf_tgui_label_t.use_as__vsf_tgui_control_t),
+                        ptMSG,
                         &c_tVLabel);
 
     //if (fsm != VSF_MSGT_ERR_MSG_NOT_HANDLED) {
@@ -72,10 +73,12 @@ fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_ms
                 if (!ptButton->_.bIsCheckButton) {
                     ptButton->_.bIsChecked = true;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
+                    #endif
                         vsf_tgui_control_refresh((const vsf_tgui_control_t*)ptButton, NULL);
                     }
-                    
+
                 }
                 break;
 
@@ -83,19 +86,23 @@ fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_ms
                 if (!ptButton->_.bIsCheckButton) {
                     ptButton->_.bIsChecked = false;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
+                    #endif
                         vsf_tgui_control_refresh((const vsf_tgui_control_t*)ptButton, NULL);
                     }
-                    
-                } 
+
+                }
                 break;
-             
+
             case VSF_TGUI_EVT_POINTER_CLICK:
                 if (ptButton->_.bIsCheckButton) {
                     //! toggle the bIsChecked flag
                     ptButton->_.bIsChecked = !ptButton->_.bIsChecked;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
+                    #endif
                         vsf_tgui_control_refresh((const vsf_tgui_control_t*)ptButton, NULL);
                     }
                 }
@@ -106,7 +113,9 @@ fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_ms
                 if (ptButton->_.bIsAllowEmphasize) {
                     ptButton->_.bIsEmphasized = true;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
+                    #endif
                         vsf_tgui_control_refresh((const vsf_tgui_control_t*)ptButton, NULL);
                     }
                 }
@@ -116,7 +125,9 @@ fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_ms
                 if (ptButton->_.bIsAllowEmphasize) {
                     ptButton->_.bIsEmphasized = false;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
+                    #endif
                         vsf_tgui_control_refresh((const vsf_tgui_control_t*)ptButton, NULL);
                     }
                 }
@@ -126,7 +137,7 @@ fsm_rt_t vsf_tgui_mc_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_ms
 
         }
     //}
-    
+
     return fsm;
 }
 

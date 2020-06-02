@@ -52,7 +52,7 @@
 #endif
 
 #ifndef VSF_LINUX_CFG_PRIO_HIGHEST
-#   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_1
+#   define VSF_LINUX_CFG_PRIO_HIGHEST       vsf_prio_0
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -412,7 +412,11 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     }
 }
 
+#if defined(__WIN__) && defined(__CPU_X64__)
+intptr_t execv(const char *pathname, char const* const* argv)
+#else
 int execv(const char *pathname, char const* const* argv)
+#endif
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
@@ -437,7 +441,11 @@ int execv(const char *pathname, char const* const* argv)
     return 0;
 }
 
+#if defined(__WIN__) && defined(__CPU_X64__)
+intptr_t execl(const char *pathname, const char *arg, ...)
+#else
 int execl(const char *pathname, const char *arg, ...)
+#endif
 {
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
@@ -545,13 +553,16 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
-    int32_t rsize = 1;
     ssize_t result = 0;
+    int32_t rsize;
 
-    while ((count > 0) && (rsize > 0)) {
-        vk_file_read(file, priv->pos, count, (uint8_t *)buf, &rsize);
-        if (VSF_ERR_NONE != vk_file_get_errcode(file)) {
+    while (count > 0) {
+        vk_file_read(file, priv->pos, count, (uint8_t *)buf);
+        rsize = (int32_t)vsf_eda_get_return_value();
+        if (rsize < 0) {
             return -1;
+        } else if (!rsize) {
+            break;
         }
 
         count -= rsize;
@@ -566,13 +577,16 @@ static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, void *buf, size_t count
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
-    int32_t wsize;
     ssize_t result = 0;
+    int32_t wsize;
 
     while (count > 0) {
-        vk_file_write(file, priv->pos, count, (uint8_t *)buf, &wsize);
-        if (VSF_ERR_NONE != vk_file_get_errcode(file)) {
+        vk_file_write(file, priv->pos, count, (uint8_t *)buf);
+        wsize = (int32_t)vsf_eda_get_return_value();
+        if (wsize < 0) {
             return -1;
+        } else if (!wsize) {
+            break;
         }
 
         count -= wsize;
@@ -915,7 +929,7 @@ static int __vsf_linux_fs_create(const char* pathname, mode_t mode, vk_file_attr
     //  how to free name?
     name = strdup(name_tmp);
     vk_file_create(dir, name, attr, size);
-    if (VSF_ERR_NONE != vk_file_get_errcode(dir)) {
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
         err = -1;
     }
     __vsf_linux_fs_close_do(dir);
@@ -980,6 +994,11 @@ int open(const char *pathname, int flags, ...)
     return fd;
 }
 
+int remove(const char *pathname)
+{
+    return unlink(pathname);
+}
+
 int close(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
@@ -1017,6 +1036,28 @@ ssize_t write(int fd, void *buf, size_t count)
     return sfd->op->write(sfd, buf, count);
 }
 
+off_t lseek(int fd, off_t offset, int whence)
+{
+    vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
+    VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    uint_fast64_t new_pos;
+
+    switch (whence) {
+    case SEEK_SET:  new_pos = 0;                break;
+    case SEEK_CUR:  new_pos = priv->pos;        break;
+    case SEEK_END:  new_pos = priv->file->size; break;
+    default:        return -1;
+    }
+
+    new_pos += offset;
+    if (new_pos > priv->file->size) {
+        return -1;
+    }
+    priv->pos = new_pos;
+    return 0;
+}
+
 int stat(const char *pathname, struct stat *buf)
 {
     VSF_LINUX_ASSERT(false);
@@ -1046,7 +1087,7 @@ int unlink(const char *pathname)
 
     vk_file_unlink(dir, pathname);
 
-    vsf_err_t err = vk_file_get_errcode(dir);
+    vsf_err_t err = (vsf_err_t)vsf_eda_get_return_value();
     __vsf_linux_fs_close_do(dir);
     return VSF_ERR_NONE == err ? 0 : -1;
 }
@@ -1114,7 +1155,7 @@ int mount(const char *source, const char *target,
 
     if (filesystem != NULL) {
         vk_fs_mount(dir, filesystem, (void *)data);
-        err = dir->ctx.err;
+        err = (vsf_err_t)vsf_eda_get_return_value();
     } else {
         vk_malfs_mounter_t mounter;
         mounter.dir = dir;
@@ -1140,7 +1181,7 @@ int umount(const char *target)
     vk_file_t *dir = priv->file;
     vk_fs_unmount(dir);
     close(fd);
-    if (VSF_ERR_NONE != dir->ctx.err) {
+    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
         return -1;
     }
     return 0;
@@ -1203,6 +1244,11 @@ int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry)
     return err;
 }
 
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wvisibility"
+#endif
+
 int tcgetattr(int fd, struct termios *termios)
 {
     return 0;
@@ -1213,4 +1259,13 @@ int tcsetattr(int fd, int optional_actions, const struct termios *termios)
     return 0;
 }
 
+void usleep(int usec)
+{
+    vsf_teda_set_timer_us(usec);
+    vsf_thread_wfe(VSF_EVT_TIMER);
+}
+
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 #endif      // VSF_USE_LINUX

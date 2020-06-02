@@ -28,7 +28,9 @@
 #include "./vsf_thread.h"
 #include "./vsf_fsm.h"
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
@@ -41,11 +43,21 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __vsf_task_func(__name)     vsf_task_func_##__name
+#define vsf_task_func(__name)       __vsf_task_func(__name)
+
+#define __vsf_task(__name)          task_cb_##__name
+#define vsf_task(__name)            __vsf_task(__name)
+
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __implement_vsf_task(__NAME)                                         \
-        fsm_rt_t vsf_task_func_##__NAME(struct task_cb_##__NAME * ptThis,       \
+#   define __implement_vsf_task(__name)                                         \
+        fsm_rt_t vsf_task_func(__name)( uintptr_t local,                        \
                                         vsf_evt_t evt)                          \
-        {                                                                       
+        {                                                                       \
+            vsf_task(__name) *ptThis =                                          \
+                *(vsf_task(__name) **)                                          \
+                    ((uintptr_t)local - sizeof(uintptr_t));                                                                                            
             
 #   define vsf_task_begin()  
 
@@ -55,24 +67,19 @@
 #   define vsf_task_state  (ptThis->tState)
 
 #else
-#   define __implement_vsf_task(__NAME)                                         \
-        void vsf_task_func_##__NAME(__NAME *ptThis, vsf_evt_t evt)
+#   define __implement_vsf_task(__name)                                         \
+        void vsf_task_func(__name)(__name *ptObj, vsf_evt_t evt)                \
+        {                                                                       \
+            vsf_task(__name) *ptThis = &(ptObj->param);
         
 #   define vsf_task_begin()  
-#   define vsf_task_end()           vsf_eda_yield();
+#   define vsf_task_end()           } vsf_eda_yield();
                 
 #   define vsf_task_state  (ptThis->tState)
 #endif
 
-#define implement_vsf_task(__NAME)  __implement_vsf_task(__NAME)
+#define implement_vsf_task(__name)  __implement_vsf_task(__name)
         
-        
-#define __vsf_task_func(__NAME)     vsf_task_func_##__NAME
-#define vsf_task_func(__NAME)       __vsf_task_func(__NAME)
-
-#define __vsf_task(__NAME)          task_cb_##__NAME
-#define vsf_task(__NAME)            __vsf_task(__NAME)
-
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #   define vsf_task_start           vsf_teda_init_ex
@@ -81,10 +88,10 @@
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __def_vsf_task(__NAME,__MEMBER)                                      \
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#       define __def_vsf_task(__NAME,__MEMBER)                                  \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t tState;                                                     \
             vsf_sync_reason_t reason;                                           \
             __MEMBER                                                            \
         };                                                                      \
@@ -92,13 +99,13 @@
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
-        extern fsm_rt_t vsf_task_func_##__NAME( struct task_cb_##__NAME *ptThis,\
+        extern fsm_rt_t vsf_task_func_##__NAME( uintptr_t local,                \
                                                 vsf_evt_t evt);                 
         
-#else
-#   define __def_vsf_task(__NAME,__MEMBER)                                      \
+#   else
+#       define __def_vsf_task(__NAME,__MEMBER)                                  \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t tState;                                                     \
             vsf_sync_reason_t reason;                                           \
             __MEMBER                                                            \
         };                                                                      \
@@ -107,25 +114,25 @@
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
         extern void vsf_task_func_##__NAME(struct __NAME *ptThis, vsf_evt_t evt);
-#endif
+#   endif
 #else
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __def_vsf_task(__NAME,...)                                           \
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#       define __def_vsf_task(__NAME,...)                                       \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t tState;                                                     \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
-        extern fsm_rt_t vsf_task_func_##__NAME( struct task_cb_##__NAME *ptThis,\
+        extern fsm_rt_t vsf_task_func_##__NAME( uintptr_t local,                \
                                                 vsf_evt_t evt);                 
         
-#else
-#   define __def_vsf_task(__NAME,...)                                           \
+#   else
+#       define __def_vsf_task(__NAME,...)                                       \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t tState;                                                     \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
@@ -133,7 +140,7 @@
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
         extern void vsf_task_func_##__NAME(struct __NAME *ptThis, vsf_evt_t evt);
-#endif
+#   endif
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
@@ -219,27 +226,31 @@
 
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#define vsf_task_call_fsm(__NAME, __TARGET)                                     \
-            __vsf_eda_call_fsm((vsf_task_entry_t)(__NAME), (uintptr_t)(__TARGET))
-#define vsf_task_call_task(__NAME, __TARGET)                                    \
-            __vsf_eda_call_fsm(   (vsf_task_entry_t)vsf_task_func(__NAME),        \
-                                (uintptr_t)(__TARGET))
+#define vsf_task_call_fsm(__NAME, __TARGET, ...)                                \
+            __vsf_eda_call_fsm( (vsf_task_entry_t)(__NAME),                     \
+                                (uintptr_t)(__TARGET), (0, ##__VA_ARGS__))
+                                
+#define vsf_task_call_task(__NAME, __TARGET, ...)                               \
+            __vsf_eda_call_fsm( (vsf_task_entry_t)vsf_task_func(__NAME),        \
+                                (uintptr_t)(__TARGET), (0, ##__VA_ARGS__))
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define vsf_task_call_sub(__NAME, __TARGET)                                  \
+#   define vsf_task_call_sub(__NAME, __TARGET, ...)                             \
             if (VSF_ERR_NONE != __vsf_eda_call_eda(                             \
                     (vsf_task_entry_t)(__NAME),                                 \
-                    (__TARGET))) {                                              \
+                    (__TARGET),                                                 \
+                    (0, ##__VA_ARGS))) {                                        \
                 return fsm_rt_on_going;                                         \
             }
 #   define vsf_eda_call_task    vsf_task_call_task
 
 #elif VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   define vsf_task_call_sub(__NAME, __TARGET)                                  \
+#   define vsf_task_call_sub(__NAME, __TARGET, ...)                             \
             if (VSF_ERR_NONE != __vsf_eda_call_eda(                             \
                     (vsf_task_entry_t)(__NAME),                                 \
-                    (__TARGET))) {                                              \
+                    (__TARGET),                                                 \
+                    (0, ##__VA_ARGS))) {                                        \
                 return ;                                                        \
             }
 #   define vsf_eda_call_task(__NAME, __TARGET)                                  \
@@ -325,6 +336,10 @@ typedef vsf_eda_evthandler_t    vsf_task_entry_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

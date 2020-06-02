@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define VSFSTREAM_CLASS_INHERIT
 #include "vsf.h"
 
 #if VSF_USE_USB_HOST == ENABLED && APP_CFG_USE_USBH_DEMO == ENABLED
@@ -30,6 +31,52 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_USE_USB_HOST_UAC == ENABLED
+describe_mem_stream(__user_usbh_uac_rx_stream, 100)
+describe_mem_stream(__user_usbh_uac_tx_stream, 200)
+static void __usrapp_usbh_uac_on_stream(void *param, vsf_stream_evt_t evt)
+{
+    vsf_stream_t *stream = param;
+    switch (evt) {
+    case VSF_STREAM_ON_TX:
+        vsf_stream_write(stream, NULL, vsf_stream_get_free_size(stream));
+        break;
+    case VSF_STREAM_ON_RX:
+        vsf_stream_read(stream, NULL, vsf_stream_get_buff_size(stream));
+        break;
+    }
+}
+void vsf_usbh_uac_on_new(void *uac, uint_fast8_t stream_num)
+{
+    vk_usbh_uac_stream_t * stream;
+    vsf_trace(VSF_TRACE_INFO, "usbh_uac: new dev" VSF_TRACE_CFG_LINEEND);
+    for (int i = 0; i < stream_num; i++) {
+        stream = vsf_usbh_uac_get_stream_info(uac, i);
+        vsf_trace(VSF_TRACE_INFO, "  stream%d:" VSF_TRACE_CFG_LINEEND, i);
+        vsf_trace(VSF_TRACE_INFO, "    direction: %s" VSF_TRACE_CFG_LINEEND, stream->is_in ? "IN" : "OUT");
+        vsf_trace(VSF_TRACE_INFO, "    format: 0x%04X" VSF_TRACE_CFG_LINEEND, stream->format);
+        vsf_trace(VSF_TRACE_INFO, "    channel_num: %d" VSF_TRACE_CFG_LINEEND, stream->channel_num);
+        vsf_trace(VSF_TRACE_INFO, "    sample_size: %d" VSF_TRACE_CFG_LINEEND, stream->sample_size);
+        vsf_trace(VSF_TRACE_INFO, "    sample_rate: %d" VSF_TRACE_CFG_LINEEND, stream->sample_rate);
+
+        if (stream->is_in) {
+            vsf_usbh_uac_connect_stream(uac, i, &__user_usbh_uac_rx_stream.use_as__vsf_stream_t);
+
+            __user_usbh_uac_rx_stream.rx.param = &__user_usbh_uac_rx_stream;
+            __user_usbh_uac_rx_stream.rx.evthandler = __usrapp_usbh_uac_on_stream;
+            vsf_stream_connect_rx(&__user_usbh_uac_rx_stream.use_as__vsf_stream_t);
+        } else {
+            vsf_usbh_uac_connect_stream(uac, i, &__user_usbh_uac_tx_stream.use_as__vsf_stream_t);
+
+            __user_usbh_uac_tx_stream.tx.param = &__user_usbh_uac_tx_stream;
+            __user_usbh_uac_tx_stream.tx.evthandler = __usrapp_usbh_uac_on_stream;
+            vsf_stream_connect_tx(&__user_usbh_uac_tx_stream.use_as__vsf_stream_t);
+            vsf_stream_write(&__user_usbh_uac_tx_stream.use_as__vsf_stream_t, NULL, vsf_stream_get_free_size(&__user_usbh_uac_tx_stream.use_as__vsf_stream_t));
+        }
+    }
+}
+#endif
 
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
 int usbh_main(int argc, char *argv[])

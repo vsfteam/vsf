@@ -26,6 +26,10 @@
 #include "component/usb/host/vsf_usbh.h"
 #include "hal/interface/vsf_interface_usb.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
@@ -52,6 +56,9 @@ extern const vk_usbh_hcd_drv_t vk_winusb_hcd_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif // __VSF_WINUSB_HCD_H___

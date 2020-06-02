@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,10 +15,20 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef _PREPROCESSOR_H_
-#define _PREPROCESSOR_H_
+#ifndef __PREPROCESSOR_H__
+#define __PREPROCESSOR_H__
 
 #include "tpaste.h"
 #include "mrepeat.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // _PREPROCESSOR_H_

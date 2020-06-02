@@ -21,6 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "../__common/__signal.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/    
 /*============================ TYPES =========================================*/
@@ -33,4 +36,9 @@ extern void __enable_interrupt(void);
 extern vsf_gint_state_t __get_interrupt_state(void);
 extern void __set_interrupt_state(vsf_gint_state_t state);
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

@@ -18,14 +18,11 @@
 /*============================ INCLUDES ======================================*/
 #include "../vsf_tgui_cfg.h"
 
-#if     VSF_USE_TINY_GUI == ENABLED \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+#if     VSF_USE_TINY_GUI == ENABLED
 
 declare_class(vsf_tgui_t)
 #include "../controls/vsf_tgui_controls.h"
 #include "./vsf_tgui_text.h"
-#include "./vsf_tgui_font.h"
-#include "../view/simple_view/vsf_tgui_sv_port.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,6 +30,9 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+extern uint8_t vsf_tgui_font_get_char_height(const uint8_t chFontIndex);
+extern uint8_t vsf_tgui_font_get_char_width(const uint8_t chFontIndex, uint32_t wChar);
+
 /*============================ IMPLEMENTATION ================================*/
 
 uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize)
@@ -63,7 +63,7 @@ uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize)
     wFirst = (uint8_t)pchString[*ptSize];
     (*ptSize)++;
 
-    if ((wFirst & 0x80) != 0x80) {                  // U+0000 ~ U+007F 
+    if ((wFirst & 0x80) != 0x80) {                  // U+0000 ~ U+007F
         return wFirst;
     }
 
@@ -98,7 +98,7 @@ uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize)
 
         return ((wFirst & 0x0F) << 12) + ((wSecond & 0x3F) << 6) + (wThird & 0x3F);
     }
- 
+
     if ((wFirst & 0xF8) == 0xF0) {                  // U+10000 ~ U+10FFFF
         wSecond = (uint8_t)pchString[*ptSize];
         (*ptSize)++;
@@ -215,10 +215,10 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
     *piOffSet = tCharOffset;
 
     return ptStringOut;
-}       
-#endif                                   
+}
+#endif
 
-vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex, 
+vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
                                         vsf_tgui_string_t* ptString,
                                         uint16_t *phwLineCount,
                                         int_fast8_t chInterlineSpace)
@@ -239,7 +239,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
         &&  (ptString->iSize > 0)
     #endif
     ) {
-        
+
         nFontHeight = vsf_tgui_font_get_char_height(chFontIndex);
 
         while ( ((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
@@ -283,73 +283,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
     return tSize;
 }
 
-void vsf_tgui_text_draw(vsf_tgui_location_t* ptLocation,
-                        vsf_tgui_region_t* ptRelativeRegion,
-                        vsf_tgui_string_t* ptString,
-                        const uint8_t chFontIndex,
-                        vsf_tgui_color_t tColor,
-                        int_fast8_t chInterLineSpace)
-{
-    vsf_tgui_region_t tVisualCharRegion = {0};
-    vsf_tgui_location_t tLocation;
-    vsf_tgui_region_t tDirtyCharRegion = {0};
-    vsf_tgui_location_t tRelativeCharLocation = {0};
-    uint32_t wChar;
-    size_t tCharOffset = 0;
 
-    VSF_TGUI_ASSERT(ptLocation != NULL);
-    VSF_TGUI_ASSERT(ptRelativeRegion != NULL);
-    VSF_TGUI_ASSERT(ptString != NULL);
-    VSF_TGUI_ASSERT(ptString->pstrText != NULL);
-
-#if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-    VSF_TGUI_ASSERT(ptString->iSize > 0);
-#endif
-
-    VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));  // x_start point in screen
-    VSF_TGUI_ASSERT((0 <= ptLocation->iY) && (ptLocation->iY < VSF_TGUI_VER_MAX));  // y_start point in screen
-    VSF_TGUI_ASSERT(0 <= (ptLocation->iX + ptRelativeRegion->tSize.iWidth));                        // x_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->iX + ptRelativeRegion->tSize.iWidth) <= VSF_TGUI_HOR_MAX);
-    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + ptRelativeRegion->tSize.iHeight));                       // y_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->iY + ptRelativeRegion->tSize.iHeight) <= VSF_TGUI_VER_MAX);
-
-    tVisualCharRegion.tSize.iHeight = vsf_tgui_font_get_char_height(chFontIndex) + chInterLineSpace;
-
-    tLocation = *ptLocation;
-
-    while ( ((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
-#if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-        &&  (tCharOffset <= ptString->iSize)
-#endif
-    ) {
-#if VSF_TGUI_SV_CFG_MULTI_LINE_TEXT == ENABLED
-        if (wChar == '\n') {
-            tVisualCharRegion.tLocation.iX = 0;
-            tVisualCharRegion.tLocation.iY += tVisualCharRegion.tSize.iHeight;
-
-            tLocation.iX = ptLocation->iX;
-            if (tDirtyCharRegion.tSize.iHeight) {
-                tLocation.iY += tDirtyCharRegion.tSize.iHeight;
-            }
-        } else if (wChar == '\r') {
-            continue;
-        } else
-#endif
-        {
-            tVisualCharRegion.tSize.iWidth = vsf_tgui_font_get_char_width(chFontIndex, wChar);
-            if (vsf_tgui_region_intersect(&tDirtyCharRegion, &tVisualCharRegion, ptRelativeRegion)) {
-                tRelativeCharLocation.iX = tDirtyCharRegion.tLocation.iX - tVisualCharRegion.tLocation.iX,
-                tRelativeCharLocation.iY = tDirtyCharRegion.tLocation.iY - tVisualCharRegion.tLocation.iY,
-                
-                //tLocation.iY = ptLocation->iY + tDirtyCharRegion.iY;
-                
-                vsf_tgui_draw_char(&tLocation, &tRelativeCharLocation, &tDirtyCharRegion.tSize, chFontIndex, wChar, tColor);
-                tLocation.iX += tDirtyCharRegion.tSize.iWidth;
-            }
-            tVisualCharRegion.tLocation.iX += tVisualCharRegion.tSize.iWidth;
-        }
-    }
-}
 
 
 #endif

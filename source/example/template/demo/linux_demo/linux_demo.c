@@ -78,15 +78,30 @@ extern int tgui_main(int argc, char *argv[]);
 extern int audio_play_main(int argc, char *argv[]);
 #endif
 
-#if     APP_CFG_USE_USBD_DEMO == ENABLED                                        \
-    &&  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
+#if APP_CFG_USE_USBD_DEMO == ENABLED
+#   if  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
         ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
             &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
-int usbd_main(int argc, char *argv[]);
+extern int usbd_cdc_main(int argc, char *argv[]);
+#   endif
+extern int usbd_msc_main(int argc, char *argv[]);
+extern int usbd_uvc_main(int argc, char *argv[]);
 #endif
 
 #if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
 extern int mount_file_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_LINUX_DEMO == ENABLED
+extern int vsfvm_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_SDL2_DEMO == ENABLED
+extern int sdl2_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_CPP_DEMO == ENABLED
+extern int cpp_main(int argc, char *argv[]);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -165,14 +180,30 @@ int vsf_linux_create_fhs(void)
 #if APP_CFG_USE_AUDIO_DEMO == ENABLED
     busybox_bind("/sbin/play_audio", audio_play_main);
 #endif
-#if     APP_CFG_USE_USBD_DEMO == ENABLED                                        \
-    &&  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
+#if APP_CFG_USE_LINUX_DEMO == ENABLED && APP_CFG_USE_VSFVM_DEMO == ENABLED
+    busybox_bind("/sbin/vsfvm", vsfvm_main);
+#endif
+#if APP_CFG_USE_USBD_DEMO == ENABLED
+#   if  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
         ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
             &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
-    busybox_bind("/sbin/usbd", usbd_main);
+    busybox_bind("/sbin/usbd_cdc", usbd_cdc_main);
+#   endif
+    busybox_bind("/sbin/usbd_msc", usbd_msc_main);
+    busybox_bind("/sbin/usbd_uvc", usbd_uvc_main);
 #endif
 #if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
     busybox_bind("/sbin/mount_file", mount_file_main);
+#endif
+#if APP_CFG_USE_CPP_DEMO == ENABLED
+    busybox_bind("/sbin/cpp_test", cpp_main);
+#endif
+
+#if VSF_USE_SDL2 == ENABLED
+    vsf_sdl2_init(&usrapp_ui_common.disp.use_as__vk_disp_t);
+#endif
+#if APP_CFG_USE_SDL2_DEMO == ENABLED
+    busybox_bind("/sbin/sdl2", sdl2_main);
 #endif
 
     return 0;
@@ -195,7 +226,7 @@ describe_usbd(user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0409, USB_DC_
         cdc_acm_ifs(user_usbd_cdc, 0)
 end_describe_usbd(user_usbd_cdc, USRAPP_CFG_USBD_DEV)
 
-#elif defined(VSF_DEBUG_STREAM_NEED_POOL)
+#elif defined(VSF_DEBUG_STREAM_NEED_POLL)
 void vsf_plug_in_on_kernel_idle(void)
 {
     VSF_DEBUG_STREAM_POLL();

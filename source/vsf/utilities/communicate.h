@@ -24,6 +24,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 typedef struct vsf_mem_t vsf_mem_t;
 struct vsf_mem_t {
@@ -91,6 +95,11 @@ end_def_interface(i_pipe_t)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

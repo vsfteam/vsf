@@ -48,42 +48,56 @@
 
 vsf_err_t vk_audio_init(vk_audio_dev_t *pthis)
 {
+    vsf_err_t err;
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->init != NULL));
-    return __vsf_call_eda((uintptr_t)pthis->drv->init, (uintptr_t)pthis);
+
+    __vsf_component_call_peda_ifs(vk_audio_init, err, pthis->drv->init, 0, pthis);
+    return err;
 }
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
 vsf_err_t vk_audio_play_set_volume(vk_audio_dev_t *pthis, uint_fast16_t volume)
 {
+    vsf_err_t err;
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->play_drv.volume != NULL));
-    pthis->ctx.param.volume = volume;
-    return __vsf_call_eda((uintptr_t)pthis->drv->play_drv.volume, (uintptr_t)pthis);
+
+    __vsf_component_call_peda_ifs(vk_audio_play_set_volume, err, pthis->drv->play_drv.volume, 0, pthis,
+        .volume = volume,
+    );
+    return err;
 }
 
 vsf_err_t vk_audio_play_set_mute(vk_audio_dev_t *pthis, bool mute)
 {
+    vsf_err_t err;
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->play_drv.mute != NULL));
-    pthis->ctx.param.mute = mute;
-    return __vsf_call_eda((uintptr_t)pthis->drv->play_drv.mute, (uintptr_t)pthis);
+
+    __vsf_component_call_peda_ifs(vk_audio_play_set_mute, err, pthis->drv->play_drv.mute, 0, pthis,
+        .mute = mute,
+    );
+    return err;
 }
 
 vsf_err_t vk_audio_play_start(vk_audio_dev_t *pthis, vsf_stream_t *stream, vk_audio_format_t *format)
 {
+    vsf_err_t err;
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (format != NULL)
                 &&  (stream != NULL)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->play_drv.play != NULL)
-                &&  (NULL == pthis->stream_play));
-    pthis->ctx.param.format = *format;
-    pthis->stream_play = stream;
-    return __vsf_call_eda((uintptr_t)pthis->drv->play_drv.play, (uintptr_t)pthis);
+                &&  (NULL == pthis->play.stream));
+
+    pthis->play.stream = stream;
+    pthis->play.format = *format;
+    __vsf_component_call_peda_ifs(vk_audio_play_start, err, pthis->drv->play_drv.play, 0, pthis);
+    return err;
 }
 
 vsf_err_t vk_audio_play_pause(vk_audio_dev_t *pthis)
@@ -94,10 +108,13 @@ vsf_err_t vk_audio_play_pause(vk_audio_dev_t *pthis)
 
 vsf_err_t vk_audio_play_stop(vk_audio_dev_t *pthis)
 {
+    vsf_err_t err;
     VSF_AV_ASSERT(  (pthis != NULL)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->play_drv.stop != NULL));
-    return __vsf_call_eda((uintptr_t)pthis->drv->play_drv.stop, (uintptr_t)pthis);
+
+    __vsf_component_call_peda_ifs(vk_audio_play_stop, err, pthis->drv->play_drv.stop, 0, pthis);
+    return err;
 }
 #endif
 

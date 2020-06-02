@@ -23,6 +23,10 @@
 
 #if VSF_USE_KERNEL == ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define vsf_timq_init(__queue)              vsf_dlist_init(__queue)
@@ -93,5 +97,10 @@ typedef vsf_dlist_t vsf_timer_queue_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 #endif

@@ -24,23 +24,63 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
+#if     defined(__M484__)
+
 // Application configure
-#define APP_CFG_USE_LINUX_DEMO                          ENABLED
-#   define APP_CFG_USE_LINUX_LIBUSB_DEMO                ENABLED
-#   define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO            ENABLED
-#define APP_CFG_USE_USBH_DEMO                           ENABLED
-#define APP_CFG_USE_USBD_DEMO                           ENABLED
-//#   define USBD_DEMO_USE_CDC                            ENABLED
-#   define USBD_DEMO_USE_MSC                            ENABLED
-#define APP_CFG_USE_SCSI_DEMO                           ENABLED
-#define APP_CFG_USE_AUDIO_DEMO                          ENABLED
-#define APP_CFG_USE_TGUI_DEMO                           ENABLED
+#   define APP_CFG_USE_LINUX_DEMO                       ENABLED
+#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            ENABLED
+#       define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO        ENABLED
+#   define APP_CFG_USE_USBH_DEMO                        ENABLED
+#   define APP_CFG_USE_USBD_DEMO                        ENABLED
+#   define APP_CFG_USE_SCSI_DEMO                        ENABLED
+//  todo: implement audio driver for m484
+#   define APP_CFG_USE_AUDIO_DEMO                       DISABLED
+//  current tgui demo depends on VSF_USE_DISP_SDL2, which is only available on __WIN__
+#   define APP_CFG_USE_TGUI_DEMO                        DISABLED
+//  current M484 hardware has no display
+#   define APP_CFG_USE_SDL2_DEMO                        DISABLED
+//  TODO: need test for c++ support
+#   define APP_CFG_USE_CPP_DEMO                         ENABLED
 
 // 3rd-party demos
-#define APP_CFG_USE_AWTK_DEMO                           ENABLED
-#define APP_CFG_USE_NNOM_DEMO                           DISABLED
-#define APP_CFG_USE_LVGL_DEMO                           DISABLED
-#define APP_CFG_USE_BTSTACK_DEMO                        DISABLED
+//  awtk is LGPL, not convenient to implement in MCU
+#   define APP_CFG_USE_AWTK_DEMO                        DISABLED
+#   define APP_CFG_USE_NNOM_DEMO                        ENABLED
+//  current M484 hardware has no display
+#   define APP_CFG_USE_LVGL_DEMO                        DISABLED
+#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
+//  vsfvm is not opensource
+#   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
+
+#elif   defined(__WIN__)
+
+// Application configure
+#   define APP_CFG_USE_LINUX_DEMO                       ENABLED
+#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            ENABLED
+#       define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO        ENABLED
+#   define APP_CFG_USE_USBH_DEMO                        ENABLED
+#   define APP_CFG_USE_USBD_DEMO                        ENABLED
+#   define APP_CFG_USE_SCSI_DEMO                        ENABLED
+#   define APP_CFG_USE_AUDIO_DEMO                       ENABLED
+#   define APP_CFG_USE_TGUI_DEMO                        ENABLED
+#   define APP_CFG_USE_SDL2_DEMO                        ENABLED
+
+// VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
+#   define APP_CFG_USE_CPP_DEMO                         DISABLED
+#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
+// if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
+#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+
+// 3rd-party demos
+#   define APP_CFG_USE_AWTK_DEMO                        ENABLED
+#   define APP_CFG_USE_NNOM_DEMO                        ENABLED
+#   define APP_CFG_USE_LVGL_DEMO                        ENABLED
+#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
+//  vsfvm is not opensource
+#   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
+
+#endif
 
 
 // component configure
@@ -48,6 +88,7 @@
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
 
 #define VSF_USE_USB_HOST                                ENABLED
+#   define VSF_USBH_CFG_ISO_EN                          ENABLED
 #   define VSF_USE_USB_HOST_LIBUSB                      ENABLED
 #   define VSF_USE_USB_HOST_HID                         ENABLED
 #   define VSF_USE_USB_HOST_DS4                         ENABLED
@@ -55,18 +96,22 @@
 #   define VSF_USE_USB_HOST_XB360                       ENABLED
 #   define VSF_USE_USB_HOST_XB1                         ENABLED
 #   define VSF_USE_USB_HOST_MSC                         ENABLED
+#   define VSF_USE_USB_HOST_UAC                         ENABLED
 
 #if APP_CFG_USE_BTSTACK_DEMO == ENABLED
 #   define VSF_USE_USB_HOST_BTHCI                       ENABLED
 #   define VSF_USE_BTSTACK                              ENABLED
 #endif
 
+#if APP_CFG_USE_SDL2_DEMO == ENABLED
+#   define VSF_USE_SDL2                                 ENABLED
+#endif
+
+#define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED
 #   define VSF_USE_DECODER_WAV                          ENABLED
 #   define VSF_AUDIO_CFG_USE_PLAY                       ENABLED
 #   define VSF_AUDIO_CFG_USE_CATURE                     DISABLED
-#   define VSF_USE_WINSOUND                             ENABLED
-#       define VSF_WINSOUND_CFG_TRACE                   DISABLED
 
 #define VSF_USE_UI                                      ENABLED
 #if APP_CFG_USE_AWTK_DEMO == ENABLED
@@ -94,6 +139,7 @@
 #   define VSF_USBD_CFG_USE_EDA                         ENABLED
 #   define VSF_USE_USB_DEVICE_CDCACM                    ENABLED
 #   define VSF_USE_USB_DEVICE_MSC                       ENABLED
+#   define VSF_USE_USB_DEVICE_UVC                       ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
@@ -219,24 +265,28 @@
 #       define VSF_WINUSB_HCD_DEV4_PID                  0x09CC
 #       define VSF_WINUSB_HCD_DEV5_VID                  0x057E      // NSPRO
 #       define VSF_WINUSB_HCD_DEV5_PID                  0x2009
-#       define VSF_WINUSB_HCD_DEV6_VID                  0x045E      // XB360
-#       define VSF_WINUSB_HCD_DEV6_PID                  0x028E
-#       define VSF_WINUSB_HCD_DEV7_VID                  0x045E      // XB1
-#       define VSF_WINUSB_HCD_DEV7_PID                  0x02EA
-// set VSF_WINUSB_HCD_CFG_DEV_NUM to 9 and uncomment DEV8
-//  to test usbh_msc/scsi/mal/fs drivers
-//#       define VSF_WINUSB_HCD_DEV8_VID                  0xA7A8      // usbd_demo
-//#       define VSF_WINUSB_HCD_DEV8_PID                  0x2348
+#       define VSF_WINUSB_HCD_DEV6_VID                  0xA7A8      // usbd_demo
+#       define VSF_WINUSB_HCD_DEV6_PID                  0x2348
+#       define VSF_WINUSB_HCD_DEV7_VID                  0x0D8C      // uac
+#       define VSF_WINUSB_HCD_DEV7_PID                  0x013C
+//#       define VSF_WINUSB_HCD_DEV7_VID                  0x045E      // XB360
+//#       define VSF_WINUSB_HCD_DEV7_PID                  0x028E
+//#       define VSF_WINUSB_HCD_DEV8_VID                  0x045E      // XB1
+//#       define VSF_WINUSB_HCD_DEV8_PID                  0x02EA
 
 #   define VSF_USE_WINFS                                ENABLED
 
-#   define VSF_USE_DISP_DRV_SDL2                        ENABLED
-#       define VSF_DISP_DRV_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
-#       define VSF_DISP_DRV_SDL2_CFG_HW_PRIORITY        vsf_arch_prio_1
-#       define APP_DISP_SDL2_HEIGHT                     600
-#       define APP_DISP_SDL2_WIDTH                      800
+#   define VSF_USE_DISP_SDL2                            ENABLED
+#       define VSF_DISP_SDL2_CFG_INCLUDE                "lib\SDL2\include\SDL.h"
+#       define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
+#       define VSF_DISP_SDL2_CFG_HW_PRIORITY            vsf_arch_prio_1
+#       define APP_DISP_SDL2_HEIGHT                     768
+#       define APP_DISP_SDL2_WIDTH                      1024
 #       define APP_DISP_SDL2_COLOR                      VSF_DISP_COLOR_RGB565
 #       define APP_DISP_SDL2_AMPLIFIER                  1
+
+#   define VSF_USE_WINSOUND                             ENABLED
+#       define VSF_WINSOUND_CFG_TRACE                   DISABLED
 
 #   define VSF_LINUX_CFG_STACKSIZE                      32768
 #   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
@@ -314,9 +364,28 @@
             vsf_bluetooth_h2_on_new((__DEV), (__ID))
 #   endif
 
-#define WEAK_VSF_SCSI_ON_NEW
-#define WEAK_VSF_SCSI_ON_DELETE
+#   define WEAK_VSF_SCSI_ON_NEW
+#   define WEAK_VSF_SCSI_ON_DELETE
 
+#   if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_UAC == ENABLED
+#       define WEAK_VSF_USBH_UAC_ON_NEW
+#   endif
+
+#   if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#       define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN                           \
+            extern void vsf_plug_in_on_kernel_idle(void);
+#       define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE()                                \
+            vsf_plug_in_on_kernel_idle()
+
+#       define WEAK_VSFVM_SET_BYTECODE_IMP
+#       define WEAK_VSFVM_GET_RES_IMP
+#       define WEAK_VSFVM_GET_BYTECODE_IMP
+#   endif
+
+#endif
+
+#if VSF_USE_LINUX == ENABLED
+#   define VSF_USE_POSIX                                ENABLED
 #endif
 
 /*============================ TYPES =========================================*/

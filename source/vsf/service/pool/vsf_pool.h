@@ -82,6 +82,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
+#include "utilities/vsf_utilities.h"
 
 #if VSF_USE_POOL == ENABLED
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
@@ -100,7 +101,9 @@
 
 #include "utilities/ooc_class.h"
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #define __vsf_pool(__name)          __name##_pool_t
@@ -427,7 +430,7 @@ uintptr_t __name##_pool_set_target(__name##_pool_t *ptThis, uintptr_t pTarget)  
 
 /*============================ TYPES =========================================*/
 
-declare_class(vsf_pool_t)
+dcl_class(vsf_pool_t)
 
 typedef
 void
@@ -506,7 +509,7 @@ typedef struct vsf_pool_cfg_t {
 
 //! \name vsf pool interface
 //! @{
-declare_interface(i_pool_t)
+dcl_interface(i_pool_t)
 def_interface(i_pool_t)
     void (*Init)            (   vsf_pool_t *pObj, 
                                 uint32_t wItemSize, 
@@ -624,5 +627,10 @@ SECTION("text.vsf.utilities.vsf_pool_get_region")
  *! \return the address of the code region
  */
 extern code_region_t *vsf_pool_get_region(vsf_pool_t *pObj);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 #endif

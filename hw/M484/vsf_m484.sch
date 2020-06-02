@@ -1,11 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:power
-LIBS:device
-LIBS:74xx
-LIBS:audio
-LIBS:interface
-LIBS:simonqian
-LIBS:vsf_m484-cache
 EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
@@ -1078,19 +1071,6 @@ Text Label 5600 4350 0    60   ~ 0
 DBG_RXD
 Text Label 5600 4500 0    60   ~ 0
 DBG_TXD
-$Comp
-L Device:Fuse F0
-U 1 1 5B14B478
-P 5900 2600
-F 0 "F0" V 5850 2450 50  0000 C CNN
-F 1 "Fuse" V 5825 2600 50  0000 C CNN
-F 2 "Fuse:Fuse_0805_2012Metric" V 5830 2600 50  0001 C CNN
-F 3 "" H 5900 2600 50  0001 C CNN
-	1    5900 2600
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	6450 2600 6050 2600
 $Comp
 L Device:R R7
 U 1 1 5B1547D9
@@ -2173,7 +2153,7 @@ U 1 1 5D943EC1
 P 5750 6000
 F 0 "J1" H 5800 6500 50  0000 C CNN
 F 1 "Conn_02x10_Odd_Even" H 5750 5400 50  0000 C CNN
-F 2 "SimonQian:PinSocket_2x10_P2.54mm_Horizontal_2Layer" H 5750 6000 50  0001 C CNN
+F 2 "SimonQian:PinSocket_2x10_P2.54mm_Horizontal_2Layer_NoSilks" H 5750 6000 50  0001 C CNN
 F 3 "~" H 5750 6000 50  0001 C CNN
 	1    5750 6000
 	1    0    0    -1  
@@ -2266,4 +2246,6 @@ F 3 "~" H 9150 4850 50  0001 C CNN
 	1    9000 4900
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	5750 2600 6450 2600
 $EndSCHEMATC

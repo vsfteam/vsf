@@ -174,7 +174,7 @@ static const usrapp_usbd_cdc_const_t __usrapp_usbd_cdc_const = {
 #   endif
 #endif
         .dev_desc               = {
-            USB_DESC_DEV_IAD(64, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 1, 2, 0, 1)
+            USB_DESC_DEV_IAD(0x0200, 64, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0100, 1, 2, 0, 1)
         },
         .config_desc            = {
             USB_DESC_CFG(sizeof(__usrapp_usbd_cdc_const.usbd.config_desc), 2 * USRAPP_CFG_CDC_NUM, 1, 0, 0x80, 100)

@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 
 #include <unistd.h>
 #include <sys/time.h>
@@ -33,12 +33,6 @@
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO: wakeup after signal
-
-void usleep(int usec)
-{
-    vsf_teda_set_timer_us(usec);
-    vsf_thread_wfe(VSF_EVT_TIMER);
-}
 
 unsigned sleep(unsigned sec)
 {
@@ -90,14 +84,25 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
     return 0;
 }
 
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wvisibility"
+#endif
+
 int getitimer(int which, struct itimerval *curr_value)
 {
     VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int setitimer(int which, const struct itimerval *new_valie, struct itimerval *old_value)
 {
     VSF_LINUX_ASSERT(false);
+    return -1;
 }
+
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 #endif      // VSF_USE_LINUX

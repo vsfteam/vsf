@@ -35,7 +35,7 @@ extern
 vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* ptLabel,
                                                 uint16_t *phwLineCount);
 
-extern 
+extern
 vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* ptLabel);
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -45,6 +45,7 @@ static const i_tgui_control_methods_t c_tVLabel= {
         (vsf_tgui_method_t *)&vsf_tgui_label_v_init,
         (vsf_tgui_method_t *)&vsf_tgui_label_v_depose,
         (vsf_tgui_v_method_render_t *)&vsf_tgui_label_v_rendering,
+        NULL,
         (vsf_tgui_method_t *)&vsf_tgui_label_v_update
     },
     (vsf_tgui_method_t*)&vk_tgui_label_init,
@@ -63,11 +64,11 @@ static const i_tgui_control_methods_t c_tVLabel= {
 
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_mc_label_msg_handler( vsf_tgui_label_t* ptControl, 
+fsm_rt_t vsf_tgui_label_msg_handler( vsf_tgui_label_t* ptControl,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)ptControl, 
-                                            ptMSG, 
+    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)ptControl,
+                                            ptMSG,
                                             &c_tVLabel);
 }
 
@@ -77,16 +78,16 @@ fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel)
     #if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
         if (ptLabel->tLabel.bIsChanged) {
             ptLabel->tLabel.bIsChanged = false;
-            ptLabel->tLabel.tInfoCache.tStringSize = 
+            ptLabel->tLabel.tInfoCache.tStringSize =
                 __vk_tgui_label_v_text_get_size(ptLabel, &(ptLabel->tLabel.tInfoCache.hwLines));
         }
     #endif
 
         if (ptLabel->bIsAutoSize) {
 
-            vsf_tgui_size_t tNewSize = 
+            vsf_tgui_size_t tNewSize =
                 __vk_tgui_label_v_get_minimal_rendering_size(ptLabel);
-            vsf_tgui_size_t *ptControlSize = 
+            vsf_tgui_size_t *ptControlSize =
                     &(ptLabel->use_as__vsf_tgui_control_t.
                         use_as____vsf_tgui_control_core_t.tRegion.tSize);
 
@@ -101,7 +102,7 @@ fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel)
     return fsm_rt_on_going;
 }
 
-static fsm_rt_t vk_tgui_label_init(vsf_tgui_label_t* ptLabel)
+fsm_rt_t vk_tgui_label_init(vsf_tgui_label_t* ptLabel)
 {
     return vk_tgui_control_init((vsf_tgui_control_t*)ptLabel);
 }

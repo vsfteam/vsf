@@ -31,6 +31,10 @@
 #   include <stdarg.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TRACE_CFG_LINEEND
@@ -100,7 +104,7 @@ extern void __vsf_trace_buffer( vsf_trace_level_t level,
 #define __vsf_trace_buffer3(__level, __buffer, __len)                           \
         __vsf_trace_buffer((__level), (__buffer), (__len), VSF_TRACE_DF_DEFAULT)
 #define __vsf_trace_buffer4(__level, __buffer, __len, __flag)                   \
-        __vsf_trace_buffer((__level), (__buffer), (__len), VSF_TRACE_DF_DEFAULT)
+        __vsf_trace_buffer((__level), (__buffer), (__len), (__flag))
 // prototype
 //  vsf_trace_buffer(__level, __buffer, __len)          // use VSF_TRACE_DF_DEFAULT
 //  vsf_trace_buffer(__level, __buffer, __len, __flag)  // use flag
@@ -127,5 +131,8 @@ extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 #   endif
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // __VSF_TRACE_H__

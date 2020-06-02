@@ -23,19 +23,42 @@
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
-#include "../../utilities/vsf_tgui_font.h"
+
+#include "./vsf_tgui_sv_color.h"
 
 /*============================ MACROS ========================================*/
+
+
+#define VSF_TGUI_V_TEST_LIST_STATIC_INIT_DEFAULT
+#define VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT
+#define VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT
+#define VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT
+#define VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT
+#define VSF_TGUI_V_BUTTON_STATIC_INIT_DEFAULT
+#define VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT
+
+
+
+#define VSF_TGUI_V_TEST_LIST_STATIC_INIT_OVERRIDE                               \
+            .tList.tContent.bIsUseRawView = true,                               \
+            .tList.tContent.bIsNoBackgroundColor = true,                        \
+            .tList.bIsNoBackgroundColor = true,
+
+#define VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_BUTTON_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 declare_structure(vsf_tgui_v_control_t)
 
 def_structure(vsf_tgui_v_control_t)
-#if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
-    //please remove this if your structure is not emplty
-    RESERVED_U8
-#endif
+    uint8_t bIsTileTransparency: 1;
+    uint8_t chTileTransparencyRate;
 end_def_structure(vsf_tgui_v_control_t)
 
 declare_structure(vsf_tgui_v_container_t)
@@ -43,14 +66,17 @@ declare_structure(vsf_tgui_v_container_t)
 def_structure(vsf_tgui_v_container_t)
     uint8_t bIsShowCornerTile   : 1;
     uint8_t bIsNoBackgroundColor: 1;
+    uint8_t bIsTileTransparency: 1;
+    uint8_t chTileTransparencyRate;
 end_def_structure(vsf_tgui_v_container_t)
 
 declare_structure(vsf_tgui_v_label_t)
 def_structure(vsf_tgui_v_label_t)
     uint8_t bIsUseRawView       : 1;
     uint8_t bIsNoBackgroundColor: 1;
+
     uint8_t chFontIndex;
-    vsf_tgui_color_t tFontColor;
+    vsf_tgui_sv_color_t tFontColor;
 end_def_structure(vsf_tgui_v_label_t)
 
 declare_structure(vsf_tgui_v_button_t)

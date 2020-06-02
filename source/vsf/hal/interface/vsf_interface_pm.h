@@ -21,6 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 #define DIV_(_N,_D)     DIV_##_N = (_N),
 
@@ -296,10 +299,12 @@ typedef enum {
 } pm_divider_t;
 //! @}
 
+#ifndef __cplusplus 
 typedef enum pm_main_clk_core_div_t pm_main_clk_core_div_t;
 typedef enum pm_main_clk_axi_div_t pm_main_clk_axi_div_t;
 typedef enum pm_main_clk_ahb_div_t pm_main_clk_ahb_div_t;
 typedef enum pm_main_clk_apb_div_t pm_main_clk_apb_div_t;
+#endif
 
 /*! \note pm_main_clk_cfg_t, CORE_NUM and XXX_CLK_NUM should be defined in 
           device specific header filer device.h
@@ -377,8 +382,9 @@ struct pm_pll_cfg_t {
 
 typedef struct pm_pll_cfg_t pm_pll_cfg_t;
 
-
+#ifndef __cplusplus
 typedef enum pm_pll_post_div_t pm_pll_post_div_t;
+#endif
 
 /*
 //! \name pll post divider
@@ -433,7 +439,13 @@ enum pm_lposc_sel_t {
     LPOSC_32K_OSC
 };
 */
+
+#ifndef __cplusplus
 typedef enum pm_lposc_sel_t pm_lposc_sel_t;
+#else
+typedef uint16_t pm_lposc_sel_t;
+#endif
+
 typedef struct pm_lposc_cfg_t pm_lposc_cfg_t;
 
 //! \name low power oscillator 
@@ -501,6 +513,8 @@ extern const i_pm_t VSF_PM;
 
 /*============================ PROTOTYPES ====================================*/
 
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 /* EOF */

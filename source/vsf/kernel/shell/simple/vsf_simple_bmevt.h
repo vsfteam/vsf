@@ -21,11 +21,17 @@
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
 
-#if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                         \
-    &&  VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED                                              \
-    &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
+#if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                  \
+    &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED                          \
+    &&  VSF_USE_KERNEL == ENABLED                                               \
+    &&  VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
     
 #include "../../vsf_eda.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -80,7 +86,7 @@
 
 
 #   define __init_grouped_evts(__NAME, __EVT_GROUP, __AUTO_RESET)               \
-        __vsf_grouped_evts_init((__EVT_GROUP),                                        \
+        __vsf_grouped_evts_init((__EVT_GROUP),                                  \
             (vsf_bmpevt_adapter_t **)&(__adapters_of_##__NAME),                 \
             UBOUND(__adapters_of_##__NAME),                                     \
             (__AUTO_RESET))
@@ -98,10 +104,10 @@
 
 #   define wait_for_all_timeout(__group, __msk, __timeout)                      \
             this.pender.mask = (__msk);                                         \
-            this.pender.operator = VSF_BMPEVT_AND;                              \
+            this.pender.op  = VSF_BMPEVT_AND;                                   \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
-                if ((reason = __vsf_bmpevt_wait_for(                              \
+                if ((reason = __vsf_bmpevt_wait_for(                            \
                     (__group),                                                  \
                     (vsf_bmpevt_pender_t *)                                     \
                     &this.pender, (__timeout)),                                 \
@@ -122,10 +128,10 @@
 
 #   define wait_for_any_timeout(__group, __msk, __timeout)                      \
             this.pender.mask = (__msk);                                         \
-            this.pender.operator = VSF_BMPEVT_OR;                               \
+            this.pender.op = VSF_BMPEVT_OR;                                     \
             for (   vsf_sync_reason_t reason = VSF_SYNC_CANCEL;                 \
                     reason == VSF_SYNC_CANCEL;)                                 \
-                if ((reason = __vsf_bmpevt_wait_for(                              \
+                if ((reason = __vsf_bmpevt_wait_for(                            \
                     (__group),                                                  \
                     (vsf_bmpevt_pender_t *)                                     \
                     &this.pender, (__timeout)),                                 \
@@ -180,7 +186,10 @@ extern vsf_sync_reason_t __vsf_bmpevt_wait_for(
                                             const vsf_bmpevt_pender_t *ppender,
                                             int_fast32_t time_out);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

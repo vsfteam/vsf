@@ -30,6 +30,10 @@
 
 #include "./vsf_dwcotg_hw.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DWCOTG_DCD_CFG_EP_NUM
@@ -96,6 +100,10 @@ typedef struct vk_dwcotg_t vk_dwcotg_t;
 void vk_dwcotg_phy_init(vk_dwcotg_t *dwcotg,
                         const vk_dwcotg_param_t *param,
                         vk_dwcotg_hw_info_t *hw_info);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

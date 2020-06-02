@@ -24,8 +24,7 @@
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
-#include "../../controls/vsf_tgui_controls.h"
-
+#include "./vsf_tgui_sv_label.h"
 
 /*============================ MACROS ========================================*/
 // Support Panel additional tiles

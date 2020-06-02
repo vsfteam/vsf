@@ -4,6 +4,10 @@
 #ifndef _RISCV_CONST_H
 #define _RISCV_CONST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef __ASSEMBLER__
 #define _AC(X,Y)        X
 #define _AT(T,X)        X
@@ -14,5 +18,9 @@
 
 #define _BITUL(x)       (_AC(1,UL) << (x))
 #define _BITULL(x)      (_AC(1,ULL) << (x))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _NUCLEI_CONST_H */

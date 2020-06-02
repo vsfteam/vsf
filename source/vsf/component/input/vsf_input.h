@@ -15,15 +15,18 @@
  *                                                                           *
  ****************************************************************************/
 
-
-
 #ifndef __VSF_INPUT_H__
 #define __VSF_INPUT_H__
 
 /*============================ INCLUDES ======================================*/
 #include "./vsf_input_cfg.h"
+#include "utilities/vsf_utilities.h"
 
 #if VSF_USE_INPUT == ENABLED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -88,6 +91,7 @@ struct vk_input_parser_t {
 };
 typedef struct vk_input_parser_t vk_input_parser_t;
 
+#if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 typedef void (*vk_input_on_evt_t)(vk_input_type_t type, vk_input_evt_t *evt);
 struct vk_input_notifier_t {
     vsf_slist_node_t notifier_node;
@@ -95,6 +99,11 @@ struct vk_input_notifier_t {
     uint8_t mask;
 };
 typedef struct vk_input_notifier_t vk_input_notifier_t;
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 /*============================ INCLUDES ======================================*/
 
@@ -103,6 +112,10 @@ typedef struct vk_input_notifier_t vk_input_notifier_t;
 #include "./protocol/vsf_input_touchscreen.h"
 #include "./protocol/vsf_input_keyboard.h"
 #include "./protocol/vsf_input_mouse.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -115,8 +128,10 @@ extern void vk_input_buf_set(uint8_t *buf, uint_fast8_t offset, uint_fast8_t len
 
 extern vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, uint8_t *cur);
 
+#if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 extern void vk_input_notifier_register(vk_input_notifier_t *notifier);
 extern void vk_input_notifier_unregister(vk_input_notifier_t *notifier);
+#endif
 
 extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
 extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
@@ -129,6 +144,10 @@ extern void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
 
 // returns duration
 extern uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_INPUT
 #endif      // __VSF_INPUT_H__

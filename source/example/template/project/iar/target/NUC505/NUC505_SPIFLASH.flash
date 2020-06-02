@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_device>
+  <exe>FlashNUC505_128K.out</exe>
+  <page>256</page>
+  <block>4000 0x1000</block>
+  <flash_base>0x0</flash_base>
+  <aggregate>1</aggregate>
+  <args_doc></args_doc>
+</flash_device>

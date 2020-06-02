@@ -65,16 +65,16 @@ struct vsf_gpio_t {
 //! @{
 enum io_pin_no_t {
 #if defined(PIO_PORTA)
-    MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
+    REPEAT_MACRO(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
 #endif
 #if defined(PIO_PORTB)
-    MREPEAT(PIO_PORTB_PIN_NUM, __IO_PINB_NUM, 16)
+    REPEAT_MACRO(PIO_PORTB_PIN_NUM, __IO_PINB_NUM, 16)
 #endif
 #if defined(PIO_PORTC)
-    MREPEAT(PIO_PORTC_PIN_NUM, __IO_PINC_NUM, 32)
+    REPEAT_MACRO(PIO_PORTC_PIN_NUM, __IO_PINC_NUM, 32)
 #endif
 #if defined(PIO_PORTD)
-    MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_NUM, 48)
+    REPEAT_MACRO(PIO_PORTD_PIN_NUM, __IO_PIND_NUM, 48)
 #endif
 };
 //! @}
@@ -83,16 +83,16 @@ enum io_pin_no_t {
 //! @{
 enum io_pin_msk_t{
 #if defined(PIO_PORTA)
-    MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
+    REPEAT_MACRO(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
 #endif
 #if defined(PIO_PORTB)
-    MREPEAT(PIO_PORTB_PIN_NUM, __IO_PINB_MSK, 0)
+    REPEAT_MACRO(PIO_PORTB_PIN_NUM, __IO_PINB_MSK, 0)
 #endif
 #if defined(PIO_PORTC)
-    MREPEAT(PIO_PORTC_PIN_NUM, __IO_PINC_MSK, 0)
+    REPEAT_MACRO(PIO_PORTC_PIN_NUM, __IO_PINC_MSK, 0)
 #endif
 #if defined(PIO_PORTD)
-    MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_MSK, 0)
+    REPEAT_MACRO(PIO_PORTD_PIN_NUM, __IO_PIND_MSK, 0)
 #endif
 };
 //! @}

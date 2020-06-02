@@ -19,6 +19,7 @@
 #define __VSF_DEMO_CLASS_IMPLEMENT
 #include "class_demo.h"
 
+
 #include "vsf.h"
 
 /*============================ MACROS ========================================*/

@@ -32,6 +32,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSFHAL_HCD_ISO_EN
+#   define VSFHAL_HCD_ISO_EN    VSF_USBH_CFG_ISO_EN
+#endif
+
 #define OHCI_ISO_DELAY          2
 
 /*******************************************************
@@ -288,18 +292,18 @@ struct ohci_td_t {
     uint32_t hwCBP;             /* Current Buffer Pointer */
     uint32_t hwNextTD;          /* Next TD Pointer */
     uint32_t hwBE;              /* Memory Buffer End Pointer */
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
     uint32_t hwPSW[4];
-#endif // VSFHAL_HCD_ISO_EN
+#endif
 
     uint32_t index;
     vsf_slist_node_t node;
     ohci_urb_t *urb_ohci;
-#ifdef VSFHAL_HCD_ISO_EN
-    uint32_t dummy[4];
+#if VSFHAL_HCD_ISO_EN == ENABLED
+    uint32_t dummy[5];
 #else
     uint32_t dummy[1];
-#endif // VSFHAL_HCD_ISO_EN
+#endif
 };
 
 declare_vsf_pool(ohci_td_pool)
@@ -633,13 +637,12 @@ static ohci_td_t * ohci_td_fill(ohci_td_t *td, uint_fast32_t info, void *data,
     return td_tmp;
 }
 
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
 static ohci_td_t * ohci_td_fill_iso(ohci_td_t *td, uint_fast32_t info, void *data,
-        uint_fast16_t len, uint_fast16_t index, ohci_urb_t *urb_ohci)
+        uint_fast16_t len, vk_usbh_hcd_iso_packet_descriptor_t *frame, ohci_urb_t *urb_ohci)
 {
     ohci_td_t *td_tmp;
     uint_fast32_t bufferStart;
-    vk_usbh_hcd_urb_t *urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
     VSF_USB_ASSERT(td != NULL);
 
@@ -648,21 +651,26 @@ static ohci_td_t * ohci_td_fill_iso(ohci_td_t *td, uint_fast32_t info, void *dat
     vsf_slist_set_next(ohci_td_t, node, &td_tmp->node, td);
     td_tmp->hwNextTD = (uint32_t)td;
 
-    bufferStart = (uint32_t)data + urb->iso_packet.frame_desc[index].offset;
-    len = urb->iso_packet.frame_desc[index].length;
+    bufferStart = (uint32_t)data + frame->offset;
+    len = frame->length;
 
     td_tmp->index = urb_ohci->cur_idx++;
     td_tmp->hwINFO = info;
-    td_tmp->hwCBP = (uint32_t)((!bufferStart || !len) ? 0 : bufferStart) & 0xfffff000;
-    td_tmp->hwBE = (uint32_t)((!bufferStart || !len) ? 0 : (uint32_t)bufferStart + len - 1);
+    if (!bufferStart || !len) {
+        td_tmp->hwCBP = 0;
+        td_tmp->hwBE = 0;
+    } else {
+        td_tmp->hwCBP = (uint32_t)bufferStart & 0xfffff000;
+        td_tmp->hwBE = (uint32_t)bufferStart + len - 1;
+    }
 
-    td_tmp->hwPSW[0] = ((uint32_t)data + urb->iso_packet.frame_desc[index].offset) & 0x0FFF | 0xE000;
+    td_tmp->hwPSW[0] = (bufferStart & 0x0FFF) | (TD_NOTACCESSED << 12);
     td_tmp->hwNextTD = 0;
     urb_ohci->ed->hwTailP = td_tmp->hwNextTD;
     vsf_slist_peek_next(ohci_td_t, node, &td->node, td_tmp);
     return td_tmp;
 }
-#endif // VSFHAL_HCD_ISO_EN
+#endif
 
 static void ohci_td_submit_urb(vk_ohci_t *ohci, struct vk_usbh_hcd_urb_t *urb)
 {
@@ -741,14 +749,14 @@ static void ohci_td_submit_urb(vk_ohci_t *ohci, struct vk_usbh_hcd_urb_t *urb)
             regs->cmdstatus = OHCI_BLF;
         }
         break;
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
     case USB_ENDPOINT_XFER_ISOC:
         for (uint_fast32_t cnt = 0; cnt < urb->iso_packet.number_of_packets; cnt++) {
             td = ohci_td_fill_iso(td, TD_CC | TD_ISO | ((urb->iso_packet.start_frame + cnt) & 0xffff),
-                    data, data_len, cnt, urb_ohci);
+                    data, data_len, &urb->iso_packet.frame_desc[cnt], urb_ohci);
         }
         break;
-#endif // VSFHAL_HCD_ISO_EN
+#endif
     }
     urb_ohci->state |= URB_PRIV_TDLINK;
 }
@@ -865,34 +873,33 @@ static void ohci_finish_unlinks(vk_ohci_t *ohci)
 static vsf_err_t ohci_td_done(vk_usbh_hcd_urb_t *urb, ohci_td_t *td)
 {
     ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
-    int_fast32_t cc = 0;
+    int_fast32_t cc = TD_CC_GET(td->hwINFO);
     vsf_err_t err = VSF_ERR_NONE;
 
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
     if (td->hwINFO & TD_ISO) {
         uint_fast16_t tdPSW = td->hwPSW[0] & 0xffff;
         uint_fast32_t dlen;
 
-        if (td->hwINFO & TD_CC) {
-            return VSF_ERR_FAIL;
-        }
-
-        cc = (tdPSW >> 12) & 0xf;
-        if (!urb->pipe.dir_in1out0) {
-            dlen = urb->iso_packet.frame_desc[td->index].length;
+        if (cc != TD_CC_NOERROR) {
+            err = VSF_ERR_FAIL;
         } else {
-            if (cc == TD_DATAUNDERRUN) {
-                cc = TD_CC_NOERROR;
+            cc = (tdPSW >> 12) & 0xf;
+            if (!urb->pipe.dir_in1out0) {
+                dlen = urb->iso_packet.frame_desc[td->index].length;
+            } else {
+                if (cc == TD_DATAUNDERRUN) {
+                    cc = TD_CC_NOERROR;
+                }
+                dlen = tdPSW & 0x3ff;
             }
-            dlen = tdPSW & 0x3ff;
+            urb->actual_length += dlen;
+            urb->iso_packet.frame_desc[td->index].actual_length = dlen;
+            urb->iso_packet.frame_desc[td->index].status = CC_TO_ERROR(cc);
         }
-        urb->actual_length += dlen;
-        urb->iso_packet.frame_desc[td->index].actual_length = dlen;
-        urb->iso_packet.frame_desc[td->index].status = CC_TO_ERROR(cc);
     } else
-#endif // VSFHAL_HCD_ISO_EN
+#endif
     {
-        cc = TD_CC_GET(td->hwINFO);
         if ((cc == TD_DATAUNDERRUN) && !(urb->transfer_flags & URB_SHORT_NOT_OK)) {
             cc = TD_CC_NOERROR;
         }
@@ -1238,10 +1245,10 @@ static vsf_err_t ohci_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
             size++;
         }
         break;
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
     case USB_ENDPOINT_XFER_ISOC:
         size = urb->iso_packet.number_of_packets;
-        if (!size || (size > VSFHAL_HCD_ISO_PACKET_LIMIT)) {
+        if (!size || (size > dimof(urb->iso_packet.frame_desc))) {
             return VSF_ERR_FAIL;
         }
         for (uint_fast32_t i = 0; i < size; i++) {
@@ -1249,7 +1256,7 @@ static vsf_err_t ohci_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
             urb->iso_packet.frame_desc[i].status = URB_PENDING;
         }
         break;
-#endif // VSFHAL_HCD_ISO_EN
+#endif
     }
 
     ed = urb_ohci->ed;
@@ -1269,11 +1276,11 @@ static vsf_err_t ohci_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
     }
     urb_ohci->state |= URB_PRIV_TDALLOC;
 
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
     if (urb->pipe.type == USB_ENDPOINT_XFER_ISOC) {
         urb->iso_packet.start_frame += (ohci->frame_no + OHCI_ISO_DELAY) & 0xffff;
     }
-#endif // VSFHAL_HCD_ISO_EN
+#endif
 
     urb->actual_length = 0;
     urb->status = URB_PENDING;
@@ -1299,10 +1306,10 @@ static vsf_err_t ohci_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
     }
 
     switch (urb->pipe.type) {
-#ifdef VSFHAL_HCD_ISO_EN
+#if VSFHAL_HCD_ISO_EN == ENABLED
     case USB_ENDPOINT_XFER_ISOC:
         // NOTE: iso transfer interval fixed to 1
-        urb->iso_packet.start_frame = (ohci->hcca->frame_no + 1) & 0xffff;
+        urb->iso_packet.start_frame = (ohci->frame_no + 1) & 0xffff;
         for (int i = 0; i < urb->iso_packet.number_of_packets; i++)
             urb->iso_packet.frame_desc[i].actual_length = 0;
 #endif

@@ -42,6 +42,8 @@
         struct {uint_fast16_t tState;__MEMBER;                                  \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);                           \
+             vsf_evt_t evt = vsf_eda_get_cur_evt();                             \
+             UNUSED_PARAM(evt);                                                 \
              UNUSED_PARAM(ptThis);
              
 #   if __IS_COMPILER_IAR__
@@ -59,6 +61,8 @@
         struct {uint_fast8_t tState;__VA_ARGS__                                 \
         } static TPASTE2(__local_cb, __LINE__),                                 \
             *ptThis = &TPASTE2(__local_cb, __LINE__);                           \
+             vsf_evt_t evt = vsf_eda_get_cur_evt();                             \
+             UNUSED_PARAM(evt);                                                 \
              UNUSED_PARAM(ptThis);
             
 #   if __IS_COMPILER_IAR__

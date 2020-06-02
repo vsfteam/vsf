@@ -10,7 +10,7 @@
       <TargetName>demo_armv7-m</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6140000::V6.14.0.2 (dev drop 2)::..\..\Program Files\ARMCompiler6.14Internal</pCCUsed>
+      <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -185,6 +185,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -336,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls> -fms-extensions </MiscControls>
-              <Define>_MSC_VER __ARM__ __MPS2__ __OOC_DEBUG__</Define>
+              <Define>_MSC_VER __ARM__ __MPS2__</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\vsf;..\..\usrapp\template;..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</IncludePath>
             </VariousControls>
@@ -351,7 +352,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -894,6 +895,62 @@
               <FileName>main_pt_simple.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_pt_simple.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1160,6 +1217,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1363,7 +1425,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1422,122 +1484,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -1722,6 +1684,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1888,7 +1851,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -2413,6 +2376,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3091,7 +3059,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -3195,7 +3163,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -3479,6 +3447,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3542,7 +3515,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -3651,7 +3624,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -3735,7 +3708,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -3819,7 +3792,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -3903,7 +3876,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -4027,7 +4000,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -4086,122 +4059,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -4386,6 +4259,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -4552,7 +4426,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -5096,6 +4970,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5412,6 +5291,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5575,7 +5459,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -5674,122 +5558,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -5974,6 +5758,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -6140,7 +5925,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -6665,6 +6450,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6728,7 +6518,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -7208,7 +6998,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -7312,7 +7102,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -7596,6 +7386,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -7659,7 +7454,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -7768,7 +7563,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -7852,7 +7647,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -7936,7 +7731,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -8020,7 +7815,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -8104,7 +7899,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -8203,122 +7998,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -8334,7 +8029,7 @@
         <TargetCommonOption>
           <Device>ARMCM0</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0-dev0</PackID>
+          <PackID>ARM.CMSIS.5.7.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M0") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -8503,6 +8198,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -8669,7 +8365,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -8758,7 +8454,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -8849,6 +8545,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_pt_simple.c</FilePath>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8912,7 +8613,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9011,7 +8712,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9090,7 +8791,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9275,7 +8976,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9379,7 +9080,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9483,7 +9184,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9681,6 +9382,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -9744,7 +9450,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9838,7 +9544,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -9922,7 +9628,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10006,7 +9712,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10090,7 +9796,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10174,7 +9880,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10258,7 +9964,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10352,7 +10058,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10436,7 +10142,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -10495,122 +10201,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -10795,6 +10401,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -10961,7 +10568,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -11607,6 +11214,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_pt_simple.c</FilePath>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -11923,6 +11535,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -12126,7 +11743,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -12185,191 +11802,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>2</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>0</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <uGnu>2</uGnu>
-                <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>2</vShortEn>
-                <vShortWch>2</vShortWch>
-                <v6Lto>2</v6Lto>
-                <v6WtE>2</v6WtE>
-                <v6Rtti>2</v6Rtti>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -12554,6 +12002,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -12720,7 +12169,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -12809,7 +12258,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -13282,6 +12731,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\usrapp\template\main_pt_simple.c</FilePath>
             </File>
+            <File>
+              <FileName>main_eda_simple.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\usrapp\template\main_eda_simple.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -13649,6 +13103,11 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</FilePath>
             </File>
+            <File>
+              <FileName>delegate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\vsf\utilities\language_extension\delegate.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -13812,7 +13271,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -13906,7 +13365,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -13990,7 +13449,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -14049,122 +13508,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>component/ui/tgui</GroupName>
+          <GroupName>vsf/osa_hal/</GroupName>
           <Files>
             <File>
-              <FileName>vsf_tgui.c</FileName>
+              <FileName>vsf_osa_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.c</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.c</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui.h</FileName>
+              <FileName>vsf_osa_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal.h</FilePath>
             </File>
             <File>
-              <FileName>vsf_tgui_cfg.h</FileName>
+              <FileName>vsf_osa_hal_cfg.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>__vsf_tgui_mc_common.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_msg_tree_cfg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_control.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_mc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_template.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_v_type.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_type.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_button.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_label.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_list.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</FilePath>
-            </File>
-            <File>
-              <FileName>vsf_tgui_panel.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</FilePath>
+              <FilePath>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -14250,5 +13609,20 @@
       </file>
     </files>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>&lt;Project Info&gt;</LayName>
+        <LayDesc></LayDesc>
+        <LayUrl></LayUrl>
+        <LayKeys></LayKeys>
+        <LayCat></LayCat>
+        <LayLic></LayLic>
+        <LayTarg>0</LayTarg>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

@@ -3,6 +3,10 @@
 #ifndef N200_TIMER_H
 #define N200_TIMER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TIMER_MSIP 0xFFC
 #define TIMER_MSIP_size   0x4
 #define TIMER_MTIMECMP 0x8
@@ -75,6 +79,10 @@ typedef volatile struct {
 
 #define SYSTICK_BASE_ADDR           0xD1000000ul
 #define SYSTICK                     (*((io_systick_reg_t *)SYSTICK_BASE_ADDR))
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

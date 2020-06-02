@@ -156,6 +156,7 @@ static void vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             pipe = vk_usbh_urb_get_pipe(&urb);
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
+                __vsf_eda_crit_npb_leave(&ds4->dev->ep0.crit);
                 vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&ds4->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_ds4_gamepad_in_report_t));
                 vk_usbh_hid_send_report((vk_usbh_hid_eda_t *)&ds4->use_as__vk_usbh_hid_teda_t, (uint8_t *)&ds4->gamepad_out_buf, sizeof(ds4->gamepad_out_buf));
             } else /* if (USB_ENDPOINT_XFER_INT == pipe.type) */ {

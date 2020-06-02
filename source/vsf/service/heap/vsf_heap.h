@@ -20,19 +20,22 @@
 
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
+#include "utilities/vsf_utilities.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 #ifndef VSF_USE_HEAP
 #   define VSF_USE_HEAP         ENABLED     //!< enable vsf_heap_t by default
 #endif
 
 #if VSF_USE_HEAP == ENABLED
+
 #   ifndef VSF_HEAP_SIZE
 #       define VSF_HEAP_SIZE    (128 * 1024)
 #   endif
-#endif
 
-#if VSF_USE_HEAP == ENABLED
 #if 0
 /*! \brief free a target memory which belongs to a bigger memory chunk previouly 
  *!        allocated from the heap
@@ -90,4 +93,9 @@ extern bool vsf_heap_partial_free(  void *buffer,
                                     uint_fast32_t size);
 
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

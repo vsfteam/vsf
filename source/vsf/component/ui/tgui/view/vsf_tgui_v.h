@@ -26,7 +26,7 @@
 
 #if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #   define VSF_TGUI_V_TEMPLATE_HEADER_FILE      "./simple_view/vsf_tgui_v_template.h"
-#else 
+#else
 #   undef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
 #   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL  VSF_TGUI_V_TEMPLATE_EXAMPLE
 #   define VSF_TGUI_V_TEMPLATE_HEADER_FILE      "./template/vsf_tgui_v_template.h"
@@ -48,7 +48,7 @@ void vsf_tgui_location_get_in_sizes_with_align( vsf_tgui_location_t* ptLocation,
                                                 vsf_tgui_align_mode_t tMode);
 */
 
-extern 
+extern
 void vsf_tgui_region_update_with_align( vsf_tgui_region_t* ptDrawRegion,
                                         vsf_tgui_region_t* ptResourceRegion,
                                         vsf_tgui_align_mode_t tMode);

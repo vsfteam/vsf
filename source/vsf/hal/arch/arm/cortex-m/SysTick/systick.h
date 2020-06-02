@@ -22,6 +22,9 @@
 #include "hal/vsf_hal_cfg.h"
 #include "./systick_internal.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -94,5 +97,8 @@ extern const systick_t SYSTICK;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif  /* end of __SYS_TICK_H__ */

@@ -7,7 +7,7 @@
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
- *  Unless requir by applicable law or agreed to in writing, software      *
+ *  Unless requir by applicable law or agreed to in writing, software        *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
@@ -105,7 +105,7 @@ int vsf_linux_create_fhs(void)
     return 0;
 }
 
-#if VSF_USE_USB_DEVICE != ENABLED && defined(VSF_DEBUG_STREAM_NEED_POOL)
+#if VSF_USE_USB_DEVICE != ENABLED && defined(VSF_DEBUG_STREAM_NEED_POLL)
 void vsf_plug_in_on_kernel_idle(void)
 {
     VSF_DEBUG_STREAM_POLL();

@@ -66,8 +66,8 @@ static void *vk_usbh_libusb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     desc_device = usbh->parser->desc_device;
     ldev->vid = desc_device->idVendor;
     ldev->pid = desc_device->idProduct;
-    ldev->class = desc_device->bDeviceClass;
-    ldev->subclass = desc_device->bDeviceSubClass;
+    ldev->c = desc_device->bDeviceClass;
+    ldev->subc = desc_device->bDeviceSubClass;
     ldev->protocol = desc_device->bDeviceProtocol;
     ldev->ep0size = desc_device->bMaxPacketSize0;
     ldev->address = dev->devnum;

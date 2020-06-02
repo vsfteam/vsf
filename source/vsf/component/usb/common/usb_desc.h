@@ -1,6 +1,10 @@
 #ifndef __USB_DESC_H__
 #define __USB_DESC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define USB_DESC_WORD(__VALUE)                                                  \
             ((__VALUE) >> 0) & 0xFF, ((__VALUE) >> 8) & 0xFF
 
@@ -8,13 +12,13 @@
             ((__VALUE) >> 0) & 0xFF, ((__VALUE) >> 8) & 0xFF,                   \
             ((__VALUE) >> 16) & 0xFF, ((__VALUE) >> 24) & 0xFF
 
-#define USB_DESC_DEV_IAD(__VERSION, __EP0_SIZE, __VID, __PID, __BCD_VER, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
+#define USB_DESC_DEV(__VERSION, __CLASS, __SUBCLASS, __PROTOCOL, __EP0_SIZE, __VID, __PID, __BCD_VER, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
             USB_DT_DEVICE_SIZE,                                                 \
             USB_DT_DEVICE,                                                      \
             USB_DESC_WORD(__VERSION),           /* bcdUSB */                    \
-            0xEF,                               /* device class: IAD */         \
-            0x02,                               /* device sub class */          \
-            0x01,                               /* device protocol */           \
+            (__CLASS),                          /* device class: IAD */         \
+            (__SUBCLASS),                       /* device sub class */          \
+            (__PROTOCOL),                       /* device protocol */           \
             (__EP0_SIZE),                       /* max packet size */           \
             USB_DESC_WORD(__VID),               /* vendor */                    \
             USB_DESC_WORD(__PID),               /* product */                   \
@@ -23,6 +27,9 @@
             (__I_PRODUCT),                      /* product */                   \
             (__I_SERIAL_NUM),                   /* serial number */             \
             (__CONFIG_NUM),                     /* number of configuration */
+
+#define USB_DESC_DEV_IAD(__VERSION, __EP0_SIZE, __VID, __PID, __BCD_VER, __I_MANUFACTURER, __I_PRODUCT, __I_SERIAL_NUM, __CONFIG_NUM)\
+            USB_DESC_DEV((__VERSION), 0xEF, 0x02, 0x01, (__EP0_SIZE), (__VID), (__PID), (__BCD_VER), (__I_MANUFACTURER), (__I_PRODUCT), (__I_SERIAL_NUM), (__CONFIG_NUM))
 
 #define USB_DESC_CFG(__CFG_SIZE, __IFS_NUM, __CONFIG_VALUE, __I_CONFIG, __ATTR, __MAX_POWER)\
             USB_DT_CONFIG_SIZE,                                                 \
@@ -78,5 +85,9 @@
             (__STR_LEN) + 2,                                                    \
             USB_DT_STRING,                                                      \
             __VA_ARGS__,
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // __USB_DESC_H__

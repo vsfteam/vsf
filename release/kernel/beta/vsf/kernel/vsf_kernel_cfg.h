@@ -177,8 +177,8 @@ included by vsf_usr_cfg.h)"
 #endif
 
 
-#ifndef VSF_KERNEL_CFG_SUPPORT_PREMPT
-#   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
+#ifndef VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED
+#   define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                    ENABLED
 #endif
 #ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                      DISABLED
@@ -191,19 +191,19 @@ included by vsf_usr_cfg.h)"
 #   error "VSF_OS_CFG_PRIORITY_NUM MUST be > 0"
 #endif
 
-#if __VSF_OS_SWI_NUM > 1 && VSF_KERNEL_CFG_SUPPORT_PREMPT != ENABLED
-#   warning "VSF_KERNEL_CFG_SUPPORT_PREMPT MUST be enabled to support           \
+#if __VSF_OS_SWI_NUM > 1 && VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED != ENABLED
+#   warning "VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED MUST be enabled to support           \
 VSF_OS_CFG_PRIORITY_NUM > 1"
-#   undef VSF_KERNEL_CFG_SUPPORT_PREMPT
-#   define VSF_KERNEL_CFG_SUPPORT_PREMPT                    ENABLED
+#   undef VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED
+#   define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                    ENABLED
 #endif
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
-#   if VSF_KERNEL_CFG_SUPPORT_PREMPT != ENABLED
-#       warning "VSF_KERNEL_CFG_SUPPORT_PREMPT MUST be enabled to support       \
+#   if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED != ENABLED
+#       warning "VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED MUST be enabled to support       \
 VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
-#       undef VSF_KERNEL_CFG_SUPPORT_PREMPT
-#       define VSF_KERNEL_CFG_SUPPORT_PREMPT                ENABLED
+#       undef VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED
+#       define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                ENABLED
 #   endif
 
 /*! \note when VSF_OS_CFG_PRIORITY_NUM equals 1, no SWI is required, hence the 
@@ -216,7 +216,7 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #   define __VSF_OS_SWI_PRIORITY_BEGIN          vsf_prio_0
 #endif
 
-#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #   define __VSF_KERNEL_CFG_EVTQ_EN                         ENABLED
 
 #   ifndef VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY

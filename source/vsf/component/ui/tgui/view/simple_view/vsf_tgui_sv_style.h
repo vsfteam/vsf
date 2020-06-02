@@ -22,7 +22,8 @@
 #include "../../vsf_tgui_cfg.h"
 
 #if VSF_USE_TINY_GUI == ENABLED
-#include "../../utilities/vsf_tgui_color.h"
+
+#include "./vsf_tgui_sv_color.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

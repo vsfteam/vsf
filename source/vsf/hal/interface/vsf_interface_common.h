@@ -21,6 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -76,7 +79,8 @@ struct peripheral_capability_t {
 //! \name class: peripheral_t
 //! @{
 def_interface(peripheral_t)
-    peripheral_status_t (*Status)   (void);
+    peripheral_status_t     (*Status)   (void);
+    peripheral_capability_t (*Capability)(void);
     fsm_rt_t            (*Unint)    (void);
     union {
         fsm_rt_t        (*Enable)   (void);
@@ -90,7 +94,7 @@ end_def_interface(peripheral_t)
 //! @}
 
 def_interface(vsf_async_block_access_t)
-    /*! \brief request a block read
+    /*! \brief request a block access
      *! \param pchBuffer    address of target memory
      *! \param wSize        the size of the target memory
      *! \retval fsm_rt_cpl  The transaction is complete
@@ -100,24 +104,21 @@ def_interface(vsf_async_block_access_t)
      *!                     value is returned.
      *! \retval vsf_err_t   Error value is returned.
      */
-    fsm_rt_t  (*RequestRead)(uint8_t *pchBuffer, uint_fast32_t wSize);
-    /*! \brief request a block write
-     *! \param pchBuffer    address of target memory
-     *! \param wSize        the size of the target memory
-     *! \retval fsm_rt_cpl  The transaction is complete
-     *! \retval fsm_rt_asyn The transaction is handled asynchronousely, i.e. by 
-     *!                     DMA or by ISR or etc.
-     *! \retval fsm_rt_on_going User should poll this API until fsm_rt_cpl or err
-     *!                     value is returned.
-     *! \retval vsf_err_t   Error value is returned.
-     */
-    fsm_rt_t  (*RequestWrite)(uint8_t *pchBuffer, uint_fast32_t wSize);
+    fsm_rt_t  (*Request)(uint8_t *pchBuffer, uint_fast32_t wSize);
+
+    /*! \brief cancel on going communication */
+    fsm_rt_t  (*Cancel) (void);
+
+    /*! \brief get transfered count */
+    intalu_t  (*GetTransferredCount)(void);
 end_def_interface(vsf_async_block_access_t)
 
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif

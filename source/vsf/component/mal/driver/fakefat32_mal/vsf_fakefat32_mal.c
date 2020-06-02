@@ -58,23 +58,23 @@
 
 static uint_fast32_t __vk_fakefat32_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_fakefat32_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-static void __vk_fakefat32_mal_init(uintptr_t target, vsf_evt_t evt);
-static void __vk_fakefat32_mal_fini(uintptr_t target, vsf_evt_t evt);
-static void __vk_fakefat32_mal_read(uintptr_t target, vsf_evt_t evt);
-static void __vk_fakefat32_mal_write(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_fakefat32_mal_init)
+dcl_vsf_peda_methods(static, __vk_fakefat32_mal_fini)
+dcl_vsf_peda_methods(static, __vk_fakefat32_mal_read)
+dcl_vsf_peda_methods(static, __vk_fakefat32_mal_write)
 
-static void __vk_fakefat32_dir_read(uintptr_t target, vsf_evt_t evt);
-static void __vk_fakefat32_dir_write(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_fakefat32_dir_read)
+dcl_vsf_peda_methods(static, __vk_fakefat32_dir_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const i_mal_drv_t VK_FAKEFAT32_MAL_DRV = {
+const vk_mal_drv_t VK_FAKEFAT32_MAL_DRV = {
     .blksz          = __vk_fakefat32_mal_blksz,
     .buffer         = __vk_fakefat32_mal_buffer,
-    .init           = __vk_fakefat32_mal_init,
-    .fini           = __vk_fakefat32_mal_fini,
-    .read           = __vk_fakefat32_mal_read,
-    .write          = __vk_fakefat32_mal_write,
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_init),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_fini),
+    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_read),
+    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_write),
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -318,8 +318,8 @@ static vsf_err_t __vk_fakefat32_init_recursion(vk_fakefat32_mal_t *pthis, vk_fak
             clusters = __vk_fakefat32_calc_dir_clusters(pthis, file);
             file->size = clusters * cluster_size;
         }
-        file->callback.read = __vk_fakefat32_dir_read;
-        file->callback.write = __vk_fakefat32_dir_write;
+        file->callback.read = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_read);
+        file->callback.write = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_write);
     } else if (file->attr == VSF_FAT_FILE_ATTR_VOLUMID) {
         clusters = 0;
     } else {
@@ -360,11 +360,12 @@ static vsf_err_t __vk_fakefat32_init(vk_fakefat32_mal_t *pthis)
     return VSF_ERR_NONE;
 }
 
-static void __vk_fakefat32_dir_read(uintptr_t target, vsf_evt_t evt)
+vsf_component_peda_ifs_entry(__vk_fakefat32_dir_read, vk_memfs_callback_read)
 {
-    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
-    uint_fast64_t addr = file->ctx.io.offset;
-    uint8_t *buff = file->ctx.io.buff;
+    vsf_peda_begin();
+    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)&vsf_this;
+    uint_fast64_t addr = vsf_local.offset;
+    uint8_t *buff = vsf_local.buff;
 
     uint_fast32_t page_size = file->mal->sector_size;
     vk_fakefat32_file_t *file_dir = file;
@@ -373,7 +374,7 @@ static void __vk_fakefat32_dir_read(uintptr_t target, vsf_evt_t evt)
 
     memset(buff, 0, page_size);
     if (!(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
-        vk_fakefat32_return(file, VSF_ERR_FAIL);
+        vsf_eda_return(VSF_ERR_FAIL);
         return;
     }
 
@@ -523,13 +524,15 @@ static void __vk_fakefat32_dir_read(uintptr_t target, vsf_evt_t evt)
         }
     }
 return_success:
-    vk_fakefat32_return(file_dir, VSF_ERR_NONE);
+    vsf_eda_return(vsf_local.size);
+    vsf_peda_end();
 }
 
-static void __vk_fakefat32_dir_write(uintptr_t target, vsf_evt_t evt)
+vsf_component_peda_ifs_entry(__vk_fakefat32_dir_write, vk_memfs_callback_write)
 {
-    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
-    uint8_t *buff = file->ctx.io.buff;
+    vsf_peda_begin();
+    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)&vsf_this;
+    uint8_t *buff = vsf_local.buff;
     uint_fast16_t child_num;
 
     uint_fast32_t page_size = file->mal->sector_size;
@@ -585,7 +588,8 @@ fakefat32_dir_write_next:
             break;
         }
     }
-    vk_fakefat32_return(file, VSF_ERR_NONE);
+    vsf_eda_return(vsf_local.size);
+    vsf_peda_end();
 }
 
 static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t addr, uint8_t *buff)
@@ -729,10 +733,12 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
             if ((file->f.buff != NULL) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
                 memcpy(buff, &file->f.buff[addr_offset], page_size);
             } else if (file->callback.read != NULL) {
-                file->ctx.io.offset = addr_offset;
-                file->ctx.io.buff = buff;
-                file->ctx.io.size = page_size;
-                vsf_eda_call_param_eda(file->callback.read, file);
+                vsf_err_t err;
+                __vsf_component_call_peda_ifs(vk_memfs_callback_read, err, file->callback.read, 0, file,
+                    .offset     = addr_offset,
+                    .size       = page_size,
+                    .buff       = buff,
+                );
                 return VSF_ERR_NOT_READY;
             }
         }
@@ -770,10 +776,12 @@ static vsf_err_t __vk_fakefat32_write(vk_fakefat32_mal_t *pthis, uint_fast64_t a
         if ((file->f.buff != NULL) && !(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
             memcpy(&file->f.buff[addr_offset], buff, page_size);
         } else if (file->callback.write != NULL) {
-            file->ctx.io.offset = addr_offset;
-            file->ctx.io.buff = buff;
-            file->ctx.io.size = page_size;
-            vsf_eda_call_param_eda(file->callback.write, file);
+            vsf_err_t err;
+            __vsf_component_call_peda_ifs(vk_memfs_callback_write, err, file->callback.write, 0, file,
+                .offset     = addr_offset,
+                .size       = page_size,
+                .buff       = buff,
+            );
             return VSF_ERR_NOT_READY;
         }
     }
@@ -793,109 +801,108 @@ static bool __vk_fakefat32_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fa
     return false;
 }
 
-static void __vk_fakefat32_mal_init(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_fakefat32_mal_init, vk_mal_init)
 {
-    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)target;
+    vsf_peda_begin();
+    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)&vsf_this;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    pthis->result.errcode = __vk_fakefat32_init(pthis);
-    pthis->result.size = 0;
-    vsf_eda_return();
+    vsf_eda_return(__vk_fakefat32_init(pthis));
+    vsf_peda_end();
 }
 
-static void __vk_fakefat32_mal_fini(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_fakefat32_mal_fini, vk_mal_fini)
 {
-    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)target;
+    vsf_peda_begin();
+    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)&vsf_this;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    pthis->result.errcode = VSF_ERR_NONE;
-    pthis->result.size = 0;
-    vsf_eda_return();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_fakefat32_mal_read(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_fakefat32_mal_read, vk_mal_read)
 {
-    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)target;
+    vsf_peda_begin();
+    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)&vsf_this;
 
     VSF_MAL_ASSERT(pthis != NULL);
 
     switch (evt) {
-    case VSF_EVT_RETURN:
-        pthis->result.errcode = pthis->err;
-        if (VSF_ERR_NONE == pthis->result.errcode) {
-        read_finish:
-            pthis->args.size -= pthis->sector_size;
-            pthis->args.addr += pthis->sector_size;
-            pthis->args.buff += pthis->sector_size;
-            pthis->result.size += pthis->sector_size;
-        } else {
-        do_return:
-            vsf_eda_return();
-            break;
+    case VSF_EVT_RETURN: {
+            int32_t result = (int32_t)vsf_eda_get_return_value();
+            if (result >= 0) {
+            read_finish:
+                vsf_local.size -= pthis->sector_size;
+                vsf_local.addr += pthis->sector_size;
+                vsf_local.buff += pthis->sector_size;
+                vsf_local.rsize += pthis->sector_size;
+            } else {
+                vsf_eda_return(result);
+                break;
+            }
+            goto next;
         }
-        goto next;
     case VSF_EVT_INIT:
-        pthis->result.size = 0;
+        vsf_local.rsize = 0;
     next:
-        if (pthis->args.size > 0) {
-            pthis->result.errcode = __vk_fakefat32_read(pthis, pthis->args.addr, pthis->args.buff);
-            if (VSF_ERR_NONE == pthis->result.errcode) {
+        if (vsf_local.size > 0) {
+            vsf_err_t err = __vk_fakefat32_read(pthis, vsf_local.addr, vsf_local.buff);
+            if (VSF_ERR_NONE == err) {
                 goto read_finish;
-            } else if (VSF_ERR_NOT_READY == pthis->result.errcode) {
+            } else if (VSF_ERR_NOT_READY == err) {
+                break;
+            } else {
+                vsf_eda_return(err);
                 break;
             }
         }
-        goto do_return;
+        vsf_eda_return(vsf_local.rsize);
+        break;
     }
+    vsf_peda_end();
 }
 
-static void __vk_fakefat32_mal_write(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_fakefat32_mal_write, vk_mal_write)
 {
-    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)target;
+    vsf_peda_begin();
+    vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)&vsf_this;
 
     VSF_MAL_ASSERT(pthis != NULL);
 
     switch (evt) {
-    case VSF_EVT_RETURN:
-        pthis->result.errcode = pthis->err;
-        if (VSF_ERR_NONE == pthis->result.errcode) {
-        write_finish:
-            pthis->args.size -= pthis->sector_size;
-            pthis->args.addr += pthis->sector_size;
-            pthis->args.buff += pthis->sector_size;
-            pthis->result.size += pthis->sector_size;
-        } else {
-        do_return:
-            vsf_eda_return();
-            break;
+    case VSF_EVT_RETURN: {
+            int32_t result = (int32_t)vsf_eda_get_return_value();
+            if (result >= 0) {
+            write_finish:
+                vsf_local.size -= pthis->sector_size;
+                vsf_local.addr += pthis->sector_size;
+                vsf_local.buff += pthis->sector_size;
+                vsf_local.wsize += pthis->sector_size;
+            } else {
+                vsf_eda_return(result);
+                break;
+            }
+            goto next;
         }
-        goto next;
     case VSF_EVT_INIT:
-        pthis->result.size = 0;
+        vsf_local.wsize = 0;
     next:
-        if (pthis->args.size > 0) {
-            pthis->result.errcode = __vk_fakefat32_write(pthis, pthis->args.addr, pthis->args.buff);
-            if (VSF_ERR_NONE == pthis->result.errcode) {
+        if (vsf_local.size > 0) {
+            vsf_err_t err = __vk_fakefat32_write(pthis, vsf_local.addr, vsf_local.buff);
+            if (VSF_ERR_NONE == err) {
                 goto write_finish;
-            } else if (VSF_ERR_NOT_READY == pthis->result.errcode) {
+            } else if (VSF_ERR_NOT_READY == err) {
+                break;
+            } else {
+                vsf_eda_return(err);
                 break;
             }
         }
-        goto do_return;
+        vsf_eda_return(vsf_local.wsize);
+        break;
     }
-}
-
-void vk_fakefat32_set_result(vk_fakefat32_file_t *file, vsf_err_t err)
-{
-    if (file->mal != NULL) {
-        file->mal->err = err;
-    }
-}
-
-void vk_fakefat32_return(vk_fakefat32_file_t *file, vsf_err_t err)
-{
-    vk_fakefat32_set_result(file, err);
-    vsf_eda_return();
+    vsf_peda_end();
 }
 
 #endif

@@ -2,6 +2,10 @@
 #ifndef _RISCV_BITS_H
 #define _RISCV_BITS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define likely(x) __builtin_expect((x), 1)
 #define unlikely(x) __builtin_expect((x), 0)
 
@@ -32,5 +36,9 @@
 # define LOG_REGBYTES 2
 #endif
 #define REGBYTES (1 << LOG_REGBYTES)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

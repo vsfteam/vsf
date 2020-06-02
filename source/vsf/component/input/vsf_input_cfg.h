@@ -25,7 +25,11 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_INPUT_ASSERT
-#   define VSF_INPUT_ASSERT             ASSERT
+#   define VSF_INPUT_ASSERT                         ASSERT
+#endif
+
+#ifndef VSF_INPUT_CFG_REGISTRATION_MECHANISM
+#   define VSF_INPUT_CFG_REGISTRATION_MECHANISM     ENABLED
 #endif
 
 /*============================ MACROS ========================================*/

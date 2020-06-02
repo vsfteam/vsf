@@ -113,7 +113,10 @@ void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
     vsf_systick_set_reload((uint32_t)tick_cnt);
 }
 
-ROOT ISR(SysTick_Handler)
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+ROOT 
+#endif
+ISR(SysTick_Handler)
 {   
     vsf_systimer_ovf_evt_hanlder();
 }
@@ -147,7 +150,10 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *
  *----------------------------------------------------------------------------*/
-ROOT ISR(PendSV_Handler)
+#if VSF_USE_KERNEL == ENABLED 
+ROOT 
+#endif
+ISR(PendSV_Handler)
 {
     if (__vsf_cm.pendsv.handler != NULL) {
         __vsf_cm.pendsv.handler(__vsf_cm.pendsv.param);

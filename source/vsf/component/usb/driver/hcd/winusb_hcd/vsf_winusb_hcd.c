@@ -27,6 +27,7 @@
 #include "vsf.h"
 #include "./vsf_winusb_hcd.h"
 
+#include <Windows.h>
 #include <SetupAPI.h>
 #include <winusb.h>
 
@@ -50,10 +51,16 @@
 
 /*============================ TYPES =========================================*/
 
+struct vk_winusb_hcd_dev_ep_t {
+    int8_t ep2ifs;
+    WINUSB_PIPE_INFORMATION_EX pipe_info;
+};
+typedef struct vk_winusb_hcd_dev_ep_t vk_winusb_hcd_dev_ep_t;
+
 struct vk_winusb_hcd_dev_t {
     uint16_t vid, pid;
     HANDLE hDev;
-    WINUSB_INTERFACE_HANDLE hUsbDev;
+    WINUSB_INTERFACE_HANDLE hUsbIfs[8];
     vk_usbh_dev_t *dev;
 
     enum usb_device_speed_t speed;
@@ -64,6 +71,7 @@ struct vk_winusb_hcd_dev_t {
     } state;
 
     int8_t addr;
+    uint8_t ifs_num;
     union {
         uint8_t value;
         struct {
@@ -77,6 +85,8 @@ struct vk_winusb_hcd_dev_t {
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
     vsf_dlist_t urb_pending_list;
+
+    vk_winusb_hcd_dev_ep_t ep[2 * 16];
 };
 typedef struct vk_winusb_hcd_dev_t vk_winusb_hcd_dev_t;
 
@@ -241,7 +251,7 @@ static void __vk_winusb_hcd_on_arrived(vk_winusb_hcd_dev_t *winusb_dev)
 {
     UCHAR speed;
     ULONG length = sizeof(speed);
-    WinUsb_QueryDeviceInformation(winusb_dev->hUsbDev, DEVICE_SPEED, &length, &speed);
+    WinUsb_QueryDeviceInformation(winusb_dev->hUsbIfs[0], DEVICE_SPEED, &length, &speed);
     switch (speed) {
     case LowSpeed:  winusb_dev->speed = USB_SPEED_LOW;      break;
     case FullSpeed: winusb_dev->speed = USB_SPEED_FULL;     break;
@@ -250,6 +260,29 @@ static void __vk_winusb_hcd_on_arrived(vk_winusb_hcd_dev_t *winusb_dev)
     }
     winusb_dev->evt_mask.is_attaching = true;
     __vsf_arch_irq_request_send(&winusb_dev->irq_request);
+}
+
+static void __vk_winusb_hcd_assign_endpoints(vk_winusb_hcd_dev_t *winusb_dev, uint_fast8_t ifs, uint_fast8_t alt)
+{
+    USB_INTERFACE_DESCRIPTOR ifs_desc;
+    WINUSB_PIPE_INFORMATION_EX pipe;
+    uint_fast8_t idx;
+
+    VSF_USB_ASSERT(ifs < winusb_dev->ifs_num);
+    do {
+        if (!WinUsb_QueryInterfaceSettings(winusb_dev->hUsbIfs[ifs], alt, &ifs_desc)) {
+            break;
+        }
+        for (uint_fast8_t i = 0; i < ifs_desc.bNumEndpoints; i++) {
+            if (!WinUsb_QueryPipeEx(winusb_dev->hUsbIfs[ifs], alt, i, &pipe)) {
+                break;
+            }
+            idx = USB_ENDPOINT_DIRECTION_IN(pipe.PipeId) ? 0x10 : 0x00;
+            idx += pipe.PipeId & USB_ENDPOINT_ADDRESS_MASK;
+            winusb_dev->ep[idx].ep2ifs = ifs;
+            winusb_dev->ep[idx].pipe_info = pipe;
+        }
+    } while (0);
 }
 
 // return 0 on success, non-0 otherwise
@@ -272,12 +305,60 @@ static int __vk_winusb_hcd_init(void)
     return 0;
 }
 
+static bool __vk_winusb_hcd_sumbit_urb_epnz(vk_usbh_hcd_urb_t *urb, WINUSB_INTERFACE_HANDLE handle, PULONG real_size)
+{
+    vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
+    vk_usbh_pipe_t pipe = urb->pipe;
+    bool result;
+
+    if (pipe.type == USB_ENDPOINT_XFER_ISOC) {
+        VSF_USB_ASSERT(urb->iso_packet.number_of_packets > 0);
+        for (int i = 0; i < urb->iso_packet.number_of_packets; i++) {
+            urb->iso_packet.frame_desc[i].actual_length = 0;
+        }
+
+        WINUSB_ISOCH_BUFFER_HANDLE buffer_handle;
+        result = WinUsb_RegisterIsochBuffer(handle, pipe.endpoint | (pipe.dir_in1out0 ? 0x80 : 0x00), urb->buffer, urb->transfer_length, &buffer_handle);
+        if (!result) {
+            return result;
+        }
+
+        if (pipe.dir_in1out0) {
+            USBD_ISO_PACKET_DESCRIPTOR desc[urb->iso_packet.number_of_packets];
+            result = WinUsb_ReadIsochPipeAsap(buffer_handle, 0, urb->transfer_length, FALSE,
+                        urb->iso_packet.number_of_packets, (PUSBD_ISO_PACKET_DESCRIPTOR)&desc, NULL);
+
+            if (result) {
+                *real_size = 0;
+                for (int i = 0; i < urb->iso_packet.number_of_packets; i++) {
+                    urb->iso_packet.frame_desc[i].actual_length = desc[i].Length;
+                    *real_size += desc[i].Length;
+                    urb->iso_packet.frame_desc[i].status = desc[i].Status;
+                }
+            }
+        } else {
+            result = WinUsb_WriteIsochPipeAsap(buffer_handle, 0, urb->transfer_length, FALSE, NULL);
+            for (int i = 0; i < urb->iso_packet.number_of_packets; i++) {
+                urb->iso_packet.frame_desc[i].status = result ? URB_OK : URB_FAIL;
+            }
+        }
+        WinUsb_UnregisterIsochBuffer(buffer_handle);
+    } else {
+        if (pipe.dir_in1out0) {
+            result = WinUsb_ReadPipe(handle, 0x80 | pipe.endpoint, urb->buffer, urb->transfer_length, real_size, NULL);
+        } else {
+            result = WinUsb_WritePipe(handle, pipe.endpoint, urb->buffer, urb->transfer_length, real_size, NULL);
+        }
+    }
+    return result;
+}
+
 static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
     vk_winusb_hcd_dev_t *winusb_dev = dev->dev_priv;
     vk_usbh_pipe_t pipe = urb->pipe;
-    ULONG real_size;
+    ULONG real_size = 0;
 
     if (NULL == winusb_dev->hDev) {
         return VSF_ERR_INVALID_PARAMETER;
@@ -289,34 +370,39 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
             return VSF_ERR_INVALID_PARAMETER;
         } else {
             struct usb_ctrlrequest_t *setup = &urb->setup_packet;
-            WINUSB_SETUP_PACKET SetupPacket = {
-                .RequestType    = setup->bRequestType,
-                .Request        = setup->bRequest,
-                .Value          = setup->wValue,
-                .Index          = setup->wIndex,
-                .Length         = setup->wLength,
-            };
 
-            if (!WinUsb_ControlTransfer(winusb_dev->hUsbDev, SetupPacket, urb->buffer,
-                        setup->wLength, &real_size, NULL)) {
-                return -GetLastError();
+            if (USB_REQ_SET_INTERFACE == setup->bRequest) {
+                VSF_USB_ASSERT(setup->wIndex < winusb_dev->ifs_num);
+                if (!WinUsb_SetCurrentAlternateSetting(winusb_dev->hUsbIfs[setup->wIndex], setup->wValue)) {
+                    return -GetLastError();
+                }
+                __vk_winusb_hcd_assign_endpoints(winusb_dev, setup->wIndex, setup->wValue);
+                return 0;
+            } else {
+                WINUSB_SETUP_PACKET SetupPacket = {
+                    .RequestType    = setup->bRequestType,
+                    .Request        = setup->bRequest,
+                    .Value          = setup->wValue,
+                    .Index          = setup->wIndex,
+                    .Length         = setup->wLength,
+                };
+
+                if (!WinUsb_ControlTransfer(winusb_dev->hUsbIfs[0], SetupPacket, urb->buffer,
+                            setup->wLength, &real_size, NULL)) {
+                    return -GetLastError();
+                }
+                return real_size;
             }
-            return real_size;
         }
     case USB_ENDPOINT_XFER_ISOC:
-        // TODO: add support to iso transfer
-        return VSF_ERR_NOT_SUPPORT;
     case USB_ENDPOINT_XFER_BULK:
     case USB_ENDPOINT_XFER_INT: {
-            bool result;
-            if (pipe.dir_in1out0) {
-                result = WinUsb_ReadPipe(winusb_dev->hUsbDev, 0x80 | pipe.endpoint,
-                            urb->buffer, urb->transfer_length, &real_size, NULL);
-            } else {
-                result = WinUsb_WritePipe(winusb_dev->hUsbDev, pipe.endpoint,
-                            urb->buffer, urb->transfer_length, &real_size, NULL);
-            }
-            if (!result) {
+            uint8_t ep_idx = pipe.endpoint | (pipe.dir_in1out0 ? 0x10 : 0);
+            int8_t ifs_idx = winusb_dev->ep[ep_idx].ep2ifs;
+            VSF_USB_ASSERT(ifs_idx >= 0);
+            WINUSB_INTERFACE_HANDLE handle = winusb_dev->hUsbIfs[ifs_idx];
+
+            if (!__vk_winusb_hcd_sumbit_urb_epnz(urb, handle, &real_size)) {
                 return -GetLastError();
             }
             return real_size;
@@ -348,14 +434,17 @@ static void __vk_winusb_hcd_dev_thread(void *arg)
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (winusb_dev->evt_mask.is_detached) {
-            WinUsb_Free(winusb_dev->hUsbDev);
+            for (int i = 0; (i < dimof(winusb_dev->hUsbIfs)) && (winusb_dev->hUsbIfs[i] != NULL); i++) {
+                WinUsb_Free(winusb_dev->hUsbIfs[i]);
+                winusb_dev->hUsbIfs[i] = NULL;
+            }
             CloseHandle(winusb_dev->hDev);
             winusb_dev->hDev = INVALID_HANDLE_VALUE;
             winusb_dev->evt_mask.is_detached = false;
         }
         if (winusb_dev->evt_mask.is_resetting) {
-            // TODO: reset hUsbDev
-//            WinUsb_Reset(winusb_dev->hUsbDev);
+            // TODO: reset hUsbIfs[0]
+//            WinUsb_Reset(winusb_dev->hUsbIfs[0]);
             winusb_dev->evt_mask.is_resetting = false;
         }
     }
@@ -421,7 +510,19 @@ static void __vk_winusb_hcd_init_thread(void *arg)
             if ((INVALID_HANDLE_VALUE == winusb_dev->hDev) && (0 == winusb_dev->evt_mask.value)) {
                 winusb_dev->hDev = __vk_winusb_open_device(winusb_dev->vid, winusb_dev->pid);
                 if (winusb_dev->hDev != INVALID_HANDLE_VALUE) {
-                    if (WinUsb_Initialize(winusb_dev->hDev, &winusb_dev->hUsbDev)) {
+                    if (WinUsb_Initialize(winusb_dev->hDev, &winusb_dev->hUsbIfs[0])) {
+                        for (uint_fast8_t i = 0; i < dimof(winusb_dev->ep); i++) {
+                            winusb_dev->ep[i].ep2ifs = -1;
+                        }
+                        winusb_dev->ifs_num = 1;
+                        __vk_winusb_hcd_assign_endpoints(winusb_dev, 0, 0);
+                        for (uint_fast8_t i = 0; i < dimof(winusb_dev->hUsbIfs) - 1; i++)  {
+                            if (!WinUsb_GetAssociatedInterface(winusb_dev->hUsbIfs[0], i, &winusb_dev->hUsbIfs[i + 1])) {
+                                break;
+                            }
+                            winusb_dev->ifs_num++;
+                            __vk_winusb_hcd_assign_endpoints(winusb_dev, i + 1, 0);
+                        }
                         __vk_winusb_hcd_on_arrived(winusb_dev);
                     } else {
                         CloseHandle(winusb_dev->hDev);
@@ -488,18 +589,18 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         struct usb_ctrlrequest_t *setup = &urb->setup_packet;
 
                         // set address is handled here
-                        if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
-                            &&  (USB_REQ_SET_ADDRESS == setup->bRequest)) {
+                        if ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType) {
+                            if (USB_REQ_SET_ADDRESS == setup->bRequest) {
+                                VSF_USB_ASSERT(0 == winusb_dev->addr);
+                                winusb_dev->addr = setup->wValue;
+                                urb->status = URB_OK;
+                                urb->actual_length = 0;
 
-                            VSF_USB_ASSERT(0 == winusb_dev->addr);
-                            winusb_dev->addr = setup->wValue;
-                            urb->status = URB_OK;
-                            urb->actual_length = 0;
-
-                            VSF_USB_ASSERT(vsf_dlist_is_empty(&winusb_dev->urb_pending_list));
-                            vsf_dlist_add_to_tail(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
-                            vsf_eda_post_msg(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, urb);
-                            goto wait_next_urb;
+                                VSF_USB_ASSERT(vsf_dlist_is_empty(&winusb_dev->urb_pending_list));
+                                vsf_dlist_add_to_tail(vk_winusb_hcd_urb_t, urb_pending_node, &winusb_dev->urb_pending_list, winusb_urb);
+                                vsf_eda_post_msg(&__vk_winusb_hcd.teda.use_as__vsf_eda_t, urb);
+                                goto wait_next_urb;
+                            }
                         }
                     }
 

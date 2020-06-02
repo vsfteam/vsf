@@ -23,6 +23,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "service/vsf_service_cfg.h"
+#include "utilities/vsf_utilities.h"
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
@@ -35,6 +36,10 @@
 #endif   
 
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -137,11 +142,6 @@ def_simple_class(vsf_stream_t) {
     )
 };
 
-/*============================ INCLUDES ======================================*/
-
-#include "./fifo_stream/vsf_fifo_stream.h"
-#include "./mem_stream/vsf_mem_stream.h"
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -164,6 +164,16 @@ extern void vsf_stream_disconnect_rx(vsf_stream_t *stream);
 extern void vsf_stream_disconnect_tx(vsf_stream_t *stream);
 extern bool vsf_stream_is_rx_connected(vsf_stream_t *stream);
 extern bool vsf_stream_is_tx_connected(vsf_stream_t *stream);
+
+#ifdef __cplusplus
+}
+#endif
+
+/*============================ INCLUDES ======================================*/
+
+#include "./fifo_stream/vsf_fifo_stream.h"
+#include "./mem_stream/vsf_mem_stream.h"
+#include "./block_stream/vsf_block_stream.h"
 
 #endif      // VSF_USE_SERVICE_VSFSTREAM
 #endif      // __VSFSTREAM_H__

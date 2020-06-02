@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_FS_CFG_CACHE == ENABLED
@@ -87,63 +91,48 @@ enum vk_file_attr_t {
 typedef enum vk_file_attr_t vk_file_attr_t;
 
 struct vk_fs_fop_t {
-    void (*close)(uintptr_t, vsf_evt_t);
-    void (*read)(uintptr_t, vsf_evt_t);
-    void (*write)(uintptr_t, vsf_evt_t);
-    void (*resize)(uintptr_t, vsf_evt_t);
+    uint8_t close_local_size;
+    uint8_t read_local_size;
+    uint8_t write_local_size;
+    uint8_t resize_local_size;
+    vsf_peda_evthandler_t close;
+    vsf_peda_evthandler_t read;
+    vsf_peda_evthandler_t write;
+    vsf_peda_evthandler_t resize;
 };
 typedef struct vk_fs_fop_t vk_fs_fop_t;
 
 struct vk_fs_dop_t {
-    void (*lookup)(uintptr_t, vsf_evt_t);
-    void (*create)(uintptr_t, vsf_evt_t);
-    void (*unlink)(uintptr_t, vsf_evt_t);
-    void (*chmod)(uintptr_t, vsf_evt_t);
-    void (*rename)(uintptr_t, vsf_evt_t);
+    uint8_t lookup_local_size;
+    uint8_t create_local_size;
+    uint8_t unlink_local_size;
+    uint8_t chmod_local_size;
+    uint8_t rename_local_size;
+    vsf_peda_evthandler_t lookup;
+    vsf_peda_evthandler_t create;
+    vsf_peda_evthandler_t unlink;
+    vsf_peda_evthandler_t chmod;
+    vsf_peda_evthandler_t rename;
 };
 typedef struct vk_fs_dop_t vk_fs_dop_t;
 
+// TODO: remove fop and dop, put everything here for optimization
 struct vk_fs_op_t {
     // if succeed, VSF_VFS_FILE_ATTR_MOUNTED should be set in file->attr
-    void (*mount)(uintptr_t, vsf_evt_t);
-    void (*unmount)(uintptr_t, vsf_evt_t);
+    uint8_t mount_local_size;
+    uint8_t unmount_local_size;
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    void (*sync)(uintptr_t, vsf_evt_t);
+    uint8_t sync_local_size;
+#endif
+    vsf_peda_evthandler_t mount;
+    vsf_peda_evthandler_t unmount;
+#if VSF_FS_CFG_USE_CACHE == ENABLED
+    vsf_peda_evthandler_t sync;
 #endif
     vk_fs_fop_t fop;
     vk_fs_dop_t dop;
 };
 typedef struct vk_fs_op_t vk_fs_op_t;
-
-struct vk_file_ctx_t {
-    vsf_err_t err;
-    union {
-        struct {
-            uint64_t offset;
-            uint32_t size;
-            uint8_t *buff;
-            int32_t *result;
-        } io;
-        struct {
-            const char *name;
-            vk_file_attr_t attr;
-            uint64_t size;
-        } create;
-        struct {
-            const char *name;
-        } unlink;
-        struct {
-            const char *name;
-            uint32_t idx;
-            vk_file_t **result;
-        } lookup;
-        struct {
-            const char *from_name;
-            const char *to_name;
-        } rename;
-    };
-};
-typedef struct vk_file_ctx_t vk_file_ctx_t;
 
 // (bytelen << 6) | index
 enum vk_file_name_coding_t {
@@ -172,8 +161,6 @@ def_simple_class(vk_file_t) {
     protected_member(
         const vk_fs_op_t *fsop;
         vk_file_t *parent;
-        // TODO: use pointer here?
-        vk_file_ctx_t ctx;
     )
 
     private_member(
@@ -218,28 +205,57 @@ def_simple_class(vk_file_stream_t) {
     public_member(
         vk_file_t *file;
     )
-    protected_member(
-        struct {
-            uint64_t addr;
-            uint32_t size;
-            uint32_t rw_size;
-            vsf_stream_t *stream;
-            uint8_t *cur_buff;
-            vsf_eda_t *cur_eda;
-        } stream;
+    private_member(
+        uint64_t addr;
+        uint32_t size;
+        uint32_t rw_size;
+        vsf_stream_t *stream;
+        uint32_t cur_size;
+        uint8_t *cur_buff;
+        vsf_eda_t *cur_eda;
     )
 };
+#endif
+
+#if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
+__vsf_component_peda_ifs(vk_fs_mount)
+__vsf_component_peda_ifs(vk_fs_unmount)
+__vsf_component_peda_ifs(vk_fs_sync)
+
+__vsf_component_peda_ifs(vk_file_create,
+    const char      *name;
+    vk_file_attr_t  attr;
+    uint64_t        size;
+)
+__vsf_component_peda_ifs(vk_file_unlink,
+    const char      *name;
+)
+__vsf_component_peda_ifs(vk_file_lookup,
+    const char      *name;
+    uint32_t        idx;
+    vk_file_t       **result;
+)
+__vsf_component_peda_ifs(vk_file_rename,
+    const char *from_name;
+    const char *to_name;
+)
+__vsf_component_peda_ifs(vk_file_read,
+    uint64_t        offset;
+    uint32_t        size;
+    uint8_t         *buff;
+)
+__vsf_component_peda_ifs(vk_file_write,
+    uint64_t        offset;
+    uint32_t        size;
+    uint8_t         *buff;
+)
+__vsf_component_peda_ifs(vk_file_close)
+__vsf_component_peda_ifs(vk_file_sync)
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern vk_fs_op_t vk_vfs_op;
-
-/*============================ INCLUDES ======================================*/
-
-#include "./driver/fatfs/vsf_fatfs.h"
-#include "./driver/memfs/vsf_memfs.h"
-#include "./driver/winfs/vsf_winfs.h"
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -256,8 +272,8 @@ extern vsf_err_t vk_file_create(vk_file_t *dir, const char *name, vk_file_attr_t
 extern vsf_err_t vk_file_unlink(vk_file_t *dir, const char *name);
 
 extern vsf_err_t vk_file_close(vk_file_t *file);
-extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *rsize);
-extern vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff, int32_t *wsize);
+extern vsf_err_t vk_file_read(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
+extern vsf_err_t vk_file_write(vk_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
 #if VSF_FS_CFG_USE_CACHE == ENABLED
 extern vsf_err_t vk_file_sync(vk_file_t *file);
 #endif
@@ -266,14 +282,7 @@ extern uint_fast16_t vk_file_get_name_length(vk_file_t *file);
 
 extern char * vk_file_getfileext(char *fname);
 extern char * vk_file_getfilename(char *path);
-
-extern vk_file_ctx_t * vk_file_get_ctx(vk_file_t *file);
-extern vsf_err_t vk_file_get_errcode(vk_file_t *file);
 extern vk_file_t * vk_file_get_parent(vk_file_t *file);
-
-extern void vk_file_set_result(vk_file_t *file, vsf_err_t err);
-extern void vk_file_set_io_result(vk_file_t *file, vsf_err_t err, int_fast32_t size);
-extern void vk_file_return(vk_file_t *file, vsf_err_t err);
 
 #if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
 extern bool vk_file_is_match(char *path, char *name);
@@ -283,14 +292,25 @@ extern vk_file_t * vk_file_alloc(uint_fast16_t size);
 extern void vk_file_free(vk_file_t *file);
 
 extern void vk_fs_return(vk_file_t *file, vsf_err_t err);
-extern void vk_dummyfs_succeed(uintptr_t target, vsf_evt_t evt);
-extern void vk_dummyfs_not_support(uintptr_t target, vsf_evt_t evt);
+
+dcl_vsf_peda_methods(extern, vk_dummyfs_succeed)
+dcl_vsf_peda_methods(extern, vk_dummyfs_not_support)
 #endif
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 extern vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 #endif
+
+#ifdef __cplusplus
+}
+#endif
+
+/*============================ INCLUDES ======================================*/
+
+#include "./driver/fatfs/vsf_fatfs.h"
+#include "./driver/memfs/vsf_memfs.h"
+#include "./driver/winfs/vsf_winfs.h"
 
 #undef VSF_FS_IMPLEMENT
 #undef VSF_FS_INHERIT

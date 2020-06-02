@@ -143,6 +143,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -649,4 +653,10 @@ uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* ptObj);
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
 extern
 int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount);
+
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

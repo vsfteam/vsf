@@ -49,8 +49,15 @@
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
     &&  VSF_USE_KERNEL == ENABLED                                               \
     &&  VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
-#ifndef this
-#   define this    (*ptThis)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef __cplusplus
+#   ifndef this
+#       define this    (*ptThis)
+#   endif
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
@@ -64,7 +71,9 @@
             __VA_ARGS__                                             \
         };
 
-#define def_params(...)         __VA_ARGS__
+#ifndef def_params
+#   define def_params(...)         __VA_ARGS__
+#endif
 
 #define args(...)               ,__VA_ARGS__
 
@@ -321,6 +330,9 @@ typedef enum {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

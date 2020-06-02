@@ -36,6 +36,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define __implement_malfs_cache(__size, __number)                               \
@@ -66,13 +70,6 @@ def_simple_class(__vk_malfs_cache_t) {
 
     private_member(
         __vk_malfs_info_t *info;
-#if VSF_FS_CFG_SUPPORT_MULTI_THREAD == ENABLED
-        vsf_crit_t crit;
-#endif
-        struct {
-            uint64_t block_addr;
-            __vk_malfs_cache_node_t *result;
-        } ctx;
     )
 };
 
@@ -105,21 +102,6 @@ def_simple_class(__vk_malfs_info_t) {
         void *total_cb;
 #endif
         char *volume_name;
-        struct {
-            vsf_err_t err;
-            uint64_t block_addr;
-            uint32_t block_num;
-            uint8_t *buff;
-        } ctx_io;
-    )
-
-    private_member(
-        struct {
-            __vk_malfs_cache_node_t *node;
-        } ctx_cache;
-#if VSF_FS_CFG_SUPPORT_MULTI_THREAD == ENABLED
-        vsf_crit_t crit;
-#endif
     )
 };
 
@@ -170,6 +152,10 @@ extern void __vk_malfs_unmount(__vk_malfs_info_t *info);
 #if VSF_USE_HEAP == ENABLED
 // user should set the mal and root in mounter, then call vk_malfs_mount and wait VSF_EVT_RETURN
 extern vsf_err_t vk_malfs_mount_mbr(vk_malfs_mounter_t *mounter);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif      // VSF_USE_FS && VSF_USE_MALFS

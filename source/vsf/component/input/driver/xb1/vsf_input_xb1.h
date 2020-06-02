@@ -27,6 +27,10 @@
 #include "component/usb/common/class/XB1/vsf_usb_xb1.h"
 #include "../../vsf_input_get_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -50,6 +54,10 @@ extern const vk_input_item_info_t vk_xb1_gamepad_item_info[GAMEPAD_ID_NUM];
 extern void vk_xb1_process_input(vk_input_xb1_t *dev, vsf_usb_xb1_gamepad_in_report_t *data);
 extern void vk_xb1_new_dev(vk_input_xb1_t *dev);
 extern void vk_xb1_free_dev(vk_input_xb1_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_INPUT && VSF_USE_INPUT_XB1
 #endif      // __VSF_INPUT_XB1_H__

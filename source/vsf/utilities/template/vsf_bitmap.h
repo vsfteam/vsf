@@ -49,6 +49,11 @@
  */
 
 /*============================ INCLUDES ======================================*/
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 #define __vsf_bitmap(__name)        __name##_bitmap_t
 
@@ -107,5 +112,9 @@ typedef uintalu_t __name[((__bitsize) + __optimal_bit_sz - 1) / __optimal_bit_sz
 
 extern void __vsf_bitmap_reset(uintalu_t * pthis, int_fast16_t bitsize);
 extern int_fast16_t __vsf_bitmap_ffz(uintalu_t * pbitmap,  int_fast16_t bitsize);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

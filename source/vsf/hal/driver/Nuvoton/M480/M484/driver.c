@@ -23,10 +23,6 @@
 
 #define M480_PLLSRC                         M480_PLLSRC_HXT
 #define M480_HCLKSRC                        M480_HCLKSRC_PLLFOUT
-#define M480_PLL_FREQ_HZ                    (384 * 1000 * 1000)
-#define M480_CPU_FREQ_HZ                    (192 * 1000 * 1000)
-#define M480_HCLK_FREQ_HZ                   (192 * 1000 * 1000)
-#define M480_HXT_FREQ_HZ                    (12 * 1000 * 1000)
 #define M480_LXT_FREQ_HZ                    0
 #define M480_HIRC_FREQ_HZ                   (22 * 1000 * 1000)
 #define M480_LIRC_FREQ_HZ                   (10 * 1000 * 1000)
@@ -146,7 +142,7 @@ bool vsf_driver_init(void)
             return VSF_ERR_INVALID_PARAMETER;
         }
         // Fin/NR: 2MHz
-        if ((M480_PLL_FREQ_HZ * 1 > ( 200* 1000 * 1000)) &&
+        if ((M480_PLL_FREQ_HZ * 1 > (200 * 1000 * 1000)) &&
                 (M480_PLL_FREQ_HZ * 1 < (500 * 1000 * 1000))) {
             no = 1;
             no_mask = M480_CLK_PLLCTL_NO_1;            
@@ -170,19 +166,19 @@ bool vsf_driver_init(void)
         while ((CLK->STATUS & CLK_STATUS_PLLSTB_Msk) != CLK_STATUS_PLLSTB_Msk);
     }
 
-    if (M480_CPU_FREQ_HZ < 27 * 1000 * 1000) {
+    if (M480_HCLK_FREQ_HZ < 27 * 1000 * 1000) {
         FMC->CYCCTL = 1;
-    } else if (M480_CPU_FREQ_HZ < 54 * 1000 * 1000) {
+    } else if (M480_HCLK_FREQ_HZ < 54 * 1000 * 1000) {
         FMC->CYCCTL = 2;
-    } else if (M480_CPU_FREQ_HZ < 81 * 1000 * 1000) {
+    } else if (M480_HCLK_FREQ_HZ < 81 * 1000 * 1000) {
         FMC->CYCCTL = 3;
-    } else if (M480_CPU_FREQ_HZ < 108 * 1000 * 1000) {
+    } else if (M480_HCLK_FREQ_HZ < 108 * 1000 * 1000) {
         FMC->CYCCTL = 4;
-    } else if (M480_CPU_FREQ_HZ < 135 * 1000 * 1000) {
+    } else if (M480_HCLK_FREQ_HZ < 135 * 1000 * 1000) {
         FMC->CYCCTL = 5;
-    } else if (M480_CPU_FREQ_HZ < 162 * 1000 * 1000) {
+    } else if (M480_HCLK_FREQ_HZ < 162 * 1000 * 1000) {
         FMC->CYCCTL = 6;
-    } else if (M480_CPU_FREQ_HZ < 192 * 1000 * 1000) {
+    } else if (M480_HCLK_FREQ_HZ < 192 * 1000 * 1000) {
         FMC->CYCCTL = 7;
     } else {
         FMC->CYCCTL = 8;
@@ -216,10 +212,34 @@ bool vsf_driver_init(void)
 
     CLK->PWRCTL |= CLK_PWRCTL_HIRCEN_Msk;
     while ((CLK->STATUS & CLK_STATUS_HXTSTB_Msk) != CLK_STATUS_HXTSTB_Msk);
+
+    // enable hclk from hirc
     CLK->CLKSEL0 = (CLK->CLKSEL0 & (~CLK_CLKSEL0_HCLKSEL_Msk)) | M480_CLK_CLKSEL0_HCLKSEL_HIRC;
 
-    CLK->CLKDIV0 = (CLK->CLKDIV0 & ~CLK_CLKDIV0_HCLKDIV_Msk) |
-            ((freq_in / M480_HCLK_FREQ_HZ) - 1);
+    // hclk div
+    CLK->CLKDIV0 = (CLK->CLKDIV0 & ~CLK_CLKDIV0_HCLKDIV_Msk) | ((freq_in / M480_HCLK_FREQ_HZ) - 1);
+    // pclk div
+    CLK->PCLKDIV = 0;
+    switch (M480_PCLK0_FREQ_HZ) {
+    case M480_HCLK_FREQ_HZ:         break;
+    case M480_HCLK_FREQ_HZ / 2:     CLK->PCLKDIV |= 1; break;
+    case M480_HCLK_FREQ_HZ / 4:     CLK->PCLKDIV |= 2; break;
+    case M480_HCLK_FREQ_HZ / 8:     CLK->PCLKDIV |= 3; break;
+    case M480_HCLK_FREQ_HZ / 16:    CLK->PCLKDIV |= 4; break;
+    default:
+        VSF_HAL_ASSERT(false);
+    }
+    switch (M480_PCLK1_FREQ_HZ) {
+    case M480_HCLK_FREQ_HZ:         break;
+    case M480_HCLK_FREQ_HZ / 2:     CLK->PCLKDIV |= 1 << 4; break;
+    case M480_HCLK_FREQ_HZ / 4:     CLK->PCLKDIV |= 2 << 4; break;
+    case M480_HCLK_FREQ_HZ / 8:     CLK->PCLKDIV |= 3 << 4; break;
+    case M480_HCLK_FREQ_HZ / 16:    CLK->PCLKDIV |= 4 << 4; break;
+    default:
+        VSF_HAL_ASSERT(false);
+    }
+
+    // enable hclk from real source
     CLK->CLKSEL0 = (CLK->CLKSEL0 & ~CLK_CLKSEL0_HCLKSEL_Msk) | temp32;
 
     m480_reg_lock(state);

@@ -120,7 +120,7 @@ REPEAT_MACRO(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
- const pFunc __VECTOR_TABLE[240] __VECTOR_TABLE_ATTRIBUTE  = {
+ const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE  = {
     (pFunc)(&__INITIAL_SP),                    /*     Initial Stack Pointer */
     Reset_Handler,                            /*     Reset Handler */
     NMI_Handler,                              /* -14 NMI Handler */

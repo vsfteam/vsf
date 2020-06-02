@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -133,6 +137,9 @@ extern vsf_err_t vsf_netdrv_output(vsf_netdrv_t *netdrv, void *netbuf);
 
 // for link driver
 
+#ifdef __cplusplus
+}
+#endif
 
 #undef VSF_NETDRV_IMPLEMENT
 #undef VSF_NETDRV_INHERIT_NETLINK

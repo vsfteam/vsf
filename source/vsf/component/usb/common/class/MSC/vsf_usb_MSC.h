@@ -20,6 +20,10 @@
 #ifndef __VSF_USB_MSC_H__
 #define __VSF_USB_MSC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
@@ -63,5 +67,9 @@ typedef enum usb_msc_csw_status_t usb_msc_csw_status_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif    // __VSF_USB_MSC_H__

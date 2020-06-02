@@ -22,6 +22,11 @@
 #include "component/usb/vsf_usb_cfg.h"
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -34,6 +39,10 @@ extern const vk_usbh_class_drv_t vk_usbh_bthci_drv;
 // type: 0x01: command_data, 0x02: acl, 0x03: sco, 0x04: event
 vsf_err_t vk_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
 bool vk_usbh_bthci_can_send(void *dev, uint8_t type);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_BTHCI
 #endif      // __VSF_USBH_BTHCI_H__

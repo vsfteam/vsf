@@ -24,7 +24,7 @@
 /*============================ MACROS ========================================*/
 #define VSF_USE_KERNEL                                          ENABLED
 
-#define     VSF_KERNEL_CFG_SUPPORT_PREMPT                       ENABLED
+#define     VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                       ENABLED
 #define         VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY         ENABLED
 #define         VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE              ENABLED
 

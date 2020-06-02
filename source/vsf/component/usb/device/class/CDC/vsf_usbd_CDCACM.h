@@ -33,6 +33,10 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define USB_CDC_ACM_PARAM(__INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
@@ -63,15 +67,9 @@
 
 #define USB_CDC_ACM_IFS_NUM     USB_CDC_IFS_NUM
 #define USB_CDC_ACM_IFS_CONTROL(__CDC_ACM_PARAM)                                \
-            {                                                                   \
-                .class_op       = &vk_usbd_cdcacm_control,                      \
-                .class_param    = &__CDC_ACM_PARAM,                             \
-            },
+            __USB_IFS(&vk_usbd_cdcacm_control, &__CDC_ACM_PARAM)
 #define USB_CDC_ACM_IFS_DATA(__CDC_ACM_PARAM)                                   \
-            {                                                                   \
-                .class_op       = &vk_usbd_cdcacm_data,                         \
-                .class_param    = &__CDC_ACM_PARAM,                             \
-            },
+            __USB_IFS(&vk_usbd_cdcacm_data, &__CDC_ACM_PARAM)
 
 
 
@@ -84,12 +82,8 @@
             };
 
 #define __cdc_acm_ifs(__NAME, __FUNC_ID)                                        \
-                {                                                               \
-                    USB_CDC_ACM_IFS_CONTROL(__##__NAME##_CDCACM##__FUNC_ID)     \
-                },                                                              \
-                {                                                               \
-                    USB_CDC_ACM_IFS_DATA(__##__NAME##_CDCACM##__FUNC_ID)        \
-                },
+            USB_CDC_ACM_IFS_CONTROL(__##__NAME##_CDCACM##__FUNC_ID)             \
+            USB_CDC_ACM_IFS_DATA(__##__NAME##_CDCACM##__FUNC_ID)
 
 #define cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
             __cdc_acm_desc(__NAME, (__IFS_START), 4 + (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
@@ -140,6 +134,10 @@ extern const vk_usbd_class_op_t vk_usbd_cdcacm_data;
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_usbd_cdcacm_init(vk_usbd_cdcacm_t *obj, const vk_usbd_cdcacm_cfg_t *cfg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM
 #endif	// __VSF_USBD_CDCACM_H__

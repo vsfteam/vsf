@@ -33,26 +33,26 @@
 #elif   defined(__VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #   undef __VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __VSF_TGUI_INTERFACE_CONTROLS_LABEL           {                            \
+#   define __VSF_TGUI_INTERFACE_CONTROLS_LABEL           {                      \
             {                                                                   \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_mc_label_msg_handler         \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_label_msg_handler            \
             },                                                                  \
             (vsf_msgt_method_status_t *)&vsf_tgui_control_status_get,           \
             (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
         }
 #else
-#   define __VSF_TGUI_INTERFACE_CONTROLS_LABEL           {                            \
+#   define __VSF_TGUI_INTERFACE_CONTROLS_LABEL           {                      \
             .tMessageHandler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_mc_label_msg_handler,        \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_label_msg_handler,           \
             },                                                                  \
             .Status = (vsf_msgt_method_status_t *)                              \
                         &vsf_tgui_control_status_get,                           \
@@ -64,36 +64,40 @@
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 #define __tgui_label(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)            \
-            tgui_control_base(   __NAME,                                        \
-                            VSF_TGUI_COMPONENT_ID_LABEL,                        \
-                            vsf_tgui_label_t,                                   \
-                            (__PARENT_ADDR),                                    \
-                            __PREVIOUS,                                         \
-                            __NEXT,                                             \
-                            __VA_ARGS__)  
+            tgui_control_base(  __NAME,                                         \
+                                VSF_TGUI_COMPONENT_ID_LABEL,                    \
+                                vsf_tgui_label_t,                               \
+                                (__PARENT_ADDR),                                \
+                                __PREVIOUS,                                     \
+                                __NEXT,                                         \
+                                VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT            \
+                                __VA_ARGS__                                     \
+                                VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE)
 
 #define tgui_label(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)              \
             __tgui_label(   __NAME,                                             \
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            __VA_ARGS__)
 
 #define __tgui_label_const(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)      \
             tgui_control_base_const(__NAME,                                     \
-                            VSF_TGUI_COMPONENT_ID_LABEL,                        \
-                            vsf_tgui_label_t,                                   \
-                            (__PARENT_ADDR),                                    \
-                            __PREVIOUS,                                         \
-                            __NEXT,                                             \
-                            __VA_ARGS__)  
+                                    VSF_TGUI_COMPONENT_ID_LABEL,                \
+                                    vsf_tgui_label_t,                           \
+                                    (__PARENT_ADDR),                            \
+                                    __PREVIOUS,                                 \
+                                    __NEXT,                                     \
+                                    VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT        \
+                                    __VA_ARGS__                                 \
+                                    VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE)
 
 #define tgui_label_const(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)        \
             __tgui_label_const(   __NAME,                                       \
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            __VA_ARGS__)
 
 
 #define __tgui_set_internal_label( __OWNER_ADDR,                                \
@@ -115,7 +119,7 @@
                                     __MEMBER,                                   \
                                     __PREVIOUS,                                 \
                                     __NEXT,                                     \
-                                    __VA_ARGS__)                               
+                                    __VA_ARGS__)
 
 
 #define tgui_set_priv_label( __OWNER_ADDR ,                                     \
@@ -124,7 +128,7 @@
         __tgui_set_internal_label(   (__OWNER_ADDR),                            \
                                     __MEMBER,                                   \
                                     __MEMBER, __MEMBER,                         \
-                                    __VA_ARGS__)  
+                                    __VA_ARGS__)
 #endif
 /*============================ TYPES =========================================*/
 declare_class(vsf_tgui_label_t)
@@ -143,8 +147,8 @@ end_def_class(vsf_tgui_label_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-extern 
-fsm_rt_t vsf_tgui_mc_label_msg_handler(vsf_tgui_label_t* ptControl, 
+extern
+fsm_rt_t vsf_tgui_label_msg_handler(vsf_tgui_label_t* ptControl,
                                         vsf_tgui_msg_t* ptMSG);
 extern
 fsm_rt_t vk_tgui_label_init(vsf_tgui_label_t* ptLabel);

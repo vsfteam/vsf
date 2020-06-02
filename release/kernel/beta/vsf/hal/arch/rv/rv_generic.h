@@ -50,7 +50,7 @@ typedef uint64_t vsf_systimer_cnt_t;
             __vsf_arch_prio_index_##__N = (__N),
 
 enum {
-    MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI_INDEX, VSF_ARCH_PRI_BIT)
 };
 
 #define __VSF_ARCH_PRI(__N, __BIT)                                              \
@@ -60,7 +60,7 @@ enum {
 enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_IVALID = -1,
     vsf_arch_prio_ivalid = -1,
-    MREPEAT(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
 };
 typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 

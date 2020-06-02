@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "osa_service/vsf_osa_service_cfg.h"
-
+#include "utilities/vsf_utilities.h"
 #include "./vsf_osa_service.h"
 
 /*============================ MACROS ========================================*/

@@ -20,7 +20,7 @@
 #include "./vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
-
+#define VSF_EDA_CLASS_INHERIT
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
@@ -43,10 +43,15 @@ struct __vsf_os_t {
     vsf_pool(vsf_evt_node_pool) node_pool;
 #   endif
 #endif
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+    vsf_pool(vsf_eda_frame_pool) eda_frame_pool;
+#endif
     const vsf_kernel_resource_t *res_ptr;
 };
 
 typedef struct __vsf_os_t __vsf_os_t;
+
+
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -63,14 +68,6 @@ WEAK_VSF_KERNEL_ERR_REPORT_EXTERN
 WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN
 #endif
 
-SECTION(".text.vsf.kernel.eda")
-#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-void vsf_kernel_init(   vsf_pool_block(vsf_eda_frame_pool) *frame_buf_ptr,
-                        uint_fast16_t count, vsf_prio_t highest_prio);
-#else
-void vsf_kernel_init(   vsf_prio_t highest_prio);
-#endif
-
 extern vsf_err_t vk_kernel_start(void);
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
@@ -83,6 +80,51 @@ extern const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
+
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
+
+SECTION(".text.vsf.kernel.vsf_eda_new_frame")
+__vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
+{
+    /* todo: add smart pool support in the future */
+#if 0
+    __vsf_eda_frame_t *frame =
+            VSF_POOL_ALLOC(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool);
+#else
+    __vsf_eda_frame_t *frame = 
+            vsf_heap_malloc_aligned(sizeof(__vsf_eda_frame_t) + local_size + sizeof(uintalu_t), 
+                                    sizeof(uintalu_t));
+#endif
+
+    if (frame != NULL) {
+        //! this is important, don't remove it.
+        memset(frame, 0, sizeof(__vsf_eda_frame_t) + local_size + sizeof(uintalu_t));
+
+        //! add watermark for local buffer overflow detection
+        *(uintalu_t *)
+            (   (uintptr_t)frame 
+            +   sizeof(__vsf_eda_frame_t) 
+            +   local_size) = 0xDEADBEEF;
+
+        frame->state.local_size = local_size;
+        //vsf_slist_init_node(__vsf_eda_frame_t, use_as__vsf_slist_node_t, frame);
+    }
+    return frame;
+}
+
+SECTION(".text.vsf.kernel.vsf_eda_free_frame")
+void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
+{
+    /* todo: add smart pool support in the future */
+#if 0
+    VSF_POOL_FREE(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool, frame);
+#else
+    vsf_heap_free(frame);
+#endif
+}
+#endif
+
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 implement_vsf_pool( vsf_evt_node_pool, vsf_evt_node_t)
 #endif
@@ -94,14 +136,52 @@ static void vsf_kernel_os_init(void)
     __vsf_os.res_ptr = vsf_kernel_get_resource_on_init();
     VSF_KERNEL_ASSERT(NULL != __vsf_os.res_ptr);
 
-//#if __VSF_OS_SWI_NUM > 0
+
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-    vsf_kernel_init(__vsf_os.res_ptr->frame_stack.frame_buf_ptr, 
-                    __vsf_os.res_ptr->frame_stack.frame_cnt,
-                    __vsf_os.res_ptr->arch.sched_prio.highest);
-#else
-    vsf_kernel_init(__vsf_os.res_ptr->arch.sched_prio.highest);
+    do {
+    #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+        VSF_POOL_PREPARE(vsf_eda_frame_pool, &(__vsf_eda.eda_frame_pool))
+            NULL,                                                               //!< target
+            (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,                       //!< region
+        END_VSF_POOL_PREPARE(vsf_eda_frame_pool)
+    #else
+        VSF_POOL_PREPARE(vsf_eda_frame_pool, &(__vsf_os.eda_frame_pool),
+            .pTarget = NULL,
+            .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
+        );
+    #endif
+    
+        if (    (NULL == __vsf_os.res_ptr->frame_stack.frame_buf_ptr) 
+            ||  (0 == __vsf_os.res_ptr->frame_stack.frame_cnt)) {
+            break;
+        }
+        
+        VSF_POOL_ADD_BUFFER(
+            vsf_eda_frame_pool,
+            &(__vsf_os.eda_frame_pool),
+            __vsf_os.res_ptr->frame_stack.frame_buf_ptr,
+            sizeof(vsf_pool_block(vsf_eda_frame_pool)) * __vsf_os.res_ptr->frame_stack.frame_cnt
+        );
+    } while(0);
 #endif
+
+//#if __VSF_OS_SWI_NUM > 0
+    {   
+    //! configure systimer priority (using higest+1 or highest)
+    #if __VSF_OS_SWI_NUM > 0
+        vsf_arch_prio_t priorit = 
+            __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
+                __vsf_os.res_ptr->arch.swi_priority_cnt - 1];
+    #else
+        vsf_arch_prio_t priorit = vsf_arch_prio_highest;
+    #endif
+    
+        vsf_kernel_cfg_t tCFG = {
+            __vsf_os.res_ptr->arch.sched_prio.highest,                          //!< highest priority
+            priorit,                                                            //!< systimer priority
+        };
+        vsf_kernel_init(&tCFG);
+    }
 //#endif
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
@@ -165,9 +245,11 @@ vsf_prio_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis)
 
 vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
 {
+#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
     uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
     VSF_KERNEL_ASSERT((     pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
+#endif
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
     if (vsf_prio_0 == priority) {
@@ -200,10 +282,11 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
 
 vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
 {
+#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
     uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
     VSF_KERNEL_ASSERT(      (pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
-#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
+
     if (index >= __vsf_os.res_ptr->arch.sched_prio.begin) {
         __vsf_os_evtq_set_priority(pthis, (vsf_prio_t)index);
     }
@@ -214,11 +297,11 @@ vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
 
 vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
 {
+#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
     uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
     VSF_KERNEL_ASSERT(      (pthis != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
-#if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
     if (index >= __vsf_os.res_ptr->arch.sched_prio.begin) {
         index -= __vsf_os.res_ptr->arch.sched_prio.begin;
         vsf_swi_trigger(index);
@@ -355,25 +438,12 @@ void __vsf_kernel_os_start(void)
     }
 #endif
 
-    //! configure systimer priority (using higest+1 or highest)
-    {
-#if __VSF_OS_SWI_NUM > 0
-        vsf_arch_prio_t priorit = 
-            __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
-                __vsf_os.res_ptr->arch.swi_priority_cnt - 1];
-#else
-        vsf_arch_prio_t priorit = vsf_arch_prio_highest;
-#endif
-
-        vsf_systimer_prio_set(priorit);
-    }
-
     vk_kernel_start();
 
-#ifndef WEAK_VSF_HAL_ADVANCE_INIT
-    vsf_hal_advance_init();
+#ifndef WEAK_VSF_OSA_HAL_INIT
+    vsf_osa_hal_init();
 #else
-    WEAK_VSF_HAL_ADVANCE_INIT();
+    WEAK_VSF_OSA_HAL_INIT();
 #endif
 #ifndef WEAK___POST_VSF_KERNEL_INIT
     __post_vsf_kernel_init();

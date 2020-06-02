@@ -19,7 +19,8 @@
 
 #include "./usrapp_audio_common.h"
 
-#if VSF_USE_AUDIO == ENABLED
+#if     VSF_USE_AUDIO == ENABLED                                                \
+    &&  (VSF_USE_WINSOUND == ENABLED)
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -45,5 +46,5 @@ usrapp_audio_common_t usrapp_audio_common = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#endif      // VSF_USE_AUDIO
+#endif      // VSF_USE_AUDIO && (VSF_USE_WINSOUND)
 /* EOF */

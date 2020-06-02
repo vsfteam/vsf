@@ -33,6 +33,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE == ENABLED
@@ -74,6 +78,10 @@ def_simple_class(vsf_eda_slist_queue_t) {
 
 #if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
 extern vsf_err_t vsf_eda_slist_queue_init(vsf_eda_slist_queue_t *pthis, uint_fast16_t max);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

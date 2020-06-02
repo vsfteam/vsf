@@ -199,7 +199,6 @@ bool vsf_pool_add_buffer(   vsf_pool_t *ptThis,
     return vsf_pool_add_buffer_ex(ptThis, pBuffer, wBufferSize, wItemSize, NULL);
 }
 
-#if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
@@ -249,7 +248,6 @@ extern int posix_memalign(  void ** /*ret*/,
 #endif
     return pMemory;
 }
-#endif
 #endif
 
 /*! \brief try to fetch a memory block from the target pool

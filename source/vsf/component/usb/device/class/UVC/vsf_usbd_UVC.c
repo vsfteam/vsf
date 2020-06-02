@@ -137,6 +137,7 @@ vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast
     vk_usbd_trans_t *trans = &uvc->trans_in;
 
     trans->ep = uvc->ep_in;
+    trans->feature = USB_DC_FEATURE_TRANSFER;
     trans->use_as__vsf_mem_t.pchBuffer = buffer;
     trans->use_as__vsf_mem_t.nSize = size;
     trans->zlp = false;

@@ -37,6 +37,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define VSF_USBIP_DCD_CFG_BACKEND_WIN   1
@@ -357,7 +361,7 @@ extern uint_fast8_t vk_usbip_usbd_get_mframe_number(vk_usbip_dcd_t *usbd);
 extern void vk_usbip_usbd_get_setup(vk_usbip_dcd_t *usbd, uint8_t *buffer);
 extern void vk_usbip_usbd_status_stage(vk_usbip_dcd_t *usbd, bool is_in);
 
-extern uint_fast8_t vk_usbip_usbd_ep_get_feature(vk_usbip_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast8_t vk_usbip_usbd_ep_get_feature(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint_fast8_t feature);
 extern vsf_err_t vk_usbip_usbd_ep_add(vk_usbip_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
 extern uint_fast16_t vk_usbip_usbd_ep_get_size(vk_usbip_dcd_t *usbd, uint_fast8_t ep);
 
@@ -376,6 +380,10 @@ extern vsf_err_t vk_usbip_usbd_ep_transfer_recv(vk_usbip_dcd_t *usbd, uint_fast8
 extern vsf_err_t vk_usbip_usbd_ep_transfer_send(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
 
 extern void vk_usbip_usbd_irq(vk_usbip_dcd_t *usbd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

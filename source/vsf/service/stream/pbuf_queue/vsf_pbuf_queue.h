@@ -43,6 +43,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -112,6 +116,10 @@ vsf_err_t vsf_pbuf_queue_data_available_event_register(
 extern 
 vsf_err_t vsf_pbuf_queue_data_drain_event_register(
     vsf_stream_fifo_t *ptObj, vsf_stream_dat_drn_evt_t tEventHandling);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

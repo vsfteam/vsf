@@ -20,13 +20,15 @@
 #define VSF_FS_INHERIT
 #include "vsf.h"
 
+#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __usrapp_on_file_read(uintptr_t target, vsf_evt_t evt);
-static void __usrapp_on_file_write(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __usrapp_on_file_read)
+dcl_vsf_peda_methods(static, __usrapp_on_file_write)
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -52,53 +54,49 @@ vk_fakefat32_file_t fakefat32_root[3] = {
         .name               = "control.bin",
         .size               = 1,
         .attr               = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
-        .callback.read      = __usrapp_on_file_read,
-        .callback.write     = __usrapp_on_file_write,
+        .callback.read      = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_read),
+        .callback.write     = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_write),
     },
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __usrapp_on_file_read(uintptr_t target, vsf_evt_t evt)
+vsf_component_peda_ifs_entry(__usrapp_on_file_read, vk_memfs_callback_read)
 {
-    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
-    uint8_t *buff = vk_file_get_ctx(&file->use_as__vk_file_t)->io.buff;
-    vsf_err_t err;
+    vsf_peda_begin();
+    uint8_t *buff = vsf_local.buff;
     int_fast32_t rlen;
 
-    if ((file->ctx.io.offset == 0) && (file->ctx.io.size > 1)) {
+    if ((vsf_local.offset == 0) && (vsf_local.size > 1)) {
         buff[0] = __control;
         vsf_trace(VSF_TRACE_INFO, "read control: %d" VSF_TRACE_CFG_LINEEND, __control);
         rlen = 1;
-        err = VSF_ERR_NONE;
     } else {
-        rlen = 0;
-        err = VSF_ERR_FAIL;
+        rlen = VSF_ERR_FAIL;
     }
 
-    vk_file_set_io_result(&file->use_as__vk_file_t, err, rlen);
-    vk_fakefat32_return(file, err);
+    vsf_eda_return(rlen);
+    vsf_peda_end();
 }
 
-static void __usrapp_on_file_write(uintptr_t target, vsf_evt_t evt)
+vsf_component_peda_ifs_entry(__usrapp_on_file_write, vk_memfs_callback_write)
 {
-    vk_fakefat32_file_t *file = (vk_fakefat32_file_t *)target;
-    uint8_t *buff = vk_file_get_ctx(&file->use_as__vk_file_t)->io.buff;
-    vsf_err_t err;
+    vsf_peda_begin();
+    uint8_t *buff = vsf_local.buff;
     int_fast32_t wlen;
 
-    if ((file->ctx.io.offset == 0) && (file->ctx.io.size == 1)) {
+    if ((vsf_local.offset == 0) && (vsf_local.size == 1)) {
         __control = buff[0];
         vsf_trace(VSF_TRACE_INFO, "write control: %d" VSF_TRACE_CFG_LINEEND, __control);
         wlen = 1;
-        err = VSF_ERR_NONE;
     } else {
-        wlen = 0;
-        err = VSF_ERR_FAIL;
+        wlen = VSF_ERR_FAIL;
     }
 
-    vk_file_set_io_result(&file->use_as__vk_file_t, err, wlen);
-    vk_fakefat32_return(file, err);
+    vsf_eda_return(wlen);
+    vsf_peda_end();
 }
+
+#endif
 
 /* EOF */

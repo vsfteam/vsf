@@ -25,6 +25,11 @@
 //#include "./vsf_kernel_common.h"
 #include "./vsf_evtq.h"
 #include "./task/vsf_task.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 typedef vsf_arch_prio_t vsf_sched_lock_status_t;
@@ -90,6 +95,11 @@ declare_vsf_pool(vsf_evt_node_pool)
 def_vsf_pool(vsf_evt_node_pool, vsf_evt_node_t)
 #endif
 
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+declare_vsf_pool(vsf_eda_frame_pool)
+def_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
+#endif
+
 struct vsf_kernel_resource_t {
 
     struct {
@@ -151,6 +161,10 @@ extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 #if __VSF_OS_SWI_NUM > 0
 extern vsf_sched_lock_status_t vsf_forced_sched_lock(void);
 extern void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

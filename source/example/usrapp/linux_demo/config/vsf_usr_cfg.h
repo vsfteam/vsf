@@ -69,7 +69,7 @@
 //      <h> Schedule Policy
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
+#define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                   ENABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
@@ -280,7 +280,7 @@ enum {
 
 #   define VSF_LINUX_CFG_STACKSIZE                      8192
 #   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
-#   define VSH_ECHO                                     0
+#   define VSH_ECHO                                     1
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *

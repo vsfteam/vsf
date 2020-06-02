@@ -3,6 +3,10 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define _NSIG           32
 
 typedef struct {
@@ -83,5 +87,9 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
 
 int kill(pid_t pid, int sig);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

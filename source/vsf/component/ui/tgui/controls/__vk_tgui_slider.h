@@ -22,6 +22,8 @@
 #include "./__vsf_tgui_controls_common.h"
 #include "./vsf_tgui_control.h"
 
+#if VSF_TGUI_CFG_SUPPORT_SLIDER == ENABLED
+
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
@@ -33,20 +35,27 @@
 #elif   defined(__VK_TGUI_CONTROLS_SLIDER_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
 #   undef __VK_TGUI_CONTROLS_SLIDER_CLASS_INHERIT
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+#if VSF_TGUI_CFG_SUPPORT_TIMER == DISABLED
+#   error tgui_slider depends on tgui_timer service, please either enable \
+tgui_timer by setting VSF_TGUI_CFG_SUPPORT_TIMER to ENABLED or disable \
+tgui_slider by setting VSF_TGUI_CFG_SUPPORT_SLIDER to DISABLED
+#endif
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 declare_class(__vk_tgui_slider_t)
 
 def_class(__vk_tgui_slider_t,
-    
+
     public_member(
-        uint16_t            hwSpeed; 
+        uint16_t            hwSpeed;
         uint16_t            hwAcceleration;
     )
 
@@ -70,23 +79,49 @@ end_def_class(__vk_tgui_slider_t)
 /*============================ PROTOTYPES ====================================*/
 
 extern
-void vk_tgui_slider_init(   __vk_tgui_slider_t *ptSlider, 
+void vk_tgui_slider_init(   __vk_tgui_slider_t *ptSlider,
                             const vsf_tgui_control_t *ptHost,
                             uint_fast8_t chFrameRatePerSec);
 
-extern 
+extern
 int_fast16_t vk_tgui_slider_on_timer_event_handler(__vk_tgui_slider_t *ptSlider);
 
 extern
-int_fast16_t vk_tgui_slider_location_target_set(  __vk_tgui_slider_t *ptSlider, 
-                                                    int_fast16_t iLocation);
+bool vk_tgui_slider_is_working(__vk_tgui_slider_t *ptSlider);
 
-extern 
+extern
+int_fast16_t vk_tgui_slider_location_set(   __vk_tgui_slider_t *ptSlider,
+                                            int_fast16_t iTarget,
+                                            int_fast16_t iCurrent);
+
+extern
+int_fast16_t vk_tgui_slider_location_target_set(  __vk_tgui_slider_t *ptSlider,
+                                                    int_fast16_t iLocation);
+extern
+int_fast16_t vk_tgui_slider_location_target_get( __vk_tgui_slider_t *ptSlider);
+
+extern
+int_fast16_t vk_tgui_slider_location_target_increase( __vk_tgui_slider_t *ptSlider,
+                                                        int_fast16_t iOffset);
+
+extern
 int_fast16_t vk_tgui_slider_location_current_get( __vk_tgui_slider_t *ptSlider);
 
-extern 
+extern
 int_fast16_t vk_tgui_slider_location_current_set( __vk_tgui_slider_t *ptSlider,
                                                     int_fast16_t iLocation);
+
+extern
+int_fast16_t vk_tgui_slider_location_current_increase( __vk_tgui_slider_t *ptSlider,
+                                                        int_fast16_t iOffset);
+
+extern
+int_fast16_t vk_tgui_slider_location_get_distance( __vk_tgui_slider_t *ptSlider);
+
+extern
+int_fast16_t vk_tgui_slider_reset(__vk_tgui_slider_t *ptSlider);
+
+#endif
 #endif
 /* EOF */
 

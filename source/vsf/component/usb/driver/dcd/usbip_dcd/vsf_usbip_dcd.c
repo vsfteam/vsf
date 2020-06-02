@@ -27,6 +27,8 @@
 // TODO: use dedicated include
 #include "vsf.h"
 
+#include <Windows.h>
+
 /*============================ MACROS ========================================*/
 
 #define VSF_USBIP_VERSION                       0x0111
@@ -419,7 +421,7 @@ static void __vk_usbip_usbd_transfer_send(vk_usbip_dcd_t *usbd, vk_usbip_dcd_ep_
         urb->rep.actual_length += real_size;
 
         if ((!urb->mem.nSize || __vk_usbip_usbd_is_short(dcd_ep, real_size)) && (urb->req.ep != 0)) {
-            vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
+            vsf_dlist_remove(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
             vsf_eda_post_msg(&__vk_usbip_server.teda.use_as__vsf_eda_t, urb);
         }
 
@@ -443,7 +445,7 @@ static void __vk_usbip_usbd_transfer_recv(vk_usbip_dcd_t *usbd, vk_usbip_dcd_ep_
         urb->rep.actual_length += real_size;
 
         if ((!urb->mem.nSize) && (urb->req.ep != 0)) {
-            vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
+            vsf_dlist_remove(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
             vsf_eda_post_msg(&__vk_usbip_server.teda.use_as__vsf_eda_t, urb);
         }
 
@@ -582,7 +584,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &server->urb_free_list, urb);
             vsf_unprotect_int(orig);
             if (urb != NULL) {
-                vsf_dlist_remove_head(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
+                vsf_dlist_remove(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
                 if (urb->dynmem.pchBuffer != NULL) {
                     vsf_heap_free(urb->dynmem.pchBuffer);
                 }
@@ -660,8 +662,6 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         urb->dynmem.nSize = urb->req.transfer_length;
                         urb->dynmem.pchBuffer = vsf_heap_malloc(urb->dynmem.nSize);
                         VSF_USB_ASSERT(urb->dynmem.pchBuffer != NULL);
-                    } else {
-                        urb->dynmem.pchBuffer = NULL;
                     }
                     urb->mem = urb->dynmem;
                     if (!urb->req.direction && urb->req.transfer_length) {
@@ -831,6 +831,9 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 } desc;
                 desc.ptr = (void *)&server->rep;
                 vk_usbip_rep_dev_t *dev = &server->dev;
+
+                // remove from server->urb_list, because urb will not be put into done_list and free_list
+                vsf_dlist_remove(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
 
                 switch (server->rep_state) {
                 case VSF_USBIP_SERVER_REP_DEVLIST_DEV:
@@ -1010,7 +1013,7 @@ void vk_usbip_usbd_status_stage(vk_usbip_dcd_t *usbd, bool is_in)
     vsf_eda_post_msg(&__vk_usbip_server.teda.use_as__vsf_eda_t, urb);
 }
 
-uint_fast8_t vk_usbip_usbd_ep_get_feature(vk_usbip_dcd_t *usbd, uint_fast8_t ep)
+uint_fast8_t vk_usbip_usbd_ep_get_feature(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint_fast8_t feature)
 {
     return USB_DC_FEATURE_TRANSFER;
 }
@@ -1079,7 +1082,6 @@ vsf_err_t vk_usbip_usbd_ep_transaction_write_buffer(vk_usbip_dcd_t *usbd, uint_f
 vsf_err_t vk_usbip_usbd_ep_transfer_recv(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
 {
     vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep(usbd, ep | USB_DIR_OUT);
-    vk_usbip_urb_t *urb = __vk_usbip_usbd_peek_urb(dcd_ep);
     dcd_ep->transfer.mem.pchBuffer = buffer;
     dcd_ep->transfer.mem.nSize = size;
     dcd_ep->transfer.size = size;

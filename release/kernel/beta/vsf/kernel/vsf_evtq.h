@@ -33,7 +33,7 @@ struct vsf_evtq_ctx_t {
 };
 typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
 
-#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 
 typedef struct vsf_evt_node_t vsf_evt_node_t;
 typedef struct vsf_evtq_t vsf_evtq_t;
@@ -91,7 +91,7 @@ struct vsf_evtq_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_KERNEL_CFG_SUPPORT_PREMPT == ENABLED
+#if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 extern void vsf_evtq_on_eda_init(vsf_eda_t *eda);
 extern void vsf_evtq_on_eda_fini(vsf_eda_t *eda);
 

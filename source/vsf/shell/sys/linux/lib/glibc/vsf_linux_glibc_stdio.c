@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 
 #define VSF_LINUX_INHERIT
 
@@ -75,7 +75,7 @@ FILE * fopen(const char *filename, const char *mode)
     if (fd < 0) {
         return NULL;
     }
-    return vsf_linux_get_fd(fd);
+    return (FILE *)vsf_linux_get_fd(fd);
 }
 
 int fclose(FILE *f)
@@ -91,32 +91,11 @@ int fclose(FILE *f)
 
 int fseek(FILE *f, long offset, int fromwhere)
 {
-    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
-    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-    uint64_t new_pos;
-
-    switch (fromwhere) {
-    case SEEK_SET:
-        new_pos = 0;
-        break;
-    case SEEK_CUR:
-        new_pos = priv->pos;
-        break;
-    case SEEK_END:
-        new_pos = priv->file->size;
-        break;
-    default:
-        VSF_LINUX_ASSERT(false);
+    int fd = __get_fd(f);
+    if (fd < 0) {
         return -1;
     }
-
-    new_pos += offset;
-    if (new_pos > priv->file->size) {
-        return -1;
-    }
-    priv->pos = new_pos;
-    return 0;
+    return lseek(fd, offset, fromwhere);
 }
 
 long ftell(FILE *f)
@@ -143,7 +122,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
     return (size_t)ret;
 }
 
-size_t fread(const void *ptr, size_t size, size_t nmemb, FILE *f)
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 {
     ssize_t ret;
     int fd = __get_fd(f);
@@ -156,6 +135,32 @@ size_t fread(const void *ptr, size_t size, size_t nmemb, FILE *f)
         ret = 0;
     }
     return (size_t)ret;
+}
+
+char * fgets(char *str, int n, FILE *f)
+{
+    char *result = str;
+    int rsize = 0;
+
+    while (rsize < n - 1) {
+        if (fread(str, 1, 1, f) != 1) {
+            break;
+        }
+        rsize++;
+        str++;
+        if ('\n' == str[-1]) {
+            break;
+        }
+    }
+    str[0] = '\0';
+    return rsize > 0 ? result : NULL;
+}
+
+// insecure
+char * gets(char *str)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
 }
 
 int fputs(const char *str, FILE *f)

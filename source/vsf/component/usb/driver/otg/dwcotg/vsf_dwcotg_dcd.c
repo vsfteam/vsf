@@ -294,7 +294,7 @@ void vk_dwcotg_usbd_status_stage(vk_dwcotg_dcd_t *usbd, bool is_in)
     }
 }
 
-uint_fast8_t vk_dwcotg_usbd_ep_get_feature(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep)
+uint_fast8_t vk_dwcotg_usbd_ep_get_feature(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast8_t feature)
 {
     return USB_DC_FEATURE_TRANSFER;
 }

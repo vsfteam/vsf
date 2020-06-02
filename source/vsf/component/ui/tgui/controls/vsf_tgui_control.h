@@ -29,10 +29,10 @@
 #if     defined(__VSF_TGUI_CONTROLS_CONTROL_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT
 #   undef __VSF_TGUI_CONTROLS_CONTROL_CLASS_IMPLEMENT
-#elif   defined(__VSF_TGUI_CONTROLS_CONTROLE_CLASS_INHERIT)
+#elif   defined(__VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT)
 #   define __PLOOC_CLASS_INHERIT
-#   undef __VSF_TGUI_CONTROLS_CONTROLE_CLASS_INHERIT
-#endif   
+#   undef __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
+#endif
 
 #include "utilities/ooc_class.h"
 
@@ -48,7 +48,7 @@
             (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
         }
 
-#define __VSF_TGUI_INTERFACE_CONTROLS_CONTAINER           {                           \
+#define __VSF_TGUI_INTERFACE_CONTROLS_CONTAINER           {                     \
             {                                                                   \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_container_msg_handler        \
@@ -57,7 +57,7 @@
             (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
         }
 #else
-#define __VSF_TGUI_INTERFACE_CONTROLS_CONTROL         {                               \
+#define __VSF_TGUI_INTERFACE_CONTROLS_CONTROL         {                         \
             .tMessageHandler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_control_msg_handler,         \
@@ -67,10 +67,10 @@
             .Shoot = (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot,        \
         }
 
-#define __VSF_TGUI_INTERFACE_CONTROLS_CONTAINER           {                           \
+#define __VSF_TGUI_INTERFACE_CONTROLS_CONTAINER           {                     \
             .tMessageHandler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_control_msg_handler,         \
+                (vsf_msgt_method_fsm_t *)&vsf_tgui_container_msg_handler,       \
             },                                                                  \
             .Status = (vsf_msgt_method_status_t *)                              \
                         &vsf_tgui_control_status_get,                           \
@@ -110,7 +110,9 @@
                 .pchNodeName = "["#__TYPE"]["#__NAME"]",                        \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
 #   define __tgui_control_base_const( __NAME,                                   \
@@ -133,7 +135,9 @@
                 .pchNodeName = "["#__TYPE"]["#__NAME"]",                        \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
 #else
@@ -156,7 +160,9 @@
                 },                                                              \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
 #   define __tgui_control_base_const( __NAME,                                   \
@@ -178,7 +184,9 @@
                 },                                                              \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 #endif
 #else
@@ -201,7 +209,9 @@
                 .pchNodeName = "["#__TYPE"]["#__NAME"]",                        \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
 #   define __tgui_control_base_const( __NAME,                                   \
@@ -222,7 +232,9 @@
                 .pchNodeName = "["#__TYPE"]["#__NAME"]",                        \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
 #else
@@ -243,7 +255,9 @@
                 },                                                              \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 
 #   define __tgui_control_base_const( __NAME,                                   \
@@ -263,7 +277,9 @@
                 },                                                              \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
                 __VA_ARGS__                                                     \
+                VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE                         \
             }
 #endif
 #endif
@@ -283,7 +299,7 @@
                         (__PARENT_ADDR),                                        \
                         __PREVIOUS,                                             \
                         __NEXT,                                                 \
-                        __VA_ARGS__)  
+                        __VA_ARGS__)
 
 #define tgui_control_base_const(   __NAME,                                      \
                         __ID,                                                   \
@@ -299,7 +315,7 @@
                         (__PARENT_ADDR),                                        \
                         __PREVIOUS,                                             \
                         __NEXT,                                                 \
-                        __VA_ARGS__) 
+                        __VA_ARGS__)
 
 
 #define __tgui_control(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)          \
@@ -309,14 +325,14 @@
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            __VA_ARGS__)
 
 #define tgui_control(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)            \
             __tgui_control(   __NAME,                                           \
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            __VA_ARGS__)
 
 #define __tgui_control_const(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)    \
             tgui_control_base_const(__NAME,                                     \
@@ -325,7 +341,7 @@
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
-                            __VA_ARGS__)  
+                            __VA_ARGS__)
 
 #define tgui_control_const(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)      \
             __tgui_control_const(   __NAME,                                     \
@@ -366,7 +382,10 @@
                                 "[vsf_tgui_container_t]["#__NAME"]",            \
                             .bIsEnabled = true,                                 \
                             .bIsVisible = true,                                 \
-                            __VA_ARGS__)  
+                            VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT            \
+                            __VA_ARGS__                                         \
+                            VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE           \
+                            )
 #else
 #   define __tgui_container(   __NAME,                                          \
                             __PARENT_ADDR,                                      \
@@ -384,7 +403,10 @@
                                &((__PARENT_ADDR)->__NAME.__NAME##_FirstNode),   \
                             .bIsEnabled = true,                                 \
                             .bIsVisible = true,                                 \
-                            __VA_ARGS__) 
+                            VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT            \
+                            __VA_ARGS__                                         \
+                            VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE           \
+                            )
 #endif
 
 #define tgui_container( __NAME,                                                 \
@@ -399,7 +421,7 @@
                             __VA_ARGS__)
 
 #endif
-            
+
 /*============================ TYPES =========================================*/
 
 
@@ -407,7 +429,7 @@
 typedef union vsf_tgui_status_t {
     uint8_t chStatus;
     struct {
-        //! \name Status bits 
+        //! \name Status bits
         //! @{
         uint8_t bIsInitialised                  : 1;
         uint8_t bIsEnabled                      : 1;
@@ -417,11 +439,12 @@ typedef union vsf_tgui_status_t {
         uint8_t bIsControlTransparent           : 1;
         uint8_t                                 : 2;
         //! @}
-        
+
         //! \name internal bits
         //! @{
         uint8_t __bIsTheFirstRefreshNode        : 1;
-        uint8_t                                 : 7;
+        uint8_t __bContainBuiltInStructure      : 1;
+        uint8_t                                 : 6;
         //! @}
     } tValues;
 }vsf_tgui_status_t;
@@ -434,6 +457,8 @@ typedef struct vsf_tgui_control_subcall_t {
     vsf_tgui_control_t          *ptControl;
 } vsf_tgui_control_subcall_t;
 
+typedef fsm_rt_t vsf_tgui_controal_fsm_t(vsf_tgui_control_t* ptNode, vsf_tgui_msg_t* ptMSG);
+
 typedef struct vsf_tgui_control_handler_t {
     uint16_t    u2Type              : 2;                    //!< vsf_msgt_handler_type_t
     uint16_t                        : 4;
@@ -441,7 +466,7 @@ typedef struct vsf_tgui_control_handler_t {
 
     implement_ex(
         union {
-            fsm_rt_t(*FSM)      (vsf_tgui_control_t* ptNode, vsf_msgt_msg_t* ptMSG);
+            vsf_tgui_controal_fsm_t *FSM;
             vsf_eda_t* ptEDA;
             vsf_tgui_control_subcall_t* ptSubCall;
         },
@@ -484,7 +509,7 @@ def_class(__vsf_tgui_control_core_t,
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN == ENABLED
         struct {
             vsf_tgui_control_t *ptAlignTo;
-            
+
             /* \note Only following mode supported:
                     VSF_TGUI_ALIGN_LEFT     = _BV(0),
                     VSF_TGUI_ALIGN_RIGHT    = _BV(1),
@@ -513,7 +538,7 @@ def_class(__vsf_tgui_control_core_t,
             implement_ex(vsf_tgui_status_t, tStatus)
         )
         struct {
-            //! \name Status bits 
+            //! \name Status bits
             //! @{
             uint8_t                                 : 1;
             uint8_t bIsEnabled                      : 1;
@@ -549,10 +574,11 @@ def_class(vsf_tgui_container_t,
 
     implement_ex(
         struct {
-            uint8_t         u5Type      : 5;    /* vsf_tgui_container_type_t */
-            uint8_t         bIsAutoSize : 1;
-            uint8_t                     : 2;
-        }, 
+            uint8_t         u5Type                          : 5;    /* vsf_tgui_container_type_t */
+            uint8_t         bIsAutoSize                     : 1;
+            uint8_t         bIsForceRefreshWholeBackground  : 1;
+            uint8_t                                         : 1;
+        },
         tContainerAttribute
     )
 
@@ -564,7 +590,7 @@ def_class(vsf_tgui_container_t,
     vsf_tgui_margin_t       tConatinerPadding;
 #endif
 
-    
+
 )
 end_def_class(vsf_tgui_container_t)
 
@@ -594,6 +620,7 @@ typedef struct i_tgui_v_vtable_t{
     vsf_tgui_method_t          *Init;
     vsf_tgui_method_t          *Depose;
     vsf_tgui_v_method_render_t *Render;
+    vsf_tgui_v_method_render_t *ContainerPostRender;
     vsf_tgui_method_t          *Update;
 }i_tgui_v_vtable_t;
 
@@ -637,40 +664,48 @@ end_def_class(vsf_tgui_timer);
 /*============================ PROTOTYPES ====================================*/
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
 extern
-void vsf_tgui_timer_init(   vsf_tgui_timer_t *ptTimer, 
+void vsf_tgui_timer_init(   vsf_tgui_timer_t *ptTimer,
                             const vsf_tgui_control_t *ptControl);
 
 extern
 void vsf_tgui_timer_enable(vsf_tgui_timer_t *ptTimer);
 
-extern 
+extern
 void vsf_tgui_timer_disable(vsf_tgui_timer_t *ptTimer);
 
-extern 
+extern
 bool vsf_tgui_timer_is_working(vsf_tgui_timer_t *ptTimer);
 #endif
 /*----------------------------------------------------------------------------*
  *  Region                                                                    *
  *----------------------------------------------------------------------------*/
 extern 
+vsf_tgui_location_t *vsf_tgui_control_get_location(
+                                    const vsf_tgui_control_t* ptControl);
+
+extern 
+vsf_tgui_size_t *vsf_tgui_control_get_size(
+                                    const vsf_tgui_control_t* ptControl);
+
+extern
 bool vsf_tgui_control_is_in_range(  const vsf_tgui_region_t *ptRegion,
                                     const vsf_tgui_location_t *ptLocation);
 
-/*! \brief get the absolute location information base on the location information 
+/*! \brief get the absolute location information base on the location information
  *!        of or derived from target control.
  *! \param ptControl    the Target Control Address
  *! \param ptLocation   the Location buffer which has already stored the location
  *!                     information of or derived from the target control
  *! \return the location buffer address passed with ptLocation
- *! 
+ *!
  *! \note DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING!!!
  */
-extern 
+extern
 vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location(
                                                 const vsf_tgui_control_t *ptControl,
                                                 vsf_tgui_location_t *ptLocation);
 
-extern 
+extern
 vsf_tgui_region_t * vsf_tgui_get_absolute_control_region(
                                                 const vsf_tgui_control_t* ptControl,
                                                 vsf_tgui_region_t* ptRegionBuffer);
@@ -680,14 +715,14 @@ vsf_tgui_location_t * vsf_tgui_control_get_absolute_location(
                                             const vsf_tgui_control_t* ptControl,
                                             vsf_tgui_location_t* ptOffset);
 
-extern 
+extern
 vsf_tgui_region_t* vsf_tgui_control_get_absolute_region(
-                                                const vsf_tgui_control_t *ptControl, 
+                                                const vsf_tgui_control_t *ptControl,
                                                 vsf_tgui_region_t *ptRegion);
 
 extern
 vsf_tgui_region_t *vsf_tgui_control_generate_dirty_region_from_parent_dirty_region(
-                                    const vsf_tgui_control_t *ptParent, 
+                                    const vsf_tgui_control_t *ptParent,
                                     const vsf_tgui_region_t *ptParentDirtyRegion,
                                     const vsf_tgui_control_t *ptPrivate,
                                     vsf_tgui_region_t *ptNewDirtyRegionBuffer);
@@ -701,16 +736,16 @@ vsf_tgui_region_t *vsf_tgui_control_generate_dirty_region_from_parent_dirty_regi
  *! \retval false       invisible
  */
 extern
-bool vsf_tgui_control_get_visible_region(   const vsf_tgui_control_t* ptControl, 
+bool vsf_tgui_control_get_visible_region(   const vsf_tgui_control_t* ptControl,
                                             vsf_tgui_region_t* ptRegionBuffer);
 
-extern 
-vsf_tgui_region_t * vsf_tgui_control_get_relative_region(   
-                                        const vsf_tgui_control_t* ptControl, 
+extern
+vsf_tgui_region_t * vsf_tgui_control_get_relative_region(
+                                        const vsf_tgui_control_t* ptControl,
                                         vsf_tgui_region_t *ptAbsoluteRegion);
 
-extern 
-bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* ptControl, 
+extern
+bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* ptControl,
                                 const vsf_tgui_location_t *ptLocation);
 
 
@@ -721,19 +756,19 @@ bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* ptControl,
 /*! \brief update bIsControlTransparent bit in control status
  *! \parame ptControl target control address
  *! \retval true the original value of bIsControlTransparent is changed
- *! \retval false the set value is the same as the original value, no change is 
+ *! \retval false the set value is the same as the original value, no change is
  *!               made.
  */
 extern
-bool vsf_tgui_control_set_is_transparent_bit(   vsf_tgui_control_t* ptControl, 
+bool vsf_tgui_control_set_is_transparent_bit(   vsf_tgui_control_t* ptControl,
                                                 bool bIsControlTransparent);
 
-extern 
+extern
 vsf_tgui_status_t vsf_tgui_control_status_get(const vsf_tgui_control_t* ptControl);
 
 
-extern 
-void vsf_tgui_control_status_set(   vsf_tgui_control_t* ptControl, 
+extern
+void vsf_tgui_control_status_set(   vsf_tgui_control_t* ptControl,
                                     vsf_tgui_status_t tStatus);
 
 extern
@@ -752,9 +787,6 @@ uint_fast8_t vk_tgui_container_visible_item_get(
                                         const vsf_tgui_container_t *ptContainer);
 
 
-extern 
-vsf_tgui_size_t vsf_tgui_control_get_size(const vsf_tgui_control_t* ptControl);
-
 /*----------------------------------------------------------------------------*
  *  Methods and Others                                                        *
  *----------------------------------------------------------------------------*/
@@ -765,13 +797,17 @@ const vsf_tgui_control_t* __vk_tgui_control_get_next_visible_one_within_containe
 extern const vsf_tgui_top_container_t* vk_tgui_control_get_top(
                                         const vsf_tgui_control_t* ptControl);
 
-#if VSF_TGUI_CFG_SUPPORT_REFRESH_SCHEME == ENABLED
-extern 
-bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *ptControl, 
+#if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
+extern
+bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *ptControl,
                                 const vsf_tgui_region_t *ptRegion);
 #endif
 
-extern 
+extern
+bool vsf_tgui_control_send_message( const vsf_tgui_control_t* ptControl, 
+                                    vsf_tgui_evt_t tEvent);
+
+extern
 bool vsf_tgui_control_update(const vsf_tgui_control_t* ptControl);
 
 extern
@@ -794,10 +830,10 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* ptControl,
                                         const i_tgui_control_methods_t* ptMethods);
 
 extern
-fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* ptControl, 
+fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* ptControl,
                                                     const vsf_tgui_evt_t* ptEvent);
 
-extern 
+extern
 fsm_rt_t vk_tgui_control_init(vsf_tgui_control_t* ptControl);
 
 extern

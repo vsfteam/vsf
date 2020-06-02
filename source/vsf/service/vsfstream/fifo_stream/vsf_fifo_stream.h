@@ -36,6 +36,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -73,6 +77,10 @@ extern uint_fast32_t vsf_fifo_get_rbuf(vsf_fifo_t *fifo, uint8_t **data);
 extern uint_fast32_t vsf_fifo_get_buff_length(vsf_fifo_t *fifo);
 extern uint_fast32_t vsf_fifo_get_data_length(vsf_fifo_t *fifo);
 extern uint_fast32_t vsf_fifo_get_avail_length(vsf_fifo_t *fifo);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_SERVICE_VSFSTREAM
 #endif      // __VSF_FIFO_STREAM_H__

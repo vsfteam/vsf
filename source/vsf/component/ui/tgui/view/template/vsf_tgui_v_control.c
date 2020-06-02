@@ -21,7 +21,7 @@
 #if     VSF_USE_TINY_GUI == ENABLED \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
 
-#define __VSF_TGUI_CONTROLS_CONTROLE_CLASS_INHERIT
+#define __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
 #include "./vsf_tgui_v_control.h"
 #include "../../__vsf_tgui_control_types.h"
 

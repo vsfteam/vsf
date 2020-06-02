@@ -21,12 +21,10 @@
 #if     VSF_USE_TINY_GUI == ENABLED \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
-#define __VSF_TGUI_CONTROLS_CONTROLE_CLASS_INHERIT
+#define __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
 declare_class(vsf_tgui_t)
-#include "./vsf_tgui_sv_control.h"
-#include "./vsf_tgui_sv_draw.h"
 
-#include "../../utilities/vsf_tgui_color.h"
+#include "./vsf_tgui_sv_control.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -36,10 +34,17 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* ptControl)
+{
+    return ptControl->use_as__vsf_msgt_node_t.pchNodeName;
+}
+#endif
+
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* ptControl)
-{   
-#if VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]control init" VSF_TRACE_CFG_LINEEND);
+{
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view init" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(ptControl), ptControl);
 #endif
 
     /*
@@ -49,7 +54,7 @@ fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* ptControl)
                         VSF_TGUI_CTRL_STATUS_ENABLED;
 
     vsf_tgui_control_status_set((vsf_tgui_control_t *)ptControl, tStatus);
-    
+
     return vk_tgui_control_update(ptControl);
     */
     return fsm_rt_cpl;
@@ -65,8 +70,8 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* ptControl,
     VSF_TGUI_ASSERT(ptControl != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]control rendering" VSF_TRACE_CFG_LINEEND);
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(ptControl), ptControl);
 #endif
 
     ptCore = vsf_tgui_control_get_core(ptControl);
@@ -74,28 +79,6 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* ptControl,
     if (ptTile != NULL) {
         vsf_tgui_control_v_draw_tile(ptControl, ptDirtyRegion, ptTile, ptCore->tBackground.tAlign);
     }
-
-#if 0
-    do {
-        int16_t nLineWidth = 2;
-        int i;
-        vsf_tgui_size_t tSize = vsf_tgui_control_get_size(ptControl);
-        vsf_tgui_region_t tRectRegions[] = {
-            {.tLocation = {.iX = 0, .iY = 0}, .tSize = {.iWidth = tSize.iWidth, .iHeight = nLineWidth},},  // Top
-            {.tLocation = {.iX = 0, .iY = tSize.iHeight - nLineWidth},  .tSize = {.iWidth = tSize.iWidth, .iHeight = nLineWidth},}, // bottom
-            {.tLocation = {.iX = 0, .iY = nLineWidth}, .tSize = {.iWidth = nLineWidth, .iHeight = tSize.iHeight - 2 * nLineWidth},}, // left
-            {.tLocation = {.iX = tSize.iWidth - nLineWidth, .iY = nLineWidth}, .tSize = {.iWidth = nLineWidth, .iHeight = tSize.iHeight - 2 * nLineWidth},}, // right
-        };
-        vsf_tgui_color_t tColor = VSF_TGUI_COLOR_BLACK; 
-
-        for (i = 0; i < dimof(tRectRegions); i++) {
-            vsf_tgui_control_v_draw_rect(ptControl,
-                                         ptDirtyRegion,
-                                         &tRectRegions[i],
-                                         tColor);
-        }
-    } while (0);
-#endif
 
     return fsm_rt_cpl;
 }

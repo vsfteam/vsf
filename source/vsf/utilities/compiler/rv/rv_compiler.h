@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2020 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -68,6 +68,10 @@
 #include "./type.h"
 #include "../__common/__compiler.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_IAR__
@@ -145,12 +149,16 @@ typedef uint32_t   vsf_gint_state_t;
 #endif
 
 /*============================ TYPES =========================================*/
+/*============================ PROTOTYPES ====================================*/
+extern void vsf_stdio_init(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 /*============================ INCLUDES ======================================*/
 
 //! \brief for interrupt 
 #include "./signal.h"
-
-/*============================ PROTOTYPES ====================================*/
-extern void vsf_stdio_init(void);
 
 #endif

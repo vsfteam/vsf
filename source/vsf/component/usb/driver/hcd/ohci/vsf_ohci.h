@@ -26,6 +26,10 @@
 #include "component/usb/host/vsf_usbh.h"
 #include "hal/interface/vsf_interface_usb.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_OHCI_CFG_SETUP_CONTROL == ENABLED
@@ -50,6 +54,9 @@ extern const vk_usbh_hcd_drv_t vk_ohci_drv;
 
 void vk_ohci_init(void);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif // __VSF_OHCI_H___

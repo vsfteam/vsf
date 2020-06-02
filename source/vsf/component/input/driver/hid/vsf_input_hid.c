@@ -72,7 +72,7 @@ struct hid_desc_t {
     int usage_min;
     int usage_max;
     int generic_usage;
-    int usages[16];
+    int usages[32];
 };
 typedef struct hid_desc_t hid_desc_t;
 
@@ -359,6 +359,8 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                 if ((desc->generic_usage == 0) && (desc->collection == 0)) {
                     desc->generic_usage = value;
                 }
+            } else {
+                VSF_INPUT_ASSERT(false);
             }
             break;
 
@@ -404,6 +406,7 @@ void vk_hid_free_dev(vk_input_hid_t *dev)
         }
         vsf_heap_free(_);
     }
+    vsf_slist_init(&dev->report_list);
 }
 
 static uint_fast32_t vk_hid_get_max_input_size(vk_input_hid_t *dev)

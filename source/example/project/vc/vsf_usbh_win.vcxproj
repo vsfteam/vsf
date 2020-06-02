@@ -132,8 +132,8 @@
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDCACM.h" />
@@ -188,6 +188,13 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_peripheral.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h" />
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h" />
@@ -345,8 +352,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.c" />
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.c" />
@@ -374,6 +381,8 @@
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
+    <ClCompile Include="..\..\..\vsf\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c" />
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c" />
@@ -476,6 +485,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\usbh_demo_win;$(ProjectDir)..\..\usrapp\usbh_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions -fmacro-backtrace-limit=0  -Wno-microsoft-include %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

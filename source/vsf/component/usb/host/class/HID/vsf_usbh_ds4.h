@@ -35,6 +35,10 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_USB_HOST_HID != ENABLED
@@ -67,6 +71,10 @@ extern const vk_usbh_class_drv_t vk_usbh_ds4_drv;
 extern bool vk_usbh_ds4_can_output(vk_usbh_ds4_t *ds4);
 extern void vk_usbh_ds4_set_rumble(vk_usbh_ds4_t *ds4, uint_fast8_t left, uint_fast8_t right);
 extern void vk_usbh_ds4_set_led(vk_usbh_ds4_t *ds4, uint_fast8_t r, uint_fast8_t g, uint_fast8_t b);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_DS4
 #endif      // __VSF_USBH_DS4_H__

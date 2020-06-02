@@ -33,6 +33,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -86,6 +90,10 @@ extern void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vk_usbh_cdc_prepare_urb(vk_usbh_cdc_t *pthis, bool tx, vk_usbh_urb_t *urb);
 extern vsf_err_t vk_usbh_cdc_submit_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb);
 extern void vk_usbh_cdc_free_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb);
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #undef VSF_USBH_CDC_IMPLEMENT

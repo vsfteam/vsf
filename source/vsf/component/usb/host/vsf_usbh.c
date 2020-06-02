@@ -165,6 +165,11 @@ vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
     uint_fast8_t direction = endpoint & USB_DIR_MASK;
     vk_usbh_pipe_t pipe;
 
+    if ((type & 0x03) == USB_EP_TYPE_ISO) {
+        // epsize of ISO is 1K max, avoid to overflow 10-bit size in pipe
+        size -= 1;
+    }
+
     endpoint &= 0x0F;
     pipe.value =   1|   (size << 2)             /* 10-bit size */
                     |   (endpoint << 12)        /* 4-bit endpoint */
@@ -652,20 +657,47 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
 
 vsf_err_t vk_usbh_submit_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb)
 {
+    VSF_USB_ASSERT(vk_usbh_urb_is_alloced(urb));
     return __vk_usbh_submit_urb_imp(usbh, urb, NULL);
 }
 
 vsf_err_t vk_usbh_submit_urb_flags(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags)
 {
+    VSF_USB_ASSERT(vk_usbh_urb_is_alloced(urb));
     urb->urb_hcd->transfer_flags = flags;
     return vk_usbh_submit_urb(usbh, urb);
 }
 
 vsf_err_t vk_usbh_submit_urb_ex(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda)
 {
+    VSF_USB_ASSERT(vk_usbh_urb_is_alloced(urb));
     urb->urb_hcd->transfer_flags = flags;
     return __vk_usbh_submit_urb_imp(usbh, urb, eda);
 }
+
+#if VSF_USBH_CFG_ISO_EN == ENABLED
+vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast8_t start_frame)
+{
+    VSF_USB_ASSERT(vk_usbh_urb_is_alloced(urb));
+    vk_usbh_hcd_iso_packet_t *iso_packet = &urb->urb_hcd->iso_packet;
+    vk_usbh_hcd_iso_packet_descriptor_t *frame_desc = iso_packet->frame_desc;
+    int_fast32_t size = urb->urb_hcd->transfer_length, cur_offset = 0;
+    uint_fast16_t ep_size = urb->urb_hcd->pipe.size + 1, cur_size;
+
+    VSF_USB_ASSERT(size <= ep_size * dimof(iso_packet->frame_desc));
+    iso_packet->start_frame = start_frame;
+    iso_packet->number_of_packets = 0;
+    while (size > 0) {
+        iso_packet->number_of_packets++;
+        cur_size = min(ep_size, size);
+        frame_desc->length = cur_size;
+        frame_desc->offset = cur_offset;
+        size -= cur_size;
+        cur_offset += cur_size;
+    }
+    return vk_usbh_submit_urb(usbh, urb);
+}
+#endif
 
 static vk_usbh_urb_t * __vk_usbh_control_msg_common(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             struct usb_ctrlrequest_t *req)
@@ -811,11 +843,11 @@ __vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
     const vk_usbh_class_drv_t *drv;
     const vk_usbh_dev_id_t *dev_id;
-    vk_usbh_class_t *class;
+    vk_usbh_class_t *c;
 
-    vsf_slist_peek_next(vk_usbh_class_t, node, &usbh->class_list, class);
-    while (class != NULL) {
-        drv = class->drv;
+    vsf_slist_peek_next(vk_usbh_class_t, node, &usbh->class_list, c);
+    while (c != NULL) {
+        drv = c->drv;
 
         dev_id = drv->dev_ids;
         for (uint_fast8_t id_idx = 0; id_idx < drv->dev_id_num; id_idx++, dev_id++) {
@@ -826,7 +858,7 @@ __vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
                 }
             }
         }
-        vsf_slist_peek_next(vk_usbh_class_t, node, &class->node, class);
+        vsf_slist_peek_next(vk_usbh_class_t, node, &c->node, c);
     }
     drv = NULL;
 end:
@@ -1129,8 +1161,10 @@ static void __vk_usbh_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     VSF_USB_ASSERT(err >= 0);
     if (VSF_ERR_NONE == err) {
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         // init_evthandler should not use frame
         VSF_USB_ASSERT(!eda->state.bits.is_use_frame);
+#endif
         eda->fn.evthandler = __vk_usbh_probe_evthandler;
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
@@ -1163,22 +1197,10 @@ vsf_err_t vk_usbh_fini(vk_usbh_t *usbh)
     return VSF_ERR_NONE;
 }
 
-void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *class)
+void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c)
 {
-    VSF_USB_ASSERT((usbh != NULL) && (class != NULL));
-    vsf_slist_add_to_head(vk_usbh_class_t, node, &usbh->class_list, class);
-}
-
-vsf_err_t vk_usbh_register_class_driver(vk_usbh_t *usbh,
-        const vk_usbh_class_drv_t *drv)
-{
-    VSF_USB_ASSERT((usbh != NULL) && (drv != NULL));
-    vk_usbh_class_t *class = VSF_USBH_MALLOC(sizeof(*class));
-    if (class == NULL) { return VSF_ERR_FAIL; }
-
-    class->drv = drv;
-    vk_usbh_register_class(usbh, class);
-    return VSF_ERR_NONE;
+    VSF_USB_ASSERT((usbh != NULL) && (c != NULL));
+    vsf_slist_add_to_head(vk_usbh_class_t, node, &usbh->class_list, c);
 }
 
 vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,

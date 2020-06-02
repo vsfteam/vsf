@@ -23,6 +23,11 @@
 #include "component/usb/vsf_usb_cfg.h"
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HUB == ENABLED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -35,6 +40,9 @@ extern const vk_usbh_class_drv_t vk_usbh_hub_drv;
 extern bool vk_usbh_hub_is_dev_resetting(struct vk_usbh_dev_t *dev);
 extern vsf_err_t vk_usbh_hub_reset_dev(struct vk_usbh_dev_t *dev);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif

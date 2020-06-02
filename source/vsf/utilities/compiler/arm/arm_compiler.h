@@ -89,7 +89,9 @@
 #include "../__common/__compiler.h"
 
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* -----------------  Start of section using anonymous unions  -------------- */
 #if __IS_COMPILER_ARM_COMPILER_5__
   //#pragma push
@@ -380,10 +382,14 @@ __attribute__((always_inline, __noreturn__)) static inline void __cmsis_start(vo
 #endif
 
 /*============================ TYPES =========================================*/
+/*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
 /*============================ INCLUDES ======================================*/
 //! \brief for interrupt 
 #include "./signal.h"
-
-/*============================ PROTOTYPES ====================================*/
 
 #endif

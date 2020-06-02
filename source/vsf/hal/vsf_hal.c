@@ -78,18 +78,4 @@ bool vsf_hal_init( void )
     return true;
 }
 
-#ifndef WEAK_VSF_HAL_ADVANCE_INIT
-/*! \note initialize level 2 hardware abstract layer
- *  \param none
- *  \retval true initialization succeeded.
- *  \retval false initialization failed
- */  
-WEAK(vsf_hal_advance_init)
-bool vsf_hal_advance_init(void)
-{
-    //! level 2 hal init
-    return true;
-}
-#endif
-
 /* EOF */

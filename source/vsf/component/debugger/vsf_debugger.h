@@ -30,16 +30,25 @@
 #   include "service/stream/vsf_stream.h"
 #endif
 
-#if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_JLINK_RTT
+#if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
+#   include "./segger_rtt/segger_rtt_stream.h"
 #elif VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #   include "./nulink/NuConsole_stream.h"
 #elif VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_USER
+
+#   ifdef __cplusplus
+extern "C" {
+#   endif
 
 #   ifdef VSF_DEBUGGER_CFG_STREAM_TX_T
         extern VSF_DEBUGGER_CFG_STREAM_TX_T VSF_DEBUG_STREAM_TX;
 #   endif
 #   ifdef VSF_DEBUGGER_CFG_STREAM_RX_T
         extern VSF_DEBUGGER_CFG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
+#   endif
+
+#   ifdef __cplusplus
+}
 #   endif
 
 #endif

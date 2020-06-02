@@ -1,5 +1,7 @@
 #include "vsf.h"
 
+#if VSF_USE_UI_AWTK == ENABLED
+
 #include "tkc/mem.h"
 #include "tkc/time_now.h"
 #include "tkc/platform.h"
@@ -45,3 +47,5 @@ ret_t tk_semaphore_destroy(tk_semaphore_t* semaphore) {
 
   return RET_OK;
 }
+
+#endif

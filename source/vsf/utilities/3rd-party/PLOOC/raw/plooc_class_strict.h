@@ -15,6 +15,8 @@
  *                                                                           *
  ****************************************************************************/
  
+
+
 //#ifndef __PLOOC_CLASS_STRICT_H__          /* deliberately comment this out! */
 //#define __PLOOC_CLASS_STRICT_H__          /* deliberately comment this out! */
 
@@ -26,7 +28,7 @@
 
 
 /*============================ INCLUDES ======================================*/
-#include <stdint.h>
+//#include <stdint.h>
 
 /*! \NOTE the uint_fast8_t used in this header file is defined in stdint.h 
           if you don't have stdint.h supported in your toolchain, you should
@@ -38,8 +40,15 @@
              uint64_t
  */
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
+#undef dcl_class
+#undef declare_class
 #undef def_class
+#undef define_class
 #undef __def_class2
 #undef __def_class3
 #undef __def_class4
@@ -49,6 +58,7 @@
 #undef __def_class8
 #undef __def_class
 #undef end_def_class
+#undef end_define_class
 #undef __end_def_class
 #undef extern_class
 #undef __extern_class
@@ -434,11 +444,13 @@
 
 #define def_class(...)                  __PLOOC_EVAL(__def_class, __VA_ARGS__)  \
                                                     (__VA_ARGS__)
+#define define_class(...)               def_class(__VA_ARGS__)
 
 #define end_def_class(...)              __end_def_class(__VA_ARGS__)
+#define end_define_class(...)           end_def_class(__VA_ARGS__)
 
-#undef declare_class
-#define declare_class(__NAME)           typedef struct __NAME __NAME;    
+#define declare_class(__name)           typedef struct __name __name;    
+#define dcl_class(__name)               declare_class(__name)
 
 #define extern_class(...)               __extern_class(__VA_ARGS__)
 #define end_extern_class(...)           __end_extern_class(__VA_ARGS__)
@@ -452,3 +464,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 //#endif                                /* deliberately comment this out! */
+
+#ifdef __cplusplus
+}
+#endif

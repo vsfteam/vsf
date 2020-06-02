@@ -95,7 +95,7 @@ bool vsf_tgui_tile_is_root(const vsf_tgui_tile_t* ptTile)
 }
 
 
-void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo, 
+void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo,
                         const vsf_tgui_string_t *pstrNew)
 {
     VSF_TGUI_ASSERT(NULL != ptTextInfo);

@@ -74,7 +74,7 @@
 //      <h> Schedule Policy
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
+#define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                   ENABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
@@ -184,8 +184,8 @@
 
 #define VSF_USE_UI                                      ENABLED
 #   define VSF_USE_UI_LVGL                              ENABLED
-#   define VSF_USE_DISP_DRV_SDL2                        ENABLED
-#       define VSF_DISP_DRV_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
+#   define VSF_USE_DISP_SDL2                            ENABLED
+#       define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
 
 #define VSF_USE_BTSTACK                                 ENABLED
 

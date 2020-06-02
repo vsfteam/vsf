@@ -26,6 +26,10 @@
 
 #include "../../vsf_input_get_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define HID_USAGE_PAGE_GENERIC      0x01
@@ -131,6 +135,10 @@ extern uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, u
 extern void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len);
 extern void vk_hid_new_dev(vk_input_hid_t *dev);
 extern void vk_hid_free_dev(vk_input_hid_t *dev);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_INPUT && VSF_USE_INPUT_HID
 #endif      // __VSF_INPUT_HID_H__

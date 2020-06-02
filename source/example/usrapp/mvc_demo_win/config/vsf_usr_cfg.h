@@ -24,7 +24,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
+#define ASSERT(...)                     //if (!(__VA_ARGS__)) {while(1);};
 //#define ASSERT(...)
 
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
@@ -68,13 +68,13 @@
 //  <h> Kernel Feature Configuration
 //      <c1>Enable Inter-task synchronisation (vsf_sync_t)
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_SYNC                     ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_SYNC                     DISABLED
 //      </c>
 
 //      <h> Schedule Policy 
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
+#define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED     DISABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
@@ -85,7 +85,7 @@
 
 //      <c1>Enable eda to call other edas
 //      <i>If this feature is enabled, eda is capable to call other eda based tasks, i.e. pure-eda, vsf_task, vsf_pt, simple_fsm and etc.
-#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL             ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL             DISABLED
 //      </c>
 
 //      <c1>Enable Timer-integrated tasks (vsf_teda_t)
@@ -95,7 +95,7 @@
 
 //      <c1>Enable message queue support
 //      <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                ENABLED
+#define VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                DISABLED
 //      </c>
 #define VSF_KERNEL_CFG_CALLBACK_TIMER                   ENABLED
 
@@ -129,7 +129,7 @@
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
 //          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
-#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                  ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                  DISABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
 //          <i>Enable this feature will provide RTOS style of task support,i.e. tasks will have dedicated stacks

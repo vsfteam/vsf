@@ -26,7 +26,23 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_LINUX_ASSERT
-#   define VSF_LINUX_ASSERT             ASSERT
+#   define VSF_LINUX_ASSERT                     ASSERT
+#endif
+
+// to use simple libc
+//  1. enable VSF_LINUX_USE_SIMPLE_LIBC
+//  2. add "shell/sys/linux/include/simple_libc to include path
+//  IMPORTANT: c++ is not supported if simple libc enabled
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   ifndef VSF_LINUX_USE_SIMPLE_STDIO
+#       define VSF_LINUX_USE_SIMPLE_STDIO       ENABLED
+#   endif
+#   ifndef VSF_LINUX_USE_SIMPLE_STRING
+#       define VSF_LINUX_USE_SIMPLE_STRING      ENABLED
+#   endif
+#   ifndef VSF_LINUX_USE_SIMPLE_TIME
+#       define VSF_LINUX_USE_SIMPLE_TIME        ENABLED
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

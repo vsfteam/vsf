@@ -45,6 +45,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef GENERAL_PBUF_POOL_BLOCK_SIZE
@@ -178,6 +182,9 @@ void vsf_stream_usr_open ( vsf_stream_usr_t *ptObj);
 extern 
 void vsf_stream_usr_close ( vsf_stream_usr_t *ptObj);
 
+#ifdef __cplusplus
+}
+#endif
 
 /*============================ INCLUDES ======================================*/
 #include "./vsf_stream_writer.h"

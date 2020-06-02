@@ -22,7 +22,8 @@
 
 #if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                  \
     &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED                          \
-    &&  VSF_USE_KERNEL == ENABLED
+    &&  VSF_USE_KERNEL == ENABLED                                               \
+    &&  VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 #define VSF_EDA_CLASS_INHERIT
 #   include "../../vsf_kernel_common.h"
 #   include "../../vsf_eda.h" 

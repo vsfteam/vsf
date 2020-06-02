@@ -20,6 +20,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "vsf_cfg.h"
+#include "utilities/vsf_utilities.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file 

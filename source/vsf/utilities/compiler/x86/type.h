@@ -18,8 +18,13 @@
 #ifndef __APP_TYPE_H_INCLUDED__
 #define __APP_TYPE_H_INCLUDED__
 
+
+
 /*============================ INCLUDES ======================================*/
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
+#   ifdef __cplusplus
+extern "C" {
+#   endif
 typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned char       uint_fast8_t;
@@ -44,6 +49,9 @@ typedef enum {
     false = 0,
     true = !false,
 } bool;
+#   ifdef __cplusplus
+}
+#   endif
 #else
 #include <stdint.h>
 #include <stdbool.h>
@@ -54,8 +62,9 @@ typedef enum {
 
 #include "../__common/__type.h"
 
-typedef uint32_t            uintalu_t;
-typedef int32_t             intalu_t;   
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 #define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
@@ -63,8 +72,15 @@ typedef int32_t             intalu_t;
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+typedef uint32_t            uintalu_t;
+typedef int32_t             intalu_t;   
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // __APP_TYPE_H_INCLUDED__

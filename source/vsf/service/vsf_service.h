@@ -34,6 +34,9 @@
 #include "./trace/vsf_trace.h"
 #include "./json/vsf_json.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -41,6 +44,11 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_service_init(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

@@ -26,6 +26,10 @@
 #include "./vsf_stream_writer.h"
 #include "./vsf_stream_reader.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -33,6 +37,10 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_service_stream_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

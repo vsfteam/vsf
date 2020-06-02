@@ -88,7 +88,7 @@ const struct {
 
     .is_support_sync =              (VSF_KERNEL_CFG_SUPPORT_SYNC ? (true) : false),
     .is_support_bmpevt =            (VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT ? (true) : false),
-    .is_support_premption =         (VSF_KERNEL_CFG_SUPPORT_PREMPT ? (true) : false),
+    .is_support_premption =         (VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED ? (true) : false),
     .is_support_msg_queue =         (VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE ? (true) : false),
     
     .is_support_dynamic_priority =  (VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY ? (true) : false),
@@ -96,10 +96,17 @@ const struct {
     .is_support_sub_call =          (VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL ? (true) : false),
     .is_support_fsm =               (VSF_KERNEL_CFG_EDA_SUPPORT_FSM ? (true) : false),
 
-    .Major =                        0,
-    .Minor =                        0x99,
+    .Major =                        1,
+    .Minor =                        0x20,
 };
 
+/*! Kernal Version Log:
+ *!     v1.20       Introduce param_eda and the concept of local, arg and param
+ *!     v1.1x       Introduce cross call among different types of tasks
+ *!     v1.0x       First stable release
+ *!     v0.9x       Alpha release 
+ *!
+ */
 /*============================ IMPLEMENTATION ================================*/
 
 #endif

@@ -29,6 +29,8 @@
 #include "vsf.h"
 #include "./vsf_winsound.h"
 
+#include <Windows.h>
+
 #pragma comment(lib, "winmm.lib")
 
 // Code from MSDN uses original naming conventions
@@ -45,35 +47,44 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __vk_winsound_init(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_winsound_init)
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-static void __vk_winsound_set_play_volume(uintptr_t target, vsf_evt_t evt);
-static void __vk_winsound_set_play_mute(uintptr_t target, vsf_evt_t evt);
-static void __vk_winsound_play(uintptr_t target, vsf_evt_t evt);
-static void __vk_winsound_stop_play(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_winsound_play_set_volume)
+dcl_vsf_peda_methods(static, __vk_winsound_play_set_mute)
+dcl_vsf_peda_methods(static, __vk_winsound_play_start)
+dcl_vsf_peda_methods(static, __vk_winsound_play_stop)
 
 static void __vk_winsound_play_irq_thread(void *arg);
+#endif
+
+#if VSF_AUDIO_CFG_USE_CATURE == ENABLED
+dcl_vsf_peda_methods(static, __vk_winsound_capture_set_volume)
+dcl_vsf_peda_methods(static, __vk_winsound_capture_set_mute)
+dcl_vsf_peda_methods(static, __vk_winsound_capture_start)
+dcl_vsf_peda_methods(static, __vk_winsound_capture_stop)
+
+static void __vk_winsound_capture_irq_thread(void *arg);
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_audio_drv_t vk_winsound_drv = {
-    .init           = __vk_winsound_init,
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_init),
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
     .play_drv       = {
-        .volume     = __vk_winsound_set_play_volume,
-        .mute       = __vk_winsound_set_play_mute,
-        .play       = __vk_winsound_play,
-        .stop       = __vk_winsound_stop_play,
+        .volume     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_play_set_volume),
+        .mute       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_play_set_mute),
+        .play       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_play_start),
+        .stop       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_play_stop),
     },
 #endif
 #if VSF_AUDIO_CFG_USE_CATURE == ENABLED
     .capture_drv    = {
-        .volume     = __vk_winsound_set_capture_volume,
-        .mute       = __vk_winsound_set_capture_mute,
-        .play       = __vk_winsound_capture,
-        .stop       = __vk_winsound_stop_capture,
+        .volume     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_capture_set_volume),
+        .mute       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_capture_set_mute),
+        .capture    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_capture_start),
+        .stop       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_capture_stop),
     },
 #endif
 };
@@ -81,54 +92,58 @@ const vk_audio_drv_t vk_winsound_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vk_winsound_init(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
 {
-    vk_winsound_dev_t *dev = (vk_winsound_dev_t *)target;
+    vsf_peda_begin();
+    vk_winsound_dev_t *dev = (vk_winsound_dev_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
         if (!dev->is_inited) {
             dev->is_inited = true;
-            dev->play.hEvent = CreateEvent(NULL, 0, 0, NULL);
+            dev->play_ctx.hEvent = CreateEvent(NULL, 0, 0, NULL);
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-            dev->play.irq_thread.name = "winsound_play";
-            __vsf_arch_irq_init(&dev->play.irq_thread, __vk_winsound_play_irq_thread, dev->hw_prio, true);
+            dev->play_ctx.irq_thread.name = "winsound_play";
+            __vsf_arch_irq_init(&dev->play_ctx.irq_thread, __vk_winsound_play_irq_thread, dev->hw_prio, true);
 #endif
         }
-        dev->ctx.err = VSF_ERR_NONE;
-        vsf_eda_return();
+        vsf_eda_return(VSF_ERR_NONE);
         break;
     }
+    vsf_peda_end();
 }
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-static void __vk_winsound_set_play_volume(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_winsound_play_set_volume, vk_audio_play_set_volume)
 {
-
+    vsf_peda_begin();
+    vsf_peda_end();
 }
 
-static void __vk_winsound_set_play_mute(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_winsound_play_set_mute, vk_audio_play_set_mute)
 {
+    vsf_peda_begin();
+    vsf_peda_end();
 }
 
 static bool __vk_winsound_play_buffer(vk_winsound_dev_t *dev, uint8_t *buffer, uint_fast32_t size)
 {
-    if (dev->play.buffer_taken < dimof(dev->play.buffer)) {
+    if (dev->play_ctx.buffer_taken < dimof(dev->play_ctx.buffer)) {
         vk_winsound_play_buffer_t *winsound_buffer =
-            dev->play.fill_ticktock ? &dev->play.buffer[0] : &dev->play.buffer[1];
+            dev->play_ctx.fill_ticktock ? &dev->play_ctx.buffer[0] : &dev->play_ctx.buffer[1];
 
         vsf_protect_t orig = vsf_protect_int();
-            dev->play.buffer_taken++;
+            dev->play_ctx.buffer_taken++;
         vsf_unprotect_int(orig);
 
-        dev->play.fill_ticktock = !dev->play.fill_ticktock;
+        dev->play_ctx.fill_ticktock = !dev->play_ctx.fill_ticktock;
         memcpy(winsound_buffer->buffer, buffer, size);
         winsound_buffer->header.lpData = (LPSTR)winsound_buffer->buffer;
         winsound_buffer->header.dwBufferLength = size;
         winsound_buffer->header.dwFlags = 0;
-        waveOutPrepareHeader(dev->play.hwo, &winsound_buffer->header, sizeof(WAVEHDR));
-        if (MMSYSERR_NOERROR == waveOutWrite(dev->play.hwo, &winsound_buffer->header, sizeof(WAVEHDR))) {
+        waveOutPrepareHeader(dev->play_ctx.hwo, (LPWAVEHDR)&winsound_buffer->header, sizeof(WAVEHDR));
+        if (MMSYSERR_NOERROR == waveOutWrite(dev->play_ctx.hwo, (LPWAVEHDR)&winsound_buffer->header, sizeof(WAVEHDR))) {
             __vsf_winsound_trace(VSF_TRACE_DEBUG, "play stream: %d bytes %08X\r\n", size, winsound_buffer->buffer);
         }
 
@@ -146,13 +161,13 @@ static void __vk_winsound_play_evthandler(void *param, vsf_stream_evt_t evt)
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
-        while (dev->play.is_playing && (dev->play.buffer_taken < dimof(dev->play.buffer))) {
+        while (dev->play_ctx.is_playing && (dev->play_ctx.buffer_taken < dimof(dev->play_ctx.buffer))) {
             __vsf_winsound_trace(VSF_TRACE_DEBUG, "play stream evthandler\r\n");
-            datasize = vsf_stream_get_rbuf(dev->stream_play, &buff);
+            datasize = vsf_stream_get_rbuf(dev->play.stream, &buff);
             if (!datasize) { break; }
 
             if (__vk_winsound_play_buffer(dev, buff, datasize)) {
-                vsf_stream_read(dev->stream_play, (uint8_t *)buff, datasize);
+                vsf_stream_read(dev->play.stream, (uint8_t *)buff, datasize);
             }
         }
         break;
@@ -172,14 +187,14 @@ static void __vk_winsound_play_irq_thread(void *arg)
         __vsf_arch_irq_start(irq_thread);
             if (play->buffer_taken > 0) {
                 vk_winsound_play_buffer_t *winsound_buffer =
-                    dev->play.play_ticktock ? &dev->play.buffer[0] : &dev->play.buffer[1];
-                WAVEHDR *header = &winsound_buffer->header;
-                dev->play.play_ticktock = !dev->play.play_ticktock;
+                    dev->play_ctx.play_ticktock ? &dev->play_ctx.buffer[0] : &dev->play_ctx.buffer[1];
+                WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
+                dev->play_ctx.play_ticktock = !dev->play_ctx.play_ticktock;
                 __vsf_winsound_trace(VSF_TRACE_DEBUG, "winsound irq: %02X %d %08X\r\n", header->dwFlags, header->dwBufferLength, header->lpData);
                 // seems no need to wait WHDR_DONE
 //                if (header->dwFlags & WHDR_DONE) {
                     vsf_protect_t orig = vsf_protect_int();
-                        dev->play.buffer_taken--;
+                        dev->play_ctx.buffer_taken--;
                     vsf_unprotect_int(orig);
                     __vk_winsound_play_evthandler(dev, VSF_STREAM_ON_IN);
 //                }
@@ -189,17 +204,18 @@ static void __vk_winsound_play_irq_thread(void *arg)
     }
 }
 
-static void __vk_winsound_play(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_winsound_play_start, vk_audio_play_start)
 {
-    vk_winsound_dev_t *dev = (vk_winsound_dev_t *)target;
+    vsf_peda_begin();
+    vk_winsound_dev_t *dev = (vk_winsound_dev_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT: {
             WAVEFORMATEX wfx    = {
                 .wFormatTag     = WAVE_FORMAT_PCM,
-                .nChannels      = dev->ctx.param.format.channel_num,
-                .nSamplesPerSec = dev->ctx.param.format.sample_rate,
-                .wBitsPerSample = dev->ctx.param.format.sample_bit_width,
+                .nChannels      = dev->play.format.channel_num,
+                .nSamplesPerSec = dev->play.format.sample_rate,
+                .wBitsPerSample = dev->play.format.sample_bit_width,
             };
 
             switch (wfx.wFormatTag) {
@@ -209,69 +225,68 @@ static void __vk_winsound_play(uintptr_t target, vsf_evt_t evt)
                 break;
             }
 
-            if (dev->play.is_playing) {
+            if (dev->play_ctx.is_playing) {
                 VSF_AV_ASSERT(false);
-                dev->ctx.err = VSF_ERR_FAIL;
-                goto do_return;
+            do_return_fail:
+                vsf_eda_return(VSF_ERR_FAIL);
+                return;
             }
   
-            if (MMSYSERR_NOERROR != waveOutOpen(&dev->play.hwo, WAVE_MAPPER, &wfx, (DWORD_PTR)dev->play.hEvent, 0L, CALLBACK_EVENT)) {
-                dev->ctx.err = VSF_ERR_FAIL;
-                goto do_return;
+            if (MMSYSERR_NOERROR != waveOutOpen((LPHWAVEOUT)&dev->play_ctx.hwo, WAVE_MAPPER, &wfx, (DWORD_PTR)dev->play_ctx.hEvent, 0L, CALLBACK_EVENT)) {
+                goto do_return_fail;
             }
 
-            uint_fast32_t half_buffer_size = vsf_stream_get_buff_size(dev->stream_play) / 2;
-            dev->play.buffer[0].buffer = vsf_heap_malloc(half_buffer_size);
-            dev->play.buffer[1].buffer = vsf_heap_malloc(half_buffer_size);
-            if ((NULL == dev->play.buffer[0].buffer) || (NULL == dev->play.buffer[1].buffer)) {
+            uint_fast32_t half_buffer_size = vsf_stream_get_buff_size(dev->play.stream) / 2;
+            dev->play_ctx.buffer[0].buffer = vsf_heap_malloc(half_buffer_size);
+            dev->play_ctx.buffer[1].buffer = vsf_heap_malloc(half_buffer_size);
+            if ((NULL == dev->play_ctx.buffer[0].buffer) || (NULL == dev->play_ctx.buffer[1].buffer)) {
                 VSF_AV_ASSERT(false);
-                dev->ctx.err = VSF_ERR_FAIL;
-                goto do_return;
+                goto do_return_fail;
             }
 
-            dev->play.is_playing = true;
-            dev->play.fill_ticktock = false;
-            dev->play.play_ticktock = false;
-            dev->play.buffer_taken = 0;
-            dev->stream_play->rx.param = dev;
-            dev->stream_play->rx.evthandler = __vk_winsound_play_evthandler;
-            vsf_stream_connect_rx(dev->stream_play);
-            if (vsf_stream_get_data_size(dev->stream_play)) {
+            dev->play_ctx.is_playing = true;
+            dev->play_ctx.fill_ticktock = false;
+            dev->play_ctx.play_ticktock = false;
+            dev->play_ctx.buffer_taken = 0;
+            dev->play.stream->rx.param = dev;
+            dev->play.stream->rx.evthandler = __vk_winsound_play_evthandler;
+            vsf_stream_connect_rx(dev->play.stream);
+            if (vsf_stream_get_data_size(dev->play.stream)) {
                 __vk_winsound_play_evthandler(dev, VSF_STREAM_ON_IN);
             }
 
-            dev->ctx.err = VSF_ERR_NONE;
-        do_return:
-            vsf_eda_return();
+            vsf_eda_return(VSF_ERR_NONE);
             break;
         }
     }
+    vsf_peda_end();
 }
 
-static void __vk_winsound_stop_play(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_winsound_play_stop, vk_audio_play_stop)
 {
-    vk_winsound_dev_t *dev = (vk_winsound_dev_t *)target;
+    vsf_peda_begin();
+    vk_winsound_dev_t *dev = (vk_winsound_dev_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        dev->play.is_playing = false;
-        waveOutClose(dev->play.hwo);
-        // TODO: make sure stream_play will not be used
-        dev->stream_play = NULL;
+        dev->play_ctx.is_playing = false;
+        waveOutClose(dev->play_ctx.hwo);
+        // TODO: make sure play.stream will not be used
+        dev->play.stream = NULL;
 
-        if (dev->play.buffer[0].buffer != NULL) {
-            vsf_heap_free(dev->play.buffer[0].buffer);
-            dev->play.buffer[0].buffer = NULL;
+        if (dev->play_ctx.buffer[0].buffer != NULL) {
+            vsf_heap_free(dev->play_ctx.buffer[0].buffer);
+            dev->play_ctx.buffer[0].buffer = NULL;
         }
-        if (dev->play.buffer[1].buffer != NULL) {
-            vsf_heap_free(dev->play.buffer[1].buffer);
-            dev->play.buffer[1].buffer = NULL;
+        if (dev->play_ctx.buffer[1].buffer != NULL) {
+            vsf_heap_free(dev->play_ctx.buffer[1].buffer);
+            dev->play_ctx.buffer[1].buffer = NULL;
         }
 
-        dev->ctx.err = VSF_ERR_NONE;
-        vsf_eda_return();
+        vsf_eda_return(VSF_ERR_NONE);
         break;
     }
+    vsf_peda_end();
 }
 #endif
 

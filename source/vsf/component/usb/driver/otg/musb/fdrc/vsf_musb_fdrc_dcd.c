@@ -143,7 +143,7 @@ void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
     }
 }
 
-uint_fast8_t vk_musb_fdrc_usbd_ep_get_feature(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
+uint_fast8_t vk_musb_fdrc_usbd_ep_get_feature(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast8_t feature)
 {
     return usbd->is_dma ? USB_DC_FEATURE_TRANSFER : 0;
 }

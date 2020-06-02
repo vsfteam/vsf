@@ -25,41 +25,57 @@
 #include "../vsf_eda.h"
 #include "./__vsf_task_common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
-#ifndef this
-#   define this        (*ptThis)
+#ifndef __cplusplus
+#   ifndef this
+#       define this        (*ptThis)
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   define __implement_vsf_pt(__NAME)                                           \
-            __implement_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+#   define __implement_vsf_pt(__name)                                           \
+            __implement_vsf_pt_common(__name, uintptr_t local)                  \
+            {                                                                   \
+                __vsf_pt_common(__name) *ptThis =                               \
+                    *(__vsf_pt_common(__name) **)                               \
+                        ((uintptr_t)local - sizeof(uintptr_t));
 
-#   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
-            __implement_vsf_pt_common(  __FUNC_NAME,                            \
-                                        __vsf_pt_common(__NAME) *ptThis)
+#   define __implement_vsf_pt_ex(__name, __func_name)                           \
+            __implement_vsf_pt_common(  __func_name,  uintptr_t local)          \
+            {                                                                   \
+                __vsf_pt_common(__name) *ptThis =                               \
+                    *(__vsf_pt_common(__name) **)                               \
+                        ((uintptr_t)local - sizeof(uintptr_t));
 
 #elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
-#   define __implement_vsf_pt(__NAME)                                           \
-            __implement_vsf_pt_common(  __NAME,                                 \
-                                        __internal_##__NAME *ptThis)
+#   define __implement_vsf_pt(__name)                                           \
+            __implement_vsf_pt_common(  __name,                                 \
+                                        __internal_##__name *ptObj) {           \
+                __vsf_pt_common(__name) *ptThis = &(ptObj->param);              
 
-#   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
-            __implement_vsf_pt_common(  __FUNC_NAME,                            \
-                                        __internal_##__NAME *ptThis)
+#   define __implement_vsf_pt_ex(__name, __func_name)                           \
+            __implement_vsf_pt_common(  __func_name,                            \
+                                        __internal_##__name *ptObj) {           \
+                __vsf_pt_common(__name) *ptThis = &(ptObj->param);              
 
 #else
 
-#   define __implement_vsf_pt(__NAME)                                           \
-            __implement_vsf_pt_common(__NAME, __NAME *ptThis)
+#   define __implement_vsf_pt(__name)                                           \
+            __implement_vsf_pt_common(__name, __name *ptObj) {                  \
+                __vsf_pt_common(__name) *ptThis = &(ptObj->param);              
 
-#   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
-            __implement_vsf_pt_common(  __FUNC_NAME,                            \
-                                        __NAME *ptThis)
+#   define __implement_vsf_pt_ex(__name, __func_name)                           \
+            __implement_vsf_pt_common(__func_name, __name *ptObj) {             \
+                __vsf_pt_common(__name) *ptThis = &(ptObj->param);              
 #endif
 
 #define __vsf_pt_state()         (ptThis->tState)
@@ -84,7 +100,7 @@
 #define vsf_pt_begin()              UNUSED_PARAM(evt);                          \
                                     __vsf_pt_begin(__vsf_pt_state())
 
-#define vsf_pt_end()                __vsf_pt_end()
+#define vsf_pt_end()                __vsf_pt_end() }
 
 #define __vsf_pt_wait_cond(__CON)   __vsf_pt_wait_cond_common(__vsf_pt_state(), __CON)
 #define vsf_pt_wfe(__evt)           __vsf_pt_wait_cond((evt != __evt))
@@ -119,8 +135,10 @@
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   define __vsf_pt_call_sub(__NAME, __TARGET)                                  \
-            __vsf_eda_call_eda((uintptr_t)(__NAME), (uintptr_t)(__TARGET))
+#   define __vsf_pt_call_sub(__NAME, __TARGET, ...)                             \
+            __vsf_eda_call_eda( (uintptr_t)(__NAME),                            \
+                                (uintptr_t)(__TARGET),                          \
+                                (0, ##__VA_ARGS__))
 
 
 #   define vsf_pt_call_sub(__NAME, __TARGET)                                    \
@@ -141,17 +159,18 @@
             __vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))            
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-#   define __vsf_pt_call_fsm(__NAME, __TARGET)                                  \
-            __vsf_eda_call_fsm(   (vsf_fsm_entry_t)(__NAME),                      \
-                                (uintptr_t)(__TARGET))
+#   define __vsf_pt_call_fsm(__NAME, __TARGET, ...)                             \
+            __vsf_eda_call_fsm( (vsf_fsm_entry_t)(__NAME),                      \
+                                (uintptr_t)(__TARGET),                          \
+                                (0, ##__VA_ARGS__))
 
 
-#   define vsf_pt_call_fsm(__NAME, __TARGET, __RET_ADDR)                        \
+#   define vsf_pt_call_fsm(__NAME, __TARGET, __RET_ADDR, ...)                   \
         do {                                                                    \
             fsm_rt_t ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn);              \
             vsf_pt_entry();                                                     \
             ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn) =                      \
-                __vsf_pt_call_fsm(__NAME, (__TARGET));                          \
+                __vsf_pt_call_fsm(__NAME, (__TARGET), (0, ##__VA_ARGS__));      \
             if (fsm_rt_on_going ==                                              \
                 ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn)) {                 \
                 return ;                                                        \
@@ -161,8 +180,8 @@
             }                                                                   \
         } while(0)
         
-#   define vsf_pt_call_task(__NAME, __TARGET, __RET_ADDR)                       \
-        vsf_pt_call_fsm(vsf_task_func(__NAME), __TARGET, __RET_ADDR)
+#   define vsf_pt_call_task(__NAME, __TARGET, __RET_ADDR, ...)                  \
+        vsf_pt_call_fsm(vsf_task_func(__NAME), __TARGET, __RET_ADDR, (0, ##__VA_ARGS__))
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -215,7 +234,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
-            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+            __extern_vsf_pt_common(__NAME, uintptr_t local)
 #elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
@@ -287,6 +306,10 @@ typedef vsf_eda_evthandler_t    vsf_pt_entry_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

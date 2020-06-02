@@ -54,6 +54,7 @@
 #include "./usb/host/class/XB1/vsf_usbh_xb1.h"
 #include "./usb/host/class/libusb/vsf_usbh_libusb.h"
 #include "./usb/host/class/MSC/vsf_usbh_msc.h"
+#include "./usb/host/class/UAC/vsf_usbh_uac.h"
 
 #include "./usb/device/vsf_usbd.h"
 #include "./usb/device/class/CDC/vsf_usbd_CDC.h"
@@ -64,10 +65,14 @@
 
 #include "./tcpip/netdrv/vsf_netdrv.h"
 
-#include "./ui/disp_drv/vsf_disp_drv.h"
+#include "./ui/disp/vsf_disp.h"
 #include "./ui/tgui/vsf_tgui.h"
 
 #include "./debugger/vsf_debugger.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -76,6 +81,10 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_component_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

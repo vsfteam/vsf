@@ -18,10 +18,15 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "../vsf_utilities_cfg.h"
+
+#if VSF_USE_SIMPLE_SPRINTF == ENABLED
+
 #include <stdarg.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -243,15 +248,21 @@ int snprintf(char *str, size_t size, const char *format, ...)
     return real_size;
 }
 
+int vsprintf(char *str, const char *format, va_list ap)
+{
+    return vsnprintf(str, (size_t)-1, format, ap);
+}
+
 int sprintf(char *str, const char *format, ...)
 {
     int real_size;
     va_list ap;
     va_start(ap, format);
-        real_size = vsnprintf(str, (size_t)-1, format, ap);
+        real_size = vsprintf(str, format, ap);
     va_end(ap);
     return real_size;
 }
 
-/* EOF */
+#endif      // VSF_USE_SIMPLE_SPRINTF
 
+/* EOF */

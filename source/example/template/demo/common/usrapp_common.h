@@ -60,10 +60,6 @@
 #   endif
 #endif
 
-#ifndef APP_CFG_USBH_HW_PRIO
-#   define APP_CFG_USBH_HW_PRIO                 vsf_arch_prio_0
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -93,7 +89,9 @@ typedef struct usrapp_common_t usrapp_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USE_FS == ENABLED
 extern usrapp_common_t usrapp_common;
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

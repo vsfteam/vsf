@@ -23,6 +23,10 @@
 #if VSF_USE_KERNEL == ENABLED
 #include "../vsf_eda.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -54,7 +58,7 @@
 
 #endif
 
-#define __vsf_pt_end_common()       } vsf_eda_return();
+#   define __vsf_pt_end_common()       } vsf_eda_return();
 
 //#define __vsf_pt_end_closure_common()                                         \
 //                }   /* for switch */                                          \
@@ -133,5 +137,10 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 #endif

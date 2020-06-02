@@ -18,6 +18,10 @@
 #ifndef __FAKEFAT32_H__
 #define __FAKEFAT32_H__
 
+#include "vsf_usr_cfg.h"
+
+#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -29,6 +33,7 @@
 
 extern vk_fakefat32_file_t fakefat32_root[3];
 
+#endif
 #endif      // __FAKEFAT32_H__
 
 /* EOF */

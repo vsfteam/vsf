@@ -32,10 +32,14 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_AV != ENABLED
-#   error "VSF_USE_AV MUST be enabled to use uvc"
+#if VSF_USE_VIDEO != ENABLED
+#   error "VSF_USE_VIDEO MUST be enabled to use uvc"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -100,6 +104,10 @@ extern const vk_usbd_class_op_t vk_usbd_uvc_stream_class;
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast32_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
 #endif      // __VSF_USBD_UVC_H__

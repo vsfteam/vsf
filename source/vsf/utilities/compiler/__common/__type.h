@@ -18,8 +18,25 @@
 #ifndef __COMMON_TYPE_H__
 #define __COMMON_TYPE_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
+
+/* do not modify this */
+#include "vsf_usr_cfg.h"
+
 /*============================ MACROS ========================================*/
+#ifndef ENABLED
+#   define ENABLED                              1
+#endif
+
+#ifndef DISABLED
+#   define DISABLED                             0
+#endif
+
+
 //! \brief system macros
 #ifndef ASSERT
 #   define ASSERT           assert
@@ -41,8 +58,11 @@
 #   endif
 #endif
 
-#define max(__A, __B)       (((__A) > (__B)) ? (__A) : (__B))
-#define min(__A, __B)       (((__A) < (__B)) ? (__A) : (__B))
+#ifndef __cplusplus
+//  conflict with std::max, std::min
+#   define max(__A, __B)    (((__A) > (__B)) ? (__A) : (__B))
+#   define min(__A, __B)    (((__A) < (__B)) ? (__A) : (__B))
+#endif
 
 #ifndef dimof
 #   define dimof(arr)       (sizeof(arr) / sizeof((arr)[0]))
@@ -293,5 +313,10 @@ typedef volatile uint32_t    reg32_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // __APP_TYPE_H_INCLUDED__

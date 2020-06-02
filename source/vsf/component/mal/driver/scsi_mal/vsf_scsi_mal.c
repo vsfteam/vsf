@@ -42,20 +42,20 @@
 
 static uint_fast32_t __vk_scsi_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_scsi_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-static void __vk_scsi_mal_init(uintptr_t target, vsf_evt_t evt);
-static void __vk_scsi_mal_fini(uintptr_t target, vsf_evt_t evt);
-static void __vk_scsi_mal_read(uintptr_t target, vsf_evt_t evt);
-static void __vk_scsi_mal_write(uintptr_t target, vsf_evt_t evt);
+dcl_vsf_peda_methods(static, __vk_scsi_mal_init)
+dcl_vsf_peda_methods(static, __vk_scsi_mal_fini)
+dcl_vsf_peda_methods(static, __vk_scsi_mal_read)
+dcl_vsf_peda_methods(static, __vk_scsi_mal_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const i_mal_drv_t VK_SCSI_MAL_DRV = {
+const vk_mal_drv_t VK_SCSI_MAL_DRV = {
     .blksz          = __vk_scsi_mal_blksz,
     .buffer         = __vk_scsi_mal_buffer,
-    .init           = __vk_scsi_mal_init,
-    .fini           = __vk_scsi_mal_fini,
-    .read           = __vk_scsi_mal_read,
-    .write          = __vk_scsi_mal_write,
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_init),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_fini),
+    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_read),
+    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_write),
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -71,19 +71,20 @@ static bool __vk_scsi_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_
     vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)mal;
     memset(pthis->cbd, 0, sizeof(pthis->cbd));
     pthis->cbd[0] = VSF_MAL_OP_READ == op ? 0x28 : 0x2A;
-    put_unaligned_be32((uint32_t)(pthis->args.addr / pthis->block_size), &pthis->cbd[2]);
-    put_unaligned_be16((uint16_t)(pthis->args.size / pthis->block_size), &pthis->cbd[7]);
+    put_unaligned_be32((uint32_t)(addr / pthis->block_size), &pthis->cbd[2]);
+    put_unaligned_be16((uint16_t)(size / pthis->block_size), &pthis->cbd[7]);
     return vk_scsi_prepare_buffer(pthis->scsi, pthis->cbd, mem);
 }
 
-static void __vk_scsi_mal_init(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
 {
+    vsf_peda_begin();
     enum {
         STATE_INIT,
         STATE_INQUIRY,
         STATE_CAPACITY,
     };
-    vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)target;
+    vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -92,7 +93,7 @@ static void __vk_scsi_mal_init(uintptr_t target, vsf_evt_t evt)
         vk_scsi_init(pthis->scsi);
         break;
     case VSF_EVT_RETURN: {
-            uint8_t state;
+            __vsf_frame_uint_t state;
             vsf_eda_frame_user_value_get(&state);
             memset(pthis->cbd, 0, sizeof(pthis->cbd));
             switch (state) {
@@ -116,58 +117,62 @@ static void __vk_scsi_mal_init(uintptr_t target, vsf_evt_t evt)
                 break;
             case STATE_CAPACITY:
                 pthis->block_size = be32_to_cpu(pthis->buffer.capacity.block_size);
-                pthis->result.errcode = VSF_ERR_NONE;
-                vsf_eda_return();
+                vsf_eda_return(VSF_ERR_NONE);
                 break;
             }
         }
         break;
     }
+    vsf_peda_end();
 }
 
-static void __vk_scsi_mal_fini(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_scsi_mal_fini, vk_mal_fini)
 {
-    vsf_eda_return();
+    vsf_peda_begin();
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
-static void __vk_scsi_mal_read(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_scsi_mal_read, vk_mal_read)
 {
-    vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)target;
+    vsf_peda_begin();
+    vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->mem.pchBuffer = pthis->args.buff;
-        pthis->mem.nSize = pthis->args.size;
+        pthis->mem.pchBuffer = vsf_local.buff;
+        pthis->mem.nSize = vsf_local.size;
         pthis->cbd[0] = 0x28;
-        put_unaligned_be32((uint32_t)(pthis->args.addr / pthis->block_size), &pthis->cbd[2]);
-        put_unaligned_be16((uint16_t)(pthis->args.size / pthis->block_size), &pthis->cbd[7]);
+        put_unaligned_be32((uint32_t)(vsf_local.addr / pthis->block_size), &pthis->cbd[2]);
+        put_unaligned_be16((uint16_t)(vsf_local.size / pthis->block_size), &pthis->cbd[7]);
         vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
         break;
     case VSF_EVT_RETURN:
-        pthis->result.errcode = vk_scsi_get_errcode(pthis->scsi, &pthis->result.size);
-        vsf_eda_return();
+        vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
+    vsf_peda_end();
 }
 
-static void __vk_scsi_mal_write(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_ifs_entry(__vk_scsi_mal_write, vk_mal_write)
 {
-    vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)target;
+    vsf_peda_begin();
+    vk_scsi_mal_t *pthis = (vk_scsi_mal_t *)&vsf_this;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->mem.pchBuffer = pthis->args.buff;
-        pthis->mem.nSize = pthis->args.size;
+        pthis->mem.pchBuffer = vsf_local.buff;
+        pthis->mem.nSize = vsf_local.size;
         pthis->cbd[0] = 0x2A;
-        put_unaligned_be32((uint32_t)(pthis->args.addr / pthis->block_size), &pthis->cbd[2]);
-        put_unaligned_be16((uint16_t)(pthis->args.size / pthis->block_size), &pthis->cbd[7]);
+        put_unaligned_be32((uint32_t)(vsf_local.addr / pthis->block_size), &pthis->cbd[2]);
+        put_unaligned_be16((uint16_t)(vsf_local.size / pthis->block_size), &pthis->cbd[7]);
         vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
         break;
     case VSF_EVT_RETURN:
-        pthis->result.errcode = vk_scsi_get_errcode(pthis->scsi, &pthis->result.size);
-        vsf_eda_return();
+        vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
+    vsf_peda_end();
 }
 
 #endif

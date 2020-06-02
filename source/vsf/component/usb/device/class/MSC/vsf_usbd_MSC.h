@@ -36,6 +36,10 @@
 #endif
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_SCSI != ENABLED
@@ -53,11 +57,7 @@
 
 #define USB_MSC_IFS_NUM             1
 #define USB_MSCBOT_IFS_NUM          USB_MSC_IFS_NUM
-#define USB_MSC_IFS(__MSC_PARAM)                                                \
-            {                                                                   \
-                .class_op       = &vk_usbd_msc,                                 \
-                .class_param  =  &(__MSC_PARAM),                                \
-            },
+#define USB_MSC_IFS(__MSC_PARAM)    __USB_IFS(&vk_usbd_msc, &(__MSC_PARAM))
 
 
 
@@ -70,9 +70,7 @@
             };
 
 #define __msc_ifs(__NAME, __FUNC_ID)                                            \
-                {                                                               \
-                    USB_MSC_IFS(__##__NAME##_MSC##__FUNC_ID)                    \
-                },
+            USB_MSC_IFS(__##__NAME##_MSC##__FUNC_ID)
 
 #define mscbot_desc(__NAME, __IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
             __mscbot_desc(__NAME, (__IFS), (__I_FUNC), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE))
@@ -123,6 +121,10 @@ def_simple_class(vk_usbd_msc_t) {
 extern const vk_usbd_class_op_t vk_usbd_msc;
 
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_MSC
 #endif      // __VSF_USBD_MSC_H__

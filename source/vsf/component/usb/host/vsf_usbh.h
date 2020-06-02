@@ -51,6 +51,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
@@ -58,12 +62,16 @@
 #endif
 
 #if !defined(VSF_USBH_CFG_EDA_PRIORITY)
-#   define VSF_USBH_CFG_EDA_PRIORITY        vsf_prio_0
+#   define VSF_USBH_CFG_EDA_PRIORITY    vsf_prio_0
 #endif
 
-#ifdef VSF_USB_HC_ISO_EN
-#ifndef VSF_USB_HC_ISO_PACKET_LIMIT
-#define VSF_USB_HC_ISO_PACKET_LIMIT     2
+#ifndef VSF_USBH_CFG_ISO_EN
+#   define VSF_USBH_CFG_ISO_EN          ENABLED
+#endif
+
+#if VSF_USBH_CFG_ISO_EN == ENABLED
+#ifndef VSF_USBH_CFG_ISO_PACKET_LIMIT
+#define VSF_USBH_CFG_ISO_PACKET_LIMIT   1
 #endif
 #endif
 
@@ -121,15 +129,15 @@
 
 
 
-#define URB_OK                  VSF_ERR_NONE
-#define URB_FAIL                VSF_ERR_FAIL
-#define URB_PENDING             VSF_ERR_NOT_READY
+#define URB_OK                          VSF_ERR_NONE
+#define URB_FAIL                        VSF_ERR_FAIL
+#define URB_PENDING                     VSF_ERR_NOT_READY
 
 // struct vsf_hcd_urb_t.transfer_flags
-#define URB_SHORT_NOT_OK        0x01
-#define URB_ISO_ASAP            0x02
-#define URB_ZERO_PACKET         0x04
-#define URB_HCD_SPECIFIED_FLAGS 0x10
+#define URB_SHORT_NOT_OK                0x01
+#define URB_ISO_ASAP                    0x02
+#define URB_ZERO_PACKET                 0x04
+#define URB_HCD_SPECIFIED_FLAGS         0x10
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -243,6 +251,7 @@ struct vk_usbh_pipe_t {
         struct {
             uint32_t is_pipe        : 1;
             uint32_t is_submitted   : 1;
+            // for iso, real size is pipe.size + 1
             uint32_t size           : 10;
             uint32_t endpoint       : 4;
             uint32_t type           : 2;
@@ -255,11 +264,19 @@ struct vk_usbh_pipe_t {
 };
 typedef struct vk_usbh_pipe_t vk_usbh_pipe_t;
 
+#ifdef __cplusplus
+}
+#endif
+
 #if     defined(VSF_USBH_IMPLEMENT_vk_usbh_hcd_t)
 #   undef VSF_USBH_IMPLEMENT_vk_usbh_hcd_t
 #   define __PLOOC_CLASS_IMPLEMENT
 #endif
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 def_simple_class(vk_usbh_hcd_drv_t) {
     private_member(
@@ -297,22 +314,26 @@ def_simple_class(vk_usbh_hcd_t) {
     )
 };
 
-#ifdef VSF_USB_HC_ISO_EN
-struct iso_packet_descriptor_t {
+#if VSF_USBH_CFG_ISO_EN == ENABLED
+struct vk_usbh_hcd_iso_packet_descriptor_t {
     uint32_t offset;                /*!< Start offset in transfer buffer*/
     uint32_t length;                /*!< Length in transfer buffer      */
     uint32_t actual_length;         /*!< Actual transfer length         */
     int32_t status;                 /*!< Transfer status                */
 };
-typedef struct iso_packet_descriptor_t iso_packet_descriptor_t;
+typedef struct vk_usbh_hcd_iso_packet_descriptor_t vk_usbh_hcd_iso_packet_descriptor_t;
 
-struct iso_packet_t {
+struct vk_usbh_hcd_iso_packet_t {
     uint32_t start_frame;           /*!< start frame (iso/irq only)     */
     uint32_t number_of_packets;     /*!< number of packets (iso)        */
     //uint32_t error_count;         /*!< number of errors (iso only)    */
-    iso_packet_descriptor_t frame_desc[VSF_USB_HC_ISO_PACKET_LIMIT];
+    vk_usbh_hcd_iso_packet_descriptor_t frame_desc[VSF_USBH_CFG_ISO_PACKET_LIMIT];
 };
-typedef struct iso_packet_t iso_packet_t;
+typedef struct vk_usbh_hcd_iso_packet_t vk_usbh_hcd_iso_packet_t;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #if     defined(VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t)
@@ -320,6 +341,10 @@ typedef struct iso_packet_t iso_packet_t;
 #   define __PLOOC_CLASS_IMPLEMENT
 #endif
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 def_simple_class(vk_usbh_hcd_dev_t) {
     private_member(
@@ -350,8 +375,9 @@ def_simple_class(vk_usbh_hcd_urb_t) {
 
         union {
             struct usb_ctrlrequest_t setup_packet;
-#ifdef VSF_USB_HC_ISO_EN
-            iso_packet_t iso_packet;
+#if VSF_USBH_CFG_ISO_EN == ENABLED
+            // TODO: iso_packet will enlarge every urb, need optimization
+            vk_usbh_hcd_iso_packet_t iso_packet;
 #endif
         };
     )
@@ -362,6 +388,10 @@ def_simple_class(vk_usbh_hcd_urb_t) {
     )
 };
 
+#ifdef __cplusplus
+}
+#endif
+
 #if     defined(VSF_USBH_IMPLEMENT_vk_usbh_urb_t)
 #   undef VSF_USBH_IMPLEMENT_vk_usbh_urb_t
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -370,6 +400,11 @@ def_simple_class(vk_usbh_hcd_urb_t) {
 #   define __PLOOC_CLASS_INHERIT
 #endif
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 def_simple_class(vk_usbh_urb_t) {
     protected_member(
         union {
@@ -379,11 +414,19 @@ def_simple_class(vk_usbh_urb_t) {
     )
 };
 
+#ifdef __cplusplus
+}
+#endif
+
 #if     defined(VSF_USBH_IMPLEMENT_vk_usbh_dev_t)
 #   undef VSF_USBH_IMPLEMENT_vk_usbh_dev_t
 #   define __PLOOC_CLASS_IMPLEMENT
 #endif
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct vk_usbh_ep0_t {
     __vsf_crit_npb_t crit;
@@ -417,6 +460,10 @@ def_simple_class(vk_usbh_dev_t) {
     )
 };
 
+#ifdef __cplusplus
+}
+#endif
+
 #if     defined(VSF_USBH_IMPLEMENT_vk_usbh_t)
 #   undef VSF_USBH_IMPLEMENT_vk_usbh_t
 #   define __PLOOC_CLASS_IMPLEMENT
@@ -425,6 +472,10 @@ def_simple_class(vk_usbh_dev_t) {
 #   define __PLOOC_CLASS_INHERIT
 #endif
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 vsf_declare_bitmap(vk_usbh_devnum_bitmap, VSF_USBH_CFG_MAX_DEVICE + 1);
 
@@ -458,9 +509,7 @@ def_simple_class(vk_usbh_t) {
 // APIs to be called by user
 extern vsf_err_t vk_usbh_init(vk_usbh_t *usbh);
 extern vsf_err_t vk_usbh_fini(vk_usbh_t *usbh);
-extern vsf_err_t vk_usbh_register_class_driver(vk_usbh_t *usbh,
-        const vk_usbh_class_drv_t *drv);
-extern void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *class);
+extern void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
 #endif
 
 #if defined(VSF_USBH_IMPLEMENT) || defined(VSF_USBH_IMPLEMENT_HCD)
@@ -505,6 +554,10 @@ extern vsf_err_t vk_usbh_submit_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb);
 extern vsf_err_t vk_usbh_submit_urb_flags(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags);
 extern vsf_err_t vk_usbh_submit_urb_ex(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast16_t flags, vsf_eda_t *eda);
 
+#if VSF_USBH_CFG_ISO_EN == ENABLED
+extern vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast8_t start_frame);
+#endif
+
 extern void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         vk_usbh_ifs_t *ifs);
 
@@ -528,11 +581,14 @@ extern vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         uint_fast8_t type, void **ptr);
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 #undef VSF_USBH_IMPLEMENT
 #undef VSF_USBH_IMPLEMENT_CLASS
 #undef VSF_USBH_IMPLEMENT_HCD
 #undef VSF_USBH_IMPLEMENT_HUB
 
 #endif
-
 #endif    // __VSF_USBH_H__

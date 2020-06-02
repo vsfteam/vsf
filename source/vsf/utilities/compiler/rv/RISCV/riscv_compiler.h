@@ -25,6 +25,10 @@
 #include "./drivers/riscv_encoding.h"
 #include "./drivers/n200_func.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 #if !defined(__IAR_SYSTEMS_ICC__)
 #	define __enable_interrupt			__enable_irq
@@ -58,5 +62,9 @@ static inline void __set_MSTATUS(uint32_t wValue)
 {
 	write_csr(mstatus, wValue & MSTATUS_MIE);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

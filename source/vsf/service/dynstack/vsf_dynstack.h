@@ -35,6 +35,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
 
@@ -58,6 +62,10 @@ extern void * vsf_dynstack_pop(vsf_dynstack_t *stack, uint_fast16_t num);
 extern vsf_err_t vsf_dynstack_push(vsf_dynstack_t *stack, void *item, uint_fast16_t num);
 extern vsf_err_t vsf_dynstack_push_ext(vsf_dynstack_t *stack, void *ptr, uint_fast32_t len);
 extern vsf_err_t vsf_dynstack_pop_ext(vsf_dynstack_t *stack, void *ptr, uint_fast32_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_DYNSTACK
 #endif      // __VSF_DYNSTACK_H__

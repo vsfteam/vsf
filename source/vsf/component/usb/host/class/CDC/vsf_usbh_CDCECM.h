@@ -26,6 +26,10 @@
     &&  VSF_USE_USB_HOST_ECM == ENABLED                                         \
     &&  VSF_USE_TCPIP == ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -35,6 +39,9 @@ extern const vk_usbh_class_drv_t vk_usbh_ecm_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif

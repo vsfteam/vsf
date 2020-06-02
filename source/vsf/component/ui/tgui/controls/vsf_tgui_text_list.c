@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "../vsf_tgui_cfg.h"
 
-#if VSF_USE_TINY_GUI == ENABLED
+#if VSF_USE_TINY_GUI == ENABLED && VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
 
 #define __VSF_TGUI_CONTROLS_TEXT_LIST_CLASS_IMPLEMENT
 #define __VK_TGUI_CONTROLS_SLIDER_CLASS_INHERIT
@@ -30,12 +30,10 @@ declare_class(vsf_tgui_t)
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern 
+extern
 int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* ptLabel);
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -46,6 +44,7 @@ static const i_tgui_control_methods_t c_tVTextList= {
         (vsf_tgui_method_t *)&vsf_tgui_text_list_v_init,
         (vsf_tgui_method_t *)&vsf_tgui_text_list_v_depose,
         (vsf_tgui_v_method_render_t *)&vsf_tgui_text_list_v_rendering,
+        (vsf_tgui_v_method_render_t *)&vsf_tgui_text_list_v_post_rendering,
         (vsf_tgui_method_t *)&vsf_tgui_text_list_v_update
     },
     (vsf_tgui_method_t*)&vk_tgui_text_list_init,
@@ -55,6 +54,7 @@ static const i_tgui_control_methods_t c_tVTextList= {
         .Init =     (vsf_tgui_method_t *)&vsf_tgui_text_list_v_init,
         .Depose =   (vsf_tgui_method_t *)&vsf_tgui_text_list_v_depose,
         .Render =   (vsf_tgui_v_method_render_t *)&vsf_tgui_text_list_v_rendering,
+        .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_text_list_v_post_rendering,
         .Update =   (vsf_tgui_method_t *)&vsf_tgui_text_list_v_update,
     },
     .Init =     (vsf_tgui_method_t *)&vk_tgui_text_list_init,
@@ -70,7 +70,8 @@ static int_fast16_t __vk_tgui_text_list_get_real_container_x(
                                                 const vsf_tgui_text_list_t* ptTextList,
                                                 int_fast16_t iTargetLineX)
 {
-    __vsf_tgui_control_core_t *ptCore = 
+
+    __vsf_tgui_control_core_t *ptCore =
         vsf_tgui_control_get_core(
             (const vsf_tgui_control_t *)&(ptTextList->tList.tContent));
     int_fast16_t iContentHeight = ptCore->tRegion.tSize.iHeight;
@@ -78,7 +79,7 @@ static int_fast16_t __vk_tgui_text_list_get_real_container_x(
     while (iTargetLineX < 0) {
         iTargetLineX += iContentHeight;
     }
-    
+
     while (iTargetLineX >= iContentHeight) {
         iTargetLineX -= iContentHeight;
     }
@@ -86,17 +87,37 @@ static int_fast16_t __vk_tgui_text_list_get_real_container_x(
     return iTargetLineX;
 }
 
+
+static int_fast16_t __vk_tgui_text_list_calculate_container_x_adjust(
+                                                    int_fast16_t iLineHeight,
+                                                    int_fast16_t iListHeight
+                                                )
+{
+    return  (iListHeight - iLineHeight) / 2;
+}
+
+static int_fast16_t __vk_tgui_text_list_calculate_container_x_height(
+                                                    int_fast16_t iLineHeight,
+                                                    int_fast16_t iLineSelect,
+                                                    int_fast8_t chLineSpace
+                                                )
+{
+    return  (iLineHeight + chLineSpace) * iLineSelect;
+}
+
+
+
 static int_fast16_t __vk_tgui_text_list_calculate_container_x(
                                                     int_fast16_t iLineHeight,
                                                     int_fast16_t iLineSelect,
                                                     int_fast16_t iListHeight,
-                                                    int_fast8_t chLineSpace            
+                                                    int_fast8_t chLineSpace
                                                 )
 {
     int_fast16_t iResult = 0;
 
-    iResult = (iLineHeight + chLineSpace) * iLineSelect;
-    iResult -= (iListHeight - iLineHeight) / 2;
+    iResult = __vk_tgui_text_list_calculate_container_x_height (iLineHeight, iLineSelect, chLineSpace);
+    iResult -= __vk_tgui_text_list_calculate_container_x_adjust(iLineHeight, iListHeight);
 
     return iResult;
 }
@@ -107,10 +128,7 @@ static void __vk_tgui_text_list_update_line_selection(
 {
     uint_fast16_t hwLineCount = ptTextList->hwLineCount;
     int_fast16_t iYOffset = 0;
-    int_fast16_t iListHeight = 
-                    vsf_tgui_control_get_core(
-                        (const vsf_tgui_control_t *)ptTextList)
-                            ->tRegion.tSize.iHeight;
+
 
     if (0 == hwLineCount) {
         return;
@@ -124,43 +142,49 @@ static void __vk_tgui_text_list_update_line_selection(
         iLineSelect += hwLineCount;
     }
 
-    //ptTextList->iLineSelect = iLineSelect;
+#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
+
+    do {
+        int_fast16_t iLineDif = ptTextList->iLineSelect - ptTextList->iOldLineSelect;
+
+        //if (iLineDif != 0) {
+            iYOffset = __vk_tgui_text_list_calculate_container_x_height(
+                    __vk_tgui_label_get_line_height(&(ptTextList->tList.tContent)),
+                    iLineDif,
+                    ptTextList->tList.tContent.tLabel.chInterLineSpace);
+            vk_tgui_slider_location_target_increase( &(ptTextList->tSlider), iYOffset);
+        //}
+    } while(0);
+
+#else
+    int_fast16_t iListHeight =
+                    vsf_tgui_control_get_core(
+                        (const vsf_tgui_control_t *)ptTextList)
+                            ->tRegion.tSize.iHeight;
 
     iYOffset = __vk_tgui_text_list_calculate_container_x(
                     __vk_tgui_label_get_line_height(&(ptTextList->tList.tContent)),
                     iLineSelect,
                     iListHeight,
                     ptTextList->tList.tContent.tLabel.chInterLineSpace);
-    
-    iYOffset = -__vk_tgui_text_list_get_real_container_x(
-                        (const vsf_tgui_text_list_t* )ptTextList, iYOffset);
 
-#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
-    /*
-    do {
-        int_fast16_t tCurrent = 
-            -__vk_tgui_text_list_get_real_container_x(
-                (const vsf_tgui_text_list_t* )ptTextList, 
-                vk_tgui_slider_location_current_get(&(ptTextList->tSlider)));
-        vk_tgui_slider_location_current_set(&(ptTextList->tSlider), tCurrent);
-    } while(0);
-    */
-    vk_tgui_slider_location_target_set( &(ptTextList->tSlider), iYOffset);
-#else
+    __vk_tgui_text_list_get_real_container_x(
+                        (const vsf_tgui_text_list_t* )ptTextList, &iYOffset);
+
     vsf_tgui_control_get_core(
             (const vsf_tgui_control_t *)&(ptTextList->tList.use_as__vsf_tgui_container_t))
-        ->tRegion.tLocation.iY = iYOffset;
+        ->tRegion.tLocation.iY = -iYOffset;
 #endif
 }
 
 static void __vk_tgui_text_list_internal_update(vsf_tgui_text_list_t* ptTextList)
 {
     ptTextList->tList.tBuffer = ptTextList->tList.tContent;
-    ptTextList->tList.tContent.Offset.iNext = 
+    ptTextList->tList.tContent.Offset.iNext =
         (intptr_t)&ptTextList->tList.tBuffer - (intptr_t)&ptTextList->tList.tContent;
     ptTextList->tList.tBuffer.Offset.iNext = 0;
 #if VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST == ENABLED
-    ptTextList->tList.tBuffer.Offset.iPrevious = 
+    ptTextList->tList.tBuffer.Offset.iPrevious =
         (intptr_t)&ptTextList->tList.tBuffer - (intptr_t)&ptTextList->tList.tContent;
 #endif
 
@@ -169,34 +193,72 @@ static void __vk_tgui_text_list_internal_update(vsf_tgui_text_list_t* ptTextList
     ptTextList->hwLineCount = ptTextList->tList.tContent.tLabel.tInfoCache.hwLines;
 }
 
-fsm_rt_t vsf_tgui_mc_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList, 
+
+
+#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
+static void __vk_tgui_text_list_use_minimal_position(vsf_tgui_text_list_t* ptTextList)
+{
+    int_fast16_t iRealPosition = __vk_tgui_text_list_get_real_container_x(
+                ptTextList,
+                vk_tgui_slider_location_target_get(&(ptTextList->tSlider)));
+
+    /*iRealPosition -= __vk_tgui_text_list_calculate_container_x_adjust(
+                    __vk_tgui_label_get_line_height(&(ptTextList->tList.tContent)),
+                    vsf_tgui_control_get_core(
+                        (const vsf_tgui_control_t *)ptTextList)
+                            ->tRegion.tSize.iHeight);
+     */
+    vk_tgui_slider_location_set(&(ptTextList->tSlider), iRealPosition, iRealPosition);
+
+}
+
+
+static void __vk_tui_text_list_update_container_position(vsf_tgui_text_list_t* ptTextList)
+{
+    vsf_tgui_control_get_core(
+            (const vsf_tgui_control_t *)&(ptTextList->tList.use_as__vsf_tgui_container_t))
+        ->tRegion.tLocation.iY =
+            - __vk_tgui_text_list_get_real_container_x(
+                ptTextList,
+
+                    vk_tgui_slider_on_timer_event_handler(&(ptTextList->tSlider))
+                -   __vk_tgui_text_list_calculate_container_x_adjust(
+                        __vk_tgui_label_get_line_height(&(ptTextList->tList.tContent)),
+                        vsf_tgui_control_get_core(
+                            (const vsf_tgui_control_t *)ptTextList)
+                                ->tRegion.tSize.iHeight)
+            );
+}
+#endif
+
+fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
                                             vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm;
     bool bStatusChanged = false;
-    //! replace UPDATE with TREE_UPDATE
-    if (VSF_TGUI_EVT_UPDATE == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
-        if (vsf_tgui_control_update_tree((const vsf_tgui_control_t *)ptTextList)) {
-            return fsm_rt_cpl;
-        }
-    } 
+
 #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
-    else if (VSF_TGUI_EVT_ON_TIME == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
-        vsf_tgui_control_get_core(
-            (const vsf_tgui_control_t *)&(ptTextList->tList.use_as__vsf_tgui_container_t))
-        ->tRegion.tLocation.iY = vk_tgui_slider_on_timer_event_handler(&(ptTextList->tSlider));
+
+    if (VSF_TGUI_EVT_ON_TIME == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
+
+        vk_tgui_slider_on_timer_event_handler(&(ptTextList->tSlider));
+        __vk_tui_text_list_update_container_position(ptTextList);
+
+        if (!vk_tgui_slider_is_working(&(ptTextList->tSlider))) {
+            __vk_tgui_text_list_use_minimal_position(ptTextList);
+        }
 
         return (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH;
     }
 #endif
 
-    fsm = __vsf_tgui_control_msg_handler(   (vsf_tgui_control_t *)ptTextList, 
-                                            ptMSG, 
+    fsm = __vsf_tgui_control_msg_handler(   (vsf_tgui_control_t *)ptTextList,
+                                            ptMSG,
                                             &c_tVTextList);
 
     if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.tMSG){
         vsf_tgui_key_evt_t* ptEvt = (vsf_tgui_key_evt_t*)ptMSG;
-        
+
         switch (ptEvt->hwKeyValue) {
             case VSF_TGUI_KEY_UP:
                 ptTextList->iLineSelect--;
@@ -209,7 +271,7 @@ fsm_rt_t vsf_tgui_mc_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
             default:
                 break;
         }
-    } 
+    }
 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
     else if (VSF_TGUI_EVT_GESTURE_SLIDE == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
         vsf_tgui_gesture_evt_t* ptEvt = (vsf_tgui_gesture_evt_t*)ptMSG;
@@ -224,11 +286,15 @@ fsm_rt_t vsf_tgui_mc_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
 
     if (bStatusChanged) {
         __vk_tgui_text_list_update_line_selection(ptTextList, ptTextList->iLineSelect);
+    #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
+        ptTextList->iOldLineSelect = ptTextList->iLineSelect;
+    #endif
         fsm = VSF_TGUI_MSG_RT_REFRESH;
     }
 
     return fsm;
 }
+
 
 fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
 {
@@ -236,8 +302,14 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
               updated with TREE_UPDATE message
      */
     __vk_tgui_text_list_internal_update(ptTextList);
-
     __vk_tgui_text_list_update_line_selection(ptTextList, ptTextList->iLineSelect);
+
+#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
+    ptTextList->iOldLineSelect = ptTextList->iLineSelect;
+    __vk_tgui_text_list_use_minimal_position(ptTextList);
+    __vk_tui_text_list_update_container_position(ptTextList);
+#endif
+
     return vk_tgui_container_update(
                 &(ptTextList->use_as__vsf_tgui_container_t));
 }
@@ -250,10 +322,19 @@ static fsm_rt_t vk_tgui_text_list_init(vsf_tgui_text_list_t* ptTextList)
                         0);                                         /*!< use default fps */
 #endif
 
-    __vk_tgui_text_list_internal_update(ptTextList); 
+    __vk_tgui_text_list_internal_update(ptTextList);
 
-    return vk_tgui_container_init(
+    vk_tgui_container_init(
                 &(ptTextList->use_as__vsf_tgui_container_t));
+
+    do {
+        vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptTextList);
+        tStatus.tValues.__bContainBuiltInStructure = true;
+
+        vsf_tgui_control_status_set((vsf_tgui_control_t*)ptTextList, tStatus);
+    } while(0);
+
+    return fsm_rt_cpl;
 }
 
 int_fast16_t vsf_tgui_text_list_select_get(vsf_tgui_text_list_t* ptTextList)
@@ -263,15 +344,19 @@ int_fast16_t vsf_tgui_text_list_select_get(vsf_tgui_text_list_t* ptTextList)
     return ptTextList->iLineSelect;
 }
 
-void vsf_tgui_text_list_select_set( vsf_tgui_text_list_t* ptTextList, 
+void vsf_tgui_text_list_select_set( vsf_tgui_text_list_t* ptTextList,
                                     int_fast16_t iSelect)
 {
     VSF_TGUI_ASSERT(NULL != ptTextList);
     /*if (0 == ptTextList->hwLineCount) {
         return;
     }*/
+#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
+    //ptTextList->iOldLineSelect = iSelect;
+#endif
     ptTextList->iLineSelect = iSelect;
     __vk_tgui_text_list_update_line_selection(ptTextList, iSelect);
+
 }
 
 #endif

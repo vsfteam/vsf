@@ -36,7 +36,16 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_FS != ENABLED || VSF_USE_MEMFS != ENABLED
+#   error FAKEFAT32 need memfs
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -83,12 +92,13 @@ def_simple_class(vk_fakefat32_mal_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const i_mal_drv_t VK_FAKEFAT32_MAL_DRV;
+extern const vk_mal_drv_t VK_FAKEFAT32_MAL_DRV;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vk_fakefat32_set_result(vk_fakefat32_file_t *file, vsf_err_t err);
-extern void vk_fakefat32_return(vk_fakefat32_file_t *file, vsf_err_t err);
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_MAL && VSF_USE_FAKEFAT32_MAL
 #endif      // __VSF_FAKEFAT32_MAL_H__

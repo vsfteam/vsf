@@ -27,14 +27,16 @@
 #include "kernel/vsf_kernel.h"
 
 #if     defined(VSF_MAL_IMPLEMENT)
-#   undef VSF_MAL_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT
 #elif   defined(VSF_MAL_INHERIT)
-#   undef VSF_MAL_INHERIT
 #   define __PLOOC_CLASS_INHERIT
 #endif
 
 #include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -65,36 +67,24 @@ enum vsf_mal_feature_t {
 };
 typedef enum vsf_mal_feature_t vsf_mal_feature_t;
 
-struct i_mal_drv_t {
+struct vk_mal_drv_t {
     // blksz can be called after successfully initialized
     uint_fast32_t (*blksz)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
     bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-    void (*init)(uintptr_t target, vsf_evt_t evt);
-    void (*fini)(uintptr_t target, vsf_evt_t evt);
-    void (*erase)(uintptr_t target, vsf_evt_t evt);
-    void (*read)(uintptr_t target, vsf_evt_t evt);
-    void (*write)(uintptr_t target, vsf_evt_t evt);
+    vsf_peda_evthandler_t init;
+    vsf_peda_evthandler_t fini;
+    vsf_peda_evthandler_t erase;
+    vsf_peda_evthandler_t read;
+    vsf_peda_evthandler_t write;
 };
-typedef struct i_mal_drv_t i_mal_drv_t;
+typedef struct vk_mal_drv_t vk_mal_drv_t;
 
 def_simple_class(vk_mal_t) {
     public_member(
-        const i_mal_drv_t *drv;
+        const vk_mal_drv_t *drv;
         void *param;
         uint64_t size;
         uint8_t feature;
-    )
-
-    protected_member(
-        struct {
-            uint64_t addr;
-            uint32_t size;
-            uint8_t *buff;
-        } args;
-        struct {
-            uint32_t size;
-            vsf_err_t errcode;
-        } result;
     )
 };
 
@@ -104,25 +94,37 @@ def_simple_class(vk_mal_stream_t) {
         vk_mal_t *mal;
     )
     protected_member(
-        struct {
-            uint64_t addr;
-            uint32_t size;
-            uint32_t rw_size;
-            vsf_stream_t *stream;
-            uint8_t *cur_buff;
-            vsf_eda_t *cur_eda;
-        } stream;
+        uint64_t addr;
+        uint32_t size;
+        uint32_t rw_size;
+        vsf_stream_t *stream;
+        uint32_t cur_size;
+        uint8_t *cur_buff;
+        vsf_eda_t *cur_eda;
     )
 };
 #endif
 
-/*============================ INCLUDES ======================================*/
-
-#include "./driver/mim_mal/vsf_mim_mal.h"
-#include "./driver/mem_mal/vsf_mem_mal.h"
-#include "./driver/fakefat32_mal/vsf_fakefat32_mal.h"
-#include "./driver/scsi_mal/vsf_scsi_mal.h"
-#include "./driver/file_mal/vsf_file_mal.h"
+#if defined(VSF_MAL_IMPLEMENT) || defined(VSF_MAL_INHERIT)
+__vsf_component_peda_ifs(vk_mal_init)
+__vsf_component_peda_ifs(vk_mal_fini)
+__vsf_component_peda_ifs(vk_mal_erase,
+    uint64_t addr;
+    uint32_t size;
+)
+__vsf_component_peda_ifs(vk_mal_read,
+    uint64_t addr;
+    uint32_t size;
+    uint8_t *buff;
+    uint32_t rsize;
+)
+__vsf_component_peda_ifs(vk_mal_write,
+    uint64_t addr;
+    uint32_t size;
+    uint8_t *buff;
+    uint32_t wsize;
+)
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -142,7 +144,20 @@ extern vsf_err_t vk_mal_read_stream(vk_mal_stream_t *pthis, uint_fast64_t addr, 
 extern vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 #endif
 
-extern vsf_err_t vk_mal_get_result(vk_mal_t *pthis, uint32_t *size);
+#ifdef __cplusplus
+}
+#endif
+
+/*============================ INCLUDES ======================================*/
+
+#include "./driver/mim_mal/vsf_mim_mal.h"
+#include "./driver/mem_mal/vsf_mem_mal.h"
+#include "./driver/fakefat32_mal/vsf_fakefat32_mal.h"
+#include "./driver/scsi_mal/vsf_scsi_mal.h"
+#include "./driver/file_mal/vsf_file_mal.h"
+
+#undef VSF_MAL_IMPLEMENT
+#undef VSF_MAL_INHERIT
 
 #endif      // VSF_USE_MAL
 #endif      // __VSF_MAL_H__

@@ -25,6 +25,10 @@
 
 #include "../vsf_input_get_type.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define VSF_SENSOR_DEF_ITEM_INFO(__id, __subid, __bitlen)                       \
@@ -86,6 +90,10 @@ typedef struct vk_sensor_evt_t vk_sensor_evt_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

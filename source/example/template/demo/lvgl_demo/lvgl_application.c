@@ -25,10 +25,6 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef USRAPP_UI_CFG_GAMEPAD_NUM
-#   define USRAPP_UI_CFG_GAMEPAD_NUM    1
-#endif
-
 // __R, __G, __B in [0, 255]
 #if LV_COLOR_DEPTH == 16
 #   define UI_COLOR(__R, __G, __B)                                              \
@@ -90,8 +86,8 @@ typedef struct lvgl_demo_gamepad_t lvgl_demo_gamepad_t;
 
 struct lvgl_demo_t {
     vk_input_notifier_t notifier;
-    lv_obj_t *cont[USRAPP_UI_CFG_GAMEPAD_NUM];
-        lvgl_demo_gamepad_t gamepad[USRAPP_UI_CFG_GAMEPAD_NUM];
+    lv_obj_t *cont[4];
+        lvgl_demo_gamepad_t gamepad[4];
 };
 typedef struct lvgl_demo_t lvgl_demo_t;
 
@@ -216,10 +212,7 @@ static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *game
         lv_label_set_text(gamepad->lbl_rt, gamepad->lbl_rt_text);
         break;
     case GAMEPAD_ID_DPAD: {
-            static uint8_t dpad_orig = 0;
-            uint8_t dpad_mask = __hid_dpad_to_mask[cur];
-            uint8_t dpad_diff = dpad_orig ^ dpad_mask;
-            dpad_orig = dpad_mask;
+            uint8_t dpad_diff = __hid_dpad_to_mask[prev] ^ __hid_dpad_to_mask[cur];
 
             if (dpad_diff & 1) {
                 lv_btn_toggle(gamepad->pad_left.btn_up);
@@ -386,18 +379,20 @@ static void lvgl_demo_create_gamepad(lvgl_demo_gamepad_t *gamepad, lv_obj_t *con
     lvgl_demo_create_joystick(&gamepad->joystick_right, cont, 20 * margin, 8 * margin, margin);
 }
 
-void lvgl_application(void)
+void lvgl_application(uint_fast8_t gamepad_num)
 {
     lv_obj_t *obj, *screen;
     lv_coord_t margin_x, margin_y, margin, top_margin;
 
+    ASSERT((gamepad_num > 0) && (gamepad_num <= dimof(__lvgl_demo.gamepad)));
+
     screen = lv_scr_act();
     margin_x = lv_obj_get_width(screen) / 30;
-    margin_y = lv_obj_get_height(screen) / (16 * USRAPP_UI_CFG_GAMEPAD_NUM);
+    margin_y = lv_obj_get_height(screen) / (16 * gamepad_num);
     margin = min(margin_x, margin_y);
-    top_margin = (lv_obj_get_height(screen) - 16 * USRAPP_UI_CFG_GAMEPAD_NUM * margin) / 2;
+    top_margin = (lv_obj_get_height(screen) - 16 * gamepad_num * margin) / 2;
 
-    for (uint_fast8_t i = 0; i < USRAPP_UI_CFG_GAMEPAD_NUM; i++) {
+    for (uint_fast8_t i = 0; i < gamepad_num; i++) {
         obj = lv_cont_create(screen, NULL);
         // gamepad size is 15 X 30
         lv_obj_set_pos(obj, (lv_obj_get_width(screen) - 30 * margin) / 2, top_margin);

@@ -25,7 +25,7 @@
 
 #if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "../view/simple_view/vsf_tgui_v_type.h"
-#else 
+#else
 #   undef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
 #   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL  VSF_TGUI_V_TEMPLATE_EXAMPLE
 #   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "../view/template/vsf_tgui_v_type.h"

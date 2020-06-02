@@ -78,7 +78,7 @@
 //      <h> Schedule Policy 
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
-#define VSF_KERNEL_CFG_SUPPORT_PREMPT                   ENABLED
+#define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED                   ENABLED
 //          </c>
 
 //          <c1>Enable Dynamic Task Priority
@@ -148,6 +148,8 @@
 //  </h>
 //! @}
 
+#define VSF_USE_VIDEO                       ENABLED
+
 #define VSF_USE_INPUT                       ENABLED
 #define VSF_USE_INPUT_HID                   ENABLED
 
@@ -166,6 +168,7 @@
 #define VSFIP_CFG_NETIF_HEADLEN             64
 
 #define VSF_USE_TRACE                       ENABLED
+#define VSF_DEBUGGER_CFG_CONSOLE            VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
 #define VSFVM_CFG_RUNTIME_EN                ENABLED
 #define VSFVM_CFG_COMPILER_EN               ENABLED

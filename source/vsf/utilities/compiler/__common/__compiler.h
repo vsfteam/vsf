@@ -18,6 +18,10 @@
 #ifndef __USE_COMMON_COMPILER_H__
 #define __USE_COMMON_COMPILER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
@@ -78,7 +82,7 @@
 
 
 //! \brief The mcu memory align mode
-# define MCU_MEM_ALIGN_SIZE             sizeof(int)
+# define MCU_MEM_ALIGN_SIZE             sizeof(uintalu_t)
 
 #ifndef __volatile__
 #define __volatile__                    volatile
@@ -216,6 +220,9 @@
 #pragma clang diagnostic ignored "-Wtautological-pointer-compare"
 #pragma clang diagnostic ignored "-Wunused-value" 
 #pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#pragma clang diagnostic ignored "-Wmain-return-type"
+#pragma clang diagnostic ignored "-Wextern-c-compat"
+#pragma clang diagnostic ignored "-Wunused-label"
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma clang diagnostic ignored "-Wbitfield-constant-conversion"
 //#pragma clang diagnostic ignored "-Wpointer-integer-compare" 
@@ -303,5 +310,9 @@
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 extern void vsf_stdio_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

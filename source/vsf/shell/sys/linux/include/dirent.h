@@ -3,6 +3,10 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct dirent {
     long d_ino;
     off_t d_off;
@@ -15,5 +19,9 @@ typedef struct vsf_linux_fd_t DIR;
 DIR * opendir(const char *name);
 struct dirent * readdir(DIR *dir);
 int closedir(DIR *dir);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

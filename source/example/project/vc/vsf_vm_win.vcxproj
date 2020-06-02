@@ -140,8 +140,8 @@
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\vsf_ui_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h" />
     <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDCACM.h" />
@@ -354,8 +354,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c" />
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c" />
     <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.c" />
@@ -481,6 +481,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\vsfvm_demo;$(ProjectDir)..\..\usrapp\vsfvm_demo\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\vsf\component\3rd-party\vsfvm\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions -fmacro-backtrace-limit=0  -Wno-microsoft-include %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

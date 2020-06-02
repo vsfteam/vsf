@@ -38,6 +38,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 #if     defined(VSF_POOL_CFG_SUPPORT_USER_OBJECT) \
     &&  VSF_POOL_CFG_SUPPORT_USER_OBJECT != ENABLED
@@ -60,7 +64,7 @@ enum {
     VSF_PBUF_NO_FREE     = 255
 };
 
-declare_class(vsf_pbuf_t)
+dcl_class(vsf_pbuf_t)
 
 /*! \name prototype of pbuf request event handler
  *! \param ptTarget target object address
@@ -114,7 +118,7 @@ end_def_class(vsf_pbuf_t)
 //! \name special methods for accessing blocks
 //! \note the instance of i_block_methods_t should stored in ROM
 //! @{
-declare_interface(i_pbuf_methods_t)
+dcl_interface(i_pbuf_methods_t)
 def_interface(i_pbuf_methods_t)
 
     /*! \retval NULL    target pbuf has been free-ed
@@ -155,7 +159,7 @@ typedef struct vsf_pbuf_cfg_t {
     uint_fast8_t        AdapterID;
 } vsf_pbuf_cfg_t;
 
-declare_interface(i_pbuf_t)
+dcl_interface(i_pbuf_t)
 def_interface(i_pbuf_t)
     
     vsf_pbuf_t *       (*Init)(vsf_pbuf_t *, vsf_pbuf_cfg_t *);
@@ -241,6 +245,10 @@ extern void vsf_pbuf_pool_item_init_event_handler(  uintptr_t ptarget,
 extern void vsf_pbuf_ref_increase(vsf_pbuf_t *pbuf);
 #endif
 /*============================ INCLUDES ======================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

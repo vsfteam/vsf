@@ -30,6 +30,16 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED
 
+#   if VSF_USBD_CFG_RAW_MODE == ENABLED
+#       define VSF_USBD_CFG_AUTOSETUP           DISABLED
+#   endif
+
+#   if defined(VSF_USBD_CFG_DRV_LV0) || defined(VSF_USBD_CFG_DRV_LV1)
+#       undef VSF_USBD_CFG_DRV_INTERFACE
+#   else
+#       define VSF_USBD_CFG_DRV_INTERFACE
+#   endif
+
 // check dependency here
 #   if VSF_USE_USB_DEVICE_CDCACM == ENABLED
 #       ifndef VSF_USE_USB_DEVICE_CDC

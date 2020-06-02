@@ -49,15 +49,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 struct vsf_input_t {
     vsf_slist_t notifier_list;
 };
 typedef struct vsf_input_t vsf_input_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
+#if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 static vsf_input_t __vsf_input;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -234,6 +238,7 @@ void vsf_input_on_free_dev(vk_input_type_t type, void *dev)
 WEAK(vsf_input_on_evt)
 void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
+#if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
     vsf_protect_t orig = vsf_input_protect();
         __vsf_slist_foreach_unsafe(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list) {
             if (_->mask & (1 << type)) {
@@ -242,6 +247,7 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
             }
         }
     vsf_input_unprotect(orig);
+#endif
 }
 #endif
 
@@ -253,6 +259,7 @@ uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp)
     return duration;
 }
 
+#if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 void vk_input_notifier_register(vk_input_notifier_t *notifier)
 {
     vsf_protect_t orig = vsf_input_protect();
@@ -268,5 +275,6 @@ void vk_input_notifier_unregister(vk_input_notifier_t *notifier)
         vsf_slist_remove(vk_input_notifier_t, notifier_node, &__vsf_input.notifier_list, notifier);
     vsf_input_unprotect(orig);
 }
+#endif
 
 #endif      // VSF_USE_INPUT

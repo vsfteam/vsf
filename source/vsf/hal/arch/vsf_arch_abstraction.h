@@ -21,6 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -32,6 +35,9 @@ typedef vsf_irq_handler_t vsf_swi_handler_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
+#ifdef __cplusplus
+}
+#endif
 /*============================ INCLUDES ======================================*/
 #if !defined(VSF_ARCH_HEADER)
 # if      (defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'M') || __TARGET_PROFILE_M
@@ -55,6 +61,9 @@ typedef vsf_irq_handler_t vsf_swi_handler_t;
 #endif
 #include VSF_ARCH_HEADER
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_ARCH_SWI_NUM
@@ -205,6 +214,10 @@ extern vsf_gint_state_t vsf_disable_interrupt(void);
 extern void vsf_enable_interrupt(void);
 
 extern void vsf_arch_sleep(uint32_t mode);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

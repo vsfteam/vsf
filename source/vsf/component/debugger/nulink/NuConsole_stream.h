@@ -19,10 +19,15 @@
 #define __NUCONSOLE_STREAM_H__
 
 /*============================ INCLUDES ======================================*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSF_DEBUG_STREAM_NEED_POOL
+#   define VSF_DEBUG_STREAM_NEED_POLL
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
 #endif
 
@@ -42,6 +47,10 @@ extern const vsf_stream_tx_t VSF_DEBUG_STREAM_TX;
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
 extern void VSF_DEBUG_STREAM_POLL(void);
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

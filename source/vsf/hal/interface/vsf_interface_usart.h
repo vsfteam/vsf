@@ -21,10 +21,10 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "vsf_interface_common.h"
-#if VSF_HAL_CFG_USE_STREAM == ENABLED || VSF_HAL_CFG_USE_VSFSTREAM == ENABLED
-#   indlude "service/stream/vsf_stream.h"
-#endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -86,28 +86,28 @@ typedef struct usart_status_t usart_status_t;
 /* usart_capability_t should implement peripheral_capability_t */
 typedef struct usart_capability_t usart_capability_t;
 
-
+typedef struct vsf_usart_t vsf_usart_t;
 
 typedef void vsf_usart_evt_handler_t(   void *pTarget, 
                                         vsf_usart_t *,
                                         usart_status_t tStatus);
 
-typedef struct vsf_usart_evt_type_t vsf_usart_evt_type_t;
-struct vsf_usart_evt_type_t
+typedef struct vsf_usart_evt_t vsf_usart_evt_t;
+struct vsf_usart_evt_t
 {
     vsf_usart_evt_handler_t *fnHandler;
     void *pTarget;
 };
 
-enum em_usart_evt_t{
-    VSF_USART_EVT_RX,
-    VSF_USART_EVT_TX,
-    VSF_USART_EVT_RCV_BLK_CPL,
-    VSF_USART_EVT_SND_BLK_CPL,
-};
+typedef enum {
+    VSF_USART_EVT_RX                = _BV(0),
+    VSF_USART_EVT_TX                = _BV(1),
+    VSF_USART_EVT_RCV_BLK_CPL       = _BV(2),
+    VSF_USART_EVT_SND_BLK_CPL       = _BV(3),
+} vsf_usart_evt_type_t;
 
 //! the the target machine int
-typedef unsigned int usart_evt_status_t;
+typedef uint_fast8_t usart_evt_status_t;
 
 //! \name class: usart_t
 //! @{
@@ -123,7 +123,11 @@ def_interface(i_usart_t)
 
     //! data access
     implement(i_byte_pipe_t)
-    implement_ex(vsf_async_block_access_t, Block)
+
+    struct {
+        vsf_async_block_access_t Read;
+        vsf_async_block_access_t Write;
+    }Block;
 
     //! event
     struct {
@@ -133,42 +137,24 @@ def_interface(i_usart_t)
         void (*Resume)(usart_evt_status_t tEventStatus);
     }Event;
 
-#if VSF_HAL_CFG_USE_STREAM == ENABLED || VSF_HAL_CFG_USE_VSFSTREAM == ENABLED
-    /*! \note the stream interface is only implemented in lv1 */
-    struct {
-#if VSF_HAL_CFG_USE_VSFSTREAM == ENABLED
-        struct {
-            vsf_stream_t *  (*Get)(void);
-        }RX;
-        struct {
-            vsf_stream_t *  (*Get)(void);
-        }TX;
-#endif
-#if VSF_HAL_CFG_USE_STREAM == ENABLED
-        struct {
-            implement(vsf_stream_rx_t)
-            void (*Register)(vsf_stream_tx_t *ptReceiver);
-        }RX;
-        struct {
-            implement(vsf_stream_tx_t)
-            void (*Register)(vsf_stream_rx_t *ptSender);
-        }TX;
-#endif
-    }Stream;
-#endif
     //! properties
     u32_property_t  Baudrate;
 
 end_def_interface(i_usart_t)
 //! @}
 
-typedef struct vsf_usart_t vsf_usart_t;
+
+
+
+
 
 /*============================ GLOBAL VARIABLES ==============================*/
 extern const i_usart_t VSF_USART[USART_COUNT];
 
 /*============================ PROTOTYPES ====================================*/
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif

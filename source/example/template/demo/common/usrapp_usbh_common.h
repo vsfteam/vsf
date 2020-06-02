@@ -31,6 +31,11 @@
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef APP_CFG_USBH_HW_PRIO
+#   define APP_CFG_USBH_HW_PRIO                 vsf_arch_prio_0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -76,6 +81,9 @@ struct usrapp_usbh_common_t {
 #endif
 #if VSF_USE_USB_HOST_XB1 == ENABLED
     vk_usbh_class_t xb1;
+#endif
+#if VSF_USE_USB_HOST_UAC == ENABLED
+    vk_usbh_class_t uac;
 #endif
 };
 typedef struct usrapp_usbh_common_t usrapp_usbh_common_t;

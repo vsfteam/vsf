@@ -45,14 +45,18 @@
 
 vsf_err_t vk_scsi_init(vk_scsi_t *pthis)
 {
+    vsf_err_t err;
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->init != NULL));
-    return __vsf_call_eda((uintptr_t)pthis->drv->init, (uintptr_t)pthis);
+    __vsf_component_call_peda_ifs(vk_scsi_init, err, pthis->drv->init, 0, pthis);
+    return err;
 }
 
 vsf_err_t vk_scsi_fini(vk_scsi_t *pthis)
 {
+    vsf_err_t err;
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->fini != NULL));
-    return __vsf_call_eda((uintptr_t)pthis->drv->fini, (uintptr_t)pthis);
+    __vsf_component_call_peda_ifs(vk_scsi_fini, err, pthis->drv->fini, 0, pthis);
+    return err;
 }
 
 bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
@@ -66,45 +70,38 @@ bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 
 vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 {
+    vsf_err_t err;
+    vsf_mem_t execute_mem;
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
-    pthis->args.cbd = cbd;
+
     if (mem != NULL) {
-        pthis->args.mem = *mem;
+        execute_mem = *mem;
     } else {
-        pthis->args.mem.pchBuffer = NULL;
-        pthis->args.mem.nSize = 0;
+        execute_mem.pchBuffer = NULL;
+        execute_mem.nSize = 0;
     }
+    __vsf_component_call_peda_ifs(vk_scsi_execute, err, pthis->drv->execute, 0, pthis,
+        .cbd    = cbd,
+        .mem    = execute_mem,
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    pthis->args.stream = NULL;
+        .stream = NULL,
 #endif
-    return __vsf_call_eda((uintptr_t)pthis->drv->execute, (uintptr_t)pthis);
+    );
+    return err;
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream)
 {
+    vsf_err_t err;
     VSF_SCSI_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->execute != NULL));
-    pthis->args.cbd = cbd;
-    pthis->args.stream = stream;
-    return __vsf_call_eda((uintptr_t)pthis->drv->execute_stream, (uintptr_t)pthis);
+    __vsf_component_call_peda_ifs(vk_scsi_execute_stream, err, pthis->drv->execute_stream, 0, pthis,
+        .cbd    = cbd,
+        .stream = stream,
+    );
+    return err;
 }
 #endif
-
-vsf_err_t vk_scsi_get_errcode(vk_scsi_t *pthis, uint32_t *reply_len)
-{
-    VSF_SCSI_ASSERT(pthis != NULL);
-    if (reply_len != NULL) {
-        *reply_len = pthis->result.reply_len;
-    }
-    return pthis->result.errcode;
-}
-
-void vk_scsi_return(vk_scsi_t *pthis, vsf_err_t err)
-{
-    VSF_SCSI_ASSERT(pthis != NULL);
-    pthis->result.errcode = err;
-    vsf_eda_return();
-}
 
 uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd)
 {

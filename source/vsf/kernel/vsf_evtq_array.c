@@ -53,7 +53,10 @@ extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis);
 
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_evtq_on_eda_init(vsf_eda_t *eda) {}
+void vsf_evtq_on_eda_init(vsf_eda_t *pthis)
+{
+    pthis->evt_cnt = 0;
+}
 
 static bool __vsf_eda_terminate(vsf_eda_t *pthis)
 {
@@ -103,14 +106,12 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 
     orig = vsf_protect_int();
 
-    if (    eda->evt_cnt 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-        &&  eda->state.bits.is_limitted 
-#endif
-        && !force) {
+    if (eda->evt_cnt && eda->state.bits.is_limitted && !force) {
         vsf_unprotect_int(orig);
         return VSF_ERR_FAIL;
     }
+#endif
 
     tail = evtq->tail;
     tail_next = (tail + 1) & mask;

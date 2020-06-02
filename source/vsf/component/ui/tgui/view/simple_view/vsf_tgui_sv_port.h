@@ -23,7 +23,10 @@
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
-#include "../../utilities/vsf_tgui_font.h"
+
+#include "./vsf_tgui_sv_font.h"
+#include "./vsf_tgui_sv_color.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -31,21 +34,24 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern
-void vsf_tgui_draw_rect(vsf_tgui_location_t* ptLocation, vsf_tgui_size_t* ptSize, vsf_tgui_color_t tColor);
+void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t* ptLocation,
+                        vsf_tgui_size_t* ptSize,
+                        vsf_tgui_sv_color_t tColor);
 
 extern
-void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation,
+void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* ptLocation,
                         vsf_tgui_location_t* ptFontLocation,
                         vsf_tgui_size_t* ptSize,
                         const uint8_t chFontIndex,
                         uint32_t wChar,
-                        vsf_tgui_color_t tCharColor);
+                        vsf_tgui_sv_color_t tCharColor);
 
 extern
-void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
+void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
                         vsf_tgui_location_t* ptTileLocation,
                         vsf_tgui_size_t* ptSize,
-                        const vsf_tgui_tile_t* ptTile);
+                        const vsf_tgui_tile_t* ptTile,
+                        uint_fast8_t chTransparencyRate);
 
 extern
 vsf_tgui_size_t vsf_tgui_font_get_size(void* pFont, uint32_t wChar);

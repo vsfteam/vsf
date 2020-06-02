@@ -34,6 +34,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -68,6 +72,10 @@ typedef struct vk_wav_t vk_wav_t;
 
 extern vsf_err_t vk_wav_play_start(vk_wav_t *wav);
 extern vsf_err_t vk_wav_play_stop(vk_wav_t *wav);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_DECODER_WAV
 #endif      // __VSF_WAV_H__

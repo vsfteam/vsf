@@ -21,7 +21,9 @@
 #if     VSF_USE_TINY_GUI == ENABLED \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 declare_class(vsf_tgui_t)
+
 #include "./vsf_tgui_sv_style.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -34,13 +36,13 @@ declare_class(vsf_tgui_t)
 typedef uint8_t vsf_tgui_opacity_t;
 
 struct vsf_tgui_sv_style_control_t {
-    vsf_tgui_color_t tColor;
+    vsf_tgui_sv_color_t tColor;
     vsf_tgui_opacity_t tOpacity;
 };
 typedef struct vsf_tgui_sv_style_control_t vsf_tgui_sv_style_control_t;
 
 struct vsf_tgui_sv_style_text_t {
-    vsf_tgui_color_t tColor;
+    vsf_tgui_sv_color_t tColor;
     vsf_tgui_opacity_t tOpacity;
 };
 typedef struct vsf_tgui_sv_style_text_t vsf_tgui_sv_style_text_t;

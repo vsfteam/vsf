@@ -20,6 +20,9 @@
 
 /*============================ INCLUDES ======================================*/
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned int        uint_fast8_t;
@@ -55,7 +58,9 @@ typedef enum {
     true = !false,
 } bool;
 #endif
-
+#ifdef __cplusplus
+}
+#endif
 #else
 #include <stdint.h>
 #include <stdbool.h>
@@ -65,15 +70,25 @@ typedef enum {
 #include <assert.h>
 #include "../__common/__type.h"
 
-typedef uint_fast8_t        uintalu_t;
-typedef int_fast8_t         intalu_t; 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 #define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
 #define __optimal_bit_msk       (__optimal_bit_sz - 1)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+typedef uint_fast8_t        uintalu_t;
+typedef int_fast8_t         intalu_t; 
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // __APP_TYPE_H_INCLUDED__

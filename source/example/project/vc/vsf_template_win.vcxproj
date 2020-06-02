@@ -114,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\kernel_test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions -fmacro-backtrace-limit=0  -Wno-microsoft-include %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -176,6 +177,8 @@
     <ClCompile Include="..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\vsf\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
+    <ClCompile Include="..\..\..\vsf\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf.c" />
     <ClCompile Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c" />
@@ -240,6 +243,13 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_peripheral.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\vsf\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf.h" />
     <ClInclude Include="..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h" />

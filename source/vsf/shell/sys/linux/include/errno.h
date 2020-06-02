@@ -1,6 +1,15 @@
 #ifndef __ERRNO_H__
 #define __ERRNO_H__
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define EPERM           1 /* Operation not permitted */
 #define ENOENT          2 /* No such file or directory */
 #define ESRCH           3 /* No such process */
@@ -135,5 +144,13 @@
 
 
 extern int errno;
+
+#ifdef __cplusplus
+}
+#endif
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif

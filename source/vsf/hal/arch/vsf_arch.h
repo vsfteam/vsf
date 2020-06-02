@@ -22,6 +22,9 @@
 #include "hal/vsf_hal_cfg.h"
 #include "vsf_arch_abstraction.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -37,6 +40,10 @@
  *  \retval false initialization failed
  */
 extern bool vsf_arch_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

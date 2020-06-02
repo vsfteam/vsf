@@ -121,8 +121,8 @@
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_touchscreen.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input.h" />
     <ClInclude Include="..\..\..\vsf\component\input\vsf_input_cfg.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\disp\vsf_disp.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_msg_tree_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.h" />
@@ -133,13 +133,13 @@
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\controls\__vsf_tgui_controls_common.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h" />
-    <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h" />
+    <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.h" />
     <ClInclude Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.h" />
@@ -181,11 +181,13 @@
     <ClInclude Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.h" />
     <ClInclude Include="..\..\..\vsf\hal\arch\x86\win\win_generic.h" />
     <ClInclude Include="..\..\..\vsf\hal\arch\__vsf_arch_interface.h" />
+    <ClInclude Include="..\..\..\vsf\hal\driver\common\common.h" />
     <ClInclude Include="..\..\..\vsf\hal\driver\driver.h" />
     <ClInclude Include="..\..\..\vsf\hal\driver\x86\driver.h" />
     <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_common.h" />
     <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_io.h" />
     <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_pm.h" />
+    <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_spi.h" />
     <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usart.h" />
     <ClInclude Include="..\..\..\vsf\hal\interface\vsf_interface_usb.h" />
     <ClInclude Include="..\..\..\vsf\hal\vsf_hal.h" />
@@ -207,6 +209,13 @@
     <ClInclude Include="..\..\..\vsf\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_periperhal_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\sw_peripheral\sw_peripheral.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal.h" />
+    <ClInclude Include="..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h" />
     <ClInclude Include="..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h" />
     <ClInclude Include="..\..\..\vsf\osa_service\vsf_osa_service.h" />
     <ClInclude Include="..\..\..\vsf\osa_service\vsf_osa_service_cfg.h" />
@@ -251,6 +260,8 @@
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_queue.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\vsf_utilities_cfg.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\vsf_utlities.h" />
     <ClInclude Include="..\..\..\vsf\vsf.h" />
     <ClInclude Include="..\..\..\vsf\vsf_cfg.h" />
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_tgui_cfg.h" />
@@ -307,8 +318,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c" />
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\sdl2\vsf_disp_drv_sdl2.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls_common.c" />
@@ -317,13 +328,13 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c" />
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c" />
@@ -365,6 +376,8 @@
     <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_queue.c" />
     <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_sync.c" />
     <ClCompile Include="..\..\..\vsf\kernel\__eda\vsf_eda_timer.c" />
+    <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
+    <ClCompile Include="..\..\..\vsf\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c" />
     <ClCompile Include="..\..\..\vsf\osa_service\vsf_osa_service.c" />
     <ClCompile Include="..\..\..\vsf\service\heap\vsf_heap.c" />
@@ -481,6 +494,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

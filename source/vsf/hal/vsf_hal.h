@@ -20,15 +20,18 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-
 #include "./arch/vsf_arch.h"
 #include "./driver/driver.h"
-
+#include "./driver/common/common.h"
 
 /* \note: never include interface.h here, individual device drivers might 
  *        include it their own driver header files.  
  */
 //#include "./interface.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -49,7 +52,11 @@ extern bool vsf_hal_init(void);
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */  
-extern bool vsf_hal_advance_init(void);
+extern bool vsf_osa_hal_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

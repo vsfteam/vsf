@@ -34,11 +34,26 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vk_memfs_file_t)
+
+__vsf_component_peda_ifs(vk_memfs_callback_read,
+    uint64_t        offset;
+    uint32_t        size;
+    uint8_t         *buff;
+)
+__vsf_component_peda_ifs(vk_memfs_callback_write,
+    uint64_t        offset;
+    uint32_t        size;
+    uint8_t         *buff;
+)
 
 def_simple_class(vk_memfs_file_t) {
     implement(vk_file_t)
@@ -76,6 +91,10 @@ extern void vk_memfs_init(vk_memfs_info_t *memfs);
 extern vk_memfs_file_t * vk_memfs_open(vk_memfs_file_t *dir, const char *path);
 extern int_fast32_t vk_memfs_read(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
 extern int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint_fast64_t addr, uint_fast32_t size, uint8_t *buff);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // VSF_USE_FS && VSF_USE_FATFS
 #endif      // __VSF_MEMFS_H__

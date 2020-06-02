@@ -76,9 +76,6 @@ typedef struct vk_malfs_mbr_t vk_malfs_mbr_t;
 
 void __vk_malfs_init(__vk_malfs_info_t *info)
 {
-#if VSF_FS_CFG_SUPPORT_MULTI_THREAD == ENABLED
-    vsf_eda_crit_init(&info->crit);
-#endif
     __vk_malfs_cache_init(info, &info->cache);
 }
 
@@ -92,14 +89,14 @@ static uint8_t * __vk_malfs_get_cache_buff(__vk_malfs_cache_t *cache, __vk_malfs
 void __vk_malfs_cache_init(__vk_malfs_info_t *info, __vk_malfs_cache_t *cache)
 {
     cache->info = info;
-#if VSF_FS_CFG_SUPPORT_MULTI_THREAD == ENABLED
-    vsf_eda_crit_init(&cache->crit);
-#endif
 }
 
-static void __vk_malfs_alloc_cache_imp(uintptr_t target, vsf_evt_t evt)
-{
-    __vk_malfs_cache_t *cache = (__vk_malfs_cache_t *)target;
+__vsf_component_peda_private_entry(__vk_malfs_alloc_cache,
+    uint64_t block_addr;
+    __vk_malfs_cache_node_t *result;
+) {
+    vsf_peda_begin();
+    __vk_malfs_cache_t *cache = (__vk_malfs_cache_t *)&vsf_this;
     __vk_malfs_info_t *info = cache->info;
     __vk_malfs_cache_node_t *nodes = cache->nodes;
 
@@ -108,9 +105,8 @@ static void __vk_malfs_alloc_cache_imp(uintptr_t target, vsf_evt_t evt)
             __vk_malfs_cache_node_t *least_node = nodes, *unalloced_node = NULL;
             for (uint_fast16_t i = 0; i < cache->number; i++) {
                 if (nodes[i].is_alloced) {
-                    if (nodes[i].block_addr == cache->ctx.block_addr) {
-                        cache->ctx.result = &nodes[i];
-                        vsf_eda_return();
+                    if (nodes[i].block_addr == vsf_local.block_addr) {
+                        vsf_eda_return(&nodes[i]);
                         return;
                     }
                     if (nodes[i].access_time_sec < least_node->access_time_sec) {
@@ -122,17 +118,15 @@ static void __vk_malfs_alloc_cache_imp(uintptr_t target, vsf_evt_t evt)
             }
             if (unalloced_node != NULL) {
                 unalloced_node->is_alloced = true;
-                cache->ctx.result = unalloced_node;
-                vsf_eda_return();
+                vsf_eda_return(unalloced_node);
                 return;
             }
 
-            cache->ctx.result = least_node;
+            vsf_local.result = least_node;
             // missed, get least cache
             // TODO: add bit to indicate the node is not currently used
             if (!least_node->is_dirty) {
-                cache->ctx.result = least_node;
-                vsf_eda_return();
+                vsf_eda_return(least_node);
                 return;
             }
 
@@ -142,22 +136,28 @@ static void __vk_malfs_alloc_cache_imp(uintptr_t target, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_RETURN:
-        vsf_eda_return();
+        vsf_eda_return(vsf_local.result);
         break;
     }
+    vsf_peda_end();
 }
 
 vsf_err_t __vk_malfs_alloc_cache(__vk_malfs_info_t *info, __vk_malfs_cache_t *cache, uint_fast64_t block_addr)
 {
-    // TODO: add lock
-    cache->ctx.block_addr = block_addr;
-    cache->ctx.result = NULL;
-    return __vsf_call_eda((uintptr_t)__vk_malfs_alloc_cache_imp, (uintptr_t)cache);
+    vsf_err_t err;
+    __vsf_component_call_peda(__vk_malfs_alloc_cache, err, cache,
+        .block_addr     = block_addr,
+    )
+    return err;
 }
 
-static void __vk_malfs_read_imp(uintptr_t target, vsf_evt_t evt)
-{
-    __vk_malfs_info_t *info = (__vk_malfs_info_t *)target;
+__vsf_component_peda_private_entry(__vk_malfs_read,
+    uint64_t block_addr;
+    uint32_t block_num;
+    uint8_t *buff;
+) {
+    vsf_peda_begin();
+    __vk_malfs_info_t *info = (__vk_malfs_info_t *)&vsf_this;
     enum {
         STATE_GET_CACHE,
         STATE_COMMIT_READ,
@@ -166,51 +166,53 @@ static void __vk_malfs_read_imp(uintptr_t target, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (NULL == info->ctx_io.buff) {
-            VSF_FS_ASSERT(1 == info->ctx_io.block_num);
+        if (NULL == vsf_local.buff) {
+            VSF_FS_ASSERT(1 == vsf_local.block_num);
             vsf_eda_frame_user_value_set(STATE_GET_CACHE);
-            __vk_malfs_alloc_cache(info, &info->cache, info->ctx_io.block_addr);
+            __vk_malfs_alloc_cache(info, &info->cache, vsf_local.block_addr);
             return;
         }
         vsf_eda_frame_user_value_set(STATE_COMMIT_READ);
     case VSF_EVT_RETURN: {
-            uint8_t state;
+            __vsf_frame_uint_t state;
             vsf_eda_frame_user_value_get(&state);
             switch (state) {
-            case STATE_GET_CACHE:
-                VSF_FS_ASSERT(info->cache.ctx.result != NULL);
-                info->ctx_io.buff = __vk_malfs_get_cache_buff(&info->cache, info->cache.ctx.result);
+            case STATE_GET_CACHE: {
+                    __vk_malfs_cache_node_t *node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
+                    VSF_FS_ASSERT(node != NULL);
+                    vsf_local.buff = __vk_malfs_get_cache_buff(&info->cache, node);
+                }
                 // fall through
             case STATE_COMMIT_READ:
                 vsf_eda_frame_user_value_set(STATE_FINISH_READ);
-                vk_mal_read(info->mal, info->block_size * info->ctx_io.block_addr,
-                            info->block_size * info->ctx_io.block_num, info->ctx_io.buff);
+                vk_mal_read(info->mal, info->block_size * vsf_local.block_addr,
+                            info->block_size * vsf_local.block_num, vsf_local.buff);
                 break;
             case STATE_FINISH_READ:
-                info->ctx_io.err = info->mal->result.errcode;
-                vsf_eda_return();
+                vsf_eda_return((int32_t)vsf_eda_get_return_value() > 0 ? vsf_local.buff : NULL);
                 break;
             }
         }
         break;
     }
+    vsf_peda_end();
 }
 
 vsf_err_t __vk_malfs_read(__vk_malfs_info_t *info, uint_fast64_t block_addr, uint_fast32_t block_num, uint8_t *buff)
 {
     // TODO: add lock and unlock
-    info->ctx_io.block_addr = block_addr;
-    info->ctx_io.block_num = block_num;
-    info->ctx_io.buff = buff;
-    return __vsf_call_eda((uintptr_t)__vk_malfs_read_imp, (uintptr_t)info);
+    vsf_err_t err;
+    __vsf_component_call_peda(__vk_malfs_read, err, info,
+        .block_addr     = block_addr,
+        .block_num      = block_num,
+        .buff           = buff,
+    )
+    return err;
 }
 
 vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, uint_fast32_t block_num, uint8_t *buff)
 {
     // TODO: add lock and unlock
-//    info->ctx_io.block_addr = block_addr;
-//    info->ctx_io.block_num = block_num;
-//    info->ctx_io.buff = buff;
     return vk_mal_write(info->mal, info->block_size * block_addr, info->block_size * block_num, buff);
 }
 
@@ -222,14 +224,16 @@ void __vk_malfs_unmount(__vk_malfs_info_t *info)
     }
 }
 
-static void __vk_malfs_mount_mbr_imp(uintptr_t target, vsf_evt_t evt)
+__vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
 {
-    vk_malfs_mounter_t *mounter = (vk_malfs_mounter_t *)target;
+    vsf_peda_begin();
+    vk_malfs_mounter_t *mounter = (vk_malfs_mounter_t *)&vsf_this;
     vk_malfs_mbr_t *mbr = (vk_malfs_mbr_t *)mounter->mbr;
     vk_malfs_dpt_t *dpt;
 
     vk_malfs_mount_partition_t *partition = &mounter->cur_partition;
     vk_mal_t *mal = mounter->mal;
+    int32_t result;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -253,9 +257,10 @@ static void __vk_malfs_mount_mbr_imp(uintptr_t target, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_RETURN:
+        result = (int32_t)vsf_eda_get_return_value();
         switch (mounter->mount_state) {
         case VSF_MOUNT_STATE_READ_MBR:
-            if (    (VSF_ERR_NONE != mal->result.errcode)
+            if (    (result < 0)
                 ||  (0xAA55 != le16_to_cpu(mbr->magic))) {
                 goto return_failed;
             }
@@ -315,7 +320,7 @@ static void __vk_malfs_mount_mbr_imp(uintptr_t target, vsf_evt_t evt)
             }
             break;
         case VSF_MOUNT_STATE_CREATE_ROOT:
-            if (VSF_ERR_NONE != mounter->dir->ctx.err) {
+            if (result < 0) {
                 goto return_mount_failed;
             }
             mounter->mount_state = VSF_MOUNT_STATE_OPEN_ROOT;
@@ -324,7 +329,7 @@ static void __vk_malfs_mount_mbr_imp(uintptr_t target, vsf_evt_t evt)
             }
             break;
         case VSF_MOUNT_STATE_OPEN_ROOT:
-            if (VSF_ERR_NONE != mounter->dir->ctx.err) {
+            if (result < 0) {
                 goto return_mount_failed;
             }
             mounter->mount_state = VSF_MOUNT_STATE_MOUNT;
@@ -333,7 +338,7 @@ static void __vk_malfs_mount_mbr_imp(uintptr_t target, vsf_evt_t evt)
             }
             break;
         case VSF_MOUNT_STATE_MOUNT:
-            if (VSF_ERR_NONE != partition->root->ctx.err) {
+            if (result < 0) {
             return_mount_failed:
                 if (partition->malfs_info->total_cb != NULL) {
                     vsf_heap_free(partition->malfs_info->total_cb);
@@ -349,12 +354,15 @@ static void __vk_malfs_mount_mbr_imp(uintptr_t target, vsf_evt_t evt)
         }
         break;
     }
+    vsf_peda_end();
 }
 
 vsf_err_t vk_malfs_mount_mbr(vk_malfs_mounter_t *mounter)
 {
+    vsf_err_t err;
     VSF_FS_ASSERT((mounter != NULL) && (mounter->mal != NULL) && (mounter->dir != NULL));
-    return __vsf_call_eda((uintptr_t)__vk_malfs_mount_mbr_imp, (uintptr_t)mounter);
+    __vsf_component_call_peda(__vk_malfs_mount_mbr, err, mounter);
+    return err;
 }
 #else
 void __vk_malfs_unmount(__vk_malfs_info_t *info)

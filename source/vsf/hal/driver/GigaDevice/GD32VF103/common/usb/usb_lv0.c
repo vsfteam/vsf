@@ -75,4 +75,4 @@ void gd32vf103_usbd_irq(gd32vf103_usb_t *dc) { ASSERT(false); }
 WEAK(gd32vf103_usbh_irq)
 void gd32vf103_usbh_irq(gd32vf103_usb_t *dc) { ASSERT(false); }
 
-MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
+REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)

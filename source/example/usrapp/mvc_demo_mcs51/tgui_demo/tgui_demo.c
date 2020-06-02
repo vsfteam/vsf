@@ -113,11 +113,11 @@ vsf_err_t tgui_demo_init(void)
 //        },
 //    };
 //
-//    vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+//    vk_tgui_send_message(&s_tTGUIDemo, tEvent);
 //
 //    if (!vsf_input_keyboard_is_down(evt)) {
 //        tEvent.tKeyEvt.tMSG = VSF_TGUI_EVT_KEY_PRESSED;
-//        vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+//        vk_tgui_send_message(&s_tTGUIDemo, tEvent);
 //    }
 //}
 
@@ -144,12 +144,12 @@ vsf_err_t tgui_demo_init(void)
 //        },
 //    };
 //
-//    vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+//    vk_tgui_send_message(&s_tTGUIDemo, tEvent);
 //
 //    
 //    if (!vsf_input_touchscreen_is_down(ts_evt)) {
 //        tEvent.tPointerEvt.tMSG = VSF_TGUI_EVT_POINTER_CLICK;
-//        vsf_tgui_send_message(&s_tTGUIDemo, tEvent);
+//        vk_tgui_send_message(&s_tTGUIDemo, tEvent);
 //    }
 //}
 

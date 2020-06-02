@@ -1,6 +1,10 @@
 #ifndef __TERMIOS_H__
 #define __TERMIOS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef unsigned int tcflag_t;
 
 #define IGNBRK      0000001
@@ -63,5 +67,9 @@ struct termios {
 
 int tcgetattr(int fd, struct termios *termios);
 int tcsetattr(int fd, int optional_actions, const struct termios *termios);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

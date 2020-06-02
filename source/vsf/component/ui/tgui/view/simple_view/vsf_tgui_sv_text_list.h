@@ -22,10 +22,11 @@
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW  \
+    &&  VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
 
-#include "../../controls/vsf_tgui_controls.h"
-
+#include "./vsf_tgui_sv_container.h"
+#include "./vsf_tgui_sv_label.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,16 +34,26 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_text_list_t* ptLabel);
+extern 
+fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_text_list_t* ptLabel);
 
-extern fsm_rt_t vsf_tgui_text_list_v_rendering(
+extern 
+fsm_rt_t vsf_tgui_text_list_v_rendering(
                                         vsf_tgui_text_list_t* ptLabel,
-                                        vsf_tgui_region_t* ptDirtyRegion,      
+                                        vsf_tgui_region_t* ptDirtyRegion,
                                         vsf_tgui_control_refresh_mode_t tMode);
 
-extern fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_text_list_t* ptLabel);
+extern
+fsm_rt_t vsf_tgui_text_list_v_post_rendering(   
+                                        vsf_tgui_text_list_t* ptTextList,
+                                        vsf_tgui_region_t* ptDirtyRegion,
+                                        vsf_tgui_control_refresh_mode_t tMode);
 
-extern fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_text_list_t* ptLabel);
+extern 
+fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_text_list_t* ptLabel);
+
+extern 
+fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_text_list_t* ptLabel);
 
 #endif
 

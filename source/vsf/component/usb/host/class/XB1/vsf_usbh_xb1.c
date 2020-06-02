@@ -167,6 +167,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         xb1->out_idle = true;
+        __vsf_eda_crit_npb_leave(&xb1->dev->ep0.crit);
         vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&xb1->use_as__vk_usbh_hid_teda_t, NULL, 64);
 
         // TODO: use timer?

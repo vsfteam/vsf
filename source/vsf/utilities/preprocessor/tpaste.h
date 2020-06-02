@@ -15,9 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef _TPASTE_H_
-#define _TPASTE_H_
+#ifndef __TPASTE_H__
+#define __TPASTE_H__
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \name Token Paste
  *
@@ -62,5 +66,9 @@
 #define ATPASTE10(a, b, c, d, e, f, g, h, i, j)   TPASTE10(a, b, c, d, e, f, g, h, i, j)
 //! @}
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // _TPASTE_H_

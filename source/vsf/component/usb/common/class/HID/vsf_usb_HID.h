@@ -18,6 +18,10 @@
 #ifndef __VSF_USB_HID_H__
 #define __VSF_USB_HID_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
@@ -53,5 +57,9 @@ typedef enum usb_hid_report_type_t usb_hid_report_type_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif    // __VSF_USB_HID_H__

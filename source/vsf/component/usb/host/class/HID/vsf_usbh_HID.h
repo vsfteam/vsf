@@ -31,6 +31,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -98,6 +102,9 @@ def_simple_class(vk_usbh_hid_teda_t) {
     implement(vsf_teda_t)
 };
 
+// user callback will need this
+typedef struct vk_usbh_hid_input_t vk_usbh_hid_input_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vk_usbh_class_drv_t vk_usbh_hid_drv;
@@ -112,12 +119,18 @@ extern void vk_usbh_hid_disconnect(vk_usbh_hid_eda_t *hid);
 extern uint8_t * __vk_usbh_hid_get_tx_report_imp(vk_usbh_hid_eda_t *hid);
 extern uint8_t * __vk_usbh_hid_get_rx_report_imp(vk_usbh_hid_eda_t *hid);
 
-extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
 extern vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
 extern vsf_err_t __vk_usbh_hid_recv_report_req_imp(vk_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
 extern vsf_err_t __vk_usbh_hid_send_report_req_imp(vk_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
 
 extern vsf_err_t __vk_usbh_hid_set_idle_imp(vk_usbh_hid_base_t *hid, uint_fast8_t id, uint_fast8_t duration);
+#endif
+
+// user can call vk_usbh_hid_send_report in callbacks
+extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
+
+#ifdef __cplusplus
+}
 #endif
 
 #undef VSF_USBH_HID_IMPLEMENT

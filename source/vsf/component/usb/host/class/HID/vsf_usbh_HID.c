@@ -60,7 +60,6 @@ struct vk_usbh_hid_input_t {
     implement(vk_input_hid_t)
 #endif
 };
-typedef struct vk_usbh_hid_input_t vk_usbh_hid_input_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 

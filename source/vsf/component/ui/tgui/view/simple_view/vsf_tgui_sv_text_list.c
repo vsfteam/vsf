@@ -19,20 +19,20 @@
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW  \
+    &&  VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
 
 #define __VSF_TGUI_CONTROLS_TEXT_LIST_CLASS_INHERIT
 declare_class(vsf_tgui_t)
-#include "./vsf_tgui_sv_text_list.h"
-#include "./vsf_tgui_sv_container.h"
-#include "./vsf_tgui_sv_label.h"
-#include "./vsf_tgui_sv_draw.h"
-#include "./vsf_tgui_sv_style.h"
 
-#include "../../utilities/vsf_tgui_color.h"
-#include "vsf_tgui_sv_port.h"
+#include "./vsf_tgui_sv_text_list.h"
 
 /*============================ MACROS ========================================*/
+#ifndef VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR   VSF_TGUI_COLOR_BLUE
+#endif
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -42,8 +42,9 @@ declare_class(vsf_tgui_t)
 
 fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_text_list_t* ptTextList)
 {
-#if VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]text list init" VSF_TRACE_CFG_LINEEND);
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) init" VSF_TRACE_CFG_LINEEND,
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptTextList), ptTextList);
 #endif
     vsf_tgui_container_v_init(&(ptTextList->use_as__vsf_tgui_container_t));
     vsf_tgui_container_v_init(&(ptTextList->tList.use_as__vsf_tgui_container_t));
@@ -60,36 +61,26 @@ fsm_rt_t vsf_tgui_text_list_v_rendering( vsf_tgui_text_list_t* ptTextList,
     VSF_TGUI_ASSERT(ptTextList != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]text list rendering" VSF_TRACE_CFG_LINEEND);
+#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) rendering" VSF_TRACE_CFG_LINEEND,
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptTextList), ptTextList);
 #endif
 
-    __vk_tgui_container_v_rendering(&(ptTextList->use_as__vsf_tgui_container_t), 
-                                    ptDirtyRegion, 
-                                    tMode, 
-                                    (vsf_tgui_color_t)VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR);
-
-    //! draw indicator
-    do {
-        vsf_tgui_control_t* ptControl = (vsf_tgui_control_t*)ptTextList;
-        vsf_tgui_color_t tColor = VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR;
-        vsf_tgui_region_t tRegion = {0};
-
-        tRegion.tSize = vsf_tgui_control_get_size(ptControl);
-
-        tRegion.tLocation.iY = tRegion.tSize.iHeight / 2 - 1;
-        tRegion.tLocation.iX = 4;
-        tRegion.tSize.iHeight = 2;
-        tRegion.tSize.iWidth -= 8;
-
-        vsf_tgui_control_v_draw_rect(   ptControl,
-                                        ptDirtyRegion,
-                                        &tRegion,
-                                        tColor);
-    } while(0);
+    __vk_tgui_container_v_rendering(&(ptTextList->use_as__vsf_tgui_container_t),
+                                    ptDirtyRegion,
+                                    tMode,
+                                    VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR);
 
     return fsm_rt_cpl;
 }
+
+fsm_rt_t vsf_tgui_text_list_v_post_rendering(   vsf_tgui_text_list_t* ptTextList,
+                                                vsf_tgui_region_t* ptDirtyRegion,
+                                                vsf_tgui_control_refresh_mode_t tMode)
+{
+    return vsf_tgui_container_v_post_rendering((vsf_tgui_container_t *)ptTextList, ptDirtyRegion, tMode);
+}
+
 
 fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_text_list_t* ptTextList)
 {

@@ -133,7 +133,7 @@
             {                                                                   \
                 .tMSG = (__MSG),                                                \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
-                .FSM = &__FUNC,                                                 \
+                .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
                 .u10EvtMask = ((uint16_t)-1, ##__VA_ARGS__),                    \
             }
 
@@ -144,7 +144,7 @@
             {                                                                   \
                 .tMSG = (__MSG),                                                \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
-                .FSM = &__FUNC,                                                 \
+                .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
                 .u10EvtMask = (0, ##__VA_ARGS__),                               \
             }
 
@@ -157,40 +157,58 @@
  *  Color                                                                     *
  *----------------------------------------------------------------------------*/
 
+
 /*! \note vsf_tgui_color is for most used by view (rendering) part
  */
 typedef union vsf_tgui_color_t vsf_tgui_color_t;
 
-#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
 union vsf_tgui_color_t {
-    struct {
-        uint8_t     chB;
-        uint8_t     chG;
-        uint8_t     chR;
-        uint8_t     chA;
-    } tChannel;
-    uint8_t         chValues[4];
-    uint32_t        wValue;
-    uint32_t        Value;          //!< generic symbol name
+    implement_ex(
+        struct {
+            uint16_t     u5R    : 5;
+            uint16_t     u6G    : 6;
+            uint16_t     u5B    : 5;
+        },
+        tChannel
+    )
+    uint16_t        hwValue;
+    uint16_t        Value;          //!< generic symbol name
+};
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+union vsf_tgui_color_t {
+    implement_ex(
+        struct {
+            uint16_t     u5B    : 5;
+            uint16_t     u6G    : 6;
+            uint16_t     u5R    : 5;
+        },
+        tChannel
+    )
+    uint16_t        hwValue;
+    uint16_t        Value;          //!< generic symbol name
 };
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE
 union vsf_tgui_color_t {
     uint8_t chColorID;
     uint8_t Value;                  //!< generic symbol name
 };
-#else
+#else /*VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888 */
 union vsf_tgui_color_t {
-    struct {
-        uint16_t     u5R    : 5;
-        uint16_t     u6G    : 6;
-        uint16_t     u5B    : 5;
-    };
-    uint16_t        hwValue;
-    uint16_t        Value;          //!< generic symbol name
+    implement_ex(
+        struct {
+            uint8_t     chB;
+            uint8_t     chG;
+            uint8_t     chR;
+            uint8_t     chA;
+        },
+        tChannel
+    )
+    uint8_t         chValues[4];
+    uint32_t        wValue;
+    uint32_t        Value;          //!< generic symbol name
 };
 #endif
-
-
 
 
 /*----------------------------------------------------------------------------*
@@ -383,24 +401,25 @@ typedef enum vsf_tgui_container_type_t {
 #define VSF_TGUI_EVT_MSK    (0x00F)
 
 enum {
-    VSF_TGUI_MSG_AVAILABLE = 0x200, //VSF_EVT_SYSTEM + 0x100,
+    VSF_TGUI_MSG_AVAILABLE          = 0x200,    //VSF_EVT_SYSTEM + 0x100,
     VSF_TGUI_MSG_LOW_LEVEL_READY_TO_REFRESH,
     VSF_TGUI_MSG = 0x210,
 
     //! control events
-    VSF_TGUI_MSG_CONTROL_EVT    = VSF_TGUI_MSG + 0x00,
+    VSF_TGUI_MSG_CONTROL_EVT        = VSF_TGUI_MSG + 0x00,
         VSF_TGUI_EVT_ON_SET_TOP_CONTAINER,
         VSF_TGUI_EVT_ON_LOAD,
         VSF_TGUI_EVT_ON_DEPOSE,
         VSF_TGUI_EVT_UPDATE,
         VSF_TGUI_EVT_UPDATE_TREE,
         VSF_TGUI_EVT_REFRESH,
+        VSF_TGUI_EVT_POST_REFRESH,
         VSF_TGUI_EVT_GET_ACTIVE,
         VSF_TGUI_EVT_LOST_ACTIVE,
         VSF_TGUI_EVT_ON_TIME,
 
     //! pointer events
-    VSF_TGUI_MSG_POINTER_EVT    = VSF_TGUI_MSG + 0x10,
+    VSF_TGUI_MSG_POINTER_EVT        = VSF_TGUI_MSG + 0x10,
 
         VSF_TGUI_EVT_POINTER_DOWN = VSF_TGUI_MSG_POINTER_EVT,
         VSF_TGUI_EVT_POINTER_HOLD,                                              //!< not all device support this
@@ -428,7 +447,7 @@ enum {
         
 
     //! key events
-    VSF_TGUI_MSG_KEY_EVT        = VSF_TGUI_MSG + 0x20,
+    VSF_TGUI_MSG_KEY_EVT            = VSF_TGUI_MSG + 0x20,
         VSF_TGUI_EVT_KEY_DOWN = VSF_TGUI_MSG_KEY_EVT,
         VSF_TGUI_EVT_KEY_REPEATE,                                               //!< not all device support this
         VSF_TGUI_EVT_KEY_UP,
@@ -437,7 +456,7 @@ enum {
         VSF_TGUI_EVT_KEY_DOUBLE_CLICK,                                          //!< not all device support this
 
     //! gesture events
-    VSF_TGUI_MSG_GESTURE_EVT    = VSF_TGUI_MSG + 0x30,
+    VSF_TGUI_MSG_GESTURE_EVT        = VSF_TGUI_MSG + 0x30,
 
         VSF_TGUI_EVT_GESTURE_SLIDE = VSF_TGUI_MSG_GESTURE_EVT,
         VSF_TGUI_EVT_GESTURE_ZOOM_IN,                                           //!< not all device support this
@@ -445,6 +464,13 @@ enum {
         VSF_TGUI_EVT_GESTURE_ROTATE_CLOCKWISE,                                  //!< not all device support this
         VSF_TGUI_EVT_GESTURE_ROTATE_ANTICLOCKWISE,                              //!< not all device support this
 
+    //! All control specific events share the same code region
+    VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT   = VSF_TGUI_MSG + 0x40,  
+    
+    VSF_TGUI_MSG_LIST_EVT           = VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT,
+        VSF_TGUI_EVT_LIST_SELECTION_CHANGED = VSF_TGUI_MSG_LIST_EVT,
+        VSF_TGUI_EVT_LIST_SLIDING_STARTED,
+        VSF_TGUI_EVT_LIST_SLIDING_STOPPED,
 };
 
 enum {

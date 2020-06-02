@@ -26,6 +26,10 @@
 #undef  __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 #include "./SysTick/systick.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*============================ MACROS ========================================*/
 
 #define __LITTLE_ENDIAN                 1
@@ -122,6 +126,10 @@ static ALWAYS_INLINE uint32_t vsf_arch_get_lr(void)
 #endif
     return reg;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */
