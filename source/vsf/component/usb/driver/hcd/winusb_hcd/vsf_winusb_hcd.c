@@ -299,8 +299,7 @@ static int __vk_winusb_hcd_init(void)
         winusb_dev->addr = -1;
 
         __vsf_arch_irq_request_init(&winusb_dev->irq_request);
-        winusb_dev->irq_thread.name = "winusb_hcd_dev";
-        __vsf_arch_irq_init(&winusb_dev->irq_thread, __vk_winusb_hcd_dev_thread, param->priority, true);
+        __vsf_arch_irq_init(&winusb_dev->irq_thread, "winusb_hcd_dev", __vk_winusb_hcd_dev_thread, param->priority, true);
     }
     return 0;
 }
@@ -719,8 +718,7 @@ static vsf_err_t __vk_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         vsf_teda_init(&__vk_winusb_hcd.teda, vsf_prio_inherit, false);
 
         __vk_winusb_hcd.init_eda = eda;
-        __vk_winusb_hcd.init_thread.name = "winusb_hcd_init";
-        __vsf_arch_irq_init(&__vk_winusb_hcd.init_thread, __vk_winusb_hcd_init_thread, param->priority, true);
+        __vsf_arch_irq_init(&__vk_winusb_hcd.init_thread, "winusb_hcd_init", __vk_winusb_hcd_init_thread, param->priority, true);
         break;
     case VSF_EVT_WINUSB_HCD_READY:
         return VSF_ERR_NONE;
@@ -766,10 +764,9 @@ static vk_usbh_hcd_urb_t * __vk_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
         vk_winusb_hcd_urb_t *winusb_urb = (vk_winusb_hcd_urb_t *)urb->priv;
         vk_winusb_hcd_param_t *param = __vk_winusb_hcd.hcd->param;
         __vsf_arch_irq_request_init(&winusb_urb->irq_request);
-        winusb_urb->irq_thread.name = "winusb_hcd_urb";
         winusb_urb->is_msg_processed = true;
         winusb_urb->is_irq_enabled = true;
-        __vsf_arch_irq_init(&winusb_urb->irq_thread, __vk_winusb_hcd_urb_thread, param->priority, true);
+        __vsf_arch_irq_init(&winusb_urb->irq_thread, "winusb_hcd_urb", __vk_winusb_hcd_urb_thread, param->priority, true);
     }
     return urb;
 }

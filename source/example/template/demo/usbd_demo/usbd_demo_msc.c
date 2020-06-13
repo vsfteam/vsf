@@ -31,8 +31,8 @@
 
 describe_mem_stream(__user_usbd_msc_stream, 1024)
 static const vk_virtual_scsi_param_t __usrapp_scsi_param = {
-    .block_size             = 512,
-    .block_num              = USRAPP_CFG_FAKEFAT32_SIZE / 512,
+    .block_size             = USRAPP_CFG_FAKEFAT32_SECTOR_SIZE,
+    .block_num              = USRAPP_CFG_FAKEFAT32_SIZE / USRAPP_CFG_FAKEFAT32_SECTOR_SIZE,
     .vendor                 = "Simon   ",
     .product                = "VSFDriver       ",
     .revision               = "1.00",

@@ -33,8 +33,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __vsf_get_slist_address(__pnode, __offset)                              \
-            ((vsf_slist_t *)(((uint8_t *)(__pnode)) + (__offset)))
+#define __vsf_get_slist_address(__node_ptr, __offset)                              \
+            ((vsf_slist_t *)(((uint8_t *)(__node_ptr)) + (__offset)))
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -45,204 +45,204 @@
 
 
 /*! \brief calculate the length of the target list 
- *! \param pthis        address of the target list
+ *! \param this_ptr        address of the target list
  *! \param list_offset  the list offset in byte within a host type
  *! \return the length of the list
  */
-uint_fast16_t __vsf_slist_get_length_imp(vsf_slist_t *pthis, size_t list_offset)
+uint_fast16_t __vsf_slist_get_length_imp(vsf_slist_t *this_ptr, size_t list_offset)
 {
     uint_fast16_t length = 0;
-    ASSERT(NULL != pthis);
+    ASSERT(NULL != this_ptr);
 
-    while (NULL != pthis->head) {
+    while (NULL != this_ptr->head) {
         length++;
-        pthis = __vsf_get_slist_address(pthis->head, list_offset);
+        this_ptr = __vsf_get_slist_address(this_ptr->head, list_offset);
     }
 
     return length;
 }
 
 /*! \brief get the specified item with a given index from the target list
- *! \param pthis        address of the target list
+ *! \param this_ptr        address of the target list
  *! \param index        index number of the wanted item
  *! \param list_offset  the list offset in byte within a host type
  *! \retval NULL        Illegal input 
  *! \retval !NULL       the address of the wanted item
  */
 void * __vsf_slist_get_item_by_index_imp(
-                            vsf_slist_t *pthis,
+                            vsf_slist_t *this_ptr,
                             uint_fast16_t index,
                             size_t list_offset)
 {
     void *item = NULL;
-    ASSERT(NULL != pthis);
+    ASSERT(NULL != this_ptr);
 
     do {
-        if (NULL == pthis->head) {
+        if (NULL == this_ptr->head) {
             break;
         }
         if (0 == index--) {
-            item = pthis->head;
+            item = this_ptr->head;
         }
-        pthis = __vsf_get_slist_address(pthis->head, list_offset);
+        this_ptr = __vsf_get_slist_address(this_ptr->head, list_offset);
     } while (index);
 
     return item;
 }
 
 /*! \brief find the index number of a given item from the target list 
- *! \param pthis        address of the target list
+ *! \param this_ptr        address of the target list
  *! \param item         address of the target item
  *! \param list_offset  the list offset in byte within a host type
  *! \return the index number, (-1) means illegal input or the item doesn't exist
  */
-int_fast16_t __vsf_slist_get_index_imp( vsf_slist_t *pthis, 
+int_fast16_t __vsf_slist_get_index_imp( vsf_slist_t *this_ptr, 
                                         void *item, 
                                         size_t list_offset)
 {
     int_fast16_t index = -1, n = 0;
-    ASSERT((NULL != pthis) && (NULL != item));
+    ASSERT((NULL != this_ptr) && (NULL != item));
 
-    while (NULL != pthis->head) {
-        if (pthis->head == item) {
+    while (NULL != this_ptr->head) {
+        if (this_ptr->head == item) {
             index = n;
             break;
         }
         n++;
-        pthis = __vsf_get_slist_address(pthis->head, list_offset);
+        this_ptr = __vsf_get_slist_address(this_ptr->head, list_offset);
     }
 
     return index;
 }
 
 /*! \brief remove a item from the target list
- *! \param pthis        address of the target list
+ *! \param this_ptr        address of the target list
  *! \param item         address of the target item
  *! \param list_offset  the list offset in byte within a host type
  *! \retval NULL        Illegal input 
  *! \retval !NULL       the address of the removed item
  */
-void * __vsf_slist_remove_imp(vsf_slist_t *pthis, void *item, size_t list_offset)
+void * __vsf_slist_remove_imp(vsf_slist_t *this_ptr, void *item, size_t list_offset)
 {
     void *item_tmp = NULL;
-    ASSERT((NULL != pthis) && (NULL != item));
+    ASSERT((NULL != this_ptr) && (NULL != item));
 
-    while (NULL != pthis->head) {
-        if ((void *)(pthis->head) == item) {
+    while (NULL != this_ptr->head) {
+        if ((void *)(this_ptr->head) == item) {
             //! remove the target item
-            pthis->head = __vsf_get_slist_address(item, list_offset)->head;
+            this_ptr->head = __vsf_get_slist_address(item, list_offset)->head;
             //! cut the item off from the list
             __vsf_get_slist_address(item, list_offset)->head = NULL;
             item_tmp = item;
             break;
         }
-        pthis = __vsf_get_slist_address(pthis->head, list_offset);
+        this_ptr = __vsf_get_slist_address(this_ptr->head, list_offset);
     }
 
     return item_tmp;
 }
 
 /*! \brief append a item to the target list
- *! \param pthis        address of the target list
+ *! \param this_ptr        address of the target list
  *! \param item         address of the target item
  *! \param list_offset  the list offset in byte within a host type
  *! \retval NULL        Illegal input 
  *! \retval !NULL       the address of the appended item
  */
-void * __vsf_slist_append_imp(vsf_slist_t *pthis, void *item, size_t list_offset)
+void * __vsf_slist_append_imp(vsf_slist_t *this_ptr, void *item, size_t list_offset)
 {
-    ASSERT((NULL != pthis) && (NULL != item));
+    ASSERT((NULL != this_ptr) && (NULL != item));
 
-    while (NULL != pthis->head) {
-        pthis = __vsf_get_slist_address(pthis->head, list_offset);
+    while (NULL != this_ptr->head) {
+        this_ptr = __vsf_get_slist_address(this_ptr->head, list_offset);
     }
-    pthis->head = item;                   //!< append the item
+    this_ptr->head = item;                   //!< append the item
     __vsf_get_slist_address(item, list_offset)->head = NULL;
 
     return item;
 }
 
-void * __vsf_slist_remove_tail_imp(vsf_slist_t *pthis, size_t list_offset)
+void * __vsf_slist_remove_tail_imp(vsf_slist_t *this_ptr, size_t list_offset)
 {
-    void *item = pthis->head;
+    void *item = this_ptr->head;
 
     while ( (item != NULL)
         &&  (__vsf_get_slist_address(item, list_offset)->head != NULL)) {
-        pthis = __vsf_get_slist_address(item, list_offset);
-        item = pthis->head;
+        this_ptr = __vsf_get_slist_address(item, list_offset);
+        item = this_ptr->head;
     }
-    pthis->head = NULL;
+    this_ptr->head = NULL;
     return item;
 }
 
-bool __vsf_dlist_is_in_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node)
+bool __vsf_dlist_is_in_imp(vsf_dlist_t *this_ptr, vsf_dlist_node_t *node)
 {
-    return (node->next != NULL) || (node->prev != NULL) || (pthis->head == node);
+    return (node->next != NULL) || (node->prev != NULL) || (this_ptr->head == node);
 }
 
-void __vsf_dlist_add_to_head_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node)
+void __vsf_dlist_add_to_head_imp(vsf_dlist_t *this_ptr, vsf_dlist_node_t *node)
 {
-    vsf_dlist_node_t *node_nxt = pthis->head;
+    vsf_dlist_node_t *node_nxt = this_ptr->head;
 
     node->next = node_nxt;
     node->prev = NULL;
-    pthis->head = node;
+    this_ptr->head = node;
     if (node_nxt != NULL) {
         node_nxt->prev = node;
     } else {
-        pthis->tail = node;
+        this_ptr->tail = node;
     }
 }
 
-void __vsf_dlist_add_to_tail_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node)
+void __vsf_dlist_add_to_tail_imp(vsf_dlist_t *this_ptr, vsf_dlist_node_t *node)
 {
-    vsf_dlist_node_t *node_prv = pthis->tail;
+    vsf_dlist_node_t *node_prv = this_ptr->tail;
 
     node->prev = node_prv;
     node->next = NULL;
-    pthis->tail = node;
+    this_ptr->tail = node;
     if (node_prv != NULL) {
         node_prv->next = node;
     } else {
-        pthis->head = node;
+        this_ptr->head = node;
     }
 }
 
-vsf_dlist_node_t *__vsf_dlist_remove_head_imp(vsf_dlist_t *pthis)
+vsf_dlist_node_t *__vsf_dlist_remove_head_imp(vsf_dlist_t *this_ptr)
 {
-    vsf_dlist_node_t *node = pthis->head;
+    vsf_dlist_node_t *node = this_ptr->head;
 
     if (node != NULL) {
         vsf_dlist_node_t *node_nxt = node->next;
         node->next = NULL;
-        pthis->head = node_nxt;
+        this_ptr->head = node_nxt;
         if (node_nxt != NULL) {
             node_nxt->prev = NULL;
         } else {
-            pthis->tail = NULL;
+            this_ptr->tail = NULL;
         }
     }
     return node;
 }
 
-vsf_dlist_node_t *__vsf_dlist_remove_tail_imp(vsf_dlist_t *pthis)
+vsf_dlist_node_t *__vsf_dlist_remove_tail_imp(vsf_dlist_t *this_ptr)
 {
-    vsf_dlist_node_t *node = pthis->tail;
+    vsf_dlist_node_t *node = this_ptr->tail;
 
     if (node != NULL) {
         vsf_dlist_node_t *node_prv = node->prev;
         node->prev = NULL;
-        pthis->tail = node_prv;
+        this_ptr->tail = node_prv;
         if (node_prv != NULL) {
             node_prv->next = NULL;
         } else {
-            pthis->head = NULL;
+            this_ptr->head = NULL;
         }
     }
     return node;
 }
 
-void __vsf_dlist_insert_after_imp(  vsf_dlist_t *pthis,
+void __vsf_dlist_insert_after_imp(  vsf_dlist_t *this_ptr,
                                     vsf_dlist_node_t *node_prv,
                                     vsf_dlist_node_t *node)
 {
@@ -254,11 +254,11 @@ void __vsf_dlist_insert_after_imp(  vsf_dlist_t *pthis,
     if (node_nxt != NULL) {
         node_nxt->prev = node;
     } else {
-        pthis->tail = node;
+        this_ptr->tail = node;
     }
 }
 
-void __vsf_dlist_insert_before_imp( vsf_dlist_t *pthis,
+void __vsf_dlist_insert_before_imp( vsf_dlist_t *this_ptr,
                                     vsf_dlist_node_t *node_nxt,
                                     vsf_dlist_node_t *node)
 {
@@ -270,11 +270,11 @@ void __vsf_dlist_insert_before_imp( vsf_dlist_t *pthis,
     if (node_prv != NULL) {
         node_prv->next = node;
     } else {
-        pthis->head = node;
+        this_ptr->head = node;
     }
 }
 
-void __vsf_dlist_remove_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node)
+void __vsf_dlist_remove_imp(vsf_dlist_t *this_ptr, vsf_dlist_node_t *node)
 {
     vsf_dlist_node_t *node_nxt = node->next, *node_prv = node->prev;
 
@@ -282,12 +282,12 @@ void __vsf_dlist_remove_imp(vsf_dlist_t *pthis, vsf_dlist_node_t *node)
     if (node_prv != NULL) {
         node_prv->next = node_nxt;
     } else {
-        pthis->head = node_nxt;
+        this_ptr->head = node_nxt;
     }
     if (node_nxt != NULL) {
         node_nxt->prev = node_prv;
     } else {
-        pthis->tail = node_prv;
+        this_ptr->tail = node_prv;
     }
 }
 

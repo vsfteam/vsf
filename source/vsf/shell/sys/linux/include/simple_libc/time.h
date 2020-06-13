@@ -1,5 +1,5 @@
-#ifndef __TIME_H__
-#define __TIME_H__
+#ifndef __SIMPLE_LIBC_TIME_H__
+#define __SIMPLE_LIBC_TIME_H__
 
 #ifdef __cplusplus
 extern "C" {

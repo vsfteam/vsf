@@ -266,7 +266,6 @@ int libusb_init(libusb_context **context)
 
 void libusb_exit(struct libusb_context *ctx)
 {
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     if (__vsf_libusb.fd >= 0) {
         __vsf_libusb.is_to_exit = true;
         vsf_eda_trig_set(&__vsf_libusb.trans_trig);
@@ -446,7 +445,6 @@ int libusb_get_device_speed(libusb_device *dev)
 
 static int __vsf_linux_libusb_submit_urb(vsf_linux_libusb_dev_t *ldev)
 {
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
 
     if (VSF_ERR_NONE != vk_usbh_submit_urb(ldev->libusb_dev->usbh, urb)) {

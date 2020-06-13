@@ -23,7 +23,7 @@
 
 /*============================ MACROS ========================================*/
 #undef this
-#define this    (*ptThis)
+#define this    (*this_ptr)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -31,237 +31,237 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void __vsf_rng_buf_init_ex(  vsf_rng_buf_t* ptObj, 
-                        uint_fast16_t hwBufferItemCount, 
-                        bool bInitAsFull)
+void __vsf_rng_buf_init_ex( vsf_rng_buf_t* obj_ptr, 
+                            uint_fast16_t buffer_item_cnt, 
+                            bool is_init_as_full)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
-    memset(ptObj, 0, sizeof(vsf_rng_buf_t));
-    this.hwBufferItemCount = hwBufferItemCount;
-    this.hwLength = bInitAsFull ? hwBufferItemCount : 0;
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
+    memset(obj_ptr, 0, sizeof(vsf_rng_buf_t));
+    this.buffer_item_cnt = buffer_item_cnt;
+    this.length = is_init_as_full ? buffer_item_cnt : 0;
 }
 
-int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *ptObj)
+int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *obj_ptr)
 {
-    int32_t nIndex = -1;
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    int32_t index = -1;
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT( NULL != ptObj);
+    ASSERT( NULL != obj_ptr);
 
     do {
-        if ((this.hwHead == this.hwTail) && (this.hwLength > 0)) {
+        if ((this.head == this.tail) && (this.length > 0)) {
             /*! this queue is full */
             break;
         }
-        nIndex = this.hwTail++;
-        this.hwLength++;
-        if (this.hwTail >= this.hwBufferItemCount) {
-            this.hwTail = 0;
+        index = this.tail++;
+        this.length++;
+        if (this.tail >= this.buffer_item_cnt) {
+            this.tail = 0;
         }
     } while(0);
 
-    return nIndex;
+    return index;
 }
 
-int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* ptObj)
+int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* obj_ptr)
 {
-    int32_t nIndex = -1;
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    int32_t index = -1;
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
 
     do {
-        if ((this.hwHead == this.hwTail) && (this.hwLength == 0)) {
+        if ((this.head == this.tail) && (this.length == 0)) {
             /*! this queue is empty */
             break;
         }
-        nIndex = this.hwHead++;
-        this.hwLength--;
+        index = this.head++;
+        this.length--;
 
         /* reset peek */
-        this.hwPeek = this.hwHead;
-        this.hwPeekCount = 0;
+        this.peek = this.head;
+        this.peek_cnt = 0;
 
-        if (this.hwHead >= this.hwBufferItemCount) {
-            this.hwHead = 0;
+        if (this.head >= this.buffer_item_cnt) {
+            this.head = 0;
         }
     } while (0);
 
-    return nIndex;
+    return index;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
-uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* ptObj)
+uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
 
-    return this.hwLength;
+    return this.length;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
-int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *ptObj, uint16_t *phwItemCount)
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr, uint16_t *item_cnt_ptr)
 {
     
-    int32_t nIndex = -1;
+    int32_t index = -1;
     uint_fast16_t hwWritten = 0;
     uint_fast16_t hwSpaceLeft;
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
     
-    ASSERT(NULL != ptObj && NULL != phwItemCount);
+    ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
-        if ((this.hwHead == this.hwTail) && (this.hwLength > 0)) {
+        if ((this.head == this.tail) && (this.length > 0)) {
             /*! this queue is full */
             break;
         }
-        nIndex = this.hwTail;
+        index = this.tail;
 
-        hwSpaceLeft = this.hwBufferItemCount - this.hwLength;
-        hwWritten = this.hwBufferItemCount - this.hwTail;
-        hwWritten = min((*phwItemCount), hwWritten);
+        hwSpaceLeft = this.buffer_item_cnt - this.length;
+        hwWritten = this.buffer_item_cnt - this.tail;
+        hwWritten = min((*item_cnt_ptr), hwWritten);
         hwWritten = min(hwWritten, hwSpaceLeft);
 
-        *phwItemCount = hwWritten;          /*!< update actual written number */
+        *item_cnt_ptr = hwWritten;          /*!< update actual written number */
         
-        this.hwTail += hwWritten;
-        this.hwLength += hwWritten;
+        this.tail += hwWritten;
+        this.length += hwWritten;
 
-        if (this.hwTail >= this.hwBufferItemCount) {
-            this.hwTail = 0;
+        if (this.tail >= this.buffer_item_cnt) {
+            this.tail = 0;
         }
     } while (0);
 
-    return nIndex;
+    return index;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
-int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
+int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr)
 {
     
-    int32_t nIndex = -1;
+    int32_t index = -1;
     uint_fast16_t hwRead = 0;
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
     
-    ASSERT(NULL != ptObj && NULL != phwItemCount);
+    ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
-        if ((this.hwHead == this.hwTail) && (this.hwLength == 0)) {
+        if ((this.head == this.tail) && (this.length == 0)) {
             /*! this queue is empty */
             break;
         }
-        nIndex = this.hwHead;
+        index = this.head;
 
-        hwRead = this.hwBufferItemCount - this.hwHead;
-        hwRead = min((*phwItemCount), hwRead);
-        hwRead = min(this.hwLength, hwRead);
+        hwRead = this.buffer_item_cnt - this.head;
+        hwRead = min((*item_cnt_ptr), hwRead);
+        hwRead = min(this.length, hwRead);
 
-        *phwItemCount = hwRead;          /*!< update actual written number */
+        *item_cnt_ptr = hwRead;          /*!< update actual written number */
 
-        this.hwHead += hwRead;
-        this.hwLength -= hwRead;
+        this.head += hwRead;
+        this.length -= hwRead;
 
         /* reset peek */
-        this.hwPeek = this.hwHead;
-        this.hwPeekCount = 0;
+        this.peek = this.head;
+        this.peek_cnt = 0;
 
-        if (this.hwHead >= this.hwBufferItemCount) {
-            this.hwHead = 0;
+        if (this.head >= this.buffer_item_cnt) {
+            this.head = 0;
         }
     } while (0);
 
-    return nIndex;
+    return index;
 }
 
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
-int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* ptObj)
+int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* obj_ptr)
 {
-    int32_t nIndex = -1;
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    int32_t index = -1;
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
 
     do {
-        if ((this.hwPeek == this.hwTail) && (0 != this.hwPeekCount)) {
+        if ((this.peek == this.tail) && (0 != this.peek_cnt)) {
             /*! all items have been peeked */
             break;
         }
-        nIndex = this.hwPeek++;
-        this.hwPeekCount++;
-        if (this.hwPeek >= this.hwBufferItemCount) {
-            this.hwPeek = 0;
+        index = this.peek++;
+        this.peek_cnt++;
+        if (this.peek >= this.buffer_item_cnt) {
+            this.peek = 0;
         }
     } while (0);
 
-    return nIndex;
+    return index;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
-void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* ptObj)
+void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
-    ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
+    ASSERT(NULL != obj_ptr);
 
-    this.hwPeek = this.hwHead;
-    this.hwPeekCount = 0;
+    this.peek = this.head;
+    this.peek_cnt = 0;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
-void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* ptObj)
+void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
-    ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
+    ASSERT(NULL != obj_ptr);
 
-    this.hwHead = this.hwPeek;
-    this.hwLength -= this.hwPeekCount;
-    this.hwPeekCount = 0;
+    this.head = this.peek;
+    this.length -= this.peek_cnt;
+    this.peek_cnt = 0;
 }
 
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
-uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* ptObj)
+uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
 
-    return this.hwLength - this.hwPeekCount;
+    return this.length - this.peek_cnt;
 }
 
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
-int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount)
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr)
 {
-    int32_t nIndex = -1;
+    int32_t index = -1;
     uint_fast16_t hwItemLeft;
     uint_fast16_t hwPeeked  = 0;
-    class_internal(ptObj, ptThis, vsf_rng_buf_t);
+    class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != ptObj && NULL != phwItemCount);
+    ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
-        if ((this.hwPeek == this.hwTail) && (this.hwPeekCount != 0)) {
+        if ((this.peek == this.tail) && (this.peek_cnt != 0)) {
             /*! this queue is empty */
             break;
         }
-        nIndex = this.hwPeek;
-        hwItemLeft = this.hwLength - this.hwPeekCount;
+        index = this.peek;
+        hwItemLeft = this.length - this.peek_cnt;
 
-        hwPeeked = this.hwBufferItemCount - this.hwPeek;
-        hwPeeked = min((*phwItemCount), hwPeeked);
+        hwPeeked = this.buffer_item_cnt - this.peek;
+        hwPeeked = min((*item_cnt_ptr), hwPeeked);
         hwPeeked = min(hwItemLeft, hwPeeked);
 
-        *phwItemCount = hwPeeked;          /*!< update actual written number */
+        *item_cnt_ptr = hwPeeked;          /*!< update actual written number */
 
-        this.hwPeek += hwPeeked;
-        this.hwPeekCount += hwPeeked;
+        this.peek += hwPeeked;
+        this.peek_cnt += hwPeeked;
 
-        if (this.hwPeek >= this.hwBufferItemCount) {
-            this.hwPeek = 0;
+        if (this.peek >= this.buffer_item_cnt) {
+            this.peek = 0;
         }
     } while (0);
 
-    return nIndex;
+    return index;
 }

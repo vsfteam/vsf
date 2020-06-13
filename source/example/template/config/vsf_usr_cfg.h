@@ -49,8 +49,7 @@
 //  current M484 hardware has no display
 #   define APP_CFG_USE_LVGL_DEMO                        DISABLED
 #   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
-//  vsfvm is not opensource
-#   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
+#   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
 
 #elif   defined(__WIN__)
 
@@ -66,19 +65,23 @@
 #   define APP_CFG_USE_SDL2_DEMO                        ENABLED
 
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
-#   define APP_CFG_USE_CPP_DEMO                         DISABLED
-#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
+#   define APP_CFG_USE_CPP_DEMO                         ENABLED
+#   define VSF_LINUX_USE_SIMPLE_LIBC                    DISABLED
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
-#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
-#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+#   define VSF_USE_SIMPLE_SSCANF                        DISABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       DISABLED
 
 // 3rd-party demos
+#   define APP_CFG_USE_XBOOT_XUI_DEMO                   DISABLED
 #   define APP_CFG_USE_AWTK_DEMO                        ENABLED
 #   define APP_CFG_USE_NNOM_DEMO                        ENABLED
 #   define APP_CFG_USE_LVGL_DEMO                        ENABLED
 #   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
-//  vsfvm is not opensource
-#   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
+#   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
+
+#   if APP_CFG_USE_TGUI_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#       define APP_CFG_USE_FREETYPE_DEMO                ENABLED
+#   endif
 
 #endif
 
@@ -120,6 +123,9 @@
 #if APP_CFG_USE_LVGL_DEMO == ENABLED
 #   define VSF_USE_UI_LVGL                              ENABLED
 #endif
+#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#   define VSF_USE_XBOOT                                ENABLED
+#endif
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_0
 #if VSF_USE_UI == ENABLED
@@ -157,6 +163,7 @@
 #   define VSF_USE_FATFS                                ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
+#define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_USE_LINUX_LIBUSB                         VSF_USE_USB_HOST
@@ -252,7 +259,7 @@
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #   define VSF_USE_USB_HOST_HUB                         DISABLED
 #   define VSF_USE_USB_HOST_HCD_WINUSB                  ENABLED
-#       define VSF_WINUSB_HCD_CFG_DEV_NUM               8
+#       define VSF_WINUSB_HCD_CFG_DEV_NUM               7
 #       define VSF_WINUSB_HCD_DEV0_VID                  0x0A12      // CSR8510 bthci
 #       define VSF_WINUSB_HCD_DEV0_PID                  0x0001
 #       define VSF_WINUSB_HCD_DEV1_VID                  0x0A5C      // BCM20702 bthci
@@ -265,16 +272,24 @@
 #       define VSF_WINUSB_HCD_DEV4_PID                  0x09CC
 #       define VSF_WINUSB_HCD_DEV5_VID                  0x057E      // NSPRO
 #       define VSF_WINUSB_HCD_DEV5_PID                  0x2009
-#       define VSF_WINUSB_HCD_DEV6_VID                  0xA7A8      // usbd_demo
-#       define VSF_WINUSB_HCD_DEV6_PID                  0x2348
-#       define VSF_WINUSB_HCD_DEV7_VID                  0x0D8C      // uac
-#       define VSF_WINUSB_HCD_DEV7_PID                  0x013C
+#       define VSF_WINUSB_HCD_DEV6_VID                  0x0D8C      // uac
+#       define VSF_WINUSB_HCD_DEV6_PID                  0x013C
+//#       define VSF_WINUSB_HCD_DEV6_VID                  0xA7A8      // usbd_demo
+//#       define VSF_WINUSB_HCD_DEV6_PID                  0x2348
 //#       define VSF_WINUSB_HCD_DEV7_VID                  0x045E      // XB360
 //#       define VSF_WINUSB_HCD_DEV7_PID                  0x028E
 //#       define VSF_WINUSB_HCD_DEV8_VID                  0x045E      // XB1
 //#       define VSF_WINUSB_HCD_DEV8_PID                  0x02EA
 
 #   define VSF_USE_WINFS                                ENABLED
+
+#   if APP_CFG_USE_TGUI_DEMO == ENABLED
+#       define APP_CFG_TGUI_RES_DIR                     "./winfs_root/ui/"
+#   endif
+
+#   if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#       define APP_CFG_XBOOT_RES_DIR                    "./winfs_root/ui/"
+#   endif
 
 #   define VSF_USE_DISP_SDL2                            ENABLED
 #       define VSF_DISP_SDL2_CFG_INCLUDE                "lib\SDL2\include\SDL.h"
@@ -288,7 +303,7 @@
 #   define VSF_USE_WINSOUND                             ENABLED
 #       define VSF_WINSOUND_CFG_TRACE                   DISABLED
 
-#   define VSF_LINUX_CFG_STACKSIZE                      32768
+#   define VSF_LINUX_CFG_STACKSIZE                      (60 * 1024)
 #   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
 #   define VSH_ECHO                                     1
 

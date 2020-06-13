@@ -242,56 +242,56 @@ typedef volatile uint32_t    reg32_t;
 #   endif
 
 #   ifndef RESERVED_16B             
-#       define RESERVED_16B         RESERVED_U32                                \
+#       define RESERVED_16B     RESERVED_U32                                    \
                                 RESERVED_U32                                    \
                                 RESERVED_U32                                    \
                                 RESERVED_U32
 #   endif
 
 #   ifndef RESERVED_64B             
-#       define RESERVED_64B         RESERVED_16B                                \
+#       define RESERVED_64B     RESERVED_16B                                    \
                                 RESERVED_16B                                    \
                                 RESERVED_16B                                    \
                                 RESERVED_16B
 #   endif
 
 #   ifndef RESERVED_256B             
-#       define RESERVED_256B        RESERVED_64B                                \
+#       define RESERVED_256B    RESERVED_64B                                    \
                                 RESERVED_64B                                    \
                                 RESERVED_64B                                    \
                                 RESERVED_64B
 #   endif
 
 #   ifndef RESERVED_1K             
-#       define RESERVED_1K          RESERVED_256B                               \
+#       define RESERVED_1K      RESERVED_256B                                   \
                                 RESERVED_256B                                   \
                                 RESERVED_256B                                   \
                                 RESERVED_256B
 #   endif
 
 #   ifndef RESERVED_4K             
-#       define RESERVED_4K          RESERVED_1K                                 \
+#       define RESERVED_4K      RESERVED_1K                                     \
                                 RESERVED_1K                                     \
                                 RESERVED_1K                                     \
                                 RESERVED_1K
 #   endif
 
 #   ifndef RESERVED_16K             
-#       define RESERVED_16K         RESERVED_4K                                 \
+#       define RESERVED_16K     RESERVED_4K                                     \
                                 RESERVED_4K                                     \
                                 RESERVED_4K                                     \
                                 RESERVED_4K
 #   endif
 
 #   ifndef RESERVED_64K             
-#       define RESERVED_64K         RESERVED_16K                                \
+#       define RESERVED_64K     RESERVED_16K                                    \
                                 RESERVED_16K                                    \
                                 RESERVED_16K                                    \
                                 RESERVED_16K
 #   endif
 
 #   ifndef RESERVED_256K             
-#       define RESERVED_256K        RESERVED_64K                                \
+#       define RESERVED_256K    RESERVED_64K                                    \
                                 RESERVED_64K                                    \
                                 RESERVED_64K                                    \
                                 RESERVED_64K
@@ -299,7 +299,7 @@ typedef volatile uint32_t    reg32_t;
 
 
 #   ifndef RESERVED_1M             
-#       define RESERVED_1M          RESERVED_256K                               \
+#       define RESERVED_1M      RESERVED_256K                                   \
                                 RESERVED_256K                                   \
                                 RESERVED_256K                                   \
                                 RESERVED_256K

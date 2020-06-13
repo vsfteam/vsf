@@ -1,5 +1,5 @@
-#ifndef __STDIO_H__
-#define __STDIO_H__
+#ifndef __SIMPLE_LIBC_STDIO_H__
+#define __SIMPLE_LIBC_STDIO_H__
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -18,10 +18,6 @@ extern "C" {
 
 typedef int FILE;
 extern FILE *stdin, *stdout, *stderr;
-
-#ifndef NULL
-#   define NULL     (void *)0
-#endif
 
 #define SEEK_SET    0
 #define SEEK_CUR    1

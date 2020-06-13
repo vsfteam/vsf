@@ -33,23 +33,23 @@ extern int_fast8_t __vsf_arch_ffz(uintalu_t);
 
 
 /*! \brief reset a bitmap
- *! \param pthis    address of the target bitmap
+ *! \param this_ptr    address of the target bitmap
  *! \param biesize  the size of the bitmap in bits
  */
-void __vsf_bitmap_reset(uintalu_t *pthis, int_fast16_t bitsize)
+void __vsf_bitmap_reset(uintalu_t *this_ptr, int_fast16_t bit_size)
 {
-    memset(pthis, 0, ((uint_fast16_t)bitsize + 7) >> 3);
+    memset(this_ptr, 0, ((uint_fast16_t)bit_size + 7) >> 3);
 }
 
 
-int_fast16_t __vsf_bitmap_ffz(uintalu_t*pbitmap, int_fast16_t bit_size)
+int_fast16_t __vsf_bitmap_ffz(uintalu_t*bitmap_ptr, int_fast16_t bit_size)
 {
     int_fast16_t word_size =    (bit_size + (int_fast16_t)__optimal_bit_sz - 1) 
                             /   (int_fast16_t)__optimal_bit_sz;
     int_fast16_t index = 0, temp, i;
 
     for (i = 0; i < word_size; i++) {
-        temp = __vsf_arch_ffz(pbitmap[i]);
+        temp = __vsf_arch_ffz(bitmap_ptr[i]);
         if (temp >= 0) {
             index += temp;
             return index;

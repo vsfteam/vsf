@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define STREAM_FILE         "/memfs/readme.txt"
+#define STREAM_FILE         "./winfs_root/readme.txt"
 
 extern "C" {
     int cpp_main(int argc, char *argv[]);
@@ -29,7 +29,7 @@ int cpp_main(int argc, char *argv[])
     ifstream fin(STREAM_FILE);
     if (!fin.is_open()) {
 #if !__IS_COMPILER_IAR__
-        cout << "Fail to open " << STREAM_FILE;
+        cout << "Fail to open " << STREAM_FILE << "\r\n";
 #else
         printf("Fail to open %s\r\n", STREAM_FILE);
 #endif

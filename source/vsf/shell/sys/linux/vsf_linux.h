@@ -62,6 +62,9 @@ extern "C" {
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_linux_thread_get_priv(__thread)         (void *)(&(((vsf_linux_thread_t *)(__thread))[1]))
+
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vsf_linux_process_t)

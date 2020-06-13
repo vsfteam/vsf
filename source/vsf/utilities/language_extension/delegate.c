@@ -27,13 +27,13 @@
 #define EVENT_RT_UNREGISTER         4
 
 #ifndef this
-#   define this             (*ptThis)
+#   define this             (*this_ptr)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef fsm_rt_t delegate_handler_func_t(void *pArg, void *pParam);
+typedef fsm_rt_t delegate_handler_func_t(void *arg_ptr, void *param_ptr);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -41,9 +41,9 @@ typedef fsm_rt_t delegate_handler_func_t(void *pArg, void *pParam);
 //! \name general event handler
 //! @{
 def_class(delegate_handler_t,,
-    delegate_handler_func_t     *fnHandler;         //!< event handler
-    void                        *pArg;              //!< Argument
-    class(delegate_handler_t)   *ptNext;            //!< next 
+    delegate_handler_func_t     *handler_fn;         //!< event handler
+    void                        *arg_ptr;              //!< Argument
+    class(delegate_handler_t)   *next_ptr;            //!< next 
 )
 end_def_class(delegate_handler_t)
 //! @}
@@ -51,9 +51,9 @@ end_def_class(delegate_handler_t)
 //! \name event
 //! @{
 def_class(delegate_t,,
-    delegate_handler_t          *ptEvent;
-    delegate_handler_t          *ptBlockedList;
-    class(delegate_handler_t)   **pptHandler;
+    delegate_handler_t          *event_ptr;
+    delegate_handler_t          *blocked_list_ptr;
+    class(delegate_handler_t)   **handler_pptr;
 )
 end_def_class(delegate_t)
 //! @}
@@ -64,92 +64,92 @@ end_def_class(delegate_t)
 /*============================ IMPLEMENTATION ================================*/
 
 /*! \brief initialize event 
- *! \param ptEvent target event
+ *! \param event_ptr target event
  *! \return the address of event item
  */
-delegate_t *delegate_init(delegate_t *ptEvent)
+delegate_t *delegate_init(delegate_t *event_ptr)
 {
-    class_internal(ptEvent, ptThis, delegate_t);
+    class_internal(event_ptr, this_ptr, delegate_t);
 
     do {
-        if (NULL == ptThis) {
+        if (NULL == this_ptr) {
             break;
         }
 
-        this.ptEvent = NULL;
-        this.ptBlockedList = NULL;
-        this.pptHandler = (class(delegate_handler_t) **)&(this.ptEvent);
+        this.event_ptr = NULL;
+        this.blocked_list_ptr = NULL;
+        this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
         
     } while (0);
 
-    return ptEvent;
+    return event_ptr;
 }
 
 /*! \brief initialize event handler item
- *! \param ptHandler the target event handler item
- *! \param fnRoutine event handler routine
- *! \param pArg handler extra arguments
+ *! \param handler_ptr the target event handler item
+ *! \param routine_fn event handler routine
+ *! \param arg_ptr handler extra arguments
  *! \return the address of event handler item
  */
 delegate_handler_t *delegate_handler_init(
-    delegate_handler_t *ptHandler, delegate_handler_func_t *fnRoutine, void *pArg)
+    delegate_handler_t *handler_ptr, delegate_handler_func_t *routine_fn, void *arg_ptr)
 {
     
-    class_internal(ptHandler, ptThis, delegate_handler_t);
+    class_internal(handler_ptr, this_ptr, delegate_handler_t);
     
-    if (NULL == ptHandler || NULL == fnRoutine) {
+    if (NULL == handler_ptr || NULL == routine_fn) {
         return NULL;
     }
-    this.fnHandler = fnRoutine;
-    this.pArg = pArg;
-    this.ptNext = NULL;
+    this.handler_fn = routine_fn;
+    this.arg_ptr = arg_ptr;
+    this.next_ptr = NULL;
 
-    return ptHandler;
+    return handler_ptr;
 }
 
 
 static class(delegate_handler_t) **search_list(
-    class(delegate_handler_t) **pptHandler, class(delegate_handler_t) *ptHND)
+    class(delegate_handler_t) **handler_pptr, class(delegate_handler_t) *hnd_ptr)
 {
     //! search event handler chain
-    while (NULL != (*pptHandler)) {
-        if ((*pptHandler) == ptHND) {
-            return pptHandler;
+    while (NULL != (*handler_pptr)) {
+        if ((*handler_pptr) == hnd_ptr) {
+            return handler_pptr;
         }
-        pptHandler = &((*pptHandler)->ptNext);      //!< get next item
+        handler_pptr = &((*handler_pptr)->next_ptr);      //!< get next item
     }
     return NULL;
 }
 
 /*! \brief register event handler to specified event
- *! \param ptEvent target event
- *! \param ptHandler target event handler
+ *! \param event_ptr target event
+ *! \param handler_ptr target event handler
  *! \return access result
  */
-vsf_err_t register_delegate_handler(delegate_t *ptEvent, delegate_handler_t *ptHandler)
+vsf_err_t register_delegate_handler(delegate_t *event_ptr, delegate_handler_t *handler_ptr)
 {
-    class_internal(ptEvent, ptThis, delegate_t);
-    class_internal(ptHandler, ptHND, delegate_handler_t);
+    class_internal(event_ptr, this_ptr, delegate_t);
+    class_internal(handler_ptr, hnd_ptr, delegate_handler_t);
 
-    if ((NULL == ptEvent) || (NULL == ptHandler) || (NULL == ptHND->fnHandler)) {
+    if ((NULL == event_ptr) || (NULL == handler_ptr) || (NULL == hnd_ptr->handler_fn)) {
         return VSF_ERR_INVALID_PTR;
-    } else if (NULL != ptHND->ptNext) {     
+    } else if (NULL != hnd_ptr->next_ptr) {     
         //! search ready list
-        class(delegate_handler_t) **pptHandler = search_list(   
-            (class(delegate_handler_t) **)&(this.ptBlockedList), ptHND );
+        class(delegate_handler_t) **handler_pptr = search_list(   
+            (class(delegate_handler_t) **)&(this.blocked_list_ptr), hnd_ptr );
 
-        if (NULL != pptHandler) {
+        if (NULL != handler_pptr) {
             //! safe to remove
-            (*pptHandler) = ptHND->ptNext;
-            ptHND->ptNext = NULL;
+            (*handler_pptr) = hnd_ptr->next_ptr;
+            hnd_ptr->next_ptr = NULL;
         } else {        
             return VSF_ERR_REQ_ALREADY_REGISTERED;
         }
     }
 
     //! add handler to the ready list
-    ptHND->ptNext = (class(delegate_handler_t) *)(this.ptEvent);
-    this.ptEvent = ptHandler;
+    hnd_ptr->next_ptr = (class(delegate_handler_t) *)(this.event_ptr);
+    this.event_ptr = handler_ptr;
 
     return VSF_ERR_NONE;
 }
@@ -157,42 +157,42 @@ vsf_err_t register_delegate_handler(delegate_t *ptEvent, delegate_handler_t *ptH
 
 
 /*! \brief unregister a specified event handler
- *! \param ptEvent target event
- *! \param ptHandler target event handler
+ *! \param event_ptr target event
+ *! \param handler_ptr target event handler
  *! \return access result
  */
-vsf_err_t unregister_delegate_handler( delegate_t *ptEvent, delegate_handler_t *ptHandler)
+vsf_err_t unregister_delegate_handler( delegate_t *event_ptr, delegate_handler_t *handler_ptr)
 {
-    class_internal(ptEvent, ptThis, delegate_t);
-    class_internal(ptHandler, ptHND, delegate_handler_t);
+    class_internal(event_ptr, this_ptr, delegate_t);
+    class_internal(handler_ptr, hnd_ptr, delegate_handler_t);
     
-    class(delegate_handler_t) **pptHandler;
-    if ((NULL == ptEvent) || (NULL == ptHandler)) {
+    class(delegate_handler_t) **handler_pptr;
+    if ((NULL == event_ptr) || (NULL == handler_ptr)) {
         return VSF_ERR_INVALID_PTR;
     } 
 
     do {
         //! search ready list
-        pptHandler = search_list(   (class(delegate_handler_t) **)&(this.ptEvent), 
-                                    ptHND );
-        if (NULL != pptHandler) {
+        handler_pptr = search_list(   (class(delegate_handler_t) **)&(this.event_ptr), 
+                                    hnd_ptr );
+        if (NULL != handler_pptr) {
             //! safe to remove
-            (*pptHandler) = ptHND->ptNext;
-            ptHND->ptNext = NULL;
-            if (this.pptHandler == &(ptHND->ptNext)) {
-                this.pptHandler = pptHandler;
+            (*handler_pptr) = hnd_ptr->next_ptr;
+            hnd_ptr->next_ptr = NULL;
+            if (this.handler_pptr == &(hnd_ptr->next_ptr)) {
+                this.handler_pptr = handler_pptr;
             }
             break;
         }
         //! search ready list
-        pptHandler = search_list(   (class(delegate_handler_t) **)&(this.ptBlockedList), 
-                                    ptHND );
-        if (NULL != pptHandler) {
+        handler_pptr = search_list(   (class(delegate_handler_t) **)&(this.blocked_list_ptr), 
+                                    hnd_ptr );
+        if (NULL != handler_pptr) {
             //! safe to remove
-            (*pptHandler) = ptHND->ptNext;
-            ptHND->ptNext = NULL;
-            if (this.pptHandler == &(ptHND->ptNext)) {
-                this.pptHandler = pptHandler;
+            (*handler_pptr) = hnd_ptr->next_ptr;
+            hnd_ptr->next_ptr = NULL;
+            if (this.handler_pptr == &(hnd_ptr->next_ptr)) {
+                this.handler_pptr = handler_pptr;
             }
             break;
         }
@@ -201,16 +201,16 @@ vsf_err_t unregister_delegate_handler( delegate_t *ptEvent, delegate_handler_t *
     return VSF_ERR_NONE;
 }
 
-static fsm_rt_t __move_to_block_list(class(delegate_t) *ptThis, class(delegate_handler_t) *ptHandler)
+static fsm_rt_t __move_to_block_list(class(delegate_t) *this_ptr, class(delegate_handler_t) *handler_ptr)
 {
-    class(delegate_handler_t) *ptHND = ptHandler;
+    class(delegate_handler_t) *hnd_ptr = handler_ptr;
     //! remove handler from ready list
-    (*this.pptHandler) = ptHND->ptNext;
+    (*this.handler_pptr) = hnd_ptr->next_ptr;
     //! add handler to block list
-    ptHND->ptNext = (class(delegate_handler_t) *)this.ptBlockedList;
-    this.ptBlockedList = (delegate_handler_t *)ptHND;
+    hnd_ptr->next_ptr = (class(delegate_handler_t) *)this.blocked_list_ptr;
+    this.blocked_list_ptr = (delegate_handler_t *)hnd_ptr;
 
-    if (NULL == this.ptEvent) {
+    if (NULL == this.event_ptr) {
         return fsm_rt_cpl;
     }
 
@@ -223,55 +223,55 @@ static fsm_rt_t __move_to_block_list(class(delegate_t) *ptThis, class(delegate_h
 #define RAISE_EVENT_RESET_FSM()     do { this.chState = 0; } while (0)
 
 /*! \brief raise target event
- *! \param ptEvent the target event
- *! \param pParam event parameter
+ *! \param event_ptr the target event
+ *! \param param_ptr event parameter
  *! \return access result
  */
-fsm_rt_t invoke_delegate( delegate_t *ptEvent, void *pParam)
+fsm_rt_t invoke_delegate( delegate_t *event_ptr, void *param_ptr)
 {
-    class_internal(ptEvent, ptThis, delegate_t);
-    if (NULL == ptThis) {
+    class_internal(event_ptr, this_ptr, delegate_t);
+    if (NULL == this_ptr) {
         return (fsm_rt_t)VSF_ERR_INVALID_PTR;
     }
 
-    if (NULL == this.ptEvent) {
-        if (NULL == this.ptBlockedList) {
+    if (NULL == this.event_ptr) {
+        if (NULL == this.blocked_list_ptr) {
             //! nothing to do
             return fsm_rt_cpl;
         }
         
         //! initialize state
-        this.ptEvent = this.ptBlockedList;
-        this.ptBlockedList = NULL;
-        this.pptHandler = (class(delegate_handler_t) **)&(this.ptEvent);
+        this.event_ptr = this.blocked_list_ptr;
+        this.blocked_list_ptr = NULL;
+        this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
     } 
 
-    if (NULL == (*this.pptHandler)) {
+    if (NULL == (*this.handler_pptr)) {
         //! finish visiting the ready list
-        this.pptHandler = (class(delegate_handler_t) **)&(this.ptEvent);
-        if (NULL == (*this.pptHandler)) {
+        this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
+        if (NULL == (*this.handler_pptr)) {
             //! complete
             return fsm_rt_cpl;
         }
     } else {
-        class(delegate_handler_t) *ptHandler = (*this.pptHandler);
+        class(delegate_handler_t) *handler_ptr = (*this.handler_pptr);
         
-        if (NULL != ptHandler->fnHandler) {
+        if (NULL != handler_ptr->handler_fn) {
             //! run the event handler
-            fsm_rt_t tFSM = ptHandler->fnHandler(ptHandler->pArg,pParam);
+            fsm_rt_t tFSM = handler_ptr->handler_fn(handler_ptr->arg_ptr,param_ptr);
 
             if (fsm_rt_on_going == tFSM) { 
-                this.pptHandler = &(ptHandler->ptNext);    //!< get next item
+                this.handler_pptr = &(handler_ptr->next_ptr);    //!< get next item
             } else if (EVENT_RT_UNREGISTER == tFSM) {
                 //! return EVENT_RT_UNREGISTER means event handler could be removed
-                class(delegate_handler_t) *ptHND = ptHandler;
-                (*this.pptHandler) = ptHND->ptNext;
-                ptHND->ptNext = NULL;
+                class(delegate_handler_t) *hnd_ptr = handler_ptr;
+                (*this.handler_pptr) = hnd_ptr->next_ptr;
+                hnd_ptr->next_ptr = NULL;
             } else {
-                return __move_to_block_list(ptThis, ptHandler);
+                return __move_to_block_list(this_ptr, handler_ptr);
             }
         } else {
-            return __move_to_block_list(ptThis, ptHandler);
+            return __move_to_block_list(this_ptr, handler_ptr);
         }
     }
 

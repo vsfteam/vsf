@@ -277,12 +277,12 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
  to add memory buffers to heap."
     return (vsf_mem_t){0};
 #else
-    NO_INIT static uint_fast8_t s_chHeapBuffer[
+    NO_INIT static uint_fast8_t __heap_buffer[
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
     
     return (vsf_mem_t){
-        .PTR.pchSrc = (uint8_t *)s_chHeapBuffer, 
-        .nSize = sizeof(s_chHeapBuffer)
+        .PTR.pchSrc = (uint8_t *)__heap_buffer, 
+        .nSize = sizeof(__heap_buffer)
     };
 #endif
 }

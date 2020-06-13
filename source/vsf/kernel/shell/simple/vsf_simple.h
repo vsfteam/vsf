@@ -116,29 +116,29 @@ extern "C" {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_mutex_enter(___MUTEX_ADDR)                                       \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                              \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),                 \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),         \
                     (-1)), ptThis->reason == VSF_SYNC_GET))
                     
 #   define vsf_mutex_try_to_enter_timeout(___MUTEX_ADDR, __TIMEOUT)             \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),                 \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),         \
                     (__TIMEOUT)),                                               \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason = VSF_SYNC_TIMEOUT)))
 
 #   define vsf_mutex_try_to_enter_timeout_ms(___MUTEX_ADDR, __TIMEOUT)          \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),                 \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),         \
                     vsf_systimer_ms_to_tick(__TIMEOUT)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_mutex_try_to_enter_timeout_us(___MUTEX_ADDR, __TIMEOUT)          \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),                 \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___MUTEX_ADDR),         \
                     vsf_systimer_us_to_tick(__TIMEOUT)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 #else
@@ -178,29 +178,29 @@ extern "C" {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_crit_enter(___CRIT_ADDR)                                         \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),                  \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),          \
                     (-1)), ptThis->reason == VSF_SYNC_GET))
                     
 #   define vsf_crit_try_to_enter_timeout(___CRIT_ADDR, __TIMEOUT)               \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),                  \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),          \
                     (__TIMEOUT)),                                               \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason = VSF_SYNC_TIMEOUT)))
 
 #   define vsf_crit_try_to_enter_timeout_ms(___CRIT_ADDR, __TIMEOUT)            \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),                  \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),          \
                     vsf_systimer_ms_to_tick(__TIMEOUT)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_crit_try_to_enter_timeout_us(___CRIT_ADDR, __TIMEOUT)            \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                 \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),                  \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_mutex_enter((___CRIT_ADDR),          \
                     vsf_systimer_us_to_tick(__TIMEOUT)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 #else
@@ -241,30 +241,30 @@ extern "C" {
             
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_sem_pend(__psem)                                                 \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__psem),                           \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__psem),                   \
                     (-1)), ptThis->reason == VSF_SYNC_GET))
                     
 #   define vsf_sem_pend_timeout(__psem, __timeout)                              \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__psem),                           \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__psem),                   \
                     (__timeout)),                                               \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason = VSF_SYNC_TIMEOUT)))
 
 
 #   define vsf_sem_pend_timeout_ms(__psem, __timeout)                           \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__psem),                           \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__psem),                   \
                     vsf_systimer_ms_to_tick(__timeout)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_sem_pend_timeout_us(__psem, __timeout)                           \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                                   \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__psem),                           \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__psem),                   \
                     vsf_systimer_us_to_tick(__timeout)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 #else
@@ -307,30 +307,30 @@ extern "C" {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_trig_wait(__ptrig)                                               \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                 \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                          \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                  \
                     (-1)), ptThis->reason == VSF_SYNC_GET))
                     
 #   define vsf_trig_wait_timeout(__ptrig, __timeout)                            \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                 \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                          \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                  \
                     (__timeout)),                                               \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason = VSF_SYNC_TIMEOUT)))
 
 
 #   define vsf_trig_wait_timeout_ms(__ptrig, __timeout)                         \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                 \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                          \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                  \
                     vsf_systimer_ms_to_tick(__timeout)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 
 #   define vsf_trig_wait_timeout_us(__ptrig, __timeout)                         \
-            for (   ptThis->reason = VSF_SYNC_CANCEL;                 \
-                    ptThis->reason == VSF_SYNC_CANCEL;)                                 \
-                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                          \
+            for (   ptThis->reason = VSF_SYNC_CANCEL;                           \
+                    ptThis->reason == VSF_SYNC_CANCEL;)                         \
+                if ((ptThis->reason =__vsf_sem_pend((__ptrig),                  \
                     vsf_systimer_us_to_tick(__timeout)),                        \
                     (ptThis->reason == VSF_SYNC_GET || ptThis->reason == VSF_SYNC_TIMEOUT)))
 #else
@@ -451,7 +451,7 @@ extern vsf_evt_t __vsf_delay(uint_fast32_t ms);
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION("text.vsf.kernel.__vsf_sem_pend")
 extern 
-vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out);
+vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out);
 
 SECTION("text.vsf.kernel.vsf_mutex_enter")
 extern 

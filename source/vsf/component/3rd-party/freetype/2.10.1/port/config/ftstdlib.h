@@ -99,7 +99,77 @@
    */
 
 
+#include "vsf.h"
 #include <stdio.h>
+
+#if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
+
+typedef struct FT_FILE {
+    implement(vk_memfs_file_t)
+    uint64_t pos;
+} FT_FILE;
+
+extern FT_FILE ft_root;
+
+static ALWAYS_INLINE int ft_fclose(FT_FILE *f)
+{
+    return 0;
+}
+
+static ALWAYS_INLINE FT_FILE * ft_fopen(const char *filename, const char *mode)
+{
+    return (FT_FILE *)vk_memfs_open(&ft_root.use_as__vk_memfs_file_t, filename);
+}
+
+static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
+{
+    uint64_t new_pos;
+
+    switch (fromwhere) {
+    case SEEK_SET:
+        new_pos = 0;
+        break;
+    case SEEK_CUR:
+        new_pos = f->pos;
+        break;
+    case SEEK_END:
+        new_pos = f->size;
+        break;
+    default:
+        VSF_UI_ASSERT(false);
+        return -1;
+    }
+
+    new_pos += offset;
+    if (new_pos > f->size) {
+        return -1;
+    }
+    f->pos = new_pos;
+    return 0;
+}
+
+static ALWAYS_INLINE long ft_ftell(FT_FILE *f)
+{
+    return f->pos;
+}
+
+static ALWAYS_INLINE size_t ft_fread(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
+{
+    int_fast32_t rlen = vk_memfs_read(&f->use_as__vk_memfs_file_t, f->pos, size * nmemb, (uint8_t *)ptr);
+    if (rlen > 0) { f->pos += rlen; }
+    return rlen;
+}
+
+static ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
+{
+    int_fast32_t wlen = vk_memfs_write(&f->use_as__vk_memfs_file_t, f->pos, size * nmemb, (uint8_t *)ptr);
+    if (wlen > 0) { f->pos += wlen; }
+    return wlen;
+}
+
+#define ft_sprintf  sprintf
+
+#else
 
 #define FT_FILE     FILE
 #define ft_fclose   fclose
@@ -108,6 +178,8 @@
 #define ft_fseek    fseek
 #define ft_ftell    ftell
 #define ft_sprintf  sprintf
+
+#endif
 
 
   /**************************************************************************

@@ -104,23 +104,35 @@ extern int sdl2_main(int argc, char *argv[]);
 extern int cpp_main(int argc, char *argv[]);
 #endif
 
+#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+extern int xui_main(int argc, char ** argv);
+#endif
+
+#if APP_CFG_USE_FREETYPE_DEMO == ENABLED
+extern void freetype_demo_init(void);
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 int vsf_linux_create_fhs(void)
 {
     int fd;
 
-#if APP_CFG_USE_USBH_DEMO == ENABLED
-    usbh_main(0, NULL);
-#endif
-
 #if VSF_USE_LINUX_BUSYBOX == ENABLED
     busybox_install();
 #endif
 
+    // 1. driver related demo
+#if APP_CFG_USE_USBH_DEMO == ENABLED
+    usbh_main(0, NULL);
+#endif
+
+    // 2. fs
 #if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED                  \
     && VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
     vk_mal_init(&usrapp_common.mal.fakefat32.use_as__vk_mal_t);
+
+#   if USRAPP_CFG_FAKEFAT32_SECTOR_SIZE == 512
     if (mkdir("/fatfs", 0)) {
         return -1;
     }
@@ -129,6 +141,9 @@ int vsf_linux_create_fhs(void)
         close(fd);
         mount(NULL, "fatfs", NULL, 0, &usrapp_common.mal.fakefat32.use_as__vk_mal_t);
     }
+#   else
+#       warning fat with non-512 sector size, current driver is not supported
+#   endif
 #endif
 
 #if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
@@ -159,7 +174,12 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
-    // install executables
+    // 3. demos depends on fs after all fs mounted
+#if APP_CFG_USE_FREETYPE_DEMO == ENABLED
+    freetype_demo_init();
+#endif
+
+    // 4. install executables
 #if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
     busybox_bind("/sbin/lsusb", lsusb_main);
     vsf_linux_libusb_startup();
@@ -167,6 +187,9 @@ int vsf_linux_create_fhs(void)
 
 #if APP_CFG_USE_NNOM_DEMO == ENABLED
     busybox_bind("/sbin/nnom", nnom_main);
+#endif
+#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+    busybox_bind("/sbin/xui", xui_main);
 #endif
 #if APP_CFG_USE_AWTK_DEMO == ENABLED
     busybox_bind("/sbin/awtk", awtk_main);

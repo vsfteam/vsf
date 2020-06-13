@@ -634,6 +634,27 @@
     <Filter Include="vsf\shell\sys\linux\include\simple_libc">
       <UniqueIdentifier>{915b6ff2-344b-4ce1-b5b4-d509c7acfcc2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\freetype_demo">
+      <UniqueIdentifier>{c4cedacb-4d37-4c1f-88f9-586e22e76545}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\xboot">
+      <UniqueIdentifier>{603ed993-410f-45dc-b456-de908da7e8db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\xboot\include">
+      <UniqueIdentifier>{10a242ce-e7c6-4032-8b6f-30ffdda00bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\xboot\include\arch">
+      <UniqueIdentifier>{72fc26fc-74ea-40ea-822f-ea9394269f29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\xboot\include\xboot">
+      <UniqueIdentifier>{649523f5-db84-4d00-96c3-86e0980f2d91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\sys\xboot\include\xfs">
+      <UniqueIdentifier>{9c9df98b-ab63-43bc-867f-d12f81b66d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\xui_demo">
+      <UniqueIdentifier>{ec9bb6ec-4985-4576-b8c3-63b4f16d3dda}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -2022,6 +2043,45 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\wchar.h">
       <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stddef.h">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\vsf_xboot_cfg.h">
+      <Filter>vsf\shell\sys\xboot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\io.h">
+      <Filter>vsf\shell\sys\xboot\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\stddef.h">
+      <Filter>vsf\shell\sys\xboot\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\types.h">
+      <Filter>vsf\shell\sys\xboot\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xboot.h">
+      <Filter>vsf\shell\sys\xboot\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\atomic.h">
+      <Filter>vsf\shell\sys\xboot\include\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\barrier.h">
+      <Filter>vsf\shell\sys\xboot\include\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\endian.h">
+      <Filter>vsf\shell\sys\xboot\include\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\irqflags.h">
+      <Filter>vsf\shell\sys\xboot\include\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\spinlock.h">
+      <Filter>vsf\shell\sys\xboot\include\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xboot\window.h">
+      <Filter>vsf\shell\sys\xboot\include\xboot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xfs\xfs.h">
+      <Filter>vsf\shell\sys\xboot\include\xfs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -3034,6 +3094,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\__common\__retarget_io.c">
       <Filter>vsf\utilities\compiler\__common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c">
+      <Filter>usrapp\demo\freetype_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\sys\xboot\vsf_xboot.c">
+      <Filter>vsf\shell\sys\xboot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\xui_demo\xui_demo.c">
+      <Filter>usrapp\demo\xui_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

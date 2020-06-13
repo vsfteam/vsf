@@ -1302,6 +1302,7 @@ fsm_rt_t vk_tgui_control_init(vsf_tgui_control_t* ptControl)
 {
     vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptControl);
     tStatus.chStatus |= VSF_TGUI_CTRL_STATUS_INITIALISED;
+    tStatus.tValues.__bContainBuiltInStructure = false;
 
     vsf_tgui_control_status_set((vsf_tgui_control_t*)ptControl, tStatus);
 

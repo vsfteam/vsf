@@ -112,6 +112,9 @@
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h" />
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h" />
+    <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs.h" />
+    <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs_cfg.h" />
     <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h" />
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h" />
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_gamepad.h" />
@@ -315,6 +318,8 @@
     <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c">
       <FileType>CppCode</FileType>
     </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c" />
+    <ClCompile Include="..\..\..\vsf\component\fs\vsf_fs.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c" />
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c" />
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c" />

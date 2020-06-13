@@ -144,16 +144,16 @@ extern "C" {
  */
 
 #define __GPIO_FUNC_DEF(__N,__VALUE)                                            \
-static void gpio##__N##_set_direction(uint32_t wDirection, uint32_t wPinMask);  \
-static uint32_t    gpio##__N##_get_direction(uint32_t wPinMask);                \
-static void        gpio##__N##_set_input(uint32_t wPinMask);                    \
-static void        gpio##__N##_set_output(uint32_t wPinMask);                   \
-static void        gpio##__N##_switch_direction(uint32_t wPinMask);             \
+static void gpio##__N##_set_direction(uint32_t direction, uint32_t pin_mask);   \
+static uint32_t    gpio##__N##_get_direction(uint32_t pin_mask);                \
+static void        gpio##__N##_set_input(uint32_t pin_mask);                    \
+static void        gpio##__N##_set_output(uint32_t pin_mask);                   \
+static void        gpio##__N##_switch_direction(uint32_t pin_mask);             \
 static uint32_t    gpio##__N##_read(void);                                      \
-static void        gpio##__N##_write(uint32_t wValue, uint32_t wPinMask);       \
-static void        gpio##__N##_set(uint32_t wPinMask);                          \
-static void        gpio##__N##_clear(uint32_t wPinMask);                        \
-static void        gpio##__N##_toggle(uint32_t wPinMask);                       
+static void        gpio##__N##_write(uint32_t value, uint32_t pin_mask);        \
+static void        gpio##__N##_set(uint32_t pin_mask);                          \
+static void        gpio##__N##_clear(uint32_t pin_mask);                        \
+static void        gpio##__N##_toggle(uint32_t pin_mask);                       
 
 #define __GPIO_INTERFACE_DEF(__N, __VALUE)                                      \
             {                                                                   \
@@ -176,54 +176,54 @@ static void        gpio##__N##_toggle(uint32_t wPinMask);
  *!
  *!
 #define __GPIO_FUNC_BODY(__N, __VALUE)                                          \
-static void gpio##__N##_set_direction(uint32_t wDirection, uint32_t wPinMask)   \
+static void gpio##__N##_set_direction(uint32_t diretion, uint32_t pin_mask)     \
 {                                                                               \
     SAFE_ATOM_CODE (                                                            \
-        uint32_t wTemp = GSP_GPIO##__N.DIR & ~wPinMask;                         \
-        wTemp |= (wDirection & wPinMask);                                       \
-        GSP_GPIO##__N.DIR = wTemp;                                              \
+        uint32_t temp = GSP_GPIO##__N.DIR & ~pin_mask;                          \
+        temp |= (direction & pin_mask);                                         \
+        GSP_GPIO##__N.DIR = temp;                                               \
     )                                                                           \
 }                                                                               \
-static uint32_t gpio##__N##_get_direction(uint32_t wPinMask)                    \
+static uint32_t gpio##__N##_get_direction(uint32_t pin_mask)                    \
 {                                                                               \
-    return GSP_GPIO##__N.DIR;                                                   \
+    return GSP_GPIO##__N.DIR & pin_mask;                                        \
 }                                                                               \
-static void gpio##__N##_set_input(uint32_t wPinMask)                            \
+static void gpio##__N##_set_input(uint32_t pin_mask)                            \
 {                                                                               \
-    GSP_GPIO##__N.DIR &= ~wPinMask;                                             \
+    GSP_GPIO##__N.DIR &= ~pin_mask;                                             \
 }                                                                               \
-static void gpio##__N##_set_output(uint32_t wPinMask)                           \
+static void gpio##__N##_set_output(uint32_t pin_mask)                           \
 {                                                                               \
-    GSP_GPIO##__N.DIR |= wPinMask;                                              \
+    GSP_GPIO##__N.DIR |= pin_mask;                                              \
 }                                                                               \
-static void gpio##__N##_switch_direction(uint32_t wPinMask)                     \
+static void gpio##__N##_switch_direction(uint32_t pin_mask)                     \
 {                                                                               \
-    GSP_GPIO##__N.DIR ^= wPinMask;                                              \
+    GSP_GPIO##__N.DIR ^= pin_mask;                                              \
 }                                                                               \
 static uint32_t gpio##__N##_read(void)                                          \
 {                                                                               \
     return GSP_GPIO##__N.IN;                                                    \
 }                                                                               \
-static void gpio##__N##_write(uint32_t wValue, uint32_t wPinMask)               \
+static void gpio##__N##_write(uint32_t value, uint32_t pin_mask)                \
 {                                                                               \
     SAFE_ATOM_CODE (                                                            \
-        uint32_t wTemp = GSP_GPIO##__N.OUT & ~wPinMask;                         \
-        wTemp |= (wValue & wPinMask);                                           \
-        GSP_GPIO##__N.OUT = wTemp;                                              \
+        uint32_t temp = GSP_GPIO##__N.OUT & ~pin_mask;                          \
+        temp |= (value & value);                                                \
+        GSP_GPIO##__N.OUT = temp;                                               \
     )                                                                           \
                                                                                 \
 }                                                                               \
-static void gpio##__N##_set(uint32_t wPinMask)                                  \
+static void gpio##__N##_set(uint32_t pin_mask)                                  \
 {                                                                               \
-    GSP_GPIO##__N.OUTSET = wPinMask;                                            \
+    GSP_GPIO##__N.OUTSET = pin_mask;                                            \
 }                                                                               \
-static void gpio##__N##_clear(uint32_t wPinMask)                                \
+static void gpio##__N##_clear(uint32_t pin_mask)                                \
 {                                                                               \
-    GSP_GPIO##__N.OUTCLR = wPinMask;                                            \
+    GSP_GPIO##__N.OUTCLR = pin_mask;                                            \
 }                                                                               \
-static void gpio##__N##_toggle(uint32_t wPinMask)                               \
+static void gpio##__N##_toggle(uint32_t pin_mask)                               \
 {                                                                               \
-    GSP_GPIO##__N.OUTTOG = wPinMask;                                            \
+    GSP_GPIO##__N.OUTTOG = pin_mask;                                            \
 }                                                                 
 */
 
@@ -337,12 +337,13 @@ enum io_model_t{
 //! @}
 */
 
-
+#ifndef __cplusplus
 typedef enum io_pin_no_t    io_pin_no_t;
 typedef enum io_model_t     io_model_t;
 typedef enum io_port_no_t   io_port_no_t;
 typedef enum io_pin_msk_t   io_pin_msk_t;
 typedef struct gpio_reg_t   gpio_reg_t;
+#endif
 
 //! \name io configuration structure
 //! @{

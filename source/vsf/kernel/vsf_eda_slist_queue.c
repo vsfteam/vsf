@@ -45,32 +45,32 @@ typedef struct __vsf_eda_slist_node_wrapper __vsf_eda_slist_node_wrapper;
 
 #if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
 
-static bool __vsf_eda_slist_queue_enqueue(vsf_eda_queue_t *pthis, void *node)
+static bool __vsf_eda_slist_queue_enqueue(vsf_eda_queue_t *this_ptr, void *node)
 {
     __vsf_eda_slist_node_wrapper *slist_node = node;
     vsf_slist_init_node(__vsf_eda_slist_node_wrapper, node, slist_node);
     vsf_slist_queue_enqueue(__vsf_eda_slist_node_wrapper, node,
-                            &((vsf_eda_slist_queue_t *)pthis)->queue,
+                            &((vsf_eda_slist_queue_t *)this_ptr)->queue,
                             (__vsf_eda_slist_node_wrapper *)node);
     return true;
 }
 
-static bool __vsf_eda_slist_queue_dequeue(vsf_eda_queue_t *pthis, void **node)
+static bool __vsf_eda_slist_queue_dequeue(vsf_eda_queue_t *this_ptr, void **node)
 {
     __vsf_eda_slist_node_wrapper *slist_node;
     vsf_slist_queue_dequeue(__vsf_eda_slist_node_wrapper, node,
-                            &((vsf_eda_slist_queue_t *)pthis)->queue,
+                            &((vsf_eda_slist_queue_t *)this_ptr)->queue,
                             slist_node);
     *node = slist_node;
     return *node != NULL;
 }
 
-vsf_err_t vsf_eda_slist_queue_init(vsf_eda_slist_queue_t *pthis, uint_fast16_t max)
+vsf_err_t vsf_eda_slist_queue_init(vsf_eda_slist_queue_t *this_ptr, uint_fast16_t max)
 {
-    pthis->use_as__vsf_eda_queue_t.op.enqueue = __vsf_eda_slist_queue_enqueue;
-    pthis->use_as__vsf_eda_queue_t.op.dequeue = __vsf_eda_slist_queue_dequeue;
-    vsf_slist_queue_init(&pthis->queue);
-    return vsf_eda_queue_init(&pthis->use_as__vsf_eda_queue_t, max);
+    this_ptr->use_as__vsf_eda_queue_t.op.enqueue = __vsf_eda_slist_queue_enqueue;
+    this_ptr->use_as__vsf_eda_queue_t.op.dequeue = __vsf_eda_slist_queue_dequeue;
+    vsf_slist_queue_init(&this_ptr->queue);
+    return vsf_eda_queue_init(&this_ptr->use_as__vsf_eda_queue_t, max);
 }
 
 #endif

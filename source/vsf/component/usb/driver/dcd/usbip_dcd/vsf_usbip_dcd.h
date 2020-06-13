@@ -72,7 +72,7 @@ typedef struct vk_usbip_dcd_param_t vk_usbip_dcd_param_t;
 
 struct vk_usbip_dcd_ep_t {
     uint16_t size;
-    enum usb_ep_type_t type;
+    usb_ep_type_t type;
     bool is_stalled;
     uint8_t ep;
 

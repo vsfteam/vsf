@@ -195,6 +195,10 @@ extern "C" {
 #define implement_vsf_pt(__NAME)        __implement_vsf_pt(__NAME)
 #define implement_vsf_pt_ex(__NAME, __FUNC_NAME)                                \
             __implement_vsf_pt_ex(__NAME, __FUNC_NAME)
+            
+#define imp_vsf_pt(__NAME)              implement_vsf_pt(__NAME)
+#define imp_vsf_pt_ex(__NAME, __FUNC_NAME)                                      \
+            implement_vsf_pt_ex(__NAME, __FUNC_NAME)
 
 #define __vsf_pt_func(__NAME)           __vsf_pt_func_common(__NAME)
 #define vsf_pt_func(__NAME)             __vsf_pt_func(__NAME)
@@ -217,8 +221,10 @@ extern "C" {
                                 __MEMBER) 
 #   endif
 
-#   define def_vsf_pt(__NAME,__MEMBER)       __def_vsf_pt(__NAME, __MEMBER)
+#   define def_vsf_pt(__NAME,__MEMBER)      __def_vsf_pt(__NAME, __MEMBER)
 #   define end_def_vsf_pt(__NAME)
+#   define define_vsf_pt(__NAME,__MEMBER)   def_vsf_pt(__NAME,__MEMBER)
+#   define end_define_vsf_pt(__NAME)
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
             __def_vsf_pt_common(__NAME,                                         \
@@ -227,6 +233,8 @@ extern "C" {
 
 #   define def_vsf_pt(__NAME,...)       __def_vsf_pt(__NAME,__VA_ARGS__)
 #   define end_def_vsf_pt(...)
+#   define define_vsf_pt(__NAME,...)    def_vsf_pt(__NAME,__VA_ARGS__)
+#   define end_define_vsf_pt(...)
 #endif
 
 
@@ -246,6 +254,7 @@ extern "C" {
 #endif
 
 #define declare_vsf_pt(__NAME)          __declare_vsf_pt(__NAME)
+#define dcl_vsf_pt(__NAME)              declare_vsf_pt(__NAME)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #define __init_vsf_pt(__NAME, __PT, __PRI)                                      \

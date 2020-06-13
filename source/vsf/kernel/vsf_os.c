@@ -72,8 +72,8 @@ extern vsf_err_t vk_kernel_start(void);
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
-extern vsf_evtq_t *__vsf_set_cur_evtq(vsf_evtq_t *pnew);
-extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis);
+extern vsf_evtq_t *__vsf_set_cur_evtq(vsf_evtq_t *new_ptr);
+extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr);
 #endif
 
 extern const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void);
@@ -146,8 +146,8 @@ static void vsf_kernel_os_init(void)
         END_VSF_POOL_PREPARE(vsf_eda_frame_pool)
     #else
         VSF_POOL_PREPARE(vsf_eda_frame_pool, &(__vsf_os.eda_frame_pool),
-            .pTarget = NULL,
-            .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
+            .target_ptr = NULL,
+            .region_ptr = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
         );
     #endif
     
@@ -194,8 +194,8 @@ static void vsf_kernel_os_init(void)
         END_VSF_POOL_PREPARE(vsf_evt_node_pool)
     #else
         VSF_POOL_PREPARE(vsf_evt_node_pool, (&__vsf_os.node_pool),
-            .pTarget = (uintptr_t)&__vsf_os,
-            .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
+            .target_ptr = (uintptr_t)&__vsf_os,
+            .region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
         );
     #endif
         if  (   (NULL == __vsf_os.res_ptr->evt_queue.nodes_buf_ptr)
@@ -234,20 +234,20 @@ vsf_evtq_t *__vsf_os_evtq_get(vsf_prio_t priority)
     return NULL;
 }
 
-vsf_prio_t __vsf_os_evtq_get_prio(vsf_evtq_t *pthis)
+vsf_prio_t __vsf_os_evtq_get_prio(vsf_evtq_t *this_ptr)
 {
-    uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
-    VSF_KERNEL_ASSERT(      (pthis != NULL) 
+    uint_fast8_t index = this_ptr - __vsf_os.res_ptr->evt_queue.queue_array;
+    VSF_KERNEL_ASSERT(      (this_ptr != NULL) 
                         && (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
     return (vsf_prio_t)index;
 }
 
-vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
+vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *this_ptr, vsf_prio_t priority)
 {
 #if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
-    uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
-    VSF_KERNEL_ASSERT((     pthis != NULL) 
+    uint_fast8_t index = this_ptr - __vsf_os.res_ptr->evt_queue.queue_array;
+    VSF_KERNEL_ASSERT((     this_ptr != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 #endif
 
@@ -268,7 +268,7 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
         return vsf_swi_init(
                 index,
                 __vsf_os.res_ptr->arch.os_swi_priorities_ptr[priority],
-                &__vsf_os_evtq_swi_handler, pthis);
+                &__vsf_os_evtq_swi_handler, this_ptr);
     }
 #endif
 
@@ -280,26 +280,26 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *pthis, vsf_prio_t priority)
 #pragma clang diagnostic ignored "-Wsign-compare"
 #endif
 
-vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *pthis)
+vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *this_ptr)
 {
 #if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
-    uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
-    VSF_KERNEL_ASSERT(      (pthis != NULL) 
+    uint_fast8_t index = this_ptr - __vsf_os.res_ptr->evt_queue.queue_array;
+    VSF_KERNEL_ASSERT(      (this_ptr != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
     if (index >= __vsf_os.res_ptr->arch.sched_prio.begin) {
-        __vsf_os_evtq_set_priority(pthis, (vsf_prio_t)index);
+        __vsf_os_evtq_set_priority(this_ptr, (vsf_prio_t)index);
     }
 #endif
 
     return VSF_ERR_NONE;
 }
 
-vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *pthis)
+vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *this_ptr)
 {
 #if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
-    uint_fast8_t index = pthis - __vsf_os.res_ptr->evt_queue.queue_array;
-    VSF_KERNEL_ASSERT(      (pthis != NULL) 
+    uint_fast8_t index = this_ptr - __vsf_os.res_ptr->evt_queue.queue_array;
+    VSF_KERNEL_ASSERT(      (this_ptr != NULL) 
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
     if (index >= __vsf_os.res_ptr->arch.sched_prio.begin) {
@@ -370,7 +370,7 @@ static const i_code_region_t __vsf_i_code_region_forced_sched_safe = {
 };
 
 const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION = {
-    .pmethods = (i_code_region_t *)&__vsf_i_code_region_forced_sched_safe,
+    .methods_ptr = (i_code_region_t *)&__vsf_i_code_region_forced_sched_safe,
 };
 #endif
 

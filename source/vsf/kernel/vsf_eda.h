@@ -894,8 +894,8 @@ def_simple_class(vsf_sync_owner_t) {
 #define VSF_BMPEVT_AND              1
 
 struct vsf_bmpevt_adapter_op_t {
-    vsf_err_t (*init)(vsf_bmpevt_adapter_t *pthis);
-    vsf_err_t (*reset)(vsf_bmpevt_adapter_t *pthis);
+    vsf_err_t (*init)(vsf_bmpevt_adapter_t *this_ptr);
+    vsf_err_t (*reset)(vsf_bmpevt_adapter_t *this_ptr);
 };
 typedef struct vsf_bmpevt_adapter_op_t vsf_bmpevt_adapter_op_t;
 #endif
@@ -972,8 +972,8 @@ def_simple_class(vsf_bmpevt_t) {
 
 #if __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE == ENABLED
 struct vsf_eda_queue_op_t {
-    bool (*enqueue)(vsf_eda_queue_t *pthis, void *node);
-    bool (*dequeue)(vsf_eda_queue_t *pthis, void **node);
+    bool (*enqueue)(vsf_eda_queue_t *this_ptr, void *node);
+    bool (*dequeue)(vsf_eda_queue_t *this_ptr, void **node);
 };
 typedef struct vsf_eda_queue_op_t vsf_eda_queue_op_t;
 
@@ -1097,24 +1097,24 @@ extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
 
 #if defined(VSF_EDA_CLASS_INHERIT) || defined(__VSF_EDA_CLASS_IMPLEMENT)
 SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
-extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *pthis, 
+extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *this_ptr, 
                                         vsf_eda_evthandler_t evthandler);
                                         
 SECTION(".text.vsf.kernel.eda")
 extern void vsf_kernel_init( const vsf_kernel_cfg_t *ptCFG);
 
 SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t vsf_eda_init(  vsf_eda_t *pthis, 
+extern vsf_err_t vsf_eda_init(  vsf_eda_t *this_ptr, 
                                 vsf_prio_t priotiry, 
                                 bool is_stack_owner);
 
 #   if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
 
 SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
-extern bool vsf_eda_polling_state_get(vsf_eda_t *pthis);
+extern bool vsf_eda_polling_state_get(vsf_eda_t *this_ptr);
 
 SECTION(".text.vsf.kernel.vsf_eda_polling_state_set")
-extern void vsf_eda_polling_state_set(vsf_eda_t *pthis, bool state);
+extern void vsf_eda_polling_state_set(vsf_eda_t *this_ptr, bool state);
 
 #   endif
 
@@ -1124,7 +1124,7 @@ SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
 extern vsf_err_t vsf_eda_go_to(uintptr_t evthandler);
 
 SECTION(".text.vsf.kernel.vsf_eda_init_ex")
-vsf_err_t vsf_eda_init_ex(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg);
+vsf_err_t vsf_eda_init_ex(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg);
 
 SECTION(".text.vsf.kernel.eda")
 extern vsf_eda_t *vsf_eda_get_cur(void);
@@ -1137,7 +1137,7 @@ extern void *vsf_eda_get_cur_msg(void);
 
 #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_is_stack_owner")
-extern bool vsf_eda_is_stack_owner(vsf_eda_t *pthis);
+extern bool vsf_eda_is_stack_owner(vsf_eda_t *this_ptr);
 #endif
 
 SECTION(".text.vsf.kernel.vsf_eda_return")
@@ -1160,7 +1160,7 @@ extern void vsf_eda_yield(void);
    the target eda to ask it killing itself after properly freeing all the resources.
  */
 SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t vsf_eda_fini(vsf_eda_t *pthis);
+extern vsf_err_t vsf_eda_fini(vsf_eda_t *this_ptr);
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
@@ -1184,7 +1184,7 @@ __vsf_eda_frame_t * __vsf_eda_peek(vsf_slist_t *list);
 #endif
 
 SECTION(".text.vsf.kernel.__vsf_eda_get_local")
-extern uintptr_t __vsf_eda_get_local(vsf_eda_t* pthis);
+extern uintptr_t __vsf_eda_get_local(vsf_eda_t* this_ptr);
 
 SECTION(".text.vsf.kernel.vsf_eda_target_set")
 extern vsf_err_t vsf_eda_target_set(uintptr_t param);
@@ -1212,18 +1212,18 @@ fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry,
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION(".text.vsf.kernel.teda")
-extern vsf_err_t vsf_teda_init(vsf_teda_t *pthis, 
+extern vsf_err_t vsf_teda_init(vsf_teda_t *this_ptr, 
                         vsf_prio_t priority, 
                         bool is_stack_owner);
 
 SECTION(".text.vsf.kernel.vsf_teda_init_ex")
-extern vsf_err_t vsf_teda_init_ex(vsf_teda_t *pthis, vsf_eda_cfg_t *cfg);
+extern vsf_err_t vsf_teda_init_ex(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
-vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, uint_fast32_t tick);
+vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, uint_fast32_t tick);
 
 #   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
@@ -1234,7 +1234,7 @@ extern vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us);
 #   endif
 
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
-extern vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *pthis);
+extern vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
 
 #if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_add")
@@ -1254,45 +1254,45 @@ vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t u
 #endif
 
 SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t vsf_eda_post_evt(vsf_eda_t *pthis, vsf_evt_t evt);
+extern vsf_err_t vsf_eda_post_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
 
 SECTION(".text.vsf.kernel.vsf_eda_post_msg")
-extern vsf_err_t vsf_eda_post_msg(vsf_eda_t *pthis, void *msg);
+extern vsf_err_t vsf_eda_post_msg(vsf_eda_t *this_ptr, void *msg);
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_post_evt_msg")
-extern vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *pthis, vsf_evt_t evt, void *msg);
+extern vsf_err_t vsf_eda_post_evt_msg(vsf_eda_t *this_ptr, vsf_evt_t evt, void *msg);
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
-extern vsf_err_t vsf_eda_sync_init(vsf_sync_t *pthis, uint_fast16_t cur_value,
+extern vsf_err_t vsf_eda_sync_init(vsf_sync_t *this_ptr, uint_fast16_t cur_value,
         uint_fast16_t max_value);
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *pthis);
+vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *this_ptr);
 #endif
 
 SECTION(".text.vsf.kernel.vsf_sync")
-extern vsf_err_t vsf_eda_sync_increase(vsf_sync_t *pthis);
+extern vsf_err_t vsf_eda_sync_increase(vsf_sync_t *this_ptr);
 
 SECTION(".text.vsf.kernel.vsf_sync")
-extern vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda);
+extern vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda);
 
 SECTION(".text.vsf.kernel.vsf_sync")
-extern void vsf_eda_sync_force_reset(vsf_sync_t *pthis);
+extern void vsf_eda_sync_force_reset(vsf_sync_t *this_ptr);
 
 SECTION(".text.vsf.kernel.vsf_sync")
-extern vsf_err_t vsf_eda_sync_decrease(vsf_sync_t *pthis, int_fast32_t timeout);
+extern vsf_err_t vsf_eda_sync_decrease(vsf_sync_t *this_ptr, int_fast32_t timeout);
 
 SECTION(".text.vsf.kernel.vsf_sync")
-extern vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, int_fast32_t timeout, vsf_eda_t *eda);
+extern vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *this_ptr, int_fast32_t timeout, vsf_eda_t *eda);
 
 SECTION(".text.vsf.kernel.vsf_eda_sync_cancel")
-extern void vsf_eda_sync_cancel(vsf_sync_t *pthis);
+extern void vsf_eda_sync_cancel(vsf_sync_t *this_ptr);
 
 SECTION(".text.vsf.kernel.vsf_eda_sync_get_reason")
-extern vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *pthis, vsf_evt_t evt);
+extern vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *this_ptr, vsf_evt_t evt);
 
 #if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_sync_op")
@@ -1302,45 +1302,45 @@ SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_bmpevt_op")
 extern const vsf_bmpevt_adapter_op_t vsf_eda_bmpevt_adapter_bmpevt_op;
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_init")
-extern vsf_err_t vsf_eda_bmpevt_init(vsf_bmpevt_t *pthis, uint_fast8_t adapter_count);
+extern vsf_err_t vsf_eda_bmpevt_init(vsf_bmpevt_t *this_ptr, uint_fast8_t adapter_count);
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_set")
-extern vsf_err_t vsf_eda_bmpevt_set(vsf_bmpevt_t *pthis, uint_fast32_t mask);
+extern vsf_err_t vsf_eda_bmpevt_set(vsf_bmpevt_t *this_ptr, uint_fast32_t mask);
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_reset")
-extern vsf_err_t vsf_eda_bmpevt_reset(vsf_bmpevt_t *pthis, uint_fast32_t mask);
+extern vsf_err_t vsf_eda_bmpevt_reset(vsf_bmpevt_t *this_ptr, uint_fast32_t mask);
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_cancel")
-extern vsf_err_t vsf_eda_bmpevt_cancel(vsf_bmpevt_t *pthis, uint_fast32_t mask);
+extern vsf_err_t vsf_eda_bmpevt_cancel(vsf_bmpevt_t *this_ptr, uint_fast32_t mask);
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_pend")
-extern vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *pthis, vsf_bmpevt_pender_t *pender, int_fast32_t timeout);
+extern vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender, int_fast32_t timeout);
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_poll")
-extern vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *pthis, vsf_bmpevt_pender_t *pender, vsf_evt_t evt);
+extern vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender, vsf_evt_t evt);
 #endif
 
 #if __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_queue_init")
-extern vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *pthis, uint_fast16_t max);
+extern vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *this_ptr, uint_fast16_t max);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send")
-extern vsf_err_t vsf_eda_queue_send(vsf_eda_queue_t *pthis, void *node, int_fast32_t timeout);
+extern vsf_err_t vsf_eda_queue_send(vsf_eda_queue_t *this_ptr, void *node, int_fast32_t timeout);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_ex")
-extern vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *pthis, void *node, int_fast32_t timeout, vsf_eda_t *eda);
+extern vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *this_ptr, void *node, int_fast32_t timeout, vsf_eda_t *eda);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_get_reason")
-extern vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void *node);
+extern vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *this_ptr, vsf_evt_t evt, void *node);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv")
-extern vsf_err_t vsf_eda_queue_recv(vsf_eda_queue_t *pthis, void **node, int_fast32_t timeout);
+extern vsf_err_t vsf_eda_queue_recv(vsf_eda_queue_t *this_ptr, void **node, int_fast32_t timeout);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv_ex")
-extern vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *pthis, void **node, int_fast32_t timeout, vsf_eda_t *eda);
+extern vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *this_ptr, void **node, int_fast32_t timeout, vsf_eda_t *eda);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv_get_reason")
-extern vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void **node);
+extern vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *this_ptr, vsf_evt_t evt, void **node);
 #endif      // __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE
 
 

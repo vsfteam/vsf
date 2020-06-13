@@ -30,25 +30,25 @@ extern "C" {
 
          
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define __SAFE_ATOM_CODE(__CODE)                                                \
+#define __SAFE_ATOM_CODE(__code)                                                \
         {                                                                       \
-            vsf_gint_state_t tState = DISABLE_GLOBAL_INTERRUPT();               \
-            __CODE;                                                             \
-            SET_GLOBAL_INTERRUPT_STATE(tState);                                 \
+            vsf_gint_state_t gint_state = DISABLE_GLOBAL_INTERRUPT();           \
+            __code;                                                             \
+            SET_GLOBAL_INTERRUPT_STATE(gint_state);                             \
         }
-#define __safe_atom_code(__CODE)           __SAFE_ATOM_CODE(__CODE)
+#define __safe_atom_code(__code)           __SAFE_ATOM_CODE(__code)
 #else
 #define __SAFE_ATOM_CODE(...)                                                   \
         {                                                                       \
-            vsf_gint_state_t tState = DISABLE_GLOBAL_INTERRUPT();               \
+            vsf_gint_state_t gint_state = DISABLE_GLOBAL_INTERRUPT();           \
             __VA_ARGS__;                                                        \
-            SET_GLOBAL_INTERRUPT_STATE(tState);                                 \
+            SET_GLOBAL_INTERRUPT_STATE(gint_state);                             \
         }
 #define __safe_atom_code(...)           __SAFE_ATOM_CODE(__VA_ARGS__)
 #endif
 
 //! \brief Exit from the safe atom operations
-#define EXIT_SAFE_ATOM_CODE()           SET_GLOBAL_INTERRUPT_STATE(tState)  
+#define EXIT_SAFE_ATOM_CODE()           SET_GLOBAL_INTERRUPT_STATE(gint_state)  
 
 #define exit_safe_atom_code()           EXIT_SAFE_ATOM_CODE()
 #define safe_atom_code()                SAFE_ATOM_CODE()
@@ -61,50 +61,50 @@ extern "C" {
 /*! @} */
 
 
-#define LOCK_INIT(__LOCKER)     do {(__LOCKER) = UNLOCKED;}while(false)
+#define LOCK_INIT(__locker)     do {(__locker) = UNLOCKED;}while(false)
 
 
-#define EXIT_LOCK()     do {\
-                            (*pLocker) = UNLOCKED;\
-                            SET_GLOBAL_INTERRUPT_STATE(tState);\
+#define EXIT_LOCK()     do {                                                    \
+                            (*lock_ptr) = UNLOCKED;                           \
+                            SET_GLOBAL_INTERRUPT_STATE(gint_state);             \
                         } while(false)
 
-#define ENTER_LOCK(__LOCKER)            enter_lock(__LOCKER)
+#define ENTER_LOCK(__locker)            enter_lock(__locker)
 
-#define LEAVE_LOCK(__LOCKER)            leave_lock(__LOCKER)
+#define LEAVE_LOCK(__locker)            leave_lock(__locker)
                         
-#define GET_LOCK_STATUS(__LOCKER)       check_lock(__LOCKER)
+#define GET_LOCK_STATUS(__locker)       check_lock(__locker)
 
-#define INIT_LOCK(__LOCKER)             init_lock(__LOCKER)
+#define INIT_LOCK(__locker)             init_lock(__locker)
                         
 /*! \brief exit lock checker structure */
 #define EXIT_LOCK_CHECKER()             EXIT_SAFE_ATOM_CODE()
 
 /*! \note check specified locker and run code segment
- *! \param __LOCKER a ES_LOCKER variable
- *! \param __CODE target code segment
+ *! \param __locker a ES_LOCKER variable
+ *! \param __code target code segment
  */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define LOCK_CHECKER(__LOCKER, __CODE)  {                                    \
+#   define LOCK_CHECKER(__locker, __code)  {                                    \
             {                                                                   \
-                locker_t *pLocker = &(__LOCKER);                                \
-                if (UNLOCKED == (*pLocker))                                     \
+                locker_t *lock_ptr = &(__locker);                               \
+                if (UNLOCKED == (*lock_ptr))                                    \
                 {                                                               \
                     SAFE_ATOM_CODE(                                             \
-                        if (UNLOCKED == (*pLocker)) {                           \
-                            __CODE;                                             \
+                        if (UNLOCKED == (*lock_ptr)) {                          \
+                            __code;                                             \
                         }                                                       \
                     )                                                           \
                 }                                                               \
             }
 #else
-#   define LOCK_CHECKER(__LOCKER, ...)  {                                       \
+#   define LOCK_CHECKER(__locker, ...)  {                                       \
             {                                                                   \
-                locker_t *pLocker = &(__LOCKER);                                \
-                if (UNLOCKED == (*pLocker))                                     \
+                locker_t *lock_ptr = &(__locker);                               \
+                if (UNLOCKED == (*lock_ptr))                                    \
                 {                                                               \
                     SAFE_ATOM_CODE(                                             \
-                        if (UNLOCKED == (*pLocker)) {                           \
+                        if (UNLOCKED == (*lock_ptr)) {                          \
                             __VA_ARGS__;                                        \
                         }                                                       \
                     )                                                           \
@@ -114,24 +114,24 @@ extern "C" {
             
 /*! \note critical code section protection
  *! \note LOCKER could be only used among FSMs and there should be no ISR involved.
- *! \param __LOCKER ES_LOCKER variable
- *! \param __CODE   target code segment
+ *! \param __locker ES_LOCKER variable
+ *! \param __code   target code segment
  */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define LOCK(__LOCKER,__CODE)                                                \
-            LOCK_CHECKER((__LOCKER),                                            \
-                (*pLocker) = LOCKED;                                            \
+#   define LOCK(__locker,__code)                                                \
+            LOCK_CHECKER((__locker),                                            \
+                (*lock_ptr) = LOCKED;                                           \
                 ENABLE_GLOBAL_INTERRUPT();                                      \
-                __CODE;                                                         \
-                (*pLocker) = UNLOCKED;                                          \
+                __code;                                                         \
+                (*lock_ptr) = UNLOCKED;                                         \
             )
 #else
-#   define LOCK(__LOCKER,...)                                                   \
-            LOCK_CHECKER((__LOCKER),                                            \
-                (*pLocker) = LOCKED;                                            \
+#   define LOCK(__locker,...)                                                   \
+            LOCK_CHECKER((__locker),                                            \
+                (*lock_ptr) = LOCKED;                                           \
                 ENABLE_GLOBAL_INTERRUPT();                                      \
                 __VA_ARGS__;                                                    \
-                (*pLocker) = UNLOCKED;                                          \
+                (*lock_ptr) = UNLOCKED;                                         \
             )
 #endif
 
@@ -150,10 +150,10 @@ extern "C" {
 #define vsf_unprotect(__type)           __vsf_unprotect(__type)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define vsf_protect_region(__type, __CODE)                                   \
+#   define vsf_protect_region(__type, __code)                                   \
     do {                                                                        \
         vsf_protect_t __state = vsf_protect(__type)();                          \
-        __CODE;                                                                 \
+        __code;                                                                 \
         vsf_unprotect(__type)(__state);                                         \
     } while (0);
 #else
@@ -172,29 +172,29 @@ typedef volatile bool locker_t;
 /*============================ PROTOTYPES ====================================*/
 
 /*! \brief try to enter a section
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \retval lock section is entered
  *! \retval The section is locked
  */
-extern bool enter_lock(locker_t *plock);
+extern bool enter_lock(locker_t *lock_ptr);
 
 /*! \brief leave a section
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \return none
  */
-extern void leave_lock(locker_t *plock);
+extern void leave_lock(locker_t *lock_ptr);
             
 /*! \brief get locker status
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \return locker status
  */
-extern bool check_lock(locker_t *plock);            
+extern bool check_lock(locker_t *lock_ptr);            
            
 /*! \brief initialize a locker
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \return none
  */
-extern void init_lock(locker_t *plock);
+extern void init_lock(locker_t *lock_ptr);
 
 #ifdef __cplusplus
 }

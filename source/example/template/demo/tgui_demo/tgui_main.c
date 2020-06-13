@@ -40,6 +40,7 @@ typedef struct usrapp_t usrapp_t;
 
 static usrapp_t __usrapp;
 
+/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_USE_UI == ENABLED

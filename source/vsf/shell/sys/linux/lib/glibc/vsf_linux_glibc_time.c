@@ -32,15 +32,6 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-// TODO: wakeup after signal
-
-unsigned sleep(unsigned sec)
-{
-    vsf_teda_set_timer_ms(sec * 1000);
-    vsf_thread_wfe(VSF_EVT_TIMER);
-    return 0;
-}
-
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 {
     if (requested_time->tv_sec) {

@@ -104,8 +104,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
             dev->play_ctx.hEvent = CreateEvent(NULL, 0, 0, NULL);
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-            dev->play_ctx.irq_thread.name = "winsound_play";
-            __vsf_arch_irq_init(&dev->play_ctx.irq_thread, __vk_winsound_play_irq_thread, dev->hw_prio, true);
+            __vsf_arch_irq_init(&dev->play_ctx.irq_thread, "winsound_play", __vk_winsound_play_irq_thread, dev->hw_prio, true);
 #endif
         }
         vsf_eda_return(VSF_ERR_NONE);

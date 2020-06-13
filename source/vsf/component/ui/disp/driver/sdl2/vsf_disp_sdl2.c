@@ -60,6 +60,11 @@ WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
     &&  defined(WEAK_VSF_INPUT_ON_KEYBOARD)
 WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN
 #endif
+
+#if     defined(WEAK_VSF_INPUT_ON_MOUSE_EXTERN)                                 \
+    &&  defined(WEAK_VSF_INPUT_ON_MOUSE)
+WEAK_VSF_INPUT_ON_MOUSE_EXTERN
+#endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -209,7 +214,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
     __vsf_arch_irq_set_background(irq_thread);
         __vk_disp_sdl2_screen_init(disp_sdl2);
 
-    __vsf_arch_irq_init(&disp_sdl2->flush_thread, __vk_disp_sdl2_flush_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
+    __vsf_arch_irq_init(&disp_sdl2->flush_thread, "disp_sdl2_flush", __vk_disp_sdl2_flush_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
 
     while (1) {
         if (SDL_WaitEvent(&event)) {
@@ -434,15 +439,12 @@ static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis)
 
     if (!__vk_disp_sdl2.is_init_called) {
         __vk_disp_sdl2.is_init_called = true;
-        __vk_disp_sdl2.init_thread.name = "disp_sdl2_init";
-        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, __vk_disp_sdl2_init_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
+        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, "disp_sdl2_init", __vk_disp_sdl2_init_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
     }
 
-    disp_sdl2->event_thread.name = "disp_sdl2_event";
-    __vsf_arch_irq_init(&disp_sdl2->event_thread, __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
+    __vsf_arch_irq_init(&disp_sdl2->event_thread, "disp_sdl2_event", __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
 
     __vsf_arch_irq_request_init(&disp_sdl2->flush_request);
-    disp_sdl2->flush_thread.name = "disp_sdl2_flush";
     return VSF_ERR_NONE;
 }
 

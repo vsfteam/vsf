@@ -273,7 +273,7 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size)
             return NULL;
         }
 
-        vsf_linux_main_priv_t *priv = (vsf_linux_main_priv_t *)&thread[1];
+        vsf_linux_main_priv_t *priv = vsf_linux_thread_get_priv(thread);
         priv->ctx = &process->ctx;
 
         vsf_protect_t orig = vsf_protect_sched();
@@ -352,7 +352,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
-    vsf_linux_main_priv_t *priv = (vsf_linux_main_priv_t *)&thread[1];
+    vsf_linux_main_priv_t *priv = vsf_linux_thread_get_priv(thread);
     vsf_linux_process_ctx_t *ctx = priv->ctx;
 
     vsf_linux_fd_t *sfd;
@@ -994,11 +994,6 @@ int open(const char *pathname, int flags, ...)
     return fd;
 }
 
-int remove(const char *pathname)
-{
-    return unlink(pathname);
-}
-
 int close(int fd)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
@@ -1263,6 +1258,19 @@ void usleep(int usec)
 {
     vsf_teda_set_timer_us(usec);
     vsf_thread_wfe(VSF_EVT_TIMER);
+}
+
+void * memalign(size_t alignment, size_t size)
+{
+    return vsf_heap_malloc_aligned(size, alignment);
+}
+
+// TODO: wakeup after signal
+unsigned sleep(unsigned sec)
+{
+    vsf_teda_set_timer_ms(sec * 1000);
+    vsf_thread_wfe(VSF_EVT_TIMER);
+    return 0;
 }
 
 #if __IS_COMPILER_LLVM__

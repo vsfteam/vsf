@@ -74,7 +74,7 @@ static void __vsf_task_push(vsf_task_t *ptask, vsf_task_stack_frame_t *frame_ptr
 
 vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
                             vsf_task_entry_t *fnEntry, 
-                            void *pTarget, 
+                            void *target_ptr, 
                             bool is_sub_call )
 {
     VSF_KERNEL_ASSERT(NULL != ptask);
@@ -82,10 +82,10 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
 
     if (!is_sub_call) {
         this.stack.frame_ptr->fnEntry = fnEntry;
-        if (NULL == pTarget) {
-            this.stack.frame_ptr->pTarget = ptask + 1;
+        if (NULL == target_ptr) {
+            this.stack.frame_ptr->target_ptr = ptask + 1;
         } else {
-            this.stack.frame_ptr->pTarget = pTarget;
+            this.stack.frame_ptr->target_ptr = target_ptr;
         }
     } else {
         vsf_task_stack_frame_t *pframe = 
@@ -96,10 +96,10 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
         }
         pframe->fnEntry = fnEntry;
         pframe->next = NULL;
-        if (NULL == pTarget) {
-            pframe->pTarget = ptask + 1;
+        if (NULL == target_ptr) {
+            pframe->target_ptr = ptask + 1;
         } else {
-            pframe->pTarget = pTarget;
+            pframe->target_ptr = target_ptr;
         }
         __vsf_task_push(ptask, pframe);
     }
@@ -108,7 +108,7 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
 }
 
 fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry, 
-                            void *pTarget, 
+                            void *target_ptr, 
                             bool is_sub_call )
 {
     class_internal(vsf_eda_get_cur(), ptThis, vsf_task_t);
@@ -128,7 +128,7 @@ fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry,
     
     __vsf_task_branch((vsf_task_t *)ptThis, 
                             fnEntry,
-                            pTarget,
+                            target_ptr,
                             is_sub_call);
     /*! \note
      *  - if VSF_ERR_NOT_ENOUGH_RESOURCES is detected, yield and try it again 
@@ -154,7 +154,7 @@ static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
 
     do {
         this.task_return_state = 
-            (*this.stack.frame_ptr->fnEntry)(this.stack.frame_ptr->pTarget, evt);
+            (*this.stack.frame_ptr->fnEntry)(this.stack.frame_ptr->target_ptr, evt);
         
         switch(this.task_return_state) {
             default:            //! return fsm_rt_err
@@ -197,8 +197,8 @@ void vsf_task_init( vsf_pool_block(vsf_task_stack_frame_pool) *frame_buf_ptr,
         vsf_task_stack_frame_pool_pool_init((&__default_frame_pool), &cfg);                         
         */    
         VSF_POOL_PREPARE(vsf_task_stack_frame_pool, (&__default_frame_pool),
-            .pTarget = NULL, 
-            .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
+            .target_ptr = NULL, 
+            .region_ptr = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
         );
         if (NULL == frame_buf_ptr || 0 == count) {
             break;
@@ -232,7 +232,7 @@ vsf_err_t vsf_task_start(vsf_task_t *ptask, vsf_task_cfg_t *pcfg)
     //this.call_depth = 0;
     //this.max_call_depth = 0;
     this.task_return_state = fsm_rt_on_going;
-    vsf_err_t err = __vsf_task_branch(ptask, pcfg->fnEntry, pcfg->pTarget, true);
+    vsf_err_t err = __vsf_task_branch(ptask, pcfg->fnEntry, pcfg->target_ptr, true);
     if (VSF_ERR_NONE != err) {
         return err;
     }

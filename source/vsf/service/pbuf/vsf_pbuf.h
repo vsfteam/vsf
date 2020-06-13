@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 #if VSF_USE_PBUF == ENABLED
-
+#include "utilities\vsf_utilities.h"
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file 
  *!        included in this file

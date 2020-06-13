@@ -56,7 +56,7 @@ static const vsf_linux_thread_op_t __vsf_linux_pthread_op = {
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
-    vsf_linux_pthread_priv_t *priv = (vsf_linux_pthread_priv_t *)&thread[1];
+    vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
     thread->retval = (int)priv->entry(priv->param);
 }
 
@@ -72,7 +72,7 @@ int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_r
     vsf_linux_thread_t *thread = vsf_linux_create_thread(NULL, 0, &__vsf_linux_pthread_op);
     if (!thread) { return -1; }
 
-    priv = (vsf_linux_pthread_priv_t *)&thread[1];
+    priv = vsf_linux_thread_get_priv(thread);
     priv->entry = start_rtn;
     priv->param = arg;
 

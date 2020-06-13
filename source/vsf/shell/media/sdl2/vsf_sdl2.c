@@ -75,7 +75,7 @@ NO_INIT vsf_sdl2_t __vsf_sdl2;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_sdl2_on_iput(vk_input_type_t type, vk_input_evt_t *evt)
+static void __vsf_sdl2_on_input(vk_input_type_t type, vk_input_evt_t *evt)
 {
 }
 
@@ -97,6 +97,26 @@ static void __vsf_sdl2_pixel_copy(  uint_fast16_t data_line_num, uint_fast32_t d
     }
 }
 
+static inline bool __vsf_sdl2_cord_intersect(int *start_out, int *width_out, int start0, int width0, int start1, int width1)
+{
+    int start = max(start0, start1);
+    int end0 = start0 + width0;
+    int end1 = start1 + width1;
+    int end = min(end0, end1);
+
+    *start_out  = start;
+    *width_out = end - start;
+    return end > start;
+}
+
+static bool __vsf_sdl2_rect_intersect(SDL_Rect *rect_out, const SDL_Rect *rect0, const SDL_Rect *rect1)
+{
+    VSF_SDL2_ASSERT((rect_out != NULL) && (rect0 != NULL) && (rect1 != NULL));
+    bool x_intersect = __vsf_sdl2_cord_intersect(&rect_out->x, &rect_out->w, rect0->x, rect0->w, rect1->x, rect1->w);
+    bool y_intersect = __vsf_sdl2_cord_intersect(&rect_out->y, &rect_out->h, rect0->y, rect0->h, rect1->y, rect1->h);
+    return x_intersect && y_intersect;
+}
+
 void vsf_sdl2_init(vk_disp_t *disp)
 {
     __vsf_sdl2.disp = disp;
@@ -116,7 +136,7 @@ int __vsf_sdl2_init_subsystem(uint32_t flags)
     __vsf_sdl2.init_flags = flags;
     if (flags & SDL_INIT_EVENTS) {
         __vsf_sdl2.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
-        __vsf_sdl2.notifier.on_evt = (vk_input_on_evt_t)__vsf_sdl2_on_iput;
+        __vsf_sdl2.notifier.on_evt = (vk_input_on_evt_t)__vsf_sdl2_on_input;
         vk_input_notifier_register(&__vsf_sdl2.notifier);
     }
 
@@ -208,22 +228,29 @@ int __vsf_sdl2_render_copy(SDL_Renderer * renderer, SDL_Texture * texture, const
 
     SDL_Window *window = renderer->window;
     SDL_Rect src_area, dst_area;
+    SDL_Rect texture_area = {
+        .x = 0,
+        .y = 0,
+        .w = texture->w,
+        .h = texture->h,
+    };
+
     if (srcrect != NULL) {
-        src_area = *srcrect;
+        if (!__vsf_sdl2_rect_intersect(&src_area, srcrect, &texture_area)) {
+            return -1;
+        }
     } else {
-        src_area.x = 0;
-        src_area.y = 0;
-        src_area.w = texture->w;
-        src_area.h = texture->h;
+        src_area = texture_area;
     }
     if (dstrect != NULL) {
-        dst_area = *dstrect;
+        if (!__vsf_sdl2_rect_intersect(&dst_area, dstrect, &window->area)) {
+            return -1;
+        }
     } else {
         dst_area = window->area;
     }
-
-    // not support scaling now
-    VSF_SDL2_ASSERT((src_area.w == dst_area.w) && (src_area.h == dst_area.h));
+    dst_area.w = src_area.w = min(dst_area.w, src_area.w);
+    dst_area.h = src_area.h = min(dst_area.h, src_area.h);
 
     uint_fast8_t pixel_size = vsf_disp_get_pixel_format_size(texture->format) >> 3;
     __vsf_sdl2_pixel_copy(src_area.h, pixel_size * src_area.w,

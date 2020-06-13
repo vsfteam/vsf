@@ -184,8 +184,9 @@
 #       define VSF_USE_USB_DEVICE_DCD_USBIP         ENABLED
 #       define APP_CFG_USBD_SPEED                   USB_DC_SPEED_HIGH
 
-#       define VSF_USBD_CFG_DRV_LV0                 vk_usbip_usbd
-#       define VSF_USBD_CFG_DRV_OBJ                 usrapp_usbd_common.usbip_dcd
+#       define VSF_USBD_CFG_DRV_LV0_OO
+#           define VSF_USBD_CFG_DRV_LV0_OO_PREFIX   vk_usbip_usbd
+#           define VSF_USBD_CFG_DRV_LV0_OO_OBJ      usrapp_usbd_common.usbip_dcd
 #       define VSF_CFG_USER_HEADER                  "usrapp_usbd_common.h"
 
         // usbip_dcd depends on timer support

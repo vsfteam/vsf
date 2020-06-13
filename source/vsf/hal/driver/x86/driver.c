@@ -143,7 +143,7 @@ static void __vsf_x86_debug_stream_init(void)
     SetConsoleMode(hOut, mode);
 
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
-    __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq,
+    __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq, "debug_stream_rx",
         __vsf_x86_debug_stream_rx_irqhandler, vsf_arch_prio_0, true);
 }
 #   elif   VSF_USE_SERVICE_STREAM == ENABLED

@@ -130,7 +130,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DbgFM</Key>
-          <Name>-I -S"System Generator:FVP_MPS2_Cortex_M3_MDK" -L"armcortexm3ct" -O4102 -C0 -MC".\FVP\MPS2_Cortex-M\FVP_MPS2_Cortex-M3_MDK.exe" -MF -MA</Name>
+          <Name>-I -S"System Generator:FVP_MPS2_Cortex_M3_MDK" -L"armcortexm3ct" -O4102 -C0 -MC".\FVP\MPS2_Cortex-M\FVP_MPS2_Cortex-M3_MDK.exe" -MF -PF -MA</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>

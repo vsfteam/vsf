@@ -32,33 +32,33 @@
 /*============================ IMPLEMENTATION ================================*/
 
 /*! \brief initialize a locker
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \return none
  */
-void init_lock(locker_t *plock)
+void init_lock(locker_t *lock_ptr)
 {
-    if (NULL == plock) {
+    if (NULL == lock_ptr) {
         return ;
     }
     
-    (*plock) = UNLOCKED;
+    (*lock_ptr) = UNLOCKED;
 }
 
 /*! \brief try to enter a section
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \retval lock section is entered
  *! \retval The section is locked
  */
-bool enter_lock(locker_t *plock)
+bool enter_lock(locker_t *lock_ptr)
 {
     bool result = false;
-    if (NULL == plock) {
+    if (NULL == lock_ptr) {
         return true;
     }
-    if (UNLOCKED == (*plock)) {
+    if (UNLOCKED == (*lock_ptr)) {
 		__SAFE_ATOM_CODE(
-            if (UNLOCKED == (*plock)) {
-                (*plock) = LOCKED;
+            if (UNLOCKED == (*lock_ptr)) {
+                (*lock_ptr) = LOCKED;
                 result = true;
             }
 		)
@@ -69,29 +69,29 @@ bool enter_lock(locker_t *plock)
 
 
 /*! \brief leave a section
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \return none
  */
-void leave_lock(locker_t *plock)
+void leave_lock(locker_t *lock_ptr)
 {
-    if (NULL == plock) {
+    if (NULL == lock_ptr) {
         return ;
     }
     
-    (*plock) = UNLOCKED;
+    (*lock_ptr) = UNLOCKED;
 }
 
 /*! \brief get locker status
- *! \param plock locker object
+ *! \param lock_ptr locker object
  *! \return locker status
  */
-bool check_lock(locker_t *plock)
+bool check_lock(locker_t *lock_ptr)
 {
-    if (NULL == plock) {
+    if (NULL == lock_ptr) {
         return false;
     }
 
-    return (*plock);
+    return (*lock_ptr);
 }
 
 /* EOF */

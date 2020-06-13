@@ -100,7 +100,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
 
 
 SECTION("text.vsf.kernel.__vsf_sem_pend")
-vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
+vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
 {
     vsf_sync_reason_t result = VSF_SYNC_PENDING;
     vsf_err_t err;
@@ -116,20 +116,20 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *psem, int_fast32_t time_out)
     do {
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
         if (vsf_eda_is_stack_owner(eda)) {
-            result = vsf_thread_sem_pend(psem, time_out);
+            result = vsf_thread_sem_pend(sem_ptr, time_out);
         } else 
 #endif
         {
             if (vsf_eda_polling_state_get(eda)) {
                 /* VSF_APP_STATE_WAIT_PENDING */
-                result = vsf_eda_sync_get_reason(psem, vsf_eda_get_cur_evt());
+                result = vsf_eda_sync_get_reason(sem_ptr, vsf_eda_get_cur_evt());
                 if (result != VSF_SYNC_PENDING) {
                     vsf_eda_polling_state_set(  eda,
                                                 (bool)VSF_APP_STATE_PENDING);
                 }
             } else {
                 /* VSF_APP_STATE_PENDING */
-                err = vsf_eda_sem_pend(psem, time_out);
+                err = vsf_eda_sem_pend(sem_ptr, time_out);
                 if (!err) { 
                     result = VSF_SYNC_GET; 
                     break;

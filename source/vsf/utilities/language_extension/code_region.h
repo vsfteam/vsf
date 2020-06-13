@@ -24,12 +24,12 @@
 /*! \brief How To Define and Use your own CODE_REGION
  *!        Example:
 
-    static void __code_region_example_on_enter(void *pobj, void *plocal)
+    static void __code_region_example_on_enter(void *obj_ptr, void *local_ptr)
     {
         printf("-------enter-------\r\n");
     }
 
-    static void __code_region_example_on_leave(void *pobj,void *plocal)
+    static void __code_region_example_on_leave(void *obj_ptr,void *local_ptr)
     {
         printf("-------leave-------\r\n");
     }
@@ -94,42 +94,42 @@ extern "C" {
 
 #if __IS_COMPILER_IAR__
 #   define __CODE_REGION(__REGION_ADDR)                                         \
-    for(code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
-        NULL != pcode_region;                                                   \
-        pcode_region = NULL)                                                    \
+    for(code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);         \
+        NULL != code_region_ptr;                                                   \
+        code_region_ptr = NULL)                                                    \
         for(uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE],               \
                 TPASTE2(__code_region_, __LINE__) = 1;                          \
             TPASTE2(__code_region_, __LINE__)-- ?                               \
-                (pcode_region->pmethods->OnEnter(  pcode_region->ptarget, local)\
+                (code_region_ptr->methods_ptr->OnEnter(  code_region_ptr->target_ptr, local)\
                     ,1)                                                         \
                 : 0;                                                            \
-            pcode_region->pmethods->OnLeave(pcode_region->ptarget, local))
+            code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local))
 
 #   define __CODE_REGION_START(__REGION_ADDR)   __CODE_REGION(__REGION_ADDR) {
 #   define __CODE_REGION_END()                  }
 
 #   define __CODE_REGION_SIMPLE(__REGION_ADDR, ...)                             \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);         \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          \
         __VA_ARGS__;                                                            \
-        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local);          \
     } } while(0);
 
 #   define __CODE_REGION_SIMPLE_START(__REGION_ADDR, ...)                       \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);         \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          
 
 #   define __CODE_REGION_SIMPLE_END(__REGION_ADDR, ...)                         \
-        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local);          \
     } } while(0);
 
 
 #   define EXIT_CODE_REGION()                                                   \
-            pcode_region->ptMethods->OnLeave(pcode_region->ptarget, local)
+            code_region_ptr->ptMethods->OnLeave(code_region_ptr->target_ptr, local)
 #   define exit_code_region()  EXIT_CODE_REGION()
 
 #   define CODE_REGION(__REGION_ADDR)          __CODE_REGION((__REGION_ADDR))
@@ -141,36 +141,37 @@ extern "C" {
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #       define __CODE_REGION_SIMPLE(__REGION_ADDR, __CODE)                      \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local); \
         __CODE;                                                                 \
-        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
     } }while(0);
 
 #       define __CODE_REGION_SIMPLE_START(__REGION_ADDR)                        \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          
 
 #       define __CODE_REGION_SIMPLE_END(__REGION_ADDR)                          \
-        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
     } } while(0);
 #   else
 
 /* code region require C99 and above */
 #       define __CODE_REGION(__REGION_ADDR)                                     \
-    for(code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
-        NULL != pcode_region;                                                   \
-        pcode_region = NULL)                                                    \
-        for(uint8_t local[pcode_region->pmethods->local_obj_size],              \
+    for(code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
+        NULL != code_region_ptr;                                                \
+        code_region_ptr = NULL)                                                 \
+        for(uint8_t local[code_region_ptr->methods_ptr->local_obj_size],        \
                 TPASTE2(__code_region_, __LINE__) = 1;                          \
             TPASTE2(__code_region_, __LINE__)-- ?                               \
-                (pcode_region->pmethods->OnEnter(  pcode_region->ptarget, local)\
+                (code_region_ptr->methods_ptr->OnEnter(                         \
+                    code_region_ptr->target_ptr, local)                            \
                     ,1)                                                         \
                 : 0;                                                            \
-            pcode_region->pmethods->OnLeave(pcode_region->ptarget, local))
+            code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local))
 
 #       define __CODE_REGION_START(__REGION_ADDR) __CODE_REGION(__REGION_ADDR) {
 #       define __CODE_REGION_END()                  }
@@ -178,26 +179,26 @@ extern "C" {
 
 #       define __CODE_REGION_SIMPLE(__REGION_ADDR, ...)                         \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
-        uint8_t local[pcode_region->pmethods->local_obj_size];                  \
-        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
+        uint8_t local[code_region_ptr->methods_ptr->local_obj_size];            \
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local); \
         __VA_ARGS__;                                                            \
-        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
     } }while(0);
     
 #       define __CODE_REGION_SIMPLE_START(__REGION_ADDR, ...)                   \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *pcode_region = (code_region_t *)(__REGION_ADDR);         \
-        uint8_t local[pcode_region->pmethods->local_obj_size];                  \
-        pcode_region->pmethods->OnEnter(pcode_region->ptarget, local);          
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
+        uint8_t local[code_region_ptr->methods_ptr->local_obj_size];            \
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          
 
 #       define __CODE_REGION_SIMPLE_END(__REGION_ADDR, ...)                     \
-        pcode_region->pmethods->OnLeave(pcode_region->ptarget, local);          \
+        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
     } } while(0);
 #   endif
 
 #   define EXIT_CODE_REGION()                                                   \
-            pcode_region->ptMethods->OnLeave(pcode_region->ptarget, local)
+            code_region_ptr->ptMethods->OnLeave(code_region_ptr->target_ptr, local)
 #   define exit_code_region()  EXIT_CODE_REGION()
 
 #   define CODE_REGION(__REGION_ADDR)          __CODE_REGION((__REGION_ADDR))
@@ -231,13 +232,13 @@ extern "C" {
 /*============================ TYPES =========================================*/
 typedef struct {
     uint_fast8_t    local_obj_size;
-    void (*OnEnter)(void *pobj, void *plocal);
-    void (*OnLeave)(void *pobj, void *plocal);
+    void (*OnEnter)(void *obj_ptr, void *local_ptr);
+    void (*OnLeave)(void *obj_ptr, void *local_ptr);
 }i_code_region_t;
 
 typedef struct {
-    void *ptarget;
-    i_code_region_t *pmethods;
+    void *target_ptr;
+    i_code_region_t *methods_ptr;
 } code_region_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

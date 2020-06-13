@@ -312,14 +312,12 @@ static void __vk_usbip_server_backend_init(vk_usbip_server_t *server)
     __vk_usbip_server_backend.server = server;
 
     __vsf_arch_irq_request_init(&__vk_usbip_server_backend.rx.irq_request);
-    __vk_usbip_server_backend.rx.name = "usbip_server_rx";
     __vsf_arch_irq_init(&__vk_usbip_server_backend.rx.use_as__vsf_arch_irq_thread_t,
-        __vk_usbip_server_backend_thread_rx, VSF_USBD_CFG_HW_PRIORITY, true);
+        "usbip_server_rx", __vk_usbip_server_backend_thread_rx, VSF_USBD_CFG_HW_PRIORITY, true);
 
     __vsf_arch_irq_request_init(&__vk_usbip_server_backend.tx.irq_request);
-    __vk_usbip_server_backend.tx.name = "usbip_server_tx";
     __vsf_arch_irq_init(&__vk_usbip_server_backend.tx.use_as__vsf_arch_irq_thread_t,
-        __vk_usbip_server_backend_thread_tx, VSF_USBD_CFG_HW_PRIORITY, true);
+        "usbip_server_tx", __vk_usbip_server_backend_thread_tx, VSF_USBD_CFG_HW_PRIORITY, true);
 }
 
 static void __vk_usbip_server_backend_close(void)

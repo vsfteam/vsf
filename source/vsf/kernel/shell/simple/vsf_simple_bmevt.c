@@ -41,13 +41,13 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *pbmpevt,
-                                    vsf_bmpevt_pender_t *ppender,
+static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *bmpevt_ptr,
+                                    vsf_bmpevt_pender_t *pender_ptr,
                                     int_fast32_t time_out)
 {
 
     vsf_sync_reason_t reason = VSF_SYNC_PENDING;
-    VSF_KERNEL_ASSERT(NULL != pbmpevt && NULL != ppender);
+    VSF_KERNEL_ASSERT(NULL != bmpevt_ptr && NULL != pender_ptr);
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     vsf_eda_t *peda = vsf_eda_get_cur();
@@ -55,11 +55,11 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *pbmpevt,
 
     if (vsf_eda_is_stack_owner(peda)) {
         //! a thread
-        reason =  vsf_thread_bmpevt_pend(pbmpevt, ppender, time_out);
+        reason =  vsf_thread_bmpevt_pend(bmpevt_ptr, pender_ptr, time_out);
     } else 
 #endif
     {
-        switch(vsf_eda_bmpevt_pend(pbmpevt, ppender, time_out)) {
+        switch(vsf_eda_bmpevt_pend(bmpevt_ptr, pender_ptr, time_out)) {
             case VSF_ERR_NONE:
                 reason = VSF_SYNC_GET;
                 break;
@@ -76,8 +76,8 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *pbmpevt,
 }
 
 SECTION("text.vsf.kernel.__vsf_bmpevt_wait_for")
-vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
-                                        const vsf_bmpevt_pender_t *ppender,
+vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *bmpevt_ptr,
+                                        const vsf_bmpevt_pender_t *pender_ptr,
                                         int_fast32_t time_out)
 {
     vsf_sync_reason_t result = VSF_SYNC_PENDING;
@@ -95,16 +95,16 @@ vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
                     break;
                 }
             }
-            result = vsf_eda_bmpevt_poll(   pbmpevt, 
-                                        (vsf_bmpevt_pender_t *)ppender, 
+            result = vsf_eda_bmpevt_poll(   bmpevt_ptr, 
+                                        (vsf_bmpevt_pender_t *)pender_ptr, 
                                         VSF_EVT_SYNC_POLL);
             if (VSF_SYNC_GET == result) {
                 vsf_eda_polling_state_set(peda, (bool)VSF_APP_STATE_PEND);
             }
         } else {
             /* VSF_APP_STATE_PEND */
-            result = __vsf_bmpevt_pend( pbmpevt, 
-                                        (vsf_bmpevt_pender_t *)ppender, 
+            result = __vsf_bmpevt_pend( bmpevt_ptr, 
+                                        (vsf_bmpevt_pender_t *)pender_ptr, 
                                         time_out); 
             if (    vsf_eda_is_stack_owner(peda) 
                 ||  VSF_SYNC_GET == result
@@ -121,15 +121,15 @@ vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *pbmpevt,
 
 SECTION("text.vsf.kernel.__vsf_grouped_evts_init")
 void __vsf_grouped_evts_init(vsf_bmpevt_t *ptThis, 
-                    vsf_bmpevt_adapter_t **ppadapters, 
+                    vsf_bmpevt_adapter_t **adapters_pptr, 
                     uint_fast8_t adapter_count,
                     uint_fast32_t auto_reset)
 {
-    VSF_KERNEL_ASSERT(NULL != ptThis && NULL != ppadapters);
+    VSF_KERNEL_ASSERT(NULL != ptThis && NULL != adapters_pptr);
     this.auto_reset = auto_reset;
     
     if (adapter_count) {
-        this.adapters = ppadapters;
+        this.adapters = adapters_pptr;
     }
     vsf_eda_bmpevt_init(ptThis, adapter_count);
 }

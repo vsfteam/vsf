@@ -288,7 +288,7 @@ extern "C" {
 
 // prototype:
 //  describe_usbd(__NAME, __VID, __PID, __SPEED, __VERSION = 0x0200, __LANG_ID = 0x0409, __BCD_VER = 0x0100)
-#define describe_usbd(__NAME, __VID, __PID, __SPEED, ...)            \
+#define describe_usbd(__NAME, __VID, __PID, __SPEED, ...)                       \
         __PLOOC_EVAL(__describe_usbd, __NAME, __VID, __PID, __SPEED, ##__VA_ARGS__)(__NAME, __VID, __PID, __SPEED, ##__VA_ARGS__)
 #define usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, __EP0_SIZE, __FUNC_DESC_SIZE, __FUNC_IFS_NUM, __ATTRIBUTE, __MAX_POWER_MA)\
         __usbd_common_desc(__NAME, __STR_PRODUCT, __STR_VENDOR, __STR_SERIAL, (__EP0_SIZE), (__FUNC_DESC_SIZE), (__FUNC_IFS_NUM), (__ATTRIBUTE), (__MAX_POWER_MA))
@@ -301,7 +301,7 @@ extern "C" {
 #define usbd_std_desc_table(__NAME)                                             \
         __usbd_std_desc_table(__NAME)
 // prototype:
-//  usbd_func_str_desc_table(__NAME, __FUNC_ID, __LANG_ID = __LANG_ID_FROM_describe_usbd)
+//  usbd_func_str_desc_table(__NAME, __FUNC_ID, __LANG_ID = __LANG_ID_FROM_DESCRIBE_USBD)
 #define usbd_func_str_desc_table(__NAME, __FUNC_ID, ...)                        \
         __PLOOC_EVAL(__usbd_func_str_desc_table, __NAME, __FUNC_ID, ##__VA_ARGS__)(__NAME, __FUNC_ID, ##__VA_ARGS__)
 #define usbd_qualifier_desc_table(__NAME)                                       \
@@ -438,7 +438,7 @@ def_simple_class(vk_usbd_dev_t) {
         vk_usbd_cfg_t *config;
 #endif
 
-#ifdef VSF_USBD_CFG_DRV_INTERFACE
+#ifdef __VSF_USBD_CFG_DRV_INTERFACE
         const i_usb_dc_t *drv;
 #endif
     )

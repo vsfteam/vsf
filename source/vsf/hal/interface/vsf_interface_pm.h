@@ -57,8 +57,10 @@ enum pm_power_cfg_msk_t {
 
 //! @}
 */
+#ifndef __cplusplus
 typedef enum pm_power_cfg_no_t  pm_power_cfg_no_t;
 typedef enum pm_power_cfg_msk_t pm_power_cfg_msk_t;
+#endif
 
 typedef uint_fast32_t pm_power_status_t;
 
@@ -97,8 +99,9 @@ enum pm_sleep_mode_t{
 } ;
 //! @}
 */
+#ifndef __cplusplus
 typedef enum pm_sleep_mode_t pm_sleep_mode_t;
-
+#endif
  
 //! \name sleep config struct
 //! @{
@@ -149,7 +152,7 @@ declare_interface(i_pm_wakeup_t)
 */
 declare_interface(i_pm_sleep_t)
 def_interface(i_pm_sleep_t)
-    vsf_err_t (*TryToSleep)(pm_sleep_cfg_t *ptCfg);
+    vsf_err_t (*TryToSleep)(pm_sleep_cfg_t *cfg_ptr);
     i_pm_wakeup_t WakeUp;
 end_def_interface(i_pm_sleep_t)
 
@@ -179,8 +182,9 @@ struct pm_periph_asyn_clk_cfg_t {
 
  */ 
 
- 
+#ifndef __cplusplus
 typedef enum pm_periph_async_clk_no_t pm_periph_async_clk_no_t;
+#endif
 
 typedef int_fast16_t pm_periph_async_clk_status_t;
 
@@ -193,7 +197,7 @@ declare_interface(i_pm_periph_asyn_clk_t)
 def_interface(i_pm_periph_asyn_clk_t)
     pm_periph_async_clk_status_t    
                         (*Config)(   pm_periph_async_clk_no_t index , 
-                                     const pm_periph_asyn_clk_cfg_t *pcfg);
+                                     const pm_periph_asyn_clk_cfg_t *cfg_ptr);
     uint_fast32_t       (*GetClock)( pm_periph_async_clk_no_t index);
     pm_periph_async_clk_status_t    
                         (*GetStatus)(pm_periph_async_clk_no_t index);
@@ -239,8 +243,10 @@ enum pm_ahb_clk_msk_t {
 //! @}
 */
 
+#ifndef __cplusplus
 typedef enum pm_ahb_clk_no_t pm_ahb_clk_no_t;
 typedef enum pm_ahb_clk_msk_t pm_ahb_clk_msk_t;
+#endif
 
 typedef uint_fast32_t pm_ahbclk_status_t;
 
@@ -289,8 +295,10 @@ enum pm_clk_src_sel_t {
 }em_clk_src_sel_t;
 //! @}
 */
- 
+
+#ifndef __cplusplus
 typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
+#endif
 
 //! \name main clock prescaler
 //! @{
@@ -324,8 +332,9 @@ struct pm_main_clk_cfg_t {
  */
 typedef struct pm_main_clk_cfg_t pm_main_clk_cfg_t;
 
+#ifndef __cplusplus
 typedef enum pm_main_clk_no_t pm_main_clk_no_t;
-
+#endif
 /*
 enum pm_main_clk_no_t {
     MCLK_CORE_idx = 0,
@@ -346,8 +355,8 @@ enum pm_main_clk_no_t {
 //! @{
 declare_interface(i_pm_main_clk_t)
 def_interface(i_pm_main_clk_t)
-    fsm_rt_t            (*Init)         (pm_main_clk_cfg_t *tCfg);
-    uint_fast32_t       (*GetClock)     (pm_main_clk_no_t tSelect);
+    fsm_rt_t            (*Init)         (pm_main_clk_cfg_t *cfg_ptr);
+    uint_fast32_t       (*GetClock)     (pm_main_clk_no_t sel);
 end_def_interface(i_pm_main_clk_t)
 //! @}
 
@@ -366,7 +375,9 @@ enum pm_pll_sel_t {
 };
 
  */
+#ifndef __cplusplus
 typedef enum pm_pll_sel_t pm_pll_sel_t;
+#endif
 
 /*! \note  pm_pll_cfg_t should be defined in device specific PM header file.
 //! \name pll config struct
@@ -404,7 +415,7 @@ enum pm_pll_post_div_t {
 declare_interface(i_pm_pll_t)
 def_interface(i_pm_pll_t)
     //! Pll config
-    fsm_rt_t                    (*Init)(pm_pll_sel_t pll, pm_pll_cfg_t *pcfg);
+    fsm_rt_t                    (*Init)(pm_pll_sel_t pll, pm_pll_cfg_t *cfg_ptr);
     //! PLL Check Is Pll Locked
     bool                        (*IsLocked)(pm_pll_sel_t pll);
     //! get pll output clock
@@ -452,7 +463,7 @@ typedef struct pm_lposc_cfg_t pm_lposc_cfg_t;
 //! @{
 declare_interface(i_pm_lposc_t)
 def_interface(i_pm_lposc_t)
-    vsf_err_t       (*Init)     (pm_lposc_sel_t lposc, pm_lposc_cfg_t *ptCFG);
+    vsf_err_t       (*Init)     (pm_lposc_sel_t lposc, pm_lposc_cfg_t *cfg_ptr);
     void            (*Enable)   (pm_lposc_sel_t lposc);
     void            (*Disable)  (pm_lposc_sel_t lposc);
     uint_fast32_t   (*GetClock) (pm_lposc_sel_t lposc);
@@ -478,7 +489,7 @@ def_interface(i_pm_clk_t)
 
     i_pm_main_clk_t         Main;
     uint_fast32_t           (*GetSysClk)(void);
-    vsf_err_t               (*ClkOutCfg)( pm_clock_out_cfg_t *ptCfg);
+    vsf_err_t               (*ClkOutCfg)( pm_clock_out_cfg_t *cfg_ptr);
     i_pm_periph_asyn_clk_t  Peripheral;
     i_pm_ahb_clk_t          AHB;
     i_pm_lposc_t            LPOSC;                  //!< low power oscillators

@@ -228,20 +228,18 @@ static void usb_dc##__N##_irq(void)                                             
 
 /*============================ TYPES =========================================*/
 
-enum usb_dc_feature_t {
+typedef enum {
     USB_DC_FEATURE_TRANSFER = 1 << 0,
-};
-typedef enum usb_dc_feature_t usb_dc_feature_t;
+}usb_dc_feature_t;
 
-enum usb_ep_type_t {
+typedef enum {
     USB_EP_TYPE_CONTROL     = 0,
     USB_EP_TYPE_INTERRUPT   = 3,
     USB_EP_TYPE_BULK        = 2,
     USB_EP_TYPE_ISO         = 1,
-};
-typedef enum usb_ep_type_t usb_ep_type_t;
+}usb_ep_type_t;
 
-enum usb_evt_t {
+typedef enum  {
     USB_ON_ATTACH,
     USB_ON_DETACH,
     USB_ON_RESET,
@@ -257,23 +255,20 @@ enum usb_evt_t {
     USB_ON_UNDERFLOW,
     USB_ON_OVERFLOW,
     USB_USR_EVT,
-};
-typedef enum usb_evt_t usb_evt_t;
+}usb_evt_t;
 
-enum usb_dc_err_t {
+typedef enum  {
     USB_DC_ERR_ERROR,
     USB_DC_ERR_INVALID_CRC,
     USB_DC_ERR_SOF_TO,
-};
-typedef enum usb_dc_err_t usb_dc_err_t;
+}usb_dc_err_t ;
 
-enum usb_dc_speed_t {
+typedef enum {
     USB_DC_SPEED_LOW,
     USB_DC_SPEED_FULL,
     USB_DC_SPEED_HIGH,
     USB_DC_SPEED_SUPER,
-};
-typedef enum usb_dc_speed_t usb_dc_speed_t;
+}usb_dc_speed_t;
 
 typedef void (*usb_ip_irq_handler_t)(void *param);
 typedef void (*usb_dc_evt_handler_t)(void *param, usb_evt_t evt, uint_fast8_t value);
@@ -290,7 +285,7 @@ struct usb_dc_cfg_t {
 typedef struct usb_dc_cfg_t usb_dc_cfg_t;
 //! @}
 
-//! \name usb_dc and ep control interface
+//! \name usb_dc and ep control interface, IMPORTANT: i_usb_dc_t belongs to lv0
 //! @{
 
 def_interface(i_usb_dc_t)
@@ -388,10 +383,6 @@ end_def_interface(i_usb_dc_ip_t)
 //! @}
 
 
-
-
-
-
 //! \name usb_hc_ip configuration structure
 //! @{
 struct usb_hc_ip_cfg_t {
@@ -412,7 +403,7 @@ struct usb_hc_ip_info_t {
 typedef struct usb_hc_ip_info_t usb_hc_ip_info_t;
 //! @}
 
-//! \name usb_hc_ip control interface
+//! \name usb_hc_ip control interface, IMPORTANT: i_usb_hc_ip_t belongs to lv0
 //! @{
 def_interface(i_usb_hc_ip_t)
 

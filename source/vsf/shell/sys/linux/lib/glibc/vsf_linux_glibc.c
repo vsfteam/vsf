@@ -51,13 +51,4 @@ int __sync_pend(vsf_sync_t *sem)
     }
 }
 
-char * strdup(const char *str)
-{
-    char *newstr = malloc(strlen(str) + 1);
-    if (newstr != NULL) {
-        strcpy(newstr, str);
-    }
-    return newstr;
-}
-
 #endif      // VSF_USE_LINUX

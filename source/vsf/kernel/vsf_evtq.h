@@ -100,14 +100,14 @@ struct vsf_evtq_t {
 extern void vsf_evtq_on_eda_init(vsf_eda_t *eda);
 extern void vsf_evtq_on_eda_fini(vsf_eda_t *eda);
 
-extern vsf_err_t vsf_evtq_init(vsf_evtq_t *pthis);
+extern vsf_err_t vsf_evtq_init(vsf_evtq_t *this_ptr);
 #   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
 extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *eda, vsf_evt_t evt, void *msg);
 #   endif
 extern vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *eda, vsf_evt_t evt, bool force);
 extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
-extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis);
+extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr);
 #endif
 
 #ifdef __cplusplus

@@ -137,8 +137,8 @@ extern "C" {
  */
  //! @{
 #define __extern_fsm_implementation_ex(__NAME,__TYPE)                           \
-        fsm_rt_t __NAME(fsm(__TYPE) *pthis, vsf_evt_t evt);                     \
-        typedef fsm_rt_t __NAME##_fn( fsm(__TYPE) *pthis, vsf_evt_t evt );              
+        fsm_rt_t __NAME(fsm(__TYPE) *this_ptr, vsf_evt_t evt);                     \
+        typedef fsm_rt_t __NAME##_fn( fsm(__TYPE) *this_ptr, vsf_evt_t evt );              
         
 #define declare_fsm_implementation_ex(__NAME, __TYPE)                           \
             __extern_fsm_implementation_ex(__NAME, __TYPE)

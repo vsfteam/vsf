@@ -79,7 +79,7 @@ extern "C" {
 #endif
 
 #define implement_vsf_task(__name)  __implement_vsf_task(__name)
-        
+#define imp_vsf_task(__name)        implement_vsf_task(__name)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 #   define vsf_task_start           vsf_teda_init_ex
@@ -145,18 +145,27 @@ extern "C" {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #define def_vsf_task(__NAME, __MEMBER)      __def_vsf_task(__NAME, __MEMBER)
+#define define_vsf_task(__NAME, __MEMBER)   def_vsf_task(__NAME, __MEMBER)
+#define end_def_vsf_task(__NAME)               
+#define end_define_vsf_task(__NAME)
 #else
 #define def_vsf_task(__NAME,...)            __def_vsf_task(__NAME,__VA_ARGS__)
+#define define_vsf_task(__NAME,...)         def_vsf_task(__NAME,__VA_ARGS__)
+#define end_def_vsf_task(...)               
+#define end_define_vsf_task(...)
 #endif
 
 #define __declare_vsf_task(__NAME)                                              \
             typedef struct __NAME __NAME;                                       \
             typedef struct task_cb_##__NAME  task_cb_##__NAME;
 
-#define declare_vsf_task(__NAME)      __declare_vsf_task(__NAME)
+#define declare_vsf_task(__NAME)        __declare_vsf_task(__NAME)
+#define dcl_vsf_task(__NAME)            declare_vsf_task(__NAME)
 
 #define prepare_vsf_task(__NAME, __TASK)                                        \
             do {(__TASK)->tState = 0; } while(0)
+
+#define prp_vsf_task(__NAME, __TASK)        prepare_vsf_task(__NAME, __TASK)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED

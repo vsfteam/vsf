@@ -25,10 +25,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
-static void __default_code_region_atom_code_on_enter(void *pobj, void *plocal);
-static void __default_code_region_atom_code_on_leave(void *pobj,void *plocal);
-static void __default_code_region_none_on_enter(void *pobj, void *plocal);
-static void __default_code_region_none_on_leave(void *pobj,void *plocal);
+static void __default_code_region_atom_code_on_enter(void *obj_ptr, void *local_ptr);
+static void __default_code_region_atom_code_on_leave(void *obj_ptr,void *local_ptr);
+static void __default_code_region_none_on_enter(void *obj_ptr, void *local_ptr);
+static void __default_code_region_none_on_leave(void *obj_ptr,void *local_ptr);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -57,38 +57,38 @@ const code_region_t DEFAULT_CODE_REGION_NONE = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __default_code_region_atom_code_on_enter(void *pobj, void *plocal)
+static void __default_code_region_atom_code_on_enter(void *obj_ptr, void *local_ptr)
 {
-    vsf_gint_state_t *pstate = (vsf_gint_state_t *)plocal;
+    vsf_gint_state_t *pstate = (vsf_gint_state_t *)local_ptr;
     
-    UNUSED_PARAM(pobj);
-    UNUSED_PARAM(plocal);
+    UNUSED_PARAM(obj_ptr);
+    UNUSED_PARAM(local_ptr);
     
-    ASSERT(NULL != plocal);
+    ASSERT(NULL != local_ptr);
     (*pstate) = DISABLE_GLOBAL_INTERRUPT();
 }
 
-static void __default_code_region_atom_code_on_leave(void *pobj,void *plocal)
+static void __default_code_region_atom_code_on_leave(void *obj_ptr,void *local_ptr)
 {
-    vsf_gint_state_t *pstate = (vsf_gint_state_t *)plocal;
+    vsf_gint_state_t *pstate = (vsf_gint_state_t *)local_ptr;
     
-    UNUSED_PARAM(pobj);
-    UNUSED_PARAM(plocal);
+    UNUSED_PARAM(obj_ptr);
+    UNUSED_PARAM(local_ptr);
     
-    ASSERT(NULL != plocal);
+    ASSERT(NULL != local_ptr);
     SET_GLOBAL_INTERRUPT_STATE(*pstate);
 }
 
-static void __default_code_region_none_on_enter(void *pobj, void *plocal)
+static void __default_code_region_none_on_enter(void *obj_ptr, void *local_ptr)
 {
-    UNUSED_PARAM(pobj);
-    UNUSED_PARAM(plocal);
+    UNUSED_PARAM(obj_ptr);
+    UNUSED_PARAM(local_ptr);
 }
 
-static void __default_code_region_none_on_leave(void *pobj,void *plocal)
+static void __default_code_region_none_on_leave(void *obj_ptr,void *local_ptr)
 {
-    UNUSED_PARAM(pobj);
-    UNUSED_PARAM(plocal);
+    UNUSED_PARAM(obj_ptr);
+    UNUSED_PARAM(local_ptr);
 }
 
 /* EOF */

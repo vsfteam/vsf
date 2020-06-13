@@ -67,20 +67,41 @@ enum em_usart_mode_t {
 //! @{
 typedef struct usart_cfg_t usart_cfg_t;
 struct usart_cfg_t {
-    uint32_t    wMode;
-    uint32_t    wBaudrate;
-    uint32_t    wReceiveTimeout;
+    uint32_t    mode;
+    uint32_t    baudrate;
+    uint32_t    rcv_timeout;
 
 #if VSF_HAL_CFG_USE_STREAM == ENABLED
     implement(vsf_stream_src_cfg_t)
-    vsf_stream_pbuf_fifo_t *ptRXFIFO;
-    vsf_stream_pbuf_fifo_t *ptTXFIFO;
+    vsf_stream_pbuf_fifo_t *rx_fifo_ptr;
+    vsf_stream_pbuf_fifo_t *tx_fifo_ptr;
 #endif
 };
 
 //! @}
 
-/* usart_status_t should implement peripheral_status_t */
+/*! \brief usart_status_t should implement peripheral_status_t 
+ *! \note uart_status_t should provide dedicated bits for 
+ *!       indicating whether a read or write timeout event is detected 
+ *!       or not:
+ *!       bIsRXTimeOut
+ *!       bIsTXTimeOut
+ *!
+ *! \note uart_status_t should provide dedicated bits for indicating 
+ *!       whether a read or write operation is cancelled by user:
+ *!       bIsRXCancelled
+ *!       bIsTXCancelled
+ *!
+ *! \note uart_status_t should provide dedicated bits for indicating 
+ *!       whether a read or write operation is encountered an error:
+ *!       bIsRXErrorDetected
+ *!       bIsTXErrorDetected
+ *!
+ *! \note:
+ *!       Those bits will not be cleared until corresponding transmission
+ *!       operation is request. E.g. When a ReadByte or Block.Read.Request
+ *!       is called, then the bIsRXTimeOut bit should be cleared.
+*/
 typedef struct usart_status_t usart_status_t;
 
 /* usart_capability_t should implement peripheral_capability_t */
@@ -88,15 +109,15 @@ typedef struct usart_capability_t usart_capability_t;
 
 typedef struct vsf_usart_t vsf_usart_t;
 
-typedef void vsf_usart_evt_handler_t(   void *pTarget, 
+typedef void vsf_usart_evt_handler_t(   void *target_ptr, 
                                         vsf_usart_t *,
-                                        usart_status_t tStatus);
+                                        usart_status_t status);
 
 typedef struct vsf_usart_evt_t vsf_usart_evt_t;
 struct vsf_usart_evt_t
 {
-    vsf_usart_evt_handler_t *fnHandler;
-    void *pTarget;
+    vsf_usart_evt_handler_t *handler_fn;
+    void *target_ptr;
 };
 
 typedef enum {
@@ -119,7 +140,7 @@ def_interface(i_usart_t)
             usart_capability_t (*Capability)(void);
         }USART;
     };
-    vsf_err_t       (*Init)(usart_cfg_t *ptCFG);
+    vsf_err_t       (*Init)(usart_cfg_t *cfg_ptr);
 
     //! data access
     implement(i_byte_pipe_t)
@@ -131,10 +152,10 @@ def_interface(i_usart_t)
 
     //! event
     struct {
-        void (*Register)(vsf_usart_evt_type_t tType, vsf_usart_evt_t tEvent);
-        usart_evt_status_t (*Enable)(usart_evt_status_t tEventMask);
-        usart_evt_status_t (*Disable)(usart_evt_status_t tEventMask);
-        void (*Resume)(usart_evt_status_t tEventStatus);
+        void (*Register)(vsf_usart_evt_type_t type, vsf_usart_evt_t usart_evt);
+        usart_evt_status_t (*Enable)(usart_evt_status_t evt_msk);
+        usart_evt_status_t (*Disable)(usart_evt_status_t evt_msk);
+        void (*Resume)(usart_evt_status_t evt_status);
     }Event;
 
     //! properties

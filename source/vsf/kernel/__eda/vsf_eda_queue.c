@@ -38,25 +38,25 @@
  *-----------------------------------------------------------------------------*/
 
 SECTION(".text.vsf.kernel.vsf_queue")
-static void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_t orig)
+static void __vsf_eda_queue_notify(vsf_eda_queue_t *this_ptr, bool tx, vsf_protect_t orig)
 {
     vsf_eda_t *eda = tx ?
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
-            __vsf_eda_sync_get_eda_pending(&pthis->use_as__vsf_sync_t)
+            __vsf_eda_sync_get_eda_pending(&this_ptr->use_as__vsf_sync_t)
 #else
-            pthis->eda_tx
+            this_ptr->eda_tx
 #endif
-        :   pthis->eda_rx;
+        :   this_ptr->eda_rx;
 
     if (eda != NULL) {
         if (tx) {
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
-            pthis->tx_processing = true;
+            this_ptr->tx_processing = true;
 #else
-            pthis->eda_tx = NULL;
+            this_ptr->eda_tx = NULL;
 #endif
         } else {
-            pthis->eda_rx = NULL;
+            this_ptr->eda_rx = NULL;
         }
 
         eda->state.bits.is_sync_got = true;
@@ -68,7 +68,7 @@ static void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_
     } else {
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
         if (tx) {
-            pthis->tx_processing = false;
+            this_ptr->tx_processing = false;
         }
 #endif
         vsf_unprotect_sched(orig);
@@ -76,34 +76,34 @@ static void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_init")
-vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *pthis, uint_fast16_t max)
+vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *this_ptr, uint_fast16_t max)
 {
-    VSF_KERNEL_ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(this_ptr != NULL);
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
-    pthis->tx_processing = false;
+    this_ptr->tx_processing = false;
 #endif
-    pthis->eda_rx = NULL;
-    return vsf_eda_sync_init(&pthis->use_as__vsf_sync_t, 0, max);
+    this_ptr->eda_rx = NULL;
+    return vsf_eda_sync_init(&this_ptr->use_as__vsf_sync_t, 0, max);
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_ex")
-vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *pthis, void *node, int_fast32_t timeout, vsf_eda_t *eda)
+vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *this_ptr, void *node, int_fast32_t timeout, vsf_eda_t *eda)
 {
-    vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
+    vsf_sync_t *sync = &this_ptr->use_as__vsf_sync_t;
     vsf_protect_t origlevel;
 
-    VSF_KERNEL_ASSERT((pthis != NULL) && (node != NULL));
+    VSF_KERNEL_ASSERT((this_ptr != NULL) && (node != NULL));
 
     origlevel = vsf_protect_sched();
     if (
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
-            vsf_dlist_is_empty(&pthis->use_as__vsf_sync_t.pending_list)
+            vsf_dlist_is_empty(&this_ptr->use_as__vsf_sync_t.pending_list)
         &&
 #endif
-            (pthis->use_as__vsf_sync_t.cur_union.cur_value < pthis->use_as__vsf_sync_t.max_union.bits.max)) {
-        pthis->use_as__vsf_sync_t.cur_union.cur_value++;
-        pthis->op.enqueue(pthis, node);
-        __vsf_eda_queue_notify(pthis, false, origlevel);
+            (this_ptr->use_as__vsf_sync_t.cur_union.cur_value < this_ptr->use_as__vsf_sync_t.max_union.bits.max)) {
+        this_ptr->use_as__vsf_sync_t.cur_union.cur_value++;
+        this_ptr->op.enqueue(this_ptr, node);
+        __vsf_eda_queue_notify(this_ptr, false, origlevel);
         return VSF_ERR_NONE;
     } else {
         if (timeout != 0) {
@@ -115,30 +115,30 @@ vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *pthis, void *node, int_fast32_t
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send")
-vsf_err_t vsf_eda_queue_send(vsf_eda_queue_t *pthis, void *node, int_fast32_t timeout)
+vsf_err_t vsf_eda_queue_send(vsf_eda_queue_t *this_ptr, void *node, int_fast32_t timeout)
 {
-    return vsf_eda_queue_send_ex(pthis, node, timeout, NULL);
+    return vsf_eda_queue_send_ex(this_ptr, node, timeout, NULL);
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_get_reason")
-vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void *node)
+vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *this_ptr, vsf_evt_t evt, void *node)
 {
-    vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
+    vsf_sync_t *sync = &this_ptr->use_as__vsf_sync_t;
     vsf_sync_reason_t reason = vsf_eda_sync_get_reason(sync, evt);
 
     vsf_protect_t origlevel = vsf_protect_sched();
     if (VSF_SYNC_GET == reason) {
-        pthis->op.enqueue(pthis, node);
+        this_ptr->op.enqueue(this_ptr, node);
         sync->cur_union.cur_value++;
-        __vsf_eda_queue_notify(pthis, false, origlevel);
+        __vsf_eda_queue_notify(this_ptr, false, origlevel);
 
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
         origlevel = vsf_protect_sched();
         if (sync->cur_value < sync->max) {
-            __vsf_eda_queue_notify(pthis, true, origlevel);
+            __vsf_eda_queue_notify(this_ptr, true, origlevel);
             return reason;
         } else {
-            pthis->tx_processing = false;
+            this_ptr->tx_processing = false;
         }
 #else
         return reason;
@@ -149,31 +149,31 @@ vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv_ex")
-vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *pthis, void **node, int_fast32_t timeout, vsf_eda_t *eda)
+vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *this_ptr, void **node, int_fast32_t timeout, vsf_eda_t *eda)
 {
     vsf_protect_t origlevel;
 
-    VSF_KERNEL_ASSERT((pthis != NULL) && (node != NULL));
+    VSF_KERNEL_ASSERT((this_ptr != NULL) && (node != NULL));
 
     origlevel = vsf_protect_sched();
-    if (pthis->use_as__vsf_sync_t.cur_union.cur_value > 0) {
-        pthis->use_as__vsf_sync_t.cur_union.cur_value--;
-        pthis->op.dequeue(pthis, node);
+    if (this_ptr->use_as__vsf_sync_t.cur_union.cur_value > 0) {
+        this_ptr->use_as__vsf_sync_t.cur_union.cur_value--;
+        this_ptr->op.dequeue(this_ptr, node);
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
-        if (!pthis->tx_processing) {
-            __vsf_eda_queue_notify(pthis, true, origlevel);
+        if (!this_ptr->tx_processing) {
+            __vsf_eda_queue_notify(this_ptr, true, origlevel);
             return VSF_ERR_NONE;
         }
         vsf_unprotect_sched(origlevel);
         return VSF_ERR_NONE;
 #else
-        __vsf_eda_queue_notify(pthis, true, origlevel);
+        __vsf_eda_queue_notify(this_ptr, true, origlevel);
         return VSF_ERR_NONE;
 #endif
     } else {
         if (timeout != 0) {
-            VSF_KERNEL_ASSERT(NULL == pthis->eda_rx);
-            pthis->eda_rx = __vsf_eda_set_timeout(eda, timeout);
+            VSF_KERNEL_ASSERT(NULL == this_ptr->eda_rx);
+            this_ptr->eda_rx = __vsf_eda_set_timeout(eda, timeout);
         }
         vsf_unprotect_sched(origlevel);
         return VSF_ERR_NOT_READY;
@@ -181,25 +181,25 @@ vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *pthis, void **node, int_fast32_
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv")
-vsf_err_t vsf_eda_queue_recv(vsf_eda_queue_t *pthis, void **node, int_fast32_t timeout)
+vsf_err_t vsf_eda_queue_recv(vsf_eda_queue_t *this_ptr, void **node, int_fast32_t timeout)
 {
-    return vsf_eda_queue_recv_ex(pthis, node, timeout, NULL);
+    return vsf_eda_queue_recv_ex(this_ptr, node, timeout, NULL);
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_recv_get_reason")
-vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, vsf_evt_t evt, void **node)
+vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *this_ptr, vsf_evt_t evt, void **node)
 {
-    vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
+    vsf_sync_t *sync = &this_ptr->use_as__vsf_sync_t;
     vsf_sync_reason_t reason = __vsf_eda_sync_get_reason(sync, evt, false);
 
     vsf_protect_t origlevel = vsf_protect_sched();
     if (VSF_SYNC_GET == reason) {
-        pthis->op.dequeue(pthis, node);
+        this_ptr->op.dequeue(this_ptr, node);
         sync->cur_union.cur_value--;
-        __vsf_eda_queue_notify(pthis, true, origlevel);
+        __vsf_eda_queue_notify(this_ptr, true, origlevel);
         return reason;
     } else if (VSF_SYNC_TIMEOUT == reason) {
-        pthis->eda_rx = NULL;
+        this_ptr->eda_rx = NULL;
     }
     vsf_unprotect_sched(origlevel);
     return reason;

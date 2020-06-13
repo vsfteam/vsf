@@ -34,10 +34,14 @@
 #       define VSF_USBD_CFG_AUTOSETUP           DISABLED
 #   endif
 
-#   if defined(VSF_USBD_CFG_DRV_LV0) || defined(VSF_USBD_CFG_DRV_LV1)
-#       undef VSF_USBD_CFG_DRV_INTERFACE
+#   if defined(VSF_USBD_CFG_DRV_LV0_OO)
+#       undef __VSF_USBD_CFG_DRV_INTERFACE
+#       if      defined(VSF_USBD_CFG_DRV_LV0_OO)                                \
+            &&  (!defined(VSF_USBD_CFG_DRV_LV0_OO_PREFIX) || !defined(VSF_USBD_CFG_DRV_LV0_OO_OBJ))
+#           error VSF_USBD_CFG_DRV_LV0_OO_PREFIX and VSF_USBD_CFG_DRV_LV0_OO_OBJ MUST be defined to use VSF_USBD_CFG_DRV_LV0_OO
+#       endif
 #   else
-#       define VSF_USBD_CFG_DRV_INTERFACE
+#       define __VSF_USBD_CFG_DRV_INTERFACE
 #   endif
 
 // check dependency here

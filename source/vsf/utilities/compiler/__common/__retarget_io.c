@@ -38,7 +38,7 @@ extern ssize_t read(int fd, void *buf, size_t size);
 extern ssize_t write(int fd, const void *buf, size_t size);
 extern off_t lseek(int fd, off_t offset, int whence);
 extern void close(int fd);
-extern int open(const char *pathname, int flags, mode_t mode);
+extern int open(const char *path_name, int flags, mode_t mode);
 #else
 extern int vsf_stdout_putchar(char ch);
 extern int vsf_stderr_putchar(char ch);
@@ -96,9 +96,9 @@ int vsf_stderr_putchar(char ch)
 /* for IAR */
 #if VSF_USE_POSIX == ENABLED
 SECTION(".vsf.utilities.stdio.iar.__open")
-int __open(const char *pathname, int flags, mode_t mode)
+int __open(const char *path_name, int flags, mode_t mode)
 {
-    return open(pathname, flags, mode);
+    return open(path_name, flags, mode);
 }
 
 SECTION(".vsf.utilities.stdio.iar.__close")
@@ -115,10 +115,10 @@ off_t __lseek(int handle, off_t offset, int whence)
 #endif
 
 SECTION(".vsf.utilities.stdio.iar.__write")
-size_t __write(int handle, const unsigned char *buf, size_t bufSize)
+size_t __write(int handle, const unsigned char *buf, size_t buf_size)
 {
 #if VSF_USE_POSIX == ENABLED
-    return write(handle, buf, bufSize);
+    return write(handle, buf, buf_size);
 #else
     size_t nChars = 0;
     /* Check for the command to flush all handles */
@@ -130,7 +130,7 @@ size_t __write(int handle, const unsigned char *buf, size_t bufSize)
     if (handle != 1 && handle != 2) {
         return 0;
     }
-    for (/* Empty */; bufSize > 0; --bufSize) {
+    for (/* Empty */; buf_size > 0; --buf_size) {
         vsf_stdout_putchar(*buf++);
         ++nChars;
     }
@@ -139,10 +139,10 @@ size_t __write(int handle, const unsigned char *buf, size_t bufSize)
 }
 
 SECTION(".vsf.utilities.stdio.iar.__read")
-size_t __read(int handle, unsigned char *buf, size_t bufSize)
+size_t __read(int handle, unsigned char *buf, size_t buf_size)
 {
 #if VSF_USE_POSIX == ENABLED
-    return read(handle, buf, bufSize);
+    return read(handle, buf, buf_size);
 #else
     size_t nChars = 0;
     /* Check for stdin
@@ -150,7 +150,7 @@ size_t __read(int handle, unsigned char *buf, size_t bufSize)
     if (handle != 0) {
         return 0;
     }
-    for (/*Empty*/; bufSize > 0; --bufSize) {
+    for (/*Empty*/; buf_size > 0; --buf_size) {
         uint8_t c = vsf_stdin_getchar();
         if (c == 0) { break; }
         *buf++ = c;
@@ -166,9 +166,9 @@ size_t __read(int handle, unsigned char *buf, size_t bufSize)
 /* for GCC / LLVM */
 #if VSF_USE_POSIX == ENABLED
 SECTION(".vsf.utilities.stdio.gcc._open")
-int _open(const char *pathname, int flags, mode_t mode)
+int _open(const char *path_name, int flags, mode_t mode)
 {
-    return open(pathname, flags, mode);
+    return open(path_name, flags, mode);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._close")
@@ -185,15 +185,15 @@ off_t _lseek(int handle, off_t offset, int whence)
 #endif
 
 SECTION(".vsf.utilities.stdio.gcc._write")
-int _write (int handle, char *buf, int bufSize)
+int _write (int handle, char *buf, int buf_size)
 {
-    return __write(handle, (const unsigned char *)buf, bufSize);
+    return __write(handle, (const unsigned char *)buf, buf_size);
 }
 
 SECTION(".vsf.utilities.stdio.gcc._read")
-int _read (int handle, char *buf, int bufSize)
+int _read (int handle, char *buf, int buf_size)
 {
-    return __read(handle, (unsigned char *)buf, bufSize);
+    return __read(handle, (unsigned char *)buf, buf_size);
 }
 
 #endif

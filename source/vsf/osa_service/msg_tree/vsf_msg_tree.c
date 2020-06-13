@@ -741,7 +741,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                 &&  (NULL == this.NodeTypes.ptInterfaces)) {
                 return (fsm_rt_t)VSF_ERR_INVALID_PARAMETER;
             }
-            VSF_OSA_SERVICE_ASSERT (NULL != this.FWBFS.tFIFO.ptBuffer);
+            VSF_OSA_SERVICE_ASSERT (NULL != this.FWBFS.tFIFO.buffer_ptr);
 
             ((vsf_msgt_node_t* )ptNode)->tAttribute._.bVisited = false;
 

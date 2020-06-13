@@ -641,9 +641,12 @@ void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread)
     __vsf_arch_unlock();
 }
 
-void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread,
+void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
     vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority, bool is_to_start)
 {
+    VSF_HAL_ASSERT(strlen(name) < sizeof(irq_thread->name) - 1);
+    strcpy((char *)irq_thread->name, name);
+
     vsf_dlist_init_node(vsf_arch_irq_thread_t, irq_node, irq_thread);
     irq_thread->priority = priority;
     irq_thread->thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)entry,
@@ -734,13 +737,12 @@ vsf_err_t vsf_systimer_init(void)
 {
     __vsf_x86.systimer.start_tick = 0;
     __vsf_x86.systimer.start_tick = vsf_systimer_get();
-    __vsf_x86.systimer.use_as__vsf_arch_irq_thread_t.name = "timer";
 
     __vsf_x86.systimer.timer = CreateWaitableTimer(NULL, true, NULL);
     VSF_HAL_ASSERT(NULL != __vsf_x86.systimer.timer);
 
     __vsf_arch_irq_init(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t,
-                vsf_systimer_thread, vsf_arch_prio_32, false);
+                "timer", vsf_systimer_thread, vsf_arch_prio_32, false);
     return VSF_ERR_NONE;
 }
 
@@ -845,9 +847,12 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
         ctx->handler = handler;
         ctx->param = param;
         if (!ctx->inited) {
+            char swi_name[7];
+
             ctx->inited = true;
+            sprintf(swi_name, "swi%d", idx);
             __vsf_arch_irq_request_init(&ctx->request);
-            __vsf_arch_irq_init(&ctx->use_as__vsf_arch_irq_thread_t,
+            __vsf_arch_irq_init(&ctx->use_as__vsf_arch_irq_thread_t, swi_name,
                         vsf_arch_swi_thread, priority, true);
         }
 
@@ -931,7 +936,7 @@ bool vsf_arch_low_level_init(void)
     __vsf_x86.por_thread.thread_id = GetCurrentThreadId();
     __vsf_x86.por_thread.thread = OpenThread(THREAD_ALL_ACCESS, false, __vsf_x86.por_thread.thread_id);
     __vsf_x86.por_thread.priority = vsf_arch_prio_ivalid;
-    __vsf_x86.por_thread.name = "por";
+    strcpy((char *)__vsf_x86.por_thread.name, "por");
     __vsf_x86.por_thread.state = VSF_ARCH_IRQ_STATE_FOREGROUND;
     __vsf_x86.cur_priority = vsf_arch_prio_ivalid;
     __vsf_x86.cur_thread = &__vsf_x86.por_thread;
@@ -940,14 +945,6 @@ bool vsf_arch_low_level_init(void)
         &__vsf_x86.irq_rdy_list, &__vsf_x86.por_thread,
         _->priority < vsf_arch_prio_ivalid);
     vsf_dlist_add_to_head(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, &__vsf_x86.por_thread);
-
-    char *swi_head = "swi";
-    char *name = malloc(strlen(swi_head) + 4 + 1);
-    VSF_HAL_ASSERT(name != NULL);
-    for (int i = 0; i < dimof(__vsf_x86.swi); i++) {
-        sprintf(name, "%s%d", swi_head, i);
-        __vsf_x86.swi[i].use_as__vsf_arch_irq_thread_t.name = strdup(name);
-    }
 
     return true;
 }

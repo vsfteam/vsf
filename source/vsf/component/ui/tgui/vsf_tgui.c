@@ -113,8 +113,6 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t* ptCFG)
 vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI, 
                                     vsf_tgui_top_container_t *ptRootNode)
 {
-    vsf_err_t tErr = VSF_ERR_NONE;
-
     VSF_TGUI_ASSERT(NULL != ptGUI);
     VSF_TGUI_ASSERT(NULL != ptRootNode);
 
@@ -134,8 +132,6 @@ vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI,
             .ptTarget = (vsf_tgui_control_t*)ptRootNode,
     });
 #endif
-
-    return tErr;
 }
 
 /*! \brief tgui msg queue producer */

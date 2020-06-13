@@ -719,6 +719,7 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\pthread.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\signal.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stddef.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdio.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\string.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\time.h" />
@@ -739,6 +740,18 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\port\busybox\config.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux_cfg.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\atomic.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\barrier.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\endian.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\irqflags.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\arch\spinlock.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\io.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\stddef.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\types.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xboot.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xboot\window.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xfs\xfs.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\vsf_xboot_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h" />
@@ -1443,6 +1456,7 @@
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\port\busybox\shell\vsh.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux_socket.c" />
+    <ClCompile Include="..\..\..\..\vsf\shell\sys\xboot\vsf_xboot.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\__common\__retarget_io.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\language_extension\code_region.c" />
@@ -1464,6 +1478,7 @@
     <ClCompile Include="..\..\demo\common\usrapp_usbh_common.c" />
     <ClCompile Include="..\..\demo\cpp_demo\cpp_demo.cpp" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
+    <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c" />
@@ -1483,6 +1498,7 @@
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_uvc.c" />
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c" />
     <ClCompile Include="..\..\demo\vsfvm_demo\vsfvm_demo.c" />
+    <ClCompile Include="..\..\demo\xui_demo\xui_demo.c" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib" />
@@ -1567,10 +1583,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__CPU_X86__;__WIN__;__OOC_CPP__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

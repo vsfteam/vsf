@@ -77,7 +77,7 @@ def_simple_class(vsf_eda_slist_queue_t) {
 /*============================ PROTOTYPES ====================================*/
 
 #if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
-extern vsf_err_t vsf_eda_slist_queue_init(vsf_eda_slist_queue_t *pthis, uint_fast16_t max);
+extern vsf_err_t vsf_eda_slist_queue_init(vsf_eda_slist_queue_t *this_ptr, uint_fast16_t max);
 #endif
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
-#ifndef __STRING_H__
-#define __STRING_H__
+#ifndef __SIMPLE_LIBC_STRING_H__
+#define __SIMPLE_LIBC_STRING_H__
 
 #if defined(__clang__)
 #pragma clang diagnostic push

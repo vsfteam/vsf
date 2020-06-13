@@ -268,6 +268,15 @@
     <Filter Include="vsf\osa_hal\sw_peripheral\io_peripheral\spi">
       <UniqueIdentifier>{0cd1bbf5-4abf-4c6c-a4d3-fc4908210655}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\fs">
+      <UniqueIdentifier>{3b633aa2-8400-4a7a-ada8-64273c9b3c06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver">
+      <UniqueIdentifier>{8da2d807-3c1d-487e-be04-d6f5467f0fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\fs\driver\memfs">
+      <UniqueIdentifier>{9bce476a-7578-4857-ab52-6dbfa7f1d01c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -1023,6 +1032,15 @@
     <ClInclude Include="..\..\..\vsf\utilities\vsf_utlities.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs.h">
+      <Filter>vsf\component\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\vsf_fs_cfg.h">
+      <Filter>vsf\component\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h">
+      <Filter>vsf\component\fs\driver\memfs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -1420,6 +1438,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c">
       <Filter>vsf\osa_hal\sw_peripheral\io_peripheral\spi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\vsf_fs.c">
+      <Filter>vsf\component\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c">
+      <Filter>vsf\component\fs\driver\memfs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

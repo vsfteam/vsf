@@ -21,12 +21,12 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-declare_vsf_pt(user_pt_task_t)
-declare_vsf_pt(user_pt_sub_t)
-declare_vsf_pt(user_pt_called_by_thread_t)
+dcl_vsf_pt(user_pt_task_t)
+dcl_vsf_pt(user_pt_sub_t)
+dcl_vsf_pt(user_pt_called_by_thread_t)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-declare_vsf_task(user_sub_task_t)
+dcl_vsf_task(user_sub_task_t)
 #endif
 
 def_vsf_pt(user_pt_sub_t,
@@ -47,7 +47,7 @@ def_vsf_task(user_sub_task_t,
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-declare_vsf_thread(user_thread_b_t)
+dcl_vsf_thread(user_thread_b_t)
 def_vsf_thread(user_thread_b_t, 1024,
     def_params(
         vsf_pt(user_pt_called_by_thread_t) pt_task;
@@ -76,14 +76,14 @@ def_vsf_pt(user_pt_task_t,
     
 #if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD                     \
     ||  VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-declare_vsf_pt(user_pt_task_b_t)
+dcl_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
         uint32_t cnt;
         vsf_sem_t *psem;
     ));
 #elif VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-declare_vsf_thread(user_thread_a_t)
+dcl_vsf_thread(user_thread_a_t)
 
 def_vsf_thread(user_thread_a_t, 1024,
 
@@ -103,7 +103,7 @@ static NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-implement_vsf_pt(user_pt_called_by_thread_t)
+imp_vsf_pt(user_pt_called_by_thread_t)
 {
     vsf_pt_begin();
     
@@ -116,7 +116,7 @@ implement_vsf_pt(user_pt_called_by_thread_t)
 }
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
-implement_vsf_thread(user_thread_b_t)
+imp_vsf_thread(user_thread_b_t)
 {
     printf("\trun thread...delay 100ms...");
     vsf_delay_ms(100);
@@ -131,7 +131,7 @@ implement_vsf_thread(user_thread_b_t)
 #endif
 
 
-private implement_vsf_pt(user_pt_sub_t) 
+private imp_vsf_pt(user_pt_sub_t) 
 {
     vsf_pt_begin();
    
@@ -143,7 +143,7 @@ private implement_vsf_pt(user_pt_sub_t)
 #define RESET_FSM()     do {vsf_task_state = 0;} while(0)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-private implement_vsf_task(user_sub_task_t)
+private imp_vsf_task(user_sub_task_t)
 {
     vsf_task_begin();
     enum {
@@ -178,7 +178,7 @@ private implement_vsf_task(user_sub_task_t)
 }
 #endif
 
-private implement_vsf_pt(user_pt_task_t) 
+private imp_vsf_pt(user_pt_task_t) 
 {
     vsf_pt_begin();
 
@@ -219,7 +219,7 @@ private implement_vsf_pt(user_pt_task_t)
 
 #if     VSF_OS_CFG_MAIN_MODE != VSF_OS_CFG_MAIN_MODE_THREAD                     \
     ||  VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-private implement_vsf_pt(user_pt_task_b_t) 
+private imp_vsf_pt(user_pt_task_b_t) 
 {
     vsf_pt_begin();
     
@@ -232,7 +232,7 @@ private implement_vsf_pt(user_pt_task_b_t)
     vsf_pt_end();
 }
 #else
-implement_vsf_thread(user_thread_a_t) 
+imp_vsf_thread(user_thread_a_t) 
 {
     uint32_t cnt = 0;
     while (1) {

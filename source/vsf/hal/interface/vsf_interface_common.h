@@ -39,12 +39,12 @@ typedef struct peripheral_capability_t peripheral_capability_t;
 struct peripheral_capability_t {
     union {
         struct {
-            uint8_t bCanReadByte        : 1;
-            uint8_t bCanReadBlock       : 1;
-            uint8_t bSupportFIFO        : 1;
-            uint8_t bSupportDMA         : 1;
-            uint8_t bSupportISR         : 1;
-            uint8_t bRandomAccess       : 1;
+            uint8_t can_read_byte       : 1;
+            uint8_t can_read_block      : 1;
+            uint8_t support_fifo        : 1;
+            uint8_t support_dma         : 1;
+            uint8_t support_isr         : 1;
+            uint8_t random_access       : 1;
             uint8_t                     : 2;
         };
         uint8_t bCanRead;
@@ -52,43 +52,43 @@ struct peripheral_capability_t {
     
     union {
         struct {
-            uint8_t bCanWriteByte       : 1;
-            uint8_t bCanWriteBlock      : 1;
-            uint8_t bSupportFIFO        : 1;
-            uint8_t bSupportDMA         : 1;
-            uint8_t bSupportISR         : 1;
-            uint8_t bRandomAccess       : 1;
+            uint8_t can_write_byte      : 1;
+            uint8_t can_write_block     : 1;
+            uint8_t support_fifo        : 1;
+            uint8_t support_dma         : 1;
+            uint8_t support_isr         : 1;
+            uint8_t random_access       : 1;
             uint8_t                     : 2;
         };
-        uint8_t bCanRead;
+        uint8_t can_read;
     }Write;
     
     union {
         struct {
-            /* Data Type: 2^(u6DataTypeSize) */
-            uint16_t u3DataTypeSize     : 3; 
+            /* Data Type: 2^(u3DataTypeSize) */
+            uint16_t u3_data_type_size      : 3; 
 
             /* Block Size: 2^(u5BlockSize) */
-            uint16_t u5BlockSize        : 5;
-            uint16_t                    : 8;
+            uint16_t u5_block_size          : 5;
+            uint16_t                        : 8;
         };
-        uint16_t hwInfo;
+        uint16_t info;
     }Feature;
 };
 
 //! \name class: peripheral_t
 //! @{
 def_interface(peripheral_t)
-    peripheral_status_t     (*Status)   (void);
-    peripheral_capability_t (*Capability)(void);
-    fsm_rt_t            (*Unint)    (void);
+    peripheral_status_t     (*Status)       (void);
+    peripheral_capability_t (*Capability)   (void);
+    fsm_rt_t            (*Unint)            (void);
     union {
-        fsm_rt_t        (*Enable)   (void);
-        fsm_rt_t        (*Open)     (void);
+        fsm_rt_t        (*Enable)           (void);
+        fsm_rt_t        (*Open)             (void);
     };
     union {
-        fsm_rt_t        (*Disable)  (void);
-        fsm_rt_t        (*Close)    (void);
+        fsm_rt_t        (*Disable)          (void);
+        fsm_rt_t        (*Close)            (void);
     };
 end_def_interface(peripheral_t)
 //! @}
@@ -104,7 +104,7 @@ def_interface(vsf_async_block_access_t)
      *!                     value is returned.
      *! \retval vsf_err_t   Error value is returned.
      */
-    fsm_rt_t  (*Request)(uint8_t *pchBuffer, uint_fast32_t wSize);
+    fsm_rt_t  (*Request)(uint8_t *buffer_ptr, uint_fast32_t size);
 
     /*! \brief cancel on going communication */
     fsm_rt_t  (*Cancel) (void);

@@ -147,51 +147,51 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
 #endif
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_init(vsf_sync_t *pthis, uint_fast16_t cur, uint_fast16_t max)
+vsf_err_t vsf_eda_sync_init(vsf_sync_t *this_ptr, uint_fast16_t cur, uint_fast16_t max)
 {
-    VSF_KERNEL_ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(this_ptr != NULL);
 
-    pthis->cur_union.cur_value = cur;
-    pthis->max_union.max_value = max;
-    vsf_dlist_init(&pthis->pending_list);
-    if (pthis->cur_union.bits.has_owner) {
-        ((vsf_sync_owner_t *)pthis)->eda_owner = NULL;
+    this_ptr->cur_union.cur_value = cur;
+    this_ptr->max_union.max_value = max;
+    vsf_dlist_init(&this_ptr->pending_list);
+    if (this_ptr->cur_union.bits.has_owner) {
+        ((vsf_sync_owner_t *)this_ptr)->eda_owner = NULL;
     }
     return VSF_ERR_NONE;
 }
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *pthis)
+vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *this_ptr)
 {
-    VSF_KERNEL_ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(this_ptr != NULL);
 #   if defined(__VSF_KERNEL_TASK_TEDA)
-    return vsf_eda_post_msg(&__vsf_eda.teda.use_as__vsf_eda_t, pthis);
+    return vsf_eda_post_msg(&__vsf_eda.teda.use_as__vsf_eda_t, this_ptr);
 #   elif defined(__VSF_KERNEL_TASK_EDA)
-    return vsf_eda_post_msg(&__vsf_eda.eda, pthis);
+    return vsf_eda_post_msg(&__vsf_eda.eda, this_ptr);
 #   endif
 }
 #endif          // VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda)
+vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda)
 {
     vsf_protect_t origlevel;
     vsf_eda_t *eda_pending;
 
-    VSF_KERNEL_ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(this_ptr != NULL);
 
     origlevel = vsf_protect_sched();
-    if (pthis->cur_union.bits.cur >= pthis->max_union.bits.max) {
+    if (this_ptr->cur_union.bits.cur >= this_ptr->max_union.bits.max) {
         vsf_unprotect_sched(origlevel);
         return VSF_ERR_OVERRUN;
     }
-    pthis->cur_union.bits.cur++;
+    this_ptr->cur_union.bits.cur++;
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-    if (pthis->cur_union.bits.has_owner) {
+    if (this_ptr->cur_union.bits.has_owner) {
         eda = __vsf_eda_get_valid_eda(eda);
-        VSF_KERNEL_ASSERT(((vsf_sync_owner_t *)pthis)->eda_owner == eda);
-        ((vsf_sync_owner_t *)pthis)->eda_owner = NULL;
+        VSF_KERNEL_ASSERT(((vsf_sync_owner_t *)this_ptr)->eda_owner == eda);
+        ((vsf_sync_owner_t *)this_ptr)->eda_owner = NULL;
         if (eda->cur_priority != eda->priority) {
             __vsf_eda_set_priority(eda, (vsf_prio_t)eda->priority);
         }
@@ -199,16 +199,16 @@ vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda)
 #endif
 
     while (1) {
-        if (pthis->cur_union.bits.cur > 0) {
-            eda_pending = __vsf_eda_sync_get_eda_pending(pthis);
+        if (this_ptr->cur_union.bits.cur > 0) {
+            eda_pending = __vsf_eda_sync_get_eda_pending(this_ptr);
             if (eda_pending != NULL) {
                 eda_pending->state.bits.is_sync_got = true;
-                if (!pthis->max_union.bits.manual_rst) {
-                    pthis->cur_union.bits.cur--;
+                if (!this_ptr->max_union.bits.manual_rst) {
+                    this_ptr->cur_union.bits.cur--;
                 }
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-                if (pthis->cur_union.bits.has_owner) {
-                    ((vsf_sync_owner_t *)pthis)->eda_owner = eda_pending;
+                if (this_ptr->cur_union.bits.has_owner) {
+                    ((vsf_sync_owner_t *)this_ptr)->eda_owner = eda_pending;
                 }
 #endif
             }
@@ -232,37 +232,37 @@ vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda)
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_increase(vsf_sync_t *pthis)
+vsf_err_t vsf_eda_sync_increase(vsf_sync_t *this_ptr)
 {
-    return vsf_eda_sync_increase_ex(pthis, NULL);
+    return vsf_eda_sync_increase_ex(this_ptr, NULL);
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-void vsf_eda_sync_force_reset(vsf_sync_t *pthis)
+void vsf_eda_sync_force_reset(vsf_sync_t *this_ptr)
 {
     vsf_protect_t origlevel = vsf_protect_sched();
-        pthis->cur_union.bits.cur = 0;
+        this_ptr->cur_union.bits.cur = 0;
     vsf_unprotect_sched(origlevel);
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, int_fast32_t timeout, vsf_eda_t *eda)
+vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *this_ptr, int_fast32_t timeout, vsf_eda_t *eda)
 {
     vsf_protect_t origlevel;
 
-    VSF_KERNEL_ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(this_ptr != NULL);
 
     eda = __vsf_eda_get_valid_eda(eda);
 
     origlevel = vsf_protect_sched();
-    if ((pthis->cur_union.bits.cur > 0) && vsf_dlist_is_empty(&pthis->pending_list)) {
-        if (!pthis->max_union.bits.manual_rst) {
-            pthis->cur_union.bits.cur--;
+    if ((this_ptr->cur_union.bits.cur > 0) && vsf_dlist_is_empty(&this_ptr->pending_list)) {
+        if (!this_ptr->max_union.bits.manual_rst) {
+            this_ptr->cur_union.bits.cur--;
         }
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-        if (pthis->cur_union.bits.has_owner) {
-            VSF_KERNEL_ASSERT((NULL == ((vsf_sync_owner_t *)pthis)->eda_owner) && (0 == pthis->cur_union.bits.cur));
-            ((vsf_sync_owner_t *)pthis)->eda_owner = eda;
+        if (this_ptr->cur_union.bits.has_owner) {
+            VSF_KERNEL_ASSERT((NULL == ((vsf_sync_owner_t *)this_ptr)->eda_owner) && (0 == this_ptr->cur_union.bits.cur));
+            ((vsf_sync_owner_t *)this_ptr)->eda_owner = eda;
         }
 #endif
         vsf_unprotect_sched(origlevel);
@@ -271,23 +271,23 @@ vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, int_fast32_t timeout, vsf_
 
     if (timeout != 0) {
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-        if (pthis->cur_union.bits.has_owner) {
+        if (this_ptr->cur_union.bits.has_owner) {
             //! use __vsf_eda_get_cur_priority to get actual cur_priority
             vsf_prio_t cur_priority = __vsf_eda_get_cur_priority(eda);
             vsf_dlist_insert(
                 vsf_eda_t, pending_node,
-                &pthis->pending_list,
+                &this_ptr->pending_list,
                 eda,
                 _->cur_priority < cur_priority);
             __vsf_eda_set_timeout(eda, timeout);
         } else
 #endif
         {
-            __vsf_eda_sync_pend(pthis, eda, timeout);
+            __vsf_eda_sync_pend(this_ptr, eda, timeout);
         }
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-        if (pthis->cur_union.bits.has_owner) {
-            vsf_eda_t *eda_owner = ((vsf_sync_owner_t *)pthis)->eda_owner;
+        if (this_ptr->cur_union.bits.has_owner) {
+            vsf_eda_t *eda_owner = ((vsf_sync_owner_t *)this_ptr)->eda_owner;
 
             if (eda->cur_priority > eda_owner->cur_priority) {
                 __vsf_eda_set_priority(eda_owner, (vsf_prio_t)eda->cur_priority);
@@ -300,22 +300,22 @@ vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, int_fast32_t timeout, vsf_
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_decrease(vsf_sync_t *pthis, int_fast32_t timeout)
+vsf_err_t vsf_eda_sync_decrease(vsf_sync_t *this_ptr, int_fast32_t timeout)
 {
-    return vsf_eda_sync_decrease_ex(pthis, timeout, NULL);
+    return vsf_eda_sync_decrease_ex(this_ptr, timeout, NULL);
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_sync_cancel")
-void vsf_eda_sync_cancel(vsf_sync_t *pthis)
+void vsf_eda_sync_cancel(vsf_sync_t *this_ptr)
 {
     vsf_eda_t *eda;
     vsf_protect_t origlevel;
 
-    VSF_KERNEL_ASSERT(pthis != NULL);
+    VSF_KERNEL_ASSERT(this_ptr != NULL);
 
     do {
         origlevel = vsf_protect_sched();
-        eda = __vsf_eda_sync_get_eda_pending(pthis);
+        eda = __vsf_eda_sync_get_eda_pending(this_ptr);
         if (eda != NULL) {
             eda->state.bits.is_sync_got = true;
             vsf_unprotect_sched(origlevel);
@@ -327,9 +327,9 @@ void vsf_eda_sync_cancel(vsf_sync_t *pthis)
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_sync_get_reason")
-vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *pthis, vsf_evt_t evt)
+vsf_sync_reason_t vsf_eda_sync_get_reason(vsf_sync_t *this_ptr, vsf_evt_t evt)
 {
-    return __vsf_eda_sync_get_reason(pthis, evt, true);
+    return __vsf_eda_sync_get_reason(this_ptr, evt, true);
 }
 
 

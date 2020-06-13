@@ -1,5 +1,5 @@
-#ifndef __WCHAR_H__
-#define __WCHAR_H__
+#ifndef __SIMPLE_LIBC_WCHAR_H__
+#define __SIMPLE_LIBC_WCHAR_H__
 
 #include <stdio.h>
 #include <time.h>

@@ -25,6 +25,7 @@
 #define VSF_USBH_IMPLEMENT
 // TODO: use dedicated include
 #include "vsf.h"
+#include "hal/interface/vsf_interface_usb.h"
 
 /*============================ MACROS ========================================*/
 
