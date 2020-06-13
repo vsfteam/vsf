@@ -90,16 +90,16 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-static uint_fast32_t vsf_trace_output(const char* buff, uint_fast32_t size);
+static uint_fast32_t __vsf_trace_output(const char* buff, uint_fast32_t size);
 
 /*============================ IMPLEMENTATION ================================*/
 
 void vsf_trace_output_string(const char* str)
 {
-    vsf_trace_output(str, strlen(str));
+    __vsf_trace_output(str, strlen(str));
 }
 
-static void vsf_trace_set_level(vsf_trace_level_t level)
+static void __vsf_trace_set_level(vsf_trace_level_t level)
 {
 #if VSF_TRACE_CFG_COLOR_EN == ENABLED
     VSF_SERVICE_ASSERT(level < dimof(__vsf_trace_color));
@@ -108,7 +108,7 @@ static void vsf_trace_set_level(vsf_trace_level_t level)
 }
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
+static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
 {
     uint32_t ret = 0;
 
@@ -136,7 +136,7 @@ void vsf_trace_fini(void)
     __vsf_trace.stream = NULL;
 }
 
-static void vsf_trace_arg(const char *format, va_list *arg)
+static void __vsf_trace_arg(const char *format, va_list *arg)
 {
     vsf_protect_t origlevel = vsf_trace_protect();
     //__vsf_sched_safe(
@@ -144,7 +144,7 @@ static void vsf_trace_arg(const char *format, va_list *arg)
                                         sizeof(__vsf_trace.print_buffer),
                                         format, 
                                         *arg);
-        vsf_trace_output((const char *)__vsf_trace.print_buffer, size);
+        __vsf_trace_output((const char *)__vsf_trace.print_buffer, size);
     //)
     vsf_trace_unprotect(origlevel);
 }
@@ -165,7 +165,7 @@ void __vsf_trace_init(vsf_stream_tx_t *ptTX)
     } while(0);
 }
 
-static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
+static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
 {
     uint_fast16_t length = size;
     uint8_t *src = (uint8_t *)buff;
@@ -187,7 +187,7 @@ static uint_fast32_t vsf_trace_output(const char *buff, uint_fast32_t size)
     return size;
 }
 
-static void vsf_trace_arg(const char *format, va_list *arg)
+static void __vsf_trace_arg(const char *format, va_list *arg)
 {
     vsf_pbuf_t *block = NULL; 
     __vsf_sched_safe(
@@ -221,7 +221,7 @@ static void vsf_trace_arg(const char *format, va_list *arg)
 
 void vsf_trace_string(vsf_trace_level_t level, const char *str)
 {
-    vsf_trace_set_level(level);
+    __vsf_trace_set_level(level);
     vsf_trace_output_string(str);
 }
 
@@ -243,7 +243,7 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
     if (!data_per_line || (data_per_line > 16))
         data_per_line = 16;
 
-    vsf_trace_set_level(level);
+    __vsf_trace_set_level(level);
     if (len > 0) {
         static const char map[16] = "0123456789ABCDEF";
         // line format 16 data max:
@@ -299,13 +299,19 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
 
 
 
+void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list *arg)
+{
+    __vsf_trace_set_level(level);
+    __vsf_trace_arg(format, arg);
+}
+
 void vsf_trace(vsf_trace_level_t level, const char *format, ...)
 {
     va_list ap;
 
-    vsf_trace_set_level(level);
+    __vsf_trace_set_level(level);
     va_start(ap, format);
-    vsf_trace_arg(format, &ap);
+    __vsf_trace_arg(format, &ap);
     va_end(ap);
 }
 

@@ -113,6 +113,7 @@ extern void __vsf_trace_buffer( vsf_trace_level_t level,
             ((__level), (__buffer), (__len), ##__VA_ARGS__)
 
 extern void vsf_trace_string(vsf_trace_level_t level, const char *str);
+extern void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list *arg);
 extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
 #else
