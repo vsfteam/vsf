@@ -32,6 +32,10 @@
 #endif
 #include <sys/mount.h>
 
+#if VSF_USE_SDL2 == ENABLED
+#   include <SDL.h>
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_USB_DEVICE == ENABLED
@@ -84,15 +88,17 @@ extern int audio_play_main(int argc, char *argv[]);
             &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
 extern int usbd_cdc_main(int argc, char *argv[]);
 #   endif
-extern int usbd_msc_main(int argc, char *argv[]);
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 extern int usbd_uvc_main(int argc, char *argv[]);
+#   endif
+extern int usbd_msc_main(int argc, char *argv[]);
 #endif
 
 #if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
 extern int mount_file_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_CFG_USE_LINUX_DEMO == ENABLED && APP_CFG_USE_VSFVM_DEMO == ENABLED
 extern int vsfvm_main(int argc, char *argv[]);
 #endif
 
@@ -212,8 +218,10 @@ int vsf_linux_create_fhs(void)
             &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
     busybox_bind("/sbin/usbd_cdc", usbd_cdc_main);
 #   endif
-    busybox_bind("/sbin/usbd_msc", usbd_msc_main);
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     busybox_bind("/sbin/usbd_uvc", usbd_uvc_main);
+#   endif
+    busybox_bind("/sbin/usbd_msc", usbd_msc_main);
 #endif
 #if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
     busybox_bind("/sbin/mount_file", mount_file_main);
@@ -252,7 +260,17 @@ end_describe_usbd(user_usbd_cdc, USRAPP_CFG_USBD_DEV)
 #elif defined(VSF_DEBUG_STREAM_NEED_POLL)
 void vsf_plug_in_on_kernel_idle(void)
 {
+#   if APP_CFG_USE_VSFVM_DEMO == ENABLED
+    extern void vsfvm_user_poll(void);
+    vsfvm_user_poll();
+#   endif
     VSF_DEBUG_STREAM_POLL();
+}
+#elif APP_CFG_USE_VSFVM_DEMO == ENABLED
+void vsf_plug_in_on_kernel_idle(void)
+{
+    extern void vsfvm_user_poll(void);
+    vsfvm_user_poll();
 }
 #endif
 

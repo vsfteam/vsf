@@ -39,7 +39,7 @@ int mount_file_main(int argc, char *argv[])
         goto cleanup;
     }
 
-    file_mal->drv = &VK_FILE_MAL_DRV;
+    file_mal->drv = &vk_file_mal_drv;
     file_mal->block_size = 512;
     vk_mal_init(&file_mal->use_as__vk_mal_t);
 

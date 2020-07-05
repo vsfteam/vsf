@@ -43,7 +43,7 @@ dcl_vsf_peda_methods(static, __vk_virtual_scsi_execute_stream)
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-const vk_scsi_drv_t VK_VIRTUAL_SCSI_DRV = {
+const vk_scsi_drv_t vk_virtual_scsi_drv = {
     .init               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_init),
     .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_fini),
     .buffer             = __vk_virtual_scsi_buffer,
@@ -86,7 +86,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_init, vk_scsi_init)
 
     switch (evt) {
     case VSF_EVT_INIT: {
-            const i_virtual_scsi_drv_t *drv = pthis->virtual_scsi_drv;
+            const vk_virtual_scsi_drv_t *drv = pthis->virtual_scsi_drv;
 
             switch (drv->drv_type) {
             case VSF_VIRTUAL_SCSI_DRV_NORMAL:
@@ -125,7 +125,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_fini, vk_scsi_fini)
 
 static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis, uint8_t *cbd, void *mem_stream)
 {
-    const i_virtual_scsi_drv_t *drv = pthis->virtual_scsi_drv;
+    const vk_virtual_scsi_drv_t *drv = pthis->virtual_scsi_drv;
     uint64_t addr;
     uint32_t size;
     int_fast32_t result;

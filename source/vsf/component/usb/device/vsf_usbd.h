@@ -333,7 +333,7 @@ declare_simple_class(vk_usbd_trans_t)
 
 enum vk_usbd_evt_t {
     USB_ON_INIT =   USB_USR_EVT + 0,
-    USB_ON_FINI =   USB_USR_EVT + 1
+    USB_ON_FINI =   USB_USR_EVT + 1,
 };
 typedef enum vk_usbd_evt_t vk_usbd_evt_t;
 

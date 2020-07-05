@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-
+#include "utilities/vsf_utilities.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,6 +33,8 @@ typedef void vsf_irq_handler_t(void *p);
 typedef vsf_irq_handler_t vsf_swi_handler_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 #ifdef __cplusplus
@@ -54,6 +56,8 @@ typedef vsf_irq_handler_t vsf_swi_handler_t;
 #   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
 # elif   defined(__CPU_RV__)
 #   define  VSF_ARCH_HEADER     "./rv/rv_generic.h"
+# elif   defined(__CPU_ARM9__)
+#   define  VSF_ARCH_HEADER     "./arm/arm9/arm9_generic.h"
 # else
 #   warning no supported architecture found, use default arch template!
 #   define  VSF_ARCH_HEADER     "./template/template_generic.h"

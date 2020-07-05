@@ -300,7 +300,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                     }
 
                     malfs_fat->fat_mal.host_mal = mal;
-                    malfs_fat->fat_mal.drv = &VK_MIM_MAL_DRV;
+                    malfs_fat->fat_mal.drv = &vk_mim_mal_drv;
                     malfs_fat->fat_mal.offset = le32_to_cpu(dpt->sectors_preceding) * 512;
                     malfs_fat->fat_mal.size = le32_to_cpu(dpt->sectors_in_partition) * 512;
                     malfs_fat->mal = &malfs_fat->fat_mal.use_as__vk_mal_t;

@@ -40,7 +40,7 @@ dcl_vsf_peda_methods(static, __vk_mal_scsi_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const i_virtual_scsi_drv_t VK_MAL_VIRTUAL_SCSI_DRV = {
+const vk_virtual_scsi_drv_t vk_mal_virtual_scsi_drv = {
     .drv_type               = VSF_VIRTUAL_SCSI_DRV_PARAM_SUBCALL,
     .param_subcall          = {
         .buffer             = __vk_mal_scsi_buffer,

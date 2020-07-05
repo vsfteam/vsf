@@ -163,11 +163,12 @@ typedef enum {
 #endif
 
 
+#ifndef __REG_TYPE__
 #define __REG_TYPE__
 
-typedef volatile uint8_t     reg8_t;
-typedef volatile uint16_t    reg16_t;
-typedef volatile uint32_t    reg32_t;
+typedef volatile uint8_t            reg8_t;
+typedef volatile uint16_t           reg16_t;
+typedef volatile uint32_t           reg32_t;
 
 #if (defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__)                       \
     ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
@@ -178,6 +179,10 @@ typedef volatile uint32_t    reg32_t;
         uint##__BIT##_t __unused_##__NAME : __BIT;
 #define __RESERVED(__BIT, __NAME)                                               \
             ____RESERVED(__BIT, __NAME)
+
+#define __RESERVED_B(__BYTE_CNT, __LINE)                                        \
+                                    uint32_t __unused_##__LINE[__BYTE_CNT >> 2]
+#define RESERVED_B(__BYTE_CNT)      __RESERVED_B(__BYTE_CNT, __LINE__)
 
 #   ifndef RESERVED_U8           
 #       define RESERVED_U8          __RESERVED( 8, __LINE__ )
@@ -192,40 +197,40 @@ typedef volatile uint32_t    reg32_t;
 #   endif
 
 #   ifndef RESERVED_16B             
-#       define RESERVED_16B         uint32_t __unused_##__LINE__[4];
+#       define RESERVED_16B         RESERVED_B(16);
 #   endif
 
 #   ifndef RESERVED_64B             
-#       define RESERVED_64B         uint32_t __unused_##__LINE__[16];
+#       define RESERVED_64B         RESERVED_B(64);
 #   endif
 
 #   ifndef RESERVED_256B             
-#       define RESERVED_256B        uint32_t __unused_##__LINE__[64];
+#       define RESERVED_256B        RESERVED_B(256);
 #   endif
 
 #   ifndef RESERVED_1K             
-#       define RESERVED_1K          uint32_t __unused_##__LINE__[256];
+#       define RESERVED_1K          RESERVED_B(1024);
 #   endif
 
 #   ifndef RESERVED_4K             
-#       define RESERVED_4K          uint32_t __unused_##__LINE__[1024];
+#       define RESERVED_4K          RESERVED_B(4096);
 #   endif
 
 #   ifndef RESERVED_16K             
-#       define RESERVED_16K         uint32_t __unused_##__LINE__[4 * 1024];
+#       define RESERVED_16K         RESERVED_B(16*1024);
 #   endif
 
 #   ifndef RESERVED_64K             
-#       define RESERVED_64K         uint32_t __unused_##__LINE__[16 * 1024];
+#       define RESERVED_64K         RESERVED_B(64*1024);
 #   endif
 
 #   ifndef RESERVED_256K             
-#       define RESERVED_256K        uint32_t __unused_##__LINE__[64 * 1024];
+#       define RESERVED_256K        RESERVED_B(256*1024);
 #   endif
 
 
 #   ifndef RESERVED_1M             
-#       define RESERVED_1M          uint32_t __unused_##__LINE__[256 * 1024];
+#       define RESERVED_1M          RESERVED_B(1024*1024);
 #   endif
 
 #else
@@ -304,6 +309,8 @@ typedef volatile uint32_t    reg32_t;
                                 RESERVED_256K                                   \
                                 RESERVED_256K
 #   endif
+
+#endif
 
 #endif
 

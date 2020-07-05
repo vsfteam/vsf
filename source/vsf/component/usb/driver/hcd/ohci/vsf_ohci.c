@@ -1464,13 +1464,13 @@ void vk_ohci_init(void)
 
 #if defined(VSF_OHCI_CFG_MAX_TD_NUM)
     VSF_POOL_INIT_EX(ohci_td_pool, &__vk_ohci_td_pool, VSF_OHCI_CFG_MAX_TD_NUM, 32,
-        .pTarget = NULL,
-        .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE, 
+        .target_ptr = NULL,
+        .region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_NONE, 
     );
 #else
     VSF_POOL_PREPARE_EX(ohci_td_pool, &__vk_ohci_td_pool, 32,
-        .pTarget = NULL,
-        .ptRegion = (code_region_t *)&DEFAULT_CODE_REGION_NONE,
+        .target_ptr = NULL,
+        .region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_NONE,
     );
 /*
     void *td_buffer = VSF_USBH_MALLOC_ALIGNED(

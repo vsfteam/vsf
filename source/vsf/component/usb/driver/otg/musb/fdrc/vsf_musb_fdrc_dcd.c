@@ -123,7 +123,7 @@ extern uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd
 
 void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
 {
-    vk_musb_fdrc_read_fifo(usbd->reg, 0, buffer, 8);
+    vk_musb_fdrc_usbd_ep_transaction_read_buffer(usbd->reg, 0, buffer, 8);
 
     VSF_USB_ASSERT(MUSB_FDRC_USBD_EP0_IDLE == usbd->ep0_state);
     usbd->has_data_stage = false;
@@ -447,6 +447,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                 VSF_USB_ASSERT(false);
             }
         }
+        // MUSBD_CSR0_TXPKTRDY is cleared by hardare
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
             usbd->has_data_stage = true;

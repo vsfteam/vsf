@@ -238,6 +238,11 @@ vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *this_ptr, vsf_evt_t evt, void *msg)
 }
 #endif
 
+bool vsf_evtq_is_empty(vsf_evtq_t *this_ptr)
+{
+    return vsf_dlist_is_empty(&this_ptr->rdy_list);
+}
+
 vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
 {
     vsf_evtq_t *evtq_orig;
@@ -249,7 +254,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
     VSF_KERNEL_ASSERT(this_ptr != NULL);
 
     evtq_orig = __vsf_set_cur_evtq(this_ptr);
-    while (!vsf_dlist_is_empty(&this_ptr->rdy_list)) {
+    while (!vsf_evtq_is_empty(this_ptr)) {
         orig = vsf_protect_int();
         node_eda = this_ptr->rdy_list.head;
         while (node_eda != NULL) {

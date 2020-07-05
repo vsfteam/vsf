@@ -492,7 +492,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__OOC_DEBUG__;__CPU_X86__;__WIN__;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;WIN32;_DEBUG;_CONSOLE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\mvc_demo_win;$(ProjectDir)..\..\usrapp\mvc_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\mvc_demo_win;$(ProjectDir)..\..\usrapp\mvc_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions -fmacro-backtrace-limit=0  -Wno-microsoft-include %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
@@ -523,7 +523,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__CPU_X64__;__WIN__;LV_CONF_INCLUDE_SIMPLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\usbh_demo_win;$(ProjectDir)..\..\usrapp\usbh_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.0\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\vsf;$(ProjectDir)..\..\usrapp\usbh_demo_win;$(ProjectDir)..\..\usrapp\usbh_demo_win\config;$(ProjectDir)SDL2\include;$(ProjectDir)libusb;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr;$(ProjectDir)..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>

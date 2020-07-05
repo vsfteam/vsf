@@ -79,6 +79,10 @@ declare_simple_class(vk_vfs_file_t)
 declare_simple_class(vk_file_stream_t)
 #endif
 
+declare_simple_class(vk_fs_fop_t)
+declare_simple_class(vk_fs_dop_t)
+declare_simple_class(vk_fs_op_t)
+
 enum vk_file_attr_t {
     VSF_FILE_ATTR_READ          = 1 << 0,
     VSF_FILE_ATTR_WRITE         = 1 << 1,
@@ -90,49 +94,52 @@ enum vk_file_attr_t {
 };
 typedef enum vk_file_attr_t vk_file_attr_t;
 
-struct vk_fs_fop_t {
-    uint8_t close_local_size;
-    uint8_t read_local_size;
-    uint8_t write_local_size;
-    uint8_t resize_local_size;
-    vsf_peda_evthandler_t close;
-    vsf_peda_evthandler_t read;
-    vsf_peda_evthandler_t write;
-    vsf_peda_evthandler_t resize;
+def_simple_class(vk_fs_fop_t) {
+    protected_member(
+        uint8_t close_local_size;
+        uint8_t read_local_size;
+        uint8_t write_local_size;
+        uint8_t resize_local_size;
+        vsf_peda_evthandler_t close;
+        vsf_peda_evthandler_t read;
+        vsf_peda_evthandler_t write;
+        vsf_peda_evthandler_t resize;
+    )
 };
-typedef struct vk_fs_fop_t vk_fs_fop_t;
 
-struct vk_fs_dop_t {
-    uint8_t lookup_local_size;
-    uint8_t create_local_size;
-    uint8_t unlink_local_size;
-    uint8_t chmod_local_size;
-    uint8_t rename_local_size;
-    vsf_peda_evthandler_t lookup;
-    vsf_peda_evthandler_t create;
-    vsf_peda_evthandler_t unlink;
-    vsf_peda_evthandler_t chmod;
-    vsf_peda_evthandler_t rename;
+def_simple_class(vk_fs_dop_t) {
+    protected_member(
+        uint8_t lookup_local_size;
+        uint8_t create_local_size;
+        uint8_t unlink_local_size;
+        uint8_t chmod_local_size;
+        uint8_t rename_local_size;
+        vsf_peda_evthandler_t lookup;
+        vsf_peda_evthandler_t create;
+        vsf_peda_evthandler_t unlink;
+        vsf_peda_evthandler_t chmod;
+        vsf_peda_evthandler_t rename;
+    )
 };
-typedef struct vk_fs_dop_t vk_fs_dop_t;
 
 // TODO: remove fop and dop, put everything here for optimization
-struct vk_fs_op_t {
-    // if succeed, VSF_VFS_FILE_ATTR_MOUNTED should be set in file->attr
-    uint8_t mount_local_size;
-    uint8_t unmount_local_size;
+def_simple_class(vk_fs_op_t) {
+    protected_member(
+        // if succeed, VSF_VFS_FILE_ATTR_MOUNTED should be set in file->attr
+        uint8_t mount_local_size;
+        uint8_t unmount_local_size;
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    uint8_t sync_local_size;
+        uint8_t sync_local_size;
 #endif
-    vsf_peda_evthandler_t mount;
-    vsf_peda_evthandler_t unmount;
+        vsf_peda_evthandler_t mount;
+        vsf_peda_evthandler_t unmount;
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    vsf_peda_evthandler_t sync;
+        vsf_peda_evthandler_t sync;
 #endif
-    vk_fs_fop_t fop;
-    vk_fs_dop_t dop;
+        vk_fs_fop_t fop;
+        vk_fs_dop_t dop;
+    )
 };
-typedef struct vk_fs_op_t vk_fs_op_t;
 
 // (bytelen << 6) | index
 enum vk_file_name_coding_t {

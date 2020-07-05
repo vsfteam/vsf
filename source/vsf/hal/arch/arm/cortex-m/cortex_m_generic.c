@@ -294,8 +294,7 @@ void vsf_enable_interrupt(void)
 void vsf_arch_sleep(uint32_t mode)
 {
     UNUSED_PARAM(mode);
-    ENABLE_GLOBAL_INTERRUPT();
-    __WFI();
+    __WFE();
 }
 
 /*----------------------------------------------------------------------------*

@@ -20,8 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "utilities/compiler.h"
-#include <stdint.h>
+#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {

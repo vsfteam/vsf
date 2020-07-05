@@ -107,6 +107,7 @@ extern vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *eda, vsf_evt_t evt, void *msg)
 extern vsf_err_t vsf_evtq_post_evt_ex(vsf_eda_t *eda, vsf_evt_t evt, bool force);
 extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
+extern bool vsf_evtq_is_empty(vsf_evtq_t *this_ptr);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr);
 #endif
 

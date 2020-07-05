@@ -48,10 +48,7 @@ static hci_transport_h2_param_t hci_transport_h2_param;
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN)                            \
-    &&  defined(WEAK_VSF_BLUETOOTH_H2_ON_NEW)
-WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN
-#endif
+extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -106,11 +103,7 @@ void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
         hci_transport_h2_param.dev = dev;
         if (!hci_transport_h2_param.is_notified) {
             hci_transport_h2_param.is_notified = true;
-#ifndef WEAK_VSF_BLUETOOTH_H2_ON_NEW
             if (VSF_ERR_NONE != vsf_bluetooth_h2_on_new(dev, id)) {
-#else
-            if (VSF_ERR_NONE != WEAK_VSF_BLUETOOTH_H2_ON_NEW(dev, id)) {
-#endif
                 hci_transport_h2_param.dev = NULL;
                 hci_transport_h2_param.is_notified = false;
             }

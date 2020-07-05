@@ -75,6 +75,7 @@ int sem_trywait(sem_t *sem)
     return 0;
 }
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
 {
     int_fast32_t timeout_us = abs_timeout->tv_sec * 1000000 + abs_timeout->tv_nsec / 1000;
@@ -83,5 +84,6 @@ int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
     }
     return 0;
 }
+#endif
 
 #endif      // VSF_USE_LINUX

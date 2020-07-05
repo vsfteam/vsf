@@ -24,6 +24,7 @@
 #if VSF_USE_POOL == ENABLED
 #include "vsf_pool.h"  
 #include <stdlib.h>
+#include "hal/arch/vsf_arch.h"
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
@@ -103,7 +104,6 @@ const i_pool_t VSF_POOL = {
 #endif
 };
 
-
 /*============================ LOCAL VARIABLES ===============================*/
 #if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
 
@@ -116,10 +116,7 @@ static struct {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN)                            \
-    &&  defined(WEAK_VSF_HEAP_MALLOC_ALIGNED)
-WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN
-#endif
+extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t align);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -227,26 +224,26 @@ bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *obj_ptr)
 
 #ifndef WEAK_VSF_HEAP_MALLOC_ALIGNED
 WEAK(vsf_heap_malloc_aligned)
-void * vsf_heap_malloc_aligned(uint_fast32_t wSize, uint_fast32_t wAlign)
+void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t align)
 {
-    UNUSED_PARAM(wSize);
-    UNUSED_PARAM(wAlign);
+    UNUSED_PARAM(size);
+    UNUSED_PARAM(align);
 
     /*! \note if vsf_heap is enabled in your project, this function will be 
      *        replaced by the function with the same name in vsf_heap. Otherwise
      *        the posix_memalign will be used by default. You can also implement
      *        this function by yourself
      */     
-    void *pMemory = NULL;
+    void *memory_ptr = NULL;
 #if     defined(_POSIX_VERSION)                                                 \
     ||  (__IS_COMPILER_ARM_COMPILER_6 && !defined(__STRICT_ANSI__))
 extern int posix_memalign(  void ** /*ret*/, 
                             size_t /*alignment*/, 
                             size_t /*size*/);
 
-    posix_memalign(&pMemory, wSize, wAlign);
+    posix_memalign(&memory_ptr, size, align);
 #endif
-    return pMemory;
+    return memory_ptr;
 }
 #endif
 
@@ -280,11 +277,7 @@ uintptr_t vsf_pool_alloc(vsf_pool_t *obj_ptr)
             bool retry = false;
             do {
                 //! feed on heap
-#ifndef WEAK_VSF_HEAP_MALLOC_ALIGNED
                 node_ptr = (__vsf_pool_node_t *)vsf_heap_malloc_aligned(this.statistic.item_size, this.statistic.u15_align);
-#else
-                node_ptr = (__vsf_pool_node_t *)WEAK_VSF_HEAP_MALLOC_ALIGNED(this.statistic.item_size, this.statistic.u15_align);
-#endif
                 if (NULL != node_ptr) {
                 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
                     if (this.item_init_fn != NULL) {

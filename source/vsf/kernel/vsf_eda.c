@@ -83,11 +83,6 @@ static NO_INIT __vsf_local_t __vsf_eda;
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_KERNEL_ERR_REPORT_EXTERN)                              \
-    &&  defined(WEAK_VSF_KERNEL_ERR_REPORT)
-WEAK_VSF_KERNEL_ERR_REPORT_EXTERN
-#endif
-
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
 extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *this_ptr, vsf_prio_t priority);
 extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *this_ptr);
@@ -114,6 +109,8 @@ static vsf_err_t vsf_eda_post_evt_ex(vsf_eda_t *this_ptr, vsf_evt_t evt, bool fo
 //! should be provided by user
 extern __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size);
 extern void vsf_eda_free_frame(__vsf_eda_frame_t *frame);
+
+extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
 
 /*============================ INCLUDES ======================================*/
 #define __EDA_GADGET__
@@ -368,11 +365,7 @@ vsf_eda_t * vsf_eda_get_cur(void)
     if (ctx_cur != NULL) {
         return ctx_cur->eda;
     } else {
-#ifndef WEAK_VSF_KERNEL_ERR_REPORT
         vsf_kernel_err_report(VSF_KERNEL_ERR_NULL_EDA_PTR);
-#else
-        WEAK_VSF_KERNEL_ERR_REPORT(VSF_KERNEL_ERR_NULL_EDA_PTR);
-#endif
         return NULL;
     }
 }
@@ -812,13 +805,8 @@ static void __vsf_eda_init( vsf_eda_t *this_ptr,
     if (priority == vsf_prio_inherit) {
         
         if (__vsf_eda.evtq.cur == NULL) {
-        #   ifndef WEAK_VSF_KERNEL_ERR_REPORT
             vsf_kernel_err_report(
                 VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR);
-        #   else
-            WEAK_VSF_KERNEL_ERR_REPORT(
-                VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR);
-        #   endif
         }
         this_ptr->priority = __vsf_os_evtq_get_prio(__vsf_eda.evtq.cur);
     } else {
@@ -1090,7 +1078,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 #endif
 
-vsf_err_t vk_kernel_start(void)
+vsf_err_t vsf_kernel_start(void)
 {
 #if defined(__VSF_KERNEL_TASK_TEDA) || defined(__VSF_KERNEL_TASK_EDA)
     vsf_err_t err;

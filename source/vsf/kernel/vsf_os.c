@@ -32,11 +32,6 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if     defined(WEAK___POST_VSF_KERNEL_INIT_EXTERN)                             \
-    &&  defined(WEAK___POST_VSF_KERNEL_INIT)
-WEAK___POST_VSF_KERNEL_INIT_EXTERN
-#endif
-
 struct __vsf_os_t {
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 #   if defined(__VSF_OS_CFG_EVTQ_LIST)
@@ -58,17 +53,12 @@ typedef struct __vsf_os_t __vsf_os_t;
 static NO_INIT __vsf_os_t __vsf_os;
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_KERNEL_ERR_REPORT_EXTERN)                              \
-    &&  defined(WEAK_VSF_KERNEL_ERR_REPORT)
-WEAK_VSF_KERNEL_ERR_REPORT_EXTERN
-#endif
+extern void vsf_kernel_err_report(vsf_kernel_error_t err);
+extern void vsf_plug_in_on_kernel_idle(void);
+extern void vsf_plug_in_for_kernel_diagnosis(void);
+extern void __post_vsf_kernel_init(void);
 
-#if     defined(WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN)                         \
-    &&  defined(WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE)
-WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN
-#endif
-
-extern vsf_err_t vk_kernel_start(void);
+extern vsf_err_t vsf_kernel_start(void);
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
@@ -253,11 +243,7 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *this_ptr, vsf_prio_t priority)
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
     if (vsf_prio_0 == priority) {
-#   ifndef WEAK_VSF_KERNEL_ERR_REPORT
         vsf_kernel_err_report(VSF_KERNEL_ERR_INVALID_USAGE);
-#   else
-        WEAK_VSF_KERNEL_ERR_REPORT(VSF_KERNEL_ERR_INVALID_USAGE);
-#   endif
     }
 #endif
 
@@ -378,7 +364,16 @@ const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION = {
 WEAK(vsf_plug_in_on_kernel_idle)
 void vsf_plug_in_on_kernel_idle(void)
 {
+#   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+    vsf_disable_interrupt();
+    if (!vsf_evtq_is_empty(&__vsf_os.res_ptr->evt_queue.queue_array[0])) {
+        // vsf_arch_sleep will enable interrupt
+        vsf_arch_sleep(0);
+    }
+    vsf_enable_interrupt();
+#   else
     vsf_arch_sleep(0);
+#   endif
 }
 #endif
 
@@ -438,18 +433,14 @@ void __vsf_kernel_os_start(void)
     }
 #endif
 
-    vk_kernel_start();
+    vsf_kernel_start();
 
 #ifndef WEAK_VSF_OSA_HAL_INIT
     vsf_osa_hal_init();
 #else
     WEAK_VSF_OSA_HAL_INIT();
 #endif
-#ifndef WEAK___POST_VSF_KERNEL_INIT
     __post_vsf_kernel_init();
-#else
-    WEAK___POST_VSF_KERNEL_INIT();
-#endif
 }
 
 void __vsf_main_entry(void)
@@ -461,16 +452,8 @@ void __vsf_main_entry(void)
     #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
         __vsf_kernel_os_run_priority(vsf_prio_0);
     #endif
-    #ifndef WEAK_VSF_PLUG_IN_FOR_KERNEL_DIAGNOSIS
         vsf_plug_in_for_kernel_diagnosis(); //!< customised kernel diagnosis
-    #else
-        WEAK_VSF_PLUG_IN_FOR_KERNEL_DIAGNOSIS();
-    #endif
-    #ifndef WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE
         vsf_plug_in_on_kernel_idle();       //!< user defined idle task 
-    #else
-        WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE();
-    #endif
     }
 }
 

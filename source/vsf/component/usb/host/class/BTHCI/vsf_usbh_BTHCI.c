@@ -170,20 +170,9 @@ const vk_usbh_class_drv_t vk_usbh_bthci_drv = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN)                              \
-    &&  defined(WEAK_VSF_USBH_BTHCI_ON_NEW)
-WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN)                              \
-    &&  defined(WEAK_VSF_USBH_BTHCI_ON_DEL)
-WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN)                           \
-    &&  defined(WEAK_VSF_USBH_BTHCI_ON_PACKET)
-WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN
-#endif
+extern void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id);
+extern void vsf_usbh_bthci_on_del(void *dev);
+extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -298,11 +287,7 @@ static void __vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
 #endif
 
-#ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
             vsf_usbh_bthci_on_new(bthci, &bthci->id);
-#else
-            WEAK_VSF_USBH_BTHCI_ON_NEW(bthci, &bthci->id);
-#endif
         } else {
             vk_usbh_bthci_iocb_t *iocb = __vk_usbh_bthci_get_iocb(bthci, (vk_usbh_hcd_urb_t *)vsf_eda_get_cur_msg());
             vk_usbh_urb_t *urb;
@@ -315,13 +300,8 @@ static void __vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             if (iocb->is_icb) {
                 if (URB_OK == status) {
-#ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
                     vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
                         buffer, actual_length);
-#else
-                    WEAK_VSF_USBH_BTHCI_ON_PACKET(bthci, iocb->type | BTHCI_PACKET_TYPE_IN,
-                        buffer, actual_length);
-#endif
                 }
                 err = vk_usbh_submit_urb(usbh, urb);
             } else {
@@ -331,13 +311,8 @@ static void __vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 }
                 iocb->is_busy = false;
                 if (URB_OK == status) {
-#ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
                     vsf_usbh_bthci_on_packet(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
                         buffer, actual_length);
-#else
-                    WEAK_VSF_USBH_BTHCI_ON_PACKET(bthci, iocb->type | BTHCI_PACKET_TYPE_OUT,
-                        buffer, actual_length);
-#endif
                 }
             }
         }
@@ -473,12 +448,7 @@ static void __vk_usbh_bthci_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void
 {
     vk_usbh_bthci_t *bthci = param;
 
-#ifndef WEAK_VSF_USBH_BTHCI_ON_DEL
     vsf_usbh_bthci_on_del(bthci);
-#else
-    WEAK_VSF_USBH_BTHCI_ON_DEL(bthci);
-#endif
-
     __vk_usbh_bthci_free_all(bthci);
     vsf_eda_fini(&bthci->eda);
 }

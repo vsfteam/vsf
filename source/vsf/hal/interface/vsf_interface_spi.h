@@ -161,10 +161,10 @@ def_interface(i_spi_t)
         uintalu_t (*Resume) (uintalu_t tMask);      /*!< resume previous status of cs pins*/
     } CS;
 
-    struct {
-        //! data access
-        fsm_rt_t (*Exchange)(uintalu_t tOutput, void *pInput);
-    } Single;
+    
+    //! data access
+    fsm_rt_t (*SingleExchange)(uintalu_t tOutput, void *pInput);
+    
 
     struct {
 

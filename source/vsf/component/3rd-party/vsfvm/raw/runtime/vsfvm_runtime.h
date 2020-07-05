@@ -112,7 +112,11 @@ typedef struct vsfvm_runtime_func_ctx_t vsfvm_runtime_func_ctx_t;
 
 def_simple_class(vsfvm_thread_t) {
     which (
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t)
+#else
+        implement(vsf_eda_t)
+#endif
     )
 
     protected_member(

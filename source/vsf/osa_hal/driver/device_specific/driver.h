@@ -21,13 +21,22 @@
 /*============================ INCLUDES ======================================*/
 #include "osa_hal/vsf_osa_hal_cfg.h"
 
-/* folder structure:  company/series/device/driver.h
-#if     defined(__SOME_COMPANY)
-#   include "./some_company/driver.h"
-#elif   ....
-...
-#endif
+/*! \note User can define VSF_OSA_DRIVER_HEADER to specify the targer device driver 
+ *!       header file. If it is not specified, this driver abstraction header 
+ *!       file will use predefined device-specific macros to decide which device
+ *!       driver header file should be included.
  */
+#ifndef VSF_OSA_DRIVER_HEADER
+#   if      defined(__WCH__)
+#       define VSF_OSA_DRIVER_HEADER    "./WCH/driver.h"
+#   endif
+#endif
+
+//! you don't have to implement a driver in your system.
+#ifdef VSF_OSA_DRIVER_HEADER
+/* include specified device driver header file */
+#   include VSF_OSA_DRIVER_HEADER
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

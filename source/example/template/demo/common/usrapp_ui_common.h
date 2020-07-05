@@ -23,7 +23,8 @@
 #include "vsf.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
+    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_DISP_FB == ENABLED)            \
+    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
 
 #if VSF_USE_UI_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
@@ -38,6 +39,8 @@
 struct usrapp_ui_common_t {
 #if VSF_USE_DISP_SDL2 == ENABLED
     vk_disp_sdl2_t disp;
+#elif VSF_USE_DISP_FB == ENABLED
+    vk_disp_fb_t disp;
 #endif
 
 #if VSF_USE_TINY_GUI == ENABLED

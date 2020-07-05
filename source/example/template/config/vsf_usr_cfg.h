@@ -49,6 +49,32 @@
 //  current M484 hardware has no display
 #   define APP_CFG_USE_LVGL_DEMO                        DISABLED
 #   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
+#   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
+
+#elif   defined(__F1C100S__)
+
+// Application configure
+#   define APP_CFG_USE_LINUX_DEMO                       ENABLED
+#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            DISABLED
+#       define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO        DISABLED
+//  todo: implement drivers for f1c100s
+#   define APP_CFG_USE_USBH_DEMO                        DISABLED
+#   define APP_CFG_USE_USBD_DEMO                        ENABLED
+#   define APP_CFG_USE_SCSI_DEMO                        DISABLED
+#   define APP_CFG_USE_AUDIO_DEMO                       DISABLED
+#   define APP_CFG_USE_SDL2_DEMO                        ENABLED
+//  current tgui demo depends on VSF_USE_DISP_SDL2, which is only available on __WIN__
+#   define APP_CFG_USE_TGUI_DEMO                        DISABLED
+//  TODO: need test for c++ support
+#   define APP_CFG_USE_CPP_DEMO                         DISABLED
+
+// 3rd-party demos
+//  awtk is LGPL, not convenient to implement in MCU
+#   define APP_CFG_USE_AWTK_DEMO                        DISABLED
+#   define APP_CFG_USE_NNOM_DEMO                        DISABLED
+//  current M484 hardware has no display
+#   define APP_CFG_USE_LVGL_DEMO                        DISABLED
+#   define APP_CFG_USE_BTSTACK_DEMO                     DISABLED
 #   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
 
 #elif   defined(__WIN__)
@@ -90,16 +116,18 @@
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
 
-#define VSF_USE_USB_HOST                                ENABLED
-#   define VSF_USBH_CFG_ISO_EN                          ENABLED
-#   define VSF_USE_USB_HOST_LIBUSB                      ENABLED
-#   define VSF_USE_USB_HOST_HID                         ENABLED
-#   define VSF_USE_USB_HOST_DS4                         ENABLED
-#   define VSF_USE_USB_HOST_NSPRO                       ENABLED
-#   define VSF_USE_USB_HOST_XB360                       ENABLED
-#   define VSF_USE_USB_HOST_XB1                         ENABLED
-#   define VSF_USE_USB_HOST_MSC                         ENABLED
-#   define VSF_USE_USB_HOST_UAC                         ENABLED
+#if APP_CFG_USE_USBH_DEMO == ENABLED
+#   define VSF_USE_USB_HOST                             ENABLED
+#       define VSF_USBH_CFG_ISO_EN                      ENABLED
+#       define VSF_USE_USB_HOST_LIBUSB                  ENABLED
+#       define VSF_USE_USB_HOST_HID                     ENABLED
+#       define VSF_USE_USB_HOST_DS4                     ENABLED
+#       define VSF_USE_USB_HOST_NSPRO                   ENABLED
+#       define VSF_USE_USB_HOST_XB360                   ENABLED
+#       define VSF_USE_USB_HOST_XB1                     ENABLED
+#       define VSF_USE_USB_HOST_MSC                     ENABLED
+#       define VSF_USE_USB_HOST_UAC                     ENABLED
+#endif
 
 #if APP_CFG_USE_BTSTACK_DEMO == ENABLED
 #   define VSF_USE_USB_HOST_BTHCI                       ENABLED
@@ -196,15 +224,17 @@
 #   define VSF_HEAP_SIZE                                0x10000
 #   define VSF_SYSTIMER_FREQ                            (192000000ul)
 
-#   define VSF_USE_USB_DEVICE                           ENABLED
-#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_1
-#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_1
-#       define USRAPP_CFG_USBD_SPEED                    USB_SPEED_HIGH
-#       define USRAPP_CFG_CDC_NUM                       1
-#       define USRAPP_CFG_CDC_TX_STREAM_SIZE            1024
-#       define USRAPP_CFG_CDC_RX_STREAM_SIZE            512
-#       define USRAPP_CFG_DCD_TYPE                      USRAPP_CFG_DCD_TYPE_DEFAULT
-#       define USRAPP_CFG_STREAM_ALIGN                  1
+#   if APP_CFG_USE_USBD_DEMO == ENABLED
+#       define VSF_USE_USB_DEVICE                       ENABLED
+#           define VSF_USBD_CFG_EDA_PRIORITY            vsf_prio_1
+#           define VSF_USBD_CFG_HW_PRIORITY             vsf_arch_prio_1
+#           define USRAPP_CFG_USBD_SPEED                USB_SPEED_HIGH
+#           define USRAPP_CFG_CDC_NUM                   1
+#           define USRAPP_CFG_CDC_TX_STREAM_SIZE        1024
+#           define USRAPP_CFG_CDC_RX_STREAM_SIZE        512
+#           define USRAPP_CFG_DCD_TYPE                  USRAPP_CFG_DCD_TYPE_DEFAULT
+#           define USRAPP_CFG_STREAM_ALIGN              1
+#   endif
 
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
 #   define VSF_USE_USB_HOST_HUB                         ENABLED
@@ -215,6 +245,72 @@
 #   define VSF_LINUX_CFG_STACKSIZE                      2048
 #   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
 #   define VSH_HAS_COLOR                                0
+#elif   defined(__F1C100S__)
+#   define ASSERT(...)                                  if (!(__VA_ARGS__)) {while(1);};
+//#   define ASSERT(...)
+
+#   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
+#   define VSF_HEAP_SIZE                                0x1000000
+#   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   12      // 4K alignment
+//#   define VSF_SYSTIMER_FREQ                            (24UL * 1000 * 1000)
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER             DISABLED
+#   define VSF_KERNEL_CFG_CALLBACK_TIMER                DISABLED
+#   define VSF_OS_CFG_PRIORITY_NUM                      1
+#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                  ENABLED
+//  retarget-io for arm9 in iar seems to be mal-functioning, use dimple_stdio
+#   define VSF_LINUX_USE_SIMPLE_STDIO                   ENABLED
+
+#   if APP_CFG_USE_USBD_DEMO == ENABLED
+#       define VSF_USE_USB_DEVICE                       ENABLED
+//          TODO: use actual priority after arm9 arch is ready
+#           define VSF_USBD_CFG_EDA_PRIORITY            vsf_prio_0
+#           define VSF_USBD_CFG_HW_PRIORITY             vsf_arch_prio_0
+#           define USRAPP_CFG_USBD_SPEED                USB_SPEED_HIGH
+#           define USRAPP_CFG_CDC_NUM                   1
+#           define USRAPP_CFG_CDC_TX_STREAM_SIZE        1024
+#           define USRAPP_CFG_CDC_RX_STREAM_SIZE        512
+#           define USRAPP_CFG_DCD_TYPE                  USRAPP_CFG_DCD_TYPE_DEFAULT
+#           define USRAPP_CFG_STREAM_ALIGN              1
+#   endif
+
+#   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
+#   define VSF_USE_USB_HOST_HUB                         ENABLED
+#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+
+#   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
+
+#   define VSF_USE_DISP_FB                              ENABLED
+#       define VSF_DISP_FB_CFG_COPY_FRAME               false
+#       define APP_DISP_FB_COLOR                        VSF_DISP_COLOR_RGB666_32
+#       define APP_DISP_FB_NUM                          3
+//      for VGA 640 * 480 60Hz
+//#       define APP_DISP_FB_CFG_PIXEL_CLOCK              (25UL * 1000 * 1000)
+//#       define APP_DISP_FB_CFG_H_FP                     16
+//#       define APP_DISP_FB_CFG_H_BP                     48
+//#       define APP_DISP_FB_CFG_H_SYNC                   96
+//#       define APP_DISP_FB_CFG_V_FP                     11
+//#       define APP_DISP_FB_CFG_V_BP                     31
+//#       define APP_DISP_FB_CFG_V_SYNC                   2
+//#       define APP_DISP_FB_WIDTH                        640
+//#       define APP_DISP_FB_HEIGHT                       480
+//      for LCD
+#       define APP_DISP_FB_CFG_PIXEL_CLOCK              (36UL * 1000 * 1000)
+#       define APP_DISP_FB_CFG_H_FP                     40
+#       define APP_DISP_FB_CFG_H_BP                     40
+#       define APP_DISP_FB_CFG_H_SYNC                   48
+#       define APP_DISP_FB_CFG_V_FP                     13
+#       define APP_DISP_FB_CFG_V_BP                     29
+#       define APP_DISP_FB_CFG_V_SYNC                   3
+#       define APP_DISP_FB_WIDTH                        800
+#       define APP_DISP_FB_HEIGHT                       480
+
+#   if APP_CFG_USE_SDL2_DEMO == ENABLED
+#       define APP_CFG_SDL2_DEMO_COLOR_RGB666
+#   endif
+
+#   define VSF_LINUX_CFG_STACKSIZE                      (60 * 1024)
+#   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
+#   define VSH_HAS_COLOR                                1
 #elif   defined(__NUC505__)
 #   define ASSERT(...)                                  if (!(__VA_ARGS__)) {while(1);};
 //#   define ASSERT(...)
@@ -300,6 +396,10 @@
 #       define APP_DISP_SDL2_COLOR                      VSF_DISP_COLOR_RGB565
 #       define APP_DISP_SDL2_AMPLIFIER                  1
 
+#   if APP_CFG_USE_SDL2_DEMO == ENABLED
+#       define APP_CFG_SDL2_DEMO_COLOR_RGB565
+#   endif
+
 #   define VSF_USE_WINSOUND                             ENABLED
 #       define VSF_WINSOUND_CFG_TRACE                   DISABLED
 
@@ -311,72 +411,24 @@
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/
 
-#   define WEAK_VSF_KERNEL_ERR_REPORT_EXTERN                                    \
-        extern void vsf_kernel_err_report(vsf_kernel_error_t err);
-#   define WEAK_VSF_KERNEL_ERR_REPORT(__ERR)                                    \
-        vsf_kernel_err_report(__ERR)
-
-#   define WEAK___POST_VSF_KERNEL_INIT_EXTERN                                   \
-        extern void __post_vsf_kernel_init(void);
-#   define WEAK___POST_VSF_KERNEL_INIT()                                        \
-        __post_vsf_kernel_init()
-
-#   define WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN                                  \
-        extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
-#   define WEAK_VSF_SYSTIMER_EVTHANDLER(__TICK)                                 \
-        vsf_systimer_evthandler(__TICK)
-
-#   define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN            \
-        extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
-#   define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR()                 \
-        vsf_arch_req___systimer_resolution___from_usr()
-
-#   define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN                  \
-        extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
-#   define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                       \
-        vsf_arch_req___systimer_freq___from_usr()
-
-#   define WEAK_VSF_DRIVER_INIT_EXTERN                                          \
-        bool vsf_driver_init(void);
-#   define WEAK_VSF_DRIVER_INIT()                                               \
-        vsf_driver_init()
-
-#   define WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN                                  \
-        extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
-#   define WEAK_VSF_HEAP_MALLOC_ALIGNED(__SIZE, __ALIGNMENT)                    \
-        vsf_heap_malloc_aligned((__SIZE), (__ALIGNMENT))
-
-
-
+#   define WEAK_VSF_KERNEL_ERR_REPORT
+#   define WEAK___POST_VSF_KERNEL_INIT
+#   define WEAK_VSF_SYSTIMER_EVTHANDLER
+#   define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
+#   define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
+#   define WEAK_VSF_DRIVER_INIT
+#   define WEAK_VSF_HEAP_MALLOC_ALIGNED
 
 #   if VSF_USE_LINUX == ENABLED
-#       define WEAK_VSF_LINUX_CREATE_FHS_EXTERN                                 \
-            extern int vsf_linux_create_fhs(void);
-#       define WEAK_VSF_LINUX_CREATE_FHS()                                      \
-            vsf_linux_create_fhs()
+#       define WEAK_VSF_LINUX_CREATE_FHS
 #   endif
 
 #   if VSF_USE_BTSTACK == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
-#       define WEAK_VSF_USBH_BTHCI_ON_NEW_EXTERN                                \
-            extern void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id);
-#       define WEAK_VSF_USBH_BTHCI_ON_NEW(__DEV, __ID)                          \
-            vsf_usbh_bthci_on_new((__DEV), (__ID))
+#       define WEAK_VSF_USBH_BTHCI_ON_NEW
+#       define WEAK_VSF_USBH_BTHCI_ON_DEL
+#       define WEAK_VSF_USBH_BTHCI_ON_PACKET
 
-#       define WEAK_VSF_USBH_BTHCI_ON_DEL_EXTERN                                \
-            extern void vsf_usbh_bthci_on_del(void *dev);
-#       define WEAK_VSF_USBH_BTHCI_ON_DEL(__DEV)                                \
-            vsf_usbh_bthci_on_del((__DEV))
-
-#       define WEAK_VSF_USBH_BTHCI_ON_PACKET_EXTERN                             \
-            extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size);
-#       define WEAK_VSF_USBH_BTHCI_ON_PACKET(__DEV, __TYPE, __PACKET, __SIZE)   \
-            vsf_usbh_bthci_on_packet((__DEV), (__TYPE), (__PACKET), (__SIZE))
-
-
-#       define WEAK_VSF_BLUETOOTH_H2_ON_NEW_EXTERN                              \
-            extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id);
-#       define WEAK_VSF_BLUETOOTH_H2_ON_NEW(__DEV, __ID)                        \
-            vsf_bluetooth_h2_on_new((__DEV), (__ID))
+#       define WEAK_VSF_BLUETOOTH_H2_ON_NEW
 #   endif
 
 #   define WEAK_VSF_SCSI_ON_NEW
@@ -387,10 +439,7 @@
 #   endif
 
 #   if APP_CFG_USE_VSFVM_DEMO == ENABLED
-#       define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE_EXTERN                           \
-            extern void vsf_plug_in_on_kernel_idle(void);
-#       define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE()                                \
-            vsf_plug_in_on_kernel_idle()
+#       define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE
 
 #       define WEAK_VSFVM_SET_BYTECODE_IMP
 #       define WEAK_VSFVM_GET_RES_IMP

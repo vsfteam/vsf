@@ -30,15 +30,8 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_ARCH_INIT)                                             \
-    &&  defined(WEAK_VSF_ARCH_INIT_EXTERN)
-WEAK_VSF_ARCH_INIT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_DRIVER_INIT_EXTERN)                                    \
-    &&  defined(WEAK_VSF_DRIVER_INIT)
-WEAK_VSF_DRIVER_INIT_EXTERN
-#endif
+extern bool vsf_arch_init(void);
+extern bool vsf_driver_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -58,19 +51,7 @@ bool vsf_driver_init(void)
 bool vsf_hal_init( void )
 {
     
-    if (    
-        #ifndef WEAK_VSF_ARCH_INIT
-            !vsf_arch_init() 
-        #else
-            !WEAK_VSF_ARCH_INIT() 
-        #endif
-        ||  
-        #ifndef WEAK_VSF_DRIVER_INIT
-            !vsf_driver_init()
-        #else
-            !WEAK_VSF_DRIVER_INIT()
-        #endif
-        ) {
+    if (!vsf_arch_init() || !vsf_driver_init()) {
         
         return false;
     }

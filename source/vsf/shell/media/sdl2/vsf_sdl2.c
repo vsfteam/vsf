@@ -60,7 +60,9 @@ struct SDL_Texture {
 typedef struct vsf_sdl2_t {
     vk_disp_t *disp;
     uint32_t init_flags;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     uint32_t start_ms;
+#endif
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
     SDL_Surface *sdl1_screen;
 #endif
@@ -119,6 +121,7 @@ static bool __vsf_sdl2_rect_intersect(SDL_Rect *rect_out, const SDL_Rect *rect0,
 
 void vsf_sdl2_init(vk_disp_t *disp)
 {
+    __vsf_sdl2.init_flags = 0;
     __vsf_sdl2.disp = disp;
     __vsf_sdl2.sdl1_screen = NULL;
 }
@@ -150,7 +153,9 @@ int __vsf_sdl2_init_subsystem(uint32_t flags)
 
 int __vsf_sdl2_init(uint32_t flags)
 {
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     __vsf_sdl2.start_ms = vsf_systimer_tick_to_ms(vsf_timer_get_tick());
+#endif
     return __vsf_sdl2_init_subsystem(flags);
 }
 
@@ -175,7 +180,7 @@ const char *__vsf_sdl2_get_error(void)
 
 SDL_Window * __vsf_sdl2_create_window(const char *title, int x, int y, int w, int h, uint32_t flags)
 {
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_size(__vsf_sdl2.disp) >> 3;
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
     SDL_Window *window = vsf_heap_malloc(sizeof(struct SDL_Window) + pixel_size * w * h);
     if (window != NULL) {
         window->title   = title;
@@ -217,6 +222,11 @@ void __vsf_sdl2_destroy_renderer(SDL_Renderer * renderer)
 int __vsf_sdl2_render_clear(SDL_Renderer * renderer)
 {
     VSF_SDL2_ASSERT(renderer != NULL);
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
+    SDL_Window *window = renderer->window;
+
+    // TODO: set to default color instead of 0
+    memset(window->pixels, 0, pixel_size * window->area.w * window->area.h);
     return 0;
 }
 
@@ -252,7 +262,7 @@ int __vsf_sdl2_render_copy(SDL_Renderer * renderer, SDL_Texture * texture, const
     dst_area.w = src_area.w = min(dst_area.w, src_area.w);
     dst_area.h = src_area.h = min(dst_area.h, src_area.h);
 
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_size(texture->format) >> 3;
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format);
     __vsf_sdl2_pixel_copy(src_area.h, pixel_size * src_area.w,
                 (uint8_t *)window->pixels + pixel_size * (dst_area.y * window->area.w + dst_area.x), pixel_size * window->area.w,
                 (uint8_t *)texture->pixels + pixel_size * (src_area.y * texture->w + src_area.x), pixel_size * texture->w);
@@ -280,7 +290,7 @@ void __vsf_sdl2_render_present(SDL_Renderer * renderer)
 
 SDL_Texture * __vsf_sdl2_create_texture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h)
 {
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_size(format) >> 3;
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(format);
     SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Renderer) + pixel_size * w * h);
     if (texture != NULL) {
         texture->format = format;
@@ -311,7 +321,7 @@ int __vsf_sdl2_update_texture(SDL_Texture * texture, const SDL_Rect * rect, cons
         area.h  = texture->h;
     }
 
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_size(texture->format) >> 3;
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format);
     __vsf_sdl2_pixel_copy(area.h, pixel_size * area.w,
                 (uint8_t *)texture->pixels + pixel_size * (area.y * texture->w + area.x), pixel_size * texture->w,
                 (uint8_t *)pixels, pitch);
@@ -344,6 +354,7 @@ int __vsf_sdl2_sem_post(SDL_sem * sem)
 }
 
 // timer
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 void __vsf_sdl2_delay(uint32_t ms)
 {
     vsf_teda_set_timer_ms(ms);
@@ -354,6 +365,7 @@ uint32_t __vsf_sdl2_get_ticks(void)
     uint32_t cur_ms = vsf_systimer_tick_to_ms(vsf_timer_get_tick());
     return cur_ms - __vsf_sdl2.start_ms;
 }
+#endif
 
 // audio
 int __vsf_sdl2_open_audio(SDL_AudioSpec * desired, SDL_AudioSpec * obtained)
@@ -434,7 +446,7 @@ SDL_Surface * __vsf_sdl_set_video_mode(int width, int height, int bpp, uint32_t 
         __vsf_sdl2.sdl1_screen = NULL;
     }
     if (!bpp) {
-        bpp = vsf_disp_get_pixel_size(__vsf_sdl2.disp) << 3;
+        bpp = vsf_disp_get_pixel_bitsize(__vsf_sdl2.disp);
     }
     surface = vsf_heap_malloc(sizeof(SDL_Surface) + (width * height * bpp >> 3));
     if (surface != NULL) {

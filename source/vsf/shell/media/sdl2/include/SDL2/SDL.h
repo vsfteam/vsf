@@ -78,8 +78,10 @@ extern "C" {
 #define SDL_SemTryWait(__sem)   __vsf_sdl2_sem_wait((__sem), 0)
 #define SDL_SemPost             __vsf_sdl2_sem_post
 
-#define SDL_Delay               __vsf_sdl2_delay
-#define SDL_GetTicks            __vsf_sdl2_get_ticks
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   define SDL_Delay            __vsf_sdl2_delay
+#   define SDL_GetTicks         __vsf_sdl2_get_ticks
+#endif
 
 #define SDL_OpenAudio           __vsf_sdl2_open_audio
 #define SDL_PauseAudio          __vsf_sdl2_pause_audio
@@ -207,6 +209,7 @@ enum {
     SDL_PIXELFORMAT_UNKNOWN     = 0,
     SDL_PIXELFORMAT_ARGB8888    = VSF_DISP_COLOR_ARGB8888,
     SDL_PIXELFORMAT_RGB565      = VSF_DISP_COLOR_RGB565,
+    SDL_PIXELFORMAT_RGB666      = VSF_DISP_COLOR_RGB666_32,
 };
 
 typedef struct SDL_Texture SDL_Texture;
@@ -635,8 +638,10 @@ extern void __vsf_sdl2_destroy_sem(SDL_sem * sem);
 extern int __vsf_sdl2_sem_wait(SDL_sem * sem, int32_t ms);
 extern int __vsf_sdl2_sem_post(SDL_sem * sem);
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 extern void __vsf_sdl2_delay(uint32_t ms);
 extern uint32_t __vsf_sdl2_get_ticks(void);
+#endif
 
 extern int __vsf_sdl2_open_audio(SDL_AudioSpec * desired, SDL_AudioSpec * obtained);
 extern void __vsf_sdl2_pause_audio(int pause_on);

@@ -46,7 +46,7 @@ enum {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSFVM_CFG_RUNTIME_EN == ENABLED
+#if VSFVM_CFG_RUNTIME_EN == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 static vsfvm_ret_t __vsfvm_ext_kernel_delay_ms(vsfvm_thread_t *thread);
 #endif
 
@@ -58,13 +58,21 @@ static NO_INIT vsfvm_ext_kernel_t __vsfvm_ext_kernel;
 #if VSFVM_CFG_COMPILER_EN == ENABLED
 extern const vsfvm_ext_op_t __vsfvm_ext_kernel_op;
 static const vsfvm_lexer_sym_t __vsfvm_ext_kernel_sym[] = {
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     VSFVM_LEXERSYM_EXTFUNC("delay_ms", &__vsfvm_ext_kernel_op, NULL, NULL, 1, VSFVM_KERNEL_EXTFUNC_DELAY_MS),
+#   else
+    0
+#   endif
 };
 #endif
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
 static const vsfvm_extfunc_t __vsfvm_ext_kernel_func[VSFVM_KERNEL_EXTFUNC_NUM] = {
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     [VSFVM_KERNEL_EXTFUNC_DELAY_MS] = VSFVM_EXTFUNC(__vsfvm_ext_kernel_delay_ms, 1),
+#   else
+    0
+#   endif
 };
 #endif
 
@@ -86,6 +94,7 @@ static const vsfvm_ext_op_t __vsfvm_ext_kernel_op = {
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
 
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 static void __vsfvm_ext_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     if (evt == VSF_EVT_TIMER) {
@@ -108,6 +117,7 @@ static vsfvm_ret_t __vsfvm_ext_kernel_delay_ms(vsfvm_thread_t *thread)
         return VSFVM_RET_FINISHED;
     }
 }
+#   endif
 
 #endif
 

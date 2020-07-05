@@ -29,8 +29,8 @@
 #   define VSF_DEBUGGER_ASSERT                      ASSERT
 #endif
 
-#define VSF_DEBUGGER_CFG_CONSOLE_JLINK_RTT          0
-#define VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE   1
+#define VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT         1
+#define VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE   2
 #define VSF_DEBUGGER_CFG_CONSOLE_USER               8
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

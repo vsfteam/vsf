@@ -112,17 +112,6 @@ const vk_usbh_class_drv_t vk_usbh_ecm_drv = {
 };
 
 /*============================ PROTOTYPES ====================================*/
-
-#if     defined(WEAK_VSF_PNP_ON_NETDRV_NEW_EXTERN)                              \
-    &&  defined(WEAK_VSF_PNP_ON_NETDRV_NEW)
-WEAK_VSF_PNP_ON_NETDRV_NEW_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_PNP_ON_NETDRV_DEL_EXTERN)                              \
-    &&  defined(WEAK_VSF_PNP_ON_NETDRV_DEL)
-WEAK_VSF_PNP_ON_NETDRV_DEL_EXTERN
-#endif
-
 /*============================ IMPLEMENTATION ================================*/
 
 static vk_usbh_ecm_icb_t * __vk_usbh_ecm_get_icb(vk_usbh_ecm_t *ecm, vk_usbh_urb_t *urb)
@@ -188,11 +177,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_fini(vsf_netdrv_t *netdrv)
 {
     if (netdrv->is_to_free) {
         vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
-#ifndef WEAK_VSF_PNP_ON_NETDRV_DEL
         vsf_pnp_on_netdrv_del(&ecm->netdrv);
-#else
-        WEAK_VSF_PNP_ON_NETDRV_DEL(&ecm->netdrv);
-#endif
         VSF_USBH_FREE(ecm);
     }
     return VSF_ERR_NONE;
@@ -422,11 +407,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             __vsf_eda_crit_npb_leave(&dev->ep0.crit);
 
             ecm->netdrv.netlink_op = &__vk_usbh_ecm_netlink_op;
-#ifndef WEAK_VSF_PNP_ON_NETDRV_NEW
             vsf_pnp_on_netdrv_new(&ecm->netdrv);
-#else
-            WEAK_VSF_PNP_ON_NETDRV_NEW(&ecm->netdrv);
-#endif
 
             eda->fn.evthandler = vk_usbh_cdc_evthandler;
             vsf_eda_post_evt(eda, VSF_EVT_INIT);

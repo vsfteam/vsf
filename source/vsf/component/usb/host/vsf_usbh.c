@@ -114,20 +114,10 @@ static const uint8_t __vk_usbh_rh_config_descriptor[] = {
 /*============================ PROTOTYPES ====================================*/
 
 
-#if     defined(WEAK_VSF_USBH_ON_DEV_PARSED_EXTERN)                             \
-    &&  defined(WEAK_VSF_USBH_ON_DEV_PARSED)
-WEAK_VSF_USBH_ON_DEV_PARSED_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_ON_MATCH_INTERFACE_EXTERN)                        \
-    &&  defined(WEAK_VSF_USBH_ON_MATCH_INTERFACE)
-WEAK_VSF_USBH_ON_MATCH_INTERFACE_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_ON_REMOVE_INTERFACE_EXTERN)                       \
-    &&  defined(WEAK_VSF_USBH_ON_REMOVE_INTERFACE)
-WEAK_VSF_USBH_ON_REMOVE_INTERFACE_EXTERN
-#endif
+extern void vsf_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser);
+extern vsf_err_t vsf_usbh_on_match_interface(
+        vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs);
+extern void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -435,11 +425,7 @@ void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL) && (ifs != NULL));
     const vk_usbh_class_drv_t *drv = ifs->drv;
     if (drv) {
-#ifndef WEAK_VSF_USBH_ON_REMOVE_INTERFACE
         vsf_usbh_on_remove_interface(ifs);
-#else
-        WEAK_VSF_USBH_ON_REMOVE_INTERFACE(ifs);
-#endif
         drv->disconnect(usbh, dev, ifs->param);
         ifs->drv = NULL;
         ifs->param = NULL;
@@ -880,11 +866,7 @@ static vsf_err_t __vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
             if (param != NULL) {
                 ifs->param = param;
                 ifs->drv = drv;
-#ifndef WEAK_VSF_USBH_ON_MATCH_INTERFACE
                 if (VSF_ERR_NONE != vsf_usbh_on_match_interface(parser, parser_ifs)) {
-#else
-                if (VSF_ERR_NONE != WEAK_VSF_USBH_ON_MATCH_INTERFACE(parser, parser_ifs)) {
-#endif
                     drv->disconnect(usbh, usbh->dev_new, param);
                     continue;
                 }
@@ -1015,11 +997,7 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
         }
     }
 
-#ifndef WEAK_VSF_USBH_ON_DEV_PARSED
     vsf_usbh_on_dev_parsed(usbh->dev_new, parser);
-#else
-    WEAK_VSF_USBH_ON_DEV_PARSED(usbh->dev_new, parser);
-#endif
 
     // probe
     size = 0;

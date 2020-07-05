@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 //#include <stdint.h>
-#include "utilities/compiler.h"
+#include "utilities/compiler/compiler.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -663,7 +663,7 @@ NULL<---|backward|<-----|backward|<----------
             __vsf_dlist_peek_head(                                              \
                     __host_type, __member, (__list_ptr), (__item_ref_ptr))
 
-#define vsf_dlist_peek_next(  __host_type,/* the type of the host type */       \
+#define vsf_dlist_peek_next(    __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __item_ptr, /* the address of the target item */\
                                 __item_ref_ptr)/* the pointer of host type */   \
@@ -685,7 +685,7 @@ NULL<---|backward|<-----|backward|<----------
                     __host_type, __member, (__list_ptr), (__item_ref_ptr))
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define vsf_dlist_insert(       __host_type,/* the type of the host type */  \
+#   define vsf_dlist_insert(    __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __list_ptr, /* the address of the list */       \
                                 __item_ptr, /* the address of the target item */\
@@ -693,7 +693,7 @@ NULL<---|backward|<-----|backward|<----------
             __vsf_dlist_insert(                                                 \
                 __host_type, __member, (__list_ptr), (__item_ptr), (__cond))
 #else
-#   define vsf_dlist_insert(       __host_type,/* the type of the host type */  \
+#   define vsf_dlist_insert(    __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __list_ptr, /* the address of the list */       \
                                 __item_ptr, /* the address of the target item */\

@@ -52,6 +52,8 @@ declare_simple_class(vk_mal_t)
 declare_simple_class(vk_mal_stream_t)
 #endif
 
+declare_simple_class(vk_mal_drv_t)
+
 enum vsf_mal_op_t {
     VSF_MAL_OP_ERASE,
     VSF_MAL_OP_READ,
@@ -67,17 +69,18 @@ enum vsf_mal_feature_t {
 };
 typedef enum vsf_mal_feature_t vsf_mal_feature_t;
 
-struct vk_mal_drv_t {
-    // blksz can be called after successfully initialized
-    uint_fast32_t (*blksz)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-    bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-    vsf_peda_evthandler_t init;
-    vsf_peda_evthandler_t fini;
-    vsf_peda_evthandler_t erase;
-    vsf_peda_evthandler_t read;
-    vsf_peda_evthandler_t write;
+def_simple_class(vk_mal_drv_t) {
+    protected_member(
+        // blksz can be called after successfully initialized
+        uint_fast32_t (*blksz)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+        bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+        vsf_peda_evthandler_t init;
+        vsf_peda_evthandler_t fini;
+        vsf_peda_evthandler_t erase;
+        vsf_peda_evthandler_t read;
+        vsf_peda_evthandler_t write;
+    )
 };
-typedef struct vk_mal_drv_t vk_mal_drv_t;
 
 def_simple_class(vk_mal_t) {
     public_member(

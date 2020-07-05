@@ -39,9 +39,9 @@ static const vk_virtual_scsi_param_t __usrapp_scsi_param = {
     .type                   = SCSI_PDT_DIRECT_ACCESS_BLOCK,
 };
 static vk_mal_scsi_t __usrapp_mal_scsi = {
-    .drv                = &VK_VIRTUAL_SCSI_DRV,
+    .drv                = &vk_virtual_scsi_drv,
     .param              = (void *)&__usrapp_scsi_param,
-    .virtual_scsi_drv   = &VK_MAL_VIRTUAL_SCSI_DRV,
+    .virtual_scsi_drv   = &vk_mal_virtual_scsi_drv,
     .mal                = &usrapp_common.mal.fakefat32.use_as__vk_mal_t,
 };
 

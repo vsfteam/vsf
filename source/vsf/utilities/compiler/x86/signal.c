@@ -18,7 +18,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
-#include "../../compiler.h"
+#include "../compiler.h"
 #include "signal.h"
 
 #include "hal/vsf_hal.h"

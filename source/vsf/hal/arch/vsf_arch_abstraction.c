@@ -126,35 +126,20 @@ typedef struct __systimer_t {
 } __systimer_t;
 #endif
 
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-
-#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
-    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
-static volatile __systimer_t __systimer;
-#endif
-
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN)                            \
-    &&  defined(WEAK_VSF_SYSTIMER_EVTHANDLER)
-WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN
-#endif
+static void __default_code_region_atom_code_on_enter(void *obj_ptr, void *local_ptr);
+static void __default_code_region_atom_code_on_leave(void *obj_ptr,void *local_ptr);
 
-#if     defined(WEAK_ON_ARCH_SYSTIMER_TICK_EVT_EXTERN)                          \
-    &&  defined(WEAK_ON_ARCH_SYSTIMER_TICK_EVT)
-WEAK_ON_ARCH_SYSTIMER_TICK_EVT_EXTERN
-#endif
+#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
+extern bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick);
 
-
-#if     defined(WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN)      \
-    &&  defined(WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR)
-WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN)            \
-    &&  defined(WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR)
-WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN
+#   if  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
+extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
+#   endif
 #endif
 
 /*! \brief initialise a software interrupt
@@ -165,6 +150,26 @@ extern vsf_err_t vsf_arch_swi_init( uint_fast8_t idx,
                                     vsf_arch_prio_t priority,
                                     vsf_swi_handler_t *handler, 
                                     void *param);
+
+/*============================ LOCAL VARIABLES ===============================*/
+
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+static volatile __systimer_t __systimer;
+#endif
+
+static const i_code_region_t __vsf_i_default_code_region_atom_code = {
+    sizeof(vsf_gint_state_t),
+    &__default_code_region_atom_code_on_enter,
+    &__default_code_region_atom_code_on_leave
+};
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const code_region_t DEFAULT_CODE_REGION_ATOM_CODE = {
+    NULL, 
+    (i_code_region_t *)&__vsf_i_default_code_region_atom_code
+};
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -344,10 +349,32 @@ int_fast8_t vsf_ffz(uint_fast32_t a)
 #endif
 
 
+/*----------------------------------------------------------------------------*
+ * Default Code region for ATOM code                                          *
+ *----------------------------------------------------------------------------*/
 
+static void __default_code_region_atom_code_on_enter(void *obj_ptr, void *local_ptr)
+{
+    vsf_gint_state_t *state_ptr = (vsf_gint_state_t *)local_ptr;
+    
+    UNUSED_PARAM(obj_ptr);
+    UNUSED_PARAM(local_ptr);
+    
+    ASSERT(NULL != local_ptr);
+    (*state_ptr) = vsf_disable_interrupt();
+}
 
+static void __default_code_region_atom_code_on_leave(void *obj_ptr,void *local_ptr)
+{
+    vsf_gint_state_t *state_ptr = (vsf_gint_state_t *)local_ptr;
+    
+    UNUSED_PARAM(obj_ptr);
+    UNUSED_PARAM(local_ptr);
+    
+    ASSERT(NULL != local_ptr);
 
-
+    vsf_set_interrupt(*state_ptr);
+}
 
 /*----------------------------------------------------------------------------*
  * SWI                                                                        *
@@ -401,6 +428,11 @@ void vsf_swi_trigger(uint_fast8_t idx)
     VSF_HAL_ASSERT(false);
 #endif
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
 
 WEAK(vsf_drv_usr_swi_init)
 vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx, 
@@ -563,11 +595,7 @@ void vsf_systimer_ovf_evt_hanlder(void)
     vsf_systimer_low_level_disable();
     
     if (on_arch_systimer_tick_evt(tick)) {
-#ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
         vsf_systimer_evthandler(tick);
-#else
-        WEAK_VSF_SYSTIMER_EVTHANDLER(tick);
-#endif
     }
 }
 
@@ -581,16 +609,8 @@ WEAK(vsf_systimer_init)
 vsf_err_t vsf_systimer_init(void)
 {
     //! calculate the cycle count of 1 tick
-#ifndef WEAK_VSF_ARCH_REQ__SYSTIMER_RESOLUTION__FROM_USR
     uint_fast32_t tick_res = vsf_arch_req___systimer_resolution___from_usr();
-#else
-    uint_fast32_t tick_res = WEAK_VSF_ARCH_REQ__SYSTIMER_RESOLUTION__FROM_USR();
-#endif
-#ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
     __systimer.unit = vsf_arch_req___systimer_freq___from_usr() / tick_res;
-#else
-    __systimer.unit = WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR() / tick_res;
-#endif
     __systimer.tick_freq = tick_res;
     __systimer.max_tick_per_round = 
         (((uintmax_t)1 << (__VSF_ARCH_SYSTIMER_BITS)) / __systimer.unit) - 1;
@@ -705,17 +725,8 @@ bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
  */
 void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick)
 {
-#ifndef WEAK_ON_ARCH_SYSTIMER_TICK_EVT
     if (on_arch_systimer_tick_evt(tick)) {
-#else
-    if (WEAK_ON_ARCH_SYSTIMER_TICK_EVT(tick)) {
-#endif
-
-#ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
         vsf_systimer_evthandler(tick);
-#else
-        WEAK_VSF_SYSTIMER_EVTHANDLER(tick);
-#endif
     }
 }
 

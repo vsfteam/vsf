@@ -40,31 +40,40 @@ extern "C" {
 #define VSF_DISP_COLOR_IDX_DEF(__name)                                          \
             VSF_DISP_COLOR_IDX_##__name
 
-#define VSF_DISP_COLOR_DEF(__name, __bitlen)                                    \
-            VSF_DISP_COLOR_##__name = ((VSF_DISP_COLOR_IDX_##__name) | ((__bitlen) << 8))
+// bit0 - 7:    index
+// bit8 - 12:   bitlen - 1
+// bit13 - 14:  bytelen - 1
+// bit15:       msb_fisrt, reserved, not used now
+#define VSF_DISP_COLOR_DEF(__name, __bitlen, __bytelen, __msb)                  \
+            VSF_DISP_COLOR_##__name =   ((VSF_DISP_COLOR_IDX_##__name)          \
+                                    |   ((((__bitlen) - 1) & 0x1F) << 8)        \
+                                    |   ((((__bytelen) - 1) & 0x03) << 13)      \
+                                    |   ((__msb) << 15))
 
-// TODO: remove upper-case non-const macros
-#define VSF_DISP_GET_PIXEL_SIZE(__disp)                                         \
-            ((((vk_disp_t *)(__disp))->param.color >> 8) & 0xFF)
-
-#define vsf_disp_get_pixel_format_size(__color_format)                          \
-            (((__color_format) >> 8) & 0xFF)
+#define vsf_disp_get_pixel_format_bytesize(__color_format)                      \
+            ((((__color_format) >> 13) & 0x03) + 1)
+#define vsf_disp_get_pixel_format_bitsize(__color_format)                       \
+            ((((__color_format) >> 8) & 0x1F) + 1)
 
 #define vsf_disp_get_pixel_format(__disp)                                       \
             ((vk_disp_t *)(__disp))->param.color
 
-#define vsf_disp_get_pixel_size(__disp)                                         \
-            vsf_disp_get_pixel_format_size(vsf_disp_get_pixel_format(__disp))
+#define vsf_disp_get_pixel_bitsize(__disp)                                      \
+            vsf_disp_get_pixel_format_bitsize(vsf_disp_get_pixel_format(__disp))
+#define vsf_disp_get_pixel_bytesize(__disp)                                     \
+            vsf_disp_get_pixel_format_bytesize(vsf_disp_get_pixel_format(__disp))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vk_disp_t)
+declare_simple_class(vk_disp_drv_t)
 
 enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(INVALID),
     VSF_DISP_COLOR_IDX_DEF(RGB565),
     VSF_DISP_COLOR_IDX_DEF(ARGB8888),
+    VSF_DISP_COLOR_IDX_DEF(RGB666_32),
 };
 typedef enum vk_disp_color_idx_t vk_disp_color_idx_t;
 
@@ -72,9 +81,10 @@ enum vk_disp_color_t {
     // avoid vk_disp_color_t to be optimized to 8bit
     __VSF_DISP_COLOR_LEAST_MAX	= INT16_MAX,
     __VSF_DISP_COLOR_LEAST_MIN  = INT16_MIN,
-    VSF_DISP_COLOR_DEF(INVALID, 0),
-    VSF_DISP_COLOR_DEF(RGB565, 16),
-    VSF_DISP_COLOR_DEF(ARGB8888, 32),
+    VSF_DISP_COLOR_DEF(INVALID, 0, 0, 0),
+    VSF_DISP_COLOR_DEF(RGB565, 16, 2, 0),
+    VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 0),
+    VSF_DISP_COLOR_DEF(RGB666_32, 18, 4, 0),
 };
 typedef enum vk_disp_color_t vk_disp_color_t;
 
@@ -90,11 +100,24 @@ struct vk_disp_area_t {
 };
 typedef struct vk_disp_area_t vk_disp_area_t;
 
-struct vk_disp_drv_t {
-    vsf_err_t (*init)(vk_disp_t *pthis);
-    vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+def_simple_class(vk_disp_drv_t) {
+    protected_member(
+        vsf_err_t (*init)(vk_disp_t *pthis);
+        vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+    )
+    protected_member(
+        // TODO: add a enum for driver type
+#if VSF_USE_DISP_FB == ENABLED
+        union {
+#   if VSF_USE_DISP_FB == ENABLED
+            struct {
+                void * (*switch_buffer)(vk_disp_t *pthis, bool is_to_copy);
+            } fb;
+#   endif
+        };
+#endif
+    )
 };
-typedef struct vk_disp_drv_t vk_disp_drv_t;
 
 struct vk_disp_param_t {
     const vk_disp_drv_t *drv;
@@ -149,6 +172,9 @@ extern void vk_disp_on_ready(vk_disp_t *pthis);
 #endif
 #if VSF_USE_DISP_VGA_M480 == ENABLED
 #   include "./driver/vga/m480/vsf_disp_vga_m480.h"
+#endif
+#if VSF_USE_DISP_FB == ENABLED
+#   include "./driver/fb/vsf_disp_fb.h"
 #endif
 
 #undef __VSF_DISP_CLASS_IMPLEMENT

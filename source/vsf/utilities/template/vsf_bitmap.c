@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "utilities/vsf_utilities_cfg.h"
-#include "../compiler.h"
+#include "../compiler/compiler.h"
 #include "vsf_bitmap.h"
 
 /*============================ MACROS ========================================*/

@@ -45,25 +45,10 @@ static void * vk_usbh_nspro_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             vk_usbh_ifs_parser_t *parser_ifs);
 static void vk_usbh_nspro_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 
-#if     defined(WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT_EXTERN)                     \
-    &&  defined(WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT)
-WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT_EXTERN)                    \
-    &&  defined(WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT)
-WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_NSPRO_ON_NEW_EXTERN)                              \
-    &&  defined(WEAK_VSF_USBH_NSPRO_ON_NEW)
-WEAK_VSF_USBH_NSPRO_ON_NEW_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_NSPRO_ON_FREE_EXTERN)                             \
-    &&  defined(WEAK_VSF_USBH_NSPRO_ON_FREE)
-WEAK_VSF_USBH_NSPRO_ON_FREE_EXTERN
-#endif
+extern void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report);
+extern void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro);
+extern void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro);
+extern void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -171,11 +156,7 @@ static void vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             break;
                         case VSF_USBH_NSPRO_RUNNING:
                             if (URB_OK == vk_usbh_urb_get_status(&urb)) {
-#ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT
                                 vsf_usbh_nspro_on_report_input(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
-#else
-                                WEAK_VSF_USBH_NSPRO_ON_REPORT_INPUT(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
-#endif
                             }
                             break;
                         }
@@ -184,11 +165,7 @@ static void vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 } else {
                     if (VSF_USBH_NSPRO_RUNNING == nspro->start_state) {
                         nspro->out_idle = true;
-#ifndef WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT
                         vsf_usbh_nspro_on_report_output(nspro);
-#else
-                        WEAK_VSF_USBH_NSPRO_ON_REPORT_OUTPUT(nspro);
-#endif
                     }
                 }
             }
@@ -202,22 +179,14 @@ static void * vk_usbh_nspro_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     vk_usbh_nspro_t *nspro = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_nspro_t), true);
     if (nspro != NULL) {
         nspro->user_evthandler = vk_usbh_nspro_evthandler;
-#ifndef WEAK_VSF_USBH_NSPRO_ON_NEW
         vsf_usbh_nspro_on_new(nspro);
-#else
-        WEAK_VSF_USBH_NSPRO_ON_NEW(nspro);
-#endif
     }
     return nspro;
 }
 
 static void vk_usbh_nspro_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
-#ifndef WEAK_VSF_USBH_NSPRO_ON_FREE
     vsf_usbh_nspro_on_free((vk_usbh_nspro_t *)param);
-#else
-    WEAK_VSF_USBH_NSPRO_ON_FREE(nspro);
-#endif
     vk_usbh_hid_disconnect((vk_usbh_hid_eda_t *)param);
 }
 

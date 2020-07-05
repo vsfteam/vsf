@@ -20,28 +20,79 @@
 #include "./usrapp_ui_common.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
+    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_DISP_FB == ENABLED)            \
+    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
+
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_USE_DISP_FB == ENABLED
+#   ifdef __F1C100S__
+static const f1cx00s_fb_param_t __fb_param = {
+    // TODO: fix according to hw
+    .lcd_type                   = F1C100S_LCD_TYPE_RGB,
+    .color_format               = 9 << 8,        // color 32-bpp(Padding:8/R:8/G:8/B:8)
+    .timing.rgb                 = {
+        .pixel_clock_hz         = APP_DISP_FB_CFG_PIXEL_CLOCK,
+        .h_front_porch          = APP_DISP_FB_CFG_H_FP,
+        .h_back_porch           = APP_DISP_FB_CFG_H_BP,
+        .h_sync                 = APP_DISP_FB_CFG_H_SYNC,
+        .v_front_porch          = APP_DISP_FB_CFG_V_FP,
+        .v_back_porch           = APP_DISP_FB_CFG_V_BP,
+        .v_sync                 = APP_DISP_FB_CFG_V_SYNC,
+        .h_sync_active          = false,
+        .v_sync_active          = false,
+        .den_active             = true,
+        .clk_active             = true,
+    },
+};
+static f1cx00s_fb_t __fb = {
+    .param                      = &__fb_param,
+    .width                      = APP_DISP_FB_WIDTH,
+    .height                     = APP_DISP_FB_HEIGHT,
+    .pixel_bit_size             = vsf_disp_get_pixel_format_bitsize(APP_DISP_FB_COLOR),
+    .pixel_byte_size            = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
+};
+#   endif
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 usrapp_ui_common_t usrapp_ui_common = {
 #if VSF_USE_DISP_SDL2 == ENABLED
-        .disp                       = {
-            .param                  = {
-                .height             = APP_DISP_SDL2_HEIGHT,
-                .width              = APP_DISP_SDL2_WIDTH,
-                .drv                = &vk_disp_drv_sdl2,
-                .color              = APP_DISP_SDL2_COLOR,
-            },
-            .amplifier              = APP_DISP_SDL2_AMPLIFIER,
+    .disp                       = {
+        .param                  = {
+            .height             = APP_DISP_SDL2_HEIGHT,
+            .width              = APP_DISP_SDL2_WIDTH,
+            .drv                = &vk_disp_drv_sdl2,
+            .color              = APP_DISP_SDL2_COLOR,
         },
+        .amplifier              = APP_DISP_SDL2_AMPLIFIER,
+    },
+#elif VSF_USE_DISP_FB == ENABLED
+    .disp                       = {
+        .param                  = {
+            .height             = APP_DISP_FB_HEIGHT,
+            .width              = APP_DISP_FB_WIDTH,
+            .drv                = &vk_disp_drv_fb,
+            .color              = APP_DISP_FB_COLOR,
+        },
+        .fb                     = {
+//            .buffer             = NULL,
+            .drv                = &VSF_FB,
+            .param              = &__fb,
+            .size               = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR) * APP_DISP_FB_WIDTH * APP_DISP_FB_HEIGHT,
+            .num                = APP_DISP_FB_NUM,
+            .pixel_byte_size    = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
+        },
+    },
 #endif
 };
 
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 

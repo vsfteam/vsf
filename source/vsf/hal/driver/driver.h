@@ -49,6 +49,8 @@
 #       define  VSF_DRIVER_HEADER       "./ST/driver.h"
 #   elif    defined(__WCH__)
 #       define  VSF_DRIVER_HEADER       "./WCH/driver.h"
+#   elif    defined(__Allwinner__)
+#       define  VSF_DRIVER_HEADER       "./Allwinner/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"

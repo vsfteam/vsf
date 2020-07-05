@@ -31,7 +31,8 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vk_fakefat32_file_t fakefat32_root[3];
+extern vk_fakefat32_file_t fakefat32_root[ 3
+                                +   (APP_CFG_USE_VSFVM_DEMO == ENABLED ? 1 : 0)];
 
 #endif
 #endif      // __FAKEFAT32_H__

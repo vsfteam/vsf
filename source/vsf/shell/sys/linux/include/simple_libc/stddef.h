@@ -1,7 +1,8 @@
 #ifndef __SIMPLE_LIBC_STDDEF_H__
 #define __SIMPLE_LIBC_STDDEF_H__
 
-#include "utilities/compiler.h"
+//! \note please do not modify this to avoid circular-including
+#include "utilities/compiler/compiler.h"
 
 #ifdef __cplusplus
 extern "C" {

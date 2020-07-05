@@ -27,7 +27,7 @@
 #include "./vsf_utilities_cfg.h"
 
 /* compiler abstraction, supports GCC, IAR, Arm Compiler 5, Arm Compiler 6 */
-#include "./compiler.h"
+#include "./compiler/compiler.h"
 
 /* minimal OO support for interface definie only, no class support */
 #include "./3rd-party/PLOOC/raw/plooc.h"

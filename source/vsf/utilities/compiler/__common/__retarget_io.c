@@ -39,6 +39,11 @@ extern ssize_t write(int fd, const void *buf, size_t size);
 extern off_t lseek(int fd, off_t offset, int whence);
 extern void close(int fd);
 extern int open(const char *path_name, int flags, mode_t mode);
+
+void vsf_stdio_init(void)
+{
+    
+}
 #else
 extern int vsf_stdout_putchar(char ch);
 extern int vsf_stderr_putchar(char ch);

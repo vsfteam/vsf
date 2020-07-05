@@ -19,7 +19,7 @@
 #define __CODE_REGION_H__
 
 /*============================ INCLUDES ======================================*/
-#include "utilities/compiler.h"
+#include "utilities/compiler/compiler.h"
 
 /*! \brief How To Define and Use your own CODE_REGION
  *!        Example:
@@ -242,7 +242,6 @@ typedef struct {
 } code_region_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
-extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
 extern const code_region_t DEFAULT_CODE_REGION_NONE;
 /*============================ PROTOTYPES ====================================*/
 

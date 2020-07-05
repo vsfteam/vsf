@@ -164,6 +164,11 @@ vsf_err_t vsf_evtq_post_evt_msg(vsf_eda_t *this_ptr, vsf_evt_t evt, void *msg)
 }
 #endif
 
+bool vsf_evtq_is_empty(vsf_evtq_t *this_ptr)
+{
+    return this_ptr->head == this_ptr->tail;
+}
+
 vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
 {
     vsf_evtq_t *evtq_orig;
@@ -176,7 +181,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
     size = 1 << this_ptr->bitsize;
 
     evtq_orig = __vsf_set_cur_evtq(this_ptr);
-    while (this_ptr->head != this_ptr->tail) {
+    while (!vsf_evtq_is_empty(this_ptr)) {
         node = &this_ptr->node[this_ptr->head];
         this_ptr->head = (this_ptr->head + 1) & (size - 1);
         eda = node->eda;

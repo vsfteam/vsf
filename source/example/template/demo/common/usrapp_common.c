@@ -30,7 +30,7 @@ usrapp_common_t usrapp_common = {
     .mal                        = {
 #       if VSF_USE_FAKEFAT32_MAL == ENABLED
         .fakefat32              = {
-            .drv                = &VK_FAKEFAT32_MAL_DRV,
+            .drv                = &vk_fakefat32_mal_drv,
             .sector_size        = USRAPP_CFG_FAKEFAT32_SECTOR_SIZE,
             .sector_number      = USRAPP_CFG_FAKEFAT32_SIZE / USRAPP_CFG_FAKEFAT32_SECTOR_SIZE,
             .sectors_per_cluster= 8,

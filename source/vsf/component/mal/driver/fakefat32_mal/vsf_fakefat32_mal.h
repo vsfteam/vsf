@@ -92,7 +92,7 @@ def_simple_class(vk_fakefat32_mal_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_mal_drv_t VK_FAKEFAT32_MAL_DRV;
+extern const vk_mal_drv_t vk_fakefat32_mal_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

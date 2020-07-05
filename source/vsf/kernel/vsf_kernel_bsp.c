@@ -229,7 +229,9 @@ ROOT void __post_vsf_kernel_init(void)
     static NO_INIT app_main_thread_t __app_main;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     __app_main  .use_as__vsf_thread_t
+#       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
                 .use_as__vsf_teda_t
+#       endif
                 .use_as__vsf_eda_t
                 .on_terminate = NULL;
 #   endif

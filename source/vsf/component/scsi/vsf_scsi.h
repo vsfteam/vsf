@@ -43,6 +43,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 declare_simple_class(vk_scsi_t)
+declare_simple_class(vk_scsi_drv_t)
 
 enum scsi_sensekey_t {
     SCSI_SENSEKEY_NO_SENSE                      = 0,
@@ -116,16 +117,17 @@ struct scsi_inquiry_t {
 } PACKED;
 typedef struct scsi_inquiry_t scsi_inquiry_t;
 
-struct vk_scsi_drv_t {
-    vsf_peda_evthandler_t init;
-    vsf_peda_evthandler_t fini;
-    vsf_peda_evthandler_t execute;
+def_simple_class(vk_scsi_drv_t) {
+    protected_member(
+        vsf_peda_evthandler_t init;
+        vsf_peda_evthandler_t fini;
+        vsf_peda_evthandler_t execute;
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-    vsf_peda_evthandler_t execute_stream;
+        vsf_peda_evthandler_t execute_stream;
 #endif
-    bool (*buffer)(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
+        bool (*buffer)(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
+    )
 };
-typedef struct vk_scsi_drv_t vk_scsi_drv_t;
 
 
 def_simple_class(vk_scsi_t) {

@@ -37,9 +37,55 @@ readme\r\n\
 ";
 static uint8_t __control = 0;
 
+#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+static const char __test_dart[] = "\
+var i = 0;\r\n\
+\r\n\
+thread1(cnt) {\r\n\
+  var i = 0;\r\n\
+  while (i < cnt) {\r\n\
+    delay_ms(500);\r\n\
+    print(\"thread1 loop: \", i, \"\\r\\n\");\r\n\
+    i = i + 1;\r\n\
+  }\r\n\
+}\r\n\
+\r\n\
+thread(thread1, 5);\r\n\
+\r\n\
+while (i < 2) {\r\n\
+  delay_ms(1000);\r\n\
+  print(\"thread main loop: \", i, \"\\r\\n\");\r\n\
+  i = i + 1;\r\n\
+}\r\n\
+";
+#   else
+static const char __test_dart[] = "\
+var i = 0;\r\n\
+\r\n\
+thread1(cnt) {\r\n\
+  var i = 0;\r\n\
+  while (i < cnt) {\r\n\
+    print(\"thread1 loop: \", i, \"\\r\\n\");\r\n\
+    i = i + 1;\r\n\
+  }\r\n\
+}\r\n\
+\r\n\
+thread(thread1, 5);\r\n\
+\r\n\
+while (i < 2) {\r\n\
+  print(\"thread main loop: \", i, \"\\r\\n\");\r\n\
+  i = i + 1;\r\n\
+}\r\n\
+";
+#   endif
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-vk_fakefat32_file_t fakefat32_root[3] = {
+vk_fakefat32_file_t fakefat32_root[ 3
+                                +   (APP_CFG_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
+                                ] = {
     {
         .name               = "FAKEFAT32",
         .attr               = (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID,
@@ -57,6 +103,14 @@ vk_fakefat32_file_t fakefat32_root[3] = {
         .callback.read      = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_read),
         .callback.write     = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_write),
     },
+#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+    {
+        .name               = "test.dart",
+        .size               = sizeof(__test_dart),
+        .attr               = VSF_FILE_ATTR_READ,
+        .f.buff             = (uint8_t *)__test_dart,
+    },
+#endif
 };
 
 /*============================ IMPLEMENTATION ================================*/

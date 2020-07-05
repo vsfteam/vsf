@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2020 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,24 +15,33 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __USE_COMPILER_H__
-#define __USE_COMPILER_H__            
+/*============================ INCLUDES ======================================*/
+#include "hal/vsf_hal_cfg.h"
 
-//! \brief CPU io
+#undef VSF_ALLWINNER_DRIVER_HEADER
 
-#if   defined(__CPU_ARM__)                                                      //!< ARM series
-#   include "./compiler/arm/arm_compiler.h"
-#elif   defined(__CPU_MCS51__)                                                  //!< MCS-51 series
-#   include "./compiler/mcs51/mcs51_compiler.h"
-#elif   defined(__CPU_X86__) || defined(__CPU_X64__)
-#   include "./compiler/x86/x86_compiler.h"
-#elif   defined(__CPU_RV__)
-#   include "./compiler/rv/rv_compiler.h"
+#if     defined(__F1C100S__)
+//  TODO
+#   define  VSF_ALLWINNER_DRIVER_HEADER     "./F1CX00S/F1C100S/driver.h"
 #else
-//#warning No specified MCU type! use arm as default
-#   include "./compiler/arm/arm_compiler.h"
+#   error No supported device found.
 #endif
 
-#include "./preprocessor/mrepeat.h"
+/* include specified device driver header file */
+#include VSF_ALLWINNER_DRIVER_HEADER
+
+
+
+#ifndef __HAL_DRIVER_ALLWINNER_H__
+#define __HAL_DRIVER_ALLWINNER_H__
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
+
 
 #endif
+/* EOF */

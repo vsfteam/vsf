@@ -58,7 +58,7 @@ def_simple_class(vk_mal_scsi_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const i_virtual_scsi_drv_t VK_MAL_VIRTUAL_SCSI_DRV;
+extern const vk_virtual_scsi_drv_t vk_mal_virtual_scsi_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

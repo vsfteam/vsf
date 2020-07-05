@@ -38,7 +38,7 @@
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
 
-#include "utilities/compiler.h"
+#include "utilities/vsf_utilities.h"
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

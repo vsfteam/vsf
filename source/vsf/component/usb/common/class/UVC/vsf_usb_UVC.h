@@ -24,7 +24,7 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
 
-#include "utilities/compiler.h"
+#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -492,7 +492,11 @@ static void vsfvm_thread_fini_imp(vsfvm_runtime_t *runtime, vsfvm_thread_t *thre
     } while (var != NULL);
     vsfvm_stack_fini(&thread->stack);
     vsf_slist_remove(vsfvm_thread_t, thread_node, &script->thread_list, thread);
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     vsf_eda_fini(&thread->use_as__vsf_teda_t.use_as__vsf_eda_t);
+#else
+    vsf_eda_fini(&thread->use_as__vsf_eda_t);
+#endif
     vsfvm_free_thread_imp(runtime, thread);
 }
 

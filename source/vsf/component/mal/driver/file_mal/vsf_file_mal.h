@@ -56,7 +56,7 @@ def_simple_class(vk_file_mal_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_mal_drv_t VK_FILE_MAL_DRV;
+extern const vk_mal_drv_t vk_file_mal_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_QUEUE_CLASS_IMPLEMENT
-#include "../compiler.h"
+#include "../compiler/compiler.h"
 #include "./vsf_queue.h"
 
 /*============================ MACROS ========================================*/

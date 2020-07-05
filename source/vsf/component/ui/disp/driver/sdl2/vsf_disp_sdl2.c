@@ -46,25 +46,9 @@
 #endif
 
 #if VSF_USE_INPUT == ENABLED
-#if     defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN)                           \
-    &&  defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN)
-WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_GAMEPAD)
-WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN)                              \
-    &&  defined(WEAK_VSF_INPUT_ON_KEYBOARD)
-WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_MOUSE_EXTERN)                                 \
-    &&  defined(WEAK_VSF_INPUT_ON_MOUSE)
-WEAK_VSF_INPUT_ON_MOUSE_EXTERN
-#endif
+extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
+extern void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -119,11 +103,6 @@ static Uint32 __vk_disp_sdl2_get_format(vk_disp_sdl2_t *disp_sdl2)
     }
 }
 
-static uint_fast8_t __vk_disp_sdl2_get_pixel_size(vk_disp_sdl2_t *disp_sdl2)
-{
-    return VSF_DISP_GET_PIXEL_SIZE(disp_sdl2);
-}
-
 static void __vk_disp_sdl2_screen_init(vk_disp_sdl2_t *disp_sdl2)
 {
     disp_sdl2->window = SDL_CreateWindow("Screen",
@@ -148,7 +127,7 @@ static void __vk_disp_sdl2_screen_update(vk_disp_sdl2_t *disp_sdl2)
        .h = disp_sdl2->area.size.y,
     };
     SDL_UpdateTexture(disp_sdl2->texture, &rect, disp_sdl2->disp_buff,
-        disp_sdl2->area.size.x * __vk_disp_sdl2_get_pixel_size(disp_sdl2) / 8);
+        disp_sdl2->area.size.x * vsf_disp_get_pixel_bytesize(disp_sdl2));
     SDL_RenderClear(disp_sdl2->renderer);
     SDL_RenderCopy(disp_sdl2->renderer, disp_sdl2->texture, NULL, NULL);
     SDL_RenderPresent(disp_sdl2->renderer);
@@ -381,25 +360,13 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                         evt.ts_evt.info.width = disp_sdl2->param.width;
                         evt.ts_evt.info.height = disp_sdl2->param.height;
                         vsf_input_touchscreen_set(&evt.ts_evt, 0, is_down, x, y);
-#ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
                         vsf_input_on_touchscreen(&evt.ts_evt);
-#else
-                        WEAK_VSF_INPUT_ON_TOUCHSCREEN(&evt.ts_evt);
-#endif
                         break;
                     case VSF_INPUT_TYPE_GAMEPAD:
-#ifndef WEAK_VSF_INPUT_ON_GAMEPAD
                         vsf_input_on_gamepad(&evt.gamepad_evt);
-#else
-                        WEAK_VSF_INPUT_ON_GAMEPAD(&evt.gamepad_evt);
-#endif
                         break;
                     case VSF_INPUT_TYPE_KEYBOARD:
-#ifndef WEAK_VSF_INPUT_ON_KEYBOARD
                         vsf_input_on_keyboard(&evt.keyboard_evt);
-#else
-                        WEAK_VSF_INPUT_ON_KEYBOARD(&evt.keyboard_evt);
-#endif
                         break;
                     case VSF_INPUT_TYPE_MOUSE:
                         switch (mouse_evt) {
@@ -413,11 +380,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                             vk_input_mouse_evt_wheel_set(&evt.mouse_evt, wheel_x, wheel_y);
                             break;
                         }
-#ifndef WEAK_VSF_INPUT_ON_MOUSE
                         vsf_input_on_mouse(&evt.mouse_evt);
-#else
-                        WEAK_VSF_INPUT_ON_MOUSE(&evt.mouse_evt);
-#endif
                         break;
                     }
                 __vsf_arch_irq_end(irq_thread, false);

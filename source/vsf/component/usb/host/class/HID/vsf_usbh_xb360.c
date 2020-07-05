@@ -58,25 +58,10 @@ const vk_usbh_class_drv_t vk_usbh_xb360_drv = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_USBH_XB360_ON_REPORT_INPUT_EXTERN)                     \
-    &&  defined(WEAK_VSF_USBH_XB360_ON_REPORT_INPUT)
-WEAK_VSF_USBH_XB360_ON_REPORT_INPUT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_XB360_ON_REPORT_OUTPUT_EXTERN)                    \
-    &&  defined(WEAK_VSF_USBH_XB360_ON_REPORT_OUTPUT)
-WEAK_VSF_USBH_XB360_ON_REPORT_OUTPUT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_XB360_ON_NEW_EXTERN)                              \
-    &&  defined(WEAK_VSF_USBH_XB360_ON_NEW)
-WEAK_VSF_USBH_XB360_ON_NEW_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_XB360_ON_FREE_EXTERN)                             \
-    &&  defined(WEAK_VSF_USBH_XB360_ON_FREE)
-WEAK_VSF_USBH_XB360_ON_FREE_EXTERN
-#endif
+extern void vsf_usbh_xb360_on_report_input(vk_usbh_xb360_t *xb360, vsf_usb_xb360_gamepad_in_report_t *report);
+extern void vsf_usbh_xb360_on_report_output(vk_usbh_xb360_t *xb360);
+extern void vsf_usbh_xb360_on_new(vk_usbh_xb360_t *xb360);
+extern void vsf_usbh_xb360_on_free(vk_usbh_xb360_t *xb360);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -138,20 +123,12 @@ static void vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (pipe.dir_in1out0) {
                 if (    (URB_OK == vk_usbh_urb_get_status(&urb))
                     &&  (sizeof(vsf_usb_xb360_gamepad_in_report_t) == vk_usbh_urb_get_actual_length(&urb))) {
-#ifndef WEAK_VSF_USBH_XB360_ON_REPORT_INPUT
                     vsf_usbh_xb360_on_report_input(xb360, (vsf_usb_xb360_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
-#else
-                    WEAK_VSF_USBH_XB360_ON_REPORT_INPUT(xb360, (vsf_usb_xb360_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
-#endif
                 }
                 vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t));
             } else {
                 xb360->out_idle = true;
-#ifndef WEAK_VSF_USBH_XB360_ON_REPORT_OUTPUT
                 vsf_usbh_xb360_on_report_output(xb360);
-#else
-                WEAK_VSF_USBH_XB360_ON_REPORT_OUTPUT(xb360);
-#endif
             }
         }
         break;
@@ -169,11 +146,7 @@ static void *vk_usbh_xb360_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
         vk_usbh_xb360_t *xb360 = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_xb360_t), true);
         if (xb360 != NULL) {
             xb360->user_evthandler = vk_usbh_xb360_evthandler;
-#ifndef WEAK_VSF_USBH_XB360_ON_NEW
             vsf_usbh_xb360_on_new(xb360);
-#else
-            WEAK_VSF_USBH_XB360_ON_NEW(xb360);
-#endif
         }
         return xb360;
     }
@@ -182,11 +155,7 @@ static void *vk_usbh_xb360_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
 
 static void vk_usbh_xb360_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
-#ifndef WEAK_VSF_USBH_XB360_ON_FREE
     vsf_usbh_xb360_on_free((vk_usbh_xb360_t *)param);
-#else
-    WEAK_VSF_USBH_XB360_ON_FREE(xb360);
-#endif
     vk_usbh_hid_disconnect((vk_usbh_hid_eda_t *)param);
 }
 

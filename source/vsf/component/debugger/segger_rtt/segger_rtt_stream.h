@@ -26,6 +26,8 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+#if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
+
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
 #   define VSF_DEBUG_STREAM_NEED_POLL
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
@@ -49,6 +51,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
 #endif
 
+#endif      // VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 #ifdef __cplusplus
 }
 #endif

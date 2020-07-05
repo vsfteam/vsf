@@ -25,7 +25,7 @@
 #if     ((VSF_USE_USB_DEVICE == ENABLED) && (VSF_USE_USB_DEVICE_UAC == ENABLED))\
     ||  ((VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_UAC == ENABLED))
 
-#include "utilities/compiler.h"
+#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {

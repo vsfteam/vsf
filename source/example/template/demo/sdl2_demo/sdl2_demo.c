@@ -49,10 +49,12 @@ int main(void)
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Window *win = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    uint16_t block[34 * 34];
 
+#if defined(APP_CFG_SDL2_DEMO_COLOR_RGB565)
     SDL_Texture *texture = SDL_CreateTexture(renderer,
             SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STATIC, 34, 34);
+
+    uint16_t block[34 * 34];
     for (int i = 0; i < sizeof(block) / sizeof(block[0]); i++) {
         block[i] = 0xFFFF;
     }
@@ -63,9 +65,29 @@ int main(void)
             .h = 34,
         }),
         block, sizeof(block[0]) * 34);
+#elif defined(APP_CFG_SDL2_DEMO_COLOR_RGB666)
+    SDL_Texture *texture = SDL_CreateTexture(renderer,
+            SDL_PIXELFORMAT_RGB666, SDL_TEXTUREACCESS_STATIC, 34, 34);
+
+    uint32_t block[34 * 34];
+    for (int i = 0; i < sizeof(block) / sizeof(block[0]); i++) {
+        block[i] = 0x3FFFF;
+    }
+    SDL_UpdateTexture(texture, &((SDL_Rect){
+            .x = 0,
+            .y = 0,
+            .w = 34,
+            .h = 34,
+        }),
+        block, sizeof(block[0]) * 34);
+#endif
 
     uint8_t x = 0, y = 0;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     srand(vsf_systimer_get());
+#else
+    srand(0);
+#endif
     while (1) {
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, NULL, &((SDL_Rect){
@@ -77,8 +99,10 @@ int main(void)
         x += rand();
         y += rand();
         SDL_RenderPresent(renderer);
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         vsf_teda_set_timer_ms(1000);
         vsf_thread_wfe(VSF_EVT_TIMER);
+#endif
     }
 
     SDL_DestroyTexture(texture);

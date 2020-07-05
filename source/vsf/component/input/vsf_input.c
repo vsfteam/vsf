@@ -65,11 +65,7 @@ static vsf_input_t __vsf_input;
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
-    &&  defined(WEAK_VSF_INPUT_ON_EVT)
-WEAK_VSF_INPUT_ON_EVT_EXTERN
-#endif
-
+extern void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
 extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -168,11 +164,7 @@ vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, u
 WEAK(vsf_input_on_sensor)
 void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
-#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vk_input_evt_t);
-#else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vk_input_evt_t);
-#endif
 }
 #endif
 
@@ -180,11 +172,7 @@ void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt)
 WEAK(vsf_input_on_touchscreen)
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
-#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
-#else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
-#endif
 }
 #endif
 
@@ -192,11 +180,7 @@ void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 WEAK(vsf_input_on_gamepad)
 void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
-#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vk_input_evt_t);
-#else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vk_input_evt_t);
-#endif
 }
 #endif
 
@@ -212,11 +196,7 @@ void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
 WEAK(vsf_input_on_keyboard)
 void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt)
 {
-#ifndef WEAK_VSF_INPUT_ON_EVT
     vsf_input_on_evt(VSF_INPUT_TYPE_KEYBOARD, &keyboard_evt->use_as__vk_input_evt_t);
-#else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_KEYBOARD, &keyboard_evt->use_as__vk_input_evt_t);
-#endif
 }
 #endif
 
@@ -253,10 +233,14 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 
 uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp)
 {
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     vk_input_timestamp_t cur = vsf_timer_get_tick();
     uint_fast32_t duration = *timestamp > 0 ? vsf_timer_get_duration(*timestamp, cur) : 0;
     *timestamp = cur;
     return duration;
+#else
+    return 0;
+#endif
 }
 
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED

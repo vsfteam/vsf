@@ -68,7 +68,7 @@ dcl_vsf_peda_methods(static, __vk_fakefat32_dir_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const vk_mal_drv_t VK_FAKEFAT32_MAL_DRV = {
+const vk_mal_drv_t vk_fakefat32_mal_drv = {
     .blksz          = __vk_fakefat32_mal_blksz,
     .buffer         = __vk_fakefat32_mal_buffer,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_init),

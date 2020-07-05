@@ -86,7 +86,7 @@ void vsf_scsi_on_new(vk_scsi_t *scsi)
 {
     if (!__usr_scsi_mounter.is_mounted) {
         __usr_scsi_mounter.scsi = scsi;
-        __usr_scsi_mounter.drv = &VK_SCSI_MAL_DRV;
+        __usr_scsi_mounter.drv = &vk_scsi_mal_drv;
         __usr_scsi_mounter.eda.fn.evthandler = __user_scsi_mounter;
         vsf_eda_init(&__usr_scsi_mounter.eda, vsf_prio_0, false);
     }

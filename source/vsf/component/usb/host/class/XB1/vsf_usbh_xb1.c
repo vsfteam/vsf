@@ -69,25 +69,10 @@ const vk_usbh_class_drv_t vk_usbh_xb1_drv = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_USBH_XB1_ON_REPORT_INPUT_EXTERN)                     \
-    &&  defined(WEAK_VSF_USBH_XB1_ON_REPORT_INPUT)
-WEAK_VSF_USBH_XB1_ON_REPORT_INPUT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT_EXTERN)                      \
-    &&  defined(WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT)
-WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_XB1_ON_NEW_EXTERN)                              \
-    &&  defined(WEAK_VSF_USBH_XB1_ON_NEW)
-WEAK_VSF_USBH_XB1_ON_NEW_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBH_XB1_ON_FREE_EXTERN)                             \
-    &&  defined(WEAK_VSF_USBH_XB1_ON_FREE)
-WEAK_VSF_USBH_XB1_ON_FREE_EXTERN
-#endif
+extern void vsf_usbh_xb1_on_report_input(vk_usbh_xb1_t *xb1, vsf_usb_xb1_gamepad_in_report_t *report);
+extern void vsf_usbh_xb1_on_report_output(vk_usbh_xb1_t *xb1);
+extern void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1);
+extern void vsf_usbh_xb1_on_free(vk_usbh_xb1_t *xb1);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -194,11 +179,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         }
                     } else if ((data[0] == 0x20) && (data[1] == 0x00)) {
                         if (len >= sizeof(vsf_usb_xb1_gamepad_in_report_t)) {
-#ifndef WEAK_VSF_USBH_XB1_ON_REPORT_INPUT
                             vsf_usbh_xb1_on_report_input(xb1, (vsf_usb_xb1_gamepad_in_report_t *)data);
-#else
-                            WEAK_VSF_USBH_XB1_ON_REPORT_INPUT(xb1, (vsf_usb_xb1_gamepad_in_report_t *)data);
-#endif
                         }
                     }
                 }
@@ -208,12 +189,8 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 if (xb1->home_got) {
                     vk_usbh_xb1_ack_home(xb1);
                 } else {
-#ifndef WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT
                     vsf_usbh_xb1_on_report_output(xb1);
-#else
-                    WEAK_VSF_USBH_XB1_ON_REPORT_OUTPUT(xb1);
-#endif
-                    }
+                }
             }
         }
         break;
@@ -231,11 +208,7 @@ static void *vk_usbh_xb1_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_
         vk_usbh_xb1_t *xb1 = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_xb1_t), false);
         if (xb1 != NULL) {
             xb1->user_evthandler = vk_usbh_xb1_evthandler;
-#ifndef WEAK_VSF_USBH_XB1_ON_NEW
             vsf_usbh_xb1_on_new(xb1);
-#else
-            WEAK_VSF_USBH_XB1_ON_NEW(xb1);
-#endif
         }
         return xb1;
     }
@@ -244,11 +217,7 @@ static void *vk_usbh_xb1_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_
 
 static void vk_usbh_xb1_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
-#ifndef WEAK_VSF_USBH_XB1_ON_FREE
     vsf_usbh_xb1_on_free((vk_usbh_xb1_t *)param);
-#else
-    WEAK_VSF_USBH_XB1_ON_FREE(xb1);
-#endif
     vk_usbh_hid_disconnect((vk_usbh_hid_eda_t *)param);
 }
 

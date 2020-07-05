@@ -155,6 +155,8 @@ void freetype_demo_init(void)
                 __ft_font_dir[i].f.buff = NULL;
             }
             fclose(f);
+        } else {
+            printf("fail to load font %s\r\n", path);
         }
     }
 #endif
@@ -178,6 +180,8 @@ void freetype_demo_init(void)
                 __ft_xboot_fonts_dir[i].f.buff = NULL;
             }
             fclose(f);
+        } else {
+            printf("fail to load font %s\r\n", path);
         }
     }
 #endif

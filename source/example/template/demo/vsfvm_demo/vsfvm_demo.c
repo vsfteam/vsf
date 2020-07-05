@@ -144,7 +144,11 @@ int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, ui
     return 0;
 }
 
+#if APP_CFG_USE_LINUX_DEMO == ENABLED
+void vsfvm_user_poll(void)
+#else
 void vsf_plug_in_on_kernel_idle(void)
+#endif
 {
     vsfvm_runtime_t *runtime = &__usrapp_vm.runtime;
     int err;
@@ -152,12 +156,14 @@ void vsf_plug_in_on_kernel_idle(void)
     // 4. poll if thread is pending
     while (__usrapp_vm.is_inited && vsfvm_runtime_is_thread_pending(runtime)) {
         if ((err = vsfvm_runtime_poll(runtime)) < 0) {
-            vsf_trace(VSF_TRACE_ERROR, "vsfvm_runtime_poll failed with %d\n", err);
+            vsf_trace(VSF_TRACE_ERROR, "vsfvm_runtime_poll failed with %d\r\n", err);
             break;
         }
     }
 
+#if APP_CFG_USE_LINUX_DEMO != ENABLED
     vsf_arch_sleep(0);
+#endif
 }
 
 static int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, char *path)
@@ -168,7 +174,7 @@ static int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, char *path)
 
     FILE *fin = fopen(path, "rt");
     if (!fin) {
-        printf("can not open file %s\n", path);
+        printf("can not open file %s\r\n", path);
         return -VSFVM_COMPILER_FAIL_USRLIB;
     }
 
@@ -188,9 +194,9 @@ static int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, char *path)
 
         if (err < 0) {
             err = -err;
-            printf("command line compile error: %s\n",
+            printf("command line compile error: %s\r\n",
                 (err >= VSFVM_ERRCODE_END) ? "unknwon error" : __vsfvm_errcode_str[err]);
-            printf("compile error around line %d column %d\n",
+            printf("compile error around line %d column %d\r\n",
                     compiler->script.lexer.curctx.line + 1, compiler->script.lexer.curctx.col + 1);
             return -err;
         }
@@ -204,11 +210,10 @@ static int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, char *path)
 int vsfvm_main(int argc, char *argv[])
 {
     char *path = NULL, *ext;
-    FILE *f;
     int err;
 
     if (argc != 2) {
-        printf("format: vsfvm FILE\n");
+        printf("format: vsfvm FILE\r\n");
         return -1;
     }
     path = argv[1];
@@ -237,9 +242,9 @@ int vsfvm_main(int argc, char *argv[])
             err = vsfvm_compiler_input(compiler, "\xFF");
             if (err < 0) {
                 err = -err;
-                printf("command line compile error: %s\n",
+                printf("command line compile error: %s\r\n",
                     (err >= VSFVM_ERRCODE_END) ? "unknwon error" : __vsfvm_errcode_str[err]);
-                printf("compile error around line %d column %d\n",
+                printf("compile error around line %d column %d\r\n",
                     compiler->script.lexer.curctx.line + 1, compiler->script.lexer.curctx.col + 1);
             }
         }
@@ -247,26 +252,23 @@ int vsfvm_main(int argc, char *argv[])
 
         if (!err) {
             __usrapp_vm.bytecode_num = compiler->bytecode_pos;
-            printf("objdump:\n");
+            printf("objdump:\r\n");
             vsfvm_objdump(__usrapp_vm.bytecode, __usrapp_vm.bytecode_num);
         }
     } else {
-        printf("%s not supported.\n", path);
+        printf("%s not supported.\r\n", path);
         return -1;
     }
 
     if (!err) {
         // run
-        printf("start runtime\n");
+        printf("start runtime\r\n");
 
         // 3. compile succeed, start runtime
         __usrapp_vm.script.token = &__usrapp_vm.bytecode;
         vsfvm_runtime_init(&__usrapp_vm.runtime);
         vsfvm_runtime_script_init(&__usrapp_vm.runtime, &__usrapp_vm.script);
         __usrapp_vm.is_inited = true;
-        while (1) {
-            sleep(1000);
-        }
     }
 
     return 0;

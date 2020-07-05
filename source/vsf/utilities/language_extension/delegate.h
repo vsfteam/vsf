@@ -20,10 +20,10 @@
 #define __DELEGATE_H__
 
 /*============================ INCLUDES ======================================*/
-#include "..\compiler.h"
+#include "../compiler/compiler.h"
 
 #define __PLOOC_CLASS_USE_BLACK_BOX_TEMPLATE__
-#include "..\ooc_class.h"
+#include "../ooc_class.h"
 
 
 #ifdef __cplusplus

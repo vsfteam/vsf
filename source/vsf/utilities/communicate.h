@@ -46,6 +46,11 @@ typedef struct vsf_mem_t vsf_mem_t;
 struct vsf_mem_t {
     union {
         union {
+            // implement linux-style variable
+            uint8_t *buffer;
+            uint8_t *src;
+            void *obj;
+
             uint8_t *pchBuffer;         //!< stream buffer
             uint8_t *pchSrc;
             void *pObj;
@@ -56,7 +61,11 @@ struct vsf_mem_t {
             void *pObj;
         }PTR;
     };
-    int32_t nSize;                      //!< stream size
+    union {
+        // implement linux-style variable
+        int32_t size;
+        int32_t nSize;                  //!< stream size
+    };
 };
 //! @}
 #endif
