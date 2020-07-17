@@ -115,7 +115,7 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
 {
     vsf_tgui_container_t *ptInnerContainer = ptList->ptList;
     const vsf_tgui_control_t *ptControl =
-        (const vsf_tgui_control_t*)ptInnerContainer->use_as__vsf_msgt_container_t.ptNode;
+        (const vsf_tgui_control_t*)ptInnerContainer->use_as__vsf_msgt_container_t.node_ptr;
     int16_t nXOffset = 0;
     int16_t nYOffset = 0;
 

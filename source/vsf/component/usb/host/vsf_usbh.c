@@ -171,6 +171,11 @@ vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
     return pipe;
 }
 
+uint_fast16_t vk_usbh_get_ep_size_from_pipe(vk_usbh_pipe_t pipe)
+{
+    return pipe.size + (pipe.type == USB_EP_TYPE_ISO ? 1 : 0);
+}
+
 vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
             struct usb_endpoint_desc_t *desc_ep)
 {
@@ -924,7 +929,7 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
     desc_header = (struct usb_descriptor_header_t *)((uint8_t *)desc_header + desc_header->bLength);
 
     parser_alt = NULL;
-    stage = desc_header->bDescriptorType == USB_DT_INTERFACE ? STAGE_ALLOC_ALT : STAGE_NONE;
+    stage = STAGE_ALLOC_ALT;
     ifs_no = 0;
     tmpsize = size;
     header_tmp = desc_header;

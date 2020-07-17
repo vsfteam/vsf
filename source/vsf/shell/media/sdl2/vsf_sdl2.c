@@ -154,7 +154,7 @@ int __vsf_sdl2_init_subsystem(uint32_t flags)
 int __vsf_sdl2_init(uint32_t flags)
 {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    __vsf_sdl2.start_ms = vsf_systimer_tick_to_ms(vsf_timer_get_tick());
+    __vsf_sdl2.start_ms = vsf_systimer_get_ms();
 #endif
     return __vsf_sdl2_init_subsystem(flags);
 }
@@ -362,7 +362,7 @@ void __vsf_sdl2_delay(uint32_t ms)
 }
 uint32_t __vsf_sdl2_get_ticks(void)
 {
-    uint32_t cur_ms = vsf_systimer_tick_to_ms(vsf_timer_get_tick());
+    uint32_t cur_ms = vsf_systimer_get_ms();
     return cur_ms - __vsf_sdl2.start_ms;
 }
 #endif

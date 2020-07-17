@@ -49,14 +49,14 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 
 clock_t clock(void)
 {
-    return vsf_systimer_tick_to_us(vsf_timer_get_tick());
+    return vsf_systimer_get_us();
 }
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
     switch (clk_id) {
     case CLOCK_MONOTONIC: {
-            uint_fast32_t us = vsf_systimer_tick_to_us(vsf_timer_get_tick());
+            uint_fast32_t us = vsf_systimer_get_us();
             tp->tv_sec = us / 1000000;
             tp->tv_nsec = us * 1000;
         }

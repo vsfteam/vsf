@@ -76,9 +76,9 @@ vsf_pbuf_t *vsf_pbuf_pool_alloc(vsf_pbuf_pool_t *pthis)
     return pbuf;
 }                                                                               
                                                                             
-void vsf_pbuf_pool_free(vsf_pbuf_pool_t *pthis, vsf_pbuf_t *ptItem)                 
+void vsf_pbuf_pool_free(vsf_pbuf_pool_t *pthis, vsf_pbuf_t *item_ptr)                 
 {                                                                               
-    vsf_pool_free((vsf_pool_t *)pthis, (uintptr_t)ptItem);                         
+    vsf_pool_free((vsf_pool_t *)pthis, (uintptr_t)item_ptr);                         
 }                                                                               
                                                                             
 SECTION(".text." "vsf_pbuf" "_get_pool_item_count")                                

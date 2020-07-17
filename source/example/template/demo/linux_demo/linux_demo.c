@@ -82,6 +82,10 @@ extern int tgui_main(int argc, char *argv[]);
 extern int audio_play_main(int argc, char *argv[]);
 #endif
 
+#if APP_CFG_USE_BTSTACK_DEMO == ENABLED
+extern int btstack_scan_main(int argc, char *argv[]);
+#endif
+
 #if APP_CFG_USE_USBD_DEMO == ENABLED
 #   if  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
         ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
@@ -209,6 +213,9 @@ int vsf_linux_create_fhs(void)
 #if APP_CFG_USE_AUDIO_DEMO == ENABLED
     busybox_bind("/sbin/play_audio", audio_play_main);
 #endif
+#if APP_CFG_USE_BTSTACK_DEMO == ENABLED
+    busybox_bind("/sbin/btscan", btstack_scan_main);
+#endif
 #if APP_CFG_USE_LINUX_DEMO == ENABLED && APP_CFG_USE_VSFVM_DEMO == ENABLED
     busybox_bind("/sbin/vsfvm", vsfvm_main);
 #endif
@@ -265,12 +272,14 @@ void vsf_plug_in_on_kernel_idle(void)
     vsfvm_user_poll();
 #   endif
     VSF_DEBUG_STREAM_POLL();
+    vsf_driver_poll();
 }
 #elif APP_CFG_USE_VSFVM_DEMO == ENABLED
 void vsf_plug_in_on_kernel_idle(void)
 {
     extern void vsfvm_user_poll(void);
     vsfvm_user_poll();
+    vsf_driver_poll();
 }
 #endif
 

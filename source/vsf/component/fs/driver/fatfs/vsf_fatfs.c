@@ -383,6 +383,8 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         root_entry = le16_to_cpu(dbr->bpb.RootEntCnt);
         if (root_entry) {
             info->root_size = ((root_entry >> 5) + sector_size - 1) / sector_size;
+        } else {
+            info->root_size = 0;
         }
         // calculate base
         info->fat_sector = reserved_size;
@@ -873,7 +875,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
 
                     if (vsf_local.cur_offset != vsf_local.offset) {
                         // read first non-page-aligned data
-                        vsf_local.cur_run_size = vsf_local.offset & ((1 << fsinfo->sector_size_bits) - 1);
+                        vsf_local.cur_run_size = vsf_local.size & ((1 << fsinfo->sector_size_bits) - 1);
                         vsf_local.cur_run_sector = 1;
                         buffer = NULL;
                     } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
@@ -906,7 +908,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
 
                 if (vsf_local.cur_offset != vsf_local.offset) {
                     uint8_t *src = result.buffer;
-                    src += (1 << fsinfo->sector_size_bits) - vsf_local.cur_run_size;
+                    src += vsf_local.offset - vsf_local.cur_offset;
                     memcpy(vsf_local.buff, src, vsf_local.cur_run_size);
                     vsf_local.cur_offset += vsf_local.cur_run_size;
                 } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
@@ -914,6 +916,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                     memcpy(dst, result.buffer, vsf_local.cur_run_size);
                 }
                 vsf_local.cur_size += vsf_local.cur_run_size;
+                vsf_local.offset += vsf_local.cur_run_size;
                 vsf_local.size -= vsf_local.cur_run_size;
 
                 // get next cluster if necessary

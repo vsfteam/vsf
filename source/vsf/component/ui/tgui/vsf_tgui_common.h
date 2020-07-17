@@ -101,7 +101,7 @@
 #   endif
 
 #   define tgui_handler(...)                                                    \
-                __tgui_attribute(tMessageHandler,       {__VA_ARGS__})
+                __tgui_attribute(msg_handler,       {__VA_ARGS__})
 #   define tgui_container_type(__TYPE)                                          \
                 tgui_attribute(u5Type, (__TYPE))
 
@@ -326,7 +326,7 @@ typedef struct vsf_tgui_tile_core_t {
         uint8_t         u3ColorSize         : 3;    /* 0: 1bit, 2: 4bit, 3: 8bit 4: 16bit, 5: 32bit, 6: 24bit */
         uint8_t         bIsRootTile         : 1;    /* 0: Child Tile, u3ColorSize and u4RootTileType have no meaning 
                                                        1: Root Tile, u3ColorSize and u4RootTileType have meaning*/
-    } tAttribute;
+    } Attribute;
 } vsf_tgui_tile_core_t;
 
 typedef struct vsf_tgui_tile_idx_root_t {
@@ -365,7 +365,7 @@ typedef struct vsf_tgui_tile_child_t {
 #endif
 
     implement_ex(vsf_tgui_size_t, tSize)            /* the size of the tile */
-    vsf_tgui_tile_core_t    *ptParent;              /* points to the parent */
+    vsf_tgui_tile_core_t    *parent_ptr;              /* points to the parent */
 } vsf_tgui_tile_child_t;
 
 typedef union vsf_tgui_tile_t {

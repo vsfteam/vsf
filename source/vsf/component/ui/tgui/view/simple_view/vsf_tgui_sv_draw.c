@@ -106,11 +106,11 @@ uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* pt
     VSF_TGUI_ASSERT(ptControl != NULL);
 
 	if (vsf_tgui_control_is_container(ptControl)) {
-		const vsf_msgt_node_t* ptNode = &ptControl->use_as__vsf_msgt_node_t;
-		const vsf_tgui_container_t* ptContainer = (const vsf_tgui_container_t*)ptNode;
+		const vsf_msgt_node_t* node_ptr = &ptControl->use_as__vsf_msgt_node_t;
+		const vsf_tgui_container_t* container_ptr = (const vsf_tgui_container_t*)node_ptr;
 
-        bIsTileTransparency = ptContainer->use_as__vsf_tgui_v_container_t.bIsTileTransparency;
-        chTileTransparencyRate = ptContainer->use_as__vsf_tgui_v_container_t.chTileTransparencyRate;
+        bIsTileTransparency = container_ptr->use_as__vsf_tgui_v_container_t.bIsTileTransparency;
+        chTileTransparencyRate = container_ptr->use_as__vsf_tgui_v_container_t.chTileTransparencyRate;
     } else {
         bIsTileTransparency = ptControl->use_as__vsf_tgui_v_control_t.bIsTileTransparency;
         chTileTransparencyRate = ptControl->use_as__vsf_tgui_v_control_t.chTileTransparencyRate;
@@ -136,11 +136,11 @@ void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* ptControl, uint_
     }
 
 	if (vsf_tgui_control_is_container(ptControl)) {
-		const vsf_msgt_node_t* ptNode = &ptControl->use_as__vsf_msgt_node_t;
-		vsf_tgui_container_t* ptContainer = (vsf_tgui_container_t *)ptNode;
+		const vsf_msgt_node_t* node_ptr = &ptControl->use_as__vsf_msgt_node_t;
+		vsf_tgui_container_t* container_ptr = (vsf_tgui_container_t *)node_ptr;
 
-        ptContainer->use_as__vsf_tgui_v_container_t.bIsTileTransparency = bIsTileTransparency;
-        ptContainer->use_as__vsf_tgui_v_container_t.chTileTransparencyRate = chTileTransparencyRate;
+        container_ptr->use_as__vsf_tgui_v_container_t.bIsTileTransparency = bIsTileTransparency;
+        container_ptr->use_as__vsf_tgui_v_container_t.chTileTransparencyRate = chTileTransparencyRate;
     } else {
         ptControl->use_as__vsf_tgui_v_control_t.bIsTileTransparency = bIsTileTransparency;
         ptControl->use_as__vsf_tgui_v_control_t.chTileTransparencyRate = chTileTransparencyRate;
@@ -169,7 +169,7 @@ void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* ptControl,
 #if (VSF_TGUI_SV_CFG_DRAW_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw rect(0x%x) in (x:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
-            ptControl->use_as__vsf_msgt_node_t.pchNodeName, tColor.tColor.wValue, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
+            ptControl->use_as__vsf_msgt_node_t.node_name_ptr, tColor.tColor.wValue, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
 #endif
 
         vsf_tgui_sv_port_draw_rect(&tRealLocation, &tResourceRegion.tSize, tTmpColor);
@@ -197,7 +197,7 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* ptControl,
 #if (VSF_TGUI_SV_CFG_DRAW_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw tile(0x%p) in (x:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
-            ptControl->use_as__vsf_msgt_node_t.pchNodeName, ptTile, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
+            ptControl->use_as__vsf_msgt_node_t.node_name_ptr, ptTile, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
 #endif
 
         chTileTransparencyRate = vsf_tgui_control_v_get_tile_trans_rate(ptControl);
@@ -355,7 +355,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
                     "[Simple View]%s draw text(%s) in "
                         "(x:%d, y:%d), size(w:%d, h:%d)"
                         VSF_TRACE_CFG_LINEEND,
-                    ptControl->use_as__vsf_msgt_node_t.pchNodeName,
+                    ptControl->use_as__vsf_msgt_node_t.node_name_ptr,
                     ptString->pstrText,
                     tRealLocation.iX,
                     tRealLocation.iY,

@@ -377,7 +377,7 @@ void task_yield(void)
 ktime_t ktime_get(void)
 {
     ktime_t ktime = {
-        .tv64 = vsf_systimer_tick_to_us(vsf_systimer_get()) * 1000,
+        .tv64 = vsf_systimer_get_us() * 1000,
     };
     return ktime;
 }

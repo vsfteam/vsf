@@ -98,7 +98,7 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
 
     const vsf_tgui_tile_buf_root_t* ptBufTile = &ptTile->tBufRoot;
     const vsf_tgui_tile_core_t* ptCoreTile = &ptBufTile->use_as__vsf_tgui_tile_core_t;
-    uint32_t wSize = (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) ? 4 : 3;
+    uint32_t wSize = (ptCoreTile->Attribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) ? 4 : 3;
 
     vsf_tgui_region_t tDisplay;
     tDisplay.tLocation = *ptLocation;
@@ -120,12 +120,12 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
             tTileColor.tChannel.chG = *pchData++;
             tTileColor.tChannel.chB = *pchData++;
 
-            if (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) {
+            if (ptCoreTile->Attribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) {
                 tTileColor.tChannel.chA = *pchData++;
                 vsf_tgui_color_t tPixelColor = vsf_tgui_get_pixel(&tPixelLocation);
                 tPixelColor = vsf_tgui_color_mix(tTileColor, tPixelColor, tTileColor.tChannel.chA);
                 vsf_tgui_set_pixel(&tPixelLocation, tPixelColor);
-            } else if (ptCoreTile->tAttribute.u3ColorSize == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE) {
+            } else if (ptCoreTile->Attribute.u3ColorSize == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE) {
                 tTileColor.tChannel.chA = 0xFF;
                 vsf_tgui_set_pixel(&tPixelLocation, tTileColor);
             }
@@ -154,7 +154,7 @@ void vsf_tgui_draw_char(vsf_tgui_location_t* ptLocation, vsf_tgui_location_t* pt
 const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     .tTopLeft = {
         .tChild = {
-            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t *)&bg1_RGB,
             .tSize = {.iWidth = 12, .iHeight = 12, },
             .tLocation = {.iX = 0, .iY = 0},
         },
@@ -162,21 +162,21 @@ const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     .tTopRight = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t *)&bg1_RGB,
             .tLocation = {.iX = 200 - 12, .iY = 0},
         },
     },
     .tBottomLeft = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t *)&bg1_RGB,
             .tLocation = {.iX = 0, .iY = 200 - 12},
         },
     },
     .tBottomRight = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t *)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t *)&bg1_RGB,
             .tLocation = {.iX = 200-12, .iY = 200-12},
         },
     },
@@ -186,14 +186,14 @@ const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
     .tLeft = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 32, },
-            .ptParent = (vsf_tgui_tile_core_t *)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t *)&bg3_RGB,
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
     .tRight = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 32, },
-            .ptParent = (vsf_tgui_tile_core_t *)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t *)&bg3_RGB,
             .tLocation = {.iX = 16, .iY = 0},
         },
     },

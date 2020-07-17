@@ -58,34 +58,34 @@ extern const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles;
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* ptContainer)
+fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* container_ptr)
 {
 #if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) container init" VSF_TRACE_CFG_LINEEND,
-        vsf_tgui_control_get_node_name((vsf_tgui_control_t *)ptContainer), ptContainer);
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t *)container_ptr), container_ptr);
 #endif
     return fsm_rt_cpl;
 }
 
 
-fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* ptContainer,
+fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
                                         vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t tMode,
                                         vsf_tgui_sv_color_t tBackground)
 {
     //fsm_rt_t tResult = fsm_rt_cpl;
 
-    VSF_TGUI_ASSERT(ptContainer != NULL);
+    VSF_TGUI_ASSERT(container_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-    if (!ptContainer->use_as__vsf_tgui_v_container_t.bIsNoBackgroundColor) {
-        vsf_tgui_control_t* ptControl = (vsf_tgui_control_t*)ptContainer;
+    if (!container_ptr->use_as__vsf_tgui_v_container_t.bIsNoBackgroundColor) {
+        vsf_tgui_control_t* ptControl = (vsf_tgui_control_t*)container_ptr;
         vsf_tgui_sv_color_t tColor = tBackground;
         vsf_tgui_region_t tRegion = { 0 };
 
         tRegion.tSize = *vsf_tgui_control_get_size(ptControl);
 #if VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES == ENABLED
-        if (ptContainer->use_as__vsf_tgui_v_container_t.bIsShowCornerTile) {
+        if (container_ptr->use_as__vsf_tgui_v_container_t.bIsShowCornerTile) {
 			vsf_tgui_tile_t* ptTile;
 			vsf_tgui_region_t tTopLeftRegion;
 			vsf_tgui_region_t tTopRightRegion;
@@ -152,58 +152,58 @@ fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* ptContainer,
     }
 
 #if VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES == ENABLED
-    if (ptContainer->use_as__vsf_tgui_v_container_t.bIsShowCornerTile) {
-        uint_fast8_t tRate = vsf_tgui_control_v_get_tile_trans_rate((const vsf_tgui_control_t *)ptContainer);
+    if (container_ptr->use_as__vsf_tgui_v_container_t.bIsShowCornerTile) {
+        uint_fast8_t tRate = vsf_tgui_control_v_get_tile_trans_rate((const vsf_tgui_control_t *)container_ptr);
         uint_fast8_t tBackGroundRate = vsf_tgui_sv_color_get_trans_rate(tBackground);
 
-        vsf_tgui_control_v_set_tile_trans_rate((vsf_tgui_control_t *)ptContainer, tBackGroundRate);
+        vsf_tgui_control_v_set_tile_trans_rate((vsf_tgui_control_t *)container_ptr, tBackGroundRate);
 
         for (int i = 0; i < dimof(s_tTilesAlign); i++) {
-            vsf_tgui_control_v_draw_tile(   (vsf_tgui_control_t*)ptContainer,
+            vsf_tgui_control_v_draw_tile(   (vsf_tgui_control_t*)container_ptr,
                                             ptDirtyRegion,
                                             &g_tContainerCornerTiles.tTiles[i],
                                             s_tTilesAlign[i]);
         }
 
-        vsf_tgui_control_v_set_tile_trans_rate((vsf_tgui_control_t *)ptContainer, tRate);
+        vsf_tgui_control_v_set_tile_trans_rate((vsf_tgui_control_t *)container_ptr, tRate);
     }
 #endif
 
-    return vsf_tgui_control_v_rendering((vsf_tgui_control_t *)ptContainer, ptDirtyRegion, tMode);
+    return vsf_tgui_control_v_rendering((vsf_tgui_control_t *)container_ptr, ptDirtyRegion, tMode);
 }
 
 
-fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* ptContainer,
+fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
                                         vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t tMode)
 {
     //fsm_rt_t tResult = fsm_rt_cpl;
 
-    VSF_TGUI_ASSERT(ptContainer != NULL);
+    VSF_TGUI_ASSERT(container_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
 #if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) container rendering" VSF_TRACE_CFG_LINEEND,
-        vsf_tgui_control_get_node_name((vsf_tgui_control_t *)ptContainer), ptContainer);
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t *)container_ptr), container_ptr);
 #endif
 
-    return __vk_tgui_container_v_rendering(ptContainer, ptDirtyRegion, tMode, VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR);
+    return __vk_tgui_container_v_rendering(container_ptr, ptDirtyRegion, tMode, VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR);
 }
 
-fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_container_t* ptContainer,
+fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_container_t* container_ptr,
                                             vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
                                             vsf_tgui_control_refresh_mode_t tMode)
 {
     return fsm_rt_cpl;
 } 
 
-fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* ptContainer)
+fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* container_ptr)
 {
     return fsm_rt_cpl;
 }
 
 
-fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_container_t* ptContainer)
+fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_container_t* container_ptr)
 {
     return fsm_rt_cpl;
 }

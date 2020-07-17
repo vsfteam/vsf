@@ -11,7 +11,7 @@ ret_t platform_disaptch_input(main_loop_t *l) {
 }
 
 uint64_t get_time_ms64(void) {
-  return (uint64_t)vsf_systimer_tick_to_ms(vsf_timer_get_tick());
+  return (uint64_t)vsf_systimer_get_ms();
 }
 
 void sleep_ms(uint32_t ms) {

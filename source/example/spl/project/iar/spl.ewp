@@ -684,7 +684,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild></postbuild>
+                <postbuild>$PROJ_DIR$\target\f1c100s\binary\post-build.bat $EXE_DIR$\spl.bin</postbuild>
             </data>
         </settings>
         <settings>

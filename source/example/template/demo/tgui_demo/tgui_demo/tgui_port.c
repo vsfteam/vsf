@@ -88,10 +88,10 @@ vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTil
     VSF_TGUI_ASSERT(ptTile != NULL);
 
     uint8_t chIndex = ptTile->tIndexRoot.chIndex;
-    if (ptTile->_.tCore.tAttribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
+    if (ptTile->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
         VSF_TGUI_ASSERT(chIndex < dimof(gIdxRootRGBTileSizes));
         return gIdxRootRGBTileSizes[chIndex];
-    } else if (ptTile->_.tCore.tAttribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
+    } else if (ptTile->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
         VSF_TGUI_ASSERT(chIndex < dimof(gIdxRootRGBATileSizes));
         return gIdxRootRGBATileSizes[chIndex];
     } 
@@ -104,14 +104,14 @@ static char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* ptTile)
 {
     VSF_TGUI_ASSERT(ptTile != NULL);
 
-    if (ptTile->_.tCore.tAttribute.u2RootTileType == 0) {     // buf tile
+    if (ptTile->_.tCore.Attribute.u2RootTileType == 0) {     // buf tile
         return ptTile->tBufRoot.ptBitmap;
     } else {                                                // index tile
         uint8_t chIndex = ptTile->tIndexRoot.chIndex;
-        if (ptTile->_.tCore.tAttribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
+        if (ptTile->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
             VSF_TGUI_ASSERT(chIndex < dimof(rgb_pixmap_array));
             return (char *)rgb_pixmap_array[chIndex];
-        } else if (ptTile->_.tCore.tAttribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
+        } else if (ptTile->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
             VSF_TGUI_ASSERT(chIndex < dimof(rgba_pixmap_array));
             return (char *)rgba_pixmap_array[chIndex];
         } else {
@@ -291,9 +291,9 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
         return;
     }
 
-    if (ptTile->_.tCore.tAttribute.u3ColorSize == VSF_TGUI_COLORSIZE_32IT) {
+    if (ptTile->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_32IT) {
         wSize = 4;
-    } else if (ptTile->_.tCore.tAttribute.u3ColorSize == VSF_TGUI_COLORSIZE_24IT) {
+    } else if (ptTile->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_24IT) {
         wSize = 3;
     } else {
         VSF_TGUI_ASSERT(0);
@@ -310,7 +310,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
             vsf_tgui_color_t tPixelColor;
             vsf_tgui_sv_color_t tSVColor;
 
-            vsf_tgui_sdl_tile_get_pixel(pchData, &tSVColor, ptTile->_.tCore.tAttribute.u2ColorType);
+            vsf_tgui_sdl_tile_get_pixel(pchData, &tSVColor, ptTile->_.tCore.Attribute.u2ColorType);
             pchData += wSize;
             tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
             tSVColor.tColor = vsf_tgui_color_mix(tSVColor.tColor, tPixelColor, ((uint16_t)tSVColor.tColor.tChannel.chA * chTransparencyRate) / 255);

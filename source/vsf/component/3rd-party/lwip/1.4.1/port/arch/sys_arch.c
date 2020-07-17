@@ -72,7 +72,7 @@ void sys_arch_unprotect(sys_prot_t pval)
 #if NO_SYS
 u32_t sys_now(void)
 {
-    return vsf_systimer_tick_to_ms(vsf_timer_get_tick());
+    return vsf_systimer_get_ms();
 }
 #else
 
@@ -155,10 +155,10 @@ void sys_sem_signal(sys_sem_t *sem)
 
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
 {
-    vsf_timer_tick_t pre = vsf_timer_get_tick();
+    vsf_timer_tick_t pre = vsf_systimer_get_tick();
     vsf_sync_reason_t reason = vsf_thread_sem_pend(sem, vsf_systimer_ms_to_tick(timeout));
     if (VSF_SYNC_GET == reason) {
-        pre = vsf_timer_get_tick() - pre;
+        pre = vsf_systimer_get_tick() - pre;
         return vsf_systimer_tick_to_ms(pre);
     } else {
         return SYS_ARCH_TIMEOUT;
@@ -288,7 +288,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 {
-    vsf_timer_tick_t start = vsf_timer_get_tick();
+    vsf_timer_tick_t start = vsf_systimer_get_tick();
     u32_t duration;
     vsf_sync_reason_t reason;
 
@@ -303,7 +303,7 @@ u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
     if (reason != VSF_SYNC_GET) {
         duration = SYS_ARCH_TIMEOUT;
     } else {
-        duration = vsf_systimer_tick_to_ms(vsf_timer_get_tick() - start);
+        duration = vsf_systimer_tick_to_ms(vsf_systimer_get_tick() - start);
     }
     return duration;
 }

@@ -40,6 +40,10 @@ const usrapp_usbh_common_const_t usrapp_usbh_common_const = {
     .winusb_hcd_param   = {
         .priority       = APP_CFG_USBH_HW_PRIO,
     },
+#else
+    .hcd_param          = {
+        .priority       = APP_CFG_USBH_HW_PRIO,
+    },
 #endif
 };
 
@@ -53,6 +57,9 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
     .host.drv           = &vk_winusb_hcd_drv,
     .host.param         = (void*)&usrapp_usbh_common_const.winusb_hcd_param,
+#else
+    .host.drv           = &vsf_usb_hcd_drv,
+    .host.param         = (void*)&usrapp_usbh_common_const.hcd_param,
 #endif
 
 #if VSF_USE_USB_HOST_HUB == ENABLED

@@ -33,7 +33,7 @@
 const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     .tTopLeft = {
         .tChild = {
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tSize = {.iWidth = 12, .iHeight = 12, },
             .tLocation = {.iX = 0, .iY = 0},
         },
@@ -41,21 +41,21 @@ const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     .tTopRight = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.iX = 200 - 12, .iY = 0},
         },
     },
     .tBottomLeft = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.iX = 0, .iY = 200 - 12},
         },
     },
     .tBottomRight = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg1_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.iX = 200 - 12, .iY = 200 - 12},
         },
     },
@@ -65,14 +65,14 @@ const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
     .tLeft = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 32, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
     .tRight = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 32, },
-            .ptParent = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.iX = 16, .iY = 0},
         },
     },

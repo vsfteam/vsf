@@ -16,8 +16,18 @@
  ****************************************************************************/
  
     NAME    entry
-    EXTERN  __iar_program_start
-    PUBLIC  _entry
+
+    SECTION FIQ_STACK:DATA:NOROOT(3)
+    SECTION IRQ_STACK:DATA:NOROOT(3)
+    SECTION SVC_STACK:DATA:NOROOT(3)
+    SECTION ABT_STACK:DATA:NOROOT(3)
+    SECTION UND_STACK:DATA:NOROOT(3)
+
+    EXTERN  SWI_Handler
+    EXTERN  IRQ_Handler
+    EXTERN  FIQ_Handler
+    EXTERN  _entry
+    PUBLIC  _vector
 
 save_regs       macro   
                 local   b_10f, b_11f
@@ -73,29 +83,11 @@ b_21:           ldm     r12, {r0 - r15}^
                 mov     r0, r0
                 endm
 
-
     SECTION .intvec:CODE:ROOT(2)
-
-    DATA
-    // image_head_t
-    // uint32_t magic;
-    DCD     0x474D495F
-    // uint32_t flags;
-    DCD     0
-    // uint32_t compressed_start;
-    DCD     0
-    // uint32_t compressed_size;
-    DCD     0
-    // uint32_t original_size;
-    // TODO: fix to image size
-    DCD     8 * 1024
-    // uint32_t link_address;
-    DCD     0x80000000
-
     CODE32
 _vector:
     // uint32_t jmp_instruction;
-    b       _entry
+    ldr     pc, _reset_handler
     ldr     pc, _undefined_instruction
     ldr     pc, _software_interrupt
     ldr     pc, _prefetch_abort
@@ -105,6 +97,8 @@ _vector:
     ldr     pc, _fiq
 
     DATA32
+_reset_handler
+    DCD     reset_handler
 _undefined_instruction:
     DCD     undefined_instruction
 _software_interrupt:
@@ -120,48 +114,71 @@ _irq:
 _fiq:
     DCD     fiq
 
+    ARM
+
+reset_handler:
+; --------------------
+; Mode, correspords to bits 0-5 in CPSR
+
+#define MODE_MSK 0x1F            ; Bit mask for mode bits in CPSR
+
+#define USR_MODE 0x10            ; User mode
+#define FIQ_MODE 0x11            ; Fast Interrupt Request mode
+#define IRQ_MODE 0x12            ; Interrupt Request mode
+#define SVC_MODE 0x13            ; Supervisor mode
+#define ABT_MODE 0x17            ; Abort mode
+#define UND_MODE 0x1B            ; Undefined Instruction mode
+#define SYS_MODE 0x1F            ; System mode
+
+
+    MRS     r0, cpsr                ; Original PSR value
+
+    ;; Set up the svc stack pointer.
+    BIC     r0, r0, #MODE_MSK       ; Clear the mode bits
+    ORR     r0, r0, #SVC_MODE       ; Set IRQ mode bits
+    MSR     cpsr_c, r0              ; Change the mode
+    ldr     r1, =sfe(SVC_STACK)     ; End of SVC_STACK
+    BIC     sp,r1,#0x7              ; Make sure SP is 8 aligned
+
+    ;; Set up the abort stack pointer.
+    BIC     r0, r0, #MODE_MSK       ; Clear the mode bits
+    ORR     r0, r0, #ABT_MODE       ; Set IRQ mode bits
+    MSR     cpsr_c, r0              ; Change the mode
+    ldr     r1, =sfe(ABT_STACK)     ; End of ABT_STACK
+    BIC     sp,r1,#0x7              ; Make sure SP is 8 aligned
+
+    ;; Set up the undefined instruction stack pointer.
+    BIC     r0, r0, #MODE_MSK       ; Clear the mode bits
+    ORR     r0, r0, #UND_MODE       ; Set IRQ mode bits
+    MSR     cpsr_c, r0              ; Change the mode
+    ldr     r1, =sfe(UND_STACK)     ; End of UND_STACK
+    BIC     sp,r1,#0x7              ; Make sure SP is 8 aligned
+
+    b       _entry
+
 //  TODO: .align 5 for all vector entries
 undefined_instruction:
-    sub     lr, lr, #4
-    save_regs
-//    bl      UndefindInstruction_Handler
-    restore_regs
+prefetch_abort:
+data_abort:
+not_used:
+    b .
 
 software_interrupt:
     sub     lr, lr, #4
     save_regs
-//    bl      SWI_Handler
+    bl      SWI_Handler
     restore_regs
-
-prefetch_abort:
-    sub     lr, lr, #4
-    save_regs
-//    bl      PrefetchAbort_Handler
-    restore_regs
-
-data_abort:
-    sub     lr, lr, #8
-    save_regs
-//    bl      DataAbort_Handler
-    restore_regs
-
-not_used:
-    b .
 
 irq:
     sub     lr, lr, #4
     save_regs
-//    bl      IRQ_Handler
+    bl      IRQ_Handler
     restore_regs
 
 fiq:
     sub     lr, lr, #4
     save_regs
-//    bl      FIQ_Handler
+    bl      FIQ_Handler
     restore_regs
-
-_entry:
-    // TODO: setup vector, SP, etc
-    b       __iar_program_start
 
     END

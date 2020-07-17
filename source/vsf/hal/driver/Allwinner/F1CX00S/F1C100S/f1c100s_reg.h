@@ -700,6 +700,14 @@
 #   define TMR2_CTRL                                0x030
 #   define TMR2_INTV_VALUE                          0x034
 #   define TMR2_CUR_VALUE                           0x038
+#       define TMR_CTRL_MODE                        (1UL << 7)
+#       define TMR_CTRL_MODE_CONTINUOUS             (0UL << 7)
+#       define TMR_CTRL_MODE_SINGLE                 (1UL << 7)
+#       define TMR_CTRL_CLK_SRC                     (3UL << 2)
+#       define TMR_CTRL_CLK_SRC_LOSC                (0UL << 2)
+#       define TMR_CTRL_CLK_SRC_OSC24M              (1UL << 2)
+#       define TMR_CTRL_RELOAD                      (1UL << 1)
+#       define TMR_CTRL_EN                          (1UL << 0)
 #   define AVS_CNT_CTL                              0x080
 #   define AVS_CNT0                                 0x084
 #   define AVS_CNT1                                 0x088
@@ -715,9 +723,9 @@
 //  use naming spec form musbmhdrc document
 #   define MUSB_FAddr                               0x0098
 #   define MUSB_Power                               0x0040
-#       define MUSB_Power_ISOUpdate                 (1UL << 7)
-#       define MUSB_Power_SoftConn                  (1UL << 6)
-#       define MUSB_Power_HSEnab                    (1UL << 5)
+#       define MUSBD_Power_ISOUpdate                (1UL << 7)
+#       define MUSBD_Power_SoftConn                 (1UL << 6)
+#       define MUSBD_Power_HSEnab                   (1UL << 5)
 #       define MUSB_Power_HSMode                    (1UL << 4)
 #       define MUSB_Power_Reset                     (1UL << 3)
 #       define MUSB_Power_Resume                    (1UL << 2)
@@ -728,25 +736,25 @@
 #   define MUSB_IntrTxE                             0x0048
 #   define MUSB_IntrRxE                             0x004a
 #   define MUSB_IntrUSB                             0x004c
-#       define MUSB_IntrUSB_VBusError               (1UL << 7)
+#       define MUSBD_IntrUSB_VBusError              (1UL << 7)
 #       define MUSB_IntrUSB_SessReq                 (1UL << 6)
 #       define MUSB_IntrUSB_Discon                  (1UL << 5)
-#       define MUSB_IntrUSB_Conn                    (1UL << 4)
+#       define MUSBH_IntrUSB_Conn                   (1UL << 4)
 #       define MUSB_IntrUSB_SOF                     (1UL << 3)
-#       define MUSB_IntrUSB_Reset                   (1UL << 2)
-#       define MUSB_IntrUSB_Babble                  (1UL << 2)
+#       define MUSBD_IntrUSB_Reset                  (1UL << 2)
+#       define MUSBH_IntrUSB_Babble                 (1UL << 2)
 #       define MUSB_IntrUSB_Resume                  (1UL << 1)
-#       define MUSB_IntrUSB_Suspend                 (1UL << 0)
+#       define MUSBD_IntrUSB_Suspend                (1UL << 0)
 #   define MUSB_IntrUSBE                            0x0050
-#       define MUSB_IntrUSBE_VBusError              (1UL << 7)
+#       define MUSBD_IntrUSBE_VBusError             (1UL << 7)
 #       define MUSB_IntrUSBE_SessReq                (1UL << 6)
 #       define MUSB_IntrUSBE_Discon                 (1UL << 5)
-#       define MUSB_IntrUSBE_Conn                   (1UL << 4)
+#       define MUSBH_IntrUSBE_Conn                  (1UL << 4)
 #       define MUSB_IntrUSBE_SOF                    (1UL << 3)
-#       define MUSB_IntrUSBE_Reset                  (1UL << 2)
-#       define MUSB_IntrUSBE_Babble                 (1UL << 2)
+#       define MUSBD_IntrUSBE_Reset                 (1UL << 2)
+#       define MUSBH_IntrUSBE_Babble                (1UL << 2)
 #       define MUSB_IntrUSBE_Resume                 (1UL << 1)
-#       define MUSB_IntrUSBE_Suspend                (1UL << 0)
+#       define MUSBD_IntrUSBE_Suspend               (1UL << 0)
 #   define MUSB_Frame                               0x0054
 #   define MUSB_Index                               0x0042
 #   define MUSB_Testmode                            0x007c
@@ -762,6 +770,19 @@
 #       define MUSBD_CSR0_SentStall                 (1UL << 2)
 #       define MUSBD_CSR0_TxPktRdy                  (1UL << 1)
 #       define MUSBD_CSR0_RxPktRdy                  (1UL << 0)
+
+#       define MUSBH_CSR0_DisPing                   (1UL << 11)
+#       define MUSBH_CSR0_DataToggleWrEnable        (1UL << 10)
+#       define MUSBH_CSR0_DataToggle                (1UL << 9)
+#       define MUSBH_CSR0_FlushFIFO                 (1UL << 8)
+#       define MUSBH_CSR0_NAKTimeout                (1UL << 7)
+#       define MUSBH_CSR0_StatusPkt                 (1UL << 6)
+#       define MUSBH_CSR0_ReqPkt                    (1UL << 5)
+#       define MUSBH_CSR0_Error                     (1UL << 4)
+#       define MUSBH_CSR0_SetupPkt                  (1UL << 3)
+#       define MUSBH_CSR0_RxStall                   (1UL << 2)
+#       define MUSBH_CSR0_TxPktRdy                  (1UL << 1)
+#       define MUSBH_CSR0_RxPktRdy                  (1UL << 0)
 #   define MUSB_TxCSR                               0x0082
 #       define MUSBD_TxCSRL_IncompTx                (1UL << 7)
 #       define MUSBD_TxCSRL_ClrDataTog              (1UL << 6)
@@ -780,6 +801,25 @@
 #       define MUSBD_TxCSRH_DMAReqEnab              (1UL << 4)
 #       define MUSBD_TxCSRH_FrcDataTog              (1UL << 3)
 #       define MUSBD_TxCSRH_DMAReqMode              (1UL << 2)
+
+#       define MUSBH_TxCSRL_NAKTimeout              (1UL << 7)
+#       define MUSBH_TxCSRL_IncomTx                 (1UL << 7)
+#       define MUSBH_TxCSRL_ClrDataTog              (1UL << 6)
+#       define MUSBH_TxCSRL_RxStall                 (1UL << 5)
+#       define MUSBH_TxCSRL_SetupPkt                (1UL << 4)
+#       define MUSBH_TxCSRL_FlushFIFO               (1UL << 3)
+#       define MUSBH_TxCSRL_Error                   (1UL << 2)
+#       define MUSBH_TxCSRL_FIFONotEmpty            (1UL << 1)
+#       define MUSBH_TxCSRL_TxPktRdy                (1UL << 0)
+#       define MUSBH_TxCSRH_AutoSet                 (1UL << 7)
+#       define MUSBH_TxCSRH_Mode                    (1UL << 6)
+#       define MUSBH_TxCSRH_Mode_Tx                 (1UL << 5)
+#       define MUSBH_TxCSRH_Mode_Rx                 (0UL << 5)
+#       define MUSBH_TxCSRH_DMAReqEnab              (1UL << 4)
+#       define MUSBH_TxCSRH_FrcDataTog              (1UL << 3)
+#       define MUSBH_TxCSRH_DMAReqMode              (1UL << 2)
+#       define MUSBH_TxCSRH_DataToggleWrEnable      (1UL << 1)
+#       define MUSBH_TxCSRH_DataToggle              (1UL << 0)
 #   define MUSB_RxMaxP                              0x0084
 #   define MUSB_RxCSR                               0x0086
 #       define MUSBD_RxCSRL_ClrDataTog              (1UL << 7)
@@ -797,6 +837,24 @@
 #       define MUSBD_RxCSRH_PIDError                (1UL << 4)
 #       define MUSBD_RxCSRH_DMAReqMode              (1UL << 3)
 #       define MUSBD_RxCSRH_IncompRx                (1UL << 0)
+
+#       define MUSBH_RxCSRL_ClrDataTog              (1UL << 7)
+#       define MUSBH_RxCSRL_RxStall                 (1UL << 6)
+#       define MUSBH_RxCSRL_ReqPkt                  (1UL << 5)
+#       define MUSBH_RxCSRL_FlushFIFO               (1UL << 4)
+#       define MUSBH_RxCSRL_DataError               (1UL << 3)
+#       define MUSBH_RxCSRL_NAKTimeout              (1UL << 3)
+#       define MUSBH_RxCSRL_Error                   (1UL << 2)
+#       define MUSBH_RxCSRL_FIFOFull                (1UL << 1)
+#       define MUSBH_RxCSRL_RxPktRdy                (1UL << 0)
+#       define MUSBH_RxCSRH_AutoClear               (1UL << 7)
+#       define MUSBH_RxCSRH_AutoReq                 (1UL << 6)
+#       define MUSBH_RxCSRH_DMAReqEnab              (1UL << 5)
+#       define MUSBH_RxCSRH_PIDError                (1UL << 4)
+#       define MUSBH_RxCSRH_DMAReqMode              (1UL << 3)
+#       define MUSBH_RxCSRH_DataToggleWrEnable      (1UL << 2)
+#       define MUSBH_RxCSRH_DataToggle              (1UL << 1)
+#       define MUSBH_RxCSRH_IncompRx                (1UL << 0)
 #   define MUSB_Count0                              0x0088
 #   define MUSB_RxCount                             0x0088
 #   define MUSB_Type0                               0x008c
@@ -815,6 +873,10 @@
 #   define MUSB_FIFO5                               0x0014
 
 #   define MUSB_DevCtl                              0x0041
+#       define MUSB_DevCtl_FSDev                    (1UL << 6)
+#       define MUSB_DevCtl_LSDev                    (1UL << 5)
+#       define MUSB_DevCtl_HostMode                 (1UL << 2)
+#       define MUSB_DevCtl_Session                  (1UL << 0)
 #   define MUSB_MISC                                
 #   define MUSB_TxFIFOsz                            0x0090
 #   define MUSB_RxFIFOsz                            0x0094
@@ -1228,6 +1290,7 @@ typedef struct debe_reg_t {
 typedef struct timer_reg_t {
     reg32_t IRQ_EN;                                 // 0x000
     reg32_t IRQ_STA;                                // 0x004
+    RESERVED_U32N(2)
 
     struct {                                        // 0x010
         reg32_t CTRL;
@@ -1270,8 +1333,9 @@ typedef struct musb_reg_t {
         };
         reg32_t FIFO[6];
     };
-
+    // unused FIFO registers
     RESERVED_U32N(10)
+
     struct {
         reg8_t Power;                               // 0x0040
         reg8_t DevCtl;                              // 0x0041
@@ -1297,47 +1361,59 @@ typedef struct musb_reg_t {
         RESERVED_U8N(1)
     } Common;
 
-    union {
-        struct {
-            union {
-                struct {
-                    RESERVED_U16N(1)
-                    reg16_t CSR0;                   // 0x0082
-                    RESERVED_U16N(2)
-                    reg16_t Count0;                 // 0x0088
-                    RESERVED_U16N(3)
-                } EP0;
-                struct {
-                    reg16_t TxMaxP;                 // 0x0080
-                    reg8_t TxCSRL;                  // 0x0082
-                    reg8_t TxCSRH;                  // 0x0083
-                    reg16_t RxMaxP;                 // 0x0084
-                    reg8_t RxCSRL;                  // 0x0086
-                    reg8_t RxCSRH;                  // 0x0087
-                    reg16_t RxCount;                // 0x0088
-                    RESERVED_U16N(3)
-                } EPN;
-            };
-        } DC;
-        struct {
-            // TODO:
-            union {
-                struct {
-                    reg16_t Count0;                 // 0x0088
-                    reg8_t Type0;                   // 0x008c
-                    reg8_t NAKLimit0;               // 0x008d
-                } EP0;
-                struct {
-                    reg16_t TxType;
-                    reg16_t RxType;
-                    reg16_t TxInterval;
-                    reg16_t RxInterval;
-                } EPN;
-            };
-        } HC;
-    } Index;
-
     struct {
+        union {
+            struct {
+                union {
+                    struct {
+                        RESERVED_U16N(1)
+                        reg16_t CSR0;               // 0x0082
+                        RESERVED_U16N(2)
+                        reg16_t Count0;             // 0x0088
+                        RESERVED_U16N(3)
+                    } EP0;
+                    struct {
+                        reg16_t TxMaxP;             // 0x0080
+                        reg8_t TxCSRL;              // 0x0082
+                        reg8_t TxCSRH;              // 0x0083
+                        reg16_t RxMaxP;             // 0x0084
+                        reg8_t RxCSRL;              // 0x0086
+                        reg8_t RxCSRH;              // 0x0087
+                        reg16_t RxCount;            // 0x0088
+                        RESERVED_U16N(3)
+                    } EPN;
+                };
+            } DC;
+            struct {
+                union {
+                    struct {
+                        RESERVED_U16N(1)
+                        reg16_t CSR0;               // 0x0082
+                        RESERVED_U16N(2)
+                        reg16_t Count0;             // 0x0088
+                        RESERVED_U16N(1)
+                        reg8_t Type0;               // 0x008c
+                        reg8_t NAKLimit0;           // 0x008d
+                        RESERVED_U16N(1)
+                    } EP0;
+                    struct {
+                        reg16_t TxMaxP;             // 0x0080
+                        reg8_t TxCSRL;              // 0x0082
+                        reg8_t TxCSRH;              // 0x0083
+                        reg16_t RxMaxP;             // 0x0084
+                        reg8_t RxCSRL;              // 0x0086
+                        reg8_t RxCSRH;              // 0x0087
+                        reg16_t RxCount;            // 0x0088
+                        RESERVED_U16N(1)
+                        reg8_t TxType;              // 0x008c
+                        reg8_t TxInterval;          // 0x008d
+                        reg8_t RxType;              // 0x008e
+                        reg8_t RxInterval;          // 0x008f
+                    } EPN;
+                };
+            } HC;
+        };
+
         reg8_t TxFIFOsz;                            // 0x0090
         RESERVED_U8N(1)
         reg16_t TxFIFOadd;                          // 0x0092
@@ -1345,8 +1421,10 @@ typedef struct musb_reg_t {
         RESERVED_U8N(1)
         reg16_t RxFIFOadd;                          // 0x0096
         reg8_t FAddr;                               // 0x0098
-        RESERVED_U8N(7)
-    } Config;
+        RESERVED_U8N(3)
+        reg8_t RAddr;                               // 0x009c
+        RESERVED_U8N(3)
+    } Index;
 
     RESERVED_U32N(216)
     struct {

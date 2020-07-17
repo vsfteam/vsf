@@ -23,7 +23,23 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+// TODO: add reg_base
+struct f1cx00s_usb_otg_t {
+    uint8_t ep_num;
+    bool is_host;
+    struct {
+        void (*handler)(void *param);
+        void *param;
+    } irq;
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
+
+f1cx00s_usb_otg_t USB_OTG0 = {
+    .ep_num     = 3,
+};
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -35,6 +51,11 @@ uint_fast8_t __f1cx00s_usb_set_ep(f1cx00s_usb_otg_t *usb, uint_fast8_t ep)
     return ep_orig;
 }
 
+uint_fast8_t __f1cx00s_usb_get_ep_num(f1cx00s_usb_otg_t *usb)
+{
+    return usb->ep_num;
+}
+
 void __f1cx00s_usb_clear_interrupt(f1cx00s_usb_otg_t *usb)
 {
     // disable all interrupts
@@ -44,6 +65,12 @@ void __f1cx00s_usb_clear_interrupt(f1cx00s_usb_otg_t *usb)
     MUSB_BASE->Common.IntrTx = 0xFFFF;
     MUSB_BASE->Common.IntrRx = 0xFFFF;
     MUSB_BASE->Common.IntrUSB = 0xFF;
+}
+
+void __f1cx00s_usb_register_irq(f1cx00s_usb_otg_t *usb, void (*irqhandler)(void *), void *param)
+{
+    usb->irq.handler = irqhandler;
+    usb->irq.param = param;
 }
 
 uint_fast16_t __f1cx00s_usb_rxfifo_size(f1cx00s_usb_otg_t *usb, uint_fast8_t ep)
@@ -84,12 +111,21 @@ void __f1cx00s_usb_write_fifo(f1cx00s_usb_otg_t *usb, uint_fast8_t ep, uint8_t *
 
 vsf_err_t __f1cx00s_usb_init(f1cx00s_usb_otg_t *usb, vsf_arch_prio_t priority)
 {
+    CCU_BASE->USBPHY_CLK |= USBPHY_CLK_SCLK_GATING;
+    CCU_BASE->USBPHY_CLK |= USBPHY_CLK_USBPHY_RST;
+    CCU_BASE->BUS_CLK_GATING0 |= BUS_CLK_GATING0_USB_OTG_GATING;
+    CCU_BASE->BUS_SOFT_RST0 |= BUS_SOFT_RST0_USBOTG_RST;
+
+    // __f1cx00s_usb_phy_config(usbd->otg);
+    SYSCON_BASE->USB_CTRL = (SYSCON_BASE->USB_CTRL & ~USB_FIFO_MODE) | USB_FIFO_MODE_8KB;
     return VSF_ERR_NONE;
 }
 
-void f1cx00s_usb_irq(f1cx00s_usb_otg_t *usb)
+bool f1cx00s_usb_irq(f1cx00s_usb_otg_t *usb)
 {
-//    if (usb->callback.irq_handler != NULL) {
-//        usb->callback.irq_handler(usb->callback.param);
-//    }
+    if (usb->irq.handler != NULL) {
+        usb->irq.handler(usb->irq.param);
+        return false;
+    }
+    return true;
 }

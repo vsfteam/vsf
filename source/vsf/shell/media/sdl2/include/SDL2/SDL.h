@@ -172,7 +172,7 @@ enum {
     SDL_WINDOWPOS_UNDEFINED,
 };
 
-typedef enum {
+typedef enum __sdl_window_flag_t {
     SDL_WINDOW_FULLSCREEN       = (1 <<0),
     SDL_WINDOW_OPENGL           = (1 << 1),
     SDL_WINDOW_SHOWN            = (1 << 2),
@@ -195,7 +195,7 @@ typedef enum {
     SDL_WINDOW_TOOLTIP          = (1 << 18),
     SDL_WINDOW_POPUP_MENU       = (1 << 19),
     SDL_WINDOW_VULKAN           = (1 << 20),
-};
+} __sdl_window_flag_t;
 
 typedef struct SDL_Window SDL_Window;
 

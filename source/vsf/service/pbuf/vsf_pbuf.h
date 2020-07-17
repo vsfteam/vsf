@@ -178,7 +178,7 @@ def_interface(i_pbuf_t)
         void            (*Register)(const vsf_pbuf_adapter_t *padapter,
                                     uint_fast8_t size);
         const vsf_pbuf_adapter_t *
-                        (*Get)(uint_fast8_t chID);
+                        (*Get)(uint_fast8_t id);
     } Adapter;
 
     struct {
@@ -221,7 +221,7 @@ extern vsf_pbuf_t *vsf_pbuf_free(vsf_pbuf_t *pbuf);
 extern vsf_pbuf_t *vsf_pbuf_init(vsf_pbuf_t *ptBlock, vsf_pbuf_cfg_t *pcfg);
 extern void vsf_adapter_register(   const vsf_pbuf_adapter_t *ptAdaptors, 
                                     uint_fast8_t chSize);
-extern const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t chID);
+extern const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t id);
 extern vsf_pbuf_capability_t vsf_pbuf_capability_get(vsf_pbuf_t *ptObj);
 extern void vsf_pbuf_size_reset(vsf_pbuf_t *pobj);
 extern void *vsf_pbuf_buffer_get(vsf_pbuf_t *pobj);

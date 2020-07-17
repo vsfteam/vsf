@@ -226,7 +226,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
     } else if (token & VSFVM_DART_TOKEN_NUM) {
         vsf_trace(VSF_TRACE_DEBUG, "token: %d" VSF_TRACE_CFG_LINEEND, data->ival);
     } else if (token & VSFVM_DART_TOKEN_SYM) {
-        vsf_trace(VSF_TRACE_DEBUG, "token: %s" VSF_TRACE_CFG_LINEEND, data->sym->name);
+        vsf_trace(VSF_TRACE_DEBUG, "token: %s" VSF_TRACE_CFG_LINEEND, data->sym->name + (('"' == data->sym->name[0]) ? 1 : 0));
     } else if (token == '\n') {
         vsf_trace(VSF_TRACE_DEBUG, "token: \\n" VSF_TRACE_CFG_LINEEND);
     } else {
@@ -629,14 +629,15 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
         } else if (strchr(vsfvm_dart_token_1char, token)) {
             err = vsfvm_lexer_on_token(lexer, token, NULL);
             if (err < 0) { return err; }
-        } else if (((token >= 'a') && (token <= 'z'))
-               ||   ((token >= 'A') && (token <= 'Z')) || (token == '_')) {
+        } else if ( ((token >= 'a') && (token <= 'z'))
+                ||  ((token >= 'A') && (token <= 'Z'))
+                ||  (token == '_')) {
             value = 0;
             lexer->cur_symbol[value++] = (char)token;
-            while (((token_next >= 'a') && (token_next <= 'z'))
+            while ( ((token_next >= 'a') && (token_next <= 'z'))
                 ||  ((token_next >= 'A') && (token_next <= 'Z'))
                 ||  ((token_next >= '0') && (token_next <= '9'))
-                || (token_next == '_')) {
+                ||  (token_next == '_')) {
                 token = vsfvm_lexer_getchar(lexer);
                 token_next = vsfvm_lexer_peekchar(lexer);
                 lexer->cur_symbol[value++] = (char)token;
@@ -657,7 +658,7 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
                 vsfvm_lexer_getchar(lexer);
                 token_next = vsfvm_lexer_peekchar(lexer);
 
-                while (((token_next >= '0') && (token_next <= '9'))
+                while ( ((token_next >= '0') && (token_next <= '9'))
                    ||   ((token_next >= 'a') && (token_next <= 'f'))
                    ||   ((token_next >= 'A') && (token_next <= 'F'))) {
                     token = vsfvm_lexer_getchar(lexer);
@@ -742,7 +743,7 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
                 } else if (token_next == '\\') {
                 check_next:
                     token_next = vsfvm_lexer_getchar(lexer);
-                    if (token_next == '\0')         goto dart_unclosed_string;
+                    if      (token_next == '\0')    goto dart_unclosed_string;
                     else if (token_next == '\r')    goto check_next;
                     else if (token_next == '\n')    continue;
                     else {

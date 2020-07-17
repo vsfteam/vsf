@@ -84,7 +84,7 @@ int main(void)
 
     uint8_t x = 0, y = 0;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    srand(vsf_systimer_get());
+    srand(vsf_systimer_get_tick());
 #else
     srand(0);
 #endif

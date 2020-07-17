@@ -49,7 +49,7 @@ static btstack_vsf_t __btstack_vsf;
 
 static uint32_t btstack_run_loop_vsf_get_time_ms(void)
 {
-    return vsf_systimer_tick_to_ms(vsf_timer_get_tick());
+    return vsf_systimer_get_ms();
 }
 
 static void btstack_run_loop_vsf_set_timer(btstack_timer_source_t *ts, uint32_t timeout_in_ms)

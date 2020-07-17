@@ -1,0 +1,1 @@
+%~dp0\sunxi_checksum.exe %1 && %~dp0\sunxi-fel -p spiflash-write 0 %1

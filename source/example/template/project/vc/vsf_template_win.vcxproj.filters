@@ -2693,9 +2693,6 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c">
       <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c">
-      <Filter>usrapp\demo\btstack_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\demo\awtk_demo\awtk_application.c">
       <Filter>usrapp\demo\awtk_demo</Filter>
     </ClCompile>

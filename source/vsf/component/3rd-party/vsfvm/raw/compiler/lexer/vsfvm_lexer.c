@@ -181,7 +181,11 @@ vsfvm_lexer_sym_t * vsfvm_lexer_symtbl_add_symbol(vsfvm_lexer_t *lexer, char *sy
             *id = sym->id;
         }
 #if VSFVM_LEXER_DEBUG_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "symbol(%08X): %s, id = %d" VSF_TRACE_CFG_LINEEND, symtbl, symbol, sym->id);
+        if ('"' == symbol[0]) {
+            vsf_trace(VSF_TRACE_DEBUG, "string(%08X): %s, id = %d" VSF_TRACE_CFG_LINEEND, symtbl, symbol + 1, sym->id);
+        } else {
+            vsf_trace(VSF_TRACE_DEBUG, "symbol(%08X): %s, id = %d" VSF_TRACE_CFG_LINEEND, symtbl, symbol, sym->id);
+        }
 #endif
     }
     return sym;

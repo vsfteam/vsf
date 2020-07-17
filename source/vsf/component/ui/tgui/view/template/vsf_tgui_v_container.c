@@ -34,18 +34,18 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* ptContainer)
+fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* container_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* ptContainer,
+fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
                                         vsf_tgui_region_t *ptDirtyRegion)             //!< you can ignore the tDirtyRegion for simplicity
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* ptContainer)
+fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* container_ptr)
 {
     return fsm_rt_cpl;
 }

@@ -78,9 +78,9 @@ vsf_pbuf_t *vsf_stream_reader_fetch_pbuf ( vsf_stream_reader_t *ptObj)
         if (NULL == this.ptCurrent) {
             this.ptCurrent = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
         } else {
-            vsf_pbuf_t *ptTemp = pbuf;
+            vsf_pbuf_t *temp_ptr = pbuf;
             pbuf = this.ptCurrent;
-            this.ptCurrent = ptTemp;
+            this.ptCurrent = temp_ptr;
         }
 
         if (NULL != this.ptCurrent) {

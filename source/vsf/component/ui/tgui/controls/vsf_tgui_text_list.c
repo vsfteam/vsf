@@ -180,11 +180,11 @@ static void __vk_tgui_text_list_update_line_selection(
 static void __vk_tgui_text_list_internal_update(vsf_tgui_text_list_t* ptTextList)
 {
     ptTextList->tList.tBuffer = ptTextList->tList.tContent;
-    ptTextList->tList.tContent.Offset.iNext =
+    ptTextList->tList.tContent.Offset.next =
         (intptr_t)&ptTextList->tList.tBuffer - (intptr_t)&ptTextList->tList.tContent;
-    ptTextList->tList.tBuffer.Offset.iNext = 0;
+    ptTextList->tList.tBuffer.Offset.next = 0;
 #if VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST == ENABLED
-    ptTextList->tList.tBuffer.Offset.iPrevious =
+    ptTextList->tList.tBuffer.Offset.previous =
         (intptr_t)&ptTextList->tList.tBuffer - (intptr_t)&ptTextList->tList.tContent;
 #endif
 

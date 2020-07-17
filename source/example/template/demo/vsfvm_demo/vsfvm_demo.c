@@ -145,11 +145,11 @@ int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, ui
 }
 
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
-void vsfvm_user_poll(void)
+void vsfvm_user_poll(void) {
 #else
-void vsf_plug_in_on_kernel_idle(void)
+void vsf_plug_in_on_kernel_idle(void) {
+    vsf_driver_poll();
 #endif
-{
     vsfvm_runtime_t *runtime = &__usrapp_vm.runtime;
     int err;
 

@@ -401,11 +401,7 @@ void __vsf_kernel_os_run_priority(vsf_prio_t priority)
 
 void __vsf_kernel_os_start(void)
 {
-#ifndef WEAK_VSF_SERVICE_INIT
     vsf_service_init();
-#else
-    WEAK_VSF_SERVICE_INIT();
-#endif
     vsf_kernel_os_init();
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
@@ -435,11 +431,7 @@ void __vsf_kernel_os_start(void)
 
     vsf_kernel_start();
 
-#ifndef WEAK_VSF_OSA_HAL_INIT
     vsf_osa_hal_init();
-#else
-    WEAK_VSF_OSA_HAL_INIT();
-#endif
     __post_vsf_kernel_init();
 }
 

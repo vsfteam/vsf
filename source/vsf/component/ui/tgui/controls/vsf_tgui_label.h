@@ -50,7 +50,7 @@
         }
 #else
 #   define __VSF_TGUI_INTERFACE_CONTROLS_LABEL           {                      \
-            .tMessageHandler = {                                                \
+            .msg_handler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_label_msg_handler,           \
             },                                                                  \

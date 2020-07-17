@@ -37,7 +37,7 @@ declare_class(vsf_tgui_t)
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
 const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* ptControl)
 {
-    return ptControl->use_as__vsf_msgt_node_t.pchNodeName;
+    return ptControl->use_as__vsf_msgt_node_t.node_name_ptr;
 }
 #endif
 

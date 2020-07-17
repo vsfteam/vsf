@@ -114,14 +114,14 @@ extern "C" {
            as <__NAME>_fn, E.g
            extern_fsm_initialiser( demo_fsm );
            we extern a function called:
-           extern fsm_demo_fsm_t *demo_fsm_init( fsm_demo_fsm_t *ptFSM );
+           extern fsm_demo_fsm_t *demo_fsm_init( fsm_demo_fsm_t *fsm_ptr );
            and a prototype definition:
-           typedef fsm_demo_fsm_t *demo_fsm_init_fn( fsm_demo_fsm_t *ptFSM );
+           typedef fsm_demo_fsm_t *demo_fsm_init_fn( fsm_demo_fsm_t *fsm_ptr );
            We can then use demo_fsm_init_fn to define function pointer
  */
 #define __extern_fsm_initialiser(__NAME, ...)                                   \
-        fsm(__NAME) *__NAME##_init(fsm(__NAME) *ptFSM __VA_ARGS__);             \
-        typedef fsm(__NAME) *__NAME##_init_fn(fsm(__NAME) *ptFSM __VA_ARGS__);  
+        fsm(__NAME) *__NAME##_init(fsm(__NAME) *fsm_ptr __VA_ARGS__);             \
+        typedef fsm(__NAME) *__NAME##_init_fn(fsm(__NAME) *fsm_ptr __VA_ARGS__);  
         
 #define extern_fsm_initialiser(__NAME, ...)                                     \
             __extern_fsm_initialiser(__NAME, __VA_ARGS__)
@@ -130,9 +130,9 @@ extern "C" {
 /*! \brief extern fsm task function and provide function prototye as <__NAME>_fn, E.g
            extern_fsm_implementation( demo_fsm );
            we extern a function called:
-           fsm_rt_t demo_fsm( fsm_demo_fsm_t *ptFSM )
+           fsm_rt_t demo_fsm( fsm_demo_fsm_t *fsm_ptr )
            and a prototype definition:
-           typedef fsm_rt_t demo_fsm_fn (fsm_demo_fsm_t *ptFSM);
+           typedef fsm_rt_t demo_fsm_fn (fsm_demo_fsm_t *fsm_ptr);
            We can then use demo_fsm_fn to define function pointer
  */
  //! @{

@@ -1773,7 +1773,7 @@
             <archiveVersion>1</archiveVersion>
             <data>
                 <prebuild></prebuild>
-                <postbuild></postbuild>
+                <postbuild>$PROJ_DIR$\target\F1C100S\binary\vsf_image.exe $EXE_DIR$\vsf_template.bin</postbuild>
             </data>
         </settings>
         <settings>
@@ -1913,7 +1913,7 @@
                 </option>
                 <option>
                     <name>IlinkOverrideProgramEntryLabel</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabelSelect</name>
@@ -1921,7 +1921,7 @@
                 </option>
                 <option>
                     <name>IlinkProgramEntryLabel</name>
-                    <state>__iar_program_start</state>
+                    <state>_vector</state>
                 </option>
                 <option>
                     <name>DoFill</name>
@@ -2189,9 +2189,6 @@
                 <name>btstack_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\btstack_demo\btstack_demo.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\example\gap_inquiry.c</name>
                 </file>
             </group>
             <group>
@@ -4475,9 +4472,6 @@
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\usb\usb_common.c</name>
                                 </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\usb\usb_lv0.c</name>
-                                </file>
                             </group>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\__common.c</name>
@@ -4490,13 +4484,10 @@
                             <name>F1C100S</name>
                             <group>
                                 <name>startup</name>
-                                <excluded>
-                                    <configuration>vsf_template_f1c100s</configuration>
-                                </excluded>
                                 <group>
                                     <name>asm</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\startup\app\asm\iar\entry.S</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\startup\app\asm\iar\startup.S</name>
                                     </file>
                                 </group>
                             </group>
@@ -5243,6 +5234,48 @@
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\customised\driver.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>device_specific</name>
+                    <group>
+                        <name>Allwinner</name>
+                        <excluded>
+                            <configuration>vsf_template_m484</configuration>
+                        </excluded>
+                        <group>
+                            <name>F1CX00S</name>
+                            <group>
+                                <name>common</name>
+                                <group>
+                                    <name>usb</name>
+                                    <group>
+                                        <name>hc</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\common\usb\hc\usbh.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\common\usb\hc\usbh.h</name>
+                                        </file>
+                                    </group>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\common\usb\usb.h</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
+                                <name>F1C100S</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\F1C100S\driver.h</name>
+                                </file>
+                            </group>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\driver.h</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h</name>
                     </file>
                 </group>
                 <file>

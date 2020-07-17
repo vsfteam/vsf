@@ -73,6 +73,11 @@ extern const i_heap_t VSF_HEAP;
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_heap_init(void);
+
+/*!\note:This interface cannot add multiple misaligned spaces. 
+ *!\when a user needs to add space multiple times, 
+ *!\the space provided each time (including the first time) must be aligned according to the agreed alignment standard.
+*/
 extern void vsf_heap_add(uint8_t *heap, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
 extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);

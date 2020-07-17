@@ -21,6 +21,9 @@
 // for vsf_heap
 #include "service/vsf_service.h"
 
+//! \note include usart poll util header file
+#include "hal/driver/common/vsf_drv_usart_poll_util.h"
+
 /*============================ MACROS ========================================*/
 
 #if VSF_ARCH_MMU == ENABLED
@@ -141,7 +144,43 @@ bool vsf_driver_init(void)
 
     vsf_arch_mmu_enable(__f1c100s_mmu_ttb);
 #endif
+
+#if VSF_HAL_DRV_CFG_SYSTIMER_POLL_MODE_EN == ENABLED
+    TIMER_BASE->TMR[0].INTV_VALUE = 24 * 1000;
+    TIMER_BASE->TMR[0].CTRL = TMR_CTRL_MODE_CONTINUOUS | TMR_CTRL_CLK_SRC_OSC24M | TMR_CTRL_EN;
+#endif
     return true;
+}
+
+/*! \brief driver polling service for f1c100s
+ *  \param none
+ *  \retval true it is safe to enter sleep mode
+ *  \retval false polling work is on going, please keep calling the function
+ */
+bool vsf_driver_poll(void)
+{
+    bool ret = true;
+
+#if VSF_HAL_DRV_CFG_USB_POLL_MODE_EN == ENABLED
+    ret &= f1cx00s_usb_irq(&USB_OTG0);
+#endif
+
+#if VSF_HAL_DRV_CFG_SYSTIMER_POLL_MODE_EN == ENABLED
+    if (TIMER_BASE->IRQ_STA & 1) {
+        TIMER_BASE->IRQ_STA = 1;
+        extern void vsf_timer_on_tick(void);
+        vsf_timer_on_tick();
+    }
+#endif
+
+    /*! \note example about how to put poll functions for each instance of peripherals
+     *!       even if the function doesn't exist, the compilation would not be 
+     *!       affected as long as the corresponding macro 
+     *!       VSF_HAL_DRV_CFG_XXXX_POLL_MODE_EN is set to DISABLED, i.e. 0
+     */
+    USART_POLL_AGENTS
+
+    return ret;
 }
 
 

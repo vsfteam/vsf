@@ -308,7 +308,7 @@ void __name##_init(__name* queue_ptr, __name##_cfg_t* cfg_ptr)                  
                                                                                 \
 bool __name##_send_one(__name *queue_ptr, __type item)                          \
 {                                                                               \
-    bool bResult = false;                                                       \
+    bool result = false;                                                       \
     ASSERT(NULL != queue_ptr);                                                  \
     __queue_protect(                                                            \
         do {                                                                    \
@@ -318,16 +318,16 @@ bool __name##_send_one(__name *queue_ptr, __type item)                          
                 break;                                                          \
             }                                                                   \
             queue_ptr->buffer_ptr[index] = item;                                \
-            bResult = true;                                                     \
+            result = true;                                                     \
         } while(0);                                                             \
     )                                                                           \
                                                                                 \
-    return bResult;                                                             \
+    return result;                                                             \
 }                                                                               \
                                                                                 \
 bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     \
 {                                                                               \
-    bool bResult = false;                                                       \
+    bool result = false;                                                       \
     ASSERT(NULL != queue_ptr);                                                  \
     __queue_protect(                                                            \
         do {                                                                    \
@@ -339,11 +339,11 @@ bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     
             if (NULL != item_ptr) {                                             \
                 *item_ptr = queue_ptr->buffer_ptr[index];                       \
             }                                                                   \
-            bResult = true;                                                     \
+            result = true;                                                     \
         } while (0);                                                            \
     )                                                                           \
                                                                                 \
-    return bResult;                                                             \
+    return result;                                                             \
 }                                                                               \
                                                                                 \
 SECTION(".text." #__name "_item_count")                                         \
@@ -412,7 +412,7 @@ int32_t __name##_get_multiple(  __name * queue_ptr,                             
 SECTION(".text." #__name "_peek_one")                                           \
 bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             \
 {                                                                               \
-    bool bResult = false;                                                       \
+    bool result = false;                                                       \
     ASSERT(NULL != queue_ptr);                                                  \
     __queue_protect(                                                            \
         do {                                                                    \
@@ -424,11 +424,11 @@ bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             
             if (NULL != item_pptr) {                                            \
                 (*item_pptr) = (const __type*)&queue_ptr->buffer_ptr[index];    \
             }                                                                   \
-            bResult = true;                                                     \
+            result = true;                                                     \
         } while (0);                                                            \
     )                                                                           \
                                                                                 \
-    return bResult;                                                             \
+    return result;                                                             \
 }                                                                               \
                                                                                 \
 SECTION(".text." #__name "_reset_peek")                                         \

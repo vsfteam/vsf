@@ -26,7 +26,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 const vsf_tgui_tile_idx_root_t bg1_RGB  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 0,
             .u3ColorSize = 6,
@@ -38,7 +38,7 @@ const vsf_tgui_tile_idx_root_t bg1_RGB  = {
 
 const vsf_tgui_tile_idx_root_t bg2_RGB  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 0,
             .u3ColorSize = 6,
@@ -50,7 +50,7 @@ const vsf_tgui_tile_idx_root_t bg2_RGB  = {
 
 const vsf_tgui_tile_idx_root_t bg3_RGB  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 0,
             .u3ColorSize = 6,
@@ -62,7 +62,7 @@ const vsf_tgui_tile_idx_root_t bg3_RGB  = {
 
 const vsf_tgui_tile_idx_root_t ic_autorenew_black_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -74,7 +74,7 @@ const vsf_tgui_tile_idx_root_t ic_autorenew_black_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_build_black_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -86,7 +86,7 @@ const vsf_tgui_tile_idx_root_t ic_build_black_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_done_black_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -98,7 +98,7 @@ const vsf_tgui_tile_idx_root_t ic_done_black_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_find_in_page_white_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -110,7 +110,7 @@ const vsf_tgui_tile_idx_root_t ic_find_in_page_white_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_help_outline_black_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -122,7 +122,7 @@ const vsf_tgui_tile_idx_root_t ic_help_outline_black_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_https_white_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -134,7 +134,7 @@ const vsf_tgui_tile_idx_root_t ic_https_white_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_power_settings_new_18pt_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -146,7 +146,7 @@ const vsf_tgui_tile_idx_root_t ic_power_settings_new_18pt_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_settings_applications_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -158,7 +158,7 @@ const vsf_tgui_tile_idx_root_t ic_settings_applications_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_settings_bluetooth_white_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,
@@ -170,7 +170,7 @@ const vsf_tgui_tile_idx_root_t ic_settings_bluetooth_white_18dp_RGBA  = {
 
 const vsf_tgui_tile_idx_root_t ic_settings_phone_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
-        .tAttribute = {
+        .Attribute = {
             .u2RootTileType = 1,
             .u2ColorType = 1,
             .u3ColorSize = 5,

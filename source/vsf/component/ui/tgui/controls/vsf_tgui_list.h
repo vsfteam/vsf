@@ -53,7 +53,7 @@
         }
 #else
 #   define __VSF_TGUI_INTERFACE_CONTROLS_LIST           {                       \
-            .tMessageHandler = {                                                \
+            .msg_handler = {                                                \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_list_msg_handler,            \
             },                                                                  \
@@ -83,31 +83,31 @@
                             __VA_ARGS__                                         \
                             VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE                \
                                                                                 \
-                            .bIsContainer = true,                               \
-                            .ptNode =                                           \
+                            .is_container = true,                               \
+                            .node_ptr =                                           \
                                 (vsf_msgt_node_t*)                              \
                                     ((__PARENT_ADDR)->__NAME.ptList),           \
-                            .pchNodeName =                                      \
+                            .node_name_ptr =                                      \
                                 "[vsf_tgui_list_t]["#__NAME"]",                 \
                             .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,            \
                             .bIsAutoSize = false,                               \
                             .bIsHideContentInsideContainer = false,             \
                                                                                 \
-                            .list.ptParent =                                    \
+                            .list.parent_ptr =                                    \
                                 (vsf_msgt_container_t *)&((__PARENT_ADDR)->     \
                                     __NAME.use_as__vsf_msgt_node_t),            \
-                            .list.chID = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
+                            .list.id = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
                             .list.Offset = {0},                                 \
-                            .list.bIsContainer = true,                          \
+                            .list.is_container = true,                          \
                             .list.bIsControlTransparent = true,                 \
                             .list.bIsAutoSize = true,                           \
                             .list.bIsEnabled = true,                            \
                             .list.bIsVisible = true,                            \
-                            .list.ptNode =                                      \
+                            .list.node_ptr =                                      \
                                 (vsf_msgt_node_t*)                              \
                                     &((__PARENT_ADDR)->                         \
                                         __NAME.list.list_FirstNode),            \
-                            .list.pchNodeName =                                 \
+                            .list.node_name_ptr =                                 \
                                 "[vsf_tgui_list_t]["#__NAME".list]",            \
                         )
 
@@ -126,25 +126,25 @@
                             __VA_ARGS__                                         \
                             VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE                \
                                                                                 \
-                            .bIsContainer = true,                               \
-                            .ptNode =                                           \
+                            .is_container = true,                               \
+                            .node_ptr =                                           \
                                 (vsf_msgt_node_t*)                              \
                                     ((__PARENT_ADDR)->__NAME.ptList),           \
                             .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,            \
                             .bIsAutoSize = false,                               \
                             .bIsHideContentInsideContainer = false,             \
                                                                                 \
-                            .list.ptParent =                                    \
+                            .list.parent_ptr =                                    \
                                 (vsf_msgt_container_t *)&((__PARENT_ADDR)->     \
                                     __NAME.use_as__vsf_msgt_node_t),            \
-                            .list.chID = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
+                            .list.id = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
                             .list.Offset = {0},                                 \
-                            .list.bIsContainer = true,                          \
+                            .list.is_container = true,                          \
                             .list.bIsControlTransparent = true,                 \
                             .list.bIsAutoSize = true,                           \
                             .list.bIsEnabled = true,                            \
                             .list.bIsVisible = true,                            \
-                            .list.ptNode =                                      \
+                            .list.node_ptr =                                      \
                                 (vsf_msgt_node_t*)                              \
                                     &((__PARENT_ADDR)->                         \
                                         __NAME.list.list_FirstNode),            \

@@ -41,16 +41,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_dynarr_table_t)
 declare_simple_class(vsf_dynarr_t)
-
-def_simple_class(vsf_dynarr_table_t) {
-    private_member(
-        vsf_slist_node_t table_node;
-        void * buffer[0];
-    )
-};
-
 def_simple_class(vsf_dynarr_t) {
 
     public_member(

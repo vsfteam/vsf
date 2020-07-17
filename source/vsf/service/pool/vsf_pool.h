@@ -190,9 +190,9 @@ __type *__name##_pool_alloc(__name##_pool_t *ptThis)                            
     return (__type *)vsf_pool_alloc((vsf_pool_t *)ptThis);                      \
 }                                                                               \
 WEAK(__name##_pool_free)                                                        \
-void __name##_pool_free(__name##_pool_t *ptThis, __type *ptItem)                \
+void __name##_pool_free(__name##_pool_t *ptThis, __type *item_ptr)                \
 {                                                                               \
-    vsf_pool_free((vsf_pool_t *)ptThis, (uintptr_t)ptItem);                     \
+    vsf_pool_free((vsf_pool_t *)ptThis, (uintptr_t)item_ptr);                     \
 }                                                                               \
 WEAK(__name##_get_pool_item_count)                                              \
 SECTION(".text." #__name "_get_pool_item_count")                                \

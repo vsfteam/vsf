@@ -46,9 +46,9 @@ vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
 vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
 {
     VSF_TGUI_ASSERT(ptTile != NULL);
-    VSF_TGUI_ASSERT(ptTile->_.tCore.tAttribute.bIsRootTile == 1);
+    VSF_TGUI_ASSERT(ptTile->_.tCore.Attribute.bIsRootTile == 1);
 
-    if (ptTile->_.tCore.tAttribute.u2RootTileType == 1) {   //vsf_tgui_tile_idx_root_t
+    if (ptTile->_.tCore.Attribute.u2RootTileType == 1) {   //vsf_tgui_tile_idx_root_t
 #ifndef WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
         return vsf_tgui_idx_root_tile_get_size(ptTile);
 #else
@@ -66,10 +66,10 @@ vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
     VSF_TGUI_ASSERT(ptTile != NULL);
     VSF_TGUI_ASSERT(ptRegion != NULL);
 
-    if (ptTile->_.tCore.tAttribute.bIsRootTile == 0) {      //vsf_tgui_tile_child_t
+    if (ptTile->_.tCore.Attribute.bIsRootTile == 0) {      //vsf_tgui_tile_child_t
 
         const vsf_tgui_tile_child_t* ptChildTile = &ptTile->tChild;
-        ptTile = vsf_tgui_tile_get_root((const vsf_tgui_tile_t *)ptChildTile->ptParent, ptRegion);
+        ptTile = vsf_tgui_tile_get_root((const vsf_tgui_tile_t *)ptChildTile->parent_ptr, ptRegion);
 
 
         ptRegion->tLocation.iX += ptChildTile->_.tLocation.iX;
@@ -77,7 +77,7 @@ vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
         ptRegion->tSize = ptChildTile->tSize;
 
         VSF_TGUI_ASSERT(ptTile != NULL);
-        VSF_TGUI_ASSERT(ptTile->_.tCore.tAttribute.bIsRootTile == 1);
+        VSF_TGUI_ASSERT(ptTile->_.tCore.Attribute.bIsRootTile == 1);
     } else {
         ptRegion->tLocation.iX = 0;
         ptRegion->tLocation.iY = 0;
@@ -91,7 +91,7 @@ vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
 bool vsf_tgui_tile_is_root(const vsf_tgui_tile_t* ptTile)
 {
     VSF_TGUI_ASSERT(ptTile != NULL);
-    return ptTile->_.tCore.tAttribute.bIsRootTile == 1;
+    return ptTile->_.tCore.Attribute.bIsRootTile == 1;
 }
 
 

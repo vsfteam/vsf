@@ -92,8 +92,8 @@ extern "C" {
                     (__pevt),                                                   \
                     (__set),                                                    \
                     1 | ((__auto_rst) ? VSF_SYNC_AUTO_RST : VSF_SYNC_MANUAL_RST))
-#define vsf_eda_trig_set(__pevt)           vsf_eda_sync_increase((__pevt))
-#define vsf_eda_trig_reset(__pevt)         vsf_eda_sync_force_reset((__pevt))
+#define vsf_eda_trig_set(__pevt)            vsf_eda_sync_increase((__pevt))
+#define vsf_eda_trig_reset(__pevt)          vsf_eda_sync_force_reset((__pevt))
 #define vsf_eda_trig_wait(__pevt, __timeout)                                    \
             vsf_eda_sync_decrease((__pevt), (__timeout))
 #if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
@@ -118,6 +118,11 @@ extern "C" {
 
 
 #   define vsf_eda_return(...)  __vsf_eda_return((uintptr_t)(0, ##__VA_ARGS__))
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   define vsf_systimer_get_ms()            vsf_systimer_tick_to_ms(vsf_systimer_get_tick())
+#   define vsf_systimer_get_us()            vsf_systimer_tick_to_us(vsf_systimer_get_tick())
+#endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define vsf_eda_call_eda(__evthandler, ...)                                  \
@@ -1085,7 +1090,7 @@ extern void vsf_timer_on_tick(void);
 #   endif
 
 SECTION(".text.vsf.kernel.teda")
-extern vsf_timer_tick_t vsf_timer_get_tick(void);
+extern vsf_timer_tick_t vsf_systimer_get_tick(void);
 
 SECTION(".text.vsf.kernel.vsf_timer_get_duration")
 extern uint_fast32_t vsf_timer_get_duration(vsf_timer_tick_t from_time, vsf_timer_tick_t to_time);

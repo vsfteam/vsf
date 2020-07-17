@@ -59,7 +59,7 @@ void refresh_my_stopwatch(void)
 }
 
 
-static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_button_t* ptNode, vsf_msgt_msg_t* ptMSG)
+static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_button_t* node_ptr, vsf_msgt_msg_t* ptMSG)
 {
     return fsm_rt_cpl;
 }

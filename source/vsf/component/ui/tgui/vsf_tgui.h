@@ -61,7 +61,7 @@ def_vsf_pt(__vsf_tgui_evt_shooter_t,
         __vsf_tgui_evt_queue_t* ptQueue;
         vsf_msgt_t* ptMSGTree;
         const vsf_tgui_top_container_t * ptRootNode;
-        const vsf_msgt_node_t*          ptNode;
+        const vsf_msgt_node_t*          node_ptr;
         vsf_tgui_evt_t                  tEvent;
         const vsf_tgui_region_t*        ptRegion;
         vsf_tgui_region_t               tTempRegion;
@@ -75,7 +75,7 @@ def_vsf_pt(__vsf_tgui_evt_shooter_t,
         struct {
             //uint8_t bIsActivatedControlChanged  : 1;
             uint8_t bIsQueueDrain               : 1;
-        } tAttribute;
+        } Attribute;
         
     ))
 end_def_vsf_pt(__vsf_tgui_evt_shooter_t)

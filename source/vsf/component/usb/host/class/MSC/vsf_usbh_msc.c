@@ -55,7 +55,8 @@ struct vk_usbh_msc_t {
 
     vsf_eda_t *eda;
     uint64_t addr;
-    uint32_t size;
+    uint32_t total_size;
+    uint32_t remain_size;
     enum {
         VSF_USBH_MSC_STATE_COMMAND,
         VSF_USBH_MSC_STATE_DATA,
@@ -143,7 +144,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             // TODO: add mutex for protection
             uint_fast8_t cbd_len = vk_scsi_get_command_len(cbd);
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
-            bool is_rw = vk_scsi_get_rw_param(cbd, &msc->addr, &msc->size);
+            bool is_rw = vk_scsi_get_rw_param(cbd, &msc->addr, &msc->total_size);
 
             msc->state = VSF_USBH_MSC_STATE_COMMAND;
             memset(&msc->buffer.cbw, 0, sizeof(msc->buffer.cbw));
@@ -152,9 +153,10 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             if (is_stream) {
                 VSF_USB_ASSERT(is_rw);
             } else {
-                msc->size = ((vsf_mem_t *)mem_stream)->nSize;
+                msc->total_size = ((vsf_mem_t *)mem_stream)->nSize;
             }
-            msc->buffer.cbw.dCBWDataTransferLength = cpu_to_le32(msc->size);
+            msc->remain_size = msc->total_size;
+            msc->buffer.cbw.dCBWDataTransferLength = cpu_to_le32(msc->total_size);
             msc->buffer.cbw.bmCBWFlags = (SCSI_CMDCODE_WRITE == cmd_code) ? 0x00 : 0x80;
             msc->buffer.cbw.bCBWLUN = 0;
             msc->buffer.cbw.bCBWCBLength = cbd_len;
@@ -173,7 +175,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
 
             switch (msc->state) {
             case VSF_USBH_MSC_STATE_COMMAND:
-                if (!msc->size) {
+                if (!msc->remain_size) {
                     goto reply_stage;
                 }
 
@@ -195,10 +197,10 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                     uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(&urb);
                     vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
-                    VSF_USB_ASSERT(msc->size >= actual_length);
-                    msc->size -= vk_usbh_urb_get_actual_length(&urb);
+                    VSF_USB_ASSERT(msc->remain_size >= actual_length);
+                    msc->remain_size -= vk_usbh_urb_get_actual_length(&urb);
                     actual_length %= pipe.size;
-                    if (!msc->size || ((actual_length > 0) && (actual_length < pipe.size))) {
+                    if (!msc->remain_size || ((actual_length > 0) && (actual_length < pipe.size))) {
                     reply_stage:
                         msc->state = VSF_USBH_MSC_STATE_REPLY;
                         vk_usbh_urb_set_buffer(&msc->urb_in, &msc->buffer.csw, sizeof(msc->buffer.csw));
@@ -216,8 +218,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                 }
                 break;
             case VSF_USBH_MSC_STATE_REPLY:
-                msc->size -= msc->buffer.csw.dCSWDataResidue;
-                vsf_eda_return(msc->buffer.csw.dCSWStatus == 0 ? msc->size : VSF_ERR_FAIL);
+                vsf_eda_return(msc->buffer.csw.dCSWStatus == 0 ? msc->total_size - msc->remain_size : VSF_ERR_FAIL);
                 break;
             }
         }

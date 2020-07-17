@@ -46,6 +46,9 @@ struct usrapp_usbh_common_const_t {
     vk_libusb_hcd_param_t libusb_hcd_param;
 #elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
     vk_winusb_hcd_param_t winusb_hcd_param;
+#else
+    // on chip non-ip hcd driver
+    vsf_usb_hcd_param_t hcd_param;
 #endif
 };
 typedef struct usrapp_usbh_common_const_t usrapp_usbh_common_const_t;
@@ -90,7 +93,11 @@ typedef struct usrapp_usbh_common_t usrapp_usbh_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     VSF_USE_USB_HOST_HCD_OHCI == ENABLED                                    \
+    ||  VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED                                  \
+    ||  VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
 extern const usrapp_usbh_common_const_t usrapp_usbh_common_const;
+#endif
 extern usrapp_usbh_common_t usrapp_usbh_common;
 
 /*============================ LOCAL VARIABLES ===============================*/

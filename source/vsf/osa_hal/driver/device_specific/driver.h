@@ -29,6 +29,8 @@
 #ifndef VSF_OSA_DRIVER_HEADER
 #   if      defined(__WCH__)
 #       define VSF_OSA_DRIVER_HEADER    "./WCH/driver.h"
+#   elif    defined(__Allwinner__)
+#       define VSF_OSA_DRIVER_HEADER    "./Allwinner/driver.h"
 #   endif
 #endif
 

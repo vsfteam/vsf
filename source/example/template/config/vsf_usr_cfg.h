@@ -55,11 +55,11 @@
 
 // Application configure
 #   define APP_CFG_USE_LINUX_DEMO                       ENABLED
-#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            DISABLED
+#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            ENABLED
 #       define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO        DISABLED
 //  todo: implement drivers for f1c100s
-#   define APP_CFG_USE_USBH_DEMO                        DISABLED
-#   define APP_CFG_USE_USBD_DEMO                        ENABLED
+#   define APP_CFG_USE_USBH_DEMO                        ENABLED
+#   define APP_CFG_USE_USBD_DEMO                        DISABLED
 #   define APP_CFG_USE_SCSI_DEMO                        DISABLED
 #   define APP_CFG_USE_AUDIO_DEMO                       DISABLED
 #   define APP_CFG_USE_SDL2_DEMO                        ENABLED
@@ -74,7 +74,7 @@
 #   define APP_CFG_USE_NNOM_DEMO                        DISABLED
 //  current M484 hardware has no display
 #   define APP_CFG_USE_LVGL_DEMO                        DISABLED
-#   define APP_CFG_USE_BTSTACK_DEMO                     DISABLED
+#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
 #   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
 
 #elif   defined(__WIN__)
@@ -153,6 +153,11 @@
 #endif
 #if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
 #   define VSF_USE_XBOOT                                ENABLED
+#endif
+#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#   define VSFVM_LEXER_DEBUG_EN                         DISABLED
+#   define VSFVM_PARSER_DEBUG_EN                        DISABLED
+#   define VSFVM_COMPILER_DEBUG_EN                      DISABLED
 #endif
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_0
@@ -249,12 +254,24 @@
 #   define ASSERT(...)                                  if (!(__VA_ARGS__)) {while(1);};
 //#   define ASSERT(...)
 
+#define VSF_HAL_DRV_CFG_USB_POLL_MODE_EN                ENABLED
+#define VSF_HAL_DRV_CFG_SYSTIMER_POLL_MODE_EN           ENABLED
+
+#define VSF_SYSTIMER_FREQ                               0
+#define VSF_KERNEL_CFG_TIMER_MODE                       0
+#define vsf_teda_set_timer_ms                           vsf_teda_set_timer
+#define vsf_callback_timer_add_ms                       vsf_callback_timer_add
+#define vsf_systimer_tick_to_ms(__tick)                 (__tick)
+#define vsf_systimer_tick_to_us(__tick)                 ((__tick) * 1000)
+#define vsf_systimer_ms_to_tick(__ms)                   (__ms)
+#define vsf_systimer_us_to_tick(__us)                   ((__us) / 1000)
+typedef unsigned int vsf_systimer_cnt_t;
+typedef int vsf_systimer_cnt_signed_t;
+
 #   define VSF_HAL_USE_DEBUG_STREAM                     ENABLED
 #   define VSF_HEAP_SIZE                                0x1000000
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   12      // 4K alignment
 //#   define VSF_SYSTIMER_FREQ                            (24UL * 1000 * 1000)
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER             DISABLED
-#   define VSF_KERNEL_CFG_CALLBACK_TIMER                DISABLED
 #   define VSF_OS_CFG_PRIORITY_NUM                      1
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                  ENABLED
 //  retarget-io for arm9 in iar seems to be mal-functioning, use dimple_stdio
@@ -273,9 +290,10 @@
 #           define USRAPP_CFG_STREAM_ALIGN              1
 #   endif
 
-#   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
-#   define VSF_USE_USB_HOST_HUB                         ENABLED
-#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#   if APP_CFG_USE_USBH_DEMO == ENABLED
+#       define VSF_USBH_CFG_ENABLE_ROOT_HUB             DISABLED
+#       define VSF_USE_USB_HOST_HUB                     ENABLED
+#   endif
 
 #   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 
@@ -308,8 +326,22 @@
 #       define APP_CFG_SDL2_DEMO_COLOR_RGB666
 #   endif
 
+#   if APP_CFG_USE_BTSTACK_DEMO == ENABLED
+#       define VSF_USBH_BTHCI_CFG_SCO_IN_NUM            0
+#       define VSF_USBH_BTHCI_CFG_SCO_OUT_NUM           0
+#       define VSF_USBH_BTHCI_CFG_ACL_IN_NUM            1
+#       define VSF_USBH_BTHCI_CFG_ACL_OUT_NUM           1
+#   endif
+
+#   if VSF_USE_UI == ENABLED
+#       undef VSF_USBH_CFG_EDA_PRIORITY
+#       define VSF_USBH_CFG_EDA_PRIORITY                    vsf_prio_0
+#       undef APP_CFG_USBH_HW_PRIO
+#       define APP_CFG_USBH_HW_PRIO                         vsf_arch_prio_0
+#   endif
+
 #   define VSF_LINUX_CFG_STACKSIZE                      (60 * 1024)
-#   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
+#   define VSF_TRACE_CFG_COLOR_EN                       ENABLED
 #   define VSH_HAS_COLOR                                1
 #elif   defined(__NUC505__)
 #   define ASSERT(...)                                  if (!(__VA_ARGS__)) {while(1);};

@@ -43,6 +43,14 @@ bool vsf_driver_init(void)
 }
 #endif
 
+#ifndef WEAK_VSF_DRIVER_POLL
+WEAK(vsf_driver_poll)
+bool vsf_driver_poll(void)
+{
+    return true;
+}
+#endif
+
 /*! \note initialize level 0/1 hardware abstract layer
  *  \param none
  *  \retval true initialization succeeded.

@@ -162,7 +162,8 @@ void vsf_set_interrupt(vsf_gint_state_t level)
     __vsf_arm9_swi.swi_mask_bit = level;
 
     //! trig SWI_Handler unconditionally 
-    __asm__ __volatile__ ("swi 0");     
+    // TODO: add back when interrupt is tested
+//    __asm__ __volatile__ ("swi 0");     
 }
 
 vsf_gint_state_t vsf_disable_interrupt(void)
@@ -177,7 +178,8 @@ void vsf_enable_interrupt(void)
     __vsf_arm9_swi.swi_mask_bit = 0;
 
     //! trig SWI_Handler unconditionally 
-    __asm__ __volatile__ ("swi 0");
+    // TODO: add back when interrupt is tested
+//    __asm__ __volatile__ ("swi 0");
 }
 #endif
 

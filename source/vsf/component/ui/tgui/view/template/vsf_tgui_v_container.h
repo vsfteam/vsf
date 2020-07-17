@@ -40,12 +40,12 @@ end_def_structure(vsf_tgui_v_container_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* ptContainer);
+extern fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* container_ptr);
 
-extern fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* ptContainer,
+extern fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
     vsf_tgui_region_t* ptDirtyRegion);
 
-extern fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* ptContainer);
+extern fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* container_ptr);
 
 #endif
 

@@ -27,8 +27,8 @@
 #define nnom_memset(p,v,s)  memset(p,v,s)
 
 // runtime & debuges
-#define nnom_us_get()       vsf_systimer_tick_to_us(vsf_timer_get_tick())
-#define nnom_ms_get()       vsf_systimer_tick_to_ms(vsf_timer_get_tick())
+#define nnom_us_get()       vsf_systimer_get_us()
+#define nnom_ms_get()       vsf_systimer_get_ms()
 #define NNOM_LOG(...)       vsf_trace(VSF_TRACE_INFO, __VA_ARGS__)
 
 // NNoM configuration

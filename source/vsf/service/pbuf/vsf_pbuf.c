@@ -81,29 +81,29 @@ const i_pbuf_t VSF_PBUF = {
 /*============================ IMPLEMENTATION ================================*/
 
 
-static const vsf_pbuf_adapter_t* __vsf_get_adapter_interface(vsf_pbuf_t *ptItem)
+static const vsf_pbuf_adapter_t* __vsf_get_adapter_interface(vsf_pbuf_t *item_ptr)
 {
-    class_internal(ptItem, ptThis, vsf_pbuf_t);
+    class_internal(item_ptr, ptThis, vsf_pbuf_t);
     VSF_SERVICE_ASSERT(NULL != ptThis);
     const vsf_pbuf_adapter_t *ptAdapter = NULL;
     
     do {
-        uint_fast8_t chID = this.u8AdapterID;
+        uint_fast8_t id = this.u8AdapterID;
         
-        if (0xFF == chID) {
+        if (0xFF == id) {
             break;
-        } /*else if (VSF_PBUF_FREE_TO_ANY == chID) {
-            chID = 1;
+        } /*else if (VSF_PBUF_FREE_TO_ANY == id) {
+            id = 1;
         }  */
         
         if (NULL == __vsf_pbuf_cb.padapters) {
             break;
         }
-        if (chID >= __vsf_pbuf_cb.length) {
+        if (id >= __vsf_pbuf_cb.length) {
             break;
         }
         
-        ptAdapter = &__vsf_pbuf_cb.padapters[chID];
+        ptAdapter = &__vsf_pbuf_cb.padapters[id];
         VSF_SERVICE_ASSERT(NULL != ptAdapter->piMethods);
     } while(0);
     
@@ -119,15 +119,15 @@ void vsf_adapter_register(const vsf_pbuf_adapter_t *ptAdaptors, uint_fast8_t chS
     __vsf_pbuf_cb.length = chSize;
 }
 
-const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t chID)
+const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t id)
 {
     const vsf_pbuf_adapter_t *ptAdapter = NULL;
     
-    /*if (VSF_PBUF_FREE_TO_ANY == chID) {
+    /*if (VSF_PBUF_FREE_TO_ANY == id) {
         ptAdapter =  __vsf_pbuf_cb.padapters;
     } else */
-    if (chID < __vsf_pbuf_cb.length) {
-        ptAdapter =  &__vsf_pbuf_cb.padapters[chID];
+    if (id < __vsf_pbuf_cb.length) {
+        ptAdapter =  &__vsf_pbuf_cb.padapters[id];
     }
 
     return ptAdapter;
@@ -358,9 +358,9 @@ vsf_pbuf_t * vsf_pbuf_free(vsf_pbuf_t *pbuf)
             break;
         }
     #endif
-        uint_fast8_t chID = this.u8AdapterID;
+        uint_fast8_t id = this.u8AdapterID;
         
-        if (VSF_PBUF_NO_FREE == chID) {
+        if (VSF_PBUF_NO_FREE == id) {
             ptReturn = NULL;
             break;
         }
