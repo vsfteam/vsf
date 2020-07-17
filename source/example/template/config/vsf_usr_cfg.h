@@ -45,10 +45,10 @@
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #   define APP_CFG_USE_AWTK_DEMO                        DISABLED
-#   define APP_CFG_USE_NNOM_DEMO                        ENABLED
+#   define APP_CFG_USE_NNOM_DEMO                        DISABLED
 //  current M484 hardware has no display
 #   define APP_CFG_USE_LVGL_DEMO                        DISABLED
-#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
+#   define APP_CFG_USE_BTSTACK_DEMO                     DISABLED
 #   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
 
 #elif   defined(__F1C100S__)
@@ -74,7 +74,7 @@
 #   define APP_CFG_USE_NNOM_DEMO                        DISABLED
 //  current M484 hardware has no display
 #   define APP_CFG_USE_LVGL_DEMO                        DISABLED
-#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
+#   define APP_CFG_USE_BTSTACK_DEMO                     DISABLED
 #   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
 
 #elif   defined(__WIN__)

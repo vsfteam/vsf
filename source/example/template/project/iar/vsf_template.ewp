@@ -2363,6 +2363,10 @@
                 <name>3rd-party</name>
                 <group>
                     <name>btstack</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                    </excluded>
                     <group>
                         <name>firmware</name>
                         <group>
@@ -2472,6 +2476,7 @@
                 <group>
                     <name>littlevgl</name>
                     <excluded>
+                        <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
                     </excluded>
                     <group>
@@ -3235,6 +3240,10 @@
                 </group>
                 <group>
                     <name>nnom</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                    </excluded>
                     <group>
                         <name>port</name>
                         <file>
