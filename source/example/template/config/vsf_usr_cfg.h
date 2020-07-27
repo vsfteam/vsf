@@ -60,7 +60,7 @@
 //  todo: implement drivers for f1c100s
 #   define APP_CFG_USE_USBH_DEMO                        ENABLED
 #   define APP_CFG_USE_USBD_DEMO                        DISABLED
-#   define APP_CFG_USE_SCSI_DEMO                        DISABLED
+#   define APP_CFG_USE_SCSI_DEMO                        ENABLED
 #   define APP_CFG_USE_AUDIO_DEMO                       DISABLED
 #   define APP_CFG_USE_SDL2_DEMO                        ENABLED
 //  current tgui demo depends on VSF_USE_DISP_SDL2, which is only available on __WIN__
@@ -72,8 +72,8 @@
 //  awtk is LGPL, not convenient to implement in MCU
 #   define APP_CFG_USE_AWTK_DEMO                        DISABLED
 #   define APP_CFG_USE_NNOM_DEMO                        DISABLED
-//  current M484 hardware has no display
 #   define APP_CFG_USE_LVGL_DEMO                        DISABLED
+#       define APP_LVGL_DEMO_CFG_TOUCH_REMAP            ENABLED
 #   define APP_CFG_USE_BTSTACK_DEMO                     DISABLED
 #   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
 
@@ -104,6 +104,7 @@
 #   define APP_CFG_USE_LVGL_DEMO                        ENABLED
 #   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
 #   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
+#   define APP_CFG_USE_TCPIP_DEMO                       ENABLED
 
 #   if APP_CFG_USE_TGUI_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
 #       define APP_CFG_USE_FREETYPE_DEMO                ENABLED
@@ -127,6 +128,9 @@
 #       define VSF_USE_USB_HOST_XB1                     ENABLED
 #       define VSF_USE_USB_HOST_MSC                     ENABLED
 #       define VSF_USE_USB_HOST_UAC                     ENABLED
+#   if APP_CFG_USE_TCPIP_DEMO == ENABLED
+#       define VSF_USE_USB_HOST_ECM                     ENABLED
+#   endif
 #endif
 
 #if APP_CFG_USE_BTSTACK_DEMO == ENABLED
@@ -172,6 +176,10 @@
 #   define VSF_USE_INPUT_NSPRO                          ENABLED
 #   define VSF_USE_INPUT_XB360                          ENABLED
 #   define VSF_USE_INPUT_XB1                            ENABLED
+
+#if APP_CFG_USE_TCPIP_DEMO == ENABLED
+#   define VSF_USE_TCPIP                                ENABLED
+#endif
 
 // VSF_USE_USB_DEVICE will be enabled if target chip supports USBD
 //#define VSF_USE_USB_DEVICE                              ENABLED
@@ -298,7 +306,7 @@ typedef int vsf_systimer_cnt_signed_t;
 #   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 
 #   define VSF_USE_DISP_FB                              ENABLED
-#       define VSF_DISP_FB_CFG_COPY_FRAME               false
+#       define VSF_DISP_FB_CFG_COPY_FRAME               true
 #       define APP_DISP_FB_COLOR                        VSF_DISP_COLOR_RGB666_32
 #       define APP_DISP_FB_NUM                          3
 //      for VGA 640 * 480 60Hz
@@ -476,6 +484,15 @@ typedef int vsf_systimer_cnt_signed_t;
 #       define WEAK_VSFVM_SET_BYTECODE_IMP
 #       define WEAK_VSFVM_GET_RES_IMP
 #       define WEAK_VSFVM_GET_BYTECODE_IMP
+#   endif
+
+#   if VSF_USE_TCPIP == ENABLED
+#       define WEAK_VSFIP_MEM_SOCKET_GET
+#       define WEAK_VSFIP_MEM_SOCKET_FREE
+#       define WEAK_VSFIP_MEM_TCP_PCB_GET
+#       define WEAK_VSFIP_MEM_TCP_PCB_FREE
+#       define WEAK_VSFIP_MEM_NETBUF_GET
+#       define WEAK_VSFIP_MEM_NETBUF_FREE
 #   endif
 
 #endif

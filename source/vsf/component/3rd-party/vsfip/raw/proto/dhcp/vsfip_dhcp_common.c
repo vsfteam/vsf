@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by SimonQian                                      *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -16,11 +16,13 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-//! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
 
-#ifndef __VSF_TCPIP_CFG_H__
-#define __VSF_TCPIP_CFG_H__
+#include "component/tcpip/vsf_tcpip_cfg.h"
+
+#if VSF_USE_TCPIP == ENABLED
+
+#include "vsf.h"
+#include "./vsfip_dhcp_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -28,8 +30,49 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
+// buf MUST be large enough for all the data
+void vsfip_dhcp_append_opt(vsfip_netbuf_t * netbuf, uint32_t *optlen,
+                        uint_fast8_t option, uint_fast8_t len, uint8_t *data)
+{
+    vsfip_dhcp_head_t *head = netbuf->app.pObj;
+    
+    head->options[(*optlen)++] = option;
+    head->options[(*optlen)++] = len;
+    memcpy(&head->options[*optlen], data, len);
+    *optlen += len;
+}
 
+void vsfip_dhcp_end_opt(vsfip_netbuf_t *netbuf, uint32_t *optlen)
+{
+    vsfip_dhcp_head_t *head = netbuf->app.pObj;
+    
+    head->options[(*optlen)++] = DHCP_OPT_END;
+    while ((*optlen < DHCP_OPT_MINLEN) || (*optlen & 3)) {
+        head->options[(*optlen)++] = 0;
+    }
+    // tweak options length
+    netbuf->app.nSize -= sizeof(head->options);
+    netbuf->app.nSize += *optlen;
+}
 
-#endif
-/* EOF */
+uint_fast8_t vsfip_dhcp_get_opt(vsfip_netbuf_t * netbuf, uint_fast8_t option,
+                        uint8_t **data)
+{
+    vsfip_dhcp_head_t *head = netbuf->app.pObj;
+    uint8_t *ptr = head->options;
+
+    while ((ptr[0] != DHCP_OPT_END) && ((ptr - netbuf->app.pchBuffer) < netbuf->app.nSize)) {
+        if (ptr[0] == option) {
+            if (data != NULL) {
+                *data = &ptr[2];
+            }
+            return ptr[1];
+        }
+        ptr += 2 + ptr[1];
+    }
+    return 0;
+}
+
+#endif      // VSF_USE_TCPIP

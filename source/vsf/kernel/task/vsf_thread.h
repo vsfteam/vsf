@@ -344,6 +344,11 @@ extern "C" {
                 vsf_thread_call_fsm(vsf_task_func(__NAME), __TARGET, (0, ##__VA_ARGS__))
 #endif
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   define vsf_thread_delay_ms(__ms)            vsf_thread_delay(vsf_systimer_ms_to_tick(__ms))
+#   define vsf_thread_delay_us(__us)            vsf_thread_delay(vsf_systimer_us_to_tick(__us))
+#endif
+
 /*============================ TYPES =========================================*/
 
 declare_class(vsf_thread_t)
@@ -399,7 +404,7 @@ typedef void vsf_thread_entry_t(vsf_thread_t *thread);
 //! @{
 def_class(vsf_thread_t,
     which(
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t)
 #else
         implement(vsf_eda_t)
@@ -486,12 +491,12 @@ extern uintptr_t vsf_thread_wait_for_evt_msg(vsf_evt_t evt);
 SECTION("text.vsf.kernel.vsf_thread_wait_for_evt_msg")
 extern uintptr_t vsf_thread_wait_for_msg(void);
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION("text.vsf.kernel.vsf_thread_delay")
 extern void vsf_thread_delay(uint_fast32_t tick);
 #endif
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION("text.vsf.kernel.vsf_thread_mutex")
 extern vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, int_fast32_t timeout);
 
@@ -507,7 +512,7 @@ extern vsf_sync_reason_t vsf_thread_sem_pend(vsf_sem_t *sem, int_fast32_t timeou
 SECTION("text.vsf.kernel.__vsf_thread_wait_for_sync")
 extern vsf_sync_reason_t vsf_thread_trig_pend(vsf_trig_t *trig, int_fast32_t timeout);
 
-#   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
+#   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
 SECTION("text.vsf.kernel.vsf_thread_bmpevt_pend")
 extern vsf_sync_reason_t vsf_thread_bmpevt_pend(
                     vsf_bmpevt_t *bmpevt,

@@ -59,6 +59,7 @@ typedef struct vk_input_item_info_t vk_input_item_info_t;
 
 union vk_input_value_t {
     uint32_t bit    : 1;
+    uint64_t valu64;
     uint32_t valu32;
     uint16_t valu16;
     uint8_t valu8;

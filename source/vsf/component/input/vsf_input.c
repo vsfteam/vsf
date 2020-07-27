@@ -172,6 +172,16 @@ void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt)
 WEAK(vsf_input_on_touchscreen)
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
+#if VSF_TOUCH_SCREEN_CFG_TRACE == ENABLED
+    if (vsf_input_touchscreen_is_down(ts_evt)) {
+        vsf_trace(VSF_TRACE_DEBUG, "touch_screen(%d): (%d, %d) %d\n",
+            vsf_input_touchscreen_get_id(ts_evt), vsf_input_touchscreen_get_x(ts_evt),
+            vsf_input_touchscreen_get_y(ts_evt), vsf_input_touchscreen_get_pressure(ts_evt));
+    } else {
+        vsf_trace(VSF_TRACE_DEBUG, "touch_screen(%d): (-1, -1) 0\n",
+            vsf_input_touchscreen_get_id(ts_evt));
+    }
+#endif
     vsf_input_on_evt(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
 }
 #endif

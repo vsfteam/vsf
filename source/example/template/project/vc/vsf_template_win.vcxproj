@@ -523,6 +523,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\libusb\vsfvm_ext_libusb.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\common\vsfvm_bytecode.h" />
@@ -575,6 +582,8 @@
     <ClInclude Include="..\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.h" />
     <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi.h" />
     <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi_cfg.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\vsf_tcpip_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.h" />
@@ -1296,6 +1305,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpc.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
@@ -1361,6 +1377,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\scsi\driver\mal_scsi\vsf_mal_scsi.c" />
     <ClCompile Include="..\..\..\..\vsf\component\scsi\driver\virtual_scsi\vsf_virtual_scsi.c" />
     <ClCompile Include="..\..\..\..\vsf\component\scsi\vsf_scsi.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\sitronix\st7735\vsf_disp_st7735.c" />
@@ -1505,6 +1522,7 @@
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_msc.c" />
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_uvc.c" />
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c" />
+    <ClCompile Include="..\..\demo\vsfip_demo\vsfip_demo.c" />
     <ClCompile Include="..\..\demo\vsfvm_demo\vsfvm_demo.c" />
     <ClCompile Include="..\..\demo\xui_demo\xui_demo.c" />
   </ItemGroup>

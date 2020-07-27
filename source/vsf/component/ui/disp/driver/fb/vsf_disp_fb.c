@@ -120,11 +120,12 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
         real_area = *area;
     }
 
-    void *cur_buffer = __vk_disp_fb_get_buffer(disp_fb);
     uint_fast32_t line_size = disp_fb->fb.pixel_byte_size * disp_fb->param.width;
     uint_fast32_t copy_size = disp_fb->fb.pixel_byte_size * real_area.size.x;
     uint_fast32_t x_offset = disp_fb->fb.pixel_byte_size * real_area.pos.x;
     uint_fast32_t y_end = real_area.pos.y + real_area.size.y;
+    void *cur_buffer = (uint8_t *)__vk_disp_fb_get_buffer(disp_fb) + line_size * real_area.pos.y;
+
     for (uint_fast32_t y = real_area.pos.y; y < y_end; y++) {
         memcpy((uint8_t *)cur_buffer + x_offset, disp_buff, copy_size);
         disp_buff = (uint8_t *)disp_buff + copy_size;

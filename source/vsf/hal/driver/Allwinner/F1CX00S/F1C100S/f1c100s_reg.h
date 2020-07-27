@@ -688,6 +688,36 @@
 #   define DEBE_COEF23                              0x97c
 
 
+#define TVE_BASE                                    ((tve_reg_t *)0x01c0a000)
+#   define TVE_ENABLE                               0x000
+#       define __TVE_ENABLE_DAC_MAP(__DAC, __OUT)   ((__OUT) << (((__DAC) + 1) << 2))
+#       define TVE_ENABLE_DAC_MAP(__DAC, ...)       __TVE_ENABLE_DAC_MAP(_DAC, (0xF, ##__VA_ARGS__))
+#       define TVE_ENABLE_EN                        (1UL << 0)
+#   define TVE_CFG0                                 0x004
+#       define TVE_CFG0_YC_EN                       (1UL << 17)
+#       define TVE_CFG0_CVBS_EN                     (1UL << 16)
+#       define TVE_CFG0_TVMODE_SELECT(...)          ((0xF, ##__VA_ARGS__) << 0)
+#   define TVE_DAC1                                 0x008
+#       define TVE_DAC1_CLOCK_INVERT                (1UL << 24)
+#       define TVE_DAC1_DAC_EN(__DAC)               (1UL << (__DAC))
+#   define TVE_NOTCH                                0x00c
+#   define TVE_CHROMA_FREQUENCY                     0x010
+#   define TVE_PORCH                                0x014
+#   define TVE_LINE                                 0x01c
+#   define TVE_LEVEL                                0x020
+#   define TVE_DAC2                                 0x024
+#   define TVE_DETECT_STATUS                        0x038
+#   define TVE_CBCR_LEVEL                           0x10c
+#   define TVE_BURST_WIDTH                          0x114
+#   define TVE_CBCR_GAIN                            0x118
+#   define TVE_SYNC_VBI                             0x11c
+#   define TVE_ACTIVE_LINE                          0x124
+#   define TVE_CHROMA                               0x128
+#   define TVE_ENCODER                              0x12c
+#   define TVE_RESYNC                               0x130
+#   define TVE_SLAVE                                0x134
+
+
 #define TIMER_BASE                                  ((timer_reg_t *)0x01c20c00)
 #   define TMR_IRQ_EN                               0x000
 #   define TMR_IRQ_STA                              0x004
@@ -882,6 +912,12 @@
 #   define MUSB_RxFIFOsz                            0x0094
 #   define MUSB_TxFIFOadd                           0x0092
 #   define MUSB_RxFIFOadd                           0x0096
+#   define MUSB_TxFuncAddr                          0x0098
+#   define MUSB_TxHubAddr                           0x009a
+#   define MUSB_TxHubPort                           0x009b
+#   define MUSB_RxFuncAddr                          0x009c
+#   define MUSB_RxHubAddr                           0x009e
+#   define MUSB_RxHubPort                           0x009f
 
 #   define MUSB_Vendor0                             0x0043
 #   define MUSB_Vendor1                             0x007d
@@ -1287,6 +1323,33 @@ typedef struct debe_reg_t {
     // TODO: add cursor buffer and platte
 } debe_reg_t;
 
+typedef struct tve_reg_t {
+    reg32_t ENABLE;                                 // 0x000
+    reg32_t CFG0;                                   // 0x004
+    reg32_t DAC1;                                   // 0x008
+    reg32_t NOTCH;                                  // 0x00c
+    reg32_t CHROMA_FREQUENCY;                       // 0x010
+    reg32_t PORCH;                                  // 0x014
+    RESERVED_U32N(1)
+    reg32_t LINE;                                   // 0x01c
+    reg32_t LEVEL;                                  // 0x020
+    reg32_t DAC2;                                   // 0x024
+    RESERVED_U32N(4)
+    reg32_t DETECT_STATUS;                          // 0x038
+    RESERVED_U32N(52)
+    reg32_t CBCR_LEVEL;                             // 0x10c
+    RESERVED_U32N(1)
+    reg32_t BURST_WIDTH;                            // 0x114
+    reg32_t CBCR_GAIN;                              // 0x118
+    reg32_t SYNC_VBI;                               // 0x11c
+    RESERVED_U32N(1)
+    reg32_t ACTIVE_LINE;                            // 0x124
+    reg32_t CHROMA;                                 // 0x128
+    reg32_t ENCODER;                                // 0x12c
+    reg32_t RESYNC;                                 // 0x130
+    reg32_t SLAVE;                                  // 0x134
+} tve_reg_t;
+
 typedef struct timer_reg_t {
     reg32_t IRQ_EN;                                 // 0x000
     reg32_t IRQ_STA;                                // 0x004
@@ -1420,10 +1483,14 @@ typedef struct musb_reg_t {
         reg8_t RxFIFOsz;                            // 0x0094
         RESERVED_U8N(1)
         reg16_t RxFIFOadd;                          // 0x0096
-        reg8_t FAddr;                               // 0x0098
-        RESERVED_U8N(3)
-        reg8_t RAddr;                               // 0x009c
-        RESERVED_U8N(3)
+        reg8_t TxFuncAddr;                          // 0x0098
+        RESERVED_U8N(1)
+        reg8_t TxHubAddr;                           // 0x009a
+        reg8_t TxHubPort;                           // 0x009b
+        reg8_t RxFuncAddr;                          // 0x009c
+        RESERVED_U8N(1)
+        reg8_t RxHubAddr;                           // 0x009e
+        reg8_t RxHubPort;                           // 0x009f
     } Index;
 
     RESERVED_U32N(216)

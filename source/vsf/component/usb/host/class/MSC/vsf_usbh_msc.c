@@ -53,10 +53,11 @@ struct vk_usbh_msc_t {
     vk_scsi_t scsi;
 #endif
 
-    vsf_eda_t *eda;
+    vsf_eda_t eda;
     uint64_t addr;
     uint32_t total_size;
     uint32_t remain_size;
+    uint8_t max_lun;
     enum {
         VSF_USBH_MSC_STATE_COMMAND,
         VSF_USBH_MSC_STATE_DATA,
@@ -253,6 +254,44 @@ static void __vk_usbh_msc_free_urb(vk_usbh_msc_t *msc)
     vk_usbh_free_urb(usbh, &msc->urb_out);
 }
 
+static vsf_err_t __vk_usbh_msc_get_max_lun(vk_usbh_msc_t *msc)
+{
+    VSF_USB_ASSERT((msc != NULL) && (msc->usbh != NULL) && (msc->dev != NULL) && (msc->ifs != NULL));
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_IN,
+        .bRequest        =  USB_MSC_REQ_GET_MAX_LUN,
+        .wValue          =  0,
+        .wIndex          =  msc->ifs->no,
+        .wLength         =  1,
+    };
+    vk_usbh_urb_set_buffer(&msc->dev->ep0.urb, &msc->max_lun, 1);
+    return vk_usbh_control_msg(msc->usbh, msc->dev, &req);
+}
+
+static void __vk_usbh_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    vk_usbh_msc_t *msc = container_of(eda, vk_usbh_msc_t, eda);
+    vk_usbh_dev_t *dev = msc->dev;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (VSF_ERR_NONE != __vsf_eda_crit_npb_enter(&dev->ep0.crit)) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC:
+        if (VSF_ERR_NONE != __vk_usbh_msc_get_max_lun(msc)) {
+            vk_usbh_remove_interface(msc->usbh, dev, msc->ifs);
+            return;
+        }
+        break;
+    case VSF_EVT_MESSAGE:
+        __vsf_eda_crit_npb_leave(&dev->ep0.crit);
+        vsf_scsi_on_new(&msc->scsi);
+        break;
+    }
+}
+
 static void __vk_usbh_msc_on_eda_terminate(vsf_eda_t *eda)
 {
     vk_usbh_msc_t *msc = container_of(eda, vk_usbh_msc_t, eda);
@@ -294,7 +333,9 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     msc->ifs = ifs;
 
     msc->scsi.drv = &__vk_usbh_msc_scsi_drv;
-    vsf_scsi_on_new(&msc->scsi);
+    msc->eda.fn.evthandler = __vk_usbh_msc_evthandler;
+    msc->eda.on_terminate = __vk_usbh_msc_on_eda_terminate;
+    vsf_eda_init(&msc->eda, vsf_prio_inherit, false);
     return msc;
 
 free_all:

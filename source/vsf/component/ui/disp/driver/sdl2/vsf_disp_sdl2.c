@@ -181,6 +181,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
     vk_input_type_t evt_type;
 
     uint_fast16_t x = 0, y = 0;
+    uint_fast8_t pressure = 0;
     bool is_down = false, is_to_update = false;
     int_fast16_t wheel_x = 0, wheel_y = 0;
     int mouse_evt = 0, mouse_button = 0;
@@ -359,7 +360,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                     case VSF_INPUT_TYPE_TOUCHSCREEN:
                         evt.ts_evt.info.width = disp_sdl2->param.width;
                         evt.ts_evt.info.height = disp_sdl2->param.height;
-                        vsf_input_touchscreen_set(&evt.ts_evt, 0, is_down, x, y);
+                        vsf_input_touchscreen_set(&evt.ts_evt, 0, is_down, pressure, x, y);
                         vsf_input_on_touchscreen(&evt.ts_evt);
                         break;
                     case VSF_INPUT_TYPE_GAMEPAD:

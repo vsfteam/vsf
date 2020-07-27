@@ -21,6 +21,10 @@ enum {
     TRUE                = 1,
 };
 
+#ifndef __WIN__
+typedef long int        ptrdiff_t;
+#endif
+
 #ifdef __cplusplus
 }
 #endif

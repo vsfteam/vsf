@@ -59,20 +59,25 @@
 /*============================ TYPES =========================================*/
 
 struct hid_desc_t {
-    int report_id;
-    int collection;
-    int report_size;
-    int report_count;
-    int usage_page;
-    int usage_num;
-    int logical_min;
-    int logical_max;
-    int physical_min;
-    int physical_max;
-    int usage_min;
-    int usage_max;
-    int generic_usage;
-    int usages[32];
+    int16_t report_id;
+    uint16_t report_size;
+    uint16_t report_count;
+
+    uint16_t usage_num;
+    uint8_t generic_usage_page;
+    uint8_t generic_usage_id;
+    uint8_t usage_page;
+    uint8_t collection;
+
+    int16_t usage_min;
+    int16_t usage_max;
+
+    int32_t logical_min;
+    int32_t logical_max;
+    int32_t physical_min;
+    int32_t physical_max;
+
+    uint8_t usages[32];
 };
 typedef struct hid_desc_t hid_desc_t;
 
@@ -80,20 +85,13 @@ typedef struct hid_desc_t hid_desc_t;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_INPUT_ON_EVT_EXTERN)                                   \
-    &&  defined(WEAK_VSF_INPUT_ON_EVT)
-WEAK_VSF_INPUT_ON_EVT_EXTERN
-#endif
+extern void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt);
+extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
 
-#if     defined(WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_NEW_DEV)
-WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN)                              \
-    &&  defined(WEAK_VSF_INPUT_ON_FREE_DEV)
-WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
-#endif
+extern void vsf_hid_on_new_dev(vk_input_hid_t *dev);
+extern void vsf_hid_on_free_dev(vk_input_hid_t *dev);
+extern void vsf_hid_on_report_input(vk_hid_evt_t *hid_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -101,11 +99,7 @@ WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
 WEAK(vsf_hid_on_new_dev)
 void vsf_hid_on_new_dev(vk_input_hid_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
     vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
-#   else
-    WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_HID, dev);
-#   endif
 }
 #endif
 
@@ -113,25 +107,108 @@ void vsf_hid_on_new_dev(vk_input_hid_t *dev)
 WEAK(vsf_hid_on_free_dev)
 void vsf_hid_on_free_dev(vk_input_hid_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
     vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
-#   else
-    WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_HID, dev);
-#   endif
 }
 #endif
 
 #ifndef WEAK_VSF_HID_ON_REPORT_INPUT
 WEAK(vsf_hid_on_report_input)
-void vsf_hid_on_report_input(vk_hid_event_t *hid_evt)
+void vsf_hid_on_report_input(vk_hid_evt_t *hid_evt)
 {
-#ifndef WEAK_VSF_INPUT_ON_EVT
-    vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
-#else
-    WEAK_VSF_INPUT_ON_EVT(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
+#if VSF_HID_CFG_TRACE == ENABLED
+    if (hid_evt->id != 0) {
+        uint_fast32_t mask = (1 << hid_evt->usage->bit_length) - 1;
+        vsf_trace(VSF_TRACE_DEBUG, "hid: usage(%d/%d:%d/%d,%d-%d) %d -> %d\n",
+            hid_get_generic_usage_page(hid_evt), hid_get_generic_usage_id(hid_evt),
+            hid_get_usage_page(hid_evt), hid_get_usage_id(hid_evt),
+            hid_evt->usage->bit_offset, hid_evt->usage->bit_length,
+            hid_evt->pre.valu32 & mask, hid_evt->cur.valu32 & mask);
+    }
 #endif
+
+    vsf_hid_parse_touch_screen(hid_evt);
+    vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
 }
 #endif
+
+void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt)
+{
+    uint_fast8_t generic_usage_page = hid_get_generic_usage_page(hid_evt);
+    uint_fast8_t generic_usage_id = hid_get_generic_usage_id(hid_evt);
+
+    if ((HID_USAGE_PAGE_DIGITIZERS == generic_usage_page) && (HID_USAGE_ID_TOUCH_SCREEN == generic_usage_id)) {
+        uint_fast8_t usage_page = hid_get_usage_page(hid_evt);
+        uint_fast8_t usage_id = hid_get_usage_id(hid_evt);
+        uint_fast32_t value = hid_evt->cur.valu32 & ((1 << hid_evt->usage->bit_length) - 1);
+
+        static uint_fast16_t x, y, height, width;
+        static uint_fast8_t mask = 0;
+        static uint_fast16_t pressure = 0;
+        static bool is_down;
+        static void *dev = NULL;
+        static uint_fast8_t id = 0;
+
+        if (dev != NULL) {
+            if (dev != hid_evt->dev) {
+                VSF_INPUT_ASSERT(false);
+
+            reset:
+                mask = 0;
+                pressure = 0;
+                dev = NULL;
+                id = 0;
+                return;
+            }
+        }
+
+        switch (usage_page) {
+        case HID_USAGE_PAGE_GENERIC:
+            if (usage_id == HID_USAGE_ID_X) {
+                mask |= 1 << 0;
+                x = value;
+                width = hid_evt->usage->logical_max;
+                dev = hid_evt->dev;
+            } else if (usage_id == HID_USAGE_ID_Y) {
+                mask |= 1 << 1;
+                y = value;
+                height = hid_evt->usage->logical_max;
+                dev = hid_evt->dev;
+            }
+            break;
+        case HID_USAGE_PAGE_DIGITIZERS:
+            switch (usage_id) {
+            case HID_USAGE_ID_TIP_SWITCH:
+                is_down = value;
+                dev = hid_evt->dev;
+                if (!is_down) {
+                    mask = 0x03;
+                }
+                break;
+           case HID_USAGE_ID_TIP_PRESSURE:
+                pressure = value;
+                dev = hid_evt->dev;
+                break;
+            case HID_USAGE_ID_TIP_ID:
+                id = value;
+                dev = hid_evt->dev;
+                break;
+            }
+            break;
+        }
+
+        if (0x03 == (mask & 0x03)) {
+            vk_touchscreen_evt_t ts_evt = {
+                .info.height = height,
+                .info.width = width,
+            };
+
+            vsf_input_touchscreen_set(&ts_evt, id, is_down, pressure, x, y);
+            vsf_input_on_touchscreen(&ts_evt);
+
+            goto reset;
+        }
+    }
+}
 
 static vk_hid_report_t * vk_hid_get_report(vk_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
 {
@@ -151,7 +228,6 @@ static vk_hid_report_t * vk_hid_get_report(vk_input_hid_t *dev, hid_desc_t *desc
             vsf_slist_add_to_head(vk_hid_report_t, report_node, &dev->report_list, report);
             report->type = type;
             report->id = (desc->report_id >= 0) ? desc->report_id : -1;
-            report->generic_usage = desc->generic_usage;
         }
     }
     return report;
@@ -182,9 +258,12 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                 usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                 if (usage == NULL) { return VSF_ERR_FAIL; }
 
-                usage->data_flag = value;
+                usage->data_flag = (uint8_t)value;
                 usage->report_size = (int32_t)desc->report_size;
                 usage->report_count = (int32_t)desc->report_count;
+
+                usage->generic_usage_page = desc->generic_usage_page;
+                usage->generic_usage_id = desc->generic_usage_id;
 
                 usage->usage_page = (uint16_t)desc->usage_page;
                 usage->usage_min = (uint8_t)desc->usage_min;
@@ -204,9 +283,12 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                     usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                     if (usage == NULL) { return VSF_ERR_FAIL; }
 
+                    usage->data_flag = (uint8_t)value;
                     usage->report_size = (int32_t)desc->report_size;
                     usage->report_count = 1;
-                    usage->data_flag = value;
+
+                    usage->generic_usage_page = desc->generic_usage_page;
+                    usage->generic_usage_id = desc->generic_usage_id;
 
                     usage->usage_page = (uint16_t)desc->usage_page;
                     usage->usage_min = (uint8_t)desc->usages[i];
@@ -234,9 +316,12 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                 usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                 if (usage == NULL) { return VSF_ERR_FAIL; }
 
+                usage->data_flag = value;
                 usage->report_size = desc->report_size;
                 usage->report_count = desc->report_count;
-                usage->data_flag = value;
+
+                usage->generic_usage_page = desc->generic_usage_page;
+                usage->generic_usage_id = desc->generic_usage_id;
 
                 usage->usage_page = desc->usage_page;
                 usage->usage_min = desc->usage_min;
@@ -256,10 +341,13 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
                     usage = vsf_heap_malloc(sizeof(vk_hid_usage_t));
                     if (usage == NULL) { return VSF_ERR_FAIL; }
 
+                    usage->data_flag = value;
                     usage->report_size = desc->report_size;
                     usage->report_count = desc->report_count;
-                    usage->data_flag = value;
                     value = desc->report_size * desc->report_count / desc->usage_num;
+
+                    usage->generic_usage_page = desc->generic_usage_page;
+                    usage->generic_usage_id = desc->generic_usage_id;
 
                     usage->usage_page = desc->usage_page;
                     usage->usage_min = desc->usages[i];
@@ -293,16 +381,19 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
             break;
 
         case HID_ITEM_USAGE_PAGE:
-            desc->usage_page = value;
+            if ((desc->generic_usage_page == 0) && (desc->collection == 0)) {
+                desc->generic_usage_page = (uint8_t)value;
+            }
+            desc->usage_page = (uint8_t)value;
             break;
 
         case HID_ITEM_LOGI_MINI:
             if (size == 1) {
                 ival = *(int8_t *)buf;
             } else if (size == 2) {
-                ival = *(int16_t *)buf;
+                ival = (int16_t)get_unaligned_le16(buf);
             } else if (size == 4) {
-                ival = *(int32_t *)buf;
+                ival = (int32_t)get_unaligned_le32(buf);
             } else {
                 return VSF_ERR_NOT_SUPPORT;
             }
@@ -313,9 +404,9 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
             if (size == 1) {
                 ival = *(int8_t *)buf;
             } else if (size == 2) {
-                ival = *(int16_t *)buf;
+                ival = (int16_t)get_unaligned_le16(buf);
             } else if (size == 4) {
-                ival = *(int32_t *)buf;
+                ival = (int32_t)get_unaligned_le32(buf);
             } else {
                 return VSF_ERR_NOT_SUPPORT;
             }
@@ -356,8 +447,8 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
         case HID_ITEM_USAGE:
             if (desc->usage_num < dimof(desc->usages)) {
                 desc->usages[desc->usage_num++] = value;
-                if ((desc->generic_usage == 0) && (desc->collection == 0)) {
-                    desc->generic_usage = value;
+                if ((desc->generic_usage_id == 0) && (desc->collection == 0)) {
+                    desc->generic_usage_id = value;
                 }
             } else {
                 VSF_INPUT_ASSERT(false);
@@ -378,22 +469,14 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
 
 void vk_hid_new_dev(vk_input_hid_t *dev)
 {
-#ifndef WEAK_VSF_HID_ON_NEW_DEV
     vsf_hid_on_new_dev(dev);
-#else
-    WEAK_VSF_HID_ON_NEW_DEV(dev);
-#endif
 }
 
 void vk_hid_free_dev(vk_input_hid_t *dev)
 {
     vk_hid_report_t *report;
 
-#ifndef WEAK_VSF_HID_ON_FREE_DEV
     vsf_hid_on_free_dev(dev);
-#else
-    WEAK_VSF_HID_ON_FREE_DEV(dev);
-#endif
 
     __vsf_slist_foreach_next_unsafe(vk_hid_report_t, report_node, &dev->report_list) {
         report = _;
@@ -461,12 +544,12 @@ free_hid_report:
 void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
 {
     vk_hid_report_t *report = NULL;
-    vk_hid_event_t event;
+    vk_hid_evt_t event;
     uint_fast32_t cur_value, pre_value;
     bool reported = false;
     int_fast16_t id = dev->report_has_id ? *buf++ : -1;
     int_fast32_t i;
-    uint_fast16_t usage_page, usage_id;
+    uint_fast16_t usage_id;
 
     __vsf_slist_foreach_unsafe(vk_hid_report_t, report_node, &dev->report_list) {
         if ((_->type == HID_ITEM_INPUT) && (_->id == id)) {
@@ -493,21 +576,15 @@ void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
             pre_value = vk_input_buf_get_value(report->value, _->bit_offset + i * _->report_size, _->report_size);
 
             /* compare and process */
-            if (cur_value != (HID_USAGE_IS_REL(_) ? 0 : pre_value)) {
-                usage_page = _->usage_page;
-                usage_id = HID_USAGE_IS_VAR(_) ? (_->usage_min + i) :
-                        (cur_value ? (uint16_t)cur_value : (uint16_t)pre_value);
-                event.id = (uint64_t)report->generic_usage | ((uint64_t)usage_page << 16) | ((uint64_t)usage_id << 32);
+            if (cur_value != (hid_usage_is_rel(_) ? 0 : pre_value)) {
+                usage_id = hid_usage_is_var(_) ? (_->usage_min + i) : (cur_value ? (uint16_t)cur_value : (uint16_t)pre_value);
+                event.id = (uint64_t)_->generic_usage_id | ((uint64_t)_->generic_usage_page << 8) | ((uint64_t)usage_id << 16) | ((uint64_t)_->usage_page << 24);
                 event.pre.valu32 = pre_value;
                 event.cur.valu32 = cur_value;
                 event.usage = _;
 
                 reported = true;
-#ifndef WEAK_VSF_HID_ON_REPORT_INPUT
                 vsf_hid_on_report_input(&event);
-#else
-                WEAK_VSF_HID_ON_REPORT_INPUT(&event);
-#endif
             }
         }
     }
@@ -515,11 +592,7 @@ void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len)
     // just report input process end if changed reportted
     if (reported) {
         event.id = 0;
-#ifndef WEAK_VSF_HID_ON_REPORT_INPUT
         vsf_hid_on_report_input(&event);
-#else
-        WEAK_VSF_HID_ON_REPORT_INPUT(&event);
-#endif
     }
     memcpy(report->value, buf, len);
 }

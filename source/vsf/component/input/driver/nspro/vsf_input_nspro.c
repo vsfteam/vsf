@@ -65,25 +65,10 @@ const vk_sensor_item_info_t vk_nspro_sensor_item_info[6] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_GAMEPAD)
-WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_NEW_DEV)
-WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN)                              \
-    &&  defined(WEAK_VSF_INPUT_ON_FREE_DEV)
-WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_SENSOR_EXTERN)                                \
-    &&  defined(WEAK_VSF_INPUT_ON_SENSOR)
-WEAK_VSF_INPUT_ON_SENSOR_EXTERN
-#endif
+extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
+extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -91,11 +76,7 @@ WEAK_VSF_INPUT_ON_SENSOR_EXTERN
 WEAK(vsf_nspro_on_new_dev)
 void vsf_nspro_on_new_dev(vk_input_nspro_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
     vsf_input_on_new_dev(VSF_INPUT_TYPE_NSPRO, dev);
-#   else
-    WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_NSPRO, dev);
-#   endif
 }
 #endif
 
@@ -103,11 +84,7 @@ void vsf_nspro_on_new_dev(vk_input_nspro_t *dev)
 WEAK(vsf_nspro_on_free_dev)
 void vsf_nspro_on_free_dev(vk_input_nspro_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
     vsf_input_on_free_dev(VSF_INPUT_TYPE_NSPRO, dev);
-#   else
-    WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_NSPRO, dev);
-#   endif
 }
 #endif
 
@@ -115,11 +92,7 @@ void vsf_nspro_on_free_dev(vk_input_nspro_t *dev)
 WEAK(vsf_nspro_on_report_input)
 void vsf_nspro_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 {
-#   ifndef WEAK_VSF_INPUT_ON_GAMEPAD
     vsf_input_on_gamepad(gamepad_evt);
-#   else
-    WEAK_VSF_INPUT_ON_GAMEPAD(gamepad_evt);
-#   endif
 }
 #endif
 
@@ -127,11 +100,7 @@ void vsf_nspro_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 WEAK(vsf_nspro_on_sensor)
 void vsf_nspro_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
-#   ifndef WEAK_VSF_INPUT_ON_SENSOR
     vsf_input_on_sensor(sensor_evt);
-#   else
-    WEAK_VSF_INPUT_ON_SENSOR(sensor_evt);
-#   endif
 }
 #endif
 

@@ -43,9 +43,16 @@ static void __lvgl_on_touchscreen(vk_input_type_t type, vk_touchscreen_evt_t *ts
 
 static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
-    data->state = vsf_input_touchscreen_is_down(&usrapp_ui_common.lvgl.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    data->point.x = vsf_input_touchscreen_get_x(&usrapp_ui_common.lvgl.ts_evt);
-    data->point.y = vsf_input_touchscreen_get_y(&usrapp_ui_common.lvgl.ts_evt);
+    vk_touchscreen_evt_t *ts_evt = &usrapp_ui_common.lvgl.ts_evt;
+    data->state = vsf_input_touchscreen_is_down(ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+
+#if APP_LVGL_DEMO_CFG_TOUCH_REMAP == ENABLED
+    data->point.x = vsf_input_touchscreen_get_x(ts_evt) * LV_HOR_RES_MAX / ts_evt->info.width;
+    data->point.y = vsf_input_touchscreen_get_y(ts_evt) * LV_VER_RES_MAX / ts_evt->info.height;
+#else
+    data->point.x = vsf_input_touchscreen_get_x(ts_evt);
+    data->point.y = vsf_input_touchscreen_get_y(ts_evt);
+#endif
 
 //    vsf_trace(VSF_TRACE_DEBUG, "touchscreen: %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
 //        data->state == LV_INDEV_STATE_PR ? "press" : "release",
@@ -121,6 +128,9 @@ int main(void)
 
     while (1) {
         lv_task_handler();
+#if APP_CFG_USE_LINUX_DEMO == ENABLED
+        vsf_thread_delay_ms(10);
+#endif
     }
     return 0;
 }

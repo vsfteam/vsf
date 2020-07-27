@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by SimonQian                                      *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,21 +15,48 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-//! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
+#ifndef __VSFIP_DHCPD_H__
+#define __VSFIP_DHCPD_H__
 
-#ifndef __VSF_TCPIP_CFG_H__
-#define __VSF_TCPIP_CFG_H__
+/*============================ INCLUDES ======================================*/
+
+#include "component/tcpip/vsf_tcpip_cfg.h"
+
+#if VSF_USE_TCPIP == ENABLED
+
+#include "../../vsfip.h"
+#include "./vsfip_dhcp_common.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSFIP_CFG_DHCPD_ASSOCNUM
+#   define VSFIP_CFG_DHCPD_ASSOCNUM         2
+#endif
+#ifndef VSFIP_CFG_DOMAIN
+#   define VSFIP_CFG_DOMAIN                 "vsfip.net"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+struct vsfip_dhcpd_t {
+    vsfip_netif_t *netif;
+
+    // private
+    vsfip_socket_t *so;
+    vsfip_sock_addr_t sockaddr;
+    vsfip_ipmac_assoc assoc[VSFIP_CFG_DHCPD_ASSOCNUM];
+    uint32_t optlen;
+    uint32_t alloc_idx;
+};
+typedef struct vsfip_dhcpd_t vsfip_dhcpd_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+// vsfip_dhcpd_start MUST be called protected with netif
+extern vsf_err_t vsfip_dhcpd_start(vsfip_netif_t*, vsfip_dhcpd_t*);
+extern void vsfip_dhcpd_stop(vsfip_dhcpd_t *);
 
-
-#endif
-/* EOF */
+#endif      // VSF_USE_TCPIP
+#endif      // __VSFIP_DHCPD_H__

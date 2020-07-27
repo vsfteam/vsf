@@ -62,30 +62,16 @@ const vk_sensor_item_info_t vk_ds4u_sensor_item_info[6] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN)                           \
-    &&  defined(WEAK_VSF_INPUT_ON_TOUCHSCREEN)
-WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN
-#endif
+extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
+extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
 
-#if     defined(WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_GAMEPAD)
-WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_NEW_DEV)
-WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN)                              \
-    &&  defined(WEAK_VSF_INPUT_ON_FREE_DEV)
-WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_SENSOR_EXTERN)                                \
-    &&  defined(WEAK_VSF_INPUT_ON_SENSOR)
-WEAK_VSF_INPUT_ON_SENSOR_EXTERN
-#endif
+extern void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev);
+extern void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev);
+extern void vsf_ds4u_on_sensor(vk_sensor_evt_t *sensor_evt);
+extern void vsf_ds4u_on_report_input(vk_gamepad_evt_t *gamepad_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -93,11 +79,7 @@ WEAK_VSF_INPUT_ON_SENSOR_EXTERN
 WEAK(vsf_ds4u_on_new_dev)
 void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
     vsf_input_on_new_dev(VSF_INPUT_TYPE_DS4, dev);
-#   else
-    WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_DS4, dev);
-#   endif
 }
 #endif
 
@@ -105,11 +87,7 @@ void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev)
 WEAK(vsf_ds4u_on_free_dev)
 void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
     vsf_input_on_free_dev(VSF_INPUT_TYPE_DS4, dev);
-#   else
-    WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_DS4, dev);
-#   endif
 }
 #endif
 
@@ -117,11 +95,7 @@ void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev)
 WEAK(vsf_ds4u_on_report_input)
 void vsf_ds4u_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 {
-#   ifndef WEAK_VSF_INPUT_ON_GAMEPAD
     vsf_input_on_gamepad(gamepad_evt);
-#   else
-    WEAK_VSF_INPUT_ON_GAMEPAD(gamepad_evt);
-#   endif
 }
 #endif
 
@@ -129,31 +103,19 @@ void vsf_ds4u_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 WEAK(vsf_ds4u_on_sensor)
 void vsf_ds4u_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
-#   ifndef WEAK_VSF_INPUT_ON_SENSOR
     vsf_input_on_sensor(sensor_evt);
-#   else
-    WEAK_VSF_INPUT_ON_SENSOR(sensor_evt);
-#   endif
 }
 #endif
 
 void vk_ds4u_new_dev(vk_input_ds4u_t *dev)
 {
     memset(&dev->data, 0, sizeof(dev->data));
-#ifndef WEAK_VSF_DS4U_ON_NEW_DEV
     vsf_ds4u_on_new_dev(dev);
-#else
-    WEAK_VSF_DS4U_ON_NEW_DEV(dev);
-#endif
 }
 
 void vk_ds4u_free_dev(vk_input_ds4u_t *dev)
 {
-#ifndef WEAK_VSF_DS4U_ON_FREE_DEV
     vsf_ds4u_on_free_dev(dev);
-#else
-    WEAK_VSF_DS4U_ON_FREE_DEV(dev);
-#endif
 }
 
 void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t *data)
@@ -186,32 +148,20 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
             parser.gamepad.evt.info = *parser.gamepad.info;
             parser.gamepad.evt.pre = parser.gamepad.parser.pre;
             parser.gamepad.evt.cur = parser.gamepad.parser.cur;
-#ifndef WEAK_VSF_DS4U_ON_REPORT_INPUT
             vsf_ds4u_on_report_input(&parser.gamepad.evt);
-#else
-            WEAK_VSF_DS4U_ON_REPORT_INPUT(&parser.gamepad.evt);
-#endif
             parser.gamepad.event_sent = true;
         }
     } while (parser.gamepad.info != NULL);
     if (parser.gamepad.event_sent) {
         parser.gamepad.evt.id = GAMEPAD_ID_DUMMY;
-#ifndef WEAK_VSF_DS4U_ON_REPORT_INPUT
         vsf_ds4u_on_report_input(&parser.gamepad.evt);
-#else
-        WEAK_VSF_DS4U_ON_REPORT_INPUT(&parser.gamepad.evt);
-#endif
     }
 
     // sensor
     parser.sensor.evt.desc.item_info    = (vk_sensor_item_info_t *)vk_ds4u_sensor_item_info;
     parser.sensor.evt.desc.item_num     = dimof(vk_ds4u_sensor_item_info);
     parser.sensor.evt.data              = (uint8_t *)&data->gyro_pitch;
-#ifndef WEAK_VSF_DS4U_ON_SENSOR
     vsf_ds4u_on_sensor(&parser.sensor.evt);
-#else
-    WEAK_VSF_DS4U_ON_SENSOR(&parser.sensor.evt);
-#endif
 
     // touch
     if (data->touch[0] > 0) {
@@ -224,23 +174,15 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
         if ((dev->data.touch[2] != data->touch[2]) || !(data->touch[2] & 0x80)) {
             x = data->touch[3] + ((data->touch[4] & 0x0F) << 8);
             y = ((data->touch[4] & 0xF0) >> 4) + (data->touch[5] << 4);
-            vsf_input_touchscreen_set(&parser.touch.evt, 0, !(data->touch[2] & 0x80), x, y);
-#ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
+            vsf_input_touchscreen_set(&parser.touch.evt, 0, !(data->touch[2] & 0x80), 0, x, y);
             vsf_input_on_touchscreen(&parser.touch.evt);
-#else
-            WEAK_VSF_INPUT_ON_TOUCHSCREEN(&parser.touch.evt);
-#endif
         }
 
         if ((dev->data.touch[6] != data->touch[6]) || !(data->touch[6] & 0x80)) {
             x = data->touch[7] + ((data->touch[8] & 0x0F) << 8);
             y = ((data->touch[8] & 0xF0) >> 4) + (data->touch[9] << 4);
-            vsf_input_touchscreen_set(&parser.touch.evt, 1, !(data->touch[6] & 0x80), x, y);
-#ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
+            vsf_input_touchscreen_set(&parser.touch.evt, 1, !(data->touch[6] & 0x80), 0, x, y);
             vsf_input_on_touchscreen(&parser.touch.evt);
-#else
-            WEAK_VSF_INPUT_ON_TOUCHSCREEN(&parser.touch.evt);
-#endif
         }
     }
 

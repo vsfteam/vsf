@@ -5538,6 +5538,24 @@
                             </file>
                         </group>
                         <group>
+                            <name>simple_libc</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stddef.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdio.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\string.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\time.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\wchar.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>sys</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\sys\mount.h</name>

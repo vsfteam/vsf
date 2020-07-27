@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by SimonQian                                      *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,21 +15,28 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-//! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
+#ifndef __VSFIP_ETH_H__
+#define __VSFIP_ETH_H__
 
-#ifndef __VSF_TCPIP_CFG_H__
-#define __VSF_TCPIP_CFG_H__
+/*============================ INCLUDES ======================================*/
+
+#include "component/tcpip/vsf_tcpip_cfg.h"
+
+#if VSF_USE_TCPIP == ENABLED
 
 /*============================ MACROS ========================================*/
+
+#define TCPIP_ETH_HWTYPE            1
+#define TCPIP_ETH_HEADSIZE          14
+#define TCPIP_ETH_ADDRLEN           6
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+
+extern const vsfip_netif_op_t vsfip_eth_op;
+
 /*============================ PROTOTYPES ====================================*/
 
-
-
-#endif
-/* EOF */
+#endif      // VSF_USE_TCPIP
+#endif      // __VSFIP_ETH_H__

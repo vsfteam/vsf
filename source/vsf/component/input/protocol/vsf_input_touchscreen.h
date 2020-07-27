@@ -32,20 +32,22 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_input_touchscreen_set(__EVENT, __ID, __IS_DOWN, __X, __Y)           \
+#define vsf_input_touchscreen_set(__evt, __id, __is_down, __pressure, __x, __y) \
             do {                                                                \
-                (__EVENT)->id = ((__ID) | ((__IS_DOWN) << 8));                  \
-                (__EVENT)->cur.valu32 = ((__X) | ((__Y) << 16));                \
+                (__evt)->id = ((__id) | ((__is_down) << 8));                    \
+                (__evt)->cur.valu64 = (__x) | ((__y) << 16) | ((uint64_t)(__pressure) << 32);\
             } while (0)
 
-#define vsf_input_touchscreen_get_id(__EVENT)                                   \
-            ((uint8_t)(((__EVENT)->id >> 0) & 0xFF))
-#define vsf_input_touchscreen_is_down(__EVENT)                                  \
-            (!!(((__EVENT)->id >> 8) & 0xFF))
-#define vsf_input_touchscreen_get_x(__EVENT)                                    \
-            ((uint16_t)(((__EVENT)->cur.valu32 >> 0) & 0xFFFF))
-#define vsf_input_touchscreen_get_y(__EVENT)                                    \
-            ((uint16_t)(((__EVENT)->cur.valu32 >> 16) & 0xFFFF))
+#define vsf_input_touchscreen_get_id(__evt)                                     \
+            ((uint8_t)(((__evt)->id >> 0) & 0xFF))
+#define vsf_input_touchscreen_is_down(__evt)                                    \
+            (!!(((__evt)->id >> 8) & 0xFF))
+#define vsf_input_touchscreen_get_x(__evt)                                      \
+            ((uint16_t)(((__evt)->cur.valu64 >> 0) & 0xFFFF))
+#define vsf_input_touchscreen_get_y(__evt)                                      \
+            ((uint16_t)(((__evt)->cur.valu64 >> 16) & 0xFFFF))
+#define vsf_input_touchscreen_get_pressure(__evt)                               \
+            ((uint16_t)(((__evt)->cur.valu64 >> 32) & 0xFFFF))
 
 /*============================ TYPES =========================================*/
 

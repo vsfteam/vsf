@@ -42,7 +42,7 @@ typedef struct f1cx00s_usbh_hcd_t {
 
     enum {
         HCD_STATE_WAIT_HOSTMODE,
-        HCD_STATE_WAIE_CONNECT,
+        HCD_STATE_WAIT_CONNECT,
         HCD_STATE_WAIT_RESET,
         HCD_STATE_WAIT_RESET_CLEAR,
         HCD_STATE_CONNECTED,
@@ -205,67 +205,94 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
     vk_usbh_hcd_dev_t *dev = urb->dev_hcd;
     f1cx00s_usbh_hcd_dev_t *musb_dev = dev->dev_priv;
     vk_usbh_pipe_t pipe = urb->pipe;
-    bool is_int_iso = !__f1cx00s_usbh_hcd_urb_for_queue(urb);
     bool is_in = pipe.dir_in1out0 > 0;
     uint_fast16_t epsize = vk_usbh_get_ep_size_from_pipe(pipe);
     uint8_t *buffer = urb->buffer;
 
     __f1cx00s_usb_set_ep(musb_hcd->otg, musb_urb->epidx);
     switch (musb_urb->state) {
-    case URB_STATE_START_SUBMITTING:
-        musb_urb->state = URB_STATE_SUBMITTING;
+    case URB_STATE_START_SUBMITTING: {
+            bool is_int_iso = !__f1cx00s_usbh_hcd_urb_for_queue(urb);
+#if VSF_USE_USB_HOST_HUB == ENABLED
+            vk_usbh_dev_t *dev = (vk_usbh_dev_t *)urb->dev_hcd;
+            vk_usbh_dev_t *dev_parent = dev->dev_parent;
+            uint_fast8_t hub_addr = 0, hub_port = 0;
 
-        urb->actual_length = 0;
-        urb->status = VSF_ERR_NONE;
-
-        if (!is_in || !pipe.endpoint) {
-            // for OUT and EP0 use FAddr
-            MUSB_BASE->Index.FAddr = pipe.address;
-        } else {
-            MUSB_BASE->Index.RAddr = pipe.address;
-        }
-
-        if (0 == pipe.endpoint) {
-            musb_urb->ep0_state = EP0_STATE_SETUP;
-            __f1cx00s_usb_write_fifo(musb_hcd->otg, 0, (uint8_t *)&urb->setup_packet, sizeof(urb->setup_packet));
-            MUSB_BASE->Index.HC.EP0.CSR0 &= ~(MUSBH_CSR0_SetupPkt | MUSBH_CSR0_StatusPkt);
-            MUSB_BASE->Index.HC.EP0.CSR0 |= MUSBH_CSR0_TxPktRdy | MUSBH_CSR0_SetupPkt;
-            break;
-        } else {
-            if (is_in) {
-                MUSB_BASE->Index.HC.EPN.RxType = (__f1cx00s_usbh_hcd_get_speed(pipe) << 6) | (pipe.type << 4) | pipe.endpoint;
-                MUSB_BASE->Index.HC.EPN.RxMaxP = (epsize + 7) >> 3;
-
-                if (is_int_iso) {
-                    MUSB_BASE->Index.HC.EPN.RxInterval = 1;
-                } else {
-                    MUSB_BASE->Index.HC.EPN.RxInterval = 3;
-                }
-
-                MUSB_BASE->Index.HC.EPN.RxCSRL |= MUSBH_RxCSRL_FlushFIFO;
-                if (musb_dev->toggle[1] & (1 << pipe.endpoint)) {
-                    MUSB_BASE->Index.HC.EPN.RxCSRH = (MUSB_BASE->Index.HC.EPN.RxCSRH | MUSBH_RxCSRH_DataToggle) | MUSBH_RxCSRH_DataToggleWrEnable;
-                } else {
-                    MUSB_BASE->Index.HC.EPN.RxCSRH = (MUSB_BASE->Index.HC.EPN.RxCSRH & ~MUSBH_RxCSRH_DataToggle) | MUSBH_RxCSRH_DataToggleWrEnable;
-                }
-            } else {
-                MUSB_BASE->Index.HC.EPN.TxType = (__f1cx00s_usbh_hcd_get_speed(pipe) << 6) | (pipe.type << 4) | pipe.endpoint;
-                MUSB_BASE->Index.HC.EPN.TxMaxP = (epsize + 7) >> 3;
-
-                if (is_int_iso) {
-                    MUSB_BASE->Index.HC.EPN.TxInterval = 1;
-                } else {
-                    MUSB_BASE->Index.HC.EPN.TxInterval = 3;
-                }
-
-                MUSB_BASE->Index.HC.EPN.TxCSRL |= MUSBH_TxCSRL_FlushFIFO;
-                if (musb_dev->toggle[0] & (1 << pipe.endpoint)) {
-                    MUSB_BASE->Index.HC.EPN.TxCSRH = (MUSB_BASE->Index.HC.EPN.TxCSRH | MUSBH_TxCSRH_DataToggle) | MUSBH_TxCSRH_DataToggleWrEnable;
-                } else {
-                    MUSB_BASE->Index.HC.EPN.TxCSRH = (MUSB_BASE->Index.HC.EPN.TxCSRH & ~MUSBH_TxCSRH_DataToggle) | MUSBH_TxCSRH_DataToggleWrEnable;
-                }
+            if (dev_parent != NULL) {
+                hub_addr = dev_parent->devnum;
+                hub_port = dev->index + 1;
+#   if F1CX00S_USBH_TRACE_EN == ENABLED
+                vsf_trace(VSF_TRACE_DEBUG, "hub_addr: %d\r\n", hub_addr);
+                vsf_trace(VSF_TRACE_DEBUG, "hub_port: %d\r\n", hub_port);
+#   endif
             }
-            goto do_tx_rx;
+#endif
+
+            musb_urb->state = URB_STATE_SUBMITTING;
+
+            urb->actual_length = 0;
+            urb->status = VSF_ERR_NONE;
+
+            if (!is_in || !pipe.endpoint) {
+                // for normal musb, use FAddr
+                MUSB_BASE->Index.TxFuncAddr = pipe.address;
+#if VSF_USE_USB_HOST_HUB == ENABLED
+                MUSB_BASE->Index.TxHubAddr = hub_addr;
+                MUSB_BASE->Index.TxHubPort = hub_port;
+#endif
+            } else {
+                // for normal musb, use RAddr
+                MUSB_BASE->Index.RxFuncAddr = pipe.address;
+#if VSF_USE_USB_HOST_HUB == ENABLED
+                MUSB_BASE->Index.RxHubAddr = hub_addr;
+                MUSB_BASE->Index.RxHubPort = hub_port;
+#endif
+            }
+
+            if (0 == pipe.endpoint) {
+                MUSB_BASE->Index.HC.EP0.Type0 = __f1cx00s_usbh_hcd_get_speed(pipe) << 6;
+
+                musb_urb->ep0_state = EP0_STATE_SETUP;
+                __f1cx00s_usb_write_fifo(musb_hcd->otg, 0, (uint8_t *)&urb->setup_packet, sizeof(urb->setup_packet));
+                MUSB_BASE->Index.HC.EP0.CSR0 &= ~(MUSBH_CSR0_SetupPkt | MUSBH_CSR0_StatusPkt);
+                MUSB_BASE->Index.HC.EP0.CSR0 |= MUSBH_CSR0_TxPktRdy | MUSBH_CSR0_SetupPkt;
+                break;
+            } else {
+                if (is_in) {
+                    MUSB_BASE->Index.HC.EPN.RxType = (__f1cx00s_usbh_hcd_get_speed(pipe) << 6) | (pipe.type << 4) | pipe.endpoint;
+                    MUSB_BASE->Index.HC.EPN.RxMaxP = (epsize + 7) >> 3;
+
+                    if (is_int_iso) {
+                        MUSB_BASE->Index.HC.EPN.RxInterval = 1;
+                    } else {
+                        MUSB_BASE->Index.HC.EPN.RxInterval = 3;
+                    }
+
+                    MUSB_BASE->Index.HC.EPN.RxCSRL |= MUSBH_RxCSRL_FlushFIFO;
+                    if (musb_dev->toggle[1] & (1 << pipe.endpoint)) {
+                        MUSB_BASE->Index.HC.EPN.RxCSRH = (MUSB_BASE->Index.HC.EPN.RxCSRH | MUSBH_RxCSRH_DataToggle) | MUSBH_RxCSRH_DataToggleWrEnable;
+                    } else {
+                        MUSB_BASE->Index.HC.EPN.RxCSRH = (MUSB_BASE->Index.HC.EPN.RxCSRH & ~MUSBH_RxCSRH_DataToggle) | MUSBH_RxCSRH_DataToggleWrEnable;
+                    }
+                } else {
+                    MUSB_BASE->Index.HC.EPN.TxType = (__f1cx00s_usbh_hcd_get_speed(pipe) << 6) | (pipe.type << 4) | pipe.endpoint;
+                    MUSB_BASE->Index.HC.EPN.TxMaxP = (epsize + 7) >> 3;
+
+                    if (is_int_iso) {
+                        MUSB_BASE->Index.HC.EPN.TxInterval = 1;
+                    } else {
+                        MUSB_BASE->Index.HC.EPN.TxInterval = 3;
+                    }
+
+                    MUSB_BASE->Index.HC.EPN.TxCSRL |= MUSBH_TxCSRL_FlushFIFO;
+                    if (musb_dev->toggle[0] & (1 << pipe.endpoint)) {
+                        MUSB_BASE->Index.HC.EPN.TxCSRH = (MUSB_BASE->Index.HC.EPN.TxCSRH | MUSBH_TxCSRH_DataToggle) | MUSBH_TxCSRH_DataToggleWrEnable;
+                    } else {
+                        MUSB_BASE->Index.HC.EPN.TxCSRH = (MUSB_BASE->Index.HC.EPN.TxCSRH & ~MUSBH_TxCSRH_DataToggle) | MUSBH_TxCSRH_DataToggleWrEnable;
+                    }
+                }
+                goto do_tx_rx;
+            }
         }
         // fall through
     case URB_STATE_SUBMITTING:
@@ -322,10 +349,11 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                 }
 
                 if (MUSB_BASE->Index.HC.EPN.RxCSRL & (MUSBH_RxCSRL_RxStall | MUSBH_RxCSRL_Error)) {
-                    MUSB_BASE->Index.HC.EPN.RxCSRL &= ~(MUSBH_RxCSRL_RxStall | MUSBH_RxCSRL_Error);
+                    MUSB_BASE->Index.HC.EPN.RxCSRL &= ~(MUSBH_RxCSRL_RxStall | MUSBH_RxCSRL_Error | MUSBH_RxCSRL_ReqPkt);
                     return VSF_ERR_FAIL;
                 }
                 if (MUSB_BASE->Index.HC.EPN.RxCSRL & MUSBH_RxCSRL_NAKTimeout) {
+                    MUSB_BASE->Index.HC.EPN.RxCSRL &= ~(MUSBH_RxCSRL_NAKTimeout | MUSBH_RxCSRL_ReqPkt);
                     __f1cx00s_usbh_hcd_enqueue_urb(musb_hcd, musb_urb);
                     return VSF_ERR_NONE;
                 }
@@ -337,10 +365,11 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                 }
 
                 if (MUSB_BASE->Index.HC.EPN.TxCSRL & (MUSBH_TxCSRL_RxStall | MUSBH_TxCSRL_Error)) {
-                    MUSB_BASE->Index.HC.EPN.TxCSRL &= ~(MUSBH_TxCSRL_RxStall | MUSBH_TxCSRL_Error);
+                    MUSB_BASE->Index.HC.EPN.TxCSRL &= ~(MUSBH_TxCSRL_RxStall | MUSBH_TxCSRL_Error | MUSBH_TxCSRL_TxPktRdy);
                     return VSF_ERR_FAIL;
                 }
                 if (MUSB_BASE->Index.HC.EPN.TxCSRL & MUSBH_TxCSRL_NAKTimeout) {
+                    MUSB_BASE->Index.HC.EPN.TxCSRL &= ~(MUSBH_TxCSRL_NAKTimeout | MUSBH_TxCSRL_TxPktRdy);
                     __f1cx00s_usbh_hcd_enqueue_urb(musb_hcd, musb_urb);
                     return VSF_ERR_NONE;
                 }
@@ -382,6 +411,7 @@ urb_finished:
 #if F1CX00S_USBH_TRACE_EN == ENABLED
     vsf_trace(VSF_TRACE_DEBUG, "urb_done: %08X %d %s%d\r\n", urb, pipe.address, pipe.dir_in1out0 ? "IN" : "OUT", pipe.endpoint);
 #endif
+    musb_urb->state = URB_STATE_IDLE;
     vsf_eda_post_msg(urb->eda_caller, urb);
     return VSF_ERR_NONE;
 }
@@ -424,8 +454,8 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (MUSB_BASE->Common.DevCtl & MUSB_DevCtl_LSDev) {
                 speed = USB_SPEED_LOW;
             } else if (MUSB_BASE->Common.DevCtl & MUSB_DevCtl_FSDev) {
-                // TODO: check if high speed
-                speed = USB_SPEED_FULL;
+                // TODO: check if full speed
+                speed = USB_SPEED_HIGH;
             } else {
                 VSF_OSA_HAL_ASSERT(false);
                 speed = USB_SPEED_UNKNOWN;
@@ -437,7 +467,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case HCD_EVT_CONN:
-        if (HCD_STATE_WAIE_CONNECT == musb_hcd->state) {
+        if (HCD_STATE_WAIT_CONNECT == musb_hcd->state) {
             MUSB_BASE->Common.Power |= MUSB_Power_Reset;
             vsf_teda_set_timer_ms(100);
             musb_hcd->state = HCD_STATE_WAIT_RESET;
@@ -447,7 +477,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (HCD_STATE_CONNECTED == musb_hcd->state) {
             vk_usbh_disconnect_device((vk_usbh_t *)musb_hcd->hcd, musb_hcd->dev);
             musb_hcd->dev = NULL;
-            musb_hcd->state = HCD_STATE_WAIE_CONNECT;
+            musb_hcd->state = HCD_STATE_WAIT_CONNECT;
         }
         MUSB_BASE->Common.IntrUSBE = MUSBH_IntrUSBE_Conn;
         break;
@@ -473,6 +503,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     }
                 } else {
                 urb_fail:
+                    musb_urb->state = URB_STATE_IDLE;
                     urb->status = VSF_ERR_FAIL;
 #if F1CX00S_USBH_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "urb failed: %08X\r\n", urb);
@@ -562,10 +593,15 @@ static vsf_err_t __f1cx00s_usbh_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         if (!MUSB_BASE->Common.DevCtl & MUSB_DevCtl_HostMode) {
             vsf_teda_set_timer_ms(1);
         } else {
-            musb_hcd->state = HCD_STATE_WAIE_CONNECT;
+            musb_hcd->state = HCD_STATE_WAIT_CONNECT;
             vsf_eda_sem_init(&musb_hcd->sem, 0);
             musb_hcd->teda.fn.evthandler = __f1cx00s_usbh_hcd_evthandler;
             vsf_teda_init(&musb_hcd->teda, vsf_prio_inherit, false);
+
+            // if device is already connected on startup, Connect interupt will not issue
+            if (MUSB_BASE->Common.DevCtl & (MUSB_DevCtl_LSDev | MUSB_DevCtl_FSDev)) {
+                vsf_eda_post_evt(&musb_hcd->teda.use_as__vsf_eda_t, HCD_EVT_CONN);
+            }
             return VSF_ERR_NONE;
         }
         break;
@@ -648,7 +684,7 @@ static void __f1cx00s_usbh_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *u
     f1cx00s_usbh_hcd_t *musb_hcd = hcd->priv;
     f1cx00s_usbh_hcd_urb_t *musb_urb = (f1cx00s_usbh_hcd_urb_t *)urb->priv;
 
-    if (URB_STATE_IDLE == musb_urb->state) {
+    if (musb_urb->state != URB_STATE_IDLE) {
         musb_urb->state = URB_STATE_TO_FREE;
     } else {
         __f1cx00s_usbh_hcd_free_urb_imp(musb_hcd, urb);
@@ -730,15 +766,19 @@ static void __f1cx00s_usbh_hcd_isr(f1cx00s_usbh_hcd_t *musb_hcd)
     status &= MUSB_BASE->Common.IntrUSBE;
 
     if (status & MUSBH_IntrUSB_Conn) {
+        MUSB_BASE->Common.IntrUSB = MUSBH_IntrUSB_Conn;
         vsf_eda_post_evt(&musb_hcd->teda.use_as__vsf_eda_t, HCD_EVT_CONN);
     }
     if (status & MUSB_IntrUSB_Discon) {
+        MUSB_BASE->Common.IntrUSB = MUSB_IntrUSB_Discon;
         vsf_eda_post_evt(&musb_hcd->teda.use_as__vsf_eda_t, HCD_EVT_DISCONN);
     }
     if (status & MUSBH_IntrUSB_Babble) {
+        MUSB_BASE->Common.IntrUSB = MUSBH_IntrUSB_Babble;
         // Babble for host
     }
     if (status & MUSB_IntrUSB_SOF) {
+        MUSB_BASE->Common.IntrUSB = MUSB_IntrUSB_SOF;
     }
 
     // EP interrupt

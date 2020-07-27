@@ -16,20 +16,64 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-//! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
 
-#ifndef __VSF_TCPIP_CFG_H__
-#define __VSF_TCPIP_CFG_H__
+#include "vsf.h"
+
+#if APP_CFG_USE_TCPIP_DEMO == ENABLED
+
+#include "component/3rd-party/vsfip/raw/vsfip.h"
+#include "component/3rd-party/vsfip/raw/proto/dhcp/vsfip_dhcpc.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct usrapp_vsfip_t {
+    vsfip_netif_t *netif;
+    vsfip_dhcpc_t dhcp_client;
+    vsfip_ipaddr_t ip_addr;
+} usrapp_vsfip_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static usrapp_vsfip_t __usrapp_vsfip;
+
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
+vsfip_socket_t * vsfip_mem_socket_get(void)
+{
+    return (vsfip_socket_t *)vsf_heap_malloc(sizeof(vsfip_socket_t));
+}
 
+void vsfip_mem_socket_free(vsfip_socket_t *socket)
+{
+    vsf_heap_free(socket);
+}
 
-#endif
-/* EOF */
+vsfip_tcp_pcb_t * vsfip_mem_tcp_pcb_get(void)
+{
+    return (vsfip_tcp_pcb_t *)vsf_heap_malloc(sizeof(vsfip_tcp_pcb_t));
+}
+
+void vsfip_mem_tcp_pcb_free(vsfip_tcp_pcb_t *tcp_pcb)
+{
+    vsf_heap_free(tcp_pcb);
+}
+
+vsfip_netbuf_t * vsfip_mem_netbuf_get(uint_fast32_t size)
+{
+    vsfip_netbuf_t *netbuf = vsf_heap_malloc(sizeof(vsfip_netbuf_t) + size);
+    if (netbuf != NULL) {
+        netbuf->buffer = (uint8_t *)&netbuf[1];
+    }
+    return netbuf;
+}
+
+void vsfip_mem_netbuf_free(vsfip_netbuf_t *netbuf)
+{
+    vsf_heap_free(netbuf);
+}
+
+#endif      // APP_CFG_USE_TCPIP_DEMO

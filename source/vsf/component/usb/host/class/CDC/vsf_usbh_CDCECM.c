@@ -48,8 +48,12 @@
 #   define VSF_USBH_CDCECM_SUPPORT_PBUF     ENABLED
 #endif
 
-#define VSF_USBH_ECM_ETH_HEADER_SIZE    6
-#define VSF_USBH_ECM_MAC_STRING_SIZE    (2 + 2 * 2 * VSF_USBH_ECM_ETH_HEADER_SIZE)
+#define VSF_USBH_ECM_ETH_HEADER_SIZE        6
+#define VSF_USBH_ECM_MAC_STRING_SIZE        (2 + 2 * 2 * VSF_USBH_ECM_ETH_HEADER_SIZE)
+
+#define TCPIP_ETH_HWTYPE                    1
+#define TCPIP_ETH_HEADSIZE                  14
+#define TCPIP_ETH_ADDRLEN                   6
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

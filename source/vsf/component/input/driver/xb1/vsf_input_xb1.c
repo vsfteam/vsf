@@ -55,20 +55,9 @@ const vk_input_item_info_t vk_xb1_gamepad_item_info[GAMEPAD_ID_NUM] = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_GAMEPAD)
-WEAK_VSF_INPUT_ON_GAMEPAD_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN)                               \
-    &&  defined(WEAK_VSF_INPUT_ON_NEW_DEV)
-WEAK_VSF_INPUT_ON_NEW_DEV_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN)                              \
-    &&  defined(WEAK_VSF_INPUT_ON_FREE_DEV)
-WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
-#endif
+extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
+extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -76,11 +65,7 @@ WEAK_VSF_INPUT_ON_FREE_DEV_EXTERN
 WEAK(vsf_xb1_on_new_dev)
 void vsf_xb1_on_new_dev(vk_input_xb1_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_NEW_DEV
     vsf_input_on_new_dev(VSF_INPUT_TYPE_XB1, dev);
-#   else
-    WEAK_VSF_INPUT_ON_NEW_DEV(VSF_INPUT_TYPE_XB1, dev);
-#   endif
 }
 #endif
 
@@ -88,11 +73,7 @@ void vsf_xb1_on_new_dev(vk_input_xb1_t *dev)
 WEAK(vsf_xb1_on_free_dev)
 void vsf_xb1_on_free_dev(vk_input_xb1_t *dev)
 {
-#   ifndef WEAK_VSF_INPUT_ON_FREE_DEV
     vsf_input_on_free_dev(VSF_INPUT_TYPE_XB1, dev);
-#   else
-    WEAK_VSF_INPUT_ON_FREE_DEV(VSF_INPUT_TYPE_XB1, dev);
-#   endif
 }
 #endif
 
@@ -100,11 +81,7 @@ void vsf_xb1_on_free_dev(vk_input_xb1_t *dev)
 WEAK(vsf_xb1_on_report_input)
 void vsf_xb1_on_report_input(vk_gamepad_evt_t *gamepad_evt)
 {
-#   ifndef WEAK_VSF_INPUT_ON_GAMEPAD
     vsf_input_on_gamepad(gamepad_evt);
-#   else
-    WEAK_VSF_INPUT_ON_GAMEPAD(gamepad_evt);
-#   endif
 }
 #endif
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by SimonQian                                      *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,21 +15,26 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-//! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
+#ifndef __VSFIP_NETDRV_ADAPTER_H__
+#define __VSFIP_NETDRV_ADAPTER_H__
 
-#ifndef __VSF_TCPIP_CFG_H__
-#define __VSF_TCPIP_CFG_H__
+/*============================ INCLUDES ======================================*/
+
+#include "component/tcpip/vsf_tcpip_cfg.h"
+
+#if VSF_USE_TCPIP == ENABLED
+
+#include "./vsfip_netif.h"
+#include "./component/tcpip/netdrv/vsf_netdrv.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
+extern vsf_netdrv_t * vsfip_netif_get_netdrv(vsfip_netif_t *netif);
 
-
-#endif
-/* EOF */
+#endif      // VSF_USE_TCPIP
+#endif      // __VSFIP_NETDRV_ADAPTER_H__

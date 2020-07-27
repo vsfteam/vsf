@@ -36,6 +36,10 @@
 #   include <SDL.h>
 #endif
 
+#if APP_CFG_USE_TCPIP_DEMO == ENABLED
+#   include "component/3rd-party/vsfip/raw/vsfip.h"
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_USB_DEVICE == ENABLED
@@ -132,7 +136,7 @@ int vsf_linux_create_fhs(void)
     busybox_install();
 #endif
 
-    // 1. driver related demo
+    // 1. hardware driver related demo
 #if APP_CFG_USE_USBH_DEMO == ENABLED
     usbh_main(0, NULL);
 #endif
@@ -242,6 +246,9 @@ int vsf_linux_create_fhs(void)
 #endif
 #if APP_CFG_USE_SDL2_DEMO == ENABLED
     busybox_bind("/sbin/sdl2", sdl2_main);
+#endif
+#if APP_CFG_USE_TCPIP_DEMO == ENABLED
+    vsfip_init();
 #endif
 
     return 0;

@@ -655,6 +655,33 @@
     <Filter Include="usrapp\demo\xui_demo">
       <UniqueIdentifier>{ec9bb6ec-4985-4576-b8c3-63b4f16d3dda}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\tcpip">
+      <UniqueIdentifier>{9846acd1-cf23-4860-bf52-4520f45ee55c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\tcpip\netdrv">
+      <UniqueIdentifier>{c015fbcc-6405-4f53-8f3b-fac7216c11c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip">
+      <UniqueIdentifier>{d76c4e1a-b153-4624-a924-01e259e9b789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\vsfip_demo">
+      <UniqueIdentifier>{12e81740-e155-4688-a805-c84e779893c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip\raw">
+      <UniqueIdentifier>{cabb584c-09b4-4b1c-910e-a64d01b5837e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip\raw\netif">
+      <UniqueIdentifier>{e1adb6d5-0aaa-47a1-8738-6396cb62da62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip\raw\netif\eth">
+      <UniqueIdentifier>{37beb20b-7d98-4ae3-a5d0-8fcd3d069a4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip\raw\proto">
+      <UniqueIdentifier>{a2b85aaa-78b4-4fac-ac9b-e19307ef4c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip\raw\proto\dhcp">
+      <UniqueIdentifier>{0e134526-4f01-45ef-8309-39e94c165781}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -2097,6 +2124,33 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cpicker.h">
       <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.h">
+      <Filter>vsf\component\tcpip\netdrv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\vsf_tcpip_cfg.h">
+      <Filter>vsf\component\tcpip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\netif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\netif\eth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\netif</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpc.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -3136,6 +3190,33 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cpicker.c">
       <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.c">
+      <Filter>vsf\component\tcpip\netdrv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\vsfip_demo\vsfip_demo.c">
+      <Filter>usrapp\demo\vsfip_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\netif</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\netif\eth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\netif</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpc.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

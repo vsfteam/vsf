@@ -24,10 +24,6 @@ extern "C" {
 
 /*============================ INCLUDES ======================================*/
 
-/* do not modify this */
-#include "vsf_usr_cfg.h"
-
-/*============================ MACROS ========================================*/
 #ifndef ENABLED
 #   define ENABLED                              1
 #endif
@@ -36,6 +32,10 @@ extern "C" {
 #   define DISABLED                             0
 #endif
 
+/* do not modify this */
+#include "vsf_usr_cfg.h"
+
+/*============================ MACROS ========================================*/
 
 //! \brief system macros
 #ifndef ASSERT
