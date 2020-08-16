@@ -23,12 +23,12 @@
 
 #if VSF_USE_JSON == ENABLED
 
-#if     defined(VSF_JSON_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_JSON_IMPLEMENT
-#elif   defined(VSF_JSON_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSF_JSON_INHERIT
+#if     defined(__VSF_JSON_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSF_JSON_CLASS_IMPLEMENT
+#elif   defined(__VSF_JSON_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_JSON_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"

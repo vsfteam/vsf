@@ -21,11 +21,16 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_UAC == ENABLED
 
-#define VSFSTREAM_CLASS_INHERIT
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT_CLASS
-#define VSF_USBH_UAC_IMPLEMENT
-#include "vsf.h"
+#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
+#define __VSF_USBH_UAC_CLASS_IMPLEMENT
+
+#include "kernel/vsf_kernel.h"
+#include "../../vsf_usbh.h"
+#include "./vsf_usbh_uac.h"
+// for USB_EP_TYPE_ISO
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 
@@ -74,25 +79,27 @@
 #   error VSF_USBH_UAC_CFG_URB_RELINK_1MS is not supported now
 #endif
 
-#define USB_AUDIO_SUBCLASS_AUDIOCONTROL         0x01
-#define USB_AUDIO_SUBCLASS_AUDIOSTREAMING       0x02
-#define USB_AUDIO_SUBCLASS_MINISTREAMING        0x03
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 enum {
-    VSF_USBH_UAC_SUBEVT_MASK        = 0x300,
-    VSF_USBH_UAC_SUBEVT_CONNECT     = 0x000,
-    VSF_USBH_UAC_SUBEVT_DISCONNECT  = 0x100,
-    VSF_USBH_UAC_SUBEVT_START_STREAM= 0x200,
-
-    VSF_USBH_UAC_EVT_CONNECT        = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_CONNECT,
-    VSF_USBH_UAC_EVT_DISCONNECT     = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_DISCONNECT,
-    VSF_USBH_UAC_EVT_START_STREAM   = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_START_STREAM,
+    USB_AUDIO_SUBCLASS_AUDIOCONTROL     = 0x01,
+    USB_AUDIO_SUBCLASS_AUDIOSTREAMING   = 0x02,
+    USB_AUDIO_SUBCLASS_MINISTREAMING    = 0x03,
 };
 
-struct vk_usbh_uac_t {
+enum {
+    VSF_USBH_UAC_SUBEVT_MASK            = 0x300,
+    VSF_USBH_UAC_SUBEVT_CONNECT         = 0x000,
+    VSF_USBH_UAC_SUBEVT_DISCONNECT      = 0x100,
+    VSF_USBH_UAC_SUBEVT_START_STREAM    = 0x200,
+
+    VSF_USBH_UAC_EVT_CONNECT            = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_CONNECT,
+    VSF_USBH_UAC_EVT_DISCONNECT         = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_DISCONNECT,
+    VSF_USBH_UAC_EVT_START_STREAM       = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_START_STREAM,
+};
+
+typedef struct vk_usbh_uac_t {
     vk_usbh_t *usbh;
     vk_usbh_dev_t *dev;
     vk_usbh_ifs_t *ifs;
@@ -108,15 +115,14 @@ struct vk_usbh_uac_t {
         // seems IAR does not support zero-length array
         uint8_t ac_interface_desc[1]; 
     };
-};
-typedef struct vk_usbh_uac_t vk_usbh_uac_t;
+} vk_usbh_uac_t;
 
 /*============================ PROTOTYPES ====================================*/
 
 static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
 static void __vk_usbh_uac_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 
-extern void vsf_usbh_uac_on_new(void *uac, uint_fast8_t stream_num);
+extern void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_header);
 extern void vsf_usbh_uac_on_del(void *uac);
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -170,7 +176,7 @@ void vsf_usbh_uac_disconnect_stream(void *param, uint_fast8_t stream_idx)
 
 #ifndef WEAK_VSF_USBH_UAC_ON_NEW
 WEAK(vsf_usbh_uac_on_new)
-void vsf_usbh_uac_on_new(void *uac, uint_fast8_t stream_num)
+void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_header)
 {
     // TODO: call av layer as default processor
 }
@@ -202,7 +208,7 @@ static void __vk_usbh_uac_free_urb(vk_usbh_uac_t *uac)
 static void __vk_usbh_uac_on_eda_terminate(vsf_eda_t *eda)
 {
     vk_usbh_uac_t *uac = container_of(eda, vk_usbh_uac_t, task);
-    VSF_USBH_FREE(uac);
+    vsf_usbh_free(uac);
 }
 
 static bool __vk_usbh_uac_submit_iso_urb(vk_usbh_uac_t *uac, vk_usbh_uac_stream_t *uac_stream, uint_fast8_t urb_idx)
@@ -297,7 +303,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_usbh_uac_on_new(uac, uac->ac_header.bInCollection);
+        vsf_usbh_uac_on_new(uac, &uac->ac_header);
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
@@ -522,7 +528,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
             return NULL;
         }
 
-        uac = VSF_USBH_MALLOC(sizeof(vk_usbh_uac_t) + ac_header->wTotalLength - sizeof(usb_uac_ac_interface_header_desc_t));
+        uac = vsf_usbh_malloc(sizeof(vk_usbh_uac_t) + ac_header->wTotalLength - sizeof(usb_uac_ac_interface_header_desc_t));
         if (NULL == uac) { return NULL; }
         memset(uac, 0, sizeof(*uac));
         memcpy(&uac->ac_header, ac_header, ac_header->wTotalLength);
@@ -585,7 +591,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 
 free_all:
     __vk_usbh_uac_free_urb(uac);
-    VSF_USBH_FREE(uac);
+    vsf_usbh_free(uac);
     return NULL;
 }
 

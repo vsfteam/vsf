@@ -37,15 +37,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usrapp_audio_common_t {
+typedef struct usrapp_audio_common_t {
     vk_audio_dev_t *default_dev;
 #if VSF_USE_WINSOUND == ENABLED
     struct {
         vk_winsound_dev_t dev;
     } winsound;
 #endif
-};
-typedef struct usrapp_audio_common_t usrapp_audio_common_t;
+} usrapp_audio_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

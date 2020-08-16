@@ -23,12 +23,13 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_CDC == ENABLED
 
-#include "../../../common/class/CDC/vsf_usb_CDC.h"
+#include "component/usb/common/class/CDC/vsf_usb_CDC.h"
+#include "../../vsf_usbh.h"
 
-#if     defined(VSF_USBH_CDC_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_USBH_CDC_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_USBH_CDC_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_USBH_CDC_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -41,16 +42,15 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbh_cdc_t)
+dcl_simple_class(vk_usbh_cdc_t)
 
-enum vk_usbh_cdc_evt_t {
+typedef enum vk_usbh_cdc_evt_t {
     VSF_USBH_CDC_ON_INIT,
     VSF_USBH_CDC_ON_DESC,
     VSF_USBH_CDC_ON_EVENT,
     VSF_USBH_CDC_ON_RX,
     VSF_USBH_CDC_ON_TX,
-};
-typedef enum vk_usbh_cdc_evt_t vk_usbh_cdc_evt_t;
+} vk_usbh_cdc_evt_t;
 
 typedef vsf_err_t (*vk_usbh_cdc_evthandler_t)(vk_usbh_cdc_t *cdc,
                 vk_usbh_cdc_evt_t evt, void *param);
@@ -82,7 +82,7 @@ def_simple_class(vk_usbh_cdc_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if defined(VSF_USBH_CDC_IMPLEMENT) || defined(VSF_USBH_CDC_INHERIT)
+#if defined(__VSF_USBH_CDC_CLASS_IMPLEMENT) || defined(__VSF_USBH_CDC_CLASS_INHERIT__)
 extern vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
         vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
 extern void vk_usbh_cdc_fini(vk_usbh_cdc_t *pthis);
@@ -96,8 +96,8 @@ extern void vk_usbh_cdc_free_urb(vk_usbh_cdc_t *pthis, vk_usbh_urb_t *urb);
 }
 #endif
 
-#undef VSF_USBH_CDC_IMPLEMENT
-#undef VSF_USBH_CDC_IMHERIT
+#undef __VSF_USBH_CDC_CLASS_IMPLEMENT
+#undef __VSF_USBH_CDC_CLASS_INHERIT__
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_CDC
 #endif      // __VSF_USBH_CDC_H__

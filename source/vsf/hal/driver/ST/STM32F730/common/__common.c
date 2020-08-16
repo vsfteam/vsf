@@ -51,33 +51,28 @@ static const IRQn_Type __stm32f730_soft_irq[VSF_DEV_SWI_NUM] = {
     VSF_DEV_SWI_LIST
 };
 
-struct __stm32f730_common_t {
+typedef struct stm32f730_common_t {
     struct {
         vsf_swi_handler_t *handler;
         void *param;
     } swi[__VSF_DEV_SWI_NUM];
-};
-typedef struct __stm32f730_common_t __stm32f730_common_t;
+} stm32f730_common_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if __VSF_DEV_SWI_NUM > 0
-static __stm32f730_common_t __stm32f730_common;
+static stm32f730_common_t __stm32f730_common;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_USR_SWI_INIT_EXTERN)                                   \
-    &&  defined(WEAK_VSF_USR_SWI_INIT)
-WEAK_VSF_USR_SWI_INIT_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USR_SWI_TRIGGER_EXTERN)                                \
-    &&  defined(WEAK_VSF_USR_SWI_TRIGGER)
-WEAK_VSF_USR_SWI_TRIGGER_EXTERN
-#endif
+extern vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, 
+                                vsf_arch_prio_t priority,
+                                vsf_swi_handler_t *handler, 
+                                void *param);
+extern void vsf_usr_swi_trigger(uint_fast8_t idx);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -140,11 +135,7 @@ void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 
 #   if      (__VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM + __VSF_DEV_SWI_NUM)          \
         ||  !defined(__VSF_HAL_SWI_NUM)
-#       ifndef WEAK_VSF_USR_SWI_TRIGGER
     vsf_usr_swi_trigger(idx);
-#       else
-    WEAK_VSF_USR_SWI_TRIGGER(idx);
-#       endif
 #   else
     VSF_HAL_ASSERT(false);
 #   endif
@@ -180,11 +171,7 @@ vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx,
 
 #   if      (__VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM + __VSF_DEV_SWI_NUM)          \
         ||  !defined(__VSF_HAL_SWI_NUM)
-#       ifndef WEAK_VSF_USR_SWI_INIT
     return vsf_usr_swi_init(idx, priority, handler, param);
-#       else
-    return WEAK_VSF_USR_SWI_INIT(idx, priority, handler, param);
-#       endif
 #   else
     VSF_HAL_ASSERT(false);
     return VSF_ERR_FAIL;

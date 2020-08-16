@@ -27,6 +27,34 @@ extern "C" {
 /*============================ MACROS ========================================*/
 #define DIV_(_N,_D)     DIV_##_N = (_N),
 
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PLL
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_PLL           ENABLED
+#endif
+
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_LPOSC
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_LPOSC         ENABLED
+#endif
+
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT       ENABLED
+#endif
+
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PRH_CLK
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_PRH_CLK       ENABLED
+#endif
+
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_SYNC_CLK
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_SYNC_CLK      ENABLED
+#endif
+
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL      ENABLED
+#endif
+
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_SLEEP_CTRL
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_SLEEP_CTRL    ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -211,54 +239,54 @@ end_def_interface(i_pm_periph_asyn_clk_t)
  *----------------------------------------------------------------------------*/
 
  
-/*! \note pm_ahb_clk_no_t and pm_ahb_clk_msk_t should be defined in device 
+/*! \note pm_sync_clk_no_t and pm_sync_clk_msk_t should be defined in device 
           specific header file device.h 
           E.g.
 
 //! \name Peripheral AHB Clock Macros
 //! @{
-enum pm_ahb_clk_no_t { 
-    AHBCLK_CORE_idx         = 0,
-    AHBCLK_ROM0_idx         = 1,
-    AHBCLK_FLASH0_idx       = 2,
-    AHBCLK_SRAM0_idx        = 3,
+enum pm_sync_clk_no_t { 
+    SyncCLK_CORE_idx         = 0,
+    SyncCLK_ROM0_idx         = 1,
+    SyncCLK_FLASH0_idx       = 2,
+    SyncCLK_SRAM0_idx        = 3,
 
     ...
 
-    AHBCLK_ARA0_idx         = 32,
-    AHBCLK_APPREG0_idx      = 33,
+    SyncCLK_ARA0_idx         = 32,
+    SyncCLK_APPREG0_idx      = 33,
 };
 
-enum pm_ahb_clk_msk_t { 
-    AHBCLK_CORE_msk         = _BV(AHBCLK_CORE_idx),
-    AHBCLK_ROM0_msk         = _BV(AHBCLK_ROM0_idx),
-    AHBCLK_FLASH0_msk       = _BV(AHBCLK_FLASH0_msk),
-    AHBCLK_SRAM0_msk        = _BV(AHBCLK_SRAM0_idx),
+enum pm_sync_clk_msk_t { 
+    SyncCLK_CORE_msk         = _BV(SyncCLK_CORE_idx),
+    SyncCLK_ROM0_msk         = _BV(SyncCLK_ROM0_idx),
+    SyncCLK_FLASH0_msk       = _BV(SyncCLK_FLASH0_msk),
+    SyncCLK_SRAM0_msk        = _BV(SyncCLK_SRAM0_idx),
 
     ...
 
-    AHBCLK_ARA0_msk         = _BV(AHBCLK_ARA0_idx - 32),
-    AHBCLK_APPREG0_msk      = _BV(AHBCLK_APPREG0_msk - 32),
+    SyncCLK_ARA0_msk         = _BV(SyncCLK_ARA0_idx - 32),
+    SyncCLK_APPREG0_msk      = _BV(SyncCLK_APPREG0_msk - 32),
 };
 //! @}
 */
 
 #ifndef __cplusplus
-typedef enum pm_ahb_clk_no_t pm_ahb_clk_no_t;
-typedef enum pm_ahb_clk_msk_t pm_ahb_clk_msk_t;
+typedef enum pm_sync_clk_no_t pm_sync_clk_no_t;
+typedef enum pm_sync_clk_msk_t pm_sync_clk_msk_t;
 #endif
 
-typedef uint_fast32_t pm_ahbclk_status_t;
+typedef uint_fast32_t pm_sync_clk_status_t;
 
 //! \name AHB Clock Management
 //! @{
-declare_interface(i_pm_ahb_clk_t)
-def_interface(i_pm_ahb_clk_t)
-    pm_ahbclk_status_t  (*Enable)(pm_ahb_clk_no_t index);
-    pm_ahbclk_status_t  (*Disable)(pm_ahb_clk_no_t index);
-    pm_ahbclk_status_t  (*GetStatus)(pm_ahb_clk_no_t index);
-    vsf_err_t           (*Resume)(pm_ahb_clk_no_t index, pm_ahbclk_status_t status);
-end_def_interface(i_pm_ahb_clk_t)
+declare_interface(i_pm_sync_clk_t)
+def_interface(i_pm_sync_clk_t)
+    pm_sync_clk_status_t  (*Enable)(pm_sync_clk_no_t index);
+    pm_sync_clk_status_t  (*Disable)(pm_sync_clk_no_t index);
+    pm_sync_clk_status_t  (*GetStatus)(pm_sync_clk_no_t index);
+    vsf_err_t           (*Resume)(pm_sync_clk_no_t index, pm_sync_clk_status_t status);
+end_def_interface(i_pm_sync_clk_t)
 //! @}
 
 /*----------------------------------------------------------------------------*
@@ -487,13 +515,40 @@ typedef struct {
 declare_interface(i_pm_clk_t)
 def_interface(i_pm_clk_t)
 
+    /*! \note Main here is used to set dividers for CPU, sync-clocks (ahb, axi, 
+     *!       apb and etc) hence generate clock for CPU, sync-clocks from system 
+     *!       clock.
+     */
     i_pm_main_clk_t         Main;
+
+    /*! \note the system clock is the root of the clock tree output
+     *!       cpu clock and Sync-Clock of bus and peripherals are derived 
+     *!       from system clock with **their own dividers**. 
+     *!       One should not suppose that the cpu clock is the same as the 
+     *!       system clock. The Sync-Clock can also be different from cpu 
+     *!       clock.
+     */ 
     uint_fast32_t           (*GetSysClk)(void);
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT == ENABLED
     vsf_err_t               (*ClkOutCfg)( pm_clock_out_cfg_t *cfg_ptr);
+#endif
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_PRH_CLK == ENABLED
     i_pm_periph_asyn_clk_t  Peripheral;
-    i_pm_ahb_clk_t          AHB;
+#endif
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_SYNC_CLK == ENABLED
+    i_pm_sync_clk_t         SyncClock;
+#endif
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_LPOSC == ENABLED
     i_pm_lposc_t            LPOSC;                  //!< low power oscillators
+#endif
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_PLL == ENABLED
     i_pm_pll_t              PLL;                    //!< pll control
+#endif
 
 end_def_interface(i_pm_clk_t)
 
@@ -511,9 +566,15 @@ def_interface(i_pm_t)
                                         uint_fast32_t src_frq,
                                         uint_fast32_t target_frq);
     i_pm_clk_t          Clock;
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL == ENABLED
     i_pm_power_t        Power;
+#endif
+
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_SLEEP_CTRL == ENABLED
     i_pm_sleep_t        Sleep;
-    
+#endif
+
 end_def_interface(i_pm_t)
 //! @}
 

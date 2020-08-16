@@ -21,12 +21,14 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
 
-#define VSF_MAL_INHERIT
-#define VSF_FAKEFAT32_MAL_IMPLEMENT
-#define VSF_FS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
-#include <ctype.h>
+#define __VSF_MAL_CLASS_INHERIT__
+#define __VSF_FS_CLASS_INHERIT__
+#define __VSF_FAKEFAT32_MAL_CLASS_IMPLEMENT
+
+// for ctype.h
+#include "utilities/vsf_utilities.h"
+#include "../../vsf_mal.h"
+#include "./vsf_fakefat32_mal.h"
 
 /*============================ MACROS ========================================*/
 
@@ -45,12 +47,12 @@
 #define FAT32_FAT_START                     0x0FFFFFF8
 #define FAT32_FAT_INVALID                   0xFFFFFFFF
 
-#define FAKEFAT32_RES_SECTORS               get_unaligned_le16(&fakefat32_mbr[0x0E])
-#define FAKEFAT32_FAT_NUM                   fakefat32_mbr[0x10]
-#define FAKEFAT32_HIDDEN_SECTORS            get_unaligned_le32(&fakefat32_mbr[0x1C])
-#define FAKEFAT32_ROOT_CLUSTER              get_unaligned_le32(&fakefat32_mbr[0x2C])
-#define FAKEFAT32_FSINFO_SECTOR             fakefat32_mbr[0x30]
-#define FAKEFAT32_BACKUP_SECTOR             get_unaligned_le16(&fakefat32_mbr[0x32])
+#define FAKEFAT32_RES_SECTORS               get_unaligned_le16(&__fakefat32_mbr[0x0E])
+#define FAKEFAT32_FAT_NUM                   __fakefat32_mbr[0x10]
+#define FAKEFAT32_HIDDEN_SECTORS            get_unaligned_le32(&__fakefat32_mbr[0x1C])
+#define FAKEFAT32_ROOT_CLUSTER              get_unaligned_le32(&__fakefat32_mbr[0x2C])
+#define FAKEFAT32_FSINFO_SECTOR             __fakefat32_mbr[0x30]
+#define FAKEFAT32_BACKUP_SECTOR             get_unaligned_le16(&__fakefat32_mbr[0x32])
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -79,7 +81,7 @@ const vk_mal_drv_t vk_fakefat32_mal_drv = {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static uint8_t fakefat32_mbr[512] = {
+static uint8_t __fakefat32_mbr[512] = {
 //00   01   02   03   04   05   06   07   08   09   0A   0B   0C   0D   0E   0F
 0xEB,0x58,0x90,0x4D,0x53,0x44,0x4F,0x53,0x35,0x2E,0x30,0x00,0x00,0x00,0x10,0x00,//00
 0x02,0x00,0x00,0x00,0x00,0xF8,0x00,0x00,0x3F,0x00,0xFF,0x00,0x40,0x00,0x00,0x00,//01
@@ -636,7 +638,7 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
         // other data in hidden sectors, all 0
     } else if ((FAKEFAT32_HIDDEN_SECTORS == block_addr) || ((FAKEFAT32_HIDDEN_SECTORS + FAKEFAT32_BACKUP_SECTOR) == block_addr)) {
         // MBR
-        memcpy(buff, fakefat32_mbr, sizeof(fakefat32_mbr));
+        memcpy(buff, __fakefat32_mbr, sizeof(__fakefat32_mbr));
 
         // Sector size in bytes
         put_unaligned_le16(pthis->sector_size, &buff[0x0B]);
@@ -739,6 +741,7 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
                     .size       = page_size,
                     .buff       = buff,
                 );
+                UNUSED_PARAM(err);
                 return VSF_ERR_NOT_READY;
             }
         }
@@ -763,7 +766,7 @@ static vsf_err_t __vk_fakefat32_write(vk_fakefat32_mal_t *pthis, uint_fast64_t a
     if (block_addr < (FAKEFAT32_HIDDEN_SECTORS + FAKEFAT32_RES_SECTORS + FAKEFAT32_FAT_NUM * fat_sectors)) {
         // first sector and first backup copy of boot sector
         if ((FAKEFAT32_HIDDEN_SECTORS == block_addr) || ((FAKEFAT32_HIDDEN_SECTORS + FAKEFAT32_BACKUP_SECTOR) == block_addr)) {
-            memcpy(fakefat32_mbr, buff, sizeof(fakefat32_mbr));
+            memcpy(__fakefat32_mbr, buff, sizeof(__fakefat32_mbr));
         }
         return VSF_ERR_NONE;
     }
@@ -782,6 +785,7 @@ static vsf_err_t __vk_fakefat32_write(vk_fakefat32_mal_t *pthis, uint_fast64_t a
                 .size       = page_size,
                 .buff       = buff,
             );
+            UNUSED_PARAM(err);
             return VSF_ERR_NOT_READY;
         }
     }
@@ -796,8 +800,8 @@ static uint_fast32_t __vk_fakefat32_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
 
 static bool __vk_fakefat32_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
-    mem->pchBuffer = NULL;
-    mem->nSize = 0;
+    mem->buffer_ptr = NULL;
+    mem->s32_size = 0;
     return false;
 }
 

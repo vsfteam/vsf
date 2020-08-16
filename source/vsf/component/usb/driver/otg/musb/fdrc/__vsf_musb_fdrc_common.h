@@ -27,7 +27,7 @@
     ||  (   (VSF_USE_USB_HOST == ENABLED)                                       \
         && (VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED))
 
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/vsf_hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,7 +140,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_musb_fdrc_reg_t {
+typedef struct vk_musb_fdrc_reg_t {
     struct {
         volatile uint8_t FAddr;
         volatile uint8_t Power;
@@ -201,8 +201,7 @@ struct vk_musb_fdrc_reg_t {
         };
         volatile uint32_t FIFO[8];
     };
-};
-typedef struct vk_musb_fdrc_reg_t vk_musb_fdrc_reg_t;
+} vk_musb_fdrc_reg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/

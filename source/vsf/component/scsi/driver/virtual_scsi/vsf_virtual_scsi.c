@@ -21,11 +21,11 @@
 
 #if VSF_USE_SCSI == ENABLED && VSF_USE_MAL_SCSI == ENABLED
 
-#define VSF_SCSI_INHERIT
-#define VSF_VIRTUAL_SCSI_IMPLEMENT
+#define __VSF_SCSI_CLASS_INHERIT__
+#define __VSF_VIRTUAL_SCSI_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_scsi.h"
+#include "./vsf_virtual_scsi.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -65,8 +65,8 @@ static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *
     cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
     is_read = cmd_code == SCSI_CMDCODE_READ;
     if ((cmd_code != SCSI_CMDCODE_READ) && (cmd_code != SCSI_CMDCODE_WRITE)) {
-        mem->nSize = sizeof(virtual_scsi->reply);
-        mem->pchBuffer = virtual_scsi->reply;
+        mem->s32_size = sizeof(virtual_scsi->reply);
+        mem->buffer_ptr = virtual_scsi->reply;
         return true;
     } else if (virtual_scsi->virtual_scsi_drv->buffer != NULL) {
         uint64_t addr;
@@ -150,6 +150,7 @@ static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis, uint8_t *cbd, vo
                 .size       = size,
                 .mem_stream = mem_stream,
             )
+            UNUSED_PARAM(err);
         } else {
             vsf_err_t err;
             __vsf_component_call_peda_ifs(vk_virtual_scsi_write, err, drv->param_subcall.write, 0, pthis,
@@ -157,6 +158,7 @@ static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis, uint8_t *cbd, vo
                 .size       = size,
                 .mem_stream = mem_stream,
             )
+            UNUSED_PARAM(err);
         }
         return VSF_ERR_NOT_READY;
     default:
@@ -171,8 +173,8 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
     vk_virtual_scsi_t *pthis = (vk_virtual_scsi_t *)&vsf_this;
     vk_virtual_scsi_param_t *param = pthis->param;
 
-    uint8_t *reply = vsf_local.mem.pchBuffer;
-    int_fast32_t reply_len = vsf_local.mem.nSize;
+    uint8_t *reply = vsf_local.mem.buffer_ptr;
+    int_fast32_t reply_len = vsf_local.mem.s32_size;
 
     switch (evt) {
     case VSF_EVT_INIT: {

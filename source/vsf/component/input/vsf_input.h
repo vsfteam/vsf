@@ -19,6 +19,7 @@
 #define __VSF_INPUT_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "./vsf_input_cfg.h"
 #include "utilities/vsf_utilities.h"
 
@@ -30,34 +31,33 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define VSF_INPUT_ITEM_EX(__item, __bitoffset, __bitlen, __is_signed, __config) \
+#define VSF_INPUT_ITEM_EX(__ITEM, __BITOFFSET, __BITLEN, __IS_SIGNED, __CONFIG) \
             {                                                                   \
-                .item       = (__item),                                         \
-                .offset     = (__bitoffset),                                    \
-                .bitlen     = (__bitlen),                                       \
-                .is_signed  = (__is_signed),                                    \
-                .config     = (__config),                                       \
+                .item       = (__ITEM),                                         \
+                .offset     = (__BITOFFSET),                                    \
+                .bitlen     = (__BITLEN),                                       \
+                .is_signed  = (__IS_SIGNED),                                    \
+                .config     = (__CONFIG),                                       \
             }
 
-#define VSF_INPUT_ITEM(__item, __bitoffset, __bitlen, __is_signed)              \
-            VSF_INPUT_ITEM_EX((__item), (__bitoffset), (__bitlen), (__is_signed), false)
+#define VSF_INPUT_ITEM(__ITEM, __BITOFFSET, __BITLEN, __IS_SIGNED)              \
+            VSF_INPUT_ITEM_EX((__ITEM), (__BITOFFSET), (__BITLEN), (__IS_SIGNED), false)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef uint32_t vk_input_timestamp_t;
 
-struct vk_input_item_info_t {
+typedef struct vk_input_item_info_t {
     uint32_t item       : 8;
     uint32_t bitlen     : 7;
     uint32_t is_signed  : 1;
     uint32_t offset     : 14;
     uint32_t config     : 1;
     uint32_t endian     : 1;
-};
-typedef struct vk_input_item_info_t vk_input_item_info_t;
+} vk_input_item_info_t;
 
-union vk_input_value_t {
+typedef union vk_input_value_t {
     uint32_t bit    : 1;
     uint64_t valu64;
     uint32_t valu32;
@@ -66,40 +66,35 @@ union vk_input_value_t {
     int32_t val32;
     int16_t val16;
     int8_t val8;
-};
-typedef union vk_input_value_t vk_input_value_t;
+} vk_input_value_t;
 
-enum vk_input_type_t {
+typedef enum vk_input_type_t {
     VSF_INPUT_TYPE_UNKNOWN,
-};
-typedef enum vk_input_type_t vk_input_type_t;
+} vk_input_type_t;
 
-struct vk_input_evt_t {
+typedef struct vk_input_evt_t {
     void *dev;
     uint32_t duration;          // duration in ms between pre and cur
     uint64_t id;
     vk_input_value_t pre;
     vk_input_value_t cur;
-};
-typedef struct vk_input_evt_t vk_input_evt_t;
+} vk_input_evt_t;
 
-struct vk_input_parser_t {
+typedef struct vk_input_parser_t {
     vk_input_item_info_t *info;
     uint8_t num;
 
     vk_input_value_t pre;
     vk_input_value_t cur;
-};
-typedef struct vk_input_parser_t vk_input_parser_t;
+} vk_input_parser_t;
 
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 typedef void (*vk_input_on_evt_t)(vk_input_type_t type, vk_input_evt_t *evt);
-struct vk_input_notifier_t {
+typedef struct vk_input_notifier_t {
     vsf_slist_node_t notifier_node;
     vk_input_on_evt_t on_evt;
     uint8_t mask;
-};
-typedef struct vk_input_notifier_t vk_input_notifier_t;
+} vk_input_notifier_t;
 #endif
 
 #ifdef __cplusplus
@@ -113,6 +108,8 @@ typedef struct vk_input_notifier_t vk_input_notifier_t;
 #include "./protocol/vsf_input_touchscreen.h"
 #include "./protocol/vsf_input_keyboard.h"
 #include "./protocol/vsf_input_mouse.h"
+
+#include "./driver/hid/vsf_input_hid.h"
 
 #ifdef __cplusplus
 extern "C" {

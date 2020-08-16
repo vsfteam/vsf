@@ -27,10 +27,7 @@
 
 #if     defined(__VSF_DISP_SSD1306_CLASS_IMPLEMENT)
 #   undef __VSF_DISP_SSD1306_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(__VSF_DISP_SSD1306_CLASS_INHERIT)
-#   undef __VSF_DISP_SSD1306_CLASS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -117,7 +114,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_disp_ssd1306_t)
+dcl_simple_class(vk_disp_ssd1306_t)
 
 def_simple_class(vk_disp_ssd1306_t) {
     public_member(

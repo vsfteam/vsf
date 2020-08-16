@@ -35,7 +35,7 @@
  *
  * \return       <tt>macro(0, data) macro(1, data) ... macro(count - 1, data)</tt>
  */
-#define REPEAT_MACRO(count, macro, data)         TPASTE2(REPEAT_MACRO, count)(macro, data)
+#define REPEAT_MACRO(count, macro, data)         __CONNECT2(REPEAT_MACRO, count)(macro, data)
 
 #define REPEAT_MACRO0(  macro, data)
 #define REPEAT_MACRO1(  macro, data)       REPEAT_MACRO0(  macro, data)   macro(  0, data)

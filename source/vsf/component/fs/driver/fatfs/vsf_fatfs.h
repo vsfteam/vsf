@@ -26,12 +26,9 @@
 
 #include "../malfs/vsf_malfs.h"
 
-#if     defined(VSF_FATFS_IMPLEMENT)
-#   undef VSF_FATFS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_FATFS_INHERIT)
-#   undef VSF_FATFS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_FATFS_CLASS_IMPLEMENT)
+#   undef __VSF_FATFS_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -63,36 +60,35 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_fatfs_file_t)
-declare_simple_class(__vk_fatfs_info_t)
+dcl_simple_class(vk_fatfs_file_t)
+dcl_simple_class(__vk_fatfs_info_t)
 
-enum vk_fat_type_t {
+typedef enum vk_fat_type_t {
     VSF_FAT_NONE,
     VSF_FAT_12,
     VSF_FAT_16,
     VSF_FAT_32,
     VSF_FAT_EX,
-};
-typedef enum vk_fat_type_t vk_fat_type_t;
+} vk_fat_type_t;
 
-enum vk_fat_file_attr_t {
+typedef enum vk_fat_file_attr_t {
     VSF_FAT_FILE_ATTR_VOLUMID = VSF_FILE_ATTR_EXT,
     VSF_FAT_FILE_ATTR_SYSTEM  = VSF_FILE_ATTR_EXT << 1,
     VSF_FAT_FILE_ATTR_ARCHIVE = VSF_FILE_ATTR_EXT << 2,
-};
-typedef enum vk_fat_file_attr_t vk_fat_file_attr_t;
+} vk_fat_file_attr_t;
 
-struct vk_fatfs_dentry_parser_t {
+typedef struct vk_fatfs_dentry_parser_t {
     uint8_t *entry;
     int16_t entry_num;
     uint8_t lfn;
     bool is_unicode;
     char *filename;
-};
-typedef struct vk_fatfs_dentry_parser_t vk_fatfs_dentry_parser_t;
+} vk_fatfs_dentry_parser_t;
 
 def_simple_class(vk_fatfs_file_t) {
-    implement(__vk_malfs_file_t)
+    public_member(
+        implement(__vk_malfs_file_t)
+    )
 
     private_member(
         uint32_t first_cluster;

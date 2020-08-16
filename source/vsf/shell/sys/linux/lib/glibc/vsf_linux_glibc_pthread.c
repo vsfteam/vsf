@@ -21,8 +21,8 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_LINUX_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_LINUX_CLASS_INHERIT__
 
 #include <unistd.h>
 #include <time.h>
@@ -37,11 +37,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_linux_pthread_priv_t {
+typedef struct vsf_linux_pthread_priv_t {
     void *param;
     void * (*entry)(void *param);
-};
-typedef struct vsf_linux_pthread_priv_t vsf_linux_pthread_priv_t;
+} vsf_linux_pthread_priv_t;
 
 /*============================ PROTOTYPES ====================================*/
 

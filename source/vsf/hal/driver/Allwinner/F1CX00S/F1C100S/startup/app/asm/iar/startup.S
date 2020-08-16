@@ -46,8 +46,8 @@ _entry:
     mcr     p15, 0, r0, c1, c0, 0
 
     // copy vector to the correct address
-    adrl     r0, _vector
-    //ldr     r0, =_vector
+    //adrl     r0, _vector
+    ldr     r0, =_vector
     mrc     p15, 0, r2, c1, c0, 0
     ands    r2, r2, #(1 << 13)
     ldreq   r1, =0x00000000

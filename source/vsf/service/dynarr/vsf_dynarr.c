@@ -21,7 +21,7 @@
 
 #if VSF_USE_DYNARR == ENABLED
 
-#define VSF_DYNARR_IMPLEMENT
+#define __VSF_DYNARR_CLASS_IMPLEMENT
 #include "./vsf_dynarr.h"
 #include "../heap/vsf_heap.h"
 
@@ -39,18 +39,18 @@ typedef struct vsf_dynarr_table_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static uint_fast16_t vsf_dynarr_get_buf_num(vsf_dynarr_t *dynarr)
+static uint_fast16_t __vsf_dynarr_get_buf_num(vsf_dynarr_t *dynarr)
 {
     uint_fast16_t buf_num = dynarr->length + (1 << dynarr->item_num_per_buf_bitlen) - 1;
     buf_num >>= dynarr->item_num_per_buf_bitlen;
     return buf_num;
 }
 
-static vsf_dynarr_table_t * vsf_dynarr_get_table(vsf_dynarr_t *dynarr, uint_fast16_t buf_idx)
+static vsf_dynarr_table_t * __vsf_dynarr_get_table(vsf_dynarr_t *dynarr, uint_fast16_t buf_idx)
 {
     uint_fast16_t table_idx = buf_idx >> dynarr->buf_num_per_table_bitlen;
 
-    if (buf_idx < vsf_dynarr_get_buf_num(dynarr)) {
+    if (buf_idx < __vsf_dynarr_get_buf_num(dynarr)) {
         __vsf_slist_foreach_unsafe(vsf_dynarr_table_t, table_node, &dynarr->table_list) {
             if (!table_idx--) {
                 return _;
@@ -90,7 +90,7 @@ vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
     }
 
     dynarr->length = buf_num_orig * item_num_per_buf;
-    table = vsf_dynarr_get_table(dynarr, buf_idx);
+    table = __vsf_dynarr_get_table(dynarr, buf_idx);
     if (buf_idx < 0) {
         buf_idx = buf_num_per_table - 1;
         table = container_of(&dynarr->table_list, vsf_dynarr_table_t, table_node);
@@ -172,7 +172,7 @@ void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos)
         item_idx = pos & ((1UL << dynarr->item_num_per_buf_bitlen) - 1);
         pos >>= dynarr->item_num_per_buf_bitlen;
 
-        table = vsf_dynarr_get_table(dynarr, pos);
+        table = __vsf_dynarr_get_table(dynarr, pos);
         if (table != NULL) {
             uint_fast16_t buf_idx = pos & ((1UL << dynarr->buf_num_per_table_bitlen) - 1);
             return (void *)((uint32_t *)table->buffer[buf_idx] +

@@ -21,10 +21,12 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT_vk_usbh_hcd_urb_t
-#define VSF_USBH_IMPLEMENT_CLASS
-#include "vsf.h"
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
+
+#include "kernel/vsf_kernel.h"
+#include "../../vsf_usbh.h"
+#include "./vsf_usbh_BTHCI.h"
 
 /*============================ MACROS ========================================*/
 
@@ -82,20 +84,17 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vk_usbh_bthci_t vk_usbh_bthci_t;
-
 // input/output control block
-struct vk_usbh_bthci_iocb_t {
+typedef struct vk_usbh_bthci_iocb_t {
     vk_usbh_urb_t urb;
     uint8_t type;
     uint8_t is_supported    : 1;
     uint8_t is_icb          : 1;
     uint8_t is_busy         : 1;
     uint8_t is_ep0_claimed  : 1;
-};
-typedef struct vk_usbh_bthci_iocb_t vk_usbh_bthci_iocb_t;
+} vk_usbh_bthci_iocb_t;
 
-struct vk_usbh_bthci_t {
+typedef struct vk_usbh_bthci_t {
     vk_usbh_t *usbh;
     vk_usbh_dev_t *dev;
     vk_usbh_ifs_t *ifs;
@@ -137,13 +136,11 @@ struct vk_usbh_bthci_t {
                     +   VSF_USBH_BTHCI_CFG_ACL_IN_NUM + VSF_USBH_BTHCI_CFG_SCO_IN_NUM
                     +   VSF_USBH_BTHCI_CFG_ACL_OUT_NUM + VSF_USBH_BTHCI_CFG_SCO_OUT_NUM];
     };
-};
-typedef struct vk_usbh_bthci_t vk_usbh_bthci_t;
+} vk_usbh_bthci_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vk_usbh_dev_id_t __vk_usbh_bthci_dev_id[] =
-{
+static const vk_usbh_dev_id_t __vk_usbh_bthci_dev_id[] = {
     { VSF_USBH_MATCH_DEV_CLASS(USB_CLASS_WIRELESS_CONTROLLER, 0x01, 0x01) },
     // BCM20702
     {
@@ -338,7 +335,7 @@ static void __vk_usbh_bthci_free_all(vk_usbh_bthci_t *bthci)
 static void __vk_usbh_bthci_on_eda_terminate(vsf_eda_t *eda)
 {
     vk_usbh_bthci_t *bthci = container_of(eda, vk_usbh_bthci_t, eda);
-    VSF_USBH_FREE(bthci);
+    vsf_usbh_free(bthci);
 }
 
 static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
@@ -355,7 +352,7 @@ static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
         return NULL;
     }
 
-    bthci = VSF_USBH_MALLOC(sizeof(vk_usbh_bthci_t));
+    bthci = vsf_usbh_malloc(sizeof(vk_usbh_bthci_t));
     if (NULL == bthci) {
         return NULL;
     }
@@ -440,7 +437,7 @@ static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
 
 free_all:
     __vk_usbh_bthci_free_all(bthci);
-    VSF_USBH_FREE(bthci);
+    vsf_usbh_free(bthci);
     return NULL;
 }
 

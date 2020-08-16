@@ -21,11 +21,13 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_ST7789 == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_ST7789_CLASS_IMPLEMENT
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "kernel/vsf_kernel.h"
+#include "../../vsf_disp.h"
+#include "./vsf_disp_st7789.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

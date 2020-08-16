@@ -21,10 +21,13 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HUB == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT_HUB
-#include "vsf.h"
-#include "../../../common/class/HUB/vsf_usb_HUB.h"
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
+#define __VSF_USBH_CLASS_IMPLEMENT_HUB__
+
+#include "kernel/vsf_kernel.h"
+#include "../../vsf_usbh.h"
+#include "./vsf_usbh_HUB.h"
 
 /*============================ MACROS ========================================*/
 
@@ -35,7 +38,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_usbh_hub_t {
+typedef struct vk_usbh_hub_t {
     vsf_teda_t teda;
 
     vk_usbh_t *usbh;
@@ -80,8 +83,7 @@ struct vk_usbh_hub_t {
     uint8_t retry                   : 4;
     uint8_t cur_dev_idx;            /* start from 1 */
     uint16_t reset_mask;
-};
-typedef struct vk_usbh_hub_t vk_usbh_hub_t;
+} vk_usbh_hub_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -445,7 +447,7 @@ fail:
 static void __vk_usbh_hub_on_eda_terminate(vsf_eda_t *eda)
 {
     vk_usbh_hub_t *hub = container_of(eda, vk_usbh_hub_t, teda);
-    VSF_USBH_FREE(hub);
+    vsf_usbh_free(hub);
 }
 
 static void *__vk_usbh_hub_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
@@ -459,7 +461,7 @@ static void *__vk_usbh_hub_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
         ||  (desc_ifs->bNumEndpoints != 1)
         ||  ((desc_ep->bEndpointAddress & USB_DIR_MASK) != USB_DIR_IN)
         ||  ((desc_ep->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) != USB_ENDPOINT_XFER_INT)
-        ||  (NULL == (hub = VSF_USBH_MALLOC(sizeof(vk_usbh_hub_t))))) {
+        ||  (NULL == (hub = vsf_usbh_malloc(sizeof(vk_usbh_hub_t))))) {
         return NULL;
     }
 

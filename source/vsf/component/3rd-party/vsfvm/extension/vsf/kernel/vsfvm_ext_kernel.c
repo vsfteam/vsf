@@ -20,24 +20,22 @@
 
 #if (VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED)
 
-#define VSFVM_RUNTIME_INHERIT
-#define VSF_EDA_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSFVM_RUNTIME_CLASS_INHERIT__
+#define __VSF_EDA_CLASS_INHERIT__
+#include "kernel/vsf_kernel.h"
 
-#include "common/vsfvm_common.h"
-#include "runtime/vsfvm_runtime.h"
-#include "extension/std/vsfvm_ext_std.h"
+#include "./common/vsfvm_common.h"
+#include "./runtime/vsfvm_runtime.h"
+#include "./extension/std/vsfvm_ext_std.h"
 #include "./vsfvm_ext_kernel.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfvm_ext_kernel_t {
+typedef struct vsfvm_ext_kernel_t {
     implement(vsfvm_ext_t)
-};
-typedef struct vsfvm_ext_kernel_t vsfvm_ext_kernel_t;
+} vsfvm_ext_kernel_t;
 
 enum {
     VSFVM_KERNEL_EXTFUNC_DELAY_MS = 0,

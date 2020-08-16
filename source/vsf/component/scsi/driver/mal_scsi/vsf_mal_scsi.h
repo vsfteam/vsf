@@ -24,12 +24,11 @@
 
 #if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_USE_MAL_SCSI == ENABLED
 
-#if     defined(VSF_MAL_SCSI_IMPLEMENT)
-#   undef VSF_MAL_SCSI_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_MAL_SCSI_INHERIT)
-#   undef VSF_MAL_SCSI_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#include "component/mal/vsf_mal.h"
+
+#if     defined(__VSF_MAL_SCSI_CLASS_IMPLEMENT)
+#   undef __VSF_MAL_SCSI_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -42,7 +41,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_mal_scsi_t)
+dcl_simple_class(vk_mal_scsi_t)
 
 def_simple_class(vk_mal_scsi_t) {
     public_member(

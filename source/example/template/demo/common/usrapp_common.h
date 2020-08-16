@@ -38,6 +38,10 @@
 #   include "./usrapp_audio_common.h"
 #endif
 
+#if VSF_USE_TCPIP == ENABLED
+#   include "./usrapp_net_common.h"
+#endif
+
 #if VSF_USE_MEMFS == ENABLED
 #   include "../fakefat32.h"
 #endif
@@ -67,7 +71,7 @@
 /*============================ TYPES =========================================*/
 
 #if VSF_USE_FS == ENABLED
-struct usrapp_common_t {
+typedef struct usrapp_common_t {
 #   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
     struct {
 #       if VSF_USE_FAKEFAT32_MAL == ENABLED
@@ -86,8 +90,7 @@ struct usrapp_common_t {
 #       endif
     } fs;
 #   endif
-};
-typedef struct usrapp_common_t usrapp_common_t;
+} usrapp_common_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

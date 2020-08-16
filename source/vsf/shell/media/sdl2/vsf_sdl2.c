@@ -21,8 +21,7 @@
 
 #if VSF_USE_SDL2 == ENABLED
 
-#define __VSF_DISP_CLASS_INHERIT
-#include "vsf.h"
+#include "component/ui/vsf_ui.h"
 #include "./include/SDL2/SDL.h"
 
 /*============================ MACROS ========================================*/
@@ -457,16 +456,16 @@ SDL_Surface * __vsf_sdl_set_video_mode(int width, int height, int bpp, uint32_t 
         surface->__format.BitsPerPixel = bpp;
         switch (vsf_disp_get_pixel_format(__vsf_sdl2.disp)) {
         case VSF_DISP_COLOR_RGB565:
-            surface->__format.Rmask = ((1 << 5) - 1) << 0;
-            surface->__format.Gmask = ((1 << 6) - 1) << 5;
-            surface->__format.Bmask = ((1 << 5) - 1) << 11;
+            surface->__format.Rmask = ((1UL << 5) - 1) << 0;
+            surface->__format.Gmask = ((1UL << 6) - 1) << 5;
+            surface->__format.Bmask = ((1UL << 5) - 1) << 11;
             surface->__format.Amask = 0;
             break;
         case VSF_DISP_COLOR_ARGB8888:
-            surface->__format.Rmask = ((1 << 8) - 1) << 0;
-            surface->__format.Gmask = ((1 << 8) - 1) << 8;
-            surface->__format.Bmask = ((1 << 8) - 1) << 16;
-            surface->__format.Amask = ((1 << 8) - 1) << 24;
+            surface->__format.Rmask = ((1UL << 8) - 1) << 0;
+            surface->__format.Gmask = ((1UL << 8) - 1) << 8;
+            surface->__format.Bmask = ((1UL << 8) - 1) << 16;
+            surface->__format.Amask = ((1UL << 8) - 1) << 24;
             break;
         default:
             VSF_SDL2_ASSERT(false);

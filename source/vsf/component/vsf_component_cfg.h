@@ -97,7 +97,7 @@
 
 //prototype:
 //  __vsf_component_peda_xxxx_entry(__peda_name)
-//  __vsf_component_peda_xxxx_entry(__peda_name, __params)
+//  __vsf_component_peda_xxxx_entry(__peda_name, __args)
 //  __vsf_component_peda_xxxx_entry(__peda_name, __params, __args)
 //  __vsf_component_peda_xxxx_entry(__peda_name, __params, __args, __locals)
 #define __vsf_component_peda_public_entry(__peda_name, ...)                     \

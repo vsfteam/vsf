@@ -35,7 +35,7 @@
 struct m480_ohci_const_t {
     m480_usbphy_t phy;
     IRQn_Type irq;
-    pm_ahb_clk_no_t ahbclk;
+    pm_sync_clk_no_t ahbclk;
     pm_periph_async_clk_no_t periph_async_clk;
 
     USBH_T *reg;

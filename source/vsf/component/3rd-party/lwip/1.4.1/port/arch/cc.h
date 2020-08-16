@@ -18,7 +18,9 @@
 #ifndef __LWIP_CC_H__
 #define __LWIP_CC_H__
 
-#include "vsf.h"
+#include "service/vsf_service.h"
+#include "utilities/vsf_utilities.h"
+#include "hal/vsf_hal.h"
 #include "lwipopts.h"
 
 #if __BYTE_ORDER == __BIG_ENDIAN

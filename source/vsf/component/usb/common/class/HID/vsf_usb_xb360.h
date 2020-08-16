@@ -18,16 +18,19 @@
 #ifndef __VSF_USB_XB360_H__
 #define __VSF_USB_XB360_H__
 
+/*============================ INCLUDES ======================================*/
+
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_usb_xb360_gamepad_in_report_t {
+typedef struct vsf_usb_xb360_gamepad_in_report_t {
     uint8_t type;           // data0
     uint8_t length;         // data1
     uint8_t up:1;           // data2
@@ -53,13 +56,11 @@ struct vsf_usb_xb360_gamepad_in_report_t {
     int16_t rx;             // data10 - data11
     int16_t ry;             // data12 - data13
     uint8_t dummy2[6];      // data14 - data19
-} PACKED;
-typedef struct vsf_usb_xb360_gamepad_in_report_t vsf_usb_xb360_gamepad_in_report_t;
+} PACKED vsf_usb_xb360_gamepad_in_report_t;
 
-struct vsf_usb_xb360_gamepad_out_report_t {
+typedef struct vsf_usb_xb360_gamepad_out_report_t {
     uint8_t buffer[8];
-} PACKED;
-typedef struct vsf_usb_xb360_gamepad_out_report_t vsf_usb_xb360_gamepad_out_report_t;
+} PACKED vsf_usb_xb360_gamepad_out_report_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -13,6 +13,10 @@
 #define LV_CONF_H
 /* clang-format off */
 
+#undef __USE_LOCAL_STDIO__
+#define __USE_LOCAL_STDIO__     1
+
+#include "vsf_cfg.h"
 #include <stdint.h>
 
 /*====================
@@ -27,8 +31,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (256)
-#define LV_VER_RES_MAX          (256)
+#define LV_HOR_RES_MAX          (APP_LVGL_DEMO_CFG_HOR_RES)
+#define LV_VER_RES_MAX          (APP_LVGL_DEMO_CFG_VER_RES)
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -36,7 +40,7 @@
  * - 16: RGB565
  * - 32: ARGB8888
  */
-#define LV_COLOR_DEPTH     16
+#define LV_COLOR_DEPTH     APP_LVGL_DEMO_CFG_COLOR_DEPTH
 
 /* Swap the 2 bytes of RGB565 color.
  * Useful if the display has a 8 bit interface (e.g. SPI)*/
@@ -88,7 +92,7 @@ typedef int16_t lv_coord_t;
 /* Automatically defrag. on free. Defrag. means joining the adjacent free cells. */
 #  define LV_MEM_AUTO_DEFRAG  1
 #else       /*LV_MEM_CUSTOM*/
-#  define LV_MEM_CUSTOM_INCLUDE "vsf.h"   /*Header for the dynamic memory function*/
+#  define LV_MEM_CUSTOM_INCLUDE "service/vsf_service.h"   /*Header for the dynamic memory function*/
 #  define LV_MEM_CUSTOM_ALLOC   vsf_heap_malloc       /*Wrapper to malloc*/
 #  define LV_MEM_CUSTOM_FREE    vsf_heap_free         /*Wrapper to free*/
 #endif     /*LV_MEM_CUSTOM*/
@@ -208,7 +212,7 @@ typedef void * lv_img_decoder_user_data_t;
  * It removes the need to manually update the tick with `lv_tick_inc`) */
 #define LV_TICK_CUSTOM     1
 #if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "vsf.h"       /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "kernel/vsf_kernel.h"       /*Header for the sys time function*/
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (vsf_systimer_get_ms())     /*Expression evaluating to current systime in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
@@ -492,5 +496,4 @@ typedef void * lv_obj_user_data_t;
 #include "lvgl/src/lv_conf_checker.h"
 
 #endif /*LV_CONF_H*/
-
 #endif /*End of "Content enable"*/

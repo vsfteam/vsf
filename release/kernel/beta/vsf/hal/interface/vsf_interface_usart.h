@@ -88,15 +88,15 @@ typedef struct usart_capability_t usart_capability_t;
 
 
 
-typedef void vsf_usart_evt_handler_t(   void *pTarget, 
+typedef void vsf_usart_evt_handler_t(   void *target_ptr, 
                                         vsf_usart_t *,
                                         usart_status_t tStatus);
 
 typedef struct vsf_usart_evt_type_t vsf_usart_evt_type_t;
 struct vsf_usart_evt_type_t
 {
-    vsf_usart_evt_handler_t *fnHandler;
-    void *pTarget;
+    vsf_usart_evt_handler_t *handler_fn;
+    void *target_ptr;
 };
 
 enum em_usart_evt_t{
@@ -119,7 +119,7 @@ def_interface(i_usart_t)
             usart_capability_t (*Capability)(void);
         }USART;
     };
-    vsf_err_t       (*Init)(usart_cfg_t *ptCFG);
+    vsf_err_t       (*Init)(usart_cfg_t *cfg_ptr);
 
     //! data access
     implement(i_byte_pipe_t)

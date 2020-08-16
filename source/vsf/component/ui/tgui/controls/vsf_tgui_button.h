@@ -27,10 +27,10 @@
  *!        included in this file
  */
 #if     defined(__VSF_TGUI_CONTROLS_BUTTON_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_TGUI_CONTROLS_BUTTON_CLASS_IMPLEMENT
 #elif   defined(__VSF_TGUI_CONTROLS_BUTTON_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_TGUI_CONTROLS_BUTTON_CLASS_INHERIT
 #endif
 

@@ -21,9 +21,9 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED
 
-#define VSF_MUSB_FDRC_DCD_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_MUSB_FDRC_DCD_CLASS_IMPLEMENT
+
+#include "./vsf_musb_fdrc_dcd.h"
 #include "./__vsf_musb_fdrc_common.h"
 
 /*============================ MACROS ========================================*/
@@ -34,7 +34,14 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
+static void __vk_musb_fdrc_usbd_notify(vk_musb_fdrc_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
+{
+    if (usbd->callback.evt_handler != NULL) {
+        usbd->callback.evt_handler(usbd->callback.param, evt, value);
+    }
+}
+
+static void __vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
 {
     vk_musb_fdrc_reg_t *reg = usbd->reg;
 
@@ -42,7 +49,7 @@ static void vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
     vk_musb_fdrc_interrupt_init(reg);
     reg->Common.IntrUSBE = MUSB_INTRUSBE_RESET;
     usbd->ep_buf_ptr = 0;
-    usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+    usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
 }
 
 vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
@@ -68,7 +75,7 @@ vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
         usbd->param->op->Init(&ip_cfg);
     }
 
-    vk_musb_fdrc_usbd_reset_do(usbd);
+    __vk_musb_fdrc_usbd_reset_do(usbd);
     return VSF_ERR_NONE;
 }
 
@@ -116,16 +123,16 @@ uint_fast16_t vk_musb_fdrc_usbd_get_frame_number(vk_musb_fdrc_dcd_t *usbd)
     return ((reg->Common.Frame2 & 0x07) << 8) | reg->Common.Frame1;
 }
 
-extern uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd)
+uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd)
 {
     return 0;
 }
 
 void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
 {
-    vk_musb_fdrc_usbd_ep_transaction_read_buffer(usbd->reg, 0, buffer, 8);
+    vk_musb_fdrc_usbd_ep_transaction_read_buffer(usbd, 0, buffer, 8);
 
-    VSF_USB_ASSERT(MUSB_FDRC_USBD_EP0_IDLE == usbd->ep0_state);
+    VSF_USB_ASSERT(MUSB_FDRC_USBD_EP0_WAIT_SETUP == usbd->ep0_state);
     usbd->has_data_stage = false;
     if (!(buffer[0] & 0x80)) {
         usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_OUT;
@@ -138,8 +145,9 @@ void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
 
     if (usbd->has_data_stage) {
         uint_fast8_t ep_orig = vk_musb_fdrc_set_ep(reg, 0);
-            reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND;
+            reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND | MUSBD_CSR0_SERVICEDRXPKGRDY;
         vk_musb_fdrc_set_ep(reg, ep_orig);
+        usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
     }
 }
 
@@ -240,7 +248,7 @@ vsf_err_t vk_musb_fdrc_usbd_ep_set_stall(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t 
     ep &= 0x0F;
     ep_orig = vk_musb_fdrc_set_ep(reg, ep);
         if (!ep) {
-            reg->EP0.CSR0 |= MUSBD_CSR0_SENDSTALL;
+            reg->EP0.CSR0 |= MUSBD_CSR0_SENDSTALL | MUSBD_CSR0_SERVICEDRXPKGRDY;
         } else {
             if (is_in) {
                 reg->EPN.TxCSR1 |= MUSBD_TXCSR1_SENDSTALL;
@@ -327,6 +335,18 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_read_buffer(vk_musb_fdrc_dcd_t *usbd,
 vsf_err_t vk_musb_fdrc_usbd_ep_transaction_enable_out(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep)
 {
     VSF_USB_ASSERT(!(ep & 0x80) && ((ep & 0x0F)) < (usbd->ep_num / 2));
+    ep &= 0x0F;
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (usbd->out_mask & (1 << ep)) {
+        // if ep in out_mask is set, means data is received, simply notify user
+        usbd->out_mask &= ~(1 << ep);
+        vsf_unprotect_int(orig);
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_OUT, ep);
+    } else {
+        usbd->out_mask |= (1 << ep);
+        vsf_unprotect_int(orig);
+    }
     return VSF_ERR_NONE;
 }
 
@@ -375,13 +395,6 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transfer_send(vk_musb_fdrc_dcd_t *usbd, uint_fast
     return VSF_ERR_NOT_SUPPORT;
 }
 
-static void vk_musb_fdrc_usbd_notify(vk_musb_fdrc_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
-{
-    if (usbd->callback.evt_handler != NULL) {
-        usbd->callback.evt_handler(usbd->callback.param, evt, value);
-    }
-}
-
 void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
 {
     vk_musb_fdrc_reg_t *reg = usbd->reg;
@@ -393,18 +406,18 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
 
     // USB interrupt
     if (status & MUSB_INTRUSB_RESET) {
-        vk_musb_fdrc_usbd_notify(usbd, USB_ON_RESET, 0);
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_RESET, 0);
         reg->Common.Power |= MUSB_POWER_ENABLESUSPEND;
     }
     if (status & MUSB_INTRUSB_SOF) {
-        vk_musb_fdrc_usbd_notify(usbd, USB_ON_SOF, 0);
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_SOF, 0);
     }
     if (status & MUSB_INTRUSB_RESUME) {
         reg->Common.Power |= MUSB_POWER_ENABLESUSPEND;
-        vk_musb_fdrc_usbd_notify(usbd, USB_ON_RESUME, 0);
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_RESUME, 0);
     }
     if (status & MUSB_INTRUSB_SUSPEND) {
-        vk_musb_fdrc_usbd_notify(usbd, USB_ON_SUSPEND, 0);
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_SUSPEND, 0);
     }
 
     status_rx = vk_musb_fdrc_get_mask(&reg->Common.IntrRx1);
@@ -423,26 +436,31 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
         if (csr1 & MUSBD_CSR0_SENTSTALL) {
             reg->EP0.CSR0 &= ~MUSBD_CSR0_SENTSTALL;
             vk_musb_fdrc_set_ep(reg, ep_orig);
-            usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+            usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
         }
 
         if (csr1 & MUSBD_CSR0_SETUPEND) {
             reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDSETUPEND;
             vk_musb_fdrc_set_ep(reg, ep_orig);
 
-            vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
-            usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
+            usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
         }
 
         if (csr1 & MUSBD_CSR0_RXPKTRDY) {
             switch (usbd->ep0_state) {
-            case MUSB_FDRC_USBD_EP0_IDLE:
-                vk_musb_fdrc_usbd_notify(usbd, USB_ON_SETUP, 0);
+            case MUSB_FDRC_USBD_EP0_WAIT_SETUP:
+            on_setup:
+                __vk_musb_fdrc_usbd_notify(usbd, USB_ON_SETUP, 0);
                 break;
             case MUSB_FDRC_USBD_EP0_DATA_OUT:
                 usbd->has_data_stage = true;
-                vk_musb_fdrc_usbd_notify(usbd, USB_ON_OUT, 0);
+                __vk_musb_fdrc_usbd_notify(usbd, USB_ON_OUT, 0);
                 break;
+            case MUSB_FDRC_USBD_EP0_STATUS:
+                __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+                goto on_setup;
             default:
                 VSF_USB_ASSERT(false);
             }
@@ -451,7 +469,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
             usbd->has_data_stage = true;
-            vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
+            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
         }
     }
 
@@ -460,13 +478,18 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
     while (status_rx) {
         uint_fast8_t ep = ffz(~status_rx);
         status_rx &= ~(1 << ep);
-        vk_musb_fdrc_usbd_notify(usbd, USB_ON_OUT, ep);
+        if (usbd->out_mask & (1 << ep)) {
+            usbd->out_mask &= ~(1 << ep);
+            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_OUT, ep);
+        } else {
+            usbd->out_mask |= 1 << ep;
+        }
     }
 
     while (status_tx) {
         uint_fast8_t ep = ffz(~status_tx);
         status_tx &= ~(1 << ep);
-        vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, ep);
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, ep);
     }
 }
 

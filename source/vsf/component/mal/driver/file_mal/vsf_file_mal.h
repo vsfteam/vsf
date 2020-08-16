@@ -26,12 +26,9 @@
 
 #include "component/fs/vsf_fs.h"
 
-#if     defined(VSF_FILE_MAL_IMPLEMENT)
-#   undef VSF_FILE_MAL_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_FILE_MAL_INHERIT)
-#   undef VSF_FILE_MAL_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_FILE_MAL_CLASS_IMPLEMENT)
+#   undef __VSF_FILE_MAL_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -44,7 +41,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_file_mal_t)
+dcl_simple_class(vk_file_mal_t)
 
 def_simple_class(vk_file_mal_t) {
     public_member(

@@ -31,26 +31,26 @@ typedef struct vsf_stream_tx_t vsf_stream_tx_t;
 typedef struct vsf_stream_rx_t vsf_stream_rx_t;
 typedef union vsf_stream_status_t vsf_stream_status_t;
 
-typedef void vsf_stream_dat_rdy_evt_handler_t(  void *pTarget, 
+typedef void vsf_stream_dat_rdy_evt_handler_t(  void *target_ptr, 
                                                 vsf_stream_rx_t *,
                                                 vsf_stream_status_t tStatus);
 
 typedef struct vsf_stream_dat_rdy_evt_t vsf_stream_dat_rdy_evt_t;
 struct vsf_stream_dat_rdy_evt_t
 {
-    vsf_stream_dat_rdy_evt_handler_t *fnHandler;
-    void *pTarget;
+    vsf_stream_dat_rdy_evt_handler_t *handler_fn;
+    void *target_ptr;
 };
 
-typedef void vsf_stream_dat_drn_evt_handler_t(  void *pTarget, 
+typedef void vsf_stream_dat_drn_evt_handler_t(  void *target_ptr, 
                                                 vsf_stream_tx_t *,
                                                 vsf_stream_status_t tStatus);
 
 typedef struct vsf_stream_dat_drn_evt_t vsf_stream_dat_drn_evt_t;
 struct vsf_stream_dat_drn_evt_t
 {
-    vsf_stream_dat_drn_evt_handler_t *fnHandler;
-    void *pTarget;
+    vsf_stream_dat_drn_evt_handler_t *handler_fn;
+    void *target_ptr;
 };
 
 union vsf_stream_status_t {
@@ -77,13 +77,13 @@ def_interface(i_stream_pbuf_rx_t)
     } DataReadyEvent;
     vsf_stream_status_t (*GetStatus)(vsf_stream_rx_t *);
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-    void  (*Open)(vsf_stream_rx_t *ptObj);
-    void  (*Close)(vsf_stream_rx_t *ptObj);
+    void  (*Open)(vsf_stream_rx_t *obj_ptr);
+    void  (*Close)(vsf_stream_rx_t *obj_ptr);
 #endif
 end_def_interface(i_stream_pbuf_rx_t)
 
 def_interface(i_stream_pbuf_tx_t)
-    vsf_err_t (*Send)(vsf_stream_tx_t *ptObj, vsf_pbuf_t *pblock);
+    vsf_err_t (*Send)(vsf_stream_tx_t *obj_ptr, vsf_pbuf_t *pblock);
     struct {
         vsf_err_t (*Register)(vsf_stream_tx_t *, vsf_stream_dat_drn_evt_t);
     } DataDrainEvent;

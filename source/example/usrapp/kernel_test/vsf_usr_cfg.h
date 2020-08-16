@@ -178,9 +178,9 @@ enum {
 
 #define VSF_PBUF_ADAPTERS                                                       \
         {                                                                       \
-            .ptTarget = &g_tGenericPBUFPool,                                    \
+            .target_ptr = &g_tGenericPBUFPool,                                    \
             .ID = VSF_PBUF_ADAPTER_CDC_SRC,                                     \
-            .piMethods = &VSF_PBUF_ADAPTER_METHODS_STREAM_SRC,                  \
+            .methods_ptr = &VSF_PBUF_ADAPTER_METHODS_STREAM_SRC,                  \
         }
 #endif
 

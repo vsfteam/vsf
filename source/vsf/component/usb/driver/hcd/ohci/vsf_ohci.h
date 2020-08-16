@@ -24,7 +24,7 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_OHCI == ENABLED
 
 #include "component/usb/host/vsf_usbh.h"
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/vsf_hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,11 +40,10 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_ohci_param_t {
+typedef struct vk_ohci_param_t {
     const i_usb_hc_ip_t *op;
     vsf_arch_prio_t priority;
-};
-typedef struct vk_ohci_param_t vk_ohci_param_t;
+} vk_ohci_param_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

@@ -34,10 +34,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
 
 #if     defined(__VSF_MSG_TREE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_MSG_TREE_CLASS_IMPLEMENT
 #elif   defined(__VSF_MSG_TREE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_MSG_TREE_CLASS_INHERIT
 #endif   
 
@@ -102,7 +102,7 @@ typedef vsf_msgt_node_status_t vsf_msgt_method_status_t(vsf_msgt_node_t* );
 typedef fsm_rt_t vsf_msgt_method_fsm_t (vsf_msgt_node_t* ptNode, vsf_msgt_msg_t* ptMSG);
 typedef struct vsf_msgt_subcall_t {
     vsf_param_eda_evthandler_t* fnSub;
-    uintptr_t pTarget;
+    uintptr_t target_ptr;
 } vsf_msgt_subcall_t;
 
 typedef struct vsf_msgt_handler_t vsf_msgt_handler_t;
@@ -128,7 +128,7 @@ end_def_interface(i_msg_tree_node_t)
 //! @{
 def_structure(vsf_msgt_node_t)
     
-    uint8_t         chID;                                                       //!< node ID for lookup table
+    uint8_t         u8_id;                                                       //!< node ID for lookup table
     union {
         struct {
             uint8_t                 : 6;
@@ -200,31 +200,31 @@ end_def_class(vsf_msgt_t)
 /*============================ PROTOTYPES ====================================*/
 
 extern 
-void vsf_msgt_init( vsf_msgt_t* ptObj, const vsf_msgt_cfg_t *ptCFG);
+void vsf_msgt_init( vsf_msgt_t* obj_ptr, const vsf_msgt_cfg_t *cfg_ptr);
 
 extern 
-const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
+const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t *ptRoot,
                                             uintptr_t pBulletInfo);
 extern 
-const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* ptObj,
+const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* obj_ptr,
                                         const vsf_msgt_node_t *ptRoot,
                                         uintptr_t pBulletInfo);
 
 extern
-fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
+fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t *ptNode,
                                             vsf_msgt_msg_t *ptMessage);
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern 
-void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj, 
+void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* obj_ptr, 
                                                 uint16_t *phwFIFOBuffer, 
                                                 uint_fast16_t hwBuffSize);
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern 
-fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
+fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage);
 #endif

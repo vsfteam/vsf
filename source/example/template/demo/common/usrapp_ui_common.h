@@ -36,7 +36,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usrapp_ui_common_t {
+typedef struct usrapp_ui_common_t {
 #if VSF_USE_DISP_SDL2 == ENABLED
     vk_disp_sdl2_t disp;
 #elif VSF_USE_DISP_FB == ENABLED
@@ -63,8 +63,7 @@ struct usrapp_ui_common_t {
         lv_color_t color[LV_VER_RES_MAX][LV_HOR_RES_MAX];
     } lvgl;
 #endif
-};
-typedef struct usrapp_ui_common_t usrapp_ui_common_t;
+} usrapp_ui_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

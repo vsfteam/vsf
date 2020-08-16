@@ -84,7 +84,7 @@ static uint_fast32_t vsf_mem_stream_get_avail_length(vsf_stream_t *stream)
     if (mem_stream->wpos & mem_stream->align) {
         return 0;
     } else {
-        return mem_stream->use_as__vsf_mem_t.nSize - vsf_mem_stream_get_data_length(stream);
+        return mem_stream->use_as__vsf_mem_t.s32_size - vsf_mem_stream_get_data_length(stream);
     }
 }
 
@@ -92,9 +92,9 @@ static uint_fast32_t vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t avail_len = vsf_mem_stream_get_avail_length(stream);
-    uint_fast32_t wlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->wpos;
+    uint_fast32_t wlen = mem_stream->use_as__vsf_mem_t.s32_size - mem_stream->wpos;
     uint8_t *p = (avail_len > 0) ?
-        mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos : NULL;
+        mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->wpos : NULL;
 
     if (ptr != NULL) {
         *ptr = p;
@@ -107,9 +107,9 @@ static uint_fast32_t vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t data_len = vsf_mem_stream_get_data_length(stream);
-    uint_fast32_t rlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->rpos;
+    uint_fast32_t rlen = mem_stream->use_as__vsf_mem_t.s32_size - mem_stream->rpos;
     uint8_t *p = (data_len > 0) ?
-        mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos : NULL;
+        mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->rpos : NULL;
 
     if (ptr != NULL) {
         *ptr = p;
@@ -124,8 +124,8 @@ static uint_fast32_t vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, ui
     uint_fast32_t wsize = min(avail_len, size);
 
     VSF_SERVICE_ASSERT(!(mem_stream->wpos & mem_stream->align));
-    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.pchBuffer[mem_stream->wpos])) {
-        memcpy(mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos, buf, wsize);
+    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.buffer_ptr[mem_stream->wpos])) {
+        memcpy(mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->wpos, buf, wsize);
     }
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -133,7 +133,7 @@ static uint_fast32_t vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, ui
     vsf_unprotect_sched(orig);
 
     mem_stream->wpos += wsize;
-    if (mem_stream->wpos >= mem_stream->use_as__vsf_mem_t.nSize) {
+    if (mem_stream->wpos >= mem_stream->use_as__vsf_mem_t.s32_size) {
         mem_stream->wpos = 0;
     }
     mem_stream->is_writing = false;
@@ -150,8 +150,8 @@ static uint_fast32_t vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, uin
     if (size < data_len) {
         rsize &= ~mem_stream->align;
     }
-    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.pchBuffer[mem_stream->rpos])) {
-        memcpy(buf, mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos, rsize);
+    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.buffer_ptr[mem_stream->rpos])) {
+        memcpy(buf, mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->rpos, rsize);
     }
 
     vsf_protect_t orig = vsf_protect_sched();

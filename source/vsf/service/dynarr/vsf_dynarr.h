@@ -24,12 +24,12 @@
 
 #if VSF_USE_DYNARR == ENABLED
 
-#if     defined(VSF_DYNARR_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_DYNARR_IMPLEMENT
-#elif   defined(VSF_DYNARR_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSF_DYNARR_INHERIT
+#if     defined(__VSF_DYNARR_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSF_DYNARR_CLASS_IMPLEMENT
+#elif   defined(__VSF_DYNARR_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_DYNARR_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -41,7 +41,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_dynarr_t)
+dcl_simple_class(vsf_dynarr_t)
 def_simple_class(vsf_dynarr_t) {
 
     public_member(

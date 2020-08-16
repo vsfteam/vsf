@@ -21,7 +21,7 @@
 
 
 #if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED && VSF_USE_KERNEL == ENABLED
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
 #include "../../vsf_kernel_common.h"
 #include "./vsf_simple.h"
 #include "../../task/vsf_thread.h"
@@ -147,10 +147,10 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
 }
 
 SECTION("text.vsf.kernel.vsf_mutex_enter")
-vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *pmtx, int_fast32_t time_out)
+vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out)
 {
-    VSF_KERNEL_ASSERT(NULL != pmtx);
-    return __vsf_sem_pend(&(pmtx->use_as__vsf_sync_t), time_out);
+    VSF_KERNEL_ASSERT(NULL != mtx_ptr);
+    return __vsf_sem_pend(&(mtx_ptr->use_as__vsf_sync_t), time_out);
 }
 
 #endif

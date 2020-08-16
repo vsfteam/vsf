@@ -56,7 +56,7 @@
 
 /*============================ TYPES =========================================*/
 
-typedef int trace_low_level_io_write(uintptr_t pStream, uint_fast16_t hwSize);
+typedef int trace_low_level_io_write(uintptr_t pStream, uint_fast16_t u16_size);
 
 typedef struct trace_cfg_t {
     trace_low_level_io_write *fnWriteIO;
@@ -77,9 +77,9 @@ def_interface(i_trace_t)
         void (*Int8)    (int8_t cValue);
         void (*String)  (const char * pchString);
    
-        void (*Words)   (uint32_t *pwStream,  uint_fast16_t hwSize);
-        void (*HWords)  (uint16_t *phwStream, uint_fast16_t hwSize);
-        void (*Bytes)   (uint8_t  *pchStream, uint_fast16_t hwSize);
+        void (*Words)   (uint32_t *pwStream,  uint_fast16_t u16_size);
+        void (*HWords)  (uint16_t *phwStream, uint_fast16_t u16_size);
+        void (*Bytes)   (uint8_t  *pchStream, uint_fast16_t u16_size);
     }ToString;
 end_def_interface(i_trace_t) /*do not remove this for forward compatibility */
 //! @}

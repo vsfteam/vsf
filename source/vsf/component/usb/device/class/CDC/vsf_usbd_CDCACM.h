@@ -24,12 +24,12 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDCACM == ENABLED
 
-#include "../../../common/class/CDC/vsf_usb_CDCACM.h"
+#include "component/usb/common/class/CDC/vsf_usb_CDCACM.h"
 #include "./vsf_usbd_CDCACM_desc.h"
 
-#if     defined(VSF_USBD_CDCACM_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_USBD_CDCACM_IMPLEMENT
+#if     defined(__VSF_USBD_CDCACM_CLASS_IMPLEMENT)
+#   undef __VSF_USBD_CDCACM_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -73,29 +73,29 @@ extern "C" {
 
 
 
-#define __cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
-            USB_DESC_CDC_ACM_IAD((__IFS_START), (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
+#define __cdc_acm_desc(__name, __ifs_start, __i_func, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
+            USB_DESC_CDC_ACM_IAD((__ifs_start), (__i_func), (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval))
 
-#define __cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
-            vk_usbd_cdcacm_t __##__NAME##_CDCACM##__FUNC_ID = {                 \
-                USB_CDC_ACM_PARAM((__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)\
+#define __cdc_acm_func(__name, __func_id, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __stream_rx, __stream_tx, ...)\
+            vk_usbd_cdcacm_t __##__name##_CDCACM##__func_id = {                 \
+                USB_CDC_ACM_PARAM((__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__stream_rx), (__stream_tx), __VA_ARGS__)\
             };
 
-#define __cdc_acm_ifs(__NAME, __FUNC_ID)                                        \
-            USB_CDC_ACM_IFS_CONTROL(__##__NAME##_CDCACM##__FUNC_ID)             \
-            USB_CDC_ACM_IFS_DATA(__##__NAME##_CDCACM##__FUNC_ID)
+#define __cdc_acm_ifs(__name, __func_id)                                        \
+            USB_CDC_ACM_IFS_CONTROL(__##__name##_CDCACM##__func_id)             \
+            USB_CDC_ACM_IFS_DATA(__##__name##_CDCACM##__func_id)
 
-#define cdc_acm_desc(__NAME, __IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
-            __cdc_acm_desc(__NAME, (__IFS_START), 4 + (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
-#define cdc_acm_func(__NAME, __FUNC_ID, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __STREAM_RX, __STREAM_TX, ...)\
-            __cdc_acm_func(__NAME, __FUNC_ID, (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__STREAM_RX), (__STREAM_TX), __VA_ARGS__)
-#define cdc_acm_ifs(__NAME, __FUNC_ID)                                          \
-            __cdc_acm_ifs(__NAME, __FUNC_ID)
+#define cdc_acm_desc(__name, __ifs_start, __i_func, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
+            __cdc_acm_desc(__name, (__ifs_start), 4 + (__i_func), (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval))
+#define cdc_acm_func(__name, __func_id, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __stream_rx, __stream_tx, ...)\
+            __cdc_acm_func(__name, __func_id, (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__stream_rx), (__stream_tx), __VA_ARGS__)
+#define cdc_acm_ifs(__name, __func_id)                                          \
+            __cdc_acm_ifs(__name, __func_id)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbd_cdcacm_t)
+dcl_simple_class(vk_usbd_cdcacm_t)
 
 def_simple_class(vk_usbd_cdcacm_t) {
 
@@ -114,7 +114,7 @@ def_simple_class(vk_usbd_cdcacm_t) {
     )
 };
 
-struct vk_usbd_cdcacm_cfg_t {
+typedef struct vk_usbd_cdcacm_cfg_t {
     implement_ex(vk_usbd_ep_cfg_t, ep)
 #if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
     vsf_stream_t *tx_stream;
@@ -123,8 +123,7 @@ struct vk_usbd_cdcacm_cfg_t {
     implement_ex(vsf_stream_usr_cfg_t, stream_usr);
     implement_ex(vsf_stream_src_cfg_t, stream_src);
 #endif
-};
-typedef struct vk_usbd_cdcacm_cfg_t vk_usbd_cdcacm_cfg_t;
+} vk_usbd_cdcacm_cfg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

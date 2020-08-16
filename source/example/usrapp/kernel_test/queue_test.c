@@ -115,7 +115,7 @@ static void usrapp_msgq_send_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 void usrapp_msgq_test_start(void)
 {
     VSF_POOL_PREPARE(usrapp_msg_pool, &usrapp_msgq.pool,
-        .pTarget = NULL,
+        .target_ptr = NULL,
         .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
     );
     vsf_eda_msg_queue_init(&usrapp_msgq.msgq, 10);

@@ -19,7 +19,7 @@
 #define __CODE_REGION_H__
 
 /*============================ INCLUDES ======================================*/
-#include "utilities/compiler/compiler.h"
+#include "../compiler/compiler.h"
 
 /*! \brief How To Define and Use your own CODE_REGION
  *!        Example:
@@ -98,8 +98,8 @@ extern "C" {
         NULL != code_region_ptr;                                                   \
         code_region_ptr = NULL)                                                    \
         for(uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE],               \
-                TPASTE2(__code_region_, __LINE__) = 1;                          \
-            TPASTE2(__code_region_, __LINE__)-- ?                               \
+                __CONNECT2(__code_region_, __LINE__) = 1;                          \
+            __CONNECT2(__code_region_, __LINE__)-- ?                               \
                 (code_region_ptr->methods_ptr->OnEnter(  code_region_ptr->target_ptr, local)\
                     ,1)                                                         \
                 : 0;                                                            \
@@ -133,7 +133,7 @@ extern "C" {
 #   define exit_code_region()  EXIT_CODE_REGION()
 
 #   define CODE_REGION(__REGION_ADDR)          __CODE_REGION((__REGION_ADDR))
-#   define code_region(__REGION_ADDR)          __CODE_REGION((__REGION_ADDR))
+#   define code_region(__region_addr)          __CODE_REGION((__region_addr))
 
 #else
 
@@ -165,8 +165,8 @@ extern "C" {
         NULL != code_region_ptr;                                                \
         code_region_ptr = NULL)                                                 \
         for(uint8_t local[code_region_ptr->methods_ptr->local_obj_size],        \
-                TPASTE2(__code_region_, __LINE__) = 1;                          \
-            TPASTE2(__code_region_, __LINE__)-- ?                               \
+                __CONNECT2(__code_region_, __LINE__) = 1;                          \
+            __CONNECT2(__code_region_, __LINE__)-- ?                               \
                 (code_region_ptr->methods_ptr->OnEnter(                         \
                     code_region_ptr->target_ptr, local)                            \
                     ,1)                                                         \
@@ -202,7 +202,7 @@ extern "C" {
 #   define exit_code_region()  EXIT_CODE_REGION()
 
 #   define CODE_REGION(__REGION_ADDR)          __CODE_REGION((__REGION_ADDR))
-#   define code_region(__REGION_ADDR)          __CODE_REGION((__REGION_ADDR))
+#   define code_region(__region_addr)          __CODE_REGION((__region_addr))
 
 #endif
 

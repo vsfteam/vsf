@@ -27,14 +27,14 @@
 
 /*============================ MACROS ========================================*/
 #undef  this
-#define this    (*ptThis)
+#define this    (*this_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 static struct {
-    const vsf_pbuf_adapter_t *padapters;
+    const vsf_pbuf_adapter_t *adapters_ptr;
     uint_fast8_t        length;
 }__vsf_pbuf_cb = {NULL, 0};
 
@@ -83,196 +83,196 @@ const i_pbuf_t VSF_PBUF = {
 
 static const vsf_pbuf_adapter_t* __vsf_get_adapter_interface(vsf_pbuf_t *ptItem)
 {
-    class_internal(ptItem, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptThis);
-    const vsf_pbuf_adapter_t *ptAdapter = NULL;
+    class_internal(ptItem, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != this_ptr);
+    const vsf_pbuf_adapter_t *adapter_ptr = NULL;
     
     do {
-        uint_fast8_t chID = this.u8AdapterID;
+        uint_fast8_t u8_id = this.u8_adapter_id;
         
-        if (0xFF == chID) {
+        if (0xFF == u8_id) {
             break;
-        } /*else if (VSF_PBUF_FREE_TO_ANY == chID) {
-            chID = 1;
+        } /*else if (VSF_PBUF_FREE_TO_ANY == u8_id) {
+            u8_id = 1;
         }  */
         
-        if (NULL == __vsf_pbuf_cb.padapters) {
+        if (NULL == __vsf_pbuf_cb.adapters_ptr) {
             break;
         }
-        if (chID >= __vsf_pbuf_cb.length) {
+        if (u8_id >= __vsf_pbuf_cb.length) {
             break;
         }
         
-        ptAdapter = &__vsf_pbuf_cb.padapters[chID];
-        VSF_SERVICE_ASSERT(NULL != ptAdapter->piMethods);
+        adapter_ptr = &__vsf_pbuf_cb.adapters_ptr[u8_id];
+        VSF_SERVICE_ASSERT(NULL != adapter_ptr->methods_ptr);
     } while(0);
     
-    return ptAdapter;
+    return adapter_ptr;
 }
 
-void vsf_adapter_register(const vsf_pbuf_adapter_t *ptAdaptors, uint_fast8_t chSize)
+void vsf_adapter_register(const vsf_pbuf_adapter_t *adaptors_ptr, uint_fast8_t u8_size)
 {
     //!< this function could only be called once.
-    VSF_SERVICE_ASSERT(__vsf_pbuf_cb.padapters == NULL);   
+    VSF_SERVICE_ASSERT(__vsf_pbuf_cb.adapters_ptr == NULL);   
     
-    __vsf_pbuf_cb.padapters = ptAdaptors;
-    __vsf_pbuf_cb.length = chSize;
+    __vsf_pbuf_cb.adapters_ptr = adaptors_ptr;
+    __vsf_pbuf_cb.length = u8_size;
 }
 
-const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t chID)
+const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t u8_id)
 {
-    const vsf_pbuf_adapter_t *ptAdapter = NULL;
+    const vsf_pbuf_adapter_t *adapter_ptr = NULL;
     
-    /*if (VSF_PBUF_FREE_TO_ANY == chID) {
-        ptAdapter =  __vsf_pbuf_cb.padapters;
+    /*if (VSF_PBUF_FREE_TO_ANY == u8_id) {
+        adapter_ptr =  __vsf_pbuf_cb.adapters_ptr;
     } else */
-    if (chID < __vsf_pbuf_cb.length) {
-        ptAdapter =  &__vsf_pbuf_cb.padapters[chID];
+    if (u8_id < __vsf_pbuf_cb.length) {
+        adapter_ptr =  &__vsf_pbuf_cb.adapters_ptr[u8_id];
     }
 
-    return ptAdapter;
+    return adapter_ptr;
 }
 
 vsf_pbuf_t *vsf_pbuf_init(vsf_pbuf_t *pbuf, vsf_pbuf_cfg_t *pcfg)
 {
-    class_internal(pbuf, ptThis, vsf_pbuf_t);
+    class_internal(pbuf, this_ptr, vsf_pbuf_t);
     VSF_SERVICE_ASSERT(NULL != pbuf && NULL != pcfg);
     
     do {
-        if (    (pcfg->u24BlockSize < sizeof(this)) 
-            &&  (NULL == pcfg->pBuffer)) {
+        if (    (pcfg->u24_block_size < sizeof(this)) 
+            &&  (NULL == pcfg->buffer_ptr)) {
             break;
         }
 
         this.Capability = pcfg->Capability;
 
-        if (NULL != pcfg->pBuffer) {
-            this.pchBuffer = pcfg->pBuffer;
-            this.u24Size = pcfg->u24BlockSize;
+        if (NULL != pcfg->buffer_ptr) {
+            this.buffer_ptr = pcfg->buffer_ptr;
+            this.u24_size = pcfg->u24_block_size;
         } else {
-            this.pchBuffer = ((uint8_t *)&this)+sizeof(this);
-            this.u24Size = pcfg->u24BlockSize - sizeof(this);
-            this.u24BlockSize = this.u24Size;
+            this.buffer_ptr = ((uint8_t *)&this)+sizeof(this);
+            this.u24_size = pcfg->u24_block_size - sizeof(this);
+            this.u24_block_size = this.u24_size;
         }
 
-        this.u8AdapterID = pcfg->AdapterID;
+        this.u8_adapter_id = pcfg->adapter_id;
     } while(false);
     
     return pbuf;
 }
 
-void vsf_pbuf_size_reset(vsf_pbuf_t *ptObj)
+void vsf_pbuf_size_reset(vsf_pbuf_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
     
-    VSF_SERVICE_ASSERT(NULL != ptThis);
-    if (!this.isNoWrite) {      //!< readonly
-        this.u24Size = this.u24BlockSize;
+    VSF_SERVICE_ASSERT(NULL != this_ptr);
+    if (!this.is_no_write) {      //!< readonly
+        this.u24_size = this.u24_block_size;
     }
 }
 
-void *vsf_pbuf_buffer_get(vsf_pbuf_t *ptObj)
+void *vsf_pbuf_buffer_get(vsf_pbuf_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptThis);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != this_ptr);
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
-    if (this.isNoDirectAccess) {
+    if (this.is_no_direct_access) {
         return NULL;
     }
 #endif
-    return this.pchBuffer;
+    return this.buffer_ptr;
 }
 
 
-int_fast32_t vsf_pbuf_buffer_write( vsf_pbuf_t *ptObj, 
+int_fast32_t vsf_pbuf_buffer_write( vsf_pbuf_t *obj_ptr, 
                             const void *psrc, 
-                            int_fast32_t nSize, 
+                            int_fast32_t s32_size, 
                             uint_fast32_t offsite)
 {
-    VSF_SERVICE_ASSERT(NULL != ptObj && NULL != psrc);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr && NULL != psrc);
     
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
     int_fast32_t nWrittenSize = -1;
     do {
-        if (0 == nSize) {
+        if (0 == s32_size) {
             break;
-        } else if (this.isNoWrite) {
+        } else if (this.is_no_write) {
             break;
         }
         
-        uint_fast32_t wMaxSize = this.u24BlockSize - offsite;
-        nSize = min(nSize, wMaxSize);
+        uint_fast32_t u32_max_size = this.u24_block_size - offsite;
+        s32_size = min(s32_size, u32_max_size);
 
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
-        if (this.isNoDirectAccess) {
+        if (this.is_no_direct_access) {
             const vsf_pbuf_adapter_t *
-                ptAdapter = __vsf_get_adapter_interface(ptObj);
-            if (NULL == ptAdapter) {
+                adapter_ptr = __vsf_get_adapter_interface(obj_ptr);
+            if (NULL == adapter_ptr) {
                 break;
             }
-            if (NULL == ptAdapter->piMethods->Write) {
+            if (NULL == adapter_ptr->methods_ptr->Write) {
                 break;
             }
             
-            nSize = (*ptAdapter->piMethods->Write)(ptAdapter->ptTarget, 
-                                                  this.pchBuffer,
+            s32_size = (*adapter_ptr->methods_ptr->Write)(adapter_ptr->target_ptr, 
+                                                  this.buffer_ptr,
                                                   psrc,
-                                                  nSize,
+                                                  s32_size,
                                                   offsite);
-            if (nSize < 0) {
+            if (s32_size < 0) {
                 break;
             }
 
         } else 
 #endif
         {
-            memcpy(((uint8_t *)vsf_pbuf_buffer_get(ptObj)) + offsite, psrc, nSize);
+            memcpy(((uint8_t *)vsf_pbuf_buffer_get(obj_ptr)) + offsite, psrc, s32_size);
         }
         
-        this.u24Size = nSize + offsite;
-        nWrittenSize = nSize;
+        this.u24_size = s32_size + offsite;
+        nWrittenSize = s32_size;
     } while(false);
     
     return nWrittenSize;
 }
 
-int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *ptObj, 
+int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *obj_ptr, 
                                 void *psrc, 
-                                int_fast32_t nSize, 
-                                uint_fast32_t wOffset)
+                                int_fast32_t s32_size, 
+                                uint_fast32_t u32_offset)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj && NULL != psrc);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr && NULL != psrc);
     //uint8_t *pbuffer = NULL;
-    //vsf_mem_t tResult = {.nSize = -1,};
+    //vsf_mem_t result = {.s32_size = -1,};
     int_fast32_t nReadSize = -1;
     do {
-        if (0 == nSize) {
+        if (0 == s32_size) {
             break;
-        } else if (this.isNoRead) {
+        } else if (this.is_no_read) {
             break;
         }
         
-        uint_fast32_t max_size = this.u24BlockSize - wOffset;
+        uint_fast32_t max_size = this.u24_block_size - u32_offset;
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
-        if (this.isNoDirectAccess) {
-            nSize = min(nSize, max_size);
+        if (this.is_no_direct_access) {
+            s32_size = min(s32_size, max_size);
             
             const vsf_pbuf_adapter_t *
-                ptAdapter = __vsf_get_adapter_interface(ptObj);
-            if (NULL == ptAdapter) {
+                adapter_ptr = __vsf_get_adapter_interface(obj_ptr);
+            if (NULL == adapter_ptr) {
                 break;
             }
-            if (NULL == ptAdapter->piMethods->Read) {
+            if (NULL == adapter_ptr->methods_ptr->Read) {
                 break;
             }
             
-            nSize = (*ptAdapter->piMethods->Read)(   ptAdapter->ptTarget, 
-                                                    this.pchBuffer,
+            s32_size = (*adapter_ptr->methods_ptr->Read)(   adapter_ptr->target_ptr, 
+                                                    this.buffer_ptr,
                                                     psrc,
-                                                    nSize,
-                                                    wOffset);
-            if (nSize < 0) {
+                                                    s32_size,
+                                                    u32_offset);
+            if (s32_size < 0) {
                 break;
             }
             //pbuffer = psrc;
@@ -280,17 +280,17 @@ int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *ptObj,
         } else 
 #endif
         {
-        //if (nSize <= max_size) {
-        //    pbuffer = (uint8_t *)vsf_pbuf_buffer_get(ptObj) + wOffset;
+        //if (s32_size <= max_size) {
+        //    pbuffer = (uint8_t *)vsf_pbuf_buffer_get(obj_ptr) + u32_offset;
         //} else {
-            nSize = min(nSize, max_size);
-            memcpy(psrc, this.pchBuffer + wOffset, nSize);
+            s32_size = min(s32_size, max_size);
+            memcpy(psrc, this.buffer_ptr + u32_offset, s32_size);
             //pbuffer = psrc;
         //}
         }
         
-        //tResult.pchBuffer = pbuffer;
-        nReadSize = nSize;
+        //result.buffer_ptr = pbuffer;
+        nReadSize = s32_size;
         
     } while(false);
     
@@ -298,46 +298,46 @@ int_fast32_t vsf_pbuf_buffer_read( vsf_pbuf_t *ptObj,
 }
 
 
-void vsf_pbuf_size_set(vsf_pbuf_t *ptObj, int_fast32_t nSize)
+void vsf_pbuf_size_set(vsf_pbuf_t *obj_ptr, int_fast32_t s32_size)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
     
-    if (this.isNoWrite) {            //! readonly
+    if (this.is_no_write) {            //! readonly
         return ;
     }
     
-    this.u24Size = min(nSize, this.u24BlockSize);
+    this.u24_size = min(s32_size, this.u24_block_size);
 }
 
-int_fast32_t vsf_pbuf_capacity_get(vsf_pbuf_t *ptObj)
+int_fast32_t vsf_pbuf_capacity_get(vsf_pbuf_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
     
-    return this.u24BlockSize;
+    return this.u24_block_size;
 }
 
-int_fast32_t vsf_pbuf_size_get(vsf_pbuf_t *ptObj)
+int_fast32_t vsf_pbuf_size_get(vsf_pbuf_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
 
-    return this.u24Size;
+    return this.u24_size;
 }
 
-vsf_pbuf_capability_t vsf_pbuf_capability_get(vsf_pbuf_t *ptObj)
+vsf_pbuf_capability_t vsf_pbuf_capability_get(vsf_pbuf_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
 
     return this.tFeature;
 }
 #if VSF_PBUF_CFG_SUPPORT_REF_COUNTING == ENABLED
 void vsf_pbuf_ref_increase(vsf_pbuf_t *pbuf)
 {
-    class_internal(pbuf, ptThis, vsf_pbuf_t);
-    VSF_SERVICE_ASSERT(NULL != ptThis);
+    class_internal(pbuf, this_ptr, vsf_pbuf_t);
+    VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_SERVICE_ASSERT(NULL != this.tFeature.u5REFCount < 32);
 
     this.tFeature.u5REFCount++;
@@ -346,7 +346,7 @@ void vsf_pbuf_ref_increase(vsf_pbuf_t *pbuf)
 
 vsf_pbuf_t * vsf_pbuf_free(vsf_pbuf_t *pbuf)
 {
-    class_internal(pbuf, ptThis, vsf_pbuf_t);
+    class_internal(pbuf, this_ptr, vsf_pbuf_t);
     vsf_pbuf_t *ptReturn = pbuf;
     do {
         if(NULL == pbuf) {      //!< allow free NULL item.
@@ -358,9 +358,9 @@ vsf_pbuf_t * vsf_pbuf_free(vsf_pbuf_t *pbuf)
             break;
         }
     #endif
-        uint_fast8_t chID = this.u8AdapterID;
+        uint_fast8_t u8_id = this.u8_adapter_id;
         
-        if (VSF_PBUF_NO_FREE == chID) {
+        if (VSF_PBUF_NO_FREE == u8_id) {
             ptReturn = NULL;
             break;
         }
@@ -368,8 +368,8 @@ vsf_pbuf_t * vsf_pbuf_free(vsf_pbuf_t *pbuf)
         if (NULL == padatper) {
             break;
         }
-        if (NULL != padatper->piMethods->Free) {
-            ptReturn = (*padatper->piMethods->Free)(padatper->ptTarget, pbuf);
+        if (NULL != padatper->methods_ptr->Free) {
+            ptReturn = (*padatper->methods_ptr->Free)(padatper->target_ptr, pbuf);
         }
     } while(false);
     
@@ -377,18 +377,18 @@ vsf_pbuf_t * vsf_pbuf_free(vsf_pbuf_t *pbuf)
 }
 
 
-void vsf_pbuf_pool_item_init_event_handler( uintptr_t ptTarget, 
+void vsf_pbuf_pool_item_init_event_handler( uintptr_t target_ptr, 
                                             uintptr_t pbuf, 
-                                            uint_fast32_t nSize)
+                                            uint_fast32_t s32_size)
 {
-    VSF_SERVICE_ASSERT(NULL != ptTarget);
+    VSF_SERVICE_ASSERT(NULL != target_ptr);
     vsf_pbuf_cfg_t cfg = {
-        .pBuffer            = NULL,     //!< use the rest memory of the block as buffer
-        .u24BlockSize       = nSize,    //!< total block nSize
-        .isNoWrite          = false,    //!< allow write
-        .isNoRead           = false,    //!< allow read
-        .isNoDirectAccess   = false,    //!< allow direct access
-        .AdapterID          = ((vsf_pbuf_adapter_t *)ptTarget)->ID  //!< use default adapter
+        .buffer_ptr            = NULL,     //!< use the rest memory of the block as buffer
+        .u24_block_size       = s32_size,    //!< total block s32_size
+        .is_no_write          = false,    //!< allow write
+        .is_no_read           = false,    //!< allow read
+        .is_no_direct_access   = false,    //!< allow direct access
+        .adapter_id          = ((vsf_pbuf_adapter_t *)target_ptr)->ID  //!< use default adapter
     };
 
     vsf_pbuf_init((vsf_pbuf_t *)pbuf, &cfg);

@@ -512,7 +512,7 @@ void Reset_Handler(void)
 
 
 #ifndef ENABLE_SPIM_CACHE
-    CLK->AHBCLK |= CLK_AHBCLK_SPIMCKEN_Msk;
+    CLK->SyncCLK |= CLK_SyncCLK_SPIMCKEN_Msk;
     SPIM->CTL1 |= SPIM_CTL1_CACHEOFF_Msk;     /* _SPIM_DISABLE_CACHE */
     SPIM->CTL1 |= SPIM_CTL1_CCMEN_Msk;        /* _SPIM_ENABLE_CCM */
 #endif

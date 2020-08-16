@@ -21,11 +21,13 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_USBD_UVC == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_USBD_UVC_CLASS_IMPLEMENT
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "kernel/vsf_kernel.h"
+#include "../../vsf_disp.h"
+#include "./vsf_disp_usbd_uvc.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

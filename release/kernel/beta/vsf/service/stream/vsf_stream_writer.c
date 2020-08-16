@@ -26,7 +26,7 @@
 
 /*============================ MACROS ========================================*/
 #undef  this
-#define this        (*ptThis)
+#define this        (*this_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -57,19 +57,19 @@ const i_stream_writer_t  VSF_STREAM_WRITER = {
 /*----------------------------------------------------------------------------*
  * STREAM WRITER                                                              *
  *----------------------------------------------------------------------------*/
-vsf_err_t vsf_stream_writer_init(   vsf_stream_writer_t *ptObj, 
-                                    const vsf_stream_src_cfg_t *ptCFG)
+vsf_err_t vsf_stream_writer_init(   vsf_stream_writer_t *obj_ptr, 
+                                    const vsf_stream_src_cfg_t *cfg_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_stream_writer_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_stream_writer_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
 
-    memset(ptObj, 0, sizeof(vsf_stream_writer_t));
-    return vsf_stream_src_init(&this.use_as__vsf_stream_src_t, ptCFG);
+    memset(obj_ptr, 0, sizeof(vsf_stream_writer_t));
+    return vsf_stream_src_init(&this.use_as__vsf_stream_src_t, cfg_ptr);
 }
 
-static void __vsf_stream_writer_send_current_pbuf(vsf_stream_writer_t *ptObj)
+static void __vsf_stream_writer_send_current_pbuf(vsf_stream_writer_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_stream_writer_t);
+    class_internal(obj_ptr, this_ptr, vsf_stream_writer_t);
     vsf_pbuf_t *ptPBUF = NULL;
     
     __SAFE_ATOM_CODE(
@@ -88,25 +88,25 @@ static void __vsf_stream_writer_send_current_pbuf(vsf_stream_writer_t *ptObj)
     }
 }
 
-vsf_err_t vsf_stream_writer_send_pbuf ( vsf_stream_writer_t *ptObj, 
+vsf_err_t vsf_stream_writer_send_pbuf ( vsf_stream_writer_t *obj_ptr, 
                                         vsf_pbuf_t *ptOldBlock)
 {
-    class_internal(ptObj, ptThis, vsf_stream_writer_t);
+    class_internal(obj_ptr, this_ptr, vsf_stream_writer_t);
 
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
     
-    __vsf_stream_writer_send_current_pbuf(ptObj);
+    __vsf_stream_writer_send_current_pbuf(obj_ptr);
 
     return vsf_stream_src_send_pbuf(&this.use_as__vsf_stream_src_t, 
                                         ptOldBlock);
 }
 
-int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *ptObj,
-                                        uint8_t *pchBuffer,
-                                        uint_fast16_t hwSize)
+int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *obj_ptr,
+                                        uint8_t *buffer_ptr,
+                                        uint_fast16_t u16_size)
 {
-    class_internal(ptObj, ptThis, vsf_stream_writer_t);
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_stream_writer_t);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
     int_fast32_t nWrittenSize = -1;
     
 
@@ -121,7 +121,7 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *ptObj,
         }
     )
     do {
-        if (NULL == pchBuffer || 0 == hwSize) {
+        if (NULL == buffer_ptr || 0 == u16_size) {
             break; 
         }
 
@@ -129,14 +129,14 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *ptObj,
             if (NULL != this.ptCurrent) {
                 if (this.hwOffset < this.hwBufferSize) {
                     nWrittenSize = vsf_pbuf_buffer_write(  this.ptCurrent, 
-                                                            pchBuffer,
-                                                            hwSize,
+                                                            buffer_ptr,
+                                                            u16_size,
                                                             this.hwOffset);
                     if (nWrittenSize > 0) {
                         this.hwOffset += nWrittenSize;
                         if (this.hwOffset == this.hwBufferSize) {
                             //! current buffer is full
-                            __vsf_stream_writer_send_current_pbuf(ptObj);
+                            __vsf_stream_writer_send_current_pbuf(obj_ptr);
                         }
                     }
                 }
@@ -148,21 +148,21 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *ptObj,
     return nWrittenSize;
 }
 
-bool vsf_stream_writer_write_byte(  vsf_stream_writer_t *ptObj, 
+bool vsf_stream_writer_write_byte(  vsf_stream_writer_t *obj_ptr, 
                                     uint_fast8_t chByte)
 {
-    return vsf_stream_writer_write(ptObj, (uint8_t *)&chByte, 1);
+    return vsf_stream_writer_write(obj_ptr, (uint8_t *)&chByte, 1);
 }
 
-fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *ptObj)
+fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_stream_writer_t);
+    class_internal(obj_ptr, this_ptr, vsf_stream_writer_t);
     fsm_rt_t tReturn;
-    VSF_SERVICE_ASSERT(NULL != ptObj);
+    VSF_SERVICE_ASSERT(NULL != obj_ptr);
     
 
     if (NULL != this.ptCurrent) {
-        __vsf_stream_writer_send_current_pbuf(ptObj);
+        __vsf_stream_writer_send_current_pbuf(obj_ptr);
     }
     
     do {

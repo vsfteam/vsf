@@ -24,11 +24,7 @@
 
 #ifdef VSF_DEBUGGER_CFG_CONSOLE
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED 
-#   include "service/vsfstream/vsfstream.h"
-#elif VSF_USE_SERVICE_STREAM == ENABLED
-#   include "service/stream/vsf_stream.h"
-#endif
+#include "service/vsf_service.h"
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 #   include "./segger_rtt/segger_rtt_stream.h"

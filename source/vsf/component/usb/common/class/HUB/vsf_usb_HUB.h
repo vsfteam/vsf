@@ -20,11 +20,14 @@
 #ifndef __VSF_USB_HUB_H__
 #define __VSF_USB_HUB_H__
 
+/*============================ INCLUDES ======================================*/
+
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
 #ifndef USB_MAXCHILDREN

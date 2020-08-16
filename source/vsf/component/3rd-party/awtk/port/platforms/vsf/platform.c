@@ -1,4 +1,8 @@
-#include "vsf.h"
+#include "component/ui/vsf_ui_cfg.h"
+
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
+
+#include "kernel/vsf_kernel.h"
 #include "tkc/types_def.h"
 #include "base/main_loop.h"
 
@@ -17,3 +21,5 @@ uint64_t get_time_ms64(void) {
 void sleep_ms(uint32_t ms) {
   vsf_thread_delay(vsf_systimer_ms_to_tick(ms));
 }
+
+#endif

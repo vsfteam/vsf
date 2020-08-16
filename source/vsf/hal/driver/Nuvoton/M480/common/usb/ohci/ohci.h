@@ -32,27 +32,25 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct m480_ohci_const_t {
+typedef struct m480_ohci_const_t {
     m480_usbphy_t phy;
     IRQn_Type irq;
-    pm_ahb_clk_no_t ahbclk;
+    pm_sync_clk_no_t ahbclk;
     pm_periph_async_clk_no_t periph_async_clk;
 
     USBH_T *reg;
     io_cfg_t dp;
     io_cfg_t dm;
-};
-typedef struct m480_ohci_const_t m480_ohci_const_t;
+} m480_ohci_const_t;
 
-struct m480_ohci_t {
+typedef struct m480_ohci_t {
     struct {
         void (*irq_handler)(void *param);
         void *param;
     } callback;
 
     const m480_ohci_const_t *param;
-};
-typedef struct m480_ohci_t m480_ohci_t;
+} m480_ohci_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/

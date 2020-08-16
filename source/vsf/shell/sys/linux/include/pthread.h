@@ -1,8 +1,6 @@
 #ifndef __PTHREAD_H__
 #define __PTHREAD_H__
 
-#include "vsf.h"
-
 #include <time.h>
 
 #ifdef __cplusplus

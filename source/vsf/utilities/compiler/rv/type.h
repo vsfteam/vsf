@@ -62,13 +62,13 @@ typedef enum {
 }
 #endif
 #else
-#include <stdint.h>
-#include <stdbool.h>
+#   include <stdint.h>
+#   include <stdbool.h>
 #endif
 
-#include <stddef.h>
-#include <assert.h>
-#include "../__common/__type.h"
+#if !__IS_COMPILER_GCC__
+#   include <uchar.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,3 +92,7 @@ typedef int_fast8_t         intalu_t;
 #endif
 
 #endif // __APP_TYPE_H_INCLUDED__
+
+
+/*============================ Multiple-Entry ================================*/
+#include "../__common/__type.h"

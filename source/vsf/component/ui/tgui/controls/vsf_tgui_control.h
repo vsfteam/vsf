@@ -27,10 +27,10 @@
  */
 
 #if     defined(__VSF_TGUI_CONTROLS_CONTROL_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_TGUI_CONTROLS_CONTROL_CLASS_IMPLEMENT
 #elif   defined(__VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
 #endif
 
@@ -637,7 +637,7 @@ def_class(vsf_tgui_timer_t,
 
     private_member(
         implement(vsf_callback_timer_t)
-        const vsf_tgui_control_t *ptTarget;
+        const vsf_tgui_control_t *target_ptr;
     )
 
     union {

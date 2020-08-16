@@ -23,41 +23,41 @@
 
 /*============================ MACROS ========================================*/
 #undef  this
-#define this    (*ptThis)
+#define this    (*this_ptr)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-vsf_err_t class_base_init(class_base_t *ptObj, uint_fast8_t chParam)
+vsf_err_t class_base_init(class_base_t *obj_ptr, uint_fast8_t chParam)
 {
-    class_internal(ptObj, ptThis, class_base_t);
+    class_internal(obj_ptr, this_ptr, class_base_t);
     this.chPrivateParamBase = chParam;
     return VSF_ERR_NONE;
 }
 
-uint_fast8_t class_base_get_param(class_base_t *ptObj)
+uint_fast8_t class_base_get_param(class_base_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, class_base_t);
+    class_internal(obj_ptr, this_ptr, class_base_t);
     return this.chPrivateParamBase;
 }
 
-vsf_err_t class_demo_init(class_demo_t *ptObj, uint_fast8_t chParam, uint_fast8_t chParamBase)
+vsf_err_t class_demo_init(class_demo_t *obj_ptr, uint_fast8_t chParam, uint_fast8_t chParamBase)
 {
-    class_internal(ptObj, ptThis, class_demo_t);
+    class_internal(obj_ptr, this_ptr, class_demo_t);
     this.chPrivateParamDemo = chParam;
     return class_base_init(&this.use_as__class_base_t, chParamBase);
 }
 
-uint_fast8_t class_demo_get_param(class_demo_t *ptObj)
+uint_fast8_t class_demo_get_param(class_demo_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, class_demo_t);
+    class_internal(obj_ptr, this_ptr, class_demo_t);
     return this.chPrivateParamDemo;
 }
 
-uint_fast8_t class_demo_get_base_param(class_demo_t *ptObj)
+uint_fast8_t class_demo_get_base_param(class_demo_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, class_demo_t);
+    class_internal(obj_ptr, this_ptr, class_demo_t);
     uint_fast8_t chBaseParam;
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     class_internal(&this.use_as__class_base_t, ptBase, class_base_t);

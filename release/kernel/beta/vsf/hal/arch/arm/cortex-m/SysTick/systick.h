@@ -38,8 +38,8 @@
 
 #define vsf_systick_cfg(...)                    \
         do {                                    \
-            systick_cfg_t tCFG = {__VA_ARGS__}; \
-            vsf_systick_init(&tCFG);            \
+            systick_cfg_t cfg = {__VA_ARGS__}; \
+            vsf_systick_init(&cfg);            \
         } while(false)
 
 /*============================ TYPES =========================================*/

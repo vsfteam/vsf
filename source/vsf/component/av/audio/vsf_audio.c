@@ -22,12 +22,12 @@
 #if VSF_USE_AUDIO == ENABLED
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
+#   define __VSFSTREAM_CLASS_INHERIT__
 #endif
-#define VSF_AUDIO_IMPLEMENT
+#define __VSF_AUDIO_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "utilities/vsf_utilities.h"
+#include "component/vsf_component.h"
 
 /*============================ MACROS ========================================*/
 

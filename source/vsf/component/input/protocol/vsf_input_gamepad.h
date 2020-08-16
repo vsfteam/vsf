@@ -30,15 +30,15 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(__name, __bitoffset, __bitlen, __is_signed, __config)\
-            [TPASTE2(GAMEPAD_ID_, __name)] = VSF_INPUT_ITEM_EX(                 \
-                TPASTE2(GAMEPAD_ID_, __name),                                   \
-                (__bitoffset), (__bitlen), (__is_signed), (__config))
+#define VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(__NAME, __BITOFFSET, __BITLEN, __IS_SIGNED, __CONFIG)\
+            [__CONNECT2(GAMEPAD_ID_, __NAME)] = VSF_INPUT_ITEM_EX(                 \
+                __CONNECT2(GAMEPAD_ID_, __NAME),                                   \
+                (__BITOFFSET), (__BITLEN), (__IS_SIGNED), (__CONFIG))
 
-#define VSF_GAMEPAD_DEF_ITEM_INFO(__name, __bitoffset, __bitlen, __is_signed)   \
-            [TPASTE2(GAMEPAD_ID_, __name)] = VSF_INPUT_ITEM(                    \
-                TPASTE2(GAMEPAD_ID_, __name),                                   \
-                (__bitoffset), (__bitlen), (__is_signed))
+#define VSF_GAMEPAD_DEF_ITEM_INFO(__NAME, __BITOFFSET, __BITLEN, __IS_SIGNED)   \
+            [__CONNECT2(GAMEPAD_ID_, __NAME)] = VSF_INPUT_ITEM(                    \
+                __CONNECT2(GAMEPAD_ID_, __NAME),                                   \
+                (__BITOFFSET), (__BITLEN), (__IS_SIGNED))
 
 /*============================ TYPES =========================================*/
 
@@ -54,7 +54,7 @@ enum {
 //  L_LEFT  LS/(LX,LY)  L_RIGHT             R_LEFT  RS/(RX,RY)  R_RIGHT
 //          L_DOWN                                  R_DOWN
 
-enum vsf_gamepad_id_t {
+typedef enum vsf_gamepad_id_t {
     GAMEPAD_ID_DUMMY = 0,
     GAMEPAD_ID_L_UP,
     GAMEPAD_ID_L_DOWN,
@@ -82,14 +82,12 @@ enum vsf_gamepad_id_t {
 
     GAMEPAD_ID_NUM,
     GAMEPAD_ID_USER = GAMEPAD_ID_NUM,
-};
-typedef enum vsf_gamepad_id_t vsf_gamepad_id_t;
+} vsf_gamepad_id_t;
 
-struct vk_gamepad_evt_t {
+typedef struct vk_gamepad_evt_t {
     implement(vk_input_evt_t)
     implement_ex(vk_input_item_info_t, info)
-};
-typedef struct vk_gamepad_evt_t vk_gamepad_evt_t;
+} vk_gamepad_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

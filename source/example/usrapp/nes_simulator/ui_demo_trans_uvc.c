@@ -48,7 +48,7 @@
 #define SCREEN_PIXEL_BITLEN             NES_COLOR_DEPTH
 #define SCREEN_FRAME_SIZE               (SCREEN_WIDTH * SCREEN_HEIGHT * SCREEN_PIXEL_BITLEN / 8)
 
-#define GENERATE_HEX(value)             TPASTE2(0x, value)
+#define GENERATE_HEX(value)             __CONNECT2(0x, value)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

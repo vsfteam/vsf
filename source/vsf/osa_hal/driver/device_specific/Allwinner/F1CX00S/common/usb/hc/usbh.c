@@ -21,18 +21,19 @@
 
 #if VSF_USE_USB_HOST == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT_HCD
-// ch32f10x_usbhd has no roothub, so need VSF_USBH_IMPLEMENT_HUB for
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT_HCD__
+// f1cx00s_usbh_hcd has no roothub, so need __VSF_USBH_CLASS_IMPLEMENT_HUB__ for
 //  vsf_usbh_new_device and vsf_usbh_disconnect_device
-#define VSF_USBH_IMPLEMENT_HUB
-#define VSF_USBH_IMPLEMENT_CLASS
+#define __VSF_USBH_CLASS_IMPLEMENT_HUB__
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define CH32F10X_usbh_CLASS_IMPLEMENT
 #include "./usbh.h"
 
 /*============================ MACROS ========================================*/
 
 #define F1CX00S_USBH_TRACE_EN               DISABLED
+#define F1CX00S_USBH_TRACE_BUFFER_EN        DISABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -163,7 +164,7 @@ static void __f1cx00s_usbh_hcd_free_ep(f1cx00s_usbh_hcd_t *musb_hcd, uint_fast8_
 
 static void __f1cx00s_usbh_hcd_free_urb_imp(f1cx00s_usbh_hcd_t *musb_hcd, vk_usbh_hcd_urb_t *urb)
 {
-    VSF_USBH_FREE(urb);
+    vsf_usbh_free(urb);
 }
 
 static bool __f1cx00s_usbh_hcd_urb_for_queue(vk_usbh_hcd_urb_t *urb)
@@ -349,6 +350,9 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                 }
 
                 if (MUSB_BASE->Index.HC.EPN.RxCSRL & (MUSBH_RxCSRL_RxStall | MUSBH_RxCSRL_Error)) {
+#if F1CX00S_USBH_TRACE_EN == ENABLED
+                    vsf_trace(VSF_TRACE_DEBUG, "rx urb failed: %08X %02X\r\n", urb, MUSB_BASE->Index.HC.EPN.RxCSRL);
+#endif
                     MUSB_BASE->Index.HC.EPN.RxCSRL &= ~(MUSBH_RxCSRL_RxStall | MUSBH_RxCSRL_Error | MUSBH_RxCSRL_ReqPkt);
                     return VSF_ERR_FAIL;
                 }
@@ -365,6 +369,9 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
                 }
 
                 if (MUSB_BASE->Index.HC.EPN.TxCSRL & (MUSBH_TxCSRL_RxStall | MUSBH_TxCSRL_Error)) {
+#if F1CX00S_USBH_TRACE_EN == ENABLED
+                    vsf_trace(VSF_TRACE_DEBUG, "tx urb failed: %08X %02X\r\n", urb, MUSB_BASE->Index.HC.EPN.TxCSRL);
+#endif
                     MUSB_BASE->Index.HC.EPN.TxCSRL &= ~(MUSBH_TxCSRL_RxStall | MUSBH_TxCSRL_Error | MUSBH_TxCSRL_TxPktRdy);
                     return VSF_ERR_FAIL;
                 }
@@ -409,7 +416,12 @@ static vsf_err_t __f1cx00s_usbh_hcd_urb_fsm(f1cx00s_usbh_hcd_t *musb_hcd, vk_usb
 
 urb_finished:
 #if F1CX00S_USBH_TRACE_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "urb_done: %08X %d %s%d\r\n", urb, pipe.address, pipe.dir_in1out0 ? "IN" : "OUT", pipe.endpoint);
+    vsf_trace(VSF_TRACE_DEBUG, "urb_done: %08X %d %s%d %d\r\n", urb, pipe.address, pipe.dir_in1out0 ? "IN" : "OUT", pipe.endpoint, urb->actual_length);
+#   if F1CX00S_USBH_TRACE_BUFFER_EN == ENABLED
+    if (pipe.dir_in1out0) {
+        vsf_trace_buffer(VSF_TRACE_DEBUG, urb->buffer, urb->actual_length);
+    }
+#   endif
 #endif
     musb_urb->state = URB_STATE_IDLE;
     vsf_eda_post_msg(urb->eda_caller, urb);
@@ -626,7 +638,7 @@ static vsf_err_t __f1cx00s_usbh_hcd_resume(vk_usbh_hcd_t *hcd)
 
 static vsf_err_t __f1cx00s_usbh_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
-    f1cx00s_usbh_hcd_dev_t *musb_dev = VSF_USBH_MALLOC(sizeof(*musb_dev));
+    f1cx00s_usbh_hcd_dev_t *musb_dev = vsf_usbh_malloc(sizeof(*musb_dev));
     if (NULL == musb_dev) { return VSF_ERR_NOT_ENOUGH_RESOURCES; }
 
     // initialize all members in musb_dev here if there is
@@ -659,7 +671,7 @@ static void __f1cx00s_usbh_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t
             }
         }
 
-        VSF_USBH_FREE(musb_dev);
+        vsf_usbh_free(musb_dev);
         dev->dev_priv = NULL;
     }
 }
@@ -672,7 +684,7 @@ static vk_usbh_hcd_urb_t * __f1cx00s_usbh_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
     VSF_OSA_HAL_ASSERT(hcd != NULL);
 
     size = sizeof(vk_usbh_hcd_urb_t) + sizeof(f1cx00s_usbh_hcd_urb_t);
-    urb = VSF_USBH_MALLOC(size);
+    urb = vsf_usbh_malloc(size);
     if (urb != NULL) {
         memset(urb, 0, size);
     }
@@ -702,13 +714,19 @@ static vsf_err_t __f1cx00s_usbh_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
     int8_t *ep_idx_arr;
     volatile uint16_t *ep_inten;
 
-#if F1CX00S_USBH_TRACE_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "submit_urb: %08x %d %s%d\r\n", urb, pipe.address, pipe.dir_in1out0 ? "IN" : "OUT", pipe.endpoint);
-#endif
     if (pipe.dir_in1out0) {
+#if F1CX00S_USBH_TRACE_EN
+        vsf_trace(VSF_TRACE_DEBUG, "submit_urb: %08x %d %s%d %d\r\n", urb, pipe.address, pipe.dir_in1out0 ? "IN" : "OUT", pipe.endpoint, urb->transfer_length);
+#endif
         ep_idx_arr = musb_dev->ep_in_idx;
         ep_inten = &MUSB_BASE->Common.IntrRxE;
     } else {
+#if F1CX00S_USBH_TRACE_EN == ENABLED
+        vsf_trace(VSF_TRACE_DEBUG, "submit_urb: %08x %d %s%d %d\r\n", urb, pipe.address, pipe.dir_in1out0 ? "IN" : "OUT", pipe.endpoint, urb->transfer_length);
+#   if F1CX00S_USBH_TRACE_BUFFER_EN == ENABLED
+        vsf_trace_buffer(VSF_TRACE_DEBUG, urb->buffer, urb->transfer_length);
+#   endif
+#endif
         ep_idx_arr = musb_dev->ep_out_idx;
         ep_inten = &MUSB_BASE->Common.IntrTxE;
     }

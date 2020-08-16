@@ -21,12 +21,10 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_MALFS == ENABLED
 
-#define VSF_FS_INHERIT
-#define VSF_MALFS_IMPLEMENT
-#define VSF_MAL_INHERIT
-
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_FS_CLASS_INHERIT__
+#define __VSF_MAL_CLASS_INHERIT__
+#define __VSF_MALFS_CLASS_IMPLEMENT
+#include "../../vsf_fs.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

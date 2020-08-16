@@ -21,11 +21,11 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_USE_MIM_MAL == ENABLED
 
-#define VSF_MAL_INHERIT
-#define VSF_MIM_MAL_IMPLEMENT
+#define __VSF_MAL_CLASS_INHERIT__
+#define __VSF_MIM_MAL_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_mal.h"
+#include "./vsf_mim_mal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

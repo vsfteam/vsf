@@ -36,11 +36,11 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_STREAM_BASE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_STREAM_BASE_CLASS_IMPLEMENT
-#elif   defined(__VSF_STREAM_BASE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef __VSF_STREAM_BASE_CLASS_INHERIT
+#elif   defined(__VSF_STREAM_BASE_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_STREAM_BASE_CLASS_INHERIT__
 #endif   
 
 #include "utilities/ooc_class.h"
@@ -88,15 +88,15 @@ def_class(vsf_stream_src_t,,
 end_def_class(vsf_stream_src_t)
 
 def_interface(i_stream_src_t)
-    vsf_err_t           (*Init) (   vsf_stream_src_t *ptObj, 
-                                    const vsf_stream_src_cfg_t *ptCFG);
-    vsf_stream_tx_t *   (*GetTX)(   vsf_stream_src_t *ptObj);
+    vsf_err_t           (*Init) (   vsf_stream_src_t *obj_ptr, 
+                                    const vsf_stream_src_cfg_t *cfg_ptr);
+    vsf_stream_tx_t *   (*GetTX)(   vsf_stream_src_t *obj_ptr);
 
     struct {
-        vsf_pbuf_t *    (*New)  (   vsf_stream_src_t *ptObj,
+        vsf_pbuf_t *    (*New)  (   vsf_stream_src_t *obj_ptr,
                                     int_fast32_t nNoLessThan,
                                     int_fast32_t nBestSize);
-        vsf_err_t       (*Send) (   vsf_stream_src_t *ptObj,vsf_pbuf_t *ptOldBlock);
+        vsf_err_t       (*Send) (   vsf_stream_src_t *obj_ptr,vsf_pbuf_t *ptOldBlock);
     }Block;
 
 end_def_interface(i_stream_src_t)
@@ -118,14 +118,14 @@ typedef struct vsf_stream_usr_cfg_t {
 }vsf_stream_usr_cfg_t;
 
 def_interface(i_stream_usr_t)
-    vsf_err_t       (*Init) (   vsf_stream_usr_t *ptObj, 
-                                const vsf_stream_usr_cfg_t *ptCFG);
+    vsf_err_t       (*Init) (   vsf_stream_usr_t *obj_ptr, 
+                                const vsf_stream_usr_cfg_t *cfg_ptr);
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-    void            (*Open)(    vsf_stream_usr_t *ptObj);
-    void            (*Close)(   vsf_stream_usr_t *ptObj);
+    void            (*Open)(    vsf_stream_usr_t *obj_ptr);
+    void            (*Close)(   vsf_stream_usr_t *obj_ptr);
 #endif
     struct {
-        vsf_pbuf_t *(*Fetch)(   vsf_stream_usr_t *ptObj);
+        vsf_pbuf_t *(*Fetch)(   vsf_stream_usr_t *obj_ptr);
     }Block;
 
 end_def_interface(i_stream_usr_t)
@@ -143,24 +143,24 @@ extern const i_stream_usr_t     VSF_STREAM_USR;
  * STREAM SOURCE                                                              *
  *----------------------------------------------------------------------------*/
 extern
-vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *ptObj, 
-                                const vsf_stream_src_cfg_t *ptCFG);
+vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *obj_ptr, 
+                                const vsf_stream_src_cfg_t *cfg_ptr);
 
 extern
-vsf_pbuf_t *vsf_stream_src_new_pbuf (vsf_stream_src_t *ptObj,
+vsf_pbuf_t *vsf_stream_src_new_pbuf (vsf_stream_src_t *obj_ptr,
                                            int_fast32_t nNoLessThan,
                                            int_fast32_t nBestSize);
 
 extern
-vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *ptObj, 
+vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *obj_ptr, 
                                     vsf_pbuf_t *ptOldBlock);
 
 extern 
-vsf_stream_tx_t *vsf_stream_src_get_tx(vsf_stream_src_t *ptObj);
+vsf_stream_tx_t *vsf_stream_src_get_tx(vsf_stream_src_t *obj_ptr);
 
 #if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
 extern 
-vsf_err_t vsf_stream_src_set_limitation(    vsf_stream_src_t *ptObj,
+vsf_err_t vsf_stream_src_set_limitation(    vsf_stream_src_t *obj_ptr,
                                             uint_fast16_t hwpbufCountUpLimit,
                                             uint_fast16_t hwpbufPoolReserve);
 #endif
@@ -170,17 +170,17 @@ vsf_err_t vsf_stream_src_set_limitation(    vsf_stream_src_t *ptObj,
  *----------------------------------------------------------------------------*/
 
 extern 
-vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *ptObj, 
-                                const vsf_stream_usr_cfg_t *ptCFG);
+vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *obj_ptr, 
+                                const vsf_stream_usr_cfg_t *cfg_ptr);
 
 extern 
-vsf_pbuf_t *vsf_stream_usr_fetch_pbuf ( vsf_stream_usr_t *ptObj);
+vsf_pbuf_t *vsf_stream_usr_fetch_pbuf ( vsf_stream_usr_t *obj_ptr);
 
 extern 
-void vsf_stream_usr_open ( vsf_stream_usr_t *ptObj);
+void vsf_stream_usr_open ( vsf_stream_usr_t *obj_ptr);
 
 extern 
-void vsf_stream_usr_close ( vsf_stream_usr_t *ptObj);
+void vsf_stream_usr_close ( vsf_stream_usr_t *obj_ptr);
 
 #ifdef __cplusplus
 }

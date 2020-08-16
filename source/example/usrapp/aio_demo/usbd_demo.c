@@ -22,7 +22,7 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define GENERATE_HEX(value)             TPASTE2(0x, value)
+#define GENERATE_HEX(value)             __CONNECT2(0x, value)
 
 
 

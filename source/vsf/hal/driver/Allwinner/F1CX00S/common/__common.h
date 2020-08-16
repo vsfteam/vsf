@@ -20,12 +20,8 @@
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
-#include "./dram/dram.h"
-#include "./debug_uart/debug_uart.h"
-#include "./fb/fb.h"
-#include "./usb/usb.h"
-
-#include <stdint.h>
+#include "./f1c100s_reg.h"
+#include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 

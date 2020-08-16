@@ -22,12 +22,12 @@
 #if VSF_USE_MAL == ENABLED
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
+#   define __VSFSTREAM_CLASS_INHERIT__
+#   include "service/vsf_service.h"
 #endif
-#define VSF_MAL_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_MAL_CLASS_IMPLEMENT
+#include "./vsf_mal.h"
 
 /*============================ MACROS ========================================*/
 

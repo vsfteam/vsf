@@ -22,7 +22,7 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
 #include "../../vsfip.h"
 #include "./vsfip_dhcp_common.h"
@@ -31,7 +31,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfip_dhcpc_t {
+typedef struct vsfip_dhcpc_t {
     vsfip_netif_t *netif;
     vsf_teda_t teda;
     vsfip_socket_t *so;
@@ -50,8 +50,7 @@ struct vsfip_dhcpc_t {
     uint32_t renew_time;
     uint32_t rebinding_time;
     unsigned ready : 1;
-};
-typedef struct vsfip_dhcpc_t vsfip_dhcpc_t;
+} vsfip_dhcpc_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

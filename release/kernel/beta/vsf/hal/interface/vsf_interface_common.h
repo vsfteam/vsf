@@ -91,8 +91,8 @@ end_def_interface(peripheral_t)
 
 def_interface(vsf_async_block_access_t)
     /*! \brief request a block read
-     *! \param pchBuffer    address of target memory
-     *! \param wSize        the size of the target memory
+     *! \param buffer_ptr    address of target memory
+     *! \param u32_size        the size of the target memory
      *! \retval fsm_rt_cpl  The transaction is complete
      *! \retval fsm_rt_asyn The transaction is handled asynchronousely, i.e. by 
      *!                     DMA or by ISR or etc.
@@ -100,10 +100,10 @@ def_interface(vsf_async_block_access_t)
      *!                     value is returned.
      *! \retval vsf_err_t   Error value is returned.
      */
-    fsm_rt_t  (*RequestRead)(uint8_t *pchBuffer, uint_fast32_t wSize);
+    fsm_rt_t  (*RequestRead)(uint8_t *buffer_ptr, uint_fast32_t u32_size);
     /*! \brief request a block write
-     *! \param pchBuffer    address of target memory
-     *! \param wSize        the size of the target memory
+     *! \param buffer_ptr    address of target memory
+     *! \param u32_size        the size of the target memory
      *! \retval fsm_rt_cpl  The transaction is complete
      *! \retval fsm_rt_asyn The transaction is handled asynchronousely, i.e. by 
      *!                     DMA or by ISR or etc.
@@ -111,7 +111,7 @@ def_interface(vsf_async_block_access_t)
      *!                     value is returned.
      *! \retval vsf_err_t   Error value is returned.
      */
-    fsm_rt_t  (*RequestWrite)(uint8_t *pchBuffer, uint_fast32_t wSize);
+    fsm_rt_t  (*RequestWrite)(uint8_t *buffer_ptr, uint_fast32_t u32_size);
 end_def_interface(vsf_async_block_access_t)
 
 

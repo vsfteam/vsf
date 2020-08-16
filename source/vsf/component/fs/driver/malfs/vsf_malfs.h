@@ -26,12 +26,12 @@
 
 #include "component/mal/vsf_mal.h"
 
-#if     defined(VSF_MALFS_IMPLEMENT)
-#   undef VSF_MALFS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_MALFS_INHERIT)
-#   undef VSF_MALFS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_MALFS_CLASS_IMPLEMENT)
+#   undef __VSF_MALFS_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_MALFS_CLASS_INHERIT__)
+#   undef __VSF_MALFS_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -49,18 +49,17 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(__vk_malfs_file_t)
-declare_simple_class(__vk_malfs_info_t)
-declare_simple_class(__vk_malfs_cache_t)
-declare_simple_class(vk_malfs_mounter_t)
+dcl_simple_class(__vk_malfs_file_t)
+dcl_simple_class(__vk_malfs_info_t)
+dcl_simple_class(__vk_malfs_cache_t)
+dcl_simple_class(vk_malfs_mounter_t)
 
-struct __vk_malfs_cache_node_t {
+typedef struct __vk_malfs_cache_node_t {
     uint64_t block_addr;
     uint32_t access_time_sec    : 30;
     uint32_t is_dirty           : 1;
     uint32_t is_alloced         : 1;
-};
-typedef struct __vk_malfs_cache_node_t __vk_malfs_cache_node_t;
+} __vk_malfs_cache_node_t;
 
 def_simple_class(__vk_malfs_cache_t) {
     public_member(
@@ -74,8 +73,8 @@ def_simple_class(__vk_malfs_cache_t) {
 };
 
 def_simple_class(__vk_malfs_file_t) {
-    implement(vk_file_t)
     public_member(
+        implement(vk_file_t)
         void *info;
     )
 };
@@ -106,21 +105,19 @@ def_simple_class(__vk_malfs_info_t) {
 };
 
 #if VSF_USE_HEAP == ENABLED
-enum vk_malfs_mount_state_t {
+typedef enum vk_malfs_mount_state_t {
     VSF_MOUNT_STATE_READ_MBR,
     VSF_MOUNT_STATE_CREATE_ROOT,
     VSF_MOUNT_STATE_OPEN_ROOT,
     VSF_MOUNT_STATE_MOUNT,
-};
-typedef enum vk_malfs_mount_state_t vk_malfs_mount_state_t;
+} vk_malfs_mount_state_t;
 
-struct vk_malfs_mount_partition_t {
+typedef struct vk_malfs_mount_partition_t {
     void *fsinfo;
     __vk_malfs_info_t *malfs_info;
     const vk_fs_op_t *fsop;
     vk_file_t *root;
-};
-typedef struct vk_malfs_mount_partition_t vk_malfs_mount_partition_t;
+} vk_malfs_mount_partition_t;
 
 def_simple_class(vk_malfs_mounter_t) {
     public_member(

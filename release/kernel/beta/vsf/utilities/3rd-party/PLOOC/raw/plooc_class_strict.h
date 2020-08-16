@@ -58,7 +58,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
-#if   defined(__PLOOC_CLASS_IMPLEMENT)
+#if   defined(__PLOOC_CLASS_IMPLEMENT__)
 
 #   define __def_class2(__NAME, _1)                                             \
     typedef struct __NAME __NAME;                                               \
@@ -210,7 +210,7 @@
             __class_internal(__SRC, __DES, __TYPE, __VA_ARGS__)
 
 
-#elif   defined(__PLOOC_CLASS_INHERIT)
+#elif   defined(__PLOOC_CLASS_INHERIT__)
 
 #   define __def_class2(__NAME, _1)                                             \
     typedef struct __NAME __NAME;                                               \
@@ -444,8 +444,8 @@
 #define end_extern_class(...)           __end_extern_class(__VA_ARGS__)
 
 
-#undef __PLOOC_CLASS_IMPLEMENT
-#undef __PLOOC_CLASS_INHERIT
+#undef __PLOOC_CLASS_IMPLEMENT__
+#undef __PLOOC_CLASS_INHERIT__
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

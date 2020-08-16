@@ -34,7 +34,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum usb_uvc_req_t {
+typedef enum usb_uvc_req_t {
     USB_UVC_REQ_CUR     = 1,
     USB_UVC_REQ_MIN     = 2,
     USB_UVC_REQ_MAX     = 3,
@@ -45,11 +45,10 @@ enum usb_uvc_req_t {
     USB_UVC_REQ_ALL     = 0x10,
     USB_UVC_REQ_SET     = 0x00,
     USB_UVC_REQ_GET     = 0x80,
-};
-typedef enum usb_uvc_req_t usb_uvc_req_t;
+} usb_uvc_req_t;
 
 // Stream Controls
-struct usb_uvc_vs_t {
+typedef struct usb_uvc_vs_t {
     uint16_t bmHint;
     uint8_t bFormatIndex;
     uint8_t bFrameIndex;
@@ -72,18 +71,16 @@ struct usb_uvc_vs_t {
     uint8_t bMaxNumberOfFramesPlus1;
     uint16_t bmRateControlModes;
     uint64_t bmLayoutPerStream;
-} PACKED;
-typedef struct usb_uvc_vs_t usb_uvc_vs_t;
+} PACKED usb_uvc_vs_t;
 
 // Camera Terminal
-struct usb_uvc_ct_roi_t {
+typedef struct usb_uvc_ct_roi_t {
     uint16_t wROI_Top;
     uint16_t wROI_Left;
     uint16_t wROI_Bottom;
     uint16_t wROI_Right;
     uint16_t bmAutoControls;
-} PACKED;
-typedef struct usb_uvc_ct_roi_t usb_uvc_ct_roi_t;
+} PACKED usb_uvc_ct_roi_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

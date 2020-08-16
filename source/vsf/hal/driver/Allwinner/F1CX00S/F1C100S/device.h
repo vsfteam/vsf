@@ -15,9 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
-#if     defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-// put arch info here
-#elif   !defined(__HAL_DEVICE_ALLWINNER_F1C100S_H__)
+#ifndef __HAL_DEVICE_ALLWINNER_F1C100S_H__
 #define __HAL_DEVICE_ALLWINNER_F1C100S_H__
 
 /*============================ INCLUDES ======================================*/
@@ -25,14 +23,24 @@
 
 /*============================ MACROS ========================================*/
 
+/*\note first define basic info for arch. */
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#endif
+//! arch info
+#   define VSF_ARCH_PRI_NUM         4
+#   define VSF_ARCH_PRI_BIT         2
+
+
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             0
+#define VSF_DEV_SWI_NUM             4
+#define VSF_DEV_SWI_LIST            60, 61, 62, 63
 
 /*============================ INCLUDES ======================================*/
 
 /*\note this is should be the only place where __common.h is included.*/
 #include "../common/__common.h"
-#include "./f1c100s_reg.h"
+
 
 /*============================ MACROS ========================================*/
 

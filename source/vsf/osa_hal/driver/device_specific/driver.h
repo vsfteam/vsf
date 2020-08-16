@@ -31,6 +31,8 @@
 #       define VSF_OSA_DRIVER_HEADER    "./WCH/driver.h"
 #   elif    defined(__Allwinner__)
 #       define VSF_OSA_DRIVER_HEADER    "./Allwinner/driver.h"
+#   elif    defined(__GigaDevice__)
+#       define VSF_OSA_DRIVER_HEADER    "./GigaDevice/driver.h"
 #   endif
 #endif
 

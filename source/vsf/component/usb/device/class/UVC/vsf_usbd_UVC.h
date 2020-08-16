@@ -25,10 +25,11 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
 
 #include "../../../common/class/UVC/vsf_usb_UVC.h"
+#include "component/av/vsf_av.h"
 
-#if     defined(VSF_USBD_UVC_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_USBD_UVC_IMPLEMENT
+#if     defined(__VSF_USBD_UVC_CLASS_IMPLEMENT)
+#   undef __VSF_USBD_UVC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -45,11 +46,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbd_uvc_t)
+dcl_simple_class(vk_usbd_uvc_t)
 
 typedef struct vk_usbd_uvc_control_t vk_usbd_uvc_control_t;
 
-struct vk_usbd_uvc_control_info_t {
+typedef struct vk_usbd_uvc_control_info_t {
     uint8_t selector;
     uint16_t size;
 
@@ -58,20 +59,18 @@ struct vk_usbd_uvc_control_info_t {
     vk_av_control_value_t def;
 
     void (*on_set)(vk_usbd_uvc_control_t *control);
-};
-typedef struct vk_usbd_uvc_control_info_t vk_usbd_uvc_control_info_t;
+} vk_usbd_uvc_control_info_t;
 
-struct vk_usbd_uvc_control_t {
+typedef struct vk_usbd_uvc_control_t {
     const vk_usbd_uvc_control_info_t *info;
     vk_av_control_value_t cur;
-};
+} vk_usbd_uvc_control_t;
 
-struct vk_usbd_uvc_entity_t {
+typedef struct vk_usbd_uvc_entity_t {
     uint8_t id;
     uint8_t control_num;
     vk_usbd_uvc_control_t *control;
-};
-typedef struct vk_usbd_uvc_entity_t vk_usbd_uvc_entity_t;
+} vk_usbd_uvc_entity_t;
 
 def_simple_class(vk_usbd_uvc_t) {
 

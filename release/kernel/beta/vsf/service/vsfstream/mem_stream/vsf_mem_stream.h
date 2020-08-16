@@ -29,10 +29,10 @@
 #include "utilities/communicate.h"
 
 #if     defined(VSFSTREAM_MEM_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef VSFSTREAM_MEM_CLASS_IMPLEMENT
 #elif   defined(VSFSTREAM_MEM_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef VSFSTREAM_MEM_CLASS_INHERIT
 #endif   
 

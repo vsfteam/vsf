@@ -19,17 +19,17 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_DISP_CLASS_INHERIT__
+
+#include "component/ui/vsf_ui_cfg.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
 
 #include "awtk.h"
 #include "./platforms/vsf/main_loop_vsf.h"
 #include "awtk_vsf_port.h"
-#include <stdio.h>
-#include <string.h>
+// for standard c headers
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 

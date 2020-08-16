@@ -188,15 +188,15 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
     tCharOffset = *piOffSet;
 
     if (    (NULL == ptStringIn->pstrText)
-        ||  (ptStringIn->iSize <= 0)
-        ||  (tCharOffset >= ptStringIn->iSize)) {
+        ||  (ptStringIn->s16_size <= 0)
+        ||  (tCharOffset >= ptStringIn->s16_size)) {
         return NULL;
     }
 
     ptStringOut->pstrText = (uintptr_t)(ptStringIn->pstrText);
 
     while ( ((wChar = vsf_tgui_text_get_next(ptStringIn->pstrText, &tCharOffset)) != '\0')
-        &&  (tCharOffset <= ptStringIn->iSize)
+        &&  (tCharOffset <= ptStringIn->s16_size)
     ) {
         if (wChar == '\n') {
             break;
@@ -211,7 +211,7 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
         }
     }
 
-    ptStringOut->iSize = tCharOffset - tStart - 1;
+    ptStringOut->s16_size = tCharOffset - tStart - 1;
     *piOffSet = tCharOffset;
 
     return ptStringOut;
@@ -236,7 +236,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
 
     if (    (NULL != ptString->pstrText)
     #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-        &&  (ptString->iSize > 0)
+        &&  (ptString->s16_size > 0)
     #endif
     ) {
 
@@ -244,7 +244,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
 
         while ( ((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
         #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-            &&  (tCharOffset <= ptString->iSize)
+            &&  (tCharOffset <= ptString->s16_size)
         #endif
         ) {
         #if VSF_TGUI_SV_CFG_MULTI_LINE_TEXT == ENABLED

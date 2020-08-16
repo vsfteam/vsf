@@ -37,10 +37,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_STREAM_WRITER_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_STREAM_WRITER_CLASS_IMPLEMENT
 #elif   defined(__VSF_STREAM_WRITER_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_STREAM_WRITER_CLASS_INHERIT
 #endif   
 
@@ -69,25 +69,25 @@ def_class(vsf_stream_writer_t,
 end_def_class(vsf_stream_writer_t)
 
 def_interface(i_stream_writer_t)
-    vsf_err_t           (*Init)     (   vsf_stream_writer_t *ptObj, 
-                                        const vsf_stream_src_cfg_t *ptCFG);
-    vsf_stream_tx_t     *(*GetTX)   (   vsf_stream_writer_t *ptObj);
+    vsf_err_t           (*Init)     (   vsf_stream_writer_t *obj_ptr, 
+                                        const vsf_stream_src_cfg_t *cfg_ptr);
+    vsf_stream_tx_t     *(*GetTX)   (   vsf_stream_writer_t *obj_ptr);
 
     struct {
-        vsf_pbuf_t *    (*New)      (   vsf_stream_writer_t *ptObj,
+        vsf_pbuf_t *    (*New)      (   vsf_stream_writer_t *obj_ptr,
                                         int_fast32_t nNoLessThan,
                                         int_fast32_t nBestSize);
-        vsf_err_t       (*Send)     (   vsf_stream_writer_t *ptObj,
+        vsf_err_t       (*Send)     (   vsf_stream_writer_t *obj_ptr,
                                         vsf_pbuf_t *ptOldBlock);
     }Block;
 
 
-    bool                (*WriteByte)(   vsf_stream_writer_t *ptObj, 
+    bool                (*WriteByte)(   vsf_stream_writer_t *obj_ptr, 
                                         uint_fast8_t chByte);
-    int_fast32_t        (*Write)    (   vsf_stream_writer_t *ptObj,
-                                        uint8_t *pchBuffer,
-                                        uint_fast16_t hwSize);
-    fsm_rt_t            (*Flush)    (   vsf_stream_writer_t *ptObj);
+    int_fast32_t        (*Write)    (   vsf_stream_writer_t *obj_ptr,
+                                        uint8_t *buffer_ptr,
+                                        uint_fast16_t u16_size);
+    fsm_rt_t            (*Flush)    (   vsf_stream_writer_t *obj_ptr);
 
 end_def_interface(i_stream_writer_t)
 
@@ -99,24 +99,24 @@ extern const i_stream_writer_t  VSF_STREAM_WRITER;
  * STREAM WRITER                                                              *
  *----------------------------------------------------------------------------*/
 extern
-vsf_err_t vsf_stream_writer_init(   vsf_stream_writer_t *ptObj, 
-                                    const vsf_stream_src_cfg_t *ptCFG);
+vsf_err_t vsf_stream_writer_init(   vsf_stream_writer_t *obj_ptr, 
+                                    const vsf_stream_src_cfg_t *cfg_ptr);
 
 extern
-vsf_err_t vsf_stream_writer_send_pbuf ( vsf_stream_writer_t *ptObj, 
+vsf_err_t vsf_stream_writer_send_pbuf ( vsf_stream_writer_t *obj_ptr, 
                                         vsf_pbuf_t *ptOldBlock);
 
 extern 
-int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *ptObj,
-                                        uint8_t *pchBuffer,
-                                        uint_fast16_t hwSize);
+int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *obj_ptr,
+                                        uint8_t *buffer_ptr,
+                                        uint_fast16_t u16_size);
 
 extern
-bool vsf_stream_writer_write_byte(  vsf_stream_writer_t *ptObj, 
+bool vsf_stream_writer_write_byte(  vsf_stream_writer_t *obj_ptr, 
                                     uint_fast8_t chByte);
 
 extern
-fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *ptObj);
+fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *obj_ptr);
 
 #endif
 #endif

@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
 #include "vsf.h"
 
 #if     VSF_USE_USB_HOST == ENABLED                                             \
@@ -31,7 +31,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_scsi_mounter_t {
+typedef struct vsf_scsi_mounter_t {
     implement(vk_scsi_mal_t)
     implement(vk_malfs_mounter_t)
     vsf_eda_t eda;
@@ -41,8 +41,7 @@ struct vsf_scsi_mounter_t {
         STATE_MBR_MOUNT,
     } state;
     bool is_mounted;
-};
-typedef struct vsf_scsi_mounter_t vsf_scsi_mounter_t;
+} vsf_scsi_mounter_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

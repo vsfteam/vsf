@@ -21,12 +21,12 @@
 
 #if VSF_USE_USB_HOST == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT_HCD
-// ch32f10x_usbhd has no roothub, so need VSF_USBH_IMPLEMENT_HUB for
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT_HCD__
+// ch32f10x_usbhd has no roothub, so need __VSF_USBH_CLASS_IMPLEMENT_HUB__ for
 //  vsf_usbh_new_device and vsf_usbh_disconnect_device
-#define VSF_USBH_IMPLEMENT_HUB
-#define VSF_USBH_IMPLEMENT_CLASS
+#define __VSF_USBH_CLASS_IMPLEMENT_HUB__
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define CH32F10X_USBHD_HCD_CLASS_IMPLEMENT
 #include "./usbhd_hcd.h"
 
@@ -373,7 +373,7 @@ static void __hc32f10x_usbhd_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         break;
     case VSF_EVT_MESSAGE:
-        VSF_USBH_FREE(vsf_eda_get_cur_msg());
+        vsf_usbh_free(vsf_eda_get_cur_msg());
         break;
     case VSF_HC32F10X_HCD_EVT_CONN_CHANGE: {
             bool is_connected = reg->R8_USB_MIS_ST & RB_UMS_DEV_ATTACH;
@@ -408,7 +408,7 @@ static void __hc32f10x_usbhd_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (HC32F10X_USBHD_URB_STATE_TO_FREE == urb->state) {
                 vsf_dlist_peek_next(hc32f10x_usbhd_urb_t, urb_node, urb, usbhd_hcd->urb_cur);
                 vsf_dlist_remove(hc32f10x_usbhd_urb_t, urb_node, &usbhd_hcd->urb_list, urb);
-                VSF_USBH_FREE(urb);
+                vsf_usbh_free(urb);
             } else {
                 vsf_err_t err = __hc32f10x_usbhd_hcd_urb_fsm(usbhd_hcd, urb);
                 if (VSF_ERR_NOT_READY == err) {
@@ -509,7 +509,7 @@ static vsf_err_t __hc32f10x_usbhd_hcd_resume(vk_usbh_hcd_t *hcd)
 
 static vk_usbh_hcd_urb_t * __hc32f10x_usbhd_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
-    vk_usbh_hcd_urb_t *usbhd_urb = VSF_USBH_MALLOC(sizeof(hc32f10x_usbhd_urb_t));
+    vk_usbh_hcd_urb_t *usbhd_urb = vsf_usbh_malloc(sizeof(hc32f10x_usbhd_urb_t));
     if (usbhd_urb != NULL) {
         memset(usbhd_urb, 0, sizeof(hc32f10x_usbhd_urb_t));
     }

@@ -17,11 +17,13 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#include "component/ui/vsf_ui_cfg.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+
+#define __VSF_DISP_CLASS_INHERIT__
+#include "component/ui/vsf_ui.h"
+
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
 

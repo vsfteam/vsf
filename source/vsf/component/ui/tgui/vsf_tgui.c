@@ -44,20 +44,20 @@ static void __vk_tgui_change_actived_control(
 implement_vsf_rng_buf(__vsf_tgui_evt_queue_t, vsf_tgui_evt_t, __safe_atom_code)
 
 
-vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t* ptCFG)
+vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t* cfg_ptr)
 {
     vsf_err_t tErr = VSF_ERR_NONE;
-    class_internal(ptGUI, ptThis, vsf_tgui_t);
+    class_internal(ptGUI, this_ptr, vsf_tgui_t);
 
     VSF_TGUI_ASSERT(NULL != ptGUI);
-    VSF_TGUI_ASSERT(NULL != ptCFG);
+    VSF_TGUI_ASSERT(NULL != cfg_ptr);
 
     do {
-        if ((NULL == ptCFG->tEVTQueue.PTR.pObj)
-            || (ptCFG->tEVTQueue.nSize <= sizeof(vsf_tgui_evt_t))
+        if ((NULL == cfg_ptr->tEVTQueue.PTR.obj_ptr)
+            || (cfg_ptr->tEVTQueue.s32_size <= sizeof(vsf_tgui_evt_t))
 #if     VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_LAYER_BY_LAYER
-            || (NULL == ptCFG->tBFSQueue.PTR.pObj)
-            || (ptCFG->tBFSQueue.nSize <= 0)
+            || (NULL == cfg_ptr->tBFSQueue.PTR.obj_ptr)
+            || (cfg_ptr->tBFSQueue.s32_size <= 0)
 #endif
             ) {
 
@@ -68,8 +68,8 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t* ptCFG)
         //! initialise the queue
         vsf_rng_buf_prepare(__vsf_tgui_evt_queue_t,
             &this.tMSGQueue,
-            (vsf_tgui_evt_t*)(ptCFG->tEVTQueue.PTR.pObj),
-            ptCFG->tEVTQueue.nSize);
+            (vsf_tgui_evt_t*)(cfg_ptr->tEVTQueue.PTR.obj_ptr),
+            cfg_ptr->tEVTQueue.s32_size);
 
         do {
             const vsf_msgt_cfg_t cfg = {
@@ -82,8 +82,8 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t* ptCFG)
 #if     VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_LAYER_BY_LAYER
         vsf_msgt_forward_propagate_msg_bfs_init(
             &(this.use_as__vsf_msgt_t),
-            (uint16_t*)(ptCFG->tBFSQueue.PTR.pObj),
-            ptCFG->tBFSQueue.nSize, false);
+            (uint16_t*)(cfg_ptr->tBFSQueue.PTR.obj_ptr),
+            cfg_ptr->tBFSQueue.s32_size, false);
 #elif   VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_Z_ORDER
         vsf_msgt_forward_propagate_msg_pre_order_traversal_init(
             &(this.use_as__vsf_msgt_t), 
@@ -97,12 +97,12 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t* ptCFG)
             this.tConsumer.param.ptQueue = &this.tMSGQueue;
             this.tConsumer.param.ptMSGTree = &this.use_as__vsf_msgt_t;
 
-            if (NULL != ptCFG->ptRootNode) {
-                vk_tgui_set_top_container(ptGUI, (vsf_tgui_top_container_t *)ptCFG->ptRootNode);
+            if (NULL != cfg_ptr->ptRootNode) {
+                vk_tgui_set_top_container(ptGUI, (vsf_tgui_top_container_t *)cfg_ptr->ptRootNode);
             }
 
             //! start pt task
-            init_vsf_pt(__vsf_tgui_evt_shooter_t, &(this.tConsumer), ptCFG->tPriority);
+            init_vsf_pt(__vsf_tgui_evt_shooter_t, &(this.tConsumer), cfg_ptr->priority);
         } while (0);
 
     } while (0);
@@ -122,14 +122,14 @@ vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI,
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t tEvent = { { {VSF_TGUI_EVT_ON_SET_TOP_CONTAINER} } };
-    tEvent.use_as__vsf_tgui_msg_t.ptTarget = (vsf_tgui_control_t*)ptRootNode;
+    tEvent.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)ptRootNode;
     return vk_tgui_send_message(ptGUI, tEvent);
 
 #else
     return vk_tgui_send_message(ptGUI,
         (vsf_tgui_evt_t) {
         .tMSG = VSF_TGUI_EVT_ON_SET_TOP_CONTAINER,
-            .ptTarget = (vsf_tgui_control_t*)ptRootNode,
+            .target_ptr = (vsf_tgui_control_t*)ptRootNode,
     });
 #endif
 }
@@ -138,7 +138,7 @@ vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI,
 
 bool vk_tgui_send_message(vsf_tgui_t* ptGUI, vsf_tgui_evt_t tEvent)
 {
-    class_internal(ptGUI, ptThis, vsf_tgui_t);
+    class_internal(ptGUI, this_ptr, vsf_tgui_t);
     if (NULL == ptGUI) {
         return false;
     }
@@ -162,55 +162,55 @@ bool vk_tgui_send_message(vsf_tgui_t* ptGUI, vsf_tgui_evt_t tEvent)
 }
 
 bool vk_tgui_update(vsf_tgui_t* ptGUI,
-                    const vsf_tgui_control_t* ptTarget)
+                    const vsf_tgui_control_t* target_ptr)
 {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t tEvent = { { {VSF_TGUI_EVT_UPDATE} } };
-    tEvent.use_as__vsf_tgui_msg_t.ptTarget = (vsf_tgui_control_t*)ptTarget;
+    tEvent.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
     return vk_tgui_send_message(ptGUI, tEvent);
 
 #else
     return vk_tgui_send_message(ptGUI,
         (vsf_tgui_evt_t) {
         .tMSG = VSF_TGUI_EVT_UPDATE,
-            .ptTarget = (vsf_tgui_control_t*)ptTarget,
+            .target_ptr = (vsf_tgui_control_t*)target_ptr,
     });
 #endif
 }
 
 bool vk_tgui_send_timer_event(  vsf_tgui_t* ptGUI,
-                                const vsf_tgui_control_t* ptTarget)
+                                const vsf_tgui_control_t* target_ptr)
 {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t tEvent = { { {VSF_TGUI_EVT_ON_TIME} } };
-    tEvent.use_as__vsf_tgui_msg_t.ptTarget = (vsf_tgui_control_t*)ptTarget;
+    tEvent.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
     return vk_tgui_send_message(ptGUI, tEvent);
 
 #else
     return vk_tgui_send_message(ptGUI,
         (vsf_tgui_evt_t) {
         .tMSG = VSF_TGUI_EVT_ON_TIME,
-            .ptTarget = (vsf_tgui_control_t*)ptTarget,
+            .target_ptr = (vsf_tgui_control_t*)target_ptr,
     });
 #endif
 }
 
 bool vk_tgui_update_tree(vsf_tgui_t* ptGUI,
-                        const vsf_tgui_control_t* ptTarget)
+                        const vsf_tgui_control_t* target_ptr)
 {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t tEvent = { { {VSF_TGUI_EVT_UPDATE_TREE} } };
-    tEvent.use_as__vsf_tgui_msg_t.ptTarget = (vsf_tgui_control_t*)ptTarget;
+    tEvent.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
     return vk_tgui_send_message(ptGUI, tEvent);
 
 #else
     return vk_tgui_send_message(ptGUI,
         (vsf_tgui_evt_t) {
         .tMSG = VSF_TGUI_EVT_UPDATE_TREE,
-            .ptTarget = (vsf_tgui_control_t*)ptTarget,
+            .target_ptr = (vsf_tgui_control_t*)target_ptr,
     });
 #endif
 }
@@ -218,13 +218,13 @@ bool vk_tgui_update_tree(vsf_tgui_t* ptGUI,
 #if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
 
 bool vk_tgui_refresh_ex(vsf_tgui_t* ptGUI,
-                        const vsf_tgui_control_t* ptTarget,
+                        const vsf_tgui_control_t* target_ptr,
                         const vsf_tgui_region_t* ptRegion)
 {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t tEvent = { { {VSF_TGUI_EVT_REFRESH} } };
-    tEvent.use_as__vsf_tgui_msg_t.ptTarget = (vsf_tgui_control_t*)ptTarget;
+    tEvent.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
     tEvent.tRefreshEvt.ptRegion = ptRegion;
     return vk_tgui_send_message(ptGUI, tEvent);
 
@@ -233,7 +233,7 @@ bool vk_tgui_refresh_ex(vsf_tgui_t* ptGUI,
         (vsf_tgui_evt_t) {
         .tRefreshEvt = {
             .tMSG = VSF_TGUI_EVT_REFRESH,
-            .ptTarget = (vsf_tgui_control_t*)ptTarget,
+            .target_ptr = (vsf_tgui_control_t*)target_ptr,
             .ptRegion = (vsf_tgui_region_t*)ptRegion,
         },
     });
@@ -385,7 +385,7 @@ static void __vk_tgui_change_focus_control( vsf_tgui_t* ptGUI,
                                             __vk_tgui_focus_t *ptFocus,
                                             vsf_evt_t tMSG)
 {
-    //class_internal(&(ptGUI->tConsumer.param), ptThis, vsf_pt(__vsf_tgui_evt_shooter_t));
+    //class_internal(&(ptGUI->tConsumer.param), this_ptr, vsf_pt(__vsf_tgui_evt_shooter_t));
 
     if (ptFocus->ptCurrent != ptControl) {
         ptFocus->ptPrevious = ptFocus->ptCurrent;
@@ -425,7 +425,7 @@ void vsf_tgui_low_level_refresh_ready(vsf_tgui_t *ptGUI)
 #endif
 }
 
-static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *ptThis,
+static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *this_ptr,
                                             const vsf_tgui_control_t *ptControl)
 {
     bool result = true;
@@ -447,7 +447,7 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *pt
 /*! \brief tgui msg queue consumer */
 implement_vsf_pt(__vsf_tgui_evt_shooter_t)
 {
-    vsf_tgui_t* ptGUI = container_of(ptThis, vsf_tgui_t, tConsumer.param);
+    vsf_tgui_t* ptGUI = container_of(this_ptr, vsf_tgui_t, tConsumer.param);
     bool result = false;
     vsf_evt_t   tMSG;
     vsf_pt_begin();
@@ -475,10 +475,10 @@ loop_start:
 
         tMSG = this.tEvent.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.tMSG;
 
-        /*! \note Use user specific ptTarget, otherwise use RootNode */
-        if (NULL != this.tEvent.use_as__vsf_tgui_msg_t.ptTarget) {
+        /*! \note Use user specific target_ptr, otherwise use RootNode */
+        if (NULL != this.tEvent.use_as__vsf_tgui_msg_t.target_ptr) {
             /*! use user specified target */
-            this.node_ptr = (const vsf_msgt_node_t*)this.tEvent.use_as__vsf_tgui_msg_t.ptTarget;
+            this.node_ptr = (const vsf_msgt_node_t*)this.tEvent.use_as__vsf_tgui_msg_t.target_ptr;
         } else if (NULL == this.ptRootNode) {
             continue;
         } else {
@@ -503,7 +503,7 @@ loop_start:
                         this.tActivated.ptPrevious = NULL;
 
                         do {
-                            if (NULL == this.tEvent.use_as__vsf_tgui_msg_t.ptTarget) {
+                            if (NULL == this.tEvent.use_as__vsf_tgui_msg_t.target_ptr) {
                                 break;
                             } else if (!this.node_ptr->Attribute._.is_top) {
                                 break;
@@ -591,7 +591,7 @@ loop_start:
 
         #if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
                     case VSF_TGUI_EVT_REFRESH & VSF_TGUI_EVT_MSK:
-                        if (NULL != this.tEvent.use_as__vsf_tgui_msg_t.ptTarget) {
+                        if (NULL != this.tEvent.use_as__vsf_tgui_msg_t.target_ptr) {
                             /*! use user specified target */
                             /*! do not refresh it if the control doesn't belong to current top container*/
                             if (this.ptRootNode != vk_tgui_control_get_top((const vsf_tgui_control_t*)this.node_ptr)) {
@@ -599,7 +599,7 @@ loop_start:
                             }
                         }
 
-                        if (!__vk_tgui_decide_refresh_region(ptThis, (const vsf_tgui_control_t *)this.node_ptr)) {
+                        if (!__vk_tgui_decide_refresh_region(this_ptr, (const vsf_tgui_control_t *)this.node_ptr)) {
                             goto loop_start;
                         }
 
@@ -623,7 +623,7 @@ loop_start:
                         if (bIsRequestRefreshParent) {
                             const vsf_tgui_container_t *container_ptr = (const vsf_tgui_container_t *)this.node_ptr;
                             if (container_ptr->tContainerAttribute.bIsForceRefreshWholeBackground) {
-                                if (!__vk_tgui_decide_refresh_region(ptThis, (const vsf_tgui_control_t *)container_ptr)) {
+                                if (!__vk_tgui_decide_refresh_region(this_ptr, (const vsf_tgui_control_t *)container_ptr)) {
                                     goto loop_start;
                                 }
                             }
@@ -651,7 +651,7 @@ loop_start:
             case VSF_TGUI_MSG_POINTER_EVT & VSF_TGUI_MSG_MSK:
 
                 /*! \note specified target will not change current activated control*/
-                if (NULL != this.tEvent.use_as__vsf_tgui_msg_t.ptTarget) {
+                if (NULL != this.tEvent.use_as__vsf_tgui_msg_t.target_ptr) {
                     break;
                 }
 
@@ -715,7 +715,7 @@ loop_start:
             case VSF_TGUI_MSG_KEY_EVT & VSF_TGUI_MSG_MSK:
             case VSF_TGUI_MSG_GESTURE_EVT& VSF_TGUI_MSG_MSK:
             case VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT & VSF_TGUI_MSG_MSK:
-                if (NULL == this.tEvent.use_as__vsf_tgui_msg_t.ptTarget) {
+                if (NULL == this.tEvent.use_as__vsf_tgui_msg_t.target_ptr) {
                     //! send message to currently activated control
                     this.node_ptr = &(this.tActivated.ptCurrent->use_as__vsf_msgt_node_t);
                     VSF_TGUI_ASSERT( NULL != this.node_ptr );
@@ -789,7 +789,7 @@ static void __vk_tgui_depose_top_container( vsf_tgui_t* ptGUI,
                                             vsf_tgui_evt_t *ptEVT)
 {
     vsf_tgui_evt_t tEvent;
-    class_internal(&(ptGUI->tConsumer.param), ptThis, vsf_pt(__vsf_tgui_evt_shooter_t));
+    class_internal(&(ptGUI->tConsumer.param), this_ptr, vsf_pt(__vsf_tgui_evt_shooter_t));
 
     if (!ptTop->use_as__vsf_tgui_container_t.
             use_as__vsf_msgt_container_t.
@@ -801,7 +801,7 @@ static void __vk_tgui_depose_top_container( vsf_tgui_t* ptGUI,
     if (NULL == ptEVT) {
         ptEVT = &tEvent;
         tEvent.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.tMSG = VSF_TGUI_EVT_ON_DEPOSE;
-        tEvent.use_as__vsf_tgui_msg_t.ptTarget = (vsf_tgui_control_t *)ptTop;  
+        tEvent.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t *)ptTop;  
     }
 
     //! send message

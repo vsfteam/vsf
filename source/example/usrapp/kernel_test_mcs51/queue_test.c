@@ -116,7 +116,7 @@ void usrapp_msgq_test_start(void)
 {
     int i;
     VSF_POOL_PREPARE(usrapp_msg_pool, &usrapp_msgq.pool,
-        .pTarget = NULL,
+        .target_ptr = NULL,
         .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
     );
     vsf_eda_msg_queue_init(&usrapp_msgq.msgq, 10);

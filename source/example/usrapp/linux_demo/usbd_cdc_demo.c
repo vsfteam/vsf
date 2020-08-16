@@ -79,12 +79,12 @@
         },                                                                      \
         .stream             = {                                                 \
             .tx.op              = &vsf_mem_stream_op,                           \
-            .tx.pchBuffer       = (uint8_t *)&__USBD.cdc[(__N)].stream.tx_buffer,\
-            .tx.nSize           = sizeof(__USBD.cdc[(__N)].stream.tx_buffer),   \
+            .tx.buffer_ptr       = (uint8_t *)&__USBD.cdc[(__N)].stream.tx_buffer,\
+            .tx.s32_size           = sizeof(__USBD.cdc[(__N)].stream.tx_buffer),   \
             .tx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
             .rx.op              = &vsf_mem_stream_op,                           \
-            .rx.pchBuffer       = (uint8_t *)&__USBD.cdc[(__N)].stream.rx_buffer,\
-            .rx.nSize           = sizeof(__USBD.cdc[(__N)].stream.rx_buffer),   \
+            .rx.buffer_ptr       = (uint8_t *)&__USBD.cdc[(__N)].stream.rx_buffer,\
+            .rx.s32_size           = sizeof(__USBD.cdc[(__N)].stream.rx_buffer),   \
             .rx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
         },                                                                      \
     },                                                                          \

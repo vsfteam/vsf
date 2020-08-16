@@ -31,7 +31,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_av_control_value_t {
+typedef struct vk_av_control_value_t {
     union {
         void *buffer;
         uint8_t uval8;
@@ -42,8 +42,7 @@ struct vk_av_control_value_t {
         int32_t ival32;
         bool enable;
     };
-};
-typedef struct vk_av_control_value_t vk_av_control_value_t;
+} vk_av_control_value_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

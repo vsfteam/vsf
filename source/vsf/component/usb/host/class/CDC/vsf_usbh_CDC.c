@@ -21,9 +21,11 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_CDC == ENABLED
 
-#define VSF_USBH_IMPLEMENT_CLASS
-#define VSF_USBH_CDC_IMPLEMENT
-#include "vsf.h"
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
+#define __VSF_USBH_CDC_CLASS_IMPLEMENT
+
+#include "./vsf_usbh_CDC.h"
+#include "kernel/vsf_kernel.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -49,8 +51,7 @@ void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         }
         break;
-    case VSF_EVT_MESSAGE:
-        do {
+    case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
             vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
@@ -74,7 +75,7 @@ void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     }
                 }
             }
-        } while (0);
+        }
         break;
     }
 
@@ -83,7 +84,7 @@ failed:
     vk_usbh_remove_interface(usbh, pthis->dev, pthis->ifs);
 }
 
-static void vk_usbh_cdc_parse_ep(vk_usbh_cdc_t *pthis, struct usb_endpoint_desc_t *desc_ep)
+static void __vk_usbh_cdc_parse_ep(vk_usbh_cdc_t *pthis, struct usb_endpoint_desc_t *desc_ep)
 {
     uint_fast8_t epaddr = desc_ep->bEndpointAddress;
     uint_fast8_t eptype = desc_ep->bmAttributes;
@@ -118,7 +119,7 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
         if (desc_ep->bLength != USB_DT_ENDPOINT_SIZE) {
             return VSF_ERR_FAIL;
         }
-        vk_usbh_cdc_parse_ep(pthis, desc_ep);
+        __vk_usbh_cdc_parse_ep(pthis, desc_ep);
         desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
     }
 
@@ -126,8 +127,7 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
     for (uint_fast8_t parsed_size = 0; parsed_size < parser_alt->desc_size;) {
         if (desc->bDescriptorType == USB_DT_CS_INTERFACE) {
             switch (desc->bDescriptorSubType) {
-            case 0x06:        // Union Functional Descriptor
-                {
+            case 0x06: {      // Union Functional Descriptor
                     struct usb_cdc_union_descriptor_t *union_desc =
                         (struct usb_cdc_union_descriptor_t *)desc;
                     if (union_desc->bControlInterface != pthis->ctrl_ifs) {
@@ -175,7 +175,7 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
                     if (desc_ep->bLength != USB_DT_ENDPOINT_SIZE) {
                         return VSF_ERR_FAIL;
                     }
-                    vk_usbh_cdc_parse_ep(pthis, desc_ep);
+                    __vk_usbh_cdc_parse_ep(pthis, desc_ep);
                     desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
                 }
             }

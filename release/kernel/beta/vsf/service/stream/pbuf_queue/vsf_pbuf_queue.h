@@ -34,10 +34,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_PBUF_QUEUE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_PBUF_QUEUE_CLASS_IMPLEMENT
 #elif   defined(__VSF_PBUF_QUEUE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_PBUF_QUEUE_CLASS_INHERIT
 #endif   
 
@@ -71,7 +71,7 @@ def_class(vsf_stream_fifo_t,
     private_member(
         implement(vsf_slist_queue_t)
         union {
-            vsf_stream_fifo_cfg_t tCFG;
+            vsf_stream_fifo_cfg_t cfg;
             struct {
                 vsf_stream_dat_rdy_evt_t    tDataReadyEventHandling;
                 vsf_stream_dat_drn_evt_t    tDataDrainEventHandling;
@@ -92,26 +92,26 @@ end_def_class(vsf_stream_fifo_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 extern 
-vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *ptObj, 
-                                vsf_stream_fifo_cfg_t *ptCFG);
+vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr, 
+                                vsf_stream_fifo_cfg_t *cfg_ptr);
 
 extern 
-vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *ptObj, vsf_pbuf_t *pblock);
+vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock);
 
 extern 
-vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *ptObj);
+vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr);
 
 SECTION(".text.vsf.service.stream.pbuf_queue.vsf_pbuf_queue_peek")
 extern 
-vsf_pbuf_t * vsf_pbuf_queue_peek(vsf_stream_fifo_t *ptObj);
+vsf_pbuf_t * vsf_pbuf_queue_peek(vsf_stream_fifo_t *obj_ptr);
 
 extern
 vsf_err_t vsf_pbuf_queue_data_available_event_register(
-    vsf_stream_fifo_t *ptObj, vsf_stream_dat_rdy_evt_t tEventHandling);
+    vsf_stream_fifo_t *obj_ptr, vsf_stream_dat_rdy_evt_t tEventHandling);
 
 extern 
 vsf_err_t vsf_pbuf_queue_data_drain_event_register(
-    vsf_stream_fifo_t *ptObj, vsf_stream_dat_drn_evt_t tEventHandling);
+    vsf_stream_fifo_t *obj_ptr, vsf_stream_dat_drn_evt_t tEventHandling);
 
 #endif
 #endif

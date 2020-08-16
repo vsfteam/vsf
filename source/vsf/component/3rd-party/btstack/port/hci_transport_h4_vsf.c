@@ -21,8 +21,7 @@
 
 #if VSF_USE_BTSTACK == ENABLED
 
-// TODO: use dedicated include
-#include "vsf.h"
+// TODO: check dependency
 
 #include "btstack_config.h"
 #include "btstack_debug.h"

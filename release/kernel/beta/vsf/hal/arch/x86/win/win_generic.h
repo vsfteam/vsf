@@ -34,9 +34,9 @@
 #endif
 
 #if     defined(VSF_ARCH_WIN_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #elif   defined(VSF_ARCH_WIN_IMPLEMENT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"

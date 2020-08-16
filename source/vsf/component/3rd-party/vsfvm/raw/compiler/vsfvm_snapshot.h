@@ -28,7 +28,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfvm_snapshot_func_t {
+typedef struct vsfvm_snapshot_func_t {
     vsfvm_lexer_sym_t *name;
     int symtbl_idx;
     int block_level;
@@ -39,18 +39,16 @@ struct vsfvm_snapshot_func_t {
     vsfvm_compiler_func_ctx_t curctx;
     uint32_t ctx_sp;
     uint32_t linktbl_sp;
-};
-typedef struct vsfvm_snapshot_func_t vsfvm_snapshot_func_t;
+} vsfvm_snapshot_func_t;
 
-struct vsfvm_snapshot_expr_t {
+typedef struct vsfvm_snapshot_expr_t {
     vsfvm_lexer_exprctx_t ctx;
     uint32_t nesting;
     uint32_t stack_exp_sp;
     uint32_t stack_op_sp;
-};
-typedef struct vsfvm_snapshot_expr_t vsfvm_snapshot_expr_t;
+} vsfvm_snapshot_expr_t;
 
-struct vsfvm_snapshot_lexer_t {
+typedef struct vsfvm_snapshot_lexer_t {
     const vsfvm_lexer_op_t *op;
     void *priv;
     int pt_state;
@@ -60,23 +58,20 @@ struct vsfvm_snapshot_lexer_t {
     int symid;
 
     vsfvm_snapshot_expr_t expr;
-};
-typedef struct vsfvm_snapshot_lexer_t vsfvm_snapshot_lexer_t;
+} vsfvm_snapshot_lexer_t;
 
-struct vsfvm_snapshot_script_t {
+typedef struct vsfvm_snapshot_script_t {
     vsfvm_snapshot_lexer_t lexer;
     vsfvm_snapshot_func_t cur_func;
 
     int pt_stmt_state;
     uint32_t func_stack_sp;
-};
-typedef struct vsfvm_snapshot_script_t vsfvm_snapshot_script_t;
+} vsfvm_snapshot_script_t;
 
-struct vsfvm_snapshot_t {
+typedef struct vsfvm_snapshot_t {
     vsfvm_snapshot_script_t script;
     uint32_t bytecode_pos;
-};
-typedef struct vsfvm_snapshot_t vsfvm_snapshot_t;
+} vsfvm_snapshot_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

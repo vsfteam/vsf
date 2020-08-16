@@ -21,11 +21,11 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_USE_FS == ENABLED && VSF_USE_FILE_MAL == ENABLED
 
-#define VSF_MAL_INHERIT
-#define VSF_FILE_MAL_IMPLEMENT
+#define __VSF_MAL_CLASS_INHERIT__
+#define __VSF_FILE_MAL_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_mal.h"
+#include "./vsf_file_mal.h"
 
 /*============================ MACROS ========================================*/
 
@@ -61,7 +61,7 @@ const vk_mal_drv_t vk_file_mal_drv = {
 
 static uint_fast32_t __vk_file_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
 {
-    return( (vk_file_mal_t *)mal)->block_size;
+    return ((vk_file_mal_t *)mal)->block_size;
 }
 
 __vsf_component_peda_ifs_entry(__vk_file_mal_init, vk_mal_init)

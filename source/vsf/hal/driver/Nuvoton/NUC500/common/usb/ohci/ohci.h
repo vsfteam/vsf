@@ -32,21 +32,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct nuc500_ohci_const_t {
+typedef struct nuc500_ohci_const_t {
     IRQn_Type irq;
     USBH_T *reg;
-};
-typedef struct nuc500_ohci_const_t nuc500_ohci_const_t;
+} nuc500_ohci_const_t;
 
-struct nuc500_ohci_t {
+typedef struct nuc500_ohci_t {
     struct {
         void (*irq_handler)(void *param);
         void *param;
     } callback;
 
     const nuc500_ohci_const_t *param;
-};
-typedef struct nuc500_ohci_t nuc500_ohci_t;
+} nuc500_ohci_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/

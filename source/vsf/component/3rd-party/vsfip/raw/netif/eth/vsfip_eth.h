@@ -22,14 +22,9 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
 /*============================ MACROS ========================================*/
-
-#define TCPIP_ETH_HWTYPE            1
-#define TCPIP_ETH_HEADSIZE          14
-#define TCPIP_ETH_ADDRLEN           6
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

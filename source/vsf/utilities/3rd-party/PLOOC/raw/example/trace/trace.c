@@ -173,19 +173,19 @@ static void __trace_double_to_string(double dfValue)
         }                                                                       \
     } while(0)
 
-static void __trace_word_stream(uint32_t *pwStream, uint_fast16_t hwSize)
+static void __trace_word_stream(uint32_t *pwStream, uint_fast16_t u16_size)
 {
-    __OUTPUT_STREAM(uint32_t, pwStream, hwSize, "%08X ", "         ");
+    __OUTPUT_STREAM(uint32_t, pwStream, u16_size, "%08X ", "         ");
 }
 
-static void __trace_hword_stream(uint16_t *phwStream, uint_fast16_t hwSize)
+static void __trace_hword_stream(uint16_t *phwStream, uint_fast16_t u16_size)
 {
-    __OUTPUT_STREAM(uint16_t, phwStream, hwSize, "%04X ", "     ");
+    __OUTPUT_STREAM(uint16_t, phwStream, u16_size, "%04X ", "     ");
 }
 
-static void __trace_byte_stream(uint8_t *pchStream, uint_fast16_t hwSize)
+static void __trace_byte_stream(uint8_t *pchStream, uint_fast16_t u16_size)
 {
-    __OUTPUT_STREAM(uint8_t, pchStream, hwSize, "%02X ", "   ");
+    __OUTPUT_STREAM(uint8_t, pchStream, u16_size, "%02X ", "   ");
 }
 
 /* EOF */

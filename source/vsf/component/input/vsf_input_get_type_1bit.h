@@ -20,7 +20,7 @@
 
 #ifndef VSF_INPUT_USER_TYPE_maker
 #   define VSF_INPUT_USER_TYPE_make(__bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)\
-            TPASTE9(0b, __bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)
+            __CONNECT9(0b, __bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)
 #endif
 
 #ifndef VSF_INPUT_USER_TYPE

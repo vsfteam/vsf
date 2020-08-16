@@ -21,11 +21,12 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED
 
-#define VSF_USBIP_DCD_IMPLEMENT
-#define VSF_USBIP_DCD_IMPLEMENT_BACKEND
-#define VSF_EDA_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__
+#define __VSF_USBIP_DCD_CLASS_IMPLEMENT
+
+#include "kernel/vsf_kernel.h"
+#include "./vsf_usbip_dcd.h"
 
 #include <Windows.h>
 
@@ -74,7 +75,7 @@
                 __vk_usbip_server_trace_buffer(&((__urb)->req.setup), 8);       \
             }                                                                   \
             if (!(__urb)->req.direction && (__urb)->req.transfer_length) {      \
-                __vk_usbip_server_trace_buffer((__urb)->dynmem.pchBuffer, (__urb)->req.transfer_length);\
+                __vk_usbip_server_trace_buffer((__urb)->dynmem.buffer_ptr, (__urb)->req.transfer_length);\
             }                                                                   \
         } while (0)
 
@@ -86,7 +87,7 @@
                                     (__urb)->req.ep);                           \
             uint_fast32_t actual_length = be32_to_cpu((__urb)->rep.actual_length);\
             if ((__urb)->req.direction && actual_length) {                      \
-                __vk_usbip_server_trace_buffer((__urb)->dynmem.pchBuffer, actual_length);\
+                __vk_usbip_server_trace_buffer((__urb)->dynmem.buffer_ptr, actual_length);\
             }                                                                   \
         } while (0)
 
@@ -116,6 +117,26 @@ enum {
     VSF_USBIP_USBD_EVT                          = VSF_EVT_USER + 0x10,
 };
 
+#if VSF_USBIP_DCD_CFG_BACKEND == VSF_USBIP_DCD_CFG_BACKEND_WIN
+
+typedef struct vk_usbip_server_backend_irq_thread_t {
+    implement(vsf_arch_irq_thread_t);
+    vsf_arch_irq_request_t irq_request;
+    vsf_mem_t mem;
+} vk_usbip_server_backend_irq_thread_t;
+
+typedef struct vk_usbip_server_backend_t {
+    vk_usbip_server_t *server;
+
+    SOCKET listener_socket;
+    SOCKET socket;
+
+    vk_usbip_server_backend_irq_thread_t rx;
+    vk_usbip_server_backend_irq_thread_t tx;
+} vk_usbip_server_backend_t;
+
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 
 static vsf_err_t __vk_usbip_server_done_urb(vk_usbip_server_t *server, vk_usbip_urb_t *urb);
@@ -125,32 +146,17 @@ static vsf_err_t __vk_usbip_server_done_urb(vk_usbip_server_t *server, vk_usbip_
 
 static vk_usbip_server_t __vk_usbip_server;
 
+#if VSF_USBIP_DCD_CFG_BACKEND == VSF_USBIP_DCD_CFG_BACKEND_WIN
+static vk_usbip_server_backend_t __vk_usbip_server_backend;
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
-implement_vsf_pool(vk_usbip_urb_poll, vk_usbip_urb_t)
+imp_vsf_pool(vk_usbip_urb_poll, vk_usbip_urb_t)
 
 #if VSF_USBIP_DCD_CFG_BACKEND == VSF_USBIP_DCD_CFG_BACKEND_WIN
 
 #pragma comment(lib,"WS2_32.lib")
-
-struct vk_usbip_server_backend_irq_thread_t {
-    implement(vsf_arch_irq_thread_t);
-    vsf_arch_irq_request_t irq_request;
-    vsf_mem_t mem;
-};
-typedef struct vk_usbip_server_backend_irq_thread_t vk_usbip_server_backend_irq_thread_t;
-
-struct vk_usbip_server_backend_t {
-    vk_usbip_server_t *server;
-
-    SOCKET listener_socket;
-    SOCKET socket;
-
-    vk_usbip_server_backend_irq_thread_t rx;
-    vk_usbip_server_backend_irq_thread_t tx;
-};
-typedef struct vk_usbip_server_backend_t vk_usbip_server_backend_t;
-static vk_usbip_server_backend_t __vk_usbip_server_backend;
 
 static void __vk_usbip_server_backend_thread_rx(void *arg)
 {
@@ -207,13 +213,13 @@ static void __vk_usbip_server_backend_thread_rx(void *arg)
         while (VSF_ERR_NONE == server->err) {
             __vsf_arch_irq_request_pend(irq_request);
 
-            if (NULL == irq_thread->mem.pchBuffer) {
+            if (NULL == irq_thread->mem.buffer_ptr) {
             close_session:
                 closesocket(backend->socket);
                 break;
             } else {
-                int want_size = irq_thread->mem.nSize;
-                char *buffer = (char *)irq_thread->mem.pchBuffer;
+                int want_size = irq_thread->mem.s32_size;
+                char *buffer = (char *)irq_thread->mem.buffer_ptr;
                 int ret;
                 while (want_size > 0) {
                     ret = recv(backend->socket, buffer, want_size, 0);
@@ -226,8 +232,8 @@ static void __vk_usbip_server_backend_thread_rx(void *arg)
             }
 
             __vsf_arch_irq_start(&irq_thread->use_as__vsf_arch_irq_thread_t);
-                if (irq_thread->mem.nSize > 0) {
-                    __vk_usbip_server_trace_rx(irq_thread->mem.pchBuffer, irq_thread->mem.nSize);
+                if (irq_thread->mem.s32_size > 0) {
+                    __vk_usbip_server_trace_rx(irq_thread->mem.buffer_ptr, irq_thread->mem.s32_size);
                 }
                 vsf_eda_post_evt(&server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_RECV_DONE);
             __vsf_arch_irq_end(&irq_thread->use_as__vsf_arch_irq_thread_t, false);
@@ -253,7 +259,7 @@ static void __vk_usbip_server_backend_thread_tx(void *arg)
     while (VSF_ERR_NONE == server->err) {
         __vsf_arch_irq_request_pend(irq_request);
 
-        if (NULL == irq_thread->mem.pchBuffer) {
+        if (NULL == irq_thread->mem.buffer_ptr) {
             vk_usbip_urb_t *urb = NULL;
             uint_fast32_t actual_length;
 
@@ -275,32 +281,32 @@ static void __vk_usbip_server_backend_thread_tx(void *arg)
                     actual_length = 0;
                 }
                 if (actual_length > 0) {
-                    send(backend->socket, (char *)urb->dynmem.pchBuffer, actual_length, 0);
+                    send(backend->socket, (char *)urb->dynmem.buffer_ptr, actual_length, 0);
                 }
 
                 __vsf_arch_irq_start(&irq_thread->use_as__vsf_arch_irq_thread_t);
                     __vk_usbip_server_trace_tx(&urb->rep, 48);
                     if (actual_length > 0) {
-                        __vk_usbip_server_trace_tx(urb->dynmem.pchBuffer, actual_length);
+                        __vk_usbip_server_trace_tx(urb->dynmem.buffer_ptr, actual_length);
                     }
 
                     __vk_usbip_server_done_urb(server, urb);
                 __vsf_arch_irq_end(&irq_thread->use_as__vsf_arch_irq_thread_t, false);
             }
 
-            irq_thread->mem.nSize = 0;
+            irq_thread->mem.s32_size = 0;
         } else {
-            if (irq_thread->mem.nSize != send(backend->socket, (char *)irq_thread->mem.pchBuffer, irq_thread->mem.nSize, 0)) {
+            if (irq_thread->mem.s32_size != send(backend->socket, (char *)irq_thread->mem.buffer_ptr, irq_thread->mem.s32_size, 0)) {
                 server->err = VSF_ERR_FAIL;
             }
         }
 
         __vsf_arch_irq_start(&irq_thread->use_as__vsf_arch_irq_thread_t);
-            if (irq_thread->mem.pchBuffer != NULL) {
-                if ((VSF_ERR_NONE == server->err) && (irq_thread->mem.nSize > 0)) {
-                    __vk_usbip_server_trace_tx(irq_thread->mem.pchBuffer, irq_thread->mem.nSize);
+            if (irq_thread->mem.buffer_ptr != NULL) {
+                if ((VSF_ERR_NONE == server->err) && (irq_thread->mem.s32_size > 0)) {
+                    __vk_usbip_server_trace_tx(irq_thread->mem.buffer_ptr, irq_thread->mem.s32_size);
                 }
-                irq_thread->mem.pchBuffer = NULL;
+                irq_thread->mem.buffer_ptr = NULL;
                 vsf_eda_post_evt(&server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_SEND_DONE);
             }
         __vsf_arch_irq_end(&irq_thread->use_as__vsf_arch_irq_thread_t, false);
@@ -322,27 +328,27 @@ static void __vk_usbip_server_backend_init(vk_usbip_server_t *server)
 
 static void __vk_usbip_server_backend_close(void)
 {
-    __vk_usbip_server_backend.rx.mem.pchBuffer = NULL;
+    __vk_usbip_server_backend.rx.mem.buffer_ptr = NULL;
     __vsf_arch_irq_request_send(&__vk_usbip_server_backend.rx.irq_request);
 }
 
 static void __vk_usbip_server_backend_recv(uint8_t *buff, uint_fast32_t size)
 {
-    __vk_usbip_server_backend.rx.mem.pchBuffer = buff;
-    __vk_usbip_server_backend.rx.mem.nSize = size;
+    __vk_usbip_server_backend.rx.mem.buffer_ptr = buff;
+    __vk_usbip_server_backend.rx.mem.s32_size = size;
     __vsf_arch_irq_request_send(&__vk_usbip_server_backend.rx.irq_request);
 }
 
 static void __vk_usbip_server_backend_send(uint8_t *buff, uint_fast32_t size)
 {
-    __vk_usbip_server_backend.tx.mem.pchBuffer = buff;
-    __vk_usbip_server_backend.tx.mem.nSize = size;
+    __vk_usbip_server_backend.tx.mem.buffer_ptr = buff;
+    __vk_usbip_server_backend.tx.mem.s32_size = size;
     __vsf_arch_irq_request_send(&__vk_usbip_server_backend.tx.irq_request);
 }
 
 static void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
 {
-    __vk_usbip_server_backend.tx.mem.pchBuffer = NULL;
+    __vk_usbip_server_backend.tx.mem.buffer_ptr = NULL;
     __vsf_arch_irq_request_send(&__vk_usbip_server_backend.tx.irq_request);
 }
 #elif VSF_USBIP_DCD_CFG_BACKEND == VSF_USBIP_DCD_CFG_BACKEND_VSF
@@ -409,21 +415,21 @@ static void __vk_usbip_usbd_transfer_send(vk_usbip_dcd_t *usbd, vk_usbip_dcd_ep_
 {
     vk_usbip_urb_t *urb = __vk_usbip_usbd_peek_urb(dcd_ep);
     if (urb != NULL) {
-        uint_fast32_t real_size = min(urb->req.transfer_length, dcd_ep->transfer.mem.nSize);
+        uint_fast32_t real_size = min(urb->req.transfer_length, dcd_ep->transfer.mem.s32_size);
 
-        memcpy(urb->mem.pchBuffer, dcd_ep->transfer.mem.pchBuffer, real_size);
-        dcd_ep->transfer.mem.pchBuffer += real_size;
-        dcd_ep->transfer.mem.nSize -= real_size;
-        urb->mem.pchBuffer += real_size;
-        urb->mem.nSize -= real_size;
+        memcpy(urb->mem.buffer_ptr, dcd_ep->transfer.mem.buffer_ptr, real_size);
+        dcd_ep->transfer.mem.buffer_ptr += real_size;
+        dcd_ep->transfer.mem.s32_size -= real_size;
+        urb->mem.buffer_ptr += real_size;
+        urb->mem.s32_size -= real_size;
         urb->rep.actual_length += real_size;
 
-        if ((!urb->mem.nSize || __vk_usbip_usbd_is_short(dcd_ep, real_size)) && (urb->req.ep != 0)) {
+        if ((!urb->mem.s32_size || __vk_usbip_usbd_is_short(dcd_ep, real_size)) && (urb->req.ep != 0)) {
             vsf_dlist_remove(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
             vsf_eda_post_msg(&__vk_usbip_server.teda.use_as__vsf_eda_t, urb);
         }
 
-        if (!dcd_ep->transfer.mem.nSize) {
+        if (!dcd_ep->transfer.mem.s32_size) {
             __vk_usbip_usbd_transfer_done(usbd, dcd_ep);
         }
     }
@@ -433,22 +439,22 @@ static void __vk_usbip_usbd_transfer_recv(vk_usbip_dcd_t *usbd, vk_usbip_dcd_ep_
 {
     vk_usbip_urb_t *urb = __vk_usbip_usbd_peek_urb(dcd_ep);
     if (urb != NULL) {
-        uint_fast32_t real_size = min(urb->req.transfer_length, dcd_ep->transfer.mem.nSize);
+        uint_fast32_t real_size = min(urb->req.transfer_length, dcd_ep->transfer.mem.s32_size);
 
-        memcpy(dcd_ep->transfer.mem.pchBuffer, urb->mem.pchBuffer, real_size);
-        dcd_ep->transfer.mem.pchBuffer += real_size;
-        dcd_ep->transfer.mem.nSize -= real_size;
-        urb->mem.pchBuffer += real_size;
-        urb->mem.nSize -= real_size;
+        memcpy(dcd_ep->transfer.mem.buffer_ptr, urb->mem.buffer_ptr, real_size);
+        dcd_ep->transfer.mem.buffer_ptr += real_size;
+        dcd_ep->transfer.mem.s32_size -= real_size;
+        urb->mem.buffer_ptr += real_size;
+        urb->mem.s32_size -= real_size;
         urb->rep.actual_length += real_size;
 
-        if ((!urb->mem.nSize) && (urb->req.ep != 0)) {
+        if ((!urb->mem.s32_size) && (urb->req.ep != 0)) {
             vsf_dlist_remove(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
             vsf_eda_post_msg(&__vk_usbip_server.teda.use_as__vsf_eda_t, urb);
         }
 
         // TODO: check urb->req.transfer_flags for URB_ZERO_PACKET
-        if (!dcd_ep->transfer.mem.nSize || __vk_usbip_usbd_is_short(dcd_ep, real_size)) {
+        if (!dcd_ep->transfer.mem.s32_size || __vk_usbip_usbd_is_short(dcd_ep, real_size)) {
             __vk_usbip_usbd_transfer_done(usbd, dcd_ep);
         }
     }
@@ -546,8 +552,8 @@ static void __vk_usbip_server_control_msg(vk_usbip_server_t *server, struct usb_
     //urb->ep = 0;
     urb->req.transfer_length = req->wLength;
     urb->req.setup = *req;
-    urb->mem.pchBuffer = buffer;
-    urb->mem.nSize = urb->req.transfer_length;
+    urb->mem.buffer_ptr = buffer;
+    urb->mem.s32_size = urb->req.transfer_length;
     __vk_usbip_server_submit_urb(server, urb);
 }
 
@@ -583,8 +589,8 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_unprotect_int(orig);
             if (urb != NULL) {
                 vsf_dlist_remove(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
-                if (urb->dynmem.pchBuffer != NULL) {
-                    vsf_heap_free(urb->dynmem.pchBuffer);
+                if (urb->dynmem.buffer_ptr != NULL) {
+                    vsf_heap_free(urb->dynmem.buffer_ptr);
                 }
                 VSF_POOL_FREE(vk_usbip_urb_poll, &__vk_usbip_server.urb_pool, urb);
             }
@@ -657,15 +663,15 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     urb->req.ep = be32_to_cpu(urb->req.ep);
                     urb->req.transfer_length = be32_to_cpu(urb->req.transfer_length);
                     if (urb->req.transfer_length) {
-                        urb->dynmem.nSize = urb->req.transfer_length;
-                        urb->dynmem.pchBuffer = vsf_heap_malloc(urb->dynmem.nSize);
-                        VSF_USB_ASSERT(urb->dynmem.pchBuffer != NULL);
+                        urb->dynmem.s32_size = urb->req.transfer_length;
+                        urb->dynmem.buffer_ptr = vsf_heap_malloc(urb->dynmem.s32_size);
+                        VSF_USB_ASSERT(urb->dynmem.buffer_ptr != NULL);
                     }
                     urb->mem = urb->dynmem;
                     if (!urb->req.direction && urb->req.transfer_length) {
                         server->cur_urb = urb;
                         server->req_state = VSF_USBIP_SERVER_REQ_DATA;
-                        __vk_usbip_server_backend_recv(urb->mem.pchBuffer, urb->mem.nSize);
+                        __vk_usbip_server_backend_recv(urb->mem.buffer_ptr, urb->mem.s32_size);
                         break;
                     }
                     __vk_usbip_server_submit_urb(server, urb);
@@ -706,7 +712,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         __vk_usbip_server_backend_send_urb(urb);
 
                         if (is_to_commit) {
-                            dcd_ep->transfer.mem.nSize = 0;
+                            dcd_ep->transfer.mem.s32_size = 0;
                             __vk_usbip_server_commit_urb(server, dcd_ep);
                         }
                     }
@@ -850,8 +856,8 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     urb->req.transfer_length = USB_DT_CONFIG_SIZE;
                     urb->req.setup.wValue = cpu_to_le16((USB_DT_CONFIG << 8) + 0);
                     urb->req.setup.wLength = cpu_to_le16(urb->req.transfer_length);
-                    urb->mem.pchBuffer = (uint8_t *)&server->rep;
-                    urb->mem.nSize = urb->req.transfer_length;
+                    urb->mem.buffer_ptr = (uint8_t *)&server->rep;
+                    urb->mem.s32_size = urb->req.transfer_length;
 
                     server->rep_state = VSF_USBIP_SERVER_REP_DEVLIST_CFG;
                     __vk_usbip_server_submit_urb(server, urb);
@@ -863,8 +869,8 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         urb->req.transfer_length = desc.cfg->wTotalLength;
                         urb->req.setup.wValue = cpu_to_le16((USB_DT_CONFIG << 8) + 0);
                         urb->req.setup.wLength = cpu_to_le16(urb->req.transfer_length);
-                        urb->mem.pchBuffer = (uint8_t *)&server->rep;
-                        urb->mem.nSize = urb->req.transfer_length;
+                        urb->mem.buffer_ptr = (uint8_t *)&server->rep;
+                        urb->mem.s32_size = urb->req.transfer_length;
                         __vk_usbip_server_submit_urb(server, urb);
                     } else {
                         VSF_USB_ASSERT(urb->rep.actual_length == desc.cfg->wTotalLength);
@@ -1054,7 +1060,7 @@ vsf_err_t vk_usbip_usbd_ep_clear_stall(vk_usbip_dcd_t *usbd, uint_fast8_t ep)
 uint_fast32_t vk_usbip_usbd_ep_get_data_size(vk_usbip_dcd_t *usbd, uint_fast8_t ep)
 {
     vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep(usbd, ep);
-    return dcd_ep->transfer.size - dcd_ep->transfer.mem.nSize;
+    return dcd_ep->transfer.size - dcd_ep->transfer.mem.s32_size;
 }
 
 vsf_err_t vk_usbip_usbd_ep_transaction_read_buffer(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
@@ -1080,8 +1086,8 @@ vsf_err_t vk_usbip_usbd_ep_transaction_write_buffer(vk_usbip_dcd_t *usbd, uint_f
 vsf_err_t vk_usbip_usbd_ep_transfer_recv(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
 {
     vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep(usbd, ep | USB_DIR_OUT);
-    dcd_ep->transfer.mem.pchBuffer = buffer;
-    dcd_ep->transfer.mem.nSize = size;
+    dcd_ep->transfer.mem.buffer_ptr = buffer;
+    dcd_ep->transfer.mem.s32_size = size;
     dcd_ep->transfer.size = size;
     dcd_ep->transfer.pending = true;
 
@@ -1092,8 +1098,8 @@ vsf_err_t vk_usbip_usbd_ep_transfer_recv(vk_usbip_dcd_t *usbd, uint_fast8_t ep, 
 vsf_err_t vk_usbip_usbd_ep_transfer_send(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp)
 {
     vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep(usbd, ep | USB_DIR_IN);
-    dcd_ep->transfer.mem.pchBuffer = buffer;
-    dcd_ep->transfer.mem.nSize = size;
+    dcd_ep->transfer.mem.buffer_ptr = buffer;
+    dcd_ep->transfer.mem.s32_size = size;
     dcd_ep->transfer.size = size;
     dcd_ep->transfer.zlp = zlp;
     dcd_ep->transfer.pending = true;

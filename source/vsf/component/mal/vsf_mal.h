@@ -26,10 +26,10 @@
 
 #include "kernel/vsf_kernel.h"
 
-#if     defined(VSF_MAL_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_MAL_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_MAL_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_MAL_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -47,27 +47,25 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_mal_t)
+dcl_simple_class(vk_mal_t)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-declare_simple_class(vk_mal_stream_t)
+dcl_simple_class(vk_mal_stream_t)
 #endif
 
-declare_simple_class(vk_mal_drv_t)
+dcl_simple_class(vk_mal_drv_t)
 
-enum vsf_mal_op_t {
+typedef enum vsf_mal_op_t {
     VSF_MAL_OP_ERASE,
     VSF_MAL_OP_READ,
     VSF_MAL_OP_WRITE,
-};
-typedef enum vsf_mal_op_t vsf_mal_op_t;
+} vsf_mal_op_t;
 
-enum vsf_mal_feature_t {
+typedef enum vsf_mal_feature_t {
     VSF_MAL_READABLE            = 1 << 0,
     VSF_MAL_WRITABLE            = 1 << 1,
     VSF_MAL_ERASABLE            = 1 << 2,
     VSF_MAL_NON_UNIFIED_BLOCK   = 1 << 3,
-};
-typedef enum vsf_mal_feature_t vsf_mal_feature_t;
+} vsf_mal_feature_t;
 
 def_simple_class(vk_mal_drv_t) {
     protected_member(
@@ -108,7 +106,7 @@ def_simple_class(vk_mal_stream_t) {
 };
 #endif
 
-#if defined(VSF_MAL_IMPLEMENT) || defined(VSF_MAL_INHERIT)
+#if defined(__VSF_MAL_CLASS_IMPLEMENT) || defined(__VSF_MAL_CLASS_INHERIT__)
 __vsf_component_peda_ifs(vk_mal_init)
 __vsf_component_peda_ifs(vk_mal_fini)
 __vsf_component_peda_ifs(vk_mal_erase,
@@ -159,8 +157,8 @@ extern vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr,
 #include "./driver/scsi_mal/vsf_scsi_mal.h"
 #include "./driver/file_mal/vsf_file_mal.h"
 
-#undef VSF_MAL_IMPLEMENT
-#undef VSF_MAL_INHERIT
+#undef __VSF_MAL_CLASS_IMPLEMENT
+#undef __VSF_MAL_CLASS_INHERIT__
 
 #endif      // VSF_USE_MAL
 #endif      // __VSF_MAL_H__

@@ -25,9 +25,9 @@
 #include "utilities/vsf_utilities.h"
 
 #if     defined(VSF_ARCH_WIN_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #elif   defined(VSF_ARCH_WIN_IMPLEMENT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -52,7 +52,19 @@ extern "C" {
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 
+#ifndef FAR
+#   define FAR             
+#endif
+#ifndef NEAR
+#   define NEAR             
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __VSF_ARCH_PRI(__N, __BIT)                                              \
+            VSF_ARCH_PRIO_##__N = (__N),                                        \
+            vsf_arch_prio_##__N = (__N),
+
 /*============================ TYPES =========================================*/
 
 // avoid to use windows.h, fix if any conflicts
@@ -60,8 +72,6 @@ typedef void *              HANDLE;
 typedef unsigned long       DWORD;
 typedef unsigned int        UINT;
 typedef unsigned char       BYTE;
-#define FAR                 
-#define NEAR                
 typedef char *              LPSTR;
 #if defined(__WIN__) && defined(__CPU_X64__)
 typedef unsigned long long  ULONG_PTR, *PULONG_PTR;
@@ -72,28 +82,22 @@ typedef ULONG_PTR           DWORD_PTR, *PDWORD_PTR;
 
 typedef uint64_t vsf_systimer_cnt_t;
 
-#define __VSF_ARCH_PRI(__N, __BIT)                                              \
-            VSF_ARCH_PRIO_##__N = (__N),                                        \
-            vsf_arch_prio_##__N = (__N),
-
-enum vsf_arch_prio_t {
+typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_IVALID = -1,
     vsf_arch_prio_ivalid = -1,
     REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
-};
-typedef enum vsf_arch_prio_t vsf_arch_prio_t;
+} vsf_arch_prio_t;
 
 declare_simple_class(vsf_arch_irq_thread_t)
 declare_simple_class(vsf_arch_irq_request_t)
 
-enum vsf_arch_irq_state_t {
+typedef enum vsf_arch_irq_state_t {
     VSF_ARCH_IRQ_STATE_IDLE,
     VSF_ARCH_IRQ_STATE_ACTIVE,
     VSF_ARCH_IRQ_STATE_FOREGROUND,
     VSF_ARCH_IRQ_STATE_BACKGROUND,
-};
-typedef enum vsf_arch_irq_state_t vsf_arch_irq_state_t;
+} vsf_arch_irq_state_t;
 
 def_simple_class(vsf_arch_irq_request_t) {
     private_member(
@@ -147,17 +151,6 @@ static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 #elif   defined(__CPU_X64__)
     __asm__("movq %0, %%rsp" : : "r"(stack));
 #endif
-}
-
-static ALWAYS_INLINE void vsf_arch_set_pc(uintptr_t pc)
-{
-    VSF_HAL_ASSERT(false);
-}
-
-static ALWAYS_INLINE uintptr_t vsf_arch_get_lr(void)
-{
-    VSF_HAL_ASSERT(false);
-    return 0;
 }
 
 #ifdef __cplusplus

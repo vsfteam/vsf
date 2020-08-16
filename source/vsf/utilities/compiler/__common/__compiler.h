@@ -285,6 +285,15 @@ extern "C" {
 //! use of address of unaligned structure member 
 #pragma diag_suppress=pa039
 
+//! declaration is not visable outside of function
+#pragma diag_suppress=pe231
+
+//! expression has no effect
+#pragma diag_suppress=pe174
+
+//! label was declared but never referenced
+#pragma diag_suppress=pe177
+
 //,Pe186,Pe111,,pe128,,,Pe1866,Pe064,Pa039
 
 #endif

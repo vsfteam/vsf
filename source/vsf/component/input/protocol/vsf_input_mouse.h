@@ -82,10 +82,9 @@ enum {
     VSF_INPUT_MOUSE_BUTTON_RIGHT,
 };
 
-struct vk_mouse_evt_t {
+typedef struct vk_mouse_evt_t {
     implement(vk_input_evt_t)
-};
-typedef struct vk_mouse_evt_t vk_mouse_evt_t;
+} vk_mouse_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

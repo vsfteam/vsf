@@ -35,7 +35,7 @@ def_fsm(user_fsm_sub_task_t,
 
 def_fsm(user_fsm_task_t,
     def_params(
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
         uint32_t cnt;
         
         vsf_task(user_fsm_sub_task_t) print_task;
@@ -45,7 +45,7 @@ def_fsm(user_fsm_task_t,
 declare_fsm(user_task_b_t)
 def_fsm(user_task_b_t,
     def_params(
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
         uint8_t cnt;
     ));
 #endif
@@ -89,7 +89,7 @@ fsm_initialiser(user_fsm_task_t,
     ))
     init_body(
         this.cnt = 0;
-        this.psem = ptSEM;
+        this.sem_ptr = ptSEM;
     )
 
 
@@ -110,7 +110,7 @@ implement_fsm(user_fsm_task_t)
     */
 
     state(WAIT_FOR_SEM) {
-        vsf_sem_pend(this.psem){                                                //!< wait for semaphore forever
+        vsf_sem_pend(this.sem_ptr){                                                //!< wait for semaphore forever
             init_fsm(user_fsm_sub_task_t, &this.print_task, args(this.cnt));    //!< init sub fsm
             transfer_to(CALL_SUB_TO_PRINT);                                     //!< tranfer to next state
         }
@@ -136,7 +136,7 @@ fsm_initialiser(user_task_b_t,
         vsf_sem_t *ptSEM
     ))
     init_body(
-        this.psem = ptSEM;
+        this.sem_ptr = ptSEM;
         this.cnt = 0;
     )
 
@@ -159,7 +159,7 @@ implement_fsm(user_task_b_t)
         
         state(PRINT){
             printf("post semaphore...   [%08x]\r\n", this.cnt++);
-            vsf_sem_post(this.psem);                                            //!< post a semaphore
+            vsf_sem_post(this.sem_ptr);                                            //!< post a semaphore
             reset_fsm();                                                        //!< reset fsm
         }
         

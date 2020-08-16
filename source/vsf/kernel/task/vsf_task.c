@@ -44,7 +44,7 @@ static NO_INIT vsf_pool(vsf_task_stack_frame_pool) __default_frame_pool;
 
 static void __vsf_task_pop(vsf_task_t *ptask)
 {
-    class_internal(ptask, ptThis, vsf_task_t);
+    class_internal(ptask, this_ptr, vsf_task_t);
     vsf_task_stack_frame_t *frame_ptr = NULL;
     
     this.call_depth--;
@@ -59,7 +59,7 @@ static void __vsf_task_pop(vsf_task_t *ptask)
 
 static void __vsf_task_push(vsf_task_t *ptask, vsf_task_stack_frame_t *frame_ptr)
 {
-    class_internal(ptask, ptThis, vsf_task_t);
+    class_internal(ptask, this_ptr, vsf_task_t);
     
     vsf_slist_stack_push(   vsf_task_stack_frame_t, 
                             use_as__vsf_slist_node_t, 
@@ -78,7 +78,7 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
                             bool is_sub_call )
 {
     VSF_KERNEL_ASSERT(NULL != ptask);
-    class_internal(ptask, ptThis, vsf_task_t);   
+    class_internal(ptask, this_ptr, vsf_task_t);   
 
     if (!is_sub_call) {
         this.stack.frame_ptr->fnEntry = fnEntry;
@@ -111,7 +111,7 @@ fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry,
                             void *target_ptr, 
                             bool is_sub_call )
 {
-    class_internal(vsf_eda_get_cur(), ptThis, vsf_task_t);
+    class_internal(vsf_eda_get_cur(), this_ptr, vsf_task_t);
     fsm_rt_t task_return_state = this.task_return_state;
     
     if (is_sub_call) {
@@ -126,7 +126,7 @@ fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry,
         }
     }
     
-    __vsf_task_branch((vsf_task_t *)ptThis, 
+    __vsf_task_branch((vsf_task_t *)this_ptr, 
                             fnEntry,
                             target_ptr,
                             is_sub_call);
@@ -147,7 +147,7 @@ fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry,
 static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
 {
     vsf_task_t *ptask = (vsf_task_t *)peda;
-    class_internal(ptask, ptThis, vsf_task_t);
+    class_internal(ptask, this_ptr, vsf_task_t);
     VSF_KERNEL_ASSERT(     ptask != NULL 
             &&  NULL != this.stack.frame_ptr
             &&  NULL != this.stack.frame_ptr->fnEntry);
@@ -218,7 +218,7 @@ vsf_err_t vsf_task_start(vsf_task_t *ptask, vsf_task_cfg_t *pcfg)
             &&  NULL != pcfg
             &&  NULL != pcfg->fnEntry);
             
-    class_internal(ptask, ptThis, vsf_task_t);
+    class_internal(ptask, this_ptr, vsf_task_t);
     
     memset(ptask, 0, sizeof(vsf_task_t));
 

@@ -26,10 +26,10 @@
 
 #include "kernel/vsf_kernel.h"
 
-#if     defined(VSF_FS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_FS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_FS_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_FS_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -72,18 +72,18 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_fs_t)
-declare_simple_class(vk_file_t)
-declare_simple_class(vk_vfs_file_t)
+dcl_simple_class(vk_fs_t)
+dcl_simple_class(vk_file_t)
+dcl_simple_class(vk_vfs_file_t)
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-declare_simple_class(vk_file_stream_t)
+dcl_simple_class(vk_file_stream_t)
 #endif
 
-declare_simple_class(vk_fs_fop_t)
-declare_simple_class(vk_fs_dop_t)
-declare_simple_class(vk_fs_op_t)
+dcl_simple_class(vk_fs_fop_t)
+dcl_simple_class(vk_fs_dop_t)
+dcl_simple_class(vk_fs_op_t)
 
-enum vk_file_attr_t {
+typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_READ          = 1 << 0,
     VSF_FILE_ATTR_WRITE         = 1 << 1,
     VSF_FILE_ATTR_EXECUTE       = 1 << 2,
@@ -91,8 +91,7 @@ enum vk_file_attr_t {
     VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
     VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
-};
-typedef enum vk_file_attr_t vk_file_attr_t;
+} vk_file_attr_t;
 
 def_simple_class(vk_fs_fop_t) {
     protected_member(
@@ -142,12 +141,11 @@ def_simple_class(vk_fs_op_t) {
 };
 
 // (bytelen << 6) | index
-enum vk_file_name_coding_t {
+typedef enum vk_file_name_coding_t {
     VSF_FILE_NAME_CODING_UNKNOWN    = 0,
     VSF_FILE_NAME_CODING_ASCII      = (1 << 6) | 0,
     VSF_FILE_NAME_CODING_UCS2       = (2 << 6) | 1,
-};
-typedef enum vk_file_name_coding_t vk_file_name_coding_t;
+} vk_file_name_coding_t;
 
 def_simple_class(vk_file_t) {
     public_member(
@@ -175,11 +173,10 @@ def_simple_class(vk_file_t) {
     )
 };
 
-#if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
-enum vk_vfs_file_attr_t {
+#if defined(__VSF_FS_CLASS_INHERIT__) || defined(__VSF_FS_CLASS_IMPLEMENT)
+typedef enum vk_vfs_file_attr_t {
     VSF_VFS_FILE_ATTR_MOUNTED   = VSF_FILE_ATTR_EXT,
-};
-typedef enum vk_file_attr_t vk_file_attr_t;
+} vk_vfs_file_attr_t;
 
 def_simple_class(vk_vfs_file_t) {
     implement(vk_file_t)
@@ -224,7 +221,7 @@ def_simple_class(vk_file_stream_t) {
 };
 #endif
 
-#if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
+#if defined(__VSF_FS_CLASS_INHERIT__) || defined(__VSF_FS_CLASS_IMPLEMENT)
 __vsf_component_peda_ifs(vk_fs_mount)
 __vsf_component_peda_ifs(vk_fs_unmount)
 __vsf_component_peda_ifs(vk_fs_sync)
@@ -291,7 +288,7 @@ extern char * vk_file_getfileext(char *fname);
 extern char * vk_file_getfilename(char *path);
 extern vk_file_t * vk_file_get_parent(vk_file_t *file);
 
-#if defined(VSF_FS_INHERIT) || defined(VSF_FS_IMPLEMENT)
+#if defined(__VSF_FS_CLASS_INHERIT__) || defined(__VSF_FS_CLASS_IMPLEMENT)
 extern bool vk_file_is_match(char *path, char *name);
 extern bool vk_file_is_div(char ch);
 
@@ -319,8 +316,8 @@ extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t add
 #include "./driver/memfs/vsf_memfs.h"
 #include "./driver/winfs/vsf_winfs.h"
 
-#undef VSF_FS_IMPLEMENT
-#undef VSF_FS_INHERIT
+#undef __VSF_FS_CLASS_IMPLEMENT
+#undef __VSF_FS_CLASS_INHERIT__
 
 #endif      // VSF_USE_FS
 #endif      // __VSF_FS_H__

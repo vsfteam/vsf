@@ -22,17 +22,16 @@
 #if     ((VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED))\
     &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_LIBUSB == ENABLED)
 
-#define VSFVM_RUNTIME_INHERIT
-#define VSF_USBH_INHERIT_vk_usbh_urb_t
-#define VSF_USBH_IMPLEMENT_vk_usbh_dev_t
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT_CLASS
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSFVM_RUNTIME_CLASS_INHERIT__
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 
-#include "common/vsfvm_common.h"
-#include "runtime/vsfvm_runtime.h"
-#include "extension/std/vsfvm_ext_std.h"
+#include "kernel/vsf_kernel.h"
+#include "component/usb/vsf_usb.h"
+
+#include "./common/vsfvm_common.h"
+#include "./runtime/vsfvm_runtime.h"
+#include "./extension/std/vsfvm_ext_std.h"
 #include "./vsfvm_ext_libusb.h"
 
 /*============================ MACROS ========================================*/
@@ -44,23 +43,21 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfvm_ext_libusb_dev_t {
+typedef struct vsfvm_ext_libusb_dev_t {
     vk_usbh_libusb_dev_t *ldev;
     vsfvm_instance_t *inst;
     vsf_slist_node_t dev_node;
     vk_usbh_urb_t urb;
     uint8_t cur_address;
-};
-typedef struct vsfvm_ext_libusb_dev_t vsfvm_ext_libusb_dev_t;
+} vsfvm_ext_libusb_dev_t;
 
-struct vsfvm_ext_libusb_t {
+typedef struct vsfvm_ext_libusb_t {
     implement(vsfvm_ext_t)
     implement(vsf_eda_t)
     vsf_slist_t dev_list;
     vsfvm_runtime_callback_t callback;
     bool callback_registered;
-};
-typedef struct vsfvm_ext_libusb_t vsfvm_ext_libusb_t;
+} vsfvm_ext_libusb_t;
 
 enum {
     VSFVM_LIBUSB_EXTFUNC_START = 0,
@@ -117,7 +114,7 @@ const vsfvm_class_t vsfvm_ext_libusb_dev = {
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
 extern const vsfvm_ext_op_t __vsfvm_ext_libusb_op;
-static const vsfvm_lexer_sym_t vsfvm_ext_libusb_sym[] = {
+static const vsfvm_lexer_sym_t __vsfvm_ext_libusb_sym[] = {
     VSFVM_LEXERSYM_EXTFUNC("libusb_start", &__vsfvm_ext_libusb_op, NULL, NULL, 1, VSFVM_LIBUSB_EXTFUNC_START),
     VSFVM_LEXERSYM_CONST("USB_EVT_ON_ARRIVED", &__vsfvm_ext_libusb_op, NULL, VSF_USBH_LIBUSB_EVT_ON_ARRIVED),
     VSFVM_LEXERSYM_CONST("USB_EVT_ON_LEFT", &__vsfvm_ext_libusb_op, NULL, VSF_USBH_LIBUSB_EVT_ON_LEFT),
@@ -156,8 +153,8 @@ static const vsfvm_extfunc_t __vsfvm_ext_libusb_func[VSFVM_LIBUSB_EXTFUNC_NUM] =
 static const vsfvm_ext_op_t __vsfvm_ext_libusb_op = {
 #if VSFVM_CFG_COMPILER_EN == ENABLED
     .name = "libusb",
-    .sym = vsfvm_ext_libusb_sym,
-    .sym_num = dimof(vsfvm_ext_libusb_sym),
+    .sym = __vsfvm_ext_libusb_sym,
+    .sym_num = dimof(__vsfvm_ext_libusb_sym),
 #endif
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
     .init = NULL,
@@ -190,7 +187,7 @@ static void __vsfvm_ext_libusb_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     argv[1].type = VSFVM_VAR_TYPE_INSTANCE;
                     argv[1].inst = vsfvm_instance_alloc(sizeof(vsfvm_ext_libusb_dev_t), &vsfvm_ext_libusb_dev);
                     if (argv[1].inst != NULL) {
-                        vsfvm_ext_libusb_dev_t *ext_ldev = argv[1].inst->pObj;
+                        vsfvm_ext_libusb_dev_t *ext_ldev = argv[1].inst->obj_ptr;
                         ext_ldev->ldev = ldev;
                         ext_ldev->inst = argv[1].inst;
                         ext_ldev->cur_address = ldev->address;
@@ -255,7 +252,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_address(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->obj_ptr)->ldev;
     vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->address);
     return VSFVM_RET_FINISHED;
 }
@@ -270,7 +267,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_pid(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->obj_ptr)->ldev;
     vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->pid);
     return VSFVM_RET_FINISHED;
 }
@@ -285,7 +282,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_vid(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->obj_ptr)->ldev;
     vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->vid);
     return VSFVM_RET_FINISHED;
 }
@@ -300,7 +297,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_class(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->obj_ptr)->ldev;
     vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->c);
     return VSFVM_RET_FINISHED;
 }
@@ -315,7 +312,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_subclass(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->obj_ptr)->ldev;
     vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->subc);
     return VSFVM_RET_FINISHED;
 }
@@ -330,7 +327,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_protocol(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->pObj)->ldev;
+    ldev = ((vsfvm_ext_libusb_dev_t*)thiz->inst->obj_ptr)->ldev;
     vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, ldev->protocol);
     return VSFVM_RET_FINISHED;
 }
@@ -345,7 +342,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_reset(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ext_ldev = thiz->inst->pObj;
+    ext_ldev = thiz->inst->obj_ptr;
     ext_ldev->cur_address = 0;
     ldev = ext_ldev->ldev;
     vk_usbh_reset_dev(ldev->usbh, ldev->dev);
@@ -367,7 +364,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    ext_ldev = thiz->inst->pObj;
+    ext_ldev = thiz->inst->obj_ptr;
     epnum = ep->uval8 & ~USB_DIR_MASK;
     urb = epnum > 0 ? &ext_ldev->urb : &ext_ldev->ldev->dev->ep0.urb;
 
@@ -400,7 +397,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
 
         if (length->uval32 > 0) {
             if (!buffer->inst) { return VSFVM_RET_ERROR; }
-            vk_usbh_urb_set_buffer(urb, buffer->inst->pchBuffer, length->uval32);
+            vk_usbh_urb_set_buffer(urb, buffer->inst->buffer_ptr, length->uval32);
         } else {
             vk_usbh_urb_set_buffer(urb, NULL, 0);
         }
@@ -490,7 +487,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_transfer(vsfvm_thread_t *thread)
 static void __vsfvm_ext_libusb_dev_print(vsfvm_instance_t *inst)
 {
     if (vsfvm_instance_of(inst, &vsfvm_ext_libusb_dev)) {
-        vsfvm_ext_libusb_dev_t *ext_ldev = inst->pObj;
+        vsfvm_ext_libusb_dev_t *ext_ldev = inst->obj_ptr;
         vk_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
 
         vsf_trace(VSF_TRACE_INFO, "libusb_dev@(%02X_%04X:%04X)",
@@ -501,7 +498,7 @@ static void __vsfvm_ext_libusb_dev_print(vsfvm_instance_t *inst)
 static void __vsfvm_ext_libusb_dev_destroy(vsfvm_instance_t *inst)
 {
     VSFVM_ASSERT(vsfvm_instance_of(inst, &vsfvm_ext_libusb_dev));
-    vsfvm_ext_libusb_dev_t *ext_ldev = inst->pObj;
+    vsfvm_ext_libusb_dev_t *ext_ldev = inst->obj_ptr;
     VSFVM_ASSERT(vsf_slist_is_in(vsfvm_ext_libusb_dev_t, dev_node, &__vsfvm_ext_libusb.dev_list, ext_ldev));
 
     vsf_slist_remove(vsfvm_ext_libusb_dev_t, dev_node, &__vsfvm_ext_libusb.dev_list, ext_ldev);

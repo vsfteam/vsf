@@ -284,7 +284,7 @@ static void _DoInit(void) {
   // Initialize up buffer 0
   //
   p->aUp[0].sName         = "Terminal";
-  p->aUp[0].pBuffer       = _acUpBuffer;
+  p->aUp[0].buffer_ptr       = _acUpBuffer;
   p->aUp[0].SizeOfBuffer  = sizeof(_acUpBuffer);
   p->aUp[0].RdOff         = 0u;
   p->aUp[0].WrOff         = 0u;
@@ -293,7 +293,7 @@ static void _DoInit(void) {
   // Initialize down buffer 0
   //
   p->aDown[0].sName         = "Terminal";
-  p->aDown[0].pBuffer       = _acDownBuffer;
+  p->aDown[0].buffer_ptr       = _acDownBuffer;
   p->aDown[0].SizeOfBuffer  = sizeof(_acDownBuffer);
   p->aDown[0].RdOff         = 0u;
   p->aDown[0].WrOff         = 0u;
@@ -321,13 +321,13 @@ static void _DoInit(void) {
 *
 *  Parameters
 *    pRing        Ring buffer to post to.
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Return value
 *    >= 0 - Number of bytes written into buffer.
 */
-static unsigned _WriteBlocking(SEGGER_RTT_BUFFER_UP* pRing, const char* pBuffer, unsigned NumBytes) {
+static unsigned _WriteBlocking(SEGGER_RTT_BUFFER_UP* pRing, const char* buffer_ptr, unsigned NumBytes) {
   unsigned NumBytesToWrite;
   unsigned NumBytesWritten;
   unsigned RdOff;
@@ -350,17 +350,17 @@ static unsigned _WriteBlocking(SEGGER_RTT_BUFFER_UP* pRing, const char* pBuffer,
     NumBytesToWrite = MIN(NumBytesToWrite, (pRing->SizeOfBuffer - WrOff));      // Number of bytes that can be written until buffer wrap-around
     NumBytesToWrite = MIN(NumBytesToWrite, NumBytes);
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pDst = pRing->pBuffer + WrOff;
+    pDst = pRing->buffer_ptr + WrOff;
     NumBytesWritten += NumBytesToWrite;
     NumBytes        -= NumBytesToWrite;
     WrOff           += NumBytesToWrite;
     while (NumBytesToWrite--) {
-      *pDst++ = *pBuffer++;
+      *pDst++ = *buffer_ptr++;
     };
 #else
-    SEGGER_RTT_MEMCPY(pRing->pBuffer + WrOff, pBuffer, NumBytesToWrite);
+    SEGGER_RTT_MEMCPY(pRing->buffer_ptr + WrOff, buffer_ptr, NumBytesToWrite);
     NumBytesWritten += NumBytesToWrite;
-    pBuffer         += NumBytesToWrite;
+    buffer_ptr         += NumBytesToWrite;
     NumBytes        -= NumBytesToWrite;
     WrOff           += NumBytesToWrite;
 #endif
@@ -385,7 +385,7 @@ static unsigned _WriteBlocking(SEGGER_RTT_BUFFER_UP* pRing, const char* pBuffer,
 *
 *  Parameters
 *    pRing        Ring buffer to post to.
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Notes
@@ -406,14 +406,14 @@ static void _WriteNoCheck(SEGGER_RTT_BUFFER_UP* pRing, const char* pData, unsign
     // All data fits before wrap around
     //
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pDst = pRing->pBuffer + WrOff;
+    pDst = pRing->buffer_ptr + WrOff;
     WrOff += NumBytes;
     while (NumBytes--) {
       *pDst++ = *pData++;
     };
     pRing->WrOff = WrOff;
 #else
-    SEGGER_RTT_MEMCPY(pRing->pBuffer + WrOff, pData, NumBytes);
+    SEGGER_RTT_MEMCPY(pRing->buffer_ptr + WrOff, pData, NumBytes);
     pRing->WrOff = WrOff + NumBytes;
 #endif
   } else {
@@ -421,12 +421,12 @@ static void _WriteNoCheck(SEGGER_RTT_BUFFER_UP* pRing, const char* pData, unsign
     // We reach the end of the buffer, so need to wrap around
     //
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pDst = pRing->pBuffer + WrOff;
+    pDst = pRing->buffer_ptr + WrOff;
     NumBytesAtOnce = Rem;
     while (NumBytesAtOnce--) {
       *pDst++ = *pData++;
     };
-    pDst = pRing->pBuffer;
+    pDst = pRing->buffer_ptr;
     NumBytesAtOnce = NumBytes - Rem;
     while (NumBytesAtOnce--) {
       *pDst++ = *pData++;
@@ -434,9 +434,9 @@ static void _WriteNoCheck(SEGGER_RTT_BUFFER_UP* pRing, const char* pData, unsign
     pRing->WrOff = NumBytes - Rem;
 #else
     NumBytesAtOnce = Rem;
-    SEGGER_RTT_MEMCPY(pRing->pBuffer + WrOff, pData, NumBytesAtOnce);
+    SEGGER_RTT_MEMCPY(pRing->buffer_ptr + WrOff, pData, NumBytesAtOnce);
     NumBytesAtOnce = NumBytes - Rem;
-    SEGGER_RTT_MEMCPY(pRing->pBuffer, pData + Rem, NumBytesAtOnce);
+    SEGGER_RTT_MEMCPY(pRing->buffer_ptr, pData + Rem, NumBytesAtOnce);
     pRing->WrOff = NumBytesAtOnce;
 #endif
   }
@@ -514,7 +514,7 @@ static unsigned _GetAvailWriteSpace(SEGGER_RTT_BUFFER_UP* pRing) {
 *
 *  Parameters
 *    BufferIndex  Index of Up-buffer to be used.
-*    pBuffer      Pointer to buffer provided by target application, to copy characters from RTT-up-buffer to.
+*    buffer_ptr      Pointer to buffer provided by target application, to copy characters from RTT-up-buffer to.
 *    BufferSize   Size of the target application buffer.
 *
 *  Return value
@@ -528,7 +528,7 @@ unsigned SEGGER_RTT_ReadUpBufferNoLock(unsigned BufferIndex, void* pData, unsign
   unsigned                NumBytesRead;
   unsigned                RdOff;
   unsigned                WrOff;
-  unsigned char*          pBuffer;
+  unsigned char*          buffer_ptr;
   SEGGER_RTT_BUFFER_UP*   pRing;
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
   const char*             pSrc;
@@ -536,7 +536,7 @@ unsigned SEGGER_RTT_ReadUpBufferNoLock(unsigned BufferIndex, void* pData, unsign
   //
   INIT();
   pRing = &_SEGGER_RTT.aUp[BufferIndex];
-  pBuffer = (unsigned char*)pData;
+  buffer_ptr = (unsigned char*)pData;
   RdOff = pRing->RdOff;
   WrOff = pRing->WrOff;
   NumBytesRead = 0u;
@@ -547,17 +547,17 @@ unsigned SEGGER_RTT_ReadUpBufferNoLock(unsigned BufferIndex, void* pData, unsign
     NumBytesRem = pRing->SizeOfBuffer - RdOff;
     NumBytesRem = MIN(NumBytesRem, BufferSize);
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pSrc = pRing->pBuffer + RdOff;
+    pSrc = pRing->buffer_ptr + RdOff;
     NumBytesRead += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
     while (NumBytesRem--) {
-      *pBuffer++ = *pSrc++;
+      *buffer_ptr++ = *pSrc++;
     };
 #else
-    SEGGER_RTT_MEMCPY(pBuffer, pRing->pBuffer + RdOff, NumBytesRem);
+    SEGGER_RTT_MEMCPY(buffer_ptr, pRing->buffer_ptr + RdOff, NumBytesRem);
     NumBytesRead += NumBytesRem;
-    pBuffer      += NumBytesRem;
+    buffer_ptr      += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
 #endif
@@ -575,17 +575,17 @@ unsigned SEGGER_RTT_ReadUpBufferNoLock(unsigned BufferIndex, void* pData, unsign
   NumBytesRem = MIN(NumBytesRem, BufferSize);
   if (NumBytesRem > 0u) {
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pSrc = pRing->pBuffer + RdOff;
+    pSrc = pRing->buffer_ptr + RdOff;
     NumBytesRead += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
     while (NumBytesRem--) {
-      *pBuffer++ = *pSrc++;
+      *buffer_ptr++ = *pSrc++;
     };
 #else
-    SEGGER_RTT_MEMCPY(pBuffer, pRing->pBuffer + RdOff, NumBytesRem);
+    SEGGER_RTT_MEMCPY(buffer_ptr, pRing->buffer_ptr + RdOff, NumBytesRem);
     NumBytesRead += NumBytesRem;
-    pBuffer      += NumBytesRem;
+    buffer_ptr      += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
 #endif
@@ -611,7 +611,7 @@ unsigned SEGGER_RTT_ReadUpBufferNoLock(unsigned BufferIndex, void* pData, unsign
 *
 *  Parameters
 *    BufferIndex  Index of Down-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to buffer provided by target application, to copy characters from RTT-down-buffer to.
+*    buffer_ptr      Pointer to buffer provided by target application, to copy characters from RTT-down-buffer to.
 *    BufferSize   Size of the target application buffer.
 *
 *  Return value
@@ -622,7 +622,7 @@ unsigned SEGGER_RTT_ReadNoLock(unsigned BufferIndex, void* pData, unsigned Buffe
   unsigned                NumBytesRead;
   unsigned                RdOff;
   unsigned                WrOff;
-  unsigned char*          pBuffer;
+  unsigned char*          buffer_ptr;
   SEGGER_RTT_BUFFER_DOWN* pRing;
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
   const char*             pSrc;
@@ -630,7 +630,7 @@ unsigned SEGGER_RTT_ReadNoLock(unsigned BufferIndex, void* pData, unsigned Buffe
   //
   INIT();
   pRing = &_SEGGER_RTT.aDown[BufferIndex];
-  pBuffer = (unsigned char*)pData;
+  buffer_ptr = (unsigned char*)pData;
   RdOff = pRing->RdOff;
   WrOff = pRing->WrOff;
   NumBytesRead = 0u;
@@ -641,17 +641,17 @@ unsigned SEGGER_RTT_ReadNoLock(unsigned BufferIndex, void* pData, unsigned Buffe
     NumBytesRem = pRing->SizeOfBuffer - RdOff;
     NumBytesRem = MIN(NumBytesRem, BufferSize);
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pSrc = pRing->pBuffer + RdOff;
+    pSrc = pRing->buffer_ptr + RdOff;
     NumBytesRead += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
     while (NumBytesRem--) {
-      *pBuffer++ = *pSrc++;
+      *buffer_ptr++ = *pSrc++;
     };
 #else
-    SEGGER_RTT_MEMCPY(pBuffer, pRing->pBuffer + RdOff, NumBytesRem);
+    SEGGER_RTT_MEMCPY(buffer_ptr, pRing->buffer_ptr + RdOff, NumBytesRem);
     NumBytesRead += NumBytesRem;
-    pBuffer      += NumBytesRem;
+    buffer_ptr      += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
 #endif
@@ -669,17 +669,17 @@ unsigned SEGGER_RTT_ReadNoLock(unsigned BufferIndex, void* pData, unsigned Buffe
   NumBytesRem = MIN(NumBytesRem, BufferSize);
   if (NumBytesRem > 0u) {
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-    pSrc = pRing->pBuffer + RdOff;
+    pSrc = pRing->buffer_ptr + RdOff;
     NumBytesRead += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
     while (NumBytesRem--) {
-      *pBuffer++ = *pSrc++;
+      *buffer_ptr++ = *pSrc++;
     };
 #else
-    SEGGER_RTT_MEMCPY(pBuffer, pRing->pBuffer + RdOff, NumBytesRem);
+    SEGGER_RTT_MEMCPY(buffer_ptr, pRing->buffer_ptr + RdOff, NumBytesRem);
     NumBytesRead += NumBytesRem;
-    pBuffer      += NumBytesRem;
+    buffer_ptr      += NumBytesRem;
     BufferSize   -= NumBytesRem;
     RdOff        += NumBytesRem;
 #endif
@@ -703,7 +703,7 @@ unsigned SEGGER_RTT_ReadNoLock(unsigned BufferIndex, void* pData, unsigned Buffe
 *
 *  Parameters
 *    BufferIndex  Index of Up-buffer to be used.
-*    pBuffer      Pointer to buffer provided by target application, to copy characters from RTT-up-buffer to.
+*    buffer_ptr      Pointer to buffer provided by target application, to copy characters from RTT-up-buffer to.
 *    BufferSize   Size of the target application buffer.
 *
 *  Return value
@@ -716,14 +716,14 @@ unsigned SEGGER_RTT_ReadNoLock(unsigned BufferIndex, void* pData, unsigned Buffe
 *    If only one consumer reads from the up buffer, 
 *    call sEGGER_RTT_ReadUpBufferNoLock() instead.
 */
-unsigned SEGGER_RTT_ReadUpBuffer(unsigned BufferIndex, void* pBuffer, unsigned BufferSize) {
+unsigned SEGGER_RTT_ReadUpBuffer(unsigned BufferIndex, void* buffer_ptr, unsigned BufferSize) {
   unsigned NumBytesRead;
   //
   SEGGER_RTT_LOCK();
   //
   // Call the non-locking read function
   //
-  NumBytesRead = SEGGER_RTT_ReadUpBufferNoLock(BufferIndex, pBuffer, BufferSize);
+  NumBytesRead = SEGGER_RTT_ReadUpBufferNoLock(BufferIndex, buffer_ptr, BufferSize);
   //
   // Finish up.
   //
@@ -742,20 +742,20 @@ unsigned SEGGER_RTT_ReadUpBuffer(unsigned BufferIndex, void* pBuffer, unsigned B
 *
 *  Parameters
 *    BufferIndex  Index of Down-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to buffer provided by target application, to copy characters from RTT-down-buffer to.
+*    buffer_ptr      Pointer to buffer provided by target application, to copy characters from RTT-down-buffer to.
 *    BufferSize   Size of the target application buffer.
 *
 *  Return value
 *    Number of bytes that have been read.
 */
-unsigned SEGGER_RTT_Read(unsigned BufferIndex, void* pBuffer, unsigned BufferSize) {
+unsigned SEGGER_RTT_Read(unsigned BufferIndex, void* buffer_ptr, unsigned BufferSize) {
   unsigned NumBytesRead;
   //
   SEGGER_RTT_LOCK();
   //
   // Call the non-locking read function
   //
-  NumBytesRead = SEGGER_RTT_ReadNoLock(BufferIndex, pBuffer, BufferSize);
+  NumBytesRead = SEGGER_RTT_ReadNoLock(BufferIndex, buffer_ptr, BufferSize);
   //
   // Finish up.
   //
@@ -776,7 +776,7 @@ unsigned SEGGER_RTT_Read(unsigned BufferIndex, void* pBuffer, unsigned BufferSiz
 *
 *  Parameters
 *    BufferIndex  Index of "Up"-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Notes
@@ -787,7 +787,7 @@ unsigned SEGGER_RTT_Read(unsigned BufferIndex, void* pBuffer, unsigned BufferSiz
 *    (3) Do not use SEGGER_RTT_WriteWithOverwriteNoLock if a J-Link 
 *        connection reads RTT data.
 */
-void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* pBuffer, unsigned NumBytes) {
+void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* buffer_ptr, unsigned NumBytes) {
   const char*           pData;
   SEGGER_RTT_BUFFER_UP* pRing;
   unsigned              Avail;
@@ -795,7 +795,7 @@ void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* pBuff
   char*                 pDst;
 #endif
 
-  pData = (const char *)pBuffer;
+  pData = (const char *)buffer_ptr;
   //
   // Get "to-host" ring buffer and copy some elements into local variables.
   //
@@ -826,14 +826,14 @@ void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* pBuff
       // Last round
       //
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-      pDst = pRing->pBuffer + pRing->WrOff;
+      pDst = pRing->buffer_ptr + pRing->WrOff;
       Avail = NumBytes;
       while (NumBytes--) {
         *pDst++ = *pData++;
       };
       pRing->WrOff += Avail;
 #else
-      SEGGER_RTT_MEMCPY(pRing->pBuffer + pRing->WrOff, pData, NumBytes);
+      SEGGER_RTT_MEMCPY(pRing->buffer_ptr + pRing->WrOff, pData, NumBytes);
       pRing->WrOff += NumBytes;
 #endif
       break;
@@ -842,14 +842,14 @@ void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* pBuff
       //  Wrap-around necessary, write until wrap-around and reset WrOff
       //
 #if SEGGER_RTT_MEMCPY_USE_BYTELOOP
-      pDst = pRing->pBuffer + pRing->WrOff;
+      pDst = pRing->buffer_ptr + pRing->WrOff;
       NumBytes -= Avail;
       while (Avail--) {
         *pDst++ = *pData++;
       };
       pRing->WrOff = 0;
 #else
-      SEGGER_RTT_MEMCPY(pRing->pBuffer + pRing->WrOff, pData, Avail);
+      SEGGER_RTT_MEMCPY(pRing->buffer_ptr + pRing->WrOff, pData, Avail);
       pData += Avail;
       pRing->WrOff = 0;
       NumBytes -= Avail;
@@ -871,7 +871,7 @@ void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* pBuff
 *
 *  Parameters
 *    BufferIndex  Index of "Up"-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *                 MUST be > 0!!!
 *                 This is done for performance reasons, so no initial check has do be done.
@@ -887,7 +887,7 @@ void SEGGER_RTT_WriteWithOverwriteNoLock(unsigned BufferIndex, const void* pBuff
 *        Either by calling SEGGER_RTT_Init() or calling another RTT API function first.
 */
 #if (RTT_USE_ASM == 0)
-unsigned SEGGER_RTT_WriteSkipNoLock(unsigned BufferIndex, const void* pBuffer, unsigned NumBytes) {
+unsigned SEGGER_RTT_WriteSkipNoLock(unsigned BufferIndex, const void* buffer_ptr, unsigned NumBytes) {
   const char*           pData;
   SEGGER_RTT_BUFFER_UP* pRing;
   unsigned              Avail;
@@ -904,7 +904,7 @@ unsigned SEGGER_RTT_WriteSkipNoLock(unsigned BufferIndex, const void* pBuffer, u
   //
   // 1) is the most common case for large buffers and assuming that J-Link reads the data fast enough
   //
-  pData = (const char *)pBuffer;
+  pData = (const char *)buffer_ptr;
   pRing = &_SEGGER_RTT.aUp[BufferIndex];
   RdOff = pRing->RdOff;
   WrOff = pRing->WrOff;
@@ -912,14 +912,14 @@ unsigned SEGGER_RTT_WriteSkipNoLock(unsigned BufferIndex, const void* pBuffer, u
     Avail = pRing->SizeOfBuffer - WrOff - 1u;           // Space until wrap-around (assume 1 byte not usable for case that RdOff == 0)
     if (Avail >= NumBytes) {                            // Case 1)?
 CopyStraight:
-      memcpy(pRing->pBuffer + WrOff, pData, NumBytes);
+      memcpy(pRing->buffer_ptr + WrOff, pData, NumBytes);
       pRing->WrOff = WrOff + NumBytes;
       return 1;
     }
     Avail += RdOff;                                     // Space incl. wrap-around
     if (Avail >= NumBytes) {                            // Case 2? => If not, we have case 3) (does not fit)
       Rem = pRing->SizeOfBuffer - WrOff;                // Space until end of buffer
-      memcpy(pRing->pBuffer + WrOff, pData, Rem);       // Copy 1st chunk
+      memcpy(pRing->buffer_ptr + WrOff, pData, Rem);       // Copy 1st chunk
       NumBytes -= Rem;
       //
       // Special case: First check that assumed RdOff == 0 calculated that last element before wrap-around could not be used
@@ -928,7 +928,7 @@ CopyStraight:
       // Therefore, check if 2nd memcpy is necessary at all
       //
       if (NumBytes) {
-        memcpy(pRing->pBuffer, pData + Rem, NumBytes);
+        memcpy(pRing->buffer_ptr, pData + Rem, NumBytes);
       }
       pRing->WrOff = NumBytes;
       return 1;
@@ -956,7 +956,7 @@ CopyStraight:
 *
 *  Parameters
 *    BufferIndex  Index of "Down"-buffer to be used.
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Return value
@@ -971,13 +971,13 @@ CopyStraight:
 *  Additional information
 *    This function must not be called when J-Link might also do RTT.
 */
-unsigned SEGGER_RTT_WriteDownBufferNoLock(unsigned BufferIndex, const void* pBuffer, unsigned NumBytes) {
+unsigned SEGGER_RTT_WriteDownBufferNoLock(unsigned BufferIndex, const void* buffer_ptr, unsigned NumBytes) {
   unsigned                Status;
   unsigned                Avail;
   const char*             pData;
   SEGGER_RTT_BUFFER_UP*   pRing;
 
-  pData = (const char *)pBuffer;
+  pData = (const char *)buffer_ptr;
   //
   // Get "to-target" ring buffer.
   // It is save to cast that to a "to-host" buffer. Up and Down buffer differ in volatility of offsets that might be modified by J-Link.
@@ -1035,7 +1035,7 @@ unsigned SEGGER_RTT_WriteDownBufferNoLock(unsigned BufferIndex, const void* pBuf
 *
 *  Parameters
 *    BufferIndex  Index of "Up"-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Return value
@@ -1047,13 +1047,13 @@ unsigned SEGGER_RTT_WriteDownBufferNoLock(unsigned BufferIndex, const void* pBuf
 *        and may only be called after RTT has been initialized.
 *        Either by calling SEGGER_RTT_Init() or calling another RTT API function first.
 */
-unsigned SEGGER_RTT_WriteNoLock(unsigned BufferIndex, const void* pBuffer, unsigned NumBytes) {
+unsigned SEGGER_RTT_WriteNoLock(unsigned BufferIndex, const void* buffer_ptr, unsigned NumBytes) {
   unsigned              Status;
   unsigned              Avail;
   const char*           pData;
   SEGGER_RTT_BUFFER_UP* pRing;
 
-  pData = (const char *)pBuffer;
+  pData = (const char *)buffer_ptr;
   //
   // Get "to-host" ring buffer.
   //
@@ -1108,7 +1108,7 @@ unsigned SEGGER_RTT_WriteNoLock(unsigned BufferIndex, const void* pBuffer, unsig
 *
 *  Parameters
 *    BufferIndex  Index of "Up"-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Return value
@@ -1124,7 +1124,7 @@ unsigned SEGGER_RTT_WriteNoLock(unsigned BufferIndex, const void* pBuffer, unsig
 *    If only one consumer writes to the down buffer, 
 *    call SEGGER_RTT_WriteDownBufferNoLock() instead.
 */
-unsigned SEGGER_RTT_WriteDownBuffer(unsigned BufferIndex, const void* pBuffer, unsigned NumBytes) {
+unsigned SEGGER_RTT_WriteDownBuffer(unsigned BufferIndex, const void* buffer_ptr, unsigned NumBytes) {
   unsigned Status;
   //
   INIT();
@@ -1132,7 +1132,7 @@ unsigned SEGGER_RTT_WriteDownBuffer(unsigned BufferIndex, const void* pBuffer, u
   //
   // Call the non-locking write function
   //
-  Status = SEGGER_RTT_WriteDownBufferNoLock(BufferIndex, pBuffer, NumBytes);
+  Status = SEGGER_RTT_WriteDownBufferNoLock(BufferIndex, buffer_ptr, NumBytes);
   //
   // Finish up.
   //
@@ -1151,7 +1151,7 @@ unsigned SEGGER_RTT_WriteDownBuffer(unsigned BufferIndex, const void* pBuffer, u
 *
 *  Parameters
 *    BufferIndex  Index of "Up"-buffer to be used (e.g. 0 for "Terminal").
-*    pBuffer      Pointer to character array. Does not need to point to a \0 terminated string.
+*    buffer_ptr      Pointer to character array. Does not need to point to a \0 terminated string.
 *    NumBytes     Number of bytes to be stored in the SEGGER RTT control block.
 *
 *  Return value
@@ -1160,7 +1160,7 @@ unsigned SEGGER_RTT_WriteDownBuffer(unsigned BufferIndex, const void* pBuffer, u
 *  Notes
 *    (1) Data is stored according to buffer flags.
 */
-unsigned SEGGER_RTT_Write(unsigned BufferIndex, const void* pBuffer, unsigned NumBytes) {
+unsigned SEGGER_RTT_Write(unsigned BufferIndex, const void* buffer_ptr, unsigned NumBytes) {
   unsigned Status;
   //
   INIT();
@@ -1168,7 +1168,7 @@ unsigned SEGGER_RTT_Write(unsigned BufferIndex, const void* pBuffer, unsigned Nu
   //
   // Call the non-locking write function
   //
-  Status = SEGGER_RTT_WriteNoLock(BufferIndex, pBuffer, NumBytes);
+  Status = SEGGER_RTT_WriteNoLock(BufferIndex, buffer_ptr, NumBytes);
   //
   // Finish up.
   //
@@ -1246,7 +1246,7 @@ unsigned SEGGER_RTT_PutCharSkipNoLock(unsigned BufferIndex, char c) {
   // Output byte if free space is available
   //
   if (WrOff != pRing->RdOff) {
-    pRing->pBuffer[pRing->WrOff] = c;
+    pRing->buffer_ptr[pRing->WrOff] = c;
     pRing->WrOff = WrOff;
     Status = 1;
   } else {
@@ -1298,7 +1298,7 @@ unsigned SEGGER_RTT_PutCharSkip(unsigned BufferIndex, char c) {
   // Output byte if free space is available
   //
   if (WrOff != pRing->RdOff) {
-    pRing->pBuffer[pRing->WrOff] = c;
+    pRing->buffer_ptr[pRing->WrOff] = c;
     pRing->WrOff = WrOff;
     Status = 1;
   } else {
@@ -1362,7 +1362,7 @@ unsigned SEGGER_RTT_PutChar(unsigned BufferIndex, char c) {
   // Output byte if free space is available
   //
   if (WrOff != pRing->RdOff) {
-    pRing->pBuffer[pRing->WrOff] = c;
+    pRing->buffer_ptr[pRing->WrOff] = c;
     pRing->WrOff = WrOff;
     Status = 1;
   } else {
@@ -1509,7 +1509,7 @@ unsigned SEGGER_RTT_HasDataUp(unsigned BufferIndex) {
 *
 *  Parameters
 *    sName        Pointer to a constant name string.
-*    pBuffer      Pointer to a buffer to be used.
+*    buffer_ptr      Pointer to a buffer to be used.
 *    BufferSize   Size of the buffer.
 *    Flags        Operating modes. Define behavior if buffer is full (not enough space for entire message).
 *
@@ -1517,21 +1517,21 @@ unsigned SEGGER_RTT_HasDataUp(unsigned BufferIndex) {
 *    >= 0 - O.K. Buffer Index
 *     < 0 - Error
 */
-int SEGGER_RTT_AllocDownBuffer(const char* sName, void* pBuffer, unsigned BufferSize, unsigned Flags) {
+int SEGGER_RTT_AllocDownBuffer(const char* sName, void* buffer_ptr, unsigned BufferSize, unsigned Flags) {
   int BufferIndex;
 
   INIT();
   SEGGER_RTT_LOCK();
   BufferIndex = 0;
   do {
-    if (_SEGGER_RTT.aDown[BufferIndex].pBuffer == NULL) {
+    if (_SEGGER_RTT.aDown[BufferIndex].buffer_ptr == NULL) {
       break;
     }
     BufferIndex++;
   } while (BufferIndex < _SEGGER_RTT.MaxNumDownBuffers);
   if (BufferIndex < _SEGGER_RTT.MaxNumDownBuffers) {
     _SEGGER_RTT.aDown[BufferIndex].sName        = sName;
-    _SEGGER_RTT.aDown[BufferIndex].pBuffer      = (char*)pBuffer;
+    _SEGGER_RTT.aDown[BufferIndex].buffer_ptr      = (char*)buffer_ptr;
     _SEGGER_RTT.aDown[BufferIndex].SizeOfBuffer = BufferSize;
     _SEGGER_RTT.aDown[BufferIndex].RdOff        = 0u;
     _SEGGER_RTT.aDown[BufferIndex].WrOff        = 0u;
@@ -1554,7 +1554,7 @@ int SEGGER_RTT_AllocDownBuffer(const char* sName, void* pBuffer, unsigned Buffer
 *
 *  Parameters
 *    sName        Pointer to a constant name string.
-*    pBuffer      Pointer to a buffer to be used.
+*    buffer_ptr      Pointer to a buffer to be used.
 *    BufferSize   Size of the buffer.
 *    Flags        Operating modes. Define behavior if buffer is full (not enough space for entire message).
 *
@@ -1562,21 +1562,21 @@ int SEGGER_RTT_AllocDownBuffer(const char* sName, void* pBuffer, unsigned Buffer
 *    >= 0 - O.K. Buffer Index
 *     < 0 - Error
 */
-int SEGGER_RTT_AllocUpBuffer(const char* sName, void* pBuffer, unsigned BufferSize, unsigned Flags) {
+int SEGGER_RTT_AllocUpBuffer(const char* sName, void* buffer_ptr, unsigned BufferSize, unsigned Flags) {
   int BufferIndex;
 
   INIT();
   SEGGER_RTT_LOCK();
   BufferIndex = 0;
   do {
-    if (_SEGGER_RTT.aUp[BufferIndex].pBuffer == NULL) {
+    if (_SEGGER_RTT.aUp[BufferIndex].buffer_ptr == NULL) {
       break;
     }
     BufferIndex++;
   } while (BufferIndex < _SEGGER_RTT.MaxNumUpBuffers);
   if (BufferIndex < _SEGGER_RTT.MaxNumUpBuffers) {
     _SEGGER_RTT.aUp[BufferIndex].sName        = sName;
-    _SEGGER_RTT.aUp[BufferIndex].pBuffer      = (char*)pBuffer;
+    _SEGGER_RTT.aUp[BufferIndex].buffer_ptr      = (char*)buffer_ptr;
     _SEGGER_RTT.aUp[BufferIndex].SizeOfBuffer = BufferSize;
     _SEGGER_RTT.aUp[BufferIndex].RdOff        = 0u;
     _SEGGER_RTT.aUp[BufferIndex].WrOff        = 0u;
@@ -1600,7 +1600,7 @@ int SEGGER_RTT_AllocUpBuffer(const char* sName, void* pBuffer, unsigned BufferSi
 *  Parameters
 *    BufferIndex  Index of the buffer to configure.
 *    sName        Pointer to a constant name string.
-*    pBuffer      Pointer to a buffer to be used.
+*    buffer_ptr      Pointer to a buffer to be used.
 *    BufferSize   Size of the buffer.
 *    Flags        Operating modes. Define behavior if buffer is full (not enough space for entire message).
 *
@@ -1613,7 +1613,7 @@ int SEGGER_RTT_AllocUpBuffer(const char* sName, void* pBuffer, unsigned BufferSi
 *    May only be called once per buffer.
 *    Buffer name and flags can be reconfigured using the appropriate functions.
 */
-int SEGGER_RTT_ConfigUpBuffer(unsigned BufferIndex, const char* sName, void* pBuffer, unsigned BufferSize, unsigned Flags) {
+int SEGGER_RTT_ConfigUpBuffer(unsigned BufferIndex, const char* sName, void* buffer_ptr, unsigned BufferSize, unsigned Flags) {
   int r;
 
   INIT();
@@ -1621,7 +1621,7 @@ int SEGGER_RTT_ConfigUpBuffer(unsigned BufferIndex, const char* sName, void* pBu
     SEGGER_RTT_LOCK();
     if (BufferIndex > 0u) {
       _SEGGER_RTT.aUp[BufferIndex].sName        = sName;
-      _SEGGER_RTT.aUp[BufferIndex].pBuffer      = (char*)pBuffer;
+      _SEGGER_RTT.aUp[BufferIndex].buffer_ptr      = (char*)buffer_ptr;
       _SEGGER_RTT.aUp[BufferIndex].SizeOfBuffer = BufferSize;
       _SEGGER_RTT.aUp[BufferIndex].RdOff        = 0u;
       _SEGGER_RTT.aUp[BufferIndex].WrOff        = 0u;
@@ -1647,7 +1647,7 @@ int SEGGER_RTT_ConfigUpBuffer(unsigned BufferIndex, const char* sName, void* pBu
 *  Parameters
 *    BufferIndex  Index of the buffer to configure.
 *    sName        Pointer to a constant name string.
-*    pBuffer      Pointer to a buffer to be used.
+*    buffer_ptr      Pointer to a buffer to be used.
 *    BufferSize   Size of the buffer.
 *    Flags        Operating modes. Define behavior if buffer is full (not enough space for entire message).
 *
@@ -1660,7 +1660,7 @@ int SEGGER_RTT_ConfigUpBuffer(unsigned BufferIndex, const char* sName, void* pBu
 *    May only be called once per buffer.
 *    Buffer name and flags can be reconfigured using the appropriate functions.
 */
-int SEGGER_RTT_ConfigDownBuffer(unsigned BufferIndex, const char* sName, void* pBuffer, unsigned BufferSize, unsigned Flags) {
+int SEGGER_RTT_ConfigDownBuffer(unsigned BufferIndex, const char* sName, void* buffer_ptr, unsigned BufferSize, unsigned Flags) {
   int r;
 
   INIT();
@@ -1668,7 +1668,7 @@ int SEGGER_RTT_ConfigDownBuffer(unsigned BufferIndex, const char* sName, void* p
     SEGGER_RTT_LOCK();
     if (BufferIndex > 0u) {
       _SEGGER_RTT.aDown[BufferIndex].sName        = sName;
-      _SEGGER_RTT.aDown[BufferIndex].pBuffer      = (char*)pBuffer;
+      _SEGGER_RTT.aDown[BufferIndex].buffer_ptr      = (char*)buffer_ptr;
       _SEGGER_RTT.aDown[BufferIndex].SizeOfBuffer = BufferSize;
       _SEGGER_RTT.aDown[BufferIndex].RdOff        = 0u;
       _SEGGER_RTT.aDown[BufferIndex].WrOff        = 0u;

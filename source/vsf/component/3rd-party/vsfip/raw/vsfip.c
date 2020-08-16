@@ -24,9 +24,10 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSFIP_CLASS_IMPLEMENT
 #include "kernel/vsf_kernel.h"
 #include "./vsfip.h"
 
@@ -44,7 +45,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct __vsfip_t {
+typedef struct vsfip_t {
     vsf_slist_t netif_list;
 
     vsf_slist_t udp_list;
@@ -61,27 +62,26 @@ struct __vsfip_t {
 #endif
     uint16_t ip_id;
     uint32_t tsn;
-};
-typedef struct __vsfip_t __vsfip_t;
+} vsfip_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT __vsfip_t __vsfip;
+static NO_INIT vsfip_t __vsfip;
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vsfip_ip4_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
-static vsf_err_t vsfip_ip6_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
-static void vsfip_icmp_input(vsfip_netbuf_t *netbuf);
+static vsf_err_t __vsfip_ip4_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
+static vsf_err_t __vsfip_ip6_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
+static void __vsfip_icmp_input(vsfip_netbuf_t *netbuf);
 
-void vsfip_udp_input(vsfip_netbuf_t *netbuf);
-static void vsfip_udp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
+static void __vsfip_udp_input(vsfip_netbuf_t *netbuf);
+static void __vsfip_udp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
 
 #if VSFIP_CFG_TCP_EN == ENABLED
-static void vsfip_tcp_socket_disable(vsfip_socket_t *socket);
-void vsfip_tcp_input(vsfip_netbuf_t *netbuf);
-static void vsfip_tcp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
+static void __vsfip_tcp_socket_disable(vsfip_socket_t *socket);
+static void __vsfip_tcp_input(vsfip_netbuf_t *netbuf);
+static void __vsfip_tcp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf);
 #endif
 
 extern vsfip_socket_t * vsfip_mem_socket_get(void);
@@ -143,7 +143,7 @@ void vsfip_mem_netbuf_free(vsfip_netbuf_t *netbuf)
 #endif
 
 // socket buffer
-static vsfip_socket_t * vsfip_socket_get(void)
+static vsfip_socket_t * __vsfip_socket_get(void)
 {
     vsfip_socket_t *socket = vsfip_mem_socket_get();
     if (socket != NULL) {
@@ -153,7 +153,7 @@ static vsfip_socket_t * vsfip_socket_get(void)
     return socket;
 }
 
-static void vsfip_socket_free(vsfip_socket_t *socket)
+static void __vsfip_socket_free(vsfip_socket_t *socket)
 {
     if (socket != NULL) {
         if (socket->netif != NULL) {
@@ -180,7 +180,7 @@ void vsfip_socket_set_netif(vsfip_socket_t *socket, vsfip_netif_t *netif)
 
 #if VSFIP_CFG_TCP_EN == ENABLED
 // tcp pcb buffer
-static vsfip_tcp_pcb_t* vsfip_tcp_pcb_get(void)
+static vsfip_tcp_pcb_t* __vsfip_tcp_pcb_get(void)
 {
     vsfip_tcp_pcb_t *tcp_pcb = vsfip_mem_tcp_pcb_get();
     if (tcp_pcb != NULL) {
@@ -189,7 +189,7 @@ static vsfip_tcp_pcb_t* vsfip_tcp_pcb_get(void)
     return tcp_pcb;
 }
 
-static void vsfip_tcp_pcb_free(vsfip_tcp_pcb_t *pcb)
+static void __vsfip_tcp_pcb_free(vsfip_tcp_pcb_t *pcb)
 {
     if (pcb != NULL) {
         vsfip_mem_tcp_pcb_free(pcb);
@@ -207,8 +207,8 @@ vsfip_netbuf_t * vsfip_netbuf_get(uint32_t size)
         memset(netbuf, 0, sizeof(*netbuf));
         netbuf->buffer = buffer;
         netbuf->ref = 1;
-        netbuf->buf.pchBuffer = netbuf->app.pchBuffer = netbuf->buffer + VSFIP_PROTO_HEADLEN;
-        netbuf->buf.nSize = netbuf->app.nSize = size;
+        netbuf->buf.buffer_ptr = netbuf->app.buffer_ptr = netbuf->buffer + VSFIP_PROTO_HEADLEN;
+        netbuf->buf.s32_size = netbuf->app.s32_size = size;
     }
     return netbuf;
 }
@@ -265,41 +265,41 @@ void vsfip_netbuf_set_netif(vsfip_netbuf_t *netbuf, vsfip_netif_t *netif)
 
 uint8_t * vsfip_netbuf_header(vsfip_netbuf_t *netbuf, int_fast16_t head_size)
 {
-    uint32_t cur_header_len = &netbuf->app.pchBuffer[netbuf->pos] - netbuf->buf.pchBuffer;
+    uint32_t cur_header_len = &netbuf->app.buffer_ptr[netbuf->pos] - netbuf->buf.buffer_ptr;
     bool backup = netbuf->pos > 0;
 
     if (    ((head_size > 0) && backup && ((cur_header_len + head_size) > VSFIP_PROTO_HEADLEN))
-        ||  ((head_size < 0) && (netbuf->buf.nSize < -head_size))) {
+        ||  ((head_size < 0) && (netbuf->buf.s32_size < -head_size))) {
         return NULL;
     }
 
-    netbuf->buf.pchBuffer -= head_size;
-    netbuf->buf.nSize += head_size;
+    netbuf->buf.buffer_ptr -= head_size;
+    netbuf->buf.s32_size += head_size;
 
     if ((head_size > 0) && backup) {
         cur_header_len += head_size;
         memcpy(netbuf->buffer + VSFIP_PROTO_HEADLEN - cur_header_len,
-                netbuf->buf.pchBuffer, head_size);
+                netbuf->buf.buffer_ptr, head_size);
     }
-    return netbuf->buf.pchBuffer;
+    return netbuf->buf.buffer_ptr;
 }
 
 // bufq
-static void vsfip_bufq_free(vsf_slist_queue_t *queue)
+static void __vsfip_bufq_free(vsf_dlist_t *queue)
 {
     vsfip_netbuf_t *netbuf;
-    while (!vsf_slist_queue_is_empty(queue)) {
-        vsf_slist_queue_dequeue(vsfip_netbuf_t, proto_node, queue, netbuf);
+    while (!vsf_dlist_is_empty(queue)) {
+        vsf_dlist_queue_dequeue(vsfip_netbuf_t, proto_node, queue, netbuf);
         vsfip_netbuf_deref(netbuf);
     }
 }
 
-static uint_fast32_t vsfip_bufq_len(vsf_slist_queue_t *queue)
+static uint_fast32_t __vsfip_bufq_len(vsf_dlist_t *queue)
 {
     uint_fast32_t len = 0;
 
-    __vsf_slist_foreach_unsafe(vsfip_netbuf_t, proto_node, (vsf_slist_t *)queue) {
-        len += _->app.nSize;
+    __vsf_dlist_foreach_unsafe(vsfip_netbuf_t, proto_node, (vsf_slist_t *)queue) {
+        len += _->app.s32_size;
     }
     return len;
 }
@@ -322,7 +322,7 @@ vsf_err_t vsfip_netif_add(vsfip_netif_t *netif)
     return VSF_ERR_NONE;
 }
 
-static void vsfip_netif_cleanup_socket(vsfip_netif_t *netif)
+static void __vsfip_netif_cleanup_socket(vsfip_netif_t *netif)
 {
     vsf_sched_lock_status_t origlevel = vsf_sched_lock();
 
@@ -335,13 +335,13 @@ static void vsfip_netif_cleanup_socket(vsfip_netif_t *netif)
 #if VSFIP_CFG_TCP_EN == ENABLED
         __vsf_slist_foreach_unsafe(vsfip_socket_t, node, &__vsfip.tcp_list) {
             if (_->netif == netif) {
-                vsfip_tcp_socket_disable(_);
+                __vsfip_tcp_socket_disable(_);
             }
 
             vsf_slist_t *child_list = &_->listener.child;
             __vsf_slist_foreach_unsafe(vsfip_socket_t, node, child_list) {
                 if (_->netif == netif) {
-                    vsfip_tcp_socket_disable(_);
+                    __vsfip_tcp_socket_disable(_);
                 }
             }
         }
@@ -356,7 +356,7 @@ vsf_err_t vsfip_netif_remove(vsfip_netif_t *netif)
     vsf_sched_unlock(origlevel);
 
     if (netif != NULL) {
-        vsfip_netif_cleanup_socket(netif);
+        __vsfip_netif_cleanup_socket(netif);
         vsfip_netif_fini(netif);
 #ifdef VSFIP_TRACE_NETIF
         vsf_trace(VSF_TRACE_DEBUG, "netif deref");
@@ -376,7 +376,7 @@ vsfip_netif_t * vsfip_ip_route_imp(vsfip_ipaddr_t *addr)
 #endif
 
 // vsfip_ip_route MUST be called protected
-static vsfip_netif_t * vsfip_ip_route(vsfip_ipaddr_t *addr)
+static vsfip_netif_t * __vsfip_ip_route(vsfip_ipaddr_t *addr)
 {
     __vsf_slist_foreach_unsafe(vsfip_netif_t, node, &__vsfip.netif_list) {
         if ((_->op->routable != NULL) && _->op->routable(_, addr)) {
@@ -386,22 +386,22 @@ static vsfip_netif_t * vsfip_ip_route(vsfip_ipaddr_t *addr)
     return vsfip_ip_route_imp(addr);
 }
 
-static void vsfip_netbuf_route(vsfip_socket_t *socket,
+static void __vsfip_netbuf_route(vsfip_socket_t *socket,
         vsfip_netbuf_t *netbuf, vsfip_ipaddr_t *addr)
 {
     ASSERT(socket != NULL);
     vsf_sched_lock_status_t origlevel = vsf_sched_lock();
         vsfip_netbuf_set_netif(netbuf,
-            (socket->netif != NULL) ? socket->netif : vsfip_ip_route(addr));
+            (socket->netif != NULL) ? socket->netif : __vsfip_ip_route(addr));
     vsf_sched_unlock(origlevel);
 }
 
-static void vsfip_socket_route(vsfip_socket_t *socket, vsfip_ipaddr_t *addr)
+static void __vsfip_socket_route(vsfip_socket_t *socket, vsfip_ipaddr_t *addr)
 {
     ASSERT(socket != NULL);
     if (!socket->netif) {
         vsf_sched_lock_status_t origlevel = vsf_sched_lock();
-            vsfip_socket_set_netif(socket, vsfip_ip_route(addr));
+            vsfip_socket_set_netif(socket, __vsfip_ip_route(addr));
         vsf_sched_unlock(origlevel);
     }
 }
@@ -444,7 +444,7 @@ vsf_err_t vsfip_fini(void)
     return VSF_ERR_NONE;
 }
 
-static uint_fast16_t vsfip_checksum(uint8_t *data, uint16_t len)
+static uint_fast16_t __vsfip_checksum(uint8_t *data, uint16_t len)
 {
     uint_fast32_t checksum = 0;
 
@@ -461,38 +461,38 @@ static uint_fast16_t vsfip_checksum(uint8_t *data, uint16_t len)
     return (uint_fast16_t)checksum;
 }
 
-static uint_fast16_t vsfip_proto_checksum(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static uint_fast16_t __vsfip_proto_checksum(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
-    uint_fast32_t checksum = vsfip_checksum(netbuf->buf.pchBuffer, netbuf->buf.nSize);
+    uint_fast32_t checksum = __vsfip_checksum(netbuf->buf.buffer_ptr, netbuf->buf.s32_size);
     vsfip_ipaddr_t *local_addr = &netbuf->netif->ip4addr;
     vsfip_ipaddr_t *remote_addr = &socket->remote_sockaddr.addr;
 
-    checksum += get_unaligned_le16(&local_addr->addr_buf[0]);
-    checksum += get_unaligned_le16(&local_addr->addr_buf[2]);
-    checksum += get_unaligned_le16(&remote_addr->addr_buf[0]);
-    checksum += get_unaligned_le16(&remote_addr->addr_buf[2]);
+    checksum += get_unaligned_be16(&local_addr->addr_buf[0]);
+    checksum += get_unaligned_be16(&local_addr->addr_buf[2]);
+    checksum += get_unaligned_be16(&remote_addr->addr_buf[0]);
+    checksum += get_unaligned_be16(&remote_addr->addr_buf[2]);
     checksum += socket->protocol;
-    checksum += netbuf->buf.nSize;
+    checksum += netbuf->buf.s32_size;
     checksum = (checksum & 0xFFFF) + (checksum >> 16);
     checksum = (checksum & 0xFFFF) + (checksum >> 16);
     return (uint_fast16_t)checksum;
 }
 
 // ip
-static bool vsfip_ip_is_match(vsfip_ipaddr_t *addr1, vsfip_ipaddr_t *addr2)
+static bool __vsfip_ip_is_match(vsfip_ipaddr_t *addr1, vsfip_ipaddr_t *addr2)
 {
     return  (addr1->size == addr2->size)
         &&  !memcmp(addr1->addr_buf, addr2->addr_buf, addr1->size);
 }
 
-static vsf_err_t vsfip_ip_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static vsf_err_t __vsfip_ip_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     return (AF_INET == socket->family) ?
-                vsfip_ip4_output(socket, netbuf) : vsfip_ip6_output(socket, netbuf);
+                __vsfip_ip4_output(socket, netbuf) : __vsfip_ip6_output(socket, netbuf);
 }
 
 // ipv4
-static vsfip_netbuf_t * vsfip_ip4_reass(vsfip_netbuf_t *netbuf)
+static vsfip_netbuf_t * __vsfip_ip4_reass(vsfip_netbuf_t *netbuf)
 {
     // TODO: add ip_reass support
 //    if (netbuf->iphead.ip4head->offset & (VSFIP_IPH_MF | VSFIP_IPH_OFFSET_MASK))
@@ -504,7 +504,7 @@ static vsfip_netbuf_t * vsfip_ip4_reass(vsfip_netbuf_t *netbuf)
     return netbuf;
 }
 
-static bool vsfip_ip4_is_broadcast(vsfip_ipaddr_t *addr, vsfip_netif_t *netif)
+static bool __vsfip_ip4_is_broadcast(vsfip_ipaddr_t *addr, vsfip_netif_t *netif)
 {
     uint_fast32_t addr32 = addr->addr32;
     uint_fast32_t netmask32 = netif->netmask.addr32;
@@ -516,15 +516,15 @@ static bool vsfip_ip4_is_broadcast(vsfip_ipaddr_t *addr, vsfip_netif_t *netif)
 }
 
 #if VSFIP_CFG_IP_FORWORD_EN == ENABLED
-static void vsfip_ip4_forward(vsfip_netbuf_t *netbuf,
+static void __vsfip_ip4_forward(vsfip_netbuf_t *netbuf,
                     vsfip_addr_t *addr, vsfip_netif_t *netif_in)
 {
-    vsfip_ip4head_t *iphead = netbuf->buf.pObj;
+    vsfip_ip4head_t *iphead = netbuf->buf.obj_ptr;
     uint_fast32_t checksum;
 
     // TODO: skip for link-local address
 
-    netbuf->netif = vsfip_ip_route(addr);
+    netbuf->netif = __vsfip_ip_route(addr);
     if ((NULL == netbuf->netif) || (netbuf->netif == netif_in) || !--iphead->ttl) {
         goto release_buf;
     }
@@ -544,12 +544,12 @@ release_buf:
 
 void vsfip_ip4_input(vsfip_netbuf_t *netbuf)
 {
-    vsfip_ip4_head_t *ip4head = netbuf->buf.pObj;
+    vsfip_ip4_head_t *ip4head = netbuf->buf.obj_ptr;
     vsfip_ipaddr_t ipaddr;
     uint_fast16_t iph_hlen = VSFIP_IP4H_HLEN(ip4head) * 4;
 
     // ip header check
-    if (vsfip_checksum((uint8_t *)ip4head, iph_hlen) != 0xFFFF) {
+    if (__vsfip_checksum((uint8_t *)ip4head, iph_hlen) != 0xFFFF) {
         goto release_buf;
     }
 
@@ -557,11 +557,11 @@ void vsfip_ip4_input(vsfip_netbuf_t *netbuf)
     ipaddr.addr32 = ip4head->ipdest;
     // forward ip if not for us:
     //         not boradcast and netif->ipaddr is valid and ipaddr not match
-    if (    !vsfip_ip4_is_broadcast(&ipaddr, netbuf->netif)
+    if (    !__vsfip_ip4_is_broadcast(&ipaddr, netbuf->netif)
         &&  (netbuf->netif->ip4addr.size > 0)
-        &&  !vsfip_ip_is_match(&ipaddr, &netbuf->netif->ip4addr)) {
+        &&  !__vsfip_ip_is_match(&ipaddr, &netbuf->netif->ip4addr)) {
 #if VSFIP_CFG_IP_FORWORD_EN == ENABLED
-        vsfip_ip4_forward(netbuf, &ipaddr, netif);
+        __vsfip_ip4_forward(netbuf, &ipaddr, netif);
 #else
         goto release_buf;
 #endif
@@ -575,15 +575,15 @@ void vsfip_ip4_input(vsfip_netbuf_t *netbuf)
     ip4head->checksum = be16_to_cpu(ip4head->checksum);
     if (    (VSFIP_IP4H_V(ip4head) != 4)
         ||  (iph_hlen > ip4head->len)
-        ||  (ip4head->len > netbuf->buf.nSize)) {
+        ||  (ip4head->len > netbuf->buf.s32_size)) {
         goto release_buf;
     }
-    netbuf->buf.nSize = ip4head->len - iph_hlen;
-    netbuf->buf.pchBuffer += iph_hlen;
+    netbuf->buf.s32_size = ip4head->len - iph_hlen;
+    netbuf->buf.buffer_ptr += iph_hlen;
 
     // ip reassembly
     if (!(ip4head->offset & VSFIP_IPH_DF)) {
-        netbuf = vsfip_ip4_reass(netbuf);
+        netbuf = __vsfip_ip4_reass(netbuf);
         if (NULL == netbuf) {
             return;
         }
@@ -596,15 +596,15 @@ void vsfip_ip4_input(vsfip_netbuf_t *netbuf)
 */    {
         switch (ip4head->proto) {
         case IPPROTO_UDP:
-            vsfip_udp_input(netbuf);
+            __vsfip_udp_input(netbuf);
             break;
 #if VSFIP_CFG_TCP_EN == ENABLED
         case IPPROTO_TCP:
-            vsfip_tcp_input(netbuf);
+            __vsfip_tcp_input(netbuf);
             break;
 #endif
         case IPPROTO_ICMP:
-            vsfip_icmp_input(netbuf);
+            __vsfip_icmp_input(netbuf);
             break;
         default:
             goto release_buf;
@@ -616,30 +616,30 @@ release_buf:
     vsfip_netbuf_deref(netbuf);
 }
 
-static void vsfip_add_ip4head_common(vsfip_netbuf_t *ipbuf)
+static void __vsfip_add_ip4head_common(vsfip_netbuf_t *ipbuf)
 {
     vsfip_ip4_head_t *ip4head = ipbuf->iphead.ip4head;
     uint_fast32_t iph_hlen = VSFIP_IP4H_HLEN(ip4head) * 4;
-    uint_fast32_t payload_len = ipbuf->buf.nSize - iph_hlen;
+    uint_fast32_t payload_len = ipbuf->buf.s32_size - iph_hlen;
     uint_fast16_t mtu = vsfip_netif_mtu(ipbuf->netif);
     uint_fast16_t offset, checksum;
     bool fragement = false;
 
-    if (ipbuf->buf.nSize > mtu) {
+    if (ipbuf->buf.s32_size > mtu) {
         payload_len = ((mtu - iph_hlen) >> 3) << 3;
-        ipbuf->buf.nSize = payload_len + iph_hlen;
+        ipbuf->buf.s32_size = payload_len + iph_hlen;
         fragement = true;
     }
 
-    ip4head->len = cpu_to_be16(ipbuf->buf.nSize);
+    ip4head->len = cpu_to_be16(ipbuf->buf.s32_size);
     offset = (ipbuf->pos >> 3) | (fragement ? VSFIP_IPH_MF : 0);
     ip4head->offset = cpu_to_be16(offset);
     ip4head->checksum = cpu_to_be16(0);
-    checksum = ~vsfip_checksum((uint8_t *)ip4head, sizeof(*ip4head));
+    checksum = ~__vsfip_checksum((uint8_t *)ip4head, sizeof(*ip4head));
     ip4head->checksum = cpu_to_be16(checksum);
 }
 
-static vsf_err_t vsfip_add_ip4head(vsfip_socket_t *socket, vsfip_netbuf_t *ipbuf)
+static vsf_err_t __vsfip_add_ip4head(vsfip_socket_t *socket, vsfip_netbuf_t *ipbuf)
 {
     vsfip_ip_pcb_t *pcb = &socket->pcb.ip_pcb;
     vsfip_ip4_head_t *ip4head;
@@ -648,7 +648,7 @@ static vsf_err_t vsfip_add_ip4head(vsfip_socket_t *socket, vsfip_netbuf_t *ipbuf
         return VSF_ERR_FAIL;
     }
 
-    ip4head = ipbuf->iphead.ip4head = ipbuf->buf.pObj;
+    ip4head = ipbuf->iphead.ip4head = ipbuf->buf.obj_ptr;
     ip4head->ver_hl = 0x45;        // IPv4 and 5 dwrod header len
     ip4head->tos = 0;
     ip4head->id = cpu_to_be16(pcb->id);
@@ -656,7 +656,7 @@ static vsf_err_t vsfip_add_ip4head(vsfip_socket_t *socket, vsfip_netbuf_t *ipbuf
     ip4head->proto = (uint8_t)socket->protocol;
     ip4head->ipsrc = ipbuf->netif->ip4addr.addr32;
     ip4head->ipdest = socket->remote_sockaddr.addr.addr32;
-    vsfip_add_ip4head_common(ipbuf);
+    __vsfip_add_ip4head_common(ipbuf);
     return VSF_ERR_NONE;
 }
 
@@ -664,51 +664,53 @@ void vsfip_ipbuf_on_finish(vsfip_netbuf_t *netbuf, vsf_err_t err)
 {
     bool backup = netbuf->pos > 0;
     uint8_t *pbackup = netbuf->buffer + VSFIP_PROTO_HEADLEN;
-    uint8_t *cur_app = &netbuf->app.pchBuffer[netbuf->pos];
+    uint8_t *cur_app = &netbuf->app.buffer_ptr[netbuf->pos];
     uint8_t iphead[32];
 
     memcpy(iphead, netbuf->iphead.ip4head, sizeof(iphead));
     // recover payload data(over-wriitten by headers) if netbuf will not be freed
     if (backup) {
-        uint_fast32_t header_len = cur_app - netbuf->buf.pchBuffer;
-        memcpy(netbuf->buf.pchBuffer, pbackup - header_len, header_len);
+        uint_fast32_t header_len = cur_app - netbuf->buf.buffer_ptr;
+        memcpy(netbuf->buf.buffer_ptr, pbackup - header_len, header_len);
     }
 
-    netbuf->pos = &netbuf->buf.pchBuffer[netbuf->buf.nSize] - netbuf->app.pchBuffer;
-    if (err || (netbuf->pos >= netbuf->app.nSize)) {
+    netbuf->pos = &netbuf->buf.buffer_ptr[netbuf->buf.s32_size] - netbuf->app.buffer_ptr;
+    if (err || (netbuf->pos >= netbuf->app.s32_size)) {
         vsfip_netbuf_deref(netbuf);
     } else {
         uint_fast32_t iph_hlen = VSFIP_IP4H_HLEN((vsfip_ip4_head_t *)iphead) * 4;
 
-        netbuf->buf.pchBuffer = &netbuf->app.pchBuffer[netbuf->pos];
-        netbuf->buf.nSize = &netbuf->app.pchBuffer[netbuf->app.nSize] - netbuf->buf.pchBuffer;
+        netbuf->buf.buffer_ptr = &netbuf->app.buffer_ptr[netbuf->pos];
+        netbuf->buf.s32_size = &netbuf->app.buffer_ptr[netbuf->app.s32_size] - netbuf->buf.buffer_ptr;
 
         vsfip_netbuf_header(netbuf, iph_hlen);
-        memcpy(netbuf->buf.pchBuffer, iphead, iph_hlen);
-        netbuf->iphead.ip4head = netbuf->buf.pObj;
+        memcpy(netbuf->buf.buffer_ptr, iphead, iph_hlen);
+        netbuf->iphead.ip4head = netbuf->buf.obj_ptr;
 
-        vsfip_add_ip4head_common(netbuf);
+        __vsfip_add_ip4head_common(netbuf);
         vsfip_netif_ip_output(netbuf, true);
     }
 }
 
-static vsf_err_t vsfip_ip4_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static vsf_err_t __vsfip_ip4_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     vsfip_ip_pcb_t *pcb = &socket->pcb.ip_pcb;
     vsf_err_t err;
     vsf_sched_lock_status_t origlevel;
 
-    vsfip_netbuf_route(socket, netbuf, &socket->remote_sockaddr.addr);
     if (NULL == netbuf->netif) {
-        err = VSF_ERR_FAIL;
-        goto cleanup;
+        __vsfip_netbuf_route(socket, netbuf, &socket->remote_sockaddr.addr);
+        if (NULL == netbuf->netif) {
+            err = VSF_ERR_FAIL;
+            goto cleanup;
+        }
     }
 
     origlevel = vsf_sched_lock();
         pcb->id = __vsfip.ip_id++;
     vsf_sched_unlock(origlevel);
 
-    err = vsfip_add_ip4head(socket, netbuf);
+    err = __vsfip_add_ip4head(socket, netbuf);
     if (err) { goto cleanup; }
 
     return vsfip_netif_ip_output(netbuf, false);
@@ -723,7 +725,7 @@ void vsfip_ip6_input(vsfip_netbuf_t *netbuf)
     vsfip_netbuf_deref(netbuf);
 }
 
-static vsf_err_t vsfip_ip6_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static vsf_err_t __vsfip_ip6_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     vsfip_netbuf_deref(netbuf);
     return VSF_ERR_NONE;
@@ -732,24 +734,24 @@ static vsf_err_t vsfip_ip6_output(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf
 // socket layer
 vsfip_socket_t * vsfip_socket(vsfip_sock_familt_t family, vsfip_sock_proto_t protocol)
 {
-    vsfip_socket_t *socket = vsfip_socket_get();
+    vsfip_socket_t *socket = __vsfip_socket_get();
 
     if (socket != NULL) {
         memset(socket, 0, sizeof(vsfip_socket_t));
         socket->family = family;
         socket->protocol = protocol;
-        vsf_slist_queue_init(&socket->input_queue);
-        vsf_slist_queue_init(&socket->output_queue);
+        vsf_dlist_init(&socket->input_queue);
+        vsf_dlist_init(&socket->output_queue);
         vsf_eda_sem_init(&socket->input_sem, 0);
 
 #if VSFIP_CFG_TCP_EN == ENABLED
         if (IPPROTO_TCP == protocol) {
             socket->can_rx = true;
-            socket->proto_callback.on_input = vsfip_tcp_socket_input;
+            socket->proto_callback.on_input = __vsfip_tcp_socket_input;
 
-            vsfip_tcp_pcb_t *pcb = vsfip_tcp_pcb_get();
+            vsfip_tcp_pcb_t *pcb = __vsfip_tcp_pcb_get();
             if (NULL == pcb) {
-                vsfip_socket_free(socket);
+                __vsfip_socket_free(socket);
                 return NULL;
             }
             memset(pcb, 0, sizeof(vsfip_tcp_pcb_t));
@@ -761,20 +763,18 @@ vsfip_socket_t * vsfip_socket(vsfip_sock_familt_t family, vsfip_sock_proto_t pro
         } else
 #endif
         if (IPPROTO_UDP == protocol) {
-            socket->proto_callback.on_input = vsfip_udp_socket_input;
+            socket->proto_callback.on_input = __vsfip_udp_socket_input;
         }
     }
 
     return socket;
 }
 
-static vsfip_socket_t * vsfip_child_socket(
-            vsfip_socket_t *father, vsfip_sock_addr_t *sockaddr)
+static vsfip_socket_t * __vsfip_child_socket(vsfip_socket_t *father, vsfip_sock_addr_t *sockaddr)
 {
     vsfip_socket_t *socket_new = vsfip_socket(father->family, father->protocol);
 
-    if (socket_new != NULL)
-    {
+    if (socket_new != NULL) {
         socket_new->can_rx = father->can_rx;
         socket_new->tx_timeout_ms = father->tx_timeout_ms;
         socket_new->rx_timeout_ms = father->rx_timeout_ms;
@@ -786,7 +786,7 @@ static vsfip_socket_t * vsfip_child_socket(
     return socket_new;
 }
 
-static vsf_err_t vsfip_free_socket(vsfip_socket_t *socket)
+static vsf_err_t __vsfip_free_socket(vsfip_socket_t *socket)
 {
     vsf_slist_t *list;
 
@@ -809,8 +809,8 @@ static vsf_err_t vsfip_free_socket(vsfip_socket_t *socket)
     vsf_sched_unlock(origlevel);
 
     // remove pending incoming buffer
-    vsfip_bufq_free(&socket->input_queue);
-    vsfip_bufq_free(&socket->output_queue);
+    __vsfip_bufq_free(&socket->input_queue);
+    __vsfip_bufq_free(&socket->output_queue);
 
 #if VSFIP_CFG_TCP_EN == ENABLED
     if ((IPPROTO_TCP == socket->protocol) && (socket->pcb.proto_pcb != NULL)) {
@@ -820,10 +820,10 @@ static vsf_err_t vsfip_free_socket(vsfip_socket_t *socket)
 //            vsfip_tcp_postevt(&tcppcb->rx_sm, VSFIP_EVT_TCP_CONNECTFAIL);
 //        }
 
-        vsfip_tcp_pcb_free(tcp_pcb);
+        __vsfip_tcp_pcb_free(tcp_pcb);
     }
 #endif
-    vsfip_socket_free(socket);
+    __vsfip_socket_free(socket);
     return VSF_ERR_NONE;
 }
 
@@ -842,10 +842,10 @@ vsf_err_t vsfip_close(vsfip_socket_t *socket)
         }
 
         if (father->listener.closing && !father->listener.accepted_num) {
-            vsfip_free_socket(father);
+            __vsfip_free_socket(father);
         }
     }
-    return vsfip_free_socket(socket);
+    return __vsfip_free_socket(socket);
 }
 
 void vsfip_socket_cb(vsfip_socket_t *socket,
@@ -921,7 +921,7 @@ vsf_err_t vsfip_listen(vsfip_socket_t *socket, uint_fast8_t backlog)
 
 // proto common
 // TODO: fix for IPv6
-static void vsfip_proto_input(vsf_slist_t *list, vsfip_netbuf_t *netbuf, vsfip_proto_port_t *port)
+static void __vsfip_proto_input(vsf_slist_t *list, vsfip_netbuf_t *netbuf, vsfip_proto_port_t *port)
 {
     vsfip_ip4_head_t *iphead = netbuf->iphead.ip4head;
     vsfip_sock_addr_t *remote_addr, *local_addr;
@@ -977,20 +977,20 @@ discard_buffer:
 }
 
 // UDP
-static void vsfip_udp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static void __vsfip_udp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     if (socket->user_callback.on_input != NULL) {
         socket->user_callback.on_input(socket->user_callback.param, netbuf);
     } else {
         netbuf->ttl = VSFIP_CFG_TTL_INPUT;
-//        vsf_slist_append(vsfip_netbuf_t, proto_node, &socket->input_queue, netbuf);
+        vsf_dlist_queue_enqueue(vsfip_netbuf_t, proto_node, &socket->input_queue, netbuf);
         vsf_eda_sem_post(&socket->input_sem);
     }
 }
 
-void vsfip_udp_input(vsfip_netbuf_t *netbuf)
+static void __vsfip_udp_input(vsfip_netbuf_t *netbuf)
 {
-    vsfip_udp_head_t *udphead = netbuf->buf.pObj;
+    vsfip_udp_head_t *udphead = netbuf->buf.obj_ptr;
 
     // endian fix
     udphead->port.src = be16_to_cpu(udphead->port.src);
@@ -998,12 +998,12 @@ void vsfip_udp_input(vsfip_netbuf_t *netbuf)
     udphead->len = be16_to_cpu(udphead->len);
     udphead->checksum = be16_to_cpu(udphead->checksum);
 
-    netbuf->app.pchBuffer = netbuf->buf.pchBuffer + sizeof(vsfip_udp_head_t);
-    netbuf->app.nSize = netbuf->buf.nSize - sizeof(vsfip_udp_head_t);
-    vsfip_proto_input(&__vsfip.udp_list, netbuf, &udphead->port);
+    netbuf->app.buffer_ptr = netbuf->buf.buffer_ptr + sizeof(vsfip_udp_head_t);
+    netbuf->app.s32_size = netbuf->buf.s32_size - sizeof(vsfip_udp_head_t);
+    __vsfip_proto_input(&__vsfip.udp_list, netbuf, &udphead->port);
 }
 
-static vsf_err_t vsfip_add_udphead(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static vsf_err_t __vsfip_udp_add_head(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     vsfip_udp_head_t *udphead;
     uint_fast16_t checksum;
@@ -1012,20 +1012,26 @@ static vsf_err_t vsfip_add_udphead(vsfip_socket_t *socket, vsfip_netbuf_t *netbu
         return VSF_ERR_FAIL;
     }
 
-    vsfip_netbuf_route(socket, netbuf, &socket->remote_sockaddr.addr);
-    udphead = netbuf->buf.pObj;
+    // checksum need netif
+    if (NULL == netbuf->netif) {
+        __vsfip_netbuf_route(socket, netbuf, &socket->remote_sockaddr.addr);
+        if (NULL == netbuf->netif) {
+            return VSF_ERR_FAIL;
+        }
+    }
+
+    udphead = netbuf->buf.obj_ptr;
     udphead->port.src = cpu_to_be16(socket->local_sockaddr.port);
     udphead->port.dst = cpu_to_be16(socket->remote_sockaddr.port);
-    udphead->len = cpu_to_be16(netbuf->buf.nSize);
+    udphead->len = cpu_to_be16(netbuf->buf.s32_size);
     udphead->checksum = cpu_to_be16(0x0000);
 
-    checksum = ~vsfip_proto_checksum(socket, netbuf);
+    checksum = ~__vsfip_proto_checksum(socket, netbuf);
     udphead->checksum = cpu_to_be16(checksum);
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsfip_udp_async_send(vsfip_socket_t *socket,
-        vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t *netbuf)
+vsf_err_t vsfip_udp_async_send(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t *netbuf)
 {
     vsf_err_t err = VSF_ERR_NONE;
 
@@ -1045,10 +1051,10 @@ vsf_err_t vsfip_udp_async_send(vsfip_socket_t *socket,
     // add udp header
     netbuf->pos = 0;
     netbuf->buf = netbuf->app;
-    err = vsfip_add_udphead(socket, netbuf);
+    err = __vsfip_udp_add_head(socket, netbuf);
     if (err) { goto cleanup; }
 
-    err = vsfip_ip_output(socket, netbuf);
+    err = __vsfip_ip_output(socket, netbuf);
     if (!err && (socket->user_callback.on_outputted != NULL)) {
         socket->user_callback.on_outputted(socket->user_callback.param);
     }
@@ -1058,21 +1064,26 @@ cleanup:
     return err;
 }
 
+vsf_err_t vsfip_udp_send(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t *buf)
+{
+    return vsfip_udp_async_send(socket, sockaddr, buf);
+}
+
 // TODO: fix for IPv6
-static vsfip_netbuf_t * vsfip_udp_get_netbuf(vsfip_socket_t *socket, vsfip_sock_addr_t *addr)
+static vsfip_netbuf_t * __vsfip_udp_get_netbuf(vsfip_socket_t *socket, vsfip_sock_addr_t *addr)
 {
     vsfip_netbuf_t *netbuf = NULL;
     vsfip_ip4_head_t *iphead;
 
-    __vsf_slist_foreach_unsafe(vsfip_netbuf_t, proto_node, (vsf_slist_t *)&socket->input_queue) {
+    __vsf_dlist_foreach_unsafe(vsfip_netbuf_t, proto_node, &socket->input_queue) {
         iphead = _->iphead.ip4head;
         if (VSFIP_IPADDR_ANY == addr->addr.addr32) {
             addr->addr.addr32 = iphead->ipsrc;
         }
         if (addr->addr.addr32 == iphead->ipsrc) {
-//            vsf_slist_queue_remove(vsfip_netbuf_t, proto_node, &socket->input_queue, _);
-            _->app.pchBuffer = _->buf.pchBuffer + sizeof(vsfip_udp_head_t);
-            _->app.nSize = _->buf.nSize - sizeof(vsfip_udp_head_t);
+            vsf_dlist_remove(vsfip_netbuf_t, proto_node, &socket->input_queue, _);
+            _->app.buffer_ptr = _->buf.buffer_ptr + sizeof(vsfip_udp_head_t);
+            _->app.s32_size = _->buf.s32_size - sizeof(vsfip_udp_head_t);
             netbuf = _;
             break;
         }
@@ -1081,15 +1092,60 @@ static vsfip_netbuf_t * vsfip_udp_get_netbuf(vsfip_socket_t *socket, vsfip_sock_
     return netbuf;
 }
 
-vsf_err_t vsfip_udp_async_recv(vsfip_socket_t *socket,
-        vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t **netbuf)
+vsf_err_t vsfip_udp_async_recv(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t **netbuf)
 {
     if ((NULL == socket) || (NULL == sockaddr) || (NULL == netbuf) || !socket->local_sockaddr.port) {
         return VSF_ERR_INVALID_PARAMETER;
     }
     socket->remote_sockaddr = *sockaddr;
-    *netbuf = vsfip_udp_get_netbuf(socket, sockaddr);
+    *netbuf = __vsfip_udp_get_netbuf(socket, sockaddr);
     return *netbuf ? VSF_ERR_NONE : VSF_ERR_NOT_READY;
+}
+
+__vsf_component_peda_private_entry(__vsfip_udp_recv,
+    vsfip_sock_addr_t * sockaddr;
+    vsfip_netbuf_t ** netbuf;
+) {
+    vsfip_socket_t *socket = (vsfip_socket_t *)&vsf_this;
+    vsf_err_t err;
+
+    vsf_peda_begin();
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (VSF_ERR_NONE != vsf_eda_sem_pend(&socket->input_sem, vsf_systimer_ms_to_tick(socket->rx_timeout_ms))) {
+            break;
+        }
+        goto recv_udp_packet;
+    case VSF_EVT_SYNC:
+    case VSF_EVT_TIMER: {
+            vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&socket->input_sem, evt);
+            if (VSF_SYNC_GET == reason) {
+            recv_udp_packet:
+                // got sem, recv again, will not fail
+                err = vsfip_udp_async_recv(socket, vsf_local.sockaddr, vsf_local.netbuf);
+                VSF_TCPIP_ASSERT(VSF_ERR_NONE == err);
+                vsf_eda_return(err);
+                break;
+            } else if (reason != VSF_SYNC_PENDING) {
+                vsf_eda_return(VSF_ERR_FAIL);
+            }
+        }
+        break;
+    }
+
+    vsf_peda_end();
+}
+
+vsf_err_t vsfip_udp_recv(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t **netbuf)
+{
+    vsf_err_t err;
+
+    __vsf_component_call_peda(__vsfip_udp_recv, err, socket,
+        .sockaddr   = sockaddr,
+        .netbuf     = netbuf,
+    );
+    return err;
 }
 
 // TCP
@@ -1103,9 +1159,9 @@ static uint32_t vsfip_get_tsn(void)
     return tsn;
 }
 
-void vsfip_tcp_input(vsfip_netbuf_t *netbuf)
+static void __vsfip_tcp_input(vsfip_netbuf_t *netbuf)
 {
-    vsfip_tcp_head_t *tcphead = netbuf->buf.pObj;
+    vsfip_tcp_head_t *tcphead = netbuf->buf.obj_ptr;
 
     // endian fix
     tcphead->port.src = be16_to_cpu(tcphead->port.src);
@@ -1118,12 +1174,12 @@ void vsfip_tcp_input(vsfip_netbuf_t *netbuf)
     tcphead->urgent_ptr = be16_to_cpu(tcphead->urgent_ptr);
 
     netbuf->proto_node.addr = tcphead->seq;
-    netbuf->app.pchBuffer = netbuf->buf.pchBuffer + tcphead->headlen;
-    netbuf->app.nSize = netbuf->buf.nSize - tcphead->headlen;
-    vsfip_proto_input(&__vsfip.tcp_list, netbuf, &tcphead->port);
+    netbuf->app.buffer_ptr = netbuf->buf.buffer_ptr + tcphead->headlen;
+    netbuf->app.s32_size = netbuf->buf.s32_size - tcphead->headlen;
+    __vsfip_proto_input(&__vsfip.tcp_list, netbuf, &tcphead->port);
 }
 
-static vsf_err_t vsfip_add_tcphead(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf, uint_fast8_t flags)
+static vsf_err_t __vsfip_tcp_add_head(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf, uint_fast8_t flags)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
     uint8_t headlen = sizeof(vsfip_tcp_head_t);
@@ -1139,8 +1195,8 @@ static vsf_err_t vsfip_add_tcphead(vsfip_socket_t *socket, vsfip_netbuf_t *netbu
         return VSF_ERR_FAIL;
     }
 
-    vsfip_netbuf_route(socket, netbuf, &socket->remote_sockaddr.addr);
-    head = netbuf->buf.pObj;
+    __vsfip_netbuf_route(socket, netbuf, &socket->remote_sockaddr.addr);
+    head = netbuf->buf.obj_ptr;
     option = (uint8_t *)head + sizeof(vsfip_tcp_head_t);
     memset(head, 0, sizeof(vsfip_tcp_head_t));
     head->port.src = cpu_to_be16(socket->local_sockaddr.port);
@@ -1152,7 +1208,7 @@ static vsf_err_t vsfip_add_tcphead(vsfip_socket_t *socket, vsfip_netbuf_t *netbu
     flags |= (pcb->rseq != 0) ? VSFIP_TCPFLAG_ACK : 0;
     head->flags = flags;
 
-    window_size = pcb->rx_window - vsfip_bufq_len(&socket->input_queue);
+    window_size = pcb->rx_window - __vsfip_bufq_len(&socket->input_queue);
     head->window_size = cpu_to_be16(window_size);
 
     head->checksum = cpu_to_be16(0);
@@ -1165,33 +1221,33 @@ static vsf_err_t vsfip_add_tcphead(vsfip_socket_t *socket, vsfip_netbuf_t *netbu
         put_unaligned_be16(VSFIP_CFG_TCP_MSS, option);
     }
 
-    checksum = ~vsfip_proto_checksum(socket, netbuf);
+    checksum = ~__vsfip_proto_checksum(socket, netbuf);
     head->checksum = cpu_to_be16(checksum);
 
     pcb->acked_rseq = pcb->rseq;
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsfip_tcp_send_do(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf, uint_fast8_t flags)
+static vsf_err_t __vsfip_tcp_send_do(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf, uint_fast8_t flags)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
 
     netbuf->pos = 0;
     netbuf->buf = netbuf->app;
-    if (vsfip_add_tcphead(socket, netbuf, flags) < 0) {
+    if (__vsfip_tcp_add_head(socket, netbuf, flags) < 0) {
         vsfip_netbuf_deref(netbuf);
         return VSF_ERR_FAIL;
     }
-    vsfip_ip_output(socket, netbuf);
+    __vsfip_ip_output(socket, netbuf);
 
-    if ((flags & (VSFIP_TCPFLAG_FIN | VSFIP_TCPFLAG_SYN)) || (netbuf->app.nSize > 0)) {
+    if ((flags & (VSFIP_TCPFLAG_FIN | VSFIP_TCPFLAG_SYN)) || (netbuf->app.s32_size > 0)) {
         pcb->flags = flags;
     }
-    pcb->lseq += netbuf->app.nSize;
+    pcb->lseq += netbuf->app.s32_size;
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vsfip_tcp_sendflags(vsfip_socket_t *socket, uint_fast8_t flags)
+static vsf_err_t __vsfip_tcp_sendflags(vsfip_socket_t *socket, uint_fast8_t flags)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
     vsfip_netbuf_t *netbuf;
@@ -1203,10 +1259,10 @@ static vsf_err_t vsfip_tcp_sendflags(vsfip_socket_t *socket, uint_fast8_t flags)
 
     // TODO: set netbuf->netif if already connected
     netbuf = VSFIP_TCPBUF_GET(0);
-    return netbuf ? vsfip_tcp_send_do(socket, netbuf, flags) : VSF_ERR_NOT_ENOUGH_RESOURCES;
+    return netbuf ? __vsfip_tcp_send_do(socket, netbuf, flags) : VSF_ERR_NOT_ENOUGH_RESOURCES;
 }
 
-static void vsfip_tcp_socket_tick(vsfip_socket_t *socket)
+static void __vsfip_tcp_socket_tick(vsfip_socket_t *socket)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
 
@@ -1215,7 +1271,7 @@ static void vsfip_tcp_socket_tick(vsfip_socket_t *socket)
         if (0 == pcb->tx_timeout_ms) {
             if (--pcb->tx_retry) {
                 pcb->lseq = pcb->acked_lseq;
-                vsfip_tcp_sendflags(socket, pcb->flags);
+                __vsfip_tcp_sendflags(socket, pcb->flags);
                 if (pcb->flags & (VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_FIN)) {
                     pcb->lseq++;
                 }
@@ -1249,7 +1305,7 @@ check_rx_to:
         }
     }
 
-    __vsf_slist_foreach_unsafe(vsfip_netbuf_t, proto_node, (vsf_slist_t *)&socket->output_queue) {
+    __vsf_dlist_foreach_unsafe(vsfip_netbuf_t, proto_node, &socket->output_queue) {
         if (!--_->ttl) {
             // if _->retry is 0
             //         always retry
@@ -1262,16 +1318,16 @@ check_rx_to:
                 pcb->lseq = _->proto_node.addr;
                 vsfip_netbuf_ref(_);
                 _->ttl = socket->tx_timeout_ms;
-                vsfip_tcp_send_do(socket, _, VSFIP_TCPFLAG_PSH);
+                __vsfip_tcp_send_do(socket, _, VSFIP_TCPFLAG_PSH);
                 pcb->lseq = lseq;
             } else {
                 // flush bufferlist
-                vsfip_bufq_free(&socket->output_queue);
+                __vsfip_bufq_free(&socket->output_queue);
                 pcb->lseq = pcb->acked_lseq;
 
                 // TODO: how to fix if tcp packet time out?
                 pcb->tx_retry = 3;
-                vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_FIN);
+                __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_FIN);
                 pcb->lseq++;
                 pcb->state = pcb->rclose ? VSFIP_TCPSTAT_LASTACK : VSFIP_TCPSTAT_FINWAIT1;
                 pcb->lclose = true;
@@ -1283,26 +1339,26 @@ check_rx_to:
     }
 
     if ((pcb->acked_rseq != pcb->rseq) && !--pcb->ack_tick) {
-        vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+        __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
         pcb->ack_tick = VSFIP_TCP_ATO;
     }
 }
 
-static void vsfip_tcp_data_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static void __vsfip_tcp_data_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
 
-    pcb->rseq += netbuf->app.nSize;
+    pcb->rseq += netbuf->app.s32_size;
     pcb->ack_tick = VSFIP_TCP_ATO;
     if (socket->user_callback.on_input != NULL) {
         socket->user_callback.on_input(socket->user_callback.param, netbuf);
     } else {
         netbuf->ttl = VSFIP_CFG_TTL_INPUT;
-        vsf_slist_queue_append(vsfip_netbuf_t, proto_node, &socket->input_queue, netbuf);
+        vsf_dlist_queue_enqueue(vsfip_netbuf_t, proto_node, &socket->input_queue, netbuf);
     }
 }
 
-static void vsfip_tcp_socket_disable(vsfip_socket_t *socket)
+static void __vsfip_tcp_socket_disable(vsfip_socket_t *socket)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
     pcb->disabled = true;
@@ -1312,10 +1368,10 @@ static void vsfip_tcp_socket_disable(vsfip_socket_t *socket)
 //        vsfip_tcp_postevt(&pcb->rx_sm, VSFIP_EVT_NETIF_REMOVED);
 }
 
-static void vsfip_tcp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
+static void __vsfip_tcp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
-    vsfip_tcp_head_t head = *(vsfip_tcp_head_t *)netbuf->buf.pObj;
+    vsfip_tcp_head_t head = *(vsfip_tcp_head_t *)netbuf->buf.obj_ptr;
     bool release_buffer = true;
     vsfip_tcp_stat_t pre_state = pcb->state;
 
@@ -1333,8 +1389,8 @@ static void vsfip_tcp_socket_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbu
         pcb->tx_timeout_ms = 0;
         pcb->rx_timeout_ms = 0;
         pcb->state = VSFIP_TCPSTAT_CLOSED;
-        vsfip_bufq_free(&socket->input_queue);
-        vsfip_bufq_free(&socket->output_queue);
+        __vsfip_bufq_free(&socket->input_queue);
+        __vsfip_bufq_free(&socket->output_queue);
 
 //        vsfip_tcp_postevt(&pcb->tx_sm, VSFIP_EVT_SOCKET_TIMEOUT);
 //        vsfip_tcp_postevt(&pcb->rx_sm, VSFIP_EVT_SOCKET_TIMEOUT);
@@ -1346,7 +1402,7 @@ re_process:
     case VSFIP_TCPSTAT_INVALID:
         goto release_buf;
     case VSFIP_TCPSTAT_CLOSED:
-        vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_RST);
+        __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_RST);
         goto release_buf;
     case VSFIP_TCPSTAT_LISTEN:
         if (    (VSFIP_TCPFLAG_SYN == head.flags)
@@ -1362,7 +1418,7 @@ re_process:
             sockaddr.addr.size = 4;
 
             //new a socket to process the data
-            socket_new = vsfip_child_socket(socket, &sockaddr);
+            socket_new = __vsfip_child_socket(socket, &sockaddr);
             if (NULL == socket_new) {
                 goto release_buf;
             }
@@ -1377,7 +1433,7 @@ re_process:
 
             pcb_new->tx_retry = 3;
             vsfip_socket_set_netif(socket_new, netbuf->netif);
-            vsfip_tcp_sendflags(socket_new, VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket_new, VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK);
             pcb_new->lseq++;
             pcb_new->rclose = false;
         }
@@ -1389,7 +1445,7 @@ re_process:
             pcb->rseq = head.seq + 1;
 
             pcb->tx_retry = 3;
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK);
             pcb->lseq++;
             pcb->state = VSFIP_TCPSTAT_SYN_GET;
         } else if ((head.flags & (VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK)) && (head.ackseq == pcb->lseq)) {
@@ -1399,7 +1455,7 @@ re_process:
             pcb->rseq = head.seq + 1;
             pcb->acked_lseq = pcb->lseq;
 
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
         connected:
             pcb->rclose = pcb->lclose = false;
             pcb->state = VSFIP_TCPSTAT_ESTABLISHED;
@@ -1419,40 +1475,40 @@ re_process:
             // get resend SYN(previous SYN + ACK lost), reply again
             pcb->lseq = pcb->acked_lseq;
             pcb->tx_retry = 3;
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_SYN | VSFIP_TCPFLAG_ACK);
             pcb->lseq++;
         } else if ((head.flags & VSFIP_TCPFLAG_ACK) && (head.ackseq == (pcb->acked_lseq + 1))) {
             pcb->tx_timeout_ms = 0;
             pcb->acked_lseq = pcb->lseq = head.ackseq;
-            if (netbuf->app.nSize > 0) {
+            if (netbuf->app.s32_size > 0) {
                 if (pcb->rseq == head.seq) {
                     release_buffer = false;
-                    vsfip_tcp_data_input(socket, netbuf);
+                    __vsfip_tcp_data_input(socket, netbuf);
                 } else {
                     // send the ACK with the latest valid seq to remote
-                    vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+                    __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
                 }
             }
             goto connected;
         } else if (VSFIP_TCPFLAG_FIN & head.flags) {
             pcb->tx_retry = 3;
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_FIN);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_FIN);
             pcb->lseq++;
             pcb->state = VSFIP_TCPSTAT_FINWAIT1;
             pcb->lclose = true;
         }
         goto release_buf;
     case VSFIP_TCPSTAT_ESTABLISHED:
-        if (netbuf->app.nSize > 0) {
+        if (netbuf->app.s32_size > 0) {
             if (pcb->rseq == head.seq) {
                 release_buffer = false;
-                vsfip_tcp_data_input(socket, netbuf);
+                __vsfip_tcp_data_input(socket, netbuf);
 //                vsfip_tcp_postevt(&pcb->rx_sm, VSFIP_EVT_TCP_RXOK);
                 if (pcb->state != pre_state) {
                     goto re_process;
                 }
             } else {
-                vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+                __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
             }
         }
     case VSFIP_TCPSTAT_CLOSEWAIT:
@@ -1461,8 +1517,8 @@ re_process:
             pcb->tx_timeout_ms = 0;
             pcb->acked_lseq = head.ackseq;
 
-            __vsf_slist_foreach_unsafe(vsfip_netbuf_t, proto_node, (vsf_slist_t *)&socket->output_queue) {
-                if (pcb->acked_lseq >= (_->proto_node.addr + _->app.nSize)) {
+            __vsf_dlist_foreach_unsafe(vsfip_netbuf_t, proto_node, &socket->output_queue) {
+                if (pcb->acked_lseq >= (_->proto_node.addr + _->app.s32_size)) {
 //                    vsfq_dequeue(&socket->outq);
                     if (socket->user_callback.on_outputted != NULL) {
                         socket->user_callback.on_outputted(socket->user_callback.param);
@@ -1485,7 +1541,7 @@ re_process:
             head.flags &= ~VSFIP_TCPFLAG_FIN;
             pcb->rclose = true;
             pcb->rseq = head.seq + 1;
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
 
             // remote close, when local socket is closed
             // set the pcb->state = VSFIP_TCPSTAT_LASTACK
@@ -1520,17 +1576,17 @@ re_process:
             goto remote_close;
         }
     check_data_in_FIN:
-        if (netbuf->app.nSize > 0) {
+        if (netbuf->app.s32_size > 0) {
             if (pcb->rseq == head.seq) {
-                pcb->rseq += netbuf->app.nSize;
+                pcb->rseq += netbuf->app.s32_size;
             }
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
         }
         goto release_buf;
     case VSFIP_TCPSTAT_LASTACK:
         // maybe receive FIN again because previous ACK is lost
         if (head.flags & VSFIP_TCPFLAG_FIN) {
-            vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
+            __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
         }
         if ((VSFIP_TCPFLAG_ACK == head.flags) && (head.ackseq == pcb->lseq)) {
             pcb->lclose = true;
@@ -1557,7 +1613,7 @@ void vsfip_tcp_config_window(vsfip_socket_t *socket, uint_fast32_t rx_window, ui
     pcb->tx_window = tx_window;
 }
 
-static vsfip_socket_t * vsfip_tcp_accept_try(vsfip_socket_t *socket)
+static vsfip_socket_t * __vsfip_tcp_accept_try(vsfip_socket_t *socket)
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
 
@@ -1587,17 +1643,17 @@ vsf_err_t vsfip_tcp_async_send(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
         goto cleanup;
     }
 
-    size = vsfip_bufq_len(&socket->output_queue);
+    size = __vsfip_bufq_len(&socket->output_queue);
     window = min(pcb->tx_window, pcb->rwnd);
-    if ((size + netbuf->app.nSize) > window) {
+    if ((size + netbuf->app.s32_size) > window) {
         return VSF_ERR_NOT_READY;
     }
 
     netbuf->retry = VSFIP_TCP_RETRY;
     netbuf->ttl = socket->tx_timeout_ms;
-    vsf_slist_append(vsfip_netbuf_t, proto_node, &socket->output_queue, netbuf);
+    vsf_dlist_queue_enqueue(vsfip_netbuf_t, proto_node, &socket->output_queue, netbuf);
     vsfip_netbuf_ref(netbuf);
-    if (vsfip_tcp_send_do(socket, netbuf, VSFIP_TCPFLAG_PSH) != 0) {
+    if (__vsfip_tcp_send_do(socket, netbuf, VSFIP_TCPFLAG_PSH) != 0) {
         err = VSF_ERR_FAIL;
         goto cleanup;
     }
@@ -1619,21 +1675,21 @@ vsf_err_t vsfip_tcp_async_recv(vsfip_socket_t *socket, vsfip_netbuf_t **netbuf)
         return VSF_ERR_FAIL;
     }
 
-    vsf_slist_queue_dequeue(vsfip_netbuf_t, proto_node, &socket->input_queue, netbuf_tmp);
+    vsf_dlist_queue_dequeue(vsfip_netbuf_t, proto_node, &socket->input_queue, netbuf_tmp);
     *netbuf = netbuf_tmp;
     return (NULL == *netbuf) ? VSF_ERR_NOT_READY : VSF_ERR_NONE;
 }
 #endif      // VSFIP_CFG_TCP_EN
 
 // ICMP
-static void vsfip_icmp_input(vsfip_netbuf_t *netbuf)
+static void __vsfip_icmp_input(vsfip_netbuf_t *netbuf)
 {
     vsfip_ip4_head_t *iphead = netbuf->iphead.ip4head;
     uint_fast16_t iph_hlen = VSFIP_IP4H_HLEN(iphead) * 4;
-    vsfip_icmp_head_t *icmphead = netbuf->buf.pObj;
+    vsfip_icmp_head_t *icmphead = netbuf->buf.obj_ptr;
 
-    netbuf->app.pchBuffer = netbuf->buf.pchBuffer + sizeof(vsfip_icmp_head_t);
-    netbuf->app.nSize = netbuf->buf.nSize - sizeof(vsfip_icmp_head_t);
+    netbuf->app.buffer_ptr = netbuf->buf.buffer_ptr + sizeof(vsfip_icmp_head_t);
+    netbuf->app.s32_size = netbuf->buf.s32_size - sizeof(vsfip_icmp_head_t);
     if (icmphead->type == VSFIP_ICMP_ECHO) {
         uint_fast32_t swap_ip_cache;
 

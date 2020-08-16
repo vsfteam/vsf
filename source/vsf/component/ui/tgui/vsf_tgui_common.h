@@ -65,7 +65,7 @@
 #       if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
 #           define __tgui_text(__NAME, __TEXT, ...)                             \
                 .__NAME.tString.pstrText = __TEXT,                              \
-                .__NAME.tString.iSize = sizeof(__TEXT) - 1,                     \
+                .__NAME.tString.s16_size = sizeof(__TEXT) - 1,                     \
                 .__NAME.bIsChanged = true,                                      \
                 .__NAME.u4Align = (0, ##__VA_ARGS__)
 #       else
@@ -287,7 +287,7 @@ typedef struct vsf_tgui_string_t {
 typedef struct vsf_tgui_string_t {
     VSF_TGUI_CFG_STRING_TYPE    *pstrText;
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-    int16_t                     iSize;
+    int16_t                     s16_size;
 #endif
 } vsf_tgui_string_t;
 
@@ -485,7 +485,7 @@ typedef struct vsf_tgui_top_container_t vsf_tgui_top_container_t;
 
 typedef struct vsf_tgui_msg_t {
     implement(vsf_msgt_msg_t)
-    vsf_tgui_control_t *ptTarget;
+    vsf_tgui_control_t *target_ptr;
 } vsf_tgui_msg_t;
 
 typedef struct vsf_tgui_refresh_evt_t {

@@ -24,12 +24,9 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
 
-#if     defined(VSF_WINFS_IMPLEMENT)
-#   undef VSF_WINFS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_WINFS_INHERIT)
-#   undef VSF_WINFS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_WINFS_CLASS_IMPLEMENT)
+#   undef __VSF_WINFS_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -42,15 +39,16 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_winfs_file_t)
+dcl_simple_class(vk_winfs_file_t)
 
-enum vk_winfs_file_attr_t {
+typedef enum vk_winfs_file_attr_t {
     VSF_WINFS_FILE_ATTR_ARCHIVE = VSF_FILE_ATTR_EXT,
-};
-typedef enum vk_fat32_file_attr_t vk_fat32_file_attr_t;
+} vk_winfs_file_attr_t;
 
 def_simple_class(vk_winfs_file_t) {
-    implement(vk_file_t)
+    public_member(
+        implement(vk_file_t)
+    )
 
     private_member(
         union {
@@ -66,10 +64,9 @@ def_simple_class(vk_winfs_file_t) {
     )
 };
 
-struct vk_winfs_info_t {
+typedef struct vk_winfs_info_t {
     vk_winfs_file_t root;
-};
-typedef struct vk_winfs_info_t vk_winfs_info_t;
+} vk_winfs_info_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

@@ -18,7 +18,6 @@
 /*============================ INCLUDES ======================================*/
 #include "vsf_cfg.h"
 #include "vsf_list.h"
-#include <stdbool.h>
 
 /*============================ MACROS ========================================*/
 #if __IS_COMPILER_ARM_COMPILER_6__

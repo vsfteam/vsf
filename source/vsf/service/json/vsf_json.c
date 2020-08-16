@@ -21,7 +21,7 @@
 
 #if VSF_USE_JSON == ENABLED
 
-#define VSF_JSON_IMPLEMENT
+#define __VSF_JSON_CLASS_IMPLEMENT
 #include "./vsf_json.h"
 #include <ctype.h>
 #include <stdio.h>

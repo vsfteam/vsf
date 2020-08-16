@@ -215,7 +215,7 @@ vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda)
             vsf_unprotect_sched(origlevel);
 
             if (eda_pending != NULL) {
-                vsf_err_t err = vsf_eda_post_evt_ex(eda_pending, VSF_EVT_SYNC, true);
+                vsf_err_t err = __vsf_eda_post_evt_ex(eda_pending, VSF_EVT_SYNC, true);
                 VSF_KERNEL_ASSERT(!err);
                 UNUSED_PARAM(err);
                 origlevel = vsf_protect_sched();
@@ -319,7 +319,7 @@ void vsf_eda_sync_cancel(vsf_sync_t *this_ptr)
         if (eda != NULL) {
             eda->state.bits.is_sync_got = true;
             vsf_unprotect_sched(origlevel);
-            vsf_eda_post_evt_ex(eda, VSF_EVT_SYNC_CANCEL, true);
+            __vsf_eda_post_evt_ex(eda, VSF_EVT_SYNC_CANCEL, true);
         } else {
             vsf_unprotect_sched(origlevel);
         }

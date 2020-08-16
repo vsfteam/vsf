@@ -1,7 +1,7 @@
 #ifndef __SEMAPHORE_H__
 #define __SEMAPHORE_H__
 
-#include "vsf.h"
+#include "kernel/vsf_kernel.h"
 
 #include <time.h>
 

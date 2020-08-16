@@ -39,21 +39,24 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usrapp_usbh_common_const_t {
+typedef struct usrapp_usbh_common_const_t {
 #if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
     vk_ohci_param_t ohci_param;
 #elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
     vk_libusb_hcd_param_t libusb_hcd_param;
 #elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
     vk_winusb_hcd_param_t winusb_hcd_param;
+#elif VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED
+    vk_dwcotg_hcd_param_t dwcotg_hcd_param;
+#elif VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED
+    vk_musb_fdrc_hcd_param_t musb_fdrc_hcd_param;
 #else
     // on chip non-ip hcd driver
     vsf_usb_hcd_param_t hcd_param;
 #endif
-};
-typedef struct usrapp_usbh_common_const_t usrapp_usbh_common_const_t;
+} usrapp_usbh_common_const_t;
 
-struct usrapp_usbh_common_t {
+typedef struct usrapp_usbh_common_t {
     vk_usbh_t host;
 #if VSF_USE_USB_HOST_HUB == ENABLED
     vk_usbh_class_t hub;
@@ -63,6 +66,9 @@ struct usrapp_usbh_common_t {
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
     vk_usbh_class_t ecm;
+#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
+    vk_usbh_class_t rtl8152;
+#   endif
 #endif
 #if VSF_USE_USB_HOST_MSC == ENABLED
     vk_usbh_class_t msc;
@@ -88,8 +94,7 @@ struct usrapp_usbh_common_t {
 #if VSF_USE_USB_HOST_UAC == ENABLED
     vk_usbh_class_t uac;
 #endif
-};
-typedef struct usrapp_usbh_common_t usrapp_usbh_common_t;
+} usrapp_usbh_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

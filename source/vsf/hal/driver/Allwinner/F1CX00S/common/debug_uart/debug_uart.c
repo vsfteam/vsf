@@ -22,7 +22,7 @@
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
+#   define __VSFSTREAM_CLASS_INHERIT__
 #   include "service/vsf_service.h"
 #endif
 

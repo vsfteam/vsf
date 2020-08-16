@@ -26,12 +26,12 @@
 
 #include "../../../common/class/HID/vsf_usb_HID.h"
 
-#if     defined(VSF_USBD_HID_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_USBD_HID_IMPLEMENT
-#elif   defined(VSF_USBD_HID_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSF_USBD_HID_INHERIT
+#if     defined(__VSF_USBD_HID_CLASS_IMPLEMENT)
+#   undef __VSF_USBD_HID_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_USBD_HID_CLASS_INHERIT)
+#   undef __VSF_USBD_HID_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -41,14 +41,14 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define VSF_USBD_DESC_HID_REPORT(__ptr, __size)                                 \
-    {USB_HID_DT_REPORT, 0, 0, (__size), (uint8_t*)(__ptr)}
+#define VSF_USBD_DESC_HID_REPORT(__PTR, __SIZE)                                 \
+    {USB_HID_DT_REPORT, 0, 0, (__SIZE), (uint8_t*)(__PTR)}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbd_hid_t)
-declare_simple_class(vk_usbd_hid_report_t)
+dcl_simple_class(vk_usbd_hid_t)
+dcl_simple_class(vk_usbd_hid_report_t)
 
 def_simple_class(vk_usbd_hid_report_t) {
 

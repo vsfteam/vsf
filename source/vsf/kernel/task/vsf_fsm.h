@@ -56,7 +56,7 @@ extern "C" {
 
 #ifndef __cplusplus
 #   ifndef this
-#       define this    (*ptThis)
+#       define this    (*this_ptr)
 #   endif
 #endif
 
@@ -65,10 +65,10 @@ extern "C" {
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-#define def_states(...)                                             \
-        enum {                                                      \
-            START = 0,                                              \
-            __VA_ARGS__                                             \
+#define def_states(...)                                                         \
+        enum {                                                                  \
+            START = 0,                                                          \
+            __VA_ARGS__                                                         \
         };
 
 #ifndef def_params
@@ -77,41 +77,41 @@ extern "C" {
 
 #define args(...)               ,__VA_ARGS__
 
-#define fsm(__NAME)             vsf_task(__NAME)
+#define fsm(__name)             vsf_task(__name)
 
-#define __def_fsm(__FSM_TYPE, ...)                                              \
-        def_vsf_task(__FSM_TYPE,                                                \
+#define __def_fsm(__fsm_type, ...)                                              \
+        def_vsf_task(__fsm_type,                                                \
             __VA_ARGS__);                                           
         
-#define def_fsm(__NAME, ...)                                                    \
-        __def_fsm(__NAME, __VA_ARGS__)
+#define def_fsm(__name, ...)                                                    \
+        __def_fsm(__name, __VA_ARGS__)
   
-#define def_simple_fsm(__NAME, ...)                                             \
-        __declare_fsm(__NAME);                                                  \
-        __def_fsm(__NAME, __VA_ARGS__)
+#define def_simple_fsm(__name, ...)                                             \
+        __declare_fsm(__name);                                                  \
+        __def_fsm(__name, __VA_ARGS__)
   
 #define end_def_simple_fsm(...)
 
 /*
-#define __extern_simple_fsm(__FSM_TYPE, ...)                                    \
-        declare_class(__FSM_TYPE)                                               \
-        extern_class(__FSM_TYPE)                                                \
-            uint_fast8_t tState;                                               \
+#define __extern_simple_fsm(__fsm_type, ...)                                    \
+        declare_class(__fsm_type)                                               \
+        extern_class(__fsm_type)                                                \
+            uint_fast8_t fsm_state;                                             \
             __VA_ARGS__                                                         \
-        end_extern_class(__FSM_TYPE)                                
+        end_extern_class(__fsm_type)                                
         
-#define extern_simple_fsm(__NAME, ...)                                          \
-        __extern_simple_fsm(fsm(__NAME), __VA_ARGS__)  
+#define extern_simple_fsm(__name, ...)                                          \
+        __extern_simple_fsm(fsm(__name), __VA_ARGS__)  
 */
 
-#define __declare_fsm(__NAME)                                                   \
-        declare_vsf_task(__NAME)                                            
+#define __declare_fsm(__name)                                                   \
+        declare_vsf_task(__name)                                            
         
-#define declare_fsm(__NAME)         __declare_fsm(__NAME)
-#define declare_simple_fsm(__NAME)  declare_fsm(__NAME)
+#define declare_fsm(__name)         __declare_fsm(__name)
+#define declare_simple_fsm(__name)  declare_fsm(__name)
 
 /*! \brief extern fsm initialisation function and provide function prototye 
-           as <__NAME>_fn, E.g
+           as <__name>_fn, E.g
            extern_fsm_initialiser( demo_fsm );
            we extern a function called:
            extern fsm_demo_fsm_t *demo_fsm_init( fsm_demo_fsm_t *fsm_ptr );
@@ -119,15 +119,15 @@ extern "C" {
            typedef fsm_demo_fsm_t *demo_fsm_init_fn( fsm_demo_fsm_t *fsm_ptr );
            We can then use demo_fsm_init_fn to define function pointer
  */
-#define __extern_fsm_initialiser(__NAME, ...)                                   \
-        fsm(__NAME) *__NAME##_init(fsm(__NAME) *fsm_ptr __VA_ARGS__);             \
-        typedef fsm(__NAME) *__NAME##_init_fn(fsm(__NAME) *fsm_ptr __VA_ARGS__);  
+#define __extern_fsm_initialiser(__name, ...)                                   \
+        fsm(__name) *__name##_init(fsm(__name) *fsm_ptr __VA_ARGS__);           \
+        typedef fsm(__name) *__name##_init_fn(fsm(__name) *fsm_ptr __VA_ARGS__);  
         
-#define extern_fsm_initialiser(__NAME, ...)                                     \
-            __extern_fsm_initialiser(__NAME, __VA_ARGS__)
+#define extern_fsm_initialiser(__name, ...)                                     \
+            __extern_fsm_initialiser(__name, __VA_ARGS__)
 
 
-/*! \brief extern fsm task function and provide function prototye as <__NAME>_fn, E.g
+/*! \brief extern fsm task function and provide function prototye as <__name>_fn, E.g
            extern_fsm_implementation( demo_fsm );
            we extern a function called:
            fsm_rt_t demo_fsm( fsm_demo_fsm_t *fsm_ptr )
@@ -136,41 +136,41 @@ extern "C" {
            We can then use demo_fsm_fn to define function pointer
  */
  //! @{
-#define __extern_fsm_implementation_ex(__NAME,__TYPE)                           \
-        fsm_rt_t __NAME(fsm(__TYPE) *this_ptr, vsf_evt_t evt);                     \
-        typedef fsm_rt_t __NAME##_fn( fsm(__TYPE) *this_ptr, vsf_evt_t evt );              
+#define __extern_fsm_implementation_ex(__name,__type)                           \
+        fsm_rt_t __name(fsm(__type) *this_ptr, vsf_evt_t evt);                  \
+        typedef fsm_rt_t __name##_fn( fsm(__type) *this_ptr, vsf_evt_t evt );              
         
-#define declare_fsm_implementation_ex(__NAME, __TYPE)                           \
-            __extern_fsm_implementation_ex(__NAME, __TYPE)
+#define declare_fsm_implementation_ex(__name, __type)                           \
+            __extern_fsm_implementation_ex(__name, __type)
 
-#define extern_fsm_implementation_ex(__NAME,__TYPE)                             \
-            __extern_fsm_implementation_ex(__NAME, __TYPE)
+#define extern_fsm_implementation_ex(__name,__type)                             \
+            __extern_fsm_implementation_ex(__name, __type)
 
-#define extern_fsm_implementation(__NAME)                                       \
-            __extern_fsm_implementation_ex(__NAME, __NAME)
+#define extern_fsm_implementation(__name)                                       \
+            __extern_fsm_implementation_ex(__name, __name)
             
-#define declare_fsm_implementation(__NAME)                                      \
-            __extern_fsm_implementation_ex(__NAME, __NAME)
+#define declare_fsm_implementation(__name)                                      \
+            __extern_fsm_implementation_ex(__name, __name)
 //! @}
 
-#define call_fsm(__NAME, __FSM )                                                \
-            vsf_task_call_task(__NAME, __FSM)                                 
+#define call_fsm(__name, __fsm )                                                \
+            vsf_task_call_task(__name, __fsm)                                 
 
-#define call_simple_fsm(__NAME, __FSM )                                         \
-            call_fsm(__NAME, __FSM)
+#define call_simple_fsm(__name, __fsm )                                         \
+            call_fsm(__name, __fsm)
 
-#define __state(__STATE, ...)                                                   \
-            case __STATE:                                                       \
-        __state_entry_##__STATE:{                                               \
+#define __state(__state, ...)                                                   \
+            case __state:                                                       \
+        __state_entry_##__state:{                                               \
                 __VA_ARGS__;                                                    \
             };
             
-#define state(__STATE, ...)                 break; __state(__STATE, __VA_ARGS__) 
+#define state(__state, ...)                 break; __state(__state, __VA_ARGS__) 
 
 #define on_start(...)                       {__VA_ARGS__;}
 
 
-#define reset_fsm()         do { ptThis->tState = 0; } while(0);
+#define reset_fsm()         do { this_ptr->fsm_state = 0; } while(0);
 #define fsm_cpl()           do {reset_fsm(); return fsm_rt_cpl;} while(0);
 #define fsm_report(__ERROR) do {reset_fsm(); return (fsm_rt_t)(__ERROR); } while(0);
 #define fsm_wait_for_obj()  return fsm_rt_wait_for_obj;
@@ -180,55 +180,55 @@ extern "C" {
 //#define fsm_continue()      break
 
 
-#define update_state_to(__STATE)                                                \
-        { ptThis->tState = (__STATE); goto __state_entry_##__STATE;}
+#define update_state_to(__state)                                                \
+        { this_ptr->fsm_state = (__state); goto __state_entry_##__state;}
 
-#define transfer_to(__STATE)                                                    \
-         { ptThis->tState = (__STATE); fsm_on_going() } 
+#define transfer_to(__state)                                                    \
+         { this_ptr->fsm_state = (__state); fsm_on_going() } 
 
 
-#define __fsm_initialiser(__NAME, ...)                                          \
-        fsm(__NAME) *__NAME##_init(fsm(__NAME) *ptThis __VA_ARGS__)             \
+#define __fsm_initialiser(__name, ...)                                          \
+        fsm(__name) *__name##_init(fsm(__name) *this_ptr __VA_ARGS__)           \
         {                                                                       \
-            VSF_KERNEL_ASSERT (NULL != ptThis);                                 \
-            ptThis->tState = 0;
+            VSF_KERNEL_ASSERT (NULL != this_ptr);                               \
+            this_ptr->fsm_state = 0;
             
-#define fsm_initialiser(__NAME, ...)                                            \
-            __fsm_initialiser(__NAME, __VA_ARGS__)
+#define fsm_initialiser(__name, ...)                                            \
+            __fsm_initialiser(__name, __VA_ARGS__)
             
             
 #define abort_init()     return NULL;
 
 #define init_body(...)                                                          \
             __VA_ARGS__                                                         \
-            return ptThis;                                                      \
+            return this_ptr;                                                    \
         }
             
 
-#define init_fsm(__NAME, __FSM, ...)                                            \
-        __NAME##_init(__FSM __VA_ARGS__)
+#define init_fsm(__name, __fsm, ...)                                            \
+        __name##_init(__fsm __VA_ARGS__)
 
-#define init_simple_fsm(__NAME, __FSM, ...)                                     \
-        init_fsm(__FSM __VA_ARGS__)
+#define init_simple_fsm(__name, __fsm, ...)                                     \
+        init_fsm(__fsm __VA_ARGS__)
 
-#define start_fsm(__NAME, __FSM, __PRI, ...)                                    \
-            init_vsf_task(__NAME, (__FSM), (__PRI), __VA_ARGS__)
+#define start_fsm(__name, __fsm, __pri, ...)                                    \
+            init_vsf_task(__name, (__fsm), (__pri), __VA_ARGS__)
 
-#define start_simple_fsm(__NAME, __FSM, __PRI, ...)                             \
-            start_fsm(__NAME, (__FSM), (__PRI), __VA_ARGS__)
+#define start_simple_fsm(__name, __fsm, __pri, ...)                             \
+            start_fsm(__name, (__fsm), (__pri), __VA_ARGS__)
 
-#define __implement_fsm_ex(__NAME, __TYPE)                                      \
-    implement_vsf_task(__NAME)                                                  \
+#define __implement_fsm_ex(__name, __type)                                      \
+    implement_vsf_task(__name)                                                  \
     {                                                                           \
         vsf_task_begin();                                                       \
-        if (NULL == ptThis) {                                                   \
+        if (NULL == this_ptr) {                                                 \
             return fsm_rt_err;                                                  \
         }                                               
 
 #define __body(...)                                                             \
-        switch (ptThis->tState) {                                              \
+        switch (this_ptr->fsm_state) {                                          \
             case 0:                                                             \
-                ptThis->tState++;                                              \
+                this_ptr->fsm_state++;                                          \
             __VA_ARGS__                                                         \
             break;                                                              \
             default:                                                            \
@@ -241,9 +241,9 @@ extern "C" {
 #define body(...)               __body(__VA_ARGS__)
 
 #define body_begin()                                                            \
-            switch (ptThis->tState) {                                          \
+            switch (this_ptr->fsm_state) {                                      \
                 case 0:                                                         \
-                    ptThis->tState++;                                              
+                    this_ptr->fsm_state++;                                              
 
 #define body_end()                                                              \
                 break;                                                          \
@@ -272,35 +272,35 @@ extern "C" {
 */        
         
         
-#define implement_fsm_ex(__NAME, __TYPE)                                        \
-            __implement_fsm_ex(__NAME, __TYPE)
+#define implement_fsm_ex(__name, __type)                                        \
+            __implement_fsm_ex(__name, __type)
         
-#define __implement_fsm(__NAME)                                                 \
-            implement_fsm_ex(__NAME, __NAME)
+#define __implement_fsm(__name)                                                 \
+            implement_fsm_ex(__name, __name)
                                                                
-#define implement_fsm(__NAME, ...)      __implement_fsm(__NAME)      
+#define implement_fsm(__name, ...)      __implement_fsm(__name)      
 
-#define __privilege_state(__STATE, ...)                                         \
+#define __privilege_state(__state, ...)                                         \
             break;do {                                                          \
                 do {                                                            \
-                    __state(__STATE, __VA_ARGS__)                               \
+                    __state(__state, __VA_ARGS__)                               \
                 } while(0); /* add extra while(0) to catch the fsm_continue()*/ \
-                if (this.tState != (__STATE)) {                                \
+                if (this.fsm_state != (__state)) {                              \
                     break;                                                      \
                 }                                                               \
             } while(1);                                                         
             
-#define privilege_state(__STATE, ...)                                           \
-            __privilege_state(__STATE, __VA_ARGS__)                                      
+#define privilege_state(__state, ...)                                           \
+            __privilege_state(__state, __VA_ARGS__)                                      
             
 
 #define privilege_group(...)  { __VA_ARGS__;}
 
 #define privilege_body(...)                                                     \
         do {                                                                    \
-            switch (ptThis->tState) {                                          \
+            switch (this_ptr->fsm_state) {                                      \
                 case 0:                                                         \
-                    ptThis->tState++;                                          \
+                    this_ptr->fsm_state++;                                      \
                 __VA_ARGS__                                                     \
             }                                                                   \
         while(1);                                                               \

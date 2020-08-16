@@ -2,7 +2,7 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#define VSF_LINUX_INHERIT
+#define __VSF_LINUX_CLASS_INHERIT__
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
@@ -30,7 +30,7 @@
 #   error VSH_ECHO must be enabled for VSH_HISTORY_NUM
 #endif
 
-struct vsh_cmd_ctx_t {
+typedef struct vsh_cmd_ctx_t {
     char cmd[VSH_CMD_SIZE];
     uint16_t pos;
     uint8_t escpos;
@@ -43,9 +43,9 @@ struct vsh_cmd_ctx_t {
         uint8_t cur_disp_entry;
     } history;
 #endif
-};
+} vsh_cmd_ctx_t;
 
-enum vsh_shell_state_t {
+typedef enum vsh_shell_state_t {
     SHELL_STATE_NORMAL,
     SHELL_STATE_ESC,
 
@@ -60,15 +60,15 @@ enum vsh_shell_state_t {
     SHELL_STATE_PM,
     SHELL_STATE_APC,
     SHELL_STATE_RIS,
-};
+} vsh_shell_state_t;
 
 // TODO: working dir should not be maintained in vsh
-static char vsh_working_dir[PATH_MAX];
-static char **vsh_path;
+static char __vsh_working_dir[PATH_MAX];
+static char **__vsh_path;
 
 char * getcwd(char * buffer, int maxlen)
 {
-    int len = strlen(vsh_working_dir) + 1;
+    int len = strlen(__vsh_working_dir) + 1;
 
     if ((NULL == buffer) && !maxlen) {
         buffer = malloc(len);
@@ -77,12 +77,12 @@ char * getcwd(char * buffer, int maxlen)
         // TODO: set errno to ERANGE
         return NULL;
     }
-    strcpy(buffer, vsh_working_dir);
+    strcpy(buffer, __vsh_working_dir);
     return buffer;
 }
 
 #if VSH_HISTORY_NUM > 0
-static void vsh_history_apply(struct vsh_cmd_ctx_t *ctx, uint8_t history_entry)
+static void __vsh_history_apply(vsh_cmd_ctx_t *ctx, uint8_t history_entry)
 {
     while (ctx->pos > 0) {
         ctx->pos--;
@@ -95,27 +95,26 @@ static void vsh_history_apply(struct vsh_cmd_ctx_t *ctx, uint8_t history_entry)
     write(STDOUT_FILENO, ctx->cmd, ctx->pos);
 }
 
-static void vsh_history_up(struct vsh_cmd_ctx_t *ctx)
+static void __vsh_history_up(vsh_cmd_ctx_t *ctx)
 {
     if (ctx->history.entry_num > 0) {
         uint8_t new_entry = (0 == ctx->history.cur_disp_entry) ?
                 ctx->history.entry_num - 1 : ctx->history.cur_disp_entry - 1;
-        vsh_history_apply(ctx, new_entry);
+        __vsh_history_apply(ctx, new_entry);
     }
 }
 
-static void vsh_history_down(struct vsh_cmd_ctx_t *ctx)
+static void __vsh_history_down(vsh_cmd_ctx_t *ctx)
 {
     if (ctx->history.entry_num > 0) {
         uint8_t new_entry = ((ctx->history.entry_num - 1) == ctx->history.cur_disp_entry) ?
                 0 : ctx->history.cur_disp_entry + 1;
-        vsh_history_apply(ctx, new_entry);
+        __vsh_history_apply(ctx, new_entry);
     }
 }
 #endif
 
-static enum vsh_shell_state_t
-vsh_process_escape(struct vsh_cmd_ctx_t *ctx, enum vsh_shell_state_t type)
+static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_state_t type)
 {
     char esc = ctx->cmd[ctx->pos];
     int esclen = ctx->escpos;
@@ -126,12 +125,12 @@ vsh_process_escape(struct vsh_cmd_ctx_t *ctx, enum vsh_shell_state_t type)
         switch (esc) {
         case 'A':       // up
 #if VSH_HISTORY_NUM > 0
-            vsh_history_up(ctx);
+            __vsh_history_up(ctx);
             goto exit_csi;
 #endif
         case 'B':       // down
 #if VSH_HISTORY_NUM > 0
-            vsh_history_down(ctx);
+            __vsh_history_down(ctx);
             goto exit_csi;
 #endif
         case 'C':       // right
@@ -150,7 +149,7 @@ vsh_process_escape(struct vsh_cmd_ctx_t *ctx, enum vsh_shell_state_t type)
 
 void vsh_set_path(char **path)
 {
-    vsh_path = path;
+    __vsh_path = path;
 }
 
 int vsh_generate_path(char *path, int pathlen, char *dir, char *path_in)
@@ -184,7 +183,7 @@ int vsh_generate_path(char *path, int pathlen, char *dir, char *path_in)
     return 0;
 }
 
-static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
+static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
 {
     vsf_linux_process_t *process = vsf_linux_create_process(0);
     if (NULL == process) { return -ENOMEM; }
@@ -199,7 +198,7 @@ static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
 
     char pathname[PATH_MAX];
     int exefd = -1, err;
-    char **path = vsh_path;
+    char **path = __vsh_path;
 
     // search in path first if not absolute path
     if (ctx->arg.argv[0][0] != '/') {
@@ -216,7 +215,7 @@ static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
 
     // search in working_dir if not found in path
     if (exefd < 0) {
-        err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, (char *)ctx->arg.argv[0]);
+        err = vsh_generate_path(pathname, sizeof(pathname), __vsh_working_dir, (char *)ctx->arg.argv[0]);
         if (err != 0) { goto fail; }
         exefd = vsf_linux_fs_get_executable(pathname, &ctx->entry);
         if (exefd < 0) {
@@ -237,23 +236,23 @@ static int vsh_run_cmd(struct vsh_cmd_ctx_t *cmd_ctx)
 
 int vsh_main(int argc, char *argv[])
 {
-    struct vsh_cmd_ctx_t ctx = { 0 };
+    vsh_cmd_ctx_t ctx = { 0 };
     char ch;
-    enum vsh_shell_state_t state;
+    vsh_shell_state_t state;
 
 #if VSH_HAS_COLOR
     printf(VSH_COLOR_NORMAL);
 #endif
-    printf("path: %s\r\n", *vsh_path);
+    printf("path: %s\r\n", *__vsh_path);
 
-    strcpy(vsh_working_dir, "/");
+    strcpy(__vsh_working_dir, "/");
     if ((argc > 2) && !strcmp(argv[1], "-c")) {
         if (strlen(argv[2]) >= VSH_CMD_SIZE) {
             return -ENOMEM;
         }
 
         strcpy(ctx.cmd, argv[2]);
-        return vsh_run_cmd(&ctx);
+        return __vsh_run_cmd(&ctx);
     }
 
     while (1) {
@@ -290,7 +289,7 @@ int vsh_main(int argc, char *argv[])
                         return -ENOMEM;
                     }
                     ctx.cmd[ctx.pos + ctx.escpos++] = ch;
-                    state = vsh_process_escape(&ctx, state);
+                    state = __vsh_process_escape(&ctx, state);
                     continue;
                 }
 
@@ -313,7 +312,7 @@ int vsh_main(int argc, char *argv[])
                         }
                         ctx.history.cur_disp_entry = ctx.history.cur_save_entry;
 #endif
-                        vsh_run_cmd(&ctx);
+                        __vsh_run_cmd(&ctx);
                     }
                     goto input_cmd;
                 case '\n':
@@ -344,7 +343,7 @@ int vsh_main(int argc, char *argv[])
 
 int pwd_main(int argc, char *argv[])
 {
-    printf("%s" VSH_LINEEND, vsh_working_dir);
+    printf("%s" VSH_LINEEND, __vsh_working_dir);
     return 0;
 }
 
@@ -355,12 +354,12 @@ int cd_main(int argc, char *argv[])
         return -1;
     }
 
-    if (strlen(vsh_working_dir) + strlen(argv[1]) + 1 >= PATH_MAX) {
+    if (strlen(__vsh_working_dir) + strlen(argv[1]) + 1 >= PATH_MAX) {
         return -ENOMEM;
     }
 
     char pathname[PATH_MAX];
-    int err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, argv[1]);
+    int err = vsh_generate_path(pathname, sizeof(pathname), __vsh_working_dir, argv[1]);
     if (err != 0) { return err; }
 
     if (pathname[strlen(pathname) - 1] != '/') {
@@ -373,10 +372,10 @@ int cd_main(int argc, char *argv[])
         goto return_no_directory;
     }
     closedir(dir);
-    strcpy(vsh_working_dir, pathname);
+    strcpy(__vsh_working_dir, pathname);
     return 0;
 return_no_directory:
-    printf("current path is %s" VSH_LINEEND, vsh_working_dir);
+    printf("current path is %s" VSH_LINEEND, __vsh_working_dir);
     return -ENOENT;
 }
 
@@ -399,7 +398,7 @@ int ls_main(int argc, char *argv[])
     char dirname[PATH_MAX];
     int err;
     for (int i = 0; i < dirnum; i++) {
-        err = vsh_generate_path(dirname, sizeof(dirname), vsh_working_dir, dirnames[i]);
+        err = vsh_generate_path(dirname, sizeof(dirname), __vsh_working_dir, dirnames[i]);
         if (err != 0) { return err; }
 
         if (dirnum > 1) {
@@ -449,7 +448,7 @@ int mkdir_main(int argc, char *argv[])
     }
 
     char pathname[PATH_MAX];
-    int err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, argv[1]);
+    int err = vsh_generate_path(pathname, sizeof(pathname), __vsh_working_dir, argv[1]);
     if (err != 0) {
         printf("invalid directory %s" VSH_LINEEND, argv[1]);
         return -1;
@@ -481,7 +480,7 @@ int cat_main(int argc, char *argv[])
     }
 
     char pathname[PATH_MAX];
-    int err = vsh_generate_path(pathname, sizeof(pathname), vsh_working_dir, argv[1]);
+    int err = vsh_generate_path(pathname, sizeof(pathname), __vsh_working_dir, argv[1]);
     if (err != 0) { return err; }
 
     int fd = open(pathname, 0);

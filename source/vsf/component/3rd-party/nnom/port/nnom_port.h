@@ -13,7 +13,9 @@
 #ifndef __NNOM_PORT_H__
 #define __NNOM_PORT_H__
 
-#include "vsf.h"
+#include "service/vsf_service.h"
+#include "utilities/vsf_utilities.h"
+#include "kernel/vsf_kernel.h"
 
 //#include <stdint.h>
 //#include <string.h>

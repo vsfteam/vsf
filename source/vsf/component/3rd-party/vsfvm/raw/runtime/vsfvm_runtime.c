@@ -21,8 +21,8 @@
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSFVM_RUNTIME_IMPLEMENT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSFVM_RUNTIME_CLASS_IMPLEMENT
 #include "./vsfvm_runtime.h"
 #include "../common/vsfvm_objdump.h"
 
@@ -90,7 +90,7 @@ int_fast32_t vsfvm_get_res(vsfvm_runtime_script_t *script, uint_fast32_t offset,
     return vsfvm_get_res_imp(script->token, offset, buffer);
 }
 
-static const vsfvm_extfunc_t * vsfvm_get_extfunc(uint_fast16_t id)
+static const vsfvm_extfunc_t * __vsfvm_get_extfunc(uint_fast16_t id)
 {
     __vsf_slist_foreach_unsafe(vsfvm_ext_t, ext_node, &vsfvm_ext_list) {
         if (id < _->op->func_num) {
@@ -101,7 +101,7 @@ static const vsfvm_extfunc_t * vsfvm_get_extfunc(uint_fast16_t id)
     return NULL;
 }
 
-static vsfvm_var_t * vsfvm_get_extvar(uint_fast16_t id)
+static vsfvm_var_t * __vsfvm_get_extvar(uint_fast16_t id)
 {
     __vsf_slist_foreach_unsafe(vsfvm_ext_t, ext_node, &vsfvm_ext_list) {
         if (id < _->op->var_num) {
@@ -112,7 +112,7 @@ static vsfvm_var_t * vsfvm_get_extvar(uint_fast16_t id)
     return NULL;
 }
 
-static vsfvm_var_t * vsfvm_stack_get(vsfvm_stack_t *stack, uint_fast32_t offset)
+static vsfvm_var_t * __vsfvm_stack_get(vsfvm_stack_t *stack, uint_fast32_t offset)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     uint_fast16_t id;
@@ -126,7 +126,7 @@ static vsfvm_var_t * vsfvm_stack_get(vsfvm_stack_t *stack, uint_fast32_t offset)
 #endif
 }
 
-static vsfvm_var_t * vsfvm_stack_get_byidx(vsfvm_stack_t *stack, uint_fast32_t idx)
+static vsfvm_var_t * __vsfvm_stack_get_byidx(vsfvm_stack_t *stack, uint_fast32_t idx)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     if (idx >= stack->sp) {
@@ -138,7 +138,7 @@ static vsfvm_var_t * vsfvm_stack_get_byidx(vsfvm_stack_t *stack, uint_fast32_t i
 #endif
 }
 
-static vsf_err_t vsfvm_stack_push(vsfvm_stack_t *stack, vsfvm_var_t *var, uint_fast32_t num)
+static vsf_err_t __vsfvm_stack_push(vsfvm_stack_t *stack, vsfvm_var_t *var, uint_fast32_t num)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     if (stack->size < (stack->sp + num)) {
@@ -153,7 +153,7 @@ static vsf_err_t vsfvm_stack_push(vsfvm_stack_t *stack, vsfvm_var_t *var, uint_f
 #endif
 }
 
-static vsfvm_var_t * vsfvm_stack_pop(vsfvm_stack_t *stack, uint_fast32_t num)
+static vsfvm_var_t * __vsfvm_stack_pop(vsfvm_stack_t *stack, uint_fast32_t num)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     if ((stack->sp >= num) && (num > 0)) {
@@ -166,7 +166,7 @@ static vsfvm_var_t * vsfvm_stack_pop(vsfvm_stack_t *stack, uint_fast32_t num)
 #endif
 }
 
-static vsf_err_t vsfvm_stack_push_ext(vsfvm_stack_t *stack, void *ptr, uint_fast32_t len)
+static vsf_err_t __vsfvm_stack_push_ext(vsfvm_stack_t *stack, void *ptr, uint_fast32_t len)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     uint_fast32_t item_size = sizeof(stack->var[0]);
@@ -183,7 +183,7 @@ static vsf_err_t vsfvm_stack_push_ext(vsfvm_stack_t *stack, void *ptr, uint_fast
 #endif
 }
 
-static vsf_err_t vsfvm_stack_pop_ext(vsfvm_stack_t *stack, void *ptr, uint_fast32_t len)
+static vsf_err_t __vsfvm_stack_pop_ext(vsfvm_stack_t *stack, void *ptr, uint_fast32_t len)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     uint_fast32_t item_size = sizeof(stack->var[0]);
@@ -200,14 +200,14 @@ static vsf_err_t vsfvm_stack_pop_ext(vsfvm_stack_t *stack, void *ptr, uint_fast3
 #endif
 }
 
-static void vsfvm_stack_fini(vsfvm_stack_t *stack)
+static void __vsfvm_stack_fini(vsfvm_stack_t *stack)
 {
 #ifndef VSFVM_CFG_RUNTIME_STACK_SIZE
     vsf_dynstack_fini(stack);
 #endif
 }
 
-static vsf_err_t vsfvm_stack_init(vsfvm_stack_t *stack)
+static vsf_err_t __vsfvm_stack_init(vsfvm_stack_t *stack)
 {
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
     stack->sp = 0;
@@ -221,7 +221,7 @@ static vsf_err_t vsfvm_stack_init(vsfvm_stack_t *stack)
 #endif
 }
 
-static vsfvm_var_t * vsfvm_runtime_get_var(vsfvm_thread_t *thread, VSFVM_CODE_VARIABLE_POS_t pos, uint_fast16_t id)
+static vsfvm_var_t * __vsfvm_runtime_get_var(vsfvm_thread_t *thread, VSFVM_CODE_VARIABLE_POS_t pos, uint_fast16_t id)
 {
     vsfvm_runtime_script_t *script = thread->script;
 
@@ -233,7 +233,7 @@ static vsfvm_var_t * vsfvm_runtime_get_var(vsfvm_thread_t *thread, VSFVM_CODE_VA
     case VSFVM_CODE_VARIABLE_POS_STACK_BEGIN:
         break;
     case VSFVM_CODE_VARIABLE_POS_STACK_END:
-        return vsfvm_stack_get(&thread->stack, id);
+        return __vsfvm_stack_get(&thread->stack, id);
     case VSFVM_CODE_VARIABLE_POS_FUNCARG:
         id = thread->func.arg_reg + id;
         break;
@@ -241,17 +241,17 @@ static vsfvm_var_t * vsfvm_runtime_get_var(vsfvm_thread_t *thread, VSFVM_CODE_VA
         id = thread->func.auto_reg + id;
         break;
     case VSFVM_CODE_VARIABLE_POS_EXT:
-        return vsfvm_get_extvar(id);
+        return __vsfvm_get_extvar(id);
         break;
     default: return NULL;
     }
-    return vsfvm_stack_get_byidx(&thread->stack, id);
+    return __vsfvm_stack_get_byidx(&thread->stack, id);
 }
 
 vsfvm_var_t * vsfvm_get_func_argu(vsfvm_thread_t *thread, uint_fast8_t idx)
 {
     if (thread->func.argc <= idx) { return NULL; }
-    return vsfvm_runtime_get_var(thread, VSFVM_CODE_VARIABLE_POS_FUNCARG, idx);
+    return __vsfvm_runtime_get_var(thread, VSFVM_CODE_VARIABLE_POS_FUNCARG, idx);
 }
 
 vsfvm_var_t * vsfvm_get_func_argu_ref(vsfvm_thread_t *thread, uint_fast8_t idx)
@@ -278,8 +278,8 @@ vsfvm_instance_t * vsfvm_instance_alloc(uint_fast32_t size, const vsfvm_class_t 
 #endif
         memset(inst, 0, sizeof(vsfvm_instance_t) + size);
 
-        inst->pchBuffer = (uint8_t *)&inst[1];
-        inst->nSize = size;
+        inst->buffer_ptr = (uint8_t *)&inst[1];
+        inst->s32_size = size;
         inst->ref = 1;
         inst->c = c;
     }
@@ -323,7 +323,7 @@ bool vsfvm_var_instance_of(vsfvm_var_t *var, const vsfvm_class_t *c)
     return (var->type == VSFVM_VAR_TYPE_INSTANCE) && vsfvm_instance_of(var->inst, c);
 }
 
-static void vsfvm_var_ref_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
+static void __vsfvm_var_ref_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
 {
     if (var->type == VSFVM_VAR_TYPE_REFERENCE) {
         var = vsfvm_get_ref(thread, var);
@@ -334,7 +334,7 @@ static void vsfvm_var_ref_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
     }
 }
 
-static void vsfvm_var_deref_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
+static void __vsfvm_var_deref_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
 {
     if (var->type == VSFVM_VAR_TYPE_REFERENCE) {
         var = vsfvm_get_ref(thread, var);
@@ -349,7 +349,7 @@ static void vsfvm_var_deref_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
 
 vsfvm_ret_t vsfvm_var_alloc_instance(vsfvm_thread_t *thread, vsfvm_var_t *var, uint_fast32_t size, const vsfvm_class_t *c)
 {
-    vsfvm_var_deref_instance(thread, var);
+    __vsfvm_var_deref_instance(thread, var);
     var->type = VSFVM_VAR_TYPE_INSTANCE;
     var->inst = vsfvm_instance_alloc(size, c);
     return var->inst ? VSFVM_RET_FINISHED : VSFVM_RET_ERROR;
@@ -370,48 +370,48 @@ vsfvm_ret_t vsfvm_var_free_instance(vsfvm_thread_t *thread, vsfvm_var_t *var)
 
 void vsfvm_var_set(vsfvm_thread_t *thread, vsfvm_var_t *var, vsfvm_var_type_t type, intptr_t value)
 {
-    vsfvm_var_deref_instance(thread, var);
+    __vsfvm_var_deref_instance(thread, var);
     var->type = type;
     var->value = value;
-    vsfvm_var_ref_instance(thread, var);
+    __vsfvm_var_ref_instance(thread, var);
 }
 
 
 vsfvm_var_t * vsfvm_thread_stack_pop(vsfvm_thread_t *thread, uint_fast32_t num)
 {
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-    vsfvm_var_t *var = vsfvm_stack_pop(&thread->stack, num);
+    vsfvm_var_t *var = __vsfvm_stack_pop(&thread->stack, num);
     if (num) {
         vsf_trace(VSF_TRACE_DEBUG, "pop stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
     }
     return var;
 #else
-    return vsfvm_stack_pop(&thread->stack, num);
+    return __vsfvm_stack_pop(&thread->stack, num);
 #endif
 }
 
-static int vsfvm_thread_stack_pop_and_free(vsfvm_thread_t *thread, uint_fast32_t num)
+static int __vsfvm_thread_stack_pop_and_free(vsfvm_thread_t *thread, uint_fast32_t num)
 {
     vsfvm_var_t *var;
 
     while (num-- > 0) {
         var = vsfvm_thread_stack_pop(thread, 1);
         if (!var) { return -1; }
-        vsfvm_var_deref_instance(thread, var);
+        __vsfvm_var_deref_instance(thread, var);
     }
     return 0;
 }
 
 vsfvm_var_t * vsfvm_thread_stack_get(vsfvm_thread_t *thread, uint_fast32_t offset)
 {
-    return vsfvm_stack_get(&thread->stack, offset);
+    return __vsfvm_stack_get(&thread->stack, offset);
 }
 
 int vsfvm_thread_stack_push(vsfvm_thread_t *thread, intptr_t value,
     vsfvm_var_type_t type, uint_fast32_t num)
 {
     vsfvm_var_t var = { value, type };
-    int err = vsfvm_stack_push(&thread->stack, &var, num);
+    int err = __vsfvm_stack_push(&thread->stack, &var, num);
     if (!err) {
         if (thread->max_sp < thread->stack.sp) {
             thread->max_sp = thread->stack.sp;
@@ -423,7 +423,7 @@ int vsfvm_thread_stack_push(vsfvm_thread_t *thread, intptr_t value,
     return err;
 }
 
-static int vsfvm_thread_stack_push_ref(vsfvm_thread_t *thread,
+static int __vsfvm_thread_stack_push_ref(vsfvm_thread_t *thread,
     intptr_t value, vsfvm_var_type_t type, uint_fast32_t num)
 {
     VSFVM_CODE_VARIABLE_POS_t pos = (VSFVM_CODE_VARIABLE_POS_t)((value >> 16) & 0xFF);
@@ -450,12 +450,12 @@ vsfvm_var_t * vsfvm_get_ref(vsfvm_thread_t *thread, vsfvm_var_t *var)
 {
     VSFVM_CODE_VARIABLE_POS_t pos = (VSFVM_CODE_VARIABLE_POS_t)((var->value >> 16) & 0xFF);
     uint_fast16_t id = var->value & 0xFFFF;
-    return vsfvm_runtime_get_var(thread, pos, id);
+    return __vsfvm_runtime_get_var(thread, pos, id);
 }
 
-static int vsfvm_push_func(vsfvm_thread_t *thread)
+static int __vsfvm_push_func(vsfvm_thread_t *thread)
 {
-    int err = vsfvm_stack_push_ext(&thread->stack, &thread->func, sizeof(thread->func));
+    int err = __vsfvm_stack_push_ext(&thread->stack, &thread->func, sizeof(thread->func));
     if (!err) {
         if (thread->max_sp < thread->stack.sp) {
             thread->max_sp = thread->stack.sp;
@@ -467,11 +467,11 @@ static int vsfvm_push_func(vsfvm_thread_t *thread)
     return err;
 }
 
-static int vsfvm_pop_func(vsfvm_thread_t *thread)
+static int __vsfvm_pop_func(vsfvm_thread_t *thread)
 {
     vsfvm_runtime_func_ctx_t func;
 
-    if (vsfvm_stack_pop_ext(&thread->stack, &func, sizeof(func)) < 0) {
+    if (__vsfvm_stack_pop_ext(&thread->stack, &func, sizeof(func)) < 0) {
         return -1;
     }
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
@@ -481,16 +481,16 @@ static int vsfvm_pop_func(vsfvm_thread_t *thread)
     return 0;
 }
 
-static void vsfvm_thread_fini_imp(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
+static void __vsfvm_thread_fini_imp(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
 {
     vsfvm_runtime_script_t *script = thread->script;
     vsfvm_var_t *var;
 
     do {
         var = vsfvm_thread_stack_pop(thread, 1);
-        if (var != NULL) vsfvm_var_deref_instance(thread, var);
+        if (var != NULL) { __vsfvm_var_deref_instance(thread, var); }
     } while (var != NULL);
-    vsfvm_stack_fini(&thread->stack);
+    __vsfvm_stack_fini(&thread->stack);
     vsf_slist_remove(vsfvm_thread_t, thread_node, &script->thread_list, thread);
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     vsf_eda_fini(&thread->use_as__vsf_teda_t.use_as__vsf_eda_t);
@@ -500,10 +500,10 @@ static void vsfvm_thread_fini_imp(vsfvm_runtime_t *runtime, vsfvm_thread_t *thre
     vsfvm_free_thread_imp(runtime, thread);
 }
 
-static void vsfvm_thread_fini(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
+static void __vsfvm_thread_fini(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
 {
     if (thread->script->root_thread != thread) {
-        vsfvm_thread_fini_imp(runtime, thread);
+        __vsfvm_thread_fini_imp(runtime, thread);
     }
 }
 
@@ -547,7 +547,7 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                 func->expression_sp = 0;
                 switch ((enum VSFVM_CODE_SYBMOL_SEMICOLIN_ID_t)arg8) {
                 case VSFVM_CODE_SYMBOL_SEMICOLON_POP:
-                    vsfvm_thread_stack_pop_and_free(thread, 1);
+                    __vsfvm_thread_stack_pop_and_free(thread, 1);
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "expr end stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
 #endif
@@ -602,7 +602,7 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                         return VSFVM_RET_ERROR;
                     }
 
-                    vsfvm_var_deref_instance(thread, result);
+                    __vsfvm_var_deref_instance(thread, result);
                     switch (id) {
                     case VSFVM_CODE_SYMBOL_MUL:     result->value = arg1->value * arg2->value; break;
                     case VSFVM_CODE_SYMBOL_DIV:
@@ -634,18 +634,18 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                         var = vsfvm_get_ref(thread, arg1);
                         if (!var) { return VSFVM_RET_ERROR; }
 
-                        vsfvm_var_deref_instance(thread, var);
+                        __vsfvm_var_deref_instance(thread, var);
                         result->value = var->value = arg2->value;
                         result->type = var->type = arg2->type;
-                        vsfvm_var_ref_instance(thread, var);
-                        vsfvm_var_ref_instance(thread, result);
-                        vsfvm_var_deref_instance(thread, arg2);
+                        __vsfvm_var_ref_instance(thread, var);
+                        __vsfvm_var_ref_instance(thread, result);
+                        __vsfvm_var_deref_instance(thread, arg2);
                         continue;
                     default:
                         return VSFVM_RET_ERROR;
                     }
                     result->type = VSFVM_VAR_TYPE_VALUE;
-                    vsfvm_var_deref_instance(thread, arg2);
+                    __vsfvm_var_deref_instance(thread, arg2);
                 }
             }
             break;
@@ -660,7 +660,7 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
 #endif
                 break;
             case VSFVM_CODE_KEYWORD_goto:
-                vsfvm_thread_stack_pop_and_free(thread, arg8);
+                __vsfvm_thread_stack_pop_and_free(thread, arg8);
             do_goto:
                 func->pc += (int16_t)arg16;
                 break;
@@ -670,14 +670,14 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                 break;
             case VSFVM_CODE_KEYWORD_return:
             do_return:
-                vsfvm_thread_stack_pop_and_free(thread, thread->stack.sp - func->auto_reg);
+                __vsfvm_thread_stack_pop_and_free(thread, thread->stack.sp - func->auto_reg);
                 // reserve one arg as return value
                 arg8 = func->argc - 1;
-                vsfvm_pop_func(thread);
-                vsfvm_thread_stack_pop_and_free(thread, arg8);
+                __vsfvm_pop_func(thread);
+                __vsfvm_thread_stack_pop_and_free(thread, arg8);
                 if (!func->pc) {
-                    // vsfvm_thread_fini will not free script->root_thread
-                    vsfvm_thread_fini(runtime, thread);
+                    // __vsfvm_thread_fini will not free script->root_thread
+                    __vsfvm_thread_fini(runtime, thread);
                     return VSFVM_RET_FINISHED;
                 }
                 break;
@@ -704,29 +704,29 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
 
             switch (id) {
             case VSFVM_CODE_VARIABLE_NORMAL:
-                arg1 = vsfvm_runtime_get_var(thread, (VSFVM_CODE_VARIABLE_POS_t)arg8, arg16);
+                arg1 = __vsfvm_runtime_get_var(thread, (VSFVM_CODE_VARIABLE_POS_t)arg8, arg16);
                 if (!arg1) { return VSFVM_RET_ERROR; }
                 if (arg1->type == VSFVM_VAR_TYPE_REFERENCE) {
                     arg1 = vsfvm_get_ref(thread, arg1);
                     if (!arg1) { return VSFVM_RET_ERROR; }
                 }
-                vsfvm_var_ref_instance(thread, arg1);
+                __vsfvm_var_ref_instance(thread, arg1);
                 if (vsfvm_thread_stack_push(thread, arg1->value, arg1->type, 1)) {
                     return VSFVM_RET_STACK_FAIL;
                 }
                 break;
             case VSFVM_CODE_VARIABLE_REFERENCE:
             case VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE:
-                arg1 = vsfvm_runtime_get_var(thread, (VSFVM_CODE_VARIABLE_POS_t)arg8, arg16);
+                arg1 = __vsfvm_runtime_get_var(thread, (VSFVM_CODE_VARIABLE_POS_t)arg8, arg16);
                 if (!arg1) { return VSFVM_RET_ERROR; }
-                vsfvm_var_ref_instance(thread, arg1);
+                __vsfvm_var_ref_instance(thread, arg1);
                 if (    (id != VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE)
                     &&  (arg1->type == VSFVM_VAR_TYPE_REFERENCE)) {
                     if (vsfvm_thread_stack_push(thread, arg1->value,
                             VSFVM_VAR_TYPE_REFERENCE, 1)) {
                         return VSFVM_RET_STACK_FAIL;
                     }
-                } else if (vsfvm_thread_stack_push_ref(thread,
+                } else if (__vsfvm_thread_stack_push_ref(thread,
                         VSFVM_CODE_ARG24(token), VSFVM_VAR_TYPE_REFERENCE, 1)) {
                     return VSFVM_RET_STACK_FAIL;
                 }
@@ -765,7 +765,7 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                     }
                 }
 
-                if (vsfvm_push_func(thread)) {
+                if (__vsfvm_push_func(thread)) {
                     return VSFVM_RET_STACK_FAIL;
                 }
 
@@ -779,12 +779,12 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                     func->pc += (int16_t)arg16;
                     break;
                 case VSFVM_CODE_FUNCTION_EXT:
-                    ext = vsfvm_get_extfunc(arg16);
+                    ext = __vsfvm_get_extfunc(arg16);
                     if (!ext) return VSFVM_RET_ERROR;
                     func->handler = ext->handler;
                     break;
                 case VSFVM_CODE_FUNCTION_THREAD:
-                    vsfvm_pop_func(thread);
+                    __vsfvm_pop_func(thread);
                     if (!vsfvm_thread_init(runtime, script, 0, arg8, thread, NULL)) {
                         return VSFVM_RET_ERROR;
                     }
@@ -819,7 +819,7 @@ vsfvm_thread_t * vsfvm_thread_init(vsfvm_runtime_t *runtime,
     memset(thread, 0, sizeof(*thread));
     func = &thread->func;
 
-    vsfvm_stack_init(&thread->stack);
+    __vsfvm_stack_init(&thread->stack);
 
     func->arg_reg = thread->stack.sp;
     // stack layout while calling a function:
@@ -861,7 +861,7 @@ vsfvm_thread_t * vsfvm_thread_init(vsfvm_runtime_t *runtime,
             }
         }
     }
-    if (vsfvm_push_func(thread)) {
+    if (__vsfvm_push_func(thread)) {
         goto fail_stack;
     }
     if (!script->lvar_pos) {
@@ -880,7 +880,7 @@ vsfvm_thread_t * vsfvm_thread_init(vsfvm_runtime_t *runtime,
     return thread;
 
 fail_stack:
-    vsfvm_stack_fini(&thread->stack);
+    __vsfvm_stack_fini(&thread->stack);
     vsfvm_free_thread_imp(runtime, thread);
 fail_alloc_thread:
     return NULL;
@@ -905,7 +905,7 @@ int vsfvm_runtime_script_fini(vsfvm_runtime_t *runtime, vsfvm_runtime_script_t *
     script->state = VSFVM_SCRIPTSTAT_FINIED;
 
     __vsf_slist_foreach_next_unsafe(vsfvm_thread_t, thread_node, &script->thread_list) {
-        vsfvm_thread_fini_imp(runtime, _);
+        __vsfvm_thread_fini_imp(runtime, _);
     }
     vsf_slist_init(&script->thread_list);
     vsf_slist_remove(vsfvm_runtime_script_t, script_node, &runtime->script_list, script);

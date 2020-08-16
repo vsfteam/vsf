@@ -102,7 +102,7 @@ typedef enum m480_pllsrc_t m480_pllsrc_t;
 char __low_level_init(void)
 {
     // to use SRAM BANK2
-    CLK->AHBCLK |= CLK_AHBCLK_SPIMCKEN_Msk;
+    CLK->SyncCLK |= CLK_SyncCLK_SPIMCKEN_Msk;
     SPIM->CTL1 |= 1 << 2;
 
     return 1;

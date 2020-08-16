@@ -29,10 +29,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_PBUF_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_PBUF_CLASS_IMPLEMENT
 #elif   defined(__VSF_PBUF_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_PBUF_CLASS_INHERIT
 #endif   
 
@@ -63,32 +63,32 @@ enum {
 declare_class(vsf_pbuf_t)
 
 /*! \name prototype of pbuf request event handler
- *! \param ptTarget target object address
+ *! \param target_ptr target object address
  *! \param nNoLessThan Specify the smallest available size of the pbuf, 
  *!        (-1) means don't care.
  *! \param nBestSize Specify the most desired size of the pbuf, 
  *!        (-1) means don't care.
  *! \return the address of the allocated pbuf, (NULL) means allocation is failed.
  */
-typedef vsf_pbuf_t *req_pbuf_evt_handler(   void *pTarget, 
+typedef vsf_pbuf_t *req_pbuf_evt_handler(   void *target_ptr, 
                                             int_fast32_t nNoLessThan,
                                             int_fast32_t nBestSize,
                                             uint_fast16_t hwReserve);
 
 typedef struct req_pbuf_evt_t req_pbuf_evt_t;
 struct req_pbuf_evt_t {
-    req_pbuf_evt_handler    *fnHandler;
-    void                    *pTarget;
+    req_pbuf_evt_handler    *handler_fn;
+    void                    *target_ptr;
 };
 
 //! \brief fixed memory block used as stream buffer
 //! @{
 typedef union vsf_pbuf_capability_t {
     struct {
-        uint32_t    u24BlockSize        : 24;
-        uint32_t    isNoWrite           : 1;
-        uint32_t    isNoRead            : 1;
-        uint32_t    isNoDirectAccess    : 1;
+        uint32_t    u24_block_size        : 24;
+        uint32_t    is_no_write           : 1;
+        uint32_t    is_no_read            : 1;
+        uint32_t    is_no_direct_access    : 1;
         uint32_t    u5REFCount          : 5;
     };
     uint32_t        Capability;
@@ -102,10 +102,10 @@ def_class(vsf_pbuf_t,
     private_member(
         implement_ex(vsf_pbuf_capability_t, tFeature)
         
-        uint8_t            *pchBuffer;                                         
+        uint8_t            *buffer_ptr;                                         
        
-        uint32_t            u24Size             : 24;
-        uint32_t            u8AdapterID           : 8;
+        uint32_t            u24_size             : 24;
+        uint32_t            u8_adapter_id           : 8;
     )
 )
 end_def_class(vsf_pbuf_t)
@@ -119,7 +119,7 @@ def_interface(i_pbuf_methods_t)
     /*! \retval NULL    target pbuf has been free-ed
      *! \retval !NULL   Only reference number decreased.
      */
-    vsf_pbuf_t * (*Free)(void *, vsf_pbuf_t *ptBlock);         //!< User specified free
+    vsf_pbuf_t * (*Free)(void *, vsf_pbuf_t *block_ptr);         //!< User specified free
 
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
     //! interface for reading target memory
@@ -140,18 +140,18 @@ end_def_interface(i_pbuf_methods_t)
 //! @}
 
 struct vsf_pbuf_adapter_t {
-    void *ptTarget;                             //!< user defined target obj
+    void *target_ptr;                             //!< user defined target obj
     uint_fast8_t ID;                            //!< Array index
-    const i_pbuf_methods_t *piMethods;          //!< block methods
+    const i_pbuf_methods_t *methods_ptr;          //!< block methods
 };
 typedef struct vsf_pbuf_adapter_t vsf_pbuf_adapter_t;
 
 
 
 typedef struct vsf_pbuf_cfg_t {
-    void *              pBuffer;
+    void *              buffer_ptr;
     vsf_pbuf_capability_t;
-    uint_fast8_t        AdapterID;
+    uint_fast8_t        adapter_id;
 } vsf_pbuf_cfg_t;
 
 
@@ -173,7 +173,7 @@ def_interface(i_pbuf_t)
         void            (*Register)(const vsf_pbuf_adapter_t *padapter,
                                     uint_fast8_t size);
         const vsf_pbuf_adapter_t *
-                        (*Get)(uint_fast8_t chID);
+                        (*Get)(uint_fast8_t u8_id);
     } Adapter;
 
     struct {
@@ -213,11 +213,11 @@ extern const i_pbuf_t VSF_PBUF;
 
 /*============================ PROTOTYPES ====================================*/
 extern vsf_pbuf_t *vsf_pbuf_free(vsf_pbuf_t *pbuf);
-extern vsf_pbuf_t *vsf_pbuf_init(vsf_pbuf_t *ptBlock, vsf_pbuf_cfg_t *pcfg);
-extern void vsf_adapter_register(   const vsf_pbuf_adapter_t *ptAdaptors, 
-                                    uint_fast8_t chSize);
-extern const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t chID);
-extern vsf_pbuf_capability_t vsf_pbuf_capability_get(vsf_pbuf_t *ptObj);
+extern vsf_pbuf_t *vsf_pbuf_init(vsf_pbuf_t *block_ptr, vsf_pbuf_cfg_t *pcfg);
+extern void vsf_adapter_register(   const vsf_pbuf_adapter_t *adaptors_ptr, 
+                                    uint_fast8_t u8_size);
+extern const vsf_pbuf_adapter_t *vsf_pbuf_adapter_get(uint_fast8_t u8_id);
+extern vsf_pbuf_capability_t vsf_pbuf_capability_get(vsf_pbuf_t *obj_ptr);
 extern void vsf_pbuf_size_reset(vsf_pbuf_t *pobj);
 extern void *vsf_pbuf_buffer_get(vsf_pbuf_t *pobj);
 extern void vsf_pbuf_size_set(vsf_pbuf_t *pobj, int_fast32_t size);

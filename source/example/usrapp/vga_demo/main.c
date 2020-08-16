@@ -214,7 +214,7 @@ int main(void)
     TIMER1->CMP         = vga.param.h.pulse_bporch;
     TIMER1->TRGCTL      = (0 << TIMER_TRGCTL_TRGSSEL_Pos) | TIMER_TRGCTL_TRGPDMA_Msk;
 
-    CLK->AHBCLK         |= CLK_AHBCLK_PDMACKEN_Msk;
+    CLK->SyncCLK         |= CLK_SyncCLK_PDMACKEN_Msk;
     PDMA->SCATBA        = (uint32_t)&vga & 0xFFFF0000;
     PDMA->INTEN         |= (1 << 13);
     NVIC_SetPriority(PDMA_IRQn, vsf_arch_prio_highest);

@@ -21,19 +21,19 @@
 
 #if VSF_USE_USB_HOST == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBH_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
-#include "hal/interface/vsf_interface_usb.h"
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBH_CLASS_IMPLEMENT
+
+#include "./vsf_usbh.h"
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 
 #define USB_DEFAULT_TIMEOUT         50    // 50ms
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
-#define VSF_USBH_REL    0
-#define VSF_USBH_VER    0
+#   define VSF_USBH_REL             0
+#   define VSF_USBH_VER             0
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -111,8 +111,8 @@ static const uint8_t __vk_usbh_rh_config_descriptor[] = {
     0xff        /*  __u8  ep_bInterval; (255ms -- usb 2.0 spec) */
 };
 #endif
-/*============================ PROTOTYPES ====================================*/
 
+/*============================ PROTOTYPES ====================================*/
 
 extern void vsf_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser);
 extern vsf_err_t vsf_usbh_on_match_interface(
@@ -247,14 +247,14 @@ void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd)
 
 static void __vk_usbh_free_buffer(void *buffer)
 {
-    VSF_USBH_FREE(buffer);
+    vsf_usbh_free(buffer);
 }
 
 void * vk_usbh_hcd_urb_alloc_buffer(vk_usbh_hcd_urb_t *urb_hcd, uint_fast16_t size)
 {
     VSF_USB_ASSERT((urb_hcd != NULL) && (size > 0));
     vk_usbh_hcd_urb_free_buffer(urb_hcd);
-    urb_hcd->buffer = VSF_USBH_MALLOC(size);
+    urb_hcd->buffer = vsf_usbh_malloc(size);
     urb_hcd->transfer_length = size;
     urb_hcd->free_buffer = __vk_usbh_free_buffer;
     urb_hcd->free_buffer_param = urb_hcd->buffer;
@@ -267,14 +267,14 @@ static vk_usbh_dev_t * __vk_usbh_alloc_device(vk_usbh_t *usbh)
 
     VSF_USB_ASSERT(usbh != NULL);
 
-    dev = VSF_USBH_MALLOC(sizeof(vk_usbh_dev_t));
+    dev = vsf_usbh_malloc(sizeof(vk_usbh_dev_t));
     if (NULL == dev) { return NULL; }
     memset(dev, 0, sizeof(vk_usbh_dev_t));
 
     if (    (usbh->drv->alloc_device != NULL)
         &&  (usbh->drv->alloc_device(&usbh->use_as__vk_usbh_hcd_t, &dev->use_as__vk_usbh_hcd_dev_t) != VSF_ERR_NONE)) {
 free_dev:
-        VSF_USBH_FREE(dev);
+        vsf_usbh_free(dev);
         return NULL;
     }
 
@@ -315,7 +315,7 @@ static void __vk_usbh_clean_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         usbh->drv->free_device(&usbh->use_as__vk_usbh_hcd_t, &dev->use_as__vk_usbh_hcd_dev_t);
     }
     if (dev->ifs != NULL) {
-        VSF_USBH_FREE(dev->ifs);
+        vsf_usbh_free(dev->ifs);
         dev->ifs = NULL;
     }
 }
@@ -327,7 +327,11 @@ void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         vk_usbh_hub_reset_dev(dev);
     } else
 #endif
-    if (usbh->drv->reset_dev != NULL){
+    if (    (usbh->drv->reset_dev != NULL)
+#if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
+        &&  (usbh->dev_rh != dev)
+#endif
+        ) {
         usbh->drv->reset_dev(&usbh->use_as__vk_usbh_hcd_t, &dev->use_as__vk_usbh_hcd_dev_t);
     }
 }
@@ -339,7 +343,11 @@ static bool __vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         return vk_usbh_hub_is_dev_resetting(dev);
     } else
 #endif
-    if (usbh->drv->is_dev_reset != NULL) {
+    if (    (usbh->drv->is_dev_reset != NULL)
+#if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
+        &&  (usbh->dev_rh != dev)
+#endif
+        ) {
         return usbh->drv->is_dev_reset(&usbh->use_as__vk_usbh_hcd_t, &dev->use_as__vk_usbh_hcd_dev_t);
     }
     return false;
@@ -441,16 +449,16 @@ void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 static void __vk_usbh_reset_parser(vk_usbh_dev_parser_t *parser)
 {
     if (parser->desc_config != NULL) {
-        VSF_USBH_FREE(parser->desc_config);
+        vsf_usbh_free(parser->desc_config);
         parser->desc_config = NULL;
     }
 
     if (parser->parser_ifs != NULL) {
         vk_usbh_ifs_parser_t *parser_ifs = parser->parser_ifs;
         for (uint_fast8_t ifs_idx = 0; ifs_idx < parser->num_of_ifs; ifs_idx++, parser_ifs++) {
-            VSF_USBH_FREE(parser_ifs->parser_alt);
+            vsf_usbh_free(parser_ifs->parser_alt);
         }
-        VSF_USBH_FREE(parser->parser_ifs);
+        vsf_usbh_free(parser->parser_ifs);
         parser->parser_ifs = NULL;
     }
 }
@@ -461,9 +469,9 @@ static void __vk_usbh_free_parser(vk_usbh_t *usbh)
     if (parser != NULL) {
         __vk_usbh_reset_parser(parser);
         if (parser->desc_device != NULL) {
-            VSF_USBH_FREE(parser->desc_device);
+            vsf_usbh_free(parser->desc_device);
         }
-        VSF_USBH_FREE(parser);
+        vsf_usbh_free(parser);
         usbh->parser = NULL;
     }
 }
@@ -501,7 +509,7 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         vsf_eda_fini(&usbh->teda.use_as__vsf_eda_t);
         usbh->dev_new = NULL;
     }
-    VSF_USBH_FREE(dev);
+    vsf_usbh_free(dev);
 }
 
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
@@ -828,16 +836,20 @@ static bool __vk_usbh_match_id(vk_usbh_dev_parser_t *parser,
     return true;
 }
 
-static const vk_usbh_class_drv_t *
+static const vk_usbh_class_t *
 __vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
-        vk_usbh_ifs_parser_t *parser_ifs)
+        vk_usbh_ifs_parser_t *parser_ifs, const vk_usbh_class_t *c)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
     const vk_usbh_class_drv_t *drv;
     const vk_usbh_dev_id_t *dev_id;
-    vk_usbh_class_t *c;
 
-    vsf_slist_peek_next(vk_usbh_class_t, node, &usbh->class_list, c);
+    if (NULL == c) {
+        vsf_slist_peek_next(vk_usbh_class_t, node, &usbh->class_list, c);
+    } else {
+        vsf_slist_peek_next(vk_usbh_class_t, node, &c->node, c);
+    }
+
     while (c != NULL) {
         drv = c->drv;
 
@@ -852,21 +864,21 @@ __vk_usbh_match_interface_driver(vk_usbh_t *usbh, vk_usbh_dev_parser_t *parser,
         }
         vsf_slist_peek_next(vk_usbh_class_t, node, &c->node, c);
     }
-    drv = NULL;
 end:
-    return drv;
+    return c;
 }
 
 static vsf_err_t __vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
         vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
-    const vk_usbh_class_drv_t *drv;
+    const vk_usbh_class_t *c = NULL;
     void *param;
 
     do {
-        drv = __vk_usbh_match_interface_driver(usbh, parser, parser_ifs);
-        if (drv != NULL) {
+        c = __vk_usbh_match_interface_driver(usbh, parser, parser_ifs, c);
+        if (c != NULL) {
+            const vk_usbh_class_drv_t *drv = c->drv;
             param = drv->probe(usbh, usbh->dev_new, parser_ifs);
             if (param != NULL) {
                 ifs->param = param;
@@ -877,9 +889,8 @@ static vsf_err_t __vk_usbh_find_intrface_driver(vk_usbh_t *usbh,
                 }
                 return VSF_ERR_NONE;
             }
-            return VSF_ERR_FAIL;
         }
-    } while (drv != NULL);
+    } while (c != NULL);
     return VSF_ERR_FAIL;
 }
 
@@ -908,7 +919,7 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
     parser->num_of_ifs = dev->num_of_ifs = desc_config->bNumInterfaces;
 
     len = dev->num_of_ifs * sizeof(vk_usbh_ifs_t);
-    dev->ifs = VSF_USBH_MALLOC(len);
+    dev->ifs = vsf_usbh_malloc(len);
     if (!dev->ifs) {
         VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
@@ -916,7 +927,7 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
     memset(dev->ifs, 0, len);
 
     len = dev->num_of_ifs * sizeof(vk_usbh_ifs_parser_t);
-    parser->parser_ifs = VSF_USBH_MALLOC(len);
+    parser->parser_ifs = vsf_usbh_malloc(len);
     if (!parser->parser_ifs) {
         VSF_USB_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
@@ -944,7 +955,7 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
                 alloc_alt:
                     parser_ifs->ifs->no = ifs_no;
                     len = parser_ifs->ifs->num_of_alt * sizeof(*parser_ifs->parser_alt);
-                    parser_ifs->parser_alt = VSF_USBH_MALLOC(len);
+                    parser_ifs->parser_alt = vsf_usbh_malloc(len);
                     if (!parser_ifs->parser_alt) {
                         VSF_USB_ASSERT(false);
                         return VSF_ERR_NOT_ENOUGH_RESOURCES;
@@ -1032,7 +1043,7 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        parser = VSF_USBH_MALLOC(sizeof(*parser));
+        parser = vsf_usbh_malloc(sizeof(*parser));
         if (NULL == parser) { goto parse_failed; }
         memset(parser, 0, sizeof(*parser));
         usbh->parser = parser;

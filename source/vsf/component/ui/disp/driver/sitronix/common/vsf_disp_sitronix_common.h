@@ -27,10 +27,10 @@
 
 #if     defined(__VSF_DISP_SITRONIX_CLASS_IMPLEMENT)
 #   undef __VSF_DISP_SITRONIX_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(__VSF_DISP_SITRONIX_CLASS_INHERIT)
-#   undef __VSF_DISP_SITRONIX_CLASS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_DISP_SITRONIX_CLASS_INHERIT__)
+#   undef __VSF_DISP_SITRONIX_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"

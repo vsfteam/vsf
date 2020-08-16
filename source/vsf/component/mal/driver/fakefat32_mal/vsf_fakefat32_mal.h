@@ -25,13 +25,14 @@
 #if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
 
 #include "component/fs/vsf_fs.h"
+// DO NOT REMOVE vsf_memfs.h BELOW, unless you really know what you are doing.
+// vsf_fs.h includes vsf_mal.h for malfs to use mal
+// vsf_mal.h includes vsf_fs.h for fakefat32_mal to use memfs
+#include "component/fs/driver/memfs/vsf_memfs.h"
 
-#if     defined(VSF_FAKEFAT32_MAL_IMPLEMENT)
-#   undef VSF_FAKEFAT32_MAL_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_FAKEFAT32_MAL_INHERIT)
-#   undef VSF_FAKEFAT32_MAL_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_FAKEFAT32_MAL_CLASS_IMPLEMENT)
+#   undef __VSF_FAKEFAT32_MAL_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -49,11 +50,13 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_fakefat32_mal_t)
-declare_simple_class(vk_fakefat32_file_t)
+dcl_simple_class(vk_fakefat32_mal_t)
+dcl_simple_class(vk_fakefat32_file_t)
 
 def_simple_class(vk_fakefat32_file_t) {
-    implement(vk_memfs_file_t)
+    public_member(
+        implement(vk_memfs_file_t)
+    )
 
     private_member(
         uint32_t first_cluster;
@@ -75,9 +78,9 @@ def_simple_class(vk_fakefat32_file_t) {
 
 
 def_simple_class(vk_fakefat32_mal_t) {
-    implement(vk_mal_t)
-
     public_member(
+        implement(vk_mal_t)
+
         uint16_t sector_size;
         uint16_t sector_number;
         uint8_t sectors_per_cluster;

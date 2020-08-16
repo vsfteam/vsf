@@ -26,9 +26,9 @@
 
 #include "component/usb/common/class/UAC/vsf_usb_UAC.h"
 
-#if     defined(VSF_USBH_UAC_IMPLEMENT)
-#   undef VSF_USBH_UAC_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
+#if     defined(__VSF_USBH_UAC_CLASS_IMPLEMENT)
+#   undef __VSF_USBH_UAC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   define PUBLIC_CONST
 #else
 #   define PUBLIC_CONST                         const
@@ -49,7 +49,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbh_uac_stream_t)
+dcl_simple_class(vk_usbh_uac_stream_t)
 
 def_simple_class(vk_usbh_uac_stream_t) {
     public_member(

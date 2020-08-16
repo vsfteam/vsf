@@ -67,7 +67,7 @@ void cdc_stream_init(void)
 #endif
     //! initialise stream source
     do {
-        vsf_stream_src_cfg_t tCFG = {
+        vsf_stream_src_cfg_t cfg = {
             .ptTX = &s_tCDCStreamFIFO.TX,                                       //!< connect stream TX 
 #if USER_APP_CFG_CDC_POOL == ENABLED
             .tRequestPBUFEvent = 
@@ -76,14 +76,14 @@ void cdc_stream_init(void)
 #endif
         };
 
-        VSF_STREAM_SRC.Init(&g_tStreamSourceCDC, &tCFG);
+        VSF_STREAM_SRC.Init(&g_tStreamSourceCDC, &cfg);
 
     } while(0);
 }
 
 void usrapp_log_info(const char *fmt, ...)
 {
-    vsf_pbuf_t *ptBlock = NULL; 
+    vsf_pbuf_t *block_ptr = NULL; 
     __vsf_sched_safe(
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
         if (!s_tCDCStreamFIFO.RX.piMethod->GetStatus(&s_tCDCStreamFIFO.RX).IsOpen) {
@@ -91,23 +91,23 @@ void usrapp_log_info(const char *fmt, ...)
             return;
         }
     #endif
-        ptBlock = vsf_stream_src_new_pbuf(&g_tStreamSourceCDC, -1, -1);
-        if (NULL == ptBlock) {
+        block_ptr = vsf_stream_src_new_pbuf(&g_tStreamSourceCDC, -1, -1);
+        if (NULL == block_ptr) {
             //! no enough buffer
             vsf_sched_safe_exit();
             return;
         }
-        //vsf_pbuf_size_reset(ptBlock);
+        //vsf_pbuf_size_reset(block_ptr);
     )
 
     do {
         va_list ap;
         va_start(ap, fmt);
 
-        vsf_pbuf_capability_t tCapability = vsf_pbuf_capability_get(ptBlock);
-        ASSERT(0 == tCapability.isNoWrite && 0 == tCapability.isNoRead);
+        vsf_pbuf_capability_t tCapability = vsf_pbuf_capability_get(block_ptr);
+        ASSERT(0 == tCapability.is_no_write && 0 == tCapability.is_no_read);
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
-        if (tCapability.isNoDirectAccess) {
+        if (tCapability.is_no_direct_access) {
             /*! \Note NO Direct Memory Access is supported. If you assume this
                       SHOULD NOT happen in your application, then you can use 
                       the simplified access as shown in else part
@@ -115,18 +115,18 @@ void usrapp_log_info(const char *fmt, ...)
             char chLocalBuffer[CDC_BUFFER_BLOCK_SIZE];
             uint_fast32_t hwWrittenSize = 
                 vsnprintf(chLocalBuffer, sizeof(chLocalBuffer), fmt, ap);
-            vsf_pbuf_buffer_write(ptBlock, chLocalBuffer, hwWrittenSize, 0);
+            vsf_pbuf_buffer_write(block_ptr, chLocalBuffer, hwWrittenSize, 0);
         } else 
 #endif
         { 
-            vsf_pbuf_size_set(ptBlock, vsnprintf(   vsf_pbuf_buffer_get(ptBlock), 
-                                                    vsf_pbuf_size_get(ptBlock), 
+            vsf_pbuf_size_set(block_ptr, vsnprintf(   vsf_pbuf_buffer_get(block_ptr), 
+                                                    vsf_pbuf_size_get(block_ptr), 
                                                     fmt, 
                                                     ap));
         }
 
         //! write stream
-        VSF_STREAM_SRC.Block.Send(&g_tStreamSourceCDC, ptBlock);
+        VSF_STREAM_SRC.Block.Send(&g_tStreamSourceCDC, block_ptr);
     } while (0);
 }
 #else

@@ -21,12 +21,12 @@
 
 #if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_USE_MAL_SCSI == ENABLED
 
-#define VSF_SCSI_INHERIT
-#define VSF_VIRTUAL_SCSI_INHERIT
-#define VSF_MAL_SCSI_IMPLEMENT
+#define __VSF_SCSI_CLASS_INHERIT__
+#define __VSF_VIRTUAL_SCSI_CLASS_INHERIT__
+#define __VSF_MAL_SCSI_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_scsi.h"
+#include "./vsf_mal_scsi.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -98,7 +98,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_read, vk_virtual_scsi_read)
 #endif
             vk_mal_read(mal_scsi->mal,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
-                ((vsf_mem_t *)vsf_local.mem_stream)->pchBuffer);
+                ((vsf_mem_t *)vsf_local.mem_stream)->buffer_ptr);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         }
 #endif
@@ -127,7 +127,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_write, vk_virtual_scsi_write)
 #endif
             vk_mal_write(mal_scsi->mal,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
-                ((vsf_mem_t *)vsf_local.mem_stream)->pchBuffer);
+                ((vsf_mem_t *)vsf_local.mem_stream)->buffer_ptr);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         }
 #endif

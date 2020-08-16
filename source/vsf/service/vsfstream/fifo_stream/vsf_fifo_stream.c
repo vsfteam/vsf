@@ -20,7 +20,8 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#define VSFSTREAM_FIFO_CLASS_IMPLEMENT
+#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSFSTREAM_FIFO_CLASS_IMPLEMENT
 #include "../vsfstream.h"
 #include "./vsf_fifo_stream.h"
 

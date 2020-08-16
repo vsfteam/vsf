@@ -21,11 +21,11 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_USE_SCSI == ENABLED && VSF_USE_SCSI_MAL == ENABLED
 
-#define VSF_MAL_INHERIT
-#define VSF_SCSI_MAL_IMPLEMENT
+#define __VSF_MAL_CLASS_INHERIT__
+#define __VSF_SCSI_MAL_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_mal.h"
+#include "./vsf_scsi_mal.h"
 
 /*============================ MACROS ========================================*/
 
@@ -100,8 +100,8 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
             case STATE_INIT:
                 pthis->cbd[0] = 0x12;
                 pthis->cbd[4] = 0x24;
-                pthis->mem.pchBuffer = (uint8_t *)&pthis->buffer.inquiry;
-                pthis->mem.nSize = sizeof(pthis->buffer.inquiry);
+                pthis->mem.buffer_ptr = (uint8_t *)&pthis->buffer.inquiry;
+                pthis->mem.s32_size = sizeof(pthis->buffer.inquiry);
                 vsf_eda_frame_user_value_set(STATE_INQUIRY);
                 vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
                 break;
@@ -110,8 +110,8 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
                         pthis->buffer.inquiry.vendor, pthis->buffer.inquiry.product, pthis->buffer.inquiry.revision);
 
                 pthis->cbd[0] = 0x25;
-                pthis->mem.pchBuffer = (uint8_t *)&pthis->buffer.capacity;
-                pthis->mem.nSize = sizeof(pthis->buffer.capacity);
+                pthis->mem.buffer_ptr = (uint8_t *)&pthis->buffer.capacity;
+                pthis->mem.s32_size = sizeof(pthis->buffer.capacity);
                 vsf_eda_frame_user_value_set(STATE_CAPACITY);
                 vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
                 break;
@@ -140,8 +140,8 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_read, vk_mal_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->mem.pchBuffer = vsf_local.buff;
-        pthis->mem.nSize = vsf_local.size;
+        pthis->mem.buffer_ptr = vsf_local.buff;
+        pthis->mem.s32_size = vsf_local.size;
         pthis->cbd[0] = 0x28;
         put_unaligned_be32((uint32_t)(vsf_local.addr / pthis->block_size), &pthis->cbd[2]);
         put_unaligned_be16((uint16_t)(vsf_local.size / pthis->block_size), &pthis->cbd[7]);
@@ -161,8 +161,8 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_write, vk_mal_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->mem.pchBuffer = vsf_local.buff;
-        pthis->mem.nSize = vsf_local.size;
+        pthis->mem.buffer_ptr = vsf_local.buff;
+        pthis->mem.s32_size = vsf_local.size;
         pthis->cbd[0] = 0x2A;
         put_unaligned_be32((uint32_t)(vsf_local.addr / pthis->block_size), &pthis->cbd[2]);
         put_unaligned_be16((uint16_t)(vsf_local.size / pthis->block_size), &pthis->cbd[7]);

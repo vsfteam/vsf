@@ -24,15 +24,12 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED
 
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/vsf_hal.h"
 #include "component/usb/common/usb_common.h"
 
-#if     defined(VSF_USBIP_DCD_IMPLEMENT)
-#   undef VSF_USBIP_DCD_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_USBIP_DCD_INHERIT)
-#   undef VSF_USBIP_DCD_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_USBIP_DCD_CLASS_IMPLEMENT)
+#   undef __VSF_USBIP_DCD_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -57,20 +54,18 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-// use uppercase because of __USB_DC_FROM_IP
-#define VSF_USB_DC_FROM_USBIP_IP(__N, __OBJ, __DRV_NAME)                        \
-        __USB_DC_FROM_IP(__N, (__OBJ), __DRV_NAME, vk_usbip_usbd)
+#define vsf_usb_dc_from_usbip_ip(__n, __obj, __drv_name)                        \
+        __USB_DC_FROM_IP(__n, (__obj), __drv_name, vk_usbip_usbd)
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbip_dcd_t)
+dcl_simple_class(vk_usbip_dcd_t)
 
-struct vk_usbip_dcd_param_t {
+typedef struct vk_usbip_dcd_param_t {
     uint16_t port;
-};
-typedef struct vk_usbip_dcd_param_t vk_usbip_dcd_param_t;
+} vk_usbip_dcd_param_t;
 
-struct vk_usbip_dcd_ep_t {
+typedef struct vk_usbip_dcd_ep_t {
     uint16_t size;
     usb_ep_type_t type;
     bool is_stalled;
@@ -83,8 +78,7 @@ struct vk_usbip_dcd_ep_t {
         bool zlp;
         bool pending;
     } transfer;
-};
-typedef struct vk_usbip_dcd_ep_t vk_usbip_dcd_ep_t;
+} vk_usbip_dcd_ep_t;
 
 def_simple_class(vk_usbip_dcd_t) {
     public_member(
@@ -112,18 +106,17 @@ def_simple_class(vk_usbip_dcd_t) {
     )
 };
 
-#ifdef VSF_USBIP_DCD_IMPLEMENT_BACKEND
-#   undef VSF_USBIP_DCD_IMPLEMENT_BACKEND
+#ifdef __VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__
+#   undef __VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__
 
-struct vk_usbip_rep_ifs_t {
+typedef struct vk_usbip_rep_ifs_t {
     uint8_t     bInterfaceClass;
     uint8_t     bInterfaceSubClass;
     uint8_t     bInterfaceProtocol;
     uint8_t     padding;
-} PACKED;
-typedef struct vk_usbip_rep_ifs_t vk_usbip_rep_ifs_t;
+} PACKED vk_usbip_rep_ifs_t;
 
-struct vk_usbip_rep_dev_t {
+typedef struct vk_usbip_rep_dev_t {
     uint32_t    busnum;
     uint32_t    devnum;
     uint32_t    speed;
@@ -137,10 +130,9 @@ struct vk_usbip_rep_dev_t {
     uint8_t     bNumConfigurations;
     uint8_t     bNumInterfaces;
     vk_usbip_rep_ifs_t ifs[16];
-} PACKED;
-typedef struct vk_usbip_rep_dev_t vk_usbip_rep_dev_t;
+} PACKED vk_usbip_rep_dev_t;
 
-enum vk_usbip_cmd_t {
+typedef enum vk_usbip_cmd_t {
     USBIP_CMD_INVALID   = 0x00000000,
     USBIP_CMD_SUBMIT    = 0x00000001,
     USBIP_CMD_UNLINK    = 0x00000002,
@@ -151,51 +143,45 @@ enum vk_usbip_cmd_t {
     USBIP_REP_DEVLIST   = 0x8005,
     USBIP_REQ_IMPORT    = 0x8003,
     USBIP_REP_IMPORT    = 0x8003,
-};
-typedef enum vk_usbip_cmd_t vk_usbip_cmd_t;
+} vk_usbip_cmd_t;
 
-struct vk_usbip_op_common_t {
+typedef struct vk_usbip_op_common_t {
     uint16_t    version_bcd;
     uint16_t    code;
     uint32_t    status;
-} PACKED;
-typedef struct vk_usbip_op_common_t vk_usbip_op_common_t;
+} PACKED vk_usbip_op_common_t;
 
 // OP_REQ_DEVLIST
-struct vk_usbip_req_devlist_t {
+typedef struct vk_usbip_req_devlist_t {
     implement(vk_usbip_op_common_t)
-} PACKED;
-typedef struct vk_usbip_req_devlist_t vk_usbip_req_devlist_t;
+} PACKED vk_usbip_req_devlist_t;
 
 // OP_REP_DEVLIST
 //  vk_usbip_rep_devlist_t
 //  vk_usbip_rep_dev_t[devnum]
 //  vk_usbip_rep_devlist_ifs_t[bNumInterfaces]
-struct vk_usbip_rep_devlist_t {
+typedef struct vk_usbip_rep_devlist_t {
     implement(vk_usbip_op_common_t)
     uint32_t    devnum;     // number of devices
-} PACKED;
-typedef struct vk_usbip_rep_devlist_t vk_usbip_rep_devlist_t;
+} PACKED vk_usbip_rep_devlist_t;
 
 // OP_REQ_IMPORT
-struct vk_usbip_req_import_t {
+typedef struct vk_usbip_req_import_t {
     implement(vk_usbip_op_common_t)
     char        busid[32];
-} PACKED;
-typedef struct vk_usbip_req_import_t vk_usbip_req_import_t;
+} PACKED vk_usbip_req_import_t;
 
 // OP_REP_IMPORT
 //  vk_usbip_rep_import_t
 //  vk_usbip_rep_dev_t
-struct vk_usbip_rep_import_t {
+typedef struct vk_usbip_rep_import_t {
     implement(vk_usbip_op_common_t)
-} PACKED;
-typedef struct vk_usbip_rep_import_t vk_usbip_rep_import_t;
+} PACKED vk_usbip_rep_import_t;
 
 // USBIP_CMD_SUBMIT
 //  vk_usbip_req_submit_t
 //  data[transfer_length]
-struct vk_usbip_req_submit_t {
+typedef struct vk_usbip_req_submit_t {
     uint32_t    command;
     uint32_t    seqnum;
     uint32_t    devid;
@@ -207,13 +193,12 @@ struct vk_usbip_req_submit_t {
     uint32_t    number_of_packets;  // for ISO
     uint32_t    interval;
     struct usb_ctrlrequest_t setup;
-} PACKED;
-typedef struct vk_usbip_req_submit_t vk_usbip_req_submit_t;
+} PACKED vk_usbip_req_submit_t;
 
 // USBIP_RET_SUBMIT
 //  vk_usbip_rep_submit_t
 //  data[actual_length]
-struct vk_usbip_rep_submit_t {
+typedef struct vk_usbip_rep_submit_t {
     uint32_t    command;
     uint32_t    seqnum;
     uint32_t    devid;
@@ -224,36 +209,33 @@ struct vk_usbip_rep_submit_t {
     uint32_t    start_frame;        // for ISO
     uint32_t    number_of_packets;  // for ISO
     uint32_t    error_count;
-} PACKED;
-typedef struct vk_usbip_rep_submit_t vk_usbip_rep_submit_t;
+} PACKED vk_usbip_rep_submit_t;
 
 // USBIP_CMD_UNLINK
 //  vk_usbip_req_unlink_t
 //  data[unknown]
-struct vk_usbip_req_unlink_t {
+typedef struct vk_usbip_req_unlink_t {
     uint32_t    command;
     uint32_t    seqnum;
     uint32_t    devid;
     uint32_t    direction;          // 0: OUT, 1: IN
     uint32_t    ep;
     uint32_t    seqnum_to_unlink;
-} PACKED;
-typedef struct vk_usbip_req_unlink_t vk_usbip_req_unlink_t;
+} PACKED vk_usbip_req_unlink_t;
 
 // USBIP_RET_UNLINK
 //  vk_usbip_rep_unlink_t
 //  data[unknown]
-struct vk_usbip_rep_unlink_t {
+typedef struct vk_usbip_rep_unlink_t {
     uint32_t    command;
     uint32_t    seqnum;
     uint32_t    devid;
     uint32_t    direction;          // 0: OUT, 1: IN
     uint32_t    ep;
     uint32_t    status;
-} PACKED;
-typedef struct vk_usbip_rep_unlink_t vk_usbip_rep_unlink_t;
+} PACKED vk_usbip_rep_unlink_t;
 
-struct vk_usbip_urb_t {
+typedef struct vk_usbip_urb_t {
     vsf_dlist_node_t urb_node;
     vsf_dlist_node_t urb_node_ep;
     vk_usbip_req_submit_t req;
@@ -271,13 +253,12 @@ struct vk_usbip_urb_t {
         VSF_USBIP_URB_COMITTED,
         VSF_USBIP_URB_DONE,
     } state;
-};
-typedef struct vk_usbip_urb_t vk_usbip_urb_t;
+} vk_usbip_urb_t;
 
-declare_vsf_pool(vk_usbip_urb_poll)
+dcl_vsf_pool(vk_usbip_urb_poll)
 def_vsf_pool(vk_usbip_urb_poll, vk_usbip_urb_t)
 
-struct vk_usbip_server_t {
+typedef struct vk_usbip_server_t {
     vk_usbip_dcd_t *usbd;
     vsf_teda_t teda;
     uint16_t port;
@@ -336,8 +317,7 @@ struct vk_usbip_server_t {
     vsf_dlist_t urb_done_list;
     vsf_dlist_t urb_free_list;
     vk_usbip_urb_t *cur_urb;
-};
-typedef struct vk_usbip_server_t vk_usbip_server_t;
+} vk_usbip_server_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

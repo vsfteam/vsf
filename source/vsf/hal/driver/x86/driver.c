@@ -21,7 +21,7 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#       define VSFSTREAM_CLASS_INHERIT
+#       define __VSFSTREAM_CLASS_INHERIT__
 #       include "service/vsf_service.h"
 #   endif
 #endif
@@ -77,8 +77,8 @@ vsf_stream_t VSF_DEBUG_STREAM_TX = {
 
 vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .op         = &vsf_mem_stream_op,
-    .pchBuffer  = __vsf_x86_debug_stream_rx_buff,
-    .nSize      = sizeof(__vsf_x86_debug_stream_rx_buff),
+    .buffer_ptr  = __vsf_x86_debug_stream_rx_buff,
+    .s32_size      = sizeof(__vsf_x86_debug_stream_rx_buff),
 };
 
 #   elif   VSF_USE_SERVICE_STREAM == ENABLED

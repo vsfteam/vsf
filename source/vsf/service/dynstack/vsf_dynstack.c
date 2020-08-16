@@ -21,6 +21,8 @@
 
 #if VSF_USE_DYNARR == ENABLED
 
+#define __VSF_DYNSTACK_CLASS_IMPLEMENT
+
 #include "./vsf_dynstack.h"
 #include "../dynarr/vsf_dynarr.h"
 

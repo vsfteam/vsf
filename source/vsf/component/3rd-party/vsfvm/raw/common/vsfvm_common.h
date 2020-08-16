@@ -30,74 +30,74 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
-#   define VSFVM_EXTFUNC(__handler, __argu_num)                                 \
+#   define VSFVM_EXTFUNC(__HANDLER, __ARGU_NUM)                                 \
         {                                                                       \
-            .handler = (__handler),                                             \
-            .argu_num = (__argu_num),                                           \
+            .handler = (__HANDLER),                                             \
+            .argu_num = (__ARGU_NUM),                                           \
         }
-#   define VSFVM_EXTVAR(__value, __type)                                        \
+#   define VSFVM_EXTVAR(__VALUE, __TYPE)                                        \
         {                                                                       \
-            .value = (__value),                                                 \
-            .type = (__type),                                                   \
+            .value = (__VALUE),                                                 \
+            .type = (__TYPE),                                                   \
         }
 
-#   define VSFVM_EXTINST(__inst, __type)                                        \
+#   define VSFVM_EXTINST(__INST, __TYPE)                                        \
         {                                                                       \
-            .inst = (__inst),                                                   \
-            .type = (__type),                                                   \
+            .inst = (__INST),                                                   \
+            .type = (__TYPE),                                                   \
         }
 #endif
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
 
-#   define VSFVM_LEXERSYM_EXTFUNC(__name, __extop, __class, __retclass, __param_num, __pos)\
+#   define VSFVM_LEXERSYM_EXTFUNC(__NAME, __EXTOP, __CLASS, __RETCLASS, __PARAM_NUM, __POS)\
         {                                                                       \
-            .name = (__name),                                                   \
-            .ext_op = (__extop),                                                \
-            .func.param_num = (__param_num),                                    \
-            .func.retc = (__retclass),                                          \
-            .func.pos = (__pos),                                                \
-            .c = (__class),                                                     \
+            .name = (__NAME),                                                   \
+            .ext_op = (__EXTOP),                                                \
+            .func.param_num = (__PARAM_NUM),                                    \
+            .func.retc = (__RETCLASS),                                          \
+            .func.pos = (__POS),                                                \
+            .c = (__CLASS),                                                     \
             .type = VSFVM_LEXER_SYM_EXTFUNC,                                    \
         }
-#   define VSFVM_LEXERSYM_EXTVAR(__name, __extop, __class, __pos)               \
+#   define VSFVM_LEXERSYM_EXTVAR(__NAME, __EXTOP, __CLASS, __POS)               \
         {                                                                       \
-            .name = (__name),                                                   \
-            .ext_op = (__extop),                                                \
-            .c = (__class),                                                     \
-            .var.pos = (__pos),                                                 \
+            .name = (__NAME),                                                   \
+            .ext_op = (__EXTOP),                                                \
+            .c = (__CLASS),                                                     \
+            .var.pos = (__POS),                                                 \
             .type = VSFVM_LEXER_SYM_EXTVAR,                                     \
         }
-#   define VSFVM_LEXERSYM_CLASS(__name, __extop, __class)                       \
+#   define VSFVM_LEXERSYM_CLASS(__NAME, __EXTOP, __CLASS)                       \
         {                                                                       \
-            .name = (__name),                                                   \
-            .ext_op = (__extop),                                                \
-            .c = (__class),                                                     \
+            .name = (__NAME),                                                   \
+            .ext_op = (__EXTOP),                                                \
+            .c = (__CLASS),                                                     \
             .type = VSFVM_LEXER_SYM_EXTCLASS,                                   \
         }
-#   define VSFVM_LEXERSYM_CONST(__name, __extop, __class, __value)              \
+#   define VSFVM_LEXERSYM_CONST(__NAME, __EXTOP, __CLASS, __VALUE)              \
         {                                                                       \
-            .name = (__name),                                                   \
-            .ext_op = (__extop),                                                \
-            .ival = (__value),                                                  \
-            .c = (__class),                                                     \
+            .name = (__NAME),                                                   \
+            .ext_op = (__EXTOP),                                                \
+            .ival = (__VALUE),                                                  \
+            .c = (__CLASS),                                                     \
             .type = VSFVM_LEXER_SYM_CONST,                                      \
         }
-#   define VSFVM_LEXERSYM_KEYWORKD(__name)                                      \
+#   define VSFVM_LEXERSYM_KEYWORKD(__NAME)                                      \
         {                                                                       \
-            .name = (__name),                                                   \
+            .name = (__NAME),                                                   \
             .type = VSFVM_LEXER_SYM_KEYWORD,                                    \
         }
-#   define VSFVM_LEXERSYM_FUNCTION(__name, __param_num)                         \
+#   define VSFVM_LEXERSYM_FUNCTION(__NAME, __PARAM_NUM)                         \
         {                                                                       \
-            .name = (__name),                                                   \
-            .func.param_num = (__param_num),                                    \
+            .name = (__NAME),                                                   \
+            .func.param_num = (__PARAM_NUM),                                    \
             .type = VSFVM_LEXER_SYM_FUNCTION,                                   \
         }
-#   define VSFVM_LEXERSYM_ALIAS(__name, __sym)                                  \
+#   define VSFVM_LEXERSYM_ALIAS(__NAME, __SYM)                                  \
         {                                                                       \
-            .name = (__name),                                                   \
-            .sym = (vsfvm_lexer_sym_t *)(__sym),                                \
+            .name = (__NAME),                                                   \
+            .sym = (vsfvm_lexer_sym_t *)(__SYM),                                \
             .type = VSFVM_LEXER_SYM_ALIAS,                                      \
         }
 
@@ -133,18 +133,16 @@
 /*============================ TYPES =========================================*/
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
-struct vsfvm_pt_t {
+typedef struct vsfvm_pt_t {
     int state;
-};
-typedef struct vsfvm_pt_t vsfvm_pt_t;
+} vsfvm_pt_t;
 
-enum vsfvm_pt_evt_t {
+typedef enum vsfvm_pt_evt_t {
     VSFVM_EVT_INVALID,
     VSFVM_EVT_ON_TOKEN,
     VSFVM_EVT_ON_EXPR,
     VSFVM_EVT_ON_STMT,
-};
-typedef enum vsfvm_pt_evt_t vsfvm_pt_evt_t;
+} vsfvm_pt_evt_t;
 #endif
 
 typedef struct vsfvm_class_t vsfvm_class_t;
@@ -169,22 +167,20 @@ typedef struct vsfvm_var_t vsfvm_var_t;
 #   include "../compiler/lexer/vsfvm_lexer.h"
 #endif
 
-enum vsfvm_class_type_t {
+typedef enum vsfvm_class_type_t {
     VSFVM_CLASS_USER,
     VSFVM_CLASS_STRING,
     VSFVM_CLASS_BUFFER,
     VSFVM_CLASS_ARRAY,
     VSFVM_CLASS_POINTER,
-};
-typedef enum vsfvm_class_type_t vsfvm_class_type_t;
+} vsfvm_class_type_t;
 
-struct vsfvm_class_op_t {
+typedef struct vsfvm_class_op_t {
     void (*print)(vsfvm_instance_t *inst);
     void (*destroy)(vsfvm_instance_t *inst);
-};
-typedef struct vsfvm_class_op_t vsfvm_class_op_t;
+} vsfvm_class_op_t;
 
-struct vsfvm_class_t {
+typedef struct vsfvm_class_t {
 #if VSFVM_CFG_COMPILER_EN == ENABLED
     char *name;
 #endif
@@ -192,17 +188,15 @@ struct vsfvm_class_t {
     vsfvm_class_type_t type;
     vsfvm_class_op_t op;
 #endif
-};
-typedef struct vsfvm_class_t vsfvm_class_t;
+} vsfvm_class_t;
 
 #if VSFVM_CFG_RUNTIME_EN == ENABLED
 typedef vsfvm_ret_t (*vsfvm_extfunc_handler_t)(vsfvm_thread_t *thread);
-struct vsfvm_extfunc_t {
+typedef struct vsfvm_extfunc_t {
     vsfvm_extfunc_handler_t handler;
     // if argu_num is -1, use dynamic paramter
     int16_t argu_num;
-};
-typedef struct vsfvm_extfunc_t vsfvm_extfunc_t;
+} vsfvm_extfunc_t;
 #endif
 
 struct vsfvm_ext_op_t {
@@ -223,7 +217,7 @@ struct vsfvm_ext_op_t {
     uint16_t var_num;
 };
 
-struct vsfvm_ext_t {
+typedef struct vsfvm_ext_t {
     const vsfvm_ext_op_t *op;
 #if VSFVM_CFG_COMPILER_EN == ENABLED
     vsfvm_lexer_symarr_t symarr;
@@ -231,8 +225,7 @@ struct vsfvm_ext_t {
     uint16_t var_id;
 #endif
     vsf_slist_node_t ext_node;
-};
-typedef struct vsfvm_ext_t vsfvm_ext_t;
+} vsfvm_ext_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

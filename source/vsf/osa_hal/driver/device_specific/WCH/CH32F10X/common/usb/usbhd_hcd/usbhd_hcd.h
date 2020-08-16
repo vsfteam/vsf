@@ -35,10 +35,10 @@
 #include "hal/interface/vsf_interface_usb.h"
 
 #if     defined(CH32F10X_USBHD_HCD_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef CH32F10X_USBHD_HCD_CLASS_IMPLEMENT
 #elif   defined(CH32F10X_USBHD_HCD_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef CH32F10X_USBHD_HCD_CLASS_INHERIT
 #endif
 #include "utilities/ooc_class.h"

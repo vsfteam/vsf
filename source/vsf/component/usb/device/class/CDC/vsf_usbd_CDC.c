@@ -21,10 +21,11 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDC == ENABLED
 
-#define VSF_USBD_INHERIT
-#define VSF_USBD_CDC_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_USBD_CLASS_INHERIT__
+#define __VSF_USBD_CDC_CLASS_IMPLEMENT
+
+#include "../../vsf_usbd.h"
+#include "./vsf_usbd_CDC.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -121,8 +122,8 @@ static vsf_err_t __vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_us
         return VSF_ERR_FAIL;
     }
 
-    ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
-    ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.buffer_ptr = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.s32_size = size;
     return VSF_ERR_NONE;
 }
 

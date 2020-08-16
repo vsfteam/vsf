@@ -23,7 +23,7 @@
 
 #include "./vsf_input.h"
 #include "kernel/vsf_kernel.h"
-#include "utilities/template/vsf_list.h"
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 
@@ -50,10 +50,9 @@
 /*============================ TYPES =========================================*/
 
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
-struct vsf_input_t {
+typedef struct vsf_input_t {
     vsf_slist_t notifier_list;
-};
-typedef struct vsf_input_t vsf_input_t;
+} vsf_input_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

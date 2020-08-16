@@ -20,7 +20,7 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#define VSFSTREAM_CLASS_IMPLEMENT
+#define __VSFSTREAM_CLASS_IMPLEMENT
 #include "./vsfstream.h"
 
 /*============================ MACROS ========================================*/
@@ -35,7 +35,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void vsf_stream_on_write(vsf_stream_t *stream)
+static void __vsf_stream_on_write(vsf_stream_t *stream)
 {
     uint_fast32_t data_len = stream->op->get_data_length(stream);
 
@@ -54,7 +54,7 @@ static void vsf_stream_on_write(vsf_stream_t *stream)
     }
 }
 
-static void vsf_stream_on_read(vsf_stream_t *stream)
+static void __vsf_stream_on_read(vsf_stream_t *stream)
 {
     uint_fast32_t avail_len = stream->op->get_avail_length(stream);
 
@@ -77,7 +77,7 @@ uint_fast32_t vsf_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t 
 {
     VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->read != NULL));
     uint_fast32_t count = stream->op->read(stream, buf, size);
-    vsf_stream_on_read(stream);
+    __vsf_stream_on_read(stream);
     return count;
 }
 
@@ -85,7 +85,7 @@ uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t
 {
     VSF_SERVICE_ASSERT((stream != NULL) && (stream->op != NULL) && (stream->op->write != NULL));
     uint_fast32_t count = stream->op->write(stream, buf, size);
-    vsf_stream_on_write(stream);
+    __vsf_stream_on_write(stream);
     return count;
 }
 
@@ -94,14 +94,14 @@ void vsf_stream_set_tx_threshold(vsf_stream_t *stream, uint_fast32_t threshold)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
     stream->tx.threshold = threshold;
-    vsf_stream_on_read(stream);
+    __vsf_stream_on_read(stream);
 }
 
 void vsf_stream_set_rx_threshold(vsf_stream_t *stream, uint_fast32_t threshold)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
     stream->rx.threshold = threshold;
-    vsf_stream_on_write(stream);
+    __vsf_stream_on_write(stream);
 }
 #endif
 
@@ -149,7 +149,7 @@ uint_fast32_t vsf_stream_get_rbuf(vsf_stream_t *stream, uint8_t **ptr)
     return size;
 }
 
-static void vsf_stream_connect_terminal(vsf_stream_t *stream, uint_fast8_t terminal)
+static void __vsf_stream_connect_terminal(vsf_stream_t *stream, uint_fast8_t terminal)
 {
     vsf_stream_terminal_t *term_current = &stream->terminal[terminal];
     vsf_stream_terminal_t *term_another = &stream->terminal[terminal ^ 1];
@@ -170,13 +170,13 @@ static void vsf_stream_connect_terminal(vsf_stream_t *stream, uint_fast8_t termi
 void vsf_stream_connect_rx(vsf_stream_t *stream)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
-    vsf_stream_connect_terminal(stream, VSF_STREAM_TERM_RX);
+    __vsf_stream_connect_terminal(stream, VSF_STREAM_TERM_RX);
 }
 
 void vsf_stream_connect_tx(vsf_stream_t *stream)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
-    vsf_stream_connect_terminal(stream, VSF_STREAM_TERM_TX);
+    __vsf_stream_connect_terminal(stream, VSF_STREAM_TERM_TX);
 }
 
 bool vsf_stream_is_rx_connected(vsf_stream_t *stream)
@@ -191,7 +191,7 @@ bool vsf_stream_is_tx_connected(vsf_stream_t *stream)
     return stream->tx.ready;
 }
 
-static void vsf_stream_disconnect_terminal(vsf_stream_t *stream, uint_fast8_t terminal)
+static void __vsf_stream_disconnect_terminal(vsf_stream_t *stream, uint_fast8_t terminal)
 {
     vsf_stream_terminal_t *term_current = &stream->terminal[terminal];
     vsf_stream_terminal_t *term_another = &stream->terminal[terminal ^ 1];
@@ -205,13 +205,13 @@ static void vsf_stream_disconnect_terminal(vsf_stream_t *stream, uint_fast8_t te
 void vsf_stream_disconnect_rx(vsf_stream_t *stream)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
-    vsf_stream_disconnect_terminal(stream, VSF_STREAM_TERM_RX);
+    __vsf_stream_disconnect_terminal(stream, VSF_STREAM_TERM_RX);
 }
 
 void vsf_stream_disconnect_tx(vsf_stream_t *stream)
 {
     VSF_SERVICE_ASSERT(stream != NULL);
-    vsf_stream_disconnect_terminal(stream, VSF_STREAM_TERM_TX);
+    __vsf_stream_disconnect_terminal(stream, VSF_STREAM_TERM_TX);
 }
 
 vsf_err_t vsf_stream_init(vsf_stream_t *stream)

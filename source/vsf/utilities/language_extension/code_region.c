@@ -18,7 +18,6 @@
 
 /*============================ INCLUDES ======================================*/
 #include "utilities/vsf_utilities_cfg.h"
-#include "../compiler/compiler.h"
 #include "code_region.h"
 
 /*============================ MACROS ========================================*/

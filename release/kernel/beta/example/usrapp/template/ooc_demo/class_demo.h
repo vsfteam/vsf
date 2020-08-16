@@ -28,10 +28,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_DEMO_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_DEMO_CLASS_IMPLEMENT
 #elif   defined(__VSF_DEMO_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_DEMO_CLASS_INHERIT
 #endif   
 
@@ -71,13 +71,13 @@ def_class(class_demo_t,
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t class_base_init(class_base_t *ptThis, uint_fast8_t chParam);
-extern uint_fast8_t class_base_get_param(class_base_t *ptThis);
+extern vsf_err_t class_base_init(class_base_t *this_ptr, uint_fast8_t chParam);
+extern uint_fast8_t class_base_get_param(class_base_t *this_ptr);
 
-extern vsf_err_t class_demo_init(   class_demo_t *ptThis, 
+extern vsf_err_t class_demo_init(   class_demo_t *this_ptr, 
                                     uint_fast8_t chParam, 
                                     uint_fast8_t chParamBase);
-extern uint_fast8_t class_demo_get_param(class_demo_t *ptThis);
-extern uint_fast8_t class_demo_get_base_param(class_demo_t *ptThis);
+extern uint_fast8_t class_demo_get_param(class_demo_t *this_ptr);
+extern uint_fast8_t class_demo_get_base_param(class_demo_t *this_ptr);
 
 #endif      // __CLASS_DEMO_H__

@@ -25,7 +25,7 @@ typedef struct user_task_t user_task_t;
 struct user_task_t {
     implement(vsf_eda_t)
     
-    vsf_sem_t *psem;
+    vsf_sem_t *sem_ptr;
     uint32_t cnt;
 };
 
@@ -44,7 +44,7 @@ static void user_task_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case VSF_EVT_INIT:
             pthis->cnt = 0;
 label_loop_start:
-            if (VSF_ERR_NONE != vsf_eda_sem_pend(pthis->psem, -1)) {
+            if (VSF_ERR_NONE != vsf_eda_sem_pend(pthis->sem_ptr, -1)) {
                 break;
             }
             //! fall through
@@ -92,7 +92,7 @@ void vsf_kernel_eda_simple_demo(void)
             .fn.evthandler = user_task_evthandler,
             .priority = vsf_prio_0,
         };
-        __user_task_t.psem = &__user_sem;
+        __user_task_t.sem_ptr = &__user_sem;
         vsf_eda_init_ex(&__user_task_t.use_as__vsf_eda_t, (vsf_eda_cfg_t *)&cfg);
     }
 

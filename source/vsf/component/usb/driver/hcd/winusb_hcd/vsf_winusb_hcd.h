@@ -24,7 +24,7 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
 
 #include "component/usb/host/vsf_usbh.h"
-#include "hal/interface/vsf_interface_usb.h"
+#include "hal/vsf_hal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,10 +45,9 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_winusb_hcd_param_t {
+typedef struct vk_winusb_hcd_param_t {
     vsf_arch_prio_t priority;
-};
-typedef struct vk_winusb_hcd_param_t vk_winusb_hcd_param_t;
+} vk_winusb_hcd_param_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

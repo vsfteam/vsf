@@ -51,8 +51,8 @@
 
 #define M480_BIT_FIELD_GET_BITLEN(__bf) (((__bf) >> 8) & 0x1F)
 
-#define __def_idx(__name, __no)     TPASTE2(__name, _idx) = (__no)
-#define __def_msk(__name)           TPASTE2(__name, _msk) = _BV(TPASTE2(__name, _idx) & 0x1F)
+#define __def_idx(__name, __no)     __CONNECT2(__name, _idx) = (__no)
+#define __def_msk(__name)           __CONNECT2(__name, _msk) = _BV(__CONNECT2(__name, _idx) & 0x1F)
 
 #define GPIO_COUNT                  4
 
@@ -82,7 +82,7 @@
 #define USB_HC0_IRQHandler          OHCI_IRQHandler
 #define USB_HC0_CONFIG                                                          \
     .reg                = USBH,                                                 \
-    .ahbclk             = AHBCLK_USBH_idx,                                      \
+    .ahbclk             = SyncCLK_USBH_idx,                                      \
     .periph_async_clk   = PCLK_USB_idx,                                         \
     .phy                = M480_USBPHY_FS,                                       \
     .irq                = USBH_IRQn,                                            \
@@ -102,7 +102,7 @@
 #define USB_DC0_EP_NUM              14
 #define USB_DC0_CONFIG                                                          \
     .reg                = HSUSBD,                                               \
-    .ahbclk             = AHBCLK_USBD_idx,                                      \
+    .ahbclk             = SyncCLK_USBD_idx,                                      \
     .phy                = M480_USBPHY_HS,                                       \
     .irq                = USBD20_IRQn,
 
@@ -113,12 +113,12 @@
 // bit14- bit27:    clkdiv bitfield
 // bit28- bit31:    clkdiv_remap
 #define __def_periph_clk(__name, __bf_clksel, __bf_clkdiv, __clksel_map_idx)    \
-        TPASTE2(__name, _idx) = ((__bf_clksel) << 0)                            \
+        __CONNECT2(__name, _idx) = ((__bf_clksel) << 0)                            \
                             |   ((__bf_clkdiv) << 14)                           \
                             |   ((__clksel_map_idx) << 28)
 
-#define __def_ahbclk_idx(__name, __bus_idx, __bit_idx)                          \
-            TPASTE2(__name, _idx) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
+#define __def_sync_clk_idx(__name, __bus_idx, __bit_idx)                          \
+            __CONNECT2(__name, _idx) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
 
 #define __def_clk_src(__name, __value)      __name = (__value)
 
@@ -332,133 +332,133 @@ enum pm_main_clk_no_t {
 
 //! \name Peripheral AHB Clock Macros
 //! @{
-enum pm_ahb_clk_no_t { 
+enum pm_sync_clk_no_t { 
                         // NAME         BUS_IDX,BIT_IDX
     // AHB
-    __def_ahbclk_idx(   AHBCLK_DMA,     0,      1   ),
-    __def_ahbclk_idx(   AHBCLK_ISP,     0,      2   ),
-    __def_ahbclk_idx(   AHBCLK_EBI,     0,      3   ),
-    __def_ahbclk_idx(   AHBCLK_EMAC,    0,      5   ),
-    __def_ahbclk_idx(   AHBCLK_SDH0,    0,      6   ),
-    __def_ahbclk_idx(   AHBCLK_CRC,     0,      7   ),
-    __def_ahbclk_idx(   AHBCLK_HSUSB,   0,      10  ),
-    __def_ahbclk_idx(   AHBCLK_CRYPTO,  0,      12  ),
-    __def_ahbclk_idx(   AHBCLK_SPIM,    0,      14  ),
-    __def_ahbclk_idx(   AHBCLK_FLASH,   0,      15  ),
-    __def_ahbclk_idx(   AHBCLK_USBH,    0,      16  ),
-    __def_ahbclk_idx(   AHBCLK_SDH1,    0,      17  ),
+    __def_sync_clk_idx(   SyncCLK_DMA,     0,      1   ),
+    __def_sync_clk_idx(   SyncCLK_ISP,     0,      2   ),
+    __def_sync_clk_idx(   SyncCLK_EBI,     0,      3   ),
+    __def_sync_clk_idx(   SyncCLK_EMAC,    0,      5   ),
+    __def_sync_clk_idx(   SyncCLK_SDH0,    0,      6   ),
+    __def_sync_clk_idx(   SyncCLK_CRC,     0,      7   ),
+    __def_sync_clk_idx(   SyncCLK_HSUSB,   0,      10  ),
+    __def_sync_clk_idx(   SyncCLK_CRYPTO,  0,      12  ),
+    __def_sync_clk_idx(   SyncCLK_SPIM,    0,      14  ),
+    __def_sync_clk_idx(   SyncCLK_FLASH,   0,      15  ),
+    __def_sync_clk_idx(   SyncCLK_USBH,    0,      16  ),
+    __def_sync_clk_idx(   SyncCLK_SDH1,    0,      17  ),
 
     // APB0
-    __def_ahbclk_idx(   AHBCLK_WDT,     1,      0   ),
-    __def_ahbclk_idx(   AHBCLK_RTC,     1,      1   ),
-    __def_ahbclk_idx(   AHBCLK_TMR0,    1,      2   ),
-    __def_ahbclk_idx(   AHBCLK_TMR1,    1,      3   ),
-    __def_ahbclk_idx(   AHBCLK_TMR2,    1,      4   ),
-    __def_ahbclk_idx(   AHBCLK_TMR3,    1,      5   ),
-    __def_ahbclk_idx(   AHBCLK_CLKO,    1,      6   ),
-    __def_ahbclk_idx(   AHBCLK_ACMP,    1,      7   ),
-    __def_ahbclk_idx(   AHBCLK_I2C0,    1,      8   ),
-    __def_ahbclk_idx(   AHBCLK_I2C1,    1,      9   ),
-    __def_ahbclk_idx(   AHBCLK_I2C2,    1,      10  ),
-    __def_ahbclk_idx(   AHBCLK_QSPI0,   1,      12  ),
-    __def_ahbclk_idx(   AHBCLK_SPI0,    1,      13  ),
-    __def_ahbclk_idx(   AHBCLK_SPI1,    1,      14  ),
-    __def_ahbclk_idx(   AHBCLK_SPI2,    1,      15  ),
-    __def_ahbclk_idx(   AHBCLK_UART0,   1,      16  ),
-    __def_ahbclk_idx(   AHBCLK_UART1,   1,      17  ),
-    __def_ahbclk_idx(   AHBCLK_UART2,   1,      18  ),
-    __def_ahbclk_idx(   AHBCLK_UART3,   1,      19  ),
-    __def_ahbclk_idx(   AHBCLK_UART4,   1,      20  ),
-    __def_ahbclk_idx(   AHBCLK_UART5,   1,      21  ),
-    __def_ahbclk_idx(   AHBCLK_CAN0,    1,      24  ),
-    __def_ahbclk_idx(   AHBCLK_CAN1,    1,      25  ),
-    __def_ahbclk_idx(   AHBCLK_OTG,     1,      26  ),
-    __def_ahbclk_idx(   AHBCLK_USBD,    1,      27  ),
-    __def_ahbclk_idx(   AHBCLK_EADC,    1,      28  ),
-    __def_ahbclk_idx(   AHBCLK_I2S0,    1,      29  ),
-    __def_ahbclk_idx(   AHBCLK_HSOTG,   1,      30  ),
+    __def_sync_clk_idx(   SyncCLK_WDT,     1,      0   ),
+    __def_sync_clk_idx(   SyncCLK_RTC,     1,      1   ),
+    __def_sync_clk_idx(   SyncCLK_TMR0,    1,      2   ),
+    __def_sync_clk_idx(   SyncCLK_TMR1,    1,      3   ),
+    __def_sync_clk_idx(   SyncCLK_TMR2,    1,      4   ),
+    __def_sync_clk_idx(   SyncCLK_TMR3,    1,      5   ),
+    __def_sync_clk_idx(   SyncCLK_CLKO,    1,      6   ),
+    __def_sync_clk_idx(   SyncCLK_ACMP,    1,      7   ),
+    __def_sync_clk_idx(   SyncCLK_I2C0,    1,      8   ),
+    __def_sync_clk_idx(   SyncCLK_I2C1,    1,      9   ),
+    __def_sync_clk_idx(   SyncCLK_I2C2,    1,      10  ),
+    __def_sync_clk_idx(   SyncCLK_QSPI0,   1,      12  ),
+    __def_sync_clk_idx(   SyncCLK_SPI0,    1,      13  ),
+    __def_sync_clk_idx(   SyncCLK_SPI1,    1,      14  ),
+    __def_sync_clk_idx(   SyncCLK_SPI2,    1,      15  ),
+    __def_sync_clk_idx(   SyncCLK_UART0,   1,      16  ),
+    __def_sync_clk_idx(   SyncCLK_UART1,   1,      17  ),
+    __def_sync_clk_idx(   SyncCLK_UART2,   1,      18  ),
+    __def_sync_clk_idx(   SyncCLK_UART3,   1,      19  ),
+    __def_sync_clk_idx(   SyncCLK_UART4,   1,      20  ),
+    __def_sync_clk_idx(   SyncCLK_UART5,   1,      21  ),
+    __def_sync_clk_idx(   SyncCLK_CAN0,    1,      24  ),
+    __def_sync_clk_idx(   SyncCLK_CAN1,    1,      25  ),
+    __def_sync_clk_idx(   SyncCLK_OTG,     1,      26  ),
+    __def_sync_clk_idx(   SyncCLK_USBD,    1,      27  ),
+    __def_sync_clk_idx(   SyncCLK_EADC,    1,      28  ),
+    __def_sync_clk_idx(   SyncCLK_I2S0,    1,      29  ),
+    __def_sync_clk_idx(   SyncCLK_HSOTG,   1,      30  ),
 
     // APB1
-    __def_ahbclk_idx(   AHBCLK_SC0,     2,      0   ),
-    __def_ahbclk_idx(   AHBCLK_SC1,     2,      1   ),
-    __def_ahbclk_idx(   AHBCLK_SC2,     2,      2   ),
-    __def_ahbclk_idx(   AHBCLK_SPI3,    2,      6   ),
-    __def_ahbclk_idx(   AHBCLK_USCI0,   2,      8   ),
-    __def_ahbclk_idx(   AHBCLK_USCI1,   2,      9   ),
-    __def_ahbclk_idx(   AHBCLK_DAC,     2,      12  ),
-    __def_ahbclk_idx(   AHBCLK_EPWM0,   2,      16  ),
-    __def_ahbclk_idx(   AHBCLK_EPWM1,   2,      17  ),
-    __def_ahbclk_idx(   AHBCLK_BPWM0,   2,      18  ),
-    __def_ahbclk_idx(   AHBCLK_BPWM1,   2,      19  ),
-    __def_ahbclk_idx(   AHBCLK_QEI0,    2,      22  ),
-    __def_ahbclk_idx(   AHBCLK_QEI1,    2,      23  ),
-    __def_ahbclk_idx(   AHBCLK_CAP0,    2,      26  ),
-    __def_ahbclk_idx(   AHBCLK_CAP1,    2,      27  ),
-    __def_ahbclk_idx(   AHBCLK_OP,      2,      30  ),
+    __def_sync_clk_idx(   SyncCLK_SC0,     2,      0   ),
+    __def_sync_clk_idx(   SyncCLK_SC1,     2,      1   ),
+    __def_sync_clk_idx(   SyncCLK_SC2,     2,      2   ),
+    __def_sync_clk_idx(   SyncCLK_SPI3,    2,      6   ),
+    __def_sync_clk_idx(   SyncCLK_USCI0,   2,      8   ),
+    __def_sync_clk_idx(   SyncCLK_USCI1,   2,      9   ),
+    __def_sync_clk_idx(   SyncCLK_DAC,     2,      12  ),
+    __def_sync_clk_idx(   SyncCLK_EPWM0,   2,      16  ),
+    __def_sync_clk_idx(   SyncCLK_EPWM1,   2,      17  ),
+    __def_sync_clk_idx(   SyncCLK_BPWM0,   2,      18  ),
+    __def_sync_clk_idx(   SyncCLK_BPWM1,   2,      19  ),
+    __def_sync_clk_idx(   SyncCLK_QEI0,    2,      22  ),
+    __def_sync_clk_idx(   SyncCLK_QEI1,    2,      23  ),
+    __def_sync_clk_idx(   SyncCLK_CAP0,    2,      26  ),
+    __def_sync_clk_idx(   SyncCLK_CAP1,    2,      27  ),
+    __def_sync_clk_idx(   SyncCLK_OP,      2,      30  ),
 };
 
-enum pm_ahb_clk_msk_t { 
+enum pm_sync_clk_msk_t { 
     // AHB
-    __def_msk(AHBCLK_DMA),
-    __def_msk(AHBCLK_ISP),
-    __def_msk(AHBCLK_EBI),
-    __def_msk(AHBCLK_EMAC),
-    __def_msk(AHBCLK_SDH0),
-    __def_msk(AHBCLK_CRC),
-    __def_msk(AHBCLK_HSUSB),
-    __def_msk(AHBCLK_CRYPTO),
-    __def_msk(AHBCLK_SPIM),
-    __def_msk(AHBCLK_FLASH),
-    __def_msk(AHBCLK_USBH),
-    __def_msk(AHBCLK_SDH1),
+    __def_msk(SyncCLK_DMA),
+    __def_msk(SyncCLK_ISP),
+    __def_msk(SyncCLK_EBI),
+    __def_msk(SyncCLK_EMAC),
+    __def_msk(SyncCLK_SDH0),
+    __def_msk(SyncCLK_CRC),
+    __def_msk(SyncCLK_HSUSB),
+    __def_msk(SyncCLK_CRYPTO),
+    __def_msk(SyncCLK_SPIM),
+    __def_msk(SyncCLK_FLASH),
+    __def_msk(SyncCLK_USBH),
+    __def_msk(SyncCLK_SDH1),
 
     // APB0
-    __def_msk(AHBCLK_WDT),
-    __def_msk(AHBCLK_RTC),
-    __def_msk(AHBCLK_TMR0),
-    __def_msk(AHBCLK_TMR1),
-    __def_msk(AHBCLK_TMR2),
-    __def_msk(AHBCLK_TMR3),
-    __def_msk(AHBCLK_CLKO),
-    __def_msk(AHBCLK_ACMP),
-    __def_msk(AHBCLK_I2C0),
-    __def_msk(AHBCLK_I2C1),
-    __def_msk(AHBCLK_I2C2),
-    __def_msk(AHBCLK_QSPI0),
-    __def_msk(AHBCLK_SPI0),
-    __def_msk(AHBCLK_SPI1),
-    __def_msk(AHBCLK_SPI2),
-    __def_msk(AHBCLK_UART0),
-    __def_msk(AHBCLK_UART1),
-    __def_msk(AHBCLK_UART2),
-    __def_msk(AHBCLK_UART3),
-    __def_msk(AHBCLK_UART4),
-    __def_msk(AHBCLK_UART5),
-    __def_msk(AHBCLK_CAN0),
-    __def_msk(AHBCLK_CAN1),
-    __def_msk(AHBCLK_OTG),
-    __def_msk(AHBCLK_USBD),
-    __def_msk(AHBCLK_EADC),
-    __def_msk(AHBCLK_I2S0),
-    __def_msk(AHBCLK_HSOTG),
+    __def_msk(SyncCLK_WDT),
+    __def_msk(SyncCLK_RTC),
+    __def_msk(SyncCLK_TMR0),
+    __def_msk(SyncCLK_TMR1),
+    __def_msk(SyncCLK_TMR2),
+    __def_msk(SyncCLK_TMR3),
+    __def_msk(SyncCLK_CLKO),
+    __def_msk(SyncCLK_ACMP),
+    __def_msk(SyncCLK_I2C0),
+    __def_msk(SyncCLK_I2C1),
+    __def_msk(SyncCLK_I2C2),
+    __def_msk(SyncCLK_QSPI0),
+    __def_msk(SyncCLK_SPI0),
+    __def_msk(SyncCLK_SPI1),
+    __def_msk(SyncCLK_SPI2),
+    __def_msk(SyncCLK_UART0),
+    __def_msk(SyncCLK_UART1),
+    __def_msk(SyncCLK_UART2),
+    __def_msk(SyncCLK_UART3),
+    __def_msk(SyncCLK_UART4),
+    __def_msk(SyncCLK_UART5),
+    __def_msk(SyncCLK_CAN0),
+    __def_msk(SyncCLK_CAN1),
+    __def_msk(SyncCLK_OTG),
+    __def_msk(SyncCLK_USBD),
+    __def_msk(SyncCLK_EADC),
+    __def_msk(SyncCLK_I2S0),
+    __def_msk(SyncCLK_HSOTG),
 
     // APB1
-    __def_msk(AHBCLK_SC0),
-    __def_msk(AHBCLK_SC1),
-    __def_msk(AHBCLK_SC2),
-    __def_msk(AHBCLK_SPI3),
-    __def_msk(AHBCLK_USCI0),
-    __def_msk(AHBCLK_USCI1),
-    __def_msk(AHBCLK_DAC),
-    __def_msk(AHBCLK_EPWM0),
-    __def_msk(AHBCLK_EPWM1),
-    __def_msk(AHBCLK_BPWM0),
-    __def_msk(AHBCLK_BPWM1),
-    __def_msk(AHBCLK_QEI0),
-    __def_msk(AHBCLK_QEI1),
-    __def_msk(AHBCLK_CAP0),
-    __def_msk(AHBCLK_CAP1),
-    __def_msk(AHBCLK_OP),
+    __def_msk(SyncCLK_SC0),
+    __def_msk(SyncCLK_SC1),
+    __def_msk(SyncCLK_SC2),
+    __def_msk(SyncCLK_SPI3),
+    __def_msk(SyncCLK_USCI0),
+    __def_msk(SyncCLK_USCI1),
+    __def_msk(SyncCLK_DAC),
+    __def_msk(SyncCLK_EPWM0),
+    __def_msk(SyncCLK_EPWM1),
+    __def_msk(SyncCLK_BPWM0),
+    __def_msk(SyncCLK_BPWM1),
+    __def_msk(SyncCLK_QEI0),
+    __def_msk(SyncCLK_QEI1),
+    __def_msk(SyncCLK_CAP0),
+    __def_msk(SyncCLK_CAP1),
+    __def_msk(SyncCLK_OP),
 };
 //! @}
 

@@ -26,12 +26,9 @@
 
 #include "component/av/vsf_av.h"
 
-#if     defined(VSF_WINSOUND_IMPLEMENT)
-#   undef VSF_WINSOUND_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_WINSOUND_INHERIT)
-#   undef VSF_WINSOUND_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_WINSOUND_CLASS_IMPLEMENT)
+#   undef __VSF_WINSOUND_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -44,7 +41,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_winsound_dev_t)
+dcl_simple_class(vk_winsound_dev_t)
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
 
@@ -62,13 +59,12 @@ typedef struct __wavehdr_tag {
     DWORD_PTR   reserved;               /* reserved for driver */
 } __WAVEHDR;
 
-struct vk_winsound_play_buffer_t {
+typedef struct vk_winsound_play_buffer_t {
     __WAVEHDR header;
     uint8_t *buffer;
-};
-typedef struct vk_winsound_play_buffer_t vk_winsound_play_buffer_t;
+} vk_winsound_play_buffer_t;
 
-struct vk_winsound_play_ctx_t {
+typedef struct vk_winsound_play_ctx_t {
     vsf_arch_irq_thread_t irq_thread;
 
     HWAVEOUT hwo;
@@ -80,8 +76,7 @@ struct vk_winsound_play_ctx_t {
     bool fill_ticktock;
     bool play_ticktock;
     uint8_t buffer_taken;
-};
-typedef struct vk_winsound_play_ctx_t vk_winsound_play_ctx_t;
+} vk_winsound_play_ctx_t;
 
 #undef HWAVEOUT
 #endif

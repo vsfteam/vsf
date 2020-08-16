@@ -22,6 +22,7 @@
 #include "hal/vsf_hal_cfg.h"
 
 #include "service/vsf_service.h"
+#include "hal/interface/vsf_interface_usb.h"
 
 #ifdef __cplusplus
 extern "C" {

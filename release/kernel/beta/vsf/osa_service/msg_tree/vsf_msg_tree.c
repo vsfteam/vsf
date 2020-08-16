@@ -39,14 +39,14 @@ static const i_msg_tree_node_t c_tRootNodes[] = {
 
 implement_vsf_rng_buf(__bfs_node_fifo_t, uint16_t, NO_RNG_BUF_PROTECT)
 
-void vsf_msgt_init(vsf_msgt_t* ptObj, const vsf_msgt_cfg_t* ptCFG)
+void vsf_msgt_init(vsf_msgt_t* obj_ptr, const vsf_msgt_cfg_t* cfg_ptr)
 {
-    class_internal(ptObj, ptThis, vsf_msgt_t);
-    VSF_OSA_SERVICE_ASSERT(NULL != ptObj && NULL != ptCFG);
-    VSF_OSA_SERVICE_ASSERT(     (NULL != ptCFG->ptInterfaces) 
-                            ||  (0 != ptCFG->chTypeNumbers));
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
+    VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr && NULL != cfg_ptr);
+    VSF_OSA_SERVICE_ASSERT(     (NULL != cfg_ptr->ptInterfaces) 
+                            ||  (0 != cfg_ptr->chTypeNumbers));
     
-    this.NodeTypes = *ptCFG;
+    this.NodeTypes = *cfg_ptr;
 }
 
 
@@ -54,20 +54,20 @@ void vsf_msgt_init(vsf_msgt_t* ptObj, const vsf_msgt_cfg_t* ptCFG)
  * Node shooting algorithm                                                    *
  *----------------------------------------------------------------------------*/
 
-static bool __msgt_shoot(   vsf_msgt_t* ptObj,
+static bool __msgt_shoot(   vsf_msgt_t* obj_ptr,
                             const vsf_msgt_node_t *ptNode,
                             uintptr_t pBulletInfo)
 {
-    uint_fast8_t chID = ptNode->chID;
+    uint_fast8_t u8_id = ptNode->u8_id;
     bool bResult = false;
     vsf_msgt_method_shoot_t* fnShoot = NULL;
-    class_internal(ptObj, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
-    if (chID < 2) {
-        fnShoot = c_tRootNodes[chID].Shoot;
+    if (u8_id < 2) {
+        fnShoot = c_tRootNodes[u8_id].Shoot;
     } else {
-        chID -= 2;
-        fnShoot = this.NodeTypes.ptInterfaces[chID].Shoot;
+        u8_id -= 2;
+        fnShoot = this.NodeTypes.ptInterfaces[u8_id].Shoot;
     }
 
     if (NULL != fnShoot) {
@@ -77,14 +77,14 @@ static bool __msgt_shoot(   vsf_msgt_t* ptObj,
     return bResult;
 }
 
-const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
+const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t *ptRoot,
                                             uintptr_t pBulletInfo)
 {
     vsf_msgt_node_t* ptItem = NULL;
-    class_internal(ptObj, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
-    VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
+    VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
 
     
     do {
@@ -93,7 +93,7 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
         }
 
         //! shoot the root item
-        if (__msgt_shoot(ptObj, ptRoot, pBulletInfo)) {
+        if (__msgt_shoot(obj_ptr, ptRoot, pBulletInfo)) {
             ptItem = (vsf_msgt_node_t *)ptRoot;
         } else if (ptRoot->bIsContainer){
             if (!ptRoot->bIsTransparent) {
@@ -117,7 +117,7 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
             }
 
             do {
-                if (__msgt_shoot(ptObj, ptNode, pBulletInfo)) {
+                if (__msgt_shoot(obj_ptr, ptNode, pBulletInfo)) {
                     //! shoot a node
                     ptItem = ptNode;
                     break;
@@ -139,21 +139,21 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* ptObj,
 }
 
 
-const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* ptObj,
+const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* obj_ptr,
                                         const vsf_msgt_node_t *ptRoot,
                                         uintptr_t pBulletInfo)
 {
     const vsf_msgt_node_t* ptItem = NULL;
-    class_internal(ptObj, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
-    VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
+    VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
 
     
     do {
         const vsf_msgt_node_t* ptNode = ptRoot;
 
         do {
-            ptNode = vsf_msgt_shoot_top_node(ptObj, ptNode, pBulletInfo);
+            ptNode = vsf_msgt_shoot_top_node(obj_ptr, ptNode, pBulletInfo);
             if (NULL == ptNode) {
                 break;
             }
@@ -180,7 +180,7 @@ const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* ptObj,
  *----------------------------------------------------------------------------*/
 
 void __vsf_msg_handling_init(   __vsf_msgt_msg_handling_fsm_t* ptFSM,
-                                vsf_msgt_t* ptObj,
+                                vsf_msgt_t* obj_ptr,
                                 vsf_msgt_msg_t* ptMessage,
                                 bool bIgnoreStatus)
 {
@@ -197,7 +197,7 @@ void __vsf_msg_handling_init(   __vsf_msgt_msg_handling_fsm_t* ptFSM,
 
 
 fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM, 
-                            vsf_msgt_t* ptObj,
+                            vsf_msgt_t* obj_ptr,
                             const vsf_msgt_node_t* ptNode)
 {
     enum {
@@ -209,7 +209,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
         HANDLE_SUBCALL,
 #endif
     };
-    class_internal(ptObj, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     switch (THIS_FSM_STATE) {
         case START:
@@ -221,19 +221,19 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
             }
             //break;
         case CHECK_STATUS:
-            if (ptNode->chID - 2 >= this.NodeTypes.chTypeNumbers) {
+            if (ptNode->u8_id - 2 >= this.NodeTypes.chTypeNumbers) {
                 //! illegal Node ID detected, ignore this
                 RESET_MSGT_HANDLING_FSM();
                 return fsm_rt_err;
             } else {
                 vsf_msgt_method_status_t* fnStatus = NULL;
 
-                uint_fast8_t chID = ptNode->chID;
-                if (chID < 2) {
-                    fnStatus = c_tRootNodes[chID].Status;
+                uint_fast8_t u8_id = ptNode->u8_id;
+                if (u8_id < 2) {
+                    fnStatus = c_tRootNodes[u8_id].Status;
                 } else {
-                    chID -= 2;
-                    fnStatus = this.NodeTypes.ptInterfaces[chID].Status;
+                    u8_id -= 2;
+                    fnStatus = this.NodeTypes.ptInterfaces[u8_id].Status;
                 }
 
                 if (NULL != fnStatus) {
@@ -250,12 +250,12 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
             //break;
         case GET_HANDLER: {
             const vsf_msgt_handler_t* ptHandler = NULL;
-            uint_fast8_t chID = ptNode->chID;
-            if (chID < 2) {
-                ptHandler = &c_tRootNodes[chID].tMessageHandler;
+            uint_fast8_t u8_id = ptNode->u8_id;
+            if (u8_id < 2) {
+                ptHandler = &c_tRootNodes[u8_id].tMessageHandler;
             } else {
-                chID -= 2;
-                ptHandler = &this.NodeTypes.ptInterfaces[chID].tMessageHandler;
+                u8_id -= 2;
+                ptHandler = &this.NodeTypes.ptInterfaces[u8_id].tMessageHandler;
             }
             if (NULL == ptHandler->fnFSM) {
                 //! empty handler
@@ -330,7 +330,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *ptFSM,
 #define RESET_MSGT_BACKWARD_PROPAGATE_MSG_FSM()                                 \
         do { THIS_FSM_STATE = 0; } while(0)
 
-fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
+fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t *ptNode,
                                             vsf_msgt_msg_t *ptMessage)
 {
@@ -340,10 +340,10 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
         GET_PARENT,
     };
     fsm_rt_t tfsm = fsm_rt_on_going;
-    class_internal(ptObj, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     
 
-    VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
+    VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != ptMessage);
 
     switch (THIS_FSM_STATE) {
@@ -355,12 +355,12 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
             if (this.NodeTypes.chTypeNumbers > 0 && NULL == this.NodeTypes.ptInterfaces) {
                 return (fsm_rt_t)VSF_ERR_INVALID_PARAMETER;
             }
-            __vsf_msg_handling_init(&this.BW.tMSGHandling, ptObj, ptMessage, false);
+            __vsf_msg_handling_init(&this.BW.tMSGHandling, obj_ptr, ptMessage, false);
             THIS_FSM_STATE++;
             //break;
 
         case MSG_HANDLING:
-            tfsm = __vsf_msg_handling(&this.BW.tMSGHandling, ptObj, this.BW.tMSGHandling.ptNode);
+            tfsm = __vsf_msg_handling(&this.BW.tMSGHandling, obj_ptr, this.BW.tMSGHandling.ptNode);
             if (tfsm < 0) {
                 THIS_FSM_STATE = GET_PARENT;
                 break;
@@ -392,11 +392,11 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* ptObj,
  * Forward Message Propagation using DFS algorithm                            *
  *----------------------------------------------------------------------------*/
 
-fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
+fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* obj_ptr,
                                         vsf_msgt_node_t* ptNode,
                                         vsf_msgt_msg_t* ptMessage)
 {
-    class_internal(&ptObj, ptThis, vsf_msgt_t);
+    class_internal(&obj_ptr, this_ptr, vsf_msgt_t);
 
     
 
@@ -408,12 +408,12 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* ptObj,
  *----------------------------------------------------------------------------*/
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
-void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj, 
+void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* obj_ptr, 
                                                 uint16_t *phwFIFOBuffer, 
                                                 uint_fast16_t hwBuffSize)
 {
-    class_internal(ptObj, ptThis, vsf_msgt_t);
-    VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
+    VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != phwFIFOBuffer);
     VSF_OSA_SERVICE_ASSERT(hwBuffSize > 2);
 
@@ -431,7 +431,7 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* ptObj,
         do { THIS_FSM_STATE = 0; } while(0)
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
-fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
+fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t* ptNode,
                                             vsf_msgt_msg_t* ptMessage)
 {
@@ -442,11 +442,11 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
     };
     fsm_rt_t tfsm = fsm_rt_on_going;
     uint16_t hwOffset = 0;
-    class_internal(ptObj, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     
     //vsf_msgt_node_t *ptItem = NULL;
 
-    VSF_OSA_SERVICE_ASSERT(NULL != ptObj);
+    VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != ptMessage);
 
     switch (THIS_FSM_STATE) {
@@ -458,7 +458,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
                 &&  (NULL == this.NodeTypes.ptInterfaces)) {
                 return (fsm_rt_t)VSF_ERR_INVALID_PARAMETER;
             }
-            VSF_OSA_SERVICE_ASSERT (NULL != this.FWBFS.tFIFO.ptBuffer);
+            VSF_OSA_SERVICE_ASSERT (NULL != this.FWBFS.tFIFO.buffer_ptr);
 
             if (!vsf_rng_buf_send_one(  __bfs_node_fifo_t, 
                                         &(this.FWBFS.tFIFO), 
@@ -467,7 +467,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
             }
 
             __vsf_msg_handling_init(&this.FWBFS.tMSGHandling, 
-                                    ptObj, 
+                                    obj_ptr, 
                                     ptMessage, 
                                     true);
             THIS_FSM_STATE ++;
@@ -489,7 +489,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* ptObj,
 
         case VISIT_ITEM:
             tfsm = __vsf_msg_handling(  &this.FWBFS.tMSGHandling, 
-                                        ptObj, 
+                                        obj_ptr, 
                                         this.FWBFS.tMSGHandling.ptNode);
             if (tfsm < 0 || tfsm == fsm_rt_cpl) {
 

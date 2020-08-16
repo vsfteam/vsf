@@ -35,7 +35,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct m480_usbd_hs_const_t {
+typedef struct m480_usbd_hs_const_t {
 #ifdef M480_USBD_HS_WROKAROUND_ISO
     // information from lv0
     uint16_t *tx_size;
@@ -46,12 +46,11 @@ struct m480_usbd_hs_const_t {
     uint8_t ep_num;
     m480_usbphy_t phy;
     IRQn_Type irq;
-    pm_ahb_clk_no_t ahbclk;
+    pm_sync_clk_no_t ahbclk;
     HSUSBD_T *reg;
-};
-typedef struct m480_usbd_hs_const_t m480_usbd_hs_const_t;
+} m480_usbd_hs_const_t;
 
-struct m480_usbd_hs_t {
+typedef struct m480_usbd_hs_t {
     uint16_t ep_buf_ptr;
 #ifdef M480_USBD_HS_WROKAROUND_ISO
     uint16_t ep_tx_mask;
@@ -62,8 +61,7 @@ struct m480_usbd_hs_t {
         void *param;
     } callback;
     const m480_usbd_hs_const_t *param;
-};
-typedef struct m480_usbd_hs_t m480_usbd_hs_t;
+} m480_usbd_hs_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/

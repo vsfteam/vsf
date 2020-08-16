@@ -21,10 +21,10 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSFSTREAM_CLASS_INHERIT
-#define VSF_FS_INHERIT
-#define VSF_LINUX_IMPLEMENT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_FS_CLASS_INHERIT__
+#define __VSF_LINUX_CLASS_IMPLEMENT
 #include "./vsf_linux.h"
 
 #include <unistd.h>
@@ -63,7 +63,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_linux_t {
+typedef struct vsf_linux_t {
     int cur_tid;
     int cur_pid;
     vsf_dlist_t process_list;
@@ -72,18 +72,15 @@ struct vsf_linux_t {
     int sig_pid;
 
     vsf_linux_stdio_stream_t stdio_stream;
-};
-typedef struct vsf_linux_t vsf_linux_t;
+} vsf_linux_t;
 
-struct vsf_linux_main_priv_t {
+typedef struct vsf_linux_main_priv_t {
     vsf_linux_process_ctx_t *ctx;
-};
-typedef struct vsf_linux_main_priv_t vsf_linux_main_priv_t;
+} vsf_linux_main_priv_t;
 
-struct vsf_linux_stream_priv_t {
+typedef struct vsf_linux_stream_priv_t {
     vsf_stream_t *stream;
-};
-typedef struct vsf_linux_stream_priv_t vsf_linux_stream_priv_t;
+} vsf_linux_stream_priv_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -107,7 +104,7 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 static ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 
-static vsf_linux_process_t * vsf_linux_start_process_internal(int stack_size,
+static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio);
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -161,7 +158,7 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
     __vsf_linux_init_thread(argc, argv);
 #else
     // create init process(pid1)
-    vsf_linux_start_process_internal(0, __vsf_linux_init_thread, VSF_LINUX_CFG_PRIO_HIGHEST);
+    __vsf_linux_start_process_internal(0, __vsf_linux_init_thread, VSF_LINUX_CFG_PRIO_HIGHEST);
 
     vsf_linux_sig_handler_t *handler;
     vsf_linux_process_t *process;
@@ -218,7 +215,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     vsf_linux_glibc_init();
 
     // create kernel process(pid0)
-    if (NULL != vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
+    if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
@@ -298,7 +295,7 @@ int vsf_linux_start_process(vsf_linux_process_t *process)
     return vsf_linux_start_thread(thread);
 }
 
-static vsf_linux_process_t * vsf_linux_start_process_internal(int stack_size,
+static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio)
 {
     VSF_LINUX_ASSERT((prio >= VSF_LINUX_CFG_PRIO_LOWEST) && (prio <= VSF_LINUX_CFG_PRIO_HIGHEST));

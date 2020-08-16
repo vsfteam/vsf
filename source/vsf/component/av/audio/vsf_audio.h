@@ -24,12 +24,12 @@
 
 #include "kernel/vsf_kernel.h"
 
-#if     defined(VSF_AUDIO_IMPLEMENT)
-#   undef VSF_AUDIO_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_AUDIO_INHERIT)
-#   undef VSF_AUDIO_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_AUDIO_CLASS_IMPLEMENT)
+#   undef __VSF_AUDIO_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_AUDIO_CLASS_INHERIT__)
+#   undef __VSF_AUDIO_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -43,47 +43,45 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_audio_dev_t)
+dcl_simple_class(vk_audio_dev_t)
+dcl_simple_class(vk_audio_drv_t)
 
-struct vk_audio_play_drv_t {
+typedef struct vk_audio_play_drv_t {
     vsf_peda_evthandler_t volume;
     vsf_peda_evthandler_t mute;
     vsf_peda_evthandler_t play;
     vsf_peda_evthandler_t stop;
-};
-typedef struct vk_audio_play_drv_t vk_audio_play_drv_t;
+} vk_audio_play_drv_t;
 
-struct vk_audio_capture_drv_t {
+typedef struct vk_audio_capture_drv_t {
     vsf_peda_evthandler_t volume;
     vsf_peda_evthandler_t mute;
     vsf_peda_evthandler_t capture;
     vsf_peda_evthandler_t stop;
-};
-typedef struct vk_audio_capture_drv_t vk_audio_capture_drv_t;
+} vk_audio_capture_drv_t;
 
-struct vk_audio_drv_t {
-    vsf_peda_evthandler_t init;
+def_simple_class(vk_audio_drv_t) {
+    protected_member(
+        vsf_peda_evthandler_t init;
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-    const vk_audio_play_drv_t play_drv;
+        const vk_audio_play_drv_t play_drv;
 #endif
 #if VSF_AUDIO_CFG_USE_CATURE == ENABLED
-    const vk_audio_capture_drv_t capture_drv;
+        const vk_audio_capture_drv_t capture_drv;
 #endif
+    )
 };
-typedef struct vk_audio_drv_t vk_audio_drv_t;
 
-struct vk_audio_format_t {
+typedef struct vk_audio_format_t {
     uint8_t channel_num;        // eg: 2
     uint8_t sample_bit_width;   // eg: 16
     uint16_t sample_rate;       // eg: 44100/48000
-};
-typedef struct vk_audio_format_t vk_audio_format_t;
+} vk_audio_format_t;
 
-struct vk_audio_stream_t {
+typedef struct vk_audio_stream_t {
     vk_audio_format_t format;
     vsf_stream_t *stream;
-};
-typedef struct vk_audio_stream_t vk_audio_stream_t;
+} vk_audio_stream_t;
 
 def_simple_class(vk_audio_dev_t) {
     public_member(
@@ -99,7 +97,6 @@ def_simple_class(vk_audio_dev_t) {
 #endif
     )
 };
-typedef struct vk_audio_dev_t vk_audio_dev_t;
 
 __vsf_component_peda_ifs(vk_audio_init)
 
@@ -141,9 +138,7 @@ vsf_err_t vk_audio_capture_stop(vk_audio_dev_t *pthis);
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_USE_DECODER_WAV == ENABLED
-#   include "./decoder/wav/vsf_wav.h"
-#endif
+#include "./decoder/wav/vsf_wav.h"
 
 #endif      // VSF_USE_AUDIO
 #endif      // __VSF_AUDIO_H__

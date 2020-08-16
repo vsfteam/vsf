@@ -24,6 +24,9 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HUB == ENABLED
 
+// for hub constants
+#include "component/usb/common/class/HUB/vsf_usb_HUB.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -15,13 +15,10 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __USE_ARM_COMPILER_H__
-#define __USE_ARM_COMPILER_H__
+#ifndef __USE_MCS51_COMPILER_H_PART_1__
+#define __USE_MCS51_COMPILER_H_PART_1__
 
 /*============================ INCLUDES ======================================*/
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
 
 //! \name The macros to identify the compiler
 //! @{
@@ -35,7 +32,7 @@
 #endif
 
 
-//! \note for arm compiler 5
+//! \note for KEIL51
 #ifdef __IS_COMPILER_51_KEIL__
 #   undef __IS_COMPILER_51_KEIL__
 #endif
@@ -44,14 +41,23 @@
 #endif
 //! @}
 
+#endif /* __USE_MCS51_COMPILER_H_PART_1__ */
+
+
+/*========================== Multiple-Entry Start ============================*/
 
 #if __IS_COMPILER_IAR__
 #   include <intrinsics.h>
 #endif
 
-
 #include "./type.h"
 #include "../__common/__compiler.h"
+
+/*========================== Multiple-Entry End ==============================*/
+
+
+#ifndef __USE_MCS51_COMPILER_H_PART_2__
+#define __USE_MCS51_COMPILER_H_PART_2__
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,5 +201,5 @@ extern void vsf_stdio_init(void);
 //! \brief for interrupt 
 #include "./signal.h"
 
+#endif /* __USE_MCS51_COMPILER_H_PART_2__ */
 
-#endif

@@ -33,10 +33,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_THREAD_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_THREAD_CLASS_IMPLEMENT
 #elif   defined(__VSF_THREAD_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_THREAD_CLASS_INHERIT
 #endif   
 
@@ -101,7 +101,7 @@
                                     priority);                                  \
             }                                                                   \
             void vsf_thread_##__NAME##_entry(                                   \
-                        struct thread_cb_##__NAME##_t *ptThis)
+                        struct thread_cb_##__NAME##_t *this_ptr)
                         
 #   define __vsf_eda_call_thread_prepare__(__NAME, __THREAD_CB)                 \
             do {                                                                \
@@ -159,7 +159,7 @@
                                     priority);                                  \
             }                                                                   \
             void vsf_thread_##__NAME##_entry(                                   \
-                        struct thread_cb_##__NAME##_t *ptThis)
+                        struct thread_cb_##__NAME##_t *this_ptr)
 
 #   define __vsf_eda_call_thread_prepare_ex__(  __NAME,                         \
                                                 __THREAD_CB,                    \
@@ -222,7 +222,7 @@
                 vk_thread_start(pthis, priority);                              \
             }                                                                   \
             void vsf_thread_##__NAME##_entry(                                   \
-                        struct thread_cb_##__NAME##_t *ptThis)
+                        struct thread_cb_##__NAME##_t *this_ptr)
 
 #   define __def_vsf_thread_ex(__NAME, ...)                                     \
             struct thread_cb_##__NAME##_t {                                     \
@@ -235,12 +235,12 @@
             extern void vsf_thread_##__NAME##_start(struct __NAME *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__NAME##_entry(                            \
-                        struct thread_cb_##__NAME##_t *ptThis);                 
+                        struct thread_cb_##__NAME##_t *this_ptr);                 
                                                     
 
 #   define __implement_vsf_thread_ex(__NAME)                                    \
             void vsf_thread_##__NAME##_entry(                                   \
-                        struct thread_cb_##__NAME##_t *ptThis);                 \
+                        struct thread_cb_##__NAME##_t *this_ptr);                 \
             void vsf_thread_##__NAME##_start(   struct __NAME *task,            \
                                                 vsf_prio_t priority,            \
                                                 void *stack,                    \
@@ -256,7 +256,7 @@
                 vk_thread_start(pthis, priority);                              \
             }                                                                   \
             void vsf_thread_##__NAME##_entry(                                   \
-                        struct thread_cb_##__NAME##_t *ptThis)
+                        struct thread_cb_##__NAME##_t *this_ptr)
 
 #endif
 
@@ -306,7 +306,7 @@
 
 
 #   define vsf_thread_call_pt(__NAME, __TARGET)                                 \
-            (__TARGET)->tState = 0;                                            \
+            (__TARGET)->fsm_state = 0;                                            \
             vsf_thread_call_sub(vsf_pt_func(__NAME), (__TARGET))
 
 #endif
@@ -429,7 +429,7 @@ extern vsf_err_t vk_thread_start(  vsf_thread_t *thread,
                                     vsf_thread_cb_t *thread_cb, 
                                     vsf_prio_t priority);
 #else
-extern vsf_err_t vk_thread_start(vsf_thread_t *ptThis, vsf_prio_t tPriority);
+extern vsf_err_t vk_thread_start(vsf_thread_t *this_ptr, vsf_prio_t priority);
 #endif
 
 SECTION("text.vsf.kernel.vsf_thread_exit")

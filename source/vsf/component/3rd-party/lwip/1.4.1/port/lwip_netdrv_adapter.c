@@ -21,9 +21,8 @@
 
 #if VSF_USE_TCPIP == ENABLED
 
-#define VSF_NETDRV_INHERIT_NETIF
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_NETDRV_CLASS_INHERIT_NETIF__
+#include "component/tcpip/vsf_tcpip.h"
 
 #include "lwip/opt.h"
 #include "lwip/def.h"
@@ -234,8 +233,8 @@ static void * lwip_netdrv_adapter_read_buf(void *netbuf, vsf_mem_t *mem)
     ASSERT((netbuf != NULL) && (mem != NULL))
     struct pbuf *pbuf = netbuf;
 
-    mem->pchBuffer = pbuf->payload;
-    mem->nSize = pbuf->len;
+    mem->buffer_ptr = pbuf->payload;
+    mem->s32_size = pbuf->len;
     return pbuf->next;
 }
 

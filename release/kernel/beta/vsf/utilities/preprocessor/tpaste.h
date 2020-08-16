@@ -25,20 +25,20 @@
  *
  * May be used only within macros with the tokens passed as arguments if the tokens are \#defined.
  *
- * For example, writing TPASTE2(U, WIDTH) within a macro \#defined by
+ * For example, writing __CONNECT2(U, WIDTH) within a macro \#defined by
  * UTYPE(WIDTH) and invoked as UTYPE(UL_WIDTH) with UL_WIDTH \#defined as 32 is
  * equivalent to writing U32.
  */
 //! @{
-#define TPASTE2( a, b)                            a##b
-#define TPASTE3( a, b, c)                         a##b##c
-#define TPASTE4( a, b, c, d)                      a##b##c##d
-#define TPASTE5( a, b, c, d, e)                   a##b##c##d##e
-#define TPASTE6( a, b, c, d, e, f)                a##b##c##d##e##f
-#define TPASTE7( a, b, c, d, e, f, g)             a##b##c##d##e##f##g
-#define TPASTE8( a, b, c, d, e, f, g, h)          a##b##c##d##e##f##g##h
-#define TPASTE9( a, b, c, d, e, f, g, h, i)       a##b##c##d##e##f##g##h##i
-#define TPASTE10(a, b, c, d, e, f, g, h, i, j)    a##b##c##d##e##f##g##h##i##j
+#define __CONNECT2( a, b)                            a##b
+#define __CONNECT3( a, b, c)                         a##b##c
+#define __CONNECT4( a, b, c, d)                      a##b##c##d
+#define __CONNECT5( a, b, c, d, e)                   a##b##c##d##e
+#define __CONNECT6( a, b, c, d, e, f)                a##b##c##d##e##f
+#define __CONNECT7( a, b, c, d, e, f, g)             a##b##c##d##e##f##g
+#define __CONNECT8( a, b, c, d, e, f, g, h)          a##b##c##d##e##f##g##h
+#define __CONNECT9( a, b, c, d, e, f, g, h, i)       a##b##c##d##e##f##g##h##i
+#define __CONNECT10(a, b, c, d, e, f, g, h, i, j)    a##b##c##d##e##f##g##h##i##j
 //! @}
 
 /*! \name Absolute Token Paste
@@ -47,19 +47,19 @@
  *
  * No restriction of use if the tokens are \#defined.
  *
- * For example, writing ATPASTE2(U, UL_WIDTH) anywhere with UL_WIDTH \#defined
+ * For example, writing CONNECT2(U, UL_WIDTH) anywhere with UL_WIDTH \#defined
  * as 32 is equivalent to writing U32.
  */
 //! @{
-#define ATPASTE2( a, b)                           TPASTE2( a, b)
-#define ATPASTE3( a, b, c)                        TPASTE3( a, b, c)
-#define ATPASTE4( a, b, c, d)                     TPASTE4( a, b, c, d)
-#define ATPASTE5( a, b, c, d, e)                  TPASTE5( a, b, c, d, e)
-#define ATPASTE6( a, b, c, d, e, f)               TPASTE6( a, b, c, d, e, f)
-#define ATPASTE7( a, b, c, d, e, f, g)            TPASTE7( a, b, c, d, e, f, g)
-#define ATPASTE8( a, b, c, d, e, f, g, h)         TPASTE8( a, b, c, d, e, f, g, h)
-#define ATPASTE9( a, b, c, d, e, f, g, h, i)      TPASTE9( a, b, c, d, e, f, g, h, i)
-#define ATPASTE10(a, b, c, d, e, f, g, h, i, j)   TPASTE10(a, b, c, d, e, f, g, h, i, j)
+#define CONNECT2( a, b)                           __CONNECT2( a, b)
+#define CONNECT3( a, b, c)                        __CONNECT3( a, b, c)
+#define CONNECT4( a, b, c, d)                     __CONNECT4( a, b, c, d)
+#define CONNECT5( a, b, c, d, e)                  __CONNECT5( a, b, c, d, e)
+#define CONNECT6( a, b, c, d, e, f)               __CONNECT6( a, b, c, d, e, f)
+#define CONNECT7( a, b, c, d, e, f, g)            __CONNECT7( a, b, c, d, e, f, g)
+#define CONNECT8( a, b, c, d, e, f, g, h)         __CONNECT8( a, b, c, d, e, f, g, h)
+#define CONNECT9( a, b, c, d, e, f, g, h, i)      __CONNECT9( a, b, c, d, e, f, g, h, i)
+#define CONNECT10(a, b, c, d, e, f, g, h, i, j)   __CONNECT10(a, b, c, d, e, f, g, h, i, j)
 //! @}
 
 

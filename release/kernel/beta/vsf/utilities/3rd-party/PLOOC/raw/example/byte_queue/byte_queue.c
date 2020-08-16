@@ -49,22 +49,22 @@ const i_byte_queue_t BYTE_QUEUE = {
 /*============================ IMPLEMENTATION ================================*/
 
 
-byte_queue_t * byte_queue_init(byte_queue_t *ptObj, byte_queue_cfg_t *ptCFG)
+byte_queue_t * byte_queue_init(byte_queue_t *obj_ptr, byte_queue_cfg_t *ptCFG)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, byte_queue_t);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
     
-    ASSERT(NULL != ptObj && NULL != ptCFG);
+    ASSERT(NULL != obj_ptr && NULL != ptCFG);
 
     /* access inherited member of mem_t directly */
-    if (    (NULL == ptCFG->use_as__mem_t.pchBuffer) 
-        ||  (0 == ptCFG->use_as__mem_t.hwSize)) {
+    if (    (NULL == ptCFG->use_as__mem_t.buffer_ptr) 
+        ||  (0 == ptCFG->use_as__mem_t.u16_size)) {
 
         return NULL;
     }
    
     
-    memset(ptObj, 0, sizeof(byte_queue_t));     //! clear object
+    memset(obj_ptr, 0, sizeof(byte_queue_t));     //! clear object
     /*
     this.hwHead = 0;
     this.hwTail = 0;
@@ -74,15 +74,15 @@ byte_queue_t * byte_queue_init(byte_queue_t *ptObj, byte_queue_cfg_t *ptCFG)
     this.use_as__mem_t = ptCFG->use_as__mem_t;
     this.pTarget = ptCFG->pTarget;              //!< user target
     
-    return ptObj;
+    return obj_ptr;
 }
 
-bool byte_queue_enqueue(byte_queue_t *ptObj, uint8_t chByte)
+bool byte_queue_enqueue(byte_queue_t *obj_ptr, uint8_t chByte)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, byte_queue_t);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
     
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     
     /* ------------------atomicity sensitive start---------------- */
     if (    (this.hwHead == this.hwTail)
@@ -90,9 +90,9 @@ bool byte_queue_enqueue(byte_queue_t *ptObj, uint8_t chByte)
         //! queue is full
         return false;
     }
-    this.use_as__mem_t.pchBuffer[this.hwHead++] = chByte;
+    this.use_as__mem_t.buffer_ptr[this.hwHead++] = chByte;
     this.hwCount++;
-    if (this.hwHead >= this.use_as__mem_t.hwSize) {
+    if (this.hwHead >= this.use_as__mem_t.u16_size) {
         this.hwHead = 0;
     }
     /* ------------------atomicity sensitive end---------------- */
@@ -100,12 +100,12 @@ bool byte_queue_enqueue(byte_queue_t *ptObj, uint8_t chByte)
     return true;
 }
 
-bool byte_queue_dequeue(byte_queue_t *ptObj, uint8_t *pchByte)
+bool byte_queue_dequeue(byte_queue_t *obj_ptr, uint8_t *pchByte)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, byte_queue_t);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
     uint8_t chByte;
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     
     /* ------------------atomicity sensitive start---------------- */
     if (    (this.hwHead == this.hwTail)
@@ -114,9 +114,9 @@ bool byte_queue_dequeue(byte_queue_t *ptObj, uint8_t *pchByte)
         return false;
     }
     
-    chByte = this.use_as__mem_t.pchBuffer[this.hwTail++];
+    chByte = this.use_as__mem_t.buffer_ptr[this.hwTail++];
     this.hwCount--;
-    if (this.hwTail >= this.use_as__mem_t.hwSize) {
+    if (this.hwTail >= this.use_as__mem_t.u16_size) {
         this.hwTail = 0;
     }
     /* ------------------atomicity sensitive end---------------- */
@@ -128,35 +128,35 @@ bool byte_queue_dequeue(byte_queue_t *ptObj, uint8_t *pchByte)
     return true;
 }
 
-uint_fast16_t byte_queue_count(byte_queue_t *ptObj)
+uint_fast16_t byte_queue_count(byte_queue_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, byte_queue_t);
-    ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
+    ASSERT(NULL != obj_ptr);
     
     return this.hwCount;
 }
 
-void *byte_queue_target_get(byte_queue_t *ptObj)
+void *byte_queue_target_get(byte_queue_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, byte_queue_t);
-    ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
+    ASSERT(NULL != obj_ptr);
     
     return this.pTarget;
 }
 
-void  byte_queue_target_set(byte_queue_t *ptObj, void *pTarget)
+void  byte_queue_target_set(byte_queue_t *obj_ptr, void *pTarget)
 {
-    class_internal(ptObj, ptThis, byte_queue_t);
-    ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
+    ASSERT(NULL != obj_ptr);
     
     this.pTarget = pTarget;
 }
 
 
-mem_t byte_queue_buffer_get(byte_queue_t *ptObj)
+mem_t byte_queue_buffer_get(byte_queue_t *obj_ptr)
 {
-    class_internal(ptObj, ptThis, byte_queue_t);
-    ASSERT(NULL != ptObj);
+    class_internal(obj_ptr, ptThis, byte_queue_t);
+    ASSERT(NULL != obj_ptr);
     
     return this.use_as__mem_t;
 }

@@ -24,12 +24,9 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
 
-#if     defined(VSF_MEMFS_IMPLEMENT)
-#   undef VSF_MEMFS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_MEMFS_INHERIT)
-#   undef VSF_MEMFS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_MEMFS_CLASS_IMPLEMENT)
+#   undef __VSF_MEMFS_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -42,7 +39,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_memfs_file_t)
+dcl_simple_class(vk_memfs_file_t)
 
 __vsf_component_peda_ifs(vk_memfs_callback_read,
     uint64_t        offset;
@@ -56,9 +53,9 @@ __vsf_component_peda_ifs(vk_memfs_callback_write,
 )
 
 def_simple_class(vk_memfs_file_t) {
-    implement(vk_file_t)
-
     public_member(
+        implement(vk_file_t)
+
         union {
             struct {
                 uint8_t *buff;
@@ -76,10 +73,9 @@ def_simple_class(vk_memfs_file_t) {
     )
 };
 
-struct vk_memfs_info_t {
+typedef struct vk_memfs_info_t {
     vk_memfs_file_t root;
-};
-typedef struct vk_memfs_info_t vk_memfs_info_t;
+} vk_memfs_info_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

@@ -41,54 +41,48 @@
 typedef struct vsfvm_lexer_sym_t vsfvm_lexer_sym_t;
 typedef struct vsfvm_lexer_op_t vsfvm_lexer_op_t;
 
-struct vsfvm_lexer_symarr_t {
+typedef struct vsfvm_lexer_symarr_t {
     vsfvm_lexer_sym_t *sym;
     uint16_t num;
     uint16_t id;
-};
-typedef struct vsfvm_lexer_symarr_t vsfvm_lexer_symarr_t;
+} vsfvm_lexer_symarr_t;
 
-struct vsfvm_lexer_symtbl_t {
+typedef struct vsfvm_lexer_symtbl_t {
     vsf_dynarr_t table;
     vsf_dynarr_t strpool;
     char *strbuf;
     char *strpos;
     uint8_t varnum;
-};
-typedef struct vsfvm_lexer_symtbl_t vsfvm_lexer_symtbl_t;
+} vsfvm_lexer_symtbl_t;
 
 // expression token
-union vsfvm_token_data_t {
+typedef union vsfvm_token_data_t {
     uint32_t uval;
     int32_t ival;
     vsfvm_lexer_sym_t *sym;
-};
-typedef union vsfvm_token_data_t vsfvm_token_data_t;
+} vsfvm_token_data_t;
 
-struct vsfvm_lexer_etoken_t {
+typedef struct vsfvm_lexer_etoken_t {
     uint32_t token;
     vsfvm_token_data_t data;
-};
-typedef struct vsfvm_lexer_etoken_t vsfvm_lexer_etoken_t;
+} vsfvm_lexer_etoken_t;
 
-struct vsfvm_lexer_exprctx_t {
+typedef struct vsfvm_lexer_exprctx_t {
     vsfvm_lexer_etoken_t pre_etoken;
     bool comma_is_op;
     uint8_t func_param;
     uint32_t opsp;
     uint32_t expsp;
     vsfvm_pt_t pt;
-};
-typedef struct vsfvm_lexer_exprctx_t vsfvm_lexer_exprctx_t;
+} vsfvm_lexer_exprctx_t;
 
-struct vsfvm_lexer_expr_t {
+typedef struct vsfvm_lexer_expr_t {
     vsfvm_lexer_exprctx_t ctx;
     uint32_t nesting;
 
     vsf_dynstack_t stack_exp;
     vsf_dynstack_t stack_op;
-};
-typedef struct vsfvm_lexer_expr_t vsfvm_lexer_expr_t;
+} vsfvm_lexer_expr_t;
 
 struct vsfvm_lexer_sym_t {
     char *name;
@@ -135,7 +129,7 @@ struct vsfvm_lexer_sym_t {
     vsf_slist_node_t symbol_node;
 };
 
-struct vsfvm_lexer_ctx_t {
+typedef struct vsfvm_lexer_ctx_t {
     const vsfvm_lexer_op_t *op;
 
     const char *pos;
@@ -144,10 +138,9 @@ struct vsfvm_lexer_ctx_t {
 
     vsfvm_pt_t pt;
     void *priv;
-};
-typedef struct vsfvm_lexer_ctx_t vsfvm_lexer_ctx_t;
+} vsfvm_lexer_ctx_t;
 
-struct vsfvm_lexer_t {
+typedef struct vsfvm_lexer_t {
     vsfvm_lexer_ctx_t curctx;
     vsf_dynstack_t ctx_stack;
 
@@ -156,8 +149,7 @@ struct vsfvm_lexer_t {
     char cur_symbol[VSFVM_LEXER_MAX_SYMLEN];
     int symid;
     bool within_cur_symtbl;
-};
-typedef struct vsfvm_lexer_t vsfvm_lexer_t;
+} vsfvm_lexer_t;
 
 struct vsfvm_lexer_op_t {
     const char *name;
@@ -171,11 +163,10 @@ struct vsfvm_lexer_op_t {
     int (*input)(vsfvm_lexer_t *lexer);
 };
 
-struct vsfvm_lexer_list_t {
+typedef struct vsfvm_lexer_list_t {
     const vsfvm_lexer_op_t *op;
     vsf_slist_node_t op_node;
-};
-typedef struct vsfvm_lexer_list_t vsfvm_lexer_list_t;
+} vsfvm_lexer_list_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

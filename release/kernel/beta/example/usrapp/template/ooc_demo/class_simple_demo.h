@@ -22,10 +22,10 @@
 #include "vsf_cfg.h"
 
 #if     defined(CLASS_SIMPLE_DEMO_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef CLASS_SIMPLE_DEMO_IMPLEMENT
 #elif   defined(CLASS_SIMPLE_DEMO_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef CLASS_SIMPLE_DEMO_INHERIT
 #endif
 #include "utilities/ooc_class.h"
@@ -65,7 +65,7 @@ declare_class(xxxxx_t)
 
 typedef struct xxxxx_cfg_t xxxxx_cfg_t;
 struct xxxxx_cfg_t {
-    uint8_t *pchBuffer;
+    uint8_t *buffer_ptr;
     uint32_t wNumber;
 };
 
@@ -78,10 +78,10 @@ def_simple_class(xxxxx_t) {
 
 };
 /*
-vsf_err_t xxxxx_cfg(xxxxx_t *ptObj, xxxxx_cfg_t *ptCFG)
+vsf_err_t xxxxx_cfg(xxxxx_t *obj_ptr, xxxxx_cfg_t *cfg_ptr)
 {
     ...
-    ptObj->use_as__xxxxx_cfg_t = (*ptCFG);      //! copy to initialise
+    obj_ptr->use_as__xxxxx_cfg_t = (*cfg_ptr);      //! copy to initialise
     ...
 }
 */
@@ -98,10 +98,10 @@ vsf_err_t xxxxx_cfg(xxxxx_t *ptObj, xxxxx_cfg_t *ptCFG)
 #define STATIC_XXXXX(__VAR, ...)            \
         do {                                \
             xxxxx_t __VAR;                  \
-            const xxxxx_cfg_t tCFG = {      \
+            const xxxxx_cfg_t cfg = {      \
                 __VA_ARGS__                 \
             };                              \
-            xxxxx_cfg(&(__VAR), &tCFG);     \
+            xxxxx_cfg(&(__VAR), &cfg);     \
         } while(0);
 #endif
 

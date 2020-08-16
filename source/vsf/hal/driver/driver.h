@@ -59,8 +59,14 @@
 */
 #   elif    defined(__ARM__)
 #       define  VSF_DRIVER_HEADER       "./arm/driver.h"
-//#   else
-//#       define  VSF_DRIVER_HEADER       "./template/driver.h"
+
+/*! \note please try not ignore the __UNKNOWN_VENDOR__ if you want to select 
+ *!       the chip inside unknown folder 
+ */
+#   elif    defined(__UNKOWN_VENDOR__)                                          
+#       define  VSF_DRIVER_HEADER       "./unknown/driver.h"
+#   else
+#       define  VSF_DRIVER_HEADER       "./unknown/driver.h"
 #   endif
 #endif
 

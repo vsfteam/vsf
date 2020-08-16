@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
+#include "./driver.h"
 // for vsf_heap
 #include "service/vsf_service.h"
 

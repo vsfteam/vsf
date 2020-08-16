@@ -1,7 +1,8 @@
 #ifndef __XBOOT_XFS_H__
 #define __XBOOT_XFS_H__
 
-#include "vsf.h"
+#include "utilities/ooc_class.h"
+#include "component/vsf_component.h"
 #include <xboot.h>
 
 struct xfs_context_t {

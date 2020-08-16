@@ -37,10 +37,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__VSF_STREAM_READER_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_STREAM_READER_CLASS_IMPLEMENT
 #elif   defined(__VSF_STREAM_READER_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_STREAM_READER_CLASS_INHERIT
 #endif   
 
@@ -70,21 +70,21 @@ end_def_class(vsf_stream_reader_t)
 typedef vsf_stream_usr_cfg_t vsf_stream_reader_cfg_t;
 
 def_interface(i_stream_reader_t)
-    vsf_err_t           (*Init)    (vsf_stream_reader_t *ptObj, 
-                                    const vsf_stream_reader_cfg_t *ptCFG);
+    vsf_err_t           (*Init)    (vsf_stream_reader_t *obj_ptr, 
+                                    const vsf_stream_reader_cfg_t *cfg_ptr);
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-    void                (*Open)(    vsf_stream_reader_t *ptObj);
-    void                (*Close)(   vsf_stream_reader_t *ptObj);
+    void                (*Open)(    vsf_stream_reader_t *obj_ptr);
+    void                (*Close)(   vsf_stream_reader_t *obj_ptr);
 #endif
     struct {
-        vsf_pbuf_t *    (*Fetch)   (vsf_stream_reader_t *ptObj);
+        vsf_pbuf_t *    (*Fetch)   (vsf_stream_reader_t *obj_ptr);
     }Block;
 
-    bool            (*ReadByte)(vsf_stream_reader_t *ptObj, 
-                                uint8_t *pchByte);
-    int_fast32_t    (*Read)    (vsf_stream_reader_t *ptObj,
-                                uint8_t *pchBuffer,
-                                uint_fast16_t hwSize);
+    bool            (*ReadByte)(vsf_stream_reader_t *obj_ptr, 
+                                uint8_t *byte_ptr);
+    int_fast32_t    (*Read)    (vsf_stream_reader_t *obj_ptr,
+                                uint8_t *buffer_ptr,
+                                uint_fast16_t u16_size);
 end_def_interface(i_stream_reader_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -96,20 +96,20 @@ extern const i_stream_reader_t  VSF_STREAM_READER;
  *----------------------------------------------------------------------------*/
 
 extern 
-vsf_err_t vsf_stream_reader_init(   vsf_stream_reader_t *ptObj, 
-                                    const vsf_stream_reader_cfg_t *ptCFG);
+vsf_err_t vsf_stream_reader_init(   vsf_stream_reader_t *obj_ptr, 
+                                    const vsf_stream_reader_cfg_t *cfg_ptr);
 
 extern 
-vsf_pbuf_t *vsf_stream_reader_fetch_pbuf ( vsf_stream_reader_t *ptObj);
+vsf_pbuf_t *vsf_stream_reader_fetch_pbuf ( vsf_stream_reader_t *obj_ptr);
 
 extern 
-int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *ptObj,
-                                    uint8_t *pchBuffer,
-                                    uint_fast16_t hwSize);
+int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *obj_ptr,
+                                    uint8_t *buffer_ptr,
+                                    uint_fast16_t u16_size);
 
 extern
-bool vsf_stream_reader_read_byte(   vsf_stream_reader_t *ptObj, 
-                                    uint8_t *pchByte);
+bool vsf_stream_reader_read_byte(   vsf_stream_reader_t *obj_ptr, 
+                                    uint8_t *byte_ptr);
 
 #endif
 #endif

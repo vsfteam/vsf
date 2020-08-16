@@ -62,9 +62,9 @@ static void __vsf_eda_queue_notify(vsf_eda_queue_t *this_ptr, bool tx, vsf_prote
         eda->state.bits.is_sync_got = true;
         vsf_unprotect_sched(orig);
 
-        vsf_err_t err = vsf_eda_post_evt(eda, VSF_EVT_SYNC);
-        VSF_KERNEL_ASSERT(!err);
-        UNUSED_PARAM(err);
+        vsf_eda_post_evt(eda, VSF_EVT_SYNC);
+        // do not check result of vsf_eda_post_evt
+        //  because it may fail if time-outted and VSF_EVT_TIMER in queue
     } else {
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
         if (tx) {
@@ -78,7 +78,7 @@ static void __vsf_eda_queue_notify(vsf_eda_queue_t *this_ptr, bool tx, vsf_prote
 SECTION(".text.vsf.kernel.vsf_eda_queue_init")
 vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *this_ptr, uint_fast16_t max)
 {
-    VSF_KERNEL_ASSERT(this_ptr != NULL);
+    VSF_KERNEL_ASSERT((this_ptr != NULL) && (max > 0));
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
     this_ptr->tx_processing = false;
 #endif

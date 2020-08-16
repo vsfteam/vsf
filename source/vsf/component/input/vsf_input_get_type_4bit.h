@@ -19,7 +19,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_INPUT_USER_TYPE_maker
-#   define VSF_INPUT_USER_TYPE_make(__x, __y)       TPASTE3(0x, __x, __y)
+#   define VSF_INPUT_USER_TYPE_make(__x, __y)       __CONNECT3(0x, __x, __y)
 #endif
 
 #ifndef VSF_INPUT_USER_TYPE

@@ -19,9 +19,9 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
-#define VSF_NETDRV_INHERIT_NETIF
+#define __VSF_NETDRV_CLASS_INHERIT_NETIF__
 #include "../../vsfip.h"
 #include "./vsfip_dhcpc.h"
 
@@ -41,7 +41,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum vsfip_dhcpc_evt_t {
+enum {
     VSFIP_DHCP_EVT_READY            = VSF_EVT_USER + 0,
     VSFIP_DHCP_EVT_SEND_DISCOVER    = VSF_EVT_USER + 1,
     VSFIP_DHCP_EVT_SEND_REQUEST     = VSF_EVT_USER + 2,
@@ -50,9 +50,19 @@ enum vsfip_dhcpc_evt_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void vsfip_dhcpc_on_finish(vsfip_dhcpc_t *dhcpc);
+
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
+#ifndef WEAK_VSFIP_DHCPC_ON_FINISH
+WEAK(vsfip_dhcpc_on_finish)
+void vsfip_dhcpc_on_finish(vsfip_dhcpc_t *dhcpc)
+{
+}
+#endif
+
+static vsf_err_t __vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
 {
     vsfip_netif_t *netif = dhcpc->netif;
     vsfip_netbuf_t *netbuf;
@@ -66,7 +76,7 @@ static vsf_err_t vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
     netbuf = dhcpc->outbuffer;
     vsfip_netbuf_set_netif(netbuf, dhcpc->netif);
 
-    head = netbuf->app.pObj;
+    head = netbuf->app.obj_ptr;
     memset(head, 0, sizeof(vsfip_dhcp_head_t));
     head->op = DHCP_TOSERVER;
     head->htype = netif->netdrv->hwtype;
@@ -87,12 +97,12 @@ static vsf_err_t vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
                             DHCP_OPT_MAXMSGSIZE_LEN, (uint8_t *)&tmp16);
     } while (0);
 
-    do {
+    {
         uint8_t requestlist[] = {DHCP_OPT_SUBNETMASK,
             DHCP_OPT_ROUTER, DHCP_OPT_DNSSERVER, DHCP_OPT_BROADCAST};
         vsfip_dhcp_append_opt(netbuf, &dhcpc->optlen, DHCP_OPT_PARAMLIST,
                                 sizeof(requestlist), requestlist);
-    } while (0);
+    }
 
 #ifdef TCPIP_CFG_HOSTNAME
     vsfip_dhcp_append_opt(netbuf, &dhcpc->optlen, DHCP_OPT_HOSTNAME,
@@ -102,7 +112,7 @@ static vsf_err_t vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
     return VSF_ERR_NONE;
 }
 
-static void vsfip_dhcpc_input(void *param, vsfip_netbuf_t *netbuf)
+static void __vsfip_dhcpc_input(void *param, vsfip_netbuf_t *netbuf)
 {
     vsfip_dhcpc_t *dhcpc = param;
     vsfip_netif_t *netif = dhcpc->netif;
@@ -110,7 +120,7 @@ static void vsfip_dhcpc_input(void *param, vsfip_netbuf_t *netbuf)
     uint_fast8_t optlen;
     uint8_t *optptr;
 
-    head = netbuf->app.pObj;
+    head = netbuf->app.obj_ptr;
     if (    (head->op != DHCP_TOCLIENT)
         ||  (head->magic != cpu_to_be32(DHCP_MAGIC))
         ||  memcmp(head->chaddr, netif->netdrv->macaddr.addr_buf, netif->netdrv->macaddr.size)
@@ -167,7 +177,7 @@ static void vsfip_dhcpc_input(void *param, vsfip_netbuf_t *netbuf)
     }
 }
 
-static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsfip_dhcpc_t *dhcpc = container_of(eda, vsfip_dhcpc_t, teda);
     vsfip_netif_t *netif = dhcpc->netif;
@@ -182,7 +192,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (NULL == dhcpc->so) {
             goto cleanup;
         }
-        vsfip_socket_cb(dhcpc->so, dhcpc, vsfip_dhcpc_input, NULL);
+        vsfip_socket_cb(dhcpc->so, dhcpc, __vsfip_dhcpc_input, NULL);
         if (vsfip_bind(dhcpc->so, DHCP_CLIENT_PORT)) {
             goto cleanup;
         }
@@ -198,7 +208,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSFIP_DHCP_EVT_SEND_DISCOVER:
         memset(&netif->ip4addr, 0, sizeof(netif->ip4addr));
         dhcpc->ipaddr.size = 0;
-        if (vsfip_dhcpc_init_msg(dhcpc, (uint8_t)DHCP_OP_DISCOVER) < 0) {
+        if (__vsfip_dhcpc_init_msg(dhcpc, (uint8_t)DHCP_OP_DISCOVER) < 0) {
             goto cleanup;
         }
         vsfip_dhcp_end_opt(dhcpc->outbuffer, &dhcpc->optlen);
@@ -211,7 +221,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSFIP_DHCP_EVT_SEND_REQUEST:
     dhcp_request:
         vsf_teda_cancel_timer(NULL);
-        if (vsfip_dhcpc_init_msg(dhcpc, (uint8_t)DHCP_OP_REQUEST) < 0) {
+        if (__vsfip_dhcpc_init_msg(dhcpc, (uint8_t)DHCP_OP_REQUEST) < 0) {
             goto cleanup;
         }
         vsfip_dhcp_append_opt(dhcpc->outbuffer, &dhcpc->optlen, DHCP_OPT_REQIP,
@@ -253,6 +263,7 @@ static void vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vsfip_dhcpc_stop(dhcpc);
             }
         }
+        vsfip_dhcpc_on_finish(dhcpc);
         break;
     }
 }
@@ -268,7 +279,7 @@ void vsfip_dhcpc_stop(vsfip_dhcpc_t *dhcpc)
     }
 }
 
-static void vsfip_dhcpc_on_eda_terminate(vsf_eda_t *eda)
+static void __vsfip_dhcpc_on_eda_terminate(vsf_eda_t *eda)
 {
     vsfip_dhcpc_t *dhcpc = container_of(eda, vsfip_dhcpc_t, teda);
 #ifdef VSFIP_TRACE_NETIF
@@ -294,11 +305,11 @@ vsf_err_t vsfip_dhcpc_start(vsfip_netif_t *netif, vsfip_dhcpc_t *dhcpc)
     dhcpc->sockaddr.port = DHCP_SERVER_PORT;
     dhcpc->sockaddr.addr.size = 4;
 
-    dhcpc->teda.fn.evthandler = vsfip_dhcpc_evthandler;
-    dhcpc->teda.on_terminate = vsfip_dhcpc_on_eda_terminate;
+    dhcpc->teda.fn.evthandler = __vsfip_dhcpc_evthandler;
+    dhcpc->teda.on_terminate = __vsfip_dhcpc_on_eda_terminate;
     vsf_err_t err = vsf_teda_init(&dhcpc->teda, vsf_prio_inherit, false);
     if (VSF_ERR_NONE != err) {
-        vsfip_dhcpc_on_eda_terminate(&dhcpc->teda.use_as__vsf_eda_t);
+        __vsfip_dhcpc_on_eda_terminate(&dhcpc->teda.use_as__vsf_eda_t);
     }
     return err;
 }

@@ -26,6 +26,11 @@
 #include "lv_conf.h"
 #include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
 
+#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#   include <pthread.h>
+#endif
+#include <stdio.h>
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -61,6 +66,15 @@ static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
 }
 
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
+
+void * __lvgl_thread(void *arg)
+{
+    while (1) {
+        lv_task_handler();
+        vsf_thread_delay_ms(10);
+    }
+}
+
 int lvgl_main(int argc, char *argv[])
 {
     uint_fast8_t gamepad_num = 1;
@@ -126,12 +140,14 @@ int main(void)
     extern void lvgl_application(uint_fast8_t);
     lvgl_application(gamepad_num);
 
+#if APP_CFG_USE_LINUX_DEMO == ENABLED
+    pthread_t thread;
+    pthread_create(&thread, NULL, __lvgl_thread, NULL);
+#else
     while (1) {
         lv_task_handler();
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
-        vsf_thread_delay_ms(10);
-#endif
     }
+#endif
     return 0;
 }
 

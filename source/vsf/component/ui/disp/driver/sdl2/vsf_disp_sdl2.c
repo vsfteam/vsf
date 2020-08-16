@@ -21,10 +21,13 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_SDL2 == ENABLED
 
+#define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_SDL2_CLASS_IMPLEMENT
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "../../vsf_disp.h"
+#include "./vsf_disp_sdl2.h"
+
+#include "component/input/vsf_input.h"
 
 #ifdef VSF_DISP_SDL2_CFG_INCLUDE
 #   include VSF_DISP_SDL2_CFG_INCLUDE
@@ -45,41 +48,40 @@
 #   define VSF_DISP_SDL2_CFG_HW_PRIORITY                vsf_arch_prio_0
 #endif
 
-#if VSF_USE_INPUT == ENABLED
-extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
-extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
-extern void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct __vk_disp_sdl2_t {
+typedef struct vsf_disp_sdl2_t {
     vsf_arch_irq_thread_t init_thread;
     bool is_init_called;
     bool is_inited;
-};
-typedef struct __vk_disp_sdl2_t __vk_disp_sdl2_t;
+} vsf_disp_sdl2_t;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __vk_disp_sdl2_t __vk_disp_sdl2 = {
+static vsf_disp_sdl2_t __vk_disp_sdl2 = {
     .is_init_called = false,
     .is_inited      = false,
 };
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis);
-static vsf_err_t vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis);
+static vsf_err_t __vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
+
+#if VSF_USE_INPUT == ENABLED
+extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
+extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
+extern void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_disp_drv_t vk_disp_drv_sdl2 = {
-    .init       = vk_disp_sdl2_init,
-    .refresh    = vk_disp_sdl2_refresh,
+    .init       = __vk_disp_sdl2_init,
+    .refresh    = __vk_disp_sdl2_refresh,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -105,7 +107,7 @@ static Uint32 __vk_disp_sdl2_get_format(vk_disp_sdl2_t *disp_sdl2)
 
 static void __vk_disp_sdl2_screen_init(vk_disp_sdl2_t *disp_sdl2)
 {
-    disp_sdl2->window = SDL_CreateWindow("Screen",
+    disp_sdl2->window = SDL_CreateWindow(disp_sdl2->title,
                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                             disp_sdl2->param.width * disp_sdl2->amplifier,
                             disp_sdl2->param.height * disp_sdl2->amplifier,
@@ -396,7 +398,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
 
 
 
-static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis)
+static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis)
 {
     vk_disp_sdl2_t *disp_sdl2 = (vk_disp_sdl2_t *)pthis;
     VSF_UI_ASSERT(disp_sdl2 != NULL);
@@ -412,7 +414,7 @@ static vsf_err_t vk_disp_sdl2_init(vk_disp_t *pthis)
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
+static vsf_err_t __vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
     vk_disp_sdl2_t *disp_sdl2 = (vk_disp_sdl2_t *)pthis;
     VSF_UI_ASSERT(disp_sdl2 != NULL);

@@ -127,7 +127,7 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
     m480_enable_usbphy(M480_USBPHY_HS, M480_USBPHY_DEV);
 
     // TODO: use pm to config clock
-    CLK->AHBCLK |= CLK_AHBCLK_HSUSBDCKEN_Msk;
+    CLK->SyncCLK |= CLK_SyncCLK_HSUSBDCKEN_Msk;
 
     reg->PHYCTL |= HSUSBD_PHYCTL_PHYEN_Msk;
     while (1) {
@@ -182,7 +182,7 @@ void m480_usbd_hs_fini(m480_usbd_hs_t *usbd_hs)
     reg->GINTEN = 0;
     NVIC_DisableIRQ(usbd_hs->param->irq);
     // TODO: use pm to config clock
-    CLK->AHBCLK &= ~CLK_AHBCLK_HSUSBDCKEN_Msk;
+    CLK->SyncCLK &= ~CLK_SyncCLK_HSUSBDCKEN_Msk;
 }
 
 void m480_usbd_hs_reset(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)

@@ -50,6 +50,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "..\compiler\compiler.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +59,8 @@ extern "C" {
 #define __vsf_bitmap(__name)        __name##_bitmap_t
 
 #define __vsf_declare_bitmap_ex(__name, __bit_size)                             \
-typedef uintalu_t __name[((__bit_size) + __optimal_bit_sz - 1) / __optimal_bit_sz];
+    typedef uintalu_t                                                           \
+                __name[((__bit_size) + __optimal_bit_sz - 1) / __optimal_bit_sz];
 
 #define __vsf_declare_bitmap(__name, __bit_size)                                \
     __vsf_declare_bitmap_ex(__vsf_bitmap(__name), __bit_size)
@@ -117,7 +119,8 @@ typedef uintalu_t __name[((__bit_size) + __optimal_bit_sz - 1) / __optimal_bit_s
 /*============================ PROTOTYPES ====================================*/
 
 extern void __vsf_bitmap_reset(uintalu_t * this_ptr, int_fast16_t bit_size);
-extern int_fast16_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr,  int_fast16_t bit_size);
+extern int_fast16_t __vsf_bitmap_ffz(   uintalu_t * bitmap_ptr,  
+                                        int_fast16_t bit_size);
 
 #ifdef __cplusplus
 }

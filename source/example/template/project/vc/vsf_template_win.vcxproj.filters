@@ -76,9 +76,6 @@
     <Filter Include="vsf\component\input\driver">
       <UniqueIdentifier>{a8c1f548-b85a-412d-ac4d-da2b2aba2566}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\input\driver\ds4">
-      <UniqueIdentifier>{85ca653e-7c11-4251-aef5-48a9edf7ab76}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\input\driver\hid">
       <UniqueIdentifier>{b4e8d762-c880-4d47-8961-f6d8e5ae5d2b}</UniqueIdentifier>
     </Filter>
@@ -87,15 +84,6 @@
     </Filter>
     <Filter Include="vsf\component\ui">
       <UniqueIdentifier>{16b6f51f-2859-4b63-bbc5-277c3de0a84f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\input\driver\nspro">
-      <UniqueIdentifier>{0c8ab9ae-5c34-40fa-a502-d90332fb1d9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\input\driver\xb360">
-      <UniqueIdentifier>{f73d903e-1d5b-44de-b2ab-11e72b08a958}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\input\driver\xb1">
-      <UniqueIdentifier>{b07d6ff9-5744-4894-b383-7c98a9060a3c}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\service\pbuf">
       <UniqueIdentifier>{5785e981-7a69-422f-a4c7-709cc214ca77}</UniqueIdentifier>
@@ -682,6 +670,114 @@
     <Filter Include="vsf\component\3rd-party\vsfip\raw\proto\dhcp">
       <UniqueIdentifier>{0e134526-4f01-45ef-8309-39e94c165781}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\tcpip\netdrv\driver">
+      <UniqueIdentifier>{46e1d381-e5b6-4918-a560-1409f1c57140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\tcpip\netdrv\driver\wpcap">
+      <UniqueIdentifier>{817ac589-42f7-44d9-8df0-1b3361bc0419}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\vsfip\raw\proto\dns">
+      <UniqueIdentifier>{36666954-12f0-4199-a86d-8c62a6acd470}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\vsf_usr_cfg">
+      <UniqueIdentifier>{65ed0cf2-8f6c-41b9-b0e9-502848be78a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip">
+      <UniqueIdentifier>{a49b4cbf-a23a-438c-bbe3-47d3c4e99fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2">
+      <UniqueIdentifier>{fb20a1de-71c3-48e6-9f7c-3b3bfdd61fce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw">
+      <UniqueIdentifier>{087a3b0c-6425-40f9-ad53-ec8d631675d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src">
+      <UniqueIdentifier>{776aac50-94c3-4aa2-8295-24f7a91c3408}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\api">
+      <UniqueIdentifier>{3a4d99c7-7a72-4404-9181-218d924e1832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\apps">
+      <UniqueIdentifier>{f632b7ce-7bf2-4827-882f-0f92ba836d0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\core">
+      <UniqueIdentifier>{1f043116-9908-4b91-b3cf-d1ac63c9667b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4">
+      <UniqueIdentifier>{b5c0d298-108d-4d3c-a1f1-95cd2b20c0bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6">
+      <UniqueIdentifier>{37341559-6f22-441d-bc73-c76c5fb824c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\netif">
+      <UniqueIdentifier>{682b3ece-63f1-4f28-958a-8c5265f6bd4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\port">
+      <UniqueIdentifier>{7e6a67f8-43ac-4d42-a5d3-9ebb1ec7ca4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\port\arch">
+      <UniqueIdentifier>{8fc42111-22c6-4f6f-98ea-2e7d2f6720aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\lwip_demo">
+      <UniqueIdentifier>{1156c2e5-9595-4816-9ea7-5e9ba5c4caa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\rtl8152">
+      <UniqueIdentifier>{845012a4-c61f-448d-b552-3b7375dae544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\crypto">
+      <UniqueIdentifier>{270587e0-572c-4c46-9608-b3b54844bb21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\crypto\hash">
+      <UniqueIdentifier>{8b83a947-f7b8-4892-b843-cafd96407820}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\crypto\hash\crc">
+      <UniqueIdentifier>{034b888c-6456-4fdb-bf33-75a8c9395c48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\otg">
+      <UniqueIdentifier>{349a1c52-416c-4dda-abd2-951a6844a99e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\otg\dwcotg">
+      <UniqueIdentifier>{8edb2586-46e6-4229-a084-1d7fface0067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\otg\musb">
+      <UniqueIdentifier>{1a0feec4-fa3f-45ff-ad1c-a9a1075f84fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\otg\musb\fdrc">
+      <UniqueIdentifier>{812b90b9-f49e-4f42-8992-1c68d2e7cb80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\ohci">
+      <UniqueIdentifier>{bde6b24c-a276-4dfe-b337-ba6da3d83c8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\device\class\HID">
+      <UniqueIdentifier>{203b8d8c-9cbe-4cc8-a9e1-8ff764c650dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\fb">
+      <UniqueIdentifier>{0134bae2-1dd6-4807-b048-d2ba7392bb5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\solomon-systech">
+      <UniqueIdentifier>{9cde408f-4b03-463c-b911-2d933a28e2ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\solomon-systech\common">
+      <UniqueIdentifier>{675b8f4f-d70b-4ca1-8e0a-9ea28d6591ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\solomon-systech\ssd1306">
+      <UniqueIdentifier>{8742363e-349a-4da0-b3d9-22c988d98c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\vga">
+      <UniqueIdentifier>{ef0948f3-83d7-4e9c-8aaa-44df03228859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\disp\driver\vga\m480">
+      <UniqueIdentifier>{1d24a391-7def-4194-a1af-43714f68f2ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\DFU">
+      <UniqueIdentifier>{37b2e3ca-fe04-41cd-bf33-6994d2abdb63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\common\class\DFU">
+      <UniqueIdentifier>{1811f5b6-c002-45fb-ad36-5fb678a57550}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
+      <UniqueIdentifier>{1beb2733-c0d0-40b0-9c12-9846527d12fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -691,9 +787,6 @@
       <Filter>vsf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\communicate.h">
-      <Filter>vsf\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\compiler.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\ooc_class.h">
@@ -706,15 +799,6 @@
       <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\mrepeat.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\preprocessor.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\tpaste.h">
       <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\template\template.h">
@@ -894,9 +978,6 @@
     <ClInclude Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple.h">
       <Filter>vsf\kernel\shell\simple</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h">
-      <Filter>vsf\kernel\shell\simple</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\kernel\shell\vsf_shell.h">
       <Filter>vsf\kernel\shell</Filter>
     </ClInclude>
@@ -911,9 +992,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\input\protocol\vsf_input_sensor.h">
       <Filter>vsf\component\input\protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h">
-      <Filter>vsf\component\input\driver\ds4</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
       <Filter>vsf\component\input\driver\hid</Filter>
@@ -948,20 +1026,11 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_nspro.h">
       <Filter>vsf\component\usb\common\class\HID</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.h">
-      <Filter>vsf\component\input\driver\nspro</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.h">
-      <Filter>vsf\component\input\driver\xb360</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\XB1\vsf_usb_xb1.h">
       <Filter>vsf\component\usb\common\class\XB1</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.h">
       <Filter>vsf\component\usb\host\class\XB1</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.h">
-      <Filter>vsf\component\input\driver\xb1</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\HID\vsf_usb_xb360.h">
       <Filter>vsf\component\usb\common\class\HID</Filter>
@@ -2151,6 +2220,118 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.h">
       <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.h">
+      <Filter>vsf\component\tcpip\netdrv\driver\wpcap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\common\usrapp_net_common.h">
+      <Filter>usrapp\demo\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dns\vsfip_dnsc.h">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dns</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\vsf_usr_cfg\vsf_usr_cfg_win.h">
+      <Filter>usrapp\config\vsf_usr_cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwip_netdrv_adapter.h">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwippools.h">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\cc.h">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\perf.h">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.h">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\lwipopts.h">
+      <Filter>usrapp\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h">
+      <Filter>vsf\component\usb\host\class\rtl8152</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\vsf_usb.h">
+      <Filter>vsf\component\usb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\vsf_ui.h">
+      <Filter>vsf\component\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\vsf_tcpip.h">
+      <Filter>vsf\component\tcpip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\crypto\vsf_crypto.h">
+      <Filter>vsf\component\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\crypto\vsf_crypto_cfg.h">
+      <Filter>vsf\component\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\crypto\hash\crc\vsf_crc.h">
+      <Filter>vsf\component\crypto\hash\crc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\dwcotg_regs.h">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_common.h">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_dcd.h">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_hw.h">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\__vsf_musb_fdrc_common.h">
+      <Filter>vsf\component\usb\driver\otg\musb\fdrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_dcd.h">
+      <Filter>vsf\component\usb\driver\otg\musb\fdrc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\hcd\ohci\vsf_ohci.h">
+      <Filter>vsf\component\usb\driver\hcd\ohci</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID.h">
+      <Filter>vsf\component\usb\device\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\crypto\hash\vsf_hash.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\fb\vsf_disp_fb.h">
+      <Filter>vsf\component\ui\disp\driver\fb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\solomon-systech\common\vsf_disp_solomon_systech_common.h">
+      <Filter>vsf\component\ui\disp\driver\solomon-systech\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.h">
+      <Filter>vsf\component\ui\disp\driver\solomon-systech\ssd1306</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.h">
+      <Filter>vsf\component\ui\disp\driver\vga\m480</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_connect.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_repeat_macro.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\compiler\compiler.h">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.h">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.h">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\DFU\vsf_usbh_dfu.h">
+      <Filter>vsf\component\usb\host\class\DFU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\common\class\DFU\vsf_usb_dfu.h">
+      <Filter>vsf\component\usb\common\class\DFU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
+      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -2249,9 +2430,6 @@
     <ClCompile Include="..\..\..\..\vsf\kernel\task\vsf_thread.c">
       <Filter>vsf\kernel\task</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c">
-      <Filter>vsf\kernel\shell\simple</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c">
       <Filter>vsf\kernel\shell\simple</Filter>
     </ClCompile>
@@ -2260,9 +2438,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\input\vsf_input.c">
       <Filter>vsf\component\input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c">
-      <Filter>vsf\component\input\driver\ds4</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
@@ -2276,17 +2451,8 @@
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_nspro.c">
       <Filter>vsf\component\usb\host\class\HID</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.c">
-      <Filter>vsf\component\input\driver\nspro</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.c">
-      <Filter>vsf\component\input\driver\xb360</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\XB1\vsf_usbh_xb1.c">
       <Filter>vsf\component\usb\host\class\XB1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.c">
-      <Filter>vsf\component\input\driver\xb1</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_xb360.c">
       <Filter>vsf\component\usb\host\class\HID</Filter>
@@ -3217,6 +3383,213 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.c">
       <Filter>vsf\component\3rd-party\vsfip\raw\proto\dhcp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.c">
+      <Filter>vsf\component\tcpip\netdrv\driver\wpcap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\common\usrapp_net_common.c">
+      <Filter>usrapp\demo\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dns\vsfip_dnsc.c">
+      <Filter>vsf\component\3rd-party\vsfip\raw\proto\dns</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwip_netdrv_adapter.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\api_lib.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\api_msg.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\err.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\if_api.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netbuf.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netdb.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netifapi.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\sockets.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\tcpip.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_alloc.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_tcp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\def.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\dns.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\inet_chksum.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\init.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ip.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\mem.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\memp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\netif.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\pbuf.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\raw.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\stats.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\sys.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp_in.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp_out.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\timeouts.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\udp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\autoip.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\dhcp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\etharp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\icmp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\igmp.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4_addr.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4_frag.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\dhcp6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ethip6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\icmp6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\inet6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6_addr.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6_frag.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\mld6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\nd6.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\netif\ethernet.c">
+      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\netif</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\lwip_demo\lwip_demo.c">
+      <Filter>usrapp\demo\lwip_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c">
+      <Filter>vsf\component\usb\host\class\rtl8152</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\crypto\hash\crc\vsf_crc.c">
+      <Filter>vsf\component\crypto\hash\crc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_common.c">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_dcd.c">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\__vsf_musb_fdrc_common.c">
+      <Filter>vsf\component\usb\driver\otg\musb\fdrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_dcd.c">
+      <Filter>vsf\component\usb\driver\otg\musb\fdrc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\hcd\ohci\vsf_ohci.c">
+      <Filter>vsf\component\usb\driver\hcd\ohci</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID.c">
+      <Filter>vsf\component\usb\device\class\HID</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\fb\vsf_disp_fb.c">
+      <Filter>vsf\component\ui\disp\driver\fb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\solomon-systech\common\vsf_disp_solomon_systech_common.c">
+      <Filter>vsf\component\ui\disp\driver\solomon-systech\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\solomon-systech\ssd1306\vsf_disp_ssd1306.c">
+      <Filter>vsf\component\ui\disp\driver\solomon-systech\ssd1306</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\vga\m480\vsf_disp_vga_m480.c">
+      <Filter>vsf\component\ui\disp\driver\vga\m480</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.c">
+      <Filter>vsf\component\usb\driver\otg\dwcotg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\DFU\vsf_usbh_dfu.c">
+      <Filter>vsf\component\usb\host\class\DFU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
+      <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

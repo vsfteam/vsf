@@ -36,10 +36,6 @@
 #   include <SDL.h>
 #endif
 
-#if APP_CFG_USE_TCPIP_DEMO == ENABLED
-#   include "component/3rd-party/vsfip/raw/vsfip.h"
-#endif
-
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_USB_DEVICE == ENABLED
@@ -74,6 +70,14 @@ extern int awtk_main(int argc, char *argv[]);
 extern int usbh_main(int argc, char *argv[]);
 #endif
 
+#if APP_CFG_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
+extern int vsfip_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
+extern int lwip_main(int argc, char *argv[]);
+#endif
+
 #if APP_CFG_USE_LVGL_DEMO == ENABLED
 extern int lvgl_main(int argc, char *argv[]);
 #endif
@@ -91,15 +95,16 @@ extern int btstack_scan_main(int argc, char *argv[]);
 #endif
 
 #if APP_CFG_USE_USBD_DEMO == ENABLED
-#   if  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
-        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
-            &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
+
+#   if APP_CFG_USE_USBD_CDC_DEMO == ENABLED
 extern int usbd_cdc_main(int argc, char *argv[]);
 #   endif
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   if APP_CFG_USE_USBD_UVC_DEMO == ENABLED
 extern int usbd_uvc_main(int argc, char *argv[]);
 #   endif
+#   if APP_CFG_USE_USBD_MSC_DEMO == ENABLED
 extern int usbd_msc_main(int argc, char *argv[]);
+#   endif
 #endif
 
 #if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
@@ -224,15 +229,15 @@ int vsf_linux_create_fhs(void)
     busybox_bind("/sbin/vsfvm", vsfvm_main);
 #endif
 #if APP_CFG_USE_USBD_DEMO == ENABLED
-#   if  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
-        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
-            &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
+#   if APP_CFG_USE_USBD_CDC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_cdc", usbd_cdc_main);
 #   endif
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   if APP_CFG_USE_USBD_UVC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_uvc", usbd_uvc_main);
 #   endif
+#   if APP_CFG_USE_USBD_MSC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_msc", usbd_msc_main);
+#   endif
 #endif
 #if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
     busybox_bind("/sbin/mount_file", mount_file_main);
@@ -247,8 +252,11 @@ int vsf_linux_create_fhs(void)
 #if APP_CFG_USE_SDL2_DEMO == ENABLED
     busybox_bind("/sbin/sdl2", sdl2_main);
 #endif
-#if APP_CFG_USE_TCPIP_DEMO == ENABLED
-    vsfip_init();
+#if APP_CFG_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
+    busybox_bind("/sbin/vsfip", vsfip_main);
+#endif
+#if APP_CFG_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
+    busybox_bind("/sbin/lwip", lwip_main);
 #endif
 
     return 0;

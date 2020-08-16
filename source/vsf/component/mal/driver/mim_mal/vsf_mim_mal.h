@@ -24,12 +24,9 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_USE_MIM_MAL == ENABLED
 
-#if     defined(VSF_MIM_MAL_IMPLEMENT)
-#   undef VSF_MIM_MAL_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_MIM_MAL_INHERIT)
-#   undef VSF_MIM_MAL_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_MIM_MAL_CLASS_IMPLEMENT)
+#   undef __VSF_MIM_MAL_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -42,7 +39,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_mim_mal_t)
+dcl_simple_class(vk_mim_mal_t)
 
 def_simple_class(vk_mim_mal_t) {
     implement(vk_mal_t)

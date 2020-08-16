@@ -51,7 +51,7 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 #   define vsf_sched_unlock(__level)    UNUSED_PARAM(__level)
 #   define vsf_sched_safe()             if (1)
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#       define __vsf_sched_safe(__CODE) __CODE
+#       define __vsf_sched_safe(__code) __code
 #   else
 #       define __vsf_sched_safe(...)    __VA_ARGS__
 #   endif
@@ -85,7 +85,7 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 #define vsf_interrupt_safe              SAFE_ATOM_CODE
 
 #define vsf_protect_sched()             (vsf_protect_t)vsf_protect_scheduler()
-#define vsf_unprotect_sched(__PROT)     vsf_unprotect_scheduler(__PROT)
+#define vsf_unprotect_sched(__prot)     vsf_unprotect_scheduler(__prot)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -100,8 +100,7 @@ declare_vsf_pool(vsf_eda_frame_pool)
 def_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
 #endif
 
-struct vsf_kernel_resource_t {
-
+typedef struct vsf_kernel_resource_t {
     struct {
     #if __VSF_OS_SWI_NUM > 0
         const vsf_arch_prio_t               *os_swi_priorities_ptr;
@@ -140,9 +139,8 @@ struct vsf_kernel_resource_t {
         uint16_t                            frame_cnt;
     } frame_stack;
 #endif
-};
+} vsf_kernel_resource_t;
 
-typedef struct vsf_kernel_resource_t vsf_kernel_resource_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if __VSF_OS_SWI_NUM > 0

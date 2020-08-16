@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef this
-#   define this        (*ptThis)
+#   define this        (*this_ptr)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -36,33 +36,33 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __implement_vsf_pt(__NAME)                                           \
-            __implement_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+            __implement_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *this_ptr)
 
 #   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
             __implement_vsf_pt_common(  __FUNC_NAME,                            \
-                                        __vsf_pt_common(__NAME) *ptThis)
+                                        __vsf_pt_common(__NAME) *this_ptr)
 
 #elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 
 #   define __implement_vsf_pt(__NAME)                                           \
             __implement_vsf_pt_common(  __NAME,                                 \
-                                        __internal_##__NAME *ptThis)
+                                        __internal_##__NAME *this_ptr)
 
 #   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
             __implement_vsf_pt_common(  __FUNC_NAME,                            \
-                                        __internal_##__NAME *ptThis)
+                                        __internal_##__NAME *this_ptr)
 
 #else
 
 #   define __implement_vsf_pt(__NAME)                                           \
-            __implement_vsf_pt_common(__NAME, __NAME *ptThis)
+            __implement_vsf_pt_common(__NAME, __NAME *this_ptr)
 
 #   define __implement_vsf_pt_ex(__NAME, __FUNC_NAME)                           \
             __implement_vsf_pt_common(  __FUNC_NAME,                            \
-                                        __NAME *ptThis)
+                                        __NAME *this_ptr)
 #endif
 
-#define __vsf_pt_state()         (ptThis->tState)
+#define __vsf_pt_state()         (this_ptr->fsm_state)
 #define __vsf_pt_end()           __vsf_pt_end_common()
 
 
@@ -132,7 +132,7 @@
 
 
 #   define vsf_pt_call_pt(__NAME, __TARGET)                                     \
-            (__TARGET)->tState = 0;                                             \
+            (__TARGET)->fsm_state = 0;                                             \
             vsf_pt_call_sub(vsf_pt_func(__NAME), (__TARGET))
 
 #endif
@@ -148,16 +148,16 @@
 
 #   define vsf_pt_call_fsm(__NAME, __TARGET, __RET_ADDR)                        \
         do {                                                                    \
-            fsm_rt_t ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn);              \
+            fsm_rt_t CONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn);              \
             vsf_pt_entry();                                                     \
-            ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn) =                      \
+            CONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn) =                      \
                 __vsf_pt_call_fsm(__NAME, (__TARGET));                          \
             if (fsm_rt_on_going ==                                              \
-                ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn)) {                 \
+                CONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn)) {                 \
                 return ;                                                        \
             }                                                                   \
             if (NULL != (__RET_ADDR)) {                                         \
-                *(__RET_ADDR) = ATPASTE3(__vsf_pt_call_fsm,__LINE__,tReturn);   \
+                *(__RET_ADDR) = CONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn);   \
             }                                                                   \
         } while(0)
         
@@ -188,13 +188,13 @@
 #   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 #       define __def_vsf_pt(__NAME,__MEMBER)                                    \
             __def_vsf_pt_common(__NAME,                                         \
-                                uint16_t tState;                                \
+                                uint16_t fsm_state;                                \
                                 vsf_sync_reason_t reason;                       \
                                 __MEMBER)           
 #   else
 #       define __def_vsf_pt(__NAME,__MEMBER)                                    \
             __def_vsf_pt_common(__NAME,                                         \
-                                uint16_t tState;                                \
+                                uint16_t fsm_state;                                \
                                 __MEMBER) 
 #   endif
 
@@ -203,7 +203,7 @@
 #else
 #   define __def_vsf_pt(__NAME,...)                                             \
             __def_vsf_pt_common(__NAME,                                         \
-                                uint8_t tState;                                 \
+                                uint8_t fsm_state;                                 \
                                 __VA_ARGS__)           
 
 #   define def_vsf_pt(__NAME,...)       __def_vsf_pt(__NAME,__VA_ARGS__)
@@ -215,15 +215,15 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
-            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *ptThis)
+            __extern_vsf_pt_common(__NAME, __vsf_pt_common(__NAME) *this_ptr)
 #elif !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
-            __extern_vsf_pt_common(__NAME, __internal_##__NAME *ptThis)
+            __extern_vsf_pt_common(__NAME, __internal_##__NAME *this_ptr)
 #else
 #   define __declare_vsf_pt(__NAME)                                             \
             __declare_vsf_pt_common(__NAME)                                     \
-            __extern_vsf_pt_common(__NAME, __NAME *ptThis)
+            __extern_vsf_pt_common(__NAME, __NAME *this_ptr)
 #endif
 
 #define declare_vsf_pt(__NAME)          __declare_vsf_pt(__NAME)
@@ -231,27 +231,27 @@
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #define __init_vsf_pt(__NAME, __PT, __PRI)                                      \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {0};                     \
-            ATPASTE3(__,__LINE__,tCFG).fn.evthandler =                          \
+            vsf_eda_cfg_t CONNECT3(__,__LINE__,cfg) = {0};                     \
+            CONNECT3(__,__LINE__,cfg).fn.evthandler =                          \
                 (vsf_pt_entry_t)__vsf_pt_func(__NAME);                          \
-            ATPASTE3(__,__LINE__,tCFG).priority = (__PRI);                      \
-            ATPASTE3(__,__LINE__,tCFG).target = (uintptr_t)&((__PT)->param);    \
-            (__PT)->param.tState = 0;                                          \
+            CONNECT3(__,__LINE__,cfg).priority = (__PRI);                      \
+            CONNECT3(__,__LINE__,cfg).target = (uintptr_t)&((__PT)->param);    \
+            (__PT)->param.fsm_state = 0;                                          \
             vsf_pt_start( &((__PT)->use_as__vsf_pt_t),                          \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
+                            &CONNECT3(__,__LINE__,cfg));                       \
         } while(0)
 #else
 #define __init_vsf_pt(__NAME, __PT, __PRI, ...)                                 \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
+            vsf_eda_cfg_t CONNECT3(__,__LINE__,cfg) = {                        \
                 .fn.evthandler = (vsf_pt_entry_t)__vsf_pt_func(__NAME),         \
                 .priority = (__PRI),                                            \
                 .target = (uintptr_t)&((__PT)->param),                          \
                 __VA_ARGS__                                                     \
             };                                                                  \
-            (__PT)->param.tState = 0;                                          \
+            (__PT)->param.fsm_state = 0;                                          \
             vsf_pt_start( &((__PT)->use_as__vsf_pt_t),                          \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
+                            &CONNECT3(__,__LINE__,cfg));                       \
         } while(0)
 #endif
 

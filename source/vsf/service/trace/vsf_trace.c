@@ -62,11 +62,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-struct vsf_trace_t {
+typedef struct vsf_trace_t {
     vsf_stream_t *stream;
     uint8_t print_buffer[VSF_TRACE_CFG_BUFSIZE];
-};
-typedef struct vsf_trace_t vsf_trace_t;
+} vsf_trace_t;
 #elif VSF_USE_SERVICE_STREAM == ENABLED
 
 #endif
@@ -156,11 +155,11 @@ void __vsf_trace_init(vsf_stream_tx_t *ptTX)
     
     //! initialise stream source
     do {
-        vsf_stream_src_cfg_t tCFG = {
+        vsf_stream_src_cfg_t cfg = {
             .ptTX = ptTX,                                       //!< connect stream TX 
         };
 
-        vsf_stream_writer_init(&__vsf_trace, &tCFG);
+        vsf_stream_writer_init(&__vsf_trace, &cfg);
 
     } while(0);
 }
@@ -245,7 +244,7 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
 
     __vsf_trace_set_level(level);
     if (len > 0) {
-        static const char map[16] = "0123456789ABCDEF";
+        static const char __map[16] = "0123456789ABCDEF";
         // line format 16 data max:
         //    XXXXXXXX: XXXXXXXX XXXXXXXX ....  | CHAR.....\r\n\0
         //              9 * 16                 3   4 * 16   3
@@ -261,8 +260,8 @@ void __vsf_trace_buffer(  vsf_trace_level_t level,
             for (uint_fast8_t j = 0; j < data_per_line; j++) {
                 for (uint_fast8_t k = 0; k < data_size; k++, buf_tmp++) {
                     if (buf_tmp < pend) {
-                        *ptr++ = map[(*buf_tmp >> 4) & 0x0F];
-                        *ptr++ = map[(*buf_tmp >> 0) & 0x0F];
+                        *ptr++ = __map[(*buf_tmp >> 4) & 0x0F];
+                        *ptr++ = __map[(*buf_tmp >> 0) & 0x0F];
                     } else if (disp_char) {
                         *ptr++ = ' ';
                         *ptr++ = ' ';

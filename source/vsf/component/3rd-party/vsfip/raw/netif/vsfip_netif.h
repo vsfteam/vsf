@@ -22,12 +22,14 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
-#if     defined(VSFIP_NETIF_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSFIP_NETIF_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSFIP_NETIF_CLASS_IMPLEMENT)
+#   undef __VSFIP_NETIF_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSFIP_NETIF_CLASS_INHERIT__)
+#   undef __VSFIP_NETIF_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -49,45 +51,44 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsfip_netif_t)
+dcl_simple_class(vsfip_netif_t)
+dcl_simple_class(vsfip_netif_op_t)
 
-enum vsfip_netif_proto_t {
+typedef enum vsfip_netif_proto_t {
     VSFIP_NETIF_PROTO_IP = 0x0800,
     VSFIP_NETIF_PROTO_ARP = 0x0806,
     VSFIP_NETIF_PROTO_RARP = 0x8035
-};
-typedef enum vsfip_netif_proto_t vsfip_netif_proto_t;
+} vsfip_netif_proto_t;
 
-struct vsfip_arp_entry_t {
+typedef struct vsfip_arp_entry_t {
     vsfip_ipmac_assoc assoc;
     uint32_t time;
-};
-typedef struct vsfip_arp_entry_t vsfip_arp_entry_t;
+} vsfip_arp_entry_t;
 
-struct vsfip_netif_op_t {
-    vsf_err_t (*header)(vsfip_netbuf_t *netbuf, vsfip_netif_proto_t proto, const vsfip_macaddr_t *dest);
-    bool (*can_output)(vsfip_netif_t *netif);
-    vsf_err_t (*output)(vsfip_netbuf_t *netbuf);
-    void (*input)(vsfip_netbuf_t *netbuf);
-    bool (*routable)(vsfip_netif_t *netif, const vsfip_ipaddr_t *dest_addr);
+def_simple_class(vsfip_netif_op_t) {
+    protected_member(
+        vsf_err_t (*header)(vsfip_netbuf_t *netbuf, vsfip_netif_proto_t proto, const vsfip_macaddr_t *dest);
+        bool (*can_output)(vsfip_netif_t *netif);
+        vsf_err_t (*output)(vsfip_netbuf_t *netbuf);
+        void (*input)(vsfip_netbuf_t *netbuf);
+        bool (*routable)(vsfip_netif_t *netif, const vsfip_ipaddr_t *dest_addr);
+    )
 };
-typedef struct vsfip_netif_op_t vsfip_netif_op_t;
 
-struct vsfip_netif_arpc_t {
+typedef struct vsfip_netif_arpc_t {
     vsf_teda_t teda;
     vsf_sem_t sem;
     vsf_slist_queue_t request_queue;
     vsfip_netbuf_t *cur_netbuf, *cur_request;
     vsfip_ipaddr_t ip_for_mac;
     uint32_t retry;
-};
-typedef struct vsfip_netif_arpc_t vsfip_netif_arpc_t;
+} vsfip_netif_arpc_t;
 
 def_simple_class(vsfip_netif_t) {
     vsf_slist_node_t node;
 
     const vsfip_netif_op_t *op;
-    vsf_netdrv_t *netdrv;
+    vk_netdrv_t *netdrv;
 
     vsfip_ipaddr_t ip4addr;
     vsfip_ipaddr_t netmask;

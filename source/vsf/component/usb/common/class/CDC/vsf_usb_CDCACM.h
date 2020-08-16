@@ -27,25 +27,23 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usb_cdcacm_line_coding_t {
+typedef struct usb_cdcacm_line_coding_t {
     uint32_t bitrate;
     uint8_t stop;
     uint8_t parity;
     uint8_t datalen;
-};
-typedef struct usb_cdcacm_line_coding_t usb_cdcacm_line_coding_t;
+} PACKED usb_cdcacm_line_coding_t;
 
 #define USB_CDCACM_CONTROLLINE_RTS          0x02
 #define USB_CDCACM_CONTROLLINE_DTR          0x01
 #define USB_CDCACM_CONTROLLINE_MASK         0x03
 
-enum usb_cdcacm_req_t {
+typedef enum usb_cdcacm_req_t {
     USB_CDCACM_REQ_SET_LINE_CODING          = 0x20,
     USB_CDCACM_REQ_GET_LINE_CODING          = 0x21,
     USB_CDCACM_REQ_SET_CONTROL_LINE_STATE   = 0x22,
     USB_CDCACM_REQ_SEND_BREAK               = 0x23,
-};
-typedef enum usb_cdcacm_req_t usb_cdcacm_req_t;
+} usb_cdcacm_req_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

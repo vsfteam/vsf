@@ -31,29 +31,26 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum usb_hid_description_type_t {
+typedef enum usb_hid_description_type_t {
     USB_HID_DT_HID          = 0x21,
     USB_HID_DT_REPORT       = 0x22,
     USB_HID_DT_PHYSICAL     = 0x23,
-};
-typedef enum usb_hid_description_type_t usb_hid_description_type_t;
+} usb_hid_description_type_t;
 
-enum usb_hid_req_t {
+typedef enum usb_hid_req_t {
     USB_HID_REQ_GET_REPORT  = 0x01,
     USB_HID_REQ_GET_IDLE    = 0x02,
     USB_HID_REQ_GET_PROTOCOL= 0x03,
     USB_HID_REQ_SET_REPORT  = 0x09,
     USB_HID_REQ_SET_IDLE    = 0x0A,
     USB_HID_REQ_SET_PROTOCOL= 0x0B,
-};
-typedef enum usb_hid_req_t usb_hid_req_t;
+} usb_hid_req_t;
 
-enum usb_hid_report_type_t {
+typedef enum usb_hid_report_type_t {
     USB_HID_REPORT_INPUT    = 1,
     USB_HID_REPORT_OUTPUT   = 2,
     USB_HID_REPORT_FEATURE  = 3,
-};
-typedef enum usb_hid_report_type_t usb_hid_report_type_t;
+} usb_hid_report_type_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

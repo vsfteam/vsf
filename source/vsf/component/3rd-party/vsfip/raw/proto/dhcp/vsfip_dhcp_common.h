@@ -22,7 +22,7 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
 #include "../../vsfip.h"
 
@@ -42,7 +42,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum dhcp_opt_t {
+typedef enum dhcp_opt_t {
     DHCP_OPT_PAD                    = 0,
     DHCP_OPT_SUBNETMASK             = 1,
     DHCP_OPT_ROUTER                 = 3,
@@ -62,10 +62,9 @@ enum dhcp_opt_t {
     DHCP_OPT_REBINDING_TIME         = 59,
     DHCP_OPT_CLASSID                = 60,
     DHCP_OPT_END                    = 255,
-};
-typedef enum dhcp_opt_t dhcp_opt_t;
+} dhcp_opt_t;
 
-enum dhcp_op_t {
+typedef enum dhcp_op_t {
     DHCP_OP_DISCOVER                = 1,
     DHCP_OP_OFFER                   = 2,
     DHCP_OP_REQUEST                 = 3,
@@ -74,10 +73,9 @@ enum dhcp_op_t {
     DHCP_OP_NAK                     = 6,
     DHCP_OP_RELEASE                 = 7,
     DHCP_OP_INFORM                  = 8,
-};
-typedef enum dhcp_op_t dhcp_op_t;
+} dhcp_op_t;
 
-struct vsfip_dhcp_head_t {
+typedef struct vsfip_dhcp_head_t {
     uint8_t op;
     uint8_t htype;
     uint8_t hlen;
@@ -94,8 +92,7 @@ struct vsfip_dhcp_head_t {
     char file[128];
     uint32_t magic;
     uint8_t options[DHCP_OPT_MINLEN];    // min option size
-} PACKED;
-typedef struct vsfip_dhcp_head_t vsfip_dhcp_head_t;
+} PACKED vsfip_dhcp_head_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

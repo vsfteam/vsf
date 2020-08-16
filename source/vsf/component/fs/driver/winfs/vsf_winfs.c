@@ -21,11 +21,10 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
 
-#define VSF_FS_INHERIT
-#define VSF_WINFS_IMPLEMENT
+#define __VSF_FS_CLASS_INHERIT__
+#define __VSF_WINFS_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_fs.h"
 #include <windows.h>
 
 /*============================ MACROS ========================================*/

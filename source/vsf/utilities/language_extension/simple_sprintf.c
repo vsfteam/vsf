@@ -22,10 +22,7 @@
 
 #if VSF_USE_SIMPLE_SPRINTF == ENABLED
 
-#include <stdarg.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include "..\compiler\compiler.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

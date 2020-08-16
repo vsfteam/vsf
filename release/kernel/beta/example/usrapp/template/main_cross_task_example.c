@@ -58,7 +58,7 @@ def_vsf_thread(user_thread_b_t, 1024,
 
 def_vsf_pt(user_pt_task_t,
     def_params(
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
         uint32_t cnt;
         
         vsf_pt(user_pt_sub_t)       print_task;
@@ -80,7 +80,7 @@ declare_vsf_pt(user_pt_task_b_t)
 def_vsf_pt(user_pt_task_b_t,
     def_params(
         uint32_t cnt;
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
     ));
 #elif VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 declare_vsf_thread(user_thread_a_t)
@@ -93,7 +93,7 @@ def_vsf_thread(user_thread_a_t, 1024,
     )
     
     def_params(
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
     ));
 #endif
 
@@ -182,7 +182,7 @@ private implement_vsf_pt(user_pt_task_t)
 
     this.cnt = 0;
     while(1) {
-        vsf_pt_wait_until(vsf_sem_pend(this.psem));
+        vsf_pt_wait_until(vsf_sem_pend(this.sem_ptr));
 
     #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         this.print_task.cnt = this.cnt;                                         //!< Pass parameter
@@ -224,7 +224,7 @@ private implement_vsf_pt(user_pt_task_b_t)
     while(1) {
         vsf_pt_wait_until( vsf_delay_ms(3000) );                               //!< wait 10s
         printf("post semaphore...   [%08x]\r\n", this.cnt++);
-        vsf_sem_post(this.psem);                                                //!< post a semaphore
+        vsf_sem_post(this.sem_ptr);                                                //!< post a semaphore
     }
     
     vsf_pt_end();
@@ -251,7 +251,7 @@ void vsf_kernel_cross_call_demo(void)
     {
         static NO_INIT user_pt_task_t __user_pt;
         memset(&__user_pt, 0, sizeof(user_pt_task_t));
-        __user_pt.param.psem = &__user_sem;
+        __user_pt.param.sem_ptr = &__user_sem;
         init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_0);
     };
 
@@ -261,7 +261,7 @@ void vsf_kernel_cross_call_demo(void)
     //! start the user task a
     {
         static NO_INIT user_thread_a_t __user_task_a;
-        __user_task_a.param.psem = &__user_sem;
+        __user_task_a.param.sem_ptr = &__user_sem;
         init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
 #else
@@ -270,7 +270,7 @@ void vsf_kernel_cross_call_demo(void)
     //! start a user task b
     {
         static NO_INIT user_pt_task_b_t __user_pt_task_b;
-        __user_pt_task_b.param.psem = &__user_sem;
+        __user_pt_task_b.param.sem_ptr = &__user_sem;
         __user_pt_task_b.param.cnt = 0;
         init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_prio_0);
     }

@@ -21,8 +21,7 @@
 
 #if VSF_USE_BTSTACK == ENABLED && VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_BTHCI == ENABLED
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "component/usb/vsf_usb.h"
 
 #include "btstack_config.h"
 #include "btstack_debug.h"
@@ -33,22 +32,40 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct hci_transport_h2_param_t {
+typedef struct hci_transport_h2_param_t {
     bool is_opened;
     bool is_notified;
     void *dev;
     void (*packet_handler)(uint8_t packet_type, uint8_t *packet, uint16_t size);
-};
-typedef struct hci_transport_h2_param_t hci_transport_h2_param_t;
-
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
-
-static hci_transport_h2_param_t hci_transport_h2_param;
+} hci_transport_h2_param_t;
 
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id);
+
+static void __hci_transport_h2_init(const void *transport_config);
+static int __hci_transport_h2_open(void);
+static int __hci_transport_h2_close(void);
+static void __hci_transport_h2_register_packet_handler(
+        void (*handler)(uint8_t packet_type, uint8_t *packet, uint16_t size));
+static int __hci_transport_h2_can_send_packet_now(uint8_t packet_type);
+static int __hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, int size);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+static const hci_transport_t hci_transport_h2 = {
+    .name = "H2_VSF",
+    .init = __hci_transport_h2_init,
+    .open = __hci_transport_h2_open,
+    .close = __hci_transport_h2_close,
+    .register_packet_handler = __hci_transport_h2_register_packet_handler,
+    .can_send_packet_now = __hci_transport_h2_can_send_packet_now,
+    .send_packet = __hci_transport_h2_send_packet,
+};
+
+/*============================ LOCAL VARIABLES ===============================*/
+
+static hci_transport_h2_param_t __hci_transport_h2_param;
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -60,52 +77,52 @@ vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
 }
 #endif
 
-static int hci_transport_h2_open(void)
+static int __hci_transport_h2_open(void)
 {
-    if (hci_transport_h2_param.dev) {
-        hci_transport_h2_param.is_opened = true;
+    if (__hci_transport_h2_param.dev) {
+        __hci_transport_h2_param.is_opened = true;
         return 0;
     }
     return -1;
 }
 
-static int hci_transport_h2_close(void)
+static int __hci_transport_h2_close(void)
 {
-    hci_transport_h2_param.is_opened = false;
+    __hci_transport_h2_param.is_opened = false;
     return 0;
 }
 
-static void hci_transport_h2_register_packet_handler(
+static void __hci_transport_h2_register_packet_handler(
         void (*handler)(uint8_t packet_type, uint8_t *packet, uint16_t size))
 {
-    hci_transport_h2_param.packet_handler = handler;
+    __hci_transport_h2_param.packet_handler = handler;
 }
 
-static int hci_transport_h2_can_send_packet_now(uint8_t packet_type)
+static int __hci_transport_h2_can_send_packet_now(uint8_t packet_type)
 {
-    if (hci_transport_h2_param.is_opened && (hci_transport_h2_param.dev != NULL)) {
-        return vk_usbh_bthci_can_send(hci_transport_h2_param.dev, packet_type);
+    if (__hci_transport_h2_param.is_opened && (__hci_transport_h2_param.dev != NULL)) {
+        return vk_usbh_bthci_can_send(__hci_transport_h2_param.dev, packet_type);
     }
     return 0;
 }
 
-static int hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, int size)
+static int __hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, int size)
 {
-    if (hci_transport_h2_param.is_opened && (hci_transport_h2_param.dev != NULL)) {
-        return vk_usbh_bthci_send(hci_transport_h2_param.dev, packet_type, packet, size);
+    if (__hci_transport_h2_param.is_opened && (__hci_transport_h2_param.dev != NULL)) {
+        return vk_usbh_bthci_send(__hci_transport_h2_param.dev, packet_type, packet, size);
     }
     return 0;
 }
 
 void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
-    if (!hci_transport_h2_param.dev) {
-        hci_transport_h2_param.dev = dev;
-        if (!hci_transport_h2_param.is_notified) {
-            hci_transport_h2_param.is_notified = true;
+    if (!__hci_transport_h2_param.dev) {
+        __hci_transport_h2_param.dev = dev;
+        if (!__hci_transport_h2_param.is_notified) {
+            __hci_transport_h2_param.is_notified = true;
             if (VSF_ERR_NONE != vsf_bluetooth_h2_on_new(dev, id)) {
-                hci_transport_h2_param.dev = NULL;
-                hci_transport_h2_param.is_notified = false;
+                __hci_transport_h2_param.dev = NULL;
+                __hci_transport_h2_param.is_notified = false;
             }
         }
     }
@@ -113,8 +130,8 @@ void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id)
 
 void vsf_usbh_bthci_on_del(void *dev)
 {
-    if (dev == hci_transport_h2_param.dev) {
-        hci_transport_h2_param.dev = NULL;
+    if (dev == __hci_transport_h2_param.dev) {
+        __hci_transport_h2_param.dev = NULL;
     }
 }
 
@@ -122,33 +139,23 @@ void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t
 {
     const uint8_t event[] = {HCI_EVENT_TRANSPORT_PACKET_SENT, 0};
 
-    if (    hci_transport_h2_param.is_opened
-        &&  (dev == hci_transport_h2_param.dev)
-        &&  (NULL != hci_transport_h2_param.packet_handler)) {
+    if (    __hci_transport_h2_param.is_opened
+        &&  (dev == __hci_transport_h2_param.dev)
+        &&  (NULL != __hci_transport_h2_param.packet_handler)) {
 
         if (type & 0x80) {
             type = HCI_EVENT_PACKET;
             packet = (uint8_t *)event;
             size = sizeof(event);
         }
-        hci_transport_h2_param.packet_handler(type, packet, size);
+        __hci_transport_h2_param.packet_handler(type, packet, size);
     }
 }
 
-static void hci_transport_h2_init(const void *transport_config)
+static void __hci_transport_h2_init(const void *transport_config)
 {
     
 }
-
-static const hci_transport_t hci_transport_h2 = {
-    .name = "H2_VSF",
-    .init = hci_transport_h2_init,
-    .open = hci_transport_h2_open,
-    .close = hci_transport_h2_close,
-    .register_packet_handler = hci_transport_h2_register_packet_handler,
-    .can_send_packet_now = hci_transport_h2_can_send_packet_now,
-    .send_packet = hci_transport_h2_send_packet,
-};
 
 const hci_transport_t * hci_transport_usb_instance(void)
 {

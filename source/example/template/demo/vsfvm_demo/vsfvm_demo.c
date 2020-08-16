@@ -48,7 +48,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usrapp_vm_t {
+typedef struct usrapp_vm_t {
     bool is_inited;
 
     vsfvm_runtime_t runtime;
@@ -58,8 +58,7 @@ struct usrapp_vm_t {
     vsfvm_lexer_list_t lexer_dart;
     uint32_t bytecode_num;
     vsfvm_bytecode_t bytecode[APP_CFG_VM_BYTECODE_MAX_NUMBER];
-};
-typedef struct usrapp_vm_t usrapp_vm_t;
+} usrapp_vm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -221,7 +220,7 @@ int vsfvm_main(int argc, char *argv[])
     // 1. register extension(s)
     vsfvm_ext_register_std();
     vsfvm_ext_register_kernel();
-#if VSF_USE_USB_HOST == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_LIBUSB == ENABLED
     vsfvm_ext_register_libusb();
 #endif
 

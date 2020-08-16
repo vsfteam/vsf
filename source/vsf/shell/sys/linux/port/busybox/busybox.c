@@ -1,4 +1,4 @@
-#include <vsf.h>
+#include "vsf_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED
 
@@ -14,10 +14,15 @@ extern int cat_main(int argc, char *argv[]);
 extern int echo_main(int argc, char *argv[]);
 extern int mkdir_main(int argc, char *argv[]);
 
-static int init_main(int argc, char *argv[])
+extern int vsf_linux_init_main(int argc, char *argv[]);
+
+#ifndef WEAK_VSF_LINUX_INIT_MAIN
+WEAK(vsf_linux_init_main)
+int vsf_linux_init_main(int argc, char *argv[])
 {
     return vsh_main(argc, argv);
 }
+#endif
 
 int busybox_bind(char *path, vsf_linux_main_entry_t entry)
 {
@@ -39,7 +44,7 @@ int busybox_install(void)
         return -1;
     }
 
-    if (    busybox_bind("/sbin/init", init_main) < 0
+    if (    busybox_bind("/sbin/init", vsf_linux_init_main) < 0
         ||  busybox_bind("/sbin/ls", ls_main) < 0
         ||  busybox_bind("/sbin/cd", cd_main) < 0
         ||  busybox_bind("/sbin/pwd", pwd_main) < 0
@@ -49,11 +54,11 @@ int busybox_install(void)
         return -1;
     }
 
-    static const char *path[] = {
+    static const char *__path[] = {
         "/sbin/",
         NULL,
     };
-    vsh_set_path((char **)path);
+    vsh_set_path((char **)__path);
     return 0;
 }
 

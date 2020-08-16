@@ -60,13 +60,13 @@ vsf_err_t tgui_demo_init(void)
 
     const vsf_tgui_cfg_t cfg = {
         .tEVTQueue = {
-            .pObj = s_tEvtQueueBuffer, 
-            .nSize = sizeof(s_tEvtQueueBuffer)
+            .obj_ptr = s_tEvtQueueBuffer, 
+            .s32_size = sizeof(s_tEvtQueueBuffer)
         },
 #if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
         .tBFSQueue = {
-            .pObj = s_tBFSBuffer,
-            .nSize = sizeof(s_tBFSBuffer),
+            .obj_ptr = s_tBFSBuffer,
+            .s32_size = sizeof(s_tBFSBuffer),
         },
 #endif
     };

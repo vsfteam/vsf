@@ -45,7 +45,7 @@ static eda_sub_demo_t eda_sub_demo;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 #undef this
-#define this    (*ptThis)
+#define this    (*this_ptr)
 
 
 static fsm_rt_t eda_sub_demo_fsm_b_entry(__vsf_eda_frame_t *frame , vsf_evt_t evt)

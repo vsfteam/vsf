@@ -117,15 +117,15 @@ typedef struct spi_capability_t spi_capability_t;
 
 typedef struct vsf_spi_t vsf_spi_t;
 
-typedef void vsf_spi_evt_handler_t(   void *pTarget, 
+typedef void vsf_spi_evt_handler_t(   void *target_ptr, 
                                         vsf_spi_t *,
                                         spi_status_t tStatus);
 
 typedef struct vsf_spi_evt_t vsf_spi_evt_t;
 struct vsf_spi_evt_t
 {
-    vsf_spi_evt_handler_t *fnHandler;
-    void *pTarget;
+    vsf_spi_evt_handler_t *handler_fn;
+    void *target_ptr;
 };
 
 typedef enum {
@@ -146,7 +146,7 @@ def_interface(i_spi_t)
             spi_capability_t (*Capability)(void);
         } SPI;
     };
-    vsf_err_t       (*Init)   (spi_cfg_t *ptCFG);
+    vsf_err_t       (*Init)   (spi_cfg_t *cfg_ptr);
     
     struct {
         /*! set the new polarity and return the old polarity */
@@ -188,7 +188,7 @@ def_interface(i_spi_t)
         /*! \brief request a block exchaging access
          *! \param pOutput      address of output buffer
          *! \param pInput       address of input buffer
-         *! \param wSize        the size of the two buffers
+         *! \param u32_size        the size of the two buffers
          *! \retval fsm_rt_cpl  The transaction is complete
          *! \retval fsm_rt_asyn The transaction is handled asynchronousely, i.e. by 
          *!                     DMA or by ISR or etc.
@@ -197,7 +197,7 @@ def_interface(i_spi_t)
          *! \retval vsf_err_t   Error value is returned.
          */
 
-        fsm_rt_t  (*RequestExchange)( void *pOutput, void *pInput, uint_fast32_t wSize);
+        fsm_rt_t  (*RequestExchange)( void *pOutput, void *pInput, uint_fast32_t u32_size);
 #endif
 
         /*! \brief cancel on going communication */

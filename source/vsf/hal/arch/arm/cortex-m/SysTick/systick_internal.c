@@ -28,7 +28,7 @@
  *!         disable it:
  *!
  *!         #define __SYSTICK_ATOM_CODE(...)        \
- *!             for (int TPASTE2(___, __LINE__) =1;TPASTE2(___, __LINE__)--;)
+ *!             for (int __CONNECT2(___, __LINE__) =1;__CONNECT2(___, __LINE__)--;)
  *!                 
  *!         
  *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h

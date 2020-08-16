@@ -21,17 +21,19 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_HID == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
-#define VSF_USBD_INHERIT
-#define VSF_USBD_HID_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_USBD_CLASS_INHERIT__
+#define __VSF_USBD_HID_CLASS_IMPLEMENT
+
+#include "kernel/vsf_kernel.h"
+#include "../../vsf_usbd.h"
+#include "./vsf_usbd_HID.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum vk_usbd_HID_EVT_t {
+enum {
     VSF_USBD_HID_EVT_INREPORT = VSF_EVT_USER + 0,
 };
 
@@ -96,8 +98,8 @@ void vk_usbd_hid_in_report_changed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *rep
 void vk_usbh_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report)
 {
     vk_usbd_trans_t *trans = &hid->transact_out;
-    report->mem.pchBuffer = NULL;
-    trans->nSize = hid->rx_buffer.nSize;
+    report->mem.buffer_ptr = NULL;
+    trans->s32_size = hid->rx_buffer.s32_size;
     vk_usbd_ep_recv(hid->dev, trans);
 }
 
@@ -135,16 +137,16 @@ static void __vk_usbd_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             __vk_usbd_hid_on_report(hid, report);
             goto process_in_report;
         } else /* if (trans == &hid->transact_out) */ {
-            uint_fast16_t size = hid->rx_buffer.nSize - trans->nSize;
+            uint_fast16_t size = hid->rx_buffer.s32_size - trans->s32_size;
             if (size > 0) {
                 uint_fast8_t report_id = 0;
                 if (hid->has_report_id) {
-                    report_id = hid->rx_buffer.pchBuffer[0];
+                    report_id = hid->rx_buffer.buffer_ptr[0];
                 }
                 report = __vk_usbd_hid_find_report(hid, USB_HID_REPORT_OUTPUT, report_id);
                 if (report != NULL) {
-                    VSF_USB_ASSERT(report->mem.nSize == size);
-                    report->mem.pchBuffer = hid->rx_buffer.pchBuffer;
+                    VSF_USB_ASSERT(report->mem.s32_size == size);
+                    report->mem.buffer_ptr = hid->rx_buffer.buffer_ptr;
                     __vk_usbd_hid_on_report(hid, report);
                 }
             }
@@ -203,7 +205,7 @@ static vsf_err_t __vk_usbd_hid_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_hid_t *hid = ifs->class_param;
 
-    VSF_USB_ASSERT((hid->rx_buffer.pchBuffer != NULL) && (hid->rx_buffer.nSize > 0));
+    VSF_USB_ASSERT((hid->rx_buffer.buffer_ptr != NULL) && (hid->rx_buffer.s32_size > 0));
     hid->ifs = ifs;
     hid->dev = dev;
 
@@ -246,12 +248,12 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
 
     switch (request->bRequest) {
     case USB_HID_REQ_GET_REPORT:
-        if ((NULL == report) || (type != report->type) || (NULL == report->mem.pchBuffer)) {
+        if ((NULL == report) || (type != report->type) || (NULL == report->mem.buffer_ptr)) {
             return VSF_ERR_FAIL;
         }
 
-        buffer = report->mem.pchBuffer;
-        size = report->mem.nSize;
+        buffer = report->mem.buffer_ptr;
+        size = report->mem.s32_size;
         if (hid->has_report_id) {
             size--;
             buffer++;
@@ -278,8 +280,8 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
             return VSF_ERR_FAIL;
         }
 
-        size = report->mem.nSize;
-        buffer = report->mem.pchBuffer;
+        size = report->mem.s32_size;
+        buffer = report->mem.buffer_ptr;
         if (hid->has_report_id) {
             size--;
             buffer++;
@@ -308,8 +310,8 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     default:
         return VSF_ERR_FAIL;
     }
-    ctrl_handler->trans.pchBuffer = buffer;
-    ctrl_handler->trans.nSize = size;
+    ctrl_handler->trans.buffer_ptr = buffer;
+    ctrl_handler->trans.s32_size = size;
     return VSF_ERR_NONE;
 }
 

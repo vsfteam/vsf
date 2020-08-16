@@ -21,12 +21,13 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
 
-#define VSF_FS_INHERIT
-#define VSF_FATFS_IMPLEMENT
-#define VSF_MALFS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
-#include <ctype.h>
+#define __VSF_FS_CLASS_INHERIT__
+#define __VSF_MALFS_CLASS_INHERIT__
+#define __VSF_FATFS_CLASS_IMPLEMENT
+
+// for ctype.h
+#include "utilities/vsf_utilities.h"
+#include "../../vsf_fs.h"
 
 /*============================ MACROS ========================================*/
 
@@ -45,7 +46,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct fatfs_bpb_t {
+typedef struct fatfs_bpb_t {
     uint16_t BytsPerSec;
     uint8_t SecPerClus;
     uint16_t RsvdSecCnt;
@@ -58,20 +59,18 @@ struct fatfs_bpb_t {
     uint16_t NumHeads;
     uint32_t HiddSec;
     uint32_t TotSec32;
-} PACKED;
-typedef struct fatfs_bpb_t fatfs_bpb_t;
+} PACKED fatfs_bpb_t;
 
-struct fatfs_ebpb_t {
+typedef struct fatfs_ebpb_t {
     uint8_t DrvNo;
     uint8_t Reserved;
     uint8_t BootSig;
     uint32_t VolID;
     uint8_t VolLab[11];
     uint8_t FilSysType[8];
-} PACKED;
-typedef struct fatfs_ebpb_t fatfs_ebpb_t;
+} PACKED fatfs_ebpb_t;
 
-struct fatfs_dbr_t {
+typedef struct fatfs_dbr_t {
     uint8_t jmp[3];
     uint8_t oem[8];
     // bpb All 0 for exFAT
@@ -120,10 +119,9 @@ struct fatfs_dbr_t {
         } PACKED exfat;
     } PACKED;
     uint16_t Magic;
-} PACKED;
-typedef struct fatfs_dbr_t fatfs_dbr_t;
+} PACKED fatfs_dbr_t;
 
-struct fatfs_dentry_t {
+typedef struct fatfs_dentry_t {
     union {
         struct {
             char Name[8];
@@ -141,27 +139,24 @@ struct fatfs_dentry_t {
             uint32_t FileSize;
         } PACKED fat;
     } PACKED;
-} PACKED;
-typedef struct fatfs_dentry_t fatfs_dentry_t;
+} PACKED fatfs_dentry_t;
 
-struct vk_fatfs_read_local {
+typedef struct vk_fatfs_read_local {
     uint32_t cur_cluster;
     uint32_t cur_sector;
     uint64_t cur_offset;
     uint32_t cur_size;
     uint32_t cur_run_size;
     uint32_t cur_run_sector;
-};
-typedef struct vk_fatfs_read_local vk_fatfs_read_local;
+} vk_fatfs_read_local;
 
-struct vk_fatfs_lookup_local {
+typedef struct vk_fatfs_lookup_local {
     uint32_t cur_cluster;
     uint32_t cur_sector;
     char *filename;
     uint32_t cur_sector_in_cluster;
     vk_fatfs_dentry_parser_t dparser;
-};
-typedef struct vk_fatfs_lookup_local vk_fatfs_lookup_local;
+} vk_fatfs_lookup_local;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -755,6 +750,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                             .cluster = vsf_local.cur_cluster,
                             .entry = &vsf_local.cur_cluster,
                         )
+                        UNUSED_PARAM(err);
                     }
                 }
                 break;
@@ -859,6 +855,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                         .cluster = vsf_local.cur_cluster,
                         .entry = &vsf_local.cur_cluster,
                     );
+                    UNUSED_PARAM(err);
                     break;
                 }
 
@@ -927,6 +924,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                         .cluster = vsf_local.cur_cluster,
                         .entry = &vsf_local.cur_cluster,
                     );
+                    UNUSED_PARAM(err);
                     break;
                 }
                 goto read_next;

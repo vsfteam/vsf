@@ -21,10 +21,9 @@
 
 #if VSF_USE_SCSI == ENABLED
 
-#define VSF_SCSI_IMPLEMENT
-
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_SCSI_CLASS_IMPLEMENT
+#include "kernel/vsf_kernel.h"
+#include "./vsf_scsi.h"
 
 /*============================ MACROS ========================================*/
 
@@ -77,8 +76,8 @@ vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
     if (mem != NULL) {
         execute_mem = *mem;
     } else {
-        execute_mem.pchBuffer = NULL;
-        execute_mem.nSize = 0;
+        execute_mem.buffer_ptr = NULL;
+        execute_mem.s32_size = 0;
     }
     __vsf_component_call_peda_ifs(vk_scsi_execute, err, pthis->drv->execute, 0, pthis,
         .cbd    = cbd,

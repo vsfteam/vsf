@@ -23,10 +23,12 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HID == ENABLED
 
-#if     defined(VSF_USBH_HID_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_USBH_HID_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#include "kernel/vsf_kernel.h"
+
+#if     defined(__VSF_USBH_HID_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_USBH_HID_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -65,9 +67,9 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbh_hid_base_t)
-declare_simple_class(vk_usbh_hid_eda_t)
-declare_simple_class(vk_usbh_hid_teda_t)
+dcl_simple_class(vk_usbh_hid_base_t)
+dcl_simple_class(vk_usbh_hid_eda_t)
+dcl_simple_class(vk_usbh_hid_teda_t)
 
 def_simple_class(vk_usbh_hid_base_t) {
 
@@ -111,7 +113,7 @@ extern const vk_usbh_class_drv_t vk_usbh_hid_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-#ifdef VSF_USBH_HID_INHERIT
+#ifdef __VSF_USBH_HID_CLASS_INHERIT__
 extern void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             vk_usbh_ifs_parser_t *parser_ifs, uint_fast32_t obj_size, bool has_hid_desc);
 extern void vk_usbh_hid_disconnect(vk_usbh_hid_eda_t *hid);
@@ -133,8 +135,8 @@ extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *
 }
 #endif
 
-#undef VSF_USBH_HID_IMPLEMENT
-#undef VSF_USBH_HID_IMHERIT
+#undef __VSF_USBH_HID_CLASS_IMPLEMENT
+#undef __VSF_USBH_HID_CLASS_INHERIT__
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_HID
 #endif      // __VSF_USBH_HID_H__

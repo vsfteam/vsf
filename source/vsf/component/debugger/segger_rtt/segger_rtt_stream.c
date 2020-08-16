@@ -17,16 +17,12 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSFSTREAM_CLASS_INHERIT__
 #include "../vsf_debugger.h"
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 
 #include "./RTT/SEGGER_RTT.h"
-
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
-#   include "service/vsf_service.h"
-#endif
 
 #include "utilities/vsf_utilities.h"
 
@@ -49,13 +45,13 @@ static uint_fast32_t __vsf_segger_rtt_stream_write(   vsf_stream_t *stream,
 static uint_fast32_t __vsf_segger_rtt_stream_get_data_length(vsf_stream_t *stream);
 static uint_fast32_t __vsf_segger_rtt_stream_get_avail_length(vsf_stream_t *stream);
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
-static vsf_err_t vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *ptObj, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
                                                     vsf_pbuf_t *pblock);
 static 
-vsf_stream_status_t vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *ptObj);
+vsf_stream_status_t __vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *obj_ptr);
 
-static vsf_err_t vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
-                                            vsf_stream_tx_t *ptObj, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
+                                            vsf_stream_tx_t *obj_ptr, 
                                             vsf_stream_dat_drn_evt_t tEvent);
 #endif
 
@@ -85,16 +81,16 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 };
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
-static const i_stream_pbuf_tx_t s_iSeggerRttStreamTx = {
-    .Send =         &vsf_segger_rtt_stream_tx_send_pbuf,
-    .GetStatus =    &vsf_segger_rtt_stream_tx_get_status,
+static const i_stream_pbuf_tx_t __segger_rtt_stream_tx = {
+    .Send =         &__vsf_segger_rtt_stream_tx_send_pbuf,
+    .GetStatus =    &__vsf_segger_rtt_stream_tx_get_status,
     .DataDrainEvent = {
-        .Register = &vsf_segger_rtt_stream_tx_dat_drn_evt_reg,
+        .Register = &__vsf_segger_rtt_stream_tx_dat_drn_evt_reg,
     },
 };
 
 const vsf_stream_tx_t VSF_DEBUG_STREAM_TX = {
-    .piMethod = &s_iSeggerRttStreamTx,
+    .piMethod = &__segger_rtt_stream_tx,
 };
 #endif
 /*============================ IMPLEMENTATION ================================*/
@@ -184,42 +180,42 @@ uint_fast32_t __vsf_segger_rtt_stream_get_avail_length(vsf_stream_t *stream)
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
 
-static vsf_err_t vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *ptObj, 
-                                                    vsf_pbuf_t *ptBlock)
+static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
+                                                    vsf_pbuf_t *block_ptr)
 {
-    vsf_err_t tResult = VSF_ERR_NONE;
+    vsf_err_t result = VSF_ERR_NONE;
     do {
-        if (NULL == ptBlock) {
-            tResult = VSF_ERR_INVALID_PTR;
+        if (NULL == block_ptr) {
+            result = VSF_ERR_INVALID_PTR;
             break;
         }
     #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == DISABLED
-        if (vsf_pbuf_capability_get(ptBlock).isNoDirectAccess) {
+        if (vsf_pbuf_capability_get(block_ptr).is_no_direct_access) {
             //! no direct access: todo add support
-            tResult = VSF_ERR_NOT_ACCESSABLE;
+            result = VSF_ERR_NOT_ACCESSABLE;
             break;
         } else 
     #endif
         {
-            SEGGER_RTT_Write(0, (const void *)vsf_pbuf_buffer_get(ptBlock), 
-                            vsf_pbuf_size_get(ptBlock));
+            SEGGER_RTT_Write(0, (const void *)vsf_pbuf_buffer_get(block_ptr), 
+                            vsf_pbuf_size_get(block_ptr));
         }
         
     } while(0);
 
-    vsf_pbuf_free(ptBlock);
+    vsf_pbuf_free(block_ptr);
 
-    return tResult;
+    return result;
 }
 
 static 
-vsf_stream_status_t vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *ptObj)
+vsf_stream_status_t __vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
     return (vsf_stream_status_t){0};//s_tNuStream.tStatus;
 }
 
-static vsf_err_t vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
-                                            vsf_stream_tx_t *ptObj, 
+static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
+                                            vsf_stream_tx_t *obj_ptr, 
                                             vsf_stream_dat_drn_evt_t tEvent)
 {
     //s_tNuStream.tEvent = tEvent;

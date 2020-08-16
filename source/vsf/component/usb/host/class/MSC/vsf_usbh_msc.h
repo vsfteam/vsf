@@ -26,12 +26,6 @@
 
 #include "component/usb/common/class/MSC/vsf_usb_MSC.h"
 
-#if     defined(VSF_USBH_MSC_IMPLEMENT)
-#   undef VSF_USBH_MSC_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#endif
-#include "utilities/ooc_class.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

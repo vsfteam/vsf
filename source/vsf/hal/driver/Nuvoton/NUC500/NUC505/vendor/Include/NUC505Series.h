@@ -331,7 +331,7 @@ typedef struct
     __IO uint32_t PWRCTL;
 
     /**
-     * AHBCLK
+     * SyncCLK
      * ===================================================================================================
      * Offset: 0x04  AHB Devices Clock Enable Control Register
      * ---------------------------------------------------------------------------------------------------
@@ -359,7 +359,7 @@ typedef struct
      * |        |          |0 = USB Host Clock Disabled.
      * |        |          |1 = USB Host Clock Enabled.
     */
-    __IO uint32_t AHBCLK;
+    __IO uint32_t SyncCLK;
 
     /**
      * APBCLK
@@ -663,26 +663,26 @@ typedef struct
 #define CLK_PWRCTL_PDWTCPU_Pos           (24)                                              /*!< CLK_T::PWRCTL: PDWTCPU Position           */
 #define CLK_PWRCTL_PDWTCPU_Msk           (0x1ul << CLK_PWRCTL_PDWTCPU_Pos)                 /*!< CLK_T::PWRCTL: PDWTCPU Mask               */
 
-#define CLK_AHBCLK_SRAM01CKEN_Pos        (0)                                               /*!< CLK_T::AHBCLK: SRAM01CKEN Position        */
-#define CLK_AHBCLK_SRAM01CKEN_Msk        (0x1ul << CLK_AHBCLK_SRAM01CKEN_Pos)              /*!< CLK_T::AHBCLK: SRAM01CKEN Mask            */
+#define CLK_SyncCLK_SRAM01CKEN_Pos        (0)                                               /*!< CLK_T::SyncCLK: SRAM01CKEN Position        */
+#define CLK_SyncCLK_SRAM01CKEN_Msk        (0x1ul << CLK_SyncCLK_SRAM01CKEN_Pos)              /*!< CLK_T::SyncCLK: SRAM01CKEN Mask            */
 
-#define CLK_AHBCLK_SRAM23CKEN_Pos        (1)                                               /*!< CLK_T::AHBCLK: SRAM23CKEN Position        */
-#define CLK_AHBCLK_SRAM23CKEN_Msk        (0x1ul << CLK_AHBCLK_SRAM23CKEN_Pos)              /*!< CLK_T::AHBCLK: SRAM23CKEN Mask            */
+#define CLK_SyncCLK_SRAM23CKEN_Pos        (1)                                               /*!< CLK_T::SyncCLK: SRAM23CKEN Position        */
+#define CLK_SyncCLK_SRAM23CKEN_Msk        (0x1ul << CLK_SyncCLK_SRAM23CKEN_Pos)              /*!< CLK_T::SyncCLK: SRAM23CKEN Mask            */
 
-#define CLK_AHBCLK_ROMCKEN_Pos           (2)                                               /*!< CLK_T::AHBCLK: ROMCKEN Position           */
-#define CLK_AHBCLK_ROMCKEN_Msk           (0x1ul << CLK_AHBCLK_ROMCKEN_Pos)                 /*!< CLK_T::AHBCLK: ROMCKEN Mask               */
+#define CLK_SyncCLK_ROMCKEN_Pos           (2)                                               /*!< CLK_T::SyncCLK: ROMCKEN Position           */
+#define CLK_SyncCLK_ROMCKEN_Msk           (0x1ul << CLK_SyncCLK_ROMCKEN_Pos)                 /*!< CLK_T::SyncCLK: ROMCKEN Mask               */
 
-#define CLK_AHBCLK_SPIMCKEN_Pos          (3)                                               /*!< CLK_T::AHBCLK: SPIMCKEN Position          */
-#define CLK_AHBCLK_SPIMCKEN_Msk          (0x1ul << CLK_AHBCLK_SPIMCKEN_Pos)                /*!< CLK_T::AHBCLK: SPIMCKEN Mask              */
+#define CLK_SyncCLK_SPIMCKEN_Pos          (3)                                               /*!< CLK_T::SyncCLK: SPIMCKEN Position          */
+#define CLK_SyncCLK_SPIMCKEN_Msk          (0x1ul << CLK_SyncCLK_SPIMCKEN_Pos)                /*!< CLK_T::SyncCLK: SPIMCKEN Mask              */
 
-#define CLK_AHBCLK_SDHCKEN_Pos           (5)                                               /*!< CLK_T::AHBCLK: SDHCKEN Position           */
-#define CLK_AHBCLK_SDHCKEN_Msk           (0x1ul << CLK_AHBCLK_SDHCKEN_Pos)                 /*!< CLK_T::AHBCLK: SDHCKEN Mask               */
+#define CLK_SyncCLK_SDHCKEN_Pos           (5)                                               /*!< CLK_T::SyncCLK: SDHCKEN Position           */
+#define CLK_SyncCLK_SDHCKEN_Msk           (0x1ul << CLK_SyncCLK_SDHCKEN_Pos)                 /*!< CLK_T::SyncCLK: SDHCKEN Mask               */
 
-#define CLK_AHBCLK_USBDCKEN_Pos          (6)                                               /*!< CLK_T::AHBCLK: USBDCKEN Position          */
-#define CLK_AHBCLK_USBDCKEN_Msk          (0x1ul << CLK_AHBCLK_USBDCKEN_Pos)                /*!< CLK_T::AHBCLK: USBDCKEN Mask              */
+#define CLK_SyncCLK_USBDCKEN_Pos          (6)                                               /*!< CLK_T::SyncCLK: USBDCKEN Position          */
+#define CLK_SyncCLK_USBDCKEN_Msk          (0x1ul << CLK_SyncCLK_USBDCKEN_Pos)                /*!< CLK_T::SyncCLK: USBDCKEN Mask              */
 
-#define CLK_AHBCLK_USBHCKEN_Pos          (9)                                               /*!< CLK_T::AHBCLK: USBHCKEN Position          */
-#define CLK_AHBCLK_USBHCKEN_Msk          (0x1ul << CLK_AHBCLK_USBHCKEN_Pos)                /*!< CLK_T::AHBCLK: USBHCKEN Mask              */
+#define CLK_SyncCLK_USBHCKEN_Pos          (9)                                               /*!< CLK_T::SyncCLK: USBHCKEN Position          */
+#define CLK_SyncCLK_USBHCKEN_Msk          (0x1ul << CLK_SyncCLK_USBHCKEN_Pos)                /*!< CLK_T::SyncCLK: USBHCKEN Mask              */
 
 #define CLK_APBCLK_TMR0CKEN_Pos          (0)                                               /*!< CLK_T::APBCLK: TMR0CKEN Position          */
 #define CLK_APBCLK_TMR0CKEN_Msk          (0x1ul << CLK_APBCLK_TMR0CKEN_Pos)                /*!< CLK_T::APBCLK: TMR0CKEN Mask              */

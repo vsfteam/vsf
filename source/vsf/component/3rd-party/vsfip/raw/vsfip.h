@@ -22,15 +22,17 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
 // for vsf_netdrv_addr_t
 #include "component/tcpip/netdrv/vsf_netdrv.h"
 
-#if     defined(VSFIP_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSFIP_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSFIP_CLASS_IMPLEMENT)
+#   undef __VSFIP_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSFIP_CLASS_INHERIT__)
+#   undef __VSFIP_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -76,22 +78,21 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsfip_socket_t)
-declare_simple_class(vsfip_netbuf_t)
+dcl_simple_class(vsfip_socket_t)
+dcl_simple_class(vsfip_netbuf_t)
 
-typedef vsf_netdrv_addr_t vsfip_addr_t;
-typedef vsf_netdrv_addr_t vsfip_ipaddr_t;
-typedef vsf_netdrv_addr_t vsfip_macaddr_t;
+typedef vk_netdrv_addr_t vsfip_addr_t;
+typedef vk_netdrv_addr_t vsfip_ipaddr_t;
+typedef vk_netdrv_addr_t vsfip_macaddr_t;
 
 typedef enum vsfip_sock_familt_t vsfip_sock_familt_t;
 typedef enum vsfip_sock_proto_t vsfip_sock_proto_t;
 typedef struct vsfip_sock_addr_t vsfip_sock_addr_t;
 
-struct vsfip_ipmac_assoc {
+typedef struct vsfip_ipmac_assoc {
     vsfip_macaddr_t mac;
     vsfip_ipaddr_t ip;
-};
-typedef struct vsfip_ipmac_assoc vsfip_ipmac_assoc;
+} vsfip_ipmac_assoc;
 
 /*============================ INCLUDES ======================================*/
 
@@ -99,18 +100,18 @@ typedef struct vsfip_ipmac_assoc vsfip_ipmac_assoc;
 
 /*============================ TYPES =========================================*/
 
-#define VSFIP_BUF_GET(s)            vsfip_netbuf_get(s)
-#define VSFIP_NETIFBUF_GET(s)       VSFIP_BUF_GET((s) + VSFIP_CFG_NETIF_HEADLEN)
-#define VSFIP_IPBUF_GET(s)          VSFIP_NETIFBUF_GET((s) + VSFIP_IP_HEADLEN)
+#define vsfip_buf_get(s)            vsfip_netbuf_get(s)
+#define vsfip_netifbuf_get(s)       vsfip_buf_get((s) + VSFIP_CFG_NETIF_HEADLEN)
+#define vsfip_ipbuf_get(s)          vsfip_netifbuf_get((s) + VSFIP_IP_HEADLEN)
 
 #define VSFIP_PROTO_HEADLEN         (VSFIP_CFG_NETIF_HEADLEN + VSFIP_IP_HEADLEN)
-#define VSFIP_UDPBUF_GET(s)         vsfip_appbuf_get(VSFIP_PROTO_HEADLEN + VSFIP_UDP_HEADLEN, (s))
-#define VSFIP_TCPBUF_GET(s)         vsfip_appbuf_get(VSFIP_PROTO_HEADLEN + VSFIP_TCP_HEADLEN, (s))
+#define vsfip_udpbuf_get(s)         vsfip_appbuf_get(VSFIP_PROTO_HEADLEN + VSFIP_UDP_HEADLEN, (s))
+#define vsfip_tcpbuf_get(s)         vsfip_appbuf_get(VSFIP_PROTO_HEADLEN + VSFIP_TCP_HEADLEN, (s))
 
 enum vsfip_sock_familt_t {
-    AF_NONE        = 0,
-    AF_INET        = 2,
-    AF_INET6    = 10,
+    AF_NONE         = 0,
+    AF_INET         = 2,
+    AF_INET6        = 10,
 };
 
 enum vsfip_sock_proto_t {
@@ -128,16 +129,15 @@ struct vsfip_sock_addr_t {
     vsfip_ipaddr_t addr;
 };
 
-struct vsfip_ip_pcb_t {
+typedef struct vsfip_ip_pcb_t {
     vsfip_ipaddr_t src;
     vsfip_ipaddr_t dest;
     uint16_t id;
-};
-typedef struct vsfip_ip_pcb_t vsfip_ip_pcb_t;
+} vsfip_ip_pcb_t;
 
 // headers
 // IPv4
-struct vsfip_ip4_head_t {
+typedef struct vsfip_ip4_head_t {
     uint8_t ver_hl;
     uint8_t tos;
     uint16_t len;
@@ -152,28 +152,25 @@ struct vsfip_ip4_head_t {
     uint16_t checksum;
     uint32_t ipsrc;
     uint32_t ipdest;
-} PACKED;
-typedef struct vsfip_ip4_head_t vsfip_ip4_head_t;
+} PACKED vsfip_ip4_head_t;
 #define VSFIP_IP4H_V(h)         ((h)->ver_hl >> 4)
 #define VSFIP_IP4H_HLEN(h)      ((h)->ver_hl & 0x0F)
 
 // PROTO PORT
-struct vsfip_proto_port_t {
+typedef struct vsfip_proto_port_t {
     uint16_t src;
     uint16_t dst;
-} PACKED;
-typedef struct vsfip_proto_port_t vsfip_proto_port_t;
+} PACKED vsfip_proto_port_t;
 
 // UDP
-struct vsfip_udp_head_t {
+typedef struct vsfip_udp_head_t {
     vsfip_proto_port_t port;
     uint16_t len;
     uint16_t checksum;
-} PACKED;
-typedef struct vsfip_udp_head_t vsfip_udp_head_t;
+} PACKED vsfip_udp_head_t;
 
 // TCP
-struct vsfip_tcp_head_t {
+typedef struct vsfip_tcp_head_t {
     vsfip_proto_port_t port;
     uint32_t seq;
     uint32_t ackseq;
@@ -188,11 +185,10 @@ struct vsfip_tcp_head_t {
     uint16_t window_size;
     uint16_t checksum;
     uint16_t urgent_ptr;
-} PACKED;
-typedef struct vsfip_tcp_head_t vsfip_tcp_head_t;
+} PACKED vsfip_tcp_head_t;
 
 // ICMP
-struct vsfip_icmp_head_t {
+typedef struct vsfip_icmp_head_t {
     uint8_t type;
     uint8_t code;
     uint16_t checksum;
@@ -202,11 +198,10 @@ struct vsfip_icmp_head_t {
             uint16_t seqnum;
         } echo;
     } body;
-} PACKED;
-typedef struct vsfip_icmp_head_t vsfip_icmp_head_t;
+} PACKED vsfip_icmp_head_t;
 
 
-enum vsfip_tcp_stat_t {
+typedef enum vsfip_tcp_stat_t {
     VSFIP_TCPSTAT_INVALID,
     VSFIP_TCPSTAT_CLOSED,
     VSFIP_TCPSTAT_LISTEN,
@@ -217,10 +212,9 @@ enum vsfip_tcp_stat_t {
     VSFIP_TCPSTAT_FINWAIT2,
     VSFIP_TCPSTAT_CLOSEWAIT,
     VSFIP_TCPSTAT_LASTACK,
-};
-typedef enum vsfip_tcp_stat_t vsfip_tcp_stat_t;
+} vsfip_tcp_stat_t;
 
-struct vsfip_tcp_pcb_t {
+typedef struct vsfip_tcp_pcb_t {
     vsfip_tcp_stat_t state;
     uint32_t lseq;
     uint32_t acked_lseq;
@@ -246,15 +240,12 @@ struct vsfip_tcp_pcb_t {
     uint8_t flags;
 
     vsf_err_t err;
-};
-typedef struct vsfip_tcp_pcb_t vsfip_tcp_pcb_t;
+} vsfip_tcp_pcb_t;
 
-struct vsfip_pcb_t
-{
+typedef struct vsfip_pcb_t {
     vsfip_ip_pcb_t ip_pcb;
     void *proto_pcb;
-};
-typedef struct vsfip_pcb_t vsfip_pcb_t;
+} vsfip_pcb_t;
 
 // buffer layout:
 //    |--VSFIP_PROTO_HEADLEN--||--VSFIP_CFG_NETIF_HEADLEN--||--app--|
@@ -264,7 +255,7 @@ typedef struct vsfip_pcb_t vsfip_pcb_t;
 //    If VSFIP_IPBUF_NO_AUTOFREE is set in flags while sending buffer,
 //        buffer will not be released after being sent.
 def_simple_class(vsfip_netbuf_t) {
-    vsf_slist_node_t proto_node;
+    vsf_dlist_node_t proto_node;
     vsf_slist_node_t netif_node;
     vsf_mem_t buf;
     vsf_mem_t app;
@@ -294,8 +285,8 @@ def_simple_class(vsfip_socket_t) {
 
     vsfip_pcb_t pcb;
     vsf_sem_t input_sem;
-    vsf_slist_queue_t input_queue;
-    vsf_slist_queue_t output_queue;
+    vsf_dlist_t input_queue;
+    vsf_dlist_t output_queue;
 
     struct {
         vsf_slist_t child;
@@ -367,6 +358,8 @@ extern vsf_err_t vsfip_tcp_async_recv(vsfip_socket_t *socket, vsfip_netbuf_t **b
 // for UDP
 extern vsf_err_t vsfip_udp_async_send(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t *buf);
 extern vsf_err_t vsfip_udp_async_recv(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t **buf);
+extern vsf_err_t vsfip_udp_send(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t *buf);
+extern vsf_err_t vsfip_udp_recv(vsfip_socket_t *socket, vsfip_sock_addr_t *sockaddr, vsfip_netbuf_t **netbuf);
 
 // for proto
 extern vsf_err_t vsfip_ip4_pton(vsfip_ipaddr_t *ip, char *domain);

@@ -69,7 +69,7 @@ void __vsf_tgui_label_v_rendering(  vsf_tgui_label_t* ptLabel,
 
     if (    (ptLabel->tLabel.tString.pstrText != NULL)
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-        &&  (ptLabel->tLabel.tString.iSize > 0)
+        &&  (ptLabel->tLabel.tString.s16_size > 0)
 #endif
     ) {
         vsf_tgui_control_v_draw_text((vsf_tgui_control_t *)ptLabel,

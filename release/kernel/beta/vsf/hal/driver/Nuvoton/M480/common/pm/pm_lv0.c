@@ -108,7 +108,7 @@ pm_periph_async_clk_status_t vsf_pm_peripheral_config(pm_periph_async_clk_no_t i
 }
 
 #define __def_vsf_pm_peripheral_clksel(__name)                                  \
-            [TPASTE2(__name, _MAP_IDX)] = TPASTE2(__name, _MAP)
+            [__CONNECT2(__name, _MAP_IDX)] = __CONNECT2(__name, _MAP)
 
 static const pm_periph_clksel_t vsf_pm_peripheral_clksel[] = {
     __def_vsf_pm_peripheral_clksel(SDH_CLKSEL),
@@ -179,18 +179,18 @@ uint_fast32_t vsf_pm_peripheral_get_clock(pm_periph_async_clk_no_t index)
     return 0;
 }
 
-pm_ahbclk_status_t vsf_pm_ahbclk_get_status(pm_ahb_clk_no_t index)
+pm_sync_clk_status_t vsf_pm_sync_clk_get_status(pm_sync_clk_no_t index)
 {
     uint_fast8_t bus_idx = index >> 5;
-    return (pm_ahbclk_status_t)(&CLK->AHBCLK)[bus_idx];
+    return (pm_sync_clk_status_t)(&CLK->SyncCLK)[bus_idx];
 }
 
-vsf_err_t vsf_pm_ahbclk_resume(pm_ahb_clk_no_t index, pm_ahbclk_status_t status)
+vsf_err_t vsf_pm_sync_clk_resume(pm_sync_clk_no_t index, pm_sync_clk_status_t status)
 {
     uint_fast8_t bus_idx = index >> 5;
     uint_fast8_t bit_idx = index & 0x1F;
 
-    reg32_t *reg_enable = &CLK->AHBCLK;
+    reg32_t *reg_enable = &CLK->SyncCLK;
     uint_fast32_t mask = 1 << bit_idx;
 
     if ((reg_enable[bus_idx] ^ status) & mask) {
@@ -205,18 +205,18 @@ vsf_err_t vsf_pm_ahbclk_resume(pm_ahb_clk_no_t index, pm_ahbclk_status_t status)
     return VSF_ERR_NONE;
 }
 
-pm_ahbclk_status_t vsf_pm_ahbclk_enable(pm_ahb_clk_no_t index)
+pm_sync_clk_status_t vsf_pm_sync_clk_enable(pm_sync_clk_no_t index)
 {
-    pm_ahbclk_status_t orig = vsf_pm_ahbclk_get_status(index);
+    pm_sync_clk_status_t orig = vsf_pm_sync_clk_get_status(index);
     uint_fast8_t bit_idx = index & 0x1F;
-    vsf_pm_ahbclk_resume(index, (pm_ahbclk_status_t)(1 << bit_idx));
+    vsf_pm_sync_clk_resume(index, (pm_sync_clk_status_t)(1 << bit_idx));
     return orig;
 }
 
-pm_ahbclk_status_t vsf_pm_ahbclk_disable(pm_ahb_clk_no_t index)
+pm_sync_clk_status_t vsf_pm_sync_clk_disable(pm_sync_clk_no_t index)
 {
-    pm_ahbclk_status_t orig = vsf_pm_ahbclk_get_status(index);
-    vsf_pm_ahbclk_resume(index, (pm_ahbclk_status_t)0);
+    pm_sync_clk_status_t orig = vsf_pm_sync_clk_get_status(index);
+    vsf_pm_sync_clk_resume(index, (pm_sync_clk_status_t)0);
     return orig;
 }
 

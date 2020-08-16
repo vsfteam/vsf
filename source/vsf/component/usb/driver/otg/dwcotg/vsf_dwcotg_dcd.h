@@ -26,12 +26,9 @@
 
 #include "./vsf_dwcotg_common.h"
 
-#if     defined(VSF_DWCOTG_DCD_IMPLEMENT)
-#   undef VSF_DWCOTG_DCD_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_DWCOTG_DCD_INHERIT)
-#   undef VSF_DWCOTG_DCD_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_DWCOTG_DCD_CLASS_IMPLEMENT)
+#   undef __VSF_DWCOTG_DCD_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -43,24 +40,22 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_USB_DC_FROM_DWCOTG_IP(__N, __OBJ, __DRV_NAME)                       \
-            __USB_DC_FROM_IP(__N, (__OBJ), __DRV_NAME, vk_dwcotg_usbd)
+#define vsf_usb_dc_from_dwcotg_ip(__n, __obj, __drv_name)                       \
+            __USB_DC_FROM_IP(__n, (__obj), __drv_name, vk_dwcotg_dcd)
 
 /*============================ TYPES =========================================*/
 
-struct vk_dwcotg_dcd_param_t {
+typedef struct vk_dwcotg_dcd_param_t {
     const i_usb_dc_ip_t *op;
     implement(vk_dwcotg_param_t)
-};
-typedef struct vk_dwcotg_dcd_param_t vk_dwcotg_dcd_param_t;
+} vk_dwcotg_dcd_param_t;
 
-struct vk_dwcotg_dc_ip_info_t {
+typedef struct vk_dwcotg_dc_ip_info_t {
     implement(usb_dc_ip_info_t)
     implement(vk_dwcotg_hw_info_t)
-};
-typedef struct vk_dwcotg_dc_ip_info_t vk_dwcotg_dc_ip_info_t;
+} vk_dwcotg_dc_ip_info_t;
 
-declare_simple_class(vk_dwcotg_dcd_trans_t)
+dcl_simple_class(vk_dwcotg_dcd_trans_t)
 def_simple_class(vk_dwcotg_dcd_trans_t) {
     private_member(
         uint8_t *buffer;
@@ -71,14 +66,13 @@ def_simple_class(vk_dwcotg_dcd_trans_t) {
     )
 };
 
-enum ctrl_transfer_state_t{
+typedef enum ctrl_transfer_state_t {
     DWCOTG_SETUP_STAGE,
     DWCOTG_DATA_STAGE,
     DWCOTG_STATUS_STAGE,
-};
-typedef enum ctrl_transfer_state_t ctrl_transfer_state_t;
+} ctrl_transfer_state_t;
 
-declare_simple_class(vk_dwcotg_dcd_t)
+dcl_simple_class(vk_dwcotg_dcd_t)
 def_simple_class(vk_dwcotg_dcd_t) {
 
     public_member(
@@ -103,42 +97,42 @@ def_simple_class(vk_dwcotg_dcd_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vk_dwcotg_usbd_init(vk_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg);
-extern void vk_dwcotg_usbd_fini(vk_dwcotg_dcd_t *usbd);
-extern void vk_dwcotg_usbd_reset(vk_dwcotg_dcd_t *usbd, usb_dc_cfg_t *cfg);
+extern vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg);
+extern void vk_dwcotg_dcd_fini(vk_dwcotg_dcd_t *dwcotg_dcd);
+extern void vk_dwcotg_dcd_reset(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg);
 
-extern void vk_dwcotg_usbd_connect(vk_dwcotg_dcd_t *usbd);
-extern void vk_dwcotg_usbd_disconnect(vk_dwcotg_dcd_t *usbd);
-extern void vk_dwcotg_usbd_wakeup(vk_dwcotg_dcd_t *usbd);
+extern void vk_dwcotg_dcd_connect(vk_dwcotg_dcd_t *dwcotg_dcd);
+extern void vk_dwcotg_dcd_disconnect(vk_dwcotg_dcd_t *dwcotg_dcd);
+extern void vk_dwcotg_dcd_wakeup(vk_dwcotg_dcd_t *dwcotg_dcd);
 
-extern void vk_dwcotg_usbd_set_address(vk_dwcotg_dcd_t *usbd, uint_fast8_t addr);
-extern uint_fast8_t vk_dwcotg_usbd_get_address(vk_dwcotg_dcd_t *usbd);
+extern void vk_dwcotg_dcd_set_address(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t addr);
+extern uint_fast8_t vk_dwcotg_dcd_get_address(vk_dwcotg_dcd_t *dwcotg_dcd);
 
-extern uint_fast16_t vk_dwcotg_usbd_get_frame_number(vk_dwcotg_dcd_t *usbd);
-extern uint_fast8_t vk_dwcotg_usbd_get_mframe_number(vk_dwcotg_dcd_t *usbd);
+extern uint_fast16_t vk_dwcotg_dcd_get_frame_number(vk_dwcotg_dcd_t *dwcotg_dcd);
+extern uint_fast8_t vk_dwcotg_dcd_get_mframe_number(vk_dwcotg_dcd_t *dwcotg_dcd);
 
-extern void vk_dwcotg_usbd_get_setup(vk_dwcotg_dcd_t *usbd, uint8_t *buffer);
-extern void vk_dwcotg_usbd_status_stage(vk_dwcotg_dcd_t *usbd, bool is_in);
+extern void vk_dwcotg_dcd_get_setup(vk_dwcotg_dcd_t *dwcotg_dcd, uint8_t *buffer);
+extern void vk_dwcotg_dcd_status_stage(vk_dwcotg_dcd_t *dwcotg_dcd, bool is_in);
 
-extern uint_fast8_t vk_dwcotg_usbd_ep_get_feature(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast8_t feature);
-extern vsf_err_t vk_dwcotg_usbd_ep_add(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
-extern uint_fast16_t vk_dwcotg_usbd_ep_get_size(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast8_t vk_dwcotg_dcd_ep_get_feature(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint_fast8_t feature);
+extern vsf_err_t vk_dwcotg_dcd_ep_add(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size);
+extern uint_fast16_t vk_dwcotg_dcd_ep_get_size(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep);
 
-extern vsf_err_t vk_dwcotg_usbd_ep_set_stall(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep);
-extern bool vk_dwcotg_usbd_ep_is_stalled(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep);
-extern vsf_err_t vk_dwcotg_usbd_ep_clear_stall(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep);
+extern vsf_err_t vk_dwcotg_dcd_ep_set_stall(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep);
+extern bool vk_dwcotg_dcd_ep_is_stalled(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep);
+extern vsf_err_t vk_dwcotg_dcd_ep_clear_stall(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep);
 
-extern uint_fast32_t vk_dwcotg_usbd_ep_get_data_size(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep);
+extern uint_fast32_t vk_dwcotg_dcd_ep_get_data_size(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep);
 
-extern vsf_err_t vk_dwcotg_usbd_ep_transaction_read_buffer(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
-extern vsf_err_t vk_dwcotg_usbd_ep_transaction_enable_out(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep);
-extern vsf_err_t vk_dwcotg_usbd_ep_transaction_set_data_size(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint_fast16_t size);
-extern vsf_err_t vk_dwcotg_usbd_ep_transaction_write_buffer(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vk_dwcotg_dcd_ep_transaction_read_buffer(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
+extern vsf_err_t vk_dwcotg_dcd_ep_transaction_enable_out(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep);
+extern vsf_err_t vk_dwcotg_dcd_ep_transaction_set_data_size(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint_fast16_t size);
+extern vsf_err_t vk_dwcotg_dcd_ep_transaction_write_buffer(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
-extern vsf_err_t vk_dwcotg_usbd_ep_transfer_recv(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size);
-extern vsf_err_t vk_dwcotg_usbd_ep_transfer_send(vk_dwcotg_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
+extern vsf_err_t vk_dwcotg_dcd_ep_transfer_recv(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size);
+extern vsf_err_t vk_dwcotg_dcd_ep_transfer_send(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
 
-extern void vk_dwcotg_usbd_irq(vk_dwcotg_dcd_t *usbd);
+extern void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd);
 
 #ifdef __cplusplus
 }

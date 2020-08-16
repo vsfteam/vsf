@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<flash_device>
+  <exe>FlashMT071.out</exe>
+  <page>4</page>
+  <block>240 0x200</block>
+  <flash_base>0x00000000</flash_base>
+  <macro>FlashMT071.mac</macro>
+</flash_device>

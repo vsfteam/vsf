@@ -22,7 +22,7 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
 #include "../../vsfip.h"
 #include "./vsfip_dhcp_common.h"
@@ -39,7 +39,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfip_dhcpd_t {
+typedef struct vsfip_dhcpd_t {
     vsfip_netif_t *netif;
 
     // private
@@ -48,8 +48,7 @@ struct vsfip_dhcpd_t {
     vsfip_ipmac_assoc assoc[VSFIP_CFG_DHCPD_ASSOCNUM];
     uint32_t optlen;
     uint32_t alloc_idx;
-};
-typedef struct vsfip_dhcpd_t vsfip_dhcpd_t;
+} vsfip_dhcpd_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -27,10 +27,7 @@
 
 #if     defined(__VSF_DISP_VGA_M480_CLASS_IMPLEMENT)
 #   undef __VSF_DISP_VGA_M480_CLASS_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(__VSF_DISP_VGA_M480_CLASS_INHERIT)
-#   undef __VSF_DISP_VGA_M480_CLASS_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -43,10 +40,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_disp_vga_m480_t)
+dcl_simple_class(vk_disp_vga_m480_t)
 
 def_simple_class(vk_disp_vga_m480_t) {
-    implement(vk_disp_t)
+    public_member(
+        implement(vk_disp_t)
+    )
 
     private_member(
         vsf_eda_t       eda;

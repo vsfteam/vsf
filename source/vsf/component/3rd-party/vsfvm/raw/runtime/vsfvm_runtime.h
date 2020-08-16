@@ -27,10 +27,10 @@
 #include "kernel/vsf_kernel.h"
 #include "../common/vsfvm_common.h"
 
-#if     defined(VSFVM_RUNTIME_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSFVM_RUNTIME_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSFVM_RUNTIME_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSFVM_RUNTIME_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -39,22 +39,21 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsfvm_runtime_t)
-declare_simple_class(vsfvm_runtime_script_t)
-declare_simple_class(vsfvm_thread_t)
-declare_simple_class(vsfvm_runtime_callback_t)
+dcl_simple_class(vsfvm_runtime_t)
+dcl_simple_class(vsfvm_runtime_script_t)
+dcl_simple_class(vsfvm_thread_t)
+dcl_simple_class(vsfvm_runtime_callback_t)
 
-enum vsfvm_var_type_t {
+typedef enum vsfvm_var_type_t {
     VSFVM_VAR_TYPE_VALUE = 0,
     VSFVM_VAR_TYPE_RESOURCES,
     VSFVM_VAR_TYPE_REFERENCE,
     VSFVM_VAR_TYPE_FUNCTION,
     VSFVM_VAR_TYPE_INSTANCE,
     VSFVM_VAR_TYPE_USER,
-};
-typedef enum vsfvm_var_type_t vsfvm_var_type_t;
+} vsfvm_var_type_t;
 
-struct vsfvm_var_t {
+typedef struct vsfvm_var_t {
     union {
         intptr_t value;
         int32_t ival;
@@ -70,10 +69,9 @@ struct vsfvm_var_t {
         vsfvm_instance_t *inst;
     };
     vsfvm_var_type_t type;
-};
-typedef struct vsfvm_var_t vsfvm_var_t;
+} vsfvm_var_t;
 
-enum vsfvm_ret_t {
+typedef enum vsfvm_ret_t {
     VSFVM_RET_INVALID_PARAM = -4,
     VSFVM_RET_STACK_FAIL = -3,
     VSFVM_RET_DIV0 = -2,
@@ -81,21 +79,19 @@ enum vsfvm_ret_t {
     VSFVM_RET_FINISHED = 0,
     VSFVM_RET_PEND,
     VSFVM_RET_GOON,
-};
-typedef enum vsfvm_ret_t vsfvm_ret_t;
+} vsfvm_ret_t;
 
 #ifdef VSFVM_CFG_RUNTIME_STACK_SIZE
-struct vsfvm_stack_t {
+typedef struct vsfvm_stack_t {
     vsfvm_var_t var[VSFVM_CFG_RUNTIME_STACK_SIZE];
     uint32_t sp;
     uint32_t size;
-};
-typedef struct vsfvm_stack_t vsfvm_stack_t;
+} vsfvm_stack_t;
 #else
 #define vsfvm_stack_t        vsf_dynstack_t
 #endif
 
-struct vsfvm_runtime_func_ctx_t {
+typedef struct vsfvm_runtime_func_ctx_t {
     uint8_t argc;
 
     VSFVM_CODE_FUNCTION_ID_t type;
@@ -107,8 +103,7 @@ struct vsfvm_runtime_func_ctx_t {
     uint32_t arg_reg;
     uint32_t auto_reg;
     uint32_t expression_sp;
-};
-typedef struct vsfvm_runtime_func_ctx_t vsfvm_runtime_func_ctx_t;
+} vsfvm_runtime_func_ctx_t;
 
 def_simple_class(vsfvm_thread_t) {
     which (
@@ -134,14 +129,13 @@ def_simple_class(vsfvm_thread_t) {
     )
 };
 
-enum vsfvm_runtime_state_t {
+typedef enum vsfvm_runtime_state_t {
     VSFVM_SCRIPTSTAT_UNKNOWN,
     VSFVM_SCRIPTSTAT_RUNNING,
     VSFVM_SCRIPTSTAT_ERROR,
     VSFVM_SCRIPTSTAT_FINING,
     VSFVM_SCRIPTSTAT_FINIED,
-};
-typedef enum vsfvm_runtime_state_t vsfvm_runtime_state_t;
+} vsfvm_runtime_state_t;
 
 def_simple_class(vsfvm_runtime_script_t) {
 
@@ -195,7 +189,7 @@ extern void vsfvm_thread_ready(vsfvm_thread_t *thread);
 extern int vsfvm_runtime_script_init(vsfvm_runtime_t *runtime, vsfvm_runtime_script_t *script);
 extern int vsfvm_runtime_script_fini(vsfvm_runtime_t *runtime, vsfvm_runtime_script_t *script);
 
-#if defined(VSFVM_RUNTIME_INHERIT) || defined(VSFVM_RUNTIME_IMPLEMENT)
+#if defined(__VSFVM_RUNTIME_CLASS_INHERIT__) || defined(__VSFVM_RUNTIME_CLASS_IMPLEMENT)
 extern vsfvm_var_t * vsfvm_get_func_argu(vsfvm_thread_t *thread, uint_fast8_t idx);
 extern vsfvm_var_t * vsfvm_get_func_argu_ref(vsfvm_thread_t *thread, uint_fast8_t idx);
 extern vsfvm_var_t * vsfvm_thread_stack_get(vsfvm_thread_t *thread, uint_fast32_t offset);
@@ -223,8 +217,8 @@ extern bool vsfvm_runtime_register_callback(vsfvm_runtime_callback_t *callback, 
 extern vsfvm_thread_t * vsfvm_runtime_call_callback(vsfvm_runtime_callback_t *callback, uint_fast8_t argc, vsfvm_var_t *argv);
 #endif
 
-#undef VSFVM_RUNTIME_IMPLEMENT
-#undef VSFVM_RUNTIME_INHERIT
+#undef __VSFVM_RUNTIME_CLASS_IMPLEMENT
+#undef __VSFVM_RUNTIME_CLASS_INHERIT__
 
 #endif      // VSFVM_CFG_RUNTIME_EN
 #endif      // __VSFVM_RUNTIME_H__

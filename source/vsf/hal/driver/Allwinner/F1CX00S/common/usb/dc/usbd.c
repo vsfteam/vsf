@@ -18,6 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 //#include "../../common.h"
+#include "../usb.h"
 #include "./usbd.h"
 
 #if VSF_USE_USB_DEVICE == ENABLED

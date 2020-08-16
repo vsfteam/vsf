@@ -261,7 +261,7 @@ static vsf_tgui_region_t s_tRefreshRegion = {
 
 implement_vsf_pt(tgui_demo_t)
 {
-    stopwatch_t *ptBase = (stopwatch_t*)container_of(ptThis, stopwatch_t, tTask.param);
+    stopwatch_t *ptBase = (stopwatch_t*)container_of(this_ptr, stopwatch_t, tTask.param);
     vsf_pt_begin();
 
     //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.ptGUI, NULL, &s_tRefreshRegion);

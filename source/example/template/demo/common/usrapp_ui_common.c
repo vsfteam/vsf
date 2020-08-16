@@ -26,6 +26,16 @@
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_DISP_SDL2 == ENABLED
+#   ifndef APP_DISP_SDL2_TITLE
+#       define APP_DISP_SDL2_TITLE              "title"
+#   endif
+#   ifndef APP_DISP_SDL2_AMPLIFIER
+#       define APP_DISP_SDL2_AMPLIFIER          1
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -71,6 +81,7 @@ usrapp_ui_common_t usrapp_ui_common = {
             .drv                = &vk_disp_drv_sdl2,
             .color              = APP_DISP_SDL2_COLOR,
         },
+        .title                  = APP_DISP_SDL2_TITLE,
         .amplifier              = APP_DISP_SDL2_AMPLIFIER,
     },
 #elif VSF_USE_DISP_FB == ENABLED

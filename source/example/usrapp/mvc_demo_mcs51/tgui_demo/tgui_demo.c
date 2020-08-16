@@ -73,12 +73,12 @@ vsf_err_t tgui_demo_init(void)
     
     const vsf_tgui_cfg_t cfg = {
         .tEVTQueue = {
-            .pObj = __evt_queue_buffer, 
-            .nSize = sizeof(__evt_queue_buffer)
+            .obj_ptr = __evt_queue_buffer, 
+            .s32_size = sizeof(__evt_queue_buffer)
         },
         .tBFSQueue = {
-            .pObj = __bfs_buffer,
-            .nSize = sizeof(__bfs_buffer),
+            .obj_ptr = __bfs_buffer,
+            .s32_size = sizeof(__bfs_buffer),
         },
         .ptRootNode = (vsf_tgui_control_t *)&s_tMyStopwatch,
     };

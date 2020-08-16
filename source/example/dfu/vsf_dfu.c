@@ -211,7 +211,7 @@ static const char * __usbd_dev_debug_info[] = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
+vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
     VSF_USBD_DRV_PREPARE(dev);
 #if VSF_DFU_CFG_DEBUG_EN == ENABLED
@@ -335,8 +335,8 @@ void vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
                 break;
             }
 
-            dev->ctrl_handler.trans.pchBuffer = buffer;
-            dev->ctrl_handler.trans.nSize = size;
+            dev->ctrl_handler.trans.buffer_ptr = buffer;
+            dev->ctrl_handler.trans.s32_size = size;
         }
         break;
     case USB_ON_STATUS: {
@@ -392,6 +392,7 @@ void vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
         }
         break;
     }
+    return VSF_ERR_NONE;
 }
 
 void vsf_dfu_start(void)

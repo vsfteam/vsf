@@ -25,13 +25,13 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_NSPRO == ENABLED
 
 #include "component/usb/common/class/HID/vsf_usb_nspro.h"
-#if VSF_USE_INPUT_NSPRO == ENABLED
-#   include "component/input/driver/nspro/vsf_input_nspro.h"
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#   include "component/input/vsf_input.h"
 #endif
 
-#if     defined(VSF_USBH_NSPRO_IMPLEMENT)
-#   undef VSF_USBH_NSPRO_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
+#if     defined(__VSF_USBH_NSPRO_CLASS_IMPLEMENT)
+#   undef __VSF_USBH_NSPRO_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -48,21 +48,30 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbh_nspro_t)
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+enum {
+    VSF_INPUT_TYPE_NSPRO = VSF_INPUT_USER_TYPE,
+};
 
-enum vk_usbh_nspro_state_t {
+typedef struct vk_input_nspro_t {
+    vsf_usb_nspro_gamepad_in_report_t data;
+    vk_input_timestamp_t timestamp;
+} vk_input_nspro_t;
+#endif
+
+dcl_simple_class(vk_usbh_nspro_t)
+
+typedef enum vk_usbh_nspro_state_t {
     VSF_USBH_NSPRO_GET_INFO,
     VSF_USBH_NSPRO_HANDSHAKE,
     VSF_USBH_NSPRO_RUNNING,
-};
-typedef enum vk_usbh_nspro_state_t vk_usbh_nspro_state_t;
+} vk_usbh_nspro_state_t;
 
-enum vk_usbh_nspro_type_t {
+typedef enum vk_usbh_nspro_type_t {
     NSPRO_LEFT      = 0x01,
     NSPRO_RIGHT     = 0x02,
     NSPRO_BOTH      = 0x03,
-};
-typedef enum vk_usbh_nspro_type_t vk_usbh_nspro_type_t;
+} vk_usbh_nspro_type_t;
 
 def_simple_class(vk_usbh_nspro_t) {
     implement(vk_usbh_hid_teda_t)
@@ -81,9 +90,20 @@ def_simple_class(vk_usbh_nspro_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+extern const vk_input_item_info_t vk_nspro_gamepad_item_info[GAMEPAD_ID_NUM];
+extern const vk_sensor_item_info_t vk_nspro_sensor_item_info[6];
+#endif
+
 extern const vk_usbh_class_drv_t vk_usbh_nspro_drv;
 
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+extern void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data);
+extern void vk_nspro_new_dev(vk_input_nspro_t *dev);
+extern void vk_nspro_free_dev(vk_input_nspro_t *dev);
+#endif
 
 #ifdef __cplusplus
 }

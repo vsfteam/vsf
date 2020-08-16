@@ -22,12 +22,11 @@
 #if VSF_USE_FS == ENABLED
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
+#   define __VSFSTREAM_CLASS_INHERIT__
 #endif
-#define VSF_FS_IMPLEMENT
-#define VSF_EDA_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_FS_CLASS_IMPLEMENT
+#define __VSF_EDA_CLASS_INHERIT__
+#include "./vsf_fs.h"
 
 /*============================ MACROS ========================================*/
 
@@ -44,13 +43,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct __vk_fs_t {
+typedef struct __vk_fs_t {
     struct {
         vsf_crit_t lock;
     } open;
     vk_vfs_file_t rootfs;
-};
-typedef struct __vk_fs_t __vk_fs_t;
+} __vk_fs_t;
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 enum {

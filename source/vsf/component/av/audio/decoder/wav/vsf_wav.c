@@ -22,12 +22,12 @@
 #if VSF_USE_AUDIO == ENABLED && VSF_USE_DECODER_WAV == ENABLED
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define VSFSTREAM_CLASS_INHERIT
+#   define __VSFSTREAM_CLASS_INHERIT__
 #endif
-#define VSF_WAV_IMPLEMENT
-#define VSF_EDA_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_WAV_CLASS_IMPLEMENT
+#define __VSF_EDA_CLASS_INHERIT__
+#include "kernel/vsf_kernel.h"
+#include "./vsf_wav.h"
 
 /*============================ MACROS ========================================*/
 
@@ -46,14 +46,13 @@ enum {
     VSF_EVT_PARSE_DONE = VSF_EVT_USER + 0,
 };
 
-struct vk_wav_riff_t {
+typedef struct vk_wav_riff_t {
     char        chunk_id[4];    // "RIFF"
     uint32_t    size;           // all size except chunk_id and size(file_size - 8)
     char        format[4];      // "WAVE"
-} PACKED;
-typedef struct vk_wav_riff_t vk_wav_riff_t;
+} PACKED vk_wav_riff_t;
 
-struct vk_wav_format_t {
+typedef struct vk_wav_format_t {
     char        sub_chunk_id[4];// "fmt "
     uint32_t    sub_chunk_size; // 16 for PCM
     uint16_t    format;         // 1: PCM
@@ -62,14 +61,12 @@ struct vk_wav_format_t {
     uint32_t    byte_rate;
     uint16_t    block_align;
     uint16_t    bit_width;
-} PACKED;
-typedef struct vk_wav_format_t vk_wav_format_t;
+} PACKED vk_wav_format_t;
 
-struct vk_wav_data_t {
+typedef struct vk_wav_data_t {
     char        sub_chunk_id[4];// "data"
     uint32_t    sub_chunk_size;
-};
-typedef struct vk_wav_data_t vk_wav_data_t;
+} PACKED vk_wav_data_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

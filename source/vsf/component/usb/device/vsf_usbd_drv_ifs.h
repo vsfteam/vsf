@@ -1,12 +1,36 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
 #ifndef __VSF_USBD_DRV_IFS_H__
 #define __VSF_USBD_DRV_IFS_H__
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal.h"
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if defined(VSF_USBD_CFG_DRV_LV0_OO)
 // oo-style lv0 API used as usbd driver
 #   undef VSF_USBD_DRV_PREPARE
 #   define VSF_USBD_DRV_PREPARE(__dev)
 
-#   define vk_usbd_drv_func_name(__header, __func) TPASTE3(__header, _, __func)
+#   define vk_usbd_drv_func_name(__header, __func) __CONNECT3(__header, _, __func)
 
 // lv0 API used as usbd driver
 #   define vk_usbd_drv_init(__cfg)                                              \
@@ -134,5 +158,10 @@
                 __drv->Ep.Transfer.Recv((__ep), (__buf), (__size))
 
 #endif
+
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
+
 
 #endif      // __VSF_USBD_DRV_IFS_H__

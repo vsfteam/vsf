@@ -21,11 +21,13 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_VGA_M480 == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_VGA_M480_CLASS_IMPLEMENT
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "kernel/vsf_kernel.h"
+#include "../../../vsf_disp.h"
+#include "./vsf_disp_vga_m480.h"
 
 /* VGA implementation by M480 PDMA
 
@@ -251,7 +253,7 @@ static void __vk_disp_vga_m480_hw_init(void)
     TIMER1->CMP         = __vga_m480.param.h.pulse_bporch;
     TIMER1->TRGCTL      = (0 << TIMER_TRGCTL_TRGSSEL_Pos) | TIMER_TRGCTL_TRGPDMA_Msk;
 
-    CLK->AHBCLK         |= CLK_AHBCLK_PDMACKEN_Msk;
+    CLK->SyncCLK         |= CLK_SyncCLK_PDMACKEN_Msk;
     PDMA->SCATBA        = (uint32_t)&__vga_m480 & 0xFFFF0000;
     PDMA->INTEN         |= (1 << 13);
     NVIC_SetPriority(PDMA_IRQn, vsf_arch_prio_highest);

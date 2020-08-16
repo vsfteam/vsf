@@ -20,8 +20,10 @@
 #include "../../vsf_input_cfg.h"
 
 #if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "service/vsf_service.h"
+#include "hal/vsf_hal.h"
+#include "./vsf_input_hid.h"
 
 /*============================ MACROS ========================================*/
 
@@ -58,7 +60,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct hid_desc_t {
+typedef struct vk_hid_desc_t {
     int16_t report_id;
     uint16_t report_size;
     uint16_t report_count;
@@ -78,8 +80,7 @@ struct hid_desc_t {
     int32_t physical_max;
 
     uint8_t usages[32];
-};
-typedef struct hid_desc_t hid_desc_t;
+} vk_hid_desc_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -141,22 +142,22 @@ void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt)
         uint_fast8_t usage_id = hid_get_usage_id(hid_evt);
         uint_fast32_t value = hid_evt->cur.valu32 & ((1 << hid_evt->usage->bit_length) - 1);
 
-        static uint_fast16_t x, y, height, width;
-        static uint_fast8_t mask = 0;
-        static uint_fast16_t pressure = 0;
-        static bool is_down;
-        static void *dev = NULL;
-        static uint_fast8_t id = 0;
+        static uint_fast16_t __x, __y, __height, __width;
+        static uint_fast8_t __mask = 0;
+        static uint_fast16_t __pressure = 0;
+        static bool __is_down;
+        static void *__dev = NULL;
+        static uint_fast8_t __id = 0;
 
-        if (dev != NULL) {
-            if (dev != hid_evt->dev) {
+        if (__dev != NULL) {
+            if (__dev != hid_evt->dev) {
                 VSF_INPUT_ASSERT(false);
 
             reset:
-                mask = 0;
-                pressure = 0;
-                dev = NULL;
-                id = 0;
+                __mask = 0;
+                __pressure = 0;
+                __dev = NULL;
+                __id = 0;
                 return;
             }
         }
@@ -164,45 +165,45 @@ void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt)
         switch (usage_page) {
         case HID_USAGE_PAGE_GENERIC:
             if (usage_id == HID_USAGE_ID_X) {
-                mask |= 1 << 0;
-                x = value;
-                width = hid_evt->usage->logical_max;
-                dev = hid_evt->dev;
+                __mask |= 1 << 0;
+                __x = value;
+                __width = hid_evt->usage->logical_max;
+                __dev = hid_evt->dev;
             } else if (usage_id == HID_USAGE_ID_Y) {
-                mask |= 1 << 1;
-                y = value;
-                height = hid_evt->usage->logical_max;
-                dev = hid_evt->dev;
+                __mask |= 1 << 1;
+                __y = value;
+                __height = hid_evt->usage->logical_max;
+                __dev = hid_evt->dev;
             }
             break;
         case HID_USAGE_PAGE_DIGITIZERS:
             switch (usage_id) {
             case HID_USAGE_ID_TIP_SWITCH:
-                is_down = value;
-                dev = hid_evt->dev;
-                if (!is_down) {
-                    mask = 0x03;
+                __is_down = value;
+                __dev = hid_evt->dev;
+                if (!__is_down) {
+                    __mask = 0x03;
                 }
                 break;
            case HID_USAGE_ID_TIP_PRESSURE:
-                pressure = value;
-                dev = hid_evt->dev;
+                __pressure = value;
+                __dev = hid_evt->dev;
                 break;
             case HID_USAGE_ID_TIP_ID:
-                id = value;
-                dev = hid_evt->dev;
+                __id = value;
+                __dev = hid_evt->dev;
                 break;
             }
             break;
         }
 
-        if (0x03 == (mask & 0x03)) {
+        if (0x03 == (__mask & 0x03)) {
             vk_touchscreen_evt_t ts_evt = {
-                .info.height = height,
-                .info.width = width,
+                .info.height = __height,
+                .info.width = __width,
             };
 
-            vsf_input_touchscreen_set(&ts_evt, id, is_down, pressure, x, y);
+            vsf_input_touchscreen_set(&ts_evt, __id, __is_down, __pressure, __x, __y);
             vsf_input_on_touchscreen(&ts_evt);
 
             goto reset;
@@ -210,7 +211,7 @@ void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt)
     }
 }
 
-static vk_hid_report_t * vk_hid_get_report(vk_input_hid_t *dev, hid_desc_t *desc, uint_fast8_t type)
+static vk_hid_report_t * __vk_hid_get_report(vk_input_hid_t *dev, vk_hid_desc_t *desc, uint_fast8_t type)
 {
     vk_hid_report_t *report = NULL;
 
@@ -233,8 +234,8 @@ static vk_hid_report_t * vk_hid_get_report(vk_input_hid_t *dev, hid_desc_t *desc
     return report;
 }
 
-static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
-        hid_desc_t *desc, uint_fast8_t tag, uint_fast32_t size, uint8_t *buf)
+static vsf_err_t __vk_hid_parse_item(vk_input_hid_t *dev,
+        vk_hid_desc_t *desc, uint_fast8_t tag, uint_fast32_t size, uint8_t *buf)
 {
     vk_hid_report_t *report;
     vk_hid_usage_t *usage;
@@ -250,7 +251,7 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
 
     switch (tag) {
         case HID_ITEM_INPUT:
-            report = vk_hid_get_report(dev, desc, HID_ITEM_INPUT);
+            report = __vk_hid_get_report(dev, desc, HID_ITEM_INPUT);
             if (!report) { return VSF_ERR_FAIL; }
 
             if ((desc->usage_min != -1) && (desc->usage_max != -1)) {
@@ -308,7 +309,7 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
             break;
 
         case HID_ITEM_OUTPUT:
-            report = vk_hid_get_report(dev, desc, HID_ITEM_OUTPUT);
+            report = __vk_hid_get_report(dev, desc, HID_ITEM_OUTPUT);
             if (!report) { return VSF_ERR_FAIL; }
 
             if ((desc->usage_min != -1) && (desc->usage_max != -1)) {
@@ -367,7 +368,7 @@ static vsf_err_t vk_hid_parse_item(vk_input_hid_t *dev,
             break;
 
         case HID_ITEM_FEATURE:
-            report = vk_hid_get_report(dev, desc, HID_ITEM_FEATURE);
+            report = __vk_hid_get_report(dev, desc, HID_ITEM_FEATURE);
             if (!report) { return VSF_ERR_FAIL; }
             break;
 
@@ -492,7 +493,7 @@ void vk_hid_free_dev(vk_input_hid_t *dev)
     vsf_slist_init(&dev->report_list);
 }
 
-static uint_fast32_t vk_hid_get_max_input_size(vk_input_hid_t *dev)
+static uint_fast32_t __vk_hid_get_max_input_size(vk_input_hid_t *dev)
 {
     uint_fast32_t maxsize = 0;
 
@@ -506,7 +507,7 @@ static uint_fast32_t vk_hid_get_max_input_size(vk_input_hid_t *dev)
 
 uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t len)
 {
-    hid_desc_t *desc = vsf_heap_malloc(sizeof(hid_desc_t));
+    vk_hid_desc_t *desc = vsf_heap_malloc(sizeof(vk_hid_desc_t));
     uint8_t *end = desc_buf + len;
     int item_size;
     vsf_err_t err;
@@ -523,7 +524,7 @@ uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fas
             item_size = *(desc_buf + 1);
         } else {
             item_size = HID_ITEM_SIZE(*desc_buf);
-            err = vk_hid_parse_item(dev, desc, HID_ITEM_TAG(*desc_buf), item_size, desc_buf + 1);
+            err = __vk_hid_parse_item(dev, desc, HID_ITEM_TAG(*desc_buf), item_size, desc_buf + 1);
             if (err) { break; }
         }
         desc_buf += (item_size + 1);
@@ -533,7 +534,7 @@ uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fas
         goto free_hid_report;
     }
     vsf_heap_free(desc);
-    return vk_hid_get_max_input_size(dev);
+    return __vk_hid_get_max_input_size(dev);
 
 free_hid_report:
     vsf_heap_free(desc);

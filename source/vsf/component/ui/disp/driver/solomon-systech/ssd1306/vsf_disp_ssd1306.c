@@ -21,11 +21,13 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_SSD1306 == ENABLED
 
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_SSD1306_CLASS_IMPLEMENT
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "kernel/vsf_kernel.h"
+#include "../../../vsf_disp.h"
+#include "./vsf_disp_ssd1306.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

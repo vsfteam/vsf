@@ -21,11 +21,11 @@
 
 #if VSF_USE_MAL == ENABLED && VSF_USE_MEM_MAL == ENABLED
 
-#define VSF_MAL_INHERIT
-#define VSF_MEM_MAL_IMPLEMENT
+#define __VSF_MAL_CLASS_INHERIT__
+#define __VSF_MEM_MAL_CLASS_IMPLEMENT
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_mal.h"
+#include "./vsf_mem_mal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -62,8 +62,8 @@ static uint_fast32_t __vk_mem_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_
 static bool __vk_mem_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
     vk_mem_mal_t *pthis = (vk_mem_mal_t *)mal;
-    mem->pchBuffer = &pthis->mem.pchBuffer[addr];
-    mem->nSize = size;
+    mem->buffer_ptr = &pthis->mem.buffer_ptr[addr];
+    mem->s32_size = size;
     return true;
 }
 
@@ -95,10 +95,10 @@ __vsf_component_peda_ifs_entry(__vk_mem_mal_read, vk_mal_read)
     VSF_MAL_ASSERT(pthis != NULL);
     addr = vsf_local.addr;
     size = vsf_local.size;
-    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.nSize));
+    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.s32_size));
 
-    if (vsf_local.buff != &pthis->mem.pchBuffer[addr]) {
-        memcpy(vsf_local.buff, &pthis->mem.pchBuffer[addr], size);
+    if (vsf_local.buff != &pthis->mem.buffer_ptr[addr]) {
+        memcpy(vsf_local.buff, &pthis->mem.buffer_ptr[addr], size);
     }
     vsf_eda_return(size);
     vsf_peda_end();
@@ -114,10 +114,10 @@ __vsf_component_peda_ifs_entry(__vk_mem_mal_write, vk_mal_write)
     VSF_MAL_ASSERT(pthis != NULL);
     addr = vsf_local.addr;
     size = vsf_local.size;
-    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.nSize));
+    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.s32_size));
 
-    if (vsf_local.buff != &pthis->mem.pchBuffer[addr]) {
-        memcpy(&pthis->mem.pchBuffer[addr], vsf_local.buff, size);
+    if (vsf_local.buff != &pthis->mem.buffer_ptr[addr]) {
+        memcpy(&pthis->mem.buffer_ptr[addr], vsf_local.buff, size);
     }
     vsf_eda_return(size);
     vsf_peda_end();

@@ -26,10 +26,10 @@
 
 #include "kernel/vsf_kernel.h"
 
-#if     defined(VSF_SCSI_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_SCSI_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_SCSI_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_SCSI_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -42,10 +42,10 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_scsi_t)
-declare_simple_class(vk_scsi_drv_t)
+dcl_simple_class(vk_scsi_t)
+dcl_simple_class(vk_scsi_drv_t)
 
-enum scsi_sensekey_t {
+typedef enum scsi_sensekey_t {
     SCSI_SENSEKEY_NO_SENSE                      = 0,
     SCSI_SENSEKEY_RECOVERED_ERROR               = 1,
     SCSI_SENSEKEY_NOT_READY                     = 2,
@@ -60,10 +60,9 @@ enum scsi_sensekey_t {
     SCSI_SENSEKEY_ABORTED_COMMAND               = 11,
     SCSI_SENSEKEY_VOLUME_OVERFLOW               = 13,
     SCSI_SENSEKEY_MISCOMPARE                    = 14,
-};
-typedef enum scsi_sensekey_t scsi_sensekey_t;
+} scsi_sensekey_t;
 
-enum scsi_asc_t {
+typedef enum scsi_asc_t {
     SCSI_ASC_NONE                               = 0x00,
     SCSI_ASC_PARAMETER_LIST_LENGTH_ERROR        = 0x1A,
     SCSI_ASC_INVALID_COMMAND                    = 0x20,
@@ -72,19 +71,17 @@ enum scsi_asc_t {
     SCSI_ASC_MEDIUM_HAVE_CHANGED                = 0x28,
     SCSI_ASC_ADDRESS_OUT_OF_RANGE               = 0x21,
     SCSI_ASC_MEDIUM_NOT_PRESENT                 = 0x3A,
-};
-typedef enum scsi_asc_t scsi_asc_t;
+} scsi_asc_t;
 
-enum scsi_group_code_t {
+typedef enum scsi_group_code_t {
     SCSI_GROUPCODE6                             = 0x00,
     SCSI_GROUPCODE10_1                          = 0x20,
     SCSI_GROUPCODE10_2                          = 0x40,
     SCSI_GROUPCODE16                            = 0x80,
     SCSI_GROUPCODE12                            = 0xA0,
-};
-typedef enum scsi_group_code_t scsi_group_code_t;
+} scsi_group_code_t;
 
-enum scsi_cmd_code_t {
+typedef enum scsi_cmd_code_t {
     SCSI_CMDCODE_TEST_UNIT_READY                = 0x00,
     SCSI_CMDCODE_REQUEST_SENSE                  = 0x03, // SCSI_GROUPCODE6
     SCSI_CMDCODE_READ_FORMAT_CAPACITIES         = 0x03, // SCSI_GROUPCODE10_1
@@ -101,10 +98,9 @@ enum scsi_cmd_code_t {
     SCSI_CMDCODE_START_STOP_UNIT                = 0x1B,
     SCSI_CMDCODE_SEND_DIAGNOSTIC                = 0x1D,
     SCSI_CMDCODE_ALLOW_MEDIUM_REMOVAL           = 0x1E,
-};
-typedef enum scsi_cmd_code_t scsi_cmd_code_t;
+} scsi_cmd_code_t;
 
-struct scsi_inquiry_t {
+typedef struct scsi_inquiry_t {
     uint8_t type;
     uint8_t removable;
     uint8_t version;
@@ -114,8 +110,7 @@ struct scsi_inquiry_t {
     uint8_t vendor[8];
     uint8_t product[16];
     uint8_t revision[4];
-} PACKED;
-typedef struct scsi_inquiry_t scsi_inquiry_t;
+} PACKED scsi_inquiry_t;
 
 def_simple_class(vk_scsi_drv_t) {
     protected_member(
@@ -137,7 +132,7 @@ def_simple_class(vk_scsi_t) {
     )
 };
 
-#if defined(VSF_SCSI_IMPLEMENT) || defined(VSF_SCSI_INHERIT)
+#if defined(__VSF_SCSI_CLASS_IMPLEMENT) || defined(__VSF_SCSI_CLASS_INHERIT__)
 __vsf_component_peda_ifs(vk_scsi_init)
 __vsf_component_peda_ifs(vk_scsi_fini)
 __vsf_component_peda_ifs(vk_scsi_execute,
@@ -167,7 +162,7 @@ extern vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
 extern vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream);
 #endif
 
-#ifdef VSF_SCSI_INHERIT
+#ifdef __VSF_SCSI_CLASS_INHERIT__
 extern bool vk_scsi_get_rw_param(uint8_t *scsi_cmd, uint64_t *addr, uint32_t *size);
 extern uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd);
 #endif
@@ -181,8 +176,8 @@ extern uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd);
 #include "./driver/virtual_scsi/vsf_virtual_scsi.h"
 #include "./driver/mal_scsi/vsf_mal_scsi.h"
 
-#undef VSF_SCSI_IMPLEMENT
-#undef VSF_SCSI_INHERIT
+#undef __VSF_SCSI_CLASS_IMPLEMENT
+#undef __VSF_SCSI_CLASS_INHERIT__
 
 #endif      // VSF_USE_SCSI
 #endif      // __VSF_SCSI_H__

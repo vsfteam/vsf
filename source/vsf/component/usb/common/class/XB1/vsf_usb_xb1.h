@@ -18,16 +18,19 @@
 #ifndef __VSF_USB_XB1_H__
 #define __VSF_USB_XB1_H__
 
+/*============================ INCLUDES ======================================*/
+
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_usb_xb1_gamepad_in_report_t {
+typedef struct vsf_usb_xb1_gamepad_in_report_t {
     uint8_t data0;          //0x20
     uint8_t data1;          //0x00
     uint8_t number;         //0x01-0xff
@@ -54,13 +57,11 @@ struct vsf_usb_xb1_gamepad_in_report_t {
     int16_t ly;             //data12,data13
     int16_t rx;             //data14,data15
     int16_t ry;             //data16,data17
-} PACKED;
-typedef struct vsf_usb_xb1_gamepad_in_report_t vsf_usb_xb1_gamepad_in_report_t;
+} PACKED vsf_usb_xb1_gamepad_in_report_t;
 
-struct vsf_usb_xb1_gamepad_out_report_t {
+typedef struct vsf_usb_xb1_gamepad_out_report_t {
     uint8_t buffer[36];
-} PACKED;
-typedef struct vsf_usb_xb1_gamepad_out_report_t vsf_usb_xb1_gamepad_out_report_t;
+} PACKED vsf_usb_xb1_gamepad_out_report_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

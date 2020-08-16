@@ -31,11 +31,11 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define VSF_SENSOR_DEF_ITEM_INFO(__id, __subid, __bitlen)                       \
+#define VSF_SENSOR_DEF_ITEM_INFO(__ID, __SUBID, __BITLEN)                       \
             {                                                                   \
-                .id     = (__id),                                               \
-                .subid  = (__subid),                                            \
-                .bitlen = (__bitlen),                                           \
+                .id     = (__ID),                                               \
+                .subid  = (__SUBID),                                            \
+                .bitlen = (__BITLEN),                                           \
             }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -45,16 +45,15 @@ enum {
     VSF_INPUT_TYPE_SENSOR = VSF_INPUT_USER_TYPE,
 };
 
-enum vk_sensor_id_t {
+typedef enum vk_sensor_id_t {
     SENSOR_ID_ACC,
     SENSOR_ID_GYRO,
     SENSOR_ID_MAG,
 
     SENSOR_ID_USER,
-};
-typedef enum vk_sensor_id_t vk_sensor_id_t;
+} vk_sensor_id_t;
 
-enum vk_sensor_subid_t {
+typedef enum vk_sensor_subid_t {
     SENSOR_SUBID_X,
     SENSOR_SUBID_Y,
     SENSOR_SUBID_Z,
@@ -64,28 +63,24 @@ enum vk_sensor_subid_t {
     SENSOR_SUBID_ROLL,
 
     SENSOR_SUBID_USER,
-};
-typedef enum vk_sensor_subid_t vk_sensor_subid_t;
+} vk_sensor_subid_t;
 
-struct vk_sensor_item_info_t {
+typedef struct vk_sensor_item_info_t {
     vk_sensor_id_t id;
     vk_sensor_subid_t subid;
     uint8_t bitlen;
-};
-typedef struct vk_sensor_item_info_t vk_sensor_item_info_t;
+} vk_sensor_item_info_t;
 
-struct vk_sensor_desc_t {
+typedef struct vk_sensor_desc_t {
     uint8_t item_num;
     vk_sensor_item_info_t *item_info;
-};
-typedef struct vk_sensor_desc_t vk_sensor_desc_t;
+} vk_sensor_desc_t;
 
-struct vk_sensor_evt_t {
+typedef struct vk_sensor_evt_t {
     implement(vk_input_evt_t)
     vk_sensor_desc_t desc;
     void *data;
-};
-typedef struct vk_sensor_evt_t vk_sensor_evt_t;
+} vk_sensor_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

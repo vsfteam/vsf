@@ -24,8 +24,8 @@
         ||  (VSF_USE_DISP_ST7735 == ENABLED))
 
 #define __VSF_DISP_SITRONIX_CLASS_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
+#include "../../vsf_disp.h"
+#include "./vsf_disp_sitronix_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

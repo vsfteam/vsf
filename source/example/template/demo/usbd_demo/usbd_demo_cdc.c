@@ -19,14 +19,29 @@
 
 #include "vsf.h"
 
-#if     VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED       \
-    &&  (   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                 \
-        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
-            &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC)))
+#if     VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED && APP_CFG_USE_USBD_CDC_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
+
+#if !((   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                   \
+        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
+            &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC))))
+#   error configuration not supported
+#endif
+
+#ifndef APP_CFG_USBD_SPEED
+#   define APP_CFG_USBD_SPEED               USB_DC_SPEED_HIGH
+#endif
+
+// __APP_CFG_CDC_BULK_SIZE is for internal usage
+#if APP_CFG_USBD_SPEED == USB_DC_SPEED_HIGH
+#   define __APP_CFG_CDC_BULK_SIZE          512
+#else
+#   define __APP_CFG_CDC_BULK_SIZE          64
+#endif
+        
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -35,10 +50,10 @@
 describe_mem_stream(__user_usbd_cdc_stream0, 1024)
 describe_mem_stream(__user_usbd_cdc_stream1, 1024)
 
-describe_usbd(__user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_HIGH)
+describe_usbd(__user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, APP_CFG_USBD_SPEED)
     usbd_common_desc(__user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, 2 * USB_DESC_CDC_ACM_IAD_LEN, 2 * USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
-        cdc_acm_desc(__user_usbd_cdc, 0 * USB_CDC_ACM_IFS_NUM, 0, 1, 2, 2, 512, 16)
-        cdc_acm_desc(__user_usbd_cdc, 1 * USB_CDC_ACM_IFS_NUM, 1, 3, 4, 4, 512, 16)
+        cdc_acm_desc(__user_usbd_cdc, 0 * USB_CDC_ACM_IFS_NUM, 0, 1, 2, 2, __APP_CFG_CDC_BULK_SIZE, 16)
+        cdc_acm_desc(__user_usbd_cdc, 1 * USB_CDC_ACM_IFS_NUM, 1, 3, 4, 4, __APP_CFG_CDC_BULK_SIZE, 16)
     usbd_func_desc(__user_usbd_cdc)
         usbd_func_str_desc(__user_usbd_cdc, 0, u"VSF-CDC0")
         usbd_func_str_desc(__user_usbd_cdc, 1, u"VSF-CDC1")

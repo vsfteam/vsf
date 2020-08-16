@@ -34,7 +34,7 @@ implement_vsf_rng_buf(__bfs_node_fifo_t, uint16_t, NO_RNG_BUF_PROTECT)
 
 void vsf_msgt_init(vsf_msgt_t* obj_ptr, const vsf_msgt_cfg_t* cfg_ptr)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr && NULL != cfg_ptr);
     VSF_OSA_SERVICE_ASSERT(     (NULL != cfg_ptr->interface_ptr) 
                             ||  (0 != cfg_ptr->type_num));
@@ -66,7 +66,7 @@ static bool __msgt_check_status(vsf_msgt_t* obj_ptr,
 {
     vsf_msgt_method_status_t* status_fn = NULL;
     uint_fast8_t id = node_ptr->id;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     status_fn = this.NodeTypes.interface_ptr[id].Status;
 
@@ -91,7 +91,7 @@ static bool __msgt_shoot(   vsf_msgt_t* obj_ptr,
     uint_fast8_t id = node_ptr->id;
     bool result = false;
     vsf_msgt_method_shoot_t* shoot_fn = NULL;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     shoot_fn = this.NodeTypes.interface_ptr[id].Shoot;
 
@@ -107,7 +107,7 @@ const vsf_msgt_node_t * vsf_msgt_shoot_top_node(  vsf_msgt_t* obj_ptr,
                                             uintptr_t bullet_info_ptr)
 {
     const vsf_msgt_node_t* item_ptr = NULL;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
 
@@ -165,7 +165,7 @@ const vsf_msgt_node_t * vsf_msgt_shoot_node(  vsf_msgt_t* obj_ptr,
                                         uintptr_t bullet_info_ptr)
 {
     const vsf_msgt_node_t* item_ptr = NULL;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
 
@@ -230,7 +230,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *fsm_ptr,
         HANDLE_SUBCALL,
 #endif
     };
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     switch (THIS_FSM_STATE) {
         case START:
@@ -348,7 +348,7 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* obj_ptr,
         GET_PARENT,
     };
     fsm_rt_t fsm_rt = fsm_rt_on_going;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     
 
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
@@ -403,7 +403,7 @@ fsm_rt_t vsf_msgt_backward_propagate_msg(   vsf_msgt_t* obj_ptr,
 const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
                                                             vsf_msgt_t* obj_ptr)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     
     return this.BW.msg_handling.node_ptr;
@@ -417,7 +417,7 @@ SECTION(".text.vsf.osa_service.msg_tree"
 void vsf_msgt_forward_propagate_msg_pre_order_traversal_init(vsf_msgt_t* obj_ptr,
                                              bool is_support_container_post_handling)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     
     this.FWPOT.state = 0;
@@ -429,7 +429,7 @@ SECTION(".text.vsf.osa_service.msg_tree"
 void vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(vsf_msgt_t* obj_ptr, 
                                                 bool is_support_container_post_handling)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     this.FWPOT.is_support_container_post_handling = is_support_container_post_handling;
 }
@@ -455,7 +455,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
     };
 
     fsm_rt_t fsm_rt = fsm_rt_on_going;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != msg_ptr);
     
@@ -556,7 +556,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
 void vsf_msgt_forward_propagate_msg_dfs_init(vsf_msgt_t* obj_ptr)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
 
     this.FWDFS.state = 0;
@@ -581,7 +581,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* obj_ptr,
         VISIT_THE_ENTRY_NODE,
     };
     fsm_rt_t fsm_rt = fsm_rt_on_going;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != msg_ptr);
@@ -686,7 +686,7 @@ void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* obj_ptr,
                                                 uint_fast16_t buff_size,
                                                 bool is_support_container_post_handling)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != fifo_buffer_ptr);
     VSF_OSA_SERVICE_ASSERT(buff_size > 2);
@@ -703,7 +703,7 @@ SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs_setti
 void vsf_msgt_forward_propagate_msg_bfs_setting(vsf_msgt_t* obj_ptr, 
                                                 bool is_support_container_post_handling)
 {
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     this.FWBFS.is_support_container_post_handling = is_support_container_post_handling;
 }
@@ -727,7 +727,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
     };
     fsm_rt_t fsm_rt = fsm_rt_on_going;
     uint16_t hwOffset = 0;
-    class_internal(obj_ptr, ptThis, vsf_msgt_t);
+    class_internal(obj_ptr, this_ptr, vsf_msgt_t);
 
     VSF_OSA_SERVICE_ASSERT(NULL != obj_ptr);
     VSF_OSA_SERVICE_ASSERT(NULL != msg_ptr);

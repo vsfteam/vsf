@@ -27,12 +27,12 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#if     defined(VSFSTREAM_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSFSTREAM_CLASS_IMPLEMENT
-#elif   defined(VSFSTREAM_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSFSTREAM_CLASS_INHERIT
+#if     defined(__VSFSTREAM_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSFSTREAM_CLASS_IMPLEMENT
+#elif   defined(__VSFSTREAM_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSFSTREAM_CLASS_INHERIT__
 #endif   
 
 #include "utilities/ooc_class.h"
@@ -76,34 +76,35 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_stream_t)
-declare_simple_class(vsf_stream_terminal_t)
+dcl_simple_class(vsf_stream_t)
+dcl_simple_class(vsf_stream_terminal_t)
+dcl_simple_class(vsf_stream_op_t)
 
-enum vsf_stream_evt_t {
+typedef enum vsf_stream_evt_t {
     VSF_STREAM_ON_CONNECT,
     VSF_STREAM_ON_DISCONNECT,
     VSF_STREAM_ON_IN,
     VSF_STREAM_ON_RX = VSF_STREAM_ON_IN,
     VSF_STREAM_ON_OUT,
     VSF_STREAM_ON_TX = VSF_STREAM_ON_OUT,
-};
-typedef enum vsf_stream_evt_t vsf_stream_evt_t;
+} vsf_stream_evt_t;
 
-struct vsf_stream_op_t {
-    void (*init)(vsf_stream_t *stream);
-    void (*fini)(vsf_stream_t *stream);
-    // for read/write, if buffer->buffer is NULL,
-    //         then do dummy read/write of buffer->size
-    uint_fast32_t (*write)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
-    uint_fast32_t (*read)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
-    uint_fast32_t (*get_buff_length)(vsf_stream_t *stream);
-    uint_fast32_t (*get_data_length)(vsf_stream_t *stream);
-    uint_fast32_t (*get_avail_length)(vsf_stream_t *stream);
-    // get consequent buffer for read/write
-    uint_fast32_t (*get_wbuf)(vsf_stream_t *stream, uint8_t **ptr);
-    uint_fast32_t (*get_rbuf)(vsf_stream_t *stream, uint8_t **ptr);
+def_simple_class(vsf_stream_op_t) {
+    protected_member(
+        void (*init)(vsf_stream_t *stream);
+        void (*fini)(vsf_stream_t *stream);
+        // for read/write, if buffer->buffer is NULL,
+        //         then do dummy read/write of buffer->size
+        uint_fast32_t (*write)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+        uint_fast32_t (*read)(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size);
+        uint_fast32_t (*get_buff_length)(vsf_stream_t *stream);
+        uint_fast32_t (*get_data_length)(vsf_stream_t *stream);
+        uint_fast32_t (*get_avail_length)(vsf_stream_t *stream);
+        // get consequent buffer for read/write
+        uint_fast32_t (*get_wbuf)(vsf_stream_t *stream, uint8_t **ptr);
+        uint_fast32_t (*get_rbuf)(vsf_stream_t *stream, uint8_t **ptr);
+    )
 };
-typedef struct vsf_stream_op_t vsf_stream_op_t;
 
 def_simple_class(vsf_stream_terminal_t) {
 

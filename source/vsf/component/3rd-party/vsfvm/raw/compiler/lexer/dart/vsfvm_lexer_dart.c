@@ -21,9 +21,10 @@
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
 
+// for ctype.h
+#include "utilities/vsf_utilities.h"
 #include "../../vsfvm_compiler.h"
 #include "../vsfvm_lexer.h"
-#include <ctype.h>
 
 /*============================ MACROS ========================================*/
 
@@ -32,7 +33,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfvm_lexer_dart_t {
+typedef struct vsfvm_lexer_dart_t {
     bool parse_enter;
     bool isconst;
     bool type_parsed;
@@ -45,10 +46,9 @@ struct vsfvm_lexer_dart_t {
     };
     vsfvm_lexer_etoken_t pre_etoken;
     vsfvm_lexer_etoken_t etoken;
-};
-typedef struct vsfvm_lexer_dart_t vsfvm_lexer_dart_t;
+} vsfvm_lexer_dart_t;
 
-enum vsfvm_dart_token_t {
+typedef enum vsfvm_dart_token_t {
     VSFVM_DART_TOKEN_NL         = '\n',
     VSFVM_DART_TOKEN_REF        = '@',
     VSFVM_DART_TOKEN_POUND      = '#',
@@ -103,13 +103,11 @@ enum vsfvm_dart_token_t {
     VSFVM_DART_TOKEN_SYM_BREAK,
     VSFVM_DART_TOKEN_SYM_CONTINUE,
     VSFVM_DART_TOKEN_SYM_THREAD,
-};
-typedef enum vsfvm_dart_token_t vsfvm_dart_token_t;
+} vsfvm_dart_token_t;
 
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vsfvm_lexer_sym_t vsfvm_lexer_dart_keyword[] = {
+static const vsfvm_lexer_sym_t __vsfvm_lexer_dart_keyword[] = {
     VSFVM_LEXERSYM_KEYWORKD("var"),
     VSFVM_LEXERSYM_KEYWORKD("const"),
     VSFVM_LEXERSYM_KEYWORKD("alias"),
@@ -128,38 +126,58 @@ static const vsfvm_lexer_sym_t vsfvm_lexer_dart_keyword[] = {
 };
 
 /*============================ PROTOTYPES ====================================*/
+
+static vsf_err_t __vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
+    vsfvm_pt_evt_t evt, uint_fast32_t token, vsfvm_token_data_t *data);
+static int __vsfvm_dart_input(vsfvm_lexer_t *lexer);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsfvm_lexer_op_t vsfvm_lexer_op_dart = {
+    .name           = "dart",
+    .ext            = "dart",
+    .priv_size      = sizeof(vsfvm_lexer_dart_t),
+
+    .keyword.sym    = (vsfvm_lexer_sym_t *)__vsfvm_lexer_dart_keyword,
+    .keyword.num    = dimof(__vsfvm_lexer_dart_keyword),
+    .keyword.id     = 0,
+
+    .parse_token    = __vsfvm_dart_parse_token,
+    .input          = __vsfvm_dart_input,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t vsfvm_dart_on_expr(vsfvm_lexer_t *lexer,
+static vsf_err_t __vsfvm_dart_on_expr(vsfvm_lexer_t *lexer,
     uint_fast32_t token, vsfvm_token_data_t *data, bool ref)
 {
-    if (token == VSFVM_DART_TOKEN_SEMICOLON)        token = VSFVM_TOKEN_SEMICOLON;
-    else if (token == VSFVM_DART_TOKEN_DOT)         token = VSFVM_TOKEN_DOT;
-    else if (token == VSFVM_DART_TOKEN_COMMA)       token = VSFVM_TOKEN_COMMA;
-    else if (token == VSFVM_DART_TOKEN_LGROUPING)   token = VSFVM_TOKEN_LGROUPING;
-    else if (token == VSFVM_DART_TOKEN_RGROUPING)   token = VSFVM_TOKEN_RGROUPING;
-    else if (token == VSFVM_DART_TOKEN_ASSIGN)      token = VSFVM_TOKEN_ASSIGN;
-    else if (token == VSFVM_DART_TOKEN_NUM)         token = VSFVM_TOKEN_NUM;
-    else if (token == VSFVM_DART_TOKEN_ADD)         token = VSFVM_TOKEN_ADD;
-    else if (token == VSFVM_DART_TOKEN_SUB)         token = VSFVM_TOKEN_SUB;
-    else if (token == VSFVM_DART_TOKEN_MUL)         token = VSFVM_TOKEN_MUL;
-    else if (token == VSFVM_DART_TOKEN_DIV)         token = VSFVM_TOKEN_DIV;
-    else if (token == VSFVM_DART_TOKEN_AND)         token = VSFVM_TOKEN_AND;
-    else if (token == VSFVM_DART_TOKEN_OR)          token = VSFVM_TOKEN_OR;
-    else if (token == VSFVM_DART_TOKEN_XOR)         token = VSFVM_TOKEN_XOR;
-    else if (token == VSFVM_DART_TOKEN_REV)         token = VSFVM_TOKEN_REV;
-    else if (token == VSFVM_DART_TOKEN_MOD)         token = VSFVM_TOKEN_MOD;
-    else if (token == VSFVM_DART_TOKEN_NOT)         token = VSFVM_TOKEN_NOT;
-    else if (token == VSFVM_DART_TOKEN_GT)          token = VSFVM_TOKEN_GT;
-    else if (token == VSFVM_DART_TOKEN_LT)          token = VSFVM_TOKEN_LT;
-    else if (token == VSFVM_DART_TOKEN_EQ)          token = VSFVM_TOKEN_EQ;
-    else if (token == VSFVM_DART_TOKEN_NE)          token = VSFVM_TOKEN_NE;
-    else if (token == VSFVM_DART_TOKEN_GE)          token = VSFVM_TOKEN_GE;
-    else if (token == VSFVM_DART_TOKEN_LE)          token = VSFVM_TOKEN_LE;
-    else if (token == VSFVM_DART_TOKEN_LAND)        token = VSFVM_TOKEN_LAND;
-    else if (token == VSFVM_DART_TOKEN_LOR)         token = VSFVM_TOKEN_LOR;
-    else if (token == VSFVM_DART_TOKEN_SHL)         token = VSFVM_TOKEN_SHL;
-    else if (token == VSFVM_DART_TOKEN_SHR)         token = VSFVM_TOKEN_SHR;
+    if (token == VSFVM_DART_TOKEN_SEMICOLON)        { token = VSFVM_TOKEN_SEMICOLON; }
+    else if (token == VSFVM_DART_TOKEN_DOT)         { token = VSFVM_TOKEN_DOT; }
+    else if (token == VSFVM_DART_TOKEN_COMMA)       { token = VSFVM_TOKEN_COMMA; }
+    else if (token == VSFVM_DART_TOKEN_LGROUPING)   { token = VSFVM_TOKEN_LGROUPING; }
+    else if (token == VSFVM_DART_TOKEN_RGROUPING)   { token = VSFVM_TOKEN_RGROUPING; }
+    else if (token == VSFVM_DART_TOKEN_ASSIGN)      { token = VSFVM_TOKEN_ASSIGN; }
+    else if (token == VSFVM_DART_TOKEN_NUM)         { token = VSFVM_TOKEN_NUM; }
+    else if (token == VSFVM_DART_TOKEN_ADD)         { token = VSFVM_TOKEN_ADD; }
+    else if (token == VSFVM_DART_TOKEN_SUB)         { token = VSFVM_TOKEN_SUB; }
+    else if (token == VSFVM_DART_TOKEN_MUL)         { token = VSFVM_TOKEN_MUL; }
+    else if (token == VSFVM_DART_TOKEN_DIV)         { token = VSFVM_TOKEN_DIV; }
+    else if (token == VSFVM_DART_TOKEN_AND)         { token = VSFVM_TOKEN_AND; }
+    else if (token == VSFVM_DART_TOKEN_OR)          { token = VSFVM_TOKEN_OR; }
+    else if (token == VSFVM_DART_TOKEN_XOR)         { token = VSFVM_TOKEN_XOR; }
+    else if (token == VSFVM_DART_TOKEN_REV)         { token = VSFVM_TOKEN_REV; }
+    else if (token == VSFVM_DART_TOKEN_MOD)         { token = VSFVM_TOKEN_MOD; }
+    else if (token == VSFVM_DART_TOKEN_NOT)         { token = VSFVM_TOKEN_NOT; }
+    else if (token == VSFVM_DART_TOKEN_GT)          { token = VSFVM_TOKEN_GT; }
+    else if (token == VSFVM_DART_TOKEN_LT)          { token = VSFVM_TOKEN_LT; }
+    else if (token == VSFVM_DART_TOKEN_EQ)          { token = VSFVM_TOKEN_EQ; }
+    else if (token == VSFVM_DART_TOKEN_NE)          { token = VSFVM_TOKEN_NE; }
+    else if (token == VSFVM_DART_TOKEN_GE)          { token = VSFVM_TOKEN_GE; }
+    else if (token == VSFVM_DART_TOKEN_LE)          { token = VSFVM_TOKEN_LE; }
+    else if (token == VSFVM_DART_TOKEN_LAND)        { token = VSFVM_TOKEN_LAND; }
+    else if (token == VSFVM_DART_TOKEN_LOR)         { token = VSFVM_TOKEN_LOR; }
+    else if (token == VSFVM_DART_TOKEN_SHL)         { token = VSFVM_TOKEN_SHL; }
+    else if (token == VSFVM_DART_TOKEN_SHR)         { token = VSFVM_TOKEN_SHR; }
     else if (token & VSFVM_DART_TOKEN_SYM) {
         if (data->sym->type == VSFVM_LEXER_SYM_ALIAS) {
             data->sym = data->sym->sym;
@@ -190,7 +208,7 @@ static vsf_err_t vsfvm_dart_on_expr(vsfvm_lexer_t *lexer,
     return vsfvm_lexer_on_expr(lexer, token, data);
 }
 
-static bool vsfvm_dart_is_type(vsfvm_lexer_dart_t *dart,
+static bool __vsfvm_dart_is_type(vsfvm_lexer_dart_t *dart,
     uint_fast32_t token, vsfvm_token_data_t *data)
 {
     bool istype =   (token >= VSFVM_LEXER_DART_USER_SYMID)
@@ -199,7 +217,7 @@ static bool vsfvm_dart_is_type(vsfvm_lexer_dart_t *dart,
     return istype;
 }
 
-static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
+static vsf_err_t __vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
     vsfvm_pt_evt_t evt, uint_fast32_t token, vsfvm_token_data_t *data)
 {
 #define dart_next()                                                             \
@@ -268,7 +286,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
         dart_wait_var_name:
             lexer->within_cur_symtbl = true;
             dart_next();
-            if (    !dart->type_parsed && vsfvm_dart_is_type(dart, token, data)
+            if (    !dart->type_parsed && __vsfvm_dart_is_type(dart, token, data)
                 &&  (dart->pre_etoken.token >= VSFVM_DART_TOKEN_SYM_VAR)) {
                 dart_next();
             }
@@ -299,7 +317,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
             if (token == VSFVM_DART_TOKEN_ASSIGN) {
                 lexer->expr.ctx.comma_is_op = false;
                 dart_next();
-                err = vsfvm_dart_on_expr(lexer, token, data, false);
+                err = __vsfvm_dart_on_expr(lexer, token, data, false);
                 if (err < 0) {
                     goto dart_error;
                 } else if (err > 0) {
@@ -407,7 +425,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
                 }
                 dart->isref = true;
             }
-            err = vsfvm_dart_on_expr(lexer, token, data, dart->isref);
+            err = __vsfvm_dart_on_expr(lexer, token, data, dart->isref);
             if (err < 0) {
                 goto dart_error;
             } else if (err > 0) {
@@ -451,7 +469,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
                 }
                 dart->isref = true;
             }
-            err = vsfvm_dart_on_expr(lexer, token, data, dart->isref);
+            err = __vsfvm_dart_on_expr(lexer, token, data, dart->isref);
             if (err < 0) {
                 goto dart_error;
             } else if (err > 0) {
@@ -510,7 +528,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
                         if (dart->pre_etoken.token < VSFVM_LEXER_DART_USER_SYMID) {
                             goto dart_unexpected_token;
                         }
-                    } else if (vsfvm_dart_is_type(dart, token, data)) {
+                    } else if (__vsfvm_dart_is_type(dart, token, data)) {
                         if (    (dart->pre_etoken.token != VSFVM_DART_TOKEN_LGROUPING)
                             &&  (dart->pre_etoken.token != VSFVM_DART_TOKEN_COMMA)) {
                             goto dart_unexpected_token;
@@ -518,7 +536,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
                     } else if (token >= VSFVM_LEXER_DART_USER_SYMID) {
                         if (    (dart->pre_etoken.token != VSFVM_DART_TOKEN_LGROUPING)
                             &&  (dart->pre_etoken.token != VSFVM_DART_TOKEN_COMMA)
-                            &&  !vsfvm_dart_is_type(dart, dart->pre_etoken.token, &dart->pre_etoken.data)) {
+                            &&  !__vsfvm_dart_is_type(dart, dart->pre_etoken.token, &dart->pre_etoken.data)) {
                             goto dart_unexpected_token;
                         }
                         data->sym->type = VSFVM_LEXER_SYM_VARIABLE;
@@ -546,7 +564,7 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
                     }
                     dart->isref = true;
                 }
-                err = vsfvm_dart_on_expr(lexer, token, data, dart->isref);
+                err = __vsfvm_dart_on_expr(lexer, token, data, dart->isref);
                 if (err < 0) {
                     goto dart_error;
                 } else if (!err) {
@@ -580,12 +598,12 @@ static vsf_err_t vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
     return VSF_ERR_NONE;
 }
 
-static bool vsfvm_dart_is_space(int ch)
+static bool __vsfvm_dart_is_space(int ch)
 {
     return isspace(ch);
 }
 
-static int vsfvm_dart_get_escape_char(char ch)
+static int __vsfvm_dart_get_escape_char(char ch)
 {
     switch (ch) {
     case 'a':   return '\a';
@@ -604,7 +622,7 @@ static int vsfvm_dart_get_escape_char(char ch)
     return (char)0xFF;
 }
 
-static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
+static int __vsfvm_dart_input(vsfvm_lexer_t *lexer)
 {
     const char *vsfvm_dart_token_1char = ",;()[]{}?:.@";
     const char *vsfvm_dart_token_double = "+-|&<>";         // ?? not supported
@@ -708,7 +726,7 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
             if (token_next == '\\') {
                 if (token_next == '\0')         goto dart_unclosed_string;
                 else {
-                    int ch = vsfvm_dart_get_escape_char((char)token_next);
+                    int ch = __vsfvm_dart_get_escape_char((char)token_next);
                     if (ch < 0) {
                         return -VSFVM_LEXER_INVALID_ESCAPE;
                     }
@@ -731,7 +749,7 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
                 token_next = vsfvm_lexer_getchar(lexer);
                 if (token_next == token) {
                     token_next = vsfvm_lexer_peekchar(lexer);
-                    while (vsfvm_dart_is_space(token_next)) {
+                    while (__vsfvm_dart_is_space(token_next)) {
                         vsfvm_lexer_getchar(lexer);
                         token_next = vsfvm_lexer_peekchar(lexer);
                     }
@@ -747,7 +765,7 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
                     else if (token_next == '\r')    goto check_next;
                     else if (token_next == '\n')    continue;
                     else {
-                        int ch = vsfvm_dart_get_escape_char((char)token_next);
+                        int ch = __vsfvm_dart_get_escape_char((char)token_next);
                         if (ch < 0) {
                             return -VSFVM_LEXER_INVALID_ESCAPE;
                         }
@@ -815,18 +833,5 @@ static int vsfvm_dart_input(vsfvm_lexer_t *lexer)
     }
     return err;
 }
-
-const vsfvm_lexer_op_t vsfvm_lexer_op_dart = {
-    .name           = "dart",
-    .ext            = "dart",
-    .priv_size      = sizeof(vsfvm_lexer_dart_t),
-
-    .keyword.sym    = (vsfvm_lexer_sym_t *)vsfvm_lexer_dart_keyword,
-    .keyword.num    = dimof(vsfvm_lexer_dart_keyword),
-    .keyword.id     = 0,
-
-    .parse_token    = vsfvm_dart_parse_token,
-    .input          = vsfvm_dart_input,
-};
 
 #endif      // VSFVM_CFG_COMPILER_EN

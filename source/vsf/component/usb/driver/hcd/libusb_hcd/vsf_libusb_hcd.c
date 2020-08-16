@@ -20,16 +20,156 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
 
-#define VSF_USBH_IMPLEMENT_HCD
-#define VSF_USBH_IMPLEMENT_HUB
-#define VSF_EDA_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
-#include "./vsf_libusb_hcd.h"
+#define __VSF_USBH_CLASS_IMPLEMENT_HCD__
+#define __VSF_USBH_CLASS_IMPLEMENT_HUB__
+#define __VSF_EDA_CLASS_INHERIT__
 
-#include "libusb.h"
+#include "kernel/vsf_kernel.h"
+#include "component/usb/host/vsf_usbh.h"
+#include "./vsf_libusb_hcd.h"
+#include "utilities/ooc_class.h"
+
+#ifndef VSF_LIBUSB_CFG_INCLUDE
+#   include "libusb.h"
+#else
+#   include VSF_LIBUSB_CFG_INCLUDE
+#endif
+
+#include <Windows.h>
 
 /*============================ MACROS ========================================*/
+
+#ifndef LIBUSB_API_VERSION
+// seems libusb 0.1
+// implement libusb 1.0 API wrapper
+
+enum libusb_error {
+    LIBUSB_SUCCESS                      = 0,
+    LIBUSB_ERROR_IO                     = -1,
+    LIBUSB_ERROR_INVALID_PARAM          = -2,
+    LIBUSB_ERROR_ACCESS                 = -3,
+    LIBUSB_ERROR_NO_DEVICE              = -4,
+    LIBUSB_ERROR_NOT_FOUND              = -5,
+    LIBUSB_ERROR_BUSY                   = -6,
+    LIBUSB_ERROR_TIMEOUT                = -7,
+    LIBUSB_ERROR_OVERFLOW               = -8,
+    LIBUSB_ERROR_PIPE                   = -9,
+    LIBUSB_ERROR_INTERRUPTED            = -10,
+    LIBUSB_ERROR_NO_MEM                 = -11,
+    LIBUSB_ERROR_NOT_SUPPORTED          = -12,
+    LIBUSB_ERROR_OTHER                  = -99,
+};
+
+#define LIBUSB_CALL
+#define libusb_hotplug_register_callback(...)   (LIBUSB_ERROR_NOT_SUPPORTED)
+#define libusb_has_capability(...)              (false)
+
+#define libusb_close                    usb_close
+// TODO: usb_reset will make device handle invalid
+//#define libusb_reset_device             usb_reset
+#define libusb_reset_device             
+#define libusb_claim_interface          usb_claim_interface
+#define libusb_control_transfer         usb_control_msg
+
+typedef usb_dev_handle                  libusb_device_handle;
+typedef struct usb_device               libusb_device;
+typedef void *                          libusb_context;
+typedef enum {
+    LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED = 0x01U,
+    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT    = 0x02U,
+} libusb_hotplug_event;
+
+struct libusb_device_descriptor {
+    struct usb_device_descriptor;
+};
+struct libusb_config_descriptor {
+    struct usb_config_descriptor;
+};
+
+enum libusb_speed {
+    LIBUSB_SPEED_UNKNOWN,
+    LIBUSB_SPEED_LOW,
+    LIBUSB_SPEED_FULL,
+    LIBUSB_SPEED_HIGH,
+    LIBUSB_SPEED_SUPER,
+    LIBUSB_SPEED_SUPER_PLUS,
+};
+#define libusb_get_device_speed(__dev)  (LIBUSB_SPEED_UNKNOWN)
+#define libusb_get_device(__handle)     ((libusb_device *)usb_device(__handle))
+
+int LIBUSB_CALL libusb_init(libusb_context **ctx)
+{
+    usb_init();
+    usb_find_busses();
+    return LIBUSB_SUCCESS;
+}
+
+libusb_device_handle * LIBUSB_CALL libusb_open_device_with_vid_pid(
+    libusb_context *ctx, uint16_t vendor_id, uint16_t product_id)
+{
+    struct usb_bus *bus;
+    struct usb_device *dev;
+
+    usb_find_devices();
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+        for (dev = bus->devices; dev; dev = dev->next) {
+            if (    (dev->descriptor.idVendor == vendor_id)
+                &&  (dev->descriptor.idProduct == product_id)) {
+
+                return usb_open(dev);
+            }
+        }
+    }
+    return NULL;
+}
+
+int LIBUSB_CALL libusb_get_config_descriptor_by_value(libusb_device *dev,
+	uint8_t bConfigurationValue, struct libusb_config_descriptor **config)
+{
+    *config = (struct libusb_config_descriptor *)dev->config;
+    VSF_USB_ASSERT(bConfigurationValue == dev->config->bConfigurationValue);
+    return LIBUSB_SUCCESS;
+}
+
+void LIBUSB_CALL libusb_free_config_descriptor(
+	struct libusb_config_descriptor *config)
+{
+    // config is not dynamically alloced
+}
+
+int LIBUSB_CALL libusb_bulk_transfer(libusb_device_handle *dev_handle,
+	unsigned char endpoint, unsigned char *data, int length,
+	int *actual_length, unsigned int timeout)
+{
+    int result;
+    if (endpoint & 0x80) {
+        result = usb_bulk_read(dev_handle, endpoint, (char *)data, length, timeout);
+    } else {
+        result = usb_bulk_write(dev_handle, endpoint, (char *)data, length, timeout);
+    }
+    if (actual_length != NULL) {
+        *actual_length = result;
+    }
+    return LIBUSB_SUCCESS;
+}
+
+int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
+	unsigned char endpoint, unsigned char *data, int length,
+	int *actual_length, unsigned int timeout)
+{
+    int result;
+    if (endpoint & 0x80) {
+        result = usb_interrupt_read(dev_handle, endpoint, (char *)data, length, timeout);
+    } else {
+        result = usb_interrupt_write(dev_handle, endpoint, (char *)data, length, timeout);
+    }
+    if (actual_length != NULL) {
+        *actual_length = result;
+    }
+    return LIBUSB_SUCCESS;
+}
+
+#endif
 
 // TODO: remove to user configuration
 //#define VSF_LIBUSB_HCD_CFG_TRACE_URB_EN             ENABLED
@@ -48,7 +188,7 @@
 
 /*============================ TYPES =========================================*/
 
-struct vk_libusb_hcd_dev_t {
+typedef struct vk_libusb_hcd_dev_t {
     uint16_t vid, pid;
     libusb_device_handle *handle;
     vk_usbh_dev_t *dev;
@@ -74,10 +214,9 @@ struct vk_libusb_hcd_dev_t {
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
     vsf_dlist_t urb_pending_list;
-};
-typedef struct vk_libusb_hcd_dev_t vk_libusb_hcd_dev_t;
+} vk_libusb_hcd_dev_t;
 
-struct vk_libusb_hcd_t {
+typedef struct vk_libusb_hcd_t {
     libusb_context *ctx;
 
     vk_libusb_hcd_dev_t devs[VSF_LIBUSB_HCD_CFG_DEV_NUM];
@@ -91,10 +230,9 @@ struct vk_libusb_hcd_t {
     vsf_teda_t teda;
     vsf_sem_t sem;
     vsf_dlist_t urb_list;
-};
-typedef struct vk_libusb_hcd_t vk_libusb_hcd_t;
+} vk_libusb_hcd_t;
 
-struct vk_libusb_hcd_urb_t {
+typedef struct vk_libusb_hcd_urb_t {
     vsf_dlist_node_t urb_node;
     vsf_dlist_node_t urb_pending_node;
 
@@ -111,15 +249,13 @@ struct vk_libusb_hcd_urb_t {
 
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
-};
-typedef struct vk_libusb_hcd_urb_t vk_libusb_hcd_urb_t;
+} vk_libusb_hcd_urb_t;
 
-enum vk_libusb_hcd_evt_t {
+typedef enum vk_libusb_hcd_evt_t {
     VSF_EVT_LIBUSB_HCD_ATTACH           = VSF_EVT_LIBUSB_HCD_BASE + 0x100,
     VSF_EVT_LIBUSB_HCD_DETACH           = VSF_EVT_LIBUSB_HCD_BASE + 0x200,
     VSF_EVT_LIBUSB_HCD_READY            = VSF_EVT_LIBUSB_HCD_BASE + 0x300,
-};
-typedef enum vk_libusb_hcd_evt_t vk_libusb_hcd_evt_t;
+} vk_libusb_hcd_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -216,7 +352,6 @@ static void __vk_libusb_hcd_on_arrived(vk_libusb_hcd_dev_t *libusb_dev)
             libusb_dev->speed = USB_SPEED_HIGH;
             break;
         case LIBUSB_SPEED_SUPER_PLUS:
-            // not supported, use USB_SPEED_SUPER
         case LIBUSB_SPEED_SUPER:
             libusb_dev->speed = USB_SPEED_SUPER;
             break;
@@ -286,11 +421,10 @@ static int __vk_libusb_hcd_init(void)
         libusb_dev->addr = -1;
 
         __vsf_arch_irq_request_init(&libusb_dev->irq_request);
-        libusb_dev->irq_thread.name = "libusb_hcd_dev";
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
         __vk_libusb_hcd_trace_dev_irq(libusb_dev, "init");
 #endif
-        __vsf_arch_irq_init(&libusb_dev->irq_thread, __vk_libusb_hcd_dev_thread, param->priority, true);
+        __vsf_arch_irq_init(&libusb_dev->irq_thread, "libusb_hcd_dev", __vk_libusb_hcd_dev_thread, param->priority, true);
 
         if (__vk_libusb_hcd.is_hotplug_supported) {
             libusb_hotplug_register_callback(__vk_libusb_hcd.ctx,
@@ -320,9 +454,19 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
         } else {
             struct usb_ctrlrequest_t *setup = &urb->setup_packet;
 
-            return libusb_control_transfer(libusb_dev->handle, setup->bRequestType,
+            if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
+                &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
+#if 0
+                return libusb_set_configuration(libusb_dev->handle, setup->wValue);
+#else
+                // TODO; libusb_set_configuration will fail on windows paltform
+                return 0;
+#endif
+            } else {
+                return libusb_control_transfer(libusb_dev->handle, setup->bRequestType,
                         setup->bRequest, setup->wValue, setup->wIndex, urb->buffer,
                         setup->wLength, urb->timeout);
+            }
         }
     case USB_ENDPOINT_XFER_ISOC:
         // TODO: add support to iso transfer
@@ -488,7 +632,7 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
 
 static void __vk_libusb_hcd_init_thread(void *arg)
 {
-    vk_arch_irq_thread_t *irq_thread = arg;
+    vsf_arch_irq_thread_t *irq_thread = arg;
 
     __vsf_arch_irq_set_background(irq_thread);
         __vk_libusb_hcd_init();
@@ -536,7 +680,7 @@ static bool __vk_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
         __vk_libusb_hcd_trace_urb(urb, "freed");
 #endif
-        VSF_USBH_FREE(urb);
+        vsf_usbh_free(urb);
         return true;
     }
 }
@@ -727,11 +871,10 @@ static vsf_err_t __vk_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         vsf_teda_init(&__vk_libusb_hcd.teda, vsf_prio_inherit, false);
 
         __vk_libusb_hcd.init_eda = eda;
-        __vk_libusb_hcd.init_thread.name = "libusb_hcd_init";
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
         __vk_libusb_hcd_trace_hcd_irq("init");
 #endif
-        __vsf_arch_irq_init(&__vk_libusb_hcd.init_thread, __vk_libusb_hcd_init_thread, param->priority, true);
+        __vsf_arch_irq_init(&__vk_libusb_hcd.init_thread, "libusb_hcd_init", __vk_libusb_hcd_init_thread, param->priority, true);
         break;
     case VSF_EVT_LIBUSB_HCD_READY:
         return VSF_ERR_NONE;
@@ -769,7 +912,7 @@ static void __vk_libusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *d
 static vk_usbh_hcd_urb_t * __vk_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
     uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vk_libusb_hcd_urb_t);
-    vk_usbh_hcd_urb_t *urb = VSF_USBH_MALLOC(size);
+    vk_usbh_hcd_urb_t *urb = vsf_usbh_malloc(size);
 
     if (urb != NULL) {
         memset(urb, 0, size);
@@ -777,13 +920,12 @@ static vk_usbh_hcd_urb_t * __vk_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
         vk_libusb_hcd_urb_t *libusb_urb = (vk_libusb_hcd_urb_t *)urb->priv;
         vk_libusb_hcd_param_t *param = __vk_libusb_hcd.hcd->param;
         __vsf_arch_irq_request_init(&libusb_urb->irq_request);
-        libusb_urb->irq_thread.name = "libusb_hcd_urb";
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
         __vk_libusb_hcd_trace_urb_irq(urb, "init");
 #endif
         libusb_urb->is_msg_processed = true;
         libusb_urb->is_irq_enabled = true;
-        __vsf_arch_irq_init(&libusb_urb->irq_thread, __vk_libusb_hcd_urb_thread, param->priority, true);
+        __vsf_arch_irq_init(&libusb_urb->irq_thread, "libusb_hcd_urb", __vk_libusb_hcd_urb_thread, param->priority, true);
     }
     return urb;
 }

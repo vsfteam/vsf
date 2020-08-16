@@ -21,10 +21,11 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_DISP_FB == ENABLED
 
+#define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_FB_CLASS_IMPLEMENT
-#define __VSF_DISP_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "../../vsf_disp.h"
+#include "./vsf_disp_fb.h"
 
 /*============================ MACROS ========================================*/
 

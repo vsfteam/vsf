@@ -273,7 +273,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
 {
     vsf_tgui_size_t tTileSize;
     vsf_tgui_region_t tDisplay;
-    uint32_t wSize;
+    uint32_t u32_size;
     const char* pchPixelmap;
 
     VSF_TGUI_ASSERT(ptLocation != NULL);
@@ -300,9 +300,9 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
     }
 
     if (ptTile->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_32IT) {
-        wSize = 4;
+        u32_size = 4;
     } else if (ptTile->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_24IT) {
-        wSize = 3;
+        u32_size = 3;
     } else {
         VSF_TGUI_ASSERT(0);
     }
@@ -310,8 +310,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
     pchPixelmap = vsf_tgui_sdl_tile_get_pixelmap(ptTile);
 
     for (uint16_t i = 0; i < tDisplay.tSize.iHeight; i++) {
-        uint32_t wOffset = wSize * ((ptTileLocation->iY + i) * tTileSize.iWidth + ptTileLocation->iX);
-        const char* pchData = pchPixelmap + wOffset;
+        uint32_t u32_offset = u32_size * ((ptTileLocation->iY + i) * tTileSize.iWidth + ptTileLocation->iX);
+        const char* pchData = pchPixelmap + u32_offset;
 
         for (uint16_t j = 0; j < tDisplay.tSize.iWidth; j++) {
             vsf_tgui_location_t tPixelLocation = { .iX = tDisplay.tLocation.iX + j, .iY = tDisplay.tLocation.iY + i };
@@ -319,7 +319,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
             vsf_tgui_sv_color_t tSVColor;
 
             vsf_tgui_sdl_tile_get_pixel(pchData, &tSVColor, ptTile->_.tCore.Attribute.u2ColorType);
-            pchData += wSize;
+            pchData += u32_size;
             tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
             tSVColor.tColor = vsf_tgui_color_mix(tSVColor.tColor, tPixelColor, ((uint16_t)tSVColor.tColor.tChannel.chA * chTransparencyRate) / 255);
 			vk_disp_sdl_set_pixel(&tPixelLocation, tSVColor.tColor);
@@ -580,10 +580,10 @@ void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData)
 
 #ifdef TGUI_PORT_DEBAULT_BACKGROUND_COLOR
     {
-        uint32_t wOffset = 0;
+        uint32_t u32_offset = 0;
         vsf_tgui_color_t* ptColor = (vsf_tgui_color_t*)ptData;
         vsf_tgui_sv_color_t tSVColor = TGUI_PORT_DEBAULT_BACKGROUND_COLOR;
-        while (wOffset++ < VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX) {
+        while (u32_offset++ < VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX) {
             *ptColor++ = tSVColor.tColor;
         }
     }

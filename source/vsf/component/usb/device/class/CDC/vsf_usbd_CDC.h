@@ -24,11 +24,14 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDC == ENABLED
 
-#include "../../../common/class/CDC/vsf_usb_CDC.h"
+#include "component/usb/common/class/CDC/vsf_usb_CDC.h"
 
-#if     defined(VSF_USBD_CDC_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_USBD_CDC_IMPLEMENT
+#if     defined(__VSF_USBD_CDC_CLASS_IMPLEMENT)
+#   undef __VSF_USBD_CDC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_USBD_CDC_CLASS_INHERIT__)
+#   undef __VSF_USBD_CDC_CLASS_INHERIT__
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -47,7 +50,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbd_cdc_t)
+dcl_simple_class(vk_usbd_cdc_t)
 
 typedef struct vk_usbd_encapsulate_t vk_usbd_encapsulate_t;
 struct vk_usbd_encapsulate_t {

@@ -21,11 +21,9 @@
 
 #if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
 
-#define VSF_FS_INHERIT
-#define VSF_MEMFS_IMPLEMENT
-
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_FS_CLASS_INHERIT__
+#define __VSF_MEMFS_CLASS_IMPLEMENT
+#include "../../vsf_fs.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

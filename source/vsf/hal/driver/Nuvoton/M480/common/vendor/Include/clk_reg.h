@@ -98,7 +98,7 @@ typedef struct
      * |        |          |00 = HIRC stable count is 64 clocks.
      * |        |          |01 = HIRC stable count is 24 clocks.
      * |        |          |others = Reserved.
-     * @var CLK_T::AHBCLK
+     * @var CLK_T::SyncCLK
      * Offset: 0x04  AHB Devices Clock Enable Control Register
      * ---------------------------------------------------------------------------------------------------
      * |Bits    |Field     |Descriptions
@@ -975,7 +975,7 @@ typedef struct
      * |        |          |This bit is auto cleared by hardware.
      */
     __IO uint32_t PWRCTL;                /*!< [0x0000] System Power-down Control Register                               */
-    __IO uint32_t AHBCLK;                /*!< [0x0004] AHB Devices Clock Enable Control Register                        */
+    __IO uint32_t SyncCLK;                /*!< [0x0004] AHB Devices Clock Enable Control Register                        */
     __IO uint32_t APBCLK0;               /*!< [0x0008] APB Devices Clock Enable Control Register 0                      */
     __IO uint32_t APBCLK1;               /*!< [0x000c] APB Devices Clock Enable Control Register 1                      */
     __IO uint32_t CLKSEL0;               /*!< [0x0010] Clock Source Select Control Register 0                           */
@@ -1065,41 +1065,41 @@ typedef struct
 #define CLK_PWRCTL_HIRCSTBS_Pos          (16)                                              /*!< CLK_T::PWRCTL: HIRCSTBS Position       */
 #define CLK_PWRCTL_HIRCSTBS_Msk          (0x3ul << CLK_PWRCTL_HIRCSTBS_Pos)                /*!< CLK_T::PWRCTL: HIRCSTBS Mask           */
 
-#define CLK_AHBCLK_PDMACKEN_Pos          (1)                                               /*!< CLK_T::AHBCLK: PDMACKEN Position       */
-#define CLK_AHBCLK_PDMACKEN_Msk          (0x1ul << CLK_AHBCLK_PDMACKEN_Pos)                /*!< CLK_T::AHBCLK: PDMACKEN Mask           */
+#define CLK_SyncCLK_PDMACKEN_Pos          (1)                                               /*!< CLK_T::SyncCLK: PDMACKEN Position       */
+#define CLK_SyncCLK_PDMACKEN_Msk          (0x1ul << CLK_SyncCLK_PDMACKEN_Pos)                /*!< CLK_T::SyncCLK: PDMACKEN Mask           */
 
-#define CLK_AHBCLK_ISPCKEN_Pos           (2)                                               /*!< CLK_T::AHBCLK: ISPCKEN Position        */
-#define CLK_AHBCLK_ISPCKEN_Msk           (0x1ul << CLK_AHBCLK_ISPCKEN_Pos)                 /*!< CLK_T::AHBCLK: ISPCKEN Mask            */
+#define CLK_SyncCLK_ISPCKEN_Pos           (2)                                               /*!< CLK_T::SyncCLK: ISPCKEN Position        */
+#define CLK_SyncCLK_ISPCKEN_Msk           (0x1ul << CLK_SyncCLK_ISPCKEN_Pos)                 /*!< CLK_T::SyncCLK: ISPCKEN Mask            */
 
-#define CLK_AHBCLK_EBICKEN_Pos           (3)                                               /*!< CLK_T::AHBCLK: EBICKEN Position        */
-#define CLK_AHBCLK_EBICKEN_Msk           (0x1ul << CLK_AHBCLK_EBICKEN_Pos)                 /*!< CLK_T::AHBCLK: EBICKEN Mask            */
+#define CLK_SyncCLK_EBICKEN_Pos           (3)                                               /*!< CLK_T::SyncCLK: EBICKEN Position        */
+#define CLK_SyncCLK_EBICKEN_Msk           (0x1ul << CLK_SyncCLK_EBICKEN_Pos)                 /*!< CLK_T::SyncCLK: EBICKEN Mask            */
 
-#define CLK_AHBCLK_EMACCKEN_Pos          (5)                                               /*!< CLK_T::AHBCLK: EMACCKEN Position       */
-#define CLK_AHBCLK_EMACCKEN_Msk          (0x1ul << CLK_AHBCLK_EMACCKEN_Pos)                /*!< CLK_T::AHBCLK: EMACCKEN Mask           */
+#define CLK_SyncCLK_EMACCKEN_Pos          (5)                                               /*!< CLK_T::SyncCLK: EMACCKEN Position       */
+#define CLK_SyncCLK_EMACCKEN_Msk          (0x1ul << CLK_SyncCLK_EMACCKEN_Pos)                /*!< CLK_T::SyncCLK: EMACCKEN Mask           */
 
-#define CLK_AHBCLK_SDH0CKEN_Pos          (6)                                               /*!< CLK_T::AHBCLK: SDH0CKEN Position       */
-#define CLK_AHBCLK_SDH0CKEN_Msk          (0x1ul << CLK_AHBCLK_SDH0CKEN_Pos)                /*!< CLK_T::AHBCLK: SDH0CKEN Mask           */
+#define CLK_SyncCLK_SDH0CKEN_Pos          (6)                                               /*!< CLK_T::SyncCLK: SDH0CKEN Position       */
+#define CLK_SyncCLK_SDH0CKEN_Msk          (0x1ul << CLK_SyncCLK_SDH0CKEN_Pos)                /*!< CLK_T::SyncCLK: SDH0CKEN Mask           */
 
-#define CLK_AHBCLK_CRCCKEN_Pos           (7)                                               /*!< CLK_T::AHBCLK: CRCCKEN Position        */
-#define CLK_AHBCLK_CRCCKEN_Msk           (0x1ul << CLK_AHBCLK_CRCCKEN_Pos)                 /*!< CLK_T::AHBCLK: CRCCKEN Mask            */
+#define CLK_SyncCLK_CRCCKEN_Pos           (7)                                               /*!< CLK_T::SyncCLK: CRCCKEN Position        */
+#define CLK_SyncCLK_CRCCKEN_Msk           (0x1ul << CLK_SyncCLK_CRCCKEN_Pos)                 /*!< CLK_T::SyncCLK: CRCCKEN Mask            */
 
-#define CLK_AHBCLK_HSUSBDCKEN_Pos        (10)                                              /*!< CLK_T::AHBCLK: HSUSBDCKEN Position     */
-#define CLK_AHBCLK_HSUSBDCKEN_Msk        (0x1ul << CLK_AHBCLK_HSUSBDCKEN_Pos)              /*!< CLK_T::AHBCLK: HSUSBDCKEN Mask         */
+#define CLK_SyncCLK_HSUSBDCKEN_Pos        (10)                                              /*!< CLK_T::SyncCLK: HSUSBDCKEN Position     */
+#define CLK_SyncCLK_HSUSBDCKEN_Msk        (0x1ul << CLK_SyncCLK_HSUSBDCKEN_Pos)              /*!< CLK_T::SyncCLK: HSUSBDCKEN Mask         */
 
-#define CLK_AHBCLK_CRPTCKEN_Pos          (12)                                              /*!< CLK_T::AHBCLK: CRPTCKEN Position       */
-#define CLK_AHBCLK_CRPTCKEN_Msk          (0x1ul << CLK_AHBCLK_CRPTCKEN_Pos)                /*!< CLK_T::AHBCLK: CRPTCKEN Mask           */
+#define CLK_SyncCLK_CRPTCKEN_Pos          (12)                                              /*!< CLK_T::SyncCLK: CRPTCKEN Position       */
+#define CLK_SyncCLK_CRPTCKEN_Msk          (0x1ul << CLK_SyncCLK_CRPTCKEN_Pos)                /*!< CLK_T::SyncCLK: CRPTCKEN Mask           */
 
-#define CLK_AHBCLK_SPIMCKEN_Pos          (14)                                              /*!< CLK_T::AHBCLK: SPIMCKEN Position       */
-#define CLK_AHBCLK_SPIMCKEN_Msk          (0x1ul << CLK_AHBCLK_SPIMCKEN_Pos)                /*!< CLK_T::AHBCLK: SPIMCKEN Mask           */
+#define CLK_SyncCLK_SPIMCKEN_Pos          (14)                                              /*!< CLK_T::SyncCLK: SPIMCKEN Position       */
+#define CLK_SyncCLK_SPIMCKEN_Msk          (0x1ul << CLK_SyncCLK_SPIMCKEN_Pos)                /*!< CLK_T::SyncCLK: SPIMCKEN Mask           */
 
-#define CLK_AHBCLK_FMCIDLE_Pos           (15)                                              /*!< CLK_T::AHBCLK: FMCIDLE Position        */
-#define CLK_AHBCLK_FMCIDLE_Msk           (0x1ul << CLK_AHBCLK_FMCIDLE_Pos)                 /*!< CLK_T::AHBCLK: FMCIDLE Mask            */
+#define CLK_SyncCLK_FMCIDLE_Pos           (15)                                              /*!< CLK_T::SyncCLK: FMCIDLE Position        */
+#define CLK_SyncCLK_FMCIDLE_Msk           (0x1ul << CLK_SyncCLK_FMCIDLE_Pos)                 /*!< CLK_T::SyncCLK: FMCIDLE Mask            */
 
-#define CLK_AHBCLK_USBHCKEN_Pos          (16)                                              /*!< CLK_T::AHBCLK: USBHCKEN Position       */
-#define CLK_AHBCLK_USBHCKEN_Msk          (0x1ul << CLK_AHBCLK_USBHCKEN_Pos)                /*!< CLK_T::AHBCLK: USBHCKEN Mask           */
+#define CLK_SyncCLK_USBHCKEN_Pos          (16)                                              /*!< CLK_T::SyncCLK: USBHCKEN Position       */
+#define CLK_SyncCLK_USBHCKEN_Msk          (0x1ul << CLK_SyncCLK_USBHCKEN_Pos)                /*!< CLK_T::SyncCLK: USBHCKEN Mask           */
 
-#define CLK_AHBCLK_SDH1CKEN_Pos          (17)                                              /*!< CLK_T::AHBCLK: SDH1CKEN Position       */
-#define CLK_AHBCLK_SDH1CKEN_Msk          (0x1ul << CLK_AHBCLK_SDH1CKEN_Pos)                /*!< CLK_T::AHBCLK: SDH1CKEN Mask           */
+#define CLK_SyncCLK_SDH1CKEN_Pos          (17)                                              /*!< CLK_T::SyncCLK: SDH1CKEN Position       */
+#define CLK_SyncCLK_SDH1CKEN_Msk          (0x1ul << CLK_SyncCLK_SDH1CKEN_Pos)                /*!< CLK_T::SyncCLK: SDH1CKEN Mask           */
 
 #define CLK_APBCLK0_WDTCKEN_Pos          (0)                                               /*!< CLK_T::APBCLK0: WDTCKEN Position       */
 #define CLK_APBCLK0_WDTCKEN_Msk          (0x1ul << CLK_APBCLK0_WDTCKEN_Pos)                /*!< CLK_T::APBCLK0: WDTCKEN Mask           */

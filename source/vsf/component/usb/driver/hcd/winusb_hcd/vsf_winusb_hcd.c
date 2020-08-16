@@ -20,25 +20,28 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
 
-#define VSF_USBH_IMPLEMENT_HCD
-#define VSF_USBH_IMPLEMENT_HUB
-#define VSF_EDA_CLASS_INHERIT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_USBH_CLASS_IMPLEMENT_HCD__
+#define __VSF_USBH_CLASS_IMPLEMENT_HUB__
+#define __VSF_EDA_CLASS_INHERIT__
+
+#include "kernel/vsf_kernel.h"
+#include "component/usb/host/vsf_usbh.h"
 #include "./vsf_winusb_hcd.h"
 
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <winusb.h>
 
-#include <stdio.h>
-
 #pragma comment(lib, "SetupAPI.lib")
 #pragma comment(lib, "winusb.lib")
 
 /*============================ MACROS ========================================*/
 
-#define VSF_EVT_WINUSB_HCD_BASE                     ((VSF_EVT_USER + 0x100) & ~0xFF)
+#ifndef VSF_WINUSB_CFG_WIN7
+#   define VSF_WINUSB_CFG_WIN7              DISABLED
+#endif
+
+#define VSF_EVT_WINUSB_HCD_BASE             ((VSF_EVT_USER + 0x100) & ~0xFF)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -51,13 +54,16 @@
 
 /*============================ TYPES =========================================*/
 
-struct vk_winusb_hcd_dev_ep_t {
+typedef struct vk_winusb_hcd_dev_ep_t {
     int8_t ep2ifs;
+#if VSF_WINUSB_CFG_WIN7 == ENABLED
+    WINUSB_PIPE_INFORMATION pipe_info;
+#else
     WINUSB_PIPE_INFORMATION_EX pipe_info;
-};
-typedef struct vk_winusb_hcd_dev_ep_t vk_winusb_hcd_dev_ep_t;
+#endif
+} vk_winusb_hcd_dev_ep_t;
 
-struct vk_winusb_hcd_dev_t {
+typedef struct vk_winusb_hcd_dev_t {
     uint16_t vid, pid;
     HANDLE hDev;
     WINUSB_INTERFACE_HANDLE hUsbIfs[8];
@@ -87,10 +93,9 @@ struct vk_winusb_hcd_dev_t {
     vsf_dlist_t urb_pending_list;
 
     vk_winusb_hcd_dev_ep_t ep[2 * 16];
-};
-typedef struct vk_winusb_hcd_dev_t vk_winusb_hcd_dev_t;
+} vk_winusb_hcd_dev_t;
 
-struct vk_winusb_hcd_t {
+typedef struct vk_winusb_hcd_t {
     vk_winusb_hcd_dev_t devs[VSF_WINUSB_HCD_CFG_DEV_NUM];
     vk_usbh_hcd_t *hcd;
     uint32_t new_mask;
@@ -101,10 +106,9 @@ struct vk_winusb_hcd_t {
     vsf_teda_t teda;
     vsf_sem_t sem;
     vsf_dlist_t urb_list;
-};
-typedef struct vk_winusb_hcd_t vk_winusb_hcd_t;
+} vk_winusb_hcd_t;
 
-struct vk_winusb_hcd_urb_t {
+typedef struct vk_winusb_hcd_urb_t {
     vsf_dlist_node_t urb_node;
     vsf_dlist_node_t urb_pending_node;
 
@@ -121,15 +125,13 @@ struct vk_winusb_hcd_urb_t {
 
     vsf_arch_irq_thread_t irq_thread;
     vsf_arch_irq_request_t irq_request;
-};
-typedef struct vk_winusb_hcd_urb_t vk_winusb_hcd_urb_t;
+} vk_winusb_hcd_urb_t;
 
-enum vk_winusb_hcd_evt_t {
+enum {
     VSF_EVT_WINUSB_HCD_ATTACH           = VSF_EVT_WINUSB_HCD_BASE + 0x100,
     VSF_EVT_WINUSB_HCD_DETACH           = VSF_EVT_WINUSB_HCD_BASE + 0x200,
     VSF_EVT_WINUSB_HCD_READY            = VSF_EVT_WINUSB_HCD_BASE + 0x300,
 };
-typedef enum vk_winusb_hcd_evt_t vk_winusb_hcd_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -265,7 +267,11 @@ static void __vk_winusb_hcd_on_arrived(vk_winusb_hcd_dev_t *winusb_dev)
 static void __vk_winusb_hcd_assign_endpoints(vk_winusb_hcd_dev_t *winusb_dev, uint_fast8_t ifs, uint_fast8_t alt)
 {
     USB_INTERFACE_DESCRIPTOR ifs_desc;
+#if VSF_WINUSB_CFG_WIN7 == ENABLED
+    WINUSB_PIPE_INFORMATION pipe;
+#else
     WINUSB_PIPE_INFORMATION_EX pipe;
+#endif
     uint_fast8_t idx;
 
     VSF_USB_ASSERT(ifs < winusb_dev->ifs_num);
@@ -274,7 +280,11 @@ static void __vk_winusb_hcd_assign_endpoints(vk_winusb_hcd_dev_t *winusb_dev, ui
             break;
         }
         for (uint_fast8_t i = 0; i < ifs_desc.bNumEndpoints; i++) {
+#if VSF_WINUSB_CFG_WIN7 == ENABLED
+            if (!WinUsb_QueryPipe(winusb_dev->hUsbIfs[ifs], alt, i, &pipe)) {
+#else
             if (!WinUsb_QueryPipeEx(winusb_dev->hUsbIfs[ifs], alt, i, &pipe)) {
+#endif
                 break;
             }
             idx = USB_ENDPOINT_DIRECTION_IN(pipe.PipeId) ? 0x10 : 0x00;
@@ -311,6 +321,10 @@ static bool __vk_winusb_hcd_sumbit_urb_epnz(vk_usbh_hcd_urb_t *urb, WINUSB_INTER
     bool result;
 
     if (pipe.type == USB_ENDPOINT_XFER_ISOC) {
+#if VSF_WINUSB_CFG_WIN7 == ENABLED
+        // TODO: add iso support for win7
+        return false;
+#else
         VSF_USB_ASSERT(urb->iso_packet.number_of_packets > 0);
         for (int i = 0; i < urb->iso_packet.number_of_packets; i++) {
             urb->iso_packet.frame_desc[i].actual_length = 0;
@@ -342,6 +356,7 @@ static bool __vk_winusb_hcd_sumbit_urb_epnz(vk_usbh_hcd_urb_t *urb, WINUSB_INTER
             }
         }
         WinUsb_UnregisterIsochBuffer(buffer_handle);
+#endif
     } else {
         if (pipe.dir_in1out0) {
             result = WinUsb_ReadPipe(handle, 0x80 | pipe.endpoint, urb->buffer, urb->transfer_length, real_size, NULL);
@@ -386,6 +401,11 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
                     .Length         = setup->wLength,
                 };
 
+                if (USB_REQ_SET_CONFIGURATION == setup->bRequest) {
+                    // TODO: update winusbh_dev->ifs_num
+                    // workaround: set ifs_num large enough
+                    winusb_dev->ifs_num = 0xFF;
+                }
                 if (!WinUsb_ControlTransfer(winusb_dev->hUsbIfs[0], SetupPacket, urb->buffer,
                             setup->wLength, &real_size, NULL)) {
                     return -GetLastError();
@@ -548,7 +568,7 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
         __vsf_arch_irq_request_send(&winusb_urb->irq_request);
         return false;
     } else {
-        VSF_USBH_FREE(urb);
+        vsf_usbh_free(urb);
         return true;
     }
 }
@@ -756,7 +776,7 @@ static void __vk_winusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *d
 static vk_usbh_hcd_urb_t * __vk_winusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
     uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vk_winusb_hcd_urb_t);
-    vk_usbh_hcd_urb_t *urb = VSF_USBH_MALLOC(size);
+    vk_usbh_hcd_urb_t *urb = vsf_usbh_malloc(size);
 
     if (urb != NULL) {
         memset(urb, 0, size);

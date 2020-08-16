@@ -23,13 +23,11 @@
 #if VSF_USE_DECODER_WAV == ENABLED
 
 #include "kernel/vsf_kernel.h"
+#include "component/av/audio/vsf_audio.h"
 
-#if     defined(VSF_WAV_IMPLEMENT)
-#   undef VSF_WAV_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_WAV_INHERIT)
-#   undef VSF_WAV_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_WAV_CLASS_IMPLEMENT)
+#   undef __VSF_WAV_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -43,15 +41,14 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_wav_t)
+dcl_simple_class(vk_wav_t)
 
-enum vk_wav_state_t {
+typedef enum vk_wav_state_t {
     VSF_WAV_STATE_RIFF,
     VSF_WAV_STATE_FORMAT,
     VSF_WAV_STATE_DATA,
     VSF_WAV_STATE_PLAY,
-};
-typedef enum vk_wav_state_t vk_wav_state_t;
+} vk_wav_state_t;
 
 def_simple_class(vk_wav_t) {
     public_member(
@@ -65,7 +62,6 @@ def_simple_class(vk_wav_t) {
         vk_wav_state_t      state;
     )
 };
-typedef struct vk_wav_t vk_wav_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -20,7 +20,8 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#define VSFSTREAM_MEM_CLASS_IMPLEMENT
+#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSFSTREAM_MEM_CLASS_IMPLEMENT
 #include "../vsfstream.h"
 #include "./vsf_mem_stream.h"
 #include "kernel/vsf_kernel.h"
@@ -94,7 +95,7 @@ static void __vsf_mem_stream_init(vsf_stream_t *stream)
 static uint_fast32_t __vsf_mem_stream_get_buff_length(vsf_stream_t *stream)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
-    return mem_stream->nSize;
+    return mem_stream->s32_size;
 }
 
 static uint_fast32_t __vsf_mem_stream_get_data_length(vsf_stream_t *stream)
@@ -113,16 +114,16 @@ static uint_fast32_t __vsf_mem_stream_get_avail_length(vsf_stream_t *stream)
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
 
     return (mem_stream->wpos & mem_stream->align) ? 0 :
-        mem_stream->use_as__vsf_mem_t.nSize - __vsf_mem_stream_get_data_length(stream);
+        mem_stream->use_as__vsf_mem_t.s32_size - __vsf_mem_stream_get_data_length(stream);
 }
 
 static uint_fast32_t __vsf_mem_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t avail_len = __vsf_mem_stream_get_avail_length(stream);
-    uint_fast32_t wlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->wpos;
+    uint_fast32_t wlen = mem_stream->use_as__vsf_mem_t.s32_size - mem_stream->wpos;
     uint8_t *p = (avail_len > 0) ?
-            mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos : NULL;
+            mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->wpos : NULL;
 
     if (ptr != NULL) {
         *ptr = p;
@@ -135,9 +136,9 @@ static uint_fast32_t __vsf_mem_stream_get_rbuf(vsf_stream_t *stream, uint8_t **p
 {
     vsf_mem_stream_t *mem_stream = (vsf_mem_stream_t *)stream;
     uint_fast32_t data_len = __vsf_mem_stream_get_data_length(stream);
-    uint_fast32_t rlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->rpos;
+    uint_fast32_t rlen = mem_stream->use_as__vsf_mem_t.s32_size - mem_stream->rpos;
     uint8_t *p = (data_len > 0) ?
-            mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos : NULL;
+            mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->rpos : NULL;
 
     if (ptr != NULL) {
         *ptr = p;
@@ -153,23 +154,23 @@ static uint_fast32_t __vsf_mem_stream_write(vsf_stream_t *stream, uint8_t *buf, 
 
     VSF_SERVICE_ASSERT(!(mem_stream->wpos & mem_stream->align));
     mem_stream->is_writing = true;
-    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.pchBuffer[mem_stream->wpos])) {
+    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.buffer_ptr[mem_stream->wpos])) {
         uint_fast32_t totalsize = wsize;
-        uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->wpos;
+        uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.s32_size - mem_stream->wpos;
 
         curlen = min(totalsize, curlen);
-        memcpy(mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->wpos, buf, curlen);
+        memcpy(mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->wpos, buf, curlen);
         totalsize -= curlen;
         buf += curlen;
         if (totalsize > 0) {
-            memcpy(mem_stream->use_as__vsf_mem_t.pchBuffer, buf, totalsize);
+            memcpy(mem_stream->use_as__vsf_mem_t.buffer_ptr, buf, totalsize);
         }
     }
 
     vsf_protect_t orig = __vsf_mem_stream_protect();
         mem_stream->data_size += wsize;
         mem_stream->wpos += wsize;
-        mem_stream->wpos %= mem_stream->use_as__vsf_mem_t.nSize;
+        mem_stream->wpos %= mem_stream->use_as__vsf_mem_t.s32_size;
     __vsf_mem_stream_unprotect(orig);
     mem_stream->is_writing = false;
     return wsize;
@@ -185,16 +186,16 @@ static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, u
     if (size < data_len) {
         rsize &= ~mem_stream->align;
     }
-    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.pchBuffer[mem_stream->rpos])) {
+    if ((buf != NULL) && (buf != &mem_stream->use_as__vsf_mem_t.buffer_ptr[mem_stream->rpos])) {
         uint_fast32_t totalsize = rsize;
-        uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.nSize - mem_stream->rpos;
+        uint_fast32_t curlen = mem_stream->use_as__vsf_mem_t.s32_size - mem_stream->rpos;
 
         curlen = min(totalsize, curlen);
-        memcpy(buf, mem_stream->use_as__vsf_mem_t.pchBuffer + mem_stream->rpos, curlen);
+        memcpy(buf, mem_stream->use_as__vsf_mem_t.buffer_ptr + mem_stream->rpos, curlen);
         totalsize -= curlen;
         buf += curlen;
         if (totalsize > 0) {
-            memcpy(buf, mem_stream->use_as__vsf_mem_t.pchBuffer, totalsize);
+            memcpy(buf, mem_stream->use_as__vsf_mem_t.buffer_ptr, totalsize);
         }
     }
 
@@ -202,7 +203,7 @@ static uint_fast32_t __vsf_mem_stream_read(vsf_stream_t *stream, uint8_t *buf, u
         mem_stream->data_size -= rsize;
         if ((size < data_len) || mem_stream->is_writing) {
             mem_stream->rpos += rsize;
-            mem_stream->rpos %= mem_stream->use_as__vsf_mem_t.nSize;
+            mem_stream->rpos %= mem_stream->use_as__vsf_mem_t.s32_size;
         } else {
             mem_stream->rpos = mem_stream->wpos = 0;
         }

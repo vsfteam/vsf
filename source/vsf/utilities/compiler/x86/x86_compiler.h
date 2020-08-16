@@ -15,15 +15,10 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __USE_X86_COMPILER_H__
-#define __USE_X86_COMPILER_H__
+#ifndef __USE_X86_COMPILER_H_PART_1__
+#define __USE_X86_COMPILER_H_PART_1__
 
 /*============================ INCLUDES ======================================*/
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
 
 //! \name The macros to identify the compiler
 //! @{
@@ -47,8 +42,18 @@
 #endif
 //! @}
 
+#endif /* end of __USE_X86_COMPILER_H_PART_1__ */
+
+
+/*========================== Multiple-Entry Start ============================*/
+
 #include "./type.h"
 #include "../__common/__compiler.h"
+
+/*========================== Multiple-Entry End ==============================*/
+
+#ifndef __USE_X86_COMPILER_H_PART_2__
+#define __USE_X86_COMPILER_H_PART_2__
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,4 +107,4 @@ extern void vsf_enable_interrupt(void);
 }
 #endif
 
-#endif
+#endif /* end of __USE_X86_COMPILER_H_PART_2__ */

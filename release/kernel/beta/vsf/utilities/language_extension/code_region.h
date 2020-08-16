@@ -94,8 +94,8 @@ Output:
         NULL != pcode_region;                                                   \
         pcode_region = NULL)                                                    \
         for(uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE],                    \
-                TPASTE2(__code_region_, __LINE__) = 1;                          \
-            TPASTE2(__code_region_, __LINE__)-- ?                               \
+                __CONNECT2(__code_region_, __LINE__) = 1;                          \
+            __CONNECT2(__code_region_, __LINE__)-- ?                               \
                 (pcode_region->pmethods->OnEnter(  pcode_region->ptarget, local)\
                     ,1)                                                         \
                 : 0;                                                            \
@@ -161,8 +161,8 @@ Output:
         NULL != pcode_region;                                                   \
         pcode_region = NULL)                                                    \
         for(uint8_t local[pcode_region->pmethods->local_obj_size],              \
-                TPASTE2(__code_region_, __LINE__) = 1;                          \
-            TPASTE2(__code_region_, __LINE__)-- ?                               \
+                __CONNECT2(__code_region_, __LINE__) = 1;                          \
+            __CONNECT2(__code_region_, __LINE__)-- ?                               \
                 (pcode_region->pmethods->OnEnter(  pcode_region->ptarget, local)\
                     ,1)                                                         \
                 : 0;                                                            \

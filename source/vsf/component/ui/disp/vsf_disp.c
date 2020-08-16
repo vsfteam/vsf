@@ -22,8 +22,8 @@
 #if VSF_USE_UI == ENABLED
 
 #define __VSF_DISP_CLASS_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
+
+#include "./vsf_disp.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

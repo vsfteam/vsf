@@ -20,7 +20,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
@@ -112,7 +112,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
         __vsf_eda_frame_buffer[VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE];
 #endif
 
-    static const vsf_kernel_resource_t res = {
+    static const vsf_kernel_resource_t __res = {
 #if __VSF_OS_SWI_NUM > 0
         {
             __vsf_os_swi_priority,                  // os_swi_priorities_ptr
@@ -156,7 +156,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 
     };
     
-    return &res;
+    return &__res;
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -208,7 +208,7 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)
 {
-    UNUSED_PARAM(ptThis);
+    UNUSED_PARAM(this_ptr);
     main();
 }
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
@@ -283,8 +283,8 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
     
     return (vsf_mem_t){
-        .PTR.pchSrc = (uint8_t *)__heap_buffer, 
-        .nSize = sizeof(__heap_buffer)
+        .PTR.src_ptr = (uint8_t *)__heap_buffer, 
+        .s32_size = sizeof(__heap_buffer)
     };
 #endif
 }

@@ -19,11 +19,15 @@
 
 #include "vsf.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED && APP_CFG_USE_USBD_UVC_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_TIMER must be enabled for uvc
+#endif
 
 #define SCREEN_WIDTH                    256
 #define SCREEN_HEIGHT                   256

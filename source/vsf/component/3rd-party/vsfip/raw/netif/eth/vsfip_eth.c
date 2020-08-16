@@ -17,12 +17,11 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/usb/vsf_usb_cfg.h"
+#include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
-#define VSF_NETDRV_INHERIT_NETIF
-#include "vsf.h"
+#define __VSF_NETDRV_CLASS_INHERIT_NETIF__
 
 #include "../../vsfip.h"
 #include "./vsfip_eth.h"
@@ -31,32 +30,47 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsfip_eth_head_t {
+typedef struct vsfip_eth_head_t {
     uint8_t dst_addr[TCPIP_ETH_ADDRLEN];
     uint8_t src_addr[TCPIP_ETH_ADDRLEN];
     uint16_t type;
-} PACKED;
-typedef struct vsfip_eth_head_t vsfip_eth_head_t;
+} PACKED vsfip_eth_head_t;
 
-enum vsfip_eth_type_t {
+typedef enum vsfip_eth_type_t {
     VSFIP_ETH_TYPE_IP       = 0x0800,
     VSFIP_ETH_TYPE_IP6      = 0x86DD,
     VSFIP_ETH_TYPE_ARP      = 0x0806,
     VSFIP_ETH_TYPE_RARP     = 0x0835,
-};
-typedef enum vsfip_eth_type_t vsfip_eth_type_t;
+} vsfip_eth_type_t;
 
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static vsf_err_t __vsfip_eth_header(vsfip_netbuf_t *netbuf,
+        vsfip_netif_proto_t proto, const vsfip_macaddr_t *dest_addr);
+static void __vsfip_eth_input(vsfip_netbuf_t *netbuf);
+static bool __vsfip_eth_can_output(vsfip_netif_t *netif);
+static vsf_err_t __vsfip_eth_output(vsfip_netbuf_t *netbuf);
+static bool __vsfip_eth_routable(vsfip_netif_t *netif, const vsfip_ipaddr_t *dest_addr);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vsfip_netif_op_t vsfip_eth_op = {
+    .header     = __vsfip_eth_header,
+    .input      = __vsfip_eth_input,
+    .can_output = __vsfip_eth_can_output,
+    .output     = __vsfip_eth_output,
+    .routable   = __vsfip_eth_routable,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
-bool vsfip_eth_routable(vsfip_netif_t *netif, const vsfip_ipaddr_t *dest_addr)
+static bool __vsfip_eth_routable(vsfip_netif_t *netif, const vsfip_ipaddr_t *dest_addr)
 {
     return (dest_addr->size == 4) && (dest_addr->addr_buf[0] != 127);
 }
 
-static vsf_err_t vsfip_eth_header(vsfip_netbuf_t *netbuf,
+static vsf_err_t __vsfip_eth_header(vsfip_netbuf_t *netbuf,
         vsfip_netif_proto_t proto, const vsfip_macaddr_t *dest_addr)
 {
     vsfip_netif_t *netif = netbuf->netif;
@@ -73,20 +87,20 @@ static vsf_err_t vsfip_eth_header(vsfip_netbuf_t *netbuf,
     return VSF_ERR_NONE;
 }
 
-static bool vsfip_eth_can_output(vsfip_netif_t *netif)
+static bool __vsfip_eth_can_output(vsfip_netif_t *netif)
 {
-    return vsf_netdrv_can_output(netif->netdrv);
+    return vk_netdrv_can_output(netif->netdrv);
 }
 
-static vsf_err_t vsfip_eth_output(vsfip_netbuf_t *netbuf)
+static vsf_err_t __vsfip_eth_output(vsfip_netbuf_t *netbuf)
 {
     vsfip_netif_t *netif = netbuf->netif;
-    return vsf_netdrv_output(netif->netdrv, netbuf);
+    return vk_netdrv_output(netif->netdrv, netbuf);
 }
 
-static void vsfip_eth_input(vsfip_netbuf_t *netbuf)
+static void __vsfip_eth_input(vsfip_netbuf_t *netbuf)
 {
-    vsfip_eth_head_t *head = netbuf->buf.pObj;
+    vsfip_eth_head_t *head = netbuf->buf.obj_ptr;
 
     if (!vsfip_netbuf_header(netbuf, -sizeof(vsfip_eth_head_t))) {
         vsfip_netbuf_deref(netbuf);
@@ -108,13 +122,5 @@ static void vsfip_eth_input(vsfip_netbuf_t *netbuf)
         vsfip_netbuf_deref(netbuf);
     }
 }
-
-const vsfip_netif_op_t vsfip_eth_op = {
-    .header     = vsfip_eth_header,
-    .input      = vsfip_eth_input,
-    .can_output = vsfip_eth_can_output,
-    .output     = vsfip_eth_output,
-    .routable   = vsfip_eth_routable,
-};
 
 #endif      // VSF_USE_TCPIP

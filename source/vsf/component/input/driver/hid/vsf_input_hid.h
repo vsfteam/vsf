@@ -24,7 +24,9 @@
 
 #if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
 
+#include "component/input/vsf_input.h"
 #include "../../vsf_input_get_type.h"
+#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,7 +96,7 @@ enum {
     VSF_INPUT_TYPE_HID = VSF_INPUT_USER_TYPE,
 };
 
-struct vk_hid_usage_t {
+typedef struct vk_hid_usage_t {
     implement_ex(vsf_slist_node_t, usage_node)
 
     uint8_t generic_usage_page;
@@ -109,16 +111,14 @@ struct vk_hid_usage_t {
     int32_t bit_length;
     int32_t report_size;
     int32_t report_count;
-};
-typedef struct vk_hid_usage_t vk_hid_usage_t;
+} vk_hid_usage_t;
 
-struct vk_hid_evt_t {
+typedef struct vk_hid_evt_t {
     implement(vk_input_evt_t)
     vk_hid_usage_t *usage;
-};
-typedef struct vk_hid_evt_t vk_hid_evt_t;
+} vk_hid_evt_t;
 
-struct vk_hid_report_t {
+typedef struct vk_hid_report_t {
     implement_ex(vsf_slist_node_t, report_node)
 
     uint8_t type;
@@ -127,15 +127,13 @@ struct vk_hid_report_t {
 
     uint8_t *value;
     vsf_slist_t usage_list;
-};
-typedef struct vk_hid_report_t vk_hid_report_t;
+} vk_hid_report_t;
 
-struct vk_input_hid_t {
+typedef struct vk_input_hid_t {
     vsf_slist_t report_list;
     vk_input_timestamp_t timestamp;
     bool report_has_id;
-};
-typedef struct vk_input_hid_t vk_input_hid_t;
+} vk_input_hid_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

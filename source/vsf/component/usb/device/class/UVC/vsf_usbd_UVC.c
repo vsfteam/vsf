@@ -21,25 +21,19 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
 
-#define VSF_USBD_INHERIT
-#define VSF_USBD_UVC_IMPLEMENT
-// TODO: use dedicated include
-#include "vsf.h"
+#define __VSF_USBD_CLASS_INHERIT__
+#define __VSF_USBD_UVC_CLASS_IMPLEMENT
+
+#include "../../vsf_usbd.h"
+#include "./vsf_usbd_UVC.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if     defined(WEAK_VSF_USBD_UVC_STOP_STREAM_EXTERN)                           \
-    &&  defined(WEAK_VSF_USBD_UVC_STOP_STREAM)
-WEAK_VSF_USBD_UVC_STOP_STREAM_EXTERN
-#endif
-
-#if     defined(WEAK_VSF_USBD_UVC_START_STREAM_EXTERN)                          \
-    &&  defined(WEAK_VSF_USBD_UVC_START_STREAM)
-WEAK_VSF_USBD_UVC_START_STREAM_EXTERN
-#endif
+extern void vsf_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs);
+extern void vsf_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs);
 
 static vsf_err_t __vk_usbd_uvc_vc_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 static vsf_err_t __vk_usbd_uvc_vs_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
@@ -95,8 +89,8 @@ static void __vk_usbd_uvc_trace_request_prepare(vk_usbd_ctrl_handler_t *ctrl_han
                     __vk_usbd_uvc_trace_get_request(req & ~USB_UVC_REQ_GET),
                     ifs_ep, entity, cs);
         if (is_get) {
-            vsf_trace_buffer(VSF_TRACE_NONE, ctrl_handler->trans.pchBuffer,
-                    ctrl_handler->trans.nSize, VSF_TRACE_DF_DEFAULT);
+            vsf_trace_buffer(VSF_TRACE_NONE, ctrl_handler->trans.buffer_ptr,
+                    ctrl_handler->trans.s32_size, VSF_TRACE_DF_DEFAULT);
         }
     }
 }
@@ -111,8 +105,8 @@ static void __vk_usbd_uvc_trace_request_process(vk_usbd_ctrl_handler_t *ctrl_han
         &&  (USB_TYPE_CLASS == (request->bRequestType & USB_TYPE_MASK))) {
 
         if (!is_get) {
-            vsf_trace_buffer(VSF_TRACE_NONE, ctrl_handler->trans.pchBuffer,
-                    ctrl_handler->trans.nSize, VSF_TRACE_DF_DEFAULT);
+            vsf_trace_buffer(VSF_TRACE_NONE, ctrl_handler->trans.buffer_ptr,
+                    ctrl_handler->trans.s32_size, VSF_TRACE_DF_DEFAULT);
         }
     }
 }
@@ -138,8 +132,8 @@ vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast
 
     trans->ep = uvc->ep_in;
     trans->feature = USB_DC_FEATURE_TRANSFER;
-    trans->use_as__vsf_mem_t.pchBuffer = buffer;
-    trans->use_as__vsf_mem_t.nSize = size;
+    trans->use_as__vsf_mem_t.buffer_ptr = buffer;
+    trans->use_as__vsf_mem_t.s32_size = size;
     trans->zlp = false;
     trans->eda = vsf_eda_get_cur();
     trans->notify_eda = true;
@@ -206,21 +200,13 @@ static vsf_err_t __vk_usbd_uvc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: stop stream." VSF_TRACE_CFG_LINEEND);
 #endif
-#ifndef WEAK_VSF_USBD_UVC_STOP_STREAM
                     vsf_usbd_uvc_stop_stream(uvc, request->wValue);
-#else
-                    WEAK_VSF_USBD_UVC_STOP_STREAM(uvc, request->wValue);
-#endif
                 } else {
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "uvc: start stream %d." VSF_TRACE_CFG_LINEEND,
                                 request->wValue);
 #endif
-#ifndef WEAK_VSF_USBD_UVC_START_STREAM
                     vsf_usbd_uvc_start_stream(uvc, request->wValue);
-#else
-                    WEAK_VSF_USBD_UVC_START_STREAM(uvc, request->wValue);
-#endif
                 }
                 break;
             }
@@ -266,8 +252,8 @@ static vsf_err_t __vk_usbd_uvc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     case USB_RECIP_ENDPOINT:
         break;
     }
-    ctrl_handler->trans.use_as__vsf_mem_t.pchBuffer = buffer;
-    ctrl_handler->trans.use_as__vsf_mem_t.nSize = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.buffer_ptr = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.s32_size = size;
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
     uvc->cur_size = size;
     __vk_usbd_uvc_trace_request_prepare(ctrl_handler);
@@ -283,7 +269,7 @@ static vsf_err_t __vk_usbd_uvc_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     vk_usbd_uvc_control_t *control;
 
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
-    ctrl_handler->trans.nSize = uvc->cur_size;
+    ctrl_handler->trans.s32_size = uvc->cur_size;
     __vk_usbd_uvc_trace_request_process(ctrl_handler);
 #endif
     switch (request->bRequestType & USB_RECIP_MASK) {

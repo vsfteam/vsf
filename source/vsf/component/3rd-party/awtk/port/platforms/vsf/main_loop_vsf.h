@@ -22,6 +22,10 @@
 #ifndef TK_MAIN_LOOP_VSF_H
 #define TK_MAIN_LOOP_VSF_H
 
+#include "component/ui/vsf_ui_cfg.h"
+
+#if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
+
 #include "base/idle.h"
 #include "base/timer.h"
 #include "base/main_loop.h"
@@ -62,4 +66,5 @@ ret_t main_loop_post_pointer_event(main_loop_t* l, bool_t pressed, xy_t x, xy_t 
 
 END_C_DECLS
 
+#endif
 #endif /*TK_MAIN_LOOP_VSF_H*/

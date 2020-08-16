@@ -98,7 +98,7 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
 
     const vsf_tgui_tile_buf_root_t* ptBufTile = &ptTile->tBufRoot;
     const vsf_tgui_tile_core_t* ptCoreTile = &ptBufTile->use_as__vsf_tgui_tile_core_t;
-    uint32_t wSize = (ptCoreTile->Attribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) ? 4 : 3;
+    uint32_t u32_size = (ptCoreTile->Attribute.u3ColorSize == VSF_TGUI_COLOR_ARGB_8888) ? 4 : 3;
 
     vsf_tgui_region_t tDisplay;
     tDisplay.tLocation = *ptLocation;
@@ -109,9 +109,9 @@ void vsf_tgui_draw_root_tile(vsf_tgui_location_t* ptLocation,
     }
 
     for (uint16_t i = 0; i < tDisplay.tSize.iHeight; i++) {
-        uint32_t wOffset = wSize * ((ptTileLocation->iY + i) * tTileSize.iWidth + ptTileLocation->iX);
+        uint32_t u32_offset = u32_size * ((ptTileLocation->iY + i) * tTileSize.iWidth + ptTileLocation->iX);
         const char* pchData = (const char *)ptBufTile->ptBitmap;
-        pchData += wOffset;
+        pchData += u32_offset;
 
         for (uint16_t j = 0; j < tDisplay.tSize.iWidth; j++) {
             vsf_tgui_location_t tPixelLocation = { .iX = tDisplay.tLocation.iX + j, .iY = tDisplay.tLocation.iY + i };

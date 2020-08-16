@@ -32,15 +32,14 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_crc_t {
+typedef struct vsf_crc_t {
     enum {
         VSF_CRC_BITLEN8 = 8,
         VSF_CRC_BITLEN16 = 16,
         VSF_CRC_BITLEN32 = 32,
     } bitlen;
     uint32_t poly;
-};
-typedef struct vsf_crc_t vsf_crc_t;
+} vsf_crc_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

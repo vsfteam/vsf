@@ -99,8 +99,9 @@
    */
 
 
-#include "vsf.h"
-#include <stdio.h>
+#include "component/mal/vsf_mal.h"
+#include "utilities/vsf_utilities.h"
+#include "utilities/ooc_class.h"
 
 #if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
 
@@ -136,7 +137,7 @@ static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
         new_pos = f->size;
         break;
     default:
-        VSF_UI_ASSERT(false);
+        VSF_FS_ASSERT(false);
         return -1;
     }
 

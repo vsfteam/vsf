@@ -101,7 +101,8 @@ uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr)
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
-int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr, uint16_t *item_cnt_ptr)
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr, 
+                                    uint16_t *item_cnt_ptr)
 {
     
     int32_t index = -1;
@@ -123,7 +124,7 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr, uint16_t *item_cnt_p
         hwWritten = min((*item_cnt_ptr), hwWritten);
         hwWritten = min(hwWritten, hwSpaceLeft);
 
-        *item_cnt_ptr = hwWritten;          /*!< update actual written number */
+        *item_cnt_ptr = hwWritten;  /*!< update actual written number */
         
         this.tail += hwWritten;
         this.length += hwWritten;
@@ -137,7 +138,8 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr, uint16_t *item_cnt_p
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
-int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr)
+int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr, 
+                                    uint16_t* item_cnt_ptr)
 {
     
     int32_t index = -1;
@@ -157,7 +159,7 @@ int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_pt
         hwRead = min((*item_cnt_ptr), hwRead);
         hwRead = min(this.length, hwRead);
 
-        *item_cnt_ptr = hwRead;          /*!< update actual written number */
+        *item_cnt_ptr = hwRead;     /*!< update actual written number */
 
         this.head += hwRead;
         this.length -= hwRead;
@@ -232,7 +234,8 @@ uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr)
 
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
-int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr)
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, 
+                                    uint16_t* item_cnt_ptr)
 {
     int32_t index = -1;
     uint_fast16_t hwItemLeft;
@@ -253,7 +256,7 @@ int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_p
         hwPeeked = min((*item_cnt_ptr), hwPeeked);
         hwPeeked = min(hwItemLeft, hwPeeked);
 
-        *item_cnt_ptr = hwPeeked;          /*!< update actual written number */
+        *item_cnt_ptr = hwPeeked;   /*!< update actual written number */
 
         this.peek += hwPeeked;
         this.peek_cnt += hwPeeked;

@@ -182,7 +182,7 @@ enum vsfvm_compiler_errcode_t {
     VSFVM_ERRCODE_END,
 };
 
-struct vsfvm_compiler_func_ctx_t {
+typedef struct vsfvm_compiler_func_ctx_t {
     vsfvm_lexer_etoken_t etoken;
     int symtbl_idx;
     int block_level;
@@ -203,20 +203,18 @@ struct vsfvm_compiler_func_ctx_t {
             vsfvm_bytecode_t goto_code;
         } func_ctx;
     };
-};
-typedef struct vsfvm_compiler_func_ctx_t vsfvm_compiler_func_ctx_t;
+} vsfvm_compiler_func_ctx_t;
 
-struct vsfvm_linktbl_t {
+typedef struct vsfvm_linktbl_t {
     int bytecode_pos;
     uint32_t token;
     enum {
         VSFVM_LINKTBL_STR,
     } type;
     vsfvm_lexer_sym_t *sym;
-};
-typedef struct vsfvm_linktbl_t vsfvm_linktbl_t;
+} vsfvm_linktbl_t;
 
-struct vsfvm_compiler_func_t {
+typedef struct vsfvm_compiler_func_t {
     vsfvm_lexer_sym_t *name;
     int symtbl_idx;
     int block_level;
@@ -227,10 +225,9 @@ struct vsfvm_compiler_func_t {
     vsf_dynstack_t linktbl;
     vsfvm_compiler_func_ctx_t curctx;
     vsf_dynstack_t ctx;
-};
-typedef struct vsfvm_compiler_func_t vsfvm_compiler_func_t;
+} vsfvm_compiler_func_t;
 
-struct vsfvm_compiler_script_t {
+typedef struct vsfvm_compiler_script_t {
     const char *name;
     vsfvm_lexer_t lexer;
     vsf_slist_t ext;
@@ -239,15 +236,13 @@ struct vsfvm_compiler_script_t {
     vsfvm_compiler_func_t cur_func;
 
     vsf_dynstack_t func_stack;
-};
-typedef struct vsfvm_compiler_script_t vsfvm_compiler_script_t;
+} vsfvm_compiler_script_t;
 
-struct vsfvm_compiler_t {
+typedef struct vsfvm_compiler_t {
     vsfvm_compiler_script_t script;
     uint32_t bytecode_pos;
     vsf_slist_t lexer_list;
-};
-typedef struct vsfvm_compiler_t vsfvm_compiler_t;
+} vsfvm_compiler_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

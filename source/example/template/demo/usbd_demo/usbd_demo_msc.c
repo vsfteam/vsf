@@ -19,11 +19,23 @@
 
 #include "vsf.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED && APP_CFG_USE_USBD_MSC_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef USRAPP_CFG_USBD_SPEED
+#   define USRAPP_CFG_USBD_SPEED            USB_DC_SPEED_HIGH
+#endif
+
+// __APP_CFG_MSC_BULK_SIZE is for internal usage
+#if USRAPP_CFG_USBD_SPEED == USB_DC_SPEED_HIGH
+#   define __APP_CFG_MSC_BULK_SIZE          512
+#else
+#   define __APP_CFG_MSC_BULK_SIZE          64
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -45,9 +57,9 @@ static vk_mal_scsi_t __usrapp_mal_scsi = {
     .mal                = &usrapp_common.mal.fakefat32.use_as__vk_mal_t,
 };
 
-describe_usbd(__user_usbd_msc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_HIGH)
+describe_usbd(__user_usbd_msc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_SPEED)
     usbd_common_desc(__user_usbd_msc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_MSCBOT_IAD_LEN, USB_MSCBOT_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
-        mscbot_desc(__user_usbd_msc, 0, 0, 1, 1, 512)
+        mscbot_desc(__user_usbd_msc, 0, 0, 1, 1, __APP_CFG_MSC_BULK_SIZE)
     usbd_func_desc(__user_usbd_msc)
         usbd_func_str_desc(__user_usbd_msc, 0, u"VSF-MSC0")
     usbd_std_desc_table(__user_usbd_msc)

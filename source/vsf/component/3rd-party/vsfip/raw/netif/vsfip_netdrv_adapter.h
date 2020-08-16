@@ -22,7 +22,7 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
 #include "./vsfip_netif.h"
 #include "./component/tcpip/netdrv/vsf_netdrv.h"
@@ -33,8 +33,8 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vsf_netdrv_t *netdrv);
-extern vsf_netdrv_t * vsfip_netif_get_netdrv(vsfip_netif_t *netif);
+extern void vsfip_netif_set_netdrv(vsfip_netif_t *netif, vk_netdrv_t *netdrv);
+extern vk_netdrv_t * vsfip_netif_get_netdrv(vsfip_netif_t *netif);
 
 #endif      // VSF_USE_TCPIP
 #endif      // __VSFIP_NETDRV_ADAPTER_H__

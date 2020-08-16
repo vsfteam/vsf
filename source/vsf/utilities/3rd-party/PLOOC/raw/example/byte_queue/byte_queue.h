@@ -29,7 +29,7 @@
 /*============================ TYPES =========================================*/
 typedef struct mem_t {
     uint8_t     *pchBuffer;             //!< queue buffer
-    uint16_t    hwSize;                 //!< buffer size
+    uint16_t    u16_size;                 //!< buffer size
 }mem_t;
 
 /*! \NOTE: Make sure #include "plooc_class.h" is close to the class definition 
@@ -37,9 +37,9 @@ typedef struct mem_t {
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__BYTE_QUEUE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #elif   defined(__BYTE_QUEUE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #endif   
 
 #include "plooc_class.h"
@@ -75,13 +75,13 @@ typedef struct byte_queue_cfg_t {
 //! \name interface i_byte_queue_t
 //! @{
 def_interface(i_byte_queue_t)
-    byte_queue_t *  (*Init)     (byte_queue_t *ptObj, byte_queue_cfg_t *ptCFG);
-    bool            (*Enqueue)  (byte_queue_t *ptObj, uint8_t chByte);
-    bool            (*Dequeue)  (byte_queue_t *ptObj, uint8_t *pchByte);
-    uint_fast16_t   (*Count)    (byte_queue_t *ptObj);
+    byte_queue_t *  (*Init)     (byte_queue_t *obj_ptr, byte_queue_cfg_t *ptCFG);
+    bool            (*Enqueue)  (byte_queue_t *obj_ptr, uint8_t chByte);
+    bool            (*Dequeue)  (byte_queue_t *obj_ptr, uint8_t *pchByte);
+    uint_fast16_t   (*Count)    (byte_queue_t *obj_ptr);
     struct {
-        void *      (*Get)      (byte_queue_t *ptObj);
-        void        (*Set)      (byte_queue_t *ptObj, void *pTarget);
+        void *      (*Get)      (byte_queue_t *obj_ptr);
+        void        (*Set)      (byte_queue_t *obj_ptr, void *pTarget);
     }Target;
 end_def_interface(i_byte_queue_t) /*do not remove this for forward compatibility */
 //! @}
@@ -92,25 +92,25 @@ extern const i_byte_queue_t BYTE_QUEUE;
 /*============================ PROTOTYPES ====================================*/
 
 extern
-byte_queue_t * byte_queue_init(byte_queue_t *ptObj, byte_queue_cfg_t *ptCFG);
+byte_queue_t * byte_queue_init(byte_queue_t *obj_ptr, byte_queue_cfg_t *ptCFG);
 
 extern 
-bool byte_queue_enqueue(byte_queue_t *ptObj, uint8_t chByte);
+bool byte_queue_enqueue(byte_queue_t *obj_ptr, uint8_t chByte);
 
 extern
-bool byte_queue_dequeue(byte_queue_t *ptObj, uint8_t *pchByte);
+bool byte_queue_dequeue(byte_queue_t *obj_ptr, uint8_t *pchByte);
 
 extern
-uint_fast16_t byte_queue_count(byte_queue_t *ptObj);
+uint_fast16_t byte_queue_count(byte_queue_t *obj_ptr);
 
 extern 
-void *byte_queue_target_get(byte_queue_t *ptObj);
+void *byte_queue_target_get(byte_queue_t *obj_ptr);
 
 extern 
-void  byte_queue_target_set(byte_queue_t *ptObj, void *pTarget);
+void  byte_queue_target_set(byte_queue_t *obj_ptr, void *pTarget);
 
 #if defined(__BYTE_QUEUE_CLASS_IMPLEMENT) || defined(__BYTE_QUEUE_CLASS_INHERIT)
-extern mem_t byte_queue_buffer_get(byte_queue_t *ptObj);
+extern mem_t byte_queue_buffer_get(byte_queue_t *obj_ptr);
 #endif
 
 /*! \note it is very important to undef those macros */

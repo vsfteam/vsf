@@ -15,16 +15,10 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __USE_RV_COMPILER_H__
-#define __USE_RV_COMPILER_H__
+#ifndef __USE_RV_COMPILER_H_PART_1__
+#define __USE_RV_COMPILER_H_PART_1__
 
 /*============================ INCLUDES ======================================*/
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
-
 #ifndef VSF_UTILITIES_REQ___RV_HEADER_FILE__FROM_USR
 #include "./RISCV/riscv_compiler.h"
 #else
@@ -60,6 +54,10 @@
 #endif
 //! @}
 
+#endif /* end of __USE_RV_COMPILER_H_PART_1__ */
+
+
+/*========================== Multiple-Entry Start ============================*/
 
 #if __IS_COMPILER_IAR__
 #   include <intrinsics.h>
@@ -68,6 +66,10 @@
 #include "./type.h"
 #include "../__common/__compiler.h"
 
+/*========================== Multiple-Entry End ==============================*/
+
+#ifndef __USE_RV_COMPILER_H_PART_2__
+#define __USE_RV_COMPILER_H_PART_2__
 
 #ifdef __cplusplus
 extern "C" {
@@ -161,4 +163,4 @@ extern void vsf_stdio_init(void);
 //! \brief for interrupt 
 #include "./signal.h"
 
-#endif
+#endif /* end of __USE_RV_COMPILER_H_PART_2__ */

@@ -22,8 +22,7 @@
 #if     (VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED)\
     ||  (VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED)
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "./vsf_dwcotg_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,7 +32,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void vk_dwcotg_reset(vk_dwcotg_t *dwcotg)
+static void __vk_dwcotg_reset(vk_dwcotg_t *dwcotg)
 {
     dwcotg->reg.global_regs->grstctl |= USB_OTG_GRSTCTL_CSRST;
     while (dwcotg->reg.global_regs->grstctl & USB_OTG_GRSTCTL_CSRST);
@@ -60,7 +59,7 @@ void vk_dwcotg_phy_init(vk_dwcotg_t *dwcotg,
             global_regs->gusbcfg |= USB_OTG_GUSBCFG_ULPIEVBUSD;
         }
 
-        vk_dwcotg_reset(dwcotg);
+        __vk_dwcotg_reset(dwcotg);
     } else if (param->utmi_en) {
         VSF_USB_ASSERT(hw_info->utmi_en);
 
@@ -72,14 +71,14 @@ void vk_dwcotg_phy_init(vk_dwcotg_t *dwcotg,
         // Select vbus source
         global_regs->gusbcfg &= ~(USB_OTG_GUSBCFG_ULPIEVBUSD | USB_OTG_GUSBCFG_ULPIEVBUSI);
 
-        vk_dwcotg_reset(dwcotg);
+        __vk_dwcotg_reset(dwcotg);
     } else {
         // init embedded phy
         global_regs->gusbcfg |= USB_OTG_GUSBCFG_PHYSEL;
 
-        vk_dwcotg_reset(dwcotg);
+        __vk_dwcotg_reset(dwcotg);
 
-        global_regs->gccfg = USB_OTG_GCCFG_PWRDWN | USB_OTG_GCCFG_VBUSACEN | USB_OTG_GCCFG_VBUSBCEN;
+        global_regs->gccfg |= USB_OTG_GCCFG_PWRDWN | USB_OTG_GCCFG_VBUSACEN | USB_OTG_GCCFG_VBUSBCEN;
         if (!param->vbus_en) {
             global_regs->gccfg |= USB_OTG_GCCFG_VBDEN;
         }

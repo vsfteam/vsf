@@ -27,7 +27,7 @@ typedef struct user_task_t user_task_t;
 struct user_task_t {
     implement(vsf_eda_t)
     
-    vsf_sem_t *psem;
+    vsf_sem_t *sem_ptr;
     uint32_t cnt;
 };
 
@@ -39,7 +39,7 @@ def_vsf_peda_ctx(example_peda,
     def_members(
         uint8_t StartLevel;
         uint32_t cnt;
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
     )
     end_def_members()
     
@@ -97,7 +97,7 @@ imp_vsf_peda(example_peda)
             
             
             if (0 == vsf_local.level) {
-                if (VSF_ERR_NONE != vsf_eda_sem_pend(vsf_this.psem, -1)) {
+                if (VSF_ERR_NONE != vsf_eda_sem_pend(vsf_this.sem_ptr, -1)) {
                     break;
                 } 
                 goto label_get_sem;
@@ -165,7 +165,7 @@ static void user_task_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         case VSF_EVT_INIT:
             pthis->cnt = 0;
 label_loop_start:
-            if (VSF_ERR_NONE != vsf_eda_sem_pend(pthis->psem, -1)) {
+            if (VSF_ERR_NONE != vsf_eda_sem_pend(pthis->sem_ptr, -1)) {
                 break;
             }
             //! fall through
@@ -213,13 +213,13 @@ void vsf_kernel_eda_simple_demo(void)
 #   if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     {
         static caller_thread_t __caller_thread;
-        __caller_thread.callee_param.psem = &__user_sem;
+        __caller_thread.callee_param.sem_ptr = &__user_sem;
         init_vsf_thread(caller_thread_t, &__caller_thread, vsf_prio_0);
     }
 #   else
     {
         static example_peda __user_task;
-        __user_task.param.psem = &__user_sem;
+        __user_task.param.sem_ptr = &__user_sem;
         __user_task.param.cnt = 0;
         
         vsf_sched_safe(){
@@ -239,7 +239,7 @@ void vsf_kernel_eda_simple_demo(void)
             .fn.evthandler = user_task_evthandler,
             .priority = vsf_prio_0,
         };
-        __user_task.psem = &__user_sem;
+        __user_task.sem_ptr = &__user_sem;
         vsf_eda_init_ex(&__user_task.use_as__vsf_eda_t, (vsf_eda_cfg_t *)&cfg);
     }
 #endif

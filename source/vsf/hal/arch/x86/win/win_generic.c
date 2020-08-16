@@ -701,7 +701,7 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
-static void vsf_systimer_thread(void *arg)
+static void __vsf_systimer_thread(void *arg)
 {
     vsf_arch_systimer_ctx_t *ctx = arg;
     LARGE_INTEGER li = {
@@ -742,7 +742,7 @@ vsf_err_t vsf_systimer_init(void)
     VSF_HAL_ASSERT(NULL != __vsf_x86.systimer.timer);
 
     __vsf_arch_irq_init(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t,
-                "timer", vsf_systimer_thread, vsf_arch_prio_32, false);
+                "timer", __vsf_systimer_thread, vsf_arch_prio_32, false);
     return VSF_ERR_NONE;
 }
 
@@ -816,7 +816,7 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 /*----------------------------------------------------------------------------*
  * SWI Implementation                                                         *
  *----------------------------------------------------------------------------*/
-static void vsf_arch_swi_thread(void *arg)
+static void __vsf_arch_swi_thread(void *arg)
 {
     vsf_arch_swi_ctx_t *ctx = arg;
     __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
@@ -853,7 +853,7 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
             sprintf(swi_name, "swi%d", idx);
             __vsf_arch_irq_request_init(&ctx->request);
             __vsf_arch_irq_init(&ctx->use_as__vsf_arch_irq_thread_t, swi_name,
-                        vsf_arch_swi_thread, priority, true);
+                        __vsf_arch_swi_thread, priority, true);
         }
 
         return VSF_ERR_NONE;

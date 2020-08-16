@@ -25,13 +25,13 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_XB1 == ENABLED
 
 #include "component/usb/common/class/XB1/vsf_usb_xb1.h"
-#if VSF_USE_INPUT_XB1 == ENABLED
-#   include "component/input/driver/xb1/vsf_input_xb1.h"
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#   include "component/input/vsf_input.h"
 #endif
 
-#if     defined(VSF_USBH_XB1_IMPLEMENT)
-#   undef VSF_USBH_XB1_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
+#if     defined(__VSF_USBH_XB1_CLASS_IMPLEMENT)
+#   undef __VSF_USBH_XB1_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -48,7 +48,18 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbh_xb1_t)
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+enum {
+    VSF_INPUT_TYPE_XB1 = VSF_INPUT_USER_TYPE,
+};
+
+typedef struct vk_input_xb1_t {
+    vsf_usb_xb1_gamepad_in_report_t data;
+    vk_input_timestamp_t timestamp;
+} vk_input_xb1_t;
+#endif
+
+dcl_simple_class(vk_usbh_xb1_t)
 
 // xb1 controller is not HID class, but almost compatible with HID class
 def_simple_class(vk_usbh_xb1_t) {
@@ -69,9 +80,20 @@ def_simple_class(vk_usbh_xb1_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+extern const vk_input_item_info_t vk_xb1_gamepad_item_info[GAMEPAD_ID_NUM];
+#endif
+
 extern const vk_usbh_class_drv_t vk_usbh_xb1_drv;
 
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+extern void vk_xb1_process_input(vk_input_xb1_t *dev, vsf_usb_xb1_gamepad_in_report_t *data);
+extern void vk_xb1_new_dev(vk_input_xb1_t *dev);
+extern void vk_xb1_free_dev(vk_input_xb1_t *dev);
+
+#endif
 
 #ifdef __cplusplus
 }

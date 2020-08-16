@@ -31,7 +31,7 @@ def_vsf_thread(user_thread_a_t, 1024,
     )
     
     def_params(
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
     ));
 
 declare_vsf_thread(user_thread_b_t)
@@ -44,7 +44,7 @@ def_vsf_thread(user_thread_b_t, 1024,
     )
     
     def_params(
-        vsf_sem_t *psem;
+        vsf_sem_t *sem_ptr;
     ));
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -62,14 +62,14 @@ void vsf_kernel_thread_simple_demo(void)
     //! start the user task a
     {
         static NO_INIT user_thread_a_t __user_task_a;
-        __user_task_a.param.psem = &user_sem;
+        __user_task_a.param.sem_ptr = &user_sem;
         init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
     
     //! start the user task b
     {
         static NO_INIT user_thread_b_t __user_task_b;
-        __user_task_b.param.psem = &user_sem;
+        __user_task_b.param.sem_ptr = &user_sem;
         init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_prio_0);
     }
 }
@@ -80,7 +80,7 @@ implement_vsf_thread(user_thread_a_t)
     while (1) {
         vsf_delay_ms(1000);
         printf("post semaphore...     [%08x]\r\n", cnt++);
-        vsf_sem_post(this.psem);            //!< post a semaphore
+        vsf_sem_post(this.sem_ptr);            //!< post a semaphore
     }
 }
 
@@ -88,7 +88,7 @@ implement_vsf_thread(user_thread_b_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_sem_pend(this.psem);            //! wait for semaphore forever
+        vsf_sem_pend(this.sem_ptr);            //! wait for semaphore forever
         printf("receive semaphore...  [%08x]\r\n", cnt++);
     }
 }

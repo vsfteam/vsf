@@ -24,12 +24,11 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED
 
-#if     defined(VSF_MUSB_FDRC_DCD_IMPLEMENT)
-#   undef VSF_MUSB_FDRC_DCD_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_MUSB_FDRC_DCD_INHERIT)
-#   undef VSF_MUSB_FDRC_DCD_INHERIT
-#   define __PLOOC_CLASS_INHERIT
+#include "hal/vsf_hal.h"
+
+#if     defined(__VSF_MUSB_FDRC_DCD_CLASS_IMPLEMENT)
+#   undef __VSF_MUSB_FDRC_DCD_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -41,24 +40,23 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_USB_DC_FROM_MUSB_FDRC_IP(__N, __OBJ, __DRV_NAME)                    \
-        __USB_DC_FROM_IP(__N, (__OBJ), __DRV_NAME, vk_musb_fdrc_usbd)
+#define vsf_usb_dc_from_musbfdrc_ip(__n, __obj, __drv_name)                     \
+        __USB_DC_FROM_IP(__n, (__obj), __drv_name, vk_musb_fdrc_usbd)
 
 /*============================ TYPES =========================================*/
 
-struct vk_musb_fdrc_dcd_param_t {
+typedef struct vk_musb_fdrc_dcd_param_t {
     const i_usb_dc_ip_t *op;
-};
-typedef struct vk_musb_fdrc_dcd_param_t vk_musb_fdrc_dcd_param_t;
+} vk_musb_fdrc_dcd_param_t;
 
-declare_simple_class(vk_musb_fdrc_dcd_t)
+dcl_simple_class(vk_musb_fdrc_dcd_t)
 
-enum vk_musb_fdrc_dcd_ep0state_t {
-    MUSB_FDRC_USBD_EP0_IDLE,
+typedef enum vk_musb_fdrc_dcd_ep0state_t {
+    MUSB_FDRC_USBD_EP0_WAIT_SETUP,
     MUSB_FDRC_USBD_EP0_DATA_IN,
     MUSB_FDRC_USBD_EP0_DATA_OUT,
-};
-typedef enum vk_musb_fdrc_dcd_ep0state_t vk_musb_fdrc_dcd_ep0state_t;
+    MUSB_FDRC_USBD_EP0_STATUS,
+} vk_musb_fdrc_dcd_ep0state_t;
 
 def_simple_class(vk_musb_fdrc_dcd_t) {
 
@@ -73,6 +71,7 @@ def_simple_class(vk_musb_fdrc_dcd_t) {
             void *param;
         } callback;
         uint16_t ep_buf_ptr;
+        uint16_t out_mask;
         vk_musb_fdrc_dcd_ep0state_t ep0_state;
         bool has_data_stage;
         uint8_t ep_num;

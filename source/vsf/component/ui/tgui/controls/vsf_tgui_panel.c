@@ -117,7 +117,7 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
         vsf_tgui_label_t* ptLabel = &(ptPanel->tTitleLabel);
         if (    (NULL != ptPanel->tTitle.tString.pstrText)
     #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-            &&  (ptPanel->tTitle.tString.iSize > 0)
+            &&  (ptPanel->tTitle.tString.s16_size > 0)
     #endif
             ) {
 

@@ -56,10 +56,10 @@ extern pm_periph_async_clk_status_t
                                     const pm_periph_asyn_clk_cfg_t *cfg);
 
 extern uint_fast32_t vsf_pm_peripheral_get_clock(pm_periph_async_clk_no_t index);
-extern pm_ahbclk_status_t vsf_pm_ahbclk_get_status(pm_ahb_clk_no_t index);
-extern vsf_err_t vsf_pm_ahbclk_resume(pm_ahb_clk_no_t index, pm_ahbclk_status_t status);
-extern pm_ahbclk_status_t vsf_pm_ahbclk_enable(pm_ahb_clk_no_t index);
-extern pm_ahbclk_status_t vsf_pm_ahbclk_disable(pm_ahb_clk_no_t index);
+extern pm_sync_clk_status_t vsf_pm_sync_clk_get_status(pm_sync_clk_no_t index);
+extern vsf_err_t vsf_pm_sync_clk_resume(pm_sync_clk_no_t index, pm_sync_clk_status_t status);
+extern pm_sync_clk_status_t vsf_pm_sync_clk_enable(pm_sync_clk_no_t index);
+extern pm_sync_clk_status_t vsf_pm_sync_clk_disable(pm_sync_clk_no_t index);
 extern fsm_rt_t vsf_pm_mclk_init(pm_main_clk_cfg_t *cfg);
 extern uint_fast32_t vsf_pm_mclk_get(pm_main_clk_no_t sel);
 extern fsm_rt_t vsf_pm_pll_init(pm_pll_sel_t pll, pm_pll_cfg_t *cfg);

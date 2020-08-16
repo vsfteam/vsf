@@ -51,7 +51,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
-#if   defined(__PLOOC_CLASS_IMPLEMENT)
+#if   defined(__PLOOC_CLASS_IMPLEMENT__)
 
 #   ifdef __OOC_DEBUG__
 #       define __def_class(__NAME, __PUBLIC ,...)                               \
@@ -123,7 +123,7 @@
 #   define with_class(__TYPE, __SRC, ...)                                       \
             __with_class(__TYPE, __SRC, __VA_ARGS__)
 
-#elif   defined(__OOC_DEBUG__) && defined(__PLOOC_CLASS_INHERIT)
+#elif   defined(__OOC_DEBUG__) && defined(__PLOOC_CLASS_INHERIT__)
 #   define __def_class(__NAME,__PUBLIC,...)                                     \
     typedef struct __NAME __NAME;                                               \
     struct __protected_##__NAME {                                               \
@@ -182,7 +182,7 @@
 #   define with_protected(__TYPE, __SRC, ...)                                   \
             __with_protected(__TYPE, __SRC, __VA_ARGS__)
               
-#elif   defined(__PLOOC_CLASS_INHERIT)
+#elif   defined(__PLOOC_CLASS_INHERIT__)
 
 #   define __def_class(__NAME, __PUBLIC, ...)                                   \
     typedef struct __NAME __NAME;                                               \
@@ -310,8 +310,8 @@
 #define end_extern_class(__NAME, ...)   __end_extern_class(__NAME, __VA_ARGS__)
 
 
-#undef __PLOOC_CLASS_IMPLEMENT
-#undef __PLOOC_CLASS_INHERIT
+#undef __PLOOC_CLASS_IMPLEMENT__
+#undef __PLOOC_CLASS_INHERIT__
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

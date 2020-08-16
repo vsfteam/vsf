@@ -30,10 +30,10 @@
  *!        included in this file
  */
 #if     defined(__VSF_TGUI_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_TGUI_CLASS_IMPLEMENT
 #elif   defined(__VSF_TGUI_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_TGUI_CLASS_INHERIT
 #endif   
 
@@ -100,7 +100,7 @@ typedef struct vsf_tgui_cfg_t {
 #endif
 
     const vsf_tgui_top_container_t* ptRootNode;
-    vsf_prio_t                      tPriority;
+    vsf_prio_t                      priority;
 
 
 }vsf_tgui_cfg_t;
@@ -110,7 +110,7 @@ typedef struct vsf_tgui_cfg_t {
 
 
 extern 
-vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t *ptCFG);
+vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t *cfg_ptr);
 
 extern 
 vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI, 
@@ -121,15 +121,15 @@ bool vk_tgui_send_message(vsf_tgui_t *ptGUI, vsf_tgui_evt_t tEvent);
 
 extern 
 bool vk_tgui_update(vsf_tgui_t *ptGUI, 
-                    const vsf_tgui_control_t *ptTarget);
+                    const vsf_tgui_control_t *target_ptr);
 
 extern
 bool vk_tgui_update_tree(vsf_tgui_t* ptGUI,
-                        const vsf_tgui_control_t* ptTarget);
+                        const vsf_tgui_control_t* target_ptr);
 
 extern
 bool vk_tgui_send_timer_event(  vsf_tgui_t* ptGUI,
-                                const vsf_tgui_control_t* ptTarget);
+                                const vsf_tgui_control_t* target_ptr);
 
 extern
 const vsf_tgui_control_t *vsf_tgui_actived_control_get(vsf_tgui_t *ptGUI);
@@ -145,7 +145,7 @@ bool vk_tgui_refresh(vsf_tgui_t *ptGUI);
 
 extern 
 bool vk_tgui_refresh_ex(   vsf_tgui_t *ptGUI, 
-                            const vsf_tgui_control_t *ptTarget, 
+                            const vsf_tgui_control_t *target_ptr, 
                             const vsf_tgui_region_t *ptRegion);
 
 

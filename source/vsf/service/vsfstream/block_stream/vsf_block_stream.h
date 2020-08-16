@@ -26,14 +26,14 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#include "utilities/communicate.h"
+#include "utilities/vsf_utilities.h"
 
-#if     defined(VSFSTREAM_BLOCK_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSFSTREAM_BLOCK_CLASS_IMPLEMENT
-#elif   defined(VSFSTREAM_BLOCK_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSFSTREAM_BLOCK_CLASS_INHERIT
+#if     defined(__VSFSTREAM_BLOCK_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSFSTREAM_BLOCK_CLASS_IMPLEMENT
+#elif   defined(__VSFSTREAM_BLOCK_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSFSTREAM_BLOCK_CLASS_INHERIT__
 #endif   
 
 #include "utilities/ooc_class.h"
@@ -44,31 +44,31 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define __describe_block_stream_ex(__NAME, __BUFFER, __SIZE)                      \
-            vsf_block_stream_t __NAME = {                                         \
-                .op                 = &vsf_block_stream_op,                       \
-                .pchBuffer          = (__BUFFER),                               \
-                .nSize              = (__SIZE),                                 \
+#define __describe_block_stream_ex(__name, __buffer, __size)                    \
+            vsf_block_stream_t __name = {                                       \
+                .op                 = &vsf_block_stream_op,                     \
+                .buffer_ptr          = (__buffer),                               \
+                .s32_size              = (__size),                                 \
             };
 
-#define __describe_block_stream(__NAME, __SIZE)                                   \
-            uint8_t __##__NAME##_buffer[(__SIZE)];                              \
-            __describe_block_stream_ex(__NAME, __##__NAME##_buffer, (__SIZE))
+#define __describe_block_stream(__name, __size)                                 \
+            uint8_t __##__name##_buffer[(__size)];                              \
+            __describe_block_stream_ex(__name, __##__name##_buffer, (__size))
 
-#define __declare_block_stream(__name)                                            \
+#define __declare_block_stream(__name)                                          \
             extern vsf_block_stream_t __name;
 
-#define declare_block_stream(__name)                                              \
+#define declare_block_stream(__name)                                            \
             __declare_block_stream(__name)
-#define describe_block_stream_ex(__NAME, __BUFFER, __SIZE)                        \
-            __describe_block_stream_ex(__NAME, (__BUFFER), (__SIZE))
-#define describe_block_stream(__NAME, __SIZE)                                     \
-            __describe_block_stream(__NAME, (__SIZE))
+#define describe_block_stream_ex(__name, __buffer, __size)                      \
+            __describe_block_stream_ex(__name, (__buffer), (__size))
+#define describe_block_stream(__name, __size)                                   \
+            __describe_block_stream(__name, (__size))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_block_stream_t)
+dcl_simple_class(vsf_block_stream_t)
 def_simple_class(vsf_block_stream_t) {
     public_member(
         implement(vsf_stream_t)

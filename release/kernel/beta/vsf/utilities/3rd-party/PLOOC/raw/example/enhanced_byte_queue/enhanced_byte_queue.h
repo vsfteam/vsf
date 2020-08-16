@@ -34,10 +34,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
    
 #if     defined(__ENHANCED_BYTE_QUEUE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __ENHANCED_BYTE_QUEUE_CLASS_IMPLEMENT
 #elif   defined(__ENHANCED_BYTE_QUEUE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __ENHANCED_BYTE_QUEUE_CLASS_INHERIT
 #endif   
 
@@ -65,23 +65,23 @@ typedef byte_queue_cfg_t enhanced_byte_queue_cfg_t;
 //! @{
 def_interface(i_enhanced_byte_queue_t)
     inherit(i_byte_queue_t)
-    enhanced_byte_queue_t * (*Init)     (   enhanced_byte_queue_t *ptObj, 
+    enhanced_byte_queue_t * (*Init)     (   enhanced_byte_queue_t *obj_ptr, 
                                             enhanced_byte_queue_cfg_t *ptCFG);
-    bool                    (*Enqueue)  (   enhanced_byte_queue_t *ptObj, 
+    bool                    (*Enqueue)  (   enhanced_byte_queue_t *obj_ptr, 
                                             uint8_t chByte);
-    bool                    (*Dequeue)  (   enhanced_byte_queue_t *ptObj, 
+    bool                    (*Dequeue)  (   enhanced_byte_queue_t *obj_ptr, 
                                             uint8_t *pchByte);
-    uint_fast16_t           (*Count)    (   enhanced_byte_queue_t *ptObj);
+    uint_fast16_t           (*Count)    (   enhanced_byte_queue_t *obj_ptr);
     struct {
-        void *              (*Get)      (   enhanced_byte_queue_t *ptObj);
-        void                (*Set)      (   enhanced_byte_queue_t *ptObj, 
+        void *              (*Get)      (   enhanced_byte_queue_t *obj_ptr);
+        void                (*Set)      (   enhanced_byte_queue_t *obj_ptr, 
                                             void *pTarget);
     }Target;
     struct {
-        bool                (*PeekByte)  (  enhanced_byte_queue_t *ptObj, 
+        bool                (*PeekByte)  (  enhanced_byte_queue_t *obj_ptr, 
                                             uint8_t *pchByte);
-        void                (*Reset)     (  enhanced_byte_queue_t *ptObj);
-        void                (*GetAllPeeked)(enhanced_byte_queue_t *ptObj);
+        void                (*Reset)     (  enhanced_byte_queue_t *obj_ptr);
+        void                (*GetAllPeeked)(enhanced_byte_queue_t *obj_ptr);
     }Peek;
 end_def_interface(i_enhanced_byte_queue_t) /*do not remove this for forward compatibility */
 //! @}
@@ -92,22 +92,22 @@ extern const i_enhanced_byte_queue_t ENHANCED_BYTE_QUEUE;
 /*============================ PROTOTYPES ====================================*/
 
 extern
-enhanced_byte_queue_t * enhanced_byte_queue_init(enhanced_byte_queue_t *ptObj, 
+enhanced_byte_queue_t * enhanced_byte_queue_init(enhanced_byte_queue_t *obj_ptr, 
                                                  enhanced_byte_queue_cfg_t *ptCFG);
 
 extern 
-bool enhanced_byte_queue_enqueue(enhanced_byte_queue_t *ptObj, uint8_t chByte);
+bool enhanced_byte_queue_enqueue(enhanced_byte_queue_t *obj_ptr, uint8_t chByte);
 
 extern 
-bool enhanced_byte_queue_dequeue(enhanced_byte_queue_t *ptObj, uint8_t *pchByte);
+bool enhanced_byte_queue_dequeue(enhanced_byte_queue_t *obj_ptr, uint8_t *pchByte);
 
 extern 
-bool enhanced_byte_queue_peek(enhanced_byte_queue_t *ptObj, uint8_t *pchByte);
+bool enhanced_byte_queue_peek(enhanced_byte_queue_t *obj_ptr, uint8_t *pchByte);
 
 extern 
-void enhanced_byte_queue_peek_reset(enhanced_byte_queue_t *ptObj);
+void enhanced_byte_queue_peek_reset(enhanced_byte_queue_t *obj_ptr);
 
 extern 
-void enhanced_byte_queue_peek_get_all_peeked(enhanced_byte_queue_t *ptObj);
+void enhanced_byte_queue_peek_get_all_peeked(enhanced_byte_queue_t *obj_ptr);
 #endif
 /* EOF */

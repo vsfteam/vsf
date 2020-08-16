@@ -17,9 +17,8 @@
 
 /*============================ INCLUDES ======================================*/
 #include "utilities/vsf_utilities_cfg.h"
-#include "../compiler/compiler.h"
 #include "vsf_bitmap.h"
-
+#include "../compiler/compiler.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -42,14 +41,14 @@ void __vsf_bitmap_reset(uintalu_t *this_ptr, int_fast16_t bit_size)
 }
 
 
-int_fast16_t __vsf_bitmap_ffz(uintalu_t*bitmap_ptr, int_fast16_t bit_size)
+int_fast16_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast16_t bit_size)
 {
     int_fast16_t word_size =    (bit_size + (int_fast16_t)__optimal_bit_sz - 1) 
                             /   (int_fast16_t)__optimal_bit_sz;
-    int_fast16_t index = 0, temp, i;
+    int_fast16_t index = 0, i = 0;
 
-    for (i = 0; i < word_size; i++) {
-        temp = __vsf_arch_ffz(bitmap_ptr[i]);
+    for (; i < word_size; i++) {
+        int_fast16_t temp = __vsf_arch_ffz(bitmap_ptr[i]);
         if (temp >= 0) {
             index += temp;
             return index;

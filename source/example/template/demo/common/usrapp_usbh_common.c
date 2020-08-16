@@ -40,6 +40,16 @@ const usrapp_usbh_common_const_t usrapp_usbh_common_const = {
     .winusb_hcd_param   = {
         .priority       = APP_CFG_USBH_HW_PRIO,
     },
+#elif VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED
+    .dwcotg_hcd_param   = {
+        .op             = &VSF_USB_HC0_IP,
+        .priority       = APP_CFG_USBH_HW_PRIO,
+    },
+#elif VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED
+    .musb_fdrc_hcd_param = {
+        .op             = &VSF_USB_HC0_IP,
+        .priority       = APP_CFG_USBH_HW_PRIO,
+    },
 #else
     .hcd_param          = {
         .priority       = APP_CFG_USBH_HW_PRIO,
@@ -57,6 +67,12 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
     .host.drv           = &vk_winusb_hcd_drv,
     .host.param         = (void*)&usrapp_usbh_common_const.winusb_hcd_param,
+#elif VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED
+    .host.drv           = &vk_dwcotg_hcd_drv,
+    .host.param         = (void*)&usrapp_usbh_common_const.dwcotg_hcd_param,
+#elif VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED
+    .host.drv           = &vk_musb_fdrc_hcd_drv,
+    .host.param         = (void*)&usrapp_usbh_common_const.musb_fdrc_hcd_param,
 #else
     .host.drv           = &vsf_usb_hcd_drv,
     .host.param         = (void*)&usrapp_usbh_common_const.hcd_param,
@@ -67,6 +83,9 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #endif
 #if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
     .ecm.drv            = &vk_usbh_ecm_drv,
+#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
+    .rtl8152.drv        = &vk_usbh_rtl8152_drv,
+#   endif
 #endif
 #   if VSF_USE_USB_HOST_MSC == ENABLED
     .msc.drv            = &vk_usbh_msc_drv,
@@ -108,36 +127,39 @@ vsf_err_t usrapp_usbh_common_init(void)
 #endif
 
     vk_usbh_init(&usrapp_usbh_common.host);
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USE_USB_HOST_LIBUSB == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.libusb);
+#endif
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
+#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
+    vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.rtl8152);
 #   endif
-#   if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.ecm);
-#   endif
-#   if VSF_USE_USB_HOST_MSC == ENABLED
+#endif
+#if VSF_USE_USB_HOST_MSC == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.msc);
-#   endif
-#   if VSF_USE_USB_HOST_BTHCI == ENABLED
+#endif
+#if VSF_USE_USB_HOST_BTHCI == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.bthci);
-#   endif
-#   if VSF_USE_USB_HOST_HID == ENABLED
+#endif
+#if VSF_USE_USB_HOST_HID == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.hid);
-#   endif
-#   if VSF_USE_USB_HOST_DS4 == ENABLED
+#endif
+#if VSF_USE_USB_HOST_DS4 == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.ds4);
-#   endif
-#   if VSF_USE_USB_HOST_NSPRO == ENABLED
+#endif
+#if VSF_USE_USB_HOST_NSPRO == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.nspro);
-#   endif
-#   if VSF_USE_USB_HOST_XB360 == ENABLED
+#endif
+#if VSF_USE_USB_HOST_XB360 == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.xb360);
-#   endif
-#   if VSF_USE_USB_HOST_XB1 == ENABLED
+#endif
+#if VSF_USE_USB_HOST_XB1 == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.xb1);
-#   endif
-#   if VSF_USE_USB_HOST_HUB == ENABLED
+#endif
+#if VSF_USE_USB_HOST_HUB == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.hub);
-#   endif
+#endif
 #if VSF_USE_USB_HOST_UAC == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.uac);
 #endif

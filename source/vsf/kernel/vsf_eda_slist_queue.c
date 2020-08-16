@@ -24,7 +24,7 @@
 #include "./vsf_kernel_common.h"
 #include "./vsf_eda.h"
 
-#define __VSF_QUEUE_CLASS_IMPLEMENT
+#define __VSF_EDA_SLIST_QUEUE_CLASS_IMPLEMENT
 #include "./vsf_eda_slist_queue.h"
 
 /*============================ MACROS ========================================*/
@@ -32,10 +32,9 @@
 /*============================ TYPES =========================================*/
 
 #if __VSF_KERNEL_CFG_SUPPORT_EDA_SLIST_QUEUE == ENABLED
-struct __vsf_eda_slist_node_wrapper {
+typedef struct __vsf_eda_slist_node_wrapper {
     implement_ex(vsf_slist_node_t, node)
-};
-typedef struct __vsf_eda_slist_node_wrapper __vsf_eda_slist_node_wrapper;
+} __vsf_eda_slist_node_wrapper;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

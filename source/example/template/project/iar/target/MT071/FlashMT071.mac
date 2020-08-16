@@ -1,0 +1,35 @@
+execUserFlashInit()
+{
+	__message "---MT071 execUserFlashInit---";
+	__writeMemory32(0xFFFFFFFF,0xe000e180,"Memory");
+	__writeMemory32(0x00000000,0xe000e010,"Memory");
+	__writeMemory32(0x00080547,0x40000010,"Memory");
+	__writeMemory32(0x00000000,0x40000310,"Memory");
+	__writeMemory32(0x00000000,0x40000090,"Memory");
+	__writeMemory32(0x00000000,0x40000094,"Memory");
+	__writeMemory32(0x00000000,0x400000A0,"Memory");
+	__writeMemory32(0x00000000,0x400000A4,"Memory");
+	__writeMemory32(0x00000000,0x400000B0,"Memory");
+	__writeMemory32(0x00000000,0x400000D0,"Memory");
+	__writeMemory32(0x00000000,0x400000D8,"Memory");
+	__writeMemory32(0x00008005,0x40000130,"Memory");
+	__message "---MT071 execUserFlashInit---";
+}
+
+execUserReset()
+{
+	__message "---MT071 execUserReset---";
+	__writeMemory32(0xFFFFFFFF,0xe000e180,"Memory");
+	__writeMemory32(0x00000000,0xe000e010,"Memory");
+	__writeMemory32(0x00080547,0x40000010,"Memory");
+	__writeMemory32(0x00000000,0x40000310,"Memory");
+	__writeMemory32(0x00000000,0x40000090,"Memory");
+	__writeMemory32(0x00000000,0x40000094,"Memory");
+	__writeMemory32(0x00000000,0x400000A0,"Memory");
+	__writeMemory32(0x00000000,0x400000A4,"Memory");
+	__writeMemory32(0x00000000,0x400000B0,"Memory");
+	__writeMemory32(0x00000000,0x400000D0,"Memory");
+	__writeMemory32(0x00000000,0x400000D8,"Memory");
+	__writeMemory32(0x00008005,0x40000130,"Memory");
+	__message "---MT071 execUserReset---";
+}

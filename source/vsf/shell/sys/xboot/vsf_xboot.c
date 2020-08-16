@@ -19,7 +19,7 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_USE_XBOOT == ENABLED
 
-#define VSF_LINUX_INHERIT
+#define __VSF_LINUX_CLASS_INHERIT__
 #include <unistd.h>
 #include <xboot.h>
 #include <string.h>

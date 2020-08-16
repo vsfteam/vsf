@@ -29,11 +29,8 @@
 #include "hci_cmd.h"
 #include "btstack_run_loop.h"
 
-// TODO: use dedicated include
-#include "vsf.h"
-
-#include <stdarg.h>
-#include <stdio.h>
+#include "service/vsf_service.h"
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,13 +41,13 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if defined(ENABLE_LOG_INFO) || defined(ENABLE_LOG_ERROR) || defined(ENABLE_LOG_DEBUG)
-static void printf_timestamp(void)
+static void __hci_printf_timestamp(void)
 {
     uint32_t time_ms = btstack_run_loop_get_time_ms();
     vsf_trace(VSF_TRACE_DEBUG, "[%04ums] ", time_ms);
 }
 
-static void printf_packet(uint8_t packet_type, uint8_t in, uint8_t * packet, uint16_t len)
+static void __hci_printf_packet(uint8_t packet_type, uint8_t in, uint8_t * packet, uint16_t len)
 {
     switch (packet_type) {
     case HCI_COMMAND_DATA_PACKET:
@@ -84,8 +81,8 @@ static void printf_packet(uint8_t packet_type, uint8_t in, uint8_t * packet, uin
 
 void hci_dump_packet(uint8_t packet_type, uint8_t in, uint8_t *packet, uint16_t len)
 {
-    printf_timestamp();
-    printf_packet(packet_type, in, packet, len);
+    __hci_printf_timestamp();
+    __hci_printf_packet(packet_type, in, packet, len);
 }
 
 void hci_dump_log(int log_level, const char * format, ...)

@@ -31,7 +31,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_usbh_libusb_dev_t {
+typedef struct vk_usbh_libusb_dev_t {
     vk_usbh_t *usbh;
     vk_usbh_dev_t *dev;
     vk_usbh_urb_t urb;
@@ -45,14 +45,12 @@ struct vk_usbh_libusb_dev_t {
     uint8_t address;
     bool is_opened;
     bool is_to_remove;
-};
-typedef struct vk_usbh_libusb_dev_t vk_usbh_libusb_dev_t;
+} vk_usbh_libusb_dev_t;
 
-enum vk_usbh_libusb_evt_t {
+typedef enum vk_usbh_libusb_evt_t {
     VSF_USBH_LIBUSB_EVT_ON_ARRIVED,
     VSF_USBH_LIBUSB_EVT_ON_LEFT,
-};
-typedef enum vk_usbh_libusb_evt_t vk_usbh_libusb_evt_t;
+} vk_usbh_libusb_evt_t;
 
 typedef void (*vk_usbh_libusb_on_event_t)( void *param,
                                             vk_usbh_libusb_dev_t *dev,

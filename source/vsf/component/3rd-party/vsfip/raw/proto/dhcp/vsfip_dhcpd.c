@@ -19,9 +19,9 @@
 
 #include "component/tcpip/vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_VSFIP == ENABLED
 
-#define VSF_NETDRV_INHERIT_NETIF
+#define __VSF_NETDRV_CLASS_INHERIT_NETIF__
 #include "../../vsfip.h"
 #include "./vsfip_dhcpd.h"
 
@@ -33,7 +33,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static struct vsfip_ipmac_assoc * vsfip_dhcpd_get_assoc(vsfip_netif_t *netif, uint8_t *hwaddr)
+static struct vsfip_ipmac_assoc * __vsfip_dhcpd_get_assoc(vsfip_netif_t *netif, uint8_t *hwaddr)
 {
     vsfip_dhcpd_t *dhcpd = netif->dhcp.dhcpd;
     uint_fast8_t macsize = netif->netdrv->macaddr.size;
@@ -68,7 +68,7 @@ static struct vsfip_ipmac_assoc * vsfip_dhcpd_get_assoc(vsfip_netif_t *netif, ui
     return assoc;
 }
 
-static void vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
+static void __vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
 {
     vsfip_dhcpd_t *dhcpd = param;
     vsfip_netif_t *netif = dhcpd->netif;
@@ -81,7 +81,7 @@ static void vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
         goto exit;
     }
 
-    head = netbuf->app.pObj;
+    head = netbuf->app.obj_ptr;
     if (    (head->op != DHCP_TOSERVER)
         ||  (head->magic != cpu_to_be32(DHCP_MAGIC))
         ||  (head->htype != TCPIP_ETH_HWTYPE) || (head->hlen != 6)) {
@@ -95,7 +95,7 @@ static void vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
 
     switch (optptr[0]) {
     case DHCP_OP_DISCOVER:
-        assoc = vsfip_dhcpd_get_assoc(netif, head->chaddr);
+        assoc = __vsfip_dhcpd_get_assoc(netif, head->chaddr);
         if (NULL == assoc) {
             goto exit;
         }
@@ -108,7 +108,7 @@ static void vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
         head->flags = 0;
         head->yiaddr = assoc->ip.addr32;
         head->siaddr = netif->ip4addr.addr32;
-        netbuf->app.nSize = sizeof(*head);
+        netbuf->app.s32_size = sizeof(*head);
 
         dhcpd->optlen = 0;
         vsfip_dhcp_append_opt(netbuf, &dhcpd->optlen, DHCP_OPT_MSGTYPE,
@@ -146,7 +146,7 @@ static void vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
         dhcpd->so->remote_sockaddr.addr.addr32 = VSFIP_IPADDR_ANY;
         return;
     case DHCP_OP_REQUEST:
-        assoc = vsfip_dhcpd_get_assoc(netif, head->chaddr);
+        assoc = __vsfip_dhcpd_get_assoc(netif, head->chaddr);
         if (NULL == assoc) {
             goto exit;
         }
@@ -191,7 +191,7 @@ vsf_err_t vsfip_dhcpd_start(vsfip_netif_t *netif, vsfip_dhcpd_t *dhcpd)
     if (NULL == dhcpd->so) {
         goto cleanup;
     }
-    vsfip_socket_cb(dhcpd->so, dhcpd, vsfip_dhcpd_input, NULL);
+    vsfip_socket_cb(dhcpd->so, dhcpd, __vsfip_dhcpd_input, NULL);
     if (vsfip_bind(dhcpd->so, DHCP_SERVER_PORT)) {
         goto cleanup;
     }

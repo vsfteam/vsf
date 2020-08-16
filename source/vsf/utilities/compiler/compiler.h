@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __USE_COMPILER_H__
-#define __USE_COMPILER_H__            
+//#ifndef __USE_COMPILER_H__
+//#define __USE_COMPILER_H__            
 
 //! \brief CPU io
 
@@ -33,6 +33,7 @@
 #   include "./arm/arm_compiler.h"
 #endif
 
-#include "../preprocessor/mrepeat.h"
+#include "../preprocessor/vsf_connect.h"
+#include "../preprocessor/vsf_repeat_macro.h"
 
-#endif
+//#endif

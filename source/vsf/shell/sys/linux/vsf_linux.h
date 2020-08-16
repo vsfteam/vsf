@@ -31,10 +31,10 @@
 #include <signal.h>
 #include <dirent.h>
 
-#if     defined(VSF_LINUX_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#elif   defined(VSF_LINUX_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#if     defined(__VSF_LINUX_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#elif   defined(__VSF_LINUX_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -67,31 +67,28 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_linux_process_t)
-declare_simple_class(vsf_linux_thread_t)
-declare_simple_class(vsf_linux_fd_t)
+dcl_simple_class(vsf_linux_process_t)
+dcl_simple_class(vsf_linux_thread_t)
+dcl_simple_class(vsf_linux_fd_t)
 
-struct vsf_linux_process_arg_t {
+typedef struct vsf_linux_process_arg_t {
     int argc;
     char const *argv[VSF_LINUX_CFG_MAX_ARG_NUM + 1];
-};
-typedef struct vsf_linux_process_arg_t vsf_linux_process_arg_t;
+} vsf_linux_process_arg_t;
 
 typedef int (*vsf_linux_main_entry_t)(int, char **);
 typedef int (*vsf_linux_process_arg_parser_t)(vsf_linux_process_arg_t *arg);
 
-struct vsf_linux_thread_op_t {
+typedef struct vsf_linux_thread_op_t {
     int priv_size;
     void (*on_run)(vsf_thread_cb_t *cb);
     void (*on_terminate)(vsf_linux_thread_t *thread);
-};
-typedef struct vsf_linux_thread_op_t vsf_linux_thread_op_t;
+} vsf_linux_thread_op_t;
 
-struct vsf_linux_process_ctx_t {
+typedef struct vsf_linux_process_ctx_t {
     vsf_linux_process_arg_t arg;
     vsf_linux_main_entry_t entry;
-};
-typedef struct vsf_linux_process_ctx_t vsf_linux_process_ctx_t;
+} vsf_linux_process_ctx_t;
 
 def_simple_class(vsf_linux_thread_t) {
     public_member(
@@ -115,19 +112,17 @@ def_simple_class(vsf_linux_thread_t) {
     )
 };
 
-struct vsf_linux_sig_handler_t {
+typedef struct vsf_linux_sig_handler_t {
     vsf_dlist_node_t node;
     uint_fast8_t sig;
     void (*handler)(int, siginfo_t *, void *);
-};
-typedef struct vsf_linux_sig_handler_t vsf_linux_sig_handler_t;
+} vsf_linux_sig_handler_t;
 
-struct vsf_linux_stdio_stream_t {
+typedef struct vsf_linux_stdio_stream_t {
     vsf_stream_t *in;
     vsf_stream_t *out;
     vsf_stream_t *err;
-};
-typedef struct vsf_linux_stdio_stream_t vsf_linux_stdio_stream_t;
+} vsf_linux_stdio_stream_t;
 
 def_simple_class(vsf_linux_process_t) {
     public_member(
@@ -161,14 +156,13 @@ def_simple_class(vsf_linux_process_t) {
     )
 };
 
-struct vsf_linux_fd_op_t {
+typedef struct vsf_linux_fd_op_t {
     int priv_size;
     int (*fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
     ssize_t (*read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
     ssize_t (*write)(vsf_linux_fd_t *sfd, void *buf, size_t count);
     int (*close)(vsf_linux_fd_t *sfd);
-};
-typedef struct vsf_linux_fd_op_t vsf_linux_fd_op_t;
+} vsf_linux_fd_op_t;
 
 def_simple_class(vsf_linux_fd_t) {
     protected_member(
@@ -196,15 +190,14 @@ def_simple_class(vsf_linux_fd_t) {
     )
 };
 
-#if defined(VSF_LINUX_IMPLEMENT) || defined(VSF_LINUX_INHERIT)
-struct vsf_linux_fs_priv_t {
+#if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
+typedef struct vsf_linux_fs_priv_t {
     vk_file_t *file;
     uint64_t pos;
 
     struct dirent dir;
     vk_file_t *child;
-};
-typedef struct vsf_linux_fs_priv_t vsf_linux_fs_priv_t;
+} vsf_linux_fs_priv_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -217,7 +210,7 @@ extern int vsf_linux_fs_bind_target(int fd, void *target, vsf_param_eda_evthandl
         vsf_param_eda_evthandler_t write);
 extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
 
-#if defined(VSF_LINUX_IMPLEMENT) || defined(VSF_LINUX_INHERIT)
+#if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size);
@@ -249,8 +242,8 @@ extern vk_vfs_file_t * vsf_linux_fs_get_vfs(int fd);
 }
 #endif
 
-#undef VSF_LINUX_IMPLEMENT
-#undef VSF_LINUX_INHERIT
+#undef __VSF_LINUX_CLASS_IMPLEMENT
+#undef __VSF_LINUX_CLASS_INHERIT__
 
 #endif      // VSF_USE_LINUX
 #endif      // __VSF_LINUX_H__

@@ -41,12 +41,11 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-struct vsf_disp_solomon_systech_hw_iic_t {
+typedef struct vsf_disp_solomon_systech_hw_iic_t {
     void *port;
-};
-typedef struct vsf_disp_solomon_systech_hw_iic_t vsf_disp_solomon_systech_hw_iic_t;
+} vsf_disp_solomon_systech_hw_iic_t;
 
-struct vsf_disp_solomon_systech_hw_spi_t {
+typedef struct vsf_disp_solomon_systech_hw_spi_t {
     void *port;
     struct {
         vsf_gpio_t *port;
@@ -56,10 +55,9 @@ struct vsf_disp_solomon_systech_hw_spi_t {
         vsf_gpio_t *port;
         uint8_t pin;
     } dc;
-};
-typedef struct vsf_disp_solomon_systech_hw_spi_t vsf_disp_solomon_systech_hw_spi_t;
+} vsf_disp_solomon_systech_hw_spi_t;
 
-struct vsf_disp_solomon_systech_hw_ebi_t {
+typedef struct vsf_disp_solomon_systech_hw_ebi_t {
     void *addr;
     struct {
         vsf_gpio_t *port;
@@ -69,8 +67,7 @@ struct vsf_disp_solomon_systech_hw_ebi_t {
         vsf_gpio_t *port;
         uint8_t pin;
     } dc;
-};
-typedef struct vsf_disp_solomon_systech_hw_ebi_t vsf_disp_solomon_systech_hw_ebi_t;
+} vsf_disp_solomon_systech_hw_ebi_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

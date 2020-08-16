@@ -26,12 +26,12 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#if     defined(VSFSTREAM_FIFO_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSFSTREAM_FIFO_CLASS_IMPLEMENT
-#elif   defined(VSFSTREAM_FIFO_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSFSTREAM_FIFO_CLASS_INHERIT
+#if     defined(__VSFSTREAM_FIFO_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSFSTREAM_FIFO_CLASS_IMPLEMENT
+#elif   defined(__VSFSTREAM_FIFO_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSFSTREAM_FIFO_CLASS_INHERIT__
 #endif   
 
 #include "utilities/ooc_class.h"
@@ -44,19 +44,21 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_fifo_t)
-declare_simple_class(vsf_fifo_stream_t)
+dcl_simple_class(vsf_fifo_t)
+dcl_simple_class(vsf_fifo_stream_t)
 
 def_simple_class(vsf_fifo_t) {
-	uint8_t *buffer;
-    uint32_t size;
+    public_member(
+	    uint8_t *buffer;
+        uint32_t size;
 
-	uint32_t head;
-	uint32_t tail;
+	    uint32_t head;
+	    uint32_t tail;
+    )
 };
 
 def_simple_class(vsf_fifo_stream_t) {
-    which(
+    public_member(
         implement(vsf_stream_t)
         implement(vsf_fifo_t)
     )

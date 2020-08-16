@@ -43,7 +43,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __implement_vsf_task(__NAME)                                         \
-        fsm_rt_t vsf_task_func_##__NAME(struct task_cb_##__NAME * ptThis,       \
+        fsm_rt_t vsf_task_func_##__NAME(struct task_cb_##__NAME * this_ptr,       \
                                         vsf_evt_t evt)                          \
         {                                                                       
             
@@ -52,16 +52,16 @@
 #   define vsf_task_end()                                                       \
             } return fsm_rt_on_going;
 
-#   define vsf_task_state  (ptThis->tState)
+#   define vsf_task_state  (this_ptr->fsm_state)
 
 #else
 #   define __implement_vsf_task(__NAME)                                         \
-        void vsf_task_func_##__NAME(__NAME *ptThis, vsf_evt_t evt)
+        void vsf_task_func_##__NAME(__NAME *this_ptr, vsf_evt_t evt)
         
 #   define vsf_task_begin()  
 #   define vsf_task_end()           vsf_eda_yield();
                 
-#   define vsf_task_state  (ptThis->tState)
+#   define vsf_task_state  (this_ptr->fsm_state)
 #endif
 
 #define implement_vsf_task(__NAME)  __implement_vsf_task(__NAME)
@@ -84,7 +84,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __def_vsf_task(__NAME,__MEMBER)                                      \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t fsm_state;                                                    \
             vsf_sync_reason_t reason;                                           \
             __MEMBER                                                            \
         };                                                                      \
@@ -92,13 +92,13 @@
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
-        extern fsm_rt_t vsf_task_func_##__NAME( struct task_cb_##__NAME *ptThis,\
+        extern fsm_rt_t vsf_task_func_##__NAME( struct task_cb_##__NAME *this_ptr,\
                                                 vsf_evt_t evt);                 
         
 #else
 #   define __def_vsf_task(__NAME,__MEMBER)                                      \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t fsm_state;                                                    \
             vsf_sync_reason_t reason;                                           \
             __MEMBER                                                            \
         };                                                                      \
@@ -106,33 +106,33 @@
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
-        extern void vsf_task_func_##__NAME(struct __NAME *ptThis, vsf_evt_t evt);
+        extern void vsf_task_func_##__NAME(struct __NAME *this_ptr, vsf_evt_t evt);
 #endif
 #else
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __def_vsf_task(__NAME,...)                                           \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t fsm_state;                                                    \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
-        extern fsm_rt_t vsf_task_func_##__NAME( struct task_cb_##__NAME *ptThis,\
+        extern fsm_rt_t vsf_task_func_##__NAME( struct task_cb_##__NAME *this_ptr,\
                                                 vsf_evt_t evt);                 
         
 #else
 #   define __def_vsf_task(__NAME,...)                                           \
         struct task_cb_##__NAME {                                               \
-            uint8_t tState;                                                    \
+            uint8_t fsm_state;                                                    \
             __VA_ARGS__                                                         \
         };                                                                      \
         struct __NAME {                                                         \
             implement(vsf_task_t);                                              \
             implement_ex(task_cb_##__NAME, param);                              \
         };                                                                      \
-        extern void vsf_task_func_##__NAME(struct __NAME *ptThis, vsf_evt_t evt);
+        extern void vsf_task_func_##__NAME(struct __NAME *this_ptr, vsf_evt_t evt);
 #endif
 #endif
 
@@ -149,13 +149,13 @@
 #define declare_vsf_task(__NAME)      __declare_vsf_task(__NAME)
 
 #define prepare_vsf_task(__NAME, __TASK)                                        \
-            do {(__TASK)->tState = 0; } while(0)
+            do {(__TASK)->fsm_state = 0; } while(0)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __init_vsf_task(__NAME, __TASK, __PRI)                               \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
+            vsf_eda_cfg_t CONNECT3(__,__LINE__,cfg) = {                        \
                 .fn.fsm_entry = (vsf_task_entry_t)vsf_task_func(__NAME),        \
                 .priority = (__PRI),                                            \
                 .target = (uintptr_t)&((__TASK)->param),                        \
@@ -163,26 +163,26 @@
             };                                                                  \
             prepare_vsf_task(__NAME, &((__TASK)->param));                       \
             vsf_task_start( &((__TASK)->use_as__vsf_task_t),                    \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
+                            &CONNECT3(__,__LINE__,cfg));                       \
         } while(0)
 #else
 #   define __init_vsf_task(__NAME, __TASK, __PRI)                               \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
+            vsf_eda_cfg_t CONNECT3(__,__LINE__,cfg) = {                        \
                 .fn.evthandler = (vsf_task_entry_t)vsf_task_func(__NAME),       \
                 .priority = (__PRI),                                            \
                 .target = NULL,                                                 \
             };                                                                  \
             prepare_vsf_task(__NAME, &((__TASK)->param));                       \
             vsf_task_start( &((__TASK)->use_as__vsf_task_t),                    \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
+                            &CONNECT3(__,__LINE__,cfg));                       \
         } while(0)
 #endif
 #else
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __init_vsf_task(__NAME, __TASK, __PRI, ...)                          \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
+            vsf_eda_cfg_t CONNECT3(__,__LINE__,cfg) = {                        \
                 .fn.fsm_entry = (vsf_task_entry_t)vsf_task_func(__NAME),        \
                 .priority = (__PRI),                                            \
                 .target = (uintptr_t)&((__TASK)->param),                        \
@@ -191,12 +191,12 @@
             };                                                                  \
             prepare_vsf_task(__NAME, &((__TASK)->param));                       \
             vsf_task_start( &((__TASK)->use_as__vsf_task_t),                    \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
+                            &CONNECT3(__,__LINE__,cfg));                       \
         } while(0)
 #else
 #   define __init_vsf_task(__NAME, __TASK, __PRI, ...)                          \
         do {                                                                    \
-            vsf_eda_cfg_t ATPASTE3(__,__LINE__,tCFG) = {                        \
+            vsf_eda_cfg_t CONNECT3(__,__LINE__,cfg) = {                        \
                 .fn.evthandler = (vsf_task_entry_t)vsf_task_func(__NAME),       \
                 .priority = (__PRI),                                            \
                 .target = NULL,                                                 \
@@ -204,7 +204,7 @@
             };                                                                  \
             prepare_vsf_task(__NAME, &((__TASK)->param));                       \
             vsf_task_start( &((__TASK)->use_as__vsf_task_t),                    \
-                            &ATPASTE3(__,__LINE__,tCFG));                       \
+                            &CONNECT3(__,__LINE__,cfg));                       \
         } while(0)
 #endif
 #endif

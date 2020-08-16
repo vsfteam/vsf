@@ -89,11 +89,11 @@ a compile-time constant value.
 #   if __MFUNC_OUT_DEC_DIGIT_TEMP1 == 0
 #       define MFUNC_OUT_DEC_STR        __MFUNC_OUT_DEC_DIGIT_TEMP0
 #   else
-#       define MFUNC_OUT_DEC_STR        ATPASTE2(   __MFUNC_OUT_DEC_DIGIT_TEMP1,\
+#       define MFUNC_OUT_DEC_STR        CONNECT2(   __MFUNC_OUT_DEC_DIGIT_TEMP1,\
                                                     __MFUNC_OUT_DEC_DIGIT_TEMP0)
 #   endif
 #else
-#   define MFUNC_OUT_DEC_STR            ATPASTE3(   __MFUNC_OUT_DEC_DIGIT_TEMP2,\
+#   define MFUNC_OUT_DEC_STR            CONNECT3(   __MFUNC_OUT_DEC_DIGIT_TEMP2,\
                                                     __MFUNC_OUT_DEC_DIGIT_TEMP1,\
                                                     __MFUNC_OUT_DEC_DIGIT_TEMP0)
 #endif

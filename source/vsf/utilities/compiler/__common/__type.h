@@ -15,6 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
+
+
+
 #ifndef __COMMON_TYPE_H__
 #define __COMMON_TYPE_H__
 
@@ -34,6 +37,30 @@ extern "C" {
 
 /* do not modify this */
 #include "vsf_usr_cfg.h"
+
+
+/*! \note IMPORTANT 
+ *!       - Everytime when you try to add some 'common' header file including
+ *!         into __type.h, please take more time to think your decision, and 
+ *!         make sure that the header file is available in all the compiler 
+ *!         environment and platforms. 
+ *! 
+ *!       - If you know what you are doing, and there is still some concerns 
+ *!         which others need to know, please DO add necessary information  
+ *!         besides the "#include <xxxx>"
+ *!     
+ *!       - If you want to introduce a system header file (as part of c 
+ *!         standard) and you haven't encounter any known case where the header
+ *!         file is absent, we can assume that it is safe to put it in __type.h.
+ *!         If you do encounter scenarios where the header files is missing, 
+ *!         please move it to the plaform specific type.h
+ */
+
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
+#include <assert.h>
 
 /*============================ MACROS ========================================*/
 
@@ -160,6 +187,28 @@ typedef enum {
 } fsm_rt_t;
 //! @}
 
+#endif
+
+#if __IS_COMPILER_IAR__
+//! start of typedef name has already been declared
+#   pragma diag_suppress=pe301
+#endif
+
+
+#if defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L && !defined(__cplusplus)
+/*! \note if your compiler raises warning about "redefine" type, 
+ *!       please ignore and suppress the warning
+ *! 
+ *! \note char32_t and char16_t should only be used when C11 is enabled.
+ */
+typedef uint_least32_t char32_t;
+typedef uint_least16_t char16_t;
+#endif
+
+
+#if __IS_COMPILER_IAR__
+//! end of typedef name has already been declared
+//#   pragma diag_suppress=pe301
 #endif
 
 
@@ -327,3 +376,35 @@ typedef volatile uint32_t           reg32_t;
 
 
 #endif // __APP_TYPE_H_INCLUDED__
+
+
+/*============================ Multiple-Entry ================================*/
+
+/*! \note it is forseeable that in certain platform or compiler, people might 
+ *!       have their own version of those system header files listed below
+ */
+
+
+#if !defined(__USE_LOCAL_STDIO__)
+//#warning including stdio.h                                                    //! uncomment this for debugging purpose only
+#   include <stdio.h>
+#else
+//#   warning user ignored standard stdio.h                                     //! uncomment this for debugging purpose only
+#   undef __USE_LOCAL_STDIO__
+#endif
+
+#if !defined(__USE_LOCAL_SETJMP__)
+//#warning including setjmp.h                                                    //! uncomment this for debugging purpose only
+#   include <setjmp.h>
+#else
+//#   warning user ignored standard setjmp.h                                     //! uncomment this for debugging purpose only
+#   undef __USE_LOCAL_SETJMP__
+#endif
+
+#if !defined(__USE_LOCAL_STDARG__)
+//#warning including stdarg.h                                                    //! uncomment this for debugging purpose only
+#   include <stdarg.h>
+#else
+//#   warning user ignored standard stdarg.h                                     //! uncomment this for debugging purpose only
+#   undef __USE_LOCAL_STDARG__
+#endif

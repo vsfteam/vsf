@@ -134,11 +134,11 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
 
 #if     defined(__VSF_QUEUE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_QUEUE_CLASS_IMPLEMENT
-#elif   defined(__VSF_QUEUE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef __VSF_QUEUE_CLASS_INHERIT
+#elif   defined(__VSF_QUEUE_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_QUEUE_CLASS_INHERIT__
 #endif   
 
 #include "utilities/ooc_class.h"
@@ -308,7 +308,7 @@ void __name##_init(__name* queue_ptr, __name##_cfg_t* cfg_ptr)                  
                                                                                 \
 bool __name##_send_one(__name *queue_ptr, __type item)                          \
 {                                                                               \
-    bool result = false;                                                       \
+    bool result = false;                                                        \
     ASSERT(NULL != queue_ptr);                                                  \
     __queue_protect(                                                            \
         do {                                                                    \
@@ -318,16 +318,16 @@ bool __name##_send_one(__name *queue_ptr, __type item)                          
                 break;                                                          \
             }                                                                   \
             queue_ptr->buffer_ptr[index] = item;                                \
-            result = true;                                                     \
+            result = true;                                                      \
         } while(0);                                                             \
     )                                                                           \
                                                                                 \
-    return result;                                                             \
+    return result;                                                              \
 }                                                                               \
                                                                                 \
 bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     \
 {                                                                               \
-    bool result = false;                                                       \
+    bool result = false;                                                        \
     ASSERT(NULL != queue_ptr);                                                  \
     __queue_protect(                                                            \
         do {                                                                    \
@@ -339,11 +339,11 @@ bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     
             if (NULL != item_ptr) {                                             \
                 *item_ptr = queue_ptr->buffer_ptr[index];                       \
             }                                                                   \
-            result = true;                                                     \
+            result = true;                                                      \
         } while (0);                                                            \
     )                                                                           \
                                                                                 \
-    return result;                                                             \
+    return result;                                                              \
 }                                                                               \
                                                                                 \
 SECTION(".text." #__name "_item_count")                                         \
@@ -412,7 +412,7 @@ int32_t __name##_get_multiple(  __name * queue_ptr,                             
 SECTION(".text." #__name "_peek_one")                                           \
 bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             \
 {                                                                               \
-    bool result = false;                                                       \
+    bool result = false;                                                        \
     ASSERT(NULL != queue_ptr);                                                  \
     __queue_protect(                                                            \
         do {                                                                    \
@@ -424,11 +424,11 @@ bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             
             if (NULL != item_pptr) {                                            \
                 (*item_pptr) = (const __type*)&queue_ptr->buffer_ptr[index];    \
             }                                                                   \
-            result = true;                                                     \
+            result = true;                                                      \
         } while (0);                                                            \
     )                                                                           \
                                                                                 \
-    return result;                                                             \
+    return result;                                                              \
 }                                                                               \
                                                                                 \
 SECTION(".text." #__name "_reset_peek")                                         \
@@ -528,7 +528,11 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
     } while(0)
 
 #   define vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size, ...)          \
-        __vsf_rng_buf_prepare(__name, (__qaddr), (__buffer), (__size), __VA_ARGS__)
+        __vsf_rng_buf_prepare(  __name,                                         \
+                                (__qaddr),                                      \
+                                (__buffer),                                     \
+                                (__size),                                       \
+                                __VA_ARGS__)
 #endif
 
 #define __vsf_rng_buf_send_1(__name, __qaddr, __item)                           \
@@ -628,11 +632,13 @@ int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
 extern 
-int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr);
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t* obj_ptr, 
+                                    uint16_t* item_cnt_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
 extern 
-int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr);
+int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr, 
+                                    uint16_t* item_cnt_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
 extern 
@@ -656,7 +662,8 @@ uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
 extern
-int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* item_cnt_ptr);
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, 
+                                    uint16_t* item_cnt_ptr);
 
 
 #ifdef __cplusplus

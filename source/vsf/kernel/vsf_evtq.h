@@ -31,12 +31,11 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_evtq_ctx_t {
+typedef struct vsf_evtq_ctx_t {
     vsf_eda_t *eda;
     vsf_evt_t evt;
     uintptr_t msg;
-};
-typedef struct vsf_evtq_ctx_t vsf_evtq_ctx_t;
+} vsf_evtq_ctx_t;
 
 #if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 

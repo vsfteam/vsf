@@ -27,6 +27,11 @@
 /*============================ INCLUDES ======================================*/
 #       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
+#       include "../common/dram/dram.h"
+#       include "../common/debug_uart/debug_uart.h"
+#       include "../common/fb/fb.h"
+#       include "../common/usb/usb.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

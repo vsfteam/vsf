@@ -18,8 +18,9 @@
 
 /*! \note Top Level Configuration */
 
-#ifndef __VSF_UTILITIES_H__
-#define __VSF_UTILITIES_H__
+/*====================== Reentrant Header File================================*/
+//#ifndef __VSF_UTILITIES_H__
+//#define __VSF_UTILITIES_H__
 
 /*============================ MACROS ========================================*/
 /*============================ INCLUDES ======================================*/
@@ -55,5 +56,5 @@ extern "C" {
 }
 #endif
 
-#endif
+//#endif
 /* EOF */

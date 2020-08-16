@@ -30,7 +30,7 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
 {
     const m480_ohci_const_t *hc_cfg = hc->param;
     bool state = m480_reg_unlock();
-        vsf_pm_ahbclk_enable(hc_cfg->ahbclk);
+        vsf_pm_sync_clk_enable(hc_cfg->ahbclk);
         do {
 //            uint_fast32_t clk = vsf_pm_pll_get_clk_out(PLL0_idx);
             // TODO: remove later
@@ -43,8 +43,8 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
         } while (0);
 
         CLK->APBCLK0 |= CLK_APBCLK0_USBDCKEN_Msk | CLK_APBCLK0_OTGCKEN_Msk;
-//        vsf_pm_ahbclk_enable(AHBCLK_USBD_idx);
-//        vsf_pm_ahbclk_enable(AHBCLK_OTG_idx);
+//        vsf_pm_sync_clk_enable(SyncCLK_USBD_idx);
+//        vsf_pm_sync_clk_enable(SyncCLK_OTG_idx);
 
         // TODO: use vsf_gpio_config instead
 #define SYS_GPA_MFPH_PA13MFP_USB_D_N		(0x0EUL<<SYS_GPA_MFPH_PA13MFP_Pos) /*!< USB Full speed differential signal D-. \hideinitializer */

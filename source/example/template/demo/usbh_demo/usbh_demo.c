@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSFSTREAM_CLASS_INHERIT
+#define __VSFSTREAM_CLASS_INHERIT__
 #include "vsf.h"
 
 #if VSF_USE_USB_HOST == ENABLED && APP_CFG_USE_USBH_DEMO == ENABLED
@@ -47,11 +47,16 @@ static void __usrapp_usbh_uac_on_stream(void *param, vsf_stream_evt_t evt)
         break;
     }
 }
-void vsf_usbh_uac_on_new(void *uac, uint_fast8_t stream_num)
+void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_header)
 {
     vk_usbh_uac_stream_t * stream;
+
     vsf_trace(VSF_TRACE_INFO, "usbh_uac: new dev" VSF_TRACE_CFG_LINEEND);
-    for (int i = 0; i < stream_num; i++) {
+    // TODO: parse UAC units
+    vsf_trace(VSF_TRACE_INFO, "  descriptors:" VSF_TRACE_CFG_LINEEND);
+    vsf_trace_buffer(VSF_TRACE_INFO, ac_header, ac_header->wTotalLength);
+
+    for (int i = 0; i < ac_header->bInCollection; i++) {
         stream = vsf_usbh_uac_get_stream_info(uac, i);
         vsf_trace(VSF_TRACE_INFO, "  stream%d:" VSF_TRACE_CFG_LINEEND, i);
         vsf_trace(VSF_TRACE_INFO, "    direction: %s" VSF_TRACE_CFG_LINEEND, stream->is_in ? "IN" : "OUT");

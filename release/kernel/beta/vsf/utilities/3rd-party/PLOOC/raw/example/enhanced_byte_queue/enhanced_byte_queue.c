@@ -72,10 +72,10 @@ const i_enhanced_byte_queue_t ENHANCED_BYTE_QUEUE = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-enhanced_byte_queue_t * enhanced_byte_queue_init(enhanced_byte_queue_t *ptObj, 
+enhanced_byte_queue_t * enhanced_byte_queue_init(enhanced_byte_queue_t *obj_ptr, 
                                         byte_queue_cfg_t *ptCFG)
 {
-    class_internal(ptObj, ptThis, enhanced_byte_queue_t);
+    class_internal(obj_ptr, ptThis, enhanced_byte_queue_t);
     //! call base constructor
     if (NULL == byte_queue_init(&this.use_as__byte_queue_t, ptCFG)) {
         return NULL;
@@ -83,16 +83,16 @@ enhanced_byte_queue_t * enhanced_byte_queue_init(enhanced_byte_queue_t *ptObj,
     this.hwPeek = 0;
     this.hwPeekCount = 0;
     
-    return ptObj;
+    return obj_ptr;
 }
 
-bool enhanced_byte_queue_enqueue(enhanced_byte_queue_t *ptObj, uint8_t chByte)
+bool enhanced_byte_queue_enqueue(enhanced_byte_queue_t *obj_ptr, uint8_t chByte)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, enhanced_byte_queue_t);
+    class_internal(obj_ptr, ptThis, enhanced_byte_queue_t);
     /* initialise "base" (i.e. ptBase) to access protected members */
     protected_internal(&this.use_as__byte_queue_t, ptBase, byte_queue_t);
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     
     /* ------------------atomicity sensitive start---------------- */
     if (!byte_queue_enqueue(&this.use_as__byte_queue_t, chByte)) {
@@ -104,13 +104,13 @@ bool enhanced_byte_queue_enqueue(enhanced_byte_queue_t *ptObj, uint8_t chByte)
     return true;
 }
 
-bool enhanced_byte_queue_dequeue(enhanced_byte_queue_t *ptObj, uint8_t *pchByte)
+bool enhanced_byte_queue_dequeue(enhanced_byte_queue_t *obj_ptr, uint8_t *pchByte)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, enhanced_byte_queue_t);
+    class_internal(obj_ptr, ptThis, enhanced_byte_queue_t);
     /* initialise "base" (i.e. ptBase) to access protected members */
     protected_internal(&this.use_as__byte_queue_t, ptBase, byte_queue_t);
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     
     /* ------------------atomicity sensitive start---------------- */
     if (!byte_queue_dequeue(&this.use_as__byte_queue_t, pchByte)) {
@@ -123,14 +123,14 @@ bool enhanced_byte_queue_dequeue(enhanced_byte_queue_t *ptObj, uint8_t *pchByte)
     return true;
 }
 
-bool enhanced_byte_queue_peek(enhanced_byte_queue_t *ptObj, uint8_t *pchByte)
+bool enhanced_byte_queue_peek(enhanced_byte_queue_t *obj_ptr, uint8_t *pchByte)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, enhanced_byte_queue_t);
+    class_internal(obj_ptr, ptThis, enhanced_byte_queue_t);
     /* initialise "base" (i.e. ptBase) to access protected members */
     protected_internal(&this.use_as__byte_queue_t, ptBase, byte_queue_t);
     uint8_t chByte;
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     mem_t tBuffer;
     
     /* ------------------atomicity sensitive start---------------- */
@@ -140,9 +140,9 @@ bool enhanced_byte_queue_peek(enhanced_byte_queue_t *ptObj, uint8_t *pchByte)
         return false;
     }
     tBuffer = byte_queue_buffer_get(&this.use_as__byte_queue_t);
-    chByte = tBuffer.pchBuffer[this.hwPeek++];
+    chByte = tBuffer.buffer_ptr[this.hwPeek++];
     this.hwPeekCount--;
-    if (this.hwPeek >= tBuffer.hwSize) {
+    if (this.hwPeek >= tBuffer.u16_size) {
         this.hwPeek = 0;
     }
     /* ------------------atomicity sensitive end---------------- */
@@ -154,28 +154,28 @@ bool enhanced_byte_queue_peek(enhanced_byte_queue_t *ptObj, uint8_t *pchByte)
     return true;
 }
 
-void enhanced_byte_queue_peek_reset(enhanced_byte_queue_t *ptObj)
+void enhanced_byte_queue_peek_reset(enhanced_byte_queue_t *obj_ptr)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, enhanced_byte_queue_t);
+    class_internal(obj_ptr, ptThis, enhanced_byte_queue_t);
     /* initialise "base" (i.e. ptBase) to access protected members */
     protected_internal(&this.use_as__byte_queue_t, ptBase, byte_queue_t);
     
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     /* ------------------atomicity sensitive start---------------- */
     this.hwPeek = base.hwTail;
     this.hwPeekCount = base.hwCount;
     /* ------------------atomicity sensitive end---------------- */
 }
 
-void enhanced_byte_queue_peek_get_all_peeked(enhanced_byte_queue_t *ptObj)
+void enhanced_byte_queue_peek_get_all_peeked(enhanced_byte_queue_t *obj_ptr)
 {
     /* initialise "this" (i.e. ptThis) to access class members */
-    class_internal(ptObj, ptThis, enhanced_byte_queue_t);
+    class_internal(obj_ptr, ptThis, enhanced_byte_queue_t);
     /* initialise "base" (i.e. ptBase) to access protected members */
     protected_internal(&this.use_as__byte_queue_t, ptBase, byte_queue_t);
     
-    ASSERT(NULL != ptObj);
+    ASSERT(NULL != obj_ptr);
     /* ------------------atomicity sensitive start---------------- */
     base.hwCount = this.hwPeekCount;
     base.hwTail = this.hwPeek;

@@ -229,7 +229,7 @@ static void vsf_tgui_sv_text_draw(vsf_tgui_location_t* ptLocation,
     VSF_TGUI_ASSERT(ptString->pstrText != NULL);
 
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-    VSF_TGUI_ASSERT(ptString->iSize > 0);
+    VSF_TGUI_ASSERT(ptString->s16_size > 0);
 #endif
 
     VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));  // x_start point in screen
@@ -245,7 +245,7 @@ static void vsf_tgui_sv_text_draw(vsf_tgui_location_t* ptLocation,
 
     while (((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-        && (tCharOffset <= ptString->iSize)
+        && (tCharOffset <= ptString->s16_size)
 #endif
         ) {
 #if VSF_TGUI_SV_CFG_MULTI_LINE_TEXT == ENABLED
@@ -299,7 +299,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
     VSF_TGUI_ASSERT(ptStringInfo->tString.pstrText != NULL);
 
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-    VSF_TGUI_ASSERT(ptStringInfo->tString.iSize > 0);
+    VSF_TGUI_ASSERT(ptStringInfo->tString.s16_size > 0);
 #endif
 
     //Noto: Temporary code, Will be removed when style is supported

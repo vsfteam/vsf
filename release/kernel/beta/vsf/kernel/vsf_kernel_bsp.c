@@ -189,7 +189,7 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 implement_vsf_thread(app_main_thread_t)
 {
-    UNUSED_PARAM(ptThis);
+    UNUSED_PARAM(this_ptr);
     main();
 }
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
@@ -262,8 +262,8 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
     
     return (vsf_mem_t){
-        .PTR.pchSrc = (uint8_t *)s_chHeapBuffer, 
-        .nSize = sizeof(s_chHeapBuffer)
+        .PTR.src_ptr = (uint8_t *)s_chHeapBuffer, 
+        .s32_size = sizeof(s_chHeapBuffer)
     };
 #endif
 }

@@ -65,7 +65,7 @@ extern "C" {
 
 
 #define EXIT_LOCK()     do {                                                    \
-                            (*lock_ptr) = UNLOCKED;                           \
+                            (*lock_ptr) = UNLOCKED;                             \
                             SET_GLOBAL_INTERRUPT_STATE(gint_state);             \
                         } while(false)
 
@@ -135,19 +135,19 @@ extern "C" {
             )
 #endif
 
-#define vsf_protect_t                   uint_fast32_t
-#define vsf_protect_interrupt()         DISABLE_GLOBAL_INTERRUPT()
-#define vsf_unprotect_interrupt(__state)SET_GLOBAL_INTERRUPT_STATE(__state)
-#define vsf_protect_none()              (0)
-#define vsf_unprotect_none(__state)     UNUSED_PARAM(__state)
+#define vsf_protect_t                       uint_fast32_t
+#define vsf_protect_interrupt()              DISABLE_GLOBAL_INTERRUPT()
+#define vsf_unprotect_interrupt(__state)    SET_GLOBAL_INTERRUPT_STATE(__state)
+#define vsf_protect_none()                  (0)
+#define vsf_unprotect_none(__state)         UNUSED_PARAM(__state)
 
-#define vsf_protect_int()               vsf_protect_interrupt()
-#define vsf_unprotect_int(__state)      vsf_unprotect_interrupt(__state)
+#define vsf_protect_int()                   vsf_protect_interrupt()
+#define vsf_unprotect_int(__state)          vsf_unprotect_interrupt(__state)
 
-#define __vsf_protect(__type)           vsf_protect_##__type
-#define __vsf_unprotect(__type)         vsf_unprotect_##__type
-#define vsf_protect(__type)             __vsf_protect(__type)
-#define vsf_unprotect(__type)           __vsf_unprotect(__type)
+#define __vsf_protect(__type)               vsf_protect_##__type
+#define __vsf_unprotect(__type)             vsf_unprotect_##__type
+#define vsf_protect(__type)                 __vsf_protect(__type)
+#define vsf_unprotect(__type)               __vsf_unprotect(__type)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_protect_region(__type, __code)                                   \

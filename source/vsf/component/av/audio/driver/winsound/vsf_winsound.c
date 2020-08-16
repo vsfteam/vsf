@@ -21,12 +21,12 @@
 
 #if VSF_USE_AUDIO == ENABLED && VSF_USE_WINSOUND == ENABLED
 
-#define VSF_AUDIO_INHERIT
-#define VSF_WINSOUND_IMPLEMENT
-#define VSFSTREAM_CLASS_INHERIT
+#define __VSF_AUDIO_CLASS_INHERIT__
+#define __VSF_WINSOUND_CLASS_IMPLEMENT
+#define __VSFSTREAM_CLASS_INHERIT__
 
-// TODO: use dedicated include
-#include "vsf.h"
+#include "service/vsf_service.h"
+#include "../../vsf_audio.h"
 #include "./vsf_winsound.h"
 
 #include <Windows.h>

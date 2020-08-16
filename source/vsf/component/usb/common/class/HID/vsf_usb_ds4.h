@@ -18,16 +18,19 @@
 #ifndef __VSF_USB_DS4_H__
 #define __VSF_USB_DS4_H__
 
+/*============================ INCLUDES ======================================*/
+
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_usb_ds4_gamepad_in_report_t {
+typedef struct vsf_usb_ds4_gamepad_in_report_t {
     uint8_t id;             // data 0
     uint8_t lx;             // data 1
     uint8_t ly;             // data 2
@@ -64,10 +67,9 @@ struct vsf_usb_ds4_gamepad_in_report_t {
     uint8_t unknown3[2];    // data 31 - data 32
     uint8_t touch[19];      // data 33 - data 51
     uint8_t unknown4[12];   // data 52 - data 63
-} PACKED;
-typedef struct vsf_usb_ds4_gamepad_in_report_t vsf_usb_ds4_gamepad_in_report_t;
+} PACKED vsf_usb_ds4_gamepad_in_report_t;
 
-struct vsf_usb_ds4_gamepad_out_report_t {
+typedef struct vsf_usb_ds4_gamepad_out_report_t {
     uint8_t id;
     uint8_t dummyFF;
     uint8_t dummy1[2];
@@ -82,8 +84,7 @@ struct vsf_usb_ds4_gamepad_out_report_t {
     uint8_t flash_dark;     // 255 = 2.5 seconds
     
     uint8_t dummy2[21];
-} PACKED;
-typedef struct vsf_usb_ds4_gamepad_out_report_t vsf_usb_ds4_gamepad_out_report_t;
+} PACKED vsf_usb_ds4_gamepad_out_report_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

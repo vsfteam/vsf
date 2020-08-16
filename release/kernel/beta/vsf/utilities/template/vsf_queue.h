@@ -134,10 +134,10 @@
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
 
 #if     defined(__VSF_QUEUE_CLASS_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_QUEUE_CLASS_IMPLEMENT
 #elif   defined(__VSF_QUEUE_CLASS_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
+#   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_QUEUE_CLASS_INHERIT
 #endif   
 
@@ -162,12 +162,12 @@
 #   define __def_vsf_rng_buf(__name, __type)                                    \
     struct __name {                                                             \
         implement(vsf_rng_buf_t)                                                \
-        __type *ptBuffer;                                                       \
+        __type *buffer_ptr;                                                       \
     };                                                                          \
                                                                                 \
     struct __name##_cfg_t {                                                     \
-        __type *ptBuffer;                                                       \
-        uint16_t hwSize;                                                        \
+        __type *buffer_ptr;                                                       \
+        uint16_t u16_size;                                                        \
         bool     bInitAsFull;                                                   \
     };                                                                          \
                                                                                 \
@@ -228,13 +228,13 @@ int32_t __name##_peek_multiple( __name* ptQ,                                    
 #   define __def_vsf_rng_buf(__name, __type, ...)                               \
     struct __name {                                                             \
         implement(vsf_rng_buf_t)                                                \
-        __type *ptBuffer;                                                       \
+        __type *buffer_ptr;                                                       \
         __VA_ARGS__                                                             \
     };                                                                          \
                                                                                 \
     struct __name##_cfg_t {                                                     \
-        __type *ptBuffer;                                                       \
-        uint16_t hwSize;                                                        \
+        __type *buffer_ptr;                                                       \
+        uint16_t u16_size;                                                        \
         bool     bInitAsFull;                                                   \
     };                                                                          \
                                                                                 \
@@ -294,11 +294,11 @@ int32_t __name##_peek_multiple( __name* ptQ,                                    
 void __name##_init(__name* ptQ, __name##_cfg_t* ptCFG)                          \
 {                                                                               \
     ASSERT(NULL != ptQ && NULL != ptCFG);                                       \
-    ASSERT(NULL != ptCFG->ptBuffer);                                            \
-    ASSERT(ptCFG->hwSize >= sizeof(__type));                                    \
-    ptQ->ptBuffer = ptCFG->ptBuffer;                                            \
+    ASSERT(NULL != ptCFG->buffer_ptr);                                            \
+    ASSERT(ptCFG->u16_size >= sizeof(__type));                                    \
+    ptQ->buffer_ptr = ptCFG->buffer_ptr;                                            \
     __vsf_rng_buf_init_ex(&(ptQ->use_as__vsf_rng_buf_t),                        \
-        ptCFG->hwSize / sizeof(__type),                                         \
+        ptCFG->u16_size / sizeof(__type),                                         \
         ptCFG->bInitAsFull);                                                    \
 }                                                                               \
                                                                                 \
@@ -313,7 +313,7 @@ bool __name##_send_one(__name *ptQ, __type tItem)                               
             if (nIndex < 0) {                                                   \
                 break;                                                          \
             }                                                                   \
-            ptQ->ptBuffer[nIndex] = tItem;                                      \
+            ptQ->buffer_ptr[nIndex] = tItem;                                      \
             bResult = true;                                                     \
         } while(0);                                                             \
     )                                                                           \
@@ -333,7 +333,7 @@ bool __name##_get_one(__name * ptQ, __type *ptItem)                             
                 break;                                                          \
             }                                                                   \
             if (NULL != ptItem) {                                               \
-                *ptItem = ptQ->ptBuffer[nIndex];                                \
+                *ptItem = ptQ->buffer_ptr[nIndex];                                \
             }                                                                   \
             bResult = true;                                                     \
         } while (0);                                                            \
@@ -368,7 +368,7 @@ int32_t __name##_send_multiple(  __name * ptQ,                                  
                 break;                                                          \
             }                                                                   \
                                                                                 \
-            memcpy(&(ptQ->ptBuffer[nIndex]), ptItem, hwCount * sizeof(__type)); \
+            memcpy(&(ptQ->buffer_ptr[nIndex]), ptItem, hwCount * sizeof(__type)); \
             nResult = hwCount;                                                  \
         } while(0);                                                             \
     )                                                                           \
@@ -394,7 +394,7 @@ int32_t __name##_get_multiple(  __name * ptQ,                                   
                 break;                                                          \
             }                                                                   \
                                                                                 \
-            memcpy(ptItem, &(ptQ->ptBuffer[nIndex]), hwCount * sizeof(__type)); \
+            memcpy(ptItem, &(ptQ->buffer_ptr[nIndex]), hwCount * sizeof(__type)); \
             nResult = hwCount;                                                  \
         } while(0);                                                             \
     )                                                                           \
@@ -414,7 +414,7 @@ bool __name##_peek_one(__name *ptQ, const __type** pptItem)                     
                 break;                                                          \
             }                                                                   \
             if (NULL != pptItem) {                                              \
-                (*pptItem) = (const __type*)&ptQ->ptBuffer[nIndex];             \
+                (*pptItem) = (const __type*)&ptQ->buffer_ptr[nIndex];             \
             }                                                                   \
             bResult = true;                                                     \
         } while (0);                                                            \
@@ -467,8 +467,8 @@ int32_t __name##_peek_multiple( __name * ptQ,                                   
                 break;                                                          \
             }                                                                   \
                                                                                 \
-/*memcpy(ptItem, &(ptQ->ptBuffer[nIndex]), hwCount * sizeof(__type));*/         \
-            (*pptItem) = (const __type*)&(ptQ->ptBuffer[nIndex]);               \
+/*memcpy(ptItem, &(ptQ->buffer_ptr[nIndex]), hwCount * sizeof(__type));*/         \
+            (*pptItem) = (const __type*)&(ptQ->buffer_ptr[nIndex]);               \
             nResult = hwCount;                                                  \
         } while(0);                                                             \
     )                                                                           \
@@ -483,11 +483,11 @@ int32_t __name##_peek_multiple( __name * ptQ,                                   
 #define __vsf_rng_buf_init(__name, __type, __qaddr, __item_count)               \
     do {                                                                        \
         NO_INIT static uint16_t s_hwBuffer[(__item_count)];                     \
-        __name##_cfg_t tCFG = {                                                 \
+        __name##_cfg_t cfg = {                                                 \
             s_hwBuffer,                                                         \
             sizeof(s_hwBuffer),                                                 \
         };                                                                      \
-        __name##_init((__qaddr), & tCFG);                                       \
+        __name##_init((__qaddr), & cfg);                                       \
     } while(0)
 
 #define vsf_rng_buf_init(__name, __type, __qaddr, __item_count)                 \
@@ -499,10 +499,10 @@ int32_t __name##_peek_multiple( __name * ptQ,                                   
 
 #define __vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size)                \
     do {                                                                        \
-        __name##_cfg_t tCFG = {0};                                              \
-        tCFG.ptBuffer = (__buffer);                                             \
-        tCFG.hwSize = (__size);                                                 \
-        __name##_init((__qaddr), & tCFG);                                       \
+        __name##_cfg_t cfg = {0};                                              \
+        cfg.buffer_ptr = (__buffer);                                             \
+        cfg.u16_size = (__size);                                                 \
+        __name##_init((__qaddr), & cfg);                                       \
     } while(0)
 
 #   define vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size)               \
@@ -511,12 +511,12 @@ int32_t __name##_peek_multiple( __name * ptQ,                                   
 
 #   define __vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size, ...)        \
     do {                                                                        \
-        __name##_cfg_t tCFG = {                                                 \
+        __name##_cfg_t cfg = {                                                 \
             (__buffer),                                                         \
             (__size),                                                           \
             __VA_ARGS__                                                         \
         };                                                                      \
-        __name##_init((__qaddr), & tCFG);                                       \
+        __name##_init((__qaddr), & cfg);                                       \
     } while(0)
 
 #   define vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size, ...)          \
@@ -608,45 +608,45 @@ end_def_class(vsf_rng_buf_t)
 /*============================ PROTOTYPES ====================================*/
 
 extern 
-void __vsf_rng_buf_init_ex(  vsf_rng_buf_t* ptObj, 
+void __vsf_rng_buf_init_ex(  vsf_rng_buf_t* obj_ptr, 
                         uint_fast16_t hwBufferItemCount, 
                         bool bInitAsFull);
 
 extern 
-int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t* ptObj);
+int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t* obj_ptr);
 
 extern 
-int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* ptObj);
+int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
 extern 
-int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount);
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* phwItemCount);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
 extern 
-int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount);
+int32_t __vsf_rng_buf_get_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* phwItemCount);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
 extern 
-uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* ptObj);
+uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
 extern 
-int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* ptObj);
+int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
 extern 
-void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* ptObj);
+void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
 extern
-void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* ptObj);
+void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
 extern
-uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* ptObj);
+uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr);
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
 extern
-int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* ptObj, uint16_t* phwItemCount);
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, uint16_t* phwItemCount);
 #endif

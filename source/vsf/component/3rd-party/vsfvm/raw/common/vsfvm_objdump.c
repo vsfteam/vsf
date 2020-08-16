@@ -32,7 +32,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const char * vsfvmc_variable_id[] = {
+static const char * __vsfvmc_variable_id[] = {
     STR(VSFVM_CODE_VARIABLE_NORMAL),
     STR(VSFVM_CODE_VARIABLE_REFERENCE),
     STR(VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE),
@@ -40,7 +40,7 @@ static const char * vsfvmc_variable_id[] = {
     STR(VSFVM_CODE_VARIABLE_FUNCTION),
 };
 
-static const char * vsfvmc_variable_pos[] = {
+static const char * __vsfvmc_variable_pos[] = {
     STR(VSFVM_CODE_VARIABLE_POS_LOCAL),
     STR(VSFVM_CODE_VARIABLE_POS_STACK_BEGIN),
     STR(VSFVM_CODE_VARIABLE_POS_STACK_END),
@@ -49,7 +49,7 @@ static const char * vsfvmc_variable_pos[] = {
     STR(VSFVM_CODE_VARIABLE_POS_EXT),
 };
 
-static const char * vsfvmc_funtion_id[] = {
+static const char * __vsfvmc_funtion_id[] = {
     STR(VSFVM_CODE_FUNCTION_SCRIPT),
     STR(VSFVM_CODE_FUNCTION_EXT),
     STR(VSFVM_CODE_FUNCTION_THREAD),
@@ -129,13 +129,13 @@ void vsfvm_tkdump(vsfvm_bytecode_t token)
         break;
     case VSFVM_CODE_TYPE_VARIABLE:
         vsf_trace(VSF_TRACE_NONE, "VSFVM_VARIABLE(%s, %s, %d)," VSF_TRACE_CFG_LINEEND,
-                id > VSFVM_CODE_VARIABLE_FUNCTION ? "unknown variable type" : vsfvmc_variable_id[id],
-                arg8 > VSFVM_CODE_VARIABLE_POS_EXT ? "unknown variable position" : vsfvmc_variable_pos[arg8],
+                id > VSFVM_CODE_VARIABLE_FUNCTION ? "unknown variable type" : __vsfvmc_variable_id[id],
+                arg8 > VSFVM_CODE_VARIABLE_POS_EXT ? "unknown variable position" : __vsfvmc_variable_pos[arg8],
                 arg16);
         break;
     case VSFVM_CODE_TYPE_FUNCTION:
         vsf_trace(VSF_TRACE_NONE, "VSFVM_FUNCTION(%s, %d, %d)," VSF_TRACE_CFG_LINEEND,
-            id > VSFVM_CODE_FUNCTION_THREAD ? "unknown function type" : vsfvmc_funtion_id[id],
+            id > VSFVM_CODE_FUNCTION_THREAD ? "unknown function type" : __vsfvmc_funtion_id[id],
             arg8, arg16);
         break;
     case VSFVM_CODE_TYPE_EOF:

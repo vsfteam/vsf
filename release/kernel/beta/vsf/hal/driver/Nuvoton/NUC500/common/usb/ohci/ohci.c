@@ -30,8 +30,8 @@ vsf_err_t nuc500_ohci_init(nuc500_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
     const nuc500_ohci_const_t *hc_cfg = hc->param;
 
     // TODO: use pm to configure usbh clock
-//    vsf_pm_ahbclk_enable(hc_cfg->ahbclk);
-    CLK->AHBCLK |= CLK_AHBCLK_USBHCKEN_Msk;
+//    vsf_pm_sync_clk_enable(hc_cfg->ahbclk);
+    CLK->SyncCLK |= CLK_SyncCLK_USBHCKEN_Msk;
     // TODO: get pll clock from pm
     uint_fast32_t pll_clk = 480000000;
     CLK->CLKDIV0 = (CLK->CLKDIV0 & ~(CLK_CLKDIV0_USBHDIV_Msk | CLK_CLKDIV0_USBHSEL_Msk))

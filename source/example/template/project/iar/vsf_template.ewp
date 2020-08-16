@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.40.2.22864</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -304,11 +304,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--no_unaligned_access</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -367,6 +367,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1138,7 +1140,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.40.2.22864</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -1377,11 +1379,11 @@
                 </option>
                 <option>
                     <name>IExtraOptionsCheck</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>IExtraOptions</name>
-                    <state></state>
+                    <state>--no_unaligned_access</state>
                 </option>
                 <option>
                     <name>CCLangConformance</name>
@@ -1439,6 +1441,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2145,10 +2149,2189 @@
             <data />
         </settings>
     </configuration>
+    <configuration>
+        <name>vsf_template_gd32e103</name>
+        <toolchain>
+            <name>ARM</name>
+        </toolchain>
+        <debug>1</debug>
+        <settings>
+            <name>General</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <version>31</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>ExePath</name>
+                    <state>vsf_template_gd32e103\Exe</state>
+                </option>
+                <option>
+                    <name>ObjPath</name>
+                    <state>vsf_template_gd32e103\Obj</state>
+                </option>
+                <option>
+                    <name>ListPath</name>
+                    <state>vsf_template_gd32e103\List</state>
+                </option>
+                <option>
+                    <name>GEndianMode</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>Input description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>Output description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>GOutputBinary</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGCoreOrChip</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelect</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelectSlave</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>RTDescription</name>
+                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                </option>
+                <option>
+                    <name>OGProductVersion</name>
+                    <state>8.30.1.17146</state>
+                </option>
+                <option>
+                    <name>OGLastSavedByProductVersion</name>
+                    <state>8.40.2.22864</state>
+                </option>
+                <option>
+                    <name>GeneralEnableMisra</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraVerbose</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGChipSelectEditMenu</name>
+                    <state>GD32E103xB	GD GD32E103xB</state>
+                </option>
+                <option>
+                    <name>GenLowLevelInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GEndianModeBE</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OGBufferedTerminalOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenStdoutInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraRules98</name>
+                    <version>0</version>
+                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                </option>
+                <option>
+                    <name>GeneralMisraVer</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraRules04</name>
+                    <version>0</version>
+                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                </option>
+                <option>
+                    <name>RTConfigPath2</name>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</state>
+                </option>
+                <option>
+                    <name>GBECoreSlave</name>
+                    <version>27</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>OGUseCmsis</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGUseCmsisDspLib</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibThreads</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CoreVariant</name>
+                    <version>27</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>GFPUDeviceSlave</name>
+                    <state>GD32E103xB	GD GD32E103xB</state>
+                </option>
+                <option>
+                    <name>FPU2</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>NrRegs</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>NEON</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GFPUCoreSlave2</name>
+                    <version>27</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>OGCMSISPackSelectDevice</name>
+                </option>
+                <option>
+                    <name>OgLibHeap</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGLibAdditionalLocale</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenLocaleTags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>GenLocaleDisplayOnly</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>DSPExtension</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>TrustZone</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>TrustZoneModes</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>ICCARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>35</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>CCDefines</name>
+                    <state>__GigaDevice__</state>
+                    <state>__GD32E103__</state>
+                </option>
+                <option>
+                    <name>CCPreprocFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocComments</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocLine</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCListCFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMnemonics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMessages</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagSuppress</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagRemark</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagWarning</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagError</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCAllowList</name>
+                    <version>1</version>
+                    <state>11111110</state>
+                </option>
+                <option>
+                    <name>CCDebugInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IEndianMode</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptionsCheck</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptions</name>
+                    <state>--no_unaligned_access</state>
+                </option>
+                <option>
+                    <name>CCLangConformance</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCSignedPlainChar</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCRequirePrototypes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagWarnAreErr</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCompilerRuntimeInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>CCLibConfigHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CompilerMisraOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCIncludePath2</name>
+                    <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\DSP\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\NN\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\shell\media\sdl2\include\SDL2</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfvm\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\raw\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include</state>
+                </option>
+                <option>
+                    <name>CCStdIncCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCodeSection</name>
+                    <state>.text</state>
+                </option>
+                <option>
+                    <name>IProcessorMode2</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevel</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CCOptStrategy</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevelSlave</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CompilerMisraRules98</name>
+                    <version>0</version>
+                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                </option>
+                <option>
+                    <name>CompilerMisraRules04</name>
+                    <version>0</version>
+                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                </option>
+                <option>
+                    <name>CCPosIndRopi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndRwpi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndNoDynInit</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccLang</name>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>IccCDialect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccAllowVLA</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccStaticDestr</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccCppInlineSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccFloatSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptStrategySlave</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCGuardCalls</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccExceptions2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccRTTI2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OICompilerExtraOption</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>AARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>10</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>AObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AEndian</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>ACaseSensitivity</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacroChars</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnWhat</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnOne</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange1</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>ADebug</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AltRegisterNames</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ADefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AList</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AListHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AListing</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>Includes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacDefs</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacExps</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacExec</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OnlyAssed</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MultiLine</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLengthCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLength</name>
+                    <state>80</state>
+                </option>
+                <option>
+                    <name>TabSpacing</name>
+                    <state>8</state>
+                </option>
+                <option>
+                    <name>AXRef</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDefines</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefInternal</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDual</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AOutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsEdit</name>
+                    <state>100</state>
+                </option>
+                <option>
+                    <name>AIgnoreStdInclude</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AUserIncludes</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AExtraOptionsCheckV2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AExtraOptionsV2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AsmNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>OBJCOPY</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>1</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>OOCOutputFormat</name>
+                    <version>3</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OCOutputOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OOCOutputFile</name>
+                    <state>vsf_template.hex</state>
+                </option>
+                <option>
+                    <name>OOCCommandLineProducer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OOCObjCopyEnable</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>CUSTOM</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <extensions></extensions>
+                <cmdline></cmdline>
+                <hasPrio>0</hasPrio>
+            </data>
+        </settings>
+        <settings>
+            <name>BICOMP</name>
+            <archiveVersion>0</archiveVersion>
+            <data />
+        </settings>
+        <settings>
+            <name>BUILDACTION</name>
+            <archiveVersion>1</archiveVersion>
+            <data>
+                <prebuild></prebuild>
+                <postbuild></postbuild>
+            </data>
+        </settings>
+        <settings>
+            <name>ILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>23</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IlinkLibIOConfig</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>XLinkMisraHandler</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkInputFileSlave</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOutputFile</name>
+                    <state>vsf_template_gd23e103.out</state>
+                </option>
+                <option>
+                    <name>IlinkDebugInfoEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkKeepSymbols</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkConfigDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkMapFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogInitialization</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogModule</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogSection</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogVeneer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile</name>
+                    <state>$TOOLKIT_DIR$\config\linker\GD\GD32E103xB.icf</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFileSlave</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkSuppressDiags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsRem</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsWarn</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsErr</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkWarningsAreErrors</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkUseExtraOptions</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkExtraOptions</name>
+                    <state>--no_entry</state>
+                </option>
+                <option>
+                    <name>IlinkLowLevelInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAutoLibEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAdditionalLibs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkOverrideProgramEntryLabel</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabelSelect</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabel</name>
+                    <state>__iar_program_start</state>
+                </option>
+                <option>
+                    <name>DoFill</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FillerByte</name>
+                    <state>0xFF</state>
+                </option>
+                <option>
+                    <name>FillerStart</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>FillerEnd</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>CrcSize</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcAlign</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcPoly</name>
+                    <state>0x11021</state>
+                </option>
+                <option>
+                    <name>CrcCompl</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcBitOrder</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcInitialValue</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>DoCrc</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkBE8Slave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkBufferedTerminalOutput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkStdoutInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcFullSize</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkIElfToolPostProcess</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogAutoLibSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogRedirSymbols</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogUnusedFragments</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkCrcReverseByteOrder</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCrcUseAsInput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptInline</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsAllow</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsForce</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptMergeDuplSections</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptUseVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptForceVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackAnalysisEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackControlFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkStackCallGraphFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CrcAlgorithm</name>
+                    <version>1</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcUnitSize</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkThreadsSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogCallGraph</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile_AltDefault</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkHeapSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLocaleSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkTrustzoneImportLibraryOut</name>
+                    <state>vsf_template_m484_import_lib.o</state>
+                </option>
+                <option>
+                    <name>OILinkExtraOption</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign2</name>
+                    <state></state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>IARCHIVE</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IarchiveInputs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IarchiveOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IarchiveOutput</name>
+                    <state>###Unitialized###</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>BILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data />
+        </settings>
+    </configuration>
+    <configuration>
+        <name>vsf_template_mt071</name>
+        <toolchain>
+            <name>ARM</name>
+        </toolchain>
+        <debug>1</debug>
+        <settings>
+            <name>General</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <version>31</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>ExePath</name>
+                    <state>vsf_template_mt071\Exe</state>
+                </option>
+                <option>
+                    <name>ObjPath</name>
+                    <state>vsf_template_mt071\Obj</state>
+                </option>
+                <option>
+                    <name>ListPath</name>
+                    <state>vsf_template_mt071\List</state>
+                </option>
+                <option>
+                    <name>GEndianMode</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>Input description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>Output description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>GOutputBinary</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGCoreOrChip</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelect</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelectSlave</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>RTDescription</name>
+                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                </option>
+                <option>
+                    <name>OGProductVersion</name>
+                    <state>8.30.1.17146</state>
+                </option>
+                <option>
+                    <name>OGLastSavedByProductVersion</name>
+                    <state>8.40.2.22864</state>
+                </option>
+                <option>
+                    <name>GeneralEnableMisra</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraVerbose</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGChipSelectEditMenu</name>
+                    <state>Default	None</state>
+                </option>
+                <option>
+                    <name>GenLowLevelInterface</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>GEndianModeBE</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OGBufferedTerminalOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenStdoutInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraRules98</name>
+                    <version>0</version>
+                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                </option>
+                <option>
+                    <name>GeneralMisraVer</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraRules04</name>
+                    <version>0</version>
+                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                </option>
+                <option>
+                    <name>RTConfigPath2</name>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</state>
+                </option>
+                <option>
+                    <name>GBECoreSlave</name>
+                    <version>27</version>
+                    <state>34</state>
+                </option>
+                <option>
+                    <name>OGUseCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OGUseCmsisDspLib</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibThreads</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CoreVariant</name>
+                    <version>27</version>
+                    <state>34</state>
+                </option>
+                <option>
+                    <name>GFPUDeviceSlave</name>
+                    <state>Default	None</state>
+                </option>
+                <option>
+                    <name>FPU2</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>NrRegs</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>NEON</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GFPUCoreSlave2</name>
+                    <version>27</version>
+                    <state>34</state>
+                </option>
+                <option>
+                    <name>OGCMSISPackSelectDevice</name>
+                </option>
+                <option>
+                    <name>OgLibHeap</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGLibAdditionalLocale</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenLocaleTags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>GenLocaleDisplayOnly</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>DSPExtension</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>TrustZone</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>TrustZoneModes</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>ICCARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>35</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>CCDefines</name>
+                    <state>__MT071__</state>
+                </option>
+                <option>
+                    <name>CCPreprocFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocComments</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocLine</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCListCFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMnemonics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMessages</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagSuppress</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagRemark</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagWarning</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagError</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCAllowList</name>
+                    <version>1</version>
+                    <state>11111110</state>
+                </option>
+                <option>
+                    <name>CCDebugInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IEndianMode</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptionsCheck</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptions</name>
+                    <state>--no_unaligned_access</state>
+                </option>
+                <option>
+                    <name>CCLangConformance</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCSignedPlainChar</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCRequirePrototypes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagWarnAreErr</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCompilerRuntimeInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>CCLibConfigHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CompilerMisraOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCIncludePath2</name>
+                    <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\DSP\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\NN\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\shell\media\sdl2\include\SDL2</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfvm\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\raw\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include</state>
+                </option>
+                <option>
+                    <name>CCStdIncCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCodeSection</name>
+                    <state>.text</state>
+                </option>
+                <option>
+                    <name>IProcessorMode2</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevel</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CCOptStrategy</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevelSlave</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CompilerMisraRules98</name>
+                    <version>0</version>
+                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                </option>
+                <option>
+                    <name>CompilerMisraRules04</name>
+                    <version>0</version>
+                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                </option>
+                <option>
+                    <name>CCPosIndRopi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndRwpi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndNoDynInit</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccLang</name>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>IccCDialect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccAllowVLA</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccStaticDestr</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccCppInlineSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccFloatSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptStrategySlave</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCGuardCalls</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccExceptions2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccRTTI2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OICompilerExtraOption</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>AARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>10</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>AObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AEndian</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>ACaseSensitivity</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacroChars</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnWhat</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnOne</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange1</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>ADebug</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AltRegisterNames</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ADefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AList</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AListHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AListing</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>Includes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacDefs</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacExps</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacExec</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OnlyAssed</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MultiLine</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLengthCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLength</name>
+                    <state>80</state>
+                </option>
+                <option>
+                    <name>TabSpacing</name>
+                    <state>8</state>
+                </option>
+                <option>
+                    <name>AXRef</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDefines</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefInternal</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDual</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AOutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsEdit</name>
+                    <state>100</state>
+                </option>
+                <option>
+                    <name>AIgnoreStdInclude</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AUserIncludes</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AExtraOptionsCheckV2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AExtraOptionsV2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AsmNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>OBJCOPY</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>1</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>OOCOutputFormat</name>
+                    <version>3</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OCOutputOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OOCOutputFile</name>
+                    <state>vsf_template.hex</state>
+                </option>
+                <option>
+                    <name>OOCCommandLineProducer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OOCObjCopyEnable</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>CUSTOM</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <extensions></extensions>
+                <cmdline></cmdline>
+                <hasPrio>0</hasPrio>
+            </data>
+        </settings>
+        <settings>
+            <name>BICOMP</name>
+            <archiveVersion>0</archiveVersion>
+            <data />
+        </settings>
+        <settings>
+            <name>BUILDACTION</name>
+            <archiveVersion>1</archiveVersion>
+            <data>
+                <prebuild></prebuild>
+                <postbuild></postbuild>
+            </data>
+        </settings>
+        <settings>
+            <name>ILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>23</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IlinkLibIOConfig</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>XLinkMisraHandler</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkInputFileSlave</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOutputFile</name>
+                    <state>vsf_template_mt071.out</state>
+                </option>
+                <option>
+                    <name>IlinkDebugInfoEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkKeepSymbols</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkConfigDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkMapFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogInitialization</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogModule</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogSection</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogVeneer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfOverride</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile</name>
+                    <state>$PROJ_DIR$\target\MT071\MT071_flash.icf</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFileSlave</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkSuppressDiags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsRem</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsWarn</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsErr</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkWarningsAreErrors</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkUseExtraOptions</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkExtraOptions</name>
+                    <state>--no_entry</state>
+                </option>
+                <option>
+                    <name>IlinkLowLevelInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAutoLibEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAdditionalLibs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkOverrideProgramEntryLabel</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabelSelect</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabel</name>
+                    <state>__iar_program_start</state>
+                </option>
+                <option>
+                    <name>DoFill</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FillerByte</name>
+                    <state>0xFF</state>
+                </option>
+                <option>
+                    <name>FillerStart</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>FillerEnd</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>CrcSize</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcAlign</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcPoly</name>
+                    <state>0x11021</state>
+                </option>
+                <option>
+                    <name>CrcCompl</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcBitOrder</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcInitialValue</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>DoCrc</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkBE8Slave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkBufferedTerminalOutput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkStdoutInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcFullSize</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkIElfToolPostProcess</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogAutoLibSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogRedirSymbols</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogUnusedFragments</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkCrcReverseByteOrder</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCrcUseAsInput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptInline</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsAllow</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsForce</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptMergeDuplSections</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptUseVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptForceVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackAnalysisEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackControlFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkStackCallGraphFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CrcAlgorithm</name>
+                    <version>1</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcUnitSize</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkThreadsSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogCallGraph</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile_AltDefault</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkHeapSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLocaleSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkTrustzoneImportLibraryOut</name>
+                    <state>vsf_template_m484_import_lib.o</state>
+                </option>
+                <option>
+                    <name>OILinkExtraOption</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign2</name>
+                    <state></state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>IARCHIVE</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IarchiveInputs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IarchiveOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IarchiveOutput</name>
+                    <state>###Unitialized###</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>BILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data />
+        </settings>
+    </configuration>
     <group>
         <name>usrapp</name>
         <group>
             <name>config</name>
+            <group>
+                <name>vsf_usr_cfg</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_f1c100s.h</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_gd32e103.h</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_m484.h</name>
+                    <excluded>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_mt071.h</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                    </excluded>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_win.h</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                </file>
+            </group>
             <file>
                 <name>$PROJ_DIR$\..\..\config\awtk_config.h</name>
             </file>
@@ -2157,6 +4340,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\config\lv_conf.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\config\lwipopts.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\config\vsf_tgui_cfg.h</name>
@@ -2206,6 +4392,12 @@
                     <name>$PROJ_DIR$\..\..\demo\common\usrapp_common.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\common\usrapp_net_common.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\common\usrapp_net_common.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\common\usrapp_ui_common.c</name>
                 </file>
                 <file>
@@ -2249,6 +4441,12 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\lvgl_demo\lvgl_demo.c</name>
+                </file>
+            </group>
+            <group>
+                <name>lwip_demo</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\lwip_demo\lwip_demo.c</name>
                 </file>
             </group>
             <group>
@@ -2342,6 +4540,12 @@
                 </file>
             </group>
             <group>
+                <name>vsfip_demo</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\vsfip_demo\vsfip_demo.c</name>
+                </file>
+            </group>
+            <group>
                 <name>vsfvm_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\vsfvm_demo\vsfvm_demo.c</name>
@@ -2364,8 +4568,8 @@
                 <group>
                     <name>btstack</name>
                     <excluded>
-                        <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>firmware</name>
@@ -2477,7 +4681,8 @@
                     <name>littlevgl</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>6.1.2</name>
@@ -3047,36 +5252,36 @@
                 <group>
                     <name>lwip</name>
                     <excluded>
-                        <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
-                        <name>1.4.1</name>
+                        <name>2.1.2</name>
                         <group>
                             <name>port</name>
                             <group>
                                 <name>arch</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\cc.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\cc.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\perf.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\perf.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\sys_arch.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\arch\sys_arch.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.h</name>
                                 </file>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\lwip_netdrv_adapter.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwip_netdrv_adapter.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\lwip_netdrv_adapter.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwip_netdrv_adapter.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\port\lwippools.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwippools.h</name>
                             </file>
                         </group>
                         <group>
@@ -3086,28 +5291,31 @@
                                 <group>
                                     <name>api</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\api_lib.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\api_lib.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\api_msg.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\api_msg.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\err.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\err.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\netbuf.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\if_api.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\netdb.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netbuf.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\netifapi.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netdb.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\sockets.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netifapi.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\api\tcpip.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\sockets.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\tcpip.c</name>
                                     </file>
                                 </group>
                                 <group>
@@ -3115,123 +5323,125 @@
                                     <group>
                                         <name>ipv4</name>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\autoip.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\autoip.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\icmp.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\dhcp.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\igmp.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\etharp.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\inet.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\icmp.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\inet_chksum.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\igmp.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\ip.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\ip_addr.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4_addr.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv4\ip_frag.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4_frag.c</name>
                                         </file>
                                     </group>
                                     <group>
                                         <name>ipv6</name>
-                                        <excluded>
-                                            <configuration>vsf_template_m484</configuration>
-                                            <configuration>vsf_template_f1c100s</configuration>
-                                        </excluded>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\icmp6.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\dhcp6.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\inet6.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ethip6.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\ip6.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\icmp6.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\ipv6\ip6_addr.c</name>
-                                        </file>
-                                    </group>
-                                    <group>
-                                        <name>snmp</name>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\asn1_dec.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\inet6.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\asn1_enc.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\mib2.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6_addr.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\mib_structs.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6_frag.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\msg_in.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\mld6.c</name>
                                         </file>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\snmp\msg_out.c</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\nd6.c</name>
                                         </file>
                                     </group>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\def.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\dhcp.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_alloc.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\dns.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_tcp.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\init.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\def.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\mem.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\dns.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\memp.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\inet_chksum.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\netif.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\init.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\pbuf.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ip.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\raw.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\mem.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\stats.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\memp.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\sys.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\netif.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\tcp.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\pbuf.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\tcp_in.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\raw.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\tcp_out.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\stats.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\timers.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\sys.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\core\udp.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp_in.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp_out.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\timeouts.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\udp.c</name>
                                     </file>
                                 </group>
                                 <group>
                                     <name>netif</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\1.4.1\raw\src\netif\etharp.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\netif\ethernet.c</name>
                                     </file>
                                 </group>
                             </group>
@@ -3241,8 +5451,8 @@
                 <group>
                     <name>nnom</name>
                     <excluded>
-                        <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -3303,7 +5513,84 @@
                     </group>
                 </group>
                 <group>
+                    <name>vsfip</name>
+                    <excluded>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                    <group>
+                        <name>raw</name>
+                        <group>
+                            <name>netif</name>
+                            <group>
+                                <name>eth</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>proto</name>
+                            <group>
+                                <name>dhcp</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpc.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpc.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcpd.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>dns</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dns\vsfip_dnsc.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dns\vsfip_dnsc.h</name>
+                                </file>
+                            </group>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.h</name>
+                        </file>
+                    </group>
+                </group>
+                <group>
                     <name>vsfvm</name>
+                    <excluded>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
                     <group>
                         <name>extension</name>
                         <group>
@@ -3454,6 +5741,27 @@
                 </file>
             </group>
             <group>
+                <name>crypto</name>
+                <group>
+                    <name>hash</name>
+                    <group>
+                        <name>crc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\crypto\hash\crc\vsf_crc.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\crypto\hash\crc\vsf_crc.h</name>
+                        </file>
+                    </group>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\crypto\vsf_crypto.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\crypto\vsf_crypto_cfg.h</name>
+                </file>
+            </group>
+            <group>
                 <name>debugger</name>
                 <group>
                     <name>nulink</name>
@@ -3560,48 +5868,12 @@
                 <group>
                     <name>driver</name>
                     <group>
-                        <name>ds4</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h</name>
-                        </file>
-                    </group>
-                    <group>
                         <name>hid</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>nspro</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>xb1</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\xb1\vsf_input_xb1.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>xb360</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\xb360\vsf_input_xb360.h</name>
                         </file>
                     </group>
                 </group>
@@ -3738,6 +6010,9 @@
                     </file>
                 </group>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\tcpip\vsf_tcpip.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\component\tcpip\vsf_tcpip_cfg.h</name>
                 </file>
             </group>
@@ -3773,6 +6048,9 @@
                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\ui\disp\vsf_disp.h</name>
                     </file>
                 </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\ui\vsf_ui.h</name>
+                </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\component\ui\vsf_ui_cfg.h</name>
                 </file>
@@ -3926,6 +6204,15 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_dcd.h</name>
                             </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_hcd.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\dwcotg\vsf_dwcotg_hw.h</name>
+                            </file>
                         </group>
                         <group>
                             <name>musb</name>
@@ -3942,6 +6229,12 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_dcd.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_hcd.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\driver\otg\musb\fdrc\vsf_musb_fdrc_hcd.h</name>
                                 </file>
                             </group>
                         </group>
@@ -4030,6 +6323,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>rtl8152</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>UAC</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\host\class\UAC\vsf_usbh_uac.c</name>
@@ -4056,6 +6358,9 @@
                     </file>
                 </group>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\vsf_usb.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\vsf_usb_cfg.h</name>
                 </file>
             </group>
@@ -4079,6 +6384,8 @@
                         <name>arm9</name>
                         <excluded>
                             <configuration>vsf_template_m484</configuration>
+                            <configuration>vsf_template_gd32e103</configuration>
+                            <configuration>vsf_template_mt071</configuration>
                         </excluded>
                         <group>
                             <name>startup</name>
@@ -4371,6 +6678,8 @@
                         <excluded>
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_f1c100s</configuration>
+                            <configuration>vsf_template_gd32e103</configuration>
+                            <configuration>vsf_template_mt071</configuration>
                         </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-a\cortex_a_generic.c</name>
@@ -4429,6 +6738,8 @@
                     <name>Allwinner</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>F1CX00S</name>
@@ -4526,6 +6837,8 @@
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>mps2</name>
@@ -4586,9 +6899,127 @@
                     </file>
                 </group>
                 <group>
+                    <name>GigaDevice</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                    <group>
+                        <name>GD32E10X</name>
+                        <group>
+                            <name>common</name>
+                            <group>
+                                <name>vendor</name>
+                                <group>
+                                    <name>Include</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_adc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_bkp.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_can.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_crc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_ctc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_dac.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_dbg.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_dma.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_exmc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_exti.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_fmc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_fwdgt.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_gpio.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_i2c.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_misc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_pmu.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_rcu.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_rtc.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_spi.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_timer.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_usart.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\vendor\Include\gd32e10x_wwdgt.h</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\__common.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\__common.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>GD32E103</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\GD32E103\device.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\GD32E103\driver.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\GD32E103\driver.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\GD32E103\startup_gd32e103.c</name>
+                            </file>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\__device.h</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\driver.h</name>
+                    </file>
+                </group>
+                <group>
                     <name>Nuvoton</name>
                     <excluded>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>M480</name>
@@ -4798,6 +7229,8 @@
                                         <excluded>
                                             <configuration>vsf_template_m484</configuration>
                                             <configuration>vsf_template_f1c100s</configuration>
+                                            <configuration>vsf_template_gd32e103</configuration>
+                                            <configuration>vsf_template_mt071</configuration>
                                         </excluded>
                                     </file>
                                 </group>
@@ -4833,6 +7266,8 @@
                         <excluded>
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_f1c100s</configuration>
+                            <configuration>vsf_template_gd32e103</configuration>
+                            <configuration>vsf_template_mt071</configuration>
                         </excluded>
                         <group>
                             <name>common</name>
@@ -4895,6 +7330,8 @@
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>STM32F730</name>
@@ -4944,6 +7381,8 @@
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>__series_name__</name>
@@ -4975,6 +7414,8 @@
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>AM335X</name>
@@ -4996,10 +7437,89 @@
                     </file>
                 </group>
                 <group>
+                    <name>unknown</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                    </excluded>
+                    <group>
+                        <name>MT071</name>
+                        <group>
+                            <name>usb</name>
+                            <group>
+                                <name>dc</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\dc\usbd.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\dc\usbd.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>hc</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\hc\usbh.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\hc\usbh.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\usb.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\usb.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\usb_common.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usb\usb_lv0.c</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>vendor</name>
+                            <group>
+                                <name>Include</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\vendor\Include\mt071x.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\vendor\Include\usb_regs.h</name>
+                                </file>
+                            </group>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\__device.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\common.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\device.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\driver.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\driver.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\startup_mt071.c</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\driver.h</name>
+                    </file>
+                </group>
+                <group>
                     <name>WinnerMicro</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
                         <name>W60X</name>
@@ -5131,7 +7651,7 @@
                         <name>$PROJ_DIR$\..\..\..\..\vsf\kernel\shell\simple\vsf_simple.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c</name>
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c</name>
@@ -5251,6 +7771,8 @@
                         <name>Allwinner</name>
                         <excluded>
                             <configuration>vsf_template_m484</configuration>
+                            <configuration>vsf_template_gd32e103</configuration>
+                            <configuration>vsf_template_mt071</configuration>
                         </excluded>
                         <group>
                             <name>F1CX00S</name>
@@ -5281,6 +7803,62 @@
                         </group>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\driver.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>GigaDevice</name>
+                        <excluded>
+                            <configuration>vsf_template_m484</configuration>
+                            <configuration>vsf_template_f1c100s</configuration>
+                            <configuration>vsf_template_mt071</configuration>
+                        </excluded>
+                        <group>
+                            <name>GD32E10X</name>
+                            <group>
+                                <name>common</name>
+                                <group>
+                                    <name>usb</name>
+                                    <group>
+                                        <name>dc</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\dc\usbd.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\dc\usbd.h</name>
+                                        </file>
+                                    </group>
+                                    <group>
+                                        <name>hc</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\hc\usbh.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\hc\usbh.h</name>
+                                        </file>
+                                    </group>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb_common.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb_lv0.c</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
+                                <name>GD32E103</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\GD32E103\driver.h</name>
+                                </file>
+                            </group>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\driver.h</name>
                         </file>
                     </group>
                     <file>
@@ -5894,6 +8472,9 @@
                     <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\arm_compiler.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\compiler.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\retarget_io.c</name>
                 </file>
                 <file>
@@ -5967,10 +8548,10 @@
                 <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\communicate.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\ooc_class.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\ooc_class.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\vsf_utilities.h</name>
             </file>
         </group>
         <file>

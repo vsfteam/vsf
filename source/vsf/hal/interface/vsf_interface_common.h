@@ -21,6 +21,8 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -95,8 +97,8 @@ end_def_interface(peripheral_t)
 
 def_interface(vsf_async_block_access_t)
     /*! \brief request a block access
-     *! \param pchBuffer    address of target memory
-     *! \param wSize        the size of the target memory
+     *! \param buffer_ptr    address of target memory
+     *! \param u32_size        the size of the target memory
      *! \retval fsm_rt_cpl  The transaction is complete
      *! \retval fsm_rt_asyn The transaction is handled asynchronousely, i.e. by 
      *!                     DMA or by ISR or etc.

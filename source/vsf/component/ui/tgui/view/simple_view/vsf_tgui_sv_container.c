@@ -73,7 +73,7 @@ fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
                                         vsf_tgui_control_refresh_mode_t tMode,
                                         vsf_tgui_sv_color_t tBackground)
 {
-    //fsm_rt_t tResult = fsm_rt_cpl;
+    //fsm_rt_t result = fsm_rt_cpl;
 
     VSF_TGUI_ASSERT(container_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
@@ -177,7 +177,7 @@ fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
                                         vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t tMode)
 {
-    //fsm_rt_t tResult = fsm_rt_cpl;
+    //fsm_rt_t result = fsm_rt_cpl;
 
     VSF_TGUI_ASSERT(container_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);

@@ -39,6 +39,15 @@ extern "C" {
 #endif
 /*============================ MACROS ========================================*/
 
+#if     !defined(__VSF_RELEASE__) && !defined(__VSF_DEBUG__)
+#   define __VSF_DEBUG__                        1
+#elif   defined(__VSF_RELEASE__) && defined(__VSF_DEBUG__)
+#   error Both __VSF_RELEASE__ and __VSF_DEBUG__ are defined!!!! They should be\
+ mutually exclusive from each other, i.e. either define __VSF_RELEASE__ or\
+ __VSF_DEBUG__. If neither of them are defined, __VSF_DEBUG__ will be assumed. 
+#endif
+
+
 #ifndef VSF_USE_KERNEL
 #   define VSF_USE_KERNEL                       ENABLED
 #endif

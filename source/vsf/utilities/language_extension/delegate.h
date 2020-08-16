@@ -42,9 +42,9 @@ declare_class( delegate_handler_t )
 //! \name general event handler
 //! @{
 extern_class( delegate_handler_t ,,
-    delegate_handler_func_t     *handler_fn;                                     //!< event handler
-    void                        *arg_ptr;                                          //!< Argument
-    delegate_handler_t          *next_ptr;                                        //!< next 
+    delegate_handler_func_t     *handler_fn;                                    //!< event handler
+    void                        *arg_ptr;                                       //!< Argument
+    delegate_handler_t          *next_ptr;                                      //!< next 
 )
 end_extern_class(delegate_handler_t)
 //! @}
@@ -78,21 +78,25 @@ extern delegate_t *delegate_init(delegate_t *event_ptr);
  *! \return the address of event handler item
  */
 extern delegate_handler_t *delegate_handler_init(
-    delegate_handler_t *handler_ptr, delegate_handler_func_t *routine_fn, void *arg_ptr);
+                                            delegate_handler_t *handler_ptr, 
+                                            delegate_handler_func_t *routine_fn, 
+                                            void *arg_ptr);
 
 /*! \brief register event handler to specified event
  *! \param event_ptr target event
  *! \param handler_ptr target event handler
  *! \return access result
  */
-extern vsf_err_t register_delegate_handler(delegate_t *event_ptr, delegate_handler_t *handler_ptr);
+extern vsf_err_t register_delegate_handler( delegate_t *event_ptr, 
+                                            delegate_handler_t *handler_ptr);
 
 /*! \brief unregister a specified event handler
  *! \param event_ptr target event
  *! \param handler_ptr target event handler
  *! \return access result
  */
-extern vsf_err_t unregister_delegate_handler( delegate_t *event_ptr, delegate_handler_t *handler_ptr);
+extern vsf_err_t unregister_delegate_handler(   delegate_t *event_ptr, 
+                                                delegate_handler_t *handler_ptr);
 
 /*! \brief raise target event
  *! \param event_ptr the target event

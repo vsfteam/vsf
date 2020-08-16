@@ -56,7 +56,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum usb_pid_t {
+typedef enum usb_pid_t {
     USB_PID_EXT                 = 0xf0,     /* USB 2.0 LPM ECN */
     USB_PID_OUT                 = 0xe1,
     USB_PID_ACK                 = 0xd2,
@@ -74,8 +74,7 @@ enum usb_pid_t {
     USB_PID_SETUP               = 0x2d,
     USB_PID_STALL               = 0x1e,
     USB_PID_MDATA               = 0x0f,     /* USB 2.0 */
-};
-typedef enum usb_pid_t usb_pid_t;
+} usb_pid_t;
 
 enum usb_dir_t {
     USB_DIR_MASK                = 0x80,
@@ -83,14 +82,13 @@ enum usb_dir_t {
     USB_DIR_IN                  = 0x80,     /* to host */
 };
 
-struct usb_ctrlrequest_t {
+typedef struct usb_ctrlrequest_t {
     uint8_t  bRequestType;
     uint8_t  bRequest;
     uint16_t wValue;
     uint16_t wIndex;
     uint16_t wLength;
-} PACKED;
-typedef struct usb_ctrlrequest_t usb_ctrlrequest_t;
+} PACKED usb_ctrlrequest_t;
 
 enum usb_req_t {
     USB_REQ_GET_STATUS          = 0x00,
@@ -173,20 +171,18 @@ enum usb_desc_type_t {
     USB_DT_HUB                  = (USB_TYPE_CLASS | 0x09),
 };
 
-struct usb_descriptor_header_t {
+typedef struct usb_descriptor_header_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
-} PACKED;
-typedef struct usb_descriptor_header_t usb_descriptor_header_t;
+} PACKED usb_descriptor_header_t;
 
-struct usb_class_interface_desc_t {
+typedef struct usb_class_interface_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
     uint8_t  bDescriptorSubType;
-} PACKED;
-typedef struct usb_class_interface_desc_t usb_class_interface_desc_t;
+} PACKED usb_class_interface_desc_t;
 
-struct usb_device_desc_t {
+typedef struct usb_device_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
@@ -202,10 +198,9 @@ struct usb_device_desc_t {
     uint8_t  iProduct;
     uint8_t  iSerialNumber;
     uint8_t  bNumConfigurations;
-}PACKED;
-typedef struct usb_device_desc_t usb_device_desc_t;
+}PACKED usb_device_desc_t;
 
-struct usb_config_desc_t {
+typedef struct usb_config_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
@@ -215,8 +210,7 @@ struct usb_config_desc_t {
     uint8_t  iConfiguration;
     uint8_t  bmAttributes;
     uint8_t  bMaxPower;
-} PACKED;
-typedef struct usb_config_desc_t usb_config_desc_t;
+} PACKED usb_config_desc_t;
 
 enum usb_config_desc_att_t {
     USB_CONFIG_ATT_ONE          = (1 << 7),     /* must be set */
@@ -230,7 +224,7 @@ enum usb_feature_t {
     USB_DEVICE_REMOTE_WAKEUP    = 1,            /* dev may initiate wakeup */
 };
 
-struct usb_interface_desc_t {
+typedef struct usb_interface_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
@@ -241,10 +235,9 @@ struct usb_interface_desc_t {
     uint8_t  bInterfaceSubClass;
     uint8_t  bInterfaceProtocol;
     uint8_t  iInterface;
-} PACKED;
-typedef struct usb_interface_desc_t usb_interface_desc_t;
+} PACKED usb_interface_desc_t;
 
-struct usb_endpoint_desc_t {
+typedef struct usb_endpoint_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
@@ -257,10 +250,9 @@ struct usb_endpoint_desc_t {
     /* use USB_DT_ENDPOINT*_SIZE in bLength, not sizeof. */
     uint8_t  bRefresh;
     uint8_t  bSynchAddress;
-} PACKED;
-typedef struct usb_endpoint_desc_t usb_endpoint_desc_t;
+} PACKED usb_endpoint_desc_t;
 
-struct usb_interface_assoc_desc_t {
+typedef struct usb_interface_assoc_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
 
@@ -270,17 +262,15 @@ struct usb_interface_assoc_desc_t {
     uint8_t  bFunctionSubClass;
     uint8_t  bFunctionProtocol;
     uint8_t  iFunction;
-} PACKED;
-typedef struct usb_interface_assoc_desc_t usb_interface_assoc_desc_t;
+} PACKED usb_interface_assoc_desc_t;
 
-enum usb_device_speed_t {
+typedef enum usb_device_speed_t {
     USB_SPEED_UNKNOWN = 0,          /* enumerating */
     USB_SPEED_LOW, USB_SPEED_FULL,  /* usb 1.1 */
     USB_SPEED_HIGH,                 /* usb 2.0 */
     USB_SPEED_VARIABLE,             /* wireless (usb 2.5) */
     USB_SPEED_SUPER,                /* usb 3.0 */
-};
-typedef enum usb_device_speed_t usb_device_speed_t;
+} usb_device_speed_t;
 
 enum usb_endpoint_sync_t {
     USB_ENDPOINT_SYNCTYPE       = 0x0c,

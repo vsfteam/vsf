@@ -30,15 +30,15 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_input_keyboard_set(__EVENT, __KEYCODE,  __IS_DOWN)                  \
+#define vsf_input_keyboard_set(__event, __keycode,  __is_down)                  \
             do {                                                                \
-                (__EVENT)->id = ((__KEYCODE) | ((__IS_DOWN) << 16));            \
+                (__event)->id = ((__keycode) | ((__is_down) << 16));            \
             } while (0)
 
-#define vsf_input_keyboard_get_keycode(__EVENT)                                 \
-            ((uint16_t)(((__EVENT)->id >> 0) & 0xFFFF))
-#define vsf_input_keyboard_is_down(__EVENT)                                     \
-            (((__EVENT)->id >> 16) & 0x01)
+#define vsf_input_keyboard_get_keycode(__event)                                 \
+            ((uint16_t)(((__event)->id >> 0) & 0xFFFF))
+#define vsf_input_keyboard_is_down(__event)                                     \
+            (((__event)->id >> 16) & 0x01)
 
 /*============================ TYPES =========================================*/
 
@@ -48,10 +48,9 @@ enum {
     VSF_INPUT_TYPE_KEYBOARD = VSF_INPUT_USER_TYPE,
 };
 
-struct vk_keyboard_evt_t {
+typedef struct vk_keyboard_evt_t {
     implement(vk_input_evt_t)
-};
-typedef struct vk_keyboard_evt_t vk_keyboard_evt_t;
+} vk_keyboard_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

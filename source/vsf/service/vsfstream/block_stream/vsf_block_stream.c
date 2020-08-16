@@ -20,7 +20,8 @@
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 
-#define VSFSTREAM_BLOCK_CLASS_IMPLEMENT
+#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSFSTREAM_BLOCK_CLASS_IMPLEMENT
 #include "../vsfstream.h"
 #include "./vsf_block_stream.h"
 #include "kernel/vsf_kernel.h"
@@ -80,19 +81,19 @@ const vsf_stream_op_t vsf_block_stream_op = {
 static void __vsf_block_stream_init(vsf_stream_t *stream)
 {
     vsf_block_stream_t *block_stream = (vsf_block_stream_t *)stream;
-    uint_fast8_t block_num = block_stream->nSize / block_stream->block_size;
-    VSF_SERVICE_ASSERT(block_stream->nSize >= block_num * (sizeof(*block_stream->block_size_arr) + block_stream->block_size));
+    uint_fast8_t block_num = block_stream->s32_size / block_stream->block_size;
+    VSF_SERVICE_ASSERT(block_stream->s32_size >= block_num * (sizeof(*block_stream->block_size_arr) + block_stream->block_size));
 
     block_stream->state = 0;
-    block_stream->block_size_arr = (uint32_t *)block_stream->pchBuffer;
-    block_stream->pchBuffer = (uint8_t *)&block_stream->block_size_arr[block_num];
-    block_stream->nSize -= block_num * 4;
+    block_stream->block_size_arr = (uint32_t *)block_stream->buffer_ptr;
+    block_stream->buffer_ptr = (uint8_t *)&block_stream->block_size_arr[block_num];
+    block_stream->s32_size -= block_num * 4;
 }
 
 static uint_fast32_t __vsf_block_stream_get_buff_length(vsf_stream_t *stream)
 {
     vsf_block_stream_t *block_stream = (vsf_block_stream_t *)stream;
-    return block_stream->nSize;
+    return block_stream->s32_size;
 }
 
 static uint_fast32_t __vsf_block_stream_get_data_length(vsf_stream_t *stream)
@@ -110,7 +111,7 @@ static uint_fast32_t __vsf_block_stream_get_avail_length(vsf_stream_t *stream)
 {
     vsf_block_stream_t *block_stream = (vsf_block_stream_t *)stream;
     uint_fast32_t data_size;
-    uint_fast8_t block_num = block_stream->nSize / block_stream->block_size;
+    uint_fast8_t block_num = block_stream->s32_size / block_stream->block_size;
 
     vsf_protect_t orig = __vsf_block_stream_protect();
         data_size = (block_stream->rblock_num < block_num) ? block_stream->block_size : 0;
@@ -121,12 +122,12 @@ static uint_fast32_t __vsf_block_stream_get_avail_length(vsf_stream_t *stream)
 static uint_fast32_t __vsf_block_stream_get_wbuf(vsf_stream_t *stream, uint8_t **ptr)
 {
     vsf_block_stream_t *block_stream = (vsf_block_stream_t *)stream;
-    uint_fast8_t block_num = block_stream->nSize / block_stream->block_size;
+    uint_fast8_t block_num = block_stream->s32_size / block_stream->block_size;
     uint8_t *buffer;
 
     vsf_protect_t orig = __vsf_block_stream_protect();
     if (block_stream->rblock_num < block_num) {
-        buffer = &block_stream->pchBuffer[block_stream->block_size * block_stream->wblock_idx];
+        buffer = &block_stream->buffer_ptr[block_stream->block_size * block_stream->wblock_idx];
         __vsf_block_stream_unprotect(orig);
         if (ptr != NULL) {
             *ptr = buffer;
@@ -145,7 +146,7 @@ static uint_fast32_t __vsf_block_stream_get_rbuf(vsf_stream_t *stream, uint8_t *
 
     vsf_protect_t orig = __vsf_block_stream_protect();
     if (block_stream->rblock_num > 0) {
-        buffer = &block_stream->pchBuffer[block_stream->block_size * block_stream->rblock_idx];
+        buffer = &block_stream->buffer_ptr[block_stream->block_size * block_stream->rblock_idx];
         size = block_stream->block_size_arr[block_stream->rblock_idx];
         __vsf_block_stream_unprotect(orig);
         if (ptr != NULL) {
@@ -160,11 +161,11 @@ static uint_fast32_t __vsf_block_stream_get_rbuf(vsf_stream_t *stream, uint8_t *
 static uint_fast32_t __vsf_block_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_block_stream_t *block_stream = (vsf_block_stream_t *)stream;
-    uint_fast8_t block_num = block_stream->nSize / block_stream->block_size;
+    uint_fast8_t block_num = block_stream->s32_size / block_stream->block_size;
 
     vsf_protect_t orig = __vsf_block_stream_protect();
         VSF_SERVICE_ASSERT(block_num > block_stream->rblock_num);
-        VSF_SERVICE_ASSERT(!buf || (buf == &block_stream->pchBuffer[block_stream->wblock_idx * block_stream->block_size]));
+        VSF_SERVICE_ASSERT(!buf || (buf == &block_stream->buffer_ptr[block_stream->wblock_idx * block_stream->block_size]));
         VSF_SERVICE_ASSERT(size <= block_stream->block_size);
         block_stream->block_size_arr[block_stream->wblock_idx] = size;
         if (++block_stream->wblock_idx >= block_num) {
@@ -178,11 +179,11 @@ static uint_fast32_t __vsf_block_stream_write(vsf_stream_t *stream, uint8_t *buf
 static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf, uint_fast32_t size)
 {
     vsf_block_stream_t *block_stream = (vsf_block_stream_t *)stream;
-    uint_fast8_t block_num = block_stream->nSize / block_stream->block_size;
+    uint_fast8_t block_num = block_stream->s32_size / block_stream->block_size;
 
     vsf_protect_t orig = __vsf_block_stream_protect();
         VSF_SERVICE_ASSERT(block_stream->rblock_num > 0);
-        VSF_SERVICE_ASSERT(!buf || (buf == &block_stream->pchBuffer[block_stream->rblock_idx * block_stream->block_size]));
+        VSF_SERVICE_ASSERT(!buf || (buf == &block_stream->buffer_ptr[block_stream->rblock_idx * block_stream->block_size]));
         VSF_SERVICE_ASSERT(size <= block_stream->block_size_arr[block_stream->rblock_idx]);
         size = block_stream->block_size_arr[block_stream->rblock_idx];
         if (++block_stream->rblock_idx >= block_num) {

@@ -35,7 +35,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void vsfvm_compiler_script_fini(vsfvm_compiler_t *compiler);
+static void __vsfvm_compiler_script_fini(vsfvm_compiler_t *compiler);
 
 extern int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, uint_fast32_t offset);
 extern char * vsfvm_module_get_lexer_imp(const char *path);
@@ -71,7 +71,7 @@ int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, const char *path)
 #endif
 
 
-static vsfvm_compiler_func_t * vsfvm_get_rootfunc(vsfvm_compiler_script_t *script)
+static vsfvm_compiler_func_t * __vsfvm_get_rootfunc(vsfvm_compiler_script_t *script)
 {
     if (script->func_stack.sp) {
         return vsf_dynarr_get(&script->func_stack.use_as__vsf_dynarr_t, 1);
@@ -80,7 +80,7 @@ static vsfvm_compiler_func_t * vsfvm_get_rootfunc(vsfvm_compiler_script_t *scrip
     }
 }
 
-static int vsfvm_push_bytecode(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code)
+static int __vsfvm_push_bytecode(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code)
 {
 #if VSFVM_COMPILER_DEBUG_EN == ENABLED
     vsf_trace(VSF_TRACE_DEBUG, "%d:", compiler->bytecode_pos);
@@ -89,16 +89,16 @@ static int vsfvm_push_bytecode(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code
     return vsfvm_set_bytecode_imp(compiler, code, compiler->bytecode_pos++);
 }
 
-static int vsfvm_add_res(vsfvm_compiler_func_t *func, vsfvm_linktbl_t *linktbl)
+static int __vsfvm_add_res(vsfvm_compiler_func_t *func, vsfvm_linktbl_t *linktbl)
 {
     return vsf_dynstack_push(&func->linktbl, linktbl, 1);
 }
 
-static int vsfvm_compiler_get_var(vsfvm_compiler_t *compiler,
+static int __vsfvm_compiler_get_var(vsfvm_compiler_t *compiler,
     vsfvm_compiler_script_t *script, vsfvm_compiler_func_t *func,
     vsfvm_lexer_sym_t *sym, uint8_t *pos, uint16_t *idx)
 {
-    vsfvm_compiler_func_t *rootfunc = vsfvm_get_rootfunc(script);
+    vsfvm_compiler_func_t *rootfunc = __vsfvm_get_rootfunc(script);
     int varidx;
 
     if (sym->type == VSFVM_LEXER_SYM_EXTVAR) {
@@ -148,7 +148,7 @@ local_var:
     return -VSFVM_BUG;
 }
 
-static int vsfvm_push_res(vsfvm_compiler_t *compiler, vsfvm_compiler_func_t *func)
+static int __vsfvm_push_res(vsfvm_compiler_t *compiler, vsfvm_compiler_func_t *func)
 {
     vsfvm_linktbl_t *linktbl = vsf_dynstack_pop(&func->linktbl, 1);
 
@@ -176,13 +176,13 @@ static int vsfvm_push_res(vsfvm_compiler_t *compiler, vsfvm_compiler_func_t *fun
             fix_code |= (uint16_t)(compiler->bytecode_pos - linktbl->bytecode_pos - 1);
             vsfvm_set_bytecode_imp(compiler, fix_code, linktbl->bytecode_pos);
 
-            if (vsfvm_push_bytecode(compiler,
+            if (__vsfvm_push_bytecode(compiler,
                     VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, 0, len)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
 
             for (len = 0; len < token_num; len++) {
-                if (vsfvm_push_bytecode(compiler, get_unaligned_32(res)) < 0) {
+                if (__vsfvm_push_bytecode(compiler, get_unaligned_32(res)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
                 res += 4;
@@ -197,7 +197,7 @@ static int vsfvm_push_res(vsfvm_compiler_t *compiler, vsfvm_compiler_func_t *fun
     return 0;
 }
 
-static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stack)
+static int __vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stack)
 {
     vsfvm_compiler_script_t *script = &compiler->script;
     vsfvm_compiler_func_t *func = &script->cur_func;
@@ -219,14 +219,14 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
         switch (token) {
         case VSFVM_TOKEN_NUM:
             if (data->ival & (0xFFFFFFFF << VSFVM_CODE_LENGTH)) {
-                if (    (vsfvm_push_bytecode(compiler, VSFVM_NUMBER(data->ival >> (32 - VSFVM_CODE_LENGTH))) < 0)
-                    ||  (vsfvm_push_bytecode(compiler, VSFVM_NUMBER(32 - VSFVM_CODE_LENGTH)) < 0)
-                    ||  (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SHL, 0, 0)) < 0)
-                    ||  (vsfvm_push_bytecode(compiler, VSFVM_NUMBER(data->ival & ((1 << (32 - VSFVM_CODE_LENGTH)) - 1))) < 0)
-                    ||  (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ADD, 0, 0)) < 0)) {
+                if (    (__vsfvm_push_bytecode(compiler, VSFVM_NUMBER(data->ival >> (32 - VSFVM_CODE_LENGTH))) < 0)
+                    ||  (__vsfvm_push_bytecode(compiler, VSFVM_NUMBER(32 - VSFVM_CODE_LENGTH)) < 0)
+                    ||  (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SHL, 0, 0)) < 0)
+                    ||  (__vsfvm_push_bytecode(compiler, VSFVM_NUMBER(data->ival & ((1 << (32 - VSFVM_CODE_LENGTH)) - 1))) < 0)
+                    ||  (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ADD, 0, 0)) < 0)) {
                     return -VSFVM_BYTECODE_TOOLONG;
                     }
-            } else if (vsfvm_push_bytecode(compiler, VSFVM_NUMBER(data->ival)) < 0) {
+            } else if (__vsfvm_push_bytecode(compiler, VSFVM_NUMBER(data->ival)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
             break;
@@ -235,29 +235,29 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
             linktbl.token = VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_RESOURCES, 0, 0);
             linktbl.sym = etoken->data.sym;
             linktbl.type = VSFVM_LINKTBL_STR;
-            if (vsfvm_add_res(func, &linktbl)) {
+            if (__vsfvm_add_res(func, &linktbl)) {
                 return -VSFVM_NOT_ENOUGH_RESOURCES;
             }
             compiler->bytecode_pos++;
             break;
         case VSFVM_TOKEN_VAR_ID:
-            if (vsfvm_compiler_get_var(compiler, script, func, data->sym, &arg8, &arg16)) {
+            if (__vsfvm_compiler_get_var(compiler, script, func, data->sym, &arg8, &arg16)) {
                 return -VSFVM_PARSER_INVALID_EXPR;
             }
-            if (vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_NORMAL, arg8, arg16)) < 0) {
+            if (__vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_NORMAL, arg8, arg16)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
             break;
         case VSFVM_TOKEN_VAR_ID_REF:
-            if (vsfvm_compiler_get_var(compiler, script, func, data->sym, &arg8, &arg16)) {
+            if (__vsfvm_compiler_get_var(compiler, script, func, data->sym, &arg8, &arg16)) {
                 return -VSFVM_PARSER_INVALID_EXPR;
             }
-            if (vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, arg8, arg16)) < 0) {
+            if (__vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, arg8, arg16)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
             break;
         case VSFVM_TOKEN_FUNC_ID:
-            if (vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_FUNCTION,
+            if (__vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_FUNCTION,
                     data->sym->func.param_num, data->sym->func.pos - compiler->bytecode_pos - 1)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
@@ -268,11 +268,11 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
             }
             if (data->sym->type == VSFVM_LEXER_SYM_FUNCTION) {
                 if (!strcmp(data->sym->name, "thread")) {
-                    if (vsfvm_push_bytecode(compiler, VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_THREAD,
+                    if (__vsfvm_push_bytecode(compiler, VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_THREAD,
                             token_param, 0)) < 0) {
                         return -VSFVM_BYTECODE_TOOLONG;
                     }
-                } else if (vsfvm_push_bytecode(compiler, VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_SCRIPT,
+                } else if (__vsfvm_push_bytecode(compiler, VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_SCRIPT,
                         token_param, data->sym->func.pos - compiler->bytecode_pos - 1)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
@@ -284,7 +284,7 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
                         break;
                     }
                 }
-                if (vsfvm_push_bytecode(compiler, VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_EXT,
+                if (__vsfvm_push_bytecode(compiler, VSFVM_FUNCTION(VSFVM_CODE_FUNCTION_EXT,
                         token_param, ext->func_id + data->sym->func.pos)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
@@ -296,26 +296,26 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
             if (token > VSFVM_TOKEN_BINARY_OP) {
                 int ret;
                 switch (token) {
-                case VSFVM_TOKEN_MUL:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_MUL, 0, 0));  break;
-                case VSFVM_TOKEN_DIV:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_DIV, 0, 0));  break;
-                case VSFVM_TOKEN_MOD:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_MOD, 0, 0));  break;
-                case VSFVM_TOKEN_ADD:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ADD, 0, 0));  break;
-                case VSFVM_TOKEN_SUB:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SUB, 0, 0));  break;
-                case VSFVM_TOKEN_SHL:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SHL, 0, 0));  break;
-                case VSFVM_TOKEN_SHR:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SHR, 0, 0));  break;
-                case VSFVM_TOKEN_LT:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LT, 0, 0));   break;
-                case VSFVM_TOKEN_LE:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LE, 0, 0));   break;
-                case VSFVM_TOKEN_GT:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_GT, 0, 0));   break;
-                case VSFVM_TOKEN_GE:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_GE, 0, 0));   break;
-                case VSFVM_TOKEN_EQ:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_EQ, 0, 0));   break;
-                case VSFVM_TOKEN_NE:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NE, 0, 0));   break;
-                case VSFVM_TOKEN_AND:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_AND, 0, 0));  break;
-                case VSFVM_TOKEN_XOR:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_XOR, 0, 0));  break;
-                case VSFVM_TOKEN_OR:       ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_OR, 0, 0));   break;
-                case VSFVM_TOKEN_LAND:     ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LAND, 0, 0)); break;
-                case VSFVM_TOKEN_LOR:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LOR, 0, 0));  break;
-                case VSFVM_TOKEN_ASSIGN:   ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0));break;
-                case VSFVM_TOKEN_COMMA_OP: ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_COMMA, 0, 0));break;
+                case VSFVM_TOKEN_MUL:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_MUL, 0, 0));  break;
+                case VSFVM_TOKEN_DIV:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_DIV, 0, 0));  break;
+                case VSFVM_TOKEN_MOD:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_MOD, 0, 0));  break;
+                case VSFVM_TOKEN_ADD:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ADD, 0, 0));  break;
+                case VSFVM_TOKEN_SUB:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SUB, 0, 0));  break;
+                case VSFVM_TOKEN_SHL:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SHL, 0, 0));  break;
+                case VSFVM_TOKEN_SHR:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SHR, 0, 0));  break;
+                case VSFVM_TOKEN_LT:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LT, 0, 0));   break;
+                case VSFVM_TOKEN_LE:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LE, 0, 0));   break;
+                case VSFVM_TOKEN_GT:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_GT, 0, 0));   break;
+                case VSFVM_TOKEN_GE:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_GE, 0, 0));   break;
+                case VSFVM_TOKEN_EQ:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_EQ, 0, 0));   break;
+                case VSFVM_TOKEN_NE:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NE, 0, 0));   break;
+                case VSFVM_TOKEN_AND:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_AND, 0, 0));  break;
+                case VSFVM_TOKEN_XOR:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_XOR, 0, 0));  break;
+                case VSFVM_TOKEN_OR:       ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_OR, 0, 0));   break;
+                case VSFVM_TOKEN_LAND:     ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LAND, 0, 0)); break;
+                case VSFVM_TOKEN_LOR:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_LOR, 0, 0));  break;
+                case VSFVM_TOKEN_ASSIGN:   ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0));break;
+                case VSFVM_TOKEN_COMMA_OP: ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_COMMA, 0, 0));break;
                 default:
                     return -VSFVM_NOT_SUPPORT;
                 }
@@ -326,10 +326,10 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
                 int ret;
                 switch (token)
                 {
-                case VSFVM_TOKEN_NOT:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NOT, 0, 0));  break;
-                case VSFVM_TOKEN_REV:      ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_REV, 0, 0));  break;
-                case VSFVM_TOKEN_NEGA:     ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NEGA, 0, 0)); break;
-                case VSFVM_TOKEN_POSI:     ret = vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_POSI, 0, 0)); break;
+                case VSFVM_TOKEN_NOT:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NOT, 0, 0));  break;
+                case VSFVM_TOKEN_REV:      ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_REV, 0, 0));  break;
+                case VSFVM_TOKEN_NEGA:     ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_NEGA, 0, 0)); break;
+                case VSFVM_TOKEN_POSI:     ret = __vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_POSI, 0, 0)); break;
                 default:
                     return -VSFVM_NOT_SUPPORT;
                 }
@@ -344,7 +344,7 @@ static int vsfvm_push_expr(vsfvm_compiler_t *compiler, vsf_dynstack_t *expr_stac
     return 0;
 }
 
-static vsfvm_lexer_list_t * vsfvm_get_lexer(vsfvm_compiler_t *compiler, const char *ext)
+static vsfvm_lexer_list_t * __vsfvm_get_lexer(vsfvm_compiler_t *compiler, const char *ext)
 {
     __vsf_slist_foreach_unsafe(vsfvm_lexer_list_t, op_node, &compiler->lexer_list) {
         if (!strcmp(_->op->ext, ext)) {
@@ -354,7 +354,7 @@ static vsfvm_lexer_list_t * vsfvm_get_lexer(vsfvm_compiler_t *compiler, const ch
     return NULL;
 }
 
-static int vsfvm_push_func(vsfvm_compiler_script_t *script, vsfvm_lexer_sym_t *sym)
+static int __vsfvm_push_func(vsfvm_compiler_script_t *script, vsfvm_lexer_sym_t *sym)
 {
     vsfvm_compiler_func_t *func = &script->cur_func;
 
@@ -378,14 +378,14 @@ static int vsfvm_push_func(vsfvm_compiler_script_t *script, vsfvm_lexer_sym_t *s
     return 0;
 }
 
-static void vsfvm_compiler_func_fini(vsfvm_compiler_func_t *func)
+static void __vsfvm_compiler_func_fini(vsfvm_compiler_func_t *func)
 {
     vsf_dynstack_fini(&func->linktbl);
     vsf_dynstack_fini(&func->ctx);
 }
 
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-static void vsfvm_print_expr(vsf_dynstack_t *expr_stack)
+static void __vsfvm_print_expr(vsf_dynstack_t *expr_stack)
 {
     vsfvm_lexer_etoken_t *etoken;
     uint_fast16_t token, token_param;
@@ -466,7 +466,7 @@ static void vsfvm_print_expr(vsf_dynstack_t *expr_stack)
 }
 #endif
 
-static vsf_err_t vsfvm_func_push_ctx(vsfvm_compiler_func_t *func)
+static vsf_err_t __vsfvm_func_push_ctx(vsfvm_compiler_func_t *func)
 {
     vsfvm_compiler_func_ctx_t *ctx = &func->curctx;
     vsf_err_t err;
@@ -479,7 +479,7 @@ static vsf_err_t vsfvm_func_push_ctx(vsfvm_compiler_func_t *func)
     return VSF_ERR_NONE;
 }
 
-static vsfvm_compiler_func_ctx_t * vsfvm_func_pop_ctx(vsfvm_compiler_func_t *func)
+static vsfvm_compiler_func_ctx_t * __vsfvm_func_pop_ctx(vsfvm_compiler_func_t *func)
 {
     vsfvm_compiler_func_ctx_t *ctx = vsf_dynstack_pop(&func->ctx, 1);
     if (ctx != NULL) {
@@ -488,7 +488,7 @@ static vsfvm_compiler_func_ctx_t * vsfvm_func_pop_ctx(vsfvm_compiler_func_t *fun
     return &func->curctx;
 }
 
-static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
+static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
     vsfvm_pt_evt_t evt, uint_fast32_t token, vsfvm_token_data_t *data)
 {
     vsfvm_compiler_script_t *script = &compiler->script;
@@ -528,11 +528,11 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
                 vsf_trace(VSF_TRACE_DEBUG, "parser: func %s end" VSF_TRACE_CFG_LINEEND, func->name->name);
 #endif
-                if (vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0)) < 0) {
+                if (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
 
-                vsfvm_compiler_func_fini(func);
+                __vsfvm_compiler_func_fini(func);
                 func = vsf_dynstack_pop(&script->func_stack, 1);
                 if (!func) { return -VSFVM_BUG; }
 
@@ -545,12 +545,12 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
                         fix_code |= (int16_t)(compiler->bytecode_pos - ctx->func_ctx.goto_anchor - 1);
                         vsfvm_set_bytecode_imp(compiler, fix_code, ctx->func_ctx.goto_anchor);
                     }
-                    ctx = vsfvm_func_pop_ctx(func);
+                    ctx = __vsfvm_func_pop_ctx(func);
                 }
             } else {
                 if (data->uval) {
 
-                    if (vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, data->uval, 0)) < 0) {
+                    if (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, data->uval, 0)) < 0) {
                         return -VSFVM_BYTECODE_TOOLONG;
                     }
                     while (data->uval--) {
@@ -568,7 +568,7 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
                             fix_code |= (int16_t)(compiler->bytecode_pos - ctx->if_ctx.if_anchor - 1);
                             vsfvm_set_bytecode_imp(compiler, fix_code, ctx->if_ctx.if_anchor);
 
-                            ctx = vsfvm_func_pop_ctx(func);
+                            ctx = __vsfvm_func_pop_ctx(func);
                             if ((ctx->etoken.token > 0) && (ctx->block_level == func->block_level)) {
                                 goto block_close;
                             }
@@ -586,19 +586,19 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
                         fix_code |= (int16_t)(compiler->bytecode_pos - ctx->if_ctx.else_anchor - 1);
                         vsfvm_set_bytecode_imp(compiler, fix_code, ctx->if_ctx.else_anchor);
 
-                        ctx = vsfvm_func_pop_ctx(func);
+                        ctx = __vsfvm_func_pop_ctx(func);
                         if ((ctx->etoken.token > 0) && (ctx->block_level == func->block_level)) {
                             goto block_close;
                         }
                     } else if (ctx->etoken.token == VSFVM_TOKEN_WHILE) {
-                        if (vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, 0,
+                        if (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_goto, 0,
                                 (int16_t)(ctx->while_ctx.calc_anchor - compiler->bytecode_pos - 1))) < 0) {
                             return -VSFVM_BYTECODE_TOOLONG;
                         }
                         fix_code = ctx->while_ctx.if_code;
                         fix_code |= (int16_t)(compiler->bytecode_pos - ctx->while_ctx.if_anchor - 1);
                         vsfvm_set_bytecode_imp(compiler, fix_code, ctx->while_ctx.if_anchor);
-                        ctx = vsfvm_func_pop_ctx(func);
+                        ctx = __vsfvm_func_pop_ctx(func);
 
                         if ((ctx->etoken.token > 0) && (ctx->block_level == func->block_level)) {
                             goto block_close;
@@ -615,7 +615,7 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             vsf_trace(VSF_TRACE_DEBUG, "parser: import module \"%s\"" VSF_TRACE_CFG_LINEEND, path);
 #endif
 
-            vsfvm_lexer_list_t *list = vsfvm_get_lexer(compiler, vsfvm_module_get_lexer_imp(path));
+            vsfvm_lexer_list_t *list = __vsfvm_get_lexer(compiler, vsfvm_module_get_lexer_imp(path));
             int err;
 
             if (!list) {
@@ -636,7 +636,7 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             vsf_trace(VSF_TRACE_DEBUG, "parser: variable \"%s\", type %s" VSF_TRACE_CFG_LINEEND, data->sym->name,
                     data->sym->c ? data->sym->c->name : "value");
             if (stack_exp->sp > 0) {
-                vsfvm_print_expr(stack_exp);
+                __vsfvm_print_expr(stack_exp);
             }
 #endif
 
@@ -652,26 +652,26 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             }
 
             vsf_slist_append(vsfvm_lexer_sym_t, symbol_node, &func->varlist, data->sym);
-            if (vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_var, VSFVM_CODE_VAR_I32, 0)) < 0) {
+            if (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_var, VSFVM_CODE_VAR_I32, 0)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
             if (stack_exp->sp) {
                 uint8_t pos;
                 uint16_t idx;
 
-                if (vsfvm_compiler_get_var(compiler, script, func, data->sym, &pos, &idx)) {
+                if (__vsfvm_compiler_get_var(compiler, script, func, data->sym, &pos, &idx)) {
                     return -VSFVM_BUG;
                 }
-                if (vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, pos, idx)) < 0) {
+                if (__vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, pos, idx)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
-                err = vsfvm_push_expr(compiler, stack_exp);
+                err = __vsfvm_push_expr(compiler, stack_exp);
                 if (err) { return err; }
-                if (    (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0)) < 0)
-                    ||  (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0)) {
+                if (    (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0)) < 0)
+                    ||  (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0)) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
-                err = vsfvm_push_res(compiler, func);
+                err = __vsfvm_push_res(compiler, func);
                 if (err) { return err; }
             }
         } else if (token == VSFVM_TOKEN_CONST) {
@@ -679,7 +679,7 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             vsf_trace(VSF_TRACE_DEBUG, "parser: const \"%s\" = %d" VSF_TRACE_CFG_LINEEND, data->sym->name, data->sym->ival);
 #endif
         } else if (token == VSFVM_TOKEN_FUNC) {
-            vsfvm_func_push_ctx(func);
+            __vsfvm_func_push_ctx(func);
             ctx = &func->curctx;
             ctx->etoken.token = token;
             ctx->block_level = func->block_level;
@@ -693,7 +693,7 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             }
 
             data->sym->func.pos = compiler->bytecode_pos;
-            vsfvm_push_func(script, data->sym);
+            __vsfvm_push_func(script, data->sym);
             func = &script->cur_func;
 
             vsfvm_lexer_etoken_t *etoken;
@@ -706,32 +706,32 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             vsf_trace(VSF_TRACE_DEBUG, "parser: function \"%s\"(%d)" VSF_TRACE_CFG_LINEEND, data->sym->name, stack_exp->sp);
             if (stack_exp->sp > 0) {
                 vsf_trace(VSF_TRACE_DEBUG, "parser: function argument" VSF_TRACE_CFG_LINEEND);
-                vsfvm_print_expr(stack_exp);
+                __vsfvm_print_expr(stack_exp);
             }
 #endif
         } else if (token == VSFVM_TOKEN_IF) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
             vsf_trace(VSF_TRACE_DEBUG, "parser: if" VSF_TRACE_CFG_LINEEND);
-            vsfvm_print_expr(stack_exp);
+            __vsfvm_print_expr(stack_exp);
 #endif
 
-            vsfvm_func_push_ctx(func);
+            __vsfvm_func_push_ctx(func);
             ctx = &func->curctx;
             ctx->etoken.token = token;
             ctx->block_level = func->block_level;
 
         push_if:
-            if (    (vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_var, VSFVM_CODE_VAR_I32, 0)) < 0)
-                ||  (vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, VSFVM_CODE_VARIABLE_POS_STACK_END, 0)) < 0)) {
+            if (    (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_var, VSFVM_CODE_VAR_I32, 0)) < 0)
+                ||  (__vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE, VSFVM_CODE_VARIABLE_POS_STACK_END, 0)) < 0)) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
-            err = vsfvm_push_expr(compiler, stack_exp);
+            err = __vsfvm_push_expr(compiler, stack_exp);
             if (err) { return err; }
-            if (    (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0)) < 0)
-                ||  (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0)) {
+            if (    (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0)) < 0)
+                ||  (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0)) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
-            err = vsfvm_push_res(compiler, func);
+            err = __vsfvm_push_res(compiler, func);
             if (err) { return err; }
             ctx->if_ctx.if_anchor = compiler->bytecode_pos;
             ctx->if_ctx.if_code = VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_if, 0, 0);
@@ -739,10 +739,10 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
         } else if (token == VSFVM_TOKEN_WHILE) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
             vsf_trace(VSF_TRACE_DEBUG, "parser: while" VSF_TRACE_CFG_LINEEND);
-            vsfvm_print_expr(stack_exp);
+            __vsfvm_print_expr(stack_exp);
 #endif
 
-            vsfvm_func_push_ctx(func);
+            __vsfvm_func_push_ctx(func);
             ctx = &func->curctx;
             ctx->etoken.token = token;
             ctx->block_level = func->block_level;
@@ -751,37 +751,37 @@ static vsf_err_t vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
         } else if (token == VSFVM_TOKEN_RET) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
             vsf_trace(VSF_TRACE_DEBUG, "parser: return" VSF_TRACE_CFG_LINEEND);
-            vsfvm_print_expr(stack_exp);
+            __vsfvm_print_expr(stack_exp);
 #endif
 
             if (stack_exp->sp) {
-                if (vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE, VSFVM_CODE_VARIABLE_POS_FUNCARG, 0)) < 0) {
+                if (__vsfvm_push_bytecode(compiler, VSFVM_VARIABLE(VSFVM_CODE_VARIABLE_REFERENCE_NOTRACE, VSFVM_CODE_VARIABLE_POS_FUNCARG, 0)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
-                err = vsfvm_push_expr(compiler, stack_exp);
+                err = __vsfvm_push_expr(compiler, stack_exp);
                 if (err) { return err; }
-                if (    (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0)) < 0)
-                    ||  (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0)) {
+                if (    (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_ASSIGN, 0, 0)) < 0)
+                    ||  (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0)) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
-                err = vsfvm_push_res(compiler, func);
+                err = __vsfvm_push_res(compiler, func);
                 if (err) { return err; }
             }
-            if (vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0)) < 0) {
+            if (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
         } else if (token == VSFVM_TOKEN_EXPR) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
             vsf_trace(VSF_TRACE_DEBUG, "parser: expression" VSF_TRACE_CFG_LINEEND);
-            vsfvm_print_expr(stack_exp);
+            __vsfvm_print_expr(stack_exp);
 #endif
 
-            err = vsfvm_push_expr(compiler, stack_exp);
+            err = __vsfvm_push_expr(compiler, stack_exp);
             if (err) { return err; }
-            if (vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0) {
+            if (__vsfvm_push_bytecode(compiler, VSFVM_SYMBOL(VSFVM_CODE_SYMBOL_SEMICOLON, 0, 0)) < 0) {
                 return -VSFVM_BYTECODE_TOOLONG;
             }
-            err = vsfvm_push_res(compiler, func);
+            err = __vsfvm_push_res(compiler, func);
             if (err) { return err; }
         } else {
             return -VSFVM_NOT_SUPPORT;
@@ -802,7 +802,7 @@ vsf_err_t vsfvm_on_stmt(vsfvm_lexer_t *lexer, uint_fast32_t token, vsfvm_token_d
 {
     vsfvm_compiler_script_t *script = container_of(lexer, vsfvm_compiler_script_t, lexer);
     vsfvm_compiler_t *compiler = container_of(script, vsfvm_compiler_t, script);
-    return vsfvm_parse_stmt(compiler, &script->pt_stmt, VSFVM_EVT_ON_STMT, token, data);
+    return __vsfvm_parse_stmt(compiler, &script->pt_stmt, VSFVM_EVT_ON_STMT, token, data);
 }
 
 int vsfvm_compiler_register_lexer(vsfvm_compiler_t *compiler, vsfvm_lexer_list_t *lexer_list)
@@ -813,7 +813,7 @@ int vsfvm_compiler_register_lexer(vsfvm_compiler_t *compiler, vsfvm_lexer_list_t
 
 void vsfvm_compiler_fini(vsfvm_compiler_t *compiler)
 {
-    vsfvm_compiler_script_fini(compiler);
+    __vsfvm_compiler_script_fini(compiler);
 }
 
 int vsfvm_compiler_init(vsfvm_compiler_t *compiler)
@@ -822,7 +822,7 @@ int vsfvm_compiler_init(vsfvm_compiler_t *compiler)
     return 0;
 }
 
-static int vsfvm_compiler_ext_init(vsfvm_compiler_t *compiler, vsfvm_ext_t *ext)
+static int __vsfvm_compiler_ext_init(vsfvm_compiler_t *compiler, vsfvm_ext_t *ext)
 {
     vsfvm_compiler_script_t *script = &compiler->script;
 
@@ -833,17 +833,17 @@ static int vsfvm_compiler_ext_init(vsfvm_compiler_t *compiler, vsfvm_ext_t *ext)
     return 0;
 }
 
-static void vsfvm_compiler_script_fini(vsfvm_compiler_t *compiler)
+static void __vsfvm_compiler_script_fini(vsfvm_compiler_t *compiler)
 {
     vsfvm_compiler_script_t *script = &compiler->script;
     vsfvm_compiler_func_t *f;
 
     vsfvm_lexer_fini(&script->lexer);
-    vsfvm_compiler_func_fini(&script->cur_func);
+    __vsfvm_compiler_func_fini(&script->cur_func);
 
     do {
         if ((f = vsf_dynstack_pop(&script->func_stack, 1))) {
-            vsfvm_compiler_func_fini(f);
+            __vsfvm_compiler_func_fini(f);
         }
     } while (f != NULL);
     vsf_dynstack_fini(&script->func_stack);
@@ -866,13 +866,13 @@ int vsfvm_compiler_set_script(vsfvm_compiler_t *compiler, const char *script_nam
     script->name = script_name;
     script->pt_stmt.state = 0;
 
-    lexer = vsfvm_get_lexer(compiler, vsfvm_module_get_lexer_imp(script_name));
+    lexer = __vsfvm_get_lexer(compiler, vsfvm_module_get_lexer_imp(script_name));
     if (!lexer) { return VSFVM_NOT_SUPPORT; }
     err = vsfvm_lexer_init(&script->lexer, lexer);
     if (err) { return err; }
 
     __vsf_slist_foreach_unsafe(vsfvm_ext_t, ext_node, &vsfvm_ext_list) {
-        err = vsfvm_compiler_ext_init(compiler, _);
+        err = __vsfvm_compiler_ext_init(compiler, _);
         if (err) { return err; }
         _->func_id = func_id;
         func_id += _->op->func_num;
@@ -881,7 +881,7 @@ int vsfvm_compiler_set_script(vsfvm_compiler_t *compiler, const char *script_nam
     }
 
     err = vsfvm_compiler_input(compiler, "__startup__(){");
-    if (err < 0) { vsfvm_compiler_script_fini(compiler); }
+    if (err < 0) { __vsfvm_compiler_script_fini(compiler); }
     return err;
 }
 
@@ -892,7 +892,7 @@ int vsfvm_compiler_input(vsfvm_compiler_t *compiler, const char *code)
 
     if (code[0] == '\xFF') {
         err = vsfvm_lexer_input(lexer, "}");
-        vsfvm_compiler_script_fini(compiler);
+        __vsfvm_compiler_script_fini(compiler);
     } else {
         err = vsfvm_lexer_input(lexer, code);
     }

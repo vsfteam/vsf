@@ -160,11 +160,11 @@ void __vsf_trace_init(vsf_stream_tx_t *ptTX)
     
     //! initialise stream source
     do {
-        vsf_stream_src_cfg_t tCFG = {
+        vsf_stream_src_cfg_t cfg = {
             .ptTX = ptTX,                                       //!< connect stream TX 
         };
 
-        vsf_stream_writer_init(&__vsf_trace, &tCFG);
+        vsf_stream_writer_init(&__vsf_trace, &cfg);
 
     } while(0);
 }

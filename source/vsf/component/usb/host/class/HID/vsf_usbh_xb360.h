@@ -25,13 +25,13 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_XB360 == ENABLED
 
 #include "component/usb/common/class/HID/vsf_usb_xb360.h"
-#if VSF_USE_INPUT_XB360 == ENABLED
-#   include "component/input/driver/xb360/vsf_input_xb360.h"
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+#   include "component/input/vsf_input.h"
 #endif
 
-#if     defined(VSF_USBH_XB360_IMPLEMENT)
-#   undef VSF_USBH_XB360_IMPLEMENT
-#   define __PLOOC_CLASS_IMPLEMENT
+#if     defined(__VSF_USBH_XB360_CLASS_IMPLEMENT)
+#   undef __VSF_USBH_XB360_CLASS_IMPLEMENT
+#   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 #include "utilities/ooc_class.h"
 
@@ -48,7 +48,18 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vk_usbh_xb360_t)
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+enum {
+    VSF_INPUT_TYPE_XB360 = VSF_INPUT_USER_TYPE,
+};
+
+typedef struct vk_input_xb360_t {
+    vsf_usb_xb360_gamepad_in_report_t data;
+    vk_input_timestamp_t timestamp;
+} vk_input_xb360_t;
+#endif
+
+dcl_simple_class(vk_usbh_xb360_t)
 
 // xb360 controller is not HID class, but almost compatible with HID class
 def_simple_class(vk_usbh_xb360_t) {
@@ -66,9 +77,19 @@ def_simple_class(vk_usbh_xb360_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+extern const vk_input_item_info_t vk_xb360_gamepad_item_info[GAMEPAD_ID_NUM];
+#endif
+
 extern const vk_usbh_class_drv_t vk_usbh_xb360_drv;
 
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+extern void vk_xb360_process_input(vk_input_xb360_t *dev, vsf_usb_xb360_gamepad_in_report_t *data);
+extern void vk_xb360_new_dev(vk_input_xb360_t *dev);
+extern void vk_xb360_free_dev(vk_input_xb360_t *dev);
+#endif
 
 #ifdef __cplusplus
 }

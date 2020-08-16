@@ -35,7 +35,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vk_dwcotg_hw_info_t {
+typedef struct vk_dwcotg_hw_info_t {
     uint16_t buffer_word_size;
     union {
         struct {
@@ -47,8 +47,7 @@ struct vk_dwcotg_hw_info_t {
         };
         uint8_t feature;
     };
-};
-typedef struct vk_dwcotg_hw_info_t vk_dwcotg_hw_info_t;
+} vk_dwcotg_hw_info_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/

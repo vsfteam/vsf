@@ -25,12 +25,12 @@
 
 #include "../dynarr/vsf_dynarr.h"
 
-#if     defined(VSF_DYNSTACK_IMPLEMENT)
-#   define __PLOOC_CLASS_IMPLEMENT
-#   undef VSF_DYNSTACK_IMPLEMENT
-#elif   defined(VSF_DYNSTACK_INHERIT)
-#   define __PLOOC_CLASS_INHERIT
-#   undef VSF_DYNSTACK_INHERIT
+#if     defined(__VSF_DYNSTACK_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSF_DYNSTACK_CLASS_IMPLEMENT
+#elif   defined(__VSF_DYNSTACK_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_DYNSTACK_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -42,7 +42,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_dynstack_t)
+dcl_simple_class(vsf_dynstack_t)
 
 def_simple_class(vsf_dynstack_t) {
     public_member(

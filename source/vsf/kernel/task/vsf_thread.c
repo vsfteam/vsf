@@ -21,7 +21,7 @@
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_USE_KERNEL == ENABLED
 
 #define __VSF_THREAD_CLASS_IMPLEMENT
-#define VSF_EDA_CLASS_INHERIT
+#define __VSF_EDA_CLASS_INHERIT__
 #include "../vsf_kernel_common.h"
 #include "./vsf_thread.h"
 #include "../vsf_os.h"
