@@ -15,35 +15,29 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_TEMPLATE_H__
-#define __HAL_DRIVER_TEMPLATE_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#include "service/vsf_service.h"
-#include "hal/interface/vsf_interface_usb.h"
+#undef VSF_X86_DRIVER_HEADER
 
-#ifdef __cplusplus
-extern "C" {
+#if     defined(__WIN__)
+#   define  VSF_X86_DRIVER_HEADER           "./win/driver.h"
+#elif   defined(__LINUX__)
+#   define  VSF_X86_DRIVER_HEADER           "./linux/driver.h"
+#else
+#   error No supported device found.
 #endif
+
+/* include specified device driver header file */
+#include VSF_X86_DRIVER_HEADER
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-extern vsf_stream_t VSF_DEBUG_STREAM_TX;
-extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#ifdef __cplusplus
-}
-#endif
 
-
-#endif
 /* EOF */

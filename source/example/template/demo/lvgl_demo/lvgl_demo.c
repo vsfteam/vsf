@@ -24,7 +24,11 @@
 
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
-#include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
+#include "component/3rd-party/littlevgl/6.1.2/port/vsf_lvgl_port.h"
+
+#if APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+#include "component/3rd-party/littlevgl/6.1.2/extension/lv_lib_freetype/raw/lv_freetype.h"
+#endif
 
 #if APP_CFG_USE_LINUX_DEMO == ENABLED
 #   include <pthread.h>
@@ -43,6 +47,9 @@ static void __lvgl_on_touchscreen(vk_input_type_t type, vk_touchscreen_evt_t *ts
 {
     if (0 == vsf_input_touchscreen_get_id(ts_evt)) {
         usrapp_ui_common.lvgl.ts_evt = *ts_evt;
+        if (usrapp_ui_common.lvgl.eda_poll != NULL) {
+            vsf_eda_post_evt(usrapp_ui_common.lvgl.eda_poll, VSF_EVT_USER);
+        }
     }
 }
 
@@ -69,9 +76,14 @@ static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
 
 void * __lvgl_thread(void *arg)
 {
+    usrapp_ui_common.lvgl.eda_poll = vsf_eda_get_cur();
+    usrapp_ui_common.lvgl.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
+    usrapp_ui_common.lvgl.notifier.on_evt = (vk_input_on_evt_t)__lvgl_on_touchscreen;
+    vk_input_notifier_register(&usrapp_ui_common.lvgl.notifier);
+
     while (1) {
         lv_task_handler();
-        vsf_thread_delay_ms(10);
+        vsf_thread_wfe(VSF_EVT_USER);
     }
 }
 
@@ -105,10 +117,6 @@ int main(void)
     lv_log_register_print(vsf_lvgl_printf);
 #   endif
 
-    usrapp_ui_common.lvgl.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
-    usrapp_ui_common.lvgl.notifier.on_evt = (vk_input_on_evt_t)__lvgl_on_touchscreen;
-    vk_input_notifier_register(&usrapp_ui_common.lvgl.notifier);
-
     lv_init();
 
     lv_disp_drv_t disp_drv;
@@ -137,6 +145,10 @@ int main(void)
     indev_drv.read_cb = __lvgl_touchscreen_read;
     lv_indev_drv_register(&indev_drv);
 
+#if APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+    lv_freetype_init(APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES);
+#endif
+
     extern void lvgl_application(uint_fast8_t);
     lvgl_application(gamepad_num);
 
@@ -144,6 +156,10 @@ int main(void)
     pthread_t thread;
     pthread_create(&thread, NULL, __lvgl_thread, NULL);
 #else
+    usrapp_ui_common.lvgl.notifier.mask = 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
+    usrapp_ui_common.lvgl.notifier.on_evt = (vk_input_on_evt_t)__lvgl_on_touchscreen;
+    vk_input_notifier_register(&usrapp_ui_common.lvgl.notifier);
+
     while (1) {
         lv_task_handler();
     }

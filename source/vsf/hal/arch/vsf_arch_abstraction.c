@@ -62,8 +62,8 @@ void be##__bitlen##_to_cpus(uint##__bitlen##_t *p)                              
 {                                                                               \
     *p = be##__bitlen##_to_cpu(*p);                                             \
 }                                                                               \
-WEAK(get_unaligned_##__bitlen)                                                  \
-uint_fast##__bitlen##_t get_unaligned_##__bitlen(const void *p)                 \
+WEAK(get_unaligned_cpu##__bitlen)                                               \
+uint_fast##__bitlen##_t get_unaligned_cpu##__bitlen(const void *p)              \
 {                                                                               \
     struct PACKED __packed_##__bitlen_t {                                       \
         uint##__bitlen##_t __v;                                                 \
@@ -73,15 +73,15 @@ uint_fast##__bitlen##_t get_unaligned_##__bitlen(const void *p)                 
 WEAK(get_unaligned_le##__bitlen)                                                \
 uint_fast##__bitlen##_t get_unaligned_le##__bitlen(const void *p)               \
 {                                                                               \
-    return cpu_to_le##__bitlen(get_unaligned_##__bitlen(p));                    \
+    return cpu_to_le##__bitlen(get_unaligned_cpu##__bitlen(p));                 \
 }                                                                               \
 WEAK(get_unaligned_be##__bitlen)                                                \
 uint_fast##__bitlen##_t get_unaligned_be##__bitlen(const void *p)               \
 {                                                                               \
-    return cpu_to_be##__bitlen(get_unaligned_##__bitlen(p));                    \
+    return cpu_to_be##__bitlen(get_unaligned_cpu##__bitlen(p));                 \
 }                                                                               \
-WEAK(put_unaligned_##__bitlen)                                                  \
-void put_unaligned_##__bitlen(uint_fast##__bitlen##_t val, void *p)             \
+WEAK(put_unaligned_cpu##__bitlen)                                               \
+void put_unaligned_cpu##__bitlen(uint_fast##__bitlen##_t val, void *p)          \
 {                                                                               \
     struct PACKED __packed_##__bitlen_t {                                       \
         uint##__bitlen##_t __v;                                                 \
@@ -91,12 +91,12 @@ void put_unaligned_##__bitlen(uint_fast##__bitlen##_t val, void *p)             
 WEAK(put_unaligned_le##__bitlen)                                                \
 void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t val, void *p)           \
 {                                                                               \
-    put_unaligned_##__bitlen(cpu_to_le##__bitlen(val), p);                      \
+    put_unaligned_cpu##__bitlen(cpu_to_le##__bitlen(val), p);                   \
 }                                                                               \
 WEAK(put_unaligned_be##__bitlen)                                                \
 void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           \
 {                                                                               \
-    put_unaligned_##__bitlen(cpu_to_be##__bitlen(val), p);                      \
+    put_unaligned_cpu##__bitlen(cpu_to_be##__bitlen(val), p);                   \
 }
 
 
@@ -474,6 +474,11 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
     return VSF_ERR_FAIL;
 #endif
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 /*----------------------------------------------------------------------------*
  * System Timer                                                               *

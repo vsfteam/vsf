@@ -93,12 +93,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftconfig.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftheader.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftmodule.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftoption.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftstdlib.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\freetype.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftadvanc.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbbox.h" />
@@ -186,6 +186,7 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\port\vsf_lvgl_port.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
@@ -696,6 +697,8 @@
     <ClInclude Include="..\..\..\..\vsf\hal\driver\common\common.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\driver\driver.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\device.h" />
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\driver.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_common.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_io.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_pm.h" />
@@ -720,6 +723,10 @@
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
@@ -971,6 +978,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type1\type1.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type42\type42.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\port\vsf_lvgl_port.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
@@ -1526,7 +1534,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\vsf_component.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\arch\vsf_arch_abstraction.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic.c" />
-    <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\driver.c" />
+    <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\driver.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\vsf_hal.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c" />
@@ -1538,6 +1546,7 @@
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_os.c" />
+    <ClCompile Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c" />
@@ -1744,15 +1753,19 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;__OOC_CPP__;WIN32;NDEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\usrapp\usbh_demo_win;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

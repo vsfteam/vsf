@@ -199,9 +199,6 @@
     <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\src\FT_MODULES">
       <UniqueIdentifier>{bb741321-19fc-4478-b95c-5e19ac9b9f12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\port\config">
-      <UniqueIdentifier>{5c567e4b-0790-44f9-b7af-dd5c0dd37d39}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\include">
       <UniqueIdentifier>{3326a08a-3d6d-448c-80d1-5b932eaa0161}</UniqueIdentifier>
     </Filter>
@@ -276,6 +273,9 @@
     </Filter>
     <Filter Include="vsf\component\fs\driver\memfs">
       <UniqueIdentifier>{9bce476a-7578-4857-ab52-6dbfa7f1d01c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\2.10.1\port\vsf_config">
+      <UniqueIdentifier>{5c567e4b-0790-44f9-b7af-dd5c0dd37d39}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -596,21 +596,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h">
       <Filter>vsf\component\3rd-party\freetype\2.10.1\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h">
-      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h">
-      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h">
-      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h">
-      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h">
-      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlist.h">
       <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype</Filter>
@@ -1040,6 +1025,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.h">
       <Filter>vsf\component\fs\driver\memfs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftmodule.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftoption.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftstdlib.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftconfig.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftheader.h">
+      <Filter>vsf\component\3rd-party\freetype\2.10.1\port\vsf_config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

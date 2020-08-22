@@ -25,35 +25,35 @@
 /*============================ MACROS ========================================*/
 
 // Application configure
-#   define APP_CFG_USE_LINUX_DEMO                       ENABLED
-#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            ENABLED
-#       define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO        ENABLED
-#   define APP_CFG_USE_USBH_DEMO                        ENABLED
-#   define APP_CFG_USE_USBD_DEMO                        ENABLED
-#       define APP_CFG_USE_USBD_CDC_DEMO                ENABLED
-#       define APP_CFG_USE_USBD_MSC_DEMO                ENABLED
-#       define APP_CFG_USE_USBD_UVC_DEMO                ENABLED
-#   define APP_CFG_USE_SCSI_DEMO                        ENABLED
+#define APP_CFG_USE_LINUX_DEMO                          ENABLED
+#   define APP_CFG_USE_LINUX_LIBUSB_DEMO                ENABLED
+#   define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO            ENABLED
+#define APP_CFG_USE_USBH_DEMO                           ENABLED
+#define APP_CFG_USE_USBD_DEMO                           ENABLED
+#   define APP_CFG_USE_USBD_CDC_DEMO                    ENABLED
+#   define APP_CFG_USE_USBD_MSC_DEMO                    ENABLED
+#   define APP_CFG_USE_USBD_UVC_DEMO                    ENABLED
+#define APP_CFG_USE_SCSI_DEMO                           ENABLED
 //  todo: implement audio driver for m484
-#   define APP_CFG_USE_AUDIO_DEMO                       DISABLED
+#define APP_CFG_USE_AUDIO_DEMO                          DISABLED
 //  current tgui demo depends on VSF_USE_DISP_SDL2, which is only available on __WIN__
-#   define APP_CFG_USE_TGUI_DEMO                        DISABLED
+#define APP_CFG_USE_TGUI_DEMO                           DISABLED
 //  current M484 hardware has no display
-#   define APP_CFG_USE_SDL2_DEMO                        DISABLED
+#define APP_CFG_USE_SDL2_DEMO                           DISABLED
 //  TODO: need test for c++ support
-#   define APP_CFG_USE_CPP_DEMO                         ENABLED
+#define APP_CFG_USE_CPP_DEMO                            ENABLED
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
-#   define APP_CFG_USE_AWTK_DEMO                        DISABLED
-#   define APP_CFG_USE_NNOM_DEMO                        ENABLED
+#define APP_CFG_USE_AWTK_DEMO                           DISABLED
+#define APP_CFG_USE_NNOM_DEMO                           ENABLED
 //  current M484 hardware has no display
-#   define APP_CFG_USE_LVGL_DEMO                        DISABLED
-#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
-#   define APP_CFG_USE_VSFVM_DEMO                       DISABLED
+#define APP_CFG_USE_LVGL_DEMO                           DISABLED
+#define APP_CFG_USE_BTSTACK_DEMO                        ENABLED
+#define APP_CFG_USE_VSFVM_DEMO                          DISABLED
 // select one for tcpip stack
-#   define APP_CFG_USE_VSFIP_DEMO                       DISABLED
-#   define APP_CFG_USE_LWIP_DEMO                        ENABLED
+#define APP_CFG_USE_VSFIP_DEMO                          DISABLED
+#define APP_CFG_USE_LWIP_DEMO                           ENABLED
 
 
 // component configure

@@ -1,10 +1,8 @@
 #ifndef __VSF_IIC_INTERNAL_H__
 #define __VSF_IIC_INTERNAL_H__
 
-#include "utilities/vsf_utilities.h"
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
-
 
 //! \brief i2c address configuration structure
 typedef struct {

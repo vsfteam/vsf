@@ -342,7 +342,7 @@ copy_match:
         if (match < lowprefix) {
             return;
         }
-        put_unaligned_32((uint32_t)offset, op);
+        put_unaligned_cpu32((uint32_t)offset, op);
 
         if (length == ML_MASK) {
             do {

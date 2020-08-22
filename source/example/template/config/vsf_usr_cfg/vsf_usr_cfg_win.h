@@ -27,45 +27,47 @@
 //#define __WIN7__
 
 // Application configure
-#   define APP_CFG_USE_LINUX_DEMO                       ENABLED
-#       define APP_CFG_USE_LINUX_LIBUSB_DEMO            ENABLED
-#       define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO        ENABLED
-#   define APP_CFG_USE_USBH_DEMO                        ENABLED
-#       define APP_CFG_USE_DFU_HOST_DEMO                ENABLED
-#   define APP_CFG_USE_USBD_DEMO                        ENABLED
-#       define APP_CFG_USE_USBD_CDC_DEMO                ENABLED
-#       define APP_CFG_USE_USBD_MSC_DEMO                ENABLED
-#       define APP_CFG_USE_USBD_UVC_DEMO                ENABLED
-#   define APP_CFG_USE_SCSI_DEMO                        ENABLED
-#   define APP_CFG_USE_AUDIO_DEMO                       ENABLED
-#   define APP_CFG_USE_TGUI_DEMO                        ENABLED
-#   define APP_CFG_USE_SDL2_DEMO                        ENABLED
+#define APP_CFG_USE_LINUX_DEMO                          ENABLED
+#   define APP_CFG_USE_LINUX_LIBUSB_DEMO                ENABLED
+#   define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO            ENABLED
+#define APP_CFG_USE_USBH_DEMO                           ENABLED
+#   define APP_CFG_USE_DFU_HOST_DEMO                    ENABLED
+#define APP_CFG_USE_USBD_DEMO                           ENABLED
+#   define APP_CFG_USE_USBD_CDC_DEMO                    ENABLED
+#   define APP_CFG_USE_USBD_MSC_DEMO                    ENABLED
+#   define APP_CFG_USE_USBD_UVC_DEMO                    ENABLED
+#define APP_CFG_USE_SCSI_DEMO                           ENABLED
+#define APP_CFG_USE_AUDIO_DEMO                          ENABLED
+#define APP_CFG_USE_TGUI_DEMO                           ENABLED
+#define APP_CFG_USE_SDL2_DEMO                           ENABLED
 
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
-#   define APP_CFG_USE_CPP_DEMO                         ENABLED
-#   define VSF_LINUX_USE_SIMPLE_LIBC                    DISABLED
+#define APP_CFG_USE_CPP_DEMO                            ENABLED
+#define VSF_LINUX_USE_SIMPLE_LIBC                       DISABLED
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
-#   define VSF_USE_SIMPLE_SSCANF                        DISABLED
-#   define VSF_USE_SIMPLE_SPRINTF                       DISABLED
+#define VSF_USE_SIMPLE_SSCANF                           DISABLED
+#define VSF_USE_SIMPLE_SPRINTF                          DISABLED
 
 // 3rd-party demos
-#   define APP_CFG_USE_XBOOT_XUI_DEMO                   DISABLED
-#   define APP_CFG_USE_AWTK_DEMO                        ENABLED
-#   define APP_CFG_USE_NNOM_DEMO                        ENABLED
-#   define APP_CFG_USE_LVGL_DEMO                        ENABLED
-#       define APP_LVGL_DEMO_CFG_TOUCH_REMAP            DISABLED
-#       define APP_LVGL_DEMO_CFG_COLOR_DEPTH            16
-#       define APP_LVGL_DEMO_CFG_HOR_RES                256
-#       define APP_LVGL_DEMO_CFG_VER_RES                256
-#   define APP_CFG_USE_BTSTACK_DEMO                     ENABLED
-#   define APP_CFG_USE_VSFVM_DEMO                       ENABLED
+#define APP_CFG_USE_XBOOT_XUI_DEMO                      DISABLED
+#define APP_CFG_USE_AWTK_DEMO                           ENABLED
+#define APP_CFG_USE_NNOM_DEMO                           ENABLED
+#define APP_CFG_USE_LVGL_DEMO                           ENABLED
+#   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE				    ENABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES		    4
+#   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
+#   define APP_LVGL_DEMO_CFG_HOR_RES                    256
+#   define APP_LVGL_DEMO_CFG_VER_RES                    256
+#define APP_CFG_USE_BTSTACK_DEMO                        ENABLED
+#define APP_CFG_USE_VSFVM_DEMO                          ENABLED
 // select one for tcpip stack
-#   define APP_CFG_USE_VSFIP_DEMO                       DISABLED
-#   define APP_CFG_USE_LWIP_DEMO                        ENABLED
+#define APP_CFG_USE_VSFIP_DEMO                          DISABLED
+#define APP_CFG_USE_LWIP_DEMO                           ENABLED
 
-#   if APP_CFG_USE_TGUI_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
-#       define APP_CFG_USE_FREETYPE_DEMO                ENABLED
-#   endif
+#if APP_CFG_USE_TGUI_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+#   define APP_CFG_USE_FREETYPE_DEMO                    ENABLED
+#endif
 
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
@@ -204,7 +206,10 @@
 //#   define VSF_WINUSB_HCD_DEV8_PID                      0x02EA
 #endif
 #if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
-#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb\libusb-1.0\libusb.h"
+// for libusb
+//#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb\libusb.h"
+// for libusb-win32
+#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb-win32\lusb0_usb.h"
 #   define VSF_LIBUSB_HCD_CFG_DEV_NUM                   2
 #   define VSF_LIBUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
 #   define VSF_LIBUSB_HCD_DEV0_PID                      0x0001
@@ -235,6 +240,7 @@
 #   define VSF_DISP_SDL2_CFG_HW_PRIORITY                vsf_arch_prio_1
 #   define APP_DISP_SDL2_HEIGHT                         768
 #   define APP_DISP_SDL2_WIDTH                          1024
+#   define APP_DISP_SDL2_TITLE                          "vsf_screen"
 #   define APP_DISP_SDL2_COLOR                          VSF_DISP_COLOR_RGB565
 #   define APP_DISP_SDL2_AMPLIFIER                      1
 

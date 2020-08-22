@@ -353,6 +353,11 @@ static bool __vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
     return false;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 vsf_err_t vk_usbh_alloc_urb(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_urb_t *urb)
 {
     vk_usbh_pipe_t pipe;
@@ -1025,6 +1030,11 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
     }
     return size > 0 ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {

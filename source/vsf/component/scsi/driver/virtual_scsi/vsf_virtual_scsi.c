@@ -78,6 +78,11 @@ static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *
     return false;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 __vsf_component_peda_ifs_entry(__vk_virtual_scsi_init, vk_scsi_init)
 {
     vsf_peda_begin();
@@ -166,6 +171,11 @@ static vsf_err_t __vk_virtual_scsi_rw(vk_virtual_scsi_t *pthis, uint8_t *cbd, vo
         return VSF_ERR_NOT_SUPPORT;
     }
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
 {

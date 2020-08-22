@@ -107,7 +107,7 @@
    *
    */
 #ifndef FT_CONFIG_CONFIG_H
-#define FT_CONFIG_CONFIG_H  "./config/ftconfig.h"
+#define FT_CONFIG_CONFIG_H  "./vsf_config/ftconfig.h"
 #endif
 
 
@@ -122,7 +122,7 @@
    *
    */
 #ifndef FT_CONFIG_STANDARD_LIBRARY_H
-#define FT_CONFIG_STANDARD_LIBRARY_H  "./config/ftstdlib.h"
+#define FT_CONFIG_STANDARD_LIBRARY_H  "./vsf_config/ftstdlib.h"
 #endif
 
 
@@ -137,7 +137,7 @@
    *
    */
 #ifndef FT_CONFIG_OPTIONS_H
-#define FT_CONFIG_OPTIONS_H  "./config/ftoption.h"
+#define FT_CONFIG_OPTIONS_H  "./vsf_config/ftoption.h"
 #endif
 
 
@@ -153,7 +153,7 @@
    *
    */
 #ifndef FT_CONFIG_MODULES_H
-#define FT_CONFIG_MODULES_H  "./config/ftmodule.h"
+#define FT_CONFIG_MODULES_H  "./vsf_config/ftmodule.h"
 #endif
 
   /* */

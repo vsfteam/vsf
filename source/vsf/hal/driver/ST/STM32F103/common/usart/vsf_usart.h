@@ -6,12 +6,12 @@
 #include "hal/interface/vsf_interface_usart.h"
 
 enum em_clk_reg_rw_t {
-    USART1_CLK_EN   = 0x04000U,
-    USART2_CLK_EN   = 0x20000U,
-    USART3_CLK_EN   = 0x40000U,
+    USART1_CLK_EN           = 0x04000U,
+    USART2_CLK_EN           = 0x20000U,
+    USART3_CLK_EN           = 0x40000U,
     
-    GPIOA_CLK_EN    = 0X00004U,
-    GPIOB_CLK_EN    = 0X00008U,
+    GPIOA_CLK_EN            = 0X00004U,
+    GPIOB_CLK_EN            = 0X00008U,
 };
 
 enum em_gpio_reg_rw_t {
@@ -66,48 +66,41 @@ struct usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
-            uint32_t    bIsBusy     : 1;
-            uint32_t    chEvtStatus : 8;
+            uint32_t    is_busy    : 1;
+            uint32_t    evt_status : 8;
         };
     };
 };
 
-//struct usart_capability_t {
-//    implement(peripheral_status_t)
-//    struct {
-
-//    };
-//};
-
 struct vsf_usart_t {
-    USART_TypeDef      *pBase;
-    uint8_t            *pchWriteBuffer;
-    uint8_t            *pchReadBuffer;
-    uint32_t           wWriteSize;
-    uint32_t           wReadSize;
-    uint32_t           wWriteSizeTimer;
-    uint32_t           wReadSizeTimer;
-    bool               bIsWriting;
-    bool               bIsLoading;
-    vsf_usart_evt_t    tEvtRx;
-    vsf_usart_evt_t    tEvtTx;
-    vsf_usart_evt_t    tEvtRcv;
-    vsf_usart_evt_t    tEvtSnd;
-    usart_status_t     tEvtStatus;
+    USART_TypeDef      *obj_ptr;
+    uint8_t            *write_buffer_ptr;
+    uint8_t            *read_buffer_ptr;
+    uint32_t           write_size;
+    uint32_t           read_size;
+    uint32_t           write_sizecounter;
+    uint32_t           read_sizecounter;
+    bool               is_writing;
+    bool               is_loading;
+    vsf_usart_evt_t    evt_rx;
+    vsf_usart_evt_t    evt_tx;
+    vsf_usart_evt_t    evt_rcv;
+    vsf_usart_evt_t    evt_send;
+    usart_status_t     evt_status;
 };
 
-extern vsf_err_t vsf_usart_init(vsf_usart_t *pusart, usart_cfg_t *cfg_ptr);
-extern fsm_rt_t vsf_usart_enable(vsf_usart_t *pUsart);
-extern fsm_rt_t vsf_usart_disable(vsf_usart_t *pusart);
-extern usart_status_t vsf_usart_status(vsf_usart_t *pUsart);
-extern bool vsf_usart_read_byte(vsf_usart_t *pUsart, uint8_t *byte_ptr);
-extern bool vsf_usart_write_byte(vsf_usart_t *pUsart, uint_fast8_t chByte);
-extern fsm_rt_t vsf_usart_request_read(vsf_usart_t *pUsart, uint8_t *buffer_ptr, uint_fast32_t u32_size);
-extern fsm_rt_t vsf_usart_request_write(vsf_usart_t *pUsart, uint8_t *buffer_ptr, uint_fast32_t u32_size);
+extern vsf_err_t          vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
+extern fsm_rt_t           vsf_usart_enable(vsf_usart_t *usart_ptr);
+extern fsm_rt_t           vsf_usart_disable(vsf_usart_t *usart_ptr);
+extern usart_status_t     vsf_usart_status(vsf_usart_t *usart_ptr);
+extern bool               vsf_usart_read_byte(vsf_usart_t *usart_ptr, uint8_t *byte_ptr);
+extern bool               vsf_usart_write_byte(vsf_usart_t *usart_ptr, uint_fast8_t byte);
+extern fsm_rt_t           vsf_usart_request_read(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size);
+extern fsm_rt_t           vsf_usart_request_write(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size);
 
-extern void vsf_usart_evt_register(vsf_usart_evt_type_t tType, vsf_usart_evt_t tEvent);
-extern usart_evt_status_t vsf_usart_evt_enable(usart_evt_status_t tEventMask);
-extern usart_evt_status_t vsf_usart_evt_disable(usart_evt_status_t tEventMask);
-extern void vsf_usart_evt_resume(usart_evt_status_t tEventStatus);
+extern void               vsf_usart_evt_register(vsf_usart_evt_type_t type, vsf_usart_evt_t event);
+extern usart_evt_status_t vsf_usart_evt_enable(usart_evt_status_t event_mask);
+extern usart_evt_status_t vsf_usart_evt_disable(usart_evt_status_t event_mask);
+extern void               vsf_usart_evt_resume(usart_evt_status_t event_status);
 
 #endif

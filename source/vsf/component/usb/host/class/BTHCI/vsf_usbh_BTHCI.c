@@ -457,6 +457,11 @@ bool vk_usbh_bthci_can_send(void *dev, uint8_t type)
     return ocb != NULL;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 vsf_err_t vk_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t size)
 {
     vk_usbh_bthci_t *bthci = dev;
@@ -523,5 +528,11 @@ vsf_err_t vk_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t 
     ocb->is_busy = true;
     return vk_usbh_submit_urb_ex(usbh, urb, flags, &bthci->eda);
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
+
 
 #endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_BTHCI

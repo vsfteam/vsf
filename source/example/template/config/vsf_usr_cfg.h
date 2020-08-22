@@ -45,7 +45,9 @@
 #       define VSF_USE_USB_HOST_NSPRO                   ENABLED
 #       define VSF_USE_USB_HOST_XB360                   ENABLED
 #       define VSF_USE_USB_HOST_XB1                     ENABLED
+#   if APP_CFG_USE_SCSI_DEMO == ENABLED
 #       define VSF_USE_USB_HOST_MSC                     ENABLED
+#   endif
 #       define VSF_USE_USB_HOST_UAC                     ENABLED
 #   if APP_CFG_USE_VSFIP_DEMO == ENABLED || APP_CFG_USE_LWIP_DEMO == ENABLED
 #       define VSF_USE_USB_HOST_ECM                     ENABLED

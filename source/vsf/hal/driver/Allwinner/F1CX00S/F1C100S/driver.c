@@ -150,6 +150,10 @@ bool vsf_driver_init(void)
     TIMER_BASE->TMR[0].INTV_VALUE = 24 * 1000;
     TIMER_BASE->TMR[0].CTRL = TMR_CTRL_MODE_CONTINUOUS | TMR_CTRL_CLK_SRC_OSC24M | TMR_CTRL_EN;
 #endif
+
+    //! initialise interrupt controller;
+    intc_init();
+
     return true;
 }
 

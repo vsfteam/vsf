@@ -170,15 +170,17 @@ software_interrupt:
     restore_regs
 
 irq:
-    sub     lr, lr, #4
-    save_regs
+    ; IAR provide __irq __nested __arm to handle those
+    ;sub     lr, lr, #4
+    ;save_regs
     bl      IRQ_Handler
-    restore_regs
+    ;restore_regs
 
 fiq:
-    sub     lr, lr, #4
-    save_regs
+    ; IAR provide __fiq __nested __arm to handle those
+    ;sub     lr, lr, #4
+    ;save_regs
     bl      FIQ_Handler
-    restore_regs
+    ;restore_regs
 
     END

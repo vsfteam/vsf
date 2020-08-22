@@ -22,6 +22,7 @@
 //! expression has no effect
 #   pragma diag_suppress=pe174
 #endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -32,7 +33,7 @@
 
 void __delay_loops(int loops)
 {
-    while (loops-- > 0);
+    while (loops-- > 0) { NOP(); };
 }
 
 static void __f1cx00s_clock_set_pll_cpu(uint_fast32_t clk)

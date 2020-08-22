@@ -32,19 +32,19 @@ spi_capability_t vsf_spi_get_capability(void)
 {
     spi_capability_t spi_capability;
     
-    spi_capability.Read.can_read_byte        = true;
-    spi_capability.Read.can_read_block       = true;
-    spi_capability.Read.random_access        = false;
-    spi_capability.Read.support_dma          = true;
-    spi_capability.Read.support_fifo         = false;
-    spi_capability.Read.support_isr          = true;
+    spi_capability.Read.can_read_block   = true;
+    spi_capability.Read.can_read_byte    = true;
+    spi_capability.Read.random_access    = false;
+    spi_capability.Read.support_dma      = true;
+    spi_capability.Read.support_fifo     = false;
+    spi_capability.Read.support_isr      = true;
     
-    spi_capability.Write.can_write_byte      = true;
-    spi_capability.Write.can_write_block     = true;
-    spi_capability.Write.random_access       = false;
-    spi_capability.Write.support_dma         = true;
-    spi_capability.Write.support_fifo        = false;
-    spi_capability.Write.support_isr         = true;
+    spi_capability.Write.can_write_block = true;
+    spi_capability.Write.can_write_byte  = true;
+    spi_capability.Write.random_access   = false;
+    spi_capability.Write.support_dma     = true;
+    spi_capability.Write.support_dma     = false;
+    spi_capability.Write.support_isr     = true;
     
     spi_capability.Feature.u3_data_type_size = 0x03;
     spi_capability.Feature.u5_block_size     = 0xFF;
@@ -96,10 +96,12 @@ uintalu_t vsf_spi_polarity_set(vsf_spi_t *spi_obj, uintalu_t polarity)
     
     uintalu_t uintalu;
     
-    uintalu = spi_obj->hspi->CR1 & 0x0003;
-    
-    spi_obj->hspi->CR1 &= 0xFFFB;
-    spi_obj->hspi->CR1 |= polarity;
+    SAFE_ATOM_CODE() {
+        uintalu = spi_obj->hspi->CR1 & 0x0003;
+        
+        spi_obj->hspi->CR1 &= 0xFFFB;
+        spi_obj->hspi->CR1 |= polarity;
+    }
     return uintalu;
 }
 
@@ -109,7 +111,9 @@ uintalu_t vsf_spi_polarity_get(vsf_spi_t *spi_obj)
     
     uintalu_t uintalu;
     
-    uintalu = spi_obj->hspi->CR1 & 0x0003;
+    SAFE_ATOM_CODE() {
+        uintalu = spi_obj->hspi->CR1 & 0x0003;
+    }
     return uintalu;
 }
 
@@ -120,22 +124,25 @@ fsm_rt_t vsf_spi_exchange(vsf_spi_t *spi_obj, uintalu_t output, void *input)
     bool wait_for_read = false;
     bool exchange_cpl  = false;
     
-    spi_obj->hspi->CR1 |= SPI_EN;
+    SAFE_ATOM_CODE() {
     
-    while(!exchange_cpl) {        
-                
-        if((spi_obj->hspi->SR & SPI_SR_TXE_IS_TRUE) && (false == wait_for_read)) {
-            *(__IO uint8_t *)&spi_obj->hspi->DR = output;
-            wait_for_read = true;
+        spi_obj->hspi->CR1 |= SPI_EN;
+        
+        while(!exchange_cpl) {        
+                    
+            if((spi_obj->hspi->SR & SPI_SR_TXE_IS_TRUE) && (false == wait_for_read)) {
+                *(__IO uint8_t *)&spi_obj->hspi->DR = output;
+                wait_for_read = true;
+            }
+            
+            if(spi_obj->hspi->SR & SPI_SR_RXNE_IS_TRUE) {
+                *(uint8_t *)input = spi_obj->hspi->DR;
+                exchange_cpl = true;
+            }
         }
         
-        if(spi_obj->hspi->SR & SPI_SR_RXNE_IS_TRUE) {
-            *(uint8_t *)input = spi_obj->hspi->DR;
-            exchange_cpl = true;
-        }
+        spi_obj->hspi->CR1 &= (~SPI_EN);
     }
-    
-    spi_obj->hspi->CR1 &= (~SPI_EN);
     
     return fsm_rt_cpl;
 }
@@ -144,24 +151,27 @@ fsm_rt_t vsf_spi_request_exchange(vsf_spi_t *spi_obj, void *output, void *input,
 {
     ASSERT((spi_obj != NULL) && (output != NULL) && (input != NULL) && (size != 0));
     
-    if(false == spi_obj->data_exchange) {
-        spi_obj->output           = output;
-        spi_obj->input            = input;
-        spi_obj->data_size        = size;
+    SAFE_ATOM_CODE() {
+        if(false == spi_obj->data_exchange) {
+            spi_obj->output           = output;
+            spi_obj->input            = input;
+            spi_obj->data_size        = size;
+            
+            spi_obj->rx_count         = 0;
+            spi_obj->tx_count         = 0;
+            spi_obj->data_exchange    = true;
+            
+            spi_obj->hspi->CR2 |= SPI_IT_TXE | SPI_IT_RXNE;
+            spi_obj->hspi->CR1 |= SPI_EN;
+        }
         
-        spi_obj->rx_count         = 0;
-        spi_obj->tx_count         = 0;
-        spi_obj->data_exchange    = true;
-        
-        spi_obj->hspi->CR2 |= SPI_IT_TXE | SPI_IT_RXNE;
-        spi_obj->hspi->CR1 |= SPI_EN;
     }
         
-        
     if((spi_obj->rx_count >= spi_obj->data_size) && (spi_obj->tx_count >= spi_obj->data_size)) {
-        
-        spi_obj->hspi->CR1 &= ~SPI_EN;
-        spi_obj->data_exchange = false;
+        SAFE_ATOM_CODE() {
+            spi_obj->hspi->CR1 &= ~SPI_EN;
+            spi_obj->data_exchange = false;
+        }
 
         return fsm_rt_cpl;
     }      
@@ -197,9 +207,9 @@ spi_status_t vsf_spi##__N##_get_status(void)                                 \
     return vsf_spi_get_status(&vsf_spi[__N]);                                \
 }                                                                            \
                                                                              \
-vsf_err_t vsf_spi##__N##_init(spi_cfg_t *cfg_ptr)                              \
+vsf_err_t vsf_spi##__N##_init(spi_cfg_t *cfg_ptr)                            \
 {                                                                            \
-    return vsf_spi_init(&vsf_spi[__N], cfg_ptr);                               \
+    return vsf_spi_init(&vsf_spi[__N], cfg_ptr);                             \
 }                                                                            \
                                                                              \
 uintalu_t vsf_spi##__N##_polarity_set(uintalu_t polarity)                    \

@@ -21,7 +21,7 @@
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
 
-#include "hal/vsf_hal.h"            // for get_unaligned_32
+#include "hal/vsf_hal.h"            // for get_unaligned_cpu32
 #include "service/vsf_service.h"
 
 #include "./vsfvm_compiler.h"
@@ -182,7 +182,7 @@ static int __vsfvm_push_res(vsfvm_compiler_t *compiler, vsfvm_compiler_func_t *f
             }
 
             for (len = 0; len < token_num; len++) {
-                if (__vsfvm_push_bytecode(compiler, get_unaligned_32(res)) < 0) {
+                if (__vsfvm_push_bytecode(compiler, get_unaligned_cpu32(res)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
                 }
                 res += 4;

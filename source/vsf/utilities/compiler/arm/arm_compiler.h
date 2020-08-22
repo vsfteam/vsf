@@ -146,7 +146,7 @@ extern "C" {
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                 _Pragma(__STR(weak __ORIGIN=__ALIAS))
 #   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __attribute__((packed))
+#   define UNALIGNED            __packed
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
@@ -172,7 +172,7 @@ extern "C" {
                                 __attribute__((weakref(__STR(__ALIAS))))
                                 
 #   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __attribute__((packed))
+#   define UNALIGNED            __packed
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
@@ -221,7 +221,7 @@ extern "C" {
 static ALWAYS_INLINE uint32_t ____disable_irq(void) 
 {
     uint32_t wPRIMASK = __get_interrupt_state();
-    __disable_irq();
+    __disable_interrupt();
     return wPRIMASK & 0x1;
 }
 

@@ -40,7 +40,7 @@
 
 /*\note this is should be the only place where __common.h is included.*/
 #include "../common/__common.h"
-
+#include "./f1c100s_reg.h"
 
 /*============================ MACROS ========================================*/
 
@@ -53,6 +53,10 @@
 #ifndef F1CX00S_PLL_DDR_CLK_HZ
 #   define F1CX00S_PLL_DDR_CLK_HZ   (156UL * 1000 * 1000)
 #endif
+
+
+//! \brief intc register base address
+#define F1CX00S_INTC_BASE_ADDRESS   (0x01C20400ul)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

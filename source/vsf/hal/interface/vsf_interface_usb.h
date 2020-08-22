@@ -29,10 +29,12 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define USB_DC_SPEED_LOW            0
-#define USB_DC_SPEED_FULL           1
-#define USB_DC_SPEED_HIGH           2
-#define USB_DC_SPEED_SUPER          3
+// USB_DC_SPEED_XXXX is compatible with USB_SPEED_XXXX
+#define USB_DC_SPEED_UNKNOWN        0
+#define USB_DC_SPEED_LOW            1
+#define USB_DC_SPEED_FULL           2
+#define USB_DC_SPEED_HIGH           3
+#define USB_DC_SPEED_SUPER          4
 
 #define __USB_HC_IP_FUNC_DEF(__N, __VALUE)                                      \
 static vsf_err_t    usb_hc##__N##_init(usb_hc_ip_cfg_t *cfg);                   \

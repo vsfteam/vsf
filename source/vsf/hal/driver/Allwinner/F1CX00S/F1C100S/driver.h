@@ -31,7 +31,8 @@
 #       include "../common/debug_uart/debug_uart.h"
 #       include "../common/fb/fb.h"
 #       include "../common/usb/usb.h"
-
+#       include "../common/intc/intc.h"
+#       include "./interrupt_swi.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

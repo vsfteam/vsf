@@ -20,6 +20,13 @@
 
 /*============================ INCLUDES ======================================*/
 
+/*! \note i_reg_xxxx.h header files must be standalong and assume following 
+ *!       conditions: 
+ *!       a. stdint.h exists
+ *!       b. anonymouse structures and unions are supported
+ */
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -106,9 +113,151 @@ extern "C" {
 #ifndef __REG_TYPE__
 #define __REG_TYPE__
 
-typedef volatile uint8_t                reg8_t;
-typedef volatile uint16_t               reg16_t;
-typedef volatile uint32_t               reg32_t;
+typedef volatile uint8_t            reg8_t;
+typedef volatile uint16_t           reg16_t;
+typedef volatile uint32_t           reg32_t;
+
+#if defined(__IAR_SYSTEMS_ICC__)                                                \
+    ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
+
+#undef ____RESERVED
+#undef __RESERVED
+#define ____RESERVED(__BIT, __NAME)                                             \
+        uint##__BIT##_t __unused_##__NAME : __BIT;
+#define __RESERVED(__BIT, __NAME)                                               \
+            ____RESERVED(__BIT, __NAME)
+
+#define __RESERVED_B(__BYTE_CNT, __LINE)                                        \
+                                    uint32_t __unused_##__LINE[__BYTE_CNT >> 2]
+#define RESERVED_B(__BYTE_CNT)      __RESERVED_B(__BYTE_CNT, __LINE__)
+
+#   ifndef RESERVED_U8           
+#       define RESERVED_U8          __RESERVED( 8, __LINE__ )
+#   endif
+
+#   ifndef RESERVED_U16            
+#       define RESERVED_U16         __RESERVED( 16, __LINE__ )
+#   endif
+
+#   ifndef RESERVED_U32             
+#       define RESERVED_U32         __RESERVED( 32, __LINE__ )
+#   endif
+
+#   ifndef RESERVED_16B             
+#       define RESERVED_16B         RESERVED_B(16);
+#   endif
+
+#   ifndef RESERVED_64B             
+#       define RESERVED_64B         RESERVED_B(64);
+#   endif
+
+#   ifndef RESERVED_256B             
+#       define RESERVED_256B        RESERVED_B(256);
+#   endif
+
+#   ifndef RESERVED_1K             
+#       define RESERVED_1K          RESERVED_B(1024);
+#   endif
+
+#   ifndef RESERVED_4K             
+#       define RESERVED_4K          RESERVED_B(4096);
+#   endif
+
+#   ifndef RESERVED_16K             
+#       define RESERVED_16K         RESERVED_B(16*1024);
+#   endif
+
+#   ifndef RESERVED_64K             
+#       define RESERVED_64K         RESERVED_B(64*1024);
+#   endif
+
+#   ifndef RESERVED_256K             
+#       define RESERVED_256K        RESERVED_B(256*1024);
+#   endif
+
+
+#   ifndef RESERVED_1M             
+#       define RESERVED_1M          RESERVED_B(1024*1024);
+#   endif
+
+#else
+#   ifndef RESERVED_U8           
+#       define RESERVED_U8          uint8_t  : 8;
+#   endif
+
+#   ifndef RESERVED_U16            
+#       define RESERVED_U16         uint16_t : 16;
+#   endif
+
+#   ifndef RESERVED_U32             
+#       define RESERVED_U32         uint32_t : 32;
+#   endif
+
+#   ifndef RESERVED_16B             
+#       define RESERVED_16B     RESERVED_U32                                    \
+                                RESERVED_U32                                    \
+                                RESERVED_U32                                    \
+                                RESERVED_U32
+#   endif
+
+#   ifndef RESERVED_64B             
+#       define RESERVED_64B     RESERVED_16B                                    \
+                                RESERVED_16B                                    \
+                                RESERVED_16B                                    \
+                                RESERVED_16B
+#   endif
+
+#   ifndef RESERVED_256B             
+#       define RESERVED_256B    RESERVED_64B                                    \
+                                RESERVED_64B                                    \
+                                RESERVED_64B                                    \
+                                RESERVED_64B
+#   endif
+
+#   ifndef RESERVED_1K             
+#       define RESERVED_1K      RESERVED_256B                                   \
+                                RESERVED_256B                                   \
+                                RESERVED_256B                                   \
+                                RESERVED_256B
+#   endif
+
+#   ifndef RESERVED_4K             
+#       define RESERVED_4K      RESERVED_1K                                     \
+                                RESERVED_1K                                     \
+                                RESERVED_1K                                     \
+                                RESERVED_1K
+#   endif
+
+#   ifndef RESERVED_16K             
+#       define RESERVED_16K     RESERVED_4K                                     \
+                                RESERVED_4K                                     \
+                                RESERVED_4K                                     \
+                                RESERVED_4K
+#   endif
+
+#   ifndef RESERVED_64K             
+#       define RESERVED_64K     RESERVED_16K                                    \
+                                RESERVED_16K                                    \
+                                RESERVED_16K                                    \
+                                RESERVED_16K
+#   endif
+
+#   ifndef RESERVED_256K             
+#       define RESERVED_256K    RESERVED_64K                                    \
+                                RESERVED_64K                                    \
+                                RESERVED_64K                                    \
+                                RESERVED_64K
+#   endif
+
+
+#   ifndef RESERVED_1M             
+#       define RESERVED_1M      RESERVED_256K                                   \
+                                RESERVED_256K                                   \
+                                RESERVED_256K                                   \
+                                RESERVED_256K
+#   endif
+
+#endif
 
 #endif
 

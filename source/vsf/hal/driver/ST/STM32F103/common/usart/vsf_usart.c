@@ -1,25 +1,25 @@
 #include "./vsf_usart.h"
 
 /**********************************define tEvtMask*******************************/
-usart_evt_status_t tEvtMask = 0x00;
+usart_evt_status_t evt_mask = 0x00;
 
 /***********************************usart_init***********************************/
-vsf_err_t vsf_usart_init(vsf_usart_t *pUsart, usart_cfg_t *cfg_ptr)
+vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 {
-    ASSERT(pUsart->pBase != NULL);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     
-    float fUsartdtiv;
-	uint16_t hwIntegerPart;
-	uint16_t hwDecimalPart;	   
+    float usart_div;
+	uint16_t integer_part;
+	uint16_t decimal_part;	   
 
 /*USART1_CLK_GPIO_NVIC*/    
-    if(USART1 == pUsart->pBase) {
+    if(USART1 == usart_ptr->obj_ptr) {
         RCC->APB2ENR |= USART1_CLK_EN|GPIOA_CLK_EN; 
         
         GPIOA->CRH &= USART1_GPIO_MODE_CLEAR;
         GPIOA->CRH |= USART1_GPIO_MODE; 
 
-        fUsartdtiv = (float)PCLK2/(cfg_ptr->baudrate*16);
+        usart_div = (float)PCLK2/(cfg_ptr->baudrate*16);
         
         /* USART1 interrupt Init */
         HAL_NVIC_SetPriority(USART1_IRQn, 1, 1);
@@ -28,14 +28,14 @@ vsf_err_t vsf_usart_init(vsf_usart_t *pUsart, usart_cfg_t *cfg_ptr)
     
     
 /*USART2_CLK_GPIO_NVIC*/  
-    if(USART2 == pUsart->pBase) {
+    if(USART2 == usart_ptr->obj_ptr) {
         RCC->APB1ENR |= USART2_CLK_EN;
         RCC->APB2ENR |= GPIOA_CLK_EN; 
         
         GPIOA->CRL &= USART2_GPIO_MODE_CLEAR;
         GPIOA->CRL |= USART2_GPIO_MODE; 
 
-        fUsartdtiv = (float)PCLK1/(cfg_ptr->baudrate*16);
+        usart_div = (float)PCLK1/(cfg_ptr->baudrate*16);
         
         /* USART2 interrupt Init */
         HAL_NVIC_SetPriority(USART2_IRQn, 1, 1);
@@ -44,102 +44,77 @@ vsf_err_t vsf_usart_init(vsf_usart_t *pUsart, usart_cfg_t *cfg_ptr)
     
     
 /*USART3_CLK_GPIO_NVIC*/ 
-    if(USART3 == pUsart->pBase) {
+    if(USART3 == usart_ptr->obj_ptr) {
         RCC->APB1ENR |= USART3_CLK_EN;
         RCC->APB2ENR |= GPIOB_CLK_EN; 
         
         GPIOB->CRH &= USART3_GPIO_MODE_CLEAR;
         GPIOB->CRH |= USART3_GPIO_MODE; 
 
-        fUsartdtiv = (float)PCLK1/(cfg_ptr->baudrate*16);
+        usart_div = (float)PCLK1/(cfg_ptr->baudrate*16);
 
         HAL_NVIC_SetPriority(USART3_IRQn, 1, 1);
         HAL_NVIC_EnableIRQ(USART3_IRQn);
     }
       
-    hwIntegerPart = fUsartdtiv;
-    hwDecimalPart = (fUsartdtiv - hwIntegerPart) * 16;	 
-    hwIntegerPart <<= 4;
-    hwIntegerPart += hwDecimalPart;
+    integer_part = usart_div;
+    decimal_part = (usart_div - integer_part) * 16;	 
+    integer_part <<= 4;
+    integer_part += decimal_part;
     
-    pUsart->pBase->BRR  = hwIntegerPart;
-    pUsart->pBase->CR1 |= cfg_ptr->mode;
-    pUsart->pBase->CR1 |= USART_EN;
+    usart_ptr->obj_ptr->BRR  = integer_part;
+    usart_ptr->obj_ptr->CR1 |= cfg_ptr->mode;
+    usart_ptr->obj_ptr->CR1 |= USART_EN;
     
     return VSF_ERR_NONE;
 }
 
 /**********************************usart_enable**********************************/
-fsm_rt_t vsf_usart_enable(vsf_usart_t *pUsart)
+fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr)
 {
-    ASSERT(pUsart->pBase != NULL);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     
-    pUsart->pBase->CR1 |= USART_EN;
+    usart_ptr->obj_ptr->CR1 |= USART_EN;
     return fsm_rt_cpl;
 }
 
 /**********************************usart_disable*********************************/
-fsm_rt_t vsf_usart_disable(vsf_usart_t *pUsart)
+fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr)
 {
-    ASSERT(pUsart->pBase != NULL);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     
-    pUsart->pBase->CR1 |= USART_DISEN;
+    usart_ptr->obj_ptr->CR1 |= USART_DISEN;
     return fsm_rt_cpl;
 }
 
 /***********************************usart_status*********************************/
-usart_status_t vsf_usart_status(vsf_usart_t *pUsart)
+usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
 {
-    ASSERT(pUsart->pBase != NULL);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     
     usart_status_t state_break = {
-        .bIsBusy = false
+        .is_busy = false
     };
     
-    if(pUsart->pBase->SR & USART_SR_IDLE_FREE) { 
-        state_break.bIsBusy = true;
+    if(usart_ptr->obj_ptr->SR & USART_SR_IDLE_FREE) { 
+        state_break.is_busy = true;
     }
     
     return state_break;
 }
 
 /*********************************usart_read_byte********************************/
-bool vsf_usart_read_byte(vsf_usart_t *pUsart, uint8_t *byte_ptr) 
+bool vsf_usart_read_byte(vsf_usart_t *usart_ptr, uint8_t *byte_ptr) 
 {
-    ASSERT(pUsart->pBase != NULL);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     
-    if(pUsart->pBase->SR & USART_SR_RXNE_FULL) {
-        *byte_ptr = pUsart->pBase->DR;
-        
-        pUsart->tEvtStatus.chEvtStatus |= VSF_USART_EVT_RX;
-        if((pUsart->tEvtRx.handler_fn != NULL) && (tEvtMask & VSF_USART_EVT_RX)) {
-            pUsart->tEvtRx.handler_fn(pUsart->tEvtRx.target_ptr, pUsart, pUsart->tEvtStatus);
-        }
-        
-        return true;
-    }
-    return false;
-}
-
-/*********************************usart_write_byte*******************************/
-bool vsf_usart_write_byte(vsf_usart_t *pUsart, uint_fast8_t chByte) 
-{
-    ASSERT(pUsart->pBase != NULL);
-    
-    uint8_t chTimer = 100;
-    
-    if(pUsart->pBase->SR & USART_SR_TXE_TRUE) {
-        pUsart->pBase->DR = chByte;
-    } else {
-        return false;
-    }
-    
-    while(chTimer--){
-        if(USART_SR_TC_TRUE == (pUsart->pBase->SR & USART_SR_TC_TRUE)) {
+    SAFE_ATOM_CODE() {
+        if(usart_ptr->obj_ptr->SR & USART_SR_RXNE_FULL) {
+            *byte_ptr = usart_ptr->obj_ptr->DR;
             
-            pUsart->tEvtStatus.chEvtStatus |= VSF_USART_EVT_TX;
-            if((pUsart->tEvtTx.handler_fn != NULL) && (tEvtMask & VSF_USART_EVT_TX)) {
-                pUsart->tEvtTx.handler_fn(pUsart->tEvtTx.target_ptr, pUsart, pUsart->tEvtStatus);
+            usart_ptr->evt_status.evt_status |= VSF_USART_EVT_RX;
+            if((usart_ptr->evt_rx.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_RX)) {
+                usart_ptr->evt_rx.handler_fn(usart_ptr->evt_rx.target_ptr, usart_ptr, usart_ptr->evt_status);
             }
             
             return true;
@@ -148,27 +123,58 @@ bool vsf_usart_write_byte(vsf_usart_t *pUsart, uint_fast8_t chByte)
     return false;
 }
 
-/********************************usart_request_read******************************/
-fsm_rt_t vsf_usart_request_read(vsf_usart_t *pUsart, uint8_t *buffer_ptr, uint_fast32_t u32_size)
+/*********************************usart_write_byte*******************************/
+bool vsf_usart_write_byte(vsf_usart_t *usart_ptr, uint_fast8_t byte) 
 {
-    ASSERT(pUsart->pBase != NULL);
-    ASSERT(buffer_ptr != NULL);
-    ASSERT(u32_size != 0);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     
-    if(false == pUsart->bIsLoading) {
-        pUsart->bIsLoading     = true;
-        pUsart->pchReadBuffer  = buffer_ptr;
-        pUsart->wReadSize      = u32_size - 1;
-        pUsart->wReadSizeTimer = 0; 
-        pUsart->pBase->CR1 |= USART_CR1_RXNEIE_EN;
+    uint8_t timer = 100;
+    
+    SAFE_ATOM_CODE() {
+        if(usart_ptr->obj_ptr->SR & USART_SR_TXE_TRUE) {
+            usart_ptr->obj_ptr->DR = byte;
+        } else {
+            return false;
+        }
+        
+        while(timer--){
+            if(USART_SR_TC_TRUE == (usart_ptr->obj_ptr->SR & USART_SR_TC_TRUE)) {
+                
+                usart_ptr->evt_status.evt_status |= VSF_USART_EVT_TX;
+                if((usart_ptr->evt_tx.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_TX)) {
+                    usart_ptr->evt_tx.handler_fn(usart_ptr->evt_tx.target_ptr, usart_ptr, usart_ptr->evt_status);
+                }
+                
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/********************************usart_request_read******************************/
+fsm_rt_t vsf_usart_request_read(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size)
+{
+    ASSERT(usart_ptr->obj_ptr != NULL);
+    ASSERT(buffer_ptr != NULL);
+    ASSERT(size != 0);
+    
+    SAFE_ATOM_CODE() {
+        if(false == usart_ptr->is_loading) {
+            usart_ptr->is_loading       = true;
+            usart_ptr->read_buffer_ptr  = buffer_ptr;
+            usart_ptr->read_size        = size - 1;
+            usart_ptr->read_sizecounter = 0; 
+            usart_ptr->obj_ptr->CR1     |= USART_CR1_RXNEIE_EN;
+        }
     }
     
-    if(pUsart->wReadSizeTimer > pUsart->wReadSize) {
-        pUsart->bIsLoading = false;
+    if(usart_ptr->read_sizecounter > usart_ptr->read_size) {
+        usart_ptr->is_loading = false;
         
-        pUsart->tEvtStatus.chEvtStatus |= VSF_USART_EVT_RCV_BLK_CPL;
-        if((pUsart->tEvtRcv.handler_fn != NULL) && (tEvtMask & VSF_USART_EVT_RCV_BLK_CPL)) {
-            pUsart->tEvtRcv.handler_fn(pUsart->tEvtRcv.target_ptr, pUsart, pUsart->tEvtStatus);
+        usart_ptr->evt_status.evt_status |= VSF_USART_EVT_RCV_BLK_CPL;
+        if((usart_ptr->evt_rcv.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_RCV_BLK_CPL)) {
+            usart_ptr->evt_rcv.handler_fn(usart_ptr->evt_rcv.target_ptr, usart_ptr, usart_ptr->evt_status);
         }
         
         return fsm_rt_cpl;
@@ -178,26 +184,28 @@ fsm_rt_t vsf_usart_request_read(vsf_usart_t *pUsart, uint8_t *buffer_ptr, uint_f
 }
 
 /*******************************usart_request_write******************************/
-fsm_rt_t vsf_usart_request_write(vsf_usart_t *pUsart, uint8_t *buffer_ptr, uint_fast32_t u32_size)
+fsm_rt_t vsf_usart_request_write(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size)
 {
-    ASSERT(pUsart->pBase != NULL);
+    ASSERT(usart_ptr->obj_ptr != NULL);
     ASSERT(buffer_ptr != NULL);
-    ASSERT(u32_size != 0);
+    ASSERT(size != 0);
         
-    if(false == pUsart->bIsWriting) {
-        pUsart->bIsWriting      = true;
-        pUsart->pchWriteBuffer  = buffer_ptr;
-        pUsart->wWriteSize      = u32_size - 1;
-        pUsart->wWriteSizeTimer = 0;
-        pUsart->pBase->CR1 |= USART_CR1_TXEIE_EN;
+    SAFE_ATOM_CODE() {
+        if(false == usart_ptr->is_writing) {
+            usart_ptr->is_writing        = true;
+            usart_ptr->write_buffer_ptr  = buffer_ptr;
+            usart_ptr->write_size        = size - 1;
+            usart_ptr->write_sizecounter = 0;
+            usart_ptr->obj_ptr->CR1      |= USART_CR1_TXEIE_EN;
+        }
     }
     
-    if(pUsart->wWriteSizeTimer >= pUsart->wWriteSize) {
-        pUsart->bIsWriting = false;
+    if(usart_ptr->write_sizecounter >= usart_ptr->write_size) {
+        usart_ptr->is_writing = false;
         
-        pUsart->tEvtStatus.chEvtStatus |= VSF_USART_EVT_SND_BLK_CPL;
-        if((pUsart->tEvtSnd.handler_fn != NULL) && (tEvtMask & VSF_USART_EVT_SND_BLK_CPL)) {
-            pUsart->tEvtSnd.handler_fn(pUsart->tEvtSnd.target_ptr, pUsart, pUsart->tEvtStatus);
+        usart_ptr->evt_status.evt_status |= VSF_USART_EVT_SND_BLK_CPL;
+        if((usart_ptr->evt_send.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_SND_BLK_CPL)) {
+            usart_ptr->evt_send.handler_fn(usart_ptr->evt_send.target_ptr, usart_ptr, usart_ptr->evt_status);
         }
         
         return fsm_rt_cpl;
@@ -207,18 +215,18 @@ fsm_rt_t vsf_usart_request_write(vsf_usart_t *pUsart, uint8_t *buffer_ptr, uint_
 }
 
 /*******************************vsf_usart_riqhandler*****************************/
-void vsf_usart_irqhandler(vsf_usart_t *pUsart)
+void vsf_usart_irqhandler(vsf_usart_t *usart_ptr)
 {
 //    SAFE_ATOM_CODE() {
-        if(pUsart->pBase->SR & USART_SR_RXNE_FULL) {
-            pUsart->pchReadBuffer[pUsart->wReadSizeTimer] = pUsart->pBase->DR;
-            if((pUsart->wReadSizeTimer++) >= pUsart->wReadSize) {
-                pUsart->pBase->CR1 &= USART_CR1_RXNEIE_DISEN;
+        if(usart_ptr->obj_ptr->SR & USART_SR_RXNE_FULL) {
+            usart_ptr->read_buffer_ptr[usart_ptr->read_sizecounter] = usart_ptr->obj_ptr->DR;
+            if((usart_ptr->read_sizecounter++) >= usart_ptr->read_size) {
+                usart_ptr->obj_ptr->CR1 &= USART_CR1_RXNEIE_DISEN;
             }
         } else {
-            pUsart->pBase->DR = pUsart->pchWriteBuffer[pUsart->wWriteSizeTimer];
-            if((pUsart->wWriteSizeTimer++) >= pUsart->wWriteSize) {
-                pUsart->pBase->CR1 &= USART_CR1_TXEIE_DISEN;
+            usart_ptr->obj_ptr->DR = usart_ptr->write_buffer_ptr[usart_ptr->write_sizecounter];
+            if((usart_ptr->write_sizecounter++) >= usart_ptr->write_size) {
+                usart_ptr->obj_ptr->CR1 &= USART_CR1_TXEIE_DISEN;
             }
         }
 //    }
@@ -228,7 +236,7 @@ void vsf_usart_irqhandler(vsf_usart_t *pUsart)
 #define __USART_HUART(__N, __VALUE)                                              \
                                                                                  \
         {                                                                        \
-            .pBase  = USART##__N                                               \
+            .obj_ptr = USART##__N                                                \
         },                             
 
 static vsf_usart_t usart_huart[] = {
@@ -236,55 +244,55 @@ static vsf_usart_t usart_huart[] = {
 };
 
 /*******************************vsf_evt_usart_register***************************/
-void vsf_usart_evt_register(vsf_usart_evt_type_t tType, vsf_usart_evt_t tEvent)
+void vsf_usart_evt_register(vsf_usart_evt_type_t tType, vsf_usart_evt_t event)
 {
     if(VSF_USART_EVT_RX == tType) {
         for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].tEvtRx = tEvent;
+            usart_huart[i].evt_rx = event;
         }
     }
     
     if(VSF_USART_EVT_TX == tType) {
         for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].tEvtTx = tEvent;
+            usart_huart[i].evt_tx = event;
         }
     }
     
     if(VSF_USART_EVT_RCV_BLK_CPL == tType) {
         for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].tEvtRcv = tEvent;
+            usart_huart[i].evt_rcv = event;
         }
     }
     
     if(VSF_USART_EVT_SND_BLK_CPL == tType) {
         for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].tEvtSnd = tEvent;
+            usart_huart[i].evt_send = event;
         }
     }
 }
 
 /*******************************vsf_usart_evt_enable*****************************/
-usart_evt_status_t vsf_usart_evt_enable(usart_evt_status_t tEventMask)
+usart_evt_status_t vsf_usart_evt_enable(usart_evt_status_t event_mask)
 {
-    if(tEvtMask != 0xFF) {
-        tEvtMask |= tEventMask;
+    if(evt_mask != 0xFF) {
+        evt_mask |= event_mask;
     }
-    return tEvtMask;
+    return evt_mask;
 }
 
 /*******************************vsf_usart_evt_disable****************************/
-usart_evt_status_t vsf_usart_evt_disable(usart_evt_status_t tEventMask)
+usart_evt_status_t vsf_usart_evt_disable(usart_evt_status_t event_mask)
 {
-    if(tEvtMask != 0x00) {
-        tEvtMask &= (~tEventMask);
+    if(evt_mask != 0x00) {
+        evt_mask &= (~event_mask);
     }
-    return tEvtMask;
+    return evt_mask;
 }
 
 /*******************************vsf_usart_evt_resume*****************************/
 void vsf_usart_evt_resume(usart_evt_status_t tEventStatus)
 {
-    tEvtMask = tEventStatus;
+    evt_mask = tEventStatus;
 }
 
 /********************************VSF_USART_FUNC_BODY*****************************/
@@ -315,27 +323,27 @@ usart_status_t vsf_usart##__N##_status(void)                                    
 }                                                                                \
                                                                                  \
 /*usart_read_byte*/                                                              \
-bool vsf_usart##__N##_read_byte(uint8_t *byte_ptr)                                \
+bool vsf_usart##__N##_read_byte(uint8_t *byte_ptr)                               \
 {                                                                                \
-    return vsf_usart_read_byte(&usart_huart[__N], byte_ptr);                      \
+    return vsf_usart_read_byte(&usart_huart[__N], byte_ptr);                     \
 }                                                                                \
                                                                                  \
 /*usart_write_byte*/                                                             \
-bool vsf_usart##__N##_write_byte(uint_fast8_t chByte)                            \
+bool vsf_usart##__N##_write_byte(uint_fast8_t byte)                              \
 {                                                                                \
-    return vsf_usart_write_byte(&usart_huart[__N], chByte);                      \
+    return vsf_usart_write_byte(&usart_huart[__N], byte);                        \
 }                                                                                \
                                                                                  \
 /*usart_request_read*/                                                           \
-fsm_rt_t vsf_usart##__N##_request_read(uint8_t *buffer_ptr, uint_fast32_t u32_size)  \
+fsm_rt_t vsf_usart##__N##_request_read(uint8_t *buffer_ptr, uint_fast32_t size)  \
 {                                                                                \
-    return vsf_usart_request_read(&usart_huart[__N], buffer_ptr, u32_size);          \
+    return vsf_usart_request_read(&usart_huart[__N], buffer_ptr, size);          \
 }                                                                                \
                                                                                  \
 /*usart_request_write*/                                                          \
-fsm_rt_t vsf_usart##__N##_request_write(uint8_t *buffer_ptr, uint_fast32_t u32_size) \
+fsm_rt_t vsf_usart##__N##_request_write(uint8_t *buffer_ptr, uint_fast32_t size) \
 {                                                                                \
-    return vsf_usart_request_write(&usart_huart[__N], buffer_ptr, u32_size);         \
+    return vsf_usart_request_write(&usart_huart[__N], buffer_ptr, size);         \
 }                                                                                \
                                                                                  \
 /*usart_irqhandler*/                                                             \

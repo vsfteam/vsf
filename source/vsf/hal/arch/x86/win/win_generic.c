@@ -30,7 +30,7 @@
 
 // configuration start
 #define VSF_ARCH_BACKGROUND_TRACE_EN            ENABLED
-#define VSF_ARCH_CFG_LOW_LANTECY_EN             ENABLED
+#define VSF_ARCH_CFG_LOW_LANTECY_EN             DISABLED
 //#define VSF_ARCH_BACKGROUND_TRACE_FILTER        &__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t
 //#define VSF_ARCH_BACKGROUND_TRACE_EVENTS_NUM    (32 * 1024)
 //#define VSF_ARCH_TRACE_IRQ_EN                   ENABLED
@@ -48,9 +48,9 @@
 #define VSF_ARCH_SYSTIMER_FREQ              (10 * 1000 * 1000)
 
 #if VSF_ARCH_CFG_LOW_LANTECY_EN == ENABLED
-#   define VSF_ARCH_YIELD()                 Sleep(0)
+#   define vsf_arch_yield()                 Sleep(0)
 #else
-#   define VSF_ARCH_YIELD()                 Sleep(1)
+#   define vsf_arch_yield()                 Sleep(1)
 #endif
 
 #define VSF_ARCH_TRACE_HEADER               "[x86/x64]: "
@@ -59,7 +59,7 @@
 #endif
 #ifndef VSF_ARCH_TRACE
 //! VSF_ARCH_TRACE MUST be called arch_locked
-#   define VSF_ARCH_TRACE(__color, ...)                                         \
+#   define vsf_arch_trace(__color, ...)                                         \
     do {                                                                        \
         vsf_arch_irq_thread_t *__irq_thread =                                   \
                         __vsf_arch_get_cur_irq_thread();                        \
@@ -71,36 +71,36 @@
     } while (0)
 #endif
 
-#undef VSF_ARCH_TRACE_CALLSTACK
+#undef vsf_arch_trace_callstack
 #if VSF_ARCH_TRACE_CALLSTACK_EN == ENABLED
-#   define VSF_ARCH_TRACE_CALLSTACK(...)                                        \
-                VSF_ARCH_TRACE(VSF_ARCH_TRACE_CALLSTACK_COLOR, __VA_ARGS__)
+#   define vsf_arch_trace_callstack(...)                                        \
+                vsf_arch_trace(VSF_ARCH_TRACE_CALLSTACK_COLOR, __VA_ARGS__)
 #else
-#   define VSF_ARCH_TRACE_CALLSTACK(...)
+#   define vsf_arch_trace_callstack(...)
 #endif
 
-#undef VSF_ARCH_TRACE_IRQ
+#undef vsf_arch_trace_irq
 #if VSF_ARCH_TRACE_IRQ_EN == ENABLED
-#   define VSF_ARCH_TRACE_IRQ(...)                                              \
-                VSF_ARCH_TRACE(VSF_ARCH_TRACE_IRQ_COLOR, __VA_ARGS__)
+#   define vsf_arch_trace_irq(...)                                              \
+                vsf_arch_trace(VSF_ARCH_TRACE_IRQ_COLOR, __VA_ARGS__)
 #else
-#   define VSF_ARCH_TRACE_IRQ(...)
+#   define vsf_arch_trace_irq(...)
 #endif
 
-#undef VSF_ARCH_TRACE_SYSTIMER
+#undef vsf_arch_trace_systimer
 #if VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED
-#   define VSF_ARCH_TRACE_SYSTIMER(...)                                         \
-                VSF_ARCH_TRACE(VSF_ARCH_TRACE_SYSTIMER_COLOR, __VA_ARGS__)
+#   define vsf_arch_trace_systimer(...)                                         \
+                vsf_arch_trace(VSF_ARCH_TRACE_SYSTIMER_COLOR, __VA_ARGS__)
 #else
-#   define VSF_ARCH_TRACE_SYSTIMER(...)
+#   define vsf_arch_trace_systimer(...)
 #endif
 
-#undef VSF_ARCH_TRACE_STATUS
+#undef vsf_arch_trace_status
 #if VSF_ARCH_TRACE_STATUS_EN == ENABLED
-#   define VSF_ARCH_TRACE_STATUS(...)                                        \
-                VSF_ARCH_TRACE(VSF_ARCH_TRACE_STATUS_COLOR, __VA_ARGS__)
+#   define vsf_arch_trace_status(...)                                        \
+                vsf_arch_trace(VSF_ARCH_TRACE_STATUS_COLOR, __VA_ARGS__)
 #else
-#   define VSF_ARCH_TRACE_STATUS(...)
+#   define vsf_arch_trace_status(...)
 #endif
 
 #if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
@@ -115,21 +115,19 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct vsf_arch_swi_ctx_t {
+typedef struct vsf_arch_swi_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t request;
     bool inited;
-};
-typedef struct vsf_arch_swi_ctx_t vsf_arch_swi_ctx_t;
+} vsf_arch_swi_ctx_t;
 
-struct vsf_arch_systimer_ctx_t {
+typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
     HANDLE timer;
     vsf_systimer_cnt_t start_tick;
-};
-typedef struct vsf_arch_systimer_ctx_t vsf_arch_systimer_ctx_t;
+} vsf_arch_systimer_ctx_t;
 
-struct __vsf_x86_t {
+typedef struct vsf_x86_t {
     CRITICAL_SECTION lock;
 
     vsf_arch_irq_thread_t por_thread;    // power on reset
@@ -144,24 +142,22 @@ struct __vsf_x86_t {
     vsf_arch_prio_t cur_priority;
     vsf_arch_prio_t prio_base;
     vsf_gint_state_t gint_state;
-};
-typedef struct __vsf_x86_t __vsf_x86_t;
+} vsf_x86_t;
 
 //! preempt_param
-enum __vsf_arch_irq_pp_t {
+typedef enum vsf_arch_irq_pp_t {
     VSF_ARCH_IRQ_PP_NORMAL,
     // below is ONLY used in __vsf_arch_irq_deactivate
     // indicating the irq is end, and should current thread suspend or still running
     VSF_ARCH_IRQ_PP_EXIT_SUSPEND,
     VSF_ARCH_IRQ_PP_EXIT_RUNNING,
-};
-typedef enum __vsf_arch_irq_pp_t __vsf_arch_irq_pp_t;
+} vsf_arch_irq_pp_t;
 
 #if     VSF_ARCH_TRACE_IRQ_EN == ENABLED                                        \
     ||  VSF_ARCH_TRACE_CALLSTACK_EN == ENABLED                                  \
     ||  VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED                                   \
     ||  VSF_ARCH_TRACE_STATUS_EN == ENABLED
-enum __vsf_arch_trace_color_t {
+enum {
     VSF_ARCH_TRACE_CALLSTACK_COLOR,
     VSF_ARCH_TRACE_IRQ_COLOR,
     VSF_ARCH_TRACE_SYSTIMER_COLOR,
@@ -170,7 +166,7 @@ enum __vsf_arch_trace_color_t {
 #endif
 
 #if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
-struct __vsf_arch_background_trace_event_t {
+typedef struct vsf_arch_background_trace_event_t {
     uint32_t idx;
     enum {
         VSF_ARCH_TRACE_PREEMPT_ENTER,
@@ -194,21 +190,19 @@ struct __vsf_arch_background_trace_event_t {
     uint32_t status;
     uint32_t info;
     uint32_t pos;
-};
-typedef struct __vsf_arch_background_trace_event_t __vsf_arch_background_trace_event_t;
+} vsf_arch_background_trace_event_t;
 
-struct __vsf_arch_background_trace_t {
-    __vsf_arch_background_trace_event_t events[1024];
+typedef struct vsf_arch_background_trace_t {
+    vsf_arch_background_trace_event_t events[1024];
     uint32_t pos;
     uint32_t idx;
-};
-typedef struct __vsf_arch_background_trace_t __vsf_arch_background_trace_t;
+} vsf_arch_background_trace_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-NO_INIT static __vsf_x86_t __vsf_x86;
+NO_INIT static vsf_x86_t __vsf_x86;
 
 #if     VSF_ARCH_TRACE_IRQ_EN == ENABLED                                        \
     ||  VSF_ARCH_TRACE_CALLSTACK_EN == ENABLED                                  \
@@ -223,7 +217,7 @@ static const char *__vsf_x86_trace_color[] = {
 #endif
 
 #if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
-static __vsf_arch_background_trace_t __vsf_arch_background_trace;
+static vsf_arch_background_trace_t __vsf_arch_background_trace;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -240,9 +234,9 @@ static void __vsf_arch_irq_pend(vsf_arch_irq_thread_t *irq_thread);
 
 
 #if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
-static __vsf_arch_background_trace_event_t * __vsf_arch_bg_trace_get(void)
+static vsf_arch_background_trace_event_t * __vsf_arch_bg_trace_get(void)
 {
-    __vsf_arch_background_trace_event_t *event = &__vsf_arch_background_trace.events[__vsf_arch_background_trace.pos++];
+    vsf_arch_background_trace_event_t *event = &__vsf_arch_background_trace.events[__vsf_arch_background_trace.pos++];
     if (__vsf_arch_background_trace.pos >= dimof(__vsf_arch_background_trace.events)) {
         __vsf_arch_background_trace.pos = 0;
     }
@@ -258,7 +252,7 @@ static void __vsf_arch_bg_trace(int event, vsf_arch_irq_thread_t *caller_thread,
         ||  (VSF_ARCH_BACKGROUND_TRACE_FILTER == cur_thread))
 #endif
     {
-        __vsf_arch_background_trace_event_t *trace_event = __vsf_arch_bg_trace_get();
+        vsf_arch_background_trace_event_t *trace_event = __vsf_arch_bg_trace_get();
         trace_event->caller_thread = caller_thread;
         trace_event->cur_thread = cur_thread;
         trace_event->event = event;
@@ -302,7 +296,7 @@ void __vsf_arch_lock(void)
             }
             break;
         } else {
-            VSF_ARCH_YIELD();
+            vsf_arch_yield();
         }
     }
 //    EnterCriticalSection(&__vsf_x86.lock);
@@ -350,7 +344,7 @@ static void __vsf_arch_wait_suspended(vsf_arch_irq_thread_t *irq_thread)
         if (ret) {
             break;
         } else {
-            VSF_ARCH_YIELD();
+            vsf_arch_yield();
         }
     }
 }
@@ -358,7 +352,7 @@ static void __vsf_arch_wait_suspended(vsf_arch_irq_thread_t *irq_thread)
 /* __vsf_arch_preempt MUST be called arch_locked,
     and will unlock before return.
 */
-static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
+static void __vsf_arch_preempt(vsf_arch_irq_pp_t pp)
 {
     vsf_arch_irq_thread_t *irq_thread = NULL;
     vsf_arch_irq_thread_t *cur_irq_thread = __vsf_x86.cur_thread;
@@ -382,14 +376,14 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
         VSF_HAL_ASSERT(cur_irq_thread == caller_irq_thread);
     }
 
-    VSF_ARCH_TRACE_STATUS("system status: gint:%d, base:%d\r\n",
+    vsf_arch_trace_status("system status: gint:%d, base:%d\r\n",
             __vsf_x86.gint_state, (int)__vsf_x86.prio_base);
 
     if (cur_irq_thread != caller_irq_thread) {
         VSF_HAL_ASSERT(!exit_suspend);
 
         if (VSF_ARCH_IRQ_STATE_FOREGROUND == cur_irq_thread->state) {
-            VSF_ARCH_TRACE_IRQ("%s suspend\r\n", cur_irq_thread->name);
+            vsf_arch_trace_irq("%s suspend\r\n", cur_irq_thread->name);
 
             suspend_cnt = SuspendThread(cur_irq_thread->thread);
             __vsf_arch_bg_trace(VSF_ARCH_TRACE_SUSPEND, caller_irq_thread, cur_irq_thread, suspend_cnt, 0);
@@ -427,11 +421,11 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
             if (    is_popped
                 ||  (irq_to_exit && (irq_thread == cur_irq_thread->prev))) {
                 // pop call stack;
-//                VSF_ARCH_TRACE_CALLSTACK("%s popped from %s\r\n", irq_thread->name, cur_irq_thread->name);
+//                vsf_arch_trace_callstack("%s popped from %s\r\n", irq_thread->name, cur_irq_thread->name);
                 __vsf_arch_bg_trace(VSF_ARCH_TRACE_POP, cur_irq_thread, irq_thread, 0, 0);
             } else if (irq_to_exit) {
                 // inherit call stack
-//                VSF_ARCH_TRACE_CALLSTACK("%s inherited from %s\r\n", irq_thread->name, cur_irq_thread->name);
+//                vsf_arch_trace_callstack("%s inherited from %s\r\n", irq_thread->name, cur_irq_thread->name);
                 __vsf_arch_bg_trace(VSF_ARCH_TRACE_INHERIT, irq_thread, cur_irq_thread, 0, 0);
                 if (irq_thread != &__vsf_x86.por_thread) {
                     irq_thread->prev = cur_irq_thread->prev;
@@ -439,12 +433,12 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
             } else {
                 // push call stack
                 VSF_HAL_ASSERT(irq_thread != &__vsf_x86.por_thread);
-//                VSF_ARCH_TRACE_CALLSTACK("%s pushed in %s\r\n", cur_irq_thread->name, irq_thread->name);
+//                vsf_arch_trace_callstack("%s pushed in %s\r\n", cur_irq_thread->name, irq_thread->name);
                 __vsf_arch_bg_trace(VSF_ARCH_TRACE_PUSH, irq_thread, cur_irq_thread, 0, 0);
                 irq_thread->prev = cur_irq_thread;
             }
 
-            VSF_ARCH_TRACE_CALLSTACK("%s(%d,%s) ==> %s(%d,%s)\r\n",
+            vsf_arch_trace_callstack("%s(%d,%s) ==> %s(%d,%s)\r\n",
                 cur_irq_thread->name, cur_irq_thread->priority,
                 (NULL == cur_irq_thread->prev) ? "NULL" : cur_irq_thread->prev->name,
                 irq_thread->name, irq_thread->priority,
@@ -453,7 +447,7 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
             VSF_HAL_ASSERT(irq_thread->state != VSF_ARCH_IRQ_STATE_FOREGROUND);
             if (irq_thread->state != VSF_ARCH_IRQ_STATE_BACKGROUND) {
                 VSF_HAL_ASSERT(irq_thread != caller_irq_thread);
-                VSF_ARCH_TRACE_IRQ("%s resume\r\n", irq_thread->name);
+                vsf_arch_trace_irq("%s resume\r\n", irq_thread->name);
 
                 // maybe SuspendThread is called, but not really suspend, wait first
                 __vsf_arch_wait_suspended(irq_thread);
@@ -465,7 +459,7 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
                     VSF_HAL_ASSERT(1 == suspend_cnt);
                 }
             } else {
-                VSF_ARCH_TRACE_IRQ("%s back ground running\r\n", irq_thread->name);
+                vsf_arch_trace_irq("%s back ground running\r\n", irq_thread->name);
             }
             irq_thread->state = VSF_ARCH_IRQ_STATE_FOREGROUND;
             __vsf_arch_bg_trace(VSF_ARCH_TRACE_IRQ_STATE, caller_irq_thread, irq_thread, irq_thread->state, 0);
@@ -477,7 +471,7 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
             VSF_HAL_ASSERT(cur_irq_thread->state != VSF_ARCH_IRQ_STATE_FOREGROUND);
             cur_irq_thread->state = VSF_ARCH_IRQ_STATE_FOREGROUND;
             __vsf_arch_bg_trace(VSF_ARCH_TRACE_IRQ_STATE, caller_irq_thread, cur_irq_thread, cur_irq_thread->state, 0);
-            VSF_ARCH_TRACE_IRQ("%s resume\r\n", cur_irq_thread->name);
+            vsf_arch_trace_irq("%s resume\r\n", cur_irq_thread->name);
             suspend_cnt = ResumeThread(cur_irq_thread->thread);
             __vsf_arch_bg_trace(VSF_ARCH_TRACE_RESUME, caller_irq_thread, cur_irq_thread, suspend_cnt, 1);
             VSF_HAL_ASSERT(1 == suspend_cnt);
@@ -505,12 +499,12 @@ static void __vsf_arch_preempt(__vsf_arch_irq_pp_t pp)
 #if VSF_ARCH_CFG_NO_UNLOCKED_SUSPEND_EN == ENABLED
                 cur_irq_thread->state = VSF_ARCH_IRQ_STATE_BACKGROUND;
                 __vsf_arch_bg_trace(VSF_ARCH_TRACE_IRQ_STATE, caller_irq_thread, cur_irq_thread, cur_irq_thread->state, 0);
-                VSF_ARCH_TRACE_IRQ("%s background suspend\r\n", cur_irq_thread->name);
+                vsf_arch_trace_irq("%s background suspend\r\n", cur_irq_thread->name);
                 __vsf_arch_irq_pend(cur_irq_thread);
 #else
                 cur_irq_thread->state = VSF_ARCH_IRQ_STATE_IDLE;
                 __vsf_arch_bg_trace(VSF_ARCH_TRACE_IRQ_STATE, caller_irq_thread, cur_irq_thread, cur_irq_thread->state, 0);
-                VSF_ARCH_TRACE_IRQ("%s suspend\r\n", cur_irq_thread->name);
+                vsf_arch_trace_irq("%s suspend\r\n", cur_irq_thread->name);
                 __vsf_arch_bg_trace(VSF_ARCH_TRACE_PREEMPT_LEAVE, caller_irq_thread, cur_irq_thread, 0, 0);
                 __vsf_arch_unlock();
                 suspend_cnt = SuspendThread(cur_irq_thread->thread);
@@ -543,7 +537,7 @@ static void __vsf_arch_irq_pend(vsf_arch_irq_thread_t *irq_thread)
         }
 
         __vsf_arch_unlock();
-            VSF_ARCH_YIELD();
+            vsf_arch_yield();
         __vsf_arch_lock();
     }
 }
@@ -559,7 +553,7 @@ static void __vsf_arch_irq_activate(vsf_arch_irq_thread_t *irq_thread)
             &__vsf_x86.irq_rdy_list, irq_thread,
             _->priority < irq_thread->priority);
 
-        VSF_ARCH_TRACE_IRQ("%s activated\r\n", irq_thread->name);
+        vsf_arch_trace_irq("%s activated\r\n", irq_thread->name);
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_ACTIVATED, NULL, irq_thread, 0, 0);
 
         bool force = irq_thread == __vsf_arch_get_cur_irq_thread();
@@ -584,7 +578,7 @@ static void __vsf_arch_irq_activate(vsf_arch_irq_thread_t *irq_thread)
                     irq_thread->reply = NULL;
                 }
                 __vsf_arch_unlock();
-                    VSF_ARCH_YIELD();
+                    vsf_arch_yield();
                 __vsf_arch_lock();
             }
         }
@@ -598,7 +592,7 @@ static void __vsf_arch_irq_deactivate(vsf_arch_irq_thread_t *irq_thread, bool is
     if (irq_thread != &__vsf_x86.por_thread) {
         vsf_dlist_remove(vsf_arch_irq_thread_t, rdy_node,
             &__vsf_x86.irq_rdy_list, irq_thread);
-        VSF_ARCH_TRACE_IRQ("%s deactivated\r\n", irq_thread->name);
+        vsf_arch_trace_irq("%s deactivated\r\n", irq_thread->name);
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_DEACTIVATED, NULL, irq_thread, 0, 0);
     }
 
@@ -720,7 +714,7 @@ static void __vsf_systimer_thread(void *arg)
             vsf_systimer_cnt_t tick = vsf_systimer_get();
 #if VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED
             __vsf_arch_lock();
-                VSF_ARCH_TRACE_SYSTIMER("systimer triggered: %lld\r\n", tick);
+                vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
             __vsf_arch_unlock();
 #endif
             vsf_systimer_timeout_evt_hanlder(tick);
@@ -770,7 +764,7 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
     };
 #if VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED
     __vsf_arch_lock();
-        VSF_ARCH_TRACE_SYSTIMER("systimer update: %lld\r\n", due);
+        vsf_arch_trace_systimer("systimer update: %lld\r\n", due);
     __vsf_arch_unlock();
 #endif
     if (!SetWaitableTimer(__vsf_x86.systimer.timer, &li, 0, NULL, NULL, false)) {
@@ -899,7 +893,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
     vsf_arch_prio_t orig = __vsf_x86.prio_base;
     if (orig != priority) {
         __vsf_x86.prio_base = priority;
-        VSF_ARCH_TRACE_STATUS("prio_base: %d\r\n", (int)__vsf_x86.prio_base);
+        vsf_arch_trace_status("prio_base: %d\r\n", (int)__vsf_x86.prio_base);
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_STATUS, __vsf_arch_get_cur_irq_thread(), NULL, 0, 1);
         if (priority < orig) {
             vsf_arch_irq_thread_t *irq_thread = NULL;
@@ -963,7 +957,7 @@ void vsf_set_interrupt(vsf_gint_state_t level)
     __vsf_arch_lock();
     if (__vsf_x86.gint_state != level) {
         __vsf_x86.gint_state = level;
-        VSF_ARCH_TRACE_STATUS("gint_state: %d\r\n", __vsf_x86.gint_state);
+        vsf_arch_trace_status("gint_state: %d\r\n", __vsf_x86.gint_state);
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_STATUS, __vsf_arch_get_cur_irq_thread(), NULL, 0, 0);
         if (level) {
             vsf_arch_irq_thread_t *irq_thread = NULL;
@@ -985,7 +979,7 @@ vsf_gint_state_t vsf_disable_interrupt(void)
     vsf_gint_state_t orig = __vsf_x86.gint_state;
     if (orig != false) {
         __vsf_x86.gint_state = false;
-        VSF_ARCH_TRACE_STATUS("gint_state: %d\r\n", __vsf_x86.gint_state);
+        vsf_arch_trace_status("gint_state: %d\r\n", __vsf_x86.gint_state);
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_STATUS, __vsf_arch_get_cur_irq_thread(), NULL, 0, 0);
     }
     __vsf_arch_unlock();

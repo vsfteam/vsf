@@ -36,7 +36,7 @@
 #ifndef FT2BUILD_H_
 #define FT2BUILD_H_
 
-#include "./config/ftheader.h"
+#include "./vsf_config/ftheader.h"
 
 #endif /* FT2BUILD_H_ */
 

@@ -325,9 +325,6 @@
     <Filter Include="vsf\component\3rd-party\freetype\port">
       <UniqueIdentifier>{451d6c24-8929-48e0-85c5-4ed76ff2f480}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\port\config">
-      <UniqueIdentifier>{9dc19b0f-9932-43c4-8a50-f65e8b1b3995}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party\freetype\raw">
       <UniqueIdentifier>{e0baee1b-5fdd-44a2-8f01-e45c6b2f5fde}</UniqueIdentifier>
     </Filter>
@@ -778,6 +775,36 @@
     <Filter Include="vsf\component\usb\driver\hcd\libusb_hcd">
       <UniqueIdentifier>{1beb2733-c0d0-40b0-9c12-9846527d12fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\osa_hal\driver">
+      <UniqueIdentifier>{37c12579-0964-4709-9417-4db21ef55fc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86\win">
+      <UniqueIdentifier>{d0f9b226-2086-4c83-a362-a34fcbc01344}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\device_specific">
+      <UniqueIdentifier>{3e328104-431b-4d61-90e2-0884c2a8835d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\device_specific\x86">
+      <UniqueIdentifier>{08b4654a-a634-42b9-bf29-a1aa13d0e128}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\device_specific\x86\win">
+      <UniqueIdentifier>{9a0ee342-f6d6-4e8c-a036-c1d6fa79431c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\device_specific\x86\win\uart">
+      <UniqueIdentifier>{a292d392-a782-499f-b802-abd934f664bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\freetype\port\vsf_config">
+      <UniqueIdentifier>{9dc19b0f-9932-43c4-8a50-f65e8b1b3995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\extension">
+      <UniqueIdentifier>{0f0113f1-71bb-4997-8664-98d9d5443111}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype">
+      <UniqueIdentifier>{8e73a720-b005-4368-a373-2527ba676ba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw">
+      <UniqueIdentifier>{baf49705-00bb-4b6d-9396-5e8a88d7bb7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -995,9 +1022,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
       <Filter>vsf\component\input\driver\hid</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\driver.h">
-      <Filter>vsf\hal\driver\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\ui\vsf_ui_cfg.h">
       <Filter>vsf\component\ui</Filter>
@@ -1514,21 +1538,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h">
       <Filter>vsf\component\3rd-party\freetype\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h">
-      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h">
-      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h">
-      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h">
-      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h">
-      <Filter>vsf\component\3rd-party\freetype\port\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\autohint.h">
       <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
@@ -2332,6 +2341,45 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\driver.h">
+      <Filter>vsf\osa_hal\driver\device_specific\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h">
+      <Filter>vsf\osa_hal\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\driver.h">
+      <Filter>vsf\osa_hal\driver\device_specific\x86\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.h">
+      <Filter>vsf\osa_hal\driver\device_specific\x86\win\uart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\device.h">
+      <Filter>vsf\hal\driver\x86\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\driver.h">
+      <Filter>vsf\hal\driver\x86\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\driver.h">
+      <Filter>vsf\hal\driver\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftmodule.h">
+      <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftoption.h">
+      <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftstdlib.h">
+      <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftconfig.h">
+      <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftheader.h">
+      <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.h">
+      <Filter>vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -2441,9 +2489,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\driver.c">
-      <Filter>vsf\hal\driver\x86</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_eda_slist_queue.c">
       <Filter>vsf\kernel</Filter>
@@ -3590,6 +3635,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.c">
+      <Filter>vsf\osa_hal\driver\device_specific\x86\win\uart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\driver.c">
+      <Filter>vsf\hal\driver\x86\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.c">
+      <Filter>vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

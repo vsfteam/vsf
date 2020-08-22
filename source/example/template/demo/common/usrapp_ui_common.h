@@ -61,6 +61,7 @@ typedef struct usrapp_ui_common_t {
         vk_touchscreen_evt_t ts_evt;
         lv_disp_buf_t disp_buf;
         lv_color_t color[LV_VER_RES_MAX][LV_HOR_RES_MAX];
+        vsf_eda_t *eda_poll;
     } lvgl;
 #endif
 } usrapp_ui_common_t;

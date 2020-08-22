@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftconfig.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftheader.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftmodule.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftoption.h" />
-    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\config\ftstdlib.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h" />
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftconfig.h" />
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftheader.h" />
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftmodule.h" />
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftoption.h" />
+    <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftstdlib.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\freetype.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftadvanc.h" />
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbbox.h" />

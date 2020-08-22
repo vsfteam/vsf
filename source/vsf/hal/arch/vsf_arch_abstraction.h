@@ -120,10 +120,10 @@ extern void cpu_to_le##__bitlen##s(uint##__bitlen##_t *);                       
 extern void cpu_to_be##__bitlen##s(uint##__bitlen##_t *);                       \
 extern void le##__bitlen##_to_cpus(uint##__bitlen##_t *);                       \
 extern void be##__bitlen##_to_cpus(uint##__bitlen##_t *);                       \
-extern uint_fast##__bitlen##_t get_unaligned_##__bitlen(const void *);          \
+extern uint_fast##__bitlen##_t get_unaligned_cpu##__bitlen(const void *);       \
 extern uint_fast##__bitlen##_t get_unaligned_le##__bitlen(const void *);        \
 extern uint_fast##__bitlen##_t get_unaligned_be##__bitlen(const void *);        \
-extern void put_unaligned_##__bitlen(uint_fast##__bitlen##_t, void *);          \
+extern void put_unaligned_cpu##__bitlen(uint_fast##__bitlen##_t, void *);       \
 extern void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t, void *);        \
 extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 

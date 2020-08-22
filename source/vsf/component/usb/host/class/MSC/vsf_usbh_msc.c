@@ -140,6 +140,12 @@ __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_fini, vk_scsi_fini)
     vsf_peda_end();
 }
 
+#if __IS_COMPILER_IAR__
+//! transfer of control bypasses initialization of variables
+//! integer conversion resulted in a change of sign
+#   pragma diag_suppress=pe546,pe068
+#endif
+
 static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uint8_t *cbd, bool is_stream, void *mem_stream)
 {
     switch (evt) {
@@ -228,6 +234,12 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
         break;
     }
 }
+
+#if __IS_COMPILER_IAR__
+//! transfer of control bypasses initialization of variables
+//! integer conversion resulted in a change of sign
+#   pragma diag_warning=pe546,pe068
+#endif
 
 __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute, vk_scsi_execute)
 {

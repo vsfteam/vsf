@@ -495,10 +495,13 @@ static void __vk_dwcotg_dcd_ep_write(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
 
         size = min(size, remain_size);
 
+        VSF_USB_ASSERT(buffer != NULL);
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
-            VSF_USB_ASSERT(buffer != NULL);
-            // TODO: support unaligned access
-            data = *(uint32_t *)buffer;
+#ifndef UNALIGNED
+            data = get_unaligned_cpu32(buffer);
+#else
+            data = *(uint32_t UNALIGNED *)buffer;
+#endif
             debug_add_data(data);
             *dwcotg_dcd->reg.dfifo[ep_idx] = data;
         }
@@ -528,11 +531,15 @@ static void __vk_dwcotg_dcd_ep_read(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep
         uint8_t *buffer = trans->buffer;
         uint32_t data;
 
+        VSF_USB_ASSERT(buffer != NULL);
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
             data = *dwcotg_dcd->reg.dfifo[0];
-            // TODO: support unaligned access
             debug_add_evt(data);
-            *(uint32_t *)buffer = data;
+#ifndef UNALIGNED
+            put_unaligned_cpu32(data, buffer);
+#else
+            *(uint32_t UNALIGNED *)buffer = data;
+#endif
         }
         trans->remain -= size;
         trans->buffer = buffer;

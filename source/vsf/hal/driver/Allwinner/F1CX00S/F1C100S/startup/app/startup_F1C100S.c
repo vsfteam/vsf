@@ -96,6 +96,7 @@ REPEAT_MACRO(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
+ALIGN(256)
 const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE  = {
     NMI_Handler,                                /*!< FIQ0 */
     UART0_Handler,

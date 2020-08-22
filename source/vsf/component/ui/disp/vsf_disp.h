@@ -103,9 +103,9 @@ def_simple_class(vk_disp_drv_t) {
         vsf_err_t (*init)(vk_disp_t *pthis);
         vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
     )
+#if VSF_USE_DISP_FB == ENABLED
     protected_member(
         // TODO: add a enum for driver type
-#if VSF_USE_DISP_FB == ENABLED
         union {
 #   if VSF_USE_DISP_FB == ENABLED
             struct {
@@ -113,8 +113,8 @@ def_simple_class(vk_disp_drv_t) {
             } fb;
 #   endif
         };
-#endif
     )
+#endif
 };
 
 typedef struct vk_disp_param_t {

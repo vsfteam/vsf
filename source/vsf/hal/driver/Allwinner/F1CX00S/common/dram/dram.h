@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
-#include <stdint.h>
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -125,7 +125,8 @@ extern "C" {
                                 __asm__(".equ " #__ALIAS ", " #__ORIGIN)
 
 #   define PACKED               __attribute__((__packed__))
-#   define UNALIGNED            __attribute__((__packed__))
+//#   define UNALIGNED            __attribute__((__packed__))
+#   undef UNALIGNED                                                             //! llvm doesn't support this
 #   define TRANSPARENT_UNION    __attribute__((__transparent_union__))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
@@ -149,7 +150,8 @@ extern "C" {
                                 __attribute__((weakref(__STR(__ALIAS))))
 
 #   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __attribute__((packed))
+//#   define UNALIGNED            __attribute__((packed))
+#   undef UNALIGNED                                                             //! gcc doesn't support this
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __ALIGN_OF(...)    __alignof__(__VA_ARGS__)
 

@@ -174,48 +174,51 @@ bool vsf_iic_master_init(vsf_iic_t *iic_obj, iic_cfg_t *cfg_obj)
         iic_obj->slave_evt_handler->s_w_evt_txe      = &vsf_iic_s_w_evt_txe_handler;
     }
     
-    if(I2C1 == iic_obj->iic_reg) {
-        RCC->APB2ENR |= IIC1_GPIO_CLK_EN;
-        RCC->APB1ENR |= IIC1_CLK_EN;
+    SAFE_ATOM_CODE() {
+    
+        if(I2C1 == iic_obj->iic_reg) {
+            RCC->APB2ENR |= IIC1_GPIO_CLK_EN;
+            RCC->APB1ENR |= IIC1_CLK_EN;
+            
+            GPIOB->CRL |= IIC1_GPIO_MODE;         
+            
+            HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+            HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+        }
         
-        GPIOB->CRL |= IIC1_GPIO_MODE;         
+        if(I2C2 == iic_obj->iic_reg) {
+            RCC->APB2ENR |= IIC2_GPIO_CLK_EN;
+            RCC->APB1ENR |= IIC2_CLK_EN;
+            
+            GPIOB->CRH |= IIC2_GPIO_MODE;
+
+            HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
+            HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
+        }
         
-        HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-        HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+        frequency = PCLK1 / 1000000;
+        
+        iic_obj->iic_reg->CR1   &= ~IIC_EN;
+        
+        iic_obj->iic_reg->CR2   |= (0x3F & frequency);
+
+        iic_obj->iic_reg->TRISE &= 0x00;
+        iic_obj->iic_reg->TRISE |= (frequency + 1);
+
+        iic_obj->iic_reg->CCR   |= (0x0FFF & (((500000000U / cfg_obj->clock_speed) / ((972) / frequency)) - 6));
+
+        iic_obj->iic_reg->CR1   |= cfg_obj->general_call_mode | cfg_obj->no_stretch_mode;
+
+        iic_obj->iic_reg->OAR1  |= cfg_obj->addressing_mode | cfg_obj->own_address1;
+
+        iic_obj->iic_reg->OAR2  |= cfg_obj->dual_address_mode | cfg_obj->own_address2;
+
+        iic_obj->iic_reg->CR1   |= IIC_EN;
     }
-    
-    if(I2C2 == iic_obj->iic_reg) {
-        RCC->APB2ENR |= IIC2_GPIO_CLK_EN;
-        RCC->APB1ENR |= IIC2_CLK_EN;
-        
-        GPIOB->CRH |= IIC2_GPIO_MODE;
-
-        HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
-        HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
-    }
-    
-    frequency = PCLK1 / 1000000;
-    
-    iic_obj->iic_reg->CR1   &= ~IIC_EN;
-    
-    iic_obj->iic_reg->CR2   |= (0x3F & frequency);
-
-    iic_obj->iic_reg->TRISE &= 0x00;
-    iic_obj->iic_reg->TRISE |= (frequency + 1);
-
-    iic_obj->iic_reg->CCR   |= (0x0FFF & (((500000000U / cfg_obj->clock_speed) / ((972) / frequency)) - 6));
-
-    iic_obj->iic_reg->CR1   |= cfg_obj->general_call_mode | cfg_obj->no_stretch_mode;
-
-    iic_obj->iic_reg->OAR1  |= cfg_obj->addressing_mode | cfg_obj->own_address1;
-
-    iic_obj->iic_reg->OAR2  |= cfg_obj->dual_address_mode | cfg_obj->own_address2;
-
-    iic_obj->iic_reg->CR1   |= IIC_EN;
     
     iic_obj->is_master = true;
     
@@ -231,58 +234,61 @@ bool vsf_iic_slave_init(vsf_iic_t *iic_obj, iic_cfg_t *cfg_obj)
     
     uint8_t frequency;
     
-    iic_obj->slave_evt_handler->s_r_err_af       = &vsf_iic_s_r_err_af_handler;
-    iic_obj->slave_evt_handler->s_r_evt_addr     = &vsf_iic_s_r_evt_addr_handler;
-    iic_obj->slave_evt_handler->s_r_evt_rxne     = &vsf_iic_s_r_evt_rxne_handler;
-    iic_obj->slave_evt_handler->s_r_evt_stopf    = &vsf_iic_s_r_evt_stopf_handler;
+    iic_obj->slave_evt_handler->s_r_err_af     = &vsf_iic_s_r_err_af_handler;
+    iic_obj->slave_evt_handler->s_r_evt_addr   = &vsf_iic_s_r_evt_addr_handler;
+    iic_obj->slave_evt_handler->s_r_evt_rxne   = &vsf_iic_s_r_evt_rxne_handler;
+    iic_obj->slave_evt_handler->s_r_evt_stopf  = &vsf_iic_s_r_evt_stopf_handler;
     
-    iic_obj->slave_evt_handler->s_w_evt_addr     = &vsf_iic_s_w_evt_addr_handler;
-    iic_obj->slave_evt_handler->s_w_evt_txe      = &vsf_iic_s_w_evt_txe_handler;
+    iic_obj->slave_evt_handler->s_w_evt_addr   = &vsf_iic_s_w_evt_addr_handler;
+    iic_obj->slave_evt_handler->s_w_evt_txe    = &vsf_iic_s_w_evt_txe_handler;
     
-    if(I2C1 == iic_obj->iic_reg) {
-        RCC->APB2ENR |= IIC1_GPIO_CLK_EN;
+    SAFE_ATOM_CODE() {
+    
+        if(I2C1 == iic_obj->iic_reg) {
+            RCC->APB2ENR |= IIC1_GPIO_CLK_EN;
+            
+            GPIOB->CRL |= IIC1_GPIO_MODE;
+            
+            RCC->APB1ENR |= IIC1_CLK_EN;
+
+            HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
+            HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+        }
         
-        GPIOB->CRL |= IIC1_GPIO_MODE;
+        if(I2C2 == iic_obj->iic_reg) {
+            RCC->APB2ENR |= IIC2_GPIO_CLK_EN;
+
+            GPIOB->CRH |= IIC2_GPIO_MODE;
+
+            RCC->APB1ENR |= IIC2_CLK_EN;
+
+            HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
+            HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
+        }
         
-        RCC->APB1ENR |= IIC1_CLK_EN;
+        frequency = PCLK1 / 1000000;
+        
+        iic_obj->iic_reg->CR1   &= ~IIC_EN;
+        
+        iic_obj->iic_reg->CR2   |= (0x3F & frequency);
 
-        HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
-        HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+        iic_obj->iic_reg->TRISE &= 0x00;
+        iic_obj->iic_reg->TRISE |= (frequency + 1);
+
+        iic_obj->iic_reg->CCR   |= (0x0FFF & ((500000000U / cfg_obj->clock_speed) / ((972) / frequency)));
+
+        iic_obj->iic_reg->CR1   |= cfg_obj->general_call_mode | cfg_obj->no_stretch_mode;
+
+        iic_obj->iic_reg->OAR1  |= cfg_obj->addressing_mode | cfg_obj->own_address1;
+
+        iic_obj->iic_reg->OAR2  |= cfg_obj->dual_address_mode | cfg_obj->own_address2;
+
+        iic_obj->iic_reg->CR1   |= IIC_EN;
     }
-    
-    if(I2C2 == iic_obj->iic_reg) {
-        RCC->APB2ENR |= IIC2_GPIO_CLK_EN;
-
-        GPIOB->CRH |= IIC2_GPIO_MODE;
-
-        RCC->APB1ENR |= IIC2_CLK_EN;
-
-        HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
-        HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 0);
-        HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
-    }
-    
-    frequency = PCLK1 / 1000000;
-    
-    iic_obj->iic_reg->CR1   &= ~IIC_EN;
-    
-    iic_obj->iic_reg->CR2   |= (0x3F & frequency);
-
-    iic_obj->iic_reg->TRISE &= 0x00;
-    iic_obj->iic_reg->TRISE |= (frequency + 1);
-
-    iic_obj->iic_reg->CCR   |= (0x0FFF & ((500000000U / cfg_obj->clock_speed) / ((972) / frequency)));
-
-    iic_obj->iic_reg->CR1   |= cfg_obj->general_call_mode | cfg_obj->no_stretch_mode;
-
-    iic_obj->iic_reg->OAR1  |= cfg_obj->addressing_mode | cfg_obj->own_address1;
-
-    iic_obj->iic_reg->OAR2  |= cfg_obj->dual_address_mode | cfg_obj->own_address2;
-
-    iic_obj->iic_reg->CR1   |= IIC_EN;
     
     iic_obj->is_master = false;
     
@@ -318,14 +324,16 @@ bool vsf_iic_master_write(vsf_iic_t *iic_obj, uint8_t slave_address, uint8_t *ou
         iic_obj->no_stop = true;
     }
     
-    iic_obj->iic_reg->CR1 |= IIC_EN;
-    iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
-    
-    if(!(Process_sele & NO_START)) {
-        iic_obj->iic_reg->CR1 |= IIC_START;
+    SAFE_ATOM_CODE() {
+        iic_obj->iic_reg->CR1 |= IIC_EN;
+        iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
+        
+        if(!(Process_sele & NO_START)) {
+            iic_obj->iic_reg->CR1 |= IIC_START;
+        }
+        
+        iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN | IIC_IT_ERR_EN;
     }
-    
-    iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN | IIC_IT_ERR_EN;
     
     return true;
 }
@@ -348,12 +356,14 @@ bool vsf_iic_master_read(vsf_iic_t *iic_obj, uint8_t slave_address, uint8_t *inp
     iic_obj->iic_is_busy   = true;
     iic_obj->is_write      = false;
     
-    iic_obj->iic_reg->CR1 |= IIC_EN;
-    iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
-    iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
-    iic_obj->iic_reg->CR1 |= IIC_START;
-    
-    iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN;
+    SAFE_ATOM_CODE() {
+        iic_obj->iic_reg->CR1 |= IIC_EN;
+        iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
+        iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
+        iic_obj->iic_reg->CR1 |= IIC_START;
+        
+        iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN;
+    }
     
     return true;
 }
@@ -375,11 +385,13 @@ bool vsf_iic_slave_write(vsf_iic_t *iic_obj, uint8_t *output, uint16_t size)
     iic_obj->iic_is_busy = true;
     iic_obj->is_write    = true;
     
-    iic_obj->iic_reg->CR1 |= IIC_EN;
-    iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
-    iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
-    
-    iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN | IIC_IT_ERR_EN;
+    SAFE_ATOM_CODE() {
+        iic_obj->iic_reg->CR1 |= IIC_EN;
+        iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
+        iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
+        
+        iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN | IIC_IT_ERR_EN;
+    }
     
     return true;
 }
@@ -401,11 +413,13 @@ bool vsf_iic_slave_read(vsf_iic_t *iic_obj, uint8_t *input, uint16_t size)
     iic_obj->iic_is_busy = true;
     iic_obj->is_write    = false;
     
-    iic_obj->iic_reg->CR1 |= IIC_EN;
-    iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
-    iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
-    
-    iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN;
+    SAFE_ATOM_CODE() {
+        iic_obj->iic_reg->CR1 |= IIC_EN;
+        iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
+        iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
+        
+        iic_obj->iic_reg->CR2 |= IIC_IT_EVT_EN | IIC_IT_BUF_EN;
+    }
     
     return true;
 }
