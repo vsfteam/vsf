@@ -62,8 +62,8 @@ static uint_fast32_t __vk_mem_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_
 static bool __vk_mem_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
     vk_mem_mal_t *pthis = (vk_mem_mal_t *)mal;
-    mem->buffer_ptr = &pthis->mem.buffer_ptr[addr];
-    mem->s32_size = size;
+    mem->buffer = &pthis->mem.buffer[addr];
+    mem->size = size;
     return true;
 }
 
@@ -95,10 +95,10 @@ __vsf_component_peda_ifs_entry(__vk_mem_mal_read, vk_mal_read)
     VSF_MAL_ASSERT(pthis != NULL);
     addr = vsf_local.addr;
     size = vsf_local.size;
-    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.s32_size));
+    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.size));
 
-    if (vsf_local.buff != &pthis->mem.buffer_ptr[addr]) {
-        memcpy(vsf_local.buff, &pthis->mem.buffer_ptr[addr], size);
+    if (vsf_local.buff != &pthis->mem.buffer[addr]) {
+        memcpy(vsf_local.buff, &pthis->mem.buffer[addr], size);
     }
     vsf_eda_return(size);
     vsf_peda_end();
@@ -114,10 +114,10 @@ __vsf_component_peda_ifs_entry(__vk_mem_mal_write, vk_mal_write)
     VSF_MAL_ASSERT(pthis != NULL);
     addr = vsf_local.addr;
     size = vsf_local.size;
-    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.s32_size));
+    VSF_MAL_ASSERT((size > 0) && ((addr + size) <= pthis->mem.size));
 
-    if (vsf_local.buff != &pthis->mem.buffer_ptr[addr]) {
-        memcpy(&pthis->mem.buffer_ptr[addr], vsf_local.buff, size);
+    if (vsf_local.buff != &pthis->mem.buffer[addr]) {
+        memcpy(&pthis->mem.buffer[addr], vsf_local.buff, size);
     }
     vsf_eda_return(size);
     vsf_peda_end();

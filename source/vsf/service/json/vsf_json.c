@@ -23,8 +23,7 @@
 
 #define __VSF_JSON_CLASS_IMPLEMENT
 #include "./vsf_json.h"
-#include <ctype.h>
-#include <stdio.h>
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -226,8 +225,8 @@ char *vsf_json_get(const char *json, const char *key)
                     key += idx;
                     if (*key) {
                         key++;
-                    cur += idx + 1;
                     }
+                    cur += idx + 1;
                     cur = vsf_json_skip_space(cur);
                     if (*cur++ != ':') {
                         return NULL;

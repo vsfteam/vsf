@@ -30,10 +30,14 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_f1c100s.h"
 #elif   defined(__WIN__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_win.h"
+#elif   defined(__LINUX__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_linux.h"
 #elif   defined(__GD32E103__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_gd32e103.h"
 #elif   defined(__MT071__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_mt071.h"
+#elif   defined(__MPS2__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_mps2.h"
 #endif
 
 #if APP_CFG_USE_USBH_DEMO == ENABLED

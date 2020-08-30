@@ -277,11 +277,21 @@ void __vsf_libusb_exit(struct libusb_context *ctx)
     }
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 int __vsf_libusb_get_next_timeout(libusb_context *ctx, struct timeval *tv)
 {
     VSF_LINUX_ASSERT(false);
     return 0;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 int __vsf_libusb_has_capability(uint32_t capability)
 {
@@ -453,6 +463,11 @@ static int __vsf_libusb_submit_urb(vsf_linux_libusb_dev_t *ldev)
     return URB_OK != vk_usbh_urb_get_status(urb) ? LIBUSB_ERROR_IO : LIBUSB_SUCCESS;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 static vk_usbh_urb_t * __vsf_libusb_get_urb(vsf_linux_libusb_dev_t *ldev)
 {
     vk_usbh_urb_t *urb = &ldev->libusb_dev->urb;
@@ -464,6 +479,11 @@ static vk_usbh_urb_t * __vsf_libusb_get_urb(vsf_linux_libusb_dev_t *ldev)
     }
     return urb;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 int __vsf_libusb_control_transfer(libusb_device_handle *dev_handle,
     uint8_t bRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex,

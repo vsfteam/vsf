@@ -68,7 +68,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
                         &c_tVLabel);
 
     //if (fsm != VSF_MSGT_ERR_MSG_NOT_HANDLED) {
-        switch (ptMSG->use_as__vsf_msgt_msg_t.tMSG){
+        switch (ptMSG->use_as__vsf_msgt_msg_t.msg){
             case VSF_TGUI_EVT_POINTER_DOWN:
                 if (!ptButton->_.bIsCheckButton) {
                     ptButton->_.bIsChecked = true;

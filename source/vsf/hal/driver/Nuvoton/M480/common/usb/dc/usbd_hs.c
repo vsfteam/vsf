@@ -117,6 +117,11 @@ static int_fast8_t m480_usbd_hs_get_free_idx(m480_usbd_hs_t *usbd_hs, uint_fast8
     return -1;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
 {
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
@@ -174,6 +179,11 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
     }
     return VSF_ERR_NONE;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 void m480_usbd_hs_fini(m480_usbd_hs_t *usbd_hs)
 {
@@ -285,6 +295,11 @@ uint_fast8_t m480_usbd_hs_ep_get_feature(m480_usbd_hs_t *usbd_hs, uint_fast8_t e
     }
 */    return 0;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
 
 vsf_err_t m480_usbd_hs_ep_add(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
 {
@@ -562,6 +577,11 @@ vsf_err_t m480_usbd_hs_ep_transaction_write_buffer(m480_usbd_hs_t *usbd_hs, uint
     }
     return VSF_ERR_NONE;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 vsf_err_t m480_usbd_hs_ep_transfer_recv(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size)
 {

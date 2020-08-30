@@ -79,11 +79,11 @@ fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
     if (!container_ptr->use_as__vsf_tgui_v_container_t.bIsNoBackgroundColor) {
-        vsf_tgui_control_t* ptControl = (vsf_tgui_control_t*)container_ptr;
+        vsf_tgui_control_t* control_ptr = (vsf_tgui_control_t*)container_ptr;
         vsf_tgui_sv_color_t tColor = tBackground;
         vsf_tgui_region_t tRegion = { 0 };
 
-        tRegion.tSize = *vsf_tgui_control_get_size(ptControl);
+        tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
 #if VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES == ENABLED
         if (container_ptr->use_as__vsf_tgui_v_container_t.bIsShowCornerTile) {
 			vsf_tgui_tile_t* ptTile;
@@ -129,22 +129,22 @@ fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
 			tRightRegion.tSize.iWidth = tTopLeftRegion.tSize.iWidth;
 			tRightRegion.tSize.iHeight = tRegion.tSize.iHeight - 2 * tTopLeftRegion.tSize.iHeight;
 
-			vsf_tgui_control_v_draw_rect(ptControl,
+			vsf_tgui_control_v_draw_rect(control_ptr,
 				ptDirtyRegion,
 				&tMiddleRegion,
 				tColor);
-			vsf_tgui_control_v_draw_rect(ptControl,
+			vsf_tgui_control_v_draw_rect(control_ptr,
 				ptDirtyRegion,
 				&tLeftRegion,
 				tColor);
-			vsf_tgui_control_v_draw_rect(ptControl,
+			vsf_tgui_control_v_draw_rect(control_ptr,
 				ptDirtyRegion,
 				&tRightRegion,
 				tColor);
 		} else 
 #endif
         {
-			vsf_tgui_control_v_draw_rect(ptControl,
+			vsf_tgui_control_v_draw_rect(control_ptr,
 				ptDirtyRegion,
 				&tRegion,
 				tColor);

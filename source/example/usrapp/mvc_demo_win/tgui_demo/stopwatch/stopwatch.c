@@ -58,13 +58,13 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* node_ptr,
 #endif
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
 static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
-                                        vsf_tgui_refresh_evt_t* ptEvent);
+                                        vsf_tgui_refresh_evt_t* event_ptr);
 
 static fsm_rt_t __on_list_sliding_started(  vsf_tgui_list_t* ptList,
-                                            vsf_tgui_refresh_evt_t* ptEvent);
+                                            vsf_tgui_refresh_evt_t* event_ptr);
 
 static fsm_rt_t __on_list_sliding_stopped( vsf_tgui_list_t* ptList,
-                                            vsf_tgui_refresh_evt_t* ptEvent);
+                                            vsf_tgui_refresh_evt_t* event_ptr);
 #endif
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -100,10 +100,10 @@ describe_tgui_msgmap(tLapMSGMap,
     tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
 )
 
-stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
+stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 {
     do {
-        if (NULL == ptPanel && NULL != ptGUI) {
+        if (NULL == ptPanel && NULL != gui_ptr) {
             break;
         }
 
@@ -321,7 +321,7 @@ static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
     //! update existing text content
     vsf_tgui_text_set(&(ptPanel->tTime.tLabel), &(ptPanel->tTime.tLabel.tString));
 
-    vk_tgui_refresh_ex(ptPanel->use_as__vsf_tgui_panel_t.ptGUI,
+    vk_tgui_refresh_ex(ptPanel->use_as__vsf_tgui_panel_t.gui_ptr,
                         (vsf_tgui_control_t *)&(ptPanel->tTime), NULL);
 
     vsf_tgui_timer_enable(&ptPanel->tTimer);
@@ -360,24 +360,24 @@ static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
 
 
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* ptControl,
+static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
                                             vsf_msgt_msg_t* ptMSG)
 {
-    vsf_tgui_refresh_evt_t *ptEvent = (vsf_tgui_refresh_evt_t *)ptMSG;
-    const vsf_tgui_region_t *ptDirtyRegion = (const vsf_tgui_region_t *)(ptEvent->ptRegion);
+    vsf_tgui_refresh_evt_t *event_ptr = (vsf_tgui_refresh_evt_t *)ptMSG;
+    const vsf_tgui_region_t *ptDirtyRegion = (const vsf_tgui_region_t *)(event_ptr->region_ptr);
 
     do {
         vsf_tgui_sv_color_t tColor = VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR;
         vsf_tgui_region_t tRegion = {0};
 
-        tRegion.tSize = *vsf_tgui_control_get_size(ptControl);
+        tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
 
         tRegion.tLocation.iY = tRegion.tSize.iHeight / 2 - 1;
         tRegion.tLocation.iX = 4;
         tRegion.tSize.iHeight = 2;
         tRegion.tSize.iWidth -= 8;
 
-        vsf_tgui_control_v_draw_rect(   ptControl,
+        vsf_tgui_control_v_draw_rect(   control_ptr,
                                         ptDirtyRegion,
                                         &tRegion,
                                         tColor);
@@ -391,21 +391,21 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* ptControl,
 static volatile bool s_bShowProgressbar = false;
 
 static fsm_rt_t __on_list_sliding_started(  vsf_tgui_list_t* ptList,
-                                            vsf_tgui_refresh_evt_t* ptEvent)
+                                            vsf_tgui_refresh_evt_t* event_ptr)
 {
     s_bShowProgressbar = true;
     return fsm_rt_cpl;
 }
 
 static fsm_rt_t __on_list_sliding_stopped(  vsf_tgui_list_t* ptList,
-                                            vsf_tgui_refresh_evt_t* ptEvent)
+                                            vsf_tgui_refresh_evt_t* event_ptr)
 {
     s_bShowProgressbar = false;
     return fsm_rt_cpl;
 }
 
 static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
-                                        vsf_tgui_refresh_evt_t* ptEvent)
+                                        vsf_tgui_refresh_evt_t* event_ptr)
 {
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
@@ -414,7 +414,7 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
 #define VSF_TGUI_SCROLLBAR_COLOR_BLUE                   VSF_TGUI_COLOR_RGBA(0x4c, 0xa1, 0xff, 0x80)
 
     vsf_tgui_list_scrollbar_region_t tScrollbarRegion;
-    vsf_tgui_region_t *ptDirtyRegion = ptEvent->ptRegion;
+    vsf_tgui_region_t *ptDirtyRegion = event_ptr->region_ptr;
 
     if (!s_bShowProgressbar) {
         return fsm_rt_cpl;
@@ -457,8 +457,8 @@ implement_vsf_pt(tgui_demo_t)
 
     UNUSED_PARAM(s_tRefreshRegion);
 
-    //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.ptGUI, NULL, &s_tRefreshRegion);
-    vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.ptGUI);
+    //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.gui_ptr, NULL, &s_tRefreshRegion);
+    vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.gui_ptr);
     while(1) {
 
         //! refresh timer
@@ -472,7 +472,7 @@ implement_vsf_pt(tgui_demo_t)
             //! update existing text content
             vsf_tgui_text_set(&(base.tTime.tLabel), &(base.tTime.tLabel.tString));
 
-            vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.ptGUI,
+            vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.gui_ptr,
                                 (vsf_tgui_control_t *)&(base.tTime), NULL);
                                 //&s_tRefreshRegion);
         } while(0);

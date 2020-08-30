@@ -65,6 +65,11 @@ uint_fast32_t vsf_dynarr_get_size(vsf_dynarr_t *dynarr)
     return dynarr->length;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
 {
     uint_fast16_t buf_num_per_table = 1UL << dynarr->buf_num_per_table_bitlen;
@@ -162,6 +167,11 @@ vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
     dynarr->length = size;
     return VSF_ERR_NONE;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 void * vsf_dynarr_get(vsf_dynarr_t *dynarr, uint_fast32_t pos)
 {

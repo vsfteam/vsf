@@ -147,7 +147,7 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
             break;
         }
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-        if (!this.tStatus.IsOpen) {
+        if (!this.Status.IsOpen) {
             return VSF_ERR_NOT_AVAILABLE;
         }
     #endif
@@ -157,16 +157,16 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
                                     use_as__vsf_slist_node_t,
                                     &this.use_as__vsf_slist_queue_t,
                                     pblock);
-            this.tStatus.u14Count++;
-            if (this.tStatus.u14Count > this.tStatus.u8DataDrainThreshold) {
-                this.tStatus.IsDataDrain = false;
+            this.Status.u14Count++;
+            if (this.Status.u14Count > this.Status.u8DataDrainThreshold) {
+                this.Status.IsDataDrain = false;
             }
     #if VSF_PBUF_QUEUE_CFG_RAISE_DAVL_EVT_ONCE == ENABLED
-            if (this.tStatus.u14Count == (this.tStatus.u8DataReadyThreshold + 1)) {
+            if (this.Status.u14Count == (this.Status.u8DataReadyThreshold + 1)) {
     #else
-            if (this.tStatus.u14Count >= (this.tStatus.u8DataReadyThreshold + 1)) {
+            if (this.Status.u14Count >= (this.Status.u8DataReadyThreshold + 1)) {
     #endif
-                this.tStatus.IsDataReady = true;
+                this.Status.IsDataReady = true;
                 bFirstDataReady = true;
             }
         )
@@ -177,7 +177,7 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
             this.tDataReadyEventHandling.handler_fn(
                 this.tDataReadyEventHandling.target_ptr, 
                 &this.RX,
-                this.tStatus);
+                this.Status);
         }
 
     } while(0);
@@ -217,12 +217,12 @@ vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr)
                 break;
             }
 
-            this.tStatus.u14Count--;
-            if (!this.tStatus.u14Count) {
-                this.tStatus.IsDataReady = false;
+            this.Status.u14Count--;
+            if (!this.Status.u14Count) {
+                this.Status.IsDataReady = false;
             } 
-            if (this.tStatus.u14Count <= this.tStatus.u8DataDrainThreshold) {
-                this.tStatus.IsDataDrain = true;
+            if (this.Status.u14Count <= this.Status.u8DataDrainThreshold) {
+                this.Status.IsDataDrain = true;
                 bDataDrain = true;
             }
         } while(0);
@@ -234,7 +234,7 @@ vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr)
         this.tDataDrainEventHandling.handler_fn(
             this.tDataDrainEventHandling.target_ptr, 
             &this.TX,
-            this.tStatus);
+            this.Status);
     }
 
     return ptBuff;
@@ -280,7 +280,7 @@ void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *obj_ptr)
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
-        this.tStatus.IsOpen = true;
+        this.Status.IsOpen = true;
     )
 }
 
@@ -291,7 +291,7 @@ void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *obj_ptr)
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
-        this.tStatus.IsOpen = false;
+        this.Status.IsOpen = false;
     )
 }
 #endif
@@ -303,7 +303,7 @@ vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *obj_ptr)
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
-    return this.tStatus;
+    return this.Status;
 }
 
 static vsf_err_t __vsf_stream_pbuf_rx_register_notification(
@@ -344,7 +344,7 @@ vsf_stream_status_t __vsf_stream_pbuf_tx_get_status(vsf_stream_tx_t *obj_ptr)
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
-    return this.tStatus;
+    return this.Status;
 }
 
 #endif

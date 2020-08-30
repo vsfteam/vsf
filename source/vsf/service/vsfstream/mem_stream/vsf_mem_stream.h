@@ -47,8 +47,8 @@ extern "C" {
 #define __describe_mem_stream_ex(__name, __buffer, __size)                      \
             vsf_mem_stream_t __name = {                                         \
                 .op                 = &vsf_mem_stream_op,                       \
-                .buffer_ptr          = (__buffer),                               \
-                .s32_size              = (__size),                                 \
+                .buffer             = (__buffer),                               \
+                .size               = (__size),                                 \
             };
 
 #define __describe_mem_stream(__name, __size)                                   \

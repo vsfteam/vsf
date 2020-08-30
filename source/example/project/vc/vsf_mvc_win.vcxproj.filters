@@ -70,42 +70,6 @@
     <Filter Include="vsf\component">
       <UniqueIdentifier>{14fd5089-ee4f-48ef-86c6-b6a181482b5b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb">
-      <UniqueIdentifier>{e1328ffc-17be-4ff7-b12c-411991ea4b4a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common">
-      <UniqueIdentifier>{4c415816-3ce1-49a0-ad33-5646302ac3a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class">
-      <UniqueIdentifier>{6a1f3497-ba4b-43b3-8270-bfbe4de18a58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class\CDC">
-      <UniqueIdentifier>{3c6bd704-fb59-4c29-ba49-88af0c700ea9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class\HID">
-      <UniqueIdentifier>{9eced937-9f8d-4f41-a56f-916e2b223505}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\common\class\UVC">
-      <UniqueIdentifier>{206386de-bfee-4d6e-a163-1da1fbf79a03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host">
-      <UniqueIdentifier>{27fad79b-8498-4537-8416-31b0e12aa999}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class">
-      <UniqueIdentifier>{2d8cc84c-e86f-4f43-ba04-f89ff6b487a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\BTHCI">
-      <UniqueIdentifier>{f165771f-d763-47a8-adb1-dc49ee1663d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\CDC">
-      <UniqueIdentifier>{eb32e0d7-5f2e-4d57-a159-afc60f82d8ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\HID">
-      <UniqueIdentifier>{b875fb17-0c3d-41b5-8aca-372cc0dacb41}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\host\class\HUB">
-      <UniqueIdentifier>{afc349a7-f559-4e3e-aa65-d524842f7c73}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\utilities\language_externsion">
       <UniqueIdentifier>{084aaae4-edd8-4d6b-b43f-b87bcc301d5d}</UniqueIdentifier>
     </Filter>
@@ -118,12 +82,6 @@
     <Filter Include="vsf\kernel\shell\simple">
       <UniqueIdentifier>{7ecb6f44-c773-444d-b026-021d8759fb22}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver">
-      <UniqueIdentifier>{7b7965a4-097d-4abd-8990-d440cab94b5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd">
-      <UniqueIdentifier>{96f19d70-a16e-498e-abf0-6e91a2cbe607}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party">
       <UniqueIdentifier>{cb4eff1c-101d-4646-9b87-aa0f415e59d7}</UniqueIdentifier>
     </Filter>
@@ -132,9 +90,6 @@
     </Filter>
     <Filter Include="vsf\component\input\driver">
       <UniqueIdentifier>{a8c1f548-b85a-412d-ac4d-da2b2aba2566}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\input\driver\ds4">
-      <UniqueIdentifier>{85ca653e-7c11-4251-aef5-48a9edf7ab76}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\component\input\driver\hid">
       <UniqueIdentifier>{b4e8d762-c880-4d47-8961-f6d8e5ae5d2b}</UniqueIdentifier>
@@ -217,9 +172,6 @@
     <Filter Include="usrapp\mvc_demo_win\tgui_demo\stopwatch">
       <UniqueIdentifier>{125644a1-849b-44c9-a557-faea05558c55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\usb\driver\hcd\winusb_hcd">
-      <UniqueIdentifier>{6675a22e-6f54-4682-b420-8f298128daca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\ui\tgui\view">
       <UniqueIdentifier>{d51c94c5-faa8-4566-97c1-aeb0c7526045}</UniqueIdentifier>
     </Filter>
@@ -276,6 +228,9 @@
     </Filter>
     <Filter Include="vsf\component\3rd-party\freetype\2.10.1\port\vsf_config">
       <UniqueIdentifier>{5c567e4b-0790-44f9-b7af-dd5c0dd37d39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86\win">
+      <UniqueIdentifier>{a1c83283-d847-4465-8e93-c61585a14f62}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -423,48 +378,6 @@
     <ClInclude Include="..\..\..\vsf\component\vsf_component_cfg.h">
       <Filter>vsf\component</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\usb_common.h">
-      <Filter>vsf\component\usb\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDC.h">
-      <Filter>vsf\component\usb\common\class\CDC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\class\CDC\vsf_usb_CDCACM.h">
-      <Filter>vsf\component\usb\common\class\CDC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_ds4.h">
-      <Filter>vsf\component\usb\common\class\HID</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\class\HID\vsf_usb_HID.h">
-      <Filter>vsf\component\usb\common\class\HID</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\common\class\UVC\vsf_usb_UVC.h">
-      <Filter>vsf\component\usb\common\class\UVC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.h">
-      <Filter>vsf\component\usb\host\class\BTHCI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\vsf_usbh.h">
-      <Filter>vsf\component\usb\host</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.h">
-      <Filter>vsf\component\usb\host\class\CDC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDCECM.h">
-      <Filter>vsf\component\usb\host\class\CDC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_ds4.h">
-      <Filter>vsf\component\usb\host\class\HID</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_HID.h">
-      <Filter>vsf\component\usb\host\class\HID</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.h">
-      <Filter>vsf\component\usb\host\class\HUB</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\vsf_usb_cfg.h">
-      <Filter>vsf\component\usb</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h">
       <Filter>vsf\utilities\language_externsion</Filter>
     </ClInclude>
@@ -489,9 +402,6 @@
     <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple.h">
       <Filter>vsf\kernel\shell\simple</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h">
-      <Filter>vsf\kernel\shell\simple</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\kernel\shell\vsf_shell.h">
       <Filter>vsf\kernel\shell</Filter>
     </ClInclude>
@@ -506,9 +416,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\input\protocol\vsf_input_sensor.h">
       <Filter>vsf\component\input\protocol</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.h">
-      <Filter>vsf\component\input\driver\ds4</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h">
       <Filter>vsf\component\input\driver\hid</Filter>
@@ -867,9 +774,6 @@
     <ClInclude Include="..\..\usrapp\mvc_demo_win\config\vsf_tgui_cfg.h">
       <Filter>usrapp\mvc_demo_win\config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
-      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.h">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClInclude>
@@ -1041,6 +945,15 @@
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftheader.h">
       <Filter>vsf\component\3rd-party\freetype\2.10.1\port\vsf_config</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\x86\win\driver.h">
+      <Filter>vsf\hal\driver\x86\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\hal\driver\x86\win\device.h">
+      <Filter>vsf\hal\driver\x86\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.h">
+      <Filter>vsf\kernel\shell\simple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -1112,27 +1025,6 @@
     <ClCompile Include="..\..\..\vsf\component\vsf_component.c">
       <Filter>vsf\component</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\class\BTHCI\vsf_usbh_BTHCI.c">
-      <Filter>vsf\component\usb\host\class\BTHCI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\vsf_usbh.c">
-      <Filter>vsf\component\usb\host</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDC.c">
-      <Filter>vsf\component\usb\host\class\CDC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\class\CDC\vsf_usbh_CDCECM.c">
-      <Filter>vsf\component\usb\host\class\CDC</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_ds4.c">
-      <Filter>vsf\component\usb\host\class\HID</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_HID.c">
-      <Filter>vsf\component\usb\host\class\HID</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\host\class\HUB\vsf_usbh_HUB.c">
-      <Filter>vsf\component\usb\host\class\HUB</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c">
       <Filter>vsf\utilities\language_externsion</Filter>
     </ClCompile>
@@ -1141,9 +1033,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\task\vsf_thread.c">
       <Filter>vsf\kernel\task</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c">
-      <Filter>vsf\kernel\shell\simple</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c">
       <Filter>vsf\kernel\shell\simple</Filter>
@@ -1154,14 +1043,8 @@
     <ClCompile Include="..\..\..\vsf\component\input\vsf_input.c">
       <Filter>vsf\component\input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\input\driver\ds4\vsf_input_ds4.c">
-      <Filter>vsf\component\input\driver\ds4</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\input\driver\hid\vsf_input_hid.c">
       <Filter>vsf\component\input\driver\hid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\hal\driver\x86\driver.c">
-      <Filter>vsf\hal\driver\x86</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\osa_service\vsf_osa_service.c">
       <Filter>vsf\osa_service</Filter>
@@ -1343,9 +1226,6 @@
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\stopwatch\stopwatch.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo\stopwatch</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.c">
-      <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_custom.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo</Filter>
     </ClCompile>
@@ -1444,6 +1324,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c">
       <Filter>vsf\component\fs\driver\memfs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\hal\driver\x86\win\driver.c">
+      <Filter>vsf\hal\driver\x86\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c">
+      <Filter>vsf\kernel\shell\simple</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

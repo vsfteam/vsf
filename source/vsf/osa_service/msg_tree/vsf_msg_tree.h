@@ -75,7 +75,7 @@ declare_structure(vsf_msgt_node_t)
 //! \name the base class for all other tree messages
 //! @{
 typedef struct vsf_msgt_msg_t {
-    vsf_evt_t   tMSG;                                                           //!< the tree message which should larger than VSF_EVT_USER
+    vsf_evt_t   msg;                                                           //!< the tree message which should larger than VSF_EVT_USER
 }vsf_msgt_msg_t;
 //! @}
 

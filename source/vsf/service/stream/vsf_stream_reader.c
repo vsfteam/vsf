@@ -75,15 +75,15 @@ vsf_pbuf_t *vsf_stream_reader_fetch_pbuf ( vsf_stream_reader_t *obj_ptr)
     
     __SAFE_ATOM_CODE(
         pbuf = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
-        if (NULL == this.ptCurrent) {
-            this.ptCurrent = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
+        if (NULL == this.current_ptr) {
+            this.current_ptr = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
         } else {
             vsf_pbuf_t *temp_ptr = pbuf;
-            pbuf = this.ptCurrent;
-            this.ptCurrent = temp_ptr;
+            pbuf = this.current_ptr;
+            this.current_ptr = temp_ptr;
         }
 
-        if (NULL != this.ptCurrent) {
+        if (NULL != this.current_ptr) {
             this.hwOffset = 0;
             this.hwBufferSize = 0;
         } 
@@ -107,17 +107,17 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *obj_ptr,
         }
 
         __SAFE_ATOM_CODE(
-            if (NULL == this.ptCurrent) {
-                this.ptCurrent = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
+            if (NULL == this.current_ptr) {
+                this.current_ptr = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
                 this.hwOffset = 0;
                 this.hwBufferSize = 0;
             }
         )
 
         __SAFE_ATOM_CODE(
-            if (NULL != this.ptCurrent) {
+            if (NULL != this.current_ptr) {
                 if (this.hwOffset < this.hwBufferSize) {
-                    nReadSize = vsf_pbuf_buffer_read(   this.ptCurrent, 
+                    nReadSize = vsf_pbuf_buffer_read(   this.current_ptr, 
                                                         buffer_ptr,
                                                         u16_size,
                                                         this.hwOffset);
@@ -126,8 +126,8 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *obj_ptr,
                         this.hwOffset += nReadSize;
                         if (this.hwOffset == this.hwBufferSize) {
                             //! current buffer is full
-                            vsf_pbuf_free(this.ptCurrent);                      //! free
-                            this.ptCurrent = NULL;
+                            vsf_pbuf_free(this.current_ptr);                      //! free
+                            this.current_ptr = NULL;
                         }
                     }
                 }

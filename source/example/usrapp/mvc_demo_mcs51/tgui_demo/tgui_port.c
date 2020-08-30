@@ -203,13 +203,13 @@ const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
 /**********************************************************************************/
 
 /*! \brief begin a refresh loop
- *! \param ptGUI the tgui object address
+ *! \param gui_ptr the tgui object address
  *! \param ptPlannedRefreshRegion the planned refresh region
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
  */
 vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(   
-                    vsf_tgui_t *ptGUI, 
+                    vsf_tgui_t *gui_ptr, 
                     const vsf_tgui_region_t *ptPlannedRefreshRegion)
 {
     return (vsf_tgui_region_t *)ptPlannedRefreshRegion;
@@ -218,7 +218,7 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
 
 volatile static bool s_bIsReadyToRefresh = true;
 
-bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
+bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
 {
     vk_disp_area_t area = {
         .pos = {.x = 0, .y = 0},

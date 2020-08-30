@@ -21,6 +21,8 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_DFU == ENABLED
 
+// for vsf_eda_fini
+#define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #include "../../vsf_usbh.h"
 #include "./vsf_usbh_dfu.h"

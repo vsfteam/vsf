@@ -249,7 +249,7 @@ typedef struct intc_reg_t {
 
     union {
         reg32_t MASK[2];                //!< Interrupt Mask Register 0/1
-        reg32_t ENABLE[2];              //!< Alias as interrupt Enable register
+        reg32_t DISABLE[2];             //!< Alias as interrupt Disable register
     };
     RESERVED_U32
     RESERVED_U32

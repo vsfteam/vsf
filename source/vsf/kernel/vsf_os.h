@@ -161,6 +161,9 @@ extern vsf_sched_lock_status_t vsf_forced_sched_lock(void);
 extern void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel);
 #endif
 
+// vsf_sleep can only be called in vsf_plug_in_on_kernel_idle
+extern void vsf_sleep(void);
+
 #ifdef __cplusplus
 }
 #endif

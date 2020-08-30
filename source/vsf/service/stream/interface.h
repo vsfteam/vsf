@@ -37,7 +37,7 @@ typedef union vsf_stream_status_t vsf_stream_status_t;
 
 typedef void vsf_stream_dat_rdy_evt_handler_t(  void *target_ptr, 
                                                 vsf_stream_rx_t *,
-                                                vsf_stream_status_t tStatus);
+                                                vsf_stream_status_t Status);
 
 typedef struct vsf_stream_dat_rdy_evt_t vsf_stream_dat_rdy_evt_t;
 struct vsf_stream_dat_rdy_evt_t
@@ -48,7 +48,7 @@ struct vsf_stream_dat_rdy_evt_t
 
 typedef void vsf_stream_dat_drn_evt_handler_t(  void *target_ptr, 
                                                 vsf_stream_tx_t *,
-                                                vsf_stream_status_t tStatus);
+                                                vsf_stream_status_t Status);
 
 typedef struct vsf_stream_dat_drn_evt_t vsf_stream_dat_drn_evt_t;
 struct vsf_stream_dat_drn_evt_t

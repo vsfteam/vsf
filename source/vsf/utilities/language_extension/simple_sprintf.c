@@ -22,7 +22,7 @@
 
 #if VSF_USE_SIMPLE_SPRINTF == ENABLED
 
-#include "..\compiler\compiler.h"
+#include "../compiler/compiler.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -45,6 +45,10 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
         signed long long integer;
         unsigned long long uinteger;
     } arg;
+
+    if (!size) {
+        goto end;
+    }
 
     size--;     // reserve for '\0' terminator
     while (*format != '\0') {
@@ -86,7 +90,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 
             next:
                 ch = *format++;
-                flags.is_upper = isupper(ch);
+                flags.is_upper = isupper(ch) ? 1 : 0;
                 switch (ch) {
                 case 'u':
                     integer_wordsize = 1;

@@ -30,7 +30,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_KERNEL_ASSERT
-#   define VSF_KERNEL_ASSERT                    ASSERT
+#   define VSF_KERNEL_ASSERT                                ASSERT
 #endif
 
 
@@ -71,6 +71,9 @@
 #       define VSF_KERNEL_CFG_TIMER_MODE                    VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 #   endif
 #else
+#   ifndef VSF_KERNEL_CFG_CALLBACK_TIMER
+#       define VSF_KERNEL_CFG_CALLBACK_TIMER                DISABLED
+#   endif
 #   if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
 #       warning "VSF_KERNEL_CFG_EDA_SUPPORT_TIMER MUST be enabled to use callback_timer"
 #       undef VSF_KERNEL_CFG_EDA_SUPPORT_TIMER

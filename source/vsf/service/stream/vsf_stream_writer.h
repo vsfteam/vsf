@@ -65,7 +65,7 @@ def_class(vsf_stream_writer_t,
         implement(vsf_stream_src_t)
     ),
     private_member(
-        vsf_pbuf_t *ptCurrent;
+        vsf_pbuf_t *current_ptr;
         uint16_t    hwOffset;
         uint16_t    hwBufferSize;
     )

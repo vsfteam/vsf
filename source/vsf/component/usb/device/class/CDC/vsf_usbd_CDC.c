@@ -122,8 +122,8 @@ static vsf_err_t __vk_usbd_cdc_control_request_prepare(vk_usbd_dev_t *dev, vk_us
         return VSF_ERR_FAIL;
     }
 
-    ctrl_handler->trans.use_as__vsf_mem_t.buffer_ptr = buffer;
-    ctrl_handler->trans.use_as__vsf_mem_t.s32_size = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.buffer = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.size = size;
     return VSF_ERR_NONE;
 }
 

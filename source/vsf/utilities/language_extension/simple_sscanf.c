@@ -22,7 +22,7 @@
 
 #if VSF_USE_SIMPLE_SSCANF == ENABLED
 
-#include "..\compiler\compiler.h"
+#include "../compiler/compiler.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

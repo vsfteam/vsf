@@ -397,7 +397,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
 
         if (length->uval32 > 0) {
             if (!buffer->inst) { return VSFVM_RET_ERROR; }
-            vk_usbh_urb_set_buffer(urb, buffer->inst->buffer_ptr, length->uval32);
+            vk_usbh_urb_set_buffer(urb, buffer->inst->buffer, length->uval32);
         } else {
             vk_usbh_urb_set_buffer(urb, NULL, 0);
         }

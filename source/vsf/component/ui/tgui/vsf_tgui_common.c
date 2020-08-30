@@ -61,28 +61,28 @@ vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
 
 
 vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
-                                            vsf_tgui_region_t* ptRegion)
+                                            vsf_tgui_region_t* region_ptr)
 {
     VSF_TGUI_ASSERT(ptTile != NULL);
-    VSF_TGUI_ASSERT(ptRegion != NULL);
+    VSF_TGUI_ASSERT(region_ptr != NULL);
 
     if (ptTile->_.tCore.Attribute.bIsRootTile == 0) {      //vsf_tgui_tile_child_t
 
         const vsf_tgui_tile_child_t* ptChildTile = &ptTile->tChild;
-        ptTile = vsf_tgui_tile_get_root((const vsf_tgui_tile_t *)ptChildTile->parent_ptr, ptRegion);
+        ptTile = vsf_tgui_tile_get_root((const vsf_tgui_tile_t *)ptChildTile->parent_ptr, region_ptr);
 
 
-        ptRegion->tLocation.iX += ptChildTile->_.tLocation.iX;
-        ptRegion->tLocation.iY += ptChildTile->_.tLocation.iY;
-        ptRegion->tSize = ptChildTile->tSize;
+        region_ptr->tLocation.iX += ptChildTile->_.tLocation.iX;
+        region_ptr->tLocation.iY += ptChildTile->_.tLocation.iY;
+        region_ptr->tSize = ptChildTile->tSize;
 
         VSF_TGUI_ASSERT(ptTile != NULL);
         VSF_TGUI_ASSERT(ptTile->_.tCore.Attribute.bIsRootTile == 1);
     } else {
-        ptRegion->tLocation.iX = 0;
-        ptRegion->tLocation.iY = 0;
+        region_ptr->tLocation.iX = 0;
+        region_ptr->tLocation.iY = 0;
 
-        ptRegion->tSize = vsf_tgui_root_tile_get_size(ptTile);
+        region_ptr->tSize = vsf_tgui_root_tile_get_size(ptTile);
     }
 
     return (vsf_tgui_tile_t *)ptTile;

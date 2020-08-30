@@ -33,7 +33,7 @@
 
 #if __F1C100S__
 // disable swi in spl
-#   define VSF_ARCH_PRI_NUM                         0
+//#   define VSF_ARCH_PRI_NUM                         0
 // disable driver mmu in spl
 #   define VSF_DRIVER_MMU                           DISABLED
 #   define VSF_HAL_SPL_CFG_LZ4                      ENABLED

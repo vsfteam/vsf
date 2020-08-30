@@ -92,3 +92,5 @@ fp-info-cache
 source/example/project/mdk/lib
 source/example/template/project/iar/vsf_template_f1c100s
 source/example/template/project/iar/vsf_template_m484
+*.jlink
+*._ip

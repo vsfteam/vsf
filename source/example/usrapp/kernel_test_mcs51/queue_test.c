@@ -59,8 +59,7 @@ static void usrapp_msgq_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (VSF_ERR_NONE == vsf_eda_msg_queue_recv(&usrapp_msgq.msgq, &node, -1)) {
         process_node:
             ASSERT(node != NULL);
-            vsf_trace(VSF_TRACE_INFO, "%d: get msg from %d\r\n",
-                    vsf_systimer_tick_to_ms(vsf_timer_get_tick()), node->idx);
+            vsf_trace(VSF_TRACE_INFO, "%d: get msg from %d\r\n", vsf_systimer_get_ms(), node->idx);
             VSF_POOL_FREE(usrapp_msg_pool, &usrapp_msgq.pool, node);
             goto recv_next;
         }
@@ -96,12 +95,10 @@ static void usrapp_msgq_send_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             usrapp_msg_t *node = VSF_POOL_ALLOC(usrapp_msg_pool, &usrapp_msgq.pool);
             if (node != NULL) {
                 node->idx = idx;
-                vsf_trace(VSF_TRACE_INFO, "%d: post msg from %d\r\n",
-                        vsf_systimer_tick_to_ms(vsf_timer_get_tick()), idx);
+                vsf_trace(VSF_TRACE_INFO, "%d: post msg from %d\r\n", vsf_systimer_get_ms(), idx);
                 if (VSF_ERR_NONE != vsf_eda_msg_queue_send(&usrapp_msgq.msgq, node, 0)) {
                     VSF_POOL_FREE(usrapp_msg_pool, &usrapp_msgq.pool, node);
-                    vsf_trace(VSF_TRACE_INFO, "%d: fail to post msg from %d\r\n",
-                        vsf_systimer_tick_to_ms(vsf_timer_get_tick()), idx);
+                    vsf_trace(VSF_TRACE_INFO, "%d: fail to post msg from %d\r\n", vsf_systimer_get_ms(), idx);
                 }
             }
         }
@@ -117,7 +114,7 @@ void usrapp_msgq_test_start(void)
     int i;
     VSF_POOL_PREPARE(usrapp_msg_pool, &usrapp_msgq.pool,
         .target_ptr = NULL,
-        .ptRegion = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
+        .region_ptr = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
     );
     vsf_eda_msg_queue_init(&usrapp_msgq.msgq, 10);
 

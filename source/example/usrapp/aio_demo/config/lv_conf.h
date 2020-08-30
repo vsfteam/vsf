@@ -209,7 +209,7 @@ typedef void * lv_img_decoder_user_data_t;
 #define LV_TICK_CUSTOM     1
 #if LV_TICK_CUSTOM == 1
 #define LV_TICK_CUSTOM_INCLUDE  "vsf.h"       /*Header for the sys time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (vsf_systimer_tick_to_ms(vsf_timer_get_tick()))     /*Expression evaluating to current systime in ms*/
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (vsf_systimer_get_ms())     /*Expression evaluating to current systime in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
 typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/

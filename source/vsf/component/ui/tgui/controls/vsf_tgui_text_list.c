@@ -239,7 +239,7 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
 
 #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
 
-    if (VSF_TGUI_EVT_ON_TIME == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
+    if (VSF_TGUI_EVT_ON_TIME == ptMSG->use_as__vsf_msgt_msg_t.msg) {
 
         vk_tgui_slider_on_timer_event_handler(&(ptTextList->tSlider));
         __vk_tui_text_list_update_container_position(ptTextList);
@@ -256,7 +256,7 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
                                             ptMSG,
                                             &c_tVTextList);
 
-    if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.tMSG){
+    if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.msg){
         vsf_tgui_key_evt_t* ptEvt = (vsf_tgui_key_evt_t*)ptMSG;
 
         switch (ptEvt->hwKeyValue) {
@@ -273,7 +273,7 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
         }
     }
 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
-    else if (VSF_TGUI_EVT_GESTURE_SLIDE == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
+    else if (VSF_TGUI_EVT_GESTURE_SLIDE == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         vsf_tgui_gesture_evt_t* ptEvt = (vsf_tgui_gesture_evt_t*)ptMSG;
         if (ptEvt->tDelta.use_as__vsf_tgui_location_t.iY > 0) {
             ptTextList->iLineSelect++;
@@ -328,10 +328,10 @@ static fsm_rt_t vk_tgui_text_list_init(vsf_tgui_text_list_t* ptTextList)
                 &(ptTextList->use_as__vsf_tgui_container_t));
 
     do {
-        vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptTextList);
-        tStatus.tValues.__bContainBuiltInStructure = true;
+        vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptTextList);
+        Status.Values.__does_contain_builtin_structure = true;
 
-        vsf_tgui_control_status_set((vsf_tgui_control_t*)ptTextList, tStatus);
+        vsf_tgui_control_status_set((vsf_tgui_control_t*)ptTextList, Status);
     } while(0);
 
     return fsm_rt_cpl;

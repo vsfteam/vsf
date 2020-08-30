@@ -436,17 +436,17 @@ typedef union vsf_tgui_status_t {
         uint8_t bIsVisible                      : 1;
         uint8_t bIsActive                       : 1;
         uint8_t bIsHideContentInsideContainer   : 1;
-        uint8_t bIsControlTransparent           : 1;
+        uint8_t is_control_transparent           : 1;
         uint8_t                                 : 2;
         //! @}
 
         //! \name internal bits
         //! @{
-        uint8_t __bIsTheFirstRefreshNode        : 1;
-        uint8_t __bContainBuiltInStructure      : 1;
+        uint8_t __is_the_first_node_for_refresh        : 1;
+        uint8_t __does_contain_builtin_structure      : 1;
         uint8_t                                 : 6;
         //! @}
-    } tValues;
+    } Values;
 }vsf_tgui_status_t;
 
 declare_class(__vsf_tgui_control_core_t)
@@ -454,7 +454,7 @@ declare_class(__vsf_tgui_control_core_t)
 
 typedef struct vsf_tgui_control_subcall_t {
     vsf_param_eda_evthandler_t  *fnSub;
-    vsf_tgui_control_t          *ptControl;
+    vsf_tgui_control_t          *control_ptr;
 } vsf_tgui_control_subcall_t;
 
 typedef fsm_rt_t vsf_tgui_controal_fsm_t(vsf_tgui_control_t* node_ptr, vsf_tgui_msg_t* ptMSG);
@@ -535,7 +535,7 @@ def_class(__vsf_tgui_control_core_t,
 
     union {
         protected_member(
-            implement_ex(vsf_tgui_status_t, tStatus)
+            implement_ex(vsf_tgui_status_t, Status)
         )
         struct {
             //! \name Status bits
@@ -545,7 +545,7 @@ def_class(__vsf_tgui_control_core_t,
             uint8_t bIsVisible                      : 1;
             uint8_t                                 : 1;
             uint8_t bIsHideContentInsideContainer   : 1;
-            uint8_t bIsControlTransparent           : 1;
+            uint8_t is_control_transparent           : 1;
             uint8_t                                 : 2;
             //! @}
         };
@@ -576,10 +576,10 @@ def_class(vsf_tgui_container_t,
         struct {
             uint8_t         u5Type                          : 5;    /* vsf_tgui_container_type_t */
             uint8_t         bIsAutoSize                     : 1;
-            uint8_t         bIsForceRefreshWholeBackground  : 1;
+            uint8_t         is_forced_to_refresh_whole_background  : 1;
             uint8_t                                         : 1;
         },
-        tContainerAttribute
+        ContainerAttribute
     )
 
     protected_member(
@@ -599,7 +599,7 @@ declare_class(vsf_tgui_top_container_t)
 def_class(vsf_tgui_top_container_t,
     which(implement(vsf_tgui_container_t))
     public_member(
-        vsf_tgui_t* ptGUI;
+        vsf_tgui_t* gui_ptr;
     )
 )
 
@@ -611,8 +611,8 @@ typedef enum vsf_tgui_control_refresh_mode_t {
     VSF_TGUI_CONTROL_REFRESHED_DIRECTLY_BY_USER
 } vsf_tgui_control_refresh_mode_t;
 
-typedef fsm_rt_t vsf_tgui_method_t  (vsf_tgui_control_t* ptControl);
-typedef fsm_rt_t vsf_tgui_v_method_render_t(vsf_tgui_control_t* ptControl,
+typedef fsm_rt_t vsf_tgui_method_t  (vsf_tgui_control_t* control_ptr);
+typedef fsm_rt_t vsf_tgui_v_method_render_t(vsf_tgui_control_t* control_ptr,
                                             vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 
@@ -653,7 +653,7 @@ def_class(vsf_tgui_timer_t,
                 uint32_t bIsWorking     : 1;
                 uint32_t bIsRepeat      : 1;
                 uint32_t bEnabled       : 1;
-            }tStatus;
+            }Status;
         )
     };
 )
@@ -665,7 +665,7 @@ end_def_class(vsf_tgui_timer);
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
 extern
 void vsf_tgui_timer_init(   vsf_tgui_timer_t *ptTimer,
-                            const vsf_tgui_control_t *ptControl);
+                            const vsf_tgui_control_t *control_ptr);
 
 extern
 void vsf_tgui_timer_enable(vsf_tgui_timer_t *ptTimer);
@@ -681,19 +681,19 @@ bool vsf_tgui_timer_is_working(vsf_tgui_timer_t *ptTimer);
  *----------------------------------------------------------------------------*/
 extern 
 vsf_tgui_location_t *vsf_tgui_control_get_location(
-                                    const vsf_tgui_control_t* ptControl);
+                                    const vsf_tgui_control_t* control_ptr);
 
 extern 
 vsf_tgui_size_t *vsf_tgui_control_get_size(
-                                    const vsf_tgui_control_t* ptControl);
+                                    const vsf_tgui_control_t* control_ptr);
 
 extern
-bool vsf_tgui_control_is_in_range(  const vsf_tgui_region_t *ptRegion,
+bool vsf_tgui_control_is_in_range(  const vsf_tgui_region_t *region_ptr,
                                     const vsf_tgui_location_t *ptLocation);
 
 /*! \brief get the absolute location information base on the location information
  *!        of or derived from target control.
- *! \param ptControl    the Target Control Address
+ *! \param control_ptr    the Target Control Address
  *! \param ptLocation   the Location buffer which has already stored the location
  *!                     information of or derived from the target control
  *! \return the location buffer address passed with ptLocation
@@ -702,23 +702,23 @@ bool vsf_tgui_control_is_in_range(  const vsf_tgui_region_t *ptRegion,
  */
 extern
 vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location(
-                                                const vsf_tgui_control_t *ptControl,
+                                                const vsf_tgui_control_t *control_ptr,
                                                 vsf_tgui_location_t *ptLocation);
 
 extern
 vsf_tgui_region_t * vsf_tgui_get_absolute_control_region(
-                                                const vsf_tgui_control_t* ptControl,
+                                                const vsf_tgui_control_t* control_ptr,
                                                 vsf_tgui_region_t* ptRegionBuffer);
 
 extern
 vsf_tgui_location_t * vsf_tgui_control_get_absolute_location(
-                                            const vsf_tgui_control_t* ptControl,
+                                            const vsf_tgui_control_t* control_ptr,
                                             vsf_tgui_location_t* ptOffset);
 
 extern
 vsf_tgui_region_t* vsf_tgui_control_get_absolute_region(
-                                                const vsf_tgui_control_t *ptControl,
-                                                vsf_tgui_region_t *ptRegion);
+                                                const vsf_tgui_control_t *control_ptr,
+                                                vsf_tgui_region_t *region_ptr);
 
 extern
 vsf_tgui_region_t *vsf_tgui_control_generate_dirty_region_from_parent_dirty_region(
@@ -730,22 +730,22 @@ vsf_tgui_region_t *vsf_tgui_control_generate_dirty_region_from_parent_dirty_regi
 
 
 /*! \brief get the visible region (with absolute location)
- *! \param ptControl    the target control
- *! \param ptRegion     the region buffer
+ *! \param control_ptr    the target control
+ *! \param region_ptr     the region buffer
  *! \retval true        visible
  *! \retval false       invisible
  */
 extern
-bool vsf_tgui_control_get_visible_region(   const vsf_tgui_control_t* ptControl,
+bool vsf_tgui_control_get_visible_region(   const vsf_tgui_control_t* control_ptr,
                                             vsf_tgui_region_t* ptRegionBuffer);
 
 extern
 vsf_tgui_region_t * vsf_tgui_control_get_relative_region(
-                                        const vsf_tgui_control_t* ptControl,
+                                        const vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t *ptAbsoluteRegion);
 
 extern
-bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* ptControl,
+bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* control_ptr,
                                 const vsf_tgui_location_t *ptLocation);
 
 
@@ -753,34 +753,34 @@ bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* ptControl,
  *  Status and Attributes                                                     *
  *----------------------------------------------------------------------------*/
 
-/*! \brief update bIsControlTransparent bit in control status
- *! \parame ptControl target control address
- *! \retval true the original value of bIsControlTransparent is changed
+/*! \brief update is_control_transparent bit in control status
+ *! \parame control_ptr target control address
+ *! \retval true the original value of is_control_transparent is changed
  *! \retval false the set value is the same as the original value, no change is
  *!               made.
  */
 extern
-bool vsf_tgui_control_set_is_transparent_bit(   vsf_tgui_control_t* ptControl,
-                                                bool bIsControlTransparent);
+bool vsf_tgui_control_set_is_transparent_bit(   vsf_tgui_control_t* control_ptr,
+                                                bool is_control_transparent);
 
 extern
-vsf_tgui_status_t vsf_tgui_control_status_get(const vsf_tgui_control_t* ptControl);
+vsf_tgui_status_t vsf_tgui_control_status_get(const vsf_tgui_control_t* control_ptr);
 
 
 extern
-void vsf_tgui_control_status_set(   vsf_tgui_control_t* ptControl,
-                                    vsf_tgui_status_t tStatus);
+void vsf_tgui_control_status_set(   vsf_tgui_control_t* control_ptr,
+                                    vsf_tgui_status_t Status);
 
 extern
-bool vsf_tgui_control_is_container(const vsf_tgui_control_t* ptControl);
+bool vsf_tgui_control_is_container(const vsf_tgui_control_t* control_ptr);
 
 extern
 __vsf_tgui_control_core_t* vsf_tgui_control_get_core(
-                                        const vsf_tgui_control_t* ptControl);
+                                        const vsf_tgui_control_t* control_ptr);
 
 extern
 vsf_tgui_control_t* vsf_tgui_control_get_parent(
-                                        const vsf_tgui_control_t* ptControl);
+                                        const vsf_tgui_control_t* control_ptr);
 
 extern
 uint_fast8_t vk_tgui_container_visible_item_get(
@@ -795,26 +795,26 @@ const vsf_tgui_control_t* __vk_tgui_control_get_next_visible_one_within_containe
                                             const vsf_tgui_control_t* item_ptr);
 
 extern const vsf_tgui_top_container_t* vk_tgui_control_get_top(
-                                        const vsf_tgui_control_t* ptControl);
+                                        const vsf_tgui_control_t* control_ptr);
 
 #if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
 extern
-bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *ptControl,
-                                const vsf_tgui_region_t *ptRegion);
+bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *control_ptr,
+                                const vsf_tgui_region_t *region_ptr);
 #endif
 
 extern
-bool vsf_tgui_control_send_message( const vsf_tgui_control_t* ptControl, 
-                                    vsf_tgui_evt_t tEvent);
+bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr, 
+                                    vsf_tgui_evt_t event);
 
 extern
-bool vsf_tgui_control_update(const vsf_tgui_control_t* ptControl);
+bool vsf_tgui_control_update(const vsf_tgui_control_t* control_ptr);
 
 extern
-bool vsf_tgui_control_update_tree(const vsf_tgui_control_t* ptControl);
+bool vsf_tgui_control_update_tree(const vsf_tgui_control_t* control_ptr);
 
 extern
-bool vsf_tgui_control_set_active(const vsf_tgui_control_t* ptControl);
+bool vsf_tgui_control_set_active(const vsf_tgui_control_t* control_ptr);
 
 extern
 fsm_rt_t vsf_tgui_control_msg_handler(  vsf_tgui_control_t* node_ptr,
@@ -825,22 +825,22 @@ fsm_rt_t vsf_tgui_container_msg_handler(vsf_tgui_container_t* node_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 
 extern
-fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* ptControl,
+fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG,
                                         const i_tgui_control_methods_t* ptMethods);
 
 extern
-fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* ptControl,
-                                                    const vsf_tgui_evt_t* ptEvent);
+fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_ptr,
+                                                    const vsf_tgui_evt_t* event_ptr);
 
 extern
-fsm_rt_t vk_tgui_control_init(vsf_tgui_control_t* ptControl);
+fsm_rt_t vk_tgui_control_init(vsf_tgui_control_t* control_ptr);
 
 extern
 fsm_rt_t vk_tgui_container_init(vsf_tgui_container_t *container_ptr);
 
 extern
-fsm_rt_t vk_tgui_control_update(vsf_tgui_control_t* ptControl);
+fsm_rt_t vk_tgui_control_update(vsf_tgui_control_t* control_ptr);
 
 extern
 fsm_rt_t vk_tgui_container_update(vsf_tgui_container_t* container_ptr);

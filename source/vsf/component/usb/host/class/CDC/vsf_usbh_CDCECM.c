@@ -170,7 +170,7 @@ static void __vk_usbh_ecm_recv(vk_usbh_ecm_t *ecm, vk_usbh_ecm_icb_t *icb)
             vsf_mem_t mem;
             void *netbuf = vk_netdrv_read_buf(&ecm->netdrv, icb->netbuf, &mem);
             VSF_USB_ASSERT(netbuf == NULL);
-            vk_usbh_urb_set_buffer(&icb->urb, mem.buffer_ptr, mem.s32_size);
+            vk_usbh_urb_set_buffer(&icb->urb, mem.buffer, mem.size);
 #endif
             if (VSF_ERR_NONE != vk_usbh_cdc_submit_urb(&ecm->use_as__vk_usbh_cdc_t, &icb->urb)) {
                 vk_netdrv_on_inputted(&ecm->netdrv, icb->netbuf, 0);
@@ -217,12 +217,12 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
     if ((netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL) {
         uint_fast16_t pos = 0;
         do {
-            VSF_USB_ASSERT((mem.s32_size + pos) <= sizeof(ocb->buffer));
-            memcpy(&ocb->buffer[pos], mem.buffer_ptr, mem.s32_size);
-            pos += mem.s32_size;
+            VSF_USB_ASSERT((mem.size + pos) <= sizeof(ocb->buffer));
+            memcpy(&ocb->buffer[pos], mem.buffer, mem.size);
+            pos += mem.size;
         } while ((netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem)) != NULL);
-        mem.buffer_ptr = ocb->buffer;
-        mem.s32_size = pos;
+        mem.buffer = ocb->buffer;
+        mem.size = pos;
     }
 #else
     if (vk_netdrv_read_buf(netdrv, netbuf, &mem) != NULL) {
@@ -232,9 +232,9 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
 
 #if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
     vsf_trace(VSF_TRACE_DEBUG, "ecm_output :" VSF_TRACE_CFG_LINEEND);
-    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer_ptr, mem.s32_size, VSF_TRACE_DF_DEFAULT);
+    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, mem.size, VSF_TRACE_DF_DEFAULT);
 #endif
-    vk_usbh_urb_set_buffer(&ocb->urb, mem.buffer_ptr, mem.s32_size);
+    vk_usbh_urb_set_buffer(&ocb->urb, mem.buffer, mem.size);
     err = vk_usbh_cdc_submit_urb(&ecm->use_as__vk_usbh_cdc_t, &ocb->urb);
     if (err != VSF_ERR_NONE) {
         ocb->netbuf = NULL;
@@ -328,7 +328,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                 if (!vk_netdrv_read_buf(netdrv, icb->netbuf, &mem)) {
 #   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
                     vsf_trace(VSF_TRACE_DEBUG, "ecm_input :" VSF_TRACE_CFG_LINEEND);
-                    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer_ptr, size, VSF_TRACE_DF_DEFAULT);
+                    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, size, VSF_TRACE_DF_DEFAULT);
 #   endif
                 }
 #endif

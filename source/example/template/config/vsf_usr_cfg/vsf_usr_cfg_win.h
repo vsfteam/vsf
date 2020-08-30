@@ -24,6 +24,14 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
+// enable the 3 configurations below to use simple implementation for x86
+//  simple implementation will not use ThreadSuspend and ThreadResume and has better CPU usage
+//  **** but preempt is not supported ****
+//  priority configurations below will depend on these, so but it at top
+//#define VSF_ARCH_PRI_NUM                                1
+//#define VSF_ARCH_SWI_NUM                                0
+//#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
+
 //#define __WIN7__
 
 // Application configure
@@ -40,6 +48,8 @@
 #define APP_CFG_USE_AUDIO_DEMO                          ENABLED
 #define APP_CFG_USE_TGUI_DEMO                           ENABLED
 #define APP_CFG_USE_SDL2_DEMO                           ENABLED
+#define APP_CFG_USE_KERNEL_TEST                         ENABLED
+#define APP_CFG_USE_JSON_DEMO                           ENABLED
 
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
 #define APP_CFG_USE_CPP_DEMO                            ENABLED
@@ -54,8 +64,8 @@
 #define APP_CFG_USE_NNOM_DEMO                           ENABLED
 #define APP_CFG_USE_LVGL_DEMO                           ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
-#   define APP_LVGL_DEMO_CFG_FREETYPE				    ENABLED
-#   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES		    4
+#   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES         4
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    256
 #   define APP_LVGL_DEMO_CFG_VER_RES                    256
@@ -83,8 +93,16 @@
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_1
 #if APP_CFG_USE_AWTK_DEMO == ENABLED || APP_CFG_USE_LVGL_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED || APP_CFG_USE_TGUI_DEMO == ENABLED
-#   define VSF_USBH_CFG_EDA_PRIORITY                    vsf_prio_1
-#   define APP_CFG_USBH_HW_PRIO                         vsf_arch_prio_1
+#   if VSF_ARCH_SWI_NUM == 0
+#       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_0
+#   else
+#       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_1
+#   endif
+#   if VSF_ARCH_PRI_NUM == 1
+#       define APP_CFG_USBH_HW_PRIO                     vsf_arch_prio_0
+#   else
+#       define APP_CFG_USBH_HW_PRIO                     vsf_arch_prio_1
+#   endif
 #endif
 
 #define VSF_USE_INPUT                                   ENABLED
@@ -143,11 +161,12 @@
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 
-// TODO: include for clang only
-#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
-#pragma clang diagnostic ignored "-Wmicrosoft-include"
-#pragma clang diagnostic ignored "-Winconsistent-dllimport"
-#pragma clang diagnostic ignored "-Wimplicit-function-declaration"
+#if __IS_COMPILER_LLVM__
+#   pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#   pragma clang diagnostic ignored "-Wmicrosoft-include"
+#   pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#   pragma clang diagnostic ignored "-Wimplicit-function-declaration"
+#endif
 
 #ifdef __CPU_X64__
 #   error x64 is currently not supported
@@ -165,8 +184,16 @@
 #       define VSF_USBIP_SERVER_CFG_DEBUG               ENABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC       DISABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG_URB           ENABLED
-#   define VSF_USBD_CFG_EDA_PRIORITY                    vsf_prio_1
-#   define VSF_USBD_CFG_HW_PRIORITY                     vsf_arch_prio_1
+#   if VSF_ARCH_SWI_NUM == 0
+#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
+#   else
+#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_1
+#   endif
+#   if VSF_ARCH_PRI_NUM == 1
+#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
+#   else
+#       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_1
+#   endif
 #   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 
 #define VSF_USBH_CFG_ENABLE_ROOT_HUB                    DISABLED
@@ -227,6 +254,10 @@
 #   define APP_CFG_XBOOT_RES_DIR                        "./winfs_root/ui/"
 #endif
 
+#if APP_CFG_USE_JSON_DEMO == ENABLED
+#   define VSF_USE_JSON                                 ENABLED
+#endif
+
 #if APP_CFG_USE_VSFIP_DEMO == ENABLED || APP_CFG_USE_LWIP_DEMO == ENABLED
 #   define VSF_USE_NETDRV_WPCAP                         ENABLED
 #       define VSF_NETDRV_WPCAP_CFG_HW_PRIORITY         vsf_arch_prio_0
@@ -237,7 +268,11 @@
 #define VSF_USE_DISP_SDL2                               ENABLED
 #   define VSF_DISP_SDL2_CFG_INCLUDE                    "lib\SDL2\include\SDL.h"
 #   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
-#   define VSF_DISP_SDL2_CFG_HW_PRIORITY                vsf_arch_prio_1
+#   if VSF_ARCH_PRI_NUM == 1
+#       define VSF_DISP_SDL2_CFG_HW_PRIORITY            vsf_arch_prio_0
+#   else
+#       define VSF_DISP_SDL2_CFG_HW_PRIORITY            vsf_arch_prio_1
+#   endif
 #   define APP_DISP_SDL2_HEIGHT                         768
 #   define APP_DISP_SDL2_WIDTH                          1024
 #   define APP_DISP_SDL2_TITLE                          "vsf_screen"
@@ -254,11 +289,11 @@
 #define VSF_LINUX_CFG_STACKSIZE                         (60 * 1024)
 #ifdef __WIN7__
 // console for win7 does not support color by default
-#	define VSF_TRACE_CFG_COLOR_EN                       DISABLED
+#   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
 #   define VSH_HAS_COLOR                                0
 #   define VSF_WINUSB_CFG_WIN7                          ENABLED
 #else
-#	define VSF_TRACE_CFG_COLOR_EN                       ENABLED
+#    define VSF_TRACE_CFG_COLOR_EN                      ENABLED
 #endif
 #define VSH_ECHO                                        1
 

@@ -131,7 +131,7 @@
 
 #define __tgui_msg_handler(__MSG, __FUNC, ...)                                  \
             {                                                                   \
-                .tMSG = (__MSG),                                                \
+                .msg = (__MSG),                                                \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
                 .u10EvtMask = ((uint16_t)-1, ##__VA_ARGS__),                    \
@@ -142,7 +142,7 @@
 
 #define __tgui_msg_mux(__MSG, __FUNC, ...)                                      \
             {                                                                   \
-                .tMSG = (__MSG),                                                \
+                .msg = (__MSG),                                                \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
                 .u10EvtMask = (0, ##__VA_ARGS__),                               \
@@ -490,7 +490,7 @@ typedef struct vsf_tgui_msg_t {
 
 typedef struct vsf_tgui_refresh_evt_t {
     implement(vsf_tgui_msg_t)
-    vsf_tgui_region_t *ptRegion;
+    vsf_tgui_region_t *region_ptr;
 } vsf_tgui_refresh_evt_t;
 
 typedef struct vsf_tgui_pointer_evt_t {
@@ -513,9 +513,9 @@ typedef struct vsf_tgui_key_evt_t {
 
 typedef union vsf_tgui_evt_t {
     implement(vsf_tgui_msg_t)
-    vsf_tgui_refresh_evt_t  tRefreshEvt;
+    vsf_tgui_refresh_evt_t  RefreshEvt;
     vsf_tgui_key_evt_t      tKeyEvt;
-    vsf_tgui_pointer_evt_t  tPointerEvt;
+    vsf_tgui_pointer_evt_t  PointerEvt;
     vsf_tgui_gesture_evt_t  tGestureEvt;
 }  vsf_tgui_evt_t;
 
@@ -524,7 +524,7 @@ typedef union vsf_tgui_evt_t {
 
 extern
 vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
-                                            vsf_tgui_region_t* ptRegion);
+                                            vsf_tgui_region_t* region_ptr);
 
 extern
 vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile);

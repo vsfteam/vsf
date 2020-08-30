@@ -50,31 +50,31 @@ def_vsf_rng_buf(__vsf_tgui_evt_queue_t, vsf_tgui_evt_t)
 declare_structure(__vk_tgui_focus_t)
 
 def_structure(__vk_tgui_focus_t)
-    const vsf_tgui_control_t* ptCurrent;
-    const vsf_tgui_control_t* ptPrevious;
+    const vsf_tgui_control_t* current_ptr;
+    const vsf_tgui_control_t* previous_ptr;
 end_def_structure(__vk_tgui_focus_t)
 
 declare_vsf_pt(__vsf_tgui_evt_shooter_t)
 
 def_vsf_pt(__vsf_tgui_evt_shooter_t,
     def_params(
-        __vsf_tgui_evt_queue_t* ptQueue;
-        vsf_msgt_t* ptMSGTree;
-        const vsf_tgui_top_container_t * ptRootNode;
+        __vsf_tgui_evt_queue_t* queue_ptr;
+        vsf_msgt_t* msg_tree_ptr;
+        const vsf_tgui_top_container_t * root_node_ptr;
         const vsf_msgt_node_t*          node_ptr;
-        vsf_tgui_evt_t                  tEvent;
-        const vsf_tgui_region_t*        ptRegion;
-        vsf_tgui_region_t               tTempRegion;
+        vsf_tgui_evt_t                  event;
+        const vsf_tgui_region_t*        region_ptr;
+        vsf_tgui_region_t               temp_region;
 
-        __vk_tgui_focus_t tActivated;
+        __vk_tgui_focus_t Activated;
 
 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
-        __vk_tgui_focus_t tPointerAbove;
+        __vk_tgui_focus_t pointer_above;
 #endif
 
         struct {
             //uint8_t bIsActivatedControlChanged  : 1;
-            uint8_t bIsQueueDrain               : 1;
+            uint8_t is_queue_drain               : 1;
         } Attribute;
         
     ))
@@ -86,20 +86,20 @@ declare_class(vsf_tgui_t)
 def_class(vsf_tgui_t,
     private_member(
         implement(vsf_msgt_t)
-        implement_ex(__vsf_tgui_evt_shooter_t, tConsumer)
-        __vsf_tgui_evt_queue_t tMSGQueue;
+        implement_ex(__vsf_tgui_evt_shooter_t, consumer)
+        __vsf_tgui_evt_queue_t msg_queue;
     )
 )
 end_def_class(vsf_tgui_t)
 
 typedef struct vsf_tgui_cfg_t {
-    vsf_mem_t tEVTQueue;
+    vsf_mem_t evt_queue;
 
 #if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
-    vsf_mem_t tBFSQueue;
+    vsf_mem_t bfs_queue;
 #endif
 
-    const vsf_tgui_top_container_t* ptRootNode;
+    const vsf_tgui_top_container_t* root_node_ptr;
     vsf_prio_t                      priority;
 
 
@@ -110,48 +110,48 @@ typedef struct vsf_tgui_cfg_t {
 
 
 extern 
-vsf_err_t vk_tgui_init(vsf_tgui_t* ptGUI, const vsf_tgui_cfg_t *cfg_ptr);
+vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t *cfg_ptr);
 
 extern 
-vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* ptGUI, 
-                                    vsf_tgui_top_container_t *ptRootNode);
+vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* gui_ptr, 
+                                    vsf_tgui_top_container_t *root_node_ptr);
 
 extern 
-bool vk_tgui_send_message(vsf_tgui_t *ptGUI, vsf_tgui_evt_t tEvent);
+bool vk_tgui_send_message(vsf_tgui_t *gui_ptr, vsf_tgui_evt_t event);
 
 extern 
-bool vk_tgui_update(vsf_tgui_t *ptGUI, 
+bool vk_tgui_update(vsf_tgui_t *gui_ptr, 
                     const vsf_tgui_control_t *target_ptr);
 
 extern
-bool vk_tgui_update_tree(vsf_tgui_t* ptGUI,
+bool vk_tgui_update_tree(vsf_tgui_t* gui_ptr,
                         const vsf_tgui_control_t* target_ptr);
 
 extern
-bool vk_tgui_send_timer_event(  vsf_tgui_t* ptGUI,
+bool vk_tgui_send_timer_event(  vsf_tgui_t* gui_ptr,
                                 const vsf_tgui_control_t* target_ptr);
 
 extern
-const vsf_tgui_control_t *vsf_tgui_actived_control_get(vsf_tgui_t *ptGUI);
+const vsf_tgui_control_t *vsf_tgui_actived_control_get(vsf_tgui_t *gui_ptr);
 
 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
 extern
-const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *ptGUI);
+const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *gui_ptr);
 #endif
 
 #if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
 extern
-bool vk_tgui_refresh(vsf_tgui_t *ptGUI);
+bool vk_tgui_refresh(vsf_tgui_t *gui_ptr);
 
 extern 
-bool vk_tgui_refresh_ex(   vsf_tgui_t *ptGUI, 
+bool vk_tgui_refresh_ex(   vsf_tgui_t *gui_ptr, 
                             const vsf_tgui_control_t *target_ptr, 
-                            const vsf_tgui_region_t *ptRegion);
+                            const vsf_tgui_region_t *region_ptr);
 
 
 
 /*! \brief begin a refresh loop
- *! \param ptGUI the tgui object address
+ *! \param gui_ptr the tgui object address
  *! \param ptPlannedRefreshRegion the planned refresh region
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
@@ -162,19 +162,19 @@ bool vk_tgui_refresh_ex(   vsf_tgui_t *ptGUI,
  */
 extern
 vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(
-                            vsf_tgui_t* ptGUI,
+                            vsf_tgui_t* gui_ptr,
                             const vsf_tgui_region_t* ptPlannedRefreshRegion);
 
 /*! \brief end of a refresh loop
- *! \param ptGUI the tgui object address
+ *! \param gui_ptr the tgui object address
  *! \retval true   we have to repeat the loop
  *! \retval false  the entire refresh loop ends
  */
 extern
-bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI);
+bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr);
 
 extern
-void vsf_tgui_low_level_refresh_ready(vsf_tgui_t *ptGUI);
+void vsf_tgui_low_level_refresh_ready(vsf_tgui_t *gui_ptr);
 
 
 /*============================ INCLUDES ======================================*/

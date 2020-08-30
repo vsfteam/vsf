@@ -119,7 +119,7 @@ typedef struct vsf_spi_t vsf_spi_t;
 
 typedef void vsf_spi_evt_handler_t(   void *target_ptr, 
                                         vsf_spi_t *,
-                                        spi_status_t tStatus);
+                                        spi_status_t Status);
 
 typedef struct vsf_spi_evt_t vsf_spi_evt_t;
 struct vsf_spi_evt_t
@@ -209,7 +209,7 @@ def_interface(i_spi_t)
 
     //! event
     struct {
-        void (*Register)(vsf_spi_evt_type_t tType, vsf_spi_evt_t tEvent);
+        void (*Register)(vsf_spi_evt_type_t tType, vsf_spi_evt_t event);
         spi_evt_status_t (*Enable)(spi_evt_status_t tEventMask);
         spi_evt_status_t (*Disable)(spi_evt_status_t tEventMask);
         void (*Resume)(spi_evt_status_t tEventStatus);

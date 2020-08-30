@@ -40,12 +40,12 @@ end_def_structure(vsf_tgui_v_control_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* ptControl);
+extern fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr);
 
-extern fsm_rt_t vsf_tgui_control_v_rendering(vsf_tgui_control_t* ptControl,
+extern fsm_rt_t vsf_tgui_control_v_rendering(vsf_tgui_control_t* control_ptr,
     vsf_tgui_region_t* ptDirtyRegion);
 
-extern fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* ptControl);
+extern fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* control_ptr);
 
 #endif
 

@@ -80,7 +80,7 @@ def_class(vsf_stream_fifo_t,
                 vsf_stream_dat_rdy_evt_t    tDataReadyEventHandling;
                 vsf_stream_dat_drn_evt_t    tDataDrainEventHandling;
 
-                vsf_stream_status_t tStatus;
+                vsf_stream_status_t Status;
 
         #if !defined(VSF_PBUF_QUEUE_CFG_ATOM_ACCESS)
                 code_region_t *pregion;     /*!< protection region defined by user */

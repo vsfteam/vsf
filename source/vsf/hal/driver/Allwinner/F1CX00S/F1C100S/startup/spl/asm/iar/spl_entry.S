@@ -51,7 +51,7 @@ _entry
     mrs     r0, cpsr
     bic     r0, r0, #0x1f
     orr     r0, r0, #0xd3
-    msr     cpsr, r0
+    msr     cpsr_cxsf, r0
 
     bl      spl_c_entry
     bx      lr

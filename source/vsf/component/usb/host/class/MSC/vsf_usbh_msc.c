@@ -162,7 +162,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
             if (is_stream) {
                 VSF_USB_ASSERT(is_rw);
             } else {
-                msc->total_size = ((vsf_mem_t *)mem_stream)->s32_size;
+                msc->total_size = ((vsf_mem_t *)mem_stream)->size;
             }
             msc->remain_size = msc->total_size;
             msc->buffer.cbw.dCBWDataTransferLength = cpu_to_le32(msc->total_size);
@@ -193,9 +193,9 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                     // TODO: add stream support
                     VSF_USB_ASSERT(false);
                 } else {
-                    if (((vsf_mem_t *)mem_stream)->s32_size > 0) {
+                    if (((vsf_mem_t *)mem_stream)->size > 0) {
                         vk_usbh_urb_t * urb = (msc->buffer.cbw.bmCBWFlags & 0x80) ? &msc->urb_in : &msc->urb_out;
-                        vk_usbh_urb_set_buffer(urb, ((vsf_mem_t *)mem_stream)->buffer_ptr, ((vsf_mem_t *)mem_stream)->s32_size);
+                        vk_usbh_urb_set_buffer(urb, ((vsf_mem_t *)mem_stream)->buffer, ((vsf_mem_t *)mem_stream)->size);
                         vk_usbh_submit_urb(msc->usbh, urb);
                     } else {
                         goto reply_stage;

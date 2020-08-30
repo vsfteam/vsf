@@ -805,6 +805,24 @@
     <Filter Include="vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw">
       <UniqueIdentifier>{baf49705-00bb-4b6d-9396-5e8a88d7bb7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\kernel_test">
+      <UniqueIdentifier>{bfa4cb88-b228-454f-830f-b0b0067cfd75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\common">
+      <UniqueIdentifier>{d93b2cbd-728b-4317-ba00-c91bab0333bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\arch\common\arch_without_thread_suspend">
+      <UniqueIdentifier>{a186ed79-3ca5-4649-9ab6-81835e45b9a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\json_demo">
+      <UniqueIdentifier>{c321c7a0-8ad0-4b30-8961-111c11376b59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\json">
+      <UniqueIdentifier>{7b0f1556-80e8-4e18-8669-a817438a73b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\debugger\segger_rtt">
+      <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -1514,12 +1532,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger_cfg.h">
       <Filter>vsf\component\debugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.h">
-      <Filter>vsf\component\debugger\nulink</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_Config.h">
-      <Filter>vsf\component\debugger\nulink</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.h">
       <Filter>vsf\component\debugger\nulink</Filter>
@@ -2380,6 +2392,21 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.h">
       <Filter>vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.h">
+      <Filter>vsf\hal\arch\common\arch_without_thread_suspend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\service\json\vsf_json.h">
+      <Filter>vsf\service\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\segger_rtt\segger_rtt_stream.h">
+      <Filter>vsf\component\debugger\segger_rtt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\vsf_utilities.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\vsf_utilities_cfg.h">
+      <Filter>vsf\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c">
@@ -2963,9 +2990,6 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\awtk_demo\awtk_assets.c">
       <Filter>usrapp\demo\awtk_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.c">
-      <Filter>vsf\component\debugger\nulink</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.c">
       <Filter>vsf\component\debugger\nulink</Filter>
@@ -3645,6 +3669,21 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.c">
       <Filter>vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\demo\kernel_test\sem_test.c">
+      <Filter>usrapp\demo\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic_simple.c">
+      <Filter>vsf\hal\arch\x86\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\json_demo\json_demo.c">
+      <Filter>usrapp\demo\json_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\service\json\vsf_json.c">
+      <Filter>vsf\service\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\debugger\segger_rtt\segger_rtt_stream.c">
+      <Filter>vsf\component\debugger\segger_rtt</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\awtk\awtk_vsf.lib">
@@ -3654,6 +3693,9 @@
   <ItemGroup>
     <None Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\string">
       <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </None>
+    <None Include="..\..\..\..\vsf\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
+      <Filter>vsf\hal\arch\common\arch_without_thread_suspend</Filter>
     </None>
   </ItemGroup>
 </Project>

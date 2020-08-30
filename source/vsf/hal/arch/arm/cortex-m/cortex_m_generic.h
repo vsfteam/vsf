@@ -32,8 +32,12 @@ extern "C" {
 #endif
 /*============================ MACROS ========================================*/
 
-#define __LITTLE_ENDIAN                 1
-#define __BYTE_ORDER                    __LITTLE_ENDIAN
+#ifndef __LITTLE_ENDIAN
+#   define __LITTLE_ENDIAN                 1
+#endif
+#ifndef __BYTE_ORDER
+#   define __BYTE_ORDER                    __LITTLE_ENDIAN
+#endif
 
 #if __ARM_ARCH == 6 || __TARGET_ARCH_6_M == 1 || __TARGET_ARCH_6S_M == 1
 #   ifndef VSF_ARCH_PRI_NUM

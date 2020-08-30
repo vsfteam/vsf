@@ -65,8 +65,8 @@ static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *
     cmd_code = (scsi_cmd_code_t)(cbd[0] & 0x1F);
     is_read = cmd_code == SCSI_CMDCODE_READ;
     if ((cmd_code != SCSI_CMDCODE_READ) && (cmd_code != SCSI_CMDCODE_WRITE)) {
-        mem->s32_size = sizeof(virtual_scsi->reply);
-        mem->buffer_ptr = virtual_scsi->reply;
+        mem->size = sizeof(virtual_scsi->reply);
+        mem->buffer = virtual_scsi->reply;
         return true;
     } else if (virtual_scsi->virtual_scsi_drv->buffer != NULL) {
         uint64_t addr;
@@ -183,8 +183,8 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
     vk_virtual_scsi_t *pthis = (vk_virtual_scsi_t *)&vsf_this;
     vk_virtual_scsi_param_t *param = pthis->param;
 
-    uint8_t *reply = vsf_local.mem.buffer_ptr;
-    int_fast32_t reply_len = vsf_local.mem.s32_size;
+    uint8_t *reply = vsf_local.mem.buffer;
+    int_fast32_t reply_len = vsf_local.mem.size;
 
     switch (evt) {
     case VSF_EVT_INIT: {
@@ -347,11 +347,13 @@ exit_invalid_field_in_cmd:
     pthis->asc = SCSI_ASC_INVALID_FIELD_IN_COMMAND;
     vsf_eda_return(VSF_ERR_FAIL);
     return;
+/*
 exit_not_ready:
     pthis->sense_key = SCSI_SENSEKEY_NOT_READY;
     pthis->asc = SCSI_ASC_NONE;
     vsf_eda_return(VSF_ERR_FAIL);
     return;
+*/
     vsf_peda_end();
 }
 

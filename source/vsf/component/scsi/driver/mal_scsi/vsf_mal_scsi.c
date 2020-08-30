@@ -98,7 +98,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_read, vk_virtual_scsi_read)
 #endif
             vk_mal_read(mal_scsi->mal,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
-                ((vsf_mem_t *)vsf_local.mem_stream)->buffer_ptr);
+                ((vsf_mem_t *)vsf_local.mem_stream)->buffer);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         }
 #endif
@@ -127,7 +127,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_write, vk_virtual_scsi_write)
 #endif
             vk_mal_write(mal_scsi->mal,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
-                ((vsf_mem_t *)vsf_local.mem_stream)->buffer_ptr);
+                ((vsf_mem_t *)vsf_local.mem_stream)->buffer);
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
         }
 #endif

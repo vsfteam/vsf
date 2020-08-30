@@ -32,7 +32,7 @@ declare_class(vsf_tgui_t)
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-static bool __vk_tgui_list_invoke_event(vsf_tgui_list_t* ptList, vsf_evt_t tMSG);
+static bool __vk_tgui_list_invoke_event(vsf_tgui_list_t* ptList, vsf_evt_t msg);
 
 /*============================ LOCAL VARIABLES ===============================*/
 static const i_tgui_control_methods_t c_tVList = {
@@ -63,7 +63,7 @@ static const i_tgui_control_methods_t c_tVList = {
 
 static int_fast16_t __vk_tgui_calculate_offset_for_make_target_control_visible(
                         vsf_tgui_list_t* ptList,
-                        const vsf_tgui_control_t *ptControl,
+                        const vsf_tgui_control_t *control_ptr,
                         int_fast16_t iPosition,
                         bool bIsVertical)
 {
@@ -78,9 +78,9 @@ static int_fast16_t __vk_tgui_calculate_offset_for_make_target_control_visible(
         iListLength -= ptInnerContainer->tConatinerPadding.chTop + ptInnerContainer->tConatinerPadding.chBottom;
     #endif
 
-        iControlLength = vsf_tgui_control_get_core(ptControl)->tRegion.tSize.iHeight;
+        iControlLength = vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iHeight;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
-        iControlLength += vsf_tgui_control_get_core(ptControl)->tMargin.chBottom;
+        iControlLength += vsf_tgui_control_get_core(control_ptr)->tMargin.chBottom;
     #endif
     } else {
         iListPosition = -ptInnerContainer->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iX;
@@ -89,10 +89,10 @@ static int_fast16_t __vk_tgui_calculate_offset_for_make_target_control_visible(
         iListLength -= ptInnerContainer->tConatinerPadding.chLeft + ptInnerContainer->tConatinerPadding.chRight;
     #endif
 
-        iControlLength = vsf_tgui_control_get_core(ptControl)->tRegion.tSize.iWidth;
+        iControlLength = vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iWidth;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
 
-        iControlLength += vsf_tgui_control_get_core(ptControl)->tMargin.chRight;
+        iControlLength += vsf_tgui_control_get_core(control_ptr)->tMargin.chRight;
     #endif
     }
 
@@ -114,20 +114,20 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
                                                             uint_fast8_t chIndex)
 {
     vsf_tgui_container_t *ptInnerContainer = ptList->ptList;
-    const vsf_tgui_control_t *ptControl =
+    const vsf_tgui_control_t *control_ptr =
         (const vsf_tgui_control_t*)ptInnerContainer->use_as__vsf_msgt_container_t.node_ptr;
     int16_t nXOffset = 0;
     int16_t nYOffset = 0;
 
-    switch (ptInnerContainer->tContainerAttribute.u5Type) {
+    switch (ptInnerContainer->ContainerAttribute.u5Type) {
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
             nYOffset = ptInnerContainer->tConatinerPadding.chTop;
         #endif
             while (chIndex--) {
-                ptControl = __vk_tgui_control_get_next_visible_one_within_container(ptControl);
+                control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
             }
-            nYOffset += vsf_tgui_control_get_core(ptControl)->tRegion.tLocation.iY;
+            nYOffset += vsf_tgui_control_get_core(control_ptr)->tRegion.tLocation.iY;
 
             switch (ptList->tMode.u2WorkMode) {
                 case VSF_TGUI_LIST_MODE_FREE_MOVE:
@@ -139,14 +139,14 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
                 case VSF_TGUI_LIST_MODE_ITEM_SELECTION:
                     nYOffset = __vk_tgui_calculate_offset_for_make_target_control_visible(
                                     ptList,
-                                    ptControl,
+                                    control_ptr,
                                     nYOffset,
                                     true
                                 );
                     break;
                 case VSF_TGUI_LIST_MODE_ITEM_SELECTION_CENTER_ALIGN:
                     nYOffset -= (   vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iHeight
-                                -   vsf_tgui_control_get_core(ptControl)->tRegion.tSize.iHeight) / 2;
+                                -   vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iHeight) / 2;
                     break;
                 default:
                     break;
@@ -161,9 +161,9 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
             nXOffset = ptInnerContainer->tConatinerPadding.chLeft;
             while (chIndex--) {
-                ptControl = __vk_tgui_control_get_next_visible_one_within_container(ptControl);
+                control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
             }
-            nXOffset += vsf_tgui_control_get_core(ptControl)->tRegion.tLocation.iX;
+            nXOffset += vsf_tgui_control_get_core(control_ptr)->tRegion.tLocation.iX;
 
             switch (ptList->tMode.u2WorkMode) {
                 case VSF_TGUI_LIST_MODE_FREE_MOVE:
@@ -175,14 +175,14 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
                 case VSF_TGUI_LIST_MODE_ITEM_SELECTION:
                     nXOffset = __vk_tgui_calculate_offset_for_make_target_control_visible(
                                     ptList,
-                                    ptControl,
+                                    control_ptr,
                                     nXOffset,
                                     false
                                 );
                     break;
                 case VSF_TGUI_LIST_MODE_ITEM_SELECTION_CENTER_ALIGN:
                     nXOffset -= (   vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iWidth
-                                -   vsf_tgui_control_get_core(ptControl)->tRegion.tSize.iWidth) / 2;
+                                -   vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iWidth) / 2;
                     break;
                 default:
                     break;
@@ -209,7 +209,7 @@ static void __vk_tgui_list_update_inner_container_location(vsf_tgui_list_t* ptLi
 {
     vsf_tgui_container_t *ptInnerContainer = ptList->ptList;
 
-    switch (ptInnerContainer->tContainerAttribute.u5Type) {
+    switch (ptInnerContainer->ContainerAttribute.u5Type) {
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
             vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptInnerContainer)
                 ->tRegion.tLocation.iY = vk_tgui_slider_on_timer_event_handler(&(ptList->tSlider));
@@ -222,19 +222,19 @@ static void __vk_tgui_list_update_inner_container_location(vsf_tgui_list_t* ptLi
 }
 #endif
 
-static bool __vk_tgui_list_invoke_event(vsf_tgui_list_t* ptList, vsf_evt_t tMSG)
+static bool __vk_tgui_list_invoke_event(vsf_tgui_list_t* ptList, vsf_evt_t msg)
 {
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    vsf_tgui_evt_t tEvent = {0};
-    tEvent.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.tMSG = tMSG;
+    vsf_tgui_evt_t event = {0};
+    event.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.msg = msg;
     return VSf_tgui_control_send_message(
-        (const vsf_tgui_control_t *)ptList, tEvent);
+        (const vsf_tgui_control_t *)ptList, event);
 
 #else
     return vsf_tgui_control_send_message(
         (const vsf_tgui_control_t *)ptList,
         (vsf_tgui_evt_t) {
-            .tMSG = tMSG,
+            .msg = msg,
         });
 #endif
 }
@@ -274,7 +274,7 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
     fsm_rt_t fsm;
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABLED
-    if (VSF_TGUI_EVT_ON_TIME == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
+    if (VSF_TGUI_EVT_ON_TIME == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         __vk_tgui_list_update_inner_container_location(ptList);
         if (!vk_tgui_slider_is_working(&(ptList->tSlider)) && ptList->tMode.bIsSliding) {
             ptList->tMode.bIsSliding = false;
@@ -289,14 +289,14 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
 
     bool bStatusChanged = false;
 
-    if (VSF_TGUI_EVT_LIST_SELECTION_CHANGED == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
+    if (VSF_TGUI_EVT_LIST_SELECTION_CHANGED == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         //! block backward propagation
         if (VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
             fsm = (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
         }
-    } else if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.tMSG){
+    } else if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.msg){
         vsf_tgui_key_evt_t* ptEvt = (vsf_tgui_key_evt_t*)ptMSG;
-        switch (ptList->ptList->tContainerAttribute.u5Type) {
+        switch (ptList->ptList->ContainerAttribute.u5Type) {
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
                 if          (VSF_TGUI_KEY_LEFT == ptEvt->hwKeyValue) {
                     bStatusChanged = __vk_tgui_list_previous(ptList);
@@ -324,9 +324,9 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
         }
     } 
 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
-    else if (VSF_TGUI_EVT_GESTURE_SLIDE == ptMSG->use_as__vsf_msgt_msg_t.tMSG) {
+    else if (VSF_TGUI_EVT_GESTURE_SLIDE == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         vsf_tgui_gesture_evt_t* ptEvt = (vsf_tgui_gesture_evt_t*)ptMSG;
-        switch (ptList->ptList->tContainerAttribute.u5Type) {
+        switch (ptList->ptList->ContainerAttribute.u5Type) {
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
                 if (ptEvt->tDelta.use_as__vsf_tgui_location_t.iX > 0) {
                     bStatusChanged = __vk_tgui_list_previous(ptList);
@@ -404,10 +404,10 @@ fsm_rt_t vk_tgui_list_init(vsf_tgui_list_t* ptList)
     vk_tgui_container_init(&(ptList->use_as__vsf_tgui_container_t));
 
     do {
-        vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptList);
-        tStatus.tValues.__bContainBuiltInStructure = true;
+        vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptList);
+        Status.Values.__does_contain_builtin_structure = true;
 
-        vsf_tgui_control_status_set((vsf_tgui_control_t*)ptList, tStatus);
+        vsf_tgui_control_status_set((vsf_tgui_control_t*)ptList, Status);
     } while(0);
 
     return fsm_rt_cpl;
@@ -470,19 +470,19 @@ int_fast16_t vk_tgui_list_selected_item_set(vsf_tgui_list_t* ptList,
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
 SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate");
 vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
-                            const vsf_tgui_control_t* ptControl,
+                            const vsf_tgui_control_t* control_ptr,
                             const vsf_tgui_list_t* ptList, 
                             uint_fast8_t chScalingRatio, 
                             vsf_tgui_list_scrollbar_region_t *ptOutputBuffer)
 {
-    VSF_TGUI_ASSERT(    NULL != ptControl 
+    VSF_TGUI_ASSERT(    NULL != control_ptr 
                     &&  NULL != ptList 
                     &&  chScalingRatio > 0 
                     &&  NULL != ptOutputBuffer);
 
     const vsf_tgui_container_t* ptInnerContainer = ptList->ptList;
     const vsf_tgui_size_t *ptPanelSize = 
-        vsf_tgui_control_get_size((const vsf_tgui_control_t *)ptControl);
+        vsf_tgui_control_get_size((const vsf_tgui_control_t *)control_ptr);
     const vsf_tgui_size_t *ptListSize = 
         vsf_tgui_control_get_size((const vsf_tgui_control_t *)ptList);
     const vsf_tgui_size_t *ptListInnerContainerSize = 
@@ -498,7 +498,7 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
     int16_t iLineHeight = 4;
     int16_t iLineWidth = 4;
 
-    switch (ptInnerContainer->tContainerAttribute.u5Type) {
+    switch (ptInnerContainer->ContainerAttribute.u5Type) {
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
             iListRawSize = ptListSize->iHeight;
             iInnerContainerRawSize =    ptListInnerContainerSize->iHeight 

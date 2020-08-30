@@ -34,25 +34,25 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_tgui_control_v_draw_rect(const vsf_tgui_control_t* ptControl,
+extern void vsf_tgui_control_v_draw_rect(const vsf_tgui_control_t* control_ptr,
                                          const vsf_tgui_region_t* ptDirtyRegion,
                                          const vsf_tgui_region_t* ptRectRegion,
                                          const vsf_tgui_sv_color_t tColor);
 
-extern void vsf_tgui_control_v_draw_tile(const vsf_tgui_control_t* ptControl,
+extern void vsf_tgui_control_v_draw_tile(const vsf_tgui_control_t* control_ptr,
                                          const vsf_tgui_region_t* ptDirtyRegion,
                                          const vsf_tgui_tile_t* ptTile,
                                          const vsf_tgui_align_mode_t tMode);
 
-extern void vsf_tgui_control_v_draw_text(const vsf_tgui_control_t* ptControl,
+extern void vsf_tgui_control_v_draw_text(const vsf_tgui_control_t* control_ptr,
                                          const vsf_tgui_region_t* ptDirtyRegion,
                                          vsf_tgui_text_info_t *ptStringInfo,
                                          const uint8_t chFontIndex,
                                          const vsf_tgui_sv_color_t tColor,
                                          const vsf_tgui_align_mode_t tMode);
 
-extern uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* ptControl);
-extern void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* ptControl, uint_fast8_t chTileTransparencyRate);
+extern uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* control_ptr);
+extern void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* control_ptr, uint_fast8_t chTileTransparencyRate);
 
 
 #endif

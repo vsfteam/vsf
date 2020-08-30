@@ -114,6 +114,11 @@ static void __vsh_history_down(vsh_cmd_ctx_t *ctx)
 }
 #endif
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_state_t type)
 {
     char esc = ctx->cmd[ctx->pos];
@@ -146,6 +151,11 @@ static vsh_shell_state_t __vsh_process_escape(vsh_cmd_ctx_t *ctx, vsh_shell_stat
         return SHELL_STATE_NORMAL;
     }
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 void vsh_set_path(char **path)
 {
@@ -233,6 +243,11 @@ static int __vsh_run_cmd(vsh_cmd_ctx_t *cmd_ctx)
     close(exefd);
     return 0;
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
 
 int vsh_main(int argc, char *argv[])
 {
@@ -340,6 +355,11 @@ int vsh_main(int argc, char *argv[])
         }
     }
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 int pwd_main(int argc, char *argv[])
 {

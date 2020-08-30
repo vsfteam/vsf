@@ -68,8 +68,8 @@ static void __vk_usbd_msc_error(vk_usbd_msc_t *msc, uint_fast8_t error)
         if (cbw->dCBWDataTransferLength > 0) {
             vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
             trans->ep = msc->ep_in;
-            trans->buffer_ptr = NULL;
-            trans->s32_size = 0;
+            trans->buffer = NULL;
+            trans->size = 0;
             trans->on_finish = __vk_usbd_msc_send_csw;
             trans->param = msc;
             vk_usbd_ep_send(msc->dev, trans);
@@ -90,8 +90,8 @@ static void __vk_usbd_msc_send_csw(void *p)
     // TODO: fix csw->dCSWDataResidue
     csw->dCSWSignature = cpu_to_le32(USB_MSC_CSW_SIGNATURE);
     trans->ep = msc->ep_in;
-    trans->buffer_ptr = (uint8_t *)&msc->ctx.csw;
-    trans->s32_size = sizeof(msc->ctx.csw);
+    trans->buffer = (uint8_t *)&msc->ctx.csw;
+    trans->size = sizeof(msc->ctx.csw);
     trans->on_finish = __vk_usbd_msc_on_idle;
     trans->param = msc;
     vk_usbd_ep_send(msc->dev, trans);
@@ -115,7 +115,7 @@ static void __vk_usbd_msc_on_cbw(void *p)
     usb_msc_cbw_t *cbw = &msc->ctx.cbw;
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
 
-    if (    (trans->s32_size > 0)
+    if (    (trans->size > 0)
         ||  (cbw->dCBWSignature != cpu_to_le32(USB_MSC_CBW_SIGNATURE))
         ||  (cbw->bCBWCBLength < 1) || (cbw->bCBWCBLength > 16)) {
         __vk_usbd_msc_error(msc, USB_MSC_CSW_PHASE_ERROR);
@@ -145,12 +145,17 @@ static void __vk_usbd_msc_on_idle(void *p)
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
 
     trans->ep = msc->ep_out;
-    trans->buffer_ptr = (uint8_t *)&msc->ctx.cbw;
-    trans->s32_size = sizeof(msc->ctx.cbw);
+    trans->buffer = (uint8_t *)&msc->ctx.cbw;
+    trans->size = sizeof(msc->ctx.cbw);
     trans->on_finish = __vk_usbd_msc_on_cbw;
     trans->param = msc;
     vk_usbd_ep_recv(msc->dev, trans);
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
 
 static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -183,7 +188,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             if (is_in && (cbw->dCBWDataTransferLength > 0)) {
                 if (!msc->is_stream) {
-                    trans->s32_size = reply_len;
+                    trans->size = reply_len;
                     trans->ep = msc->ep_in;
                     trans->on_finish = __vk_usbd_msc_on_data_in;
                     trans->param = msc;
@@ -196,7 +201,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_EXECUTE:
         if (cbw->dCBWDataTransferLength > 0) {
-            if (trans->buffer_ptr != NULL) {
+            if (trans->buffer != NULL) {
                 msc->is_stream = false;
                 vk_scsi_execute(msc->scsi, cbw->CBWCB, &trans->use_as__vsf_mem_t);
             } else if (msc->stream != NULL) {
@@ -223,6 +228,11 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     }
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 static vsf_err_t __vk_usbd_msc_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
@@ -262,8 +272,8 @@ static vsf_err_t __vk_usbd_msc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     default:
         return VSF_ERR_NOT_SUPPORT;
     }
-    ctrl_handler->trans.buffer_ptr = buffer;
-    ctrl_handler->trans.s32_size = size;
+    ctrl_handler->trans.buffer = buffer;
+    ctrl_handler->trans.size = size;
     return VSF_ERR_NONE;
 }
 

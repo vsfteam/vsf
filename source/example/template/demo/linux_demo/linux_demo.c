@@ -131,6 +131,14 @@ extern int xui_main(int argc, char ** argv);
 extern void freetype_demo_init(void);
 #endif
 
+#if APP_CFG_USE_KERNEL_TEST == ENABLED
+extern int kernel_sem_test_main(int argc, char *argv[]);
+#endif
+
+#if APP_CFG_USE_JSON_DEMO == ENABLED
+extern int json_main(int argc, char *argv[]);
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 int vsf_linux_create_fhs(void)
@@ -257,6 +265,12 @@ int vsf_linux_create_fhs(void)
 #endif
 #if APP_CFG_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
     busybox_bind("/sbin/lwip", lwip_main);
+#endif
+#if APP_CFG_USE_KERNEL_TEST == ENABLED
+    busybox_bind("/sbin/sem_test", kernel_sem_test_main);
+#endif
+#if APP_CFG_USE_JSON_DEMO == ENABLED
+    busybox_bind("/sbin/json", json_main);
 #endif
 
     return 0;

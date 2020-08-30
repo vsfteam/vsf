@@ -57,7 +57,7 @@ static void usrapp_mutex_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (VSF_ERR_NONE == vsf_eda_mutex_enter(&usrapp_mutex.mutex)) {
         on_got_mutex:
             vsf_trace(VSF_TRACE_INFO, "%d: eda[%d] got mutex\r\n",
-                        vsf_systimer_tick_to_ms(vsf_timer_get_tick()),
+                        vsf_systimer_get_ms(),
                         mutex_eda->i);
             mutex_eda->state = DELAYING;
             vsf_teda_set_timer(vsf_systimer_us_to_tick((mutex_eda->i + 1) * 100));
@@ -66,7 +66,7 @@ static void usrapp_mutex_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_TIMER:
         if (DELAYING == mutex_eda->state) {
             vsf_trace(VSF_TRACE_INFO, "%d: eda[%d] release mutex\r\n",
-                        vsf_systimer_tick_to_ms(vsf_timer_get_tick()),
+                        vsf_systimer_get_ms(),
                         mutex_eda->i);
             vsf_eda_mutex_leave(&usrapp_mutex.mutex);
             goto pend_next;
@@ -84,7 +84,7 @@ static void usrapp_mutex_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             case VSF_SYNC_TIMEOUT:
                 vsf_trace(VSF_TRACE_INFO, "%d: eda[%d] time out\r\n",
-                            vsf_systimer_tick_to_ms(vsf_timer_get_tick()),
+                            vsf_systimer_get_ms(),
                             mutex_eda->i);
                 goto pend_next;
             case VSF_SYNC_PENDING:

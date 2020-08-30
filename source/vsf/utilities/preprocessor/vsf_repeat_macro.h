@@ -18,7 +18,7 @@
 #ifndef __REPEAT_MACRO_H__
 #define __REPEAT_MACRO_H__
 
-#include ".\vsf_connect.h"
+#include "./vsf_connect.h"
 
 
 #ifdef __cplusplus

@@ -216,7 +216,7 @@ void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
         if (frame->state.bits.is_fsm) {
             __vsf_eda_fsm_evthandler(this_ptr, evt);
         } else {
-            if (    ((uintptr_t)0 == frame->ptr.target)     //!< no param
+            if (    ((uintptr_t)NULL == frame->ptr.target)     //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
                 frame->fn.evthandler(this_ptr, evt);        //!< this is a pure eda
             } else {
@@ -225,7 +225,7 @@ void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
             }
         }
 #   else
-        if (    ((uintptr_t)0 == frame->ptr.target)         //!< no param
+        if (    ((uintptr_t)NULL == frame->ptr.target)         //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
                 frame->fn.evthandler(this_ptr, evt);        //!< this is a pure eda
         } else {
@@ -459,7 +459,7 @@ bool __vsf_eda_return(uintptr_t return_value)
         {
             __vsf_eda_frame_t *frame_caller = __vsf_eda_peek((vsf_slist_t *)frame);
             if (    (NULL == frame_caller)                  //!< top frame
-                &&  ((uintptr_t)0 == frame->ptr.param)      //!< no param
+                &&  ((uintptr_t)NULL == frame->ptr.param)      //!< no param
                 &&  (0 == frame->state.local_size)) {       //!< no local
                 
                 this_ptr->state.bits.is_use_frame = false;
@@ -618,7 +618,7 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
     } 
-    VSF_KERNEL_ASSERT((uintptr_t)0 != func);
+    VSF_KERNEL_ASSERT((uintptr_t)NULL != func);
     
     err =  __vsf_eda_ensure_frame_used(this_ptr, 0);
     if (VSF_ERR_NONE != err) {
@@ -737,7 +737,7 @@ static void __vsf_eda_fsm_evthandler(vsf_eda_t *this_ptr, vsf_evt_t evt)
             &&  NULL != this_ptr->fn.frame->fn.fsm_entry);
             
     uintptr_t param = this_ptr->fn.frame->ptr.target;
-    if  (   ((uintptr_t)0 == param)                             //!< no param
+    if  (   ((uintptr_t)NULL == param)                             //!< no param
         &&  (0 == this_ptr->fn.frame->state.local_size)) {      //!< no local
         param = (uintptr_t )this_ptr;                           //!< it is a pure eda
     }
@@ -850,12 +850,12 @@ vsf_err_t vsf_eda_init_ex(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg)
 {
     VSF_KERNEL_ASSERT(     NULL != this_ptr 
             &&  NULL != cfg
-            &&  (uintptr_t)0 != cfg->fn.func);
+            &&  (uintptr_t)NULL != cfg->fn.func);
     
     this_ptr->fn.evthandler = cfg->fn.evthandler;
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-    if (    ((uintptr_t)0 == cfg->target)               //!< no param/target
+    if (    ((uintptr_t)NULL == cfg->target)               //!< no param/target
         &&  (0 == cfg->local_size)) {                   //!< no local
         return vsf_eda_init(this_ptr, cfg->priority, cfg->is_stack_owner);
     } 

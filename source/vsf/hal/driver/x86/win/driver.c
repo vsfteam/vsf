@@ -77,8 +77,8 @@ vsf_stream_t VSF_DEBUG_STREAM_TX = {
 
 vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .op         = &vsf_mem_stream_op,
-    .buffer_ptr  = __vsf_x86_debug_stream_rx_buff,
-    .s32_size      = sizeof(__vsf_x86_debug_stream_rx_buff),
+    .buffer     = __vsf_x86_debug_stream_rx_buff,
+    .size       = sizeof(__vsf_x86_debug_stream_rx_buff),
 };
 
 #   elif   VSF_USE_SERVICE_STREAM == ENABLED
@@ -144,7 +144,7 @@ static void __vsf_x86_debug_stream_init(void)
 
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
     __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq, "debug_stream_rx",
-        __vsf_x86_debug_stream_rx_irqhandler, vsf_arch_prio_0, true);
+        __vsf_x86_debug_stream_rx_irqhandler, vsf_arch_prio_0);
 }
 #   elif   VSF_USE_SERVICE_STREAM == ENABLED
 #   endif

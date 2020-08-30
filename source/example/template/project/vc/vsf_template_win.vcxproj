@@ -559,9 +559,8 @@
     <ClInclude Include="..\..\..\..\vsf\component\crypto\hash\vsf_hash.h" />
     <ClInclude Include="..\..\..\..\vsf\component\crypto\vsf_crypto.h" />
     <ClInclude Include="..\..\..\..\vsf\component\crypto\vsf_crypto_cfg.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_Config.h" />
     <ClInclude Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\debugger\segger_rtt\segger_rtt_stream.h" />
     <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger.h" />
     <ClInclude Include="..\..\..\..\vsf\component\debugger\vsf_debugger_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.h" />
@@ -690,6 +689,7 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\vsf_usb_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\vsf_component.h" />
     <ClInclude Include="..\..\..\..\vsf\component\vsf_component_cfg.h" />
+    <ClInclude Include="..\..\..\..\vsf\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\arch\vsf_arch.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\arch\vsf_arch_abstraction.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic.h" />
@@ -740,6 +740,7 @@
     <ClInclude Include="..\..\..\..\vsf\service\dynarr\vsf_dynarr.h" />
     <ClInclude Include="..\..\..\..\vsf\service\dynstack\vsf_dynstack.h" />
     <ClInclude Include="..\..\..\..\vsf\service\heap\vsf_heap.h" />
+    <ClInclude Include="..\..\..\..\vsf\service\json\vsf_json.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pool\vsf_pool.h" />
@@ -825,6 +826,8 @@
     <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_bitmap.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_list.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\template\vsf_queue.h" />
+    <ClInclude Include="..\..\..\..\vsf\utilities\vsf_utilities.h" />
+    <ClInclude Include="..\..\..\..\vsf\utilities\vsf_utilities_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\vsf.h" />
     <ClInclude Include="..\..\..\..\vsf\vsf_cfg.h" />
     <ClInclude Include="..\..\config\awtk_config.h" />
@@ -1443,8 +1446,8 @@
     <ClCompile Include="..\..\..\..\vsf\component\av\audio\driver\winsound\vsf_winsound.c" />
     <ClCompile Include="..\..\..\..\vsf\component\av\audio\vsf_audio.c" />
     <ClCompile Include="..\..\..\..\vsf\component\crypto\hash\crc\vsf_crc.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole.c" />
     <ClCompile Include="..\..\..\..\vsf\component\debugger\nulink\NuConsole_stream.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\debugger\segger_rtt\segger_rtt_stream.c" />
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\fatfs\vsf_fatfs.c" />
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\malfs\vsf_malfs.c" />
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\memfs\vsf_memfs.c" />
@@ -1534,6 +1537,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\vsf_component.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\arch\vsf_arch_abstraction.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic.c" />
+    <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic_simple.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\driver.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\vsf_hal.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c" />
@@ -1554,6 +1558,7 @@
     <ClCompile Include="..\..\..\..\vsf\service\dynarr\vsf_dynarr.c" />
     <ClCompile Include="..\..\..\..\vsf\service\dynstack\vsf_dynstack.c" />
     <ClCompile Include="..\..\..\..\vsf\service\heap\vsf_heap.c" />
+    <ClCompile Include="..\..\..\..\vsf\service\json\vsf_json.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pool\vsf_pool.c" />
@@ -1605,6 +1610,8 @@
     <ClCompile Include="..\..\demo\cpp_demo\cpp_demo.cpp" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
+    <ClCompile Include="..\..\demo\json_demo\json_demo.c" />
+    <ClCompile Include="..\..\demo\kernel_test\sem_test.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\linux_demo.c" />
     <ClCompile Include="..\..\demo\linux_demo\mount_file_demo.c" />
@@ -1632,6 +1639,7 @@
     <Library Include="lib\awtk\awtk_vsf.lib" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\vsf\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
     <None Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\string" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -1712,7 +1720,7 @@
       <PreprocessorDefinitions>__CPU_X86__;__WIN__;__OOC_CPP__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1731,11 +1739,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;WIN64;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;__OOC_CPP__;WIN64;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <ExceptionHandling>false</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

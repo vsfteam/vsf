@@ -168,8 +168,8 @@ static usrapp_t __usrapp = {
         .mem_mal                = {
             .drv                = &VK_MEM_MAL_DRV,
             .mem                = {
-                .buffer_ptr      = __usrapp.scsi.mem,
-                .s32_size          = sizeof(__usrapp.scsi.mem),
+                .buffer         = __usrapp.scsi.mem,
+                .size           = sizeof(__usrapp.scsi.mem),
             },
             .blksz              = 512,
         },
@@ -190,8 +190,8 @@ static usrapp_t __usrapp = {
     .stream                     = {
         .mem_stream             = {
             .op                 = &vsf_mem_stream_op,
-            .buffer_ptr          = __usrapp.stream.buffer,
-            .s32_size              = sizeof(__usrapp.stream.buffer),
+            .buffer             = __usrapp.stream.buffer,
+            .size               = sizeof(__usrapp.stream.buffer),
         },
     },
 #endif

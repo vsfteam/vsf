@@ -222,7 +222,7 @@ static ALWAYS_INLINE uint32_t ____disable_irq(void)
 {
     uint32_t wPRIMASK = __get_interrupt_state();
     __disable_interrupt();
-    return wPRIMASK & 0x1;
+    return wPRIMASK;
 }
 
 #elif __IS_COMPILER_ARM_COMPILER_5__

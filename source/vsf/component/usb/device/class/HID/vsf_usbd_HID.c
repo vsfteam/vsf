@@ -98,8 +98,8 @@ void vk_usbd_hid_in_report_changed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *rep
 void vk_usbh_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report)
 {
     vk_usbd_trans_t *trans = &hid->transact_out;
-    report->mem.buffer_ptr = NULL;
-    trans->s32_size = hid->rx_buffer.s32_size;
+    report->mem.buffer = NULL;
+    trans->size = hid->rx_buffer.size;
     vk_usbd_ep_recv(hid->dev, trans);
 }
 
@@ -137,16 +137,16 @@ static void __vk_usbd_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             __vk_usbd_hid_on_report(hid, report);
             goto process_in_report;
         } else /* if (trans == &hid->transact_out) */ {
-            uint_fast16_t size = hid->rx_buffer.s32_size - trans->s32_size;
+            uint_fast16_t size = hid->rx_buffer.size - trans->size;
             if (size > 0) {
                 uint_fast8_t report_id = 0;
                 if (hid->has_report_id) {
-                    report_id = hid->rx_buffer.buffer_ptr[0];
+                    report_id = hid->rx_buffer.buffer[0];
                 }
                 report = __vk_usbd_hid_find_report(hid, USB_HID_REPORT_OUTPUT, report_id);
                 if (report != NULL) {
-                    VSF_USB_ASSERT(report->mem.s32_size == size);
-                    report->mem.buffer_ptr = hid->rx_buffer.buffer_ptr;
+                    VSF_USB_ASSERT(report->mem.size == size);
+                    report->mem.buffer = hid->rx_buffer.buffer;
                     __vk_usbd_hid_on_report(hid, report);
                 }
             }
@@ -205,7 +205,7 @@ static vsf_err_t __vk_usbd_hid_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_hid_t *hid = ifs->class_param;
 
-    VSF_USB_ASSERT((hid->rx_buffer.buffer_ptr != NULL) && (hid->rx_buffer.s32_size > 0));
+    VSF_USB_ASSERT((hid->rx_buffer.buffer != NULL) && (hid->rx_buffer.size > 0));
     hid->ifs = ifs;
     hid->dev = dev;
 
@@ -248,12 +248,12 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
 
     switch (request->bRequest) {
     case USB_HID_REQ_GET_REPORT:
-        if ((NULL == report) || (type != report->type) || (NULL == report->mem.buffer_ptr)) {
+        if ((NULL == report) || (type != report->type) || (NULL == report->mem.buffer)) {
             return VSF_ERR_FAIL;
         }
 
-        buffer = report->mem.buffer_ptr;
-        size = report->mem.s32_size;
+        buffer = report->mem.buffer;
+        size = report->mem.size;
         if (hid->has_report_id) {
             size--;
             buffer++;
@@ -280,8 +280,8 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
             return VSF_ERR_FAIL;
         }
 
-        size = report->mem.s32_size;
-        buffer = report->mem.buffer_ptr;
+        size = report->mem.size;
+        buffer = report->mem.buffer;
         if (hid->has_report_id) {
             size--;
             buffer++;
@@ -310,8 +310,8 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     default:
         return VSF_ERR_FAIL;
     }
-    ctrl_handler->trans.buffer_ptr = buffer;
-    ctrl_handler->trans.s32_size = size;
+    ctrl_handler->trans.buffer = buffer;
+    ctrl_handler->trans.size = size;
     return VSF_ERR_NONE;
 }
 

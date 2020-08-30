@@ -76,8 +76,8 @@ static void __vsfip_netdrv_adapter_on_inputted(void *netif, void *netbuf, uint_f
 {
     vsfip_netbuf_t *vsfip_netbuf = netbuf;
 
-    ASSERT(vsfip_netbuf->buf.s32_size >= size);
-    vsfip_netbuf->buf.s32_size = size;
+    ASSERT(vsfip_netbuf->buf.size >= size);
+    vsfip_netbuf->buf.size = size;
     vsfip_netif_on_inputted((vsfip_netif_t *)netif, vsfip_netbuf);
 }
 

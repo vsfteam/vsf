@@ -148,16 +148,16 @@ vsf_pbuf_t *vsf_stream_src_new_pbuf (      vsf_stream_src_t *obj_ptr,
         }
         VSF_SERVICE_ASSERT( NULL != this.ptTX->piMethod );
         VSF_SERVICE_ASSERT( NULL != this.ptTX->piMethod->GetStatus );
-        vsf_stream_status_t tStatus = this.ptTX->piMethod->GetStatus(this.ptTX);
-        UNUSED_PARAM(tStatus);
+        vsf_stream_status_t Status = this.ptTX->piMethod->GetStatus(this.ptTX);
+        UNUSED_PARAM(Status);
     #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-        if (!tStatus.IsOpen) {
+        if (!Status.IsOpen) {
             break;
         }
     #endif
     #if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
         //! check uplimit
-        if (   (tStatus.u14Count >= this.hwpbufCountUpLimit)
+        if (   (Status.u14Count >= this.hwpbufCountUpLimit)
             && (this.hwpbufCountUpLimit != 0)) {
             break;
         }

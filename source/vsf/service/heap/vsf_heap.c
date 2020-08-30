@@ -554,7 +554,7 @@ label_first_add:
 
 void vsf_heap_add_memory(vsf_mem_t mem)
 {
-    vsf_heap_add(mem.PTR.src_ptr, (uint_fast32_t)mem.s32_size);
+    vsf_heap_add(mem.buffer, (uint_fast32_t)mem.size);
 }
 
 void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment)

@@ -41,7 +41,7 @@ declare_class(vsf_tgui_t)
 /*============================ IMPLEMENTATION ================================*/
 
 static bool update_location_and_resouce_region(
-                                        const vsf_tgui_control_t* ptControl,
+                                        const vsf_tgui_control_t* control_ptr,
                                         const vsf_tgui_region_t* ptDirtyRegion,
                                         const vsf_tgui_region_t* ptDrawInCtrlRegion,
                                         vsf_tgui_location_t* ptRealLocation,
@@ -49,7 +49,7 @@ static bool update_location_and_resouce_region(
 {
     vsf_tgui_region_t tRealRawRegion;
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDrawInCtrlRegion != NULL);
     VSF_TGUI_ASSERT(ptRealLocation != NULL);
     VSF_TGUI_ASSERT(ptResourceRegion != NULL);
@@ -74,13 +74,13 @@ static bool update_location_and_resouce_region(
         return false;
     }
 
-    vsf_tgui_control_get_absolute_location(ptControl, ptRealLocation);
+    vsf_tgui_control_get_absolute_location(control_ptr, ptRealLocation);
 
     return true;
 }
 
 static bool update_location_and_resouce_region_with_mode(
-                                                const vsf_tgui_control_t* ptControl,
+                                                const vsf_tgui_control_t* control_ptr,
                                                 const vsf_tgui_region_t* ptDirtyRegion,
                                                 const vsf_tgui_align_mode_t tMode,
                                                 vsf_tgui_location_t* ptRealLocationBuffer,
@@ -89,31 +89,31 @@ static bool update_location_and_resouce_region_with_mode(
     vsf_tgui_region_t tDrawInCtrlRegion = {0};
 
     //tDrawInCtrlRegion.tLocation = *ptRealLocation;
-    tDrawInCtrlRegion.tSize = *vsf_tgui_control_get_size(ptControl);
+    tDrawInCtrlRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
     //tDrawInCtrlRegion.tSize.iHeight -= tDrawInCtrlRegion.tLocation.iY;
     //tDrawInCtrlRegion.tSize.iWidth -= tDrawInCtrlRegion.tLocation.iX;
     // resize draw region and resource region
     vsf_tgui_region_update_with_align(&tDrawInCtrlRegion, ptResourceRegion, tMode);
 
-    return update_location_and_resouce_region(ptControl, ptDirtyRegion, &tDrawInCtrlRegion, ptRealLocationBuffer, ptResourceRegion);
+    return update_location_and_resouce_region(control_ptr, ptDirtyRegion, &tDrawInCtrlRegion, ptRealLocationBuffer, ptResourceRegion);
 }
 
-uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* ptControl)
+uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* control_ptr)
 {
     bool bIsTileTransparency;
     uint_fast8_t chTileTransparencyRate;
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
 
-	if (vsf_tgui_control_is_container(ptControl)) {
-		const vsf_msgt_node_t* node_ptr = &ptControl->use_as__vsf_msgt_node_t;
+	if (vsf_tgui_control_is_container(control_ptr)) {
+		const vsf_msgt_node_t* node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
 		const vsf_tgui_container_t* container_ptr = (const vsf_tgui_container_t*)node_ptr;
 
         bIsTileTransparency = container_ptr->use_as__vsf_tgui_v_container_t.bIsTileTransparency;
         chTileTransparencyRate = container_ptr->use_as__vsf_tgui_v_container_t.chTileTransparencyRate;
     } else {
-        bIsTileTransparency = ptControl->use_as__vsf_tgui_v_control_t.bIsTileTransparency;
-        chTileTransparencyRate = ptControl->use_as__vsf_tgui_v_control_t.chTileTransparencyRate;
+        bIsTileTransparency = control_ptr->use_as__vsf_tgui_v_control_t.bIsTileTransparency;
+        chTileTransparencyRate = control_ptr->use_as__vsf_tgui_v_control_t.chTileTransparencyRate;
     }
 
     if (bIsTileTransparency) {
@@ -123,11 +123,11 @@ uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* pt
     }
 }
 
-void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* ptControl, uint_fast8_t chTileTransparencyRate)
+void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* control_ptr, uint_fast8_t chTileTransparencyRate)
 {
     bool bIsTileTransparency;
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
 
     if (chTileTransparencyRate == 0xFF) {
         bIsTileTransparency = 0;
@@ -135,20 +135,20 @@ void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* ptControl, uint_
         bIsTileTransparency = 1;
     }
 
-	if (vsf_tgui_control_is_container(ptControl)) {
-		const vsf_msgt_node_t* node_ptr = &ptControl->use_as__vsf_msgt_node_t;
+	if (vsf_tgui_control_is_container(control_ptr)) {
+		const vsf_msgt_node_t* node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
 		vsf_tgui_container_t* container_ptr = (vsf_tgui_container_t *)node_ptr;
 
         container_ptr->use_as__vsf_tgui_v_container_t.bIsTileTransparency = bIsTileTransparency;
         container_ptr->use_as__vsf_tgui_v_container_t.chTileTransparencyRate = chTileTransparencyRate;
     } else {
-        ptControl->use_as__vsf_tgui_v_control_t.bIsTileTransparency = bIsTileTransparency;
-        ptControl->use_as__vsf_tgui_v_control_t.chTileTransparencyRate = chTileTransparencyRate;
+        control_ptr->use_as__vsf_tgui_v_control_t.bIsTileTransparency = bIsTileTransparency;
+        control_ptr->use_as__vsf_tgui_v_control_t.chTileTransparencyRate = chTileTransparencyRate;
     }
 }
 
 
-void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* ptControl,
+void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* ptDirtyRegion,
                                     const vsf_tgui_region_t* ptRectRegion,
                                     const vsf_tgui_sv_color_t tColor)
@@ -157,7 +157,7 @@ void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* ptControl,
     vsf_tgui_location_t tRealLocation = {0,0};
     vsf_tgui_sv_color_t tTmpColor = tColor;
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
     //Noto: Temporary code, Will be removed when style is supported
@@ -165,11 +165,11 @@ void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* ptControl,
         vsf_tgui_sv_color_set_trans_rate(&tTmpColor, 0xFF);
     }
 
-    if (update_location_and_resouce_region(ptControl, ptDirtyRegion, ptRectRegion, &tRealLocation, &tResourceRegion)) {
+    if (update_location_and_resouce_region(control_ptr, ptDirtyRegion, ptRectRegion, &tRealLocation, &tResourceRegion)) {
 #if (VSF_TGUI_SV_CFG_DRAW_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw rect(0x%x) in (x:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
-            ptControl->use_as__vsf_msgt_node_t.node_name_ptr, tColor.tColor.wValue, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
+            control_ptr->use_as__vsf_msgt_node_t.node_name_ptr, tColor.tColor.wValue, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
 #endif
 
         vsf_tgui_sv_port_draw_rect(&tRealLocation, &tResourceRegion.tSize, tTmpColor);
@@ -177,7 +177,7 @@ void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* ptControl,
 }
 
 
-void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* ptControl,
+void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* ptDirtyRegion,
                                     const vsf_tgui_tile_t* ptTile,
                                     const vsf_tgui_align_mode_t tMode)
@@ -186,21 +186,21 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* ptControl,
     vsf_tgui_location_t tRealLocation = {0, 0};
     uint8_t chTileTransparencyRate;
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
     VSF_TGUI_ASSERT(ptTile != NULL);
 
     ptTile = vsf_tgui_tile_get_root(ptTile, &tResourceRegion);
     VSF_TGUI_ASSERT(ptTile != NULL);
 
-    if (update_location_and_resouce_region_with_mode(ptControl, ptDirtyRegion, tMode, &tRealLocation, &tResourceRegion)) {
+    if (update_location_and_resouce_region_with_mode(control_ptr, ptDirtyRegion, tMode, &tRealLocation, &tResourceRegion)) {
 #if (VSF_TGUI_SV_CFG_DRAW_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw tile(0x%p) in (x:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
-            ptControl->use_as__vsf_msgt_node_t.node_name_ptr, ptTile, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
+            control_ptr->use_as__vsf_msgt_node_t.node_name_ptr, ptTile, tRealLocation.iX, tRealLocation.iY, tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
 #endif
 
-        chTileTransparencyRate = vsf_tgui_control_v_get_tile_trans_rate(ptControl);
+        chTileTransparencyRate = vsf_tgui_control_v_get_tile_trans_rate(control_ptr);
         vsf_tgui_sv_port_draw_root_tile(&tRealLocation,
                                         &tResourceRegion.tLocation,
                                         &tResourceRegion.tSize,
@@ -277,7 +277,7 @@ static void vsf_tgui_sv_text_draw(vsf_tgui_location_t* ptLocation,
     }
 }
 
-void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
+void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* ptDirtyRegion,
                                     vsf_tgui_text_info_t *ptStringInfo,
                                     const uint8_t chFontIndex,
@@ -293,7 +293,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
     int16_t iOffset = 0;
 #endif
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
     VSF_TGUI_ASSERT(ptStringInfo != NULL);
     VSF_TGUI_ASSERT(ptStringInfo->tString.pstrText != NULL);
@@ -326,7 +326,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
                                                     ptStringInfo->chInterLineSpace);
 #   endif
 
-    if (update_location_and_resouce_region_with_mode(   ptControl,
+    if (update_location_and_resouce_region_with_mode(   control_ptr,
                                                         ptDirtyRegion,
                                                         tMode,
                                                         &tRealLocation,
@@ -345,7 +345,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
             tSize = vsf_tgui_text_get_size( chFontIndex, &tString, NULL, 0);
             tResourceRegion.tSize = tSize;
 
-            if (update_location_and_resouce_region_with_mode(   ptControl,
+            if (update_location_and_resouce_region_with_mode(   control_ptr,
                                                                 ptDirtyRegion,
                                                                 tMode,
                                                                 &tAbsoluteLocation,
@@ -355,7 +355,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
                     "[Simple View]%s draw text(%s) in "
                         "(x:%d, y:%d), size(w:%d, h:%d)"
                         VSF_TRACE_CFG_LINEEND,
-                    ptControl->use_as__vsf_msgt_node_t.node_name_ptr,
+                    control_ptr->use_as__vsf_msgt_node_t.node_name_ptr,
                     ptString->pstrText,
                     tRealLocation.iX,
                     tRealLocation.iY,
@@ -365,18 +365,18 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
                 tResourceRegion.tSize = tSize;
                 tRealLocation.iX = tAbsoluteLocation.iX;
 
-                vsf_tgui_region_t tTempRegion = {.tLocation = tRealLocation, .tSize = tSize};
+                vsf_tgui_region_t temp_region = {.tLocation = tRealLocation, .tSize = tSize};
 
-                if (vsf_tgui_region_intersect(&tTempRegion, &tTempRegion, &tAbsoluteDirtyRegion)) {
-                    tResourceRegion.tSize = tTempRegion.tSize;
+                if (vsf_tgui_region_intersect(&temp_region, &temp_region, &tAbsoluteDirtyRegion)) {
+                    tResourceRegion.tSize = temp_region.tSize;
 
-                    vsf_tgui_text_draw( &tTempRegion.tLocation,
+                    vsf_tgui_text_draw( &temp_region.tLocation,
                                         &tResourceRegion,
                                         &tString,
                                         chFontIndex,
                                         tColor,
                                         ptStringInfo->chInterLineSpace,
-                                        ptControl->use_as__vsf_tgui_v_control_t.chTransparencyRate);
+                                        control_ptr->use_as__vsf_tgui_v_control_t.chTransparencyRate);
                 }
 
                 tRealLocation.iY += tResourceRegion.tSize.iHeight + ptStringInfo->chInterLineSpace;
@@ -406,7 +406,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
                                                     ptStringInfo->chInterLineSpace);
 #endif
 
-    if (update_location_and_resouce_region_with_mode(   ptControl,
+    if (update_location_and_resouce_region_with_mode(   control_ptr,
                                                         ptDirtyRegion,
                                                         tMode,
                                                         &tRealLocation,
@@ -416,7 +416,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* ptControl,
             "[Simple View]%p draw text(%s) in "
                 "(x:%d, y:%d), size(w:%d, h:%d)"
                 VSF_TRACE_CFG_LINEEND,
-            ptControl,
+            control_ptr,
             ptStringInfo->tString,
             tRealLocation.iX,
             tRealLocation.iY,

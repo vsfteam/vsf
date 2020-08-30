@@ -99,7 +99,7 @@
                             .list.id = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
                             .list.Offset = {0},                                 \
                             .list.is_container = true,                          \
-                            .list.bIsControlTransparent = true,                 \
+                            .list.is_control_transparent = true,                 \
                             .list.bIsAutoSize = true,                           \
                             .list.bIsEnabled = true,                            \
                             .list.bIsVisible = true,                            \
@@ -140,7 +140,7 @@
                             .list.id = VSF_TGUI_COMPONENT_ID_CONTAINER,       \
                             .list.Offset = {0},                                 \
                             .list.is_container = true,                          \
-                            .list.bIsControlTransparent = true,                 \
+                            .list.is_control_transparent = true,                 \
                             .list.bIsAutoSize = true,                           \
                             .list.bIsEnabled = true,                            \
                             .list.bIsVisible = true,                            \
@@ -254,14 +254,14 @@ extern
 fsm_rt_t vk_tgui_list_init(vsf_tgui_list_t* ptList);
 
 extern
-fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_list_t* ptControl,
+fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_list_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
 SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate")
 extern
 vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
-                            const vsf_tgui_control_t* ptControl,
+                            const vsf_tgui_control_t* control_ptr,
                             const vsf_tgui_list_t* ptList, 
                             uint_fast8_t chScalingRatio, 
                             vsf_tgui_list_scrollbar_region_t *ptOutputBuffer);

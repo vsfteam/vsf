@@ -25,7 +25,7 @@
 #include "./vsf_eda.h"
 #include "./vsf_evtq.h"
 #include "./vsf_os.h"
-
+#include "utilities/vsf_utilities.h"
 /*============================ MACROS ========================================*/
 
 #define __VSF_OS_EVTQ_SWI_PRIO_INIT(__index, __unused)                          \
@@ -283,7 +283,7 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
     
     return (vsf_mem_t){
-        .PTR.src_ptr = (uint8_t *)__heap_buffer, 
+        .ptr.src_ptr = (uint8_t *)__heap_buffer, 
         .s32_size = sizeof(__heap_buffer)
     };
 #endif

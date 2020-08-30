@@ -104,8 +104,8 @@ static vsfvm_ret_t __vsfvm_ext_print(vsfvm_thread_t *thread)
                 if (var->inst->c->op.print != NULL) {
                     var->inst->c->op.print(var->inst);
                 } else {
-                    vsf_trace_buffer(VSF_TRACE_INFO, var->inst->buffer_ptr,
-                        var->inst->s32_size, VSF_TRACE_DF_U8_16);
+                    vsf_trace_buffer(VSF_TRACE_INFO, var->inst->buffer,
+                        var->inst->size, VSF_TRACE_DF_U8_16);
                 }
             } else {
                 vsf_trace_string(VSF_TRACE_INFO, "NULL");
@@ -128,7 +128,7 @@ static vsfvm_ret_t __vsfvm_ext_memset(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    memset(thiz->inst->buffer_ptr, value->uval8, size->uval32);
+    memset(thiz->inst->buffer, value->uval8, size->uval32);
     return VSFVM_RET_FINISHED;
 }
 
@@ -144,7 +144,7 @@ static vsfvm_ret_t __vsfvm_ext_memcpy(vsfvm_thread_t *thread)
         return VSFVM_RET_ERROR;
     }
 
-    memcpy(dst->inst->buffer_ptr, src->inst->buffer_ptr, size->uval32);
+    memcpy(dst->inst->buffer, src->inst->buffer, size->uval32);
     return VSFVM_RET_FINISHED;
 }
 
@@ -297,13 +297,13 @@ static vsfvm_ret_t __vsfvm_ext_buffer_create(vsfvm_thread_t *thread)
             return VSFVM_RET_INVALID_PARAM;
         } else {
             vsfvm_var_t *arg1 = vsfvm_get_func_argu_ref(thread, 1);
-            uint8_t *ptr = arg0->inst->buffer_ptr;
+            uint8_t *ptr = arg0->inst->buffer;
 
             if (vsfvm_var_alloc_instance(thread, result, 0, &vsfvm_ext_buffer)) {
                 return VSFVM_RET_ERROR;
             }
-            result->inst->buffer_ptr = ptr;
-            result->inst->s32_size = arg1->uval32;
+            result->inst->buffer = ptr;
+            result->inst->size = arg1->uval32;
         }
     } else {
         if (thread->func.argc != 1) {
@@ -313,7 +313,7 @@ static vsfvm_ret_t __vsfvm_ext_buffer_create(vsfvm_thread_t *thread)
             if (vsfvm_var_alloc_instance(thread, result, size, &vsfvm_ext_buffer)) {
                 return VSFVM_RET_ERROR;
             }
-            buffer = result->inst->buffer_ptr;
+            buffer = result->inst->buffer;
             memset(buffer, 0, size);
         }
     }
@@ -330,7 +330,7 @@ static vsfvm_ret_t __vsfvm_ext_buffer_get_size(vsfvm_thread_t *thread)
         return VSFVM_RET_INVALID_PARAM;
     }
 
-    size = thiz->inst->s32_size;
+    size = thiz->inst->size;
     vsfvm_var_set(thread, thiz, VSFVM_VAR_TYPE_VALUE, size);
     return VSFVM_RET_FINISHED;
 }
@@ -347,7 +347,7 @@ static vsfvm_ret_t __vsfvm_ext_buffer_parse(vsfvm_thread_t *thread)
     uint_fast8_t radix = vsfvm_get_func_argu_ref(thread, 1)->uval8;
     vsfvm_var_t *hex = vsfvm_get_func_argu_ref(thread, 2);
     char *str;
-    uint8_t *buf = thiz->inst->buffer_ptr;
+    uint8_t *buf = thiz->inst->buffer;
     int pos = 0;
 
     if (NULL == buf) {
@@ -364,11 +364,11 @@ static vsfvm_ret_t __vsfvm_ext_buffer_parse(vsfvm_thread_t *thread)
         if (NULL == hex->inst) {
             return VSFVM_RET_ERROR;
         }
-        str = (char *)hex->inst->buffer_ptr;
+        str = (char *)hex->inst->buffer;
         break;
     }
 
-    while ((str != NULL) && (pos < thiz->inst->s32_size)) {
+    while ((str != NULL) && (pos < thiz->inst->size)) {
         buf[pos++] = strtoul(str, &str, radix);
     }
     return VSFVM_RET_FINISHED;
@@ -386,7 +386,7 @@ static vsfvm_ret_t __vsfvm_ext_pointer_create(vsfvm_thread_t *thread)
         } else {
             vsfvm_var_t *offset = vsfvm_get_func_argu_ref(thread, 1);
             vsfvm_var_t *size = vsfvm_get_func_argu_ref(thread, 2);
-            uint8_t *addr = arg0->inst->buffer_ptr;
+            uint8_t *addr = arg0->inst->buffer;
 
             if ((size->uval32 != 1) && (size->uval32 != 2) && (size->uval32 != 4)) {
                 return VSFVM_RET_INVALID_PARAM;
@@ -394,8 +394,8 @@ static vsfvm_ret_t __vsfvm_ext_pointer_create(vsfvm_thread_t *thread)
             if (vsfvm_var_alloc_instance(thread, result, 0, &vsfvm_ext_pointer)) {
                 return VSFVM_RET_ERROR;
             }
-            result->inst->buffer_ptr = &addr[offset->uval32 * size->uval32];
-            result->inst->s32_size = size->uval32;
+            result->inst->buffer = &addr[offset->uval32 * size->uval32];
+            result->inst->size = size->uval32;
         }
     } else {
         if (thread->func.argc != 2) {
@@ -410,8 +410,8 @@ static vsfvm_ret_t __vsfvm_ext_pointer_create(vsfvm_thread_t *thread)
             if (vsfvm_var_alloc_instance(thread, result, 0, &vsfvm_ext_pointer)) {
                 return VSFVM_RET_ERROR;
             }
-            result->inst->buffer_ptr = addr;
-            result->inst->s32_size = size->uval32;
+            result->inst->buffer = addr;
+            result->inst->size = size->uval32;
         }
     }
     return VSFVM_RET_FINISHED;
@@ -429,15 +429,15 @@ static vsfvm_ret_t __vsfvm_ext_pointer_set(vsfvm_thread_t *thread)
     }
 
     inst = thiz->inst;
-    switch (inst->s32_size) {
+    switch (inst->size) {
     case 1:
-        ((uint8_t *)inst->buffer_ptr)[offset->uval32] = value->uval8;
+        ((uint8_t *)inst->buffer)[offset->uval32] = value->uval8;
         break;
     case 2:
-        ((uint16_t *)inst->buffer_ptr)[offset->uval32] = value->uval16;
+        ((uint16_t *)inst->buffer)[offset->uval32] = value->uval16;
         break;
     case 4:
-        ((uint32_t *)inst->buffer_ptr)[offset->uval32] = value->uval32;
+        ((uint32_t *)inst->buffer)[offset->uval32] = value->uval32;
         break;
     default:
         return VSFVM_RET_INVALID_PARAM;
@@ -458,15 +458,15 @@ static vsfvm_ret_t __vsfvm_ext_pointer_get(vsfvm_thread_t *thread)
     }
 
     inst = thiz->inst;
-    switch (inst->s32_size) {
+    switch (inst->size) {
     case 1:
-        value = ((uint8_t *)inst->buffer_ptr)[offset->uval32];
+        value = ((uint8_t *)inst->buffer)[offset->uval32];
         break;
     case 2:
-        value = ((uint16_t *)inst->buffer_ptr)[offset->uval32];
+        value = ((uint16_t *)inst->buffer)[offset->uval32];
         break;
     case 4:
-        value = ((uint32_t *)inst->buffer_ptr)[offset->uval32];
+        value = ((uint32_t *)inst->buffer)[offset->uval32];
         break;
     default:
         return VSFVM_RET_INVALID_PARAM;
@@ -477,7 +477,7 @@ static vsfvm_ret_t __vsfvm_ext_pointer_get(vsfvm_thread_t *thread)
 
 static void __vsfvm_ext_string_print(vsfvm_instance_t *inst)
 {
-    vsf_trace_string(VSF_TRACE_INFO, (char *)inst->buffer_ptr);
+    vsf_trace_string(VSF_TRACE_INFO, (char *)inst->buffer);
 }
 
 static vsfvm_ret_t __vsfvm_ext_string_create(vsfvm_thread_t *thread)
@@ -490,11 +490,11 @@ static vsfvm_ret_t __vsfvm_ext_string_create(vsfvm_thread_t *thread)
         return VSFVM_RET_INVALID_PARAM;
     }
 
-    char *str = (char *)&buffer->inst->buffer_ptr[offset->uval32];
+    char *str = (char *)&buffer->inst->buffer[offset->uval32];
     if (vsfvm_var_alloc_instance(thread, result, 0, &vsfvm_ext_string)) {
         return VSFVM_RET_ERROR;
     }
-    result->inst->buffer_ptr = (uint8_t *)str;
+    result->inst->buffer = (uint8_t *)str;
     return VSFVM_RET_FINISHED;
 }
 #endif

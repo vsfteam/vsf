@@ -39,7 +39,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #if VSF_USBD_CFG_USE_EDA != ENABLED
-#   error "need VSF_USBD_CFG_USE_EDA¡°
+#   error "need VSF_USBD_CFG_USE_EDA"
 #endif
 
 #if VSF_USE_USB_DEVICE != ENABLED || VSF_USE_USB_DEVICE_UVC != ENABLED

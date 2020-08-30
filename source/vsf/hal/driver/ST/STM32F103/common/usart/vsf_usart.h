@@ -87,6 +87,7 @@ struct vsf_usart_t {
     vsf_usart_evt_t    evt_rcv;
     vsf_usart_evt_t    evt_send;
     usart_status_t     evt_status;
+    usart_evt_status_t evt_mask;
 };
 
 extern vsf_err_t          vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr);
@@ -98,9 +99,9 @@ extern bool               vsf_usart_write_byte(vsf_usart_t *usart_ptr, uint_fast
 extern fsm_rt_t           vsf_usart_request_read(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size);
 extern fsm_rt_t           vsf_usart_request_write(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size);
 
-extern void               vsf_usart_evt_register(vsf_usart_evt_type_t type, vsf_usart_evt_t event);
-extern usart_evt_status_t vsf_usart_evt_enable(usart_evt_status_t event_mask);
-extern usart_evt_status_t vsf_usart_evt_disable(usart_evt_status_t event_mask);
-extern void               vsf_usart_evt_resume(usart_evt_status_t event_status);
+extern void               vsf_usart_evt_register(vsf_usart_t *usart_ptr, vsf_usart_evt_type_t type, vsf_usart_evt_t event);
+extern usart_evt_status_t vsf_usart_evt_enable(vsf_usart_t *usart_ptr, usart_evt_status_t event_mask);
+extern usart_evt_status_t vsf_usart_evt_disable(vsf_usart_t *usart_ptr, usart_evt_status_t event_mask);
+extern void               vsf_usart_evt_resume(vsf_usart_t *usart_ptr,usart_evt_status_t event_status);
 
 #endif

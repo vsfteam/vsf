@@ -18,7 +18,7 @@
 #ifndef __CONNECT_H__
 #define __CONNECT_H__
 
-#include "..\ooc_class.h"
+#include "../ooc_class.h"
 
 #ifdef __cplusplus
 extern "C" {

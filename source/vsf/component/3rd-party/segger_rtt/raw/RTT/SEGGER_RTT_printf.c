@@ -83,7 +83,7 @@ Revision: $Rev: 17697 $
 */
 
 typedef struct {
-  char*     buffer_ptr;
+  char*     pBuffer;
   unsigned  BufferSize;
   unsigned  Cnt;
 
@@ -114,7 +114,7 @@ static void _StoreChar(SEGGER_RTT_PRINTF_DESC * p, char c) {
 
   Cnt = p->Cnt;
   if ((Cnt + 1u) <= p->BufferSize) {
-    *(p->buffer_ptr + Cnt) = c;
+    *(p->pBuffer + Cnt) = c;
     p->Cnt = Cnt + 1u;
     p->ReturnValue++;
   }
@@ -122,7 +122,7 @@ static void _StoreChar(SEGGER_RTT_PRINTF_DESC * p, char c) {
   // Write part of string, when the buffer is full
   //
   if (p->Cnt == p->BufferSize) {
-    if (SEGGER_RTT_Write(p->RTTBufferIndex, p->buffer_ptr, p->Cnt) != p->Cnt) {
+    if (SEGGER_RTT_Write(p->RTTBufferIndex, p->pBuffer, p->Cnt) != p->Cnt) {
       p->ReturnValue = -1;
     } else {
       p->Cnt = 0u;
@@ -328,7 +328,7 @@ int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pPa
   unsigned FieldWidth;
   char acBuffer[SEGGER_RTT_PRINTF_BUFFER_SIZE];
 
-  BufferDesc.buffer_ptr        = acBuffer;
+  BufferDesc.pBuffer        = acBuffer;
   BufferDesc.BufferSize     = SEGGER_RTT_PRINTF_BUFFER_SIZE;
   BufferDesc.Cnt            = 0u;
   BufferDesc.RTTBufferIndex = BufferIndex;

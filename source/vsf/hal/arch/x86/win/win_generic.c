@@ -15,15 +15,16 @@
  *                                                                           *
  ****************************************************************************/
 
- /*============================ INCLUDES ======================================*/
+/*============================ INCLUDES ======================================*/
 
 #define VSF_ARCH_WIN_IMPLEMENT
 #include "hal/arch/vsf_arch_abstraction.h"
-#include "hal/driver/driver.h"
+
+#if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
+
 #include "utilities/template/vsf_list.h"
 #include "hal/arch/__vsf_arch_interface.h"
 
-#include <stdio.h>
 #include <Windows.h>
 
 /*============================ MACROS ========================================*/
@@ -119,10 +120,14 @@ typedef struct vsf_arch_swi_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t request;
     bool inited;
+
+    vsf_irq_handler_t *handler;
+    void *param;
 } vsf_arch_swi_ctx_t;
 
 typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
+    vsf_arch_irq_request_t timer_request;
     HANDLE timer;
     vsf_systimer_cnt_t start_tick;
 } vsf_arch_systimer_ctx_t;
@@ -280,7 +285,7 @@ static vsf_arch_irq_thread_t * __vsf_arch_get_cur_irq_thread(void)
     return NULL;
 }
 
-void __vsf_arch_lock(void)
+static void __vsf_arch_lock(void)
 {
     // TODO: use EnterCriticalSection after stable
 //    vsf_arch_irq_thread_t *irq_thread = __vsf_arch_get_cur_irq_thread();
@@ -302,7 +307,7 @@ void __vsf_arch_lock(void)
 //    EnterCriticalSection(&__vsf_x86.lock);
 }
 
-void __vsf_arch_unlock(void)
+static void __vsf_arch_unlock(void)
 {
 //    __vsf_arch_bg_trace(VSF_ARCH_TRACE_LOCK, __vsf_x86.cur_lock_owner, NULL, 0, 0);
     __vsf_x86.cur_lock_owner = NULL;
@@ -636,9 +641,10 @@ void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread)
 }
 
 void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
-    vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority, bool is_to_start)
+    vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority)
 {
     VSF_HAL_ASSERT(strlen(name) < sizeof(irq_thread->name) - 1);
+    VSF_HAL_ASSERT(NULL == irq_thread->thread);
     strcpy((char *)irq_thread->name, name);
 
     vsf_dlist_init_node(vsf_arch_irq_thread_t, irq_node, irq_thread);
@@ -654,9 +660,7 @@ void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
     __vsf_arch_lock();
         vsf_dlist_add_to_head(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, irq_thread);
     __vsf_arch_unlock();
-    if (is_to_start) {
-        ResumeThread(irq_thread->thread);
-    }
+    ResumeThread(irq_thread->thread);
 }
 
 void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread)
@@ -698,16 +702,10 @@ void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 static void __vsf_systimer_thread(void *arg)
 {
     vsf_arch_systimer_ctx_t *ctx = arg;
-    LARGE_INTEGER li = {
-        .QuadPart = -VSF_ARCH_SYSTIMER_FREQ / 10,
-    };
-
     __vsf_arch_irq_set_background(&ctx->use_as__vsf_arch_irq_thread_t);
     while (1) {
+        __vsf_arch_irq_request_pend(&__vsf_x86.systimer.timer_request);
         WaitForSingleObject(ctx->timer, INFINITE);
-        if (!SetWaitableTimer(ctx->timer, &li, 0, NULL, NULL, false)) {
-            VSF_HAL_ASSERT(false);
-        }
 
         __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
 
@@ -729,20 +727,19 @@ static void __vsf_systimer_thread(void *arg)
  */
 vsf_err_t vsf_systimer_init(void)
 {
-    __vsf_x86.systimer.start_tick = 0;
     __vsf_x86.systimer.start_tick = vsf_systimer_get();
 
     __vsf_x86.systimer.timer = CreateWaitableTimer(NULL, true, NULL);
     VSF_HAL_ASSERT(NULL != __vsf_x86.systimer.timer);
 
-    __vsf_arch_irq_init(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t,
-                "timer", __vsf_systimer_thread, vsf_arch_prio_32, false);
+    __vsf_arch_irq_request_init(&__vsf_x86.systimer.timer_request);
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_systimer_start(void)
 {
-    ResumeThread(__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t.thread);
+    __vsf_arch_irq_init(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t,
+                "timer", __vsf_systimer_thread, vsf_arch_prio_32);
     return VSF_ERR_NONE;
 }
 
@@ -771,6 +768,7 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
         VSF_HAL_ASSERT(false);
         return false;
     }
+    __vsf_arch_irq_request_send(&__vsf_x86.systimer.timer_request);
     return true;
 }
 
@@ -847,7 +845,7 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
             sprintf(swi_name, "swi%d", idx);
             __vsf_arch_irq_request_init(&ctx->request);
             __vsf_arch_irq_init(&ctx->use_as__vsf_arch_irq_thread_t, swi_name,
-                        __vsf_arch_swi_thread, priority, true);
+                        __vsf_arch_swi_thread, priority);
         }
 
         return VSF_ERR_NONE;
@@ -994,6 +992,11 @@ void vsf_enable_interrupt(void)
 /*----------------------------------------------------------------------------*
  * Others: sleep, reset and etc.                                              *
  *----------------------------------------------------------------------------*/
+void __vsf_arch_irq_sleep(uint32_t ms)
+{
+    Sleep(ms);
+}
+
 void vsf_arch_sleep(uint32_t mode)
 {
     if (GetCurrentThreadId() == __vsf_x86.por_thread.thread_id) {
@@ -1004,4 +1007,5 @@ void vsf_arch_sleep(uint32_t mode)
     }
 }
 
+#endif
 /* EOF */

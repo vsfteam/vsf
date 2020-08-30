@@ -335,8 +335,8 @@ vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
                 break;
             }
 
-            dev->ctrl_handler.trans.buffer_ptr = buffer;
-            dev->ctrl_handler.trans.s32_size = size;
+            dev->ctrl_handler.trans.buffer = buffer;
+            dev->ctrl_handler.trans.size = size;
         }
         break;
     case USB_ON_STATUS: {

@@ -22,7 +22,7 @@
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 
-#include "./RTT/SEGGER_RTT.h"
+#include "RTT/SEGGER_RTT.h"
 
 #include "utilities/vsf_utilities.h"
 
@@ -52,7 +52,7 @@ vsf_stream_status_t __vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *obj_p
 
 static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
                                             vsf_stream_tx_t *obj_ptr, 
-                                            vsf_stream_dat_drn_evt_t tEvent);
+                                            vsf_stream_dat_drn_evt_t event);
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -211,14 +211,14 @@ static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
 static 
 vsf_stream_status_t __vsf_segger_rtt_stream_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
-    return (vsf_stream_status_t){0};//s_tNuStream.tStatus;
+    return (vsf_stream_status_t){0};//s_tNuStream.Status;
 }
 
 static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(  
                                             vsf_stream_tx_t *obj_ptr, 
-                                            vsf_stream_dat_drn_evt_t tEvent)
+                                            vsf_stream_dat_drn_evt_t event)
 {
-    //s_tNuStream.tEvent = tEvent;
+    //s_tNuStream.event = event;
     return VSF_ERR_NONE;
 }
 #endif

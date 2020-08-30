@@ -35,8 +35,6 @@
 #   include VSF_LIBUSB_CFG_INCLUDE
 #endif
 
-#include <Windows.h>
-
 /*============================ MACROS ========================================*/
 
 #ifndef LIBUSB_API_VERSION
@@ -424,7 +422,7 @@ static int __vk_libusb_hcd_init(void)
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
         __vk_libusb_hcd_trace_dev_irq(libusb_dev, "init");
 #endif
-        __vsf_arch_irq_init(&libusb_dev->irq_thread, "libusb_hcd_dev", __vk_libusb_hcd_dev_thread, param->priority, true);
+        __vsf_arch_irq_init(&libusb_dev->irq_thread, "libusb_hcd_dev", __vk_libusb_hcd_dev_thread, param->priority);
 
         if (__vk_libusb_hcd.is_hotplug_supported) {
             libusb_hotplug_register_callback(__vk_libusb_hcd.ctx,
@@ -874,7 +872,7 @@ static vsf_err_t __vk_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
         __vk_libusb_hcd_trace_hcd_irq("init");
 #endif
-        __vsf_arch_irq_init(&__vk_libusb_hcd.init_thread, "libusb_hcd_init", __vk_libusb_hcd_init_thread, param->priority, true);
+        __vsf_arch_irq_init(&__vk_libusb_hcd.init_thread, "libusb_hcd_init", __vk_libusb_hcd_init_thread, param->priority);
         break;
     case VSF_EVT_LIBUSB_HCD_READY:
         return VSF_ERR_NONE;
@@ -925,7 +923,7 @@ static vk_usbh_hcd_urb_t * __vk_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 #endif
         libusb_urb->is_msg_processed = true;
         libusb_urb->is_irq_enabled = true;
-        __vsf_arch_irq_init(&libusb_urb->irq_thread, "libusb_hcd_urb", __vk_libusb_hcd_urb_thread, param->priority, true);
+        __vsf_arch_irq_init(&libusb_urb->irq_thread, "libusb_hcd_urb", __vk_libusb_hcd_urb_thread, param->priority);
     }
     return urb;
 }

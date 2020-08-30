@@ -609,7 +609,7 @@ extern vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
 #include "./class/MSC/vsf_usbh_msc.h"
 #include "./class/UAC/vsf_usbh_uac.h"
 #include "./class/rtl8152/vsf_usbh_rtl8152.h"
-#include "./class/dfu/vsf_usbh_dfu.h"
+#include "./class/DFU/vsf_usbh_dfu.h"
 
 #include "../driver/hcd/ohci/vsf_ohci.h"
 #include "../driver/otg/dwcotg/vsf_dwcotg_hcd.h"

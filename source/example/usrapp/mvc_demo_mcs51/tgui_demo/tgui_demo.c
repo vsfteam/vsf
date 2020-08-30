@@ -45,11 +45,11 @@ static NO_INIT stopwatch_t s_tMyStopwatch;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void vsf_tgui_region_init_with_size(vsf_tgui_region_t* ptRegion, vsf_tgui_size_t* ptSize)
+static void vsf_tgui_region_init_with_size(vsf_tgui_region_t* region_ptr, vsf_tgui_size_t* ptSize)
 {
-    ptRegion->tLocation.iX = 0;
-    ptRegion->tLocation.iY = 0;
-    ptRegion->tSize = *ptSize;
+    region_ptr->tLocation.iX = 0;
+    region_ptr->tLocation.iY = 0;
+    region_ptr->tSize = *ptSize;
 }
 
 
@@ -72,15 +72,15 @@ vsf_err_t tgui_demo_init(void)
     NO_INIT static uint16_t __bfs_buffer[32];
     
     const vsf_tgui_cfg_t cfg = {
-        .tEVTQueue = {
+        .evt_queue = {
             .obj_ptr = __evt_queue_buffer, 
             .s32_size = sizeof(__evt_queue_buffer)
         },
-        .tBFSQueue = {
+        .bfs_queue = {
             .obj_ptr = __bfs_buffer,
             .s32_size = sizeof(__bfs_buffer),
         },
-        .ptRootNode = (vsf_tgui_control_t *)&s_tMyStopwatch,
+        .root_node_ptr = (vsf_tgui_control_t *)&s_tMyStopwatch,
     };
     vsf_err_t err = vk_tgui_init(&s_tTGUIDemo, &cfg);
     
@@ -104,20 +104,20 @@ vsf_err_t tgui_demo_init(void)
 //    }
 //*/
 ////! this block of code is used for test purpose only
-//    vsf_tgui_evt_t tEvent = {
+//    vsf_tgui_evt_t event = {
 //        .tKeyEvt = {
-//            .tMSG = vsf_input_keyboard_is_down(evt)
+//            .msg = vsf_input_keyboard_is_down(evt)
 //                                ? VSF_TGUI_EVT_KEY_DOWN
 //                                : VSF_TGUI_EVT_KEY_UP,
 //            .hwKeyValue = vsf_input_keyboard_get_keycode(evt),
 //        },
 //    };
 //
-//    vk_tgui_send_message(&s_tTGUIDemo, tEvent);
+//    vk_tgui_send_message(&s_tTGUIDemo, event);
 //
 //    if (!vsf_input_keyboard_is_down(evt)) {
-//        tEvent.tKeyEvt.tMSG = VSF_TGUI_EVT_KEY_PRESSED;
-//        vk_tgui_send_message(&s_tTGUIDemo, tEvent);
+//        event.tKeyEvt.msg = VSF_TGUI_EVT_KEY_PRESSED;
+//        vk_tgui_send_message(&s_tTGUIDemo, event);
 //    }
 //}
 
@@ -133,9 +133,9 @@ vsf_err_t tgui_demo_init(void)
 // */
 //    //! this block of code is used for test purpose only
 //
-//    vsf_tgui_evt_t tEvent = {
-//        .tPointerEvt = {
-//            .tMSG = vsf_input_touchscreen_is_down(ts_evt) 
+//    vsf_tgui_evt_t event = {
+//        .PointerEvt = {
+//            .msg = vsf_input_touchscreen_is_down(ts_evt) 
 //                                ?   VSF_TGUI_EVT_POINTER_DOWN 
 //                                :   VSF_TGUI_EVT_POINTER_UP,
 //            
@@ -144,12 +144,12 @@ vsf_err_t tgui_demo_init(void)
 //        },
 //    };
 //
-//    vk_tgui_send_message(&s_tTGUIDemo, tEvent);
+//    vk_tgui_send_message(&s_tTGUIDemo, event);
 //
 //    
 //    if (!vsf_input_touchscreen_is_down(ts_evt)) {
-//        tEvent.tPointerEvt.tMSG = VSF_TGUI_EVT_POINTER_CLICK;
-//        vk_tgui_send_message(&s_tTGUIDemo, tEvent);
+//        event.PointerEvt.msg = VSF_TGUI_EVT_POINTER_CLICK;
+//        vk_tgui_send_message(&s_tTGUIDemo, event);
 //    }
 //}
 

@@ -50,7 +50,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "..\compiler\compiler.h"
+#include "../compiler/compiler.h"
 
 #ifdef __cplusplus
 extern "C" {

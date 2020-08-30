@@ -101,7 +101,7 @@
                 .tList.id = VSF_TGUI_COMPONENT_ID_CONTAINER,                  \
                 .tList.Offset = {0},                                            \
                 .tList.is_container = true,                                     \
-                .tList.bIsControlTransparent = true,                            \
+                .tList.is_control_transparent = true,                            \
                 .tList.bIsAutoSize = true,                                      \
                 .tList.bIsEnabled = true,                                       \
                 .tList.bIsVisible = true,                                       \
@@ -147,7 +147,7 @@
                 .tList.id = VSF_TGUI_COMPONENT_ID_CONTAINER,                  \
                 .tList.Offset = {0},                                            \
                 .tList.is_container = true,                                     \
-                .tList.bIsControlTransparent = true,                            \
+                .tList.is_control_transparent = true,                            \
                 .tList.bIsAutoSize = true,                                      \
                 .tList.bIsEnabled = true,                                       \
                 .tList.bIsVisible = true,                                       \
@@ -216,7 +216,7 @@ end_def_class(vsf_tgui_text_list_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 extern
-fsm_rt_t vsf_tgui_text_list_msg_handler(vsf_tgui_text_list_t* ptControl,
+fsm_rt_t vsf_tgui_text_list_msg_handler(vsf_tgui_text_list_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 extern
 fsm_rt_t vk_tgui_text_list_init(vsf_tgui_text_list_t* ptLabel);

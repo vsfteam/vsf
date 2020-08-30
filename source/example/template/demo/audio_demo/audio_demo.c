@@ -31,7 +31,7 @@ int audio_play_main(int argc, char *argv[])
     }
 
     char * ext = vk_file_getfileext(argv[1]);
-    for (char *tmp = ext; *tmp != NULL; tmp++) {
+    for (char *tmp = ext; *tmp != '\0'; tmp++) {
         *tmp = tolower(*tmp);
     }
 
@@ -40,6 +40,7 @@ int audio_play_main(int argc, char *argv[])
     vk_file_stream_t file_stream;
     uint_fast32_t delay_us;
     enum {
+        FILE_FORMAT_NONE,
         FILE_FORMAT_PCM,
         FILE_FORMAT_WAV,
         FILE_FORMAT_MP3,
@@ -92,6 +93,7 @@ int audio_play_main(int argc, char *argv[])
         goto cleanup;
     } else {
         print_help(argv[0]);
+        file_format = FILE_FORMAT_NONE;
         goto cleanup;
     }
 

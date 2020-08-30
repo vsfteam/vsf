@@ -35,60 +35,60 @@ declare_class(vsf_tgui_t)
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* ptControl)
+const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* control_ptr)
 {
-    return ptControl->use_as__vsf_msgt_node_t.node_name_ptr;
+    return control_ptr->use_as__vsf_msgt_node_t.node_name_ptr;
 }
 #endif
 
-fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* ptControl)
+fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
 {
 #if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view init" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(ptControl), ptControl);
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view init" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif
 
     /*
-    vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptControl);
-    tStatus.chStatus |= VSF_TGUI_CTRL_STATUS_INITIALISED    |
+    vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)control_ptr);
+    Status.chStatus |= VSF_TGUI_CTRL_STATUS_INITIALISED    |
                         VSF_TGUI_CTRL_STATUS_VISIBLE        |
                         VSF_TGUI_CTRL_STATUS_ENABLED;
 
-    vsf_tgui_control_status_set((vsf_tgui_control_t *)ptControl, tStatus);
+    vsf_tgui_control_status_set((vsf_tgui_control_t *)control_ptr, Status);
 
-    return vk_tgui_control_update(ptControl);
+    return vk_tgui_control_update(control_ptr);
     */
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* ptControl,
+fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t tMode)
 {
     __vsf_tgui_control_core_t* ptCore;
     const vsf_tgui_tile_t* ptTile;
 
-    VSF_TGUI_ASSERT(ptControl != NULL);
+    VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
 #if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(ptControl), ptControl);
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif
 
-    ptCore = vsf_tgui_control_get_core(ptControl);
+    ptCore = vsf_tgui_control_get_core(control_ptr);
     ptTile = ptCore->tBackground.ptTile;
     if (ptTile != NULL) {
-        vsf_tgui_control_v_draw_tile(ptControl, ptDirtyRegion, ptTile, ptCore->tBackground.tAlign);
+        vsf_tgui_control_v_draw_tile(control_ptr, ptDirtyRegion, ptTile, ptCore->tBackground.tAlign);
     }
 
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* ptControl)
+fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_control_t* ptControl)
+fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }

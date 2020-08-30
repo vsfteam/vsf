@@ -74,8 +74,8 @@ static void __vsf_stream_writer_send_current_pbuf(vsf_stream_writer_t *obj_ptr)
     
     __SAFE_ATOM_CODE(
         if (0 != this.hwOffset) {
-            ptPBUF = this.ptCurrent;
-            this.ptCurrent = NULL;
+            ptPBUF = this.current_ptr;
+            this.current_ptr = NULL;
         }
     );
 
@@ -111,12 +111,12 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *obj_ptr,
     
 
     __SAFE_ATOM_CODE(
-        if (NULL == this.ptCurrent) {
-            this.ptCurrent = vsf_stream_src_new_pbuf(
+        if (NULL == this.current_ptr) {
+            this.current_ptr = vsf_stream_src_new_pbuf(
                                 &this.use_as__vsf_stream_src_t, -1, -1);
-            if (NULL != this.ptCurrent) {
+            if (NULL != this.current_ptr) {
                 this.hwOffset = 0;
-                this.hwBufferSize = vsf_pbuf_size_get(this.ptCurrent);
+                this.hwBufferSize = vsf_pbuf_size_get(this.current_ptr);
             } 
         }
     )
@@ -126,9 +126,9 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *obj_ptr,
         }
 
         __SAFE_ATOM_CODE(
-            if (NULL != this.ptCurrent) {
+            if (NULL != this.current_ptr) {
                 if (this.hwOffset < this.hwBufferSize) {
-                    nWrittenSize = vsf_pbuf_buffer_write(  this.ptCurrent, 
+                    nWrittenSize = vsf_pbuf_buffer_write(  this.current_ptr, 
                                                             buffer_ptr,
                                                             u16_size,
                                                             this.hwOffset);
@@ -161,7 +161,7 @@ fsm_rt_t vsf_stream_writer_flush (vsf_stream_writer_t *obj_ptr)
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
     
 
-    if (NULL != this.ptCurrent) {
+    if (NULL != this.current_ptr) {
         __vsf_stream_writer_send_current_pbuf(obj_ptr);
     }
     

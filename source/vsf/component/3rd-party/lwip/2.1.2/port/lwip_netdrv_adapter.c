@@ -259,8 +259,8 @@ static void * __lwip_netdrv_adapter_read_buf(void *netbuf, vsf_mem_t *mem)
     ASSERT((netbuf != NULL) && (mem != NULL));
     struct pbuf *pbuf = netbuf;
 
-    mem->buffer_ptr = pbuf->payload;
-    mem->s32_size = pbuf->len;
+    mem->buffer = pbuf->payload;
+    mem->size = pbuf->len;
     return pbuf->next;
 }
 

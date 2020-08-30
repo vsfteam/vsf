@@ -1146,6 +1146,55 @@ typedef volatile uint32_t           reg32_t;
 
 /*============================ TYPES =========================================*/
 
+typedef enum IRQn
+{
+    UART0_IRQn          = 1,
+    UART1_IRQn,
+    UART2_IRQn,
+    OWA_IRQn            = 5,
+    CIR_IRQn,
+    TWI0_IRQn,
+    TWI1_IRQn,                               /*!< IRQ8 */
+    TWI2_IRQn,
+    SPI0_IRQn,
+    SPI1_IRQn,
+                                            /*!< IRQ12 */ 
+    Timer0_IRQn         = 13,
+    Timer1_IRQn,
+    Timer2_IRQn,
+    WatchDog_IRQn,                           /*!< IRQ16 */
+    RSB_IRQn,
+    DMA_IRQn,
+
+    TouchPanel_IRQn     = 20,               /*!< IRQ20 */
+    AudioCodec_IRQn,
+    KEYADC_IRQn,
+    SDC0_IRQn,
+    SDC1_IRQn,                               /*!< IRQ24 */
+                         
+    USBOTG_IRQn         = 26,
+    TVD_IRQn,
+    TVE_IRQn,                                /*!< IRQ28 */
+    TCON_IRQn,
+    DEFE_IRQn,
+    DEBE_IRQn,
+    CSI_IRQn,                                /*!< IRQ32 */
+    DEInterlacer_IRQn,
+    VE_IRQn,
+    DAUDIO_IRQn,
+
+    PIOD_IRQn           = 38,
+    PIOE_IRQn,
+    PIOF_IRQn,                               /*!< IRQ40 */
+
+    SWI0_IRQn           = 60,               /*!< IRQ60 */
+    SWI1_IRQn,
+    SWI2_IRQn,
+    SWI3_IRQn,
+}IRQn_Type;
+
+
+
 typedef struct syscon_reg_t {
     RESERVED_U32N(1)
     reg32_t USB_CTRL;

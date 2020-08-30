@@ -52,8 +52,8 @@ void vsfip_dhcp_end_opt(vsfip_netbuf_t *netbuf, uint32_t *optlen)
         head->options[(*optlen)++] = 0;
     }
     // tweak options length
-    netbuf->app.s32_size -= sizeof(head->options);
-    netbuf->app.s32_size += *optlen;
+    netbuf->app.size -= sizeof(head->options);
+    netbuf->app.size += *optlen;
 }
 
 uint_fast8_t vsfip_dhcp_get_opt(vsfip_netbuf_t * netbuf, uint_fast8_t option,
@@ -62,7 +62,7 @@ uint_fast8_t vsfip_dhcp_get_opt(vsfip_netbuf_t * netbuf, uint_fast8_t option,
     vsfip_dhcp_head_t *head = netbuf->app.obj_ptr;
     uint8_t *ptr = head->options;
 
-    while ((ptr[0] != DHCP_OPT_END) && ((ptr - netbuf->app.buffer_ptr) < netbuf->app.s32_size)) {
+    while ((ptr[0] != DHCP_OPT_END) && ((ptr - netbuf->app.buffer) < netbuf->app.size)) {
         if (ptr[0] == option) {
             if (data != NULL) {
                 *data = &ptr[2];

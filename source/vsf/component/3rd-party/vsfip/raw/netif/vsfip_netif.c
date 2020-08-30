@@ -239,7 +239,7 @@ static vsf_err_t __vsfip_netif_output(vsfip_netbuf_t *netbuf,
 
 static void __vsfip_netif_get_ipaddr(vsfip_netbuf_t *netbuf, vsfip_ipaddr_t *ipaddr)
 {
-    uint_fast8_t ipver = *netbuf->buf.buffer_ptr >> 4;
+    uint_fast8_t ipver = *netbuf->buf.buffer >> 4;
 
     if (4 == ipver) {
         // IPv4
@@ -281,7 +281,7 @@ vsf_err_t vsfip_netif_ip_output(vsfip_netbuf_t *netbuf, bool urgent)
         vsf_slist_queue_enqueue(vsfip_netbuf_t, netif_node, &netif->arpc.request_queue, netbuf);
         vsf_sched_unlock(origlevel);
         return vsf_eda_sem_post(&netif->arpc.sem);
-    } else if (netbuf->buf.s32_size) {
+    } else if (netbuf->buf.size) {
         return __vsfip_netif_output(netbuf, VSFIP_NETIF_PROTO_IP, &mac, urgent);
     }
     return VSF_ERR_NONE;
@@ -344,7 +344,7 @@ void vsfip_netif_arp_input(vsfip_netbuf_t *netbuf)
 
         if (    (head->hwlen == netif->netdrv->macaddr.size)
             &&  (head->protolen == netif->ip4addr.size)
-            &&  (netbuf->buf.s32_size >= (sizeof(vsfip_arp_head_t) + 2 * (head->hwlen + head->protolen)))
+            &&  (netbuf->buf.size >= (sizeof(vsfip_arp_head_t) + 2 * (head->hwlen + head->protolen)))
             &&  !memcmp(bufptr + 2 * head->hwlen + head->protolen, netif->ip4addr.addr_buf, head->protolen)) {
 
             vsfip_macaddr_t macaddr;
@@ -361,7 +361,7 @@ void vsfip_netif_arp_input(vsfip_netbuf_t *netbuf)
             memcpy(bufptr + head->hwlen, netif->ip4addr.addr_buf, head->protolen);
             memcpy(bufptr + head->hwlen + head->protolen, macaddr.addr_buf, head->hwlen);
             memcpy(bufptr + 2 * head->hwlen + head->protolen, ipaddr.addr_buf, head->protolen);
-            netbuf->buf.s32_size = sizeof(*head) + 2 * (head->hwlen + head->protolen);
+            netbuf->buf.size = sizeof(*head) + 2 * (head->hwlen + head->protolen);
 
             // send ARP reply
             __vsfip_netif_output(netbuf, VSFIP_NETIF_PROTO_ARP, &macaddr, false);
@@ -372,7 +372,7 @@ void vsfip_netif_arp_input(vsfip_netbuf_t *netbuf)
         // for ARP reply, cache and send UPDATE event to netif->arpc.sm_pending
         if (    (head->hwlen != netif->netdrv->macaddr.size)
             ||  (head->protolen != netif->ip4addr.size)
-            ||  (netbuf->buf.s32_size < (sizeof(vsfip_arp_head_t) + 2 * (head->hwlen + head->protolen)))) {
+            ||  (netbuf->buf.size < (sizeof(vsfip_arp_head_t) + 2 * (head->hwlen + head->protolen)))) {
             break;
         }
 
@@ -411,7 +411,7 @@ static vsfip_netbuf_t * __vsfip_netif_prepare_arp_request(
         ptr += macaddr->size;
         memcpy(ptr, ipaddr->addr_buf, ipaddr->size);
         ptr += ipaddr->size;
-        netbuf->app.s32_size = netbuf->buf.s32_size = ptr - (uint8_t *)head;
+        netbuf->app.size = netbuf->buf.size = ptr - (uint8_t *)head;
     }
     return netbuf;
 }

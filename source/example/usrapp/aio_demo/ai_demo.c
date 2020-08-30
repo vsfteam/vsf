@@ -80,12 +80,12 @@ void ai_demo_mnist(uint_fast8_t index)
     float prob;
 
     printf("\nprediction start.. \n");
-    tick = vsf_timer_get_tick();
+    tick = vsf_systimer_get_tick();
     
     // copy data and do prediction
     memcpy(ai_demo.mnist_data.input_data, (int8_t*)&img[index][0], 784);
     nnom_predict(ai_demo.model, &predic_label, &prob);
-    time = vsf_timer_get_tick() - tick;
+    time = vsf_systimer_get_tick() - tick;
     
     //print original image to console
     print_img((int8_t*)&img[index][0]);

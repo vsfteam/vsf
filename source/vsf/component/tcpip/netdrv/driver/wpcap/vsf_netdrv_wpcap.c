@@ -145,7 +145,7 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
 
     wpcap_netdrv->fp = __vk_netdrv_wpcap_open(wpcap_netdrv->name);
     if (wpcap_netdrv->fp != NULL) {
-        __vsf_arch_irq_init(&wpcap_netdrv->irq_thread, "netdrv_wpcap", __vk_netdrv_wpcap_netlink_thread, VSF_NETDRV_WPCAP_CFG_HW_PRIORITY, true);
+        __vsf_arch_irq_init(&wpcap_netdrv->irq_thread, "netdrv_wpcap", __vk_netdrv_wpcap_netlink_thread, VSF_NETDRV_WPCAP_CFG_HW_PRIORITY);
         return VSF_ERR_NONE;
     }
 

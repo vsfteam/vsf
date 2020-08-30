@@ -24,7 +24,7 @@
 
 #   define usrapp_eda_t             vsf_teda_t
 #   define usrapp_eda_init          vsf_teda_init_ex
-#   define usrapp_cur_tick()        vsf_systimer_tick_to_ms(vsf_timer_get_tick())
+#   define usrapp_cur_tick()        vsf_systimer_get_ms()
 
 #   define usrapp_sem_pend_timeout  vsf_systimer_us_to_tick(100)
 #   define usrapp_sem_post_delay()  vsf_teda_set_timer(vsf_systimer_us_to_tick(10))

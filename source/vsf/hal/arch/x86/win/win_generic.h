@@ -35,19 +35,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
-#define __LITTLE_ENDIAN                 1
-#define __BYTE_ORDER                    __LITTLE_ENDIAN
+#ifndef __LITTLE_ENDIAN
+#   define __LITTLE_ENDIAN                 1
+#endif
+#ifndef __BYTE_ORDER
+#   define __BYTE_ORDER                    __LITTLE_ENDIAN
+#endif
 
-#define VSF_ARCH_PRI_NUM                64
+#ifndef VSF_ARCH_PRI_NUM
+#   define VSF_ARCH_PRI_NUM             64
+#endif
 
 #ifndef VSF_SYSTIMER_CFG_IMPL_MODE
 #   define VSF_SYSTIMER_CFG_IMPL_MODE   VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 #endif
 
 // software interrupt provided by arch
-#define VSF_ARCH_SWI_NUM                32
+#ifndef VSF_ARCH_SWI_NUM
+#   define VSF_ARCH_SWI_NUM             32
+#endif
 
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
@@ -92,18 +101,37 @@ typedef enum vsf_arch_prio_t {
 declare_simple_class(vsf_arch_irq_thread_t)
 declare_simple_class(vsf_arch_irq_request_t)
 
-typedef enum vsf_arch_irq_state_t {
-    VSF_ARCH_IRQ_STATE_IDLE,
-    VSF_ARCH_IRQ_STATE_ACTIVE,
-    VSF_ARCH_IRQ_STATE_FOREGROUND,
-    VSF_ARCH_IRQ_STATE_BACKGROUND,
-} vsf_arch_irq_state_t;
+typedef void (*vsf_arch_irq_entry_t)(void*);
 
 def_simple_class(vsf_arch_irq_request_t) {
     private_member(
         HANDLE event;
     )
 };
+
+/*============================ INCLUDES ======================================*/
+
+#if VSF_ARCH_PRI_NUM == 1 && VSF_ARCH_SWI_NUM == 0
+#   include "hal/arch/common/arch_without_thread_suspend/vsf_arch_without_thread_suspend_template.h"
+#endif
+
+/*============================ TYPES =========================================*/
+
+#if VSF_ARCH_PRI_NUM == 1 && VSF_ARCH_SWI_NUM == 0
+def_simple_class(vsf_arch_irq_thread_t) {
+    private_member(
+        implement(vsf_arch_irq_thread_common_t)
+        HANDLE thread;
+        DWORD thread_id;
+    )
+};
+#else
+typedef enum vsf_arch_irq_state_t {
+    VSF_ARCH_IRQ_STATE_IDLE,
+    VSF_ARCH_IRQ_STATE_ACTIVE,
+    VSF_ARCH_IRQ_STATE_FOREGROUND,
+    VSF_ARCH_IRQ_STATE_BACKGROUND,
+} vsf_arch_irq_state_t;
 
 def_simple_class(vsf_arch_irq_thread_t) {
     private_member(
@@ -117,20 +145,15 @@ def_simple_class(vsf_arch_irq_thread_t) {
         vsf_arch_irq_thread_t *prev;     // call stack
         vsf_arch_irq_state_t state;
         vsf_arch_irq_request_t *reply;
-
-        vsf_irq_handler_t *handler;
-        void *param;
     )
 };
-
-typedef void (*vsf_arch_irq_entry_t)(void*);
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_arch_lock(void);
-extern void __vsf_arch_unlock(void);
+extern void __vsf_arch_irq_sleep(uint32_t ms);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
@@ -138,7 +161,7 @@ extern void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request);
 
 extern void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
-    vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority, bool is_to_start);
+    vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority);
 extern void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread);

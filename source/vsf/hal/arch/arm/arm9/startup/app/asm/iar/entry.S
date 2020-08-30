@@ -173,7 +173,7 @@ irq:
     ; IAR provide __irq __nested __arm to handle those
     ;sub     lr, lr, #4
     ;save_regs
-    bl      IRQ_Handler
+    b      IRQ_Handler
     ;restore_regs
 
 fiq:

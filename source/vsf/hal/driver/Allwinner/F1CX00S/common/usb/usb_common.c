@@ -19,7 +19,7 @@
 
 //#include "../common.h"
 #include "./usb.h"
-
+#include "../intc/intc.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -71,6 +71,11 @@ void __f1cx00s_usb_register_irq(f1cx00s_usb_otg_t *usb, void (*irqhandler)(void 
 {
     usb->irq.handler = irqhandler;
     usb->irq.param = param;
+    if (irqhandler != NULL) {
+        intc_enable_irq(USBOTG_IRQn);
+    } else {
+        intc_disable_irq(USBOTG_IRQn);
+    }
 }
 
 uint_fast16_t __f1cx00s_usb_rxfifo_size(f1cx00s_usb_otg_t *usb, uint_fast8_t ep)
@@ -128,4 +133,9 @@ bool f1cx00s_usb_irq(f1cx00s_usb_otg_t *usb)
         return false;
     }
     return true;
+}
+
+__arm void USBOTG_Handler(void) 
+{
+    f1cx00s_usb_irq(&USB_OTG0);
 }

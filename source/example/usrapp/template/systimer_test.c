@@ -59,7 +59,7 @@ static usrapp_t usrapp;
 
 void usrapp_on_timer(vsf_callback_timer_t *param)
 {
-    printf( "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_timer_get_tick());
+    printf( "heartbeat: [%lld]" VSF_TRACE_CFG_LINEEND, vsf_systimer_get_tick());
     vsf_callback_timer_add_ms(&usrapp.poll_timer, 1000);
 }
 

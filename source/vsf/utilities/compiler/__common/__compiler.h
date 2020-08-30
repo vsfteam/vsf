@@ -23,6 +23,8 @@ extern "C" {
 #endif
 
 /*============================ INCLUDES ======================================*/
+#include "vsf_cfg.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef DEF_REG
@@ -303,10 +305,13 @@ extern "C" {
 /*----------------------------------------------------------------------------*
  * Warning Emphasize                                                          *
  *----------------------------------------------------------------------------*/
-#if defined(__clang__) //__IS_COMPILER_LLVM__
-#pragma clang diagnostic warning "-Wcast-align"
-#elif __IS_COMPILER_GCC__
-#pragma GCC diagnostic warning "-Wcast-align"
+ 
+#if defined(__VSF_DEBUG__)
+#   if defined(__clang__) //__IS_COMPILER_LLVM__
+#       pragma clang diagnostic warning "-Wcast-align"
+#   elif __IS_COMPILER_GCC__
+#       pragma GCC diagnostic warning "-Wcast-align"
+#   endif
 #endif
 
 /*----------------------------------------------------------------------------*

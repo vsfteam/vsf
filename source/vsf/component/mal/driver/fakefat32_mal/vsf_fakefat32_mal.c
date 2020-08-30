@@ -291,7 +291,8 @@ static uint_fast32_t __vk_fakefat32_calc_dir_clusters(
     child_num = file->d.child_num;
     file = (vk_fakefat32_file_t *)file->d.child;
     for (int i = 0; i < child_num; i++, file++) {
-        if ((file->attr != VSF_FAT_FILE_ATTR_VOLUMID) && __vk_fakefat32_file_is_lfn(file)) {
+        if (    (file->attr != (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID)
+            &&  __vk_fakefat32_file_is_lfn(file)) {
             // one long name can contain 13 unicode max
             size += 0x20 * ((__vk_fakefat32_calc_lfn_len(file) + 12) / 13);
         }
@@ -322,7 +323,7 @@ static vsf_err_t __vk_fakefat32_init_recursion(vk_fakefat32_mal_t *pthis, vk_fak
         }
         file->callback.read = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_read);
         file->callback.write = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_write);
-    } else if (file->attr == VSF_FAT_FILE_ATTR_VOLUMID) {
+    } else if (file->attr == (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID) {
         clusters = 0;
     } else {
         clusters = ((uint64_t)file->size + cluster_size - 1) / cluster_size;
@@ -390,7 +391,8 @@ vsf_component_peda_ifs_entry(__vk_fakefat32_dir_read, vk_memfs_callback_read)
         if (addr) {
             uint_fast32_t current_entry_size;
 
-            if ((file->attr != VSF_FAT_FILE_ATTR_VOLUMID) && __vk_fakefat32_file_is_lfn(file)) {
+            if (    (file->attr != (vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID)
+                &&  __vk_fakefat32_file_is_lfn(file)) {
                 uint_fast32_t lfn_len = __vk_fakefat32_calc_lfn_len(file);
                 uint_fast8_t lfn_entry_num = (uint8_t)((lfn_len + 12) / 13);
                 current_entry_size = (1 + lfn_entry_num) * 0x20;
@@ -406,7 +408,7 @@ vsf_component_peda_ifs_entry(__vk_fakefat32_dir_read, vk_memfs_callback_read)
             char sfn[11];
             bool is_lfn = false;
 
-            if (VSF_FAT_FILE_ATTR_VOLUMID == file->attr) {
+            if ((vk_file_attr_t)VSF_FAT_FILE_ATTR_VOLUMID == file->attr) {
                 // ONLY file->name is valid for volume_id
                 // volume_id is 11 characters max
                 __vk_strncpy_fill((char *)buff, file->name, ' ', 11);
@@ -800,8 +802,8 @@ static uint_fast32_t __vk_fakefat32_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
 
 static bool __vk_fakefat32_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
-    mem->buffer_ptr = NULL;
-    mem->s32_size = 0;
+    mem->buffer = NULL;
+    mem->size = 0;
     return false;
 }
 

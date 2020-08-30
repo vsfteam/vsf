@@ -108,7 +108,7 @@ static void __vsfip_dhcpd_input(void *param, vsfip_netbuf_t *netbuf)
         head->flags = 0;
         head->yiaddr = assoc->ip.addr32;
         head->siaddr = netif->ip4addr.addr32;
-        netbuf->app.s32_size = sizeof(*head);
+        netbuf->app.size = sizeof(*head);
 
         dhcpd->optlen = 0;
         vsfip_dhcp_append_opt(netbuf, &dhcpd->optlen, DHCP_OPT_MSGTYPE,

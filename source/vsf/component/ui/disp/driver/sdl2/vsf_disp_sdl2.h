@@ -44,7 +44,10 @@ extern "C" {
 
 // if VSF_USE_DISP_SDL2 is used, SDL header files are not visible in vsf header files
 // so define main to SDL_main for SDL
-#define main                        SDL_main
+#if     defined(__WIN__)
+#   define main                     SDL_main
+#elif   defined(__LINUX__)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

@@ -1,7 +1,11 @@
+#include "stm32f1xx_hal_cortex.h"
+#include "utilities/vsf_utilities.h"
 #include "./vsf_usart.h"
 
-/**********************************define tEvtMask*******************************/
-usart_evt_status_t evt_mask = 0x00;
+#define VSF_USART_CFG_PROTECT_LEVEL    interrupt
+
+#define __vsf_usart_protect            vsf_protect(VSF_USART_CFG_PROTECT_LEVEL)
+#define __vsf_usart_unprotect          vsf_unprotect(VSF_USART_CFG_PROTECT_LEVEL)
 
 /***********************************usart_init***********************************/
 vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
@@ -108,18 +112,24 @@ bool vsf_usart_read_byte(vsf_usart_t *usart_ptr, uint8_t *byte_ptr)
 {
     ASSERT(usart_ptr->obj_ptr != NULL);
     
-    SAFE_ATOM_CODE() {
-        if(usart_ptr->obj_ptr->SR & USART_SR_RXNE_FULL) {
-            *byte_ptr = usart_ptr->obj_ptr->DR;
-            
-            usart_ptr->evt_status.evt_status |= VSF_USART_EVT_RX;
-            if((usart_ptr->evt_rx.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_RX)) {
-                usart_ptr->evt_rx.handler_fn(usart_ptr->evt_rx.target_ptr, usart_ptr, usart_ptr->evt_status);
-            }
-            
-            return true;
+    vsf_protect_t state;
+    
+    state = __vsf_usart_protect();
+    
+    if(usart_ptr->obj_ptr->SR & USART_SR_RXNE_FULL) {
+        *byte_ptr = usart_ptr->obj_ptr->DR;
+        
+        usart_ptr->evt_status.evt_status |= VSF_USART_EVT_RX;
+        if((usart_ptr->evt_rx.handler_fn != NULL) && (usart_ptr->evt_mask & VSF_USART_EVT_RX)) {
+            usart_ptr->evt_rx.handler_fn(usart_ptr->evt_rx.target_ptr, usart_ptr, usart_ptr->evt_status);
         }
+        
+        __vsf_usart_unprotect(state);
+        return true;
     }
+    
+    __vsf_usart_unprotect(state);
+    
     return false;
 }
 
@@ -128,27 +138,30 @@ bool vsf_usart_write_byte(vsf_usart_t *usart_ptr, uint_fast8_t byte)
 {
     ASSERT(usart_ptr->obj_ptr != NULL);
     
-    uint8_t timer = 100;
+    vsf_protect_t state;
     
-    SAFE_ATOM_CODE() {
-        if(usart_ptr->obj_ptr->SR & USART_SR_TXE_TRUE) {
-            usart_ptr->obj_ptr->DR = byte;
-        } else {
-            return false;
+    state = __vsf_usart_protect();
+    
+    if(usart_ptr->obj_ptr->SR & USART_SR_TXE_TRUE) {
+        usart_ptr->obj_ptr->DR = byte;
+    } else {
+        __vsf_usart_unprotect(state);
+        return false;
+    }
+    
+    if(USART_SR_TC_TRUE == (usart_ptr->obj_ptr->SR & USART_SR_TC_TRUE)) {
+        
+        usart_ptr->evt_status.evt_status |= VSF_USART_EVT_TX;
+        if((usart_ptr->evt_tx.handler_fn != NULL) && (usart_ptr->evt_mask & VSF_USART_EVT_TX)) {
+            usart_ptr->evt_tx.handler_fn(usart_ptr->evt_tx.target_ptr, usart_ptr, usart_ptr->evt_status);
         }
         
-        while(timer--){
-            if(USART_SR_TC_TRUE == (usart_ptr->obj_ptr->SR & USART_SR_TC_TRUE)) {
-                
-                usart_ptr->evt_status.evt_status |= VSF_USART_EVT_TX;
-                if((usart_ptr->evt_tx.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_TX)) {
-                    usart_ptr->evt_tx.handler_fn(usart_ptr->evt_tx.target_ptr, usart_ptr, usart_ptr->evt_status);
-                }
-                
-                return true;
-            }
-        }
+        __vsf_usart_unprotect(state);
+        return true;
     }
+    
+    __vsf_usart_unprotect(state);
+    
     return false;
 }
 
@@ -159,21 +172,25 @@ fsm_rt_t vsf_usart_request_read(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uin
     ASSERT(buffer_ptr != NULL);
     ASSERT(size != 0);
     
-    SAFE_ATOM_CODE() {
-        if(false == usart_ptr->is_loading) {
-            usart_ptr->is_loading       = true;
-            usart_ptr->read_buffer_ptr  = buffer_ptr;
-            usart_ptr->read_size        = size - 1;
-            usart_ptr->read_sizecounter = 0; 
-            usart_ptr->obj_ptr->CR1     |= USART_CR1_RXNEIE_EN;
-        }
+    vsf_protect_t state;
+    
+    state = __vsf_usart_protect();
+    
+    if(false == usart_ptr->is_loading) {
+        usart_ptr->is_loading       = true;
+        usart_ptr->read_buffer_ptr  = buffer_ptr;
+        usart_ptr->read_size        = size - 1;
+        usart_ptr->read_sizecounter = 0; 
+        usart_ptr->obj_ptr->CR1     |= USART_CR1_RXNEIE_EN;
     }
+
+    __vsf_usart_unprotect(state);
     
     if(usart_ptr->read_sizecounter > usart_ptr->read_size) {
         usart_ptr->is_loading = false;
         
         usart_ptr->evt_status.evt_status |= VSF_USART_EVT_RCV_BLK_CPL;
-        if((usart_ptr->evt_rcv.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_RCV_BLK_CPL)) {
+        if((usart_ptr->evt_rcv.handler_fn != NULL) && (usart_ptr->evt_mask & VSF_USART_EVT_RCV_BLK_CPL)) {
             usart_ptr->evt_rcv.handler_fn(usart_ptr->evt_rcv.target_ptr, usart_ptr, usart_ptr->evt_status);
         }
         
@@ -190,21 +207,25 @@ fsm_rt_t vsf_usart_request_write(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, ui
     ASSERT(buffer_ptr != NULL);
     ASSERT(size != 0);
         
-    SAFE_ATOM_CODE() {
-        if(false == usart_ptr->is_writing) {
-            usart_ptr->is_writing        = true;
-            usart_ptr->write_buffer_ptr  = buffer_ptr;
-            usart_ptr->write_size        = size - 1;
-            usart_ptr->write_sizecounter = 0;
-            usart_ptr->obj_ptr->CR1      |= USART_CR1_TXEIE_EN;
-        }
+    vsf_protect_t state;
+    
+    state = __vsf_usart_protect();
+    
+    if(false == usart_ptr->is_writing) {
+        usart_ptr->is_writing        = true;
+        usart_ptr->write_buffer_ptr  = buffer_ptr;
+        usart_ptr->write_size        = size - 1;
+        usart_ptr->write_sizecounter = 0;
+        usart_ptr->obj_ptr->CR1      |= USART_CR1_TXEIE_EN;
     }
+    
+    __vsf_usart_unprotect(state);
     
     if(usart_ptr->write_sizecounter >= usart_ptr->write_size) {
         usart_ptr->is_writing = false;
         
         usart_ptr->evt_status.evt_status |= VSF_USART_EVT_SND_BLK_CPL;
-        if((usart_ptr->evt_send.handler_fn != NULL) && (evt_mask & VSF_USART_EVT_SND_BLK_CPL)) {
+        if((usart_ptr->evt_send.handler_fn != NULL) && (usart_ptr->evt_mask & VSF_USART_EVT_SND_BLK_CPL)) {
             usart_ptr->evt_send.handler_fn(usart_ptr->evt_send.target_ptr, usart_ptr, usart_ptr->evt_status);
         }
         
@@ -217,19 +238,35 @@ fsm_rt_t vsf_usart_request_write(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, ui
 /*******************************vsf_usart_riqhandler*****************************/
 void vsf_usart_irqhandler(vsf_usart_t *usart_ptr)
 {
-//    SAFE_ATOM_CODE() {
-        if(usart_ptr->obj_ptr->SR & USART_SR_RXNE_FULL) {
-            usart_ptr->read_buffer_ptr[usart_ptr->read_sizecounter] = usart_ptr->obj_ptr->DR;
-            if((usart_ptr->read_sizecounter++) >= usart_ptr->read_size) {
-                usart_ptr->obj_ptr->CR1 &= USART_CR1_RXNEIE_DISEN;
-            }
-        } else {
-            usart_ptr->obj_ptr->DR = usart_ptr->write_buffer_ptr[usart_ptr->write_sizecounter];
-            if((usart_ptr->write_sizecounter++) >= usart_ptr->write_size) {
-                usart_ptr->obj_ptr->CR1 &= USART_CR1_TXEIE_DISEN;
+    vsf_protect_t state;
+    
+    if(usart_ptr->obj_ptr->SR & USART_SR_RXNE_FULL) {
+        usart_ptr->read_buffer_ptr[usart_ptr->read_sizecounter] = usart_ptr->obj_ptr->DR;
+        if((usart_ptr->read_sizecounter++) >= usart_ptr->read_size) {
+            usart_ptr->obj_ptr->CR1 &= USART_CR1_RXNEIE_DISEN;
+            
+            usart_ptr->is_loading = false;
+        
+            usart_ptr->evt_status.evt_status |= VSF_USART_EVT_RCV_BLK_CPL;
+            if((usart_ptr->evt_rcv.handler_fn != NULL) && (usart_ptr->evt_mask & VSF_USART_EVT_RCV_BLK_CPL)) {
+                usart_ptr->evt_rcv.handler_fn(usart_ptr->evt_rcv.target_ptr, usart_ptr, usart_ptr->evt_status);
             }
         }
-//    }
+    } 
+    
+    if(usart_ptr->obj_ptr->SR & USART_SR_TXE_TRUE) {
+        usart_ptr->obj_ptr->DR = usart_ptr->write_buffer_ptr[usart_ptr->write_sizecounter];
+        if((usart_ptr->write_sizecounter++) >= usart_ptr->write_size) {
+            usart_ptr->obj_ptr->CR1 &= USART_CR1_TXEIE_DISEN;
+            
+            usart_ptr->is_writing = false;
+        
+            usart_ptr->evt_status.evt_status |= VSF_USART_EVT_SND_BLK_CPL;
+            if((usart_ptr->evt_send.handler_fn != NULL) && (usart_ptr->evt_mask & VSF_USART_EVT_SND_BLK_CPL)) {
+                usart_ptr->evt_send.handler_fn(usart_ptr->evt_send.target_ptr, usart_ptr, usart_ptr->evt_status);
+            }
+        }
+    }
 }
 
 /*********************************usart_huart_arrcy******************************/
@@ -244,55 +281,49 @@ static vsf_usart_t usart_huart[] = {
 };
 
 /*******************************vsf_evt_usart_register***************************/
-void vsf_usart_evt_register(vsf_usart_evt_type_t tType, vsf_usart_evt_t event)
+void vsf_usart_evt_register(vsf_usart_t *usart_ptr, vsf_usart_evt_type_t tType, vsf_usart_evt_t event)
 {
-    if(VSF_USART_EVT_RX == tType) {
-        for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].evt_rx = event;
-        }
-    }
-    
-    if(VSF_USART_EVT_TX == tType) {
-        for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].evt_tx = event;
-        }
-    }
-    
-    if(VSF_USART_EVT_RCV_BLK_CPL == tType) {
-        for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].evt_rcv = event;
-        }
-    }
-    
-    if(VSF_USART_EVT_SND_BLK_CPL == tType) {
-        for(uint8_t i =1; i < USART_COUNT; i++) {
-            usart_huart[i].evt_send = event;
-        }
+    switch(tType) {
+        case VSF_USART_EVT_RX:
+            usart_ptr->evt_rx = event;
+            break;
+
+        case VSF_USART_EVT_TX:
+            usart_ptr->evt_tx = event;
+            break;
+
+        case VSF_USART_EVT_RCV_BLK_CPL:
+            usart_ptr->evt_rcv = event;
+            break;
+
+        case VSF_USART_EVT_SND_BLK_CPL:
+            usart_ptr->evt_send = event;
+            break;
     }
 }
 
 /*******************************vsf_usart_evt_enable*****************************/
-usart_evt_status_t vsf_usart_evt_enable(usart_evt_status_t event_mask)
+usart_evt_status_t vsf_usart_evt_enable(vsf_usart_t *usart_ptr, usart_evt_status_t event_mask)
 {
-    if(evt_mask != 0xFF) {
-        evt_mask |= event_mask;
+    if(usart_ptr->evt_mask != 0xFF) {
+        usart_ptr->evt_mask |= event_mask;
     }
-    return evt_mask;
+    return usart_ptr->evt_mask;
 }
 
 /*******************************vsf_usart_evt_disable****************************/
-usart_evt_status_t vsf_usart_evt_disable(usart_evt_status_t event_mask)
+usart_evt_status_t vsf_usart_evt_disable(vsf_usart_t *usart_ptr, usart_evt_status_t event_mask)
 {
-    if(evt_mask != 0x00) {
-        evt_mask &= (~event_mask);
+    if(usart_ptr->evt_mask != 0x00) {
+        usart_ptr->evt_mask &= (~event_mask);
     }
-    return evt_mask;
+    return usart_ptr->evt_mask;
 }
 
 /*******************************vsf_usart_evt_resume*****************************/
-void vsf_usart_evt_resume(usart_evt_status_t tEventStatus)
+void vsf_usart_evt_resume(vsf_usart_t *usart_ptr, usart_evt_status_t tEventStatus)
 {
-    evt_mask = tEventStatus;
+    usart_ptr->evt_mask = tEventStatus;
 }
 
 /********************************VSF_USART_FUNC_BODY*****************************/
@@ -346,6 +377,31 @@ fsm_rt_t vsf_usart##__N##_request_write(uint8_t *buffer_ptr, uint_fast32_t size)
     return vsf_usart_request_write(&usart_huart[__N], buffer_ptr, size);         \
 }                                                                                \
                                                                                  \
+/*usart_evt_register*/                                                           \
+void vsf_usart##__N##_evt_register(vsf_usart_evt_type_t tType,                   \
+                                   vsf_usart_evt_t event)                        \
+{                                                                                \
+    vsf_usart_evt_register(&usart_huart[__N], tType, event);                     \
+}                                                                                \
+                                                                                 \
+/*usart_evt_enbale*/                                                             \
+usart_evt_status_t vsf_usart##__N##_evt_enable(usart_evt_status_t event_mask)    \
+{                                                                                \
+    return vsf_usart_evt_enable(&usart_huart[__N], event_mask);                  \
+}                                                                                \
+                                                                                 \
+/*usart_evt_disable*/                                                            \
+usart_evt_status_t vsf_usart##__N##_evt_disable(usart_evt_status_t event_mask)   \
+{                                                                                \
+    return vsf_usart_evt_disable(&usart_huart[__N], event_mask);                 \
+}                                                                                \
+                                                                                 \
+/*usart_evt_resume*/                                                             \
+void vsf_usart##__N##_evt_resume(usart_evt_status_t tEventStatus)                \
+{                                                                                \
+    vsf_usart_evt_resume(&usart_huart[__N], tEventStatus);                       \
+}                                                                                \
+                                                                                 \
 /*usart_irqhandler*/                                                             \
 void USART##__N##_IRQHandler(void)                                               \
 {                                                                                \
@@ -366,10 +422,10 @@ void USART##__N##_IRQHandler(void)                                              
             .Write.Request = &vsf_usart##__N##_request_write,                    \
         },                                                                       \
         .Event = {                                                               \
-            .Register     = &vsf_usart_evt_register,                             \
-            .Enable       = &vsf_usart_evt_enable,                               \
-            .Disable      = &vsf_usart_evt_disable,                              \
-            .Resume       = &vsf_usart_evt_resume,                               \
+            .Register     = &vsf_usart##__N##_evt_register,                      \
+            .Enable       = &vsf_usart##__N##_evt_enable,                        \
+            .Disable      = &vsf_usart##__N##_evt_disable,                       \
+            .Resume       = &vsf_usart##__N##_evt_resume,                        \
         },                                                                       \
     },                                                                           
                                                                                  

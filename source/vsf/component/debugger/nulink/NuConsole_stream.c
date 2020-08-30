@@ -21,7 +21,7 @@
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
-#include "./NuConsole.h"
+#include "NuConsole.h"
 
 #if VSF_USE_SERVICE_VSFSTREAM == ENABLED
 #define __VSFSTREAM_CLASS_INHERIT__
@@ -42,8 +42,8 @@
 /*
 static struct {
     bool                        bInitialised;
-    //vsf_stream_status_t         tStatus;
-    //vsf_stream_dat_drn_evt_t    tEvent;
+    //vsf_stream_status_t         Status;
+    //vsf_stream_dat_drn_evt_t    event;
 } s_tNuStream = {0};
 */
 
@@ -68,7 +68,7 @@ vsf_stream_status_t __vsf_nu_console_stream_tx_get_status(vsf_stream_tx_t *obj_p
 
 static vsf_err_t __vsf_nu_console_stream_tx_dat_drn_evt_reg(  
                                             vsf_stream_tx_t *obj_ptr, 
-                                            vsf_stream_dat_drn_evt_t tEvent);
+                                            vsf_stream_dat_drn_evt_t event);
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -86,8 +86,8 @@ vsf_stream_t VSF_DEBUG_STREAM_TX = {
 
 vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .op         = &vsf_mem_stream_op,
-    .buffer_ptr  = __vsf_debug_stream_rx_buff,
-    .s32_size      = sizeof(__vsf_debug_stream_rx_buff),
+    .buffer     = __vsf_debug_stream_rx_buff,
+    .size       = sizeof(__vsf_debug_stream_rx_buff),
 };
 
 #elif   VSF_USE_SERVICE_STREAM == ENABLED
@@ -224,14 +224,14 @@ static vsf_err_t __vsf_nu_console_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr,
 static 
 vsf_stream_status_t __vsf_nu_console_stream_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
-    return (vsf_stream_status_t){0};//s_tNuStream.tStatus;
+    return (vsf_stream_status_t){0};//s_tNuStream.Status;
 }
 
 static vsf_err_t __vsf_nu_console_stream_tx_dat_drn_evt_reg(  
                                             vsf_stream_tx_t *obj_ptr, 
-                                            vsf_stream_dat_drn_evt_t tEvent)
+                                            vsf_stream_dat_drn_evt_t event)
 {
-    //s_tNuStream.tEvent = tEvent;
+    //s_tNuStream.event = event;
     return VSF_ERR_NONE;
 }
 #endif

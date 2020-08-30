@@ -47,27 +47,35 @@ __irq __nested __arm
 #endif
 void IRQ_Handler(void)
 {
-    __isr_t isr_handler = NULL;
+    __isr_t *isr_handler = NULL;
     int32_t irq_idx = 0;
+    
     do {
         //! fetch the vector from INTC
-        isr_handler = (__isr_t )F1CX00S_INTC.VECTOR;
-        if (NULL == isr_handler) {
+        isr_handler = (__isr_t *)F1CX00S_INTC.VECTOR;
+        if (F1CX00S_INTC.BASE_ADDR == (uintptr_t)isr_handler) {                 //!< take NMI as no IRQ
             break;
         }
+
+        //! calculate irq_idx
+        irq_idx = ((uintptr_t)isr_handler - (uintptr_t)F1CX00S_INTC.VTOR) >> 2;
+
+        //! clear corresponding pending bit
+        F1CX00S_INTC.PENDING[irq_idx >> 5] = 1 << (irq_idx & 0x1F);             //!< clear pending bit
+        F1CX00S_INTC.STIR[irq_idx >> 5] &= ~(1 << (irq_idx & 0x1F));            //!< clear STIR bit
+        F1CX00S_INTC.RESP[irq_idx >> 5] = (1 << (irq_idx & 0x1F));              //!< disable same level interrupt 
+        __COMPILER_BARRIER();
+        ENABLE_GLOBAL_INTERRUPT();                                              //!< enable preemption
+
         //! run the ISR
         (*isr_handler)();
 
-        //! wrong algorithm based on INTC
-        //irq_idx = ((uintptr_t)isr_handler - (uintptr_t)F1CX00S_INTC.VTOR) >> 2;
+        DISABLE_GLOBAL_INTERRUPT();                                             //!< disable preemption
+        F1CX00S_INTC.RESP[irq_idx >> 5] &= ~(1 << (irq_idx & 0x1F));            //!< enable same level interrupt
 
-        //! clear corresponding pending bit
-        //F1CX00S_INTC.PENDING[irq_idx >> 5] = 1 << (irq_idx & 0x1F);
-        //dsb();
-        //isb();
+        __COMPILER_BARRIER();
     } while(true);              //!< try low priority ISR
 }
-
 
 void intc_init(void)
 {
@@ -80,19 +88,48 @@ void intc_init(void)
         F1CX00S_INTC.SRC_MASK[0] = 0xFFFFFFFF;
         F1CX00S_INTC.SRC_MASK[1] = 0xFFFFFFFF;
 
+        F1CX00S_INTC.NMI_INT_CTRL.NMI_SRC_TYPE = 0x01;
+
         //! disable all interrupt
-        F1CX00S_INTC.ENABLE[0] = 0;
-        F1CX00S_INTC.ENABLE[1] = 0;
+        F1CX00S_INTC.DISABLE[0] = 0xFFFFFFFF;
+        F1CX00S_INTC.DISABLE[1] = 0xFFFFFFFF;
 
         //! clear all pending bit
         F1CX00S_INTC.PENDING[0] = 0xFFFFFFFF;
         F1CX00S_INTC.PENDING[1] = 0xFFFFFFFF;
 
         //! Mask interrupts with lower or the same priority
-        F1CX00S_INTC.RESP[0] = 0xFFFFFFFF;
-        F1CX00S_INTC.RESP[1] = 0xFFFFFFFF;
+        F1CX00S_INTC.RESP[0] = 0;
+        F1CX00S_INTC.RESP[1] = 0;
    )
+
+    ENABLE_GLOBAL_INTERRUPT();
 }
+
+
+/**
+  \brief   Disable Interrupt
+  \details Disables a device specific interrupt in the NVIC interrupt controller.
+  \param [in]      IRQn  Device specific interrupt number.
+  \note    IRQn must not be negative.
+ */
+__arm void intc_disable_irq(IRQn_Type IRQn)
+{
+
+    if (IRQn >= 64) {
+        return ;
+    }
+
+    F1CX00S_INTC.DISABLE[(((uint32_t)IRQn) >> 5UL)] |= (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
+
+    //__DSB();
+    __asm__ __volatile__ ("mcr p15, 0, %0, c7, c10,  4" : : "r" (0) : "memory"); 
+
+    //__ISB();
+    __asm__ __volatile__ ("" : : : "memory");
+
+}
+
 
 #ifdef __cplusplus
 }

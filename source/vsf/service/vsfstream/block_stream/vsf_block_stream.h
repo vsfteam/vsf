@@ -44,26 +44,28 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define __describe_block_stream_ex(__name, __buffer, __size)                    \
+// IMPORTANT: real size of __buffer MUST be >= (__size) + (__size) / (__block_size) * sizeof(uint32_t *)
+#define __describe_block_stream_ex(__name, __buffer, __size, __block_size)      \
             vsf_block_stream_t __name = {                                       \
                 .op                 = &vsf_block_stream_op,                     \
-                .buffer_ptr          = (__buffer),                               \
-                .s32_size              = (__size),                                 \
+                .buffer             = (__buffer),                               \
+                .size               = (__size),                                 \
+                .block_size         = (__block_size),                           \
             };
 
-#define __describe_block_stream(__name, __size)                                 \
-            uint8_t __##__name##_buffer[(__size)];                              \
-            __describe_block_stream_ex(__name, __##__name##_buffer, (__size))
+#define __describe_block_stream(__name, __size, __block_size)                   \
+            uint8_t __##__name##_buffer[(__size) + (__size) / (__block_size) * sizeof(uint32_t *)];\
+            __describe_block_stream_ex(__name, __##__name##_buffer, (__size), (__block_size))
 
 #define __declare_block_stream(__name)                                          \
             extern vsf_block_stream_t __name;
 
 #define declare_block_stream(__name)                                            \
             __declare_block_stream(__name)
-#define describe_block_stream_ex(__name, __buffer, __size)                      \
-            __describe_block_stream_ex(__name, (__buffer), (__size))
-#define describe_block_stream(__name, __size)                                   \
-            __describe_block_stream(__name, (__size))
+#define describe_block_stream_ex(__name, __buffer, __size, __block_size)        \
+            __describe_block_stream_ex(__name, (__buffer), (__size), (__block_size_))
+#define describe_block_stream(__name, __size, __block_size)                     \
+            __describe_block_stream(__name, (__size), (__block_size))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

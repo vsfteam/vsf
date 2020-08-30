@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_DISP_CLASS_INHERIT
+#define __VSF_DISP_CLASS_INHERIT__
 #include "vsf.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
@@ -398,7 +398,7 @@ static void __vk_2d_rgb32_mem_copy( uint32_t *pwSource,
 
 /**********************************************************************************/
 /*! \brief begin a refresh loop
- *! \param ptGUI the tgui object address
+ *! \param gui_ptr the tgui object address
  *! \param ptPlannedRefreshRegion the planned refresh region
  *! \retval NULL    No need to refresh (or rendering service is not ready)
  *! \retval !NULL   The actual refresh region
@@ -409,7 +409,7 @@ static void __vk_2d_rgb32_mem_copy( uint32_t *pwSource,
  **********************************************************************************/
 
 vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
-                    vsf_tgui_t *ptGUI,
+                    vsf_tgui_t *gui_ptr,
                     const vsf_tgui_region_t *ptPlannedRefreshRegion)
 {
     if (!vsf_tgui_port_is_ready_to_refresh()) {
@@ -437,7 +437,7 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
     return (vsf_tgui_region_t *)s_ptRequestedRegion;
 }
 
-bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* ptGUI)
+bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
 {
     vsf_tgui_color_t* pixmap = s_tDisp->ui_data;
 

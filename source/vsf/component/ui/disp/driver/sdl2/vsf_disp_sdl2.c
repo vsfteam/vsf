@@ -35,13 +35,6 @@
 #   include "SDL.h"
 #endif
 
-#ifdef __WIN__
-// for Sleep
-#   include <Windows.h>
-#else
-// TODO: replace Sleep
-#endif
-
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DISP_SDL2_CFG_HW_PRIORITY
@@ -157,7 +150,7 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
         __vk_disp_sdl2_screen_update(disp_sdl2);
 
         if (disp_sdl2->flush_delay_ms > 0) {
-            Sleep(disp_sdl2->flush_delay_ms);
+            __vsf_arch_irq_sleep(disp_sdl2->flush_delay_ms);
         }
 
         __vsf_arch_irq_start(irq_thread);
@@ -190,13 +183,13 @@ static void __vk_disp_sdl2_event_thread(void *arg)
 #endif
 
     while (!__vk_disp_sdl2.is_inited) {
-        Sleep(100);
+        __vsf_arch_irq_sleep(100);
     }
 
     __vsf_arch_irq_set_background(irq_thread);
         __vk_disp_sdl2_screen_init(disp_sdl2);
 
-    __vsf_arch_irq_init(&disp_sdl2->flush_thread, "disp_sdl2_flush", __vk_disp_sdl2_flush_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
+    __vsf_arch_irq_init(&disp_sdl2->flush_thread, "disp_sdl2_flush", __vk_disp_sdl2_flush_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
 
     while (1) {
         if (SDL_WaitEvent(&event)) {
@@ -405,12 +398,11 @@ static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis)
 
     if (!__vk_disp_sdl2.is_init_called) {
         __vk_disp_sdl2.is_init_called = true;
-        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, "disp_sdl2_init", __vk_disp_sdl2_init_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
+        __vsf_arch_irq_init(&__vk_disp_sdl2.init_thread, "disp_sdl2_init", __vk_disp_sdl2_init_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
     }
 
-    __vsf_arch_irq_init(&disp_sdl2->event_thread, "disp_sdl2_event", __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY, true);
-
     __vsf_arch_irq_request_init(&disp_sdl2->flush_request);
+    __vsf_arch_irq_init(&disp_sdl2->event_thread, "disp_sdl2_event", __vk_disp_sdl2_event_thread, VSF_DISP_SDL2_CFG_HW_PRIORITY);
     return VSF_ERR_NONE;
 }
 

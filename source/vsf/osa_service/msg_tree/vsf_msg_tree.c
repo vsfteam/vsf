@@ -72,8 +72,8 @@ static bool __msgt_check_status(vsf_msgt_t* obj_ptr,
 
     if (NULL != status_fn) {
         //!< get status
-        vsf_msgt_node_status_t tStatus = (*status_fn)((vsf_msgt_node_t*)node_ptr);
-        if ((tStatus & status_msk) != status_msk) {
+        vsf_msgt_node_status_t Status = (*status_fn)((vsf_msgt_node_t*)node_ptr);
+        if ((Status & status_msk) != status_msk) {
             return false;
         }
     }

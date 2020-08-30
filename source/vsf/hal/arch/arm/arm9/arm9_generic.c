@@ -25,14 +25,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_ARCH_PRI_NUM > 0
+#if VSF_ARCH_SWI_NUM > 0
 typedef volatile struct vsf_arm9_swi_t {
 
     //! SWI vector table
     struct {
         vsf_swi_handler_t *handler;
         void *param_ptr;
-    } vectors[VSF_ARCH_PRI_NUM];
+    } vectors[VSF_ARCH_SWI_NUM];
 
     uint32_t            enable;
     uint32_t            pending;
@@ -42,10 +42,12 @@ typedef volatile struct vsf_arm9_swi_t {
 } vsf_arm9_swi_t;
 #endif
 
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_ARCH_PRI_NUM > 0
+
+#if VSF_ARCH_SWI_NUM > 0
 static NO_INIT vsf_arm9_swi_t __vsf_arm9_swi;
 #endif
 
@@ -62,7 +64,7 @@ static NO_INIT vsf_arm9_swi_t __vsf_arm9_swi;
  */
 bool vsf_arch_low_level_init(void)
 {
-#if VSF_ARCH_PRI_NUM > 0
+#if VSF_ARCH_SWI_NUM > 0
     memset((void *)&__vsf_arm9_swi, 0, sizeof(__vsf_arm9_swi));
 #endif
     return true;
@@ -71,7 +73,7 @@ bool vsf_arch_low_level_init(void)
 /*----------------------------------------------------------------------------*
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
-#if VSF_ARCH_PRI_NUM > 0
+#if VSF_ARCH_SWI_NUM > 0
 ROOT ISR(SWI_Handler)
 {
     /*!  loop until there is no enabled pending swi whose priority is higher 
@@ -98,6 +100,7 @@ ROOT ISR(SWI_Handler)
 #pragma diag_suppress=pe111
 #endif
 
+
 /*! \brief initialise a software interrupt
  *! \param param_ptr idx the index of the software interrupt
  *! \return initialization result in vsf_err_t
@@ -107,7 +110,8 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
                             vsf_swi_handler_t *handler, 
                             void *param_ptr)
 {
-    if (idx < VSF_ARCH_PRI_NUM) {
+#if VSF_ARCH_SWI_NUM > 0
+    if (idx < VSF_ARCH_SWI_NUM) {
         __vsf_arm9_swi.vectors[idx].handler = handler;
         __vsf_arm9_swi.vectors[idx].param_ptr = param_ptr;
         __vsf_arm9_swi.enable |= 1 << idx;
@@ -116,7 +120,12 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
     }
     VSF_HAL_ASSERT(false);
     return VSF_ERR_INVALID_PARAMETER;
+#else
+    return VSF_ERR_NONE;
+#endif
 }
+
+
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
@@ -128,7 +137,7 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
  */
 void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
-    if (idx < VSF_ARCH_PRI_NUM) {
+    if (idx < VSF_ARCH_SWI_NUM) {
         __vsf_arm9_swi.pending |= 1 << idx;
         __asm__ __volatile__ ("swi 0");
         return;
@@ -151,37 +160,27 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  * interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 
-#if VSF_ARCH_PRI_NUM > 0
+
 vsf_gint_state_t vsf_get_interrupt(void)
 {
-    return __vsf_arm9_swi.swi_mask_bit;
+    return GET_GLOBAL_INTERRUPT_STATE();
 }
 
 void vsf_set_interrupt(vsf_gint_state_t level)
 {
-    __vsf_arm9_swi.swi_mask_bit = level;
-
-    //! trig SWI_Handler unconditionally 
-    // TODO: add back when interrupt is tested
-//    __asm__ __volatile__ ("swi 0");     
+    SET_GLOBAL_INTERRUPT_STATE(level);
 }
 
 vsf_gint_state_t vsf_disable_interrupt(void)
 {
-    vsf_gint_state_t state = __vsf_arm9_swi.swi_mask_bit;
-    __vsf_arm9_swi.swi_mask_bit = 1;
-    return state;
+    return DISABLE_GLOBAL_INTERRUPT();
 }
 
 void vsf_enable_interrupt(void)
 {
-    __vsf_arm9_swi.swi_mask_bit = 0;
-
-    //! trig SWI_Handler unconditionally 
-    // TODO: add back when interrupt is tested
-//    __asm__ __volatile__ ("swi 0");
+    ENABLE_GLOBAL_INTERRUPT();
 }
-#endif
+
 
 /*----------------------------------------------------------------------------*
  * Others: sleep, reset, etc                                                  *

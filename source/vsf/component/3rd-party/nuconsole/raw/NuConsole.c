@@ -9,7 +9,7 @@
  * Copyright (C) 2016 Nuvoton Technology Corp. All rights reserved.
 *****************************************************************************/
 
-#include "../vsf_debugger.h"
+#include "component/debugger/vsf_debugger.h"
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 

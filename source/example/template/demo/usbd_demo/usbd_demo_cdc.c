@@ -31,12 +31,12 @@
 #   error configuration not supported
 #endif
 
-#ifndef APP_CFG_USBD_SPEED
-#   define APP_CFG_USBD_SPEED               USB_DC_SPEED_HIGH
+#ifndef USRAPP_CFG_USBD_SPEED
+#   define USRAPP_CFG_USBD_SPEED            USB_DC_SPEED_HIGH
 #endif
 
 // __APP_CFG_CDC_BULK_SIZE is for internal usage
-#if APP_CFG_USBD_SPEED == USB_DC_SPEED_HIGH
+#if USRAPP_CFG_USBD_SPEED == USB_DC_SPEED_HIGH
 #   define __APP_CFG_CDC_BULK_SIZE          512
 #else
 #   define __APP_CFG_CDC_BULK_SIZE          64
@@ -47,25 +47,19 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-describe_mem_stream(__user_usbd_cdc_stream0, 1024)
-describe_mem_stream(__user_usbd_cdc_stream1, 1024)
+describe_block_stream(__user_usbd_cdc_stream0, 1024, __APP_CFG_CDC_BULK_SIZE)
 
-describe_usbd(__user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, APP_CFG_USBD_SPEED)
-    usbd_common_desc(__user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, 2 * USB_DESC_CDC_ACM_IAD_LEN, 2 * USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
+describe_usbd(__user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_SPEED)
+    usbd_common_desc(__user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
         cdc_acm_desc(__user_usbd_cdc, 0 * USB_CDC_ACM_IFS_NUM, 0, 1, 2, 2, __APP_CFG_CDC_BULK_SIZE, 16)
-        cdc_acm_desc(__user_usbd_cdc, 1 * USB_CDC_ACM_IFS_NUM, 1, 3, 4, 4, __APP_CFG_CDC_BULK_SIZE, 16)
     usbd_func_desc(__user_usbd_cdc)
         usbd_func_str_desc(__user_usbd_cdc, 0, u"VSF-CDC0")
-        usbd_func_str_desc(__user_usbd_cdc, 1, u"VSF-CDC1")
     usbd_std_desc_table(__user_usbd_cdc)
         usbd_func_str_desc_table(__user_usbd_cdc, 0)
-        usbd_func_str_desc_table(__user_usbd_cdc, 1)
     usbd_func(__user_usbd_cdc)
         cdc_acm_func(__user_usbd_cdc, 0, 1, 2, 2, &__user_usbd_cdc_stream0, &__user_usbd_cdc_stream0, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
-        cdc_acm_func(__user_usbd_cdc, 1, 3, 4, 4, &__user_usbd_cdc_stream1, &__user_usbd_cdc_stream1, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
     usbd_ifs(__user_usbd_cdc)
         cdc_acm_ifs(__user_usbd_cdc, 0)
-        cdc_acm_ifs(__user_usbd_cdc, 1)
 end_describe_usbd(__user_usbd_cdc, VSF_USB_DC0)
 
 /*============================ PROTOTYPES ====================================*/
@@ -85,6 +79,7 @@ int main(void)
 #   endif
 #endif
 
+    VSF_STREAM_INIT(&__user_usbd_cdc_stream0);
     vk_usbd_init(&__user_usbd_cdc);
     vk_usbd_connect(&__user_usbd_cdc);
     return 0;

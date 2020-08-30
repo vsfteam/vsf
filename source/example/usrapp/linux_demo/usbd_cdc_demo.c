@@ -7,7 +7,7 @@
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
- *  Unless requir by applicable law or agreed to in writing, software      *
+ *  Unless required by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
@@ -77,20 +77,20 @@
             .stream.tx.stream   = (vsf_stream_t *)&__USBD.cdc[(__N)].stream.tx, \
             .stream.rx.stream   = (vsf_stream_t *)&__USBD.cdc[(__N)].stream.rx, \
         },                                                                      \
-        .stream             = {                                                 \
+        .stream                 = {                                             \
             .tx.op              = &vsf_mem_stream_op,                           \
-            .tx.buffer_ptr       = (uint8_t *)&__USBD.cdc[(__N)].stream.tx_buffer,\
-            .tx.s32_size           = sizeof(__USBD.cdc[(__N)].stream.tx_buffer),   \
+            .tx.buffer          = (uint8_t *)&__USBD.cdc[(__N)].stream.tx_buffer,\
+            .tx.size            = sizeof(__USBD.cdc[(__N)].stream.tx_buffer),   \
             .tx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
             .rx.op              = &vsf_mem_stream_op,                           \
-            .rx.buffer_ptr       = (uint8_t *)&__USBD.cdc[(__N)].stream.rx_buffer,\
-            .rx.s32_size           = sizeof(__USBD.cdc[(__N)].stream.rx_buffer),   \
+            .rx.buffer          = (uint8_t *)&__USBD.cdc[(__N)].stream.rx_buffer,\
+            .rx.size            = sizeof(__USBD.cdc[(__N)].stream.rx_buffer),   \
             .rx.align           = USRAPP_CFG_STREAM_ALIGN,                      \
         },                                                                      \
     },                                                                          \
-    .ifs[2 * (__N)].class_op        = &vk_usbd_cdcacm_control,                 \
+    .ifs[2 * (__N)].class_op        = &vk_usbd_cdcacm_control,                  \
     .ifs[2 * (__N)].class_param     = &__USBD.cdc[(__N)].param,                 \
-    .ifs[2 * (__N) + 1].class_op    = &vk_usbd_cdcacm_data,                    \
+    .ifs[2 * (__N) + 1].class_op    = &vk_usbd_cdcacm_data,                     \
     .ifs[2 * (__N) + 1].class_param = &__USBD.cdc[(__N)].param,
 
 /*============================ TYPES =========================================*/

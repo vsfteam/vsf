@@ -140,10 +140,10 @@ vsf_err_t vk_usbd_ep_recv(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
     vsf_slist_add_to_head(vk_usbd_trans_t, node, &dev->trans_list, trans);
 
     if (vk_usbd_drv_ep_get_feature(trans->ep, trans->feature) & USB_DC_FEATURE_TRANSFER) {
-        err = vk_usbd_drv_ep_transfer_recv(trans->ep, trans->use_as__vsf_mem_t.buffer_ptr,
-                trans->use_as__vsf_mem_t.s32_size);
+        err = vk_usbd_drv_ep_transfer_recv(trans->ep, trans->use_as__vsf_mem_t.buffer,
+                trans->use_as__vsf_mem_t.size);
     } else {
-        trans->cur = trans->use_as__vsf_mem_t.buffer_ptr;
+        trans->cur = trans->use_as__vsf_mem_t.buffer;
         err = vk_usbd_drv_ep_transaction_enable_out(trans->ep);
     }
     if (VSF_ERR_NONE != err) {
@@ -157,12 +157,12 @@ static vsf_err_t __vk_usbd_ep_send_imp(vk_usbd_dev_t *dev, vk_usbd_trans_t *tran
     uint_fast8_t ep = trans->ep;
     VSF_USBD_DRV_PREPARE(dev);
     uint_fast16_t ep_size = vk_usbd_drv_ep_get_size(ep);
-    uint_fast16_t pkg_size = min(ep_size, trans->use_as__vsf_mem_t.s32_size);
+    uint_fast16_t pkg_size = min(ep_size, trans->use_as__vsf_mem_t.size);
 
     vk_usbd_drv_ep_transaction_write_buffer(ep, trans->cur, pkg_size);
     trans->cur += pkg_size;
-    trans->use_as__vsf_mem_t.s32_size -= pkg_size;
-    if (!trans->use_as__vsf_mem_t.s32_size && (pkg_size < ep_size)) {
+    trans->use_as__vsf_mem_t.size -= pkg_size;
+    if (!trans->use_as__vsf_mem_t.size && (pkg_size < ep_size)) {
         trans->zlp = false;
     }
 
@@ -180,13 +180,13 @@ vsf_err_t vk_usbd_ep_send(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans)
     vsf_slist_add_to_head(vk_usbd_trans_t, node, &dev->trans_list, trans);
 
     if (vk_usbd_drv_ep_get_feature(trans->ep, trans->feature) & USB_DC_FEATURE_TRANSFER) {
-        uint_fast32_t size = trans->use_as__vsf_mem_t.s32_size;
+        uint_fast32_t size = trans->use_as__vsf_mem_t.size;
         bool zlp = trans->zlp;
-        trans->use_as__vsf_mem_t.s32_size = 0;
+        trans->use_as__vsf_mem_t.size = 0;
         trans->zlp = false;
-        err = vk_usbd_drv_ep_transfer_send(trans->ep, trans->use_as__vsf_mem_t.buffer_ptr, size, zlp);
+        err = vk_usbd_drv_ep_transfer_send(trans->ep, trans->use_as__vsf_mem_t.buffer, size, zlp);
     } else {
-        trans->cur = trans->use_as__vsf_mem_t.buffer_ptr;
+        trans->cur = trans->use_as__vsf_mem_t.buffer;
         err = __vk_usbd_ep_send_imp(dev, trans);
     }
     if (VSF_ERR_NONE != err) {
@@ -452,8 +452,8 @@ static vsf_err_t __vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
     if (!size) {
         buffer = NULL;
     }
-    ctrl_handler->trans.use_as__vsf_mem_t.buffer_ptr = buffer;
-    ctrl_handler->trans.use_as__vsf_mem_t.s32_size = size;
+    ctrl_handler->trans.use_as__vsf_mem_t.buffer = buffer;
+    ctrl_handler->trans.use_as__vsf_mem_t.size = size;
     return VSF_ERR_NONE;
 }
 
@@ -545,6 +545,11 @@ void vsf_usbd_vendor_process(vk_usbd_dev_t *dev)
 }
 #endif
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 static vsf_err_t __vk_usbd_ctrl_prepare(vk_usbd_dev_t *dev)
 {
     vk_usbd_cfg_t *config = &dev->config[dev->configuration];
@@ -615,6 +620,12 @@ static void __vk_usbd_ctrl_process(vk_usbd_dev_t *dev)
         vsf_usbd_vendor_process(dev);
     }
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
+
 #endif      // !VSF_USBD_CFG_RAW_MODE
 
 static void __vk_usbd_setup_status_callback(void *param)
@@ -751,8 +762,8 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 break;
             }
 
-            if (ctrl_handler->trans.use_as__vsf_mem_t.s32_size > request->wLength) {
-                ctrl_handler->trans.use_as__vsf_mem_t.s32_size = request->wLength;
+            if (ctrl_handler->trans.use_as__vsf_mem_t.size > request->wLength) {
+                ctrl_handler->trans.use_as__vsf_mem_t.size = request->wLength;
             }
 
             if ((request->bRequestType & USB_DIR_MASK) == USB_DIR_OUT) {
@@ -764,7 +775,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
                 }
             } else {
                 trans->on_finish = __vk_usbd_setup_status_callback;
-                trans->zlp = ctrl_handler->trans.use_as__vsf_mem_t.s32_size < request->wLength;
+                trans->zlp = ctrl_handler->trans.use_as__vsf_mem_t.size < request->wLength;
                 vk_usbd_ep_send(dev, trans);
             }
             break;
@@ -780,7 +791,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             vk_usbd_trans_t *trans = __vk_usbd_get_trans(dev, ep);
             VSF_USB_ASSERT(trans != NULL);
 
-            if (trans->use_as__vsf_mem_t.s32_size) {
+            if (trans->use_as__vsf_mem_t.size) {
                 __vk_usbd_ep_send_imp(dev, trans);
             } else if (trans->zlp) {
                 trans->zlp = false;
@@ -795,25 +806,25 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             vk_usbd_trans_t *trans = __vk_usbd_get_trans(dev, ep);
             VSF_USB_ASSERT(trans != NULL);
 
-            if (!trans->use_as__vsf_mem_t.buffer_ptr) {
+            if (!trans->use_as__vsf_mem_t.buffer) {
                 __vk_usbd_trans_finish(dev, trans);
             } else {
                 uint_fast32_t pkg_size = vk_usbd_drv_ep_get_data_size(ep);
 
                 if (vk_usbd_drv_ep_get_feature(trans->ep, trans->feature) & USB_DC_FEATURE_TRANSFER) {
-                    VSF_USB_ASSERT(trans->use_as__vsf_mem_t.s32_size >= pkg_size);
-                    trans->use_as__vsf_mem_t.s32_size -= pkg_size;
+                    VSF_USB_ASSERT(trans->use_as__vsf_mem_t.size >= pkg_size);
+                    trans->use_as__vsf_mem_t.size -= pkg_size;
                     __vk_usbd_trans_finish(dev, trans);
                 } else {
                     uint_fast16_t ep_size = vk_usbd_drv_ep_get_size(ep);
                     // ignore the over-run data
-                    pkg_size = min(pkg_size, trans->use_as__vsf_mem_t.s32_size);
+                    pkg_size = min(pkg_size, trans->use_as__vsf_mem_t.size);
                     vk_usbd_drv_ep_transaction_read_buffer(ep, trans->cur, pkg_size);
                     trans->cur += pkg_size;
-                    trans->use_as__vsf_mem_t.s32_size -= pkg_size;
+                    trans->use_as__vsf_mem_t.size -= pkg_size;
 
                     // TODO: check trans->zlp
-                    if ((trans->use_as__vsf_mem_t.s32_size > 0) && (pkg_size == ep_size)) {
+                    if ((trans->use_as__vsf_mem_t.size > 0) && (pkg_size == ep_size)) {
                         vk_usbd_drv_ep_transaction_enable_out(ep);
                     } else {
                         __vk_usbd_trans_finish(dev, trans);
@@ -944,13 +955,13 @@ static void __vk_usbd_stream_tx_recv(vk_usbd_ep_stream_t *stream_ep, uint_fast16
     }
 
     if (size >= ep_size) {
-        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.s32_size = size;
-        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.buffer_ptr = buffer;
+        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.size = size;
+        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.buffer = buffer;
     } else {
-        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.s32_size = 0;
-        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.buffer_ptr = NULL;
+        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.size = 0;
+        stream_ep->use_as__vk_usbd_trans_t.use_as__vsf_mem_t.buffer = NULL;
     }
-    stream_ep->cur_size = stream_ep->s32_size;
+    stream_ep->cur_size = stream_ep->size;
     vk_usbd_ep_recv(stream_ep->dev, &stream_ep->use_as__vk_usbd_trans_t);
 }
 
@@ -974,7 +985,7 @@ static void __vk_usbd_stream_tx_on_trans_finish(void *param)
             size_read -= size;
         }
     } else {
-        pkg_size = stream_ep->cur_size - stream_ep->s32_size;
+        pkg_size = stream_ep->cur_size - stream_ep->size;
         stream_ep->cur_size = 0;
     }
 
@@ -1026,7 +1037,7 @@ vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
     stream->tx.evthandler = __vk_usbd_stream_tx_evthandler;
     trans->param = stream_ep;
     trans->on_finish = NULL;
-    trans->buffer_ptr = NULL;
+    trans->buffer = NULL;
     vsf_stream_connect_tx(stream);
 
     __vk_usbd_stream_tx_evthandler(stream_ep, VSF_STREAM_ON_OUT);
@@ -1045,9 +1056,9 @@ static void __vk_usbd_stream_rx_on_trans_finish(void *param)
     }
 
     if (!stream_ep->total_size || (stream_ep->transfered_size < stream_ep->total_size)) {
-        stream_ep->s32_size = vsf_stream_get_rbuf(stream, &stream_ep->buffer_ptr);
-        if (stream_ep->s32_size > 0) {
-            stream_ep->cur_size = stream_ep->s32_size;
+        stream_ep->size = vsf_stream_get_rbuf(stream, &stream_ep->buffer);
+        if (stream_ep->size > 0) {
+            stream_ep->cur_size = stream_ep->size;
             vk_usbd_ep_send(stream_ep->dev, &stream_ep->use_as__vk_usbd_trans_t);
         } else {
             stream_ep->on_finish = NULL;
@@ -1069,9 +1080,9 @@ static void __vk_usbd_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
         if (    (NULL == stream_ep->on_finish)
             &&  (   !stream_ep->total_size
                 ||  (stream_ep->transfered_size < stream_ep->total_size))) {
-            stream_ep->s32_size = vsf_stream_get_rbuf(stream, &stream_ep->buffer_ptr);
-            if (stream_ep->s32_size > 0) {
-                stream_ep->cur_size = stream_ep->s32_size;
+            stream_ep->size = vsf_stream_get_rbuf(stream, &stream_ep->buffer);
+            if (stream_ep->size > 0) {
+                stream_ep->cur_size = stream_ep->size;
                 stream_ep->on_finish = __vk_usbd_stream_rx_on_trans_finish;
                 vk_usbd_ep_send(dev, &stream_ep->use_as__vk_usbd_trans_t);
             }
@@ -1125,7 +1136,7 @@ static vsf_err_t __vk_usbd_ep_rcv_pbuf(vk_usbd_ep_stream_t *this_ptr)
         trans->param = this_ptr;
         
         trans->use_as__vsf_mem_t.src_ptr = vsf_pbuf_buffer_get(this_ptr->rx_current);
-        trans->use_as__vsf_mem_t.s32_size = vsf_pbuf_size_get(this_ptr->rx_current);
+        trans->use_as__vsf_mem_t.size = vsf_pbuf_size_get(this_ptr->rx_current);
         vk_usbd_ep_recv(this_ptr->dev, trans);
         result = VSF_ERR_NONE;
     } while(0);
@@ -1145,7 +1156,7 @@ static vsf_err_t __vk_usbd_on_ep_rcv(vk_usbd_ep_stream_t *this_ptr)
         pbuf = this_ptr->rx_current;
         this_ptr->rx_current = NULL;
         if (pbuf != NULL) {
-            ep_left_size = this_ptr->rx_trans.use_as__vsf_mem_t.s32_size;
+            ep_left_size = this_ptr->rx_trans.use_as__vsf_mem_t.size;
         }
         result = __vk_usbd_ep_rcv_pbuf(this_ptr);    //! start next rcv
     )
@@ -1194,7 +1205,7 @@ static vsf_err_t __vk_usbd_ep_send_pbuf(vk_usbd_ep_stream_t *this_ptr)
         trans->param = this_ptr;
         
         trans->use_as__vsf_mem_t.src_ptr = vsf_pbuf_buffer_get(this_ptr->tx_current);
-        trans->use_as__vsf_mem_t.s32_size = vsf_pbuf_size_get(this_ptr->tx_current);
+        trans->use_as__vsf_mem_t.size = vsf_pbuf_size_get(this_ptr->tx_current);
 
         vk_usbd_ep_send(this_ptr->dev, trans);
         result = VSF_ERR_NONE;
@@ -1234,7 +1245,7 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *this_ptr)
 
 static void __vk_usbd_on_data_ready_event( void *target_ptr, 
                                             vsf_stream_rx_t *ptRX, 
-                                            vsf_stream_status_t tStatus)
+                                            vsf_stream_status_t Status)
 {
     vk_usbd_ep_stream_t *this_ptr = (vk_usbd_ep_stream_t *)target_ptr;
     vk_usbd_ep_send_stream(this_ptr);

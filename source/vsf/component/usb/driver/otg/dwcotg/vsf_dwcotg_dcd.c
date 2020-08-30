@@ -26,10 +26,10 @@
 
 /*============================ MACROS ========================================*/
 
-#define DWCOTG_DEBUG
-#define DWCOTG_DEBUG_DUMP_USB_ON
-#define DWCOTG_DEBUG_DUMP_FUNC_CALL
-#define DWCOTG_DEBUG_DUMP_DATA
+//#define DWCOTG_DEBUG
+//#define DWCOTG_DEBUG_DUMP_USB_ON
+//#define DWCOTG_DEBUG_DUMP_FUNC_CALL
+//#define DWCOTG_DEBUG_DUMP_DATA
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -494,8 +494,10 @@ static void __vk_dwcotg_dcd_ep_write(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
         debug_add_data(0xFFFF0000 + remain_size);
 
         size = min(size, remain_size);
+        if (size > 0) {
+            VSF_USB_ASSERT(buffer != NULL);
+        }
 
-        VSF_USB_ASSERT(buffer != NULL);
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
 #ifndef UNALIGNED
             data = get_unaligned_cpu32(buffer);
@@ -531,7 +533,10 @@ static void __vk_dwcotg_dcd_ep_read(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep
         uint8_t *buffer = trans->buffer;
         uint32_t data;
 
-        VSF_USB_ASSERT(buffer != NULL);
+        if (size > 0) {
+            VSF_USB_ASSERT(buffer != NULL);
+        }
+
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
             data = *dwcotg_dcd->reg.dfifo[0];
             debug_add_evt(data);

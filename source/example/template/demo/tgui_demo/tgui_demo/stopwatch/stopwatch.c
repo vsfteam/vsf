@@ -61,10 +61,10 @@ describe_tgui_msgmap(tLapMSGMap,
     tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
 )
 
-stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *ptGUI)
+stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 {
     do {
-        if (NULL == ptPanel && NULL != ptGUI) {
+        if (NULL == ptPanel && NULL != gui_ptr) {
             break;
         }
 
@@ -230,8 +230,8 @@ implement_vsf_pt(tgui_demo_t)
 
     UNUSED_PARAM(s_tRefreshRegion);
 
-    //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.ptGUI, NULL, &s_tRefreshRegion);
-    vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.ptGUI);
+    //vk_tgui_refresh_ex(ptBase->use_as__vsf_tgui_panel_t.gui_ptr, NULL, &s_tRefreshRegion);
+    vk_tgui_refresh(ptBase->use_as__vsf_tgui_panel_t.gui_ptr);
     while(1) {
 
         //! refresh timer
@@ -245,7 +245,7 @@ implement_vsf_pt(tgui_demo_t)
             //! update existing text content
             vsf_tgui_text_set(&(base.tTime.tLabel), &(base.tTime.tLabel.tString));
 
-            vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.ptGUI, 
+            vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.gui_ptr, 
                                 (vsf_tgui_control_t *)&(base.tTime), NULL);
                                 //&s_tRefreshRegion);
         } while(0);

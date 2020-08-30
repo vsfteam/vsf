@@ -64,10 +64,10 @@ static const i_tgui_control_methods_t c_tVPanel= {
 
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_panel_msg_handler( vsf_tgui_panel_t* ptControl,
+fsm_rt_t vsf_tgui_panel_msg_handler( vsf_tgui_panel_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)ptControl,
+    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)control_ptr,
                                             ptMSG,
                                             &c_tVPanel);
 }
@@ -97,10 +97,10 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
         vk_tgui_label_init(&(ptPanel->tTitleLabel));
 
         do {
-            vsf_tgui_status_t tStatus = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptPanel);
-            tStatus.tValues.__bContainBuiltInStructure = true;
+            vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptPanel);
+            Status.Values.__does_contain_builtin_structure = true;
 
-            vsf_tgui_control_status_set((vsf_tgui_control_t*)ptPanel, tStatus);
+            vsf_tgui_control_status_set((vsf_tgui_control_t*)ptPanel, Status);
         } while(0);
 
         return fsm_rt_cpl;

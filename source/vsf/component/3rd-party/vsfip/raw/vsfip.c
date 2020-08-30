@@ -207,8 +207,8 @@ vsfip_netbuf_t * vsfip_netbuf_get(uint32_t size)
         memset(netbuf, 0, sizeof(*netbuf));
         netbuf->buffer = buffer;
         netbuf->ref = 1;
-        netbuf->buf.buffer_ptr = netbuf->app.buffer_ptr = netbuf->buffer + VSFIP_PROTO_HEADLEN;
-        netbuf->buf.s32_size = netbuf->app.s32_size = size;
+        netbuf->buf.buffer = netbuf->app.buffer = netbuf->buffer + VSFIP_PROTO_HEADLEN;
+        netbuf->buf.size = netbuf->app.size = size;
     }
     return netbuf;
 }
@@ -265,23 +265,23 @@ void vsfip_netbuf_set_netif(vsfip_netbuf_t *netbuf, vsfip_netif_t *netif)
 
 uint8_t * vsfip_netbuf_header(vsfip_netbuf_t *netbuf, int_fast16_t head_size)
 {
-    uint32_t cur_header_len = &netbuf->app.buffer_ptr[netbuf->pos] - netbuf->buf.buffer_ptr;
+    uint32_t cur_header_len = &netbuf->app.buffer[netbuf->pos] - netbuf->buf.buffer;
     bool backup = netbuf->pos > 0;
 
     if (    ((head_size > 0) && backup && ((cur_header_len + head_size) > VSFIP_PROTO_HEADLEN))
-        ||  ((head_size < 0) && (netbuf->buf.s32_size < -head_size))) {
+        ||  ((head_size < 0) && (netbuf->buf.size < -head_size))) {
         return NULL;
     }
 
-    netbuf->buf.buffer_ptr -= head_size;
-    netbuf->buf.s32_size += head_size;
+    netbuf->buf.buffer -= head_size;
+    netbuf->buf.size += head_size;
 
     if ((head_size > 0) && backup) {
         cur_header_len += head_size;
         memcpy(netbuf->buffer + VSFIP_PROTO_HEADLEN - cur_header_len,
-                netbuf->buf.buffer_ptr, head_size);
+                netbuf->buf.buffer, head_size);
     }
-    return netbuf->buf.buffer_ptr;
+    return netbuf->buf.buffer;
 }
 
 // bufq
@@ -299,7 +299,7 @@ static uint_fast32_t __vsfip_bufq_len(vsf_dlist_t *queue)
     uint_fast32_t len = 0;
 
     __vsf_dlist_foreach_unsafe(vsfip_netbuf_t, proto_node, (vsf_slist_t *)queue) {
-        len += _->app.s32_size;
+        len += _->app.size;
     }
     return len;
 }
@@ -463,7 +463,7 @@ static uint_fast16_t __vsfip_checksum(uint8_t *data, uint16_t len)
 
 static uint_fast16_t __vsfip_proto_checksum(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 {
-    uint_fast32_t checksum = __vsfip_checksum(netbuf->buf.buffer_ptr, netbuf->buf.s32_size);
+    uint_fast32_t checksum = __vsfip_checksum(netbuf->buf.buffer, netbuf->buf.size);
     vsfip_ipaddr_t *local_addr = &netbuf->netif->ip4addr;
     vsfip_ipaddr_t *remote_addr = &socket->remote_sockaddr.addr;
 
@@ -472,7 +472,7 @@ static uint_fast16_t __vsfip_proto_checksum(vsfip_socket_t *socket, vsfip_netbuf
     checksum += get_unaligned_be16(&remote_addr->addr_buf[0]);
     checksum += get_unaligned_be16(&remote_addr->addr_buf[2]);
     checksum += socket->protocol;
-    checksum += netbuf->buf.s32_size;
+    checksum += netbuf->buf.size;
     checksum = (checksum & 0xFFFF) + (checksum >> 16);
     checksum = (checksum & 0xFFFF) + (checksum >> 16);
     return (uint_fast16_t)checksum;
@@ -575,11 +575,11 @@ void vsfip_ip4_input(vsfip_netbuf_t *netbuf)
     ip4head->checksum = be16_to_cpu(ip4head->checksum);
     if (    (VSFIP_IP4H_V(ip4head) != 4)
         ||  (iph_hlen > ip4head->len)
-        ||  (ip4head->len > netbuf->buf.s32_size)) {
+        ||  (ip4head->len > netbuf->buf.size)) {
         goto release_buf;
     }
-    netbuf->buf.s32_size = ip4head->len - iph_hlen;
-    netbuf->buf.buffer_ptr += iph_hlen;
+    netbuf->buf.size = ip4head->len - iph_hlen;
+    netbuf->buf.buffer += iph_hlen;
 
     // ip reassembly
     if (!(ip4head->offset & VSFIP_IPH_DF)) {
@@ -620,18 +620,18 @@ static void __vsfip_add_ip4head_common(vsfip_netbuf_t *ipbuf)
 {
     vsfip_ip4_head_t *ip4head = ipbuf->iphead.ip4head;
     uint_fast32_t iph_hlen = VSFIP_IP4H_HLEN(ip4head) * 4;
-    uint_fast32_t payload_len = ipbuf->buf.s32_size - iph_hlen;
+    uint_fast32_t payload_len = ipbuf->buf.size - iph_hlen;
     uint_fast16_t mtu = vsfip_netif_mtu(ipbuf->netif);
     uint_fast16_t offset, checksum;
     bool fragement = false;
 
-    if (ipbuf->buf.s32_size > mtu) {
+    if (ipbuf->buf.size > mtu) {
         payload_len = ((mtu - iph_hlen) >> 3) << 3;
-        ipbuf->buf.s32_size = payload_len + iph_hlen;
+        ipbuf->buf.size = payload_len + iph_hlen;
         fragement = true;
     }
 
-    ip4head->len = cpu_to_be16(ipbuf->buf.s32_size);
+    ip4head->len = cpu_to_be16(ipbuf->buf.size);
     offset = (ipbuf->pos >> 3) | (fragement ? VSFIP_IPH_MF : 0);
     ip4head->offset = cpu_to_be16(offset);
     ip4head->checksum = cpu_to_be16(0);
@@ -664,27 +664,27 @@ void vsfip_ipbuf_on_finish(vsfip_netbuf_t *netbuf, vsf_err_t err)
 {
     bool backup = netbuf->pos > 0;
     uint8_t *pbackup = netbuf->buffer + VSFIP_PROTO_HEADLEN;
-    uint8_t *cur_app = &netbuf->app.buffer_ptr[netbuf->pos];
+    uint8_t *cur_app = &netbuf->app.buffer[netbuf->pos];
     uint8_t iphead[32];
 
     memcpy(iphead, netbuf->iphead.ip4head, sizeof(iphead));
     // recover payload data(over-wriitten by headers) if netbuf will not be freed
     if (backup) {
-        uint_fast32_t header_len = cur_app - netbuf->buf.buffer_ptr;
-        memcpy(netbuf->buf.buffer_ptr, pbackup - header_len, header_len);
+        uint_fast32_t header_len = cur_app - netbuf->buf.buffer;
+        memcpy(netbuf->buf.buffer, pbackup - header_len, header_len);
     }
 
-    netbuf->pos = &netbuf->buf.buffer_ptr[netbuf->buf.s32_size] - netbuf->app.buffer_ptr;
-    if (err || (netbuf->pos >= netbuf->app.s32_size)) {
+    netbuf->pos = &netbuf->buf.buffer[netbuf->buf.size] - netbuf->app.buffer;
+    if (err || (netbuf->pos >= netbuf->app.size)) {
         vsfip_netbuf_deref(netbuf);
     } else {
         uint_fast32_t iph_hlen = VSFIP_IP4H_HLEN((vsfip_ip4_head_t *)iphead) * 4;
 
-        netbuf->buf.buffer_ptr = &netbuf->app.buffer_ptr[netbuf->pos];
-        netbuf->buf.s32_size = &netbuf->app.buffer_ptr[netbuf->app.s32_size] - netbuf->buf.buffer_ptr;
+        netbuf->buf.buffer = &netbuf->app.buffer[netbuf->pos];
+        netbuf->buf.size = &netbuf->app.buffer[netbuf->app.size] - netbuf->buf.buffer;
 
         vsfip_netbuf_header(netbuf, iph_hlen);
-        memcpy(netbuf->buf.buffer_ptr, iphead, iph_hlen);
+        memcpy(netbuf->buf.buffer, iphead, iph_hlen);
         netbuf->iphead.ip4head = netbuf->buf.obj_ptr;
 
         __vsfip_add_ip4head_common(netbuf);
@@ -998,8 +998,8 @@ static void __vsfip_udp_input(vsfip_netbuf_t *netbuf)
     udphead->len = be16_to_cpu(udphead->len);
     udphead->checksum = be16_to_cpu(udphead->checksum);
 
-    netbuf->app.buffer_ptr = netbuf->buf.buffer_ptr + sizeof(vsfip_udp_head_t);
-    netbuf->app.s32_size = netbuf->buf.s32_size - sizeof(vsfip_udp_head_t);
+    netbuf->app.buffer = netbuf->buf.buffer + sizeof(vsfip_udp_head_t);
+    netbuf->app.size = netbuf->buf.size - sizeof(vsfip_udp_head_t);
     __vsfip_proto_input(&__vsfip.udp_list, netbuf, &udphead->port);
 }
 
@@ -1023,7 +1023,7 @@ static vsf_err_t __vsfip_udp_add_head(vsfip_socket_t *socket, vsfip_netbuf_t *ne
     udphead = netbuf->buf.obj_ptr;
     udphead->port.src = cpu_to_be16(socket->local_sockaddr.port);
     udphead->port.dst = cpu_to_be16(socket->remote_sockaddr.port);
-    udphead->len = cpu_to_be16(netbuf->buf.s32_size);
+    udphead->len = cpu_to_be16(netbuf->buf.size);
     udphead->checksum = cpu_to_be16(0x0000);
 
     checksum = ~__vsfip_proto_checksum(socket, netbuf);
@@ -1082,8 +1082,8 @@ static vsfip_netbuf_t * __vsfip_udp_get_netbuf(vsfip_socket_t *socket, vsfip_soc
         }
         if (addr->addr.addr32 == iphead->ipsrc) {
             vsf_dlist_remove(vsfip_netbuf_t, proto_node, &socket->input_queue, _);
-            _->app.buffer_ptr = _->buf.buffer_ptr + sizeof(vsfip_udp_head_t);
-            _->app.s32_size = _->buf.s32_size - sizeof(vsfip_udp_head_t);
+            _->app.buffer = _->buf.buffer + sizeof(vsfip_udp_head_t);
+            _->app.size = _->buf.size - sizeof(vsfip_udp_head_t);
             netbuf = _;
             break;
         }
@@ -1174,8 +1174,8 @@ static void __vsfip_tcp_input(vsfip_netbuf_t *netbuf)
     tcphead->urgent_ptr = be16_to_cpu(tcphead->urgent_ptr);
 
     netbuf->proto_node.addr = tcphead->seq;
-    netbuf->app.buffer_ptr = netbuf->buf.buffer_ptr + tcphead->headlen;
-    netbuf->app.s32_size = netbuf->buf.s32_size - tcphead->headlen;
+    netbuf->app.buffer = netbuf->buf.buffer + tcphead->headlen;
+    netbuf->app.size = netbuf->buf.size - tcphead->headlen;
     __vsfip_proto_input(&__vsfip.tcp_list, netbuf, &tcphead->port);
 }
 
@@ -1240,10 +1240,10 @@ static vsf_err_t __vsfip_tcp_send_do(vsfip_socket_t *socket, vsfip_netbuf_t *net
     }
     __vsfip_ip_output(socket, netbuf);
 
-    if ((flags & (VSFIP_TCPFLAG_FIN | VSFIP_TCPFLAG_SYN)) || (netbuf->app.s32_size > 0)) {
+    if ((flags & (VSFIP_TCPFLAG_FIN | VSFIP_TCPFLAG_SYN)) || (netbuf->app.size > 0)) {
         pcb->flags = flags;
     }
-    pcb->lseq += netbuf->app.s32_size;
+    pcb->lseq += netbuf->app.size;
     return VSF_ERR_NONE;
 }
 
@@ -1348,7 +1348,7 @@ static void __vsfip_tcp_data_input(vsfip_socket_t *socket, vsfip_netbuf_t *netbu
 {
     vsfip_tcp_pcb_t *pcb = socket->pcb.proto_pcb;
 
-    pcb->rseq += netbuf->app.s32_size;
+    pcb->rseq += netbuf->app.size;
     pcb->ack_tick = VSFIP_TCP_ATO;
     if (socket->user_callback.on_input != NULL) {
         socket->user_callback.on_input(socket->user_callback.param, netbuf);
@@ -1480,7 +1480,7 @@ re_process:
         } else if ((head.flags & VSFIP_TCPFLAG_ACK) && (head.ackseq == (pcb->acked_lseq + 1))) {
             pcb->tx_timeout_ms = 0;
             pcb->acked_lseq = pcb->lseq = head.ackseq;
-            if (netbuf->app.s32_size > 0) {
+            if (netbuf->app.size > 0) {
                 if (pcb->rseq == head.seq) {
                     release_buffer = false;
                     __vsfip_tcp_data_input(socket, netbuf);
@@ -1499,7 +1499,7 @@ re_process:
         }
         goto release_buf;
     case VSFIP_TCPSTAT_ESTABLISHED:
-        if (netbuf->app.s32_size > 0) {
+        if (netbuf->app.size > 0) {
             if (pcb->rseq == head.seq) {
                 release_buffer = false;
                 __vsfip_tcp_data_input(socket, netbuf);
@@ -1518,7 +1518,7 @@ re_process:
             pcb->acked_lseq = head.ackseq;
 
             __vsf_dlist_foreach_unsafe(vsfip_netbuf_t, proto_node, &socket->output_queue) {
-                if (pcb->acked_lseq >= (_->proto_node.addr + _->app.s32_size)) {
+                if (pcb->acked_lseq >= (_->proto_node.addr + _->app.size)) {
 //                    vsfq_dequeue(&socket->outq);
                     if (socket->user_callback.on_outputted != NULL) {
                         socket->user_callback.on_outputted(socket->user_callback.param);
@@ -1576,9 +1576,9 @@ re_process:
             goto remote_close;
         }
     check_data_in_FIN:
-        if (netbuf->app.s32_size > 0) {
+        if (netbuf->app.size > 0) {
             if (pcb->rseq == head.seq) {
-                pcb->rseq += netbuf->app.s32_size;
+                pcb->rseq += netbuf->app.size;
             }
             __vsfip_tcp_sendflags(socket, VSFIP_TCPFLAG_ACK);
         }
@@ -1645,7 +1645,7 @@ vsf_err_t vsfip_tcp_async_send(vsfip_socket_t *socket, vsfip_netbuf_t *netbuf)
 
     size = __vsfip_bufq_len(&socket->output_queue);
     window = min(pcb->tx_window, pcb->rwnd);
-    if ((size + netbuf->app.s32_size) > window) {
+    if ((size + netbuf->app.size) > window) {
         return VSF_ERR_NOT_READY;
     }
 
@@ -1688,8 +1688,8 @@ static void __vsfip_icmp_input(vsfip_netbuf_t *netbuf)
     uint_fast16_t iph_hlen = VSFIP_IP4H_HLEN(iphead) * 4;
     vsfip_icmp_head_t *icmphead = netbuf->buf.obj_ptr;
 
-    netbuf->app.buffer_ptr = netbuf->buf.buffer_ptr + sizeof(vsfip_icmp_head_t);
-    netbuf->app.s32_size = netbuf->buf.s32_size - sizeof(vsfip_icmp_head_t);
+    netbuf->app.buffer = netbuf->buf.buffer + sizeof(vsfip_icmp_head_t);
+    netbuf->app.size = netbuf->buf.size - sizeof(vsfip_icmp_head_t);
     if (icmphead->type == VSFIP_ICMP_ECHO) {
         uint_fast32_t swap_ip_cache;
 

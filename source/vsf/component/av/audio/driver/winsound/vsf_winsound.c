@@ -104,7 +104,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
             dev->play_ctx.hEvent = CreateEvent(NULL, 0, 0, NULL);
 
 #if VSF_AUDIO_CFG_USE_PLAY == ENABLED
-            __vsf_arch_irq_init(&dev->play_ctx.irq_thread, "winsound_play", __vk_winsound_play_irq_thread, dev->hw_prio, true);
+            __vsf_arch_irq_init(&dev->play_ctx.irq_thread, "winsound_play", __vk_winsound_play_irq_thread, dev->hw_prio);
 #endif
         }
         vsf_eda_return(VSF_ERR_NONE);
@@ -187,7 +187,7 @@ static void __vk_winsound_play_irq_thread(void *arg)
             if (play->buffer_taken > 0) {
                 vk_winsound_play_buffer_t *winsound_buffer =
                     dev->play_ctx.play_ticktock ? &dev->play_ctx.buffer[0] : &dev->play_ctx.buffer[1];
-                WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
+//                WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
                 dev->play_ctx.play_ticktock = !dev->play_ctx.play_ticktock;
                 __vsf_winsound_trace(VSF_TRACE_DEBUG, "winsound irq: %02X %d %08X\r\n", header->dwFlags, header->dwBufferLength, header->lpData);
                 // seems no need to wait WHDR_DONE

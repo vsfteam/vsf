@@ -489,6 +489,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_unmount, vk_fs_unmount)
     vsf_peda_end();
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount)
 {
     vsf_peda_begin();
@@ -779,6 +784,11 @@ exit:
     vsf_eda_return(err);
     vsf_peda_end();
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_warning=pe111
+#endif
 
 __vsf_component_peda_ifs_entry(__vk_fatfs_close, vk_file_close)
 {
