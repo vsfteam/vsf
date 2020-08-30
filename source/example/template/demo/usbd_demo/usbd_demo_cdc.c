@@ -41,13 +41,13 @@
 #else
 #   define __APP_CFG_CDC_BULK_SIZE          64
 #endif
-        
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-describe_block_stream(__user_usbd_cdc_stream0, 1024, __APP_CFG_CDC_BULK_SIZE)
+describe_block_stream(__user_usbd_cdc_stream0, 2, __APP_CFG_CDC_BULK_SIZE)
 
 describe_usbd(__user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_SPEED)
     usbd_common_desc(__user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)

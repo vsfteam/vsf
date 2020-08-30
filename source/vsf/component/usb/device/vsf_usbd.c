@@ -993,7 +993,7 @@ static void __vk_usbd_stream_tx_on_trans_finish(void *param)
     stream_ep->transfered_size += pkg_size;
 
     if (!stream_ep->total_size || (stream_ep->transfered_size < stream_ep->total_size)) {
-        if (vsf_stream_get_free_size(stream) > ep_size) {
+        if (vsf_stream_get_free_size(stream) >= ep_size) {
             __vk_usbd_stream_tx_recv(stream_ep, ep_size);
         } else {
             stream_ep->use_as__vk_usbd_trans_t.on_finish = NULL;
