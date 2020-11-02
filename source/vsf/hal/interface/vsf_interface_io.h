@@ -178,7 +178,7 @@ static void        gpio##__N##_toggle(uint32_t pin_mask);
 #define __GPIO_FUNC_BODY(__N, __VALUE)                                          \
 static void gpio##__N##_set_direction(uint32_t diretion, uint32_t pin_mask)     \
 {                                                                               \
-    SAFE_ATOM_CODE (                                                            \
+    vsf_interrupt_safe (                                                        \
         uint32_t temp = GSP_GPIO##__N.DIR & ~pin_mask;                          \
         temp |= (direction & pin_mask);                                         \
         GSP_GPIO##__N.DIR = temp;                                               \
@@ -206,7 +206,7 @@ static uint32_t gpio##__N##_read(void)                                          
 }                                                                               \
 static void gpio##__N##_write(uint32_t value, uint32_t pin_mask)                \
 {                                                                               \
-    SAFE_ATOM_CODE (                                                            \
+    vsf_interrupt_safe (                                                        \
         uint32_t temp = GSP_GPIO##__N.OUT & ~pin_mask;                          \
         temp |= (value & value);                                                \
         GSP_GPIO##__N.OUT = temp;                                               \

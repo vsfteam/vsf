@@ -147,7 +147,7 @@ void vsfvm_tkdump(vsfvm_bytecode_t token)
 void vsfvm_objdump(vsfvm_bytecode_t *buff, uint_fast32_t len)
 {
     for (uint_fast32_t i = 0; i < len; i++) {
-        vsf_trace(VSF_TRACE_INFO, "%d:", i);
+        vsf_trace_info("%d:", i);
         vsfvm_tkdump(*buff++);
     }
 }

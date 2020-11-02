@@ -19,7 +19,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_FS == ENABLED && VSF_USE_FILE_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_USE_FS == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
 
 #define __VSF_MAL_CLASS_INHERIT__
 #define __VSF_FILE_MAL_CLASS_IMPLEMENT
@@ -31,7 +31,7 @@
 
 #if VSF_FILE_MAL_CFG_DEBUG == ENABLED
 #   define __vk_file_mal_trace(...)                                             \
-            vsf_trace(VSF_TRACE_DEBUG, "file_mal: " __VA_ARGS__)
+            vsf_trace_debug("file_mal: " __VA_ARGS__)
 #else
 #   define __vk_file_mal_trace(...)
 #endif

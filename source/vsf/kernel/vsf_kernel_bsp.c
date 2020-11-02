@@ -17,6 +17,7 @@
 
 
 /*============================ INCLUDES ======================================*/
+
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
@@ -26,6 +27,10 @@
 #include "./vsf_evtq.h"
 #include "./vsf_os.h"
 #include "utilities/vsf_utilities.h"
+
+// for VSF_USER_ENTRY macro if exists in arch
+#include "hal/arch/vsf_arch.h"
+
 /*============================ MACROS ========================================*/
 
 #define __VSF_OS_EVTQ_SWI_PRIO_INIT(__index, __unused)                          \
@@ -36,6 +41,10 @@
 #       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, set to 4K by default
 #       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
 #   endif
+#endif
+
+#ifndef VSF_USER_ENTRY
+#   define VSF_USER_ENTRY                                   main
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -52,16 +61,19 @@ def_vsf_thread(app_main_thread_t, VSF_OS_CFG_MAIN_STACK_SIZE)
 /*============================ PROTOTYPES ====================================*/
 
 extern void __vsf_main_entry(void);
-extern int main(void);
+extern int VSF_USER_ENTRY(void);
+
+/*============================ IMPLEMENTATION ================================*/
+
 ROOT
 const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 {
 
 #if __VSF_OS_SWI_NUM > 0
 
-/*! \note it is important to understand the differences between following 
+/*! \note it is important to understand the differences between following
  *!       configurations when __VSF_OS_SWI_NUM == 1
- *!       
+ *!
  *!       1. VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
  *!          This configuration means user interrupt handlers and systimer
  *!          can have higher priorities and preempt the kernel and kernel
@@ -94,21 +106,21 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 
     static NO_INIT vsf_evtq_t __vsf_os_evt_queue[VSF_OS_CFG_PRIORITY_NUM];
-    
+
 #   if defined(__VSF_OS_CFG_EVTQ_LIST) && defined(VSF_OS_CFG_EVTQ_POOL_SIZE)
-    static NO_INIT vsf_pool_block(vsf_evt_node_pool)    
-        __evt_node_buffer[VSF_OS_CFG_EVTQ_POOL_SIZE];    
+    static NO_INIT vsf_pool_item(vsf_evt_node_pool)
+        __evt_node_buffer[VSF_OS_CFG_EVTQ_POOL_SIZE];
 #   endif
 
 #   if defined(__VSF_OS_CFG_EVTQ_ARRAY)
-    static NO_INIT vsf_evt_node_t 
+    static NO_INIT vsf_evt_node_t
         __vsf_os_nodes[VSF_OS_CFG_PRIORITY_NUM][1 << VSF_OS_CFG_EVTQ_BITSIZE];
 #   endif
 #endif
 
 #if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED \
     &&  defined(VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE)
-    static NO_INIT vsf_pool_block(vsf_eda_frame_pool) 
+    static NO_INIT vsf_pool_item(vsf_eda_frame_pool)
         __vsf_eda_frame_buffer[VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE];
 #endif
 
@@ -140,7 +152,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
             NULL,                                   // nodes_buf_ptr
             0,                                      // node_cnt
 #       endif
-#   endif    
+#   endif
             (uint16_t)UBOUND(__vsf_os_evt_queue),   // queue_cnt
         },
 
@@ -155,7 +167,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 #endif
 
     };
-    
+
     return &__res;
 }
 
@@ -174,16 +186,16 @@ uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 void vsf_kernel_err_report(vsf_kernel_error_t err)
 {
     switch (err) {
-        
+
         case VSF_KERNEL_ERR_NULL_EDA_PTR:
             /*! \note
             This should not happen. Two possible reasons could be:
             1. Forgeting to set VSF_OS_CFG_MAIN_MODE to VSF_OS_CFG_MAIN_MODE_THREAD
                and using vsf kernel APIs, e.g. vsf_delay_ms, vsf_sem_pend and etc.
             2. When VSF_OS_CFG_MAIN_MODE is not VSF_OS_CFG_MAIN_MODE_THREAD, using
-               any vsf_eda_xxxx APIs. 
+               any vsf_eda_xxxx APIs.
             */
-            
+
         case VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR:
             /*! \note
              This should not happen. One possible reason is:
@@ -192,15 +204,15 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
              */
         default:
             {
-                vsf_disable_interrupt(); 
+                vsf_disable_interrupt();
                 while(1);
             }
             //break;
-            
+
         case VSF_KERNEL_ERR_NONE:
             break;
     }
-    
+
 }
 
 
@@ -209,7 +221,7 @@ void vsf_kernel_err_report(vsf_kernel_error_t err)
 implement_vsf_thread(app_main_thread_t)
 {
     UNUSED_PARAM(this_ptr);
-    main();
+    VSF_USER_ENTRY();
 }
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_EDA                        \
     ||  (   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE                   \
@@ -218,7 +230,7 @@ static void __app_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     UNUSED_PARAM(eda);
     UNUSED_PARAM(evt);
-    main();
+    VSF_USER_ENTRY();
 }
 #endif
 
@@ -249,16 +261,16 @@ ROOT void __post_vsf_kernel_init(void)
     __app_main  .use_as__vsf_eda_t
                 .on_terminate = NULL;
 #       endif
-    vsf_teda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
+    vsf_teda_start(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   else
     static NO_INIT vsf_eda_t __app_main;
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     __app_main  .on_terminate = NULL;
 #       endif
-    vsf_eda_init_ex(&__app_main, (vsf_eda_cfg_t *)&cfg);
+    vsf_eda_start(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   endif
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_IDLE
-    main();
+    VSF_USER_ENTRY();
 #elif   VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_NONE
 #else
 #   error Please define VSF_OS_CFG_MAIN_MODE!!! and make sure there is no\
@@ -281,9 +293,9 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
 #else
     NO_INIT static uint_fast8_t __heap_buffer[
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
-    
+
     return (vsf_mem_t){
-        .ptr.src_ptr = (uint8_t *)__heap_buffer, 
+        .ptr.src_ptr = (uint8_t *)__heap_buffer,
         .s32_size = sizeof(__heap_buffer)
     };
 #endif
@@ -291,17 +303,15 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
 #endif
 #endif
 
-/*============================ IMPLEMENTATION ================================*/
-
+// call __vsf_main_entry in a standalone host-os thread
+#if VSF_KERNEL_CFG_NON_STANDALONE != ENABLED
 
 #if __IS_COMPILER_ARM_COMPILER_6__
 __asm(".global __use_no_semihosting\n\t");
 
-#ifndef __MICROLIB
+#   ifndef __MICROLIB
 __asm(".global __ARM_use_no_argv\n\t");
-#endif
-
-
+#   endif
 #endif
 
 /*----------------------------------------------------------------------------*
@@ -319,8 +329,8 @@ extern void exit(int arg);
 
 #   if defined(__CPU_MCS51__)
 __root
-__noreturn 
-__stackless void __cmain(void) 
+__noreturn
+__stackless void __cmain(void)
 {
     __vsf_main_entry();
     exit(0);
@@ -329,7 +339,7 @@ __stackless void __cmain(void)
 #   else
 __root
 __noreturn
-__stackless void __cmain(void) 
+__stackless void __cmain(void)
 {
     if (__low_level_init() != 0) {
         __IAR_STARTUP_DATA_INIT();
@@ -356,6 +366,8 @@ void vsf_main_entry(void)
 
 #warning please call __vsf_main_entry() before entering the main.
 #endif
+
+#endif      // VSF_KERNEL_CFG_NON_STANDALONE
 
 #endif
 /*EOF*/

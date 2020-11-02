@@ -22,7 +22,7 @@
 
 #include "../../vsf_scsi_cfg.h"
 
-#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_USE_MAL_SCSI == ENABLED
+#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_SCSI_USE_MAL_SCSI == ENABLED
 
 #include "component/mal/vsf_mal.h"
 
@@ -48,7 +48,7 @@ def_simple_class(vk_mal_scsi_t) {
         implement(vk_virtual_scsi_t)
         vk_mal_t *mal;
     )
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
     private_member(
         vk_mal_stream_t mal_stream;
     )
@@ -65,5 +65,5 @@ extern const vk_virtual_scsi_drv_t vk_mal_virtual_scsi_drv;
 }
 #endif
 
-#endif      // VSF_USE_SCSI && VSF_USE_MAL_SCSI
+#endif      // VSF_USE_SCSI && VSF_SCSI_USE_MAL_SCSI
 #endif      // __VSF_MAL_SCSI_H__

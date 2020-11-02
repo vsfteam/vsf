@@ -23,7 +23,7 @@
 
 #define __VSF_AUDIO_CLASS_INHERIT__
 #define __VSF_WINSOUND_CLASS_IMPLEMENT
-#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 
 #include "service/vsf_service.h"
 #include "../../vsf_audio.h"
@@ -49,7 +49,7 @@
 
 dcl_vsf_peda_methods(static, __vk_winsound_init)
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
 dcl_vsf_peda_methods(static, __vk_winsound_play_set_volume)
 dcl_vsf_peda_methods(static, __vk_winsound_play_set_mute)
 dcl_vsf_peda_methods(static, __vk_winsound_play_start)
@@ -71,7 +71,7 @@ static void __vk_winsound_capture_irq_thread(void *arg);
 
 const vk_audio_drv_t vk_winsound_drv = {
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_init),
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
     .play_drv       = {
         .volume     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_play_set_volume),
         .mute       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winsound_play_set_mute),
@@ -103,7 +103,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
             dev->is_inited = true;
             dev->play_ctx.hEvent = CreateEvent(NULL, 0, 0, NULL);
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
             __vsf_arch_irq_init(&dev->play_ctx.irq_thread, "winsound_play", __vk_winsound_play_irq_thread, dev->hw_prio);
 #endif
         }
@@ -113,7 +113,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
     vsf_peda_end();
 }
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
 __vsf_component_peda_ifs_entry(__vk_winsound_play_set_volume, vk_audio_play_set_volume)
 {
     vsf_peda_begin();
@@ -185,8 +185,8 @@ static void __vk_winsound_play_irq_thread(void *arg)
 
         __vsf_arch_irq_start(irq_thread);
             if (play->buffer_taken > 0) {
-                vk_winsound_play_buffer_t *winsound_buffer =
-                    dev->play_ctx.play_ticktock ? &dev->play_ctx.buffer[0] : &dev->play_ctx.buffer[1];
+//                vk_winsound_play_buffer_t *winsound_buffer =
+//                    dev->play_ctx.play_ticktock ? &dev->play_ctx.buffer[0] : &dev->play_ctx.buffer[1];
 //                WAVEHDR *header = (WAVEHDR *)&winsound_buffer->header;
                 dev->play_ctx.play_ticktock = !dev->play_ctx.play_ticktock;
                 __vsf_winsound_trace(VSF_TRACE_DEBUG, "winsound irq: %02X %d %08X\r\n", header->dwFlags, header->dwBufferLength, header->lpData);

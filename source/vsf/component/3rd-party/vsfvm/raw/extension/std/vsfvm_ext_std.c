@@ -87,17 +87,17 @@ static vsfvm_ret_t __vsfvm_ext_print(vsfvm_thread_t *thread)
 
         switch (var->type) {
         case VSFVM_VAR_TYPE_VALUE:
-            vsf_trace(VSF_TRACE_INFO, "%d", var->value);
+            vsf_trace_info("%d", var->value);
             break;
         case VSFVM_VAR_TYPE_RESOURCES:
             size = vsfvm_get_res(thread->script, var->value, &buffer);
             if (size < 0) {
                 return VSFVM_RET_ERROR;
             }
-            vsf_trace(VSF_TRACE_INFO, "%s", buffer);
+            vsf_trace_info("%s", buffer);
             break;
         case VSFVM_VAR_TYPE_FUNCTION:
-            vsf_trace(VSF_TRACE_INFO, "function@%d", var->uval16);
+            vsf_trace_info("function@%d", var->uval16);
             break;
         case VSFVM_VAR_TYPE_INSTANCE:
             if (var->inst != NULL) {
@@ -108,11 +108,11 @@ static vsfvm_ret_t __vsfvm_ext_print(vsfvm_thread_t *thread)
                         var->inst->size, VSF_TRACE_DF_U8_16);
                 }
             } else {
-                vsf_trace_string(VSF_TRACE_INFO, "NULL");
+                vsf_trace_info("NULL");
             }
             break;
         default:
-            vsf_trace(VSF_TRACE_INFO, "unknown type(%d)", var->type);
+            vsf_trace_info("unknown type(%d)", var->type);
         }
     }
     return VSFVM_RET_FINISHED;
@@ -331,7 +331,7 @@ static vsfvm_ret_t __vsfvm_ext_buffer_get_size(vsfvm_thread_t *thread)
     }
 
     size = thiz->inst->size;
-    vsfvm_var_set(thread, thiz, VSFVM_VAR_TYPE_VALUE, size);
+    vsfvm_var_set(thread, result, VSFVM_VAR_TYPE_VALUE, size);
     return VSFVM_RET_FINISHED;
 }
 
@@ -477,7 +477,7 @@ static vsfvm_ret_t __vsfvm_ext_pointer_get(vsfvm_thread_t *thread)
 
 static void __vsfvm_ext_string_print(vsfvm_instance_t *inst)
 {
-    vsf_trace_string(VSF_TRACE_INFO, (char *)inst->buffer);
+    vsf_trace_info("%s", (char *)inst->buffer);
 }
 
 static vsfvm_ret_t __vsfvm_ext_string_create(vsfvm_thread_t *thread)

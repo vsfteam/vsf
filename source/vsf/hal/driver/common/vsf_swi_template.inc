@@ -2,7 +2,7 @@
 Please read the "vsf_swi_template.h" header file for usage
 *******************************************************************************/
 
-#include "./driver.h"
+#include "hal/driver/driver.h"
 #include "./vsf_swi_template.h"
 
 #if !defined(__VSF_HAL_SWI_NUM)

@@ -18,7 +18,7 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_BTSTACK_DEMO == ENABLED
+#if APP_USE_BTSTACK_DEMO == ENABLED
 
 #include "btstack_event.h"
 #include "btstack_run_loop.h"
@@ -51,7 +51,7 @@ static void __btstack_packet_handler(uint8_t packet_type, uint16_t channel, uint
     switch (event) {
     case BTSTACK_EVENT_STATE:
         if (btstack_event_state_get_state(packet) == HCI_STATE_WORKING){
-#if APP_CFG_USE_LINUX_DEMO != ENABLED
+#if APP_USE_LINUX_DEMO != ENABLED
             vsf_trace(VSF_TRACE_INFO, "Starting inquiry scan..\n");
             gap_inquiry_start(5);
 #else
@@ -115,7 +115,7 @@ vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
     return VSF_ERR_NONE;
 }
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int btstack_scan_main(int argc, char *argv[])
 {
     if (HCI_STATE_WORKING == hci_get_state()) {

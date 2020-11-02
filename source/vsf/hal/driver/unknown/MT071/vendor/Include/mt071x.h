@@ -973,7 +973,14 @@ typedef struct
   */
 typedef struct
 {
-         uint32_t RESERVED0[8];
+	__IO uint32_t CTRL0;            //0x00
+	__IO uint32_t CTRL0_SET;
+	__IO uint32_t CTRL0_CLR;
+	__IO uint32_t CTRL0_TOG;
+	__IO uint32_t CTRL1;            //0x10
+	__IO uint32_t CTRL1_SET;
+	__IO uint32_t CTRL1_CLR;
+	__IO uint32_t CTRL1_TOG;
 	__IO uint32_t CTRL2;            //0x20
 	__IO uint32_t CTRL2_SET;
 	__IO uint32_t CTRL2_CLR;

@@ -75,7 +75,7 @@ extern "C" {
 dcl_simple_class(vk_fs_t)
 dcl_simple_class(vk_file_t)
 dcl_simple_class(vk_vfs_file_t)
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 dcl_simple_class(vk_file_stream_t)
 #endif
 
@@ -204,7 +204,7 @@ def_simple_class(vk_vfs_file_t) {
 };
 #endif
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 def_simple_class(vk_file_stream_t) {
     public_member(
         vk_file_t *file;
@@ -301,7 +301,7 @@ dcl_vsf_peda_methods(extern, vk_dummyfs_succeed)
 dcl_vsf_peda_methods(extern, vk_dummyfs_not_support)
 #endif
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 extern vsf_err_t vk_file_read_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_stream_t *stream);
 #endif

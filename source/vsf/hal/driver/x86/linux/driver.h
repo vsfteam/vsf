@@ -37,7 +37,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 extern vsf_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 #endif

@@ -23,7 +23,7 @@
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 
 #   define usrapp_eda_t             vsf_teda_t
-#   define usrapp_eda_init          vsf_teda_init_ex
+#   define usrapp_eda_init          vsf_teda_start
 #   define usrapp_cur_tick()        vsf_systimer_get_ms()
 
 #   define usrapp_sem_pend_timeout  vsf_systimer_us_to_tick(100)
@@ -32,7 +32,7 @@
 #else
 
 #   define usrapp_eda_t             vsf_eda_t
-#   define usrapp_eda_init          vsf_eda_init_ex
+#   define usrapp_eda_init          vsf_eda_start
 #   define usrapp_cur_tick()        0
 
 #   define usrapp_sem_pend_timeout  -1

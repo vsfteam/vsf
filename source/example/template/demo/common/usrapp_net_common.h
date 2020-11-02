@@ -34,9 +34,9 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_NETDRV_USE_WPCAP == ENABLED
 typedef struct usrapp_net_common_t {
-#   if VSF_USE_NETDRV_WPCAP == ENABLED
+#   if VSF_NETDRV_USE_WPCAP == ENABLED
     vk_netdrv_wpcap_t netdrv;
 #   endif
 } usrapp_net_common_t;
@@ -44,7 +44,7 @@ typedef struct usrapp_net_common_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_NETDRV_USE_WPCAP == ENABLED
 extern usrapp_net_common_t usrapp_net_common;
 #endif
 
@@ -52,7 +52,7 @@ extern usrapp_net_common_t usrapp_net_common;
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t usrapp_net_common_init(
-#if VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_NETDRV_USE_WPCAP == ENABLED
     char *name
 #else
     void

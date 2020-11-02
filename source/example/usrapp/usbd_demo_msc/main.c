@@ -89,7 +89,7 @@ struct usrapp_t {
         vk_mal_scsi_t mal_scsi;
     } scsi;
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
     struct {
         uint8_t buffer[1024];
         vsf_mem_stream_t mem_stream;
@@ -186,7 +186,7 @@ static usrapp_t __usrapp = {
         },
     },
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
     .stream                     = {
         .mem_stream             = {
             .op                 = &vsf_mem_stream_op,

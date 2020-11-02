@@ -151,17 +151,17 @@
 #define VSF_USE_VIDEO                       ENABLED
 
 #define VSF_USE_INPUT                       ENABLED
-#define VSF_USE_INPUT_HID                   ENABLED
+#define VSF_INPUT_USE_HID                   ENABLED
 
 #define VSF_USE_USB_HOST                    ENABLED
-#define VSF_USE_USB_HOST_HUB                ENABLED
-#define VSF_USE_USB_HOST_ECM                ENABLED
-#define VSF_USE_USB_HOST_HID                ENABLED
-#define VSF_USE_USB_HOST_BTHCI              ENABLED
-#define VSF_USE_USB_HOST_HCD_OHCI           ENABLED
+#define VSF_USBH_USE_HUB                    ENABLED
+#define VSF_USBH_USE_ECM                    ENABLED
+#define VSF_USBH_USE_HID                    ENABLED
+#define VSF_USBH_USE_BTHCI                  ENABLED
+#define VSF_USBH_USE_HCD_OHCI               ENABLED
 
 #define VSF_USE_USB_DEVICE                  ENABLED
-#define VSF_USE_USB_DEVICE_UVC              ENABLED
+#define VSF_USBD_USE_UVC                    ENABLED
 #   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
 
 #define VSF_USE_TCPIP                       ENABLED
@@ -181,10 +181,10 @@
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT    DISABLED
 
 
-#define VSF_USE_SERVICE_STREAM              DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM           ENABLED
+#define VSF_USE_STREAM                      DISABLED
+#define VSF_USE_SIMPLE_STREAM               ENABLED
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 #define VSF_SERVICE_CFG_INSERTION                                               \
     extern vsf_pbuf_pool_t  g_tGenericPBUFPool;
 //#define VSF_SERVICE_CFG_DEPENDENCY      

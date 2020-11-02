@@ -83,14 +83,14 @@ vsf_err_t vsf_pm_sleep(pm_sleep_cfg_t *cfg)
     return VSF_ERR_NONE;
 }
 
-pm_periph_async_clk_status_t vsf_pm_peripheral_get_status(pm_periph_async_clk_no_t index)
+pm_pclk_status_t vsf_pm_peripheral_get_status(pm_pclk_no_t index)
 {
-    return (pm_periph_async_clk_status_t)(
+    return (pm_pclk_status_t)(
                 (m480_bit_field_get((index >> 0) & 0x3FFF, (uint32_t *)&CLK->CLKSEL0) << 8)
             |   (m480_bit_field_get((index >> 14) & 0x3FFF, (uint32_t *)&CLK->CLKDIV0) << 0));
 }
 
-vsf_err_t vsf_pm_peripheral_resume(pm_periph_async_clk_no_t index , pm_periph_async_clk_status_t status)
+vsf_err_t vsf_pm_peripheral_resume(pm_pclk_no_t index , pm_pclk_status_t status)
 {
     if (status != vsf_pm_peripheral_get_status(index)) {
         m480_bit_field_set((index >> 0) & 0x3FFF, (uint32_t *)&CLK->CLKSEL0, (status >> 8) & 0xFF);
@@ -99,11 +99,10 @@ vsf_err_t vsf_pm_peripheral_resume(pm_periph_async_clk_no_t index , pm_periph_as
     return VSF_ERR_NONE;
 }
 
-pm_periph_async_clk_status_t vsf_pm_peripheral_config(pm_periph_async_clk_no_t index,
-                                                const pm_periph_asyn_clk_cfg_t *cfg)
+pm_pclk_status_t vsf_pm_peripheral_config(pm_pclk_no_t index, const pm_pclk_cfg_t *cfg)
 {
-    pm_periph_async_clk_status_t orig = vsf_pm_peripheral_get_status(index);
-    vsf_pm_peripheral_resume(index, (pm_periph_async_clk_status_t)(cfg->div | (cfg->clk_src << 8)));
+    pm_pclk_status_t orig = vsf_pm_peripheral_get_status(index);
+    vsf_pm_peripheral_resume(index, (pm_pclk_status_t)(cfg->div | (cfg->clk_src << 8)));
     return orig;
 }
 
@@ -163,12 +162,12 @@ static uint_fast32_t vsf_pm_peripheral_get_clksrc_from_clksel(uint_fast8_t map_i
     return vsf_pm_peripheral_get_clksrc(clksrc);
 }
 
-uint_fast32_t vsf_pm_peripheral_get_clock(pm_periph_async_clk_no_t index)
+uint_fast32_t vsf_pm_peripheral_get_clock(pm_pclk_no_t index)
 {
     uint_fast16_t bf_clksel = (index >> 0) & 0x3FFF;
 
     if (M480_BIT_FIELD_GET_BITLEN(bf_clksel)) {
-        pm_periph_async_clk_status_t status = vsf_pm_peripheral_get_status(index);
+        pm_pclk_status_t status = vsf_pm_peripheral_get_status(index);
         uint_fast8_t clksel = (status >> 8) & 0xFF;
         uint_fast16_t clkdiv = (status >> 0) & 0xFFFF;
         uint_fast8_t clksel_map_idx = index >> 28;
@@ -179,18 +178,18 @@ uint_fast32_t vsf_pm_peripheral_get_clock(pm_periph_async_clk_no_t index)
     return 0;
 }
 
-pm_sync_clk_status_t vsf_pm_sync_clk_get_status(pm_sync_clk_no_t index)
+pm_sclk_status_t vsf_pm_sclk_get_status(pm_sclk_no_t index)
 {
     uint_fast8_t bus_idx = index >> 5;
-    return (pm_sync_clk_status_t)(&CLK->SyncCLK)[bus_idx];
+    return (pm_sclk_status_t)(&CLK->AHBCLK)[bus_idx];
 }
 
-vsf_err_t vsf_pm_sync_clk_resume(pm_sync_clk_no_t index, pm_sync_clk_status_t status)
+vsf_err_t vsf_pm_sclk_resume(pm_sclk_no_t index, pm_sclk_status_t status)
 {
     uint_fast8_t bus_idx = index >> 5;
     uint_fast8_t bit_idx = index & 0x1F;
 
-    reg32_t *reg_enable = &CLK->SyncCLK;
+    reg32_t *reg_enable = &CLK->AHBCLK;
     uint_fast32_t mask = 1 << bit_idx;
 
     if ((reg_enable[bus_idx] ^ status) & mask) {
@@ -205,27 +204,27 @@ vsf_err_t vsf_pm_sync_clk_resume(pm_sync_clk_no_t index, pm_sync_clk_status_t st
     return VSF_ERR_NONE;
 }
 
-pm_sync_clk_status_t vsf_pm_sync_clk_enable(pm_sync_clk_no_t index)
+pm_sclk_status_t vsf_pm_sclk_enable(pm_sclk_no_t index)
 {
-    pm_sync_clk_status_t orig = vsf_pm_sync_clk_get_status(index);
+    pm_sclk_status_t orig = vsf_pm_sclk_get_status(index);
     uint_fast8_t bit_idx = index & 0x1F;
-    vsf_pm_sync_clk_resume(index, (pm_sync_clk_status_t)(1 << bit_idx));
+    vsf_pm_sclk_resume(index, (pm_sclk_status_t)(1 << bit_idx));
     return orig;
 }
 
-pm_sync_clk_status_t vsf_pm_sync_clk_disable(pm_sync_clk_no_t index)
+pm_sclk_status_t vsf_pm_sclk_disable(pm_sclk_no_t index)
 {
-    pm_sync_clk_status_t orig = vsf_pm_sync_clk_get_status(index);
-    vsf_pm_sync_clk_resume(index, (pm_sync_clk_status_t)0);
+    pm_sclk_status_t orig = vsf_pm_sclk_get_status(index);
+    vsf_pm_sclk_resume(index, (pm_sclk_status_t)0);
     return orig;
 }
 
-fsm_rt_t vsf_pm_mclk_init(pm_main_clk_cfg_t *cfg)
+fsm_rt_t vsf_pm_mclk_init(pm_mclk_cfg_t *cfg)
 {
     return fsm_rt_cpl;
 }
 
-uint_fast32_t vsf_pm_mclk_get(pm_main_clk_no_t sel)
+uint_fast32_t vsf_pm_mclk_get(pm_mclk_no_t sel)
 {
     return 0;
 }

@@ -63,23 +63,12 @@ extern "C" {
 
 /*! \note it's safe to ignore -Wcast-align in x86 platform */
 #if __IS_COMPILER_LLVM__
-#pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wcast-align"
 #elif __IS_COMPILER_GCC__
-#pragma GCC diagnostic ignored "-Wcast-align"
+#   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 /*============================ MACROS ========================================*/
-
-/*----------------------------------------------------------------------------*
- * Signal & Interrupt Definition                                              *
- *----------------------------------------------------------------------------*/
-
-typedef volatile bool vsf_gint_state_t;
-
-#define DISABLE_GLOBAL_INTERRUPT()			vsf_disable_interrupt()
-#define ENABLE_GLOBAL_INTERRUPT()			vsf_enable_interrupt()
-#define GET_GLOBAL_INTERRUPT_STATE()		vsf_get_interrupt()
-#define SET_GLOBAL_INTERRUPT_STATE(__STATE) vsf_set_interrupt((vsf_gint_state_t)__STATE)
 
 /*----------------------------------------------------------------------------*
  * Startup Source Code                                                        *
@@ -88,20 +77,7 @@ typedef volatile bool vsf_gint_state_t;
 #define vsf_stdio_init(...)
 
 /*============================ TYPES =========================================*/
-/*============================ INCLUDES ======================================*/
-
-//! \brief for interrupt 
-#include "./signal.h"
-
 /*============================ PROTOTYPES ====================================*/
-
-extern vsf_gint_state_t vsf_get_interrupt(void);
-
-extern void vsf_set_interrupt(vsf_gint_state_t level);
-
-extern vsf_gint_state_t vsf_disable_interrupt(void);
-
-extern void vsf_enable_interrupt(void);
 
 #ifdef __cplusplus
 }

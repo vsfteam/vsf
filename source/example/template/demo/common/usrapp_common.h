@@ -42,16 +42,16 @@
 #   include "./usrapp_net_common.h"
 #endif
 
-#if VSF_USE_MEMFS == ENABLED
+#if VSF_FS_USE_MEMFS == ENABLED
 #   include "../fakefat32.h"
 #endif
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_MEMFS == ENABLED
+#if VSF_FS_USE_MEMFS == ENABLED
 #   define USRAPP_CFG_MEMFS_ROOT                fakefat32_root
 #endif
-#if VSF_USE_WINFS == ENABLED
+#if VSF_FS_USE_WINFS == ENABLED
 #   define USRAPP_CFG_WINFS_ROOT                "winfs_root"
 #endif
 
@@ -72,9 +72,9 @@
 
 #if VSF_USE_FS == ENABLED
 typedef struct usrapp_common_t {
-#   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#   if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     struct {
-#       if VSF_USE_FAKEFAT32_MAL == ENABLED
+#       if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         vk_fakefat32_mal_t fakefat32;
 #       endif
     } mal;
@@ -82,10 +82,10 @@ typedef struct usrapp_common_t {
 
 #   if VSF_USE_FS == ENABLED
     struct {
-#       if VSF_USE_MEMFS == ENABLED
+#       if VSF_FS_USE_MEMFS == ENABLED
         vk_memfs_info_t memfs_info;
 #       endif
-#       if VSF_USE_WINFS == ENABLED
+#       if VSF_FS_USE_WINFS == ENABLED
         vk_winfs_info_t winfs_info;
 #       endif
     } fs;

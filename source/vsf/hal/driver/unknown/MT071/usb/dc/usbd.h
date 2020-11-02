@@ -19,10 +19,13 @@
 #define __HAL_DRIVER_MT071_USBD_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../device.h"
 
 #include "../usb.h"
+
+#if VSF_HAL_USE_USBD == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -42,5 +45,6 @@ extern void mt071_usbd_connect(mt071_usb_t *dc);
 extern void mt071_usbd_disconnect(mt071_usb_t *dc);
 extern void mt071_usbd_irq(mt071_usb_t *dc);
 
-#endif
+#endif      // VSF_HAL_USE_USBD
+#endif      // __HAL_DRIVER_MT071_USBD_H__
 /* EOF */

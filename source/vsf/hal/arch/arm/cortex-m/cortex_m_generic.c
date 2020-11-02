@@ -21,11 +21,12 @@
 #include "SysTick/systick.h"
 #include "hal/driver/driver.h"
 #include "hal/arch/__vsf_arch_interface.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct __vsf_cm_t {
+typedef struct __vsf_cm_t {
     struct {
         vsf_swi_handler_t *handler;
         void *param;
@@ -35,11 +36,11 @@ struct __vsf_cm_t {
 #endif
         vsf_gint_state_t global_int_state;
     } pendsv;
-};
-typedef struct __vsf_cm_t __vsf_cm_t;
+} __vsf_cm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
 static __vsf_cm_t __vsf_cm;
 
 /*============================ PROTOTYPES ====================================*/
@@ -48,7 +49,7 @@ static __vsf_cm_t __vsf_cm;
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
@@ -57,10 +58,10 @@ bool vsf_arch_low_level_init(void)
 {
     //memset(&__vsf_cm, 0, sizeof(__vsf_cm));
     //vsf_systimer_init();
-    
+
 #if defined(__VSF_DEBUG__) && __ARM_ARCH >= 7
 #   warning As __VSF_DEBUG__ is defined, all unaligned access will be\
- treated as faults. 
+ treated as faults.
     /*! disable processor's support for unaligned access for debug purpose */
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
 #endif
@@ -71,7 +72,7 @@ bool vsf_arch_low_level_init(void)
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -121,15 +122,15 @@ void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
 }
 
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-ROOT 
+ROOT
 #endif
 ISR(SysTick_Handler)
-{   
+{
     vsf_systimer_ovf_evt_hanlder();
 }
 
 
-/*! \brief initialise systimer without enable it 
+/*! \brief initialise systimer without enable it
  */
 vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 {
@@ -143,7 +144,7 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 
         NVIC_ClearPendingIRQ(SysTick_IRQn);
     vsf_set_interrupt(orig);
-    
+
     return VSF_ERR_NONE;
 }
 
@@ -157,8 +158,8 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *
  *----------------------------------------------------------------------------*/
-#if VSF_USE_KERNEL == ENABLED 
-ROOT 
+#if VSF_USE_KERNEL == ENABLED
+ROOT
 #endif
 ISR(PendSV_Handler)
 {
@@ -176,9 +177,9 @@ ISR(PendSV_Handler)
  *! \param idx the index of the software interrupt
  *! \return initialization result in vsf_err_t
  */
-vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, 
+vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
                             vsf_arch_prio_t priority,
-                            vsf_swi_handler_t *handler, 
+                            vsf_swi_handler_t *handler,
                             void *param)
 {
     if (0 == idx) {
@@ -210,7 +211,7 @@ void vsf_arch_swi_trigger(uint_fast8_t idx)
     #if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
     #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
-        __SAFE_ATOM_CODE(
+        __vsf_interrupt_safe(
             if (__vsf_cm.pendsv.enabled) {
                 SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             } else {
@@ -228,7 +229,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 #if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
     static vsf_gint_state_t __basepri = 0x100;
     vsf_gint_state_t origlevel = __basepri;
-        
+
         if (0 == priority) {
             __set_BASEPRI(0);
             __vsf_cm.pendsv.global_int_state = DISABLE_GLOBAL_INTERRUPT();
@@ -237,20 +238,20 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
             __set_BASEPRI(0);
             __basepri = 0x100;
             SET_GLOBAL_INTERRUPT_STATE(__vsf_cm.pendsv.global_int_state);
-            
+
         } else {
             __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
             __basepri = __get_BASEPRI();
         }
-    
+
     return (vsf_arch_prio_t)origlevel;
-    
+
 #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
     // TODO: MUST pass multi-priority test case
     static vsf_gint_state_t __basepri = 0x100;
-    
+
     vsf_gint_state_t origlevel = __basepri;
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         if (priority <= VSF_ARCH_PRIO_0) {
             //! lock sched
             __vsf_cm.pendsv.enabled = false;
@@ -273,21 +274,25 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  * interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 
+WEAK(vsf_get_interrupt)
 vsf_gint_state_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
 }
 
+WEAK(vsf_set_interrupt)
 void vsf_set_interrupt(vsf_gint_state_t level)
 {
     SET_GLOBAL_INTERRUPT_STATE(level);
 }
 
+WEAK(vsf_disable_interrupt)
 vsf_gint_state_t vsf_disable_interrupt(void)
 {
     return DISABLE_GLOBAL_INTERRUPT();
 }
 
+WEAK(vsf_enable_interrupt)
 void vsf_enable_interrupt(void)
 {
     ENABLE_GLOBAL_INTERRUPT();
@@ -298,6 +303,7 @@ void vsf_enable_interrupt(void)
  * Others: sleep, reset, etc                                                  *
  *----------------------------------------------------------------------------*/
 
+WEAK(vsf_arch_sleep)
 void vsf_arch_sleep(uint32_t mode)
 {
     UNUSED_PARAM(mode);

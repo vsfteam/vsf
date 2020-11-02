@@ -18,7 +18,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED && APP_CFG_USE_LVGL_DEMO == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED && APP_USE_LVGL_DEMO == ENABLED
 
 // for stdlib.h
 #include "utilities/vsf_utilities.h"

@@ -19,37 +19,24 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED && APP_CFG_USE_TGUI_DEMO == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED && APP_USE_TGUI_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef struct usrapp_t {
-    struct {
-        vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
-        vsf_tgui_color_t buffer[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
-    } ui;
-} usrapp_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static usrapp_t __usrapp;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
-#if VSF_USE_UI == ENABLED
+extern void vsf_tgui_bind_disp(vk_disp_t* disp, void* ui_data);
 extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
 extern void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* keyboard_evt);
-#endif
+extern vsf_err_t tgui_demo_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_UI == ENABLED
 static void __tgui_on_input_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
 //! this block of code is used for test purpose only
@@ -59,9 +46,8 @@ static void __tgui_on_input_evt(vk_input_type_t type, vk_input_evt_t *evt)
         vsf_tgui_on_touchscreen_evt((vk_touchscreen_evt_t *)evt);
     }
 }
-#endif
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int tgui_main(int argc, char *argv[])
 {
 #else
@@ -75,20 +61,16 @@ int main(void)
 #   endif
 #endif
 
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-
     usrapp_ui_common.tgui.notifier.mask = (1 << VSF_INPUT_TYPE_TOUCHSCREEN) | (1 << VSF_INPUT_TYPE_KEYBOARD);
     usrapp_ui_common.tgui.notifier.on_evt = __tgui_on_input_evt;
     vk_input_notifier_register(&usrapp_ui_common.tgui.notifier);
 
     // insecure operation
     ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_ARGB8888;
-	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data, void* buffer);
-	vsf_tgui_bind(&(usrapp_ui_common.disp.use_as__vk_disp_t), &__usrapp.ui.color, &__usrapp.ui.buffer);
+	vsf_tgui_bind_disp(&(usrapp_ui_common.disp.use_as__vk_disp_t), &usrapp_ui_common.tgui.color);
 
-    extern vsf_err_t tgui_demo_init(void);
     tgui_demo_init();
-#endif
+
     return 0;
 }
 

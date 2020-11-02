@@ -32,9 +32,9 @@
 
 struct usrapp_const_t {
     struct {
-#if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#if VSF_USBH_USE_HCD_OHCI == ENABLED
         vk_ohci_param_t ohci_param;
-#elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
         vsf_libusb_hcd_param_t libusb_hcd_param;
 #endif
     } usbh;
@@ -44,29 +44,29 @@ typedef struct usrapp_const_t usrapp_const_t;
 struct usrapp_t {
     struct {
         vk_usbh_t host;
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
         vk_usbh_class_t hub;
 #endif
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
         vk_usbh_class_t libusb;
         uint8_t dev_count;
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
         vk_usbh_class_t hid;
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
         vk_usbh_class_t ds4;
 #endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
+#if VSF_USBH_USE_NSPRO == ENABLED
         vk_usbh_class_t nspro;
 #endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
+#if VSF_USBH_USE_XB360 == ENABLED
         vk_usbh_class_t xb360;
 #endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
+#if VSF_USBH_USE_XB1 == ENABLED
         vk_usbh_class_t xb1;
 #endif
-#if VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USBH_USE_ECM == ENABLED
         vk_usbh_class_t ecm;
 /*
         struct {
@@ -87,12 +87,12 @@ typedef struct usrapp_t usrapp_t;
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const usrapp_const_t usrapp_const = {
-#if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#if VSF_USBH_USE_HCD_OHCI == ENABLED
     .usbh.ohci_param        = {
         .op                 = &VSF_USB_HC0_IP,
         .priority           = vsf_arch_prio_0,
     },
-#elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
     .usbh.libusb_hcd_param = {
         .priority = vsf_arch_prio_0,
     },
@@ -101,36 +101,36 @@ static const usrapp_const_t usrapp_const = {
 
 static usrapp_t usrapp = {
     .usbh                   = {
-#if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#if VSF_USBH_USE_HCD_OHCI == ENABLED
         .host.drv           = &vk_ohci_drv,
         .host.param         = (void *)&usrapp_const.usbh.ohci_param,
-#elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
         .host.drv           = &vsf_libusb_hcd_drv,
         .host.param         = (void*)&usrapp_const.usbh.libusb_hcd_param,
 #endif
 
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
         .hub.drv            = &vk_usbh_hub_drv,
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
         .hid.drv            = &vk_usbh_hid_drv,
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
         .ds4.drv            = &vk_usbh_ds4_drv,
 #endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
+#if VSF_USBH_USE_NSPRO == ENABLED
         .nspro.drv          = &vk_usbh_nspro_drv,
 #endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
+#if VSF_USBH_USE_XB360 == ENABLED
         .xb360.drv          = &vk_usbh_xb360_drv,
 #endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
+#if VSF_USBH_USE_XB1 == ENABLED
         .xb1.drv            = &vk_usbh_xb1_drv,
 #endif
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
         .libusb.drv         = &vk_usbh_libusb_drv,
 #endif
-#if VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USBH_USE_ECM == ENABLED
         .ecm.drv            = &vsff_usbh_ecm_drv,
 #endif
     },
@@ -139,7 +139,7 @@ static usrapp_t usrapp = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
 static void app_on_libusb_event(void *param,
                                 vk_usbh_libusb_dev_t *dev,
                                 vk_usbh_libusb_evt_t evt)
@@ -166,33 +166,33 @@ int main(void)
     vsf_trace(VSF_TRACE_INFO, "demo started..." VSF_TRACE_CFG_LINEEND);
 #endif
 
-#if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#if VSF_USBH_USE_HCD_OHCI == ENABLED
     vk_ohci_init();
 #endif
     vk_usbh_init(&usrapp.usbh.host);
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
     vk_usbh_libusb_set_evthandler(&usrapp, app_on_libusb_event);
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.libusb);
 #endif
-#if VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USBH_USE_ECM == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.ecm);
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hid);
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.ds4);
 #endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
+#if VSF_USBH_USE_NSPRO == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.nspro);
 #endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
+#if VSF_USBH_USE_XB360 == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.xb360);
 #endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
+#if VSF_USBH_USE_XB1 == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.xb1);
 #endif
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
     vk_usbh_register_class(&usrapp.usbh.host, &usrapp.usbh.hub);
 #endif
     return 0;

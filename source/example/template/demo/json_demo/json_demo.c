@@ -19,37 +19,42 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_JSON_DEMO == ENABLED && APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_JSON_DEMO == ENABLED && APP_USE_LINUX_DEMO == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static char __json[] = "\
-{\
-  \"Member\":\
-  [\
-    {\
-      \"Name\":\"SimonQian\",\
-      \"Age\":100,\
-    },\
-    {\
-      \"Name\":\"Dino\",\
-      \"Age\":200,\
-    }\
-  ]\
-}";
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 int json_main(int argc, char *argv[])
 {
-    char *json_member, buffer[128];
+    char json[1024];
+    vsf_mem_t mem   = {
+        .buffer     = (void *)json,
+        .size       = sizeof(json),
+    };
 
-    json_member = vsf_json_get(__json, "Member");
+    vsf_json_constructor_t json_constructor;
+    vsf_json_constructor_init(&json_constructor, &mem, vsf_json_constructor_buffer_write_str);
+    vsf_json_set_object(&json_constructor, NULL,
+        vsf_json_set_array(&json_constructor, "member",
+            vsf_json_set_object(&json_constructor, NULL,
+                vsf_json_set_string(&json_constructor, "name", "SimonQian");
+                vsf_json_set_integer(&json_constructor, "age", 100);
+            );
+            vsf_json_set_object(&json_constructor, NULL,
+                vsf_json_set_string(&json_constructor, "name", "Dino");
+                vsf_json_set_integer(&json_constructor, "age", 200);
+            );
+        );
+    );
+    vsf_trace_info("json:" VSF_TRACE_CFG_LINEEND "%s" VSF_TRACE_CFG_LINEEND, json);
+
+    char *json_member, buffer[128];
+    json_member = vsf_json_get(json, "member");
     if (json_member != NULL) {
         char id[2] = { '0', '\0' }, *json_persion;
         char *json_node;
@@ -60,19 +65,19 @@ int json_main(int argc, char *argv[])
             json_persion = vsf_json_get(json_member, id);
             if (json_persion != NULL) {
                 vsf_trace(VSF_TRACE_INFO, "Member %s:" VSF_TRACE_CFG_LINEEND, id);
-                json_node = vsf_json_get(json_persion, "Name");
+                json_node = vsf_json_get(json_persion, "name");
                 if (json_node != NULL) {
                     len = vsf_json_get_string(json_node, buffer, sizeof(buffer));
                     if (len > 0) {
                         buffer[len] = '\0';
-                        vsf_trace(VSF_TRACE_INFO, "  Name: %s" VSF_TRACE_CFG_LINEEND, buffer);
+                        vsf_trace(VSF_TRACE_INFO, "  name: %s" VSF_TRACE_CFG_LINEEND, buffer);
                     }
                 }
-                json_node = vsf_json_get(json_persion, "Age");
+                json_node = vsf_json_get(json_persion, "age");
                 if (json_node != NULL) {
                     len = vsf_json_get_number(json_node, &age);
                     if (len > 0) {
-                        vsf_trace(VSF_TRACE_INFO, "  Age: %d" VSF_TRACE_CFG_LINEEND, (int)age);
+                        vsf_trace(VSF_TRACE_INFO, "  age: %d" VSF_TRACE_CFG_LINEEND, (int)age);
                     }
                 }
             }

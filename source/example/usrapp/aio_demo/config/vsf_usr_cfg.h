@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level Application Configuration
 
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
@@ -76,7 +76,7 @@
 #define VSF_KERNEL_CFG_SUPPORT_SYNC                 ENABLED
 //      </c>
 
-//      <h> Schedule Policy 
+//      <h> Schedule Policy
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED               ENABLED
@@ -120,7 +120,7 @@
 #define VSF_OS_CFG_MAIN_STACK_SIZE                  2048
 
 //          <c1>Run main as a thread
-//          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
+//          <i>This feature will run main function as a thread. RTOS thread support must be enabled.
 #define VSF_OS_CFG_MAIN_MODE                        VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 
@@ -134,7 +134,7 @@
 
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
-//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
+//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant.
 #define VSF_KERNEL_CFG_EDA_SUPPORT_FSM              ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
@@ -155,41 +155,41 @@
 #define VSF_USE_VIDEO                       ENABLED
 
 #define VSF_USE_INPUT                       ENABLED
-#define VSF_USE_INPUT_HID                   ENABLED
-#define VSF_USE_INPUT_DS4                   ENABLED
+#define VSF_INPUT_USE_HID                   ENABLED
+#define VSF_INPUT_USE_DS4                   ENABLED
 
 #define VSF_USE_AV                          ENABLED
 
 #define VSF_USE_MAL                         ENABLED
-#define VSF_USE_MEM_MAL                     ENABLED
+#define VSF_MAL_USE_MEM_MAL                 ENABLED
 #define VSF_USE_SCSI                        ENABLED
 
 #define VSF_USE_USB_HOST                    ENABLED
-#define VSF_USE_USB_HOST_HUB                ENABLED
-#define VSF_USE_USB_HOST_ECM                ENABLED
-#define VSF_USE_USB_HOST_HID                ENABLED
-#define VSF_USE_USB_HOST_BTHCI              ENABLED
-#define VSF_USE_USB_HOST_DS4                ENABLED
-#define VSF_USE_USB_HOST_HCD_OHCI           ENABLED
-//#define VSF_USE_USB_HOST_HCD_MUSB_FDRC      ENABLED
+#define VSF_USBH_USE_HUB                    ENABLED
+#define VSF_USBH_USE_ECM                    ENABLED
+#define VSF_USBH_USE_HID                    ENABLED
+#define VSF_USBH_USE_BTHCI                  ENABLED
+#define VSF_USBH_USE_DS4                    ENABLED
+#define VSF_USBH_USE_HCD_OHCI               ENABLED
+//#define VSF_USBH_USE_HCD_MUSB_FDRC          ENABLED
 #define VSF_USBH_CFG_EDA_PRIORITY           vsf_prio_8
 
 #define VSF_USE_USB_DEVICE                  ENABLED
-//#define VSF_USE_USB_DEVICE_DCD_MUSB_FDRC    ENABLED
+//#define VSF_USBD_USE_DCD_MUSB_FDRC        ENABLED
 #define VSF_USBD_CFG_USE_EDA                ENABLED
 #define VSF_USBD_CFG_EDA_PRIORITY           vsf_prio_9
 #define VSF_USBD_CFG_HW_PRIORITY            vsf_arch_prio_9
-#define VSF_USE_USB_DEVICE_CDCACM           ENABLED
-#define VSF_USE_USB_DEVICE_UVC              ENABLED
+#define VSF_USBD_USE_CDCACM                 ENABLED
+#define VSF_USBD_USE_UVC                    ENABLED
 #   define VSF_USBD_UVC_CFG_TRACE_EN        ENABLED
-#define VSF_USE_USB_DEVICE_HID              ENABLED
-#define VSF_USE_USB_DEVICE_MSC              ENABLED
+#define VSF_USBD_USE_HID                    ENABLED
+#define VSF_USBD_USE_MSC                    ENABLED
 
 #define VSF_USE_TCPIP                       ENABLED
 
 #define VSF_USE_UI                          ENABLED
-#define VSF_USE_UI_LVGL                     ENABLED
-#define VSF_USE_DISP_USBD_UVC               ENABLED
+#define VSF_USE_LVGL                        ENABLED
+#define VSF_DISP_USE_USBD_UVC               ENABLED
 
 #define VSF_USE_TRACE                       ENABLED
 #define VSF_DEBUGGER_CFG_CONSOLE            VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
@@ -198,13 +198,13 @@
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT    DISABLED
 
 
-#define VSF_USE_SERVICE_STREAM              DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM           ENABLED
+#define VSF_USE_STREAM                      DISABLED
+#define VSF_USE_SIMPLE_STREAM               ENABLED
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 #define VSF_SERVICE_CFG_INSERTION                                               \
     extern vsf_pbuf_pool_t  g_tGenericPBUFPool;
-//#define VSF_SERVICE_CFG_DEPENDENCY      
+//#define VSF_SERVICE_CFG_DEPENDENCY
 
 enum {
     VSF_PBUF_ADAPTER_CDC_SRC = 1,

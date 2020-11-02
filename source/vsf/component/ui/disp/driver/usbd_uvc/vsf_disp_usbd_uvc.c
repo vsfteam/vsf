@@ -19,7 +19,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_USBD_UVC == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_USBD_UVC == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_DISP_CLASS_INHERIT__
@@ -106,7 +106,7 @@ static vsf_err_t __vk_disp_usbd_uvc_refresh(vk_disp_t *pthis, vk_disp_area_t *ar
         disp_uvc->cur_buffer = buffer;
         vsf_eda_post_evt(&disp_uvc->eda, VSF_EVT_REFRESH);
     } else {
-        vsf_trace(VSF_TRACE_ERROR, "non-line disp area [%d,%d], [%d,%d]\r\n",
+        vsf_trace_error("non-line disp area [%d,%d], [%d,%d]\r\n",
                     area->pos.x, area->pos.y, area->size.x, area->size.y);
         ASSERT(false);
     }

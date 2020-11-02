@@ -21,6 +21,8 @@
 #include "vsf.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
+#include "../../common/usrapp_common.h"
+
 #include "./images/demo_images.h"
 #include "./images/demo_images_data.h"
 
@@ -36,31 +38,31 @@
 #define FREETYPE_LOAD_FLAGS             (FT_LOAD_RENDER)
 #define FREETYPE_DEFAULT_DPI            72
 
-#define TGUI_PORT_DEBAULT_BACKGROUND_COLOR  VSF_TGUI_COLOR_WHITE
-
-#ifndef VSF_TGUI_SV_CFG_PORT_LOG
-#define VSF_TGUI_SV_CFG_PORT_LOG            DISABLED
+#ifndef VSF_TGUI_CFG_SV_PORT_SET_INIT_BG_COLOR
+#   define VSF_TGUI_CFG_SV_PORT_SET_INIT_BG_COLOR   ENABLED
 #endif
 
-#ifndef VSF_TGUI_SV_CFG_REFRESH_RATE
-#define VSF_TGUI_SV_CFG_REFRESH_RATE        ENABLED
+#ifndef VSF_TGUI_CFG_SV_PORT_INIT_BG_COLOR
+#   define VSF_TGUI_CFG_SV_PORT_INIT_BG_COLOR       VSF_TGUI_COLOR_WHITE
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_PORT_LOG
+#   define VSF_TGUI_CFG_SV_PORT_LOG                 DISABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_REFRESH_RATE
+#   define VSF_TGUI_CFG_SV_REFRESH_RATE             ENABLED
+#endif
+
+// TODO: fixed VDB
+#ifndef VSF_TGUI_CFG_SV_PORT_PARTIAL_REFRESH
+#   define VSF_TGUI_CFG_SV_PORT_PARTIAL_REFRESH     DISABLED
 #endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 extern vsf_tgui_font_t g_tUserFonts[];
 /*============================ LOCAL VARIABLES ===============================*/
-static vk_disp_t* s_tDisp;
-
-volatile static bool s_bIsReadyToRefresh = true;
-static const vsf_tgui_region_t *s_ptRequestedRegion = NULL;
-static vsf_tgui_color_t* s_ptBuffer = NULL;
-
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
-static vsf_systimer_cnt_t s_tStartTimerCnt;
-static uint16_t s_tRefreshCnt;
-static uint16_t s_tFPS;
-#endif
 /*============================ PROTOTYPES ====================================*/
 bool vsf_tgui_port_is_ready_to_refresh(void);
 
@@ -71,13 +73,15 @@ WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN
 /*============================ IMPLEMENTATION ================================*/
 static vsf_tgui_color_t vk_disp_sdl_get_pixel(vsf_tgui_location_t* ptLocation)
 {
-    vsf_tgui_color_t* ptPixMap = s_tDisp->ui_data;
+    vk_disp_t* disp = &usrapp_ui_common.disp.use_as__vk_disp_t;
+    vsf_tgui_color_t* ptPixMap = disp->ui_data;
     return ptPixMap[ptLocation->iY * VSF_TGUI_HOR_MAX + ptLocation->iX];
 }
 
 static void vk_disp_sdl_set_pixel(vsf_tgui_location_t* ptLocation, vsf_tgui_color_t tColor)
 {
-    vsf_tgui_color_t* ptPixMap = s_tDisp->ui_data;
+    vk_disp_t* disp = &usrapp_ui_common.disp.use_as__vk_disp_t;
+    vsf_tgui_color_t* ptPixMap = disp->ui_data;
     ptPixMap[ptLocation->iY * VSF_TGUI_HOR_MAX + ptLocation->iX] = tColor;
 }
 
@@ -94,8 +98,8 @@ vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTil
     } else if (ptTile->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
         VSF_TGUI_ASSERT(chIndex < dimof(gIdxRootRGBATileSizes));
         return gIdxRootRGBATileSizes[chIndex];
-    } 
-        
+    }
+
     VSF_TGUI_ASSERT(0);
     return (vsf_tgui_size_t){-1,-1};
 }
@@ -105,7 +109,7 @@ static char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* ptTile)
     VSF_TGUI_ASSERT(ptTile != NULL);
 
     if (ptTile->_.tCore.Attribute.u2RootTileType == 0) {     // buf tile
-        return ptTile->tBufRoot.ptBitmap;
+        return (char *)ptTile->tBufRoot.ptBitmap;
     } else {                                                // index tile
         uint8_t chIndex = ptTile->tIndexRoot.chIndex;
         if (ptTile->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
@@ -228,17 +232,22 @@ void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t* ptLocation,
                                 vsf_tgui_size_t* ptSize,
 								vsf_tgui_sv_color_t tRectColor)
 {
-    int16_t iHeight = ptSize->iHeight;
-    int16_t iWidth = ptSize->iWidth;
+    int16_t iHeight;
+    int16_t iWidth;
     vsf_tgui_color_t tColor;
     uint_fast8_t chRectTransparencyRate;
     VSF_TGUI_ASSERT(ptLocation != NULL);
+    VSF_TGUI_ASSERT(ptSize != NULL);
+
+    iHeight = ptSize->iHeight;
+    iWidth = ptSize->iWidth;
+
     VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));  // x_start point in screen
     VSF_TGUI_ASSERT((0 <= ptLocation->iY) && (ptLocation->iY < VSF_TGUI_VER_MAX));  // y_start point in screen
     VSF_TGUI_ASSERT(0 <= (ptLocation->iX + ptSize->iWidth));                        // x_end   point in screen
-    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + ptSize->iHeight));                       // y_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->iX + ptSize->iWidth) <= VSF_TGUI_HOR_MAX);
-    VSF_TGUI_ASSERT((ptLocation->iY + ptSize->iHeight) <= VSF_TGUI_VER_MAX);
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + iHeight));                               // y_end   point in screen
+    VSF_TGUI_ASSERT((ptLocation->iX + iWidth) <= VSF_TGUI_HOR_MAX);
+    VSF_TGUI_ASSERT((ptLocation->iY + iHeight) <= VSF_TGUI_VER_MAX);
 
     tColor = vsf_tgui_sv_color_get_color(tRectColor);
     chRectTransparencyRate = vsf_tgui_sv_color_get_trans_rate(tRectColor);
@@ -313,17 +322,21 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* ptLocation,
             vsf_tgui_sdl_tile_get_pixel(pchData, &tSVColor, ptTile->_.tCore.Attribute.u2ColorType);
             pchData += u32_size;
             tPixelColor = vk_disp_sdl_get_pixel(&tPixelLocation);
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
             tSVColor.tColor = vsf_tgui_color_mix(tSVColor.tColor, tPixelColor, ((uint16_t)tSVColor.tColor.tChannel.chA * chTransparencyRate) / 255);
+#else
+            tSVColor.tColor = vsf_tgui_color_mix(tSVColor.tColor, tPixelColor, chTransparencyRate / 255);
+#endif
 			vk_disp_sdl_set_pixel(&tPixelLocation, tSVColor.tColor);
         }
     }
 }
 void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* ptLocation,
-    vsf_tgui_location_t* ptFontLocation,
-    vsf_tgui_size_t* ptSize,
-    uint8_t chFontIndex,
-    uint32_t wChar,
-    vsf_tgui_sv_color_t tCharColor)
+                                vsf_tgui_location_t* ptFontLocation,
+                                vsf_tgui_size_t* ptSize,
+                                uint8_t chFontIndex,
+                                uint32_t wChar,
+                                vsf_tgui_sv_color_t tCharColor)
 {
     const vsf_tgui_font_t* ptFont;
     VSF_TGUI_ASSERT(ptLocation != NULL);
@@ -412,34 +425,32 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
                     vsf_tgui_t *gui_ptr,
                     const vsf_tgui_region_t *ptPlannedRefreshRegion)
 {
-    if (!vsf_tgui_port_is_ready_to_refresh()) {
-        return NULL;
-    }
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+#if VSF_TGUI_CFG_SV_PORT_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port]Begin Refresh Loop" VSF_TRACE_CFG_LINEEND);
 #endif
     if (!vsf_tgui_port_is_ready_to_refresh()) {
         return NULL;
     }
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
-    VSF_TGUI_LOG(VSF_TRACE_INFO,
-                 "[Simple View Port]Begin Refresh Loop" VSF_TRACE_CFG_LINEEND);
-#endif
-    static vsf_tgui_region_t s_tRegion;
-    const static vsf_tgui_region_t s_tDisplayRegion = {0,0, VSF_TGUI_HOR_MAX, VSF_TGUI_VER_MAX};
-    if (!vsf_tgui_region_intersect(&s_tRegion, ptPlannedRefreshRegion, &s_tDisplayRegion)) {
+
+    const vsf_tgui_region_t s_tDisplayRegion = {0,0, VSF_TGUI_HOR_MAX, VSF_TGUI_VER_MAX};
+    if (!vsf_tgui_region_intersect(&usrapp_ui_common.tgui.port.request_region, ptPlannedRefreshRegion, &s_tDisplayRegion)) {
         return NULL;
     }
 
-    s_ptRequestedRegion = &s_tRegion;
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
+    if (0 == usrapp_ui_common.tgui.port.refresh_cnt) {
+        usrapp_ui_common.tgui.port.start_cnt = vsf_systimer_get_tick();
+    }
+#endif
 
-    return (vsf_tgui_region_t *)s_ptRequestedRegion;
+    return &usrapp_ui_common.tgui.port.request_region;
 }
 
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
 {
-    vsf_tgui_color_t* pixmap = s_tDisp->ui_data;
+    vk_disp_t* disp = &usrapp_ui_common.disp.use_as__vk_disp_t;
+    vsf_tgui_color_t* pixmap = disp->ui_data;
 
     vk_disp_area_t area = {
         .pos = {.x = 0, .y = 0},
@@ -447,44 +458,34 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
     };
 
      __vsf_sched_safe(
-        if (s_bIsReadyToRefresh) {
-            s_bIsReadyToRefresh = false;
+        if (usrapp_ui_common.tgui.port.is_ready) {
+            usrapp_ui_common.tgui.port.is_ready = false;
         }
     )
 
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+#if VSF_TGUI_CFG_SV_PORT_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port]End Refresh Loop." VSF_TRACE_CFG_LINEEND "\trequest low level refresh start in area, pos(x:%d, y:%d), size(w:0x%d, h:0x%d)" VSF_TRACE_CFG_LINEEND,
                  area.pos.x, area.pos.y, area.size.x, area.size.y);
 #endif
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
-    if (0 == s_tRefreshCnt) {
-        s_tStartTimerCnt = vsf_systimer_get();
-    }
+#if VSF_TGUI_CFG_SV_PORT_PARTIAL_REFRESH == ENABLED
+    int_fast16_t iSourceX = usrapp_ui_common.tgui.port.request_region.tLocation.iX;
+    int_fast16_t iSourceY = usrapp_ui_common.tgui.port.request_region.tLocation.iY;
+
+    vsf_tgui_color_t* ptPixalBased = &(pixmap[iSourceY * VSF_TGUI_HOR_MAX + iSourceX]);
+
+    __vk_2d_rgb32_mem_copy((uint32_t*)ptPixalBased,
+                           VSF_TGUI_HOR_MAX,
+                           (uint32_t*)pixmap,
+                           usrapp_ui_common.tgui.port.request_region.tSize.iWidth,
+                           &(usrapp_ui_common.tgui.port.request_region.tSize));
+
+    vk_disp_refresh(disp, (vk_disp_area_t*)&usrapp_ui_common.tgui.port.request_region, pixmap);
+#else
+    vk_disp_refresh(disp, &area, pixmap);
 #endif
 
-    if (NULL == s_ptBuffer) {
-        vk_disp_refresh(s_tDisp,
-                        &area,
-                        pixmap);
-    } else {
-        int_fast16_t iSourceX = s_ptRequestedRegion->tLocation.iX;
-        int_fast16_t iSourceY = s_ptRequestedRegion->tLocation.iY;
-
-        vsf_tgui_color_t *ptPixalBased = &(pixmap[iSourceY * VSF_TGUI_HOR_MAX + iSourceX]);
-
-        __vk_2d_rgb32_mem_copy((uint32_t *)ptPixalBased,
-                                VSF_TGUI_HOR_MAX,
-                                (uint32_t *)s_ptBuffer,
-                                s_ptRequestedRegion->tSize.iWidth,
-                                (vsf_tgui_size_t *)&(s_ptRequestedRegion->tSize));
-
-
-        vk_disp_refresh(s_tDisp,
-                        (vk_disp_area_t *)s_ptRequestedRegion,//&area,
-                        s_ptBuffer);
-    }
     return false;
 }
 
@@ -496,12 +497,12 @@ void vsf_tgui_low_level_on_ready_to_refresh(void)
 
 static void vsf_tgui_on_ready(vk_disp_t* disp)
 {
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+#if VSF_TGUI_CFG_SV_PORT_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port] refresh ready" VSF_TRACE_CFG_LINEEND);
 #endif
 
-    s_bIsReadyToRefresh = true;
+    usrapp_ui_common.tgui.port.is_ready = true;
 
 #ifndef WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
     vsf_tgui_low_level_on_ready_to_refresh();
@@ -509,31 +510,31 @@ static void vsf_tgui_on_ready(vk_disp_t* disp)
     WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH();
 #endif
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
     {
         uint32_t tElapse;
 
-        s_tRefreshCnt++;
-        tElapse = vsf_systimer_tick_to_ms(vsf_systimer_get() - s_tStartTimerCnt);
+        usrapp_ui_common.tgui.port.refresh_cnt++;
+        tElapse = vsf_systimer_tick_to_ms(vsf_systimer_get_tick() - usrapp_ui_common.tgui.port.start_cnt);
 
         if (tElapse >= 1000) {
-            s_tFPS = s_tRefreshCnt;
-            s_tRefreshCnt = 0;
+            usrapp_ui_common.tgui.port.fps = usrapp_ui_common.tgui.port.refresh_cnt;
+            usrapp_ui_common.tgui.port.refresh_cnt = 0;
         }
     }
 #endif
 }
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
 uint32_t vsf_tgui_port_get_refresh_rate(void)
 {
-    return s_tFPS;
+    return usrapp_ui_common.tgui.port.fps;
 }
 #endif
 
 bool vsf_tgui_port_is_ready_to_refresh(void)
 {
-    return s_bIsReadyToRefresh;
+    return usrapp_ui_common.tgui.port.is_ready;
 }
 
 static bool vsf_tgui_sv_fonts_init(vsf_tgui_font_t* ptFont, size_t tSize)
@@ -591,15 +592,15 @@ static bool vsf_tgui_sv_fonts_init(vsf_tgui_font_t* ptFont, size_t tSize)
     return true;
 }
 
-void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData, void *buffer_ptr)
+void vsf_tgui_bind_disp(vk_disp_t* ptDisp, void* ptData)
 {
     VSF_TGUI_ASSERT(ptData);
 
-#ifdef TGUI_PORT_DEBAULT_BACKGROUND_COLOR
+#if VSF_TGUI_CFG_SV_PORT_SET_INIT_BG_COLOR == ENABLED
     {
         uint32_t u32_offset = 0;
         vsf_tgui_color_t* ptColor = (vsf_tgui_color_t*)ptData;
-        vsf_tgui_sv_color_t tSVColor = TGUI_PORT_DEBAULT_BACKGROUND_COLOR;
+        vsf_tgui_sv_color_t tSVColor = VSF_TGUI_CFG_SV_PORT_INIT_BG_COLOR;
         while (u32_offset++ < VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX) {
             *ptColor++ = tSVColor.tColor;
         }
@@ -611,11 +612,10 @@ void vsf_tgui_bind(vk_disp_t* ptDisp, void* ptData, void *buffer_ptr)
 
     ptDisp->ui_data = ptData;
     ptDisp->ui_on_ready = vsf_tgui_on_ready;
-    s_ptBuffer = (vsf_tgui_color_t *)buffer_ptr;
 
     vk_disp_init(ptDisp);
 
-    s_tDisp = ptDisp;
+    usrapp_ui_common.tgui.port.is_ready = true;
 }
 #endif
 

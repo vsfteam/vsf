@@ -20,7 +20,7 @@
 #define VSF_FS_INHERIT
 #include "vsf.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -37,7 +37,7 @@ readme\r\n\
 ";
 static uint8_t __control = 0;
 
-#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#if APP_USE_VSFVM_DEMO == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 static const char __test_dart[] = "\
 var i = 0;\r\n\
@@ -84,7 +84,7 @@ while (i < 2) {\r\n\
 /*============================ GLOBAL VARIABLES ==============================*/
 
 vk_fakefat32_file_t fakefat32_root[ 3
-                                +   (APP_CFG_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
+                                +   (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
                                 ] = {
     {
         .name               = "FAKEFAT32",
@@ -103,7 +103,7 @@ vk_fakefat32_file_t fakefat32_root[ 3
         .callback.read      = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_read),
         .callback.write     = (vsf_peda_evthandler_t)vsf_peda_func(__usrapp_on_file_write),
     },
-#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#if APP_USE_VSFVM_DEMO == ENABLED
     {
         .name               = "test.dart",
         .size               = sizeof(__test_dart),

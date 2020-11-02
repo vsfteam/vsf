@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_ARCH_WIN_IMPLEMENT
+#define __VSF_ARCH_WIN_IMPLEMENT
 #include "hal/arch/vsf_arch_abstraction.h"
 
 #if VSF_ARCH_PRI_NUM == 1 && VSF_ARCH_SWI_NUM == 0
@@ -71,21 +71,27 @@ static NO_INIT vsf_arch_systimer_ctx_t __vsf_arch_systimer;
 
 void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request)
 {
+    VSF_HAL_ASSERT(!request->is_inited);
     request->event = CreateEvent(NULL, false, false, NULL);
+    request->is_inited = true;
 }
 
 void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request)
 {
+    VSF_HAL_ASSERT(request->is_inited);
     CloseHandle(request->event);
+    request->is_inited = false;
 }
 
 void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
 {
+    VSF_HAL_ASSERT(request->is_inited);
     WaitForSingleObject(request->event, INFINITE);
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 {
+    VSF_HAL_ASSERT(request->is_inited);
     SetEvent(request->event);
 }
 
@@ -212,7 +218,7 @@ uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 
 void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 {
-    
+
 }
 
 #endif

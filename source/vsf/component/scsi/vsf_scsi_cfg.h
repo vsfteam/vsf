@@ -26,12 +26,12 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SCSI_ASSERT
-#   define VSF_SCSI_ASSERT              ASSERT
+#   define VSF_SCSI_ASSERT                  ASSERT
 #endif
 
 #if VSF_USE_SCSI == ENABLED
-#   if VSF_USE_MAL_SCSI == ENABLED && VSF_USE_VIRTUAL_SCSI != ENABLED
-#       define VSF_USE_VIRTUAL_SCSI     ENABLED
+#   if VSF_SCSI_USE_MAL_SCSI == ENABLED && VSF_SCSI_USE_VIRTUAL_SCSI != ENABLED
+#       define VSF_SCSI_USE_VIRTUAL_SCSI    ENABLED
 #   endif
 #endif
 

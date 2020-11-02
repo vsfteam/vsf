@@ -23,8 +23,8 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
-#ifndef VSF_TGUI_SV_CFG_MULTI_LINE_TEXT
-#   define VSF_TGUI_SV_CFG_MULTI_LINE_TEXT ENABLED
+#ifndef VSF_TGUI_CFG_SV_MULTI_LINE_TEXT
+#   define VSF_TGUI_CFG_SV_MULTI_LINE_TEXT ENABLED
 #endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

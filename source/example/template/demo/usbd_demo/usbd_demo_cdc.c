@@ -19,14 +19,14 @@
 
 #include "vsf.h"
 
-#if     VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED && APP_CFG_USE_USBD_CDC_DEMO == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && APP_USE_USBD_DEMO == ENABLED && APP_USE_USBD_CDC_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
 /*============================ MACROS ========================================*/
 
-#if !((   (APP_CFG_USE_LINUX_DEMO != ENABLED)                                   \
-        ||  (   (APP_CFG_USE_LINUX_DEMO == ENABLED)                             \
+#if !((   (APP_USE_LINUX_DEMO != ENABLED)                                   \
+        ||  (   (APP_USE_LINUX_DEMO == ENABLED)                             \
             &&  (USRAPP_CFG_LINUX_TTY != USRAPP_CFG_LINUX_TTY_CDC))))
 #   error configuration not supported
 #endif
@@ -65,7 +65,7 @@ end_describe_usbd(__user_usbd_cdc, VSF_USB_DC0)
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int usbd_cdc_main(int argc, char *argv[])
 {
 #else

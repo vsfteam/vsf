@@ -29,9 +29,11 @@
 #       include "./device.h"
 #       include "../common/dram/dram.h"
 #       include "../common/debug_uart/debug_uart.h"
+#       include "../common/uart/uart.h"
 #       include "../common/fb/fb.h"
 #       include "../common/usb/usb.h"
 #       include "../common/intc/intc.h"
+#       include "../common/rtp/rtp.h"
 #       include "./interrupt_swi.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

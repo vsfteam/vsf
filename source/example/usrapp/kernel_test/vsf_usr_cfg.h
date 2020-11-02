@@ -164,10 +164,10 @@
 #define VSF_PBUF_CFG_INDIRECT_RW_SUPPORT    DISABLED
 
 
-#define VSF_USE_SERVICE_STREAM              DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM           ENABLED
+#define VSF_USE_STREAM                      DISABLED
+#define VSF_USE_SIMPLE_STREAM               ENABLED
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 #define VSF_SERVICE_CFG_INSERTION                                               \
     extern vsf_pbuf_pool_t  g_tGenericPBUFPool;
 //#define VSF_SERVICE_CFG_DEPENDENCY      

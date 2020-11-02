@@ -23,6 +23,7 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "./vendor/Include/stm32f103xe.h"
+#include "./vendor/Include/stm32f1xx_hal_cortex.h"
 #include "hal/arch/vsf_arch.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -1,7 +1,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_AWTK == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #include "kernel/vsf_kernel.h"
@@ -158,4 +158,4 @@ ret_t tk_thread_destroy(tk_thread_t* thread) {
   return RET_OK;
 }
 
-#endif      // VSF_USE_UI_AWTK
+#endif      // VSF_USE_AWTK

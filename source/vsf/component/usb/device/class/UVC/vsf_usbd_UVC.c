@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_UVC == ENABLED
 
 #define __VSF_USBD_CLASS_INHERIT__
 #define __VSF_USBD_UVC_CLASS_IMPLEMENT
@@ -84,7 +84,7 @@ static void __vk_usbd_uvc_trace_request_prepare(vk_usbd_ctrl_handler_t *ctrl_han
     if (    (USB_RECIP_INTERFACE == (request->bRequestType & USB_RECIP_MASK))
         &&  (USB_TYPE_CLASS == (request->bRequestType & USB_TYPE_MASK))) {
 
-        vsf_trace(VSF_TRACE_DEBUG, "uvc: %s%s ifs/ep=%d, entity=%d, cs=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("uvc: %s%s ifs/ep=%d, entity=%d, cs=%d" VSF_TRACE_CFG_LINEEND,
                     is_get ? "GET_" : "SET_",
                     __vk_usbd_uvc_trace_get_request(req & ~USB_UVC_REQ_GET),
                     ifs_ep, entity, cs);
@@ -198,12 +198,12 @@ static vsf_err_t __vk_usbd_uvc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
                 if (0 == request->wValue) {
                     // 0-bandwidth
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
-                    vsf_trace(VSF_TRACE_DEBUG, "uvc: stop stream." VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_debug("uvc: stop stream." VSF_TRACE_CFG_LINEEND);
 #endif
                     vsf_usbd_uvc_stop_stream(uvc, request->wValue);
                 } else {
 #if VSF_USBD_UVC_CFG_TRACE_EN == ENABLED
-                    vsf_trace(VSF_TRACE_DEBUG, "uvc: start stream %d." VSF_TRACE_CFG_LINEEND,
+                    vsf_trace_debug("uvc: start stream %d." VSF_TRACE_CFG_LINEEND,
                                 request->wValue);
 #endif
                     vsf_usbd_uvc_start_stream(uvc, request->wValue);
@@ -321,4 +321,4 @@ static vsf_err_t __vk_usbd_uvc_vs_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *
     return VSF_ERR_NONE;
 }
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_UVC

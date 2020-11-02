@@ -14,14 +14,14 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_SDL2_H___
-#define __VSF_DISP_SDL2_H___
+#ifndef __VSF_DISP_SDL2_H__
+#define __VSF_DISP_SDL2_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_SDL2 == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_SDL2 == ENABLED
 
 #include "hal/vsf_hal.h"
 
@@ -42,7 +42,7 @@ extern "C" {
 #   error "vsf_disp_sdl2 ONLY support x86/64"
 #endif
 
-// if VSF_USE_DISP_SDL2 is used, SDL header files are not visible in vsf header files
+// if VSF_DISP_USE_SDL2 is used, SDL header files are not visible in vsf header files
 // so define main to SDL_main for SDL
 #if     defined(__WIN__)
 #   define main                     SDL_main
@@ -93,4 +93,4 @@ extern const vk_disp_drv_t vk_disp_drv_sdl2;
 #endif
 
 #endif  // VSF_USE_UI
-#endif  // __VSF_DISP_SDL2_H___
+#endif  // __VSF_DISP_SDL2_H__

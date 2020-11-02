@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_MSC == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_MSC == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBD_CLASS_INHERIT__
@@ -277,4 +277,4 @@ static vsf_err_t __vk_usbd_msc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     return VSF_ERR_NONE;
 }
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_MSC
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_MSC

@@ -37,7 +37,7 @@ extern "C" {
 #   endif
 
 #if 0
-/*! \brief free a target memory which belongs to a bigger memory chunk previouly 
+/*! \brief free a target memory which belongs to a bigger memory chunk previouly
  *!        allocated from the heap
  */
 #define vsf_heap_free_ex(                                                       \
@@ -74,8 +74,8 @@ extern const i_heap_t VSF_HEAP;
 
 extern void vsf_heap_init(void);
 
-/*!\note:This interface cannot add multiple misaligned spaces. 
- *!\when a user needs to add space multiple times, 
+/*!\note:This interface cannot add multiple misaligned spaces.
+ *!\when a user needs to add space multiple times,
  *!\the space provided each time (including the first time) must be aligned according to the agreed alignment standard.
 */
 extern void vsf_heap_add(uint8_t *heap, uint_fast32_t size);
@@ -93,8 +93,8 @@ extern void vsf_heap_free(void *buffer);
  *! \retval true the free access is sucessful
  *! \retval false the free access failed.
  */
-extern bool vsf_heap_partial_free(  void *buffer,       
-                                    uint_fast32_t pos, 
+extern bool vsf_heap_partial_free(  void *buffer,
+                                    uint_fast32_t pos,
                                     uint_fast32_t size);
 
 #endif

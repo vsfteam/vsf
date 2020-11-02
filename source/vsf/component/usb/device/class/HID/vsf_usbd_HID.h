@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_HID == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_HID == ENABLED
 
 #include "../../../common/class/HID/vsf_usb_HID.h"
 
@@ -115,5 +115,5 @@ extern void vk_usbh_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_rep
 }
 #endif
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_HID
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_HID
 #endif      // __VSF_USBD_HID_H__

@@ -19,10 +19,13 @@
 #define __HAL_DRIVER_MT071_USBH_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../device.h"
 
 #include "../usb.h"
+
+#if VSF_HAL_USE_USBH == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -39,5 +42,6 @@ extern vsf_err_t mt071_usbh_init(mt071_usb_t *hc, usb_hc_ip_cfg_t *cfg);
 extern void mt071_usbh_get_info(mt071_usb_t *hc, usb_hc_ip_info_t *info);
 extern void mt071_usbh_irq(mt071_usb_t *hc);
 
-#endif
+#endif      // VSF_HAL_USE_USBH
+#endif      // __HAL_DRIVER_MT071_USBH_H__
 /* EOF */

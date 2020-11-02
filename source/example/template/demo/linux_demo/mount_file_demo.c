@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#if VSF_USE_LINUX == ENABLED && APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
+#if VSF_USE_LINUX == ENABLED && APP_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
 
 int mount_file_main(int argc, char *argv[])
 {

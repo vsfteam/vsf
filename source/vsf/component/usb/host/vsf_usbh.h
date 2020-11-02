@@ -263,8 +263,7 @@ typedef struct vk_usbh_pipe_t {
         struct {
             uint32_t is_pipe        : 1;
             uint32_t is_submitted   : 1;
-            // for iso, real size is pipe.size + 1
-            uint32_t size           : 10;
+            uint32_t size           : 11;
             uint32_t endpoint       : 4;
             uint32_t type           : 2;
             uint32_t speed          : 2;
@@ -452,7 +451,7 @@ def_simple_class(vk_usbh_dev_t) {
         vk_usbh_ep0_t ep0;
         vk_usbh_ifs_t *ifs;
 
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
         vk_usbh_dev_t *dev_parent;
         vsf_slist_node_t child_node;
         vsf_slist_t children_list;
@@ -533,7 +532,6 @@ extern void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 
 #if defined(__VSF_USBH_CLASS_IMPLEMENT) || defined(__VSF_USBH_CLASS_IMPLEMENT_CLASS__)
 // APIs to be called by class drivers
-extern uint_fast16_t vk_usbh_get_ep_size_from_pipe(vk_usbh_pipe_t pipe);
 extern vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
             uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size);
 extern vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
@@ -588,6 +586,9 @@ extern vsf_err_t vk_usbh_set_interface(vk_usbh_t *usbh,
 
 extern vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         uint_fast8_t type, void **ptr);
+
+extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
+        usb_endpoint_desc_t *desc_ep, uint_fast16_t size);
 #endif
 
 #ifdef __cplusplus

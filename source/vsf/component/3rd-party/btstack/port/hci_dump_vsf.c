@@ -44,34 +44,34 @@
 static void __hci_printf_timestamp(void)
 {
     uint32_t time_ms = btstack_run_loop_get_time_ms();
-    vsf_trace(VSF_TRACE_DEBUG, "[%04ums] ", time_ms);
+    vsf_trace_debug("[%04ums] ", time_ms);
 }
 
 static void __hci_printf_packet(uint8_t packet_type, uint8_t in, uint8_t * packet, uint16_t len)
 {
     switch (packet_type) {
     case HCI_COMMAND_DATA_PACKET:
-        vsf_trace(VSF_TRACE_DEBUG, "CMD => " VSF_TRACE_CFG_LINEEND);
+        vsf_trace_debug("CMD => " VSF_TRACE_CFG_LINEEND);
         break;
     case HCI_EVENT_PACKET:
-        vsf_trace(VSF_TRACE_DEBUG, "EVT <= " VSF_TRACE_CFG_LINEEND);
+        vsf_trace_debug("EVT <= " VSF_TRACE_CFG_LINEEND);
         break;
     case HCI_ACL_DATA_PACKET:
         if (in) {
-            vsf_trace(VSF_TRACE_DEBUG, "ACL <= " VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("ACL <= " VSF_TRACE_CFG_LINEEND);
         } else {
-            vsf_trace(VSF_TRACE_DEBUG, "ACL => " VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("ACL => " VSF_TRACE_CFG_LINEEND);
         }
         break;
     case HCI_SCO_DATA_PACKET:
         if (in) {
-            vsf_trace(VSF_TRACE_DEBUG, "SCO <= " VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("SCO <= " VSF_TRACE_CFG_LINEEND);
         } else {
-            vsf_trace(VSF_TRACE_DEBUG, "SCO => " VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("SCO => " VSF_TRACE_CFG_LINEEND);
         }
         break;
     case LOG_MESSAGE_PACKET:
-        vsf_trace(VSF_TRACE_DEBUG, "LOG -- %s\n\r", (char*) packet);
+        vsf_trace_debug("LOG -- %s\n\r", (char*) packet);
         return;
     default:
         return;

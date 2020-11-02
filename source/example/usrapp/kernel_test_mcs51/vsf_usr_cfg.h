@@ -161,8 +161,8 @@
 #define VSF_USE_TRACE                       ENABLED
 #   define VSF_TRACE_CFG_COLOR_EN           DISABLED
 
-#define VSF_USE_SERVICE_STREAM              DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM           ENABLED
+#define VSF_USE_STREAM                      DISABLED
+#define VSF_USE_SIMPLE_STREAM               ENABLED
 
 /*============================ INCLUDES ======================================*/
 

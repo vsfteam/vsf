@@ -144,29 +144,29 @@
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
 
 #define VSF_USE_USB_HOST                                ENABLED
-#   define VSF_USE_USB_HOST_ECM                         ENABLED
-#   define VSF_USE_USB_HOST_LIBUSB                      ENABLED
+#   define VSF_USBH_USE_ECM                             ENABLED
+#   define VSF_USBH_USE_LIBUSB                          ENABLED
 
 // VSF_USE_USB_DEVICE will be enabled if target chip supports USBD
 //#define VSF_USE_USB_DEVICE                              ENABLED
 #   define VSF_USBD_CFG_USE_EDA                         ENABLED
-#   define VSF_USE_USB_DEVICE_CDCACM                    ENABLED
+#   define VSF_USBD_USE_CDCACM                          ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
 #define VSF_USE_MAL                                     ENABLED
-#   define VSF_USE_MEM_MAL                              ENABLED
-#   define VSF_USE_FAKEFAT32_MAL                        ENABLED
+#   define VSF_MAL_USE_MEM_MAL                          ENABLED
+#   define VSF_MAL_USE_FAKEFAT32_MAL                    ENABLED
 
 #define VSF_USE_FS                                      ENABLED
-#   define VSF_USE_MEMFS                                ENABLED
-#   define VSF_USE_FATFS                                ENABLED
+#   define VSF_FS_USE_MEMFS                             ENABLED
+#   define VSF_FS_USE_FATFS                             ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_USE_LINUX_LIBUSB                         VSF_USE_USB_HOST
-#   define VSF_USE_LINUX_BUSYBOX                        ENABLED
+#   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
+#   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 
 
 
@@ -181,10 +181,10 @@
 //#define GENERAL_PBUF_POOL_BLOCK_COUNT                   16
 #define GENERAL_PBUF_POLL_PRIV_USER_COUNT               2
 
-#define VSF_USE_SERVICE_STREAM                          DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
+#define VSF_USE_STREAM                                  DISABLED
+#define VSF_USE_SIMPLE_STREAM                           ENABLED
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 
 /* \note uncomment this part to add dedicated pbuf pool
 enum {
@@ -232,8 +232,8 @@ enum {
 #       define USRAPP_CFG_STREAM_ALIGN                  1
 
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
-#   define VSF_USE_USB_HOST_HUB                         ENABLED
-#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#   define VSF_USBH_USE_HUB                             ENABLED
+#   define VSF_USBH_USE_HCD_OHCI                        ENABLED
 
 #   define VSF_LINUX_CFG_STACKSIZE                      2048
 #   define VSF_TRACE_CFG_COLOR_EN                       DISABLED
@@ -245,8 +245,8 @@ enum {
 #   define VSF_SYSTIMER_FREQ                            (96000000ul)
 
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
-#   define VSF_USE_USB_HOST_HUB                         ENABLED
-#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#   define VSF_USBH_USE_HUB                             ENABLED
+#   define VSF_USBH_USE_HCD_OHCI                        ENABLED
 
 #   define VSF_DEBUGGER_CFG_CONSOLE                     VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 #elif   defined(__STM32F730R8__)
@@ -266,8 +266,8 @@ enum {
 #   define VSF_SYSTIMER_FREQ                            (0ul)
 
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
-#   define VSF_USE_USB_HOST_HUB                         DISABLED
-#   define VSF_USE_USB_HOST_HCD_WINUSB                  ENABLED
+#   define VSF_USBH_USE_HUB                             DISABLED
+#   define VSF_USBH_USE_HCD_WINUSB                      ENABLED
 #       define VSF_WINUSB_HCD_CFG_DEV_NUM               3
 #       define VSF_WINUSB_HCD_DEV0_VID                  0x0A12      // CSR8510 bthci
 #       define VSF_WINUSB_HCD_DEV0_PID                  0x0001
@@ -276,7 +276,7 @@ enum {
 #       define VSF_WINUSB_HCD_DEV2_VID                  0x04F2      // UVC
 #       define VSF_WINUSB_HCD_DEV2_PID                  0xB130
 
-#   define VSF_USE_WINFS                                ENABLED
+#   define VSF_FS_USE_WINFS                             ENABLED
 
 #   define VSF_LINUX_CFG_STACKSIZE                      8192
 #   define VSF_TRACE_CFG_COLOR_EN                       ENABLED

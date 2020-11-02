@@ -22,10 +22,10 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_XB360 == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_XB360 == ENABLED
 
 #include "component/usb/common/class/HID/vsf_usb_xb360.h"
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
 #   include "component/input/vsf_input.h"
 #endif
 
@@ -41,14 +41,14 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_USB_HOST_HID != ENABLED
-#   error "XB360 driver need VSF_USE_USB_HOST_HID"
+#if VSF_USBH_USE_HID != ENABLED
+#   error "XB360 driver need VSF_USBH_USE_HID"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
 enum {
     VSF_INPUT_TYPE_XB360 = VSF_INPUT_USER_TYPE,
 };
@@ -65,7 +65,7 @@ dcl_simple_class(vk_usbh_xb360_t)
 def_simple_class(vk_usbh_xb360_t) {
 
     implement(vk_usbh_hid_teda_t)
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
     implement(vk_input_xb360_t)
 #endif
 
@@ -77,7 +77,7 @@ def_simple_class(vk_usbh_xb360_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
 extern const vk_input_item_info_t vk_xb360_gamepad_item_info[GAMEPAD_ID_NUM];
 #endif
 
@@ -85,7 +85,7 @@ extern const vk_usbh_class_drv_t vk_usbh_xb360_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
 extern void vk_xb360_process_input(vk_input_xb360_t *dev, vsf_usb_xb360_gamepad_in_report_t *data);
 extern void vk_xb360_new_dev(vk_input_xb360_t *dev);
 extern void vk_xb360_free_dev(vk_input_xb360_t *dev);

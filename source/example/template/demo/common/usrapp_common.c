@@ -26,9 +26,9 @@
 
 #if VSF_USE_FS == ENABLED
 usrapp_common_t usrapp_common = {
-#   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#   if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     .mal                        = {
-#       if VSF_USE_FAKEFAT32_MAL == ENABLED
+#       if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         .fakefat32              = {
             .drv                = &vk_fakefat32_mal_drv,
             .sector_size        = USRAPP_CFG_FAKEFAT32_SECTOR_SIZE,
@@ -48,7 +48,7 @@ usrapp_common_t usrapp_common = {
 
 #   if VSF_USE_FS == ENABLED
     .fs                         = {
-#       if VSF_USE_MEMFS == ENABLED
+#       if VSF_FS_USE_MEMFS == ENABLED
         .memfs_info             = {
             .root               = {
                 .d.child        = (vk_memfs_file_t *)USRAPP_CFG_MEMFS_ROOT,
@@ -57,7 +57,7 @@ usrapp_common_t usrapp_common = {
             },
         },
 #       endif
-#       if VSF_USE_WINFS == ENABLED
+#       if VSF_FS_USE_WINFS == ENABLED
         .winfs_info             = {
             .root               = {
                 .name           = USRAPP_CFG_WINFS_ROOT,

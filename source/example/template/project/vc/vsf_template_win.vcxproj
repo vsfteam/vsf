@@ -186,6 +186,15 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\stb_image.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\stb_image_resize.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\stb_image_write.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\color.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\consolas-font.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\image.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\render.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\surface.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\svg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\port\vsf_lvgl_port.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -529,6 +538,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\nuklear\raw\nuklear.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netif.h" />
@@ -590,6 +600,9 @@
     <ClInclude Include="..\..\..\..\vsf\component\scsi\vsf_scsi_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.h" />
     <ClInclude Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\socket\driver\lwip\vsf_socket_lwip.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\socket\driver\win\vsf_socket_win.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\socket\vsf_socket.h" />
     <ClInclude Include="..\..\..\..\vsf\component\tcpip\vsf_tcpip.h" />
     <ClInclude Include="..\..\..\..\vsf\component\tcpip\vsf_tcpip_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\fb\vsf_disp_fb.h" />
@@ -699,9 +712,11 @@
     <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\driver.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\device.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\uart\uart.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_common.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_io.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_pm.h" />
+    <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_spi.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_usart.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_usb.h" />
     <ClInclude Include="..\..\..\..\vsf\hal\vsf_hal.h" />
@@ -723,10 +738,10 @@
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_os.h" />
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_timq.h" />
     <ClInclude Include="..\..\..\..\vsf\kernel\vsf_timq_dlist.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\customised\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\customised\stream_hal\driver.h" />
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h" />
-    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\driver.h" />
-    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\driver.h" />
-    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_periperhal_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\io_peripheral.h" />
     <ClInclude Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.h" />
@@ -739,11 +754,16 @@
     <ClInclude Include="..\..\..\..\vsf\osa_service\vsf_osa_service_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\service\dynarr\vsf_dynarr.h" />
     <ClInclude Include="..\..\..\..\vsf\service\dynstack\vsf_dynstack.h" />
+    <ClInclude Include="..\..\..\..\vsf\service\fifo\vsf_fifo.h" />
     <ClInclude Include="..\..\..\..\vsf\service\heap\vsf_heap.h" />
     <ClInclude Include="..\..\..\..\vsf\service\json\vsf_json.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.h" />
     <ClInclude Include="..\..\..\..\vsf\service\pool\vsf_pool.h" />
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.h" />
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.h" />
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.h" />
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\vsf_simple_stream.h" />
     <ClInclude Include="..\..\..\..\vsf\service\stream\interface.h" />
     <ClInclude Include="..\..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h" />
     <ClInclude Include="..\..\..\..\vsf\service\stream\vsf_stream.h" />
@@ -751,10 +771,6 @@
     <ClInclude Include="..\..\..\..\vsf\service\stream\vsf_stream_reader.h" />
     <ClInclude Include="..\..\..\..\vsf\service\stream\vsf_stream_writer.h" />
     <ClInclude Include="..\..\..\..\vsf\service\trace\vsf_trace.h" />
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\block_stream\vsf_block_stream.h" />
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h" />
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h" />
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\vsfstream.h" />
     <ClInclude Include="..\..\..\..\vsf\service\vsf_service.h" />
     <ClInclude Include="..\..\..\..\vsf\service\vsf_service_cfg.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL.h" />
@@ -809,11 +825,9 @@
     <ClInclude Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\communicate.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\compiler.h" />
-    <ClInclude Include="..\..\..\..\vsf\utilities\compiler\x86\signal.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\x86\type.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\x86\x86_compiler.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\__common\__compiler.h" />
-    <ClInclude Include="..\..\..\..\vsf\utilities\compiler\__common\__signal.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\__common\__type.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\language_extension\code_region.h" />
     <ClInclude Include="..\..\..\..\vsf\utilities\language_extension\delegate.h" />
@@ -846,6 +860,7 @@
     <ClInclude Include="..\..\demo\fakefat32.h" />
     <ClInclude Include="..\..\demo\nnom_demo\model\mnist\image.h" />
     <ClInclude Include="..\..\demo\nnom_demo\model\mnist\weights.h" />
+    <ClInclude Include="..\..\demo\nuklear_demo\sdl2surface_rawfb.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h" />
@@ -981,6 +996,10 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type1\type1.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type42\type42.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\image.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\render.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\surface.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\svg.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\port\vsf_lvgl_port.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -1466,6 +1485,9 @@
     <ClCompile Include="..\..\..\..\vsf\component\scsi\vsf_scsi.c" />
     <ClCompile Include="..\..\..\..\vsf\component\tcpip\netdrv\driver\wpcap\vsf_netdrv_wpcap.c" />
     <ClCompile Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\socket\driver\lwip\vsf_socket_lwip.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\socket\driver\win\vsf_socket_win.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\socket\vsf_socket.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\fb\vsf_disp_fb.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\sdl2\vsf_disp_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\disp\driver\sitronix\common\vsf_disp_sitronix_common.c" />
@@ -1539,6 +1561,7 @@
     <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\arch\x86\win\win_generic_simple.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\driver.c" />
+    <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\uart\uart.c" />
     <ClCompile Include="..\..\..\..\vsf\hal\vsf_hal.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c" />
@@ -1550,28 +1573,29 @@
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_evtq_list.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_kernel_bsp.c" />
     <ClCompile Include="..\..\..\..\vsf\kernel\vsf_os.c" />
-    <ClCompile Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.c" />
+    <ClCompile Include="..\..\..\..\vsf\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_hal\sw_peripheral\io_peripheral\spi\vsf_io_spi.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c" />
     <ClCompile Include="..\..\..\..\vsf\osa_service\vsf_osa_service.c" />
     <ClCompile Include="..\..\..\..\vsf\service\dynarr\vsf_dynarr.c" />
     <ClCompile Include="..\..\..\..\vsf\service\dynstack\vsf_dynstack.c" />
+    <ClCompile Include="..\..\..\..\vsf\service\fifo\vsf_fifo.c" />
     <ClCompile Include="..\..\..\..\vsf\service\heap\vsf_heap.c" />
     <ClCompile Include="..\..\..\..\vsf\service\json\vsf_json.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pbuf\vsf_pbuf_pool.c" />
     <ClCompile Include="..\..\..\..\vsf\service\pool\vsf_pool.c" />
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.c" />
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.c" />
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.c" />
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\vsf_simple_stream.c" />
     <ClCompile Include="..\..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c" />
     <ClCompile Include="..\..\..\..\vsf\service\stream\vsf_stream.c" />
     <ClCompile Include="..\..\..\..\vsf\service\stream\vsf_stream_base.c" />
     <ClCompile Include="..\..\..\..\vsf\service\stream\vsf_stream_reader.c" />
     <ClCompile Include="..\..\..\..\vsf\service\stream\vsf_stream_writer.c" />
     <ClCompile Include="..\..\..\..\vsf\service\trace\vsf_trace.c" />
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\block_stream\vsf_block_stream.c" />
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c" />
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c" />
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\vsfstream.c" />
     <ClCompile Include="..\..\..\..\vsf\service\vsf_service.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\vsf_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
@@ -1587,7 +1611,6 @@
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux_socket.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\xboot\vsf_xboot.c" />
-    <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\compiler\__common\__retarget_io.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\language_extension\code_region.c" />
     <ClCompile Include="..\..\..\..\vsf\utilities\language_extension\delegate.c" />
@@ -1610,6 +1633,9 @@
     <ClCompile Include="..\..\demo\cpp_demo\cpp_demo.cpp" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
+    <ClCompile Include="..\..\demo\gato_demo\gato_application.c" />
+    <ClCompile Include="..\..\demo\gato_demo\gato_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\usart_demo.c" />
     <ClCompile Include="..\..\demo\json_demo\json_demo.c" />
     <ClCompile Include="..\..\demo\kernel_test\sem_test.c" />
     <ClCompile Include="..\..\demo\linux_demo\libusb_demo.c" />
@@ -1619,8 +1645,11 @@
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_demo.c" />
     <ClCompile Include="..\..\demo\lwip_demo\lwip_demo.c" />
     <ClCompile Include="..\..\demo\nnom_demo\nnom_demo.c" />
+    <ClCompile Include="..\..\demo\nuklear_demo\main.c" />
     <ClCompile Include="..\..\demo\scsi_demo\scsi_demo.c" />
     <ClCompile Include="..\..\demo\sdl2_demo\sdl2_demo.c" />
+    <ClCompile Include="..\..\demo\socket_demo\socket_demo.c" />
+    <ClCompile Include="..\..\demo\stream_hal_demo\stream_usart_demo.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.c" />
@@ -1629,6 +1658,7 @@
     <ClCompile Include="..\..\demo\tgui_demo\tgui_main.c" />
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_cdc.c" />
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_msc.c" />
+    <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_user.c" />
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_uvc.c" />
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c" />
     <ClCompile Include="..\..\demo\vsfip_demo\vsfip_demo.c" />
@@ -1717,9 +1747,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__CPU_X86__;__WIN__;__OOC_CPP__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>
@@ -1728,8 +1758,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;$(ProjectDir)\lib\libwdi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;libwdi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -1739,9 +1770,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;__OOC_CPP__;WIN64;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;WIN64;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <ExceptionHandling>false</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -1763,9 +1794,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__CPU_X86__;__WIN__;__OOC_CPP__;WIN32;NDEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;__OOC_RELEASE__;__OOC_CPP__;WIN32;NDEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -1774,8 +1805,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;$(ProjectDir)\lib\libwdi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;libwdi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -1789,6 +1821,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

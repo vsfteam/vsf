@@ -117,7 +117,7 @@ def_simple_class(vk_scsi_drv_t) {
         vsf_peda_evthandler_t init;
         vsf_peda_evthandler_t fini;
         vsf_peda_evthandler_t execute;
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         vsf_peda_evthandler_t execute_stream;
 #endif
         bool (*buffer)(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
@@ -138,11 +138,11 @@ __vsf_component_peda_ifs(vk_scsi_fini)
 __vsf_component_peda_ifs(vk_scsi_execute,
     uint8_t *cbd;
     vsf_mem_t mem;
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
     vsf_stream_t *stream;
 #   endif
 )
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 __vsf_component_peda_ifs(vk_scsi_execute_stream,
     uint8_t *cbd;
     vsf_stream_t *stream;
@@ -158,7 +158,7 @@ extern vsf_err_t vk_scsi_fini(vk_scsi_t *pthis);
 // used to get mem from driver, if supported
 extern bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
 extern vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem);
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 extern vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream);
 #endif
 

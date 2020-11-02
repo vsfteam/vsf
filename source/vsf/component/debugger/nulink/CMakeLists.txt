@@ -1,6 +1,5 @@
 # CMakeLists head
 
-target_sources(vsf INTERFACE
-    NuConsole.c
+target_sources(${VSF_LIB_NAME} INTERFACE
     NuConsole_stream.c
 )

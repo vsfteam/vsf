@@ -45,20 +45,20 @@
 #   endif
 
 // check dependency here
-#   if VSF_USE_USB_DEVICE_CDCACM == ENABLED
-#       ifndef VSF_USE_USB_DEVICE_CDC
-#           define VSF_USE_USB_DEVICE_CDC       ENABLED
-#       elif VSF_USE_USB_DEVICE_CDC != ENABLED
-#           #warning "VSF_USE_USB_DEVICE_CDC MUST be enabled to use VSF_USE_USB_DEVICE_CDCACM"
-#           undef VSF_USE_USB_DEVICE_CDC
-#           define VSF_USE_USB_DEVICE_CDC       ENABLED
+#   if VSF_USBD_USE_CDCACM == ENABLED
+#       ifndef VSF_USBD_USE_CDC
+#           define VSF_USBD_USE_CDC             ENABLED
+#       elif VSF_USBD_USE_CDC != ENABLED
+#           #warning "VSF_USBD_USE_CDC MUST be enabled to use VSF_USBD_USE_CDCACM"
+#           undef VSF_USBD_USE_CDC
+#           define VSF_USBD_USE_CDC             ENABLED
 #       endif
 #   endif
 
 #endif
 
 #ifndef VSF_USBD_CFG_STREAM_EN
-#   if VSF_USE_SERVICE_STREAM == ENABLED || VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_STREAM == ENABLED || VSF_USE_SIMPLE_STREAM == ENABLED
 #       define VSF_USBD_CFG_STREAM_EN           ENABLED
 #   else
 #       define VSF_USBD_CFG_STREAM_EN           DISABLED
@@ -66,15 +66,15 @@
 #endif
 
 #if     (VSF_USBD_CFG_STREAM_EN == ENABLED)                                     \
-    &&  (VSF_USE_SERVICE_STREAM != ENABLED)                                     \
-    &&  (VSF_USE_SERVICE_VSFSTREAM != ENABLED)
-#   error "VSF_USE_SERVICE_STREAM or VSF_USE_SERVICE_VSFSTREAM must be enabled to use VSF_USBD_CFG_STREAM_EN"
+    &&  (VSF_USE_STREAM != ENABLED)                                     \
+    &&  (VSF_USE_SIMPLE_STREAM != ENABLED)
+#   error "VSF_USE_STREAM or VSF_USE_SIMPLE_STREAM must be enabled to use VSF_USBD_CFG_STREAM_EN"
 #endif
 
 #if VSF_USE_USB_HOST == ENABLED
-#   if VSF_USE_USB_HOST_ECM == ENABLED
-#       undef VSF_USE_USB_HOST_CDC
-#       define VSF_USE_USB_HOST_CDC                 ENABLED
+#   if VSF_USBH_USE_ECM == ENABLED
+#       undef VSF_USBH_USE_CDC
+#       define VSF_USBH_USE_CDC                 ENABLED
 #   endif
 #endif
 

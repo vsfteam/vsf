@@ -25,6 +25,10 @@
 #   include "./multiplex_hal/driver.h"
 #endif
 
+#if VSF_USE_STREAM_HAL == ENABLED
+#   include "./stream_hal/driver.h"
+#endif
+
 #if     VSF_USE_LV2_HAL_XXXXXA == ENABLED
 #   include "./XXXXXA/driver.h"
 

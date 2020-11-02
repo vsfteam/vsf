@@ -22,6 +22,7 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 #include "./usbd/usbd.h"
+#include "./usbhd_hcd/usbhd_hcd.h"
 
 /*============================ MACROS ========================================*/
 

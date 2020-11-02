@@ -2,7 +2,11 @@
 // so maybe compilation will be OK even without __OOC_CPP__
 #include "vsf_cfg.h"
 
-#if APP_CFG_USE_CPP_DEMO == ENABLED
+#if APP_USE_CPP_DEMO == ENABLED
+
+#ifndef __OOC_CPP__
+#   error __OOC_CPP__ MUST be defined, so that LPOOC is compatible with c++
+#endif
 
 #include <unistd.h>
 #include <iostream>

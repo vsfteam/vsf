@@ -19,10 +19,10 @@
 
 #include "../../../vsf_av_cfg.h"
 
-#if VSF_USE_AUDIO == ENABLED && VSF_USE_DECODER_WAV == ENABLED
+#if VSF_USE_AUDIO == ENABLED && VSF_AUDIO_USE_DECODER_WAV == ENABLED
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define __VSFSTREAM_CLASS_INHERIT__
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+#   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #endif
 #define __VSF_WAV_CLASS_IMPLEMENT
 #define __VSF_EDA_CLASS_INHERIT__
@@ -35,8 +35,8 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
 #endif
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL != ENABLED
-#   error VSF_USE_KERNEL_SIMPLE_SHELL must be enabled
+#if VSF_KERNEL_USE_SIMPLE_SHELL != ENABLED
+#   error VSF_KERNEL_USE_SIMPLE_SHELL must be enabled
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -8,10 +8,10 @@
 
 #define VSF_USE_USB_DEVICE              ENABLED
 #   define VSF_USBD_CFG_STREAM_EN       ENABLED
-#   define VSF_USE_USB_DEVICE_CDCACM    ENABLED
-#   define VSF_USE_USB_DEVICE_MSC       ENABLED
+#   define VSF_USBD_USE_CDCACM          ENABLED
+#   define VSF_USBD_USE_MSC             ENABLED
 
 #define VSF_USE_SCSI                    ENABLED
-#define VSF_USE_SERVICE_VSFSTREAM       ENABLED
+#define VSF_USE_SIMPLE_STREAM           ENABLED
 
 #endif

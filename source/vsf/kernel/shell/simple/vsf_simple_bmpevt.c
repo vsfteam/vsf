@@ -20,7 +20,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 
-#if     VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED                                  \
+#if     VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED                                  \
     &&  VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED                          \
     &&  VSF_USE_KERNEL == ENABLED                                               \
     &&  VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED

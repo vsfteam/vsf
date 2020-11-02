@@ -247,7 +247,7 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
             &&  (tCharOffset <= ptString->s16_size)
         #endif
         ) {
-        #if VSF_TGUI_SV_CFG_MULTI_LINE_TEXT == ENABLED
+        #if VSF_TGUI_CFG_SV_MULTI_LINE_TEXT == ENABLED
             if (wChar == '\n') {
                 tSize.iHeight += nFontHeight + chInterlineSpace;
                 tSize.iWidth = max(tSize.iWidth, iWidth);

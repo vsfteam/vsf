@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 
 #define __VSF_STREAM_READER_CLASS_IMPLEMENT
 #include "./vsf_stream_base.h"
@@ -73,7 +73,7 @@ vsf_pbuf_t *vsf_stream_reader_fetch_pbuf ( vsf_stream_reader_t *obj_ptr)
     vsf_pbuf_t *pbuf;
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
     
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         pbuf = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
         if (NULL == this.current_ptr) {
             this.current_ptr = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
@@ -106,7 +106,7 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *obj_ptr,
             break;
         }
 
-        __SAFE_ATOM_CODE(
+        __vsf_interrupt_safe(
             if (NULL == this.current_ptr) {
                 this.current_ptr = vsf_stream_usr_fetch_pbuf(&this.use_as__vsf_stream_usr_t);
                 this.hwOffset = 0;
@@ -114,7 +114,7 @@ int_fast32_t vsf_stream_reader_read(vsf_stream_reader_t *obj_ptr,
             }
         )
 
-        __SAFE_ATOM_CODE(
+        __vsf_interrupt_safe(
             if (NULL != this.current_ptr) {
                 if (this.hwOffset < this.hwBufferSize) {
                     nReadSize = vsf_pbuf_buffer_read(   this.current_ptr, 

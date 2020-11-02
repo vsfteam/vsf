@@ -22,7 +22,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_MEM_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_MEM_MAL == ENABLED
 
 #if     defined(__VSF_MEM_MAL_CLASS_IMPLEMENT)
 #   undef __VSF_MEM_MAL_CLASS_IMPLEMENT
@@ -60,5 +60,5 @@ extern const vk_mal_drv_t vk_mem_mal_drv;
 }
 #endif
 
-#endif      // VSF_USE_MAL && VSF_USE_MEM_MAL
+#endif      // VSF_USE_MAL && VSF_MAL_USE_MEM_MAL
 #endif      // __VSF_MEM_MAL_H__

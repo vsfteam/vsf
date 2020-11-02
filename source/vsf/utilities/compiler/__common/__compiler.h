@@ -27,67 +27,36 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#ifndef DEF_REG
-#define DEF_REG                     \
-        union  {                    \
-            struct {
-#endif
-    
-#ifndef END_DEF_REG
-#define END_DEF_REG(__NAME)         \
-            };                      \
-            reg32_t Value;          \
-        }__NAME;
-#endif
-
 #ifndef __REG_MACRO__
 #define __REG_MACRO__
-#endif
 
+#define __DEF_REG                                                               \
+        union  {                                                                \
+            struct {
+#define __END_DEF_REG(__NAME, __BIT_LEN)                                        \
+            };                                                                  \
+            reg##__BIT_LEN##_t VALUE;                                           \
+        } __NAME;
 
-#ifndef REG_RSVD_0x10
-#define REG_RSVD_0x10                   \
-    reg32_t                     : 32;   \
-    reg32_t                     : 32;   \
-    reg32_t                     : 32;   \
-    reg32_t                     : 32;   
-#endif
-#ifndef REG_RSVD_0x80       
-#define REG_RSVD_0x80                   \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10               \
-            REG_RSVD_0x10
-#endif
+#define DEF_REG                 __DEF_REG
+#define END_DEF_REG(__NAME, __BIT_LEN)                                          \
+        __END_DEF_REG(__NAME, __BIT_LEN)
 
-#ifndef REG_RSVD_0x100                 
-#define REG_RSVD_0x100                  \
-            REG_RSVD_0x80               \
-            REG_RSVD_0x80
-#endif
+#define DEF_REG8                DEF_REG
+#define END_DEF_REG8(__NAME)    END_DEF_REG(__NAME, 8)
+#define DEF_REG16               DEF_REG
+#define END_DEF_REG16(__NAME)   END_DEF_REG(__NAME, 16)
+#define DEF_REG32               DEF_REG
+#define END_DEF_REG32(__NAME)   END_DEF_REG(__NAME, 32)
 
-#ifndef REG_RSVD_0x800
-#define REG_RSVD_0x800                  \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100              \
-            REG_RSVD_0x100
-#endif
+#endif      // __REG_MACRO__
 
 
 //! \brief The mcu memory align mode
-# define MCU_MEM_ALIGN_SIZE             sizeof(uintalu_t)
+#define MCU_MEM_ALIGN_SIZE      sizeof(uintalu_t)
 
 #ifndef __volatile__
-#define __volatile__                    volatile
+#   define __volatile__         volatile
 #endif
 
 #undef __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
@@ -96,15 +65,15 @@ extern "C" {
 #endif
 
 #ifndef __IS_COMPILER_LLVM__
-#   define __IS_COMPILER_LLVM__     0
+#   define __IS_COMPILER_LLVM__ 0
 #endif
 
 #ifndef __IS_COMPILER_GCC__
-#   define __IS_COMPILER_GCC__      0
+#   define __IS_COMPILER_GCC__  0
 #endif
 
 #ifndef __IS_COMPILER_IAR__
-#   define __IS_COMPILER_IAR__      0
+#   define __IS_COMPILER_IAR__  0
 #endif
 
 //! \brief none standard memory types
@@ -112,7 +81,7 @@ extern "C" {
 #   define ROM_FLASH            __attribute__(( __section__( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( __section__( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__(( __section__( ".bss.noinit")))
-#   define ROOT                 __attribute__((__used__))    
+#   define ROOT                 __attribute__((__used__))
 #   define INLINE               __inline__
 #   define NO_INLINE            __attribute__ ((__noinline__))
 #   define ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
@@ -132,13 +101,13 @@ extern "C" {
 #   define TRANSPARENT_UNION    __attribute__((__transparent_union__))
 #   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)       void __VEC(void)
+#   define __ISR(__VEC)         void __VEC(void)
 
-#elif  __IS_COMPILER_GCC__ 
+#elif  __IS_COMPILER_GCC__
 #   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
 #   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
 #   define NO_INIT              __attribute__(( section( ".bss.noinit")))
-#   define ROOT                 __attribute__((used))    
+#   define ROOT                 __attribute__((used))
 #   define INLINE               inline
 #   define NO_INLINE            __attribute__((noinline))
 #   define ALWAYS_INLINE        inline __attribute__((always_inline))
@@ -146,7 +115,7 @@ extern "C" {
 #   define RAMFUNC              __attribute__((section (".textrw")))
 #   define __asm__              __asm
 #   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    __section(".ARM.__at_" #__ADDR) 
+#   define __AT_ADDR(__ADDR)    __section(".ARM.__at_" #__ADDR)
 #   define __SECTION(__SEC)     __attribute__((section (__SEC)))
 #   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                 __attribute__((weakref(__STR(__ALIAS))))
@@ -155,26 +124,26 @@ extern "C" {
 //#   define UNALIGNED            __attribute__((packed))
 #   undef UNALIGNED                                                             //! gcc doesn't support this
 #   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)    __alignof__(__VA_ARGS__)
+#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)       void __VEC(void)
+#   define __ISR(__VEC)         void __VEC(void)
 #endif
 
 #define WEAK_ALIAS(__ORIGIN, __ALIAS)                                           \
-                            __WEAK_ALIAS(__ORIGIN, __ALIAS)
-#define AT_ADDR(__ADDR)     __AT_ADDR(__ADDR)
-#define ALIGN(__N)          __ALIGN(__N)
-#define SECTION(__SEC)      __SECTION(__SEC)
+                                __WEAK_ALIAS(__ORIGIN, __ALIAS)
+#define AT_ADDR(__ADDR)         __AT_ADDR(__ADDR)
+#define ALIGN(__N)              __ALIGN(__N)
+#define SECTION(__SEC)          __SECTION(__SEC)
 
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define ALIGN_OF(__TYPE)       __ALIGN_OF(__TYPE)
-#define ALIGN_WITH(__TYPE)     ALIGN(ALIGN_OF(__TYPE))
-#define ISR(__VECT)            __ISR(__VECT)    
+#define ALIGN_OF(__TYPE)        __ALIGN_OF(__TYPE)
+#define ALIGN_WITH(__TYPE)      ALIGN(ALIGN_OF(__TYPE))
+#define ISR(__VECT)             __ISR(__VECT)
 #else
-#define ALIGN_OF(...)       __ALIGN_OF(__VA_ARGS__)
-#define ALIGN_WITH(...)     ALIGN(ALIGN_OF(__VA_ARGS__))
-#define ISR(...)            __ISR(__VA_ARGS__)
+#define ALIGN_OF(...)           __ALIGN_OF(__VA_ARGS__)
+#define ALIGN_WITH(...)         ALIGN(ALIGN_OF(__VA_ARGS__))
+#define ISR(...)                __ISR(__VA_ARGS__)
 #endif
 
 
@@ -189,15 +158,13 @@ extern "C" {
 #pragma clang diagnostic ignored "-Wconstant-conversion"
 #pragma clang diagnostic ignored "-Wmicrosoft-enum-forward-reference"
 #pragma clang diagnostic ignored "-Wbuiltin-requires-header"
-#pragma clang diagnostic ignored "-Winitializer-overrides" 
-#pragma clang diagnostic ignored "-Wbraced-scalar-init" 
-#pragma clang diagnostic ignored "-Wempty-body" 
+#pragma clang diagnostic ignored "-Winitializer-overrides"
+#pragma clang diagnostic ignored "-Wbraced-scalar-init"
+#pragma clang diagnostic ignored "-Wempty-body"
 #pragma clang diagnostic ignored "-Wgnu-empty-struct"
-#pragma clang diagnostic ignored "-Wint-conversion" 
-#pragma clang diagnostic ignored "-Wint-to-pointer-cast" 
 #pragma clang diagnostic ignored "-Wmicrosoft-include"
-#pragma clang diagnostic ignored "-Wpragma-pack" 
-#pragma clang diagnostic ignored "-Wunused-function" 
+#pragma clang diagnostic ignored "-Wpragma-pack"
+#pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wswitch"
 #pragma clang diagnostic ignored "-Wembedded-directive"
 #pragma clang diagnostic ignored "-Wundef"
@@ -222,28 +189,26 @@ extern "C" {
 #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #pragma clang diagnostic ignored "-Wtautological-pointer-compare"
-#pragma clang diagnostic ignored "-Wunused-value" 
+#pragma clang diagnostic ignored "-Wunused-value"
 #pragma clang diagnostic ignored "-Wbuiltin-requires-header"
 #pragma clang diagnostic ignored "-Wmain-return-type"
 #pragma clang diagnostic ignored "-Wextern-c-compat"
 #pragma clang diagnostic ignored "-Wunused-label"
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma clang diagnostic ignored "-Wbitfield-constant-conversion"
-//#pragma clang diagnostic ignored "-Wpointer-integer-compare" 
+//#pragma clang diagnostic ignored "-Wpointer-integer-compare"
 
-//#pragma clang diagnostic ignored "-Wno-sometimes-uninitialized" 
-//#pragma clang diagnostic ignored "-Wdeprecated-declarations" 
-//#pragma clang diagnostic ignored "-Wunused-variable"  
+//#pragma clang diagnostic ignored "-Wno-sometimes-uninitialized"
+//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+//#pragma clang diagnostic ignored "-Wunused-variable"
 
 #elif __IS_COMPILER_GCC__
 
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wmissing-braces"
-#pragma GCC diagnostic ignored "-Wempty-body" 
-#pragma GCC diagnostic ignored "-Wint-conversion" 
-#pragma GCC diagnostic ignored "-Wint-to-pointer-cast" 
-#pragma GCC diagnostic ignored "-Wunused-function" 
+#pragma GCC diagnostic ignored "-Wempty-body"
+#pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wswitch"
 #pragma GCC diagnostic ignored "-Wundef"
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -256,22 +221,22 @@ extern "C" {
 #pragma GCC diagnostic ignored "-Wbad-function-cast"
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#pragma GCC diagnostic ignored "-Wunused-value" 
+#pragma GCC diagnostic ignored "-Wunused-value"
 #pragma GCC diagnostic ignored "-Wcomment"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
 
 /*! \NOTE do not ignore following warning unless you take the risk by yourself */
 //#pragma GCC diagnostic ignored "-Wbitfield-constant-conversion"
-//#pragma GCC diagnostic ignored "-Wpointer-integer-compare" 
+//#pragma GCC diagnostic ignored "-Wpointer-integer-compare"
 //
-//#pragma GCC diagnostic ignored "-Wno-sometimes-uninitialized" 
-//#pragma GCC diagnostic ignored "-Wdeprecated-declarations" 
-//#pragma GCC diagnostic ignored "-Wunused-variable"  
+//#pragma GCC diagnostic ignored "-Wno-sometimes-uninitialized"
+//#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+//#pragma GCC diagnostic ignored "-Wunused-variable"
 
 #elif __IS_COMPILER_IAR__
 
-//! undefined behavior: the order of volatile accesses is undefined in this statement 
+//! undefined behavior: the order of volatile accesses is undefined in this statement
 #pragma diag_suppress=Pa082
 
 //! Typedef name has already been declared (with same type)
@@ -283,10 +248,10 @@ extern "C" {
 //! extra ";" ignored
 #pragma diag_suppress=pe381
 
-//! enumerated type mixed with another enumerated type 
+//! enumerated type mixed with another enumerated type
 #pragma diag_suppress=pa089
 
-//! use of address of unaligned structure member 
+//! use of address of unaligned structure member
 #pragma diag_suppress=pa039
 
 //! declaration is not visable outside of function
@@ -305,7 +270,7 @@ extern "C" {
 /*----------------------------------------------------------------------------*
  * Warning Emphasize                                                          *
  *----------------------------------------------------------------------------*/
- 
+
 #if defined(__VSF_DEBUG__)
 #   if defined(__clang__) //__IS_COMPILER_LLVM__
 #       pragma clang diagnostic warning "-Wcast-align"
@@ -325,6 +290,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
+
 extern void vsf_stdio_init(void);
 
 #ifdef __cplusplus

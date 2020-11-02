@@ -28,8 +28,8 @@
 #   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #endif
 //! arch info
-#   define VSF_ARCH_PRI_NUM         4
-#   define VSF_ARCH_PRI_BIT         2
+#define VSF_ARCH_PRI_NUM            4
+#define VSF_ARCH_PRI_BIT            2
 
 
 // software interrupt provided by a dedicated device

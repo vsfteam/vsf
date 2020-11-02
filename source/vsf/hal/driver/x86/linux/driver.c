@@ -20,8 +20,8 @@
 #include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#       define __VSFSTREAM_CLASS_INHERIT__
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
+#       define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #       include "service/vsf_service.h"
 #   endif
 #endif
@@ -41,12 +41,12 @@
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t* stream,
             uint8_t* buf, uint_fast32_t size);
 static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t* stream);
 static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t* stream);
-#   elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   elif   VSF_USE_STREAM == ENABLED
 
 #   endif
 #endif
@@ -54,7 +54,7 @@ static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t* st
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 static const vsf_stream_op_t __vsf_x86_debug_stream_tx_op = {
     .get_data_length = __vsf_x86_debug_stream_tx_get_data_length,
     .get_avail_length = __vsf_x86_debug_stream_tx_get_avail_length,
@@ -68,7 +68,7 @@ static vsf_arch_irq_thread_t __vsf_x86_debug_stream_rx_irq;
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 vsf_stream_t VSF_DEBUG_STREAM_TX = {
     .op         = &__vsf_x86_debug_stream_tx_op,
 };
@@ -79,7 +79,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .size       = sizeof(__vsf_x86_debug_stream_rx_buff),
 };
 
-#   elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   elif   VSF_USE_STREAM == ENABLED
 
 #   endif
 #endif
@@ -87,7 +87,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
             uint8_t *buf, uint_fast32_t size)
 {
@@ -129,7 +129,7 @@ static void __vsf_x86_debug_stream_init(void)
     __vsf_arch_irq_init(&__vsf_x86_debug_stream_rx_irq, "debug_stream_rx",
         __vsf_x86_debug_stream_rx_irqhandler, vsf_arch_prio_0);
 }
-#   elif   VSF_USE_SERVICE_STREAM == ENABLED
+#   elif   VSF_USE_STREAM == ENABLED
 #   endif
 #endif
 

@@ -48,14 +48,22 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define SDL_assert              VSF_SDL2_ASSERT
+
 #define SDL_Init                __vsf_sdl2_init
 #define SDL_InitSubSystem       __vsf_sdl2_init_subsystem
 #define SDL_Quit                __vsf_sdl2_quit
 
 #define SDL_GetError            __vsf_sdl2_get_error
+#define SDL_SetHint(...)
 
 #define SDL_CreateWindow        __vsf_sdl2_create_window
 #define SDL_DestroyWindow       __vsf_sdl2_destroy_window
+
+#define SDL_GetDesktopDisplayMode           __vsf_sdl2_get_desktop_display_mode
+
+#define SDL_CreateRGBSurfaceWithFormat      __vsf_sdl2_create_rgb_sruface_with_format
+#define SDL_FreeSurface         __vsf_sdl2_free_surface
 
 #define SDL_DestroyTexture      __vsf_sdl2_destroy_texture
 
@@ -66,6 +74,7 @@ extern "C" {
 #define SDL_RenderPresent       __vsf_sdl2_render_present
 
 #define SDL_CreateTexture       __vsf_sdl2_create_texture
+#define SDL_CreateTextureFromSurface        __vsf_sdl2_create_texture_from_surface
 #define SDL_UpdateTexture       __vsf_sdl2_update_texture
 
 #define SDL_LockSurface         __vsf_sdl2_lock_surface
@@ -205,16 +214,20 @@ typedef enum {
     SDL_TEXTUREACCESS_TARGET,
 } SDL_TextureAccess;
 
-enum {
-    SDL_PIXELFORMAT_UNKNOWN     = 0,
+typedef enum {
+    SDL_PIXELFORMAT_UNKNOWN     = VSF_DISP_COLOR_INVALID,
+    SDL_PIXELFORMAT_RGBA8888    = VSF_DISP_COLOR_INVALID,
+
     SDL_PIXELFORMAT_ARGB8888    = VSF_DISP_COLOR_ARGB8888,
     SDL_PIXELFORMAT_RGB565      = VSF_DISP_COLOR_RGB565,
     SDL_PIXELFORMAT_RGB666      = VSF_DISP_COLOR_RGB666_32,
-};
+} SDL_PixelFormatEnum;
 
 typedef struct SDL_Texture SDL_Texture;
 
 typedef struct SDL_PixelFormat {
+    uint32_t format;
+
     uint32_t Rmask;
     uint32_t Gmask;
     uint32_t Bmask;
@@ -227,8 +240,15 @@ typedef struct SDL_Surface {
     int pitch;
 
     SDL_PixelFormat __format;
-    uint32_t pixels[0] ALIGN(4);
+    void *pixels;
+
+    uint32_t __pixels[0] ALIGN(4);
 } SDL_Surface;
+
+typedef struct SDL_DisplayMode {
+    uint32_t format;
+    int w, h;
+} SDL_DisplayMode;
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
 enum {
@@ -571,6 +591,44 @@ typedef struct SDL_JoyDeviceEvent {
     uint32_t timestamp;
     int32_t which;
 } SDL_JoyDeviceEvent;
+typedef struct SDL_MouseMotionEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    uint32_t windowID;
+    uint32_t which;
+    uint32_t state;
+    int32_t x;
+    int32_t y;
+    int32_t xrel;
+    int32_t yrel;
+} SDL_MouseMotionEvent;
+enum {
+    SDL_BUTTON_LEFT,
+    SDL_BUTTON_MIDDLE,
+    SDL_BUTTON_RIGHT,
+    SDL_BUTTON_X1,
+    SDL_BUTTON_X2,
+};
+typedef struct SDL_MouseButtonEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    uint32_t windowID;
+    uint32_t which;
+    uint8_t button;
+    uint8_t state;
+    uint8_t clicks;
+    int32_t x;
+    int32_t y;
+} SDL_MouseButtonEvent;
+typedef struct SDL_MouseWheelEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    uint32_t windowID;
+    uint32_t which;
+    int32_t x;
+    int32_t y;
+    uint32_t direction;
+} SDL_MouseWheelEvent;
 
 typedef struct SDL_Cursor SDL_Cursor;
 typedef enum SDL_SystemCursor {
@@ -600,6 +658,9 @@ typedef union SDL_Event {
     SDL_JoyHatEvent jhat;
     SDL_JoyButtonEvent jbutton;
     SDL_JoyDeviceEvent jdevice;
+    SDL_MouseMotionEvent motion;
+    SDL_MouseButtonEvent button;
+    SDL_MouseWheelEvent wheel;
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
     SDL_ActiveEvent active;
@@ -620,6 +681,11 @@ extern const char *__vsf_sdl2_get_error(void);
 extern SDL_Window * __vsf_sdl2_create_window(const char *title, int x, int y, int w, int h, uint32_t flags);
 extern void __vsf_sdl2_destroy_window(SDL_Window * window);
 
+extern int __vsf_sdl2_get_desktop_display_mode(int display_index, SDL_DisplayMode *mode);
+
+extern SDL_Surface * __vsf_sdl2_create_rgb_sruface_with_format(uint32_t flags, int w, int h, int depth, uint32_t format);
+extern void __vsf_sdl2_free_surface(SDL_Surface *surface);
+
 extern SDL_Renderer * __vsf_sdl2_create_renderer(SDL_Window * window, int index, uint32_t flags);
 extern void __vsf_sdl2_destroy_renderer(SDL_Renderer * renderer);
 extern int __vsf_sdl2_render_clear(SDL_Renderer * renderer);
@@ -627,6 +693,7 @@ extern int __vsf_sdl2_render_copy(SDL_Renderer * renderer, SDL_Texture * texture
 extern void __vsf_sdl2_render_present(SDL_Renderer * renderer);
 
 extern SDL_Texture * __vsf_sdl2_create_texture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
+extern SDL_Texture * __vsf_sdl2_create_texture_from_surface(SDL_Renderer *renderer, SDL_Surface *surface);
 extern void __vsf_sdl2_destroy_texture(SDL_Texture * texture);
 extern int __vsf_sdl2_update_texture(SDL_Texture * texture, const SDL_Rect * rect, const void *pixels, int pitch);
 

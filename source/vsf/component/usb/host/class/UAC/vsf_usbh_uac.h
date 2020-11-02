@@ -22,10 +22,11 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_UAC == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UAC == ENABLED
 
 #include "component/usb/common/class/UAC/vsf_usb_UAC.h"
 
+#undef PUBLIC_CONST
 #if     defined(__VSF_USBH_UAC_CLASS_IMPLEMENT)
 #   undef __VSF_USBH_UAC_CLASS_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT__
@@ -44,6 +45,10 @@ extern "C" {
 // for some hcd, one urb will take 2ms(eg. ohci), so need 2 urbs to implement 1ms interval transaction
 #ifndef VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM
 #   define VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM  1
+#endif
+
+#if VSF_USE_SIMPLE_STREAM != ENABLED
+#   error VSF_USE_SIMPLE_STREAM is needed for USBH UAC driver
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

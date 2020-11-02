@@ -84,14 +84,14 @@ struct usbd_demo_t {
     struct {
         struct {
             vk_usbd_cdcacm_t param;
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
             struct {
                 vsf_fifo_stream_t tx;
                 vsf_fifo_stream_t rx;
                 uint8_t tx_buffer[4 * 1024];
                 uint8_t rx_buffer[4 * 1024];
             } stream;
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#elif VSF_USE_STREAM == ENABLED
 #endif
         } cdc[2];
 
@@ -596,7 +596,7 @@ static usbd_demo_t usbd_demo = {
                     .parity     = 0,
                     .datalen    = 8,
                 },
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
                 .stream.tx.stream = (vsf_stream_t *)&usbd_demo.usbd.cdc[0].stream.tx,
                 .stream.rx.stream = (vsf_stream_t *)&usbd_demo.usbd.cdc[0].stream.rx,
             },
@@ -626,7 +626,7 @@ static usbd_demo_t usbd_demo = {
                     .parity     = 0,
                     .datalen    = 8,
                 },
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
                 .stream.tx.stream = (vsf_stream_t *)&usbd_demo.usbd.cdc[1].stream.tx,
                 .stream.rx.stream = (vsf_stream_t *)&usbd_demo.usbd.cdc[1].stream.rx,
             },

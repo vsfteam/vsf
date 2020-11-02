@@ -1,0 +1,6 @@
+# CMakeLists head
+
+target_sources(${VSF_LIB_NAME} INTERFACE
+    n200_func.c
+)
+

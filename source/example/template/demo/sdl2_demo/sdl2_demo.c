@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_SDL2 == ENABLED && APP_CFG_USE_SDL2_DEMO == ENABLED
+#if VSF_USE_SDL2 == ENABLED && APP_USE_SDL2_DEMO == ENABLED
 
 #include <SDL.h>
 
@@ -31,7 +31,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int sdl2_main(int argc, char *argv[])
 {
 #else

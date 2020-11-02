@@ -27,7 +27,7 @@
     // IMPORTANT: DANGER: RED: can not access bits larger than bit_size
     dcl_vsf_bitmap(xxx_bitmap, 32);
 
-    // 2. Defining pool variable
+    // 2. Defining bitmap variable
     static vsf_bitmap(xxxx_bitmap) usr_xxxx_bitmap;
 
     void user_example_task(void)
@@ -119,8 +119,7 @@ extern "C" {
 /*============================ PROTOTYPES ====================================*/
 
 extern void __vsf_bitmap_reset(uintalu_t * this_ptr, int_fast16_t bit_size);
-extern int_fast16_t __vsf_bitmap_ffz(   uintalu_t * bitmap_ptr,  
-                                        int_fast16_t bit_size);
+extern int_fast16_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr, int_fast16_t bit_size);
 
 #ifdef __cplusplus
 }

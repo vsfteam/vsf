@@ -20,8 +20,8 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "utilities/vsf_utilities.h"
-/*! \note User can define VSF_DRIVER_HEADER to specify the targer device driver 
- *!       header file. If it is not specified, this driver abstraction header 
+/*! \note User can define VSF_DRIVER_HEADER to specify the targer device driver
+ *!       header file. If it is not specified, this driver abstraction header
  *!       file will use predefined device-specific macros to decide which device
  *!       driver header file should be included.
  */
@@ -57,13 +57,13 @@
 #   elif    defined(__COMPANY_NAME_B__)
 #       define  VSF_DRIVER_HEADER       "./company_name_b/driver.h"
 */
-#   elif    defined(__ARM__)
+#   elif    defined(__ARM__) || defined(__arm__)
 #       define  VSF_DRIVER_HEADER       "./arm/driver.h"
 
-/*! \note please try not ignore the __UNKNOWN_VENDOR__ if you want to select 
- *!       the chip inside unknown folder 
+/*! \note please try not ignore the __UNKNOWN_VENDOR__ if you want to select
+ *!       the chip inside unknown folder
  */
-#   elif    defined(__UNKOWN_VENDOR__)                                          
+#   elif    defined(__UNKOWN_VENDOR__)
 #       define  VSF_DRIVER_HEADER       "./unknown/driver.h"
 #   else
 #       define  VSF_DRIVER_HEADER       "./unknown/driver.h"
@@ -90,14 +90,14 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-/*! \note initialize drivers 
+/*! \note initialize drivers
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
 extern bool vsf_driver_init(void);
 
-/*! \note common entry for upper layer to poll driver servcie 
+/*! \note common entry for upper layer to poll driver servcie
  *  \param none
  *  \retval true it is safe to enter sleep mode
  *  \retval false polling work is on going, please keep calling the function

@@ -21,11 +21,11 @@
 #include "vsf.h"
 
 // define USRAPP_CF_XXXX and include usrapp_common.h
-#if VSF_USE_MEMFS == ENABLED
+#if VSF_FS_USE_MEMFS == ENABLED
 #   include "fakefat32.h"
 #   define USRAPP_CFG_MEMFS_ROOT    __fakefat32_root
 #endif
-#if VSF_USE_WINFS == ENABLED
+#if VSF_FS_USE_WINFS == ENABLED
 #   define USRAPP_CFG_WINFS_ROOT    "winfs_root"
 #endif
 #include "../usrapp_common.h"
@@ -201,7 +201,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         USRAPP_STATE_CREATED_MEMFS,
         USRAPP_STATE_OPENED_MEMFS,
         USRAPP_STATE_MOUNTED_MEMFS,
-#if VSF_USE_WINFS == ENABLED
+#if VSF_FS_USE_WINFS == ENABLED
         USRAPP_STATE_CREATED_WINFS,
         USRAPP_STATE_OPENED_WINFS,
         USRAPP_STATE_MOUNTED_WINFS,
@@ -211,7 +211,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         USRAPP_STATE_WRITTEN_CONTROL,
     } static __state;
     static vk_file_t *__froot, *__fmemfs, *__fcontrol;
-#if VSF_USE_WINFS == ENABLED
+#if VSF_FS_USE_WINFS == ENABLED
     static vk_file_t *__fwinfs;
 #endif
     static uint8_t __control = 0;
@@ -243,7 +243,7 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         case USRAPP_STATE_MOUNTED_MEMFS:
             ASSERT(result == VSF_ERR_NONE);
-#if VSF_USE_WINFS == ENABLED
+#if VSF_FS_USE_WINFS == ENABLED
             vk_file_create(__froot, "winfs", VSF_FILE_ATTR_DIRECTORY, 0);
             break;
         case USRAPP_STATE_CREATED_WINFS:

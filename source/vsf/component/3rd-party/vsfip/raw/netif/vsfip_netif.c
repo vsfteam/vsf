@@ -162,7 +162,7 @@ uint_fast16_t vsfip_netif_mtu(vsfip_netif_t *netif)
 #ifdef VSFIP_TRACE_NETIF
 static void __vsfip_netif_trace_ref(vsfip_netif_t *netif)
 {
-    vsf_trace(VSF_TRACE_DEBUG, "netif %08X ref : %d" VSFCFG_DEBUG_LINEEND, netif, netif->ref);
+    vsf_trace_debug("netif %08X ref : %d" VSFCFG_DEBUG_LINEEND, netif, netif->ref);
 }
 #endif
 

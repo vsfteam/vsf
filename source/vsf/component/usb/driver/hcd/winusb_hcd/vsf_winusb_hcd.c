@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_WINUSB == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_HCD__
 #define __VSF_USBH_CLASS_IMPLEMENT_HUB__
@@ -31,6 +31,10 @@
 #include <Windows.h>
 #include <SetupAPI.h>
 #include <winusb.h>
+
+#if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
+#   include "libwdi.h"
+#endif
 
 #pragma comment(lib, "SetupAPI.lib")
 #pragma comment(lib, "winusb.lib")
@@ -177,6 +181,40 @@ static vk_winusb_hcd_t __vk_winusb_hcd = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
+static bool __vk_winusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool force)
+{
+    struct wdi_options_create_list cl_options = {
+        .list_all           = TRUE,
+        .list_hubs          = TRUE,
+        .trim_whitespaces   = TRUE,
+    };
+    struct wdi_options_prepare_driver pd_options = {
+        .driver_type        = WDI_WINUSB,
+    };
+    struct wdi_device_info *device, *list;
+    int r = WDI_ERROR_OTHER;
+
+    wdi_set_log_level(3);
+    r = wdi_create_list(&list, &cl_options);
+    if (r != WDI_SUCCESS) {
+        return false;
+    }
+
+    for (device = list; device != NULL; device = device->next) {
+        if (    (device->vid == vid) && (device->pid == pid) && !device->is_composite
+            &&  (force || strcmp(device->driver, "WinUSB"))) {
+            if (wdi_prepare_driver(device, "usb_driver", "winusb_device.inf", &pd_options) == WDI_SUCCESS) {
+                wdi_install_driver(device, "usb_driver", "winusb_device.inf", NULL);
+            }
+            break;
+        }
+    }
+    wdi_destroy_list(list);
+    return true;
+}
+#endif
+
 static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
 {
     HANDLE hDev = INVALID_HANDLE_VALUE;
@@ -225,7 +263,7 @@ static HANDLE __vk_winusb_open_device(uint_fast16_t vid, uint_fast16_t pid)
         if (NULL != strstr(pInterfaceDetailData->DevicePath, str_tmp)) {
             sprintf(str_tmp, "pid_%04x", pid);
             if (NULL != strstr(pInterfaceDetailData->DevicePath, str_tmp)) {
-                vsf_trace(VSF_TRACE_DEBUG, "Device path: %s" VSF_TRACE_CFG_LINEEND, pInterfaceDetailData->DevicePath);
+                vsf_trace_debug("Device path: %s" VSF_TRACE_CFG_LINEEND, pInterfaceDetailData->DevicePath);
                 hDev = CreateFileA(pInterfaceDetailData->DevicePath, GENERIC_READ | GENERIC_WRITE,
                         FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
                 if (hDev != INVALID_HANDLE_VALUE) {
@@ -526,9 +564,13 @@ static void __vk_winusb_hcd_init_thread(void *arg)
         vk_winusb_hcd_dev_t *winusb_dev = &__vk_winusb_hcd.devs[0];
         for (int i = 0; i < dimof(__vk_winusb_hcd.devs); i++, winusb_dev++) {
             if ((INVALID_HANDLE_VALUE == winusb_dev->hDev) && (0 == winusb_dev->evt_mask.value)) {
+                __vk_winusb_ensure_driver(winusb_dev->vid, winusb_dev->pid, false);
                 winusb_dev->hDev = __vk_winusb_open_device(winusb_dev->vid, winusb_dev->pid);
                 if (winusb_dev->hDev != INVALID_HANDLE_VALUE) {
                     if (WinUsb_Initialize(winusb_dev->hDev, &winusb_dev->hUsbIfs[0])) {
+#if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
+                    succeed:
+#endif
                         for (uint_fast8_t i = 0; i < dimof(winusb_dev->ep); i++) {
                             winusb_dev->ep[i].ep2ifs = -1;
                         }
@@ -545,6 +587,21 @@ static void __vk_winusb_hcd_init_thread(void *arg)
                     } else {
                         CloseHandle(winusb_dev->hDev);
                         winusb_dev->hDev = INVALID_HANDLE_VALUE;
+
+#if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
+                        // fail to open device, force to change driver using libwdi
+                        __vk_winusb_ensure_driver(winusb_dev->vid, winusb_dev->pid, true);
+
+                        winusb_dev->hDev = __vk_winusb_open_device(winusb_dev->vid, winusb_dev->pid);
+                        if (winusb_dev->hDev != INVALID_HANDLE_VALUE) {
+                            if (WinUsb_Initialize(winusb_dev->hDev, &winusb_dev->hUsbIfs[0])) {
+                                goto succeed;
+                            } else {
+                                CloseHandle(winusb_dev->hDev);
+                                winusb_dev->hDev = INVALID_HANDLE_VALUE;
+                            }
+                        }
+#endif
                     }
                 }
             }
@@ -567,6 +624,7 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
         __vsf_arch_irq_request_send(&winusb_urb->irq_request);
         return false;
     } else {
+        vk_usbh_hcd_urb_free_buffer(urb);
         vsf_usbh_free(urb);
         return true;
     }
@@ -719,7 +777,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 }
                 break;
             }
-        }   
+        }
     }
 }
 

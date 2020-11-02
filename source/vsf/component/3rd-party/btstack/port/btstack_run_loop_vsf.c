@@ -83,7 +83,7 @@ static void __btstack_run_loop_vsf_add_timer(btstack_timer_source_t *ts)
     btstack_linked_item_t *it;
     for (it = (btstack_linked_item_t *)&__btstack_vsf.timers; it->next; it = it->next) {
         if ((btstack_timer_source_t *)it->next == ts) {
-//            vsf_trace(VSF_TRACE_ERROR, "btstack_run_loop_timer_add error: timer to add already in list!");
+//            vsf_trace_error("btstack_run_loop_timer_add error: timer to add already in list!");
             return;
         }
         if (ts->timeout < ((btstack_timer_source_t *)it->next)->timeout) {

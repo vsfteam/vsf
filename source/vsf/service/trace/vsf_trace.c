@@ -30,7 +30,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM != ENABLED && VSF_USE_SERVICE_STREAM != ENABLED
+#if VSF_USE_SIMPLE_STREAM != ENABLED && VSF_USE_STREAMVSF_USE_STREAM != ENABLED
 #   error stream MUST be enabled to use trace
 #endif
 
@@ -61,19 +61,19 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 typedef struct vsf_trace_t {
     vsf_stream_t *stream;
     uint8_t print_buffer[VSF_TRACE_CFG_BUFSIZE];
 } vsf_trace_t;
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#elif VSF_USE_STREAM == ENABLED
 
 #endif
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 static vsf_trace_t __vsf_trace;
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#elif VSF_USE_STREAM == ENABLED
 NO_INIT static vsf_stream_writer_t __vsf_trace;
 #endif
 
@@ -106,7 +106,7 @@ static void __vsf_trace_set_level(vsf_trace_level_t level)
 #endif
 }
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
 {
     uint32_t ret = 0;
@@ -148,7 +148,7 @@ static void __vsf_trace_arg(const char *format, va_list *arg)
     vsf_trace_unprotect(origlevel);
 }
 
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#elif VSF_USE_STREAM == ENABLED
 void __vsf_trace_init(vsf_stream_tx_t *ptTX)
 {
     //VSF_SERVICE_ASSERT(NULL != ptTX);

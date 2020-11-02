@@ -20,7 +20,7 @@
 #include "vsf.h"
 #include "../usrapp_common.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
 #   include "lv_conf.h"
 #   include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
@@ -31,7 +31,7 @@
 /*============================ TYPES =========================================*/
 
 struct usrapp_t {
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
     struct {
         vk_disp_sdl2_t disp;
         vk_touchscreen_evt_t ts_evt;
@@ -55,7 +55,7 @@ typedef struct usrapp_t usrapp_t;
 /*============================ LOCAL VARIABLES ===============================*/
 
 static usrapp_t usrapp = {
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
     .ui.disp                    = {
         .param                  = {
             .height             = LV_VER_RES_MAX,
@@ -81,18 +81,18 @@ static usrapp_t usrapp = {
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED 
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
 extern void ui_demo_start(void);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
     if (0 == vsf_input_touchscreen_get_id(ts_evt)) {
         usrapp.ui.ts_evt = *ts_evt;
-//        vsf_trace(VSF_TRACE_DEBUG, "ts: (%d, %d) %s" VSF_TRACE_CFG_LINEEND,
+//        vsf_trace_debug("ts: (%d, %d) %s" VSF_TRACE_CFG_LINEEND,
 //                vsf_input_touchscreen_get_x(ts_evt),
 //                vsf_input_touchscreen_get_y(ts_evt),
 //                vsf_input_touchscreen_is_down(ts_evt) ? "down" : "up");
@@ -104,7 +104,7 @@ static bool usrapp_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *
     data->state = vsf_input_touchscreen_is_down(&usrapp.ui.ts_evt) ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
     data->point.x = vsf_input_touchscreen_get_x(&usrapp.ui.ts_evt);
     data->point.y = vsf_input_touchscreen_get_y(&usrapp.ui.ts_evt);
-//    vsf_trace(VSF_TRACE_DEBUG, "touchscreen: %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
+//    vsf_trace_debug("touchscreen: %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
 //        data->state == LV_INDEV_STATE_PR ? "press" : "release",
 //        data->point.x, data->point.y);
     return false;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 {
     __usrapp_common_init();
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
 #   if USE_LV_LOG
     lv_log_register_print(vsf_lvgl_printf);
 #   endif

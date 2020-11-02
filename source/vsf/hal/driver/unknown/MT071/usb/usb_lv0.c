@@ -20,12 +20,13 @@
 #include "../common.h"
 #include "./usb.h"
 
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-// TODO: add mt071_usbh_irq
-#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
-#define __USB_OTG_IMPLEMENT(__N, __VALUE)                                       \
+#if VSF_HAL_USE_USBD == ENABLED && VSF_HAL_USE_USBH == ENABLED
+#define ____USB_OTG_IMPLEMENT(__N, __VALUE)                                     \
 static const mt071_usb_const_t __USB_OTG##__N##_const = {                       \
     USB_OTG##__N##_CONFIG                                                       \
 };                                                                              \
@@ -40,26 +41,34 @@ ROOT void USB_OTG##__N##_IRQHandler(void)                                       
         mt071_usbd_irq(&USB_OTG##__N##_IP);                                     \
     }                                                                           \
 }
-#else
-#define __USB_OTG_IMPLEMENT(__N, __VALUE)                                       \
+#elif VSF_HAL_USE_USBD == ENABLED
+#define ____USB_OTG_IMPLEMENT(__N, __VALUE)                                     \
 static const mt071_usb_const_t __USB_OTG##__N##_const = {                       \
     USB_OTG##__N##_CONFIG                                                       \
 };                                                                              \
 mt071_usb_t USB_OTG##__N##_IP = {                                               \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
-void USB_OTG##__N##_IRQHandler(void)                                            \
+ROOT void USB_OTG##__N##_IRQHandler(void)                                       \
 {                                                                               \
-    if (USB_OTG##__N##_IP.is_host) {                                            \
-        mt071_usbh_irq(&USB_OTG##__N##_IP);                                     \
-    } else {                                                                    \
-        mt071_usbd_irq(&USB_OTG##__N##_IP);                                     \
-    }                                                                           \
+    mt071_usbd_irq(&USB_OTG##__N##_IP);                                         \
+}
+#elif VSF_HAL_USE_USBH == ENABLED
+#define ____USB_OTG_IMPLEMENT(__N, __VALUE)                                     \
+static const mt071_usb_const_t __USB_OTG##__N##_const = {                       \
+    USB_OTG##__N##_CONFIG                                                       \
+};                                                                              \
+mt071_usb_t USB_OTG##__N##_IP = {                                               \
+    .param = &__USB_OTG##__N##_const,                                           \
+};                                                                              \
+ROOT void USB_OTG##__N##_IRQHandler(void)                                       \
+{                                                                               \
+    mt071_usbh_irq(&USB_OTG##__N##_IP);                                         \
 }
 #endif
 
-#define _USB_OTG_IMPLEMENT(__N, __VALUE)    __USB_OTG_IMPLEMENT(__N, __VALUE)
-#define USB_OTG_IMPLEMENT(__N, __VALUE)     _USB_OTG_IMPLEMENT(__N, __VALUE)
+#define __USB_OTG_IMPLEMENT(__N, __VALUE)   ____USB_OTG_IMPLEMENT(__N, __VALUE)
+#define USB_OTG_IMPLEMENT(__N, __VALUE)     __USB_OTG_IMPLEMENT(__N, __VALUE)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -73,3 +82,5 @@ WEAK(mt071_usbh_irq)
 void mt071_usbh_irq(mt071_usb_t *dc) { ASSERT(false); }
 
 REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
+
+#endif      // VSF_HAL_USE_USBD || VSF_HAL_USE_USBH

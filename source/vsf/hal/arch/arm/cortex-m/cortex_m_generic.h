@@ -42,7 +42,7 @@ extern "C" {
 #if __ARM_ARCH == 6 || __TARGET_ARCH_6_M == 1 || __TARGET_ARCH_6S_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
 #       define VSF_ARCH_PRI_NUM         4
-#       undef  VSF_ARCH_PRI_BIT         
+#       undef  VSF_ARCH_PRI_BIT
 #       define VSF_ARCH_PRI_BIT         2
 #   endif
 
@@ -52,7 +52,7 @@ extern "C" {
 #elif __ARM_ARCH >= 7 || __TARGET_ARCH_7_M == 1 || __TARGET_ARCH_7E_M == 1
 #   ifndef VSF_ARCH_PRI_NUM
 #       define VSF_ARCH_PRI_NUM         16
-#       undef  VSF_ARCH_PRI_BIT         
+#       undef  VSF_ARCH_PRI_BIT
 #       define VSF_ARCH_PRI_BIT         4
 #   endif
 
@@ -67,6 +67,9 @@ extern "C" {
 #define __VSF_ARCH_SYSTIMER_BITS        24
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_arch_wakeup()
+
 /*============================ TYPES =========================================*/
 
 typedef uint64_t vsf_systimer_cnt_t;
@@ -86,7 +89,7 @@ enum {
                 ((VSF_ARCH_PRI_NUM - 1 - __vsf_arch_prio_index_##__N)) & 0xFF,
 
 
-enum vsf_arch_prio_t {
+typedef enum vsf_arch_prio_t {
     // avoid vsf_arch_prio_t to be optimized to 8bit
     __VSF_ARCH_PRIO_LEAST_MAX       = INT16_MAX,
     __VSF_ARCH_PRIO_LEAST_MIN       = INT16_MIN,
@@ -96,8 +99,7 @@ enum vsf_arch_prio_t {
     REPEAT_MACRO(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 
     vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF ,
-};
-typedef enum vsf_arch_prio_t vsf_arch_prio_t;
+} vsf_arch_prio_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -106,29 +108,6 @@ typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
 {
     __set_MSP(stack);
-}
-
-static ALWAYS_INLINE void vsf_arch_set_pc(uint32_t pc)
-{
-#if __IS_COMPILER_ARM_COMPILER_5__
-    register uint32_t temp __asm("pc");
-    temp = pc;
-#else
-    __asm__("MOV pc, %0" : :"r"(pc));
-#endif
-}
-
-static ALWAYS_INLINE uint32_t vsf_arch_get_lr(void)
-{
-
-    uint32_t reg;
-#if __IS_COMPILER_ARM_COMPILER_5__
-    register uint32_t temp __asm("lr");
-    reg = temp;
-#else
-    __asm__("MOV %0, lr" : "=r"(reg));
-#endif
-    return reg;
 }
 
 #ifdef __cplusplus

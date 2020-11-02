@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && APP_CFG_USE_USBD_DEMO == ENABLED && APP_CFG_USE_USBD_UVC_DEMO == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && APP_USE_USBD_DEMO == ENABLED && APP_USE_USBD_UVC_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
@@ -405,7 +405,7 @@ static usbd_uvc_t __user_usbd_uvc = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int usbd_uvc_main(int argc, char *argv[])
 {
 #else

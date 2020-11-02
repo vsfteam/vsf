@@ -76,8 +76,8 @@ extern "C" {
     {USB_DT_DEVICE, 0, 0, (__SIZE), (uint8_t*)(__DESC)}
 #define VSF_USBD_DESC_CONFIG(__INDEX, __DESC, __SIZE)                           \
     {USB_DT_CONFIG, (__INDEX), 0, (__SIZE), (uint8_t*)(__DESC)}
-#define VSF_USBD_DESC_STRING(__LANID, __INDEX, __DESC, __SIZE)                  \
-    {USB_DT_STRING, (__INDEX), (__LANID), (__SIZE), (uint8_t*)(__DESC)}
+#define VSF_USBD_DESC_STRING(__LANGID, __INDEX, __DESC, __SIZE)                 \
+    {USB_DT_STRING, (__INDEX), (__LANGID), (__SIZE), (uint8_t*)(__DESC)}
 #define VSF_USBD_DESC_QUALIFIER(__DESC)                                         \
     {USB_DT_DEVICE_QUALIFIER, 0, 0, USB_DT_DEVICE_QUALIFIER_SIZE, (uint8_t*)(__DESC)}
 
@@ -105,6 +105,8 @@ extern "C" {
                 .class_op       = __DRV,                                        \
                 .class_param    = __PARAM,                                      \
             },
+#define USB_IFS(__DRV, __PARAM)                                                 \
+            __USB_IFS((__DRV), (__PARAM))
 
 
 
@@ -158,6 +160,81 @@ extern "C" {
 #define __describe_usbd6                __describe_usbd_version_langid
 #define __describe_usbd7                __describe_usbd_version_langid_bcd_ver
 
+// __str in UTF16 format, eg u"string"
+#define __usbd_str_desc(__name, __type, __str)                                  \
+        struct {                                                                \
+            uint8_t bLength;                                                    \
+            uint8_t bDescriptorType;                                            \
+            usb_unicode_t str[dimof(__str) - 1];                                \
+        } PACKED const __##__name##_str_##__type = {                            \
+            .bLength            = sizeof(__##__name##_str_##__type),            \
+            .bDescriptorType    = USB_DT_STRING,                                \
+            .str                = __str,                                        \
+        };
+
+#define __usbd_str_product_desc(__name, __str_product)                          \
+        __usbd_str_desc(__name, product, __str_product)
+#define usbd_str_product_desc(__name, __str_product)                            \
+        __usbd_str_product_desc(__name, __str_product)
+
+#define __usbd_str_vendor_desc(__name, __str_vendor)                            \
+        __usbd_str_desc(__name, vendor, __str_vendor)
+#define usbd_str_vendor_desc(__name, __str_vendor)                              \
+        __usbd_str_vendor_desc(__name, __str_vendor)
+
+#define __usbd_str_serial_desc(__name, __str_serial)                            \
+        __usbd_str_desc(__name, serial, __str_serial)
+#define usbd_str_serial_desc(__name, __str_serial)                              \
+        __usbd_str_serial_desc(__name, __str_serial)
+
+#define __usbd_str_langid_desc(__name)                                          \
+        struct {                                                                \
+            uint8_t bLength;                                                    \
+            uint8_t bDescriptorType;                                            \
+            usb_unicode_t str[1];                                               \
+        } PACKED const __##__name##_str_langid = {                              \
+            .bLength            = 4,                                            \
+            .bDescriptorType    = USB_DT_STRING,                                \
+            .str                = (__##__name##_langid),                        \
+        };
+#define usbd_str_langid_desc(__name)                                            \
+        __usbd_str_langid_desc(__name)
+
+#define __usbd_device_iad_desc(__name)                                          \
+        const uint8_t __##__name##_device_desc[USB_DT_DEVICE_SIZE] = {          \
+            USB_DESC_DEV_IAD((__##__name##_version), (__##__name##_ep0size),    \
+                (__##__name##_vid), (__##__name##_pid),                         \
+                (__##__name##_bcd_version), 1, 2, 3, (__##__name##_config_num)) \
+        };
+#define usbd_device_iad_desc(__name)                                            \
+        __usbd_device_iad_desc(__name)
+
+#define __usbd_device_desc(__name, __class, __subclass, __protocol)             \
+        const uint8_t __##__name##_device_desc[USB_DT_DEVICE_SIZE] = {          \
+            USB_DESC_DEV((__##__name##_version), (__class), (__subclass),       \
+                (__protocol), (__##__name##_ep0size), (__##__name##_vid),       \
+                (__##__name##_pid), (__##__name##_bcd_version), 1, 2, 3,        \
+                (__##__name##_config_num))                                      \
+        };
+#define usbd_device_desc(__name, __class, __subclass, __protocol)               \
+        __usbd_device_desc(__name, (__class), (__subclass), (__protocol))
+
+#define __usbd_config_desc(__name, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
+        const uint8_t __##__name##_config_desc[USB_DT_CONFIG_SIZE + (__func_desc_size)] = {\
+            USB_DESC_CFG(USB_DT_CONFIG_SIZE + (__func_desc_size), (__func_ifs_num),\
+                        1, 0, USB_CONFIG_ATT_ONE | (__attribute), (__max_power_ma) >> 1)
+#define usbd_config_desc(__name, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
+        __usbd_config_desc(__name, (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+
+#define __usbd_basic_desc(__name, __func_ifs_num, __ep0_size)                   \
+        enum {                                                                  \
+            __##__name##_ifsnum = (__func_ifs_num),                             \
+            __##__name##_ep0size = (__ep0_size),                                \
+            __##__name##_config_num = 1,                                        \
+        };
+#define usbd_basic_desc(__name, __func_ifs_num, __ep0_size)                     \
+        __usbd_basic_desc(__name, (__func_ifs_num), (__ep0_size))
+
 // known limitations:
 //  __str_product/__str_vendor/__str_serial MUST be strings in UTF16
 //  multiple configuration is not supported
@@ -173,67 +250,19 @@ extern "C" {
                                         __attribute,        /* mask attributes, eg: USB_CONFIG_ATT_[SELFPOWER/WAKEUP/BATTERY] */\
                                         __max_power_ma      /* power consumption from USB host in mA, eg: 500 */\
                                         )                                       \
-        enum {                                                                  \
-            __##__name##_ifsnum = (__func_ifs_num),                             \
-            __##__name##_ep0size = (__ep0_size),                                \
-            __##__name##_config_num = 1,                                        \
-        };                                                                      \
-        struct {                                                                \
-            uint8_t bLength;                                                    \
-            uint8_t bDescriptorType;                                            \
-            usb_unicode_t str[1];                                               \
-        } PACKED const __##__name##_str_lanid = {                               \
-            .bLength            = 4,                                            \
-            .bDescriptorType    = USB_DT_STRING,                                \
-            .str                = (__##__name##_langid),                        \
-        };                                                                      \
-        struct {                                                                \
-            uint8_t bLength;                                                    \
-            uint8_t bDescriptorType;                                            \
-            usb_unicode_t str[dimof(__str_product) - 1];                        \
-        } PACKED const __##__name##_str_product = {                             \
-            .bLength            = sizeof(__##__name##_str_product),             \
-            .bDescriptorType    = USB_DT_STRING,                                \
-            .str                = __str_product,                                \
-        };                                                                      \
-        struct {                                                                \
-            uint8_t bLength;                                                    \
-            uint8_t bDescriptorType;                                            \
-            usb_unicode_t str[dimof(__str_vendor) - 1];                         \
-        } PACKED const __##__name##_str_vendor = {                              \
-            .bLength            = sizeof(__##__name##_str_vendor),              \
-            .bDescriptorType    = USB_DT_STRING,                                \
-            .str                = __str_vendor,                                 \
-        };                                                                      \
-        struct {                                                                \
-            uint8_t bLength;                                                    \
-            uint8_t bDescriptorType;                                            \
-            usb_unicode_t str[dimof(__str_serial) - 1];                         \
-        } PACKED const __##__name##_str_serial = {                              \
-            .bLength            = sizeof(__##__name##_str_serial),              \
-            .bDescriptorType    = USB_DT_STRING,                                \
-            .str                = __str_serial,                                 \
-        };                                                                      \
-        const uint8_t __##__name##_device_desc[USB_DT_DEVICE_SIZE] = {          \
-            USB_DESC_DEV_IAD((__##__name##_version), (__##__name##_ep0size), (__##__name##_vid), (__##__name##_pid), (__##__name##_bcd_version), 1, 2, 3, (__##__name##_config_num))\
-        };                                                                      \
-        const uint8_t __##__name##_config_desc[USB_DT_CONFIG_SIZE + (__func_desc_size)] = {\
-            USB_DESC_CFG(USB_DT_CONFIG_SIZE + (__func_desc_size), (__func_ifs_num),\
-                        1, 0, USB_CONFIG_ATT_ONE | (__attribute), (__max_power_ma) >> 1)
+        usbd_basic_desc(__name, __func_ifs_num, __ep0_size)                     \
+        usbd_str_langid_desc(__name)                                            \
+        usbd_str_product_desc(__name, __str_product)                            \
+        usbd_str_vendor_desc(__name, __str_vendor)                              \
+        usbd_str_serial_desc(__name, __str_serial)                              \
+        usbd_device_iad_desc(__name)                                            \
+        usbd_config_desc(__name, (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
 
 #define __usbd_func_desc(__name)                                                \
         };
 
 #define __usbd_func_str_desc(__name, __func_id, __str_func)                     \
-        struct {                                                                \
-            uint8_t bLength;                                                    \
-            uint8_t bDescriptorType;                                            \
-            usb_unicode_t str[dimof(__str_func) - 1];                           \
-        } PACKED const __##__name##_str_func##__func_id = {                     \
-            .bLength            = sizeof(__##__name##_str_func##__func_id),     \
-            .bDescriptorType    = USB_DT_STRING,                                \
-            .str                = __str_func,                                   \
-        };
+        __usbd_str_desc(__name, func##__func_id, __str_func)
 
 #define __usbd_qualifier_desc(__name)                                           \
         const uint8_t __##__name##_qualifier_desc[USB_DT_DEVICE_QUALIFIER_SIZE] = {\
@@ -244,7 +273,7 @@ extern "C" {
         const vk_usbd_desc_t __##__name##_std_descs[] = {                       \
             VSF_USBD_DESC_DEVICE(__##__name##_device_desc, sizeof(__##__name##_device_desc)),\
             VSF_USBD_DESC_CONFIG(0, __##__name##_config_desc, sizeof(__##__name##_config_desc)),\
-            VSF_USBD_DESC_STRING(0, 0, &__##__name##_str_lanid, sizeof(__##__name##_str_lanid)),\
+            VSF_USBD_DESC_STRING(0, 0, &__##__name##_str_langid, sizeof(__##__name##_str_langid)),\
             VSF_USBD_DESC_STRING(__##__name##_langid, 1, &__##__name##_str_vendor, sizeof(__##__name##_str_vendor)),\
             VSF_USBD_DESC_STRING(__##__name##_langid, 2, &__##__name##_str_product, sizeof(__##__name##_str_product)),\
             VSF_USBD_DESC_STRING(__##__name##_langid, 3, &__##__name##_str_serial, sizeof(__##__name##_str_serial)),
@@ -286,6 +315,7 @@ extern "C" {
 // prototype:
 //  describe_usbd(__name, __vid, __pid, __speed, __version = 0x0200, __lang_id = 0x0409, __bcd_ver = 0x0100)
 #define describe_usbd(__name, __vid, __pid, __speed, ...)                       \
+        extern vk_usbd_dev_t __name;                                            \
         __PLOOC_EVAL(__describe_usbd, __name, __vid, __pid, __speed, ##__VA_ARGS__)(__name, __vid, __pid, __speed, ##__VA_ARGS__)
 #define usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
         __usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
@@ -313,15 +343,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef union vk_usbd_ep_cfg_t {
-    struct {
-        uint8_t notify;
-        uint8_t out;
-        uint8_t in;
-    };
-    uint32_t ep_cfg;
-} vk_usbd_ep_cfg_t;
-
 dcl_simple_class(vk_usbd_dev_t)
 dcl_simple_class(vk_usbd_cfg_t)
 dcl_simple_class(vk_usbd_ifs_t)
@@ -336,7 +357,7 @@ typedef enum vk_usbd_evt_t {
 typedef struct vk_usbd_desc_t {
     uint8_t type;
     uint8_t index;
-    uint16_t lanid;
+    uint16_t langid;
     uint16_t size;
     uint8_t *buffer;
 } vk_usbd_desc_t;
@@ -345,7 +366,7 @@ typedef struct vk_usbd_desc_t {
 def_simple_class(vk_usbd_class_op_t) {
     protected_member(
         vk_usbd_desc_t * (*get_desc)(vk_usbd_dev_t *dev, uint_fast8_t type,
-                uint_fast8_t index, uint_fast16_t lanid);
+                uint_fast8_t index, uint_fast16_t langid);
 
         vsf_err_t (*request_prepare)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
         vsf_err_t (*request_process)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
@@ -354,7 +375,6 @@ def_simple_class(vk_usbd_class_op_t) {
         vsf_err_t (*fini)(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
     )
 };
-typedef struct vk_usbd_class_op_t vk_usbd_class_op_t;
 #endif
 
 def_simple_class(vk_usbd_trans_t) {
@@ -462,7 +482,7 @@ def_simple_class(vk_usbd_dev_t) {
 };
 
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 dcl_simple_class(vk_usbd_ep_stream_t)
 def_simple_class(vk_usbd_ep_stream_t) {
 
@@ -483,7 +503,7 @@ def_simple_class(vk_usbd_ep_stream_t) {
     )
 };
 
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#elif VSF_USE_STREAM == ENABLED
 
 declare_class(vk_usbd_ep_stream_t)
 
@@ -526,7 +546,7 @@ extern void vk_usbd_wakeup(vk_usbd_dev_t *dev);
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
 extern vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
         uint_fast8_t desc_num, uint_fast8_t type,
-        uint_fast8_t index, uint_fast16_t lanid);
+        uint_fast8_t index, uint_fast16_t langid);
 
 extern vk_usbd_cfg_t * vk_usbd_get_cur_cfg(vk_usbd_dev_t *dev);
 extern vk_usbd_ifs_t * vk_usbd_get_ifs(vk_usbd_dev_t *dev, uint_fast8_t ifs_no);
@@ -541,16 +561,16 @@ extern vsf_err_t vk_usbd_ep_send(vk_usbd_dev_t *dev, vk_usbd_trans_t *trans);
 extern vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *stream, uint_fast32_t size);
 extern vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *stream, uint_fast32_t size);
 
-#       if VSF_USE_SERVICE_STREAM == ENABLED
+#       if VSF_USE_STREAM == ENABLED
 
-extern 
-void vk_usbd_ep_stream_init(   vk_usbd_ep_stream_t *obj, 
+extern
+void vk_usbd_ep_stream_init(   vk_usbd_ep_stream_t *obj,
                                 vk_usbd_ep_stream_cfg_t *cfg);
 
-extern 
-void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj, 
+extern
+void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
                                     vk_usbd_dev_t *dev);
-#       endif   // VSF_USE_SERVICE_STREAM
+#       endif   // VSF_USE_STREAM
 #   endif       // VSF_USBD_CFG_STREAM_EN
 
 #endif          // __VSF_USBD_CLASS_IMPLEMENT || __VSF_USBD_CLASS_INHERIT__

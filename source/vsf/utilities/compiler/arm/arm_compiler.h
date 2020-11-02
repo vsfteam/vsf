@@ -389,10 +389,6 @@ __attribute__((always_inline, __noreturn__)) static inline void __cmsis_start(vo
 }
 #endif
 
-/*============================ INCLUDES ======================================*/
-//! \brief for interrupt 
-#include "./signal.h"
-
 #endif  /* end of __USE_ARM_COMPILER_H_PART_2__ */
 
 

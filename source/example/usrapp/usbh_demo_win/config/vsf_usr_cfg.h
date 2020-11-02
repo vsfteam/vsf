@@ -145,7 +145,7 @@
 
 #define VSF_USE_USB_HOST                                ENABLED
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
-#define VSF_USE_USB_HOST_HCD_WINUSB                     ENABLED
+#define VSF_USBH_USE_HCD_WINUSB                         ENABLED
 #   define VSF_WINUSB_HCD_CFG_REMOVE_ON_ERROR           ENABLED
 #   define VSF_WINUSB_HCD_CFG_DEV_NUM                   7
 #   define VSF_WINUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
@@ -162,29 +162,29 @@
 #   define VSF_WINUSB_HCD_DEV5_PID                      0x028E
 #   define VSF_WINUSB_HCD_DEV6_VID                      0x045E      // XB1
 #   define VSF_WINUSB_HCD_DEV6_PID                      0x02EA
-#define VSF_USE_USB_HOST_HUB                            DISABLED
-#define VSF_USE_USB_HOST_ECM                            DISABLED
-#define VSF_USE_USB_HOST_BTHCI                          ENABLED
-#define VSF_USE_USB_HOST_HID                            ENABLED
-#define VSF_USE_USB_HOST_DS4                            ENABLED
-#define VSF_USE_USB_HOST_NSPRO                          ENABLED
-#define VSF_USE_USB_HOST_XB360                          ENABLED
-#define VSF_USE_USB_HOST_XB1                            ENABLED
+#define VSF_USBH_USE_HUB                                DISABLED
+#define VSF_USBH_USE_ECM                                DISABLED
+#define VSF_USBH_USE_BTHCI                              ENABLED
+#define VSF_USBH_USE_HID                                ENABLED
+#define VSF_USBH_USE_DS4                                ENABLED
+#define VSF_USBH_USE_NSPRO                              ENABLED
+#define VSF_USBH_USE_XB360                              ENABLED
+#define VSF_USBH_USE_XB1                                ENABLED
 
 #define VSF_USE_INPUT                                   ENABLED
-#define VSF_USE_INPUT_HID                               ENABLED
-#define VSF_USE_INPUT_DS4                               ENABLED
-#define VSF_USE_INPUT_NSPRO                             ENABLED
-#define VSF_USE_INPUT_XB360                             ENABLED
-#define VSF_USE_INPUT_XB1                               ENABLED
+#define VSF_INPUT_USE_HID                               ENABLED
+#define VSF_INPUT_USE_DS4                               ENABLED
+#define VSF_INPUT_USE_NSPRO                             ENABLED
+#define VSF_INPUT_USE_XB360                             ENABLED
+#define VSF_INPUT_USE_XB1                               ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 
 #define VSF_USE_UI                                      ENABLED
-#   define VSF_USE_UI_LVGL                              ENABLED
-#   define VSF_USE_DISP_SDL2                            ENABLED
+#   define VSF_USE_LVGL                                 ENABLED
+#   define VSF_DISP_USE_SDL2                            ENABLED
 #       define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN   ENABLED
 
 #define VSF_USE_BTSTACK                                 ENABLED
@@ -204,10 +204,10 @@
 //#define GENERAL_PBUF_POOL_BLOCK_COUNT                   16
 #define GENERAL_PBUF_POLL_PRIV_USER_COUNT               2
 
-#define VSF_USE_SERVICE_STREAM                          DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
+#define VSF_USE_STREAM                                  DISABLED
+#define VSF_USE_SIMPLE_STREAM                           ENABLED
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 
 /* \note uncomment this part to add dedicated pbuf pool
 enum {
@@ -274,7 +274,7 @@ enum {
 #define WEAK_VSF_INPUT_ON_EVT(__TYPE, __EVT)                                    \
         vsf_input_on_evt((__TYPE), (__EVT))
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
         extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 #   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \

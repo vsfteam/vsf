@@ -444,6 +444,12 @@
 #       define LCR_DLS_7                                (2UL << 0)
 #       define LCR_DLS_8                                (3UL << 0)
 #   define UART_MCR                                     0x010
+#       define MCR_SIRE                                 (1UL << 6)
+#       define MCR_AFCE                                 (1UL << 5)
+#       define MCR_LOOP                                 (1UL << 4)
+#       define MCR_RTS                                  (1UL << 1)
+#       define MCR_DTR                                  (1UL << 0)
+
 #   define UART_LSR                                     0x014
 #   define UART_MSR                                     0x018
 #   define UART_SCH                                     0x01c
@@ -569,6 +575,7 @@
 #       define TCON0_CTRL_IF                        (3UL << 24)
 #       define TCON0_CTRL_IF_HV                     (0UL << 24)
 #       define TCON0_CTRL_IF_8080                   (1UL << 24)
+#       define TCON0_CTRL_RBG_GBR                   (1UL << 23)
 #       define __TCON0_CTRL_STA_DLY(__DLY)          ((__DLY) << 4)
 #       define TCON0_CTRL_STA_DLY(...)              __TCON0_CTRL_STA_DLY((0x1FUL, ##__VA_ARGS__))
 #   define TCON0_CLK_CTRL                           0x044
@@ -964,176 +971,53 @@
 #       define MUSB_ISCR_DPDM_CHANGE_DETECT_EN      (1UL << 0)
 
 
-// reserved
-#ifndef __RESERVED_N
-#   define __RESERVED_N(__BIT, __N, __NAME)         uint##__BIT##_t __unused_##__NAME[__N];
-#endif
-#ifndef _RESERVED_N
-#   define _RESERVED_N(__BIT, __N, __NAME)          __RESERVED_N(__BIT, __N, __NAME)
-#endif
-#ifndef RESERVED_N
-#   define RESERVED_N(__BIT, __N, __NAME)           _RESERVED_N(__BIT, __N, __NAME)
-#endif
-#ifndef RESERVED_U32N
-#   define RESERVED_U32N(__N)                       RESERVED_N(32, __N, __LINE__)
-#endif
-#ifndef RESERVED_U16N
-#   define RESERVED_U16N(__N)                       RESERVED_N(16, __N, __LINE__)
-#endif
-#ifndef RESERVED_U8N
-#   define RESERVED_U8N(__N)                        RESERVED_N(8, __N, __LINE__)
-#endif
-
-#ifndef __REG_TYPE__
-#define __REG_TYPE__
-
-typedef volatile uint8_t            reg8_t;
-typedef volatile uint16_t           reg16_t;
-typedef volatile uint32_t           reg32_t;
-
-#if defined(__IAR_SYSTEMS_ICC__)                                                \
-    ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
-
-#undef ____RESERVED
-#undef __RESERVED
-#define ____RESERVED(__BIT, __NAME)                                             \
-        uint##__BIT##_t __unused_##__NAME : __BIT;
-#define __RESERVED(__BIT, __NAME)                                               \
-            ____RESERVED(__BIT, __NAME)
-
-#define __RESERVED_B(__BYTE_CNT, __LINE)                                        \
-                                    uint32_t __unused_##__LINE[__BYTE_CNT >> 2]
-#define RESERVED_B(__BYTE_CNT)      __RESERVED_B(__BYTE_CNT, __LINE__)
-
-#   ifndef RESERVED_U8           
-#       define RESERVED_U8          __RESERVED( 8, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_U16            
-#       define RESERVED_U16         __RESERVED( 16, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_U32             
-#       define RESERVED_U32         __RESERVED( 32, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_16B             
-#       define RESERVED_16B         RESERVED_B(16);
-#   endif
-
-#   ifndef RESERVED_64B             
-#       define RESERVED_64B         RESERVED_B(64);
-#   endif
-
-#   ifndef RESERVED_256B             
-#       define RESERVED_256B        RESERVED_B(256);
-#   endif
-
-#   ifndef RESERVED_1K             
-#       define RESERVED_1K          RESERVED_B(1024);
-#   endif
-
-#   ifndef RESERVED_4K             
-#       define RESERVED_4K          RESERVED_B(4096);
-#   endif
-
-#   ifndef RESERVED_16K             
-#       define RESERVED_16K         RESERVED_B(16*1024);
-#   endif
-
-#   ifndef RESERVED_64K             
-#       define RESERVED_64K         RESERVED_B(64*1024);
-#   endif
-
-#   ifndef RESERVED_256K             
-#       define RESERVED_256K        RESERVED_B(256*1024);
-#   endif
-
-
-#   ifndef RESERVED_1M             
-#       define RESERVED_1M          RESERVED_B(1024*1024);
-#   endif
-
-#else
-#   ifndef RESERVED_U8           
-#       define RESERVED_U8          uint8_t  : 8;
-#   endif
-
-#   ifndef RESERVED_U16            
-#       define RESERVED_U16         uint16_t : 16;
-#   endif
-
-#   ifndef RESERVED_U32             
-#       define RESERVED_U32         uint32_t : 32;
-#   endif
-
-#   ifndef RESERVED_16B             
-#       define RESERVED_16B     RESERVED_U32                                    \
-                                RESERVED_U32                                    \
-                                RESERVED_U32                                    \
-                                RESERVED_U32
-#   endif
-
-#   ifndef RESERVED_64B             
-#       define RESERVED_64B     RESERVED_16B                                    \
-                                RESERVED_16B                                    \
-                                RESERVED_16B                                    \
-                                RESERVED_16B
-#   endif
-
-#   ifndef RESERVED_256B             
-#       define RESERVED_256B    RESERVED_64B                                    \
-                                RESERVED_64B                                    \
-                                RESERVED_64B                                    \
-                                RESERVED_64B
-#   endif
-
-#   ifndef RESERVED_1K             
-#       define RESERVED_1K      RESERVED_256B                                   \
-                                RESERVED_256B                                   \
-                                RESERVED_256B                                   \
-                                RESERVED_256B
-#   endif
-
-#   ifndef RESERVED_4K             
-#       define RESERVED_4K      RESERVED_1K                                     \
-                                RESERVED_1K                                     \
-                                RESERVED_1K                                     \
-                                RESERVED_1K
-#   endif
-
-#   ifndef RESERVED_16K             
-#       define RESERVED_16K     RESERVED_4K                                     \
-                                RESERVED_4K                                     \
-                                RESERVED_4K                                     \
-                                RESERVED_4K
-#   endif
-
-#   ifndef RESERVED_64K             
-#       define RESERVED_64K     RESERVED_16K                                    \
-                                RESERVED_16K                                    \
-                                RESERVED_16K                                    \
-                                RESERVED_16K
-#   endif
-
-#   ifndef RESERVED_256K             
-#       define RESERVED_256K    RESERVED_64K                                    \
-                                RESERVED_64K                                    \
-                                RESERVED_64K                                    \
-                                RESERVED_64K
-#   endif
-
-
-#   ifndef RESERVED_1M             
-#       define RESERVED_1M      RESERVED_256K                                   \
-                                RESERVED_256K                                   \
-                                RESERVED_256K                                   \
-                                RESERVED_256K
-#   endif
-
-#endif
-
-#endif
+#define TP_BASE                                     ((tp_reg_t *)0x01c24800)
+#   define TP_CTRL0                                 0x00
+        #define ADC_FIRST_DLY(__DLY)                ((__DLY) << 24)         /* 8 bits */
+        #define ADC_FIRST_DLY_MODE(__DLY_MODE)      ((__DLY_MODE) << 23)
+        #define ADC_CLK_SEL(__CLK_SEL)              ((__CLK_SEL) << 22)
+        #define ADC_CLK_DIV(__CLK_DIV)              ((__CLK_DIV) << 20)     /* 3 bits */
+        #define FS_DIV(x)                           ((x) << 16)             /* 4 bits */
+        #define T_ACQ(x)                            ((x) << 0)              /* 16 bits */
+#   define TP_CTRL1                                 0x04
+        #define STYLUS_UP_DEBOUN(x)                 ((x) << 12)             /* 8 bits */
+        #define STYLUS_UP_DEBOUN_EN(x)              ((x) << 9)
+        #define TOUCH_PAN_CALI_EN(x)                ((x) << 6)
+        #define TP_DUAL_EN(x)                       ((x) << 5)
+        #define TP_MODE_EN(x)                       ((x) << 4)
+        #define TP_ADC_SELECT(x)                    ((x) << 3)
+        #define ADC_CHAN_SELECT(x)                  ((x) << 0)              /* 3 bits */
+#   define TP_CTRL2                                 0x08
+        #define TP_SENSITIVE_ADJUST(x)              ((x) << 28)             /* 4 bits */
+        #define TP_MODE_SELECT(x)                   ((x) << 26)             /* 2 bits */
+        #define PRE_MEA_EN(x)                       ((x) << 24)
+        #define PRE_MEA_THRE_CNT(x)                 ((x) << 0)              /* 24 bits */
+#   define TP_CTRL3                                 0x0c
+        #define FILTER_EN(x)                        ((x) << 2)
+        #define FILTER_TYPE(x)                      ((x) << 0)              /* 2 bits */
+#   define TP_INT_FIFOC                             0x10
+        #define TEMP_IRQ_EN(x)                      ((x) << 18)
+        #define OVERRUN_IRQ_EN(x)                   ((x) << 17)
+        #define DATA_IRQ_EN(x)                      ((x) << 16)
+        #define TP_DATA_XY_CHANGE(x)                ((x) << 13)
+        #define FIFO_TRIG(x)                        ((x) << 8)              /* 5 bits */
+        #define DATA_DRQ_EN(x)                      ((x) << 7)
+        #define FIFO_FLUSH(x)                       ((x) << 4)
+        #define TP_UP_IRQ_EN(x)                     ((x) << 1)
+        #define TP_DOWN_IRQ_EN(x)                   ((x) << 0)
+#   define TP_INT_FIFOS                             0x14
+        #define TEMP_DATA_PENDING                   (1 << 18)
+        #define FIFO_OVERRUN_PENDING                (1 << 17)
+        #define FIFO_DATA_PENDING                   (1 << 16)
+        #define TP_IDLE_FLG                         (1 << 2)
+        #define TP_UP_PENDING                       (1 << 1)
+        #define TP_DOWN_PENDING                     (1 << 0)
+#   define TP_TPR                                   0x18
+        #define TEMP_ENABLE(x)                      ((x) << 16)
+        #define TEMP_PERIOD(x)                      ((x) << 0)              /* t = x * 256 * 16 / clkin */
+#   define TP_CDAT                                  0x1c
+#   define TP_TEMP_DATA                             0x20
+#   define TP_DATA                                  0x24
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -1145,6 +1029,108 @@ typedef volatile uint32_t           reg32_t;
 #define write_reg32(__base, __reg, __value)         (*(volatile uint32_t *)((uint32_t)(__base) + (__reg)) = (uint32_t)(__value))
 
 /*============================ TYPES =========================================*/
+
+// copied from utilities/compiler/__common/__type.h
+#ifndef __REG_TYPE__
+#define __REG_TYPE__
+
+typedef volatile uint8_t            reg8_t;
+typedef volatile uint16_t           reg16_t;
+typedef volatile uint32_t           reg32_t;
+
+#if defined(__IAR_SYSTEMS_ICC__)                                                \
+    ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
+#   define __REG_CONNECT(__A, __B)  __A##__B
+#   define __REG_RSVD_NAME(__NAME)  __REG_CONNECT(__unused_, __NAME)
+#else
+#   define __REG_RSVD_NAME(__NAME)
+#endif
+
+#define ____REG_RSVD(__NAME, __BIT)                                             \
+        reg##__BIT##_t              __NAME : __BIT;
+#define ____REG_RSVD_N(__NAME, __BIT, __N)                                      \
+        reg##__BIT##_t              __NAME[__N];
+#define __REG_RSVD(__BIT)           ____REG_RSVD(REG_RSVD_NAME, __BIT)
+#define __REG_RSVD_N(__BIT, __N)    ____REG_RSVD_N(REG_RSVD_NAME, __BIT, (__N))
+
+#define REG_RSVD_NAME               __REG_RSVD_NAME(__LINE__)
+#define REG_RSVD(__BIT)             __REG_RSVD(__BIT)
+#define REG_RSVD_N(__BIT, __N)      __REG_RSVD_N(__BIT, (__N))
+
+#define REG_RSVD_U8                 REG_RSVD(8)
+#define REG_RSVD_U16                REG_RSVD(16)
+#define REG_RSVD_U32                REG_RSVD(32)
+
+#define REG_RSVD_U8N(__N)           REG_RSVD_N(8, (__N))
+#define REG_RSVD_U16N(__N)          REG_RSVD_N(16, (__N))
+#define REG_RSVD_U32N(__N)          REG_RSVD_N(32, (__N))
+
+#define REG8_RSVD_N(__N)            REG_RSVD_U8N(__N)
+#define REG8_RSVD_B(__BYTE_CNT)     REG8_RSVD_N(__BYTE_CNT)
+#define REG8_RSVD_8B                REG8_RSVD_B(8)
+#define REG8_RSVD_16B               REG8_RSVD_B(16)
+#define REG8_RSVD_32B               REG8_RSVD_B(32)
+#define REG8_RSVD_64B               REG8_RSVD_B(64)
+#define REG8_RSVD_128B              REG8_RSVD_B(128)
+#define REG8_RSVD_256B              REG8_RSVD_B(256)
+#define REG8_RSVD_512B              REG8_RSVD_B(512)
+#define REG8_RSVD_1K                REG8_RSVD_B(1024)
+#define REG8_RSVD_2K                REG8_RSVD_B(2048)
+#define REG8_RSVD_4K                REG8_RSVD_B(4096)
+#define REG8_RSVD_8K                REG8_RSVD_B(8192)
+#define REG8_RSVD_16K               REG8_RSVD_B(16 * 1024)
+#define REG8_RSVD_32K               REG8_RSVD_B(32 * 1024)
+#define REG8_RSVD_64K               REG8_RSVD_B(64 * 1024)
+#define REG8_RSVD_128K              REG8_RSVD_B(128 * 1024)
+#define REG8_RSVD_256K              REG8_RSVD_B(256 * 1024)
+#define REG8_RSVD_512K              REG8_RSVD_B(512 * 1024)
+#define REG8_RSVD_1M                REG8_RSVD_B(1024 * 1024)
+
+#define REG16_RSVD_N(__N)           REG_RSVD_U16N(__N)
+// __BYTE_CNT MUST be mutiple of 2
+#define REG16_RSVD_B(__BYTE_CNT)    REG16_RSVD_N(__BYTE_CNT >> 1)
+#define REG16_RSVD_8B               REG16_RSVD_B(8)
+#define REG16_RSVD_16B              REG16_RSVD_B(16)
+#define REG16_RSVD_32B              REG16_RSVD_B(32)
+#define REG16_RSVD_64B              REG16_RSVD_B(64)
+#define REG16_RSVD_128B             REG16_RSVD_B(128)
+#define REG16_RSVD_256B             REG16_RSVD_B(256)
+#define REG16_RSVD_512B             REG16_RSVD_B(512)
+#define REG16_RSVD_1K               REG16_RSVD_B(1024)
+#define REG16_RSVD_2K               REG16_RSVD_B(2048)
+#define REG16_RSVD_4K               REG16_RSVD_B(4096)
+#define REG16_RSVD_8K               REG16_RSVD_B(8192)
+#define REG16_RSVD_16K              REG16_RSVD_B(16 * 1024)
+#define REG16_RSVD_32K              REG16_RSVD_B(32 * 1024)
+#define REG16_RSVD_64K              REG16_RSVD_B(64 * 1024)
+#define REG16_RSVD_128K             REG16_RSVD_B(128 * 1024)
+#define REG16_RSVD_256K             REG16_RSVD_B(256 * 1024)
+#define REG16_RSVD_512K             REG16_RSVD_B(512 * 1024)
+#define REG16_RSVD_1M               REG16_RSVD_B(1024 * 1024)
+
+#define REG32_RSVD_N(__N)           REG_RSVD_U32N(__N)
+// __BYTE_CNT MUST be mutiple of 4
+#define REG32_RSVD_B(__BYTE_CNT)    REG_RSVD_U32N(__BYTE_CNT >> 2)
+#define REG32_RSVD_8B               REG32_RSVD_B(8)
+#define REG32_RSVD_16B              REG32_RSVD_B(16)
+#define REG32_RSVD_32B              REG32_RSVD_B(32)
+#define REG32_RSVD_64B              REG32_RSVD_B(64)
+#define REG32_RSVD_128B             REG32_RSVD_B(128)
+#define REG32_RSVD_256B             REG32_RSVD_B(256)
+#define REG32_RSVD_512B             REG32_RSVD_B(512)
+#define REG32_RSVD_1K               REG32_RSVD_B(1024)
+#define REG32_RSVD_2K               REG32_RSVD_B(2048)
+#define REG32_RSVD_4K               REG32_RSVD_B(4096)
+#define REG32_RSVD_8K               REG32_RSVD_B(8192)
+#define REG32_RSVD_16K              REG32_RSVD_B(16 * 1024)
+#define REG32_RSVD_32K              REG32_RSVD_B(32 * 1024)
+#define REG32_RSVD_64K              REG32_RSVD_B(64 * 1024)
+#define REG32_RSVD_128K             REG32_RSVD_B(128 * 1024)
+#define REG32_RSVD_256K             REG32_RSVD_B(256 * 1024)
+#define REG32_RSVD_512K             REG32_RSVD_B(512 * 1024)
+#define REG32_RSVD_1M               REG32_RSVD_B(1024 * 1024)
+
+#endif      // __REG_TYPE__
 
 typedef enum IRQn
 {
@@ -1196,77 +1182,77 @@ typedef enum IRQn
 
 
 typedef struct syscon_reg_t {
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t USB_CTRL;
 } syscon_reg_t;
 
 typedef struct ccu_reg_t {
     reg32_t PLL_CPU_CTRL;                           // 0x000
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t PLL_AUDIO_CTRL;                         // 0x008
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t PLL_VIDEO_CTRL;                         // 0x010
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t PLL_VE_CTRL;                            // 0x018
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t PLL_DDR_CTRL;                           // 0x020
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t PLL_PERIPH_CTRL;                        // 0x028
-    RESERVED_U32N(9)
+    REG_RSVD_U32N(9)
     reg32_t CPU_CLK_SRC;                            // 0x050
     reg32_t AHB_APB_HCLKC_CFG;                      // 0x054
-    RESERVED_U32N(2)
+    REG_RSVD_U32N(2)
     reg32_t BUS_CLK_GATING0;                        // 0x060
     reg32_t BUS_CLK_GATING1;                        // 0x064
     reg32_t BUS_CLK_GATING2;                        // 0x068
-    RESERVED_U32N(7)
+    REG_RSVD_U32N(7)
     reg32_t SDMMC0_CLK;                             // 0x088
     reg32_t SDMMC1_CLK;                             // 0x08c
-    RESERVED_U32N(8)
+    REG_RSVD_U32N(8)
     reg32_t DAUDIO_CLK;                             // 0x0b0
     reg32_t OWA_CLK;                                // 0x0b4
     reg32_t CIR_CLK;                                // 0x0b8
-    RESERVED_U32N(4)
+    REG_RSVD_U32N(4)
     reg32_t USBPHY_CLK;                             // 0x0cc
-    RESERVED_U32N(12)
+    REG_RSVD_U32N(12)
     reg32_t DRAM_GATING;                            // 0x100
     reg32_t BE_CLK;                                 // 0x104
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t FE_CLK;                                 // 0x10c
-    RESERVED_U32N(2)
+    REG_RSVD_U32N(2)
     reg32_t TCON_CLK;                               // 0x118
     reg32_t DI_CLK;                                 // 0x11c
     reg32_t TVE_CLK;                                // 0x120
     reg32_t TVD_CLK;                                // 0x124
-    RESERVED_U32N(3)
+    REG_RSVD_U32N(3)
     reg32_t CSI_CLK;                                // 0x134
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t VE_CLK;                                 // 0x13c
     reg32_t AUDIO_CODEC_CLK;                        // 0x140
     reg32_t AVS_CLK;                                // 0x144
-    RESERVED_U32N(46)
+    REG_RSVD_U32N(46)
     reg32_t PLL_STABLE_TIME0;                       // 0x200
     reg32_t PLL_STABLE_TIME1;                       // 0x204
-    RESERVED_U32N(6)
+    REG_RSVD_U32N(6)
     reg32_t PLL_CPU_BIAS;                           // 0x220
     reg32_t PLL_AUDIO_BIAS;                         // 0x224
     reg32_t PLL_VIDEO_BIAS;                         // 0x228
     reg32_t PLL_VE_BIAS;                            // 0x22c
     reg32_t PLL_DDR0_BIAS;                          // 0x230
     reg32_t PLL_PERIPH_BIAS;                        // 0x234
-    RESERVED_U32N(6)
+    REG_RSVD_U32N(6)
     reg32_t PLL_CPU_TUN;                            // 0x250
-    RESERVED_U32N(3)
+    REG_RSVD_U32N(3)
     reg32_t PLL_DDR_TUN;                            // 0x260
-    RESERVED_U32N(8)
+    REG_RSVD_U32N(8)
     reg32_t PLL_AUDIO_PAT_CTRL;                     // 0x284
     reg32_t PLL_VIDEO_PAT_CTRL;                     // 0x288
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t PLL_DDR0_PAT_CTRL;                      // 0x290
-    RESERVED_U32N(11)
+    REG_RSVD_U32N(11)
     reg32_t BUS_SOFT_RST0;                          // 0x2c0
     reg32_t BUS_SOFT_RST1;                          // 0x2c4
-    RESERVED_U32N(2)
+    REG_RSVD_U32N(2)
     reg32_t BUS_SOFT_RST2;                          // 0x2d0
 } ccu_reg_t;
 
@@ -1277,7 +1263,7 @@ typedef struct dram_reg_t {
     reg32_t SCTLR;                                  // 0x00c
     reg32_t SREFR;                                  // 0x010
     reg32_t SEXTMR;                                 // 0x014
-    RESERVED_U32N(3)
+    REG_RSVD_U32N(3)
     reg32_t DDLYR;                                  // 0x024
     reg32_t DADRR;                                  // 0x028
     reg32_t DVALR;                                  // 0x02c
@@ -1291,7 +1277,7 @@ typedef struct dram_reg_t {
     reg32_t SDLY0;                                  // 0x04C
     reg32_t SDLY1;                                  // 0x050
     reg32_t SDLY2;                                  // 0x054
-    RESERVED_U32N(42)
+    REG_RSVD_U32N(42)
     reg32_t MCR0;                                   // 0x100
     reg32_t MCR1;                                   // 0x104
     reg32_t MCR2;                                   // 0x108
@@ -1304,7 +1290,7 @@ typedef struct dram_reg_t {
     reg32_t MCR9;                                   // 0x124
     reg32_t MCR10;                                  // 0x128
     reg32_t MCR11;                                  // 0x12c
-    RESERVED_U32N(4)
+    REG_RSVD_U32N(4)
     reg32_t BWCR;                                   // 0x140
 } dram_reg_t;
 
@@ -1328,7 +1314,7 @@ typedef struct pio_port_int_t {
     reg32_t INT_CTRL;
     reg32_t INT_STA;
     reg32_t INT_DEB;
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
 } pio_port_int_t;
 
 typedef struct pio_reg_t {
@@ -1343,9 +1329,9 @@ typedef struct pio_reg_t {
             pio_port_t PORTF;
         };
     };
-    RESERVED_U32N(74)
+    REG_RSVD_U32N(74)
     pio_port_int_t PORT_INT[3];
-    RESERVED_U32N(24)
+    REG_RSVD_U32N(24)
     reg32_t SDR_PAD_DRV;
     reg32_t SDR_PAD_PUL;
 } pio_reg_t;
@@ -1369,35 +1355,35 @@ typedef struct uart_reg_t {
     reg32_t LSR;                                    // 0x014
     reg32_t MSR;                                    // 0x018
     reg32_t SCH;                                    // 0x01c
-    RESERVED_U32N(23)
+    REG_RSVD_U32N(23)
     reg32_t USR;                                    // 0x07c
     reg32_t TFL;                                    // 0x080
     reg32_t RFL;                                    // 0x084
-    RESERVED_U32N(7)
+    REG_RSVD_U32N(7)
     reg32_t HALT;                                   // 0x0a4
 } uart_reg_t;
 
 typedef struct spi_reg_t {
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t GCR;                                    // 0x004
     reg32_t TCR;                                    // 0x008
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t IER;                                    // 0x010
     reg32_t ISR;                                    // 0x014
     reg32_t FCR;                                    // 0x018
     reg32_t FSR;                                    // 0x01c
     reg32_t WCR;                                    // 0x020
     reg32_t CCR;                                    // 0x024
-    RESERVED_U32N(2)
+    REG_RSVD_U32N(2)
     reg32_t MBC;                                    // 0x030
     reg32_t MTC;                                    // 0x034
     reg32_t BCC;                                    // 0x038
-    RESERVED_U32N(113)
+    REG_RSVD_U32N(113)
     union {
         reg32_t TXD_WORD;                           // 0x200
         reg8_t TXD_BYTE;                            // 0x200
     };
-    RESERVED_U32N(63)
+    REG_RSVD_U32N(63)
     union {
         reg32_t RXD_WORD;                           // 0x300
         reg8_t RXD_BYTE;                            // 0x300
@@ -1408,7 +1394,7 @@ typedef struct tcon_reg_t {
     reg32_t CTRL;                                   // 0x000
     reg32_t INT_REG0;                               // 0x004
     reg32_t INT_REG1;                               // 0x008
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t FRM_CTRL;                               // 0x010
     union {
         struct {
@@ -1430,7 +1416,7 @@ typedef struct tcon_reg_t {
         };
         reg32_t FRM_TBL[4];
     };
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     struct {
         reg32_t CTRL;                               // 0x040
         reg32_t CLK_CTRL;                           // 0x044
@@ -1439,12 +1425,12 @@ typedef struct tcon_reg_t {
         reg32_t BASIC_TIMING2;                      // 0x050: VERTICAL
         reg32_t BASIC_TIMING3;                      // 0x054: SYNC
         reg32_t HV_TIMING;                          // 0x058
-        RESERVED_U32N(1)
+        REG_RSVD_U32N(1)
         reg32_t CPU_IF;                             // 0x060
         reg32_t CPU_WR;                             // 0x064
         reg32_t CPU_RD;                             // 0x068
         reg32_t CPU_RD_NX;                          // 0x06c
-        RESERVED_U32N(6)
+        REG_RSVD_U32N(6)
         reg32_t IO_CTRL0;                           // 0x088: PLORITY
         reg32_t IO_CTRL1;                           // 0x08c: TRISTATE
     } TCON0;
@@ -1456,54 +1442,54 @@ typedef struct tcon_reg_t {
         reg32_t BASIC3;                             // 0x0a0
         reg32_t BASIC4;                             // 0x0a4
         reg32_t BASIC5;                             // 0x0a8
-        RESERVED_U32N(17)
+        REG_RSVD_U32N(17)
         reg32_t IO_CTRL0;                           // 0x0f0: PLORITY
         reg32_t IO_CTRL1;                           // 0x0f4: TRISATE
     } TCON1;
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t DEBUG_INFO;                             // 0x0fc
 } tcon_reg_t;
 
 typedef struct debe_reg_t {
-    RESERVED_U32N(512)
+    REG_RSVD_U32N(512)
     reg32_t MODE_CTRL;                              // 0x800
     reg32_t BACKCOLOR;                              // 0x804
     reg32_t DISP_SIZE;                              // 0x808
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t LAY_SIZE[4];                            // 0x810
     reg32_t LAY_CODNT[4];                           // 0x820
-    RESERVED_U32N(4)
+    REG_RSVD_U32N(4)
     reg32_t LAY_LINEWIDTH[4];                       // 0x840
     reg32_t LAY_FB_ADDR0[4];                        // 0x850
     reg32_t LAY_FB_ADDR1[4];                        // 0x860
     reg32_t REGBUFF_CTRL;                           // 0x870
-    RESERVED_U32N(3)
+    REG_RSVD_U32N(3)
     reg32_t CK_MAX;                                 // 0x880
     reg32_t CK_MIN;                                 // 0x884
     reg32_t CK_CFG;                                 // 0x888
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t LAY_ATT_CTRL0[4];                       // 0x890
     reg32_t LAY_ATT_CTRL1[4];                       // 0x8a0
-    RESERVED_U32N(10)
+    REG_RSVD_U32N(10)
     reg32_t HWC_CTRL;                               // 0x8d8
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t HWCFB_CTRL;                             // 0x8e0
-    RESERVED_U32N(3)
+    REG_RSVD_U32N(3)
     reg32_t WB_CTRL;                                // 0x8f0
     reg32_t WB_ADDR;                                // 0x8f4
     reg32_t WB_LW;                                  // 0x8f8
-    RESERVED_U32N(9)
+    REG_RSVD_U32N(9)
     // YUV
     reg32_t IYUV_CH_CTRL;                           // 0x920
-    RESERVED_U32N(3)
+    REG_RSVD_U32N(3)
     reg32_t CH0_YUV_FB_ADDR;                        // 0x930
     reg32_t CH1_YUV_FB_ADDR;                        // 0x934
     reg32_t CH2_YUV_FB_ADDR;                        // 0x938
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t CH0_YUV_BLW;                            // 0x940
     reg32_t CH1_YUV_BLW;                            // 0x944
     reg32_t CH2_YUV_BLW;                            // 0x948
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t COEF00;                                 // 0x950
     reg32_t COEF01;                                 // 0x954
     reg32_t COEF02;                                 // 0x958
@@ -1526,19 +1512,19 @@ typedef struct tve_reg_t {
     reg32_t NOTCH;                                  // 0x00c
     reg32_t CHROMA_FREQUENCY;                       // 0x010
     reg32_t PORCH;                                  // 0x014
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t LINE;                                   // 0x01c
     reg32_t LEVEL;                                  // 0x020
     reg32_t DAC2;                                   // 0x024
-    RESERVED_U32N(4)
+    REG_RSVD_U32N(4)
     reg32_t DETECT_STATUS;                          // 0x038
-    RESERVED_U32N(52)
+    REG_RSVD_U32N(52)
     reg32_t CBCR_LEVEL;                             // 0x10c
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t BURST_WIDTH;                            // 0x114
     reg32_t CBCR_GAIN;                              // 0x118
     reg32_t SYNC_VBI;                               // 0x11c
-    RESERVED_U32N(1)
+    REG_RSVD_U32N(1)
     reg32_t ACTIVE_LINE;                            // 0x124
     reg32_t CHROMA;                                 // 0x128
     reg32_t ENCODER;                                // 0x12c
@@ -1549,16 +1535,16 @@ typedef struct tve_reg_t {
 typedef struct timer_reg_t {
     reg32_t IRQ_EN;                                 // 0x000
     reg32_t IRQ_STA;                                // 0x004
-    RESERVED_U32N(2)
+    REG_RSVD_U32N(2)
 
     struct {                                        // 0x010
         reg32_t CTRL;
         reg32_t INTV_VALUE;
         reg32_t CUR_VALUE;
-        RESERVED_U32N(1)
+        REG_RSVD_U32N(1)
     } TMR[3];
 
-    RESERVED_U32N(16)
+    REG_RSVD_U32N(16)
 
     struct {
         reg32_t CNT_CTL;                            // 0x080
@@ -1567,12 +1553,12 @@ typedef struct timer_reg_t {
         reg32_t CNT_DIV;                            // 0x08c
     } AVS;
 
-    RESERVED_U32N(4)
+    REG_RSVD_U32N(4)
 
     struct {
         reg32_t IRQ_EN;                             // 0x0a0
         reg32_t IRQ_STA;                            // 0x0a4
-        RESERVED_U32N(2)
+        REG_RSVD_U32N(2)
         reg32_t CTRL;                               // 0x0b0
         reg32_t CFG;                                // 0x0b4
         reg32_t MODE;                               // 0x0b8
@@ -1593,7 +1579,7 @@ typedef struct musb_reg_t {
         reg32_t FIFO[6];
     };
     // unused FIFO registers
-    RESERVED_U32N(10)
+    REG_RSVD_U32N(10)
 
     struct {
         reg8_t Power;                               // 0x0040
@@ -1605,11 +1591,11 @@ typedef struct musb_reg_t {
         reg16_t IntrTxE;                            // 0x0048
         reg16_t IntrRxE;                            // 0x004a
         reg8_t IntrUSB;                             // 0x004c
-        RESERVED_U8N(3)
+        REG_RSVD_U8N(3)
         reg8_t IntrUSBE;                            // 0x0050
-        RESERVED_U8N(3)
+        REG_RSVD_U8N(3)
         reg16_t Frame;                              // 0x0054
-        RESERVED_U8N(34)
+        REG_RSVD_U8N(34)
         reg8_t EPInfo;                              // 0x0078
         reg8_t RAMInfo;                             // 0x0079
         reg8_t LinkInfo;                            // 0x007a
@@ -1617,7 +1603,7 @@ typedef struct musb_reg_t {
         reg8_t Testmode;                            // 0x007c
         reg8_t Vendor1;                             // 0x007d
         reg8_t Vendor2;                             // 0x007e
-        RESERVED_U8N(1)
+        REG_RSVD_U8N(1)
     } Common;
 
     struct {
@@ -1625,11 +1611,11 @@ typedef struct musb_reg_t {
             struct {
                 union {
                     struct {
-                        RESERVED_U16N(1)
+                        REG_RSVD_U16N(1)
                         reg16_t CSR0;               // 0x0082
-                        RESERVED_U16N(2)
+                        REG_RSVD_U16N(2)
                         reg16_t Count0;             // 0x0088
-                        RESERVED_U16N(3)
+                        REG_RSVD_U16N(3)
                     } EP0;
                     struct {
                         reg16_t TxMaxP;             // 0x0080
@@ -1639,21 +1625,21 @@ typedef struct musb_reg_t {
                         reg8_t RxCSRL;              // 0x0086
                         reg8_t RxCSRH;              // 0x0087
                         reg16_t RxCount;            // 0x0088
-                        RESERVED_U16N(3)
+                        REG_RSVD_U16N(3)
                     } EPN;
                 };
             } DC;
             struct {
                 union {
                     struct {
-                        RESERVED_U16N(1)
+                        REG_RSVD_U16N(1)
                         reg16_t CSR0;               // 0x0082
-                        RESERVED_U16N(2)
+                        REG_RSVD_U16N(2)
                         reg16_t Count0;             // 0x0088
-                        RESERVED_U16N(1)
+                        REG_RSVD_U16N(1)
                         reg8_t Type0;               // 0x008c
                         reg8_t NAKLimit0;           // 0x008d
-                        RESERVED_U16N(1)
+                        REG_RSVD_U16N(1)
                     } EP0;
                     struct {
                         reg16_t TxMaxP;             // 0x0080
@@ -1663,7 +1649,7 @@ typedef struct musb_reg_t {
                         reg8_t RxCSRL;              // 0x0086
                         reg8_t RxCSRH;              // 0x0087
                         reg16_t RxCount;            // 0x0088
-                        RESERVED_U16N(1)
+                        REG_RSVD_U16N(1)
                         reg8_t TxType;              // 0x008c
                         reg8_t TxInterval;          // 0x008d
                         reg8_t RxType;              // 0x008e
@@ -1674,22 +1660,22 @@ typedef struct musb_reg_t {
         };
 
         reg8_t TxFIFOsz;                            // 0x0090
-        RESERVED_U8N(1)
+        REG_RSVD_U8N(1)
         reg16_t TxFIFOadd;                          // 0x0092
         reg8_t RxFIFOsz;                            // 0x0094
-        RESERVED_U8N(1)
+        REG_RSVD_U8N(1)
         reg16_t RxFIFOadd;                          // 0x0096
         reg8_t TxFuncAddr;                          // 0x0098
-        RESERVED_U8N(1)
+        REG_RSVD_U8N(1)
         reg8_t TxHubAddr;                           // 0x009a
         reg8_t TxHubPort;                           // 0x009b
         reg8_t RxFuncAddr;                          // 0x009c
-        RESERVED_U8N(1)
+        REG_RSVD_U8N(1)
         reg8_t RxHubAddr;                           // 0x009e
         reg8_t RxHubPort;                           // 0x009f
     } Index;
 
-    RESERVED_U32N(216)
+    REG_RSVD_U32N(216)
     struct {
         reg32_t ISCR;                               // 0x0400
         reg32_t PHYCTL;                             // 0x0404
@@ -1697,6 +1683,19 @@ typedef struct musb_reg_t {
         reg32_t PHYTUNE;                            // 0x040c
     } Vendor;
 } musb_reg_t;
+
+typedef struct tp_reg_t {
+    reg32_t CTRL0;                                  // 0x00
+    reg32_t CTRL1;                                  // 0x04
+    reg32_t CTRL2;                                  // 0x08
+    reg32_t CTRL3;                                  // 0x0c
+    reg32_t INT_FIFOC;                              // 0x10
+    reg32_t INT_FIFOS;                              // 0x14
+    reg32_t TPR;                                    // 0x18
+    reg32_t CDAT;                                   // 0x1c
+    reg32_t TEMP_DATA;                              // 0x20
+    reg32_t DATA;                                   // 0x24
+} tp_reg_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

@@ -18,7 +18,7 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_KERNEL_TEST == ENABLED
+#if APP_USE_KERNEL_TEST == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -99,7 +99,7 @@ void usrapp_sem_test_start(void)
             .fn.evthandler  = __usrapp_sem_recv_evthandler,
             .priority       = vsf_prio_0 + i,
         };
-        vsf_teda_init_ex(&__usrapp_sem.eda_recv[i], (vsf_eda_cfg_t *)&cfg);
+        vsf_teda_start(&__usrapp_sem.eda_recv[i], (vsf_eda_cfg_t *)&cfg);
     }
 
     for (int i = 0; i < dimof(__usrapp_sem.eda_send); i++) {
@@ -107,11 +107,11 @@ void usrapp_sem_test_start(void)
             .fn.evthandler  = __usrapp_sem_send_evthandler,
             .priority       = vsf_prio_0 + i,
         };
-        vsf_teda_init_ex(&__usrapp_sem.eda_send[i], (vsf_eda_cfg_t *)&cfg);
+        vsf_teda_start(&__usrapp_sem.eda_send[i], (vsf_eda_cfg_t *)&cfg);
     }
 }
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int kernel_sem_test_main(int argc, char *argv[])
 {
     usrapp_sem_test_start();

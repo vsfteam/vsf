@@ -48,7 +48,11 @@ extern "C" {
 #define VSF_ARCH_SWI_NUM                1
 #define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 #define __VSF_ARCH_SYSTIMER_BITS        63
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_arch_wakeup()
+
 /*============================ TYPES =========================================*/
 
 typedef uint64_t vsf_systimer_cnt_t;

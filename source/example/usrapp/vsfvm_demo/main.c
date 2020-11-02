@@ -235,7 +235,7 @@ vsfvm_bytecode_t vsfvm_get_bytecode_imp(const void *token, uint_fast32_t *pc)
     if (*pc < usrapp.vm.bytecode_num) {
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
         vsfvm_bytecode_t token = usrapp.vm.bytecode[(*pc)++];
-        vsf_trace(VSF_TRACE_DEBUG, "%d:", *pc - 1);
+        vsf_trace_debug("%d:", *pc - 1);
         vsfvm_tkdump(token);
         return token;
 #else

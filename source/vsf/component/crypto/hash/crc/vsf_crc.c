@@ -19,7 +19,7 @@
 
 #include "./vsf_crc.h"
 
-#if VSF_USE_CRC == ENABLED
+#if VSF_HASH_USE_CRC == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -22,7 +22,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
 
 #include "component/fs/vsf_fs.h"
 // DO NOT REMOVE vsf_memfs.h BELOW, unless you really know what you are doing.
@@ -43,7 +43,7 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_FS != ENABLED || VSF_USE_MEMFS != ENABLED
+#if VSF_USE_FS != ENABLED || VSF_FS_USE_MEMFS != ENABLED
 #   error FAKEFAT32 need memfs
 #endif
 
@@ -103,5 +103,5 @@ extern const vk_mal_drv_t vk_fakefat32_mal_drv;
 }
 #endif
 
-#endif      // VSF_USE_MAL && VSF_USE_FAKEFAT32_MAL
+#endif      // VSF_USE_MAL && VSF_MAL_USE_FAKEFAT32_MAL
 #endif      // __VSF_FAKEFAT32_MAL_H__

@@ -21,14 +21,14 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define __VSFSTREAM_CLASS_INHERIT__
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+#   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #   include "service/vsf_service.h"
 #endif
 
 /*============================ MACROS ========================================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 #   ifndef VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE
 #       define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE         32
 #   endif
@@ -43,13 +43,13 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 static uint8_t __vsf_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
 static uint8_t __vsf_debug_stream_tx_buff[VSF_DEBUG_STREAM_CFG_TX_BUF_SIZE];
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 vsf_mem_stream_t VSF_DEBUG_STREAM_TX = {
     .op         = &vsf_mem_stream_op,
     .buffer     = __vsf_debug_stream_tx_buff,
@@ -62,12 +62,12 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .size       = sizeof(__vsf_debug_stream_rx_buff),
 };
 
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 // TODO: use interrupt mode
 void VSF_DEBUG_STREAM_POLL(void)
 {
@@ -89,7 +89,7 @@ void VSF_DEBUG_STREAM_POLL(void)
         VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, &ch, 1);
     }
 }
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 #endif

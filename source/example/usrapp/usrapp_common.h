@@ -21,9 +21,9 @@
 /*============================ INCLUDES ======================================*/
 
 #if VSF_USE_USB_HOST == ENABLED
-#   if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#   if VSF_USBH_USE_HCD_LIBUSB == ENABLED
 #       include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
-#   elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#   elif VSF_USBH_USE_HCD_WINUSB == ENABLED
 #       include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
 #   endif
 #endif
@@ -46,11 +46,11 @@
 struct usrapp_common_const_t {
 #   if VSF_USE_USB_HOST == ENABLED
     struct {
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#       if VSF_USBH_USE_HCD_OHCI == ENABLED
         vk_ohci_param_t ohci_param;
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#       elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
         vk_libusb_hcd_param_t libusb_hcd_param;
-#       elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#       elif VSF_USBH_USE_HCD_WINUSB == ENABLED
         vk_winusb_hcd_param_t winusb_hcd_param;
 #       endif
     } usbh;
@@ -64,39 +64,39 @@ struct usrapp_common_t {
 #   if VSF_USE_USB_HOST == ENABLED
     struct {
         vk_usbh_t host;
-#       if VSF_USE_USB_HOST_HUB == ENABLED
+#       if VSF_USBH_USE_HUB == ENABLED
         vk_usbh_class_t hub;
 #       endif
-#       if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#       if VSF_USBH_USE_LIBUSB == ENABLED
         vk_usbh_class_t libusb;
 #       endif
-#       if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
+#       if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
         vk_usbh_class_t ecm;
 #       endif
-#       if VSF_USE_USB_HOST_BTHCI == ENABLED
+#       if VSF_USBH_USE_BTHCI == ENABLED
         vk_usbh_class_t bthci;
 #       endif
-#       if VSF_USE_USB_HOST_HID == ENABLED
+#       if VSF_USBH_USE_HID == ENABLED
         vk_usbh_class_t hid;
 #       endif
-#       if VSF_USE_USB_HOST_DS4 == ENABLED
+#       if VSF_USBH_USE_DS4 == ENABLED
         vk_usbh_class_t ds4;
 #       endif
-#       if VSF_USE_USB_HOST_NSPRO == ENABLED
+#       if VSF_USBH_USE_NSPRO == ENABLED
         vk_usbh_class_t nspro;
 #       endif
-#       if VSF_USE_USB_HOST_XB360 == ENABLED
+#       if VSF_USBH_USE_XB360 == ENABLED
         vk_usbh_class_t xb360;
 #       endif
-#       if VSF_USE_USB_HOST_XB1 == ENABLED
+#       if VSF_USBH_USE_XB1 == ENABLED
         vk_usbh_class_t xb1;
 #       endif
     } usbh;
 #   endif
 
-#   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#   if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     struct {
-#       if VSF_USE_FAKEFAT32_MAL == ENABLED
+#       if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         vk_fakefat32_mal_t fakefat32;
 #       endif
     } mal;
@@ -104,18 +104,18 @@ struct usrapp_common_t {
 
 #   if VSF_USE_FS == ENABLED
     struct {
-#       if VSF_USE_MEMFS == ENABLED
+#       if VSF_FS_USE_MEMFS == ENABLED
         vk_memfs_info_t memfs_info;
 #       endif
-#       if VSF_USE_FATFS == ENABLED
-#           if VSF_USE_FAKEFAT32_MAL == ENABLED
+#       if VSF_FS_USE_FATFS == ENABLED
+#           if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         struct {
             vk_mim_mal_t fat32_mal;
             implement_fatfs_info(512, 1);
         } fatfs_info_fakefat32;
 #           endif
 #       endif
-#       if VSF_USE_WINFS == ENABLED
+#       if VSF_FS_USE_WINFS == ENABLED
         vk_winfs_info_t winfs_info;
 #       endif
     } fs;
@@ -130,16 +130,16 @@ typedef struct usrapp_common_t usrapp_common_t;
 static const usrapp_common_const_t __usrapp_common_const = {
 #   if VSF_USE_USB_HOST == ENABLED
     .usbh                   = {
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#       if VSF_USBH_USE_HCD_OHCI == ENABLED
         .ohci_param         = {
             .op             = &VSF_USB_HC0_IP,
             .priority       = vsf_arch_prio_0,
         },
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#       elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
         .libusb_hcd_param = {
             .priority = vsf_arch_prio_0,
         },
-#       elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#       elif VSF_USBH_USE_HCD_WINUSB == ENABLED
         .winusb_hcd_param = {
             .priority = vsf_arch_prio_0,
         },
@@ -153,50 +153,50 @@ static const usrapp_common_const_t __usrapp_common_const = {
 static usrapp_common_t __usrapp_common = {
 #   if VSF_USE_USB_HOST == ENABLED
     .usbh                   = {
-#       if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#       if VSF_USBH_USE_HCD_OHCI == ENABLED
         .host.drv           = &vk_ohci_drv,
         .host.param         = (void *)&__usrapp_common_const.usbh.ohci_param,
-#       elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#       elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
         .host.drv           = &vk_libusb_hcd_drv,
         .host.param         = (void*)&__usrapp_common_const.usbh.libusb_hcd_param,
-#       elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#       elif VSF_USBH_USE_HCD_WINUSB == ENABLED
         .host.drv           = &vk_winusb_hcd_drv,
         .host.param         = (void*)&__usrapp_common_const.usbh.winusb_hcd_param,
 #       endif
 
-#       if VSF_USE_USB_HOST_HUB == ENABLED
+#       if VSF_USBH_USE_HUB == ENABLED
         .hub.drv            = &vk_usbh_hub_drv,
 #       endif
-#       if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
+#       if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
         .ecm.drv            = &vk_usbh_ecm_drv,
 #       endif
-#       if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#       if VSF_USBH_USE_LIBUSB == ENABLED
         .libusb.drv         = &vk_usbh_libusb_drv,
 #       endif
-#       if VSF_USE_USB_HOST_BTHCI == ENABLED
+#       if VSF_USBH_USE_BTHCI == ENABLED
         .bthci.drv          = &vk_usbh_bthci_drv,
 #       endif
-#       if VSF_USE_USB_HOST_HID == ENABLED
+#       if VSF_USBH_USE_HID == ENABLED
         .hid.drv            = &vk_usbh_hid_drv,
 #       endif
-#       if VSF_USE_USB_HOST_DS4 == ENABLED
+#       if VSF_USBH_USE_DS4 == ENABLED
         .ds4.drv            = &vk_usbh_ds4_drv,
 #       endif
-#       if VSF_USE_USB_HOST_NSPRO == ENABLED
+#       if VSF_USBH_USE_NSPRO == ENABLED
         .nspro.drv          = &vk_usbh_nspro_drv,
 #       endif
-#       if VSF_USE_USB_HOST_XB360 == ENABLED
+#       if VSF_USBH_USE_XB360 == ENABLED
         .xb360.drv          = &vk_usbh_xb360_drv,
 #       endif
-#       if VSF_USE_USB_HOST_XB1 == ENABLED
+#       if VSF_USBH_USE_XB1 == ENABLED
         .xb1.drv            = &vk_usbh_xb1_drv,
 #       endif
     },
 #   endif
 
-#   if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#   if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     .mal                        = {
-#       if VSF_USE_FAKEFAT32_MAL == ENABLED
+#       if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         .fakefat32              = {
             .drv                = &VK_FAKEFAT32_MAL_DRV,
             .sector_size        = 512,
@@ -216,7 +216,7 @@ static usrapp_common_t __usrapp_common = {
 
 #   if VSF_USE_FS == ENABLED
     .fs                         = {
-#       if VSF_USE_MEMFS == ENABLED
+#       if VSF_FS_USE_MEMFS == ENABLED
         .memfs_info             = {
             .root               = {
                 .d.child        = (vk_memfs_file_t *)USRAPP_CFG_MEMFS_ROOT,
@@ -225,15 +225,15 @@ static usrapp_common_t __usrapp_common = {
             },
         },
 #       endif
-#       if VSF_USE_WINFS == ENABLED
+#       if VSF_FS_USE_WINFS == ENABLED
         .winfs_info             = {
             .root               = {
                 .name           = USRAPP_CFG_WINFS_ROOT,
             },
         },
 #       endif
-#       if VSF_USE_FATFS == ENABLED
-#           if VSF_USE_FAKEFAT32_MAL == ENABLED
+#       if VSF_FS_USE_FATFS == ENABLED
+#           if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         .fatfs_info_fakefat32   = {
             .fat32_mal          = {
                 .drv            = &VK_MIM_MAL_DRV,
@@ -265,35 +265,35 @@ static inline vsf_err_t __usrapp_common_init(void)
 #endif
 
 #if VSF_USE_USB_HOST == ENABLED
-#   if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#   if VSF_USBH_USE_HCD_OHCI == ENABLED
     vk_ohci_init();
 #   endif
     vk_usbh_init(&__usrapp_common.usbh.host);
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#   if VSF_USBH_USE_LIBUSB == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.libusb);
 #   endif
-#   if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
+#   if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.ecm);
 #   endif
-#   if VSF_USE_USB_HOST_BTHCI == ENABLED
+#   if VSF_USBH_USE_BTHCI == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.bthci);
 #   endif
-#   if VSF_USE_USB_HOST_HID == ENABLED
+#   if VSF_USBH_USE_HID == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.hid);
 #   endif
-#   if VSF_USE_USB_HOST_DS4 == ENABLED
+#   if VSF_USBH_USE_DS4 == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.ds4);
 #   endif
-#   if VSF_USE_USB_HOST_NSPRO == ENABLED
+#   if VSF_USBH_USE_NSPRO == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.nspro);
 #   endif
-#   if VSF_USE_USB_HOST_XB360 == ENABLED
+#   if VSF_USBH_USE_XB360 == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.xb360);
 #   endif
-#   if VSF_USE_USB_HOST_XB1 == ENABLED
+#   if VSF_USBH_USE_XB1 == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.xb1);
 #   endif
-#   if VSF_USE_USB_HOST_HUB == ENABLED
+#   if VSF_USBH_USE_HUB == ENABLED
     vk_usbh_register_class(&__usrapp_common.usbh.host, &__usrapp_common.usbh.hub);
 #   endif
 #endif

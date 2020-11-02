@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
+#if APP_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
 
 #include "../common/usrapp_common.h"
 #include "shell/sys/linux/vsf_linux.h"
@@ -54,7 +54,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if APP_CFG_USE_LINUX_DEMO != ENABLED
+#if APP_USE_LINUX_DEMO != ENABLED
 #   error lwip_demo runs under linux subsystem
 #endif
 
@@ -139,7 +139,7 @@ static int __lwip_nslookup(int argc, char *argv[])
 int lwip_main(int argc, char *argv[])
 {
     struct dhcp *dhcp = &__usrapp_lwip.netif_dhcp;
-#if VSF_USE_NETDRV_WPCAP
+#if VSF_NETDRV_USE_WPCAP == ENABLED
     if (argc != 2) {
         printf("format: %s NETDRV_NAME\r\n", argv[0]);
         return -1;
@@ -174,4 +174,4 @@ int lwip_main(int argc, char *argv[])
     return 0;
 }
 
-#endif      // APP_CFG_USE_TCPIP_DEMO && VSF_USE_VSFIP
+#endif      // APP_USE_TCPIP_DEMO && VSF_USE_VSFIP

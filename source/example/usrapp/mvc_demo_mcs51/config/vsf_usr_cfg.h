@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level Application Configuration
 
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
@@ -59,7 +59,7 @@
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE             ENABLED
 
 //      <o>The default vsf_task_t stack frame pool size <1-65535>
-//      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks. 
+//      <i>The default stack pool is shared among all vsf tasks which do not specify a private frame pool. For such case, the pool size should be at least twice of the maximum number of simultaneously running vsf tasks.
 //#define VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE    16
 //  </h>
 
@@ -74,7 +74,7 @@
 #define VSF_KERNEL_CFG_SUPPORT_SYNC             DISABLED
 //      </c>
 
-//      <h> Schedule Policy 
+//      <h> Schedule Policy
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED           ENABLED
@@ -118,7 +118,7 @@
 #define VSF_OS_CFG_MAIN_STACK_SIZE              2048
 
 //          <c1>Run main as a thread
-//          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
+//          <i>This feature will run main function as a thread. RTOS thread support must be enabled.
 #define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
@@ -131,7 +131,7 @@
 
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
-//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
+//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant.
 #define VSF_KERNEL_CFG_EDA_SUPPORT_FSM          DISABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
@@ -158,12 +158,12 @@
 #define VSF_USE_TRACE                       DISABLED
 #   define VSF_TRACE_CFG_COLOR_EN           DISABLED
 
-#define VSF_USE_SERVICE_STREAM              DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM           DISABLED
+#define VSF_USE_STREAM                      DISABLED
+#define VSF_USE_SIMPLE_STREAM               DISABLED
 
 #define VSF_USE_INPUT                                   DISABLED
 #define VSF_USE_UI                                      ENABLED
-#   define VSF_USE_UI_LVGL                              DISABLED
+#   define VSF_USE_LVGL                                 DISABLED
 #   define VSF_USE_DISP_DRV_SDL2                        DISABLED
 
 #   define VSF_USE_TINY_GUI                             ENABLED
@@ -177,10 +177,10 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "utilities/compiler.h"
+#include "utilities/vsf_utilities.h"
 
 #if __IS_COMPILER_51_KEIL__
-#define VSF_POOL_LOCK()                     { vsf_gint_state_t gint_state = __disable_interrupt(); 
+#define VSF_POOL_LOCK()                     { vsf_gint_state_t gint_state = __disable_interrupt();
 #define VSF_POOL_UNLOCK()                   __set_interrupt_state(gint_state);}
 
 /*----------------------------------------------------------------------------*

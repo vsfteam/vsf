@@ -283,7 +283,7 @@ static void __vsfip_dhcpc_on_eda_terminate(vsf_eda_t *eda)
 {
     vsfip_dhcpc_t *dhcpc = container_of(eda, vsfip_dhcpc_t, teda);
 #ifdef VSFIP_TRACE_NETIF
-    vsf_trace(VSF_TRACE_DEBUG, "vsfip_dhcpc deref");
+    vsf_trace_debug("vsfip_dhcpc deref");
 #endif
     vsfip_netif_deref(dhcpc->netif);
     dhcpc->netif = NULL;
@@ -297,7 +297,7 @@ vsf_err_t vsfip_dhcpc_start(vsfip_netif_t *netif, vsfip_dhcpc_t *dhcpc)
     netif->dhcp.dhcpc = dhcpc;
     dhcpc->netif = netif;
 #ifdef VSFIP_TRACE_NETIF
-    vsf_trace(VSF_TRACE_DEBUG, "vsfip_dhcpc ref");
+    vsf_trace_debug("vsfip_dhcpc ref");
 #endif
     vsfip_netif_ref(netif);
 

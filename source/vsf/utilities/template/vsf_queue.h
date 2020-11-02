@@ -32,7 +32,7 @@
     // 3. Implement your ring buffer with specific atom access protection macro:
     implement_vsf_rng_buf(<ring buffer name>, <item type>, <atom access macro>)
     
-    NOTE: You can use __SAFE_ATOM_CODE for interrupt, use __vsf_sched_safe for
+    NOTE: You can use __vsf_interrupt_safe for interrupt, use __vsf_sched_safe for
           scheduler, use NO_RNG_BUF_PROTECT for no protection
 
     // 4. Defining your ring buffer variable

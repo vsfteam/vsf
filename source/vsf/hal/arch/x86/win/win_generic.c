@@ -17,12 +17,15 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_ARCH_WIN_IMPLEMENT
+#define __VSF_ARCH_WIN_IMPLEMENT
 #include "hal/arch/vsf_arch_abstraction.h"
 
 #if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
 
-#include "utilities/template/vsf_list.h"
+// for trace
+#include "service/vsf_service.h"
+// for list
+#include "utilities/vsf_utilities.h"
 #include "hal/arch/__vsf_arch_interface.h"
 
 #include <Windows.h>
@@ -30,14 +33,15 @@
 /*============================ MACROS ========================================*/
 
 // configuration start
-#define VSF_ARCH_BACKGROUND_TRACE_EN            ENABLED
-#define VSF_ARCH_CFG_LOW_LANTECY_EN             DISABLED
-//#define VSF_ARCH_BACKGROUND_TRACE_FILTER        &__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t
-//#define VSF_ARCH_BACKGROUND_TRACE_EVENTS_NUM    (32 * 1024)
-//#define VSF_ARCH_TRACE_IRQ_EN                   ENABLED
-//#define VSF_ARCH_TRACE_CALLSTACK_EN             ENABLED
-//#define VSF_ARCH_TRACE_SYSTIMER_EN              ENABLED
-//#define VSF_ARCH_TRACE_STATUS_EN                ENABLED
+//#define VSF_ARCH_CFG_BACKGROUND_TRACE           ENABLED
+#define VSF_ARCH_CFG_LOW_LANTECY                DISABLED
+//#define VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER    &__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t
+//#define VSF_ARCH_CFG_BACKGROUND_TRACE_NUM       (32 * 1024)
+//#define VSF_ARCH_CFG_TRACE_IRQ                  ENABLED
+//#define VSF_ARCH_CFG_TRACE_CALLSTACK            ENABLED
+//#define VSF_ARCH_CFG_TRACE_SYSTIMER             ENABLED
+//#define VSF_ARCH_CFG_TRACE_STATUS               ENABLED
+//#define VSF_ARCH_CFG_TRACE_FUNCTION             ENABLED
 // configuration end
 
 
@@ -48,34 +52,23 @@
 //! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz
 #define VSF_ARCH_SYSTIMER_FREQ              (10 * 1000 * 1000)
 
-#if VSF_ARCH_CFG_LOW_LANTECY_EN == ENABLED
+#if VSF_ARCH_CFG_LOW_LANTECY == ENABLED
 #   define vsf_arch_yield()                 Sleep(0)
 #else
 #   define vsf_arch_yield()                 Sleep(1)
 #endif
 
-#define VSF_ARCH_TRACE_HEADER               "[x86/x64]: "
-#ifndef VSF_ARCH_TRACE_FUNC
-#   define VSF_ARCH_TRACE_FUNC              printf
-#endif
-#ifndef VSF_ARCH_TRACE
-//! VSF_ARCH_TRACE MUST be called arch_locked
-#   define vsf_arch_trace(__color, ...)                                         \
-    do {                                                                        \
-        vsf_arch_irq_thread_t *__irq_thread =                                   \
-                        __vsf_arch_get_cur_irq_thread();                        \
-        VSF_HAL_ASSERT(__irq_thread != NULL);                                   \
-        VSF_ARCH_TRACE_FUNC("%s%s(%d) %lld %s", __vsf_x86_trace_color[__color], \
-            __irq_thread->name, (int)__irq_thread->thread_id,                   \
-            vsf_systimer_get(), VSF_ARCH_TRACE_HEADER);                         \
-        VSF_ARCH_TRACE_FUNC(__VA_ARGS__);                                       \
-    } while (0)
+#if     defined(__CPU_X86__)
+#   define VSF_ARCH_TRACE_HEADER            "arch/x86"
+#elif   defined(__CPU_X64__)
+#   define VSF_ARCH_TRACE_HEADER            "arch/x64"
 #endif
 
 #undef vsf_arch_trace_callstack
-#if VSF_ARCH_TRACE_CALLSTACK_EN == ENABLED
+#if VSF_ARCH_CFG_TRACE_CALLSTACK == ENABLED
 #   define vsf_arch_trace_callstack(...)                                        \
-                vsf_arch_trace(VSF_ARCH_TRACE_CALLSTACK_COLOR, __VA_ARGS__)
+        vsf_arch_trace(VSF_ARCH_TRACE_HEADER,                                   \
+            __vsf_x86_trace_color[VSF_ARCH_TRACE_CALLSTACK_COLOR], __VA_ARGS__)
 #else
 #   define vsf_arch_trace_callstack(...)
 #endif
@@ -83,31 +76,54 @@
 #undef vsf_arch_trace_irq
 #if VSF_ARCH_TRACE_IRQ_EN == ENABLED
 #   define vsf_arch_trace_irq(...)                                              \
-                vsf_arch_trace(VSF_ARCH_TRACE_IRQ_COLOR, __VA_ARGS__)
+        vsf_arch_trace(VSF_ARCH_TRACE_HEADER,                                   \
+            __vsf_x86_trace_color[VSF_ARCH_TRACE_IRQ_COLOR], __VA_ARGS__)
 #else
 #   define vsf_arch_trace_irq(...)
 #endif
 
 #undef vsf_arch_trace_systimer
-#if VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED
+#if VSF_ARCH_CFG_TRACE_SYSTIMER == ENABLED
 #   define vsf_arch_trace_systimer(...)                                         \
-                vsf_arch_trace(VSF_ARCH_TRACE_SYSTIMER_COLOR, __VA_ARGS__)
+        vsf_arch_trace(VSF_ARCH_TRACE_HEADER,                                   \
+            __vsf_x86_trace_color[VSF_ARCH_TRACE_SYSTIMER_COLOR], __VA_ARGS__)
 #else
 #   define vsf_arch_trace_systimer(...)
 #endif
 
 #undef vsf_arch_trace_status
-#if VSF_ARCH_TRACE_STATUS_EN == ENABLED
-#   define vsf_arch_trace_status(...)                                        \
-                vsf_arch_trace(VSF_ARCH_TRACE_STATUS_COLOR, __VA_ARGS__)
+#if VSF_ARCH_CFG_TRACE_STATUS == ENABLED
+#   define vsf_arch_trace_status(...)                                           \
+        vsf_arch_trace(VSF_ARCH_TRACE_HEADER,                                   \
+            __vsf_x86_trace_color[VSF_ARCH_TRACE_STATUS_COLOR], __VA_ARGS__)
 #else
 #   define vsf_arch_trace_status(...)
 #endif
 
-#if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
-#   ifndef VSF_ARCH_BACKGROUND_TRACE_EVENTS_NUM
-#       define VSF_ARCH_BACKGROUND_TRACE_EVENTS_NUM     1024
+#undef vsf_arch_trace_function
+#if VSF_ARCH_CFG_TRACE_FUNCTION == ENABLED
+#   define vsf_arch_trace_function(...)                                         \
+        vsf_arch_trace(VSF_ARCH_TRACE_HEADER,                                   \
+            __vsf_x86_trace_color[VSF_ARCH_TRACE_FUNCTION_COLOR], __VA_ARGS__)
+#else
+#   define vsf_arch_trace_function(...)
+#endif
+
+#if VSF_ARCH_CFG_TRACE_FUNCTION == ENABLED
+#endif
+
+#if VSF_ARCH_CFG_BACKGROUND_TRACE == ENABLED
+#   ifndef VSF_ARCH_CFG_BACKGROUND_TRACE_NUM
+#       define VSF_ARCH_CFG_BACKGROUND_TRACE_NUM        1024
 #   endif
+#endif
+
+#if     VSF_ARCH_CFG_TRACE_IRQ == ENABLED                                       \
+    ||  VSF_ARCH_CFG_TRACE_CALLSTACK == ENABLED                                 \
+    ||  VSF_ARCH_CFG_TRACE_SYSTIMER == ENABLED                                  \
+    ||  VSF_ARCH_CFG_TRACE_STATUS == ENABLED                                    \
+    ||  VSF_ARCH_CFG_TRACE_FUNCTION == ENABLED
+#   define __VSF_ARCH_CFG_TRACE                 ENABLED
 #endif
 
 // disable VSF_ARCH_CFG_NO_UNLOCKED_SUSPEND_EN will be unstable
@@ -134,6 +150,7 @@ typedef struct vsf_arch_systimer_ctx_t {
 
 typedef struct vsf_x86_t {
     CRITICAL_SECTION lock;
+    CRITICAL_SECTION trace_lock;
 
     vsf_arch_irq_thread_t por_thread;    // power on reset
     vsf_arch_swi_ctx_t swi[VSF_ARCH_SWI_NUM];
@@ -158,38 +175,39 @@ typedef enum vsf_arch_irq_pp_t {
     VSF_ARCH_IRQ_PP_EXIT_RUNNING,
 } vsf_arch_irq_pp_t;
 
-#if     VSF_ARCH_TRACE_IRQ_EN == ENABLED                                        \
-    ||  VSF_ARCH_TRACE_CALLSTACK_EN == ENABLED                                  \
-    ||  VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED                                   \
-    ||  VSF_ARCH_TRACE_STATUS_EN == ENABLED
+#if __VSF_ARCH_CFG_TRACE == ENABLED
 enum {
     VSF_ARCH_TRACE_CALLSTACK_COLOR,
     VSF_ARCH_TRACE_IRQ_COLOR,
     VSF_ARCH_TRACE_SYSTIMER_COLOR,
     VSF_ARCH_TRACE_STATUS_COLOR,
+    VSF_ARCH_TRACE_FUNCTION_COLOR,
 };
 #endif
 
-#if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
+typedef enum vsf_arch_trace_event_t {
+    VSF_ARCH_TRACE_PREEMPT_ENTER,
+    VSF_ARCH_TRACE_PREEMPT_LEAVE,
+    VSF_ARCH_TRACE_CUR_THREAD,
+    VSF_ARCH_TRACE_ACTIVATE,
+    VSF_ARCH_TRACE_DEACTIVATE,
+    VSF_ARCH_TRACE_SUSPEND,
+    VSF_ARCH_TRACE_RESUME,
+    VSF_ARCH_TRACE_IRQ_STATE,
+    VSF_ARCH_TRACE_ACTIVATED,
+    VSF_ARCH_TRACE_DEACTIVATED,
+    VSF_ARCH_TRACE_STATUS,
+    VSF_ARCH_TRACE_LOCK,
+    VSF_ARCH_TRACE_POP,
+    VSF_ARCH_TRACE_INHERIT,
+    VSF_ARCH_TRACE_PUSH,
+} vsf_arch_trace_event_t;
+
+#if VSF_ARCH_CFG_BACKGROUND_TRACE == ENABLED
 typedef struct vsf_arch_background_trace_event_t {
     uint32_t idx;
-    enum {
-        VSF_ARCH_TRACE_PREEMPT_ENTER,
-        VSF_ARCH_TRACE_PREEMPT_LEAVE,
-        VSF_ARCH_TRACE_CUR_THREAD,
-        VSF_ARCH_TRACE_ACTIVATE,
-        VSF_ARCH_TRACE_DEACTIVATE,
-        VSF_ARCH_TRACE_SUSPEND,
-        VSF_ARCH_TRACE_RESUME,
-        VSF_ARCH_TRACE_IRQ_STATE,
-        VSF_ARCH_TRACE_ACTIVATED,
-        VSF_ARCH_TRACE_DEACTIVATED,
-        VSF_ARCH_TRACE_STATUS,
-        VSF_ARCH_TRACE_LOCK,
-        VSF_ARCH_TRACE_POP,
-        VSF_ARCH_TRACE_INHERIT,
-        VSF_ARCH_TRACE_PUSH,
-    } event;
+    vsf_arch_trace_event_t event;
+
     vsf_arch_irq_thread_t *caller_thread;
     vsf_arch_irq_thread_t *cur_thread;
     uint32_t status;
@@ -209,19 +227,17 @@ typedef struct vsf_arch_background_trace_t {
 
 NO_INIT static vsf_x86_t __vsf_x86;
 
-#if     VSF_ARCH_TRACE_IRQ_EN == ENABLED                                        \
-    ||  VSF_ARCH_TRACE_CALLSTACK_EN == ENABLED                                  \
-    ||  VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED                                   \
-    ||  VSF_ARCH_TRACE_STATUS_EN == ENABLED
+#if __VSF_ARCH_CFG_TRACE == ENABLED
 static const char *__vsf_x86_trace_color[] = {
     [VSF_ARCH_TRACE_CALLSTACK_COLOR]    = "\033[1;32m",
     [VSF_ARCH_TRACE_IRQ_COLOR]          = "\033[1;33m",
     [VSF_ARCH_TRACE_SYSTIMER_COLOR]     = "\033[1;35m",
     [VSF_ARCH_TRACE_STATUS_COLOR]       = "\033[1;36m",
+    [VSF_ARCH_TRACE_FUNCTION_COLOR]     = "\033[1;34m",
 };
 #endif
 
-#if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
+#if VSF_ARCH_CFG_BACKGROUND_TRACE == ENABLED
 static vsf_arch_background_trace_t __vsf_arch_background_trace;
 #endif
 
@@ -238,7 +254,7 @@ static void __vsf_arch_irq_pend(vsf_arch_irq_thread_t *irq_thread);
  *----------------------------------------------------------------------------*/
 
 
-#if VSF_ARCH_BACKGROUND_TRACE_EN == ENABLED
+#if VSF_ARCH_CFG_BACKGROUND_TRACE == ENABLED
 static vsf_arch_background_trace_event_t * __vsf_arch_bg_trace_get(void)
 {
     vsf_arch_background_trace_event_t *event = &__vsf_arch_background_trace.events[__vsf_arch_background_trace.pos++];
@@ -252,9 +268,9 @@ static vsf_arch_background_trace_event_t * __vsf_arch_bg_trace_get(void)
 static void __vsf_arch_bg_trace(int event, vsf_arch_irq_thread_t *caller_thread,
                 vsf_arch_irq_thread_t *cur_thread, int info, int pos)
 {
-#ifdef VSF_ARCH_BACKGROUND_TRACE_FILTER
-    if (    (VSF_ARCH_BACKGROUND_TRACE_FILTER == caller_thread)
-        ||  (VSF_ARCH_BACKGROUND_TRACE_FILTER == cur_thread))
+#ifdef VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER
+    if (    (VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER == caller_thread)
+        ||  (VSF_ARCH_CFG_BACKGROUND_TRACE_FILTER == cur_thread))
 #endif
     {
         vsf_arch_background_trace_event_t *trace_event = __vsf_arch_bg_trace_get();
@@ -268,7 +284,7 @@ static void __vsf_arch_bg_trace(int event, vsf_arch_irq_thread_t *caller_thread,
 }
 #else
 static void __vsf_arch_bg_trace(int event, vsf_arch_irq_thread_t *caller_thread,
-                vsf_arch_irq_thread_t *cur_thread, int pos)
+                vsf_arch_irq_thread_t *cur_thread, int info, int pos)
 {
 }
 #endif
@@ -283,6 +299,24 @@ static vsf_arch_irq_thread_t * __vsf_arch_get_cur_irq_thread(void)
         }
     }
     return NULL;
+}
+
+void __vsf_arch_trace_lock(void)
+{
+    BOOL is_entered;
+    while (1) {
+        is_entered = TryEnterCriticalSection(&__vsf_x86.trace_lock);
+        if (is_entered) {
+            break;
+        } else {
+            vsf_arch_yield();
+        }
+    }
+}
+
+void __vsf_arch_trace_unlock(void)
+{
+    LeaveCriticalSection(&__vsf_x86.trace_lock);
 }
 
 static void __vsf_arch_lock(void)
@@ -625,24 +659,41 @@ static void __vsf_arch_irq_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_a
 
 void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread)
 {
+    vsf_arch_trace_function("%s(irq_thread: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, irq_thread);
+
     __vsf_arch_irq_activate(irq_thread);
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate)
 {
+    vsf_arch_trace_function("%s(irq_thread: 0x" VSF_TRACE_POINTER_HEX ", is_terminate %s)" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, irq_thread, is_terminate ? "true" : "false");
+
     __vsf_arch_irq_deactivate(irq_thread, is_terminate);
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread)
 {
+    vsf_arch_trace_function("%s(irq_thread: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, irq_thread);
     __vsf_arch_lock();
         vsf_dlist_remove(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, irq_thread);
     __vsf_arch_unlock();
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
     vsf_arch_irq_entry_t entry, vsf_arch_prio_t priority)
 {
+    vsf_arch_trace_function("%s(irq_thread: 0x" VSF_TRACE_POINTER_HEX ", name: %s, entry: 0x" VSF_TRACE_POINTER_HEX ", priority: %d)" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, irq_thread, name, entry, priority);
+
     VSF_HAL_ASSERT(strlen(name) < sizeof(irq_thread->name) - 1);
     VSF_HAL_ASSERT(NULL == irq_thread->thread);
     strcpy((char *)irq_thread->name, name);
@@ -661,34 +712,67 @@ void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
         vsf_dlist_add_to_head(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, irq_thread);
     __vsf_arch_unlock();
     ResumeThread(irq_thread->thread);
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread)
 {
+    vsf_arch_trace_function("%s(irq_thread: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, irq_thread);
+
     __vsf_arch_lock();
         irq_thread->state = VSF_ARCH_IRQ_STATE_BACKGROUND;
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_IRQ_STATE, NULL, irq_thread, irq_thread->state, 0);
     __vsf_arch_unlock();
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request)
 {
+    vsf_arch_trace_function("%s(request: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, request);
+
+    VSF_HAL_ASSERT(!request->is_inited);
     request->event = CreateEvent(NULL, false, false, NULL);
+    request->is_inited = true;
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request)
 {
+    vsf_arch_trace_function("%s(0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, request);
+
+    VSF_HAL_ASSERT(request->is_inited);
     CloseHandle(request->event);
+    request->is_inited = false;
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
 {
+    vsf_arch_trace_function("%s(request: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, request);
+
+    VSF_HAL_ASSERT(request->is_inited);
     WaitForSingleObject(request->event, INFINITE);
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 {
+    vsf_arch_trace_function("%s(request: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, request);
+
+    VSF_HAL_ASSERT(request->is_inited);
     SetEvent(request->event);
+
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 
@@ -710,11 +794,7 @@ static void __vsf_systimer_thread(void *arg)
         __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
 
             vsf_systimer_cnt_t tick = vsf_systimer_get();
-#if VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED
-            __vsf_arch_lock();
-                vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
-            __vsf_arch_unlock();
-#endif
+            vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
             vsf_systimer_timeout_evt_hanlder(tick);
 
         __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
@@ -727,79 +807,115 @@ static void __vsf_systimer_thread(void *arg)
  */
 vsf_err_t vsf_systimer_init(void)
 {
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+
     __vsf_x86.systimer.start_tick = vsf_systimer_get();
 
     __vsf_x86.systimer.timer = CreateWaitableTimer(NULL, true, NULL);
     VSF_HAL_ASSERT(NULL != __vsf_x86.systimer.timer);
 
     __vsf_arch_irq_request_init(&__vsf_x86.systimer.timer_request);
+
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
     return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_systimer_start(void)
 {
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+
     __vsf_arch_irq_init(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t,
                 "timer", __vsf_systimer_thread, vsf_arch_prio_32);
+
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
     return VSF_ERR_NONE;
 }
 
 void vsf_systimer_set_idle(void)
 {
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+}
+
+vsf_systimer_cnt_t __vsf_systimer_get(void)
+{
+    LARGE_INTEGER li;
+    GetSystemTimeAsFileTime((LPFILETIME)&li);
+
+    return (vsf_systimer_cnt_t)li.QuadPart - __vsf_x86.systimer.start_tick;
 }
 
 vsf_systimer_cnt_t vsf_systimer_get(void)
 {
-    LARGE_INTEGER li;
-    GetSystemTimeAsFileTime((LPFILETIME)&li);
-    return (vsf_systimer_cnt_t)li.QuadPart - __vsf_x86.systimer.start_tick;
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    vsf_systimer_cnt_t ret = __vsf_systimer_get();
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
+    return ret;
 }
 
 bool vsf_systimer_set(vsf_systimer_cnt_t due)
 {
+    vsf_arch_trace_function("%s(%d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
+
     LARGE_INTEGER li = {
         .QuadPart = __vsf_x86.systimer.start_tick + due,
     };
-#if VSF_ARCH_TRACE_SYSTIMER_EN == ENABLED
-    __vsf_arch_lock();
-        vsf_arch_trace_systimer("systimer update: %lld\r\n", due);
-    __vsf_arch_unlock();
-#endif
+    vsf_arch_trace_systimer("systimer update: %lld\r\n", due);
     if (!SetWaitableTimer(__vsf_x86.systimer.timer, &li, 0, NULL, NULL, false)) {
         VSF_HAL_ASSERT(false);
+        vsf_arch_trace_function("%s exited with false" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
         return false;
     }
     __vsf_arch_irq_request_send(&__vsf_x86.systimer.timer_request);
+    vsf_arch_trace_function("%s exited with true" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     return true;
 }
 
 bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
 {
-    return (vsf_systimer_get() >= due);
+    vsf_arch_trace_function("%s(due: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
+    bool ret = vsf_systimer_get() >= due;
+    vsf_arch_trace_function("%s exited with %s" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret ? "true" : "false");
+    return ret;
 }
 
 vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
-    return (vsf_systimer_cnt_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    vsf_arch_trace_function("%s(time_us: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_us);
+    vsf_systimer_cnt_t ret = (vsf_systimer_cnt_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
+    return ret;
 }
 
 vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    return (vsf_systimer_cnt_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    vsf_arch_trace_function("%s(time_ms: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_ms);
+    vsf_systimer_cnt_t ret = (vsf_systimer_cnt_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
+    return ret;
 }
 
 uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
 {
-    return tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
+    uint_fast32_t ret = tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
+    return ret;
 }
 
 uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 {
-    return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
+    uint_fast32_t ret = tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
+    return ret;
 }
 
 void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 {
+    vsf_arch_trace_function("%s(priority: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, priority);
     __vsf_arch_irq_set_priority(&__vsf_x86.systimer.use_as__vsf_arch_irq_thread_t, priority);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 #endif
@@ -816,7 +932,6 @@ static void __vsf_arch_swi_thread(void *arg)
         __vsf_arch_irq_request_pend(&ctx->request);
 
         __vsf_arch_irq_activate(&ctx->use_as__vsf_arch_irq_thread_t);
-        __vsf_arch_irq_request_init(&ctx->request);
 
             if (ctx->handler != NULL) {
                 ctx->handler(ctx->param);
@@ -833,6 +948,8 @@ static void __vsf_arch_swi_thread(void *arg)
 vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
     vsf_swi_handler_t *handler, void *param)
 {
+    vsf_arch_trace_function("%s(idx: %d, priority: %d, handler: 0x" VSF_TRACE_POINTER_HEX ", param: 0x" VSF_TRACE_POINTER_HEX ")" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, idx, priority, handler, param);
     if (idx < dimof(__vsf_x86.swi)) {
         vsf_arch_swi_ctx_t *ctx = &__vsf_x86.swi[idx];
 
@@ -848,9 +965,11 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
                         __vsf_arch_swi_thread, priority);
         }
 
+        vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_NONE);
         return VSF_ERR_NONE;
     }
     VSF_HAL_ASSERT(false);
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, VSF_ERR_INVALID_PARAMETER);
     return VSF_ERR_INVALID_PARAMETER;
 }
 
@@ -859,9 +978,11 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority,
  */
 void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
+    vsf_arch_trace_function("%s(idx: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, idx);
+
     if (idx < dimof(__vsf_x86.swi)) {
         vsf_arch_swi_ctx_t *ctx = &__vsf_x86.swi[idx];
-        vsf_arch_irq_request_t reply;
+        vsf_arch_irq_request_t reply = { 0 };
         bool is_to_pend;
 
         __vsf_arch_lock();
@@ -880,13 +1001,17 @@ void vsf_arch_swi_trigger(uint_fast8_t idx)
         if (is_to_pend) {
             __vsf_arch_irq_request_pend(&reply);
         }
+        vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
         return;
     }
     VSF_HAL_ASSERT(false);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 {
+    vsf_arch_trace_function("%s(priority: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, priority);
+
     __vsf_arch_lock();
     vsf_arch_prio_t orig = __vsf_x86.prio_base;
     if (orig != priority) {
@@ -900,11 +1025,13 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 
             if (__vsf_arch_can_preempt(irq_thread, true)) {
                 __vsf_arch_preempt(VSF_ARCH_IRQ_PP_NORMAL);
+                vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, orig);
                 return orig;
             }
         }
     }
     __vsf_arch_unlock();
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, orig);
     return orig;
 }
 
@@ -924,6 +1051,7 @@ bool vsf_arch_low_level_init(void)
     __vsf_x86.gint_state = true;
 
     InitializeCriticalSection(&__vsf_x86.lock);
+    InitializeCriticalSection(&__vsf_x86.trace_lock);
 
     __vsf_x86.por_thread.thread_id = GetCurrentThreadId();
     __vsf_x86.por_thread.thread = OpenThread(THREAD_ALL_ACCESS, false, __vsf_x86.por_thread.thread_id);
@@ -944,14 +1072,17 @@ bool vsf_arch_low_level_init(void)
 
 vsf_gint_state_t vsf_get_interrupt(void)
 {
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     __vsf_arch_lock();
         vsf_gint_state_t state = __vsf_x86.gint_state;
     __vsf_arch_unlock();
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, state);
     return state;
 }
 
 void vsf_set_interrupt(vsf_gint_state_t level)
 {
+    vsf_arch_trace_function("%s(level: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, level);
     __vsf_arch_lock();
     if (__vsf_x86.gint_state != level) {
         __vsf_x86.gint_state = level;
@@ -964,15 +1095,18 @@ void vsf_set_interrupt(vsf_gint_state_t level)
 
             if (__vsf_arch_can_preempt(irq_thread, true)) {
                 __vsf_arch_preempt(VSF_ARCH_IRQ_PP_NORMAL);
+                vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
                 return;
             }
         }
     }
     __vsf_arch_unlock();
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 vsf_gint_state_t vsf_disable_interrupt(void)
 {
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     __vsf_arch_lock();
     vsf_gint_state_t orig = __vsf_x86.gint_state;
     if (orig != false) {
@@ -981,30 +1115,37 @@ vsf_gint_state_t vsf_disable_interrupt(void)
         __vsf_arch_bg_trace(VSF_ARCH_TRACE_STATUS, __vsf_arch_get_cur_irq_thread(), NULL, 0, 0);
     }
     __vsf_arch_unlock();
+    vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, orig);
     return orig;
 }
 
 void vsf_enable_interrupt(void)
 {
+    vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     vsf_set_interrupt(true);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 /*----------------------------------------------------------------------------*
  * Others: sleep, reset and etc.                                              *
  *----------------------------------------------------------------------------*/
-void __vsf_arch_irq_sleep(uint32_t ms)
+void __vsf_arch_irq_sleep(uint_fast32_t ms)
 {
+    vsf_arch_trace_function("%s(ms: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ms);
     Sleep(ms);
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
-void vsf_arch_sleep(uint32_t mode)
+void vsf_arch_sleep(uint_fast32_t mode)
 {
+    vsf_arch_trace_function("%s(mode: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, mode);
     if (GetCurrentThreadId() == __vsf_x86.por_thread.thread_id) {
         __vsf_arch_irq_end(&__vsf_x86.por_thread, true);
     } else {
         // TODO: what will happen if call sleep in interrupt?
         VSF_HAL_ASSERT(false);
     }
+    vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
 #endif

@@ -22,8 +22,8 @@
 
 #if     VSF_USE_USB_HOST == ENABLED                                             \
     &&  VSF_USE_SCSI == ENABLED                                                 \
-    &&  VSF_USE_MAL_SCSI == ENABLED                                             \
-    &&  APP_CFG_USE_SCSI_DEMO == ENABLED
+    &&  VSF_SCSI_USE_MAL_SCSI == ENABLED                                        \
+    &&  APP_USE_SCSI_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 

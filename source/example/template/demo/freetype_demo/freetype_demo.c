@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_FREETYPE_DEMO == ENABLED
+#if APP_USE_FREETYPE_DEMO == ENABLED
 
 #include <stdio.h>
 
@@ -32,7 +32,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED
 static FT_FILE __ft_font_dir[] = {
     {
         .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
@@ -53,7 +53,7 @@ static FT_FILE __ft_font_dir[] = {
 };
 #endif
 
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
 static FT_FILE __ft_xboot_fonts_dir[] = {
     {
         .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
@@ -99,7 +99,7 @@ static FT_FILE __ft_xboot_framework_dir[] = {
 #endif
 
 static FT_FILE __ft_root_dir[] = {
-#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED
     {
         .attr           = VSF_FILE_ATTR_DIRECTORY,
         .name           = "font",
@@ -108,7 +108,7 @@ static FT_FILE __ft_root_dir[] = {
         .d.child_size   = sizeof(FT_FILE),
     },
 #endif
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
     {
         .attr           = VSF_FILE_ATTR_DIRECTORY,
         .name           = "framework",
@@ -133,10 +133,12 @@ FT_FILE ft_root         = {
 
 void freetype_demo_init(void)
 {
+#if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED
     FILE *f;
     char path[256];
+#endif
 
-#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED
     for(int i = 0; i < dimof(__ft_font_dir); i++) {
         strcpy(path, APP_CFG_TGUI_RES_DIR "font/");
         strcat(path, __ft_font_dir[i].name);
@@ -161,7 +163,7 @@ void freetype_demo_init(void)
     }
 #endif
 
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
     for(int i = 0; i < dimof(__ft_xboot_fonts_dir); i++) {
         strcpy(path, APP_CFG_XBOOT_RES_DIR "font/");
         strcat(path, __ft_xboot_fonts_dir[i].name);

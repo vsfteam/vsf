@@ -19824,7 +19824,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$TOOLKIT_DIR$\config\linker\ARM\MPS2FVP.icf</state>
+                    <state>$TOOLKIT_DIR$\config\linker\ST\stm32f103xE.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -22761,6 +22761,15 @@
                     <name>common</name>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\common\common.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\common\vsf_drv_usart_poll_util.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\common\vsf_swi_template.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\hal\driver\common\vsf_swi_template.inc</name>
                     </file>
                 </group>
                 <group>

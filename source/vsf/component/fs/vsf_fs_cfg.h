@@ -29,10 +29,10 @@
 #   define VSF_FS_ASSERT                ASSERT
 #endif
 
-#if VSF_USE_FATFS == ENABLED
-#   if VSF_USE_MALFS != ENABLED
-#       undef VSF_USE_MALFS
-#       define VSF_USE_MALFS            ENABLED
+#if VSF_FS_USE_FATFS == ENABLED
+#   if VSF_FS_USE_MALFS != ENABLED
+#       undef VSF_FS_USE_MALFS
+#       define VSF_FS_USE_MALFS         ENABLED
 #   endif
 #endif
 

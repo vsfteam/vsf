@@ -83,7 +83,7 @@ declare_structure(vsf_tgui_v_button_t)
 def_structure(vsf_tgui_v_button_t)
 #if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
     //please remove this if your structure is not emplty
-    RESERVED_U8
+    REG_RSVD_U8
 #endif
 end_def_structure(vsf_tgui_v_button_t)
 
@@ -91,7 +91,7 @@ declare_structure(vsf_tgui_v_panel_t)
 def_structure(vsf_tgui_v_panel_t)
 #if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
     //please remove this if your structure is not emplty
-    RESERVED_U8
+    REG_RSVD_U8
 #endif
 end_def_structure(vsf_tgui_v_panel_t)
 
@@ -99,7 +99,7 @@ declare_structure(vsf_tgui_v_list_t)
 def_structure(vsf_tgui_v_list_t)
 #if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
     //please remove this if your structure is not emplty
-    RESERVED_U8
+    REG_RSVD_U8
 #endif
 end_def_structure(vsf_tgui_v_list_t)
 
@@ -107,7 +107,7 @@ declare_structure(vsf_tgui_v_text_list_t)
 def_structure(vsf_tgui_v_text_list_t)
 #if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
     //please remove this if your structure is not emplty
-    RESERVED_U8
+    REG_RSVD_U8
 #endif
 end_def_structure(vsf_tgui_v_text_list_t)
 

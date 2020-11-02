@@ -24,7 +24,7 @@
 #include "./pbuf/vsf_pbuf.h"
 #include "./pbuf/vsf_pbuf_pool.h"
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 #include "./interface.h"
 #include "../pool/vsf_pool.h"
 #include "./pbuf_queue/vsf_pbuf_queue.h"

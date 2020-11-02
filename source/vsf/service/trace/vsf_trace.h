@@ -21,9 +21,9 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   include "../vsfstream/vsfstream.h"
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+#   include "../simple_stream/vsf_simple_stream.h"
+#elif VSF_USE_STREAM == ENABLED
 #   include "../stream/vsf_stream.h"
 #endif
 
@@ -59,17 +59,25 @@ extern "C" {
 #   define VSF_TRACE_DF_DEFAULT     VSF_TRACE_DF_U8_16_ACN
 #endif
 
+// TODO: fix VSF_TRACE_POINTER_HEX with arch configuration if %p is not supported
+#define VSF_TRACE_POINTER_HEX       "%p"
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_trace_print_mem         vsf_trace_buffer
 
 #if VSF_USE_TRACE == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 #       define vsf_trace_init(__stream) __vsf_trace_init((vsf_stream_t *)(__stream))
-#   elif VSF_USE_SERVICE_STREAM == ENABLED
+#   elif VSF_USE_STREAM == ENABLED
 #       define vsf_trace_init(__stream) __vsf_trace_init((vsf_stream_tx_t *)(__stream))
 #   endif
 #endif
+
+#define vsf_trace_info(...)         vsf_trace(VSF_TRACE_INFO, __VA_ARGS__)
+#define vsf_trace_warning(...)      vsf_trace(VSF_TRACE_WARNING, __VA_ARGS__)
+#define vsf_trace_error(...)        vsf_trace(VSF_TRACE_ERROR, __VA_ARGS__)
+#define vsf_trace_debug(...)        vsf_trace(VSF_TRACE_DEBUG, __VA_ARGS__)
 
 /*============================ TYPES =========================================*/
 
@@ -87,17 +95,17 @@ typedef enum vsf_trace_level_t {
 
 #if VSF_USE_TRACE == ENABLED
 
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
 extern void __vsf_trace_init(vsf_stream_t *stream);
-#   elif VSF_USE_SERVICE_STREAM == ENABLED
+#   elif VSF_USE_STREAM == ENABLED
 extern void __vsf_trace_init(vsf_stream_tx_t *ptTX);
 #   endif
 extern void vsf_trace_fini(void);
 
 SECTION(".text.vsf.trace.__vsf_trace_buffer")
-extern void __vsf_trace_buffer( vsf_trace_level_t level, 
-                                void *buffer, 
-                                uint_fast16_t len, 
+extern void __vsf_trace_buffer( vsf_trace_level_t level,
+                                void *buffer,
+                                uint_fast16_t len,
                                 uint_fast32_t flag);
 
 #define __vsf_trace_buffer3(__level, __buffer, __len)                           \

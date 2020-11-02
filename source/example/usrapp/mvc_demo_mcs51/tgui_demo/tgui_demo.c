@@ -69,18 +69,22 @@ static fsm_rt_t my_stopwatch_start_stop_on_click(vsf_tgui_button_t* node_ptr, vs
 vsf_err_t tgui_demo_init(void)
 {
     NO_INIT static vsf_tgui_evt_t __evt_queue_buffer[16];
+#if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
     NO_INIT static uint16_t __bfs_buffer[32];
+#endif
     
     const vsf_tgui_cfg_t cfg = {
         .evt_queue = {
             .obj_ptr = __evt_queue_buffer, 
             .s32_size = sizeof(__evt_queue_buffer)
         },
+#if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
         .bfs_queue = {
             .obj_ptr = __bfs_buffer,
             .s32_size = sizeof(__bfs_buffer),
         },
-        .root_node_ptr = (vsf_tgui_control_t *)&s_tMyStopwatch,
+#endif
+        .root_node_ptr = (const vsf_tgui_top_container_t *)&s_tMyStopwatch,
     };
     vsf_err_t err = vk_tgui_init(&s_tTGUIDemo, &cfg);
     
@@ -125,7 +129,7 @@ vsf_err_t tgui_demo_init(void)
 //void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 //{
 ///*
-//    vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
+//    vsf_trace_debug("touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
 //        vsf_input_touchscreen_get_id(ts_evt),
 //        vsf_input_touchscreen_is_down(ts_evt) ? "down" : "up",
 //        vsf_input_touchscreen_get_x(ts_evt),

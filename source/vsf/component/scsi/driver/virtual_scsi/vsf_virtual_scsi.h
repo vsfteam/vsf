@@ -22,7 +22,7 @@
 
 #include "../../vsf_scsi_cfg.h"
 
-#if VSF_USE_SCSI == ENABLED && VSF_USE_VIRTUAL_SCSI == ENABLED
+#if VSF_USE_SCSI == ENABLED && VSF_SCSI_USE_VIRTUAL_SCSI == ENABLED
 
 #if     defined(__VSF_VIRTUAL_SCSI_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
@@ -101,7 +101,7 @@ def_simple_class(vk_virtual_scsi_t) {
             uint8_t reply[36];
         };
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         bool is_stream;
 #endif
         scsi_sensekey_t sense_key;
@@ -136,5 +136,5 @@ extern const vk_scsi_drv_t vk_virtual_scsi_drv;
 #undef __VSF_VIRTUAL_SCSI_CLASS_IMPLEMENT
 #undef __VSF_VIRTUAL_SCSI_CLASS_INHERIT__
 
-#endif      // VSF_USE_SCSI && VSF_USE_VIRTUAL_SCSI
+#endif      // VSF_USE_SCSI && VSF_SCSI_USE_VIRTUAL_SCSI
 #endif      // __VSF_MAL_SCSI_H__

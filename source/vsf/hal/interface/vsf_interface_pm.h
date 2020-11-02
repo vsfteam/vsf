@@ -24,7 +24,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
+
 #define DIV_(_N,_D)     DIV_##_N = (_N),
 
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PLL
@@ -39,12 +41,12 @@ extern "C" {
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT       ENABLED
 #endif
 
-#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PRH_CLK
-#   define VSF_HAL_DRV_PM_CFG_SUPPORT_PRH_CLK       ENABLED
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PCLK
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_PCLK          ENABLED
 #endif
 
-#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_SYNC_CLK
-#   define VSF_HAL_DRV_PM_CFG_SUPPORT_SYNC_CLK      ENABLED
+#ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_SCLK
+#   define VSF_HAL_DRV_PM_CFG_SUPPORT_SCLK          ENABLED
 #endif
 
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL
@@ -62,23 +64,23 @@ extern "C" {
 /*----------------------------------------------------------------------------*
  * Power Domain Management                                                    *
  *----------------------------------------------------------------------------*/
- 
+
 /*! \note pm_power_cfg_no_t and pm_power_cfg_msk_t should be defined in device
-           specific header file: device.h 
+           specific header file: device.h
 
 //! \name power set index
 //! @{
 enum pm_power_cfg_no_t{
-    POWER_IRCOUT_idx           =(0), 
-    POWER_IRC_idx              =(1),
+    POWER_IRCOUT_IDX           =(0),
+    POWER_IRC_IDX              =(1),
     ...
 };
 
 //! \name power set mask
 //! @{
 enum pm_power_cfg_msk_t {
-    POWER_IRCOUT_msk           =(1UL<<0), 
-    POWER_IRC_msk              =(1UL<<1), 
+    POWER_IRCOUT_MSK           =(1UL<<0),
+    POWER_IRC_MSK              =(1UL<<1),
     ...
 } ;
 //! @}
@@ -96,16 +98,15 @@ typedef uint_fast32_t pm_power_status_t;
 //! @{
 declare_interface(i_pm_power_t)
 def_interface(i_pm_power_t)
-    //! \brief Enable specific power domains with masks defined in 
+    //! \brief Enable specific power domains with masks defined in
     //!        em_power_cfg_msk_t
-    pm_power_status_t           (*Enable)(pm_power_cfg_no_t index);      
-    //! \brief Disable specific power domains with masks defined in 
+    pm_power_status_t   (*Enable)   (pm_power_cfg_no_t index);
+    //! \brief Disable specific power domains with masks defined in
     //!        em_power_cfg_msk_t
-    pm_power_status_t           (*Disable)(pm_power_cfg_no_t index);
-    
-    pm_power_status_t           (*GetStatus)(pm_power_cfg_no_t index);
-    vsf_err_t                   (*Resume)(  pm_power_cfg_no_t index, 
-                                            pm_power_status_t status);
+    pm_power_status_t   (*Disable)  (pm_power_cfg_no_t index);
+
+    pm_power_status_t   (*GetStatus)(pm_power_cfg_no_t index);
+    vsf_err_t           (*Resume)   (pm_power_cfg_no_t index, pm_power_status_t status);
 end_def_interface(i_pm_power_t)
 //! @}
 
@@ -114,40 +115,40 @@ end_def_interface(i_pm_power_t)
  * Sleep Management                                                           *
  *----------------------------------------------------------------------------*/
 
-/*! \note pm_sleep_mode_t should be defined in device specific header file 
-          device.h 
+/*! \note pm_sleep_mode_t should be defined in device specific header file
+          device.h
 
 //! \name the lowpower mode
 //! @{
 enum pm_sleep_mode_t{
-    PM_WAIT         = 0,
-    PM_SLEEP        = 1,
-    PM_DEEP_SLEEP   = 2,
-    PM_POWER_OFF    = 3,
+    PM_WAIT                         = 0,
+    PM_SLEEP                        = 1,
+    PM_DEEP_SLEEP                   = 2,
+    PM_POWER_OFF                    = 3,
 } ;
 //! @}
 */
 #ifndef __cplusplus
 typedef enum pm_sleep_mode_t pm_sleep_mode_t;
 #endif
- 
+
 //! \name sleep config struct
 //! @{
 typedef struct {
-    pm_sleep_mode_t             sleep_mode;         //!< sleep mode
-    uint32_t                    sleep_cfg;          //!< Sleep mode cfg
-    uint32_t                    wake_cfg;           //!< Awake mode cfg
-    uint32_t                    sleep_walking_cfg;  //!< Sleep Walking mode cfg
-}pm_sleep_cfg_t;
+    pm_sleep_mode_t                 sleep_mode;         //!< sleep mode
+    uint32_t                        sleep_cfg;          //!< Sleep mode cfg
+    uint32_t                        wake_cfg;           //!< Awake mode cfg
+    uint32_t                        sleep_walking_cfg;  //!< Sleep Walking mode cfg
+} pm_sleep_cfg_t;
 //! @}
 
 declare_interface(i_pm_wakeup_t)
 
-/*! \note i_pm_wakeup_t should be defined in device specific header file 
-          pm.h. 
-          
+/*! \note i_pm_wakeup_t should be defined in device specific header file
+          pm.h.
+
  *! \note The same type of UseXXX should have a consistent interface.
-          
+
     typedef struct rtc_cfg_t rtc_cfg_t;
     typedef struct io_wakeup_cfg_t io_wakeup_cfg_t;
     typedef struct usart_wakeup_cfg_t usart_wakeup_cfg_t;
@@ -180,122 +181,120 @@ declare_interface(i_pm_wakeup_t)
 */
 declare_interface(i_pm_sleep_t)
 def_interface(i_pm_sleep_t)
-    vsf_err_t (*TryToSleep)(pm_sleep_cfg_t *cfg_ptr);
+    vsf_err_t   (*TryToSleep)       (pm_sleep_cfg_t *cfg_ptr);
     i_pm_wakeup_t WakeUp;
 end_def_interface(i_pm_sleep_t)
 
 /*----------------------------------------------------------------------------*
  * Peripheral Clock Management                                                *
  *----------------------------------------------------------------------------*/
- 
-/*! \note pm_periph_asyn_clk_cfg_t and pm_pclk_no_t should be defined in device 
-          specific header file device.h 
+
+/*! \note pm_pclk_cfg_t and pm_pclk_no_t should be defined in device
+          specific header file device.h
           E.g.
 
 //! \name peripheral clock index
 //! @{
-enum pm_periph_async_clk_no_t{
-    PCLK_ADC0_idx           = 8,    //!< ADC 0
-    PCLK_SPI0_idx           = 9,    //!< SPI 0 
-    PCLK_SPI1_idx           = 10,   //!< SPI 1
-    PCLK_USART0_idx         = 12,   //!< USART0
-    PCLK_USART1_idx         = 13,   //!< USART1
+enum pm_pclk_no_t {
+    PCLK_ADC0_IDX                   = 8,        //!< ADC 0
+    PCLK_SPI0_IDX                   = 9,        //!< SPI 0
+    PCLK_SPI1_IDX                   = 10,       //!< SPI 1
+    PCLK_USART0_IDX                 = 12,       //!< USART0
+    PCLK_USART1_IDX                 = 13,       //!< USART1
 };
 
-struct pm_periph_asyn_clk_cfg_t {
-    pm_clk_src_sel_t    clk_src;
-    uint16_t            div;
+struct pm_pclk_cfg_t {
+    pm_clk_src_sel_t                clk_src;
+    uint16_t                        div;
 };
 //! @}
 
- */ 
+ */
 
 #ifndef __cplusplus
-typedef enum pm_periph_async_clk_no_t pm_periph_async_clk_no_t;
+typedef enum pm_pclk_no_t pm_pclk_no_t;
 #endif
 
-typedef int_fast16_t pm_periph_async_clk_status_t;
+typedef int_fast16_t pm_pclk_status_t;
 
 
-typedef struct pm_periph_asyn_clk_cfg_t pm_periph_asyn_clk_cfg_t;
+typedef struct pm_pclk_cfg_t pm_pclk_cfg_t;
 
 //! \name pclk
 //! @{
-declare_interface(i_pm_periph_asyn_clk_t)
-def_interface(i_pm_periph_asyn_clk_t)
-    pm_periph_async_clk_status_t    
-                        (*Config)(   pm_periph_async_clk_no_t index , 
-                                     const pm_periph_asyn_clk_cfg_t *cfg_ptr);
-    uint_fast32_t       (*GetClock)( pm_periph_async_clk_no_t index);
-    pm_periph_async_clk_status_t    
-                        (*GetStatus)(pm_periph_async_clk_no_t index);
-    vsf_err_t           (*Resume)   (pm_periph_async_clk_no_t index , 
-                                     pm_periph_async_clk_status_t status);
-end_def_interface(i_pm_periph_asyn_clk_t)
+declare_interface(i_pm_pclk_t)
+def_interface(i_pm_pclk_t)
+    pm_pclk_status_t(*Config)       (pm_pclk_no_t index, pm_pclk_cfg_t *cfg_ptr);
+    uint_fast32_t   (*GetClock)     (pm_pclk_no_t index);
+    pm_pclk_status_t(*Enable)       (pm_pclk_no_t index);
+    pm_pclk_status_t(*Disable)      (pm_pclk_no_t index);
+    pm_pclk_status_t(*GetStatus)    (pm_pclk_no_t index);
+    vsf_err_t       (*Resume)       (pm_pclk_no_t index, pm_pclk_status_t status);
+end_def_interface(i_pm_pclk_t)
 //! @}
 
 /*----------------------------------------------------------------------------*
  * AHB Clock Management                                                       *
  *----------------------------------------------------------------------------*/
 
- 
-/*! \note pm_sync_clk_no_t and pm_sync_clk_msk_t should be defined in device 
-          specific header file device.h 
+
+/*! \note pm_sclk_no_t and pm_sclk_msk_t should be defined in device
+          specific header file device.h
           E.g.
 
 //! \name Peripheral AHB Clock Macros
 //! @{
-enum pm_sync_clk_no_t { 
-    SyncCLK_CORE_idx         = 0,
-    SyncCLK_ROM0_idx         = 1,
-    SyncCLK_FLASH0_idx       = 2,
-    SyncCLK_SRAM0_idx        = 3,
+enum pm_sclk_no_t {
+    SCLK_CORE_IDX                   = 0,
+    SCLK_ROM0_IDX                   = 1,
+    SCLK_FLASH0_IDX                 = 2,
+    SCLK_SRAM0_IDX                  = 3,
 
     ...
 
-    SyncCLK_ARA0_idx         = 32,
-    SyncCLK_APPREG0_idx      = 33,
+    SCLK_ARA0_IDX                   = 32,
+    SCLK_APPREG0_IDX                = 33,
 };
 
-enum pm_sync_clk_msk_t { 
-    SyncCLK_CORE_msk         = _BV(SyncCLK_CORE_idx),
-    SyncCLK_ROM0_msk         = _BV(SyncCLK_ROM0_idx),
-    SyncCLK_FLASH0_msk       = _BV(SyncCLK_FLASH0_msk),
-    SyncCLK_SRAM0_msk        = _BV(SyncCLK_SRAM0_idx),
+enum pm_sclk_msk_t {
+    SCLK_CORE_MSK                   = BIT(SCLK_CORE_idx),
+    SCLK_ROM0_MSK                   = BIT(SCLK_ROM0_idx),
+    SCLK_FLASH0_MSK                 = BIT(SCLK_FLASH0_msk),
+    SCLK_SRAM0_MSK                  = BIT(SCLK_SRAM0_idx),
 
     ...
 
-    SyncCLK_ARA0_msk         = _BV(SyncCLK_ARA0_idx - 32),
-    SyncCLK_APPREG0_msk      = _BV(SyncCLK_APPREG0_msk - 32),
+    SCLK_ARA0_MSK                   = BIT(SCLK_ARA0_idx - 32),
+    SCLK_APPREG0_MSK                = BIT(SCLK_APPREG0_msk - 32),
 };
 //! @}
 */
 
 #ifndef __cplusplus
-typedef enum pm_sync_clk_no_t pm_sync_clk_no_t;
-typedef enum pm_sync_clk_msk_t pm_sync_clk_msk_t;
+typedef enum pm_sclk_no_t pm_sclk_no_t;
+typedef enum pm_sclk_msk_t pm_sclk_msk_t;
 #endif
 
-typedef uint_fast32_t pm_sync_clk_status_t;
+typedef uint_fast32_t pm_sclk_status_t;
 
 //! \name AHB Clock Management
 //! @{
-declare_interface(i_pm_sync_clk_t)
-def_interface(i_pm_sync_clk_t)
-    pm_sync_clk_status_t  (*Enable)(pm_sync_clk_no_t index);
-    pm_sync_clk_status_t  (*Disable)(pm_sync_clk_no_t index);
-    pm_sync_clk_status_t  (*GetStatus)(pm_sync_clk_no_t index);
-    vsf_err_t           (*Resume)(pm_sync_clk_no_t index, pm_sync_clk_status_t status);
-end_def_interface(i_pm_sync_clk_t)
+declare_interface(i_pm_sclk_t)
+def_interface(i_pm_sclk_t)
+    pm_sclk_status_t(*Enable)       (pm_sclk_no_t index);
+    pm_sclk_status_t(*Disable)      (pm_sclk_no_t index);
+    pm_sclk_status_t(*GetStatus)    (pm_sclk_no_t index);
+    vsf_err_t       (*Resume)       (pm_sclk_no_t index, pm_sclk_status_t status);
+end_def_interface(i_pm_sclk_t)
 //! @}
 
 /*----------------------------------------------------------------------------*
  * Main Clock Management                                                      *
  *----------------------------------------------------------------------------*/
 
-/*! \note pm_clk_src_sel_t should be defined in device specific header file device.h 
+/*! \note pm_clk_src_sel_t should be defined in device specific header file device.h
           E.g.
- 
+
 //! @{
 enum pm_clk_src_sel_t {
     AUTO_CLKSRC_IRC                 = 0x0,      //!< source clk is IRC
@@ -303,7 +302,7 @@ enum pm_clk_src_sel_t {
     AUTO_CLKSRC_SYSOSC1             = 0x2,      //!< source clock is WDTOSC
     AUTO_CLKSRC_EXTCLK0             = 0x3,      //!< Source clk is extern clock0
     AUTO_CLKSRC_EXTCLK1             = 0x4,      //!< source clk is extern clock1
-    
+
 
     PLL_CLKSRC_IRC                  = 0x0,      //!< pll source clk is IRC
     PLL_CLKSRC_SYSOSC0              = 0x1,      //!< pll source clk is System oscilator
@@ -335,57 +334,57 @@ typedef enum {
 } pm_divider_t;
 //! @}
 
-#ifndef __cplusplus 
-typedef enum pm_main_clk_core_div_t pm_main_clk_core_div_t;
-typedef enum pm_main_clk_axi_div_t pm_main_clk_axi_div_t;
-typedef enum pm_main_clk_ahb_div_t pm_main_clk_ahb_div_t;
-typedef enum pm_main_clk_apb_div_t pm_main_clk_apb_div_t;
+#ifndef __cplusplus
+typedef enum pm_mclk_core_div_t     pm_mclk_core_div_t;
+typedef enum pm_mclk_axi_div_t      pm_mclk_axi_div_t;
+typedef enum pm_mclk_ahb_div_t      pm_mclk_ahb_div_t;
+typedef enum pm_mclk_apb_div_t      pm_mclk_apb_div_t;
 #endif
 
-/*! \note pm_main_clk_cfg_t, CORE_NUM and XXX_CLK_NUM should be defined in 
+/*! \note pm_mclk_cfg_t, CORE_NUM and XXX_CLK_NUM should be defined in
           device specific header filer device.h
           Example:
- 
+
 //! \name main clock config sturct
 //! @{
-struct pm_main_clk_cfg_t {
-    pm_clk_src_sel_t    clk_src;                    //!< main clock source
-    uint32_t            freq;                       //!< system oscilator frequency
-    pm_main_clk_core_div_t  core_div[CORE_NUM];     //!< system core clock divider
-    pm_main_clk_axi_div_t   axi_div[AXI_CLK_NUM];   //!< system AXI clock divider
-    pm_main_clk_ahb_div_t   ahb_div[AHB_CLK_NUM];   //!< system AHB clock divider
-    pm_main_clk_apb_div_t   apb_div[APB_CLK_NUM];   //!< system APB clock divider
+struct pm_mclk_cfg_t {
+    pm_clk_src_sel_t                clk_src;                //!< main clock source
+    uint32_t                        freq;                   //!< system oscilator frequency
+    pm_mclk_core_div_t              core_div[CORE_NUM];     //!< system core clock divider
+    pm_mclk_axi_div_t               axi_div[AXI_CLK_NUM];   //!< system AXI clock divider
+    pm_mclk_ahb_div_t               ahb_div[AHB_CLK_NUM];   //!< system AHB clock divider
+    pm_mclk_apb_div_t               apb_div[APB_CLK_NUM];   //!< system APB clock divider
 };
 //! @}
  */
-typedef struct pm_main_clk_cfg_t pm_main_clk_cfg_t;
+typedef struct pm_mclk_cfg_t pm_mclk_cfg_t;
 
 #ifndef __cplusplus
-typedef enum pm_main_clk_no_t pm_main_clk_no_t;
+typedef enum pm_mclk_no_t pm_mclk_no_t;
 #endif
 /*
-enum pm_main_clk_no_t {
-    MCLK_CORE_idx = 0,
-    MCLK_CORE0_idx = 0,
+enum pm_mclk_no_t {
+    MCLK_CORE_IDX = 0,
+    MCLK_CORE0_IDX = 0,
 
-    MCLK_AXI0_idx,
-    MCLK_AXI1_idx,
+    MCLK_AXI0_IDX,
+    MCLK_AXI1_IDX,
 
-    MCLK_AHB0_idx,
-    MCLK_AHB1_idx,
+    MCLK_AHB0_IDX,
+    MCLK_AHB1_IDX,
 
-    MCLK_APB0_idx,
-    MCLK_APB1_idx
+    MCLK_APB0_IDX,
+    MCLK_APB1_IDX,
 };
  */
 
 //! \name main clock struct type
 //! @{
-declare_interface(i_pm_main_clk_t)
-def_interface(i_pm_main_clk_t)
-    fsm_rt_t            (*Init)         (pm_main_clk_cfg_t *cfg_ptr);
-    uint_fast32_t       (*GetClock)     (pm_main_clk_no_t sel);
-end_def_interface(i_pm_main_clk_t)
+declare_interface(i_pm_mclk_t)
+def_interface(i_pm_mclk_t)
+    fsm_rt_t        (*Init)         (pm_mclk_cfg_t *cfg_ptr);
+    uint_fast32_t   (*GetClock)     (pm_mclk_no_t sel);
+end_def_interface(i_pm_mclk_t)
 //! @}
 
 
@@ -394,12 +393,12 @@ end_def_interface(i_pm_main_clk_t)
  * PLL Control                                                                *
  *----------------------------------------------------------------------------*/
 
-/*! \note pm_pll_sel_t should be defined in device specific header file device.h 
+/*! \note pm_pll_sel_t should be defined in device specific header file device.h
           E.g.
 
 enum pm_pll_sel_t {
-    PLL0_idx,
-    PLL1_idx,
+    PLL0_IDX,
+    PLL1_IDX,
 };
 
  */
@@ -411,10 +410,10 @@ typedef enum pm_pll_sel_t pm_pll_sel_t;
 //! \name pll config struct
 //! @{
 struct pm_pll_cfg_t {
-    pm_clk_src_sel_t            pll_clk_src;    //!< pll clock source
-    uint32_t                    freq;           //!< system oscilator frequency
-    uint8_t                     Msel;           //!< PLL Feedback divider value
-    uint8_t                     Psel;           //!< pll Feedback divider value
+    pm_clk_src_sel_t                pll_clk_src;//!< pll clock source
+    uint32_t                        freq;       //!< system oscilator frequency
+    uint8_t                         Msel;       //!< PLL Feedback divider value
+    uint8_t                         Psel;       //!< pll Feedback divider value
 };
 //! @}
 */
@@ -429,10 +428,10 @@ typedef enum pm_pll_post_div_t pm_pll_post_div_t;
 //! \name pll post divider
 //! @{
 enum pm_pll_post_div_t {
-    PLL_POST_DIV_1              = 0x00,     //!< pll post divider rate is 1
-    PLL_POST_DIV_2              = 0x01,     //!< pll post divider rate is 2
-    PLL_POST_DIV_4              = 0x02,     //!< pll post divider rate is 4
-    PLL_POST_DIV_8              = 0x03,     //!< pll post divider rate is 8
+    PLL_POST_DIV_1                  = 0x00,     //!< pll post divider rate is 1
+    PLL_POST_DIV_2                  = 0x01,     //!< pll post divider rate is 2
+    PLL_POST_DIV_4                  = 0x02,     //!< pll post divider rate is 4
+    PLL_POST_DIV_8                  = 0x03,     //!< pll post divider rate is 8
 } ;
 //! @}
 */
@@ -443,13 +442,13 @@ enum pm_pll_post_div_t {
 declare_interface(i_pm_pll_t)
 def_interface(i_pm_pll_t)
     //! Pll config
-    fsm_rt_t                    (*Init)(pm_pll_sel_t pll, pm_pll_cfg_t *cfg_ptr);
+    fsm_rt_t        (*Init)         (pm_pll_sel_t pll, pm_pll_cfg_t *cfg_ptr);
     //! PLL Check Is Pll Locked
-    bool                        (*IsLocked)(pm_pll_sel_t pll);
+    bool            (*IsLocked)     (pm_pll_sel_t pll);
     //! get pll output clock
-    uint_fast32_t               (*GetClockOut)(pm_pll_sel_t pll); 
+    uint_fast32_t   (*GetClockOut)  (pm_pll_sel_t pll);
     //! get pll input clock
-    uint_fast32_t               (*GetClockIn)(pm_pll_sel_t pll); 
+    uint_fast32_t   (*GetClockIn)   (pm_pll_sel_t pll);
 end_def_interface(i_pm_pll_t)
 //! @}
 
@@ -457,16 +456,16 @@ end_def_interface(i_pm_pll_t)
  * Low Power Oscillator Management                                            *
  *----------------------------------------------------------------------------*/
 
-/*! \note pm_pll_sel_t should be defined in device specific header file device.h 
+/*! \note pm_pll_sel_t should be defined in device specific header file device.h
           E.g.
 //! \name always-on oscillator configuration structure
 //! @{
-struct lposc_cfg_t{ 
+struct lposc_cfg_t{
     union {
         struct {
-            uint32_t DIV                     : 5;
-            uint32_t FREQ                    : 4;
-            reg32_t                          :23;
+            uint32_t DIV            : 5;
+            uint32_t FREQ           : 4;
+            reg32_t                 :23;
         };
         uint32_t wWord;
     };
@@ -487,14 +486,14 @@ typedef uint16_t pm_lposc_sel_t;
 
 typedef struct pm_lposc_cfg_t pm_lposc_cfg_t;
 
-//! \name low power oscillator 
+//! \name low power oscillator
 //! @{
 declare_interface(i_pm_lposc_t)
 def_interface(i_pm_lposc_t)
-    vsf_err_t       (*Init)     (pm_lposc_sel_t lposc, pm_lposc_cfg_t *cfg_ptr);
-    void            (*Enable)   (pm_lposc_sel_t lposc);
-    void            (*Disable)  (pm_lposc_sel_t lposc);
-    uint_fast32_t   (*GetClock) (pm_lposc_sel_t lposc);
+    vsf_err_t       (*Init)         (pm_lposc_sel_t lposc, pm_lposc_cfg_t *cfg_ptr);
+    void            (*Enable)       (pm_lposc_sel_t lposc);
+    void            (*Disable)      (pm_lposc_sel_t lposc);
+    uint_fast32_t   (*GetClock)     (pm_lposc_sel_t lposc);
 end_def_interface(i_pm_lposc_t)
 //! @}
 
@@ -506,48 +505,48 @@ end_def_interface(i_pm_lposc_t)
 //! @{
 typedef struct {
     //! clk out source select
-    pm_clk_src_sel_t            clk_src;        //!< clock source for output
+    pm_clk_src_sel_t                clk_src;    //!< clock source for output
     //! clk divider
-    uint_fast8_t                div;            //!< divider for output clock
+    uint_fast8_t                    div;        //!< divider for output clock
 } pm_clock_out_cfg_t;
 //! @}
 
 declare_interface(i_pm_clk_t)
 def_interface(i_pm_clk_t)
 
-    /*! \note Main here is used to set dividers for CPU, sync-clocks (ahb, axi, 
-     *!       apb and etc) hence generate clock for CPU, sync-clocks from system 
+    /*! \note Main here is used to set dividers for CPU, sync-clocks (ahb, axi,
+     *!       apb and etc) hence generate clock for CPU, sync-clocks from system
      *!       clock.
      */
-    i_pm_main_clk_t         Main;
+    i_pm_mclk_t     Main;
 
     /*! \note the system clock is the root of the clock tree output
-     *!       cpu clock and Sync-Clock of bus and peripherals are derived 
-     *!       from system clock with **their own dividers**. 
-     *!       One should not suppose that the cpu clock is the same as the 
-     *!       system clock. The Sync-Clock can also be different from cpu 
+     *!       cpu clock and Sync-Clock of bus and peripherals are derived
+     *!       from system clock with **their own dividers**.
+     *!       One should not suppose that the cpu clock is the same as the
+     *!       system clock. The Sync-Clock can also be different from cpu
      *!       clock.
-     */ 
-    uint_fast32_t           (*GetSysClk)(void);
+     */
+    uint_fast32_t   (*GetSysClk)(void);
 
 #if VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT == ENABLED
-    vsf_err_t               (*ClkOutCfg)( pm_clock_out_cfg_t *cfg_ptr);
+    vsf_err_t       (*ClkOutCfg)(pm_clock_out_cfg_t *cfg_ptr);
 #endif
 
-#if VSF_HAL_DRV_PM_CFG_SUPPORT_PRH_CLK == ENABLED
-    i_pm_periph_asyn_clk_t  Peripheral;
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_PCLK == ENABLED
+    i_pm_pclk_t     Peripheral;
 #endif
 
-#if VSF_HAL_DRV_PM_CFG_SUPPORT_SYNC_CLK == ENABLED
-    i_pm_sync_clk_t         SyncClock;
+#if VSF_HAL_DRV_PM_CFG_SUPPORT_SCLK == ENABLED
+    i_pm_sclk_t     SyncClock;
 #endif
 
 #if VSF_HAL_DRV_PM_CFG_SUPPORT_LPOSC == ENABLED
-    i_pm_lposc_t            LPOSC;                  //!< low power oscillators
+    i_pm_lposc_t    LPOSC;                      //!< low power oscillators
 #endif
 
 #if VSF_HAL_DRV_PM_CFG_SUPPORT_PLL == ENABLED
-    i_pm_pll_t              PLL;                    //!< pll control
+    i_pm_pll_t      PLL;                        //!< pll control
 #endif
 
 end_def_interface(i_pm_clk_t)
@@ -559,20 +558,20 @@ end_def_interface(i_pm_clk_t)
 
 //! \name pmu struct
 //! @{
-declare_interface(i_pm_t) 
-def_interface(i_pm_t)   
+declare_interface(i_pm_t)
+def_interface(i_pm_t)
     //! \brief set the clock auto . the main clock frequency and the div is needed
-    fsm_rt_t            (*AutoClock)(   pm_clk_src_sel_t clk_src,
-                                        uint_fast32_t src_frq,
-                                        uint_fast32_t target_frq);
-    i_pm_clk_t          Clock;
+    fsm_rt_t        (*AutoClock)(   pm_clk_src_sel_t clk_src,
+                                    uint_fast32_t src_frq,
+                                    uint_fast32_t target_frq);
+    i_pm_clk_t      Clock;
 
 #if VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL == ENABLED
-    i_pm_power_t        Power;
+    i_pm_power_t    Power;
 #endif
 
 #if VSF_HAL_DRV_PM_CFG_SUPPORT_SLEEP_CTRL == ENABLED
-    i_pm_sleep_t        Sleep;
+    i_pm_sleep_t    Sleep;
 #endif
 
 end_def_interface(i_pm_t)

@@ -20,7 +20,7 @@
 
 #include "../../../vsf_av_cfg.h"
 
-#if VSF_USE_DECODER_WAV == ENABLED
+#if VSF_AUDIO_USE_DECODER_WAV == ENABLED
 
 #include "kernel/vsf_kernel.h"
 #include "component/av/audio/vsf_audio.h"
@@ -73,5 +73,5 @@ extern vsf_err_t vk_wav_play_stop(vk_wav_t *wav);
 }
 #endif
 
-#endif      // VSF_USE_DECODER_WAV
+#endif      // VSF_AUDIO_USE_DECODER_WAV
 #endif      // __VSF_WAV_H__

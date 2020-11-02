@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources(vsf INTERFACE
+target_sources(${VSF_LIB_NAME} INTERFACE
     vsf_linux_glibc.c
     vsf_linux_glibc_pthread.c
     vsf_linux_glibc_sem.c

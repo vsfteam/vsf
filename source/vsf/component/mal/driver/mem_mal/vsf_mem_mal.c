@@ -19,7 +19,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_MEM_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_MEM_MAL == ENABLED
 
 #define __VSF_MAL_CLASS_INHERIT__
 #define __VSF_MEM_MAL_CLASS_IMPLEMENT

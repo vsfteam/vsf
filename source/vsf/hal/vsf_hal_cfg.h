@@ -41,16 +41,86 @@ extern "C" {
 #endif
 #endif
 
-#ifndef VSF_HAL_CFG_USE_STREAM
-#   define VSF_HAL_CFG_USE_STREAM       VSF_USE_SERVICE_STREAM
-#endif
-
-#ifndef VSF_HAL_CFG_USE_VSFSTREAM
-#   define VSF_HAL_CFG_USE_VSFSTREAM    VSF_USE_SERVICE_VSFSTREAM
-#endif
-
 #ifndef VSF_SYSTIMER_RESOLUTION
 #   define VSF_SYSTIMER_RESOLUTION      (1000000)    /*! using default 1us */
+#endif
+
+#ifndef VSF_HAL_USE_GPIO
+#   define VSF_HAL_USE_GPIO             ENABLED
+#endif
+#ifndef VSF_HAL_USE_PM
+#   define VSF_HAL_USE_PM               ENABLED
+#endif
+
+#ifndef VSF_HAL_USE_DMA
+#   define VSF_HAL_USE_DMA              ENABLED
+#endif
+
+/*----------------------------------------------------------------------------*
+ * USART Switch                                                               *
+ *----------------------------------------------------------------------------*/
+#ifndef VSF_HAL_USE_USART
+#   define VSF_HAL_USE_USART            ENABLED
+#endif
+#if VSF_HAL_USE_USART != ENABLED
+#   undef VSF_HAL_USE_USART0
+#   undef VSF_HAL_USE_USART1
+#   undef VSF_HAL_USE_USART2
+#   undef VSF_HAL_USE_USART3
+#   undef VSF_HAL_USE_USART4
+#   undef VSF_HAL_USE_USART5
+#   undef VSF_HAL_USE_USART6
+#   undef VSF_HAL_USE_USART7
+#else
+#   ifndef VSF_HAL_USE_USART0
+#       define VSF_HAL_USE_USART0       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART1
+#       define VSF_HAL_USE_USART1       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART2
+#       define VSF_HAL_USE_USART2       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART3
+#       define VSF_HAL_USE_USART3       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART4
+#       define VSF_HAL_USE_USART4       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART5
+#       define VSF_HAL_USE_USART5       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART6
+#       define VSF_HAL_USE_USART6       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_USART7
+#       define VSF_HAL_USE_USART7       ENABLED
+#   endif
+#endif
+
+#ifndef VSF_HAL_USE_SPI
+#   define VSF_HAL_USE_SPI              ENABLED
+#endif
+#ifndef VSF_HAL_USE_IIC
+#   define VSF_HAL_USE_IIC              ENABLED
+#endif
+#ifndef VSF_HAL_USE_TIMER
+#   define VSF_HAL_USE_TIMER            ENABLED
+#endif
+#ifndef VSF_HAL_USE_ADC
+#   define VSF_HAL_USE_ADC              ENABLED
+#endif
+#ifndef VSF_HAL_USE_DAC
+#   define VSF_HAL_USE_DAC              ENABLED
+#endif
+#ifndef VSF_HAL_USE_RTC
+#   define VSF_HAL_USE_RTC              ENABLED
+#endif
+#ifndef VSF_HAL_USE_USBD
+#   define VSF_HAL_USE_USBD             VSF_USE_USB_DEVICE
+#endif
+#ifndef VSF_HAL_USE_USBH
+#   define VSF_HAL_USE_USBH             VSF_USE_USB_HOST
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

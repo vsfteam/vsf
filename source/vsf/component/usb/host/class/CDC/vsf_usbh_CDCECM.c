@@ -20,7 +20,7 @@
 #include "component/usb/vsf_usb_cfg.h"
 
 #if     VSF_USE_USB_HOST == ENABLED                                             \
-    &&  VSF_USE_USB_HOST_ECM == ENABLED                                         \
+    &&  VSF_USBH_USE_ECM == ENABLED                                             \
     &&  VSF_USE_TCPIP == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
@@ -231,7 +231,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *netbuf)
 #endif
 
 #if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "ecm_output :" VSF_TRACE_CFG_LINEEND);
+    vsf_trace_debug("ecm_output :" VSF_TRACE_CFG_LINEEND);
     vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, mem.size, VSF_TRACE_DF_DEFAULT);
 #endif
     vk_usbh_urb_set_buffer(&ocb->urb, mem.buffer, mem.size);
@@ -271,10 +271,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
         case 0x00: {          // NETWORK_CONNECTION
                 bool connected = vk_netdrv_is_connected(&ecm->netdrv);
                 if (connected && ecm->evt[2] == 0) {
-                    vsf_trace(VSF_TRACE_INFO, "ecm_event: NETWORK_CONNECTION Disconnected" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_info("ecm_event: NETWORK_CONNECTION Disconnected" VSF_TRACE_CFG_LINEEND);
                     vk_netdrv_disconnect(&ecm->netdrv);
                 } else if (!connected && (ecm->evt[2] != 0)) {
-                    vsf_trace(VSF_TRACE_INFO, "ecm_event: NETWORK_CONNECTION Connected" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_info("ecm_event: NETWORK_CONNECTION Connected" VSF_TRACE_CFG_LINEEND);
                     vk_netdrv_connect(&ecm->netdrv);
 
                     vk_usbh_ecm_icb_t *icb = ecm->icb;
@@ -285,10 +285,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
             }
             break;
         case 0x2A:            // CONNECTION_SPEED_CHANGE
-//            vsf_trace(VSF_TRACE_INFO, "ecm_event: CONNECTION_SPEED_CHANGE" VSF_TRACE_CFG_LINEEND);
+//            vsf_trace_info("ecm_event: CONNECTION_SPEED_CHANGE" VSF_TRACE_CFG_LINEEND);
             break;
         default:
-            vsf_trace(VSF_TRACE_ERROR, "ecm_event: unknown(%d)" VSF_TRACE_CFG_LINEEND, ecm->evt[0]);
+            vsf_trace_error("ecm_event: unknown(%d)" VSF_TRACE_CFG_LINEEND, ecm->evt[0]);
             break;
         }
         break;
@@ -313,7 +313,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                 uint8_t *buffer = icb->buffer;
 
 #   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "ecm_input :" VSF_TRACE_CFG_LINEEND);
+                vsf_trace_debug("ecm_input :" VSF_TRACE_CFG_LINEEND);
                 vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, remain, VSF_TRACE_DF_DEFAULT);
 #   endif
 
@@ -327,7 +327,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
 #else
                 if (!vk_netdrv_read_buf(netdrv, icb->netbuf, &mem)) {
 #   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-                    vsf_trace(VSF_TRACE_DEBUG, "ecm_input :" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_debug("ecm_input :" VSF_TRACE_CFG_LINEEND);
                     vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, size, VSF_TRACE_DF_DEFAULT);
 #   endif
                 }
@@ -417,7 +417,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
             vk_usbh_urb_free_buffer(urb);
 
-            vsf_trace(VSF_TRACE_INFO, "cdc_cdc: MAC is %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
+            vsf_trace_info("cdc_cdc: MAC is %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
                     ecm->netdrv.macaddr.addr_buf[0], ecm->netdrv.macaddr.addr_buf[1],
                     ecm->netdrv.macaddr.addr_buf[2], ecm->netdrv.macaddr.addr_buf[3],
                     ecm->netdrv.macaddr.addr_buf[4], ecm->netdrv.macaddr.addr_buf[5]);

@@ -158,7 +158,7 @@ static void __vsfip_socket_free(vsfip_socket_t *socket)
     if (socket != NULL) {
         if (socket->netif != NULL) {
 #ifdef VSFIP_TRACE_NETIF
-            vsf_trace(VSF_TRACE_DEBUG, "socket deref");
+            vsf_trace_debug("socket deref");
 #endif
             vsfip_netif_deref(socket->netif);
             socket->netif = NULL;
@@ -172,7 +172,7 @@ void vsfip_socket_set_netif(vsfip_socket_t *socket, vsfip_netif_t *netif)
     if (!socket->netif) {
         socket->netif = netif;
 #ifdef VSFIP_TRACE_NETIF
-        vsf_trace(VSF_TRACE_DEBUG, "socket ref");
+        vsf_trace_debug("socket ref");
 #endif
         vsfip_netif_ref(netif);
     }
@@ -235,7 +235,7 @@ void vsfip_netbuf_deref(vsfip_netbuf_t *netbuf)
         if (!--netbuf->ref) {
             if (netbuf->netif != NULL) {
 #ifdef VSFIP_TRACE_NETIF
-                vsf_trace(VSF_TRACE_DEBUG, "buffer deref");
+                vsf_trace_debug("buffer deref");
 #endif
                 vsfip_netif_deref(netbuf->netif);
                 netbuf->netif = NULL;
@@ -250,14 +250,14 @@ void vsfip_netbuf_set_netif(vsfip_netbuf_t *netbuf, vsfip_netif_t *netif)
     if (netbuf->netif != netif) {
         if (netbuf->netif != NULL) {
 #ifdef VSFIP_TRACE_NETIF
-            vsf_trace(VSF_TRACE_DEBUG, "buffer deref");
+            vsf_trace_debug("buffer deref");
 #endif
             vsfip_netif_deref(netbuf->netif);
         }
 
         netbuf->netif = netif;
 #ifdef VSFIP_TRACE_NETIF
-        vsf_trace(VSF_TRACE_DEBUG, "buffer ref");
+        vsf_trace_debug("buffer ref");
 #endif
         vsfip_netif_ref(netif);
     }
@@ -310,7 +310,7 @@ vsf_err_t vsfip_netif_add(vsfip_netif_t *netif)
     netif->ip4addr.size = 4;
     netif->ref = 0;
 #ifdef VSFIP_TRACE_NETIF
-    vsf_trace(VSF_TRACE_DEBUG, "netif ref");
+    vsf_trace_debug("netif ref");
 #endif
     vsfip_netif_ref(netif);
     vsfip_netif_init(netif);
@@ -359,7 +359,7 @@ vsf_err_t vsfip_netif_remove(vsfip_netif_t *netif)
         __vsfip_netif_cleanup_socket(netif);
         vsfip_netif_fini(netif);
 #ifdef VSFIP_TRACE_NETIF
-        vsf_trace(VSF_TRACE_DEBUG, "netif deref");
+        vsf_trace_debug("netif deref");
 #endif
         vsfip_netif_deref(netif);
     }

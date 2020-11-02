@@ -46,39 +46,39 @@ static void __vsf_task_pop(vsf_task_t *ptask)
 {
     class_internal(ptask, this_ptr, vsf_task_t);
     vsf_task_stack_frame_t *frame_ptr = NULL;
-    
+
     this.call_depth--;
-    
-    vsf_slist_stack_pop(vsf_task_stack_frame_t, 
-                        use_as__vsf_slist_node_t, 
-                        &(this.stack.list), 
+
+    vsf_slist_stack_pop(vsf_task_stack_frame_t,
+                        use_as__vsf_slist_node_t,
+                        &(this.stack.list),
                         frame_ptr);
-                        
+
     VSF_POOL_FREE(vsf_task_stack_frame_pool, this.pstack_frame_pool, frame_ptr);
 }
 
 static void __vsf_task_push(vsf_task_t *ptask, vsf_task_stack_frame_t *frame_ptr)
 {
     class_internal(ptask, this_ptr, vsf_task_t);
-    
-    vsf_slist_stack_push(   vsf_task_stack_frame_t, 
-                            use_as__vsf_slist_node_t, 
-                            &(this.stack.list), 
+
+    vsf_slist_stack_push(   vsf_task_stack_frame_t,
+                            use_as__vsf_slist_node_t,
+                            &(this.stack.list),
                             frame_ptr);
     this.call_depth++;
-    
+
     //! calculate the maximum depth
     this.max_call_depth = max(this.call_depth, this.max_call_depth);
 }
 
 
 vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
-                            vsf_task_entry_t *fnEntry, 
-                            void *target_ptr, 
+                            vsf_task_entry_t *fnEntry,
+                            void *target_ptr,
                             bool is_sub_call )
 {
     VSF_KERNEL_ASSERT(NULL != ptask);
-    class_internal(ptask, this_ptr, vsf_task_t);   
+    class_internal(ptask, this_ptr, vsf_task_t);
 
     if (!is_sub_call) {
         this.stack.frame_ptr->fnEntry = fnEntry;
@@ -88,7 +88,7 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
             this.stack.frame_ptr->target_ptr = target_ptr;
         }
     } else {
-        vsf_task_stack_frame_t *pframe = 
+        vsf_task_stack_frame_t *pframe =
             VSF_POOL_ALLOC(vsf_task_stack_frame_pool, this.pstack_frame_pool);
         if (NULL == pframe) {
             VSF_KERNEL_ASSERT(false);
@@ -107,13 +107,13 @@ vsf_err_t __vsf_task_branch(vsf_task_t *ptask,
     return VSF_ERR_NONE;
 }
 
-fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry, 
-                            void *target_ptr, 
+fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry,
+                            void *target_ptr,
                             bool is_sub_call )
 {
     class_internal(vsf_eda_get_cur(), this_ptr, vsf_task_t);
     fsm_rt_t task_return_state = this.task_return_state;
-    
+
     if (is_sub_call) {
         switch(task_return_state) {
             case fsm_rt_on_going:
@@ -125,20 +125,20 @@ fsm_rt_t vsf_task_branch(  vsf_task_entry_t *fnEntry,
                 return task_return_state;
         }
     }
-    
-    __vsf_task_branch((vsf_task_t *)this_ptr, 
+
+    __vsf_task_branch((vsf_task_t *)this_ptr,
                             fnEntry,
                             target_ptr,
                             is_sub_call);
     /*! \note
-     *  - if VSF_ERR_NOT_ENOUGH_RESOURCES is detected, yield and try it again 
-     *  (automatically). For tasks sharing the same frame pool, if the pool is 
+     *  - if VSF_ERR_NOT_ENOUGH_RESOURCES is detected, yield and try it again
+     *  (automatically). For tasks sharing the same frame pool, if the pool is
      *  too small, only task performance will be affected, and all sub-task call
-     *  will work when frame is allocated. 
+     *  will work when frame is allocated.
      *  - if the frame is allocated and pushed to the stack, we should yield to
      *  let the sub-task run.
      *
-     *  Since in either way, we will yield, no need to handle the return 
+     *  Since in either way, we will yield, no need to handle the return
      *  value of __vsf_task_branch().
      */
     return fsm_rt_yield;
@@ -148,14 +148,14 @@ static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
 {
     vsf_task_t *ptask = (vsf_task_t *)peda;
     class_internal(ptask, this_ptr, vsf_task_t);
-    VSF_KERNEL_ASSERT(     ptask != NULL 
+    VSF_KERNEL_ASSERT(     ptask != NULL
             &&  NULL != this.stack.frame_ptr
             &&  NULL != this.stack.frame_ptr->fnEntry);
 
     do {
-        this.task_return_state = 
+        this.task_return_state =
             (*this.stack.frame_ptr->fnEntry)(this.stack.frame_ptr->target_ptr, evt);
-        
+
         switch(this.task_return_state) {
             default:            //! return fsm_rt_err
             case fsm_rt_asyn:   //! call sub fsm later
@@ -163,7 +163,7 @@ static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
                 if (NULL != this.stack.list.head) {
                     __vsf_task_pop(ptask);
                 }
-                
+
                 if (NULL == this.stack.list.head) {
                     //! stack is empty, i.e. the root of the call stack
                 #if VSF_CFG_TIMER_EN == ENABLED
@@ -172,9 +172,9 @@ static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
                     vsf_eda_fini(peda);
                 #endif
                     return ;
-                } 
+                }
                 break;
-            
+
             case fsm_rt_wait_for_evt:
                 //! delay, wait_for, mutex_pend, sem_pend and etc...
                 return ;
@@ -185,46 +185,45 @@ static void __vsf_task_evthandler(vsf_eda_t *peda, vsf_evt_t evt)
     } while(true);
 }
 
-void vsf_task_init( vsf_pool_block(vsf_task_stack_frame_pool) *frame_buf_ptr,
+void vsf_task_init( vsf_pool_item(vsf_task_stack_frame_pool) *frame_buf_ptr,
                     uint_fast16_t count)
 {
-    do {   
+    do {
         /*
         static const vsf_pool_cfg_t cfg = {
-            NULL, 
+            NULL,
             (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
-        };                             
-        vsf_task_stack_frame_pool_pool_init((&__default_frame_pool), &cfg);                         
-        */    
+        };
+        vsf_task_stack_frame_pool_pool_init((&__default_frame_pool), &cfg);
+        */
         VSF_POOL_PREPARE(vsf_task_stack_frame_pool, (&__default_frame_pool),
-            .target_ptr = NULL, 
+            .target_ptr = NULL,
             .region_ptr = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
         );
         if (NULL == frame_buf_ptr || 0 == count) {
             break;
         }
-        vsf_pool_add_buffer(  
-            (vsf_pool_t *)(&__default_frame_pool),               
-            frame_buf_ptr,                                  
-            count 
-                * sizeof(vsf_pool_block(vsf_task_stack_frame_pool)),                     
-            sizeof(vsf_task_stack_frame_pool_pool_item_t));              
-    } while(0);       
+        vsf_pool_add_buffer(
+            (vsf_pool_t *)(&__default_frame_pool),
+            frame_buf_ptr,
+            count * sizeof(vsf_pool_item(vsf_task_stack_frame_pool)),
+            sizeof(vsf_task_stack_frame_pool_pool_item_t));
+    } while(0);
 }
 
 vsf_err_t vsf_task_start(vsf_task_t *ptask, vsf_task_cfg_t *pcfg)
 {
-    VSF_KERNEL_ASSERT(     NULL != ptask 
+    VSF_KERNEL_ASSERT(     NULL != ptask
             &&  NULL != pcfg
             &&  NULL != pcfg->fnEntry);
-            
+
     class_internal(ptask, this_ptr, vsf_task_t);
-    
+
     memset(ptask, 0, sizeof(vsf_task_t));
 
     if (NULL == pcfg->pframe_pool) {
         //! use default frame pool
-        this.pstack_frame_pool = &__default_frame_pool; 
+        this.pstack_frame_pool = &__default_frame_pool;
     } else {
         //! use specified frame pool
         this.pstack_frame_pool = pcfg->pframe_pool;
@@ -236,9 +235,9 @@ vsf_err_t vsf_task_start(vsf_task_t *ptask, vsf_task_cfg_t *pcfg)
     if (VSF_ERR_NONE != err) {
         return err;
     }
-    
+
     this.evthandler = __vsf_task_evthandler;
-    
+
 #if VSF_CFG_TIMER_EN == ENABLED
     return vsf_teda_init(&this.use_as__vsf_teda_t, pcfg->priority, false);
 #else

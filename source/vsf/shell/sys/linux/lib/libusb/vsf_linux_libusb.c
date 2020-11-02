@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_USE_LINUX_LIBUSB == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_LIBUSB == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__

@@ -22,8 +22,8 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if     ((VSF_USE_USB_DEVICE == ENABLED) && (VSF_USE_USB_DEVICE_UAC == ENABLED))\
-    ||  ((VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_UAC == ENABLED))
+#if     ((VSF_USE_USB_DEVICE == ENABLED) && (VSF_USBD_USE_UAC == ENABLED))      \
+    ||  ((VSF_USE_USB_HOST == ENABLED) && (VSF_USBH_USE_UAC == ENABLED))
 
 #include "utilities/vsf_utilities.h"
 
@@ -76,5 +76,5 @@ typedef struct usb_uac_as_format_i_desc_t usb_uac_as_format_i_desc_t;
 }
 #endif
 
-#endif      // (VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UAC) || (VSF_USE_USB_HOST && VSF_USE_USB_HOST_UAC)
+#endif      // (VSF_USE_USB_DEVICE && VSF_USBD_USE_UAC) || (VSF_USE_USB_HOST && VSF_USBH_USE_UAC)
 #endif      // __VSFUSB_UAC_H__

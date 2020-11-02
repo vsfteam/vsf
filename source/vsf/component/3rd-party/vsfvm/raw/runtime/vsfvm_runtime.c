@@ -298,7 +298,7 @@ vsfvm_instance_t * vsfvm_instance_alloc(uint_fast32_t size, const vsfvm_class_t 
     vsfvm_instance_t *inst = vsf_heap_malloc(sizeof(vsfvm_instance_t) + size);
     if (inst) {
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "alloc instance 0x%08X" VSF_TRACE_CFG_LINEEND, inst);
+        vsf_trace_debug("alloc instance 0x%08X" VSF_TRACE_CFG_LINEEND, inst);
 #endif
         memset(inst, 0, sizeof(vsfvm_instance_t) + size);
 
@@ -313,7 +313,7 @@ vsfvm_instance_t * vsfvm_instance_alloc(uint_fast32_t size, const vsfvm_class_t 
 void vsfvm_instance_free(vsfvm_instance_t *inst)
 {
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "free instance 0x%08X" VSF_TRACE_CFG_LINEEND, inst);
+    vsf_trace_debug("free instance 0x%08X" VSF_TRACE_CFG_LINEEND, inst);
 #endif
     if ((inst->c->op.destroy != NULL)) {
         inst->c->op.destroy(inst);
@@ -325,7 +325,7 @@ void vsfvm_instance_ref(vsfvm_instance_t *inst)
 {
     inst->ref++;
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "var 0x%08X reference %d" VSF_TRACE_CFG_LINEEND, inst, inst->ref);
+    vsf_trace_debug("var 0x%08X reference %d" VSF_TRACE_CFG_LINEEND, inst, inst->ref);
 #endif
 }
 
@@ -333,7 +333,7 @@ bool vsfvm_instance_deref(vsfvm_instance_t *inst)
 {
     inst->ref--;
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "var 0x%08X reference %d" VSF_TRACE_CFG_LINEEND, inst, inst->ref);
+    vsf_trace_debug("var 0x%08X reference %d" VSF_TRACE_CFG_LINEEND, inst, inst->ref);
 #endif
     if (!inst->ref) {
         vsfvm_instance_free(inst);
@@ -406,7 +406,7 @@ vsfvm_var_t * vsfvm_thread_stack_pop(vsfvm_thread_t *thread, uint_fast32_t num)
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
     vsfvm_var_t *var = __vsfvm_stack_pop(&thread->stack, num);
     if (num) {
-        vsf_trace(VSF_TRACE_DEBUG, "pop stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
+        vsf_trace_debug("pop stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
     }
     return var;
 #else
@@ -441,7 +441,7 @@ int vsfvm_thread_stack_push(vsfvm_thread_t *thread, intptr_t value,
             thread->max_sp = thread->stack.sp;
         }
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "push stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
+        vsf_trace_debug("push stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
 #endif
     }
     return err;
@@ -485,7 +485,7 @@ static int __vsfvm_push_func(vsfvm_thread_t *thread)
             thread->max_sp = thread->stack.sp;
         }
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "push func ctx = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
+        vsf_trace_debug("push func ctx = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
 #endif
     }
     return err;
@@ -499,7 +499,7 @@ static int __vsfvm_pop_func(vsfvm_thread_t *thread)
         return -1;
     }
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "pop func ctx = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
+    vsf_trace_debug("pop func ctx = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
 #endif
     thread->func = func;
     return 0;
@@ -573,7 +573,7 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                 case VSFVM_CODE_SYMBOL_SEMICOLON_POP:
                     __vsfvm_thread_stack_pop_and_free(thread, 1);
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-                    vsf_trace(VSF_TRACE_DEBUG, "expr end stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
+                    vsf_trace_debug("expr end stack = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
 #endif
                 case VSFVM_CODE_SYMBOL_SEMICOLON_NOPOP:
                     break;
@@ -680,7 +680,7 @@ vsfvm_ret_t vsfvm_thread_run(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
                     return VSFVM_RET_STACK_FAIL;
                 }
 #if VSFVM_RUNTIME_DEBUG_EN == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "push var = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
+                vsf_trace_debug("push var = %d" VSF_TRACE_CFG_LINEEND, thread->stack.sp);
 #endif
                 break;
             case VSFVM_CODE_KEYWORD_goto:

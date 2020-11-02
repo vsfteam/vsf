@@ -24,10 +24,12 @@
 #include "hal/vsf_hal_cfg.h"
 #include "utilities/vsf_utilities.h"
 
-#if     defined(VSF_ARCH_WIN_IMPLEMENT)
+#undef PUBLIC_CONST
+#if     defined(__VSF_ARCH_WIN_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
-#elif   defined(VSF_ARCH_WIN_IMPLEMENT)
-#   define __PLOOC_CLASS_INHERIT__
+#   define PUBLIC_CONST
+#else
+#   define PUBLIC_CONST                 const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -39,10 +41,10 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef __LITTLE_ENDIAN
-#   define __LITTLE_ENDIAN                 1
+#   define __LITTLE_ENDIAN              1
 #endif
 #ifndef __BYTE_ORDER
-#   define __BYTE_ORDER                    __LITTLE_ENDIAN
+#   define __BYTE_ORDER                 __LITTLE_ENDIAN
 #endif
 
 #ifndef VSF_ARCH_PRI_NUM
@@ -62,17 +64,46 @@ extern "C" {
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 
 #ifndef FAR
-#   define FAR             
+#   define FAR
 #endif
 #ifndef NEAR
-#   define NEAR             
+#   define NEAR
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_ARCH_PRI(__N, __BIT)                                              \
+// for trace
+#ifndef VSF_ARCH_TRACE_FUNC
+#   define VSF_ARCH_TRACE_FUNC              printf
+#endif
+
+#ifndef vsf_arch_trace
+#   if VSF_ARCH_PRI_NUM == 1 && VSF_ARCH_SWI_NUM == 0
+#       define vsf_arch_trace(__header, __color, ...)
+#   else
+#       define vsf_arch_trace(__header, __color, ...)                           \
+        do {                                                                    \
+            vsf_arch_irq_thread_t *__irq_thread =                               \
+                        __vsf_arch_get_cur_irq_thread();                        \
+            __vsf_arch_trace_lock();                                            \
+                VSF_ARCH_TRACE_FUNC("%s[%s]: ", (__color), (__header));         \
+                if (__irq_thread != NULL) {                                     \
+                    VSF_ARCH_TRACE_FUNC("%s(%d) %lld ",                         \
+                        __irq_thread->name, (int)__irq_thread->thread_id,       \
+                        __vsf_systimer_get());                                  \
+                } else {                                                        \
+                }                                                               \
+                VSF_ARCH_TRACE_FUNC(__VA_ARGS__);                               \
+            __vsf_arch_trace_unlock();                                          \
+        } while (0)
+#   endif
+#endif
+
+#define __VSF_ARCH_PRI(__N, __UNUSED)                                           \
             VSF_ARCH_PRIO_##__N = (__N),                                        \
             vsf_arch_prio_##__N = (__N),
+
+#define vsf_arch_wakeup()
 
 /*============================ TYPES =========================================*/
 
@@ -82,7 +113,7 @@ typedef unsigned long       DWORD;
 typedef unsigned int        UINT;
 typedef unsigned char       BYTE;
 typedef char *              LPSTR;
-#if defined(__WIN__) && defined(__CPU_X64__)
+#ifdef __CPU_X64__
 typedef unsigned long long  ULONG_PTR, *PULONG_PTR;
 #else
 typedef unsigned long       ULONG_PTR, *PULONG_PTR;
@@ -94,20 +125,23 @@ typedef uint64_t vsf_systimer_cnt_t;
 typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_IVALID = -1,
     vsf_arch_prio_ivalid = -1,
-    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, __UNUSED)
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 } vsf_arch_prio_t;
 
-declare_simple_class(vsf_arch_irq_thread_t)
-declare_simple_class(vsf_arch_irq_request_t)
+dcl_simple_class(vsf_arch_irq_thread_t)
+dcl_simple_class(vsf_arch_irq_request_t)
 
 typedef void (*vsf_arch_irq_entry_t)(void*);
 
 def_simple_class(vsf_arch_irq_request_t) {
     private_member(
         HANDLE event;
+        bool is_inited;
     )
 };
+
+typedef volatile bool vsf_gint_state_t;
 
 /*============================ INCLUDES ======================================*/
 
@@ -134,17 +168,17 @@ typedef enum vsf_arch_irq_state_t {
 } vsf_arch_irq_state_t;
 
 def_simple_class(vsf_arch_irq_thread_t) {
-    private_member(
+    public_member(
         const char name[32];
 
-        vsf_dlist_node_t irq_node;
-        vsf_dlist_node_t rdy_node;
-        HANDLE thread;
-        DWORD thread_id;
-        vsf_arch_prio_t priority;
-        vsf_arch_irq_thread_t *prev;     // call stack
-        vsf_arch_irq_state_t state;
-        vsf_arch_irq_request_t *reply;
+        PUBLIC_CONST vsf_dlist_node_t irq_node;
+        PUBLIC_CONST vsf_dlist_node_t rdy_node;
+        PUBLIC_CONST HANDLE thread;
+        PUBLIC_CONST DWORD thread_id;
+        PUBLIC_CONST vsf_arch_prio_t priority;
+        PUBLIC_CONST vsf_arch_irq_thread_t *prev;     // call stack
+        PUBLIC_CONST vsf_arch_irq_state_t state;
+        PUBLIC_CONST vsf_arch_irq_request_t *reply;
     )
 };
 #endif
@@ -153,7 +187,7 @@ def_simple_class(vsf_arch_irq_thread_t) {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_arch_irq_sleep(uint32_t ms);
+extern void __vsf_arch_irq_sleep(uint_fast32_t ms);
 
 extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
@@ -166,6 +200,9 @@ extern void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_set_background(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate);
+
+// for trace only
+extern vsf_systimer_cnt_t __vsf_systimer_get(void);
 
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {

@@ -20,6 +20,8 @@
 #include "../../common.h"
 #include "./usbd.h"
 
+#if VSF_HAL_USE_USBD == ENABLED
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -34,13 +36,16 @@ extern void __mt071_usb_irq(mt071_usb_t *usb);
 
 vsf_err_t mt071_usbd_init(mt071_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 {
+#if VSF_HAL_USE_USBH == ENABLED
+    // hc->is_host only exists when both host and device modes are enabled
     dc->is_host = false;
+#endif
     dc->callback.irq_handler = cfg->irq_handler;
     dc->callback.param = cfg->param;
 
     // TODO: use pm to config clock
     RCC->PDRUNCFG &= ~RCC_PDRUNCFG_USB;
-    RCC->AHBCLKCTRL0_SET = SYNC_CLK_USB_msk;
+    RCC->AHBCLKCTRL0_SET = SCLK_USB_MSK;
 
     __mt071_usb_init_interrupt(dc, cfg->priority);
     return VSF_ERR_NONE;
@@ -50,7 +55,7 @@ void mt071_usbd_fini(mt071_usb_t *dc)
 {
     NVIC_DisableIRQ(dc->param->irq);
     // TODO: use pm to config clock
-    RCC->AHBCLKCTRL0_CLR = SYNC_CLK_USB_msk;
+    RCC->AHBCLKCTRL0_CLR = SCLK_USB_MSK;
 }
 
 void mt071_usbd_get_info(mt071_usb_t *dc, usb_dc_ip_info_t *info)
@@ -78,3 +83,5 @@ void mt071_usbd_irq(mt071_usb_t *dc)
 {
     __mt071_usb_irq(dc);
 }
+
+#endif      // VSF_HAL_USE_USBD

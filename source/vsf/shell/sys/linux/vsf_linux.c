@@ -22,7 +22,7 @@
 #if VSF_USE_LINUX == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
-#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_IMPLEMENT
 #include "./vsf_linux.h"
@@ -36,6 +36,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <termios.h>
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
@@ -378,7 +379,7 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 
     // clean up
     do {
-        vsf_dlist_remove_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
+        vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
         if (sfd != NULL) {
             close(sfd->fd);
         }
@@ -1250,11 +1251,6 @@ int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry)
     return err;
 }
 
-#if __IS_COMPILER_LLVM__
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wvisibility"
-#endif
-
 int tcgetattr(int fd, struct termios *termios)
 {
     return 0;
@@ -1286,7 +1282,4 @@ void * memalign(size_t alignment, size_t size)
     return vsf_heap_malloc_aligned(size, alignment);
 }
 
-#if __IS_COMPILER_LLVM__
-#   pragma clang diagnostic pop
-#endif
 #endif      // VSF_USE_LINUX

@@ -30,7 +30,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern bool vsf_arch_init(void);
 extern bool vsf_driver_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -59,7 +58,7 @@ bool vsf_driver_poll(void)
 bool vsf_hal_init( void )
 {
     
-    if (!vsf_arch_init() || !vsf_driver_init()) {
+    if (!vsf_driver_init()) {
         
         return false;
     }

@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDCACM == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_CDCACM == ENABLED
 
 #include "component/usb/common/class/CDC/vsf_usb_CDCACM.h"
 #include "./vsf_usbd_CDCACM_desc.h"
@@ -64,12 +64,15 @@ extern "C" {
                 .parity         = (__PARITY),                                   \
                 .datalen        = (__BITLEN),                                   \
             }
+// commonly used line coding
+#define USB_CDC_ACM_LINECODE_115200_8N1                                         \
+            USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1)
 
 #define USB_CDC_ACM_IFS_NUM     USB_CDC_IFS_NUM
 #define USB_CDC_ACM_IFS_CONTROL(__CDC_ACM_PARAM)                                \
-            __USB_IFS(&vk_usbd_cdcacm_control, &__CDC_ACM_PARAM)
+            USB_IFS(&vk_usbd_cdcacm_control, &__CDC_ACM_PARAM)
 #define USB_CDC_ACM_IFS_DATA(__CDC_ACM_PARAM)                                   \
-            __USB_IFS(&vk_usbd_cdcacm_data, &__CDC_ACM_PARAM)
+            USB_IFS(&vk_usbd_cdcacm_data, &__CDC_ACM_PARAM)
 
 
 
@@ -115,11 +118,11 @@ def_simple_class(vk_usbd_cdcacm_t) {
 };
 
 typedef struct vk_usbd_cdcacm_cfg_t {
-    implement_ex(vk_usbd_ep_cfg_t, ep)
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+    implement_ex(vk_usbd_cdc_ep_t, ep);
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
     vsf_stream_t *tx_stream;
     vsf_stream_t *rx_stream;
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
     implement_ex(vsf_stream_usr_cfg_t, stream_usr);
     implement_ex(vsf_stream_src_cfg_t, stream_src);
 #endif
@@ -138,5 +141,5 @@ extern vsf_err_t vk_usbd_cdcacm_init(vk_usbd_cdcacm_t *obj, const vk_usbd_cdcacm
 }
 #endif
 
-#endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM
+#endif  // VSF_USE_USB_DEVICE && VSF_USBD_USE_CDCACM
 #endif	// __VSF_USBD_CDCACM_H__

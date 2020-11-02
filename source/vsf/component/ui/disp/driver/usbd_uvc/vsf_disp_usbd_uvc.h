@@ -14,14 +14,14 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_USBD_UVC_H___
-#define __VSF_DISP_USBD_UVC_H___
+#ifndef __VSF_DISP_USBD_UVC_H__
+#define __VSF_DISP_USBD_UVC_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_USBD_UVC == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_USBD_UVC == ENABLED
 
 #include "kernel/vsf_kernel.h"
 
@@ -42,8 +42,8 @@ extern "C" {
 #   error "need VSF_USBD_CFG_USE_EDA"
 #endif
 
-#if VSF_USE_USB_DEVICE != ENABLED || VSF_USE_USB_DEVICE_UVC != ENABLED
-#   error "need VSF_USE_USB_DEVICE and VSF_USE_USB_DEVICE_UVC"
+#if VSF_USE_USB_DEVICE != ENABLED || VSF_USBD_USE_UVC != ENABLED
+#   error "need VSF_USE_USB_DEVICE and VSF_USBD_USE_UVC"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -79,4 +79,4 @@ extern const vk_disp_drv_t vk_disp_drv_usbd_uvc;
 #endif
 
 #endif  // VSF_USE_UI
-#endif  // __VSF_DISP_USBD_UVC_H___
+#endif  // __VSF_DISP_USBD_UVC_H__

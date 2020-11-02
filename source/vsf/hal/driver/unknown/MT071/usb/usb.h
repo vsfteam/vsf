@@ -19,7 +19,11 @@
 #define __HAL_DRIVER_MT071_USB_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
+
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+
 #include "../device.h"
 
 #include "hal/interface/vsf_interface_pm.h"
@@ -28,34 +32,46 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __USB_OTG_DEF(__N, __VALUE)                                             \
+#if VSF_HAL_USE_USBD == ENABLED && VSF_HAL_USE_USBH == ENABLED
+#   define __USB_OTG_DEF(__N, __VALUE)                                          \
     extern mt071_usb_t USB_OTG##__N##_IP;                                       \
     extern const i_usb_hc_ip_t VSF_USB_HC##__N##_IP;                            \
     extern const i_usb_dc_ip_t VSF_USB_DC##__N##_IP;
+#elif VSF_HAL_USE_USBD == ENABLED
+#   define __USB_OTG_DEF(__N, __VALUE)                                          \
+    extern mt071_usb_t USB_OTG##__N##_IP;                                       \
+    extern const i_usb_dc_ip_t VSF_USB_DC##__N##_IP;
+#elif VSF_HAL_USE_USBH == ENABLED
+#   define __USB_OTG_DEF(__N, __VALUE)                                          \
+    extern mt071_usb_t USB_OTG##__N##_IP;                                       \
+    extern const i_usb_hc_ip_t VSF_USB_HC##__N##_IP;
+#endif
+
 #define _USB_OTG_DEF(__N, __VALUE)          __USB_OTG_DEF(__N, __VALUE)
 #define USB_OTG_DEF(__N, __VALUE)           _USB_OTG_DEF(__N, __VALUE)
 
 /*============================ TYPES =========================================*/
 
-struct mt071_usb_const_t {
+typedef struct mt071_usb_const_t {
     IRQn_Type irq;
-    pm_sync_clk_no_t sync_clk;
-    pm_periph_async_clk_no_t pclk;
+    pm_sclk_no_t sclk;
+    pm_pclk_no_t pclk;
     void *reg;
-};
-typedef struct mt071_usb_const_t mt071_usb_const_t;
+} mt071_usb_const_t;
 
-struct mt071_usb_t {
+typedef struct mt071_usb_t {
+#if VSF_HAL_USE_USBD == ENABLED && VSF_HAL_USE_USBH == ENABLED
     bool is_host;
+#endif
     struct {
         usb_ip_irq_handler_t irq_handler;
         void *param;
     } callback;
     const mt071_usb_const_t *param;
-};
-typedef struct mt071_usb_t mt071_usb_t;
+} mt071_usb_t;
 
 /*============================ INCLUDES ======================================*/
+
 #include "./hc/usbh.h"
 #include "./dc/usbd.h"
 
@@ -66,5 +82,6 @@ REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_DEF, NULL)
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif
+#endif      // VSF_HAL_USE_USBD || VSF_HAL_USE_USBH
+#endif      // __HAL_DRIVER_MT071_USB_H__
 /* EOF */

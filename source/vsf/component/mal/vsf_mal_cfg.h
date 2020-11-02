@@ -29,8 +29,8 @@
 #   define VSF_MAL_ASSERT               ASSERT
 #endif
 
-#ifndef VSF_USE_MIM_MAL
-#   define VSF_USE_MIM_MAL              ENABLED
+#ifndef VSF_MAL_USE_MIM_MAL
+#   define VSF_MAL_USE_MIM_MAL          ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

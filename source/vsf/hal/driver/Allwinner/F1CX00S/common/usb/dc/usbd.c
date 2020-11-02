@@ -201,13 +201,13 @@ void f1cx00s_usbd_get_setup(f1cx00s_usb_dcd_t *usbd, uint8_t *buffer)
 {
     __f1cx00s_usb_read_fifo(usbd->otg, 0, buffer, 8);
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "Setup:\r\n");
+    vsf_trace_debug("Setup:\r\n");
     vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, 8);
 #endif
     uint_fast8_t ep_orig = __f1cx00s_usb_set_ep(usbd->otg, 0);
         MUSB_BASE->Index.DC.EP0.CSR0 |= MUSBD_CSR0_ServicedRxPktRdy;
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "get_setup CSR0: %02X\r\n", MUSB_BASE->Index.DC.EP0.CSR0);
+        vsf_trace_debug("get_setup CSR0: %02X\r\n", MUSB_BASE->Index.DC.EP0.CSR0);
 #endif
     __f1cx00s_usb_set_ep(usbd->otg, ep_orig);
 
@@ -221,7 +221,7 @@ void f1cx00s_usbd_get_setup(f1cx00s_usb_dcd_t *usbd, uint8_t *buffer)
 void f1cx00s_usbd_status_stage(f1cx00s_usb_dcd_t *usbd, bool is_in)
 {
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "Status_%s\r\n", is_in ? "IN" : "OUT");
+    vsf_trace_debug("Status_%s\r\n", is_in ? "IN" : "OUT");
 #endif
     usbd->ep0_state = MUSB_USBD_EP0_STATUS;
 }
@@ -405,7 +405,7 @@ static vsf_err_t __f1cx00s_usbd_ep_transfer_recv(f1cx00s_usb_dcd_t *usbd, uint_f
     VSF_HAL_ASSERT((trans->buffer != NULL) && (size <= trans->remain));
     __f1cx00s_usb_read_fifo(usbd->otg, ep, trans->buffer, size);
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "Read EP%d: %d\r\n", ep & 0x0F, size);
+    vsf_trace_debug("Read EP%d: %d\r\n", ep & 0x0F, size);
 #   if F1CX00S_USBD_TRACE_BUFFER_EN == ENABLED
     vsf_trace_buffer(VSF_TRACE_DEBUG, trans->buffer, size);
 #   endif
@@ -420,7 +420,7 @@ static vsf_err_t __f1cx00s_usbd_ep_transfer_recv(f1cx00s_usb_dcd_t *usbd, uint_f
         if (!ep) {
             MUSB_BASE->Index.DC.EP0.CSR0 |= MUSBD_CSR0_ServicedRxPktRdy | (trans->zlp ? MUSBD_CSR0_DataEnd : 0);
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "read_buffer CSR0: %02X\r\n", MUSB_BASE->Index.DC.EP0.CSR0);
+            vsf_trace_debug("read_buffer CSR0: %02X\r\n", MUSB_BASE->Index.DC.EP0.CSR0);
 #endif
         } else {
             MUSB_BASE->Index.DC.EPN.RxCSRL &= ~MUSBD_RxCSRL_RxPktRdy;
@@ -455,7 +455,7 @@ static vsf_err_t __f1cx00s_usbd_ep_transfer_send(f1cx00s_usb_dcd_t *usbd, uint_f
     if (size > 0) {
         VSF_HAL_ASSERT(trans->buffer != NULL);
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "Write EP%d: %d\r\n", ep & 0x0F, size);
+        vsf_trace_debug("Write EP%d: %d\r\n", ep & 0x0F, size);
 #   if F1CX00S_USBD_TRACE_BUFFER_EN == ENABLED
         vsf_trace_buffer(VSF_TRACE_DEBUG, trans->buffer, size);
 #   endif
@@ -472,7 +472,7 @@ static vsf_err_t __f1cx00s_usbd_ep_transfer_send(f1cx00s_usb_dcd_t *usbd, uint_f
             usbd->ep0_state = MUSB_USBD_EP0_DATA_IN;
             MUSB_BASE->Index.DC.EP0.CSR0 |= MUSBD_CSR0_TxPktRdy | (size < ep_size ? MUSBD_CSR0_DataEnd : 0);
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "set_data_size CSR0: %02X\r\n", MUSB_BASE->Index.DC.EP0.CSR0);
+            vsf_trace_debug("set_data_size CSR0: %02X\r\n", MUSB_BASE->Index.DC.EP0.CSR0);
 #endif
             MUSB_BASE->Common.IntrTxE |= ep0_int_en;
         } else {
@@ -543,7 +543,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
 
         csr = MUSB_BASE->Index.DC.EP0.CSR0;
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "interrupt CSR0: %02X\r\n", csr);
+        vsf_trace_debug("interrupt CSR0: %02X\r\n", csr);
 #endif
 
         switch (usbd->ep0_state) {
@@ -551,7 +551,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
             if (csr & MUSBD_CSR0_RxPktRdy) {
             on_setup:
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "ON_SETUP\r\n");
+                vsf_trace_debug("ON_SETUP\r\n");
 #endif
                 __f1cx00s_usbd_notify(usbd, USB_ON_SETUP, 0);
             } else {
@@ -567,7 +567,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
                 __f1cx00s_usbd_ep_transfer_recv(usbd, 0);
                 if (trans->zlp) {
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-                    vsf_trace(VSF_TRACE_DEBUG, "ON_OUT0\r\n");
+                    vsf_trace_debug("ON_OUT0\r\n");
 #endif
                     trans->buffer = NULL;
                     usbd->out_enable &= ~(1 << 0);
@@ -585,7 +585,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
                 __f1cx00s_usbd_ep_transfer_send(usbd, 0);
             } else {
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "ON_IN0\r\n");
+                vsf_trace_debug("ON_IN0\r\n");
 #endif
                 trans->buffer = NULL;
                 __f1cx00s_usbd_notify(usbd, USB_ON_IN, 0);
@@ -596,13 +596,13 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
                 // SetupEnd is set when control transact ends before DataEnd has been set
                 // so it will run here if transact has no data phase
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "EP0_SetupEnd\r\n");
+                vsf_trace_debug("EP0_SetupEnd\r\n");
 #endif
                 MUSB_BASE->Index.DC.EP0.CSR0 |= MUSBD_CSR0_ServicedSetupEnd;
             }
 
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "ON_STATUS\r\n");
+            vsf_trace_debug("ON_STATUS\r\n");
 #endif
             usbd->ep0_state = MUSB_USBD_EP0_IDLE;
             __f1cx00s_usbd_notify(usbd, USB_ON_STATUS, 0);
@@ -630,7 +630,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
 
         // TODO: check csr for SentStall or TxPktRdy
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "interrupt OUT%d\r\n", ep_idx);
+        vsf_trace_debug("interrupt OUT%d\r\n", ep_idx);
 #endif
 
         trans = __f1cx00s_usbd_get_trans(usbd, ep_idx);
@@ -638,7 +638,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
         __f1cx00s_usbd_ep_transfer_recv(usbd, ep_idx);
         if (trans->zlp) {
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "ON_OUT%d\r\n", ep_idx);
+            vsf_trace_debug("ON_OUT%d\r\n", ep_idx);
 #endif
             trans->buffer = NULL;
             usbd->out_enable &= ~(1 << ep_idx);
@@ -653,7 +653,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
 
         // TODO: check csr for SentStall or RxPktRdy
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-        vsf_trace(VSF_TRACE_DEBUG, "interrupt IN%d\r\n", ep_idx);
+        vsf_trace_debug("interrupt IN%d\r\n", ep_idx);
 #endif
 
         trans = __f1cx00s_usbd_get_trans(usbd, ep_idx | 0x80);
@@ -663,7 +663,7 @@ void f1cx00s_usbd_irq(f1cx00s_usb_dcd_t *usbd)
             __f1cx00s_usbd_ep_transfer_send(usbd, ep_idx);
         } else {
 #if F1CX00S_USBD_TRACE_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "ON_IN%d\r\n", ep_idx);
+            vsf_trace_debug("ON_IN%d\r\n", ep_idx);
 #endif
             trans->buffer = NULL;
             __f1cx00s_usbd_notify(usbd, USB_ON_IN, ep_idx);

@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_CDCACM == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_CDCACM == ENABLED
 
 #define __VSF_USBD_CLASS_INHERIT__
 #define __VSF_USBD_CDC_CLASS_INHERIT__
@@ -70,13 +70,13 @@ vsf_err_t vk_usbd_cdcacm_init(vk_usbd_cdcacm_t *cdcacm, const vk_usbd_cdcacm_cfg
                 .datalen        = 8,
             };
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
     VSF_USB_ASSERT((NULL != cfg->rx_stream) && (NULL != cfg->tx_stream));
 
     cdcacm->stream.rx.stream = cfg->rx_stream;
     cdcacm->stream.tx.stream = cfg->tx_stream;
 
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
     vsf_stream_usr_init(&(cdcacm->use_as__vk_usbd_cdc_t.stream.use_as__vk_usbd_ep_stream_t.use_as__vsf_stream_usr_t),
                         &cfg->stream_usr);
     vsf_stream_src_init(&(cdcacm->use_as__vk_usbd_cdc_t.stream.use_as__vk_usbd_ep_stream_t.use_as__vsf_stream_src_t),
@@ -188,4 +188,4 @@ static vsf_err_t __vk_usbd_cdcacm_control_request_process(
     return VSF_ERR_NONE;
 }
 
-#endif  // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_CDCACM
+#endif  // VSF_USE_USB_DEVICE && VSF_USBD_USE_CDCACM

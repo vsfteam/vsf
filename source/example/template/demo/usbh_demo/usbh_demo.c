@@ -17,10 +17,10 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #include "vsf.h"
 
-#if VSF_USE_USB_HOST == ENABLED && APP_CFG_USE_USBH_DEMO == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && APP_USE_USBH_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
@@ -32,7 +32,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_USB_HOST_UAC == ENABLED
+#if VSF_USBH_USE_UAC == ENABLED
 describe_mem_stream(__user_usbh_uac_rx_stream, 100)
 describe_mem_stream(__user_usbh_uac_tx_stream, 200)
 static void __usrapp_usbh_uac_on_stream(void *param, vsf_stream_evt_t evt)
@@ -83,7 +83,7 @@ void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_heade
 }
 #endif
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int usbh_main(int argc, char *argv[])
 {
 #else

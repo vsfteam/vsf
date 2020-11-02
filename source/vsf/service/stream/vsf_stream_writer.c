@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 
 #define __VSF_STREAM_WRITER_CLASS_IMPLEMENT
 #include "./vsf_stream_base.h"
@@ -72,7 +72,7 @@ static void __vsf_stream_writer_send_current_pbuf(vsf_stream_writer_t *obj_ptr)
     class_internal(obj_ptr, this_ptr, vsf_stream_writer_t);
     vsf_pbuf_t *ptPBUF = NULL;
     
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         if (0 != this.hwOffset) {
             ptPBUF = this.current_ptr;
             this.current_ptr = NULL;
@@ -110,7 +110,7 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *obj_ptr,
     int_fast32_t nWrittenSize = -1;
     
 
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         if (NULL == this.current_ptr) {
             this.current_ptr = vsf_stream_src_new_pbuf(
                                 &this.use_as__vsf_stream_src_t, -1, -1);
@@ -125,7 +125,7 @@ int_fast32_t vsf_stream_writer_write(   vsf_stream_writer_t *obj_ptr,
             break; 
         }
 
-        __SAFE_ATOM_CODE(
+        __vsf_interrupt_safe(
             if (NULL != this.current_ptr) {
                 if (this.hwOffset < this.hwBufferSize) {
                     nWrittenSize = vsf_pbuf_buffer_write(  this.current_ptr, 

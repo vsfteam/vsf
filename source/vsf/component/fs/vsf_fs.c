@@ -21,8 +21,8 @@
 
 #if VSF_USE_FS == ENABLED
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define __VSFSTREAM_CLASS_INHERIT__
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+#   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #endif
 #define __VSF_FS_CLASS_IMPLEMENT
 #define __VSF_EDA_CLASS_INHERIT__
@@ -34,8 +34,8 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
 #endif
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL != ENABLED
-#   error VSF_USE_KERNEL_SIMPLE_SHELL must be enabled
+#if VSF_KERNEL_USE_SIMPLE_SHELL != ENABLED
+#   error VSF_KERNEL_USE_SIMPLE_SHELL must be enabled
 #endif
 
 //#define VSF_FS_REF_TRACE            ENABLED
@@ -50,7 +50,7 @@ typedef struct __vk_fs_t {
     vk_vfs_file_t rootfs;
 } __vk_fs_t;
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 enum {
     VSF_EVT_FILE_READ       = VSF_EVT_USER + 0,
     VSF_EVT_FILE_WRITE      = VSF_EVT_USER + 1,
@@ -114,7 +114,7 @@ static void __vk_file_ref(vk_file_t *file)
         file->ref++;
     vsf_unprotect_sched(orig);
 #if VSF_FS_REF_TRACE == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "%s: %d\r\n", file->name ? file->name : "ROOT", file->ref);
+    vsf_trace_debug("%s: %d\r\n", file->name ? file->name : "ROOT", file->ref);
 #endif
 }
 
@@ -125,7 +125,7 @@ static uint_fast32_t __vk_file_deref(vk_file_t *file)
         ref = --file->ref;
     vsf_unprotect_sched(orig);
 #if VSF_FS_REF_TRACE == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "%s: %d\r\n", file->name ? file->name : "ROOT", file->ref);
+    vsf_trace_debug("%s: %d\r\n", file->name ? file->name : "ROOT", file->ref);
 #endif
     return ref;
 }
@@ -405,7 +405,7 @@ vsf_err_t vk_file_open(vk_file_t *dir, const char *name, uint_fast16_t idx, vk_f
     vsf_err_t err;
 #if VSF_FS_REF_TRACE == ENABLED
     char intbuf[32];
-    vsf_trace(VSF_TRACE_DEBUG, "open %s" VSF_TRACE_CFG_LINEEND, name ? name : itoa(idx, intbuf, 10));
+    vsf_trace_debug("open %s" VSF_TRACE_CFG_LINEEND, name ? name : itoa(idx, intbuf, 10));
 #endif
     VSF_FS_ASSERT(file != NULL);
 
@@ -471,7 +471,7 @@ vsf_err_t vk_file_close(vk_file_t *file)
 {
     vsf_err_t err;
 #if VSF_FS_REF_TRACE == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "close %s" VSF_TRACE_CFG_LINEEND, file->name ? file->name : "ROOT");
+    vsf_trace_debug("close %s" VSF_TRACE_CFG_LINEEND, file->name ? file->name : "ROOT");
 #endif
     VSF_FS_ASSERT(file != NULL);
     __vsf_component_call_peda(__vk_file_close, err, file)
@@ -694,7 +694,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_create, vk_file_create)
     vsf_unprotect_sched(orig);
     // avoid to be freed
 #if VSF_FS_REF_TRACE == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "create vfs %s" VSF_TRACE_CFG_LINEEND, new_file->name);
+    vsf_trace_debug("create vfs %s" VSF_TRACE_CFG_LINEEND, new_file->name);
 #endif
     __vk_file_ref(&new_file->use_as__vk_file_t);
 
@@ -723,7 +723,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
             if (child != NULL) {
                 VSF_FS_ASSERT(1 == child->ref);
 #if VSF_FS_REF_TRACE == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "unlink vfs %s" VSF_TRACE_CFG_LINEEND, child->name);
+                vsf_trace_debug("unlink vfs %s" VSF_TRACE_CFG_LINEEND, child->name);
                 __vk_file_deref(child);
 #endif
                 vsf_protect_t orig = vsf_protect_sched();
@@ -769,7 +769,7 @@ uint_fast16_t vk_file_get_name_length(vk_file_t *file)
     return result;
 }
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 static void __vk_file_stream_tx_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vk_file_stream_t *pthis = (vk_file_stream_t *)param;

@@ -19,7 +19,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_SDL2 == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_SDL2 == ENABLED
 
 #define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_SDL2_CLASS_IMPLEMENT
@@ -159,6 +159,147 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
     }
 }
 
+static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Keycode keycode)
+{
+    switch (keycode) {
+    case SDLK_0:                return VSF_KB_0;
+    case SDLK_1:                return VSF_KB_1;
+    case SDLK_2:                return VSF_KB_2;
+    case SDLK_3:                return VSF_KB_3;
+    case SDLK_4:                return VSF_KB_4;
+    case SDLK_5:                return VSF_KB_5;
+    case SDLK_6:                return VSF_KB_6;
+    case SDLK_7:                return VSF_KB_7;
+    case SDLK_8:                return VSF_KB_8;
+    case SDLK_9:                return VSF_KB_9;
+
+    case SDLK_a: case SDLK_b: case SDLK_c: case SDLK_d:
+    case SDLK_e: case SDLK_f: case SDLK_g: case SDLK_h:
+    case SDLK_i: case SDLK_j: case SDLK_k: case SDLK_l:
+    case SDLK_m: case SDLK_n: case SDLK_o: case SDLK_p:
+    case SDLK_q: case SDLK_r: case SDLK_s: case SDLK_t:
+    case SDLK_u: case SDLK_v: case SDLK_w: case SDLK_x:
+    case SDLK_y: case SDLK_z:
+        if ((SDL_GetModState() & KMOD_CAPS) != 0) {
+            return VSF_KB_A + (keycode - SDLK_a);
+        } else {
+            return VSF_KB_a + (keycode - SDLK_a);
+        }
+
+    case SDLK_F1:               return VSF_KB_F1;
+    case SDLK_F2:               return VSF_KB_F2;
+    case SDLK_F3:               return VSF_KB_F3;
+    case SDLK_F4:               return VSF_KB_F4;
+    case SDLK_F5:               return VSF_KB_F5;
+    case SDLK_F6:               return VSF_KB_F6;
+    case SDLK_F7:               return VSF_KB_F7;
+    case SDLK_F8:               return VSF_KB_F8;
+    case SDLK_F9:               return VSF_KB_F9;
+    case SDLK_F10:              return VSF_KB_F10;
+    case SDLK_F11:              return VSF_KB_F11;
+    case SDLK_F12:              return VSF_KB_F12;
+
+    case SDLK_CAPSLOCK:         return VSF_KB_CAPSLOCK;
+    case SDLK_RETURN:           return VSF_KB_ENTER;
+    case SDLK_ESCAPE:           return VSF_KB_ESCAPE;
+    case SDLK_BACKSPACE:        return VSF_KB_BACKSPACE;
+    case SDLK_TAB:              return VSF_KB_TAB;
+    case SDLK_SPACE:            return VSF_KB_SPACE;
+    case SDLK_EXCLAIM:          return VSF_KB_EXCLAM;
+    case SDLK_QUOTEDBL:         return VSF_KB_DOUBLE_QUOTE;
+    case SDLK_HASH:             return VSF_KB_POUND;
+    case SDLK_PERCENT:          return VSF_KB_PERCENT;
+    case SDLK_DOLLAR:           return VSF_KB_DOLLAR;
+    case SDLK_AMPERSAND:        return VSF_KB_AMPERSAND;
+    case SDLK_QUOTE:            return VSF_KB_SINGLE_QUOTE;
+    case SDLK_LEFTPAREN:        return VSF_KB_LEFT_PAREN;
+    case SDLK_RIGHTPAREN:       return VSF_KB_RIGHT_PAREN;
+    case SDLK_ASTERISK:         return VSF_KB_ASTERISK;
+    case SDLK_PLUS:             return VSF_KB_PLUS;
+    case SDLK_COMMA:            return VSF_KB_COMMA;
+    case SDLK_MINUS:            return VSF_KB_MINUS;
+    case SDLK_PERIOD:           return VSF_KB_DOT;
+    case SDLK_SLASH:            return VSF_KB_SLASH;
+    case SDLK_COLON:            return VSF_KB_COLON;
+    case SDLK_SEMICOLON:        return VSF_KB_SEMICOLON;
+    case SDLK_LESS:             return VSF_KB_LESS;
+    case SDLK_EQUALS:           return VSF_KB_EQUAL;
+    case SDLK_GREATER:          return VSF_KB_GREATER;
+    case SDLK_QUESTION:         return VSF_KB_QUESTION;
+    case SDLK_AT:               return VSF_KB_AT;
+    case SDLK_LEFTBRACKET:      return VSF_KB_LEFT_BRACKET;
+    case SDLK_BACKSLASH:        return VSF_KB_BACKSLASH;
+    case SDLK_RIGHTBRACKET:     return VSF_KB_RIGHT_BRACKET;
+    case SDLK_CARET:            return VSF_KB_CARET;
+    case SDLK_UNDERSCORE:       return VSF_KB_UNDERSCORE;
+    case SDLK_BACKQUOTE:        return VSF_KB_GRAVE;
+
+    case SDLK_PRINTSCREEN:      return VSF_KB_PRINT_SCREEN;
+    case SDLK_SCROLLLOCK:       return VSF_KB_SCROLL_LOCK;
+    case SDLK_PAUSE:            return VSF_KB_PAUSE;
+    case SDLK_INSERT:           return VSF_KB_INSERT;
+    case SDLK_HOME:             return VSF_KB_HOME;
+    case SDLK_PAGEUP:           return VSF_KB_PAGE_UP;
+    case SDLK_DELETE:           return VSF_KB_DELETE;
+    case SDLK_END:              return VSF_KB_END;
+    case SDLK_PAGEDOWN:         return VSF_KB_PAGE_DOWN;
+    case SDLK_RIGHT:            return VSF_KB_RIGHT;
+    case SDLK_LEFT:             return VSF_KB_LEFT;
+    case SDLK_DOWN:             return VSF_KB_DOWN;
+    case SDLK_UP:               return VSF_KB_UP;
+
+    case SDLK_NUMLOCKCLEAR:     return VSF_KP_NUMLOCK;
+    case SDLK_KP_DIVIDE:        return VSF_KP_DIVIDE;
+    case SDLK_KP_MULTIPLY:      return VSF_KP_MULTIPLY;
+    case SDLK_KP_MINUS:         return VSF_KP_MINUS;
+    case SDLK_KP_PLUS:          return VSF_KP_PLUS;
+    case SDLK_KP_ENTER:         return VSF_KP_ENTER;
+    case SDLK_KP_PERIOD:        return VSF_KP_DOT;
+    case SDLK_KP_1:             return VSF_KP_1;
+    case SDLK_KP_2:             return VSF_KP_2;
+    case SDLK_KP_3:             return VSF_KP_3;
+    case SDLK_KP_4:             return VSF_KP_4;
+    case SDLK_KP_5:             return VSF_KP_5;
+    case SDLK_KP_6:             return VSF_KP_6;
+    case SDLK_KP_7:             return VSF_KP_7;
+    case SDLK_KP_8:             return VSF_KP_8;
+    case SDLK_KP_9:             return VSF_KP_9;
+    case SDLK_KP_0:             return VSF_KP_0;
+    }
+    return 0;
+}
+
+static uint_fast8_t __vk_disp_sdl2_keymod_remap(uint16_t keymod)
+{
+    uint_fast8_t keymod_remap = 0;
+
+    if (keymod & KMOD_LSHIFT) {
+        keymod_remap |= VSF_KM_LEFT_SHIFT;
+    }
+    if (keymod & KMOD_RSHIFT) {
+        keymod_remap |= VSF_KM_RIGHT_SHIFT;
+    }
+    if (keymod & KMOD_LCTRL) {
+        keymod_remap |= VSF_KM_LEFT_CTRL;
+    }
+    if (keymod & KMOD_RCTRL) {
+        keymod_remap |= VSF_KM_RIGHT_CTRL;
+    }
+    if (keymod & KMOD_LALT) {
+        keymod_remap |= VSF_KM_LEFT_ALT;
+    }
+    if (keymod & KMOD_RALT) {
+        keymod_remap |= VSF_KM_RIGHT_ALT;
+    }
+    if (keymod & KMOD_LGUI) {
+        keymod_remap |= VSF_KM_LEFT_GUI;
+    }
+    if (keymod & KMOD_RGUI) {
+        keymod_remap |= VSF_KM_RIGHT_GUI;
+    }
+    return keymod_remap;
+}
+
 static void __vk_disp_sdl2_event_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
@@ -180,6 +321,8 @@ static void __vk_disp_sdl2_event_thread(void *arg)
     bool is_down = false, is_to_update = false;
     int_fast16_t wheel_x = 0, wheel_y = 0;
     int mouse_evt = 0, mouse_button = 0;
+
+    evt.dev = disp_sdl2;
 #endif
 
     while (!__vk_disp_sdl2.is_inited) {
@@ -214,7 +357,7 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                 is_to_update = is_down;
                 evt_type = VSF_INPUT_TYPE_TOUCHSCREEN;
                 break;
-#else
+#   else
             case SDL_MOUSEBUTTONUP:
                 is_down = false;
                 x = event.button.x / disp_sdl2->amplifier;
@@ -262,15 +405,17 @@ static void __vk_disp_sdl2_event_thread(void *arg)
                 is_to_update = true;
                 evt_type = VSF_INPUT_TYPE_MOUSE;
                 break;
-#endif
+#   endif
 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                if (!event.key.repeat) {
+                if (!event.key.repeat && (event.key.keysym.sym != SDLK_CAPSLOCK)) {
                     is_to_update = true;
                     evt_type = VSF_INPUT_TYPE_KEYBOARD;
-                    // TODO: remap event.key.sym to keycode in VSF
-                    vsf_input_keyboard_set(&evt.keyboard_evt, event.key.keysym.sym, SDL_KEYDOWN == event.type);
+                    vsf_input_keyboard_set(&evt.keyboard_evt,
+                        __vk_disp_sdl2_keycode_remap(event.key.keysym.sym),
+                        SDL_KEYDOWN == event.type,
+                        __vk_disp_sdl2_keymod_remap(event.key.keysym.mod));
                 }
                 break;
             case SDL_CONTROLLERDEVICEADDED:
@@ -348,7 +493,6 @@ static void __vk_disp_sdl2_event_thread(void *arg)
 
             if (is_to_update) {
                 is_to_update = false;
-                evt.dev = disp_sdl2;
 
                 __vsf_arch_irq_start(irq_thread);
                     switch (evt_type) {

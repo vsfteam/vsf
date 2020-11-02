@@ -1,6 +1,6 @@
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_AWTK == ENABLED
 
 #include "kernel/vsf_kernel.h"
 #include "utilities/ooc_class.h"

@@ -23,7 +23,7 @@
 #include "vsf_vm_cfg.h"
 
 #if     ((VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED))\
-    &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_LIBUSB == ENABLED)
+    &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USBH_USE_LIBUSB == ENABLED)
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -36,5 +36,5 @@ extern const vsfvm_class_t vsfvm_ext_libusb_dev;
 
 extern void vsfvm_ext_register_libusb(void);
 
-#endif      // (VSFVM_CFG_RUNTIME_EN || VSFVM_CFG_COMPILER_EN) && VSF_USE_USB_HOST && VSF_USE_USB_HOST_LIBUSB
+#endif      // (VSFVM_CFG_RUNTIME_EN || VSFVM_CFG_COMPILER_EN) && VSF_USE_USB_HOST && VSF_USBH_USE_LIBUSB
 #endif      // __VSFVM_EXT_LIBUSB_H__

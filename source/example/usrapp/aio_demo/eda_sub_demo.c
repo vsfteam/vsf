@@ -55,7 +55,7 @@ static fsm_rt_t eda_sub_demo_fsm_b_entry(__vsf_eda_frame_t *frame , vsf_evt_t ev
         vsf_teda_set_timer_ms(1);
         return fsm_rt_wait_for_evt;
     case VSF_EVT_TIMER:
-        vsf_trace(VSF_TRACE_DEBUG, "sub fsm B return cpl\r\n");
+        vsf_trace_debug("sub fsm B return cpl\r\n");
         return fsm_rt_cpl;
     }
     return fsm_rt_on_going;
@@ -78,13 +78,13 @@ implement_vsf_task(vsf_task_a)
             //break;
         case DELAY:
             vsf_delay_ms(1) {
-                vsf_trace(VSF_TRACE_DEBUG, "call sub fsm B\r\n");
+                vsf_trace_debug("call sub fsm B\r\n");
                 vsf_task_state = SUB_CALL;
             }
             break;
         case SUB_CALL:
             if (fsm_rt_cpl == __vsf_eda_call_fsm(eda_sub_demo_fsm_b_entry, NULL)) {
-                vsf_trace(VSF_TRACE_DEBUG, "sub fsm A return cpl\r\n");
+                vsf_trace_debug("sub fsm A return cpl\r\n");
                 RESET_FSM();
                 return fsm_rt_cpl;
             } 
@@ -108,7 +108,7 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t event)
     vsf_eda_frame_user_value_get(&this.cnt);
     switch (evt) {
     case VSF_EVT_RETURN:
-        vsf_trace(VSF_TRACE_DEBUG, "get return from sub eda\r\n");
+        vsf_trace_debug("get return from sub eda\r\n");
         /*! \note IMPORTANT 
          *!       You must call vsf_call_task()/__vsf_eda_call_fsm() again to read 
          *        the return value, even you didn't really need the value.
@@ -123,10 +123,10 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t event)
     case VSF_EVT_TIMER:
         if (this.cnt > 0) {
             vsf_eda_frame_user_value_set(this.cnt - 1);
-            vsf_trace(VSF_TRACE_DEBUG, "set 10ms timer in sub eda\r\n");
+            vsf_trace_debug("set 10ms timer in sub eda\r\n");
             vsf_teda_set_timer_ms(10);
         } else {
-            vsf_trace(VSF_TRACE_DEBUG, "call sub fsm A in sub eda\r\n");
+            vsf_trace_debug("call sub fsm A in sub eda\r\n");
             vsf_eda_call_task(vsf_task_a, &this.task_cb);
         }
         break;
@@ -137,13 +137,13 @@ static void eda_sub_demo_teda_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     switch (evt) {
     case VSF_EVT_RETURN:
-        vsf_trace(VSF_TRACE_DEBUG, "get return in main eda\r\n\r\n\r\n");
+        vsf_trace_debug("get return in main eda\r\n\r\n\r\n");
     case VSF_EVT_INIT:
-        vsf_trace(VSF_TRACE_DEBUG, "set 1000ms timer in main eda\r\n");
+        vsf_trace_debug("set 1000ms timer in main eda\r\n");
         vsf_teda_set_timer_ms(1000);
         break;
     case VSF_EVT_TIMER:
-        vsf_trace(VSF_TRACE_DEBUG, "call sub eda in main eda\r\n");
+        vsf_trace_debug("call sub eda in main eda\r\n");
         vsf_eda_call_eda(eda_sub_demo_teda_sub_evthandler);
         break;
     }
@@ -153,11 +153,11 @@ static fsm_rt_t eda_sub_demo_fsm_main_entry(void *pthis, vsf_evt_t evt)
 {
     switch (evt) {
     case VSF_EVT_RETURN:
-        vsf_trace(VSF_TRACE_DEBUG, "get yield in main fsm\r\n");
-        vsf_trace(VSF_TRACE_DEBUG, "main fsm return cpl\r\n");
+        vsf_trace_debug("get yield in main fsm\r\n");
+        vsf_trace_debug("main fsm return cpl\r\n");
         return fsm_rt_cpl;
     case VSF_EVT_INIT:
-        vsf_trace(VSF_TRACE_DEBUG, "call sub fsm in main fsm\r\n");
+        vsf_trace_debug("call sub fsm in main fsm\r\n");
         __vsf_eda_call_fsm(eda_sub_demo_fsm_a_entry, NULL);
         return fsm_rt_wait_for_evt;
     }
@@ -178,7 +178,7 @@ void eda_sub_demo_start(void)
             .target     = NULL,
             .is_fsm     = true,
         };
-        vsf_eda_init_ex(&eda_sub_demo.teda_fsm.use_as__vsf_eda_t, &cfg);
+        vsf_eda_start(&eda_sub_demo.teda_fsm.use_as__vsf_eda_t, &cfg);
     }
 */
 }

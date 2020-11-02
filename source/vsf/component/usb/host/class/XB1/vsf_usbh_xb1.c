@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_XB1 == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_XB1 == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
@@ -62,7 +62,7 @@ static void __vk_usbh_xb1_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 const vk_input_item_info_t vk_xb1_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_UP,           39, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_DOWN,         36, 1,  false),
@@ -103,7 +103,7 @@ extern void vsf_usbh_xb1_on_report_output(vk_usbh_xb1_t *xb1);
 extern void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1);
 extern void vsf_usbh_xb1_on_free(vk_usbh_xb1_t *xb1);
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
@@ -111,7 +111,7 @@ extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 #ifndef WEAK_VSF_XB1_ON_NEW_DEV
 WEAK(vsf_xb1_on_new_dev)
 void vsf_xb1_on_new_dev(vk_input_xb1_t *dev)
@@ -207,7 +207,7 @@ void vk_xb1_process_input(vk_input_xb1_t *dev, vsf_usb_xb1_gamepad_in_report_t *
 WEAK(vsf_usbh_xb1_on_report_input)
 void vsf_usbh_xb1_on_report_input(vk_usbh_xb1_t *xb1, vsf_usb_xb1_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
     vk_xb1_process_input(&xb1->use_as__vk_input_xb1_t, report);
 #   endif
 }
@@ -224,7 +224,7 @@ void vsf_usbh_xb1_on_report_output(vk_usbh_xb1_t *xb1)
 WEAK(vsf_usbh_xb1_on_new)
 void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
     vk_xb1_new_dev(&xb1->use_as__vk_input_xb1_t);
 #   endif
 }
@@ -234,7 +234,7 @@ void vsf_usbh_xb1_on_new(vk_usbh_xb1_t *xb1)
 WEAK(vsf_usbh_xb1_on_free)
 void vsf_usbh_xb1_on_free(vk_usbh_xb1_t *xb1)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
     vk_xb1_free_dev(&xb1->use_as__vk_input_xb1_t);
 #   endif
 }
@@ -244,7 +244,7 @@ static void vk_usbh_xb1_output(vk_usbh_xb1_t *xb1, uint_fast8_t len)
 {
     VSF_USB_ASSERT(xb1->out_idle);
     xb1->out_idle = false;
-    vk_usbh_hid_send_report((vk_usbh_hid_eda_t *)&xb1->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb1->gamepad_out_buf, len);
+    vk_usbh_hid_send_report(&xb1->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb1->gamepad_out_buf, len);
 }
 
 static void vk_usbh_xb1_submit_cmd(vk_usbh_xb1_t *xb1, uint_fast8_t cmd, uint_fast8_t sub_cmd, uint_fast8_t seq, const uint8_t *data, uint8_t len)
@@ -274,13 +274,13 @@ static void vk_usbh_xb1_start(vk_usbh_xb1_t *xb1)
 
 static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_xb1_t *xb1 = (vk_usbh_xb1_t *)container_of(eda, vk_usbh_hid_eda_t, use_as__vsf_eda_t);
+    vk_usbh_xb1_t *xb1 = (vk_usbh_xb1_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT:
         xb1->out_idle = true;
         __vsf_eda_crit_npb_leave(&xb1->dev->ep0.crit);
-        vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&xb1->use_as__vk_usbh_hid_teda_t, NULL, 64);
+        vk_usbh_hid_recv_report(&xb1->use_as__vk_usbh_hid_teda_t, NULL, 64);
 
         // TODO: use timer?
         break;
@@ -310,7 +310,7 @@ static void vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         }
                     }
                 }
-                vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&xb1->use_as__vk_usbh_hid_teda_t, NULL, 64);
+                vk_usbh_hid_recv_report(&xb1->use_as__vk_usbh_hid_teda_t, NULL, 64);
             } else {
                 xb1->out_idle = true;
                 if (xb1->home_got) {
@@ -345,7 +345,7 @@ static void *__vk_usbh_xb1_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
 static void __vk_usbh_xb1_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
     vsf_usbh_xb1_on_free((vk_usbh_xb1_t *)param);
-    vk_usbh_hid_disconnect((vk_usbh_hid_eda_t *)param);
+    vk_usbh_hid_disconnect((vk_usbh_hid_teda_t *)param);
 }
 
 #endif

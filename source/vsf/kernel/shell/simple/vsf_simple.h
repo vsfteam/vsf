@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "kernel/vsf_kernel_cfg.h"
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+#if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
 #include "../../vsf_eda.h"
 #include "./vsf_simple_bmpevt.h"
 

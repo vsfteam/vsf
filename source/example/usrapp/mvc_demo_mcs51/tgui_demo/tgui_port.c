@@ -34,8 +34,8 @@ extern void vsf_tgui_demo_on_ready(void);
 /*============================ IMPLEMENTATION ================================*/
 static vsf_tgui_color_t vsf_tgui_get_pixel(vsf_tgui_location_t* ptLocation)
 {
-    vsf_tgui_color_t tColor = VSF_TGUI_COLOR_BLACK;
-    return tColor;
+    vsf_tgui_sv_color_t tColor = VSF_TGUI_COLOR_BLACK;
+    return tColor.tColor;
 }
 
 static void vsf_tgui_set_pixel(vsf_tgui_location_t* ptLocation, vsf_tgui_color_t tColor)

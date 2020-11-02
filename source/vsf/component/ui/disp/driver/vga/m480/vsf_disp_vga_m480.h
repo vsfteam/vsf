@@ -14,14 +14,14 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_VGA_M480_H___
-#define __VSF_DISP_VGA_M480_H___
+#ifndef __VSF_DISP_VGA_M480_H__
+#define __VSF_DISP_VGA_M480_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_VGA_M480 == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_VGA_M480 == ENABLED
 
 #include "kernel/vsf_kernel.h"
 
@@ -65,4 +65,4 @@ extern const vk_disp_drv_t vk_disp_drv_vga_m480;
 #endif
 
 #endif  // VSF_USE_UI
-#endif  // __VSF_DISP_VGA_M480_H___
+#endif  // __VSF_DISP_VGA_M480_H__

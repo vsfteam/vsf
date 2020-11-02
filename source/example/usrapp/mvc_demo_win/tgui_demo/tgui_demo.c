@@ -131,19 +131,19 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 /*
     switch (vk_input_mouse_evt_get(mouse_evt)) {
         case VSF_INPUT_MOUSE_EVT_BUTTON:
-            vsf_trace(VSF_TRACE_DEBUG, "mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+            vsf_trace_debug("mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
                 vk_input_mouse_evt_button_get(mouse_evt),
                 vk_input_mouse_evt_button_is_down(mouse_evt) ? "down" : "up",
                 vk_input_mouse_evt_get_x(mouse_evt),
                 vk_input_mouse_evt_get_y(mouse_evt));
             break;
         case VSF_INPUT_MOUSE_EVT_MOVE:
-            vsf_trace(VSF_TRACE_DEBUG, "mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+            vsf_trace_debug("mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
                 vk_input_mouse_evt_get_x(mouse_evt),
                 vk_input_mouse_evt_get_y(mouse_evt));
             break;
         case VSF_INPUT_MOUSE_EVT_WHEEL:
-            vsf_trace(VSF_TRACE_DEBUG, "mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
+            vsf_trace_debug("mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
                 vk_input_mouse_evt_get_x(mouse_evt),
                 vk_input_mouse_evt_get_y(mouse_evt));
             break;

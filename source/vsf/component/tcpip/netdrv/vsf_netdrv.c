@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "component/usb/vsf_usb_cfg.h"
+#include "component/tcpip/vsf_tcpip_cfg.h"
 
 #if VSF_USE_TCPIP == ENABLED
 

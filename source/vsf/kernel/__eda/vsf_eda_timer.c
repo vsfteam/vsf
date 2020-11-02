@@ -87,7 +87,7 @@ static void __vsf_timer_update(bool force)
 #else
 static void __vsf_timer_update(bool force)
 {
-    
+
 }
 #endif
 
@@ -129,7 +129,7 @@ vsf_timer_tick_t vsf_systimer_get_tick(void)
 SECTION(".text.vsf.kernel.teda")
 static void __vsf_timer_start(void)
 {
-    // in tick timer mode, user will initialize timer and 
+    // in tick timer mode, user will initialize timer and
 }
 
 SECTION(".text.vsf.kernel.teda")
@@ -281,11 +281,11 @@ vsf_err_t vsf_teda_init(vsf_teda_t *this_ptr, vsf_prio_t priority, bool is_stack
     return vsf_eda_init(&this_ptr->use_as__vsf_eda_t, priority, is_stack_owner);
 }
 
-SECTION(".text.vsf.kernel.vsf_teda_init_ex")
-vsf_err_t vsf_teda_init_ex(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg)
+SECTION(".text.vsf.kernel.vsf_teda_start")
+vsf_err_t vsf_teda_start(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
-    return vsf_eda_init_ex(&(this_ptr->use_as__vsf_eda_t), cfg);
+    return vsf_eda_start(&(this_ptr->use_as__vsf_eda_t), cfg);
 }
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")

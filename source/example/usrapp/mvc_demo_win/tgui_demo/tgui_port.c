@@ -38,12 +38,12 @@
 
 #define TGUI_PORT_DEBAULT_BACKGROUND_COLOR  VSF_TGUI_COLOR_WHITE
 
-#ifndef VSF_TGUI_SV_CFG_PORT_LOG
-#   define VSF_TGUI_SV_CFG_PORT_LOG            DISABLED
+#ifndef VSF_TGUI_CFG_SV_PORT_LOG
+#   define VSF_TGUI_CFG_SV_PORT_LOG            DISABLED
 #endif
 
-#ifndef VSF_TGUI_SV_CFG_REFRESH_RATE
-#   define VSF_TGUI_SV_CFG_REFRESH_RATE        ENABLED
+#ifndef VSF_TGUI_CFG_SV_REFRESH_RATE
+#   define VSF_TGUI_CFG_SV_REFRESH_RATE        ENABLED
 #endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -56,7 +56,7 @@ volatile static bool s_bIsReadyToRefresh = true;
 static const vsf_tgui_region_t *s_ptRequestedRegion = NULL;
 //static vsf_tgui_color_t* s_ptBuffer = NULL;
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
 static vsf_systimer_cnt_t s_tStartTimerCnt;
 static uint16_t s_tRefreshCnt;
 static uint16_t s_tFPS;
@@ -423,7 +423,7 @@ vsf_tgui_region_t *vsf_tgui_v_refresh_loop_begin(
     if (!vsf_tgui_port_is_ready_to_refresh()) {
         return NULL;
     }
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+#if VSF_TGUI_CFG_SV_PORT_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port]Begin Refresh Loop" VSF_TRACE_CFG_LINEEND);
 #endif
@@ -449,7 +449,7 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
         }
     )
 
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+#if VSF_TGUI_CFG_SV_PORT_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port]End Refresh Loop." VSF_TRACE_CFG_LINEEND "\trequest low level refresh start in area, pos(x:%d, y:%d), size(w:0x%d, h:0x%d)" VSF_TRACE_CFG_LINEEND,
                  s_ptRequestedRegion->tLocation.iX, 
@@ -458,9 +458,9 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
                  s_ptRequestedRegion->tSize.iHeight);
 #endif
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
     if (0 == s_tRefreshCnt) {
-        s_tStartTimerCnt = vsf_systimer_get();
+        s_tStartTimerCnt = vsf_systimer_get_tick();
     }
 #endif
 
@@ -479,7 +479,7 @@ void vsf_tgui_low_level_on_ready_to_refresh(void)
 
 static void vsf_tgui_on_ready(vk_disp_t* disp)
 {
-#if VSF_TGUI_SV_CFG_PORT_LOG == ENABLED
+#if VSF_TGUI_CFG_SV_PORT_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_INFO,
                  "[Simple View Port] refresh ready" VSF_TRACE_CFG_LINEEND);
 #endif
@@ -492,12 +492,12 @@ static void vsf_tgui_on_ready(vk_disp_t* disp)
     WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH();
 #endif
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
     {
         uint32_t tElapse;
 
         s_tRefreshCnt++;
-        tElapse = vsf_systimer_tick_to_ms(vsf_systimer_get() - s_tStartTimerCnt);
+        tElapse = vsf_systimer_tick_to_ms(vsf_systimer_get_tick() - s_tStartTimerCnt);
 
         if (tElapse >= 1000) {
             s_tFPS = s_tRefreshCnt;
@@ -507,7 +507,7 @@ static void vsf_tgui_on_ready(vk_disp_t* disp)
 #endif
 }
 
-#if VSF_TGUI_SV_CFG_REFRESH_RATE == ENABLED
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
 uint32_t vsf_tgui_port_get_refresh_rate(void)
 {
     return s_tFPS;

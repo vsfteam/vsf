@@ -19,7 +19,7 @@
 
 #include "vsf_cfg.h"
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 
 #define VSF_LINUX_INHERIT
 #include "vsf.h"
@@ -27,7 +27,7 @@
 #include "../common/usrapp_common.h"
 #include "shell/sys/linux/vsf_linux.h"
 #include "shell/sys/linux/port/busybox/busybox.h"
-#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED && APP_USE_LINUX_LIBUSB_DEMO == ENABLED
 #   include <libusb.h>
 #endif
 #include <sys/mount.h>
@@ -54,89 +54,116 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED && APP_USE_LINUX_LIBUSB_DEMO == ENABLED
 extern int lsusb_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_NNOM_DEMO == ENABLED
+#if APP_USE_NNOM_DEMO == ENABLED
 extern int nnom_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_AWTK_DEMO == ENABLED
+#if APP_USE_AWTK_DEMO == ENABLED
 extern int awtk_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_USBH_DEMO == ENABLED
+#if APP_USE_USBH_DEMO == ENABLED
 extern int usbh_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
+#if APP_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
 extern int vsfip_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
+#if APP_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
 extern int lwip_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_LVGL_DEMO == ENABLED
+#if APP_USE_LVGL_DEMO == ENABLED
 extern int lvgl_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED
 extern int tgui_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_AUDIO_DEMO == ENABLED
+#if APP_USE_GATO_DEMO == ENABLED
+extern int gato_main(int argc, char *argv[]);
+#endif
+
+#if APP_USE_NUKLEAR_DEMO == ENABLED
+extern int nuklear_main(int argc, char *argv[]);
+#endif
+
+#if APP_USE_AUDIO_DEMO == ENABLED
 extern int audio_play_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_BTSTACK_DEMO == ENABLED
+#if APP_USE_BTSTACK_DEMO == ENABLED
 extern int btstack_scan_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_USBD_DEMO == ENABLED
+#if APP_USE_USBD_DEMO == ENABLED
 
-#   if APP_CFG_USE_USBD_CDC_DEMO == ENABLED
+#   if APP_USE_USBD_CDC_DEMO == ENABLED
 extern int usbd_cdc_main(int argc, char *argv[]);
 #   endif
-#   if APP_CFG_USE_USBD_UVC_DEMO == ENABLED
+#   if APP_USE_USBD_UVC_DEMO == ENABLED
 extern int usbd_uvc_main(int argc, char *argv[]);
 #   endif
-#   if APP_CFG_USE_USBD_MSC_DEMO == ENABLED
+#   if APP_USE_USBD_MSC_DEMO == ENABLED
 extern int usbd_msc_main(int argc, char *argv[]);
+#   endif
+#   if APP_USE_USBD_USER_DEMO == ENABLED
+extern int usbd_user_main(int argc, char *argv[]);
 #   endif
 #endif
 
-#if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
+#if APP_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
 extern int mount_file_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED && APP_CFG_USE_VSFVM_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_VSFVM_DEMO == ENABLED
 extern int vsfvm_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_SDL2_DEMO == ENABLED
+#if APP_USE_SDL2_DEMO == ENABLED
 extern int sdl2_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_CPP_DEMO == ENABLED
+#if APP_USE_CPP_DEMO == ENABLED
 extern int cpp_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
-extern int xui_main(int argc, char ** argv);
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
+extern int xui_main(int argc, char **argv);
 #endif
 
-#if APP_CFG_USE_FREETYPE_DEMO == ENABLED
+#if APP_USE_FREETYPE_DEMO == ENABLED
 extern void freetype_demo_init(void);
 #endif
 
-#if APP_CFG_USE_KERNEL_TEST == ENABLED
+#if APP_USE_KERNEL_TEST == ENABLED
 extern int kernel_sem_test_main(int argc, char *argv[]);
 #endif
 
-#if APP_CFG_USE_JSON_DEMO == ENABLED
+#if APP_USE_JSON_DEMO == ENABLED
 extern int json_main(int argc, char *argv[]);
+#endif
+
+#if APP_USE_HAL_DEMO == ENABLED
+#   if APP_USE_HAL_USART_DEMO == ENABLED && VSF_HAL_USE_USART == ENABLED
+extern int usart_main(int argc, char *argv[]);
+#   endif
+#endif
+
+#if APP_USE_STREAM_HAL_DEMO == ENABLED
+#   if APP_USE_STREAM_USART_DEMO == ENABLED
+extern int stream_usart_main(int argc, char *argv[]);
+#   endif
+#endif
+
+#if APP_USE_SOCKET_DEMO == ENABLED && VSF_USE_TCPIP == ENABLED
+extern int socket_main(int argc, char *argv[]);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -145,18 +172,18 @@ int vsf_linux_create_fhs(void)
 {
     int fd;
 
-#if VSF_USE_LINUX_BUSYBOX == ENABLED
+#if VSF_LINUX_USE_BUSYBOX == ENABLED
     busybox_install();
 #endif
 
     // 1. hardware driver related demo
-#if APP_CFG_USE_USBH_DEMO == ENABLED
+#if APP_USE_USBH_DEMO == ENABLED
     usbh_main(0, NULL);
 #endif
 
     // 2. fs
-#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED                  \
-    && VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED              \
+    && VSF_USE_FS == ENABLED && VSF_FS_USE_FATFS == ENABLED
     vk_mal_init(&usrapp_common.mal.fakefat32.use_as__vk_mal_t);
 
 #   if USRAPP_CFG_FAKEFAT32_SECTOR_SIZE == 512
@@ -169,14 +196,14 @@ int vsf_linux_create_fhs(void)
         mount(NULL, "fatfs", NULL, 0, &usrapp_common.mal.fakefat32.use_as__vk_mal_t);
     }
 #   else
-#       warning fat with non-512 sector size, current driver is not supported
+    #       warning fat with non - 512 sector size, current driver is not supported
 #   endif
 #endif
 
-#if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
-    if (mkdir("/memfs", 0)) {
-        return -1;
-    }
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED
+        if (mkdir("/memfs", 0)) {
+            return -1;
+        }
     fd = open("/memfs", 0);
     if (fd >= 0) {
         close(fd);
@@ -184,7 +211,7 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
-#if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_WINFS == ENABLED
     if (mkdir("/winfs", 0)) {
         return -1;
     }
@@ -195,82 +222,104 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
-#if APP_CFG_USE_SCSI_DEMO == ENABLED
+#if APP_USE_SCSI_DEMO == ENABLED
     if (mkdir("/scsi", 0)) {
         return -1;
     }
 #endif
 
     // 3. demos depends on fs after all fs mounted
-#if APP_CFG_USE_FREETYPE_DEMO == ENABLED
+#if APP_USE_FREETYPE_DEMO == ENABLED
     freetype_demo_init();
 #endif
 
     // 4. install executables
-#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED && APP_USE_LINUX_LIBUSB_DEMO == ENABLED
     busybox_bind("/sbin/lsusb", lsusb_main);
     vsf_linux_libusb_startup();
 #endif
 
-#if APP_CFG_USE_NNOM_DEMO == ENABLED
+#if APP_USE_NNOM_DEMO == ENABLED
     busybox_bind("/sbin/nnom", nnom_main);
 #endif
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
     busybox_bind("/sbin/xui", xui_main);
 #endif
-#if APP_CFG_USE_AWTK_DEMO == ENABLED
+#if APP_USE_AWTK_DEMO == ENABLED
     busybox_bind("/sbin/awtk", awtk_main);
 #endif
-#if APP_CFG_USE_LVGL_DEMO == ENABLED
+#if APP_USE_LVGL_DEMO == ENABLED
     busybox_bind("/sbin/lvgl", lvgl_main);
 #endif
-#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED
     busybox_bind("/sbin/tgui", tgui_main);
 #endif
-#if APP_CFG_USE_AUDIO_DEMO == ENABLED
+#if APP_USE_GATO_DEMO == ENABLED
+    busybox_bind("/sbin/gato", gato_main);
+#endif
+#if APP_USE_NUKLEAR_DEMO == ENABLED
+    busybox_bind("/sbin/nuklear", nuklear_main);
+#endif
+#if APP_USE_AUDIO_DEMO == ENABLED
     busybox_bind("/sbin/play_audio", audio_play_main);
 #endif
-#if APP_CFG_USE_BTSTACK_DEMO == ENABLED
+#if APP_USE_BTSTACK_DEMO == ENABLED
     busybox_bind("/sbin/btscan", btstack_scan_main);
 #endif
-#if APP_CFG_USE_LINUX_DEMO == ENABLED && APP_CFG_USE_VSFVM_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED && APP_USE_VSFVM_DEMO == ENABLED
     busybox_bind("/sbin/vsfvm", vsfvm_main);
 #endif
-#if APP_CFG_USE_USBD_DEMO == ENABLED
-#   if APP_CFG_USE_USBD_CDC_DEMO == ENABLED
+#if APP_USE_USBD_DEMO == ENABLED
+#   if APP_USE_USBD_CDC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_cdc", usbd_cdc_main);
 #   endif
-#   if APP_CFG_USE_USBD_UVC_DEMO == ENABLED
+#   if APP_USE_USBD_UVC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_uvc", usbd_uvc_main);
 #   endif
-#   if APP_CFG_USE_USBD_MSC_DEMO == ENABLED
+#   if APP_USE_USBD_MSC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_msc", usbd_msc_main);
 #   endif
+#   if APP_USE_USBD_USER_DEMO == ENABLED
+    busybox_bind("/sbin/usbd_user", usbd_user_main);
+#   endif
 #endif
-#if APP_CFG_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
+#if APP_USE_LINUX_MOUNT_FILE_DEMO == ENABLED
     busybox_bind("/sbin/mount_file", mount_file_main);
 #endif
-#if APP_CFG_USE_CPP_DEMO == ENABLED
+#if APP_USE_CPP_DEMO == ENABLED
     busybox_bind("/sbin/cpp_test", cpp_main);
 #endif
 
 #if VSF_USE_SDL2 == ENABLED
     vsf_sdl2_init(&usrapp_ui_common.disp.use_as__vk_disp_t);
 #endif
-#if APP_CFG_USE_SDL2_DEMO == ENABLED
+#if APP_USE_SDL2_DEMO == ENABLED
     busybox_bind("/sbin/sdl2", sdl2_main);
 #endif
-#if APP_CFG_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
+#if APP_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
     busybox_bind("/sbin/vsfip", vsfip_main);
 #endif
-#if APP_CFG_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
+#if APP_USE_LWIP_DEMO == ENABLED && VSF_USE_LWIP == ENABLED
     busybox_bind("/sbin/lwip", lwip_main);
 #endif
-#if APP_CFG_USE_KERNEL_TEST == ENABLED
+#if APP_USE_KERNEL_TEST == ENABLED
     busybox_bind("/sbin/sem_test", kernel_sem_test_main);
 #endif
-#if APP_CFG_USE_JSON_DEMO == ENABLED
+#if APP_USE_JSON_DEMO == ENABLED
     busybox_bind("/sbin/json", json_main);
+#endif
+#if APP_USE_HAL_DEMO == ENABLED
+#   if APP_USE_HAL_USART_DEMO == ENABLED && VSF_HAL_USE_USART == ENABLED
+    busybox_bind("/sbin/usart", usart_main);
+#   endif
+#endif
+#if APP_USE_STREAM_HAL_DEMO == ENABLED
+#   if APP_USE_STREAM_USART_DEMO == ENABLED
+    busybox_bind("/sbin/stream_usart", stream_usart_main);
+#   endif
+#endif
+#if APP_USE_SOCKET_DEMO == ENABLED && VSF_USE_TCPIP == ENABLED
+    busybox_bind("/sbin/socket", socket_main);
 #endif
 
     return 0;
@@ -281,29 +330,29 @@ describe_mem_stream(user_usbd_cdc_acm_stream_rx, USRAPP_CFG_CDC_RX_STREAM_SIZE)
 describe_mem_stream(user_usbd_cdc_acm_stream_tx, USRAPP_CFG_CDC_TX_STREAM_SIZE)
 
 describe_usbd(user_usbd_cdc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, 0x0409, USB_DC_SPEED_HIGH)
-    usbd_common_desc(user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
-        cdc_acm_desc(user_usbd_cdc, 0, 0, 1, 2, 2, 512, 16)
-    usbd_func_desc(user_usbd_cdc)
-        usbd_func_str_desc(user_usbd_cdc, 0, u"VSF-CDC")
-    usbd_std_desc_table(user_usbd_cdc)
-        usbd_func_str_desc_table(user_usbd_cdc, 0)
-    usbd_func(user_usbd_cdc)
-        cdc_acm_func(user_usbd_cdc, 0, 1, 2, 2, &user_usbd_cdc_acm_stream_rx, &user_usbd_cdc_acm_stream_tx, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
-    usbd_ifs(user_usbd_cdc)
-        cdc_acm_ifs(user_usbd_cdc, 0)
+usbd_common_desc(user_usbd_cdc, u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0", 64, USB_DESC_CDC_ACM_IAD_LEN, USB_CDC_ACM_IFS_NUM, USB_CONFIG_ATT_WAKEUP, 100)
+cdc_acm_desc(user_usbd_cdc, 0, 0, 1, 2, 2, 512, 16)
+usbd_func_desc(user_usbd_cdc)
+usbd_func_str_desc(user_usbd_cdc, 0, u"VSF-CDC")
+usbd_std_desc_table(user_usbd_cdc)
+usbd_func_str_desc_table(user_usbd_cdc, 0)
+usbd_func(user_usbd_cdc)
+cdc_acm_func(user_usbd_cdc, 0, 1, 2, 2, &user_usbd_cdc_acm_stream_rx, &user_usbd_cdc_acm_stream_tx, USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1))
+usbd_ifs(user_usbd_cdc)
+cdc_acm_ifs(user_usbd_cdc, 0)
 end_describe_usbd(user_usbd_cdc, USRAPP_CFG_USBD_DEV)
 
 #elif defined(VSF_DEBUG_STREAM_NEED_POLL)
 void vsf_plug_in_on_kernel_idle(void)
 {
-#   if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#   if APP_USE_VSFVM_DEMO == ENABLED
     extern void vsfvm_user_poll(void);
     vsfvm_user_poll();
 #   endif
     VSF_DEBUG_STREAM_POLL();
     vsf_driver_poll();
 }
-#elif APP_CFG_USE_VSFVM_DEMO == ENABLED
+#elif APP_USE_VSFVM_DEMO == ENABLED
 void vsf_plug_in_on_kernel_idle(void)
 {
     extern void vsfvm_user_poll(void);
@@ -338,7 +387,7 @@ int main(int argc, char *argv[])
     stream_tx = (vsf_stream_t *)&user_usbd_cdc_acm_stream_tx.use_as__vsf_stream_t;
     stream_rx = (vsf_stream_t *)&user_usbd_cdc_acm_stream_rx.use_as__vsf_stream_t;
 #elif USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_UART
-    // TODO: 
+    // TODO:
     stream_tx = (vsf_stream_t *)&UART_STREAM_TX;
     stream_rx = (vsf_stream_t *)&UART_STREAM_RX;
 #elif USRAPP_CFG_LINUX_TTY == USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
@@ -346,7 +395,7 @@ int main(int argc, char *argv[])
     stream_rx = (vsf_stream_t *)&VSF_DEBUG_STREAM_RX;
 #endif
 
-    vsf_linux_stdio_stream_t stream = {
+    vsf_linux_stdio_stream_t stream ={
         .in     = stream_rx,
         .out    = stream_tx,
         .err    = stream_tx,
@@ -355,6 +404,6 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#endif      // APP_CFG_USE_LINUX_DEMO
+#endif      // APP_USE_LINUX_DEMO
 
 /* EOF */

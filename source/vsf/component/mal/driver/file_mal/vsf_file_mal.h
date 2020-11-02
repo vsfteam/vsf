@@ -22,7 +22,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_FS == ENABLED && VSF_USE_FILE_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_USE_FS == ENABLED && VSF_MAL_USE_FILE_MAL == ENABLED
 
 #include "component/fs/vsf_fs.h"
 

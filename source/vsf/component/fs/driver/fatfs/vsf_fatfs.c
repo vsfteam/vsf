@@ -19,7 +19,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_FATFS == ENABLED
 
 #define __VSF_FS_CLASS_INHERIT__
 #define __VSF_MALFS_CLASS_INHERIT__

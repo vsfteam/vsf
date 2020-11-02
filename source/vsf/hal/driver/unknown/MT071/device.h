@@ -32,8 +32,9 @@
 #   define VSF_ARCH_PRI_BIT         4
 #endif
 
-#define __def_idx(__name, __no)     CONNECT2(__name, _idx) = (__no)
-#define __def_msk(__name)           CONNECT2(__name, _msk) = _BV(CONNECT2(__name, _idx) & 0x1F)
+// TODO: implement pm
+#define __SYSTEM_FREQ               VSF_SYSTIMER_FREQ
+#define __PLL_FREQ_HZ               __SYSTEM_FREQ
 
 #define GPIO_COUNT                  7
 #define PIO0
@@ -51,22 +52,36 @@
 #define PIO6
 #define PIO6_PIN_NUM                8
 
+#define DMA_COUNT                   1
+#   define DMA_CHANNEL_COUNT        4
+#   define DMA_CHANNEL_MAX_TRANS_SIZES                                          \
+                                    1023, 511, 255, 255
+
+#define USART_COUNT                 2
+#   define USART0_TX_DMA            0
+#   define USART0_RX_DMA            1
+#   define USART1_TX_DMA            2
+#   define USART1_RX_DMA            3
+
 #define USB_OTG_COUNT               1
 #define USB_OTG0_IRQHandler         USB_IRQHandler
 #define USB_OTG0_EP_NUMBER          8
 #define USB_OTG0_CONFIG                                                         \
-    .reg                = (void *)USB_Common_Base,                              \
-    .sync_clk           = SYNC_CLK_USB_idx,                                     \
-    .pclk               = PCLK_USB_idx,                                         \
-    .irq                = USB_IRQn,
+    .reg                            = (void *)USB_Common_Base,                  \
+    .sclk                           = SCLK_USB_IDX,                             \
+    .pclk                           = PCLK_USB_IDX,                             \
+    .irq                            = USB_IRQn,
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __def_idx(__name, __no)     CONNECT2(__name, _IDX) = (__no)
+#define __def_msk(__name)           CONNECT2(__name, _MSK) = BIT(CONNECT2(__name, _IDX) & 0x1F)
 
 // bit0  - bit7 :   clksel
 // bit8  - bit15:   clkdiv
 // bit16 - bit23:   clkref
 #define __def_clk_idx(__name, __clksel, __clkdiv, __clkref)                     \
-        CONNECT2(__name, _idx) = ((__clksel) << 0)                              \
+        CONNECT2(__name, _IDX) = ((__clksel) << 0)                              \
                             |   ((__clkdiv) << 8)                               \
                             |   ((__clkref) << 16)
 
@@ -104,7 +119,7 @@ enum pm_sleep_mode_t {
 
 //! \name peripheral async clock index
 //! @{
-enum pm_periph_async_clk_no_t {
+enum pm_pclk_no_t {
                     // NAME         CLKSEL,         CLKDIV,         CLKREF
     __def_clk_idx(  PCLK_USB,       0x18,           0,              0x0F),
     __def_clk_idx(  PCLK_USART0,    0x16,           0x24,           0),
@@ -120,56 +135,56 @@ enum pm_periph_async_clk_no_t {
 
 //! \name Peripheral Sync Clock Macros
 //! @{
-enum pm_sync_clk_no_t {
-    __def_idx(SYNC_CLK_FLASH,   0),
-    __def_idx(SYNC_CLK_RAM,     1),
-    __def_idx(SYNC_CLK_GPIO,    2),
-    __def_idx(SYNC_CLK_DMA,     3),
-    __def_idx(SYNC_CLK_USART0,  4),
-    __def_idx(SYNC_CLK_USART1,  5),
-    __def_idx(SYNC_CLK_ROM,     6),
-    __def_idx(SYNC_CLK_I2C0,    7),
-    __def_idx(SYNC_CLK_ADC,     8),
-    __def_idx(SYNC_CLK_IOCFG,   9),
-    __def_idx(SYNC_CLK_WDT,     10),
-    __def_idx(SYNC_CLK_WPWM,    12),
-    __def_idx(SYNC_CLK_SPI0,    13),
-    __def_idx(SYNC_CLK_TIMER0,  14),
-    __def_idx(SYNC_CLK_TIMER1,  15),
-    __def_idx(SYNC_CLK_ACMP,    16),
-    __def_idx(SYNC_CLK_TIMER2,  18),
-    __def_idx(SYNC_CLK_IWDG,    19),
-    __def_idx(SYNC_CLK_SPI1,    22),
-    __def_idx(SYNC_CLK_I2C1,    24),
-    __def_idx(SYNC_CLK_TIMER3,  25),
-    __def_idx(SYNC_CLK_RTC,     30),
-    __def_idx(SYNC_CLK_USB,     31),
+enum pm_sclk_no_t {
+    __def_idx(  SCLK_FLASH,         0),
+    __def_idx(  SCLK_RAM,           1),
+    __def_idx(  SCLK_GPIO,          2),
+    __def_idx(  SCLK_DMA,           3),
+    __def_idx(  SCLK_USART0,        4),
+    __def_idx(  SCLK_USART1,        5),
+    __def_idx(  SCLK_ROM,           6),
+    __def_idx(  SCLK_I2C0,          7),
+    __def_idx(  SCLK_ADC,           8),
+    __def_idx(  SCLK_IOCFG,         9),
+    __def_idx(  SCLK_WDT,           10),
+    __def_idx(  SCLK_WPWM,          12),
+    __def_idx(  SCLK_SPI0,          13),
+    __def_idx(  SCLK_TIMER0,        14),
+    __def_idx(  SCLK_TIMER1,        15),
+    __def_idx(  SCLK_ACMP,          16),
+    __def_idx(  SCLK_TIMER2,        18),
+    __def_idx(  SCLK_IWDG,          19),
+    __def_idx(  SCLK_SPI1,          22),
+    __def_idx(  SCLK_I2C1,          24),
+    __def_idx(  SCLK_TIMER3,        25),
+    __def_idx(  SCLK_RTC,           30),
+    __def_idx(  SCLK_USB,           31),
 };
 
-enum pm_sync_clk_msk_t { 
-    __def_msk(SYNC_CLK_FLASH),
-    __def_msk(SYNC_CLK_RAM),
-    __def_msk(SYNC_CLK_GPIO),
-    __def_msk(SYNC_CLK_DMA),
-    __def_msk(SYNC_CLK_USART0),
-    __def_msk(SYNC_CLK_USART1),
-    __def_msk(SYNC_CLK_ROM),
-    __def_msk(SYNC_CLK_I2C0),
-    __def_msk(SYNC_CLK_ADC),
-    __def_msk(SYNC_CLK_IOCFG),
-    __def_msk(SYNC_CLK_WDT),
-    __def_msk(SYNC_CLK_WPWM),
-    __def_msk(SYNC_CLK_SPI0),
-    __def_msk(SYNC_CLK_TIMER0),
-    __def_msk(SYNC_CLK_TIMER1),
-    __def_msk(SYNC_CLK_ACMP),
-    __def_msk(SYNC_CLK_TIMER2),
-    __def_msk(SYNC_CLK_IWDG),
-    __def_msk(SYNC_CLK_SPI1),
-    __def_msk(SYNC_CLK_I2C1),
-    __def_msk(SYNC_CLK_TIMER3),
-    __def_msk(SYNC_CLK_RTC),
-    __def_msk(SYNC_CLK_USB),
+enum pm_sclk_msk_t {
+    __def_msk(SCLK_FLASH),
+    __def_msk(SCLK_RAM),
+    __def_msk(SCLK_GPIO),
+    __def_msk(SCLK_DMA),
+    __def_msk(SCLK_USART0),
+    __def_msk(SCLK_USART1),
+    __def_msk(SCLK_ROM),
+    __def_msk(SCLK_I2C0),
+    __def_msk(SCLK_ADC),
+    __def_msk(SCLK_IOCFG),
+    __def_msk(SCLK_WDT),
+    __def_msk(SCLK_WPWM),
+    __def_msk(SCLK_SPI0),
+    __def_msk(SCLK_TIMER0),
+    __def_msk(SCLK_TIMER1),
+    __def_msk(SCLK_ACMP),
+    __def_msk(SCLK_TIMER2),
+    __def_msk(SCLK_IWDG),
+    __def_msk(SCLK_SPI1),
+    __def_msk(SCLK_I2C1),
+    __def_msk(SCLK_TIMER3),
+    __def_msk(SCLK_RTC),
+    __def_msk(SCLK_USB),
 };
 //! @}
 
@@ -206,8 +221,8 @@ enum pm_clk_src_sel_t {
 //! @}
 
 enum pm_pll_sel_t {
-    PLL_idx,
-    PLL_USB_idx,
+    PLL_IDX,
+    PLL_USB_IDX,
 };
 
 struct io_wakeup_cfg_t {
@@ -225,18 +240,18 @@ def_interface( i_pm_wakeup_t )
     }UseIO;
 end_def_interface( i_pm_wakeup_t )
 
-struct pm_periph_asyn_clk_cfg_t {
+struct pm_pclk_cfg_t {
     pm_clk_src_sel_t    clk_src;
     uint16_t            div;
 };
 
 //! \name main clock config sturct
 //! @{
-struct pm_main_clk_cfg_t {
+struct pm_mclk_cfg_t {
     pm_clk_src_sel_t    clk_src;                //!< main clock source
     uint32_t            freq;                   //!< system oscilator frequency
     uint16_t            core_div[1];            //!< system core clock divider
-    uint16_t            sync_clk_div[1];        //!< system sync clock divider
+    uint16_t            sclk_div[1];            //!< system sync clock divider
 };
 //! @}
 

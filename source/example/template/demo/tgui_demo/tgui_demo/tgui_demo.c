@@ -60,7 +60,7 @@ vsf_err_t tgui_demo_init(void)
 
     const vsf_tgui_cfg_t cfg = {
         .evt_queue = {
-            .obj_ptr = s_tEvtQueueBuffer, 
+            .obj_ptr = s_tEvtQueueBuffer,
             .s32_size = sizeof(s_tEvtQueueBuffer)
         },
 #if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
@@ -107,10 +107,10 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 
     vsf_tgui_evt_t event = {
         .PointerEvt = {
-            .msg = vsf_input_touchscreen_is_down(ts_evt) 
-                                ?   VSF_TGUI_EVT_POINTER_DOWN 
+            .msg = vsf_input_touchscreen_is_down(ts_evt)
+                                ?   VSF_TGUI_EVT_POINTER_DOWN
                                 :   VSF_TGUI_EVT_POINTER_UP,
-            
+
             .iX = vsf_input_touchscreen_get_x(ts_evt),
             .iY = vsf_input_touchscreen_get_y(ts_evt),
         },
@@ -118,13 +118,14 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 
     vk_tgui_send_message(&s_tTGUIDemo, event);
 
-    
+
     if (!vsf_input_touchscreen_is_down(ts_evt)) {
         event.PointerEvt.msg = VSF_TGUI_EVT_POINTER_CLICK;
         vk_tgui_send_message(&s_tTGUIDemo, event);
     }
 }
 
+#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
 void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 {
 /*
@@ -151,17 +152,17 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 */
     //! this block of code is used for test purpose only
 
-    
+
 
     switch (vk_input_mouse_evt_get(mouse_evt)) {
         case VSF_INPUT_MOUSE_EVT_BUTTON: {
-            
+
             vsf_tgui_evt_t event = {
                 .PointerEvt = {
-                    .msg = vk_input_mouse_evt_button_is_down(mouse_evt) 
-                                        ?   VSF_TGUI_EVT_POINTER_DOWN 
+                    .msg = vk_input_mouse_evt_button_is_down(mouse_evt)
+                                        ?   VSF_TGUI_EVT_POINTER_DOWN
                                         :   VSF_TGUI_EVT_POINTER_UP,
-            
+
                     .iX = vk_input_mouse_evt_get_x(mouse_evt),
                     .iY = vk_input_mouse_evt_get_y(mouse_evt),
                 },
@@ -169,7 +170,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 
             vk_tgui_send_message(&s_tTGUIDemo, event);
 
-    
+
             if (!vk_input_mouse_evt_button_is_down(mouse_evt)) {
                 event.PointerEvt.msg = VSF_TGUI_EVT_POINTER_CLICK;
                 vk_tgui_send_message(&s_tTGUIDemo, event);
@@ -198,7 +199,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                         .tDelta = {
                             .iX = 0,
                             .iY = vk_input_mouse_evt_get_y(mouse_evt),
-                            .hwMillisecond = 20,            //! 50Hz 
+                            .hwMillisecond = 20,            //! 50Hz
                         },
                     },
                 };
@@ -210,10 +211,10 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 
         default:
             break;
-    } 
+    }
 
 }
-
+#endif
 
 #endif
 

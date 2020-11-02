@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_UVC == ENABLED
 
 #include "../../../common/class/UVC/vsf_usb_UVC.h"
 #include "component/av/vsf_av.h"
@@ -108,5 +108,5 @@ extern vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, ui
 }
 #endif
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_UVC
 #endif      // __VSF_USBD_UVC_H__

@@ -24,11 +24,6 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#define isb()           __asm__ __volatile__ ("" : : : "memory")
-#define dsb()           __asm__ __volatile__ ("mcr p15, 0, %0, c7, c10,  4" : : "r" (0) : "memory")
-#define dmb()           __asm__ __volatile__ ("" : : : "memory")
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 typedef void (*__isr_t)(void);
@@ -64,22 +59,22 @@ void IRQ_Handler(void)
         F1CX00S_INTC.PENDING[irq_idx >> 5] = 1 << (irq_idx & 0x1F);             //!< clear pending bit
         F1CX00S_INTC.STIR[irq_idx >> 5] &= ~(1 << (irq_idx & 0x1F));            //!< clear STIR bit
         F1CX00S_INTC.RESP[irq_idx >> 5] = (1 << (irq_idx & 0x1F));              //!< disable same level interrupt 
-        __COMPILER_BARRIER();
-        ENABLE_GLOBAL_INTERRUPT();                                              //!< enable preemption
+        isb();
+        vsf_enable_interrupt();                                                 //!< enable preemption
 
         //! run the ISR
         (*isr_handler)();
 
-        DISABLE_GLOBAL_INTERRUPT();                                             //!< disable preemption
+        vsf_disable_interrupt();                                                //!< disable preemption
         F1CX00S_INTC.RESP[irq_idx >> 5] &= ~(1 << (irq_idx & 0x1F));            //!< enable same level interrupt
 
-        __COMPILER_BARRIER();
+        isb();
     } while(true);              //!< try low priority ISR
 }
 
 void intc_init(void)
 {
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
 
         //! set vector table
         F1CX00S_INTC.VTOR = (uintptr_t)__VECTOR_TABLE;
@@ -102,8 +97,6 @@ void intc_init(void)
         F1CX00S_INTC.RESP[0] = 0;
         F1CX00S_INTC.RESP[1] = 0;
    )
-
-    ENABLE_GLOBAL_INTERRUPT();
 }
 
 
@@ -122,12 +115,8 @@ __arm void intc_disable_irq(IRQn_Type IRQn)
 
     F1CX00S_INTC.DISABLE[(((uint32_t)IRQn) >> 5UL)] |= (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
 
-    //__DSB();
-    __asm__ __volatile__ ("mcr p15, 0, %0, c7, c10,  4" : : "r" (0) : "memory"); 
-
-    //__ISB();
-    __asm__ __volatile__ ("" : : : "memory");
-
+    dsb();
+    isb();
 }
 
 

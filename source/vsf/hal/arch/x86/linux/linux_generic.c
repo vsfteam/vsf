@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_ARCH_WIN_IMPLEMENT
+#define __VSF_ARCH_LINUX_IMPLEMENT
 #include "hal/arch/vsf_arch_abstraction.h"
 #include "hal/arch/__vsf_arch_interface.h"
 
@@ -107,52 +107,71 @@ static NO_INIT vsf_arch_t __vsf_arch;
 
 /*============================ IMPLEMENTATION ================================*/
 
+static int __vsf_arch_get_thread_idx(vsf_arch_thread_t *thread)
+{
+    int idx = thread - __vsf_arch.thread_pool;
+    if ((idx >= 0) && (idx <= dimof(__vsf_arch.thread_pool))) {
+        return idx;
+    }
+    return -1;
+}
+
 /*----------------------------------------------------------------------------*
  * infrastructure                                                             *
  *----------------------------------------------------------------------------*/
 
 void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request)
 {
-    request->triggered = false;
+    VSF_HAL_ASSERT(!request->is_inited);
+    request->is_triggered = false;
     pthread_mutex_init(&request->mutex, NULL);
     pthread_cond_init(&request->cond, NULL);
+    request->is_inited = true;
 }
 
 void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request)
 {
+    VSF_HAL_ASSERT(request->is_inited);
     pthread_cond_destroy(&request->cond);
+    request->is_inited = false;
 }
 
 void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
 {
-    vsf_arch_request_trace("irq_request pend\n");
+    VSF_HAL_ASSERT(request->is_inited);
+    int idx = __vsf_arch_get_thread_idx(request->arch_thread);
+
+    vsf_arch_request_trace("irq_request%d pend\n", idx);
     pthread_mutex_lock(&request->mutex);
-        while (!request->triggered) {
-            vsf_arch_request_trace("irq_request wait\n");
+        while (!request->is_triggered) {
+            vsf_arch_request_trace("irq_request%d wait\n", idx);
             pthread_cond_wait(&request->cond, &request->mutex);
         }
-        request->triggered = false;
+        request->is_triggered = false;
     pthread_mutex_unlock(&request->mutex);
-    vsf_arch_request_trace("irq_request got\n");
+    vsf_arch_request_trace("irq_request%d got\n", idx);
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 {
-    vsf_arch_request_trace("irq_request send\n");
+    VSF_HAL_ASSERT(request->is_inited);
+    int idx = __vsf_arch_get_thread_idx(request->arch_thread);
+
+    vsf_arch_request_trace("irq_request%d send\n", idx);
     pthread_mutex_lock(&request->mutex);
-        request->triggered = true;
-        vsf_arch_request_trace("irq_request signal\n");
-        pthread_cond_signal(&request->cond);
+        request->is_triggered = true;
+        vsf_arch_request_trace("irq_request%d signal\n", idx);
     pthread_mutex_unlock(&request->mutex);
-    vsf_arch_request_trace("irq_request sent\n");
+    pthread_cond_signal(&request->cond);
+    vsf_arch_request_trace("irq_request%d sent\n", idx);
 }
 
 static void * __vsf_arch_irq_entry(void *arg)
 {
     vsf_arch_thread_t *thread = arg;
-    int idx = thread - __vsf_arch.thread_pool;
-    VSF_HAL_ASSERT(idx < VSF_ARCH_CFG_THREAD_NUM);
+    int idx = __vsf_arch_get_thread_idx(thread);
 
+    thread->start_request.arch_thread = thread;
     __vsf_arch_irq_request_pend(&thread->start_request);
 
     vsf_arch_irq_thread_t *irq_thread = thread->param;
@@ -304,7 +323,7 @@ uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 
 void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 {
-    
+
 }
 
 #endif
@@ -316,17 +335,17 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
  */
 bool vsf_arch_low_level_init(void)
 {
-    memset(&__vsf_arch.systimer, 0, sizeof(__vsf_arch.systimer));
+    memset(&__vsf_arch, 0, sizeof(__vsf_arch));
     strcpy((char *)__vsf_arch_common.por_thread.name, "por");
 
     // create thread pool
     vsf_bitmap_clear(&__vsf_arch.thread_bitmap, VSF_ARCH_CFG_THREAD_NUM);
     for (int i = 0; i < dimof(__vsf_arch.thread_pool); i++) {
+        __vsf_arch_irq_request_init(&__vsf_arch.thread_pool[i].start_request);
         if (0 != pthread_create(&__vsf_arch.thread_pool[i].pthread, NULL, __vsf_arch_irq_entry, &__vsf_arch.thread_pool[i])) {
             VSF_HAL_ASSERT(false);
             return VSF_ERR_FAIL;
         }
-        __vsf_arch_irq_request_init(&__vsf_arch.thread_pool[i].start_request);
     }
     return __vsf_arch_low_level_init();
 }

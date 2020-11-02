@@ -24,9 +24,9 @@
 
 #if VSF_USE_USB_HOST == ENABLED
 
-#if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#if VSF_USBH_USE_HCD_LIBUSB == ENABLED
 #   include "component/usb/driver/hcd/libusb_hcd/vsf_libusb_hcd.h"
-#elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#elif VSF_USBH_USE_HCD_WINUSB == ENABLED
 #   include "component/usb/driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
 #endif
 
@@ -40,15 +40,15 @@
 /*============================ TYPES =========================================*/
 
 typedef struct usrapp_usbh_common_const_t {
-#if VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#if VSF_USBH_USE_HCD_OHCI == ENABLED
     vk_ohci_param_t ohci_param;
-#elif VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#elif VSF_USBH_USE_HCD_LIBUSB == ENABLED
     vk_libusb_hcd_param_t libusb_hcd_param;
-#elif VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#elif VSF_USBH_USE_HCD_WINUSB == ENABLED
     vk_winusb_hcd_param_t winusb_hcd_param;
-#elif VSF_USE_USB_HOST_HCD_DWCOTG == ENABLED
+#elif VSF_USBH_USE_HCD_DWCOTG == ENABLED
     vk_dwcotg_hcd_param_t dwcotg_hcd_param;
-#elif VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED
+#elif VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED
     vk_musb_fdrc_hcd_param_t musb_fdrc_hcd_param;
 #else
     // on chip non-ip hcd driver
@@ -58,49 +58,49 @@ typedef struct usrapp_usbh_common_const_t {
 
 typedef struct usrapp_usbh_common_t {
     vk_usbh_t host;
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
     vk_usbh_class_t hub;
 #endif
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
     vk_usbh_class_t libusb;
 #endif
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_USBH_USE_ECM == ENABLED
     vk_usbh_class_t ecm;
-#   if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#   if VSF_USBH_USE_LIBUSB == ENABLED
     vk_usbh_class_t rtl8152;
 #   endif
 #endif
-#if VSF_USE_USB_HOST_MSC == ENABLED
+#if VSF_USBH_USE_MSC == ENABLED
     vk_usbh_class_t msc;
 #endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
+#if VSF_USBH_USE_BTHCI == ENABLED
     vk_usbh_class_t bthci;
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
     vk_usbh_class_t hid;
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
     vk_usbh_class_t ds4;
 #endif
-#if VSF_USE_USB_HOST_NSPRO == ENABLED
+#if VSF_USBH_USE_NSPRO == ENABLED
     vk_usbh_class_t nspro;
 #endif
-#if VSF_USE_USB_HOST_XB360 == ENABLED
+#if VSF_USBH_USE_XB360 == ENABLED
     vk_usbh_class_t xb360;
 #endif
-#if VSF_USE_USB_HOST_XB1 == ENABLED
+#if VSF_USBH_USE_XB1 == ENABLED
     vk_usbh_class_t xb1;
 #endif
-#if VSF_USE_USB_HOST_UAC == ENABLED
+#if VSF_USBH_USE_UAC == ENABLED
     vk_usbh_class_t uac;
 #endif
 } usrapp_usbh_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if     VSF_USE_USB_HOST_HCD_OHCI == ENABLED                                    \
-    ||  VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED                                  \
-    ||  VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#if     VSF_USBH_USE_HCD_OHCI == ENABLED                                        \
+    ||  VSF_USBH_USE_HCD_LIBUSB == ENABLED                                      \
+    ||  VSF_USBH_USE_HCD_WINUSB == ENABLED
 extern const usrapp_usbh_common_const_t usrapp_usbh_common_const;
 #endif
 extern usrapp_usbh_common_t usrapp_usbh_common;

@@ -34,20 +34,20 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 //! \brief SysTick timer register base address
-#define SYSTICK_BASE_ADDRESS        (0xE000E010UL)
+#define SYSTICK_BASE_ADDRESS            (0xE000E010UL)
 
 //! \brief define the System Tick Timer register page
-#define ARM_SYSTICK                 (*(systick_reg_t *)SYSTICK_BASE_ADDRESS)
+#define ARM_SYSTICK                     (*(systick_reg_t *)SYSTICK_BASE_ADDRESS)
 
 #ifndef __REG_MACRO__
 #define __REG_MACRO__
-#define DEF_REG                     \
-        union {                     \
+#define DEF_REG                                                                 \
+        union {                                                                 \
             struct {
     
-#define END_DEF_REG(__NAME)         \
-            };                      \
-            reg32_t Value;          \
+#define END_DEF_REG32(__NAME)                                                   \
+            };                                                                  \
+            reg32_t VALUE;                                                      \
         }__NAME;
 #endif
 
@@ -58,23 +58,23 @@ extern "C" {
 
 //! \brief  SysTick Timer Control and status register
 #define SYSTICK_CSR_REG                 ARM_SYSTICK.SYST_CSR
-#define SYSTICK_CSR                     SYSTICK_CSR_REG.Value
+#define SYSTICK_CSR                     SYSTICK_CSR_REG.VALUE
 #define SYSTICK_CSR_BIT                 SYSTICK_CSR_REG
 
 //! \brief System Timer Reload value register
 #define SYSTICK_RVR_REG                 ARM_SYSTICK.SYST_RVR
-#define SYSTICK_RVR                     SYSTICK_RVR_REG.Value
+#define SYSTICK_RVR                     SYSTICK_RVR_REG.VALUE
 #define SYSTICK_RVR_BIT                 SYSTICK_RVR_REG
 
                  
 //! \brief System Timer Current value register
 #define SYSTICK_CVR_REG                 ARM_SYSTICK.SYST_CVR
-#define SYSTICK_CVR                     SYSTICK_CVR_REG.Value
+#define SYSTICK_CVR                     SYSTICK_CVR_REG.VALUE
 #define SYSTICK_CVR_BIT                 SYSTICK_CVR_REG
 
 //! \brief System Timer Calibration value register
 #define SYSTICK_CALIB_REG               ARM_SYSTICK.SYST_CALIB
-#define SYSTICK_CALIB                   SYSTICK_CALIB_REG.Value
+#define SYSTICK_CALIB                   SYSTICK_CALIB_REG.VALUE
 #define SYSTICK_CALIB_BIT               SYSTICK_CALIB_REG
 
 /* ----------------------------REGISTER DEFINE  END-------------------------- */
@@ -110,6 +110,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /*============================ TYPES =========================================*/
+
+// copied from utilities/compiler/__common/__type.h
 #ifndef __REG_TYPE__
 #define __REG_TYPE__
 
@@ -119,147 +121,97 @@ typedef volatile uint32_t           reg32_t;
 
 #if defined(__IAR_SYSTEMS_ICC__)                                                \
     ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
-
-#undef ____RESERVED
-#undef __RESERVED
-#define ____RESERVED(__BIT, __NAME)                                             \
-        uint##__BIT##_t __unused_##__NAME : __BIT;
-#define __RESERVED(__BIT, __NAME)                                               \
-            ____RESERVED(__BIT, __NAME)
-
-#define __RESERVED_B(__BYTE_CNT, __LINE)                                        \
-                                    uint32_t __unused_##__LINE[__BYTE_CNT >> 2]
-#define RESERVED_B(__BYTE_CNT)      __RESERVED_B(__BYTE_CNT, __LINE__)
-
-#   ifndef RESERVED_U8           
-#       define RESERVED_U8          __RESERVED( 8, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_U16            
-#       define RESERVED_U16         __RESERVED( 16, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_U32             
-#       define RESERVED_U32         __RESERVED( 32, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_16B             
-#       define RESERVED_16B         RESERVED_B(16);
-#   endif
-
-#   ifndef RESERVED_64B             
-#       define RESERVED_64B         RESERVED_B(64);
-#   endif
-
-#   ifndef RESERVED_256B             
-#       define RESERVED_256B        RESERVED_B(256);
-#   endif
-
-#   ifndef RESERVED_1K             
-#       define RESERVED_1K          RESERVED_B(1024);
-#   endif
-
-#   ifndef RESERVED_4K             
-#       define RESERVED_4K          RESERVED_B(4096);
-#   endif
-
-#   ifndef RESERVED_16K             
-#       define RESERVED_16K         RESERVED_B(16*1024);
-#   endif
-
-#   ifndef RESERVED_64K             
-#       define RESERVED_64K         RESERVED_B(64*1024);
-#   endif
-
-#   ifndef RESERVED_256K             
-#       define RESERVED_256K        RESERVED_B(256*1024);
-#   endif
-
-
-#   ifndef RESERVED_1M             
-#       define RESERVED_1M          RESERVED_B(1024*1024);
-#   endif
-
+#   define __REG_CONNECT(__A, __B)  __A##__B
+#   define __REG_RSVD_NAME(__NAME)  __REG_CONNECT(__unused_, __NAME)
 #else
-#   ifndef RESERVED_U8           
-#       define RESERVED_U8          uint8_t  : 8;
-#   endif
-
-#   ifndef RESERVED_U16            
-#       define RESERVED_U16         uint16_t : 16;
-#   endif
-
-#   ifndef RESERVED_U32             
-#       define RESERVED_U32         uint32_t : 32;
-#   endif
-
-#   ifndef RESERVED_16B             
-#       define RESERVED_16B     RESERVED_U32                                    \
-                                RESERVED_U32                                    \
-                                RESERVED_U32                                    \
-                                RESERVED_U32
-#   endif
-
-#   ifndef RESERVED_64B             
-#       define RESERVED_64B     RESERVED_16B                                    \
-                                RESERVED_16B                                    \
-                                RESERVED_16B                                    \
-                                RESERVED_16B
-#   endif
-
-#   ifndef RESERVED_256B             
-#       define RESERVED_256B    RESERVED_64B                                    \
-                                RESERVED_64B                                    \
-                                RESERVED_64B                                    \
-                                RESERVED_64B
-#   endif
-
-#   ifndef RESERVED_1K             
-#       define RESERVED_1K      RESERVED_256B                                   \
-                                RESERVED_256B                                   \
-                                RESERVED_256B                                   \
-                                RESERVED_256B
-#   endif
-
-#   ifndef RESERVED_4K             
-#       define RESERVED_4K      RESERVED_1K                                     \
-                                RESERVED_1K                                     \
-                                RESERVED_1K                                     \
-                                RESERVED_1K
-#   endif
-
-#   ifndef RESERVED_16K             
-#       define RESERVED_16K     RESERVED_4K                                     \
-                                RESERVED_4K                                     \
-                                RESERVED_4K                                     \
-                                RESERVED_4K
-#   endif
-
-#   ifndef RESERVED_64K             
-#       define RESERVED_64K     RESERVED_16K                                    \
-                                RESERVED_16K                                    \
-                                RESERVED_16K                                    \
-                                RESERVED_16K
-#   endif
-
-#   ifndef RESERVED_256K             
-#       define RESERVED_256K    RESERVED_64K                                    \
-                                RESERVED_64K                                    \
-                                RESERVED_64K                                    \
-                                RESERVED_64K
-#   endif
-
-
-#   ifndef RESERVED_1M             
-#       define RESERVED_1M      RESERVED_256K                                   \
-                                RESERVED_256K                                   \
-                                RESERVED_256K                                   \
-                                RESERVED_256K
-#   endif
-
+#   define __REG_RSVD_NAME(__NAME)
 #endif
 
-#endif
+#define ____REG_RSVD(__NAME, __BIT)                                             \
+        reg##__BIT##_t              __NAME : __BIT;
+#define ____REG_RSVD_N(__NAME, __BIT, __N)                                      \
+        reg##__BIT##_t              __NAME[__N];
+#define __REG_RSVD(__BIT)           ____REG_RSVD(REG_RSVD_NAME, __BIT)
+#define __REG_RSVD_N(__BIT, __N)    ____REG_RSVD_N(REG_RSVD_NAME, __BIT, (__N))
+
+#define REG_RSVD_NAME               __REG_RSVD_NAME(__LINE__)
+#define REG_RSVD(__BIT)             __REG_RSVD(__BIT)
+#define REG_RSVD_N(__BIT, __N)      __REG_RSVD_N(__BIT, (__N))
+
+#define REG_RSVD_U8                 REG_RSVD(8)
+#define REG_RSVD_U16                REG_RSVD(16)
+#define REG_RSVD_U32                REG_RSVD(32)
+
+#define REG_RSVD_U8N(__N)           REG_RSVD_N(8, (__N))
+#define REG_RSVD_U16N(__N)          REG_RSVD_N(16, (__N))
+#define REG_RSVD_U32N(__N)          REG_RSVD_N(32, (__N))
+
+#define REG8_RSVD_N(__N)            REG_RSVD_U8N(__N)
+#define REG8_RSVD_B(__BYTE_CNT)     REG8_RSVD_N(__BYTE_CNT)
+#define REG8_RSVD_8B                REG8_RSVD_B(8)
+#define REG8_RSVD_16B               REG8_RSVD_B(16)
+#define REG8_RSVD_32B               REG8_RSVD_B(32)
+#define REG8_RSVD_64B               REG8_RSVD_B(64)
+#define REG8_RSVD_128B              REG8_RSVD_B(128)
+#define REG8_RSVD_256B              REG8_RSVD_B(256)
+#define REG8_RSVD_512B              REG8_RSVD_B(512)
+#define REG8_RSVD_1K                REG8_RSVD_B(1024)
+#define REG8_RSVD_2K                REG8_RSVD_B(2048)
+#define REG8_RSVD_4K                REG8_RSVD_B(4096)
+#define REG8_RSVD_8K                REG8_RSVD_B(8192)
+#define REG8_RSVD_16K               REG8_RSVD_B(16 * 1024)
+#define REG8_RSVD_32K               REG8_RSVD_B(32 * 1024)
+#define REG8_RSVD_64K               REG8_RSVD_B(64 * 1024)
+#define REG8_RSVD_128K              REG8_RSVD_B(128 * 1024)
+#define REG8_RSVD_256K              REG8_RSVD_B(256 * 1024)
+#define REG8_RSVD_512K              REG8_RSVD_B(512 * 1024)
+#define REG8_RSVD_1M                REG8_RSVD_B(1024 * 1024)
+
+#define REG16_RSVD_N(__N)           REG_RSVD_U16N(__N)
+// __BYTE_CNT MUST be mutiple of 2
+#define REG16_RSVD_B(__BYTE_CNT)    REG16_RSVD_N(__BYTE_CNT >> 1)
+#define REG16_RSVD_8B               REG16_RSVD_B(8)
+#define REG16_RSVD_16B              REG16_RSVD_B(16)
+#define REG16_RSVD_32B              REG16_RSVD_B(32)
+#define REG16_RSVD_64B              REG16_RSVD_B(64)
+#define REG16_RSVD_128B             REG16_RSVD_B(128)
+#define REG16_RSVD_256B             REG16_RSVD_B(256)
+#define REG16_RSVD_512B             REG16_RSVD_B(512)
+#define REG16_RSVD_1K               REG16_RSVD_B(1024)
+#define REG16_RSVD_2K               REG16_RSVD_B(2048)
+#define REG16_RSVD_4K               REG16_RSVD_B(4096)
+#define REG16_RSVD_8K               REG16_RSVD_B(8192)
+#define REG16_RSVD_16K              REG16_RSVD_B(16 * 1024)
+#define REG16_RSVD_32K              REG16_RSVD_B(32 * 1024)
+#define REG16_RSVD_64K              REG16_RSVD_B(64 * 1024)
+#define REG16_RSVD_128K             REG16_RSVD_B(128 * 1024)
+#define REG16_RSVD_256K             REG16_RSVD_B(256 * 1024)
+#define REG16_RSVD_512K             REG16_RSVD_B(512 * 1024)
+#define REG16_RSVD_1M               REG16_RSVD_B(1024 * 1024)
+
+#define REG32_RSVD_N(__N)           REG_RSVD_U32N(__N)
+// __BYTE_CNT MUST be mutiple of 4
+#define REG32_RSVD_B(__BYTE_CNT)    REG_RSVD_U32N(__BYTE_CNT >> 2)
+#define REG32_RSVD_8B               REG32_RSVD_B(8)
+#define REG32_RSVD_16B              REG32_RSVD_B(16)
+#define REG32_RSVD_32B              REG32_RSVD_B(32)
+#define REG32_RSVD_64B              REG32_RSVD_B(64)
+#define REG32_RSVD_128B             REG32_RSVD_B(128)
+#define REG32_RSVD_256B             REG32_RSVD_B(256)
+#define REG32_RSVD_512B             REG32_RSVD_B(512)
+#define REG32_RSVD_1K               REG32_RSVD_B(1024)
+#define REG32_RSVD_2K               REG32_RSVD_B(2048)
+#define REG32_RSVD_4K               REG32_RSVD_B(4096)
+#define REG32_RSVD_8K               REG32_RSVD_B(8192)
+#define REG32_RSVD_16K              REG32_RSVD_B(16 * 1024)
+#define REG32_RSVD_32K              REG32_RSVD_B(32 * 1024)
+#define REG32_RSVD_64K              REG32_RSVD_B(64 * 1024)
+#define REG32_RSVD_128K             REG32_RSVD_B(128 * 1024)
+#define REG32_RSVD_256K             REG32_RSVD_B(256 * 1024)
+#define REG32_RSVD_512K             REG32_RSVD_B(512 * 1024)
+#define REG32_RSVD_1M               REG32_RSVD_B(1024 * 1024)
+
+#endif      // __REG_TYPE__
 
 //! \name register page type
 //! @{
@@ -272,19 +224,19 @@ typedef struct {
         reg32_t                         :13;
         reg32_t  COUNTFLAG              : 1;
         reg32_t                         :15;
-    END_DEF_REG(SYST_CSR) 
+    END_DEF_REG32(SYST_CSR) 
 
     //! \brief System Timer Reload value register
     DEF_REG
         reg32_t  RELOAD                 :24;
         reg32_t                         : 8;
-    END_DEF_REG(SYST_RVR) 
+    END_DEF_REG32(SYST_RVR) 
 
     //! \brief System Timer Current value register
     DEF_REG
         reg32_t CURRENT                 :24;
         reg32_t                         : 8;
-    END_DEF_REG(SYST_CVR) 
+    END_DEF_REG32(SYST_CVR) 
 
     //! \brief System Timer Calibration value register
     DEF_REG
@@ -292,7 +244,7 @@ typedef struct {
         reg32_t                         : 6;
         reg32_t SKEW                    : 1;
         reg32_t NOREF                   : 1;
-    END_DEF_REG(SYST_CALIB) 
+    END_DEF_REG32(SYST_CALIB) 
 } systick_reg_t;
 //! @}
 

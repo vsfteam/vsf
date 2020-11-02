@@ -22,7 +22,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HUB == ENABLED
 
 // for hub constants
 #include "component/usb/common/class/HUB/vsf_usb_HUB.h"

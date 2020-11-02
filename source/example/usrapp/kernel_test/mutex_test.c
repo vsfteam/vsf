@@ -106,7 +106,7 @@ void usrapp_mutex_test_start(void)
                 .fn.evthandler  = usrapp_mutex_evthandler,
                 .priority       = vsf_prio_0 + i,
             };
-            vsf_teda_init_ex(&usrapp_mutex.mutex_eda[i].teda, (vsf_eda_cfg_t *)&cfg);
+            vsf_teda_start(&usrapp_mutex.mutex_eda[i].teda, (vsf_eda_cfg_t *)&cfg);
         }
     }
 }

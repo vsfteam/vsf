@@ -24,9 +24,9 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED 
-#   include "service/vsfstream/vsfstream.h"
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED 
+#   include "service/vsf_service.h"
+#elif VSF_USE_STREAM == ENABLED
 #   include "service/stream/vsf_stream.h"
 #endif
 
@@ -38,27 +38,27 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 #   define VSF_DEBUG_STREAM_NEED_POLL
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 extern void VSF_DEBUG_STREAM_POLL(void);
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 #ifdef __cplusplus

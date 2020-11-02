@@ -23,6 +23,8 @@
 
 #if VSF_USE_JSON == ENABLED
 
+#include "utilities/vsf_utilities.h"
+
 #if     defined(__VSF_JSON_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_JSON_CLASS_IMPLEMENT
@@ -90,7 +92,7 @@ def_simple_class(vsf_json_enumerator_t) {
 };
 
 def_simple_class(vsf_json_constructor_t) {
-    private_member(
+    public_member(
         union {
             void *param;
             uint32_t len;
@@ -119,11 +121,14 @@ extern int vsf_json_get_boolean(const char *json, bool *result);
 
 extern void vsf_json_constructor_init(vsf_json_constructor_t *c, void *param,
         int (*write_str)(void *, char *, int));
+// param is vsf_mem_t *
+extern int vsf_json_constructor_buffer_write_str(void *param, char *str, int len);
 
 extern int vsf_json_write_str(vsf_json_constructor_t *c, char *buf, int len);
 extern int vsf_json_set_key(vsf_json_constructor_t *c, char *key);
 extern int vsf_json_set_string(vsf_json_constructor_t *c, char *key, char *value);
-extern int vsf_json_set_number(vsf_json_constructor_t *c, char *key, double value);
+extern int vsf_json_set_integer(vsf_json_constructor_t *c, char *key, int value);
+extern int vsf_json_set_double(vsf_json_constructor_t *c, char *key, double value);
 extern int vsf_json_set_boolean(vsf_json_constructor_t *c, char *key, bool value);
 extern int vsf_json_set_null(vsf_json_constructor_t *c, char *key);
 

@@ -81,7 +81,7 @@ int_fast16_t vk_tgui_slider_on_timer_event_handler(__vk_tgui_slider_t *ptSlider)
     ptSlider->tOldTimeTick = tCurrentTime;
 
     uint_fast32_t wStep = tElapsed * ptSlider->hwSpeed;
-    ptSlider->tPosition.iResidual = (wStep & (_BV(10) - 1)) / ptSlider->hwSpeed;
+    ptSlider->tPosition.iResidual = (wStep & (BIT(10) - 1)) / ptSlider->hwSpeed;
     wStep >>= 10;
 
     int_fast16_t nDelta = ptSlider->tPosition.iTarget - ptSlider->tPosition.iCurrent;

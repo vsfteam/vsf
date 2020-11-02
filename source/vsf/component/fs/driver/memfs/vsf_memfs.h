@@ -22,7 +22,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED
 
 #if     defined(__VSF_MEMFS_CLASS_IMPLEMENT)
 #   undef __VSF_MEMFS_CLASS_IMPLEMENT
@@ -92,5 +92,5 @@ extern int_fast32_t vk_memfs_write(vk_memfs_file_t *file, uint_fast64_t addr, ui
 }
 #endif
 
-#endif      // VSF_USE_FS && VSF_USE_FATFS
+#endif      // VSF_USE_FS && VSF_FS_USE_MEMFS
 #endif      // __VSF_MEMFS_H__

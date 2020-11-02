@@ -82,9 +82,9 @@ extern "C" {
 #define imp_vsf_task(__name)        implement_vsf_task(__name)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define vsf_task_start           vsf_teda_init_ex
+#   define vsf_task_start           vsf_teda_start
 #else
-#   define vsf_task_start           vsf_eda_init_ex
+#   define vsf_task_start           vsf_eda_start
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

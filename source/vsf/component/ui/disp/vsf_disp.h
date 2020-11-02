@@ -65,6 +65,13 @@ extern "C" {
 #define vsf_disp_get_pixel_bytesize(__disp)                                     \
             vsf_disp_get_pixel_format_bytesize(vsf_disp_get_pixel_format(__disp))
 
+#ifndef vk_disp_coord_t
+#   define vk_disp_coord_t          uint16_t
+#endif
+#ifndef vk_disp_fast_coord_t
+#   define vk_disp_fast_coord_t     uint_fast16_t
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -78,19 +85,19 @@ typedef enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(RGB666_32),
 } vk_disp_color_idx_t;
 
-typedef enum vk_disp_color_t {
-    // avoid vk_disp_color_t to be optimized to 8bit
+typedef enum vk_disp_color_type_t {
+    // avoid vk_disp_color_type_t to be optimized to 8bit
     __VSF_DISP_COLOR_LEAST_MAX	= INT16_MAX,
     __VSF_DISP_COLOR_LEAST_MIN  = INT16_MIN,
     VSF_DISP_COLOR_DEF(INVALID, 0, 0, 0),
     VSF_DISP_COLOR_DEF(RGB565, 16, 2, 0),
     VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 0),
     VSF_DISP_COLOR_DEF(RGB666_32, 18, 4, 0),
-} vk_disp_color_t;
+} vk_disp_color_type_t;
 
 typedef struct vk_disp_point {
-    uint16_t x;
-    uint16_t y;
+    vk_disp_coord_t x;
+    vk_disp_coord_t y;
 } vk_disp_point;
 
 typedef struct vk_disp_area_t {
@@ -102,12 +109,21 @@ def_simple_class(vk_disp_drv_t) {
     protected_member(
         vsf_err_t (*init)(vk_disp_t *pthis);
         vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+
+        // interfaces for gpu acceleration
+#if VSF_DISP_USE_GPU == ENABLED
+        void (*blend)(vk_disp_t *pthis, void *target_buff, vk_disp_fast_coord_t target_width,
+                        vk_disp_area_t *area, void *disp_buff);
+        void (*fill)(vk_disp_t *pthis, void *target_buff, vk_disp_fast_coord_t target_width,
+                        vk_disp_area_t *area, uint_fast32_t color);
+#endif
     )
-#if VSF_USE_DISP_FB == ENABLED
+    // interfaces for specific driver
+#if VSF_DISP_USE_FB == ENABLED
     protected_member(
         // TODO: add a enum for driver type
         union {
-#   if VSF_USE_DISP_FB == ENABLED
+#   if VSF_DISP_USE_FB == ENABLED
             struct {
                 void * (*switch_buffer)(vk_disp_t *pthis, bool is_to_copy);
             } fb;
@@ -121,7 +137,7 @@ typedef struct vk_disp_param_t {
     const vk_disp_drv_t *drv;
     uint16_t width;
     uint16_t height;
-    vk_disp_color_t color;
+    vk_disp_color_type_t color;
 } vk_disp_param_t;
 
 typedef void (*vk_disp_on_ready_t)(vk_disp_t *disp);

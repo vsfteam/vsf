@@ -4,9 +4,9 @@
 
 #include "../common/usrapp_common.h"
 
-#if APP_CFG_USE_AUDIO_DEMO == ENABLED
+#if APP_USE_AUDIO_DEMO == ENABLED
 
-#if APP_CFG_USE_LINUX_DEMO != ENABLED
+#if APP_USE_LINUX_DEMO != ENABLED
 #   error "audio demo depends on linux sub system"
 #endif
 

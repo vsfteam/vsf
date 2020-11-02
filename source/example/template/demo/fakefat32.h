@@ -20,7 +20,7 @@
 
 #include "vsf_usr_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
@@ -31,8 +31,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern vk_fakefat32_file_t fakefat32_root[ 3
-                                +   (APP_CFG_USE_VSFVM_DEMO == ENABLED ? 1 : 0)];
+extern vk_fakefat32_file_t fakefat32_root[3 + (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)];
 
 #endif
 #endif      // __FAKEFAT32_H__

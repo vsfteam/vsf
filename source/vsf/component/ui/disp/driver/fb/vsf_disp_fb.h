@@ -14,14 +14,14 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_FRAME_BUFFER_H___
-#define __VSF_DISP_FRAME_BUFFER_H___
+#ifndef __VSF_DISP_FRAME_BUFFER_H__
+#define __VSF_DISP_FRAME_BUFFER_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_FB == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_FB == ENABLED
 
 #include "kernel/vsf_kernel.h"
 #include "hal/vsf_hal.h"
@@ -78,5 +78,5 @@ extern const vk_disp_drv_t vk_disp_drv_fb;
 }
 #endif
 
-#endif  // VSF_USE_UI && VSF_USE_DISP_FB
-#endif  // __VSF_DISP_FRAME_BUFFER_H___
+#endif  // VSF_USE_UI && VSF_DISP_USE_FB
+#endif  // __VSF_DISP_FRAME_BUFFER_H__

@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_CDC == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_CDC == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define __VSF_USBH_CDC_CLASS_IMPLEMENT
@@ -172,11 +172,14 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
                 }
 
                 for (uint_fast8_t j = 0; j < desc_ifs->bNumEndpoints; j++) {
-                    if (desc_ep->bLength != USB_DT_ENDPOINT_SIZE) {
+                    if (    (NULL == desc_ep)
+                        ||  (desc_ep->bLength != USB_DT_ENDPOINT_SIZE)
+                        ||  (desc_ep->bmAttributes != USB_ENDPOINT_XFER_BULK)) {
                         return VSF_ERR_FAIL;
                     }
                     __vk_usbh_cdc_parse_ep(pthis, desc_ep);
-                    desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
+                    desc_ep = vk_usbh_get_next_ep_descriptor(desc_ep,
+                        parser_alt->desc_size - ((uintptr_t)desc_ep - (uintptr_t)desc_ifs));
                 }
             }
             break;

@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_MSC == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_MSC == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
@@ -76,7 +76,7 @@ static void __vk_usbh_msc_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_init)
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_fini)
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_execute)
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 dcl_vsf_peda_methods(static, __vk_usbh_msc_scsi_execute_stream)
 #endif
 
@@ -94,7 +94,7 @@ const vk_scsi_drv_t __vk_usbh_msc_scsi_drv = {
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_fini),
     .buffer         = NULL,
     .execute        = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_execute),
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
     .execute_stream = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_execute_stream),
 #endif
 };
@@ -249,7 +249,7 @@ __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute, vk_scsi_execute)
     vsf_peda_end();
 }
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute_stream, vk_scsi_execute_stream)
 {
     vsf_peda_begin();
@@ -317,7 +317,7 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
     vk_usbh_ifs_alt_parser_t *parser_alt = &parser_ifs->parser_alt[ifs->cur_alt];
     struct usb_interface_desc_t *desc_ifs = parser_alt->desc_ifs;
-    struct usb_endpoint_desc_t *desc_ep = parser_ifs->parser_alt[ifs->cur_alt].desc_ep;
+    struct usb_endpoint_desc_t *desc_ep = parser_alt->desc_ep;
     uint_fast8_t epaddr;
     vk_usbh_msc_t *msc;
 
@@ -326,8 +326,13 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     if (NULL == msc) { return NULL; }
     memset(msc, 0, sizeof(*msc));
 
+    msc->usbh = usbh;
+    msc->dev = dev;
+    msc->ifs = ifs;
+
     for (int i = 0; i < desc_ifs->bNumEndpoints; i++) {
-        if (    (desc_ep->bLength != USB_DT_ENDPOINT_SIZE)
+        if (    (NULL == desc_ep)
+            ||  (desc_ep->bLength != USB_DT_ENDPOINT_SIZE)
             ||  (desc_ep->bmAttributes != USB_ENDPOINT_XFER_BULK)) {
             goto free_all;
         }
@@ -339,12 +344,10 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
             vk_usbh_urb_prepare(&msc->urb_out, dev, desc_ep);
             vk_usbh_alloc_urb(usbh, dev, &msc->urb_out);
         }
-        desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + USB_DT_ENDPOINT_SIZE);
-    }
 
-    msc->usbh = usbh;
-    msc->dev = dev;
-    msc->ifs = ifs;
+        desc_ep = vk_usbh_get_next_ep_descriptor(desc_ep,
+            parser_alt->desc_size - ((uintptr_t)desc_ep - (uintptr_t)desc_ifs));
+    }
 
     msc->scsi.drv = &__vk_usbh_msc_scsi_drv;
     msc->eda.fn.evthandler = __vk_usbh_msc_evthandler;

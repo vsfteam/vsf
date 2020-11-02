@@ -19,7 +19,7 @@
 
 #include "../../vsf_scsi_cfg.h"
 
-#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL_SCSI == ENABLED
+#if VSF_USE_SCSI == ENABLED && VSF_SCSI_USE_VIRTUAL_SCSI == ENABLED
 
 #define __VSF_SCSI_CLASS_INHERIT__
 #define __VSF_VIRTUAL_SCSI_CLASS_IMPLEMENT
@@ -37,7 +37,7 @@ static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *
 dcl_vsf_peda_methods(static, __vk_virtual_scsi_init)
 dcl_vsf_peda_methods(static, __vk_virtual_scsi_fini)
 dcl_vsf_peda_methods(static, __vk_virtual_scsi_execute)
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 dcl_vsf_peda_methods(static, __vk_virtual_scsi_execute_stream)
 #endif
 
@@ -48,7 +48,7 @@ const vk_scsi_drv_t vk_virtual_scsi_drv = {
     .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_fini),
     .buffer             = __vk_virtual_scsi_buffer,
     .execute            = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_execute),
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
     .execute_stream     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_execute_stream),
 #endif
 };
@@ -192,7 +192,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
             scsi_group_code_t group_code = (scsi_group_code_t)(scsi_cmd[0] & 0xE0);
             scsi_cmd_code_t cmd_code = (scsi_cmd_code_t)(scsi_cmd[0] & 0x1F);
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
             pthis->is_stream = false;
 #endif
             if (reply == pthis->reply) {
@@ -357,7 +357,7 @@ exit_not_ready:
     vsf_peda_end();
 }
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute_stream, vk_scsi_execute_stream)
 {
     vsf_peda_begin();

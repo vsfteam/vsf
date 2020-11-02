@@ -34,7 +34,7 @@
 #include "./3rd-party/PLOOC/raw/plooc.h"
 
 /* definition for communication pipe and memory block */
-#include "./communicate.h"       
+#include "./communicate.h"
 
 /* template for abstraction data type */
 #include "./template/template.h"

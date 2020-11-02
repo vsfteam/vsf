@@ -47,21 +47,20 @@ extern vsf_err_t vsf_pm_power_resume(pm_power_cfg_no_t index, pm_power_status_t 
 extern pm_power_status_t vsf_pm_power_enable(pm_power_cfg_no_t index);
 extern pm_power_status_t vsf_pm_power_disable(pm_power_cfg_no_t index);
 extern vsf_err_t vsf_pm_sleep(pm_sleep_cfg_t *cfg);
-extern  pm_periph_async_clk_status_t 
-        vsf_pm_peripheral_get_status(pm_periph_async_clk_no_t index);
-extern vsf_err_t vsf_pm_peripheral_resume(  pm_periph_async_clk_no_t index , 
-                                            pm_periph_async_clk_status_t status);
-extern pm_periph_async_clk_status_t 
-        vsf_pm_peripheral_config(   pm_periph_async_clk_no_t index,
-                                    const pm_periph_asyn_clk_cfg_t *cfg);
+extern pm_pclk_status_t vsf_pm_peripheral_get_status(pm_pclk_no_t index);
+extern vsf_err_t vsf_pm_peripheral_resume(  pm_pclk_no_t index , 
+                                            pm_pclk_status_t status);
+extern pm_pclk_status_t vsf_pm_peripheral_config(
+                                            pm_pclk_no_t index,
+                                            const pm_pclk_cfg_t *cfg);
 
-extern uint_fast32_t vsf_pm_peripheral_get_clock(pm_periph_async_clk_no_t index);
-extern pm_sync_clk_status_t vsf_pm_sync_clk_get_status(pm_sync_clk_no_t index);
-extern vsf_err_t vsf_pm_sync_clk_resume(pm_sync_clk_no_t index, pm_sync_clk_status_t status);
-extern pm_sync_clk_status_t vsf_pm_sync_clk_enable(pm_sync_clk_no_t index);
-extern pm_sync_clk_status_t vsf_pm_sync_clk_disable(pm_sync_clk_no_t index);
-extern fsm_rt_t vsf_pm_mclk_init(pm_main_clk_cfg_t *cfg);
-extern uint_fast32_t vsf_pm_mclk_get(pm_main_clk_no_t sel);
+extern uint_fast32_t vsf_pm_peripheral_get_clock(pm_pclk_no_t index);
+extern pm_sclk_status_t vsf_pm_sclk_get_status(pm_sclk_no_t index);
+extern vsf_err_t vsf_pm_sclk_resume(pm_sclk_no_t index, pm_sclk_status_t status);
+extern pm_sclk_status_t vsf_pm_sclk_enable(pm_sclk_no_t index);
+extern pm_sclk_status_t vsf_pm_sclk_disable(pm_sclk_no_t index);
+extern fsm_rt_t vsf_pm_mclk_init(pm_mclk_cfg_t *cfg);
+extern uint_fast32_t vsf_pm_mclk_get(pm_mclk_no_t sel);
 extern fsm_rt_t vsf_pm_pll_init(pm_pll_sel_t pll, pm_pll_cfg_t *cfg);
 extern bool vsf_pm_pll_is_locked(pm_pll_sel_t pll);
 extern uint_fast32_t vsf_pm_pll_get_clk_out(pm_pll_sel_t pll);

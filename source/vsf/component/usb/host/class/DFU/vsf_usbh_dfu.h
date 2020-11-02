@@ -22,7 +22,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_DFU == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_DFU == ENABLED
 
 #ifdef __cplusplus
 extern "C" {

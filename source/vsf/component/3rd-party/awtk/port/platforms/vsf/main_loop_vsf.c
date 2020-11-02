@@ -21,12 +21,13 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_AWTK == ENABLED
 
 #include "tkc/time_now.h"
 #include "native_window/native_window_raw.h"
 
 #include "./main_loop_vsf.h"
+#include "hal/arch/vsf_arch.h"
 
 #ifndef VSF_AWTK_CFG_PROTECT_LEVEL
 /*! \note   By default, the event queue operation will be interrupt-safe,
@@ -34,11 +35,11 @@
  *!         in the case when you want to disable it,
  *!         please use following macro:
  *!         #define VSF_AWTK_CFG_PROTECT_LEVEL  none
- *!         
+ *!
  *!         in the case when you want to use scheduler-safe,
  *!         please use following macro:
  *!         #define VSF_AWTK_CFG_PROTECT_LEVEL  scheduler
- *!         
+ *!
  *!         NOTE: This macro should be defined in vsf_usr_cfg.h
  */
 #   define VSF_AWTK_CFG_PROTECT_LEVEL       interrupt
@@ -46,6 +47,8 @@
 
 #define vsf_awtk_protect                    vsf_protect(VSF_AWTK_CFG_PROTECT_LEVEL)
 #define vsf_awtk_unprotect                  vsf_unprotect(VSF_AWTK_CFG_PROTECT_LEVEL)
+
+extern ret_t platform_disaptch_input(main_loop_t *l);
 
 static ret_t main_loop_vsf_queue_event(main_loop_t* l, const event_queue_req_t* r) {
   ret_t ret = RET_FAIL;

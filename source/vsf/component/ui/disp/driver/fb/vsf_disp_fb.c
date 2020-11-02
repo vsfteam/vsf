@@ -19,7 +19,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_FB == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_FB == ENABLED
 
 #define __VSF_DISP_CLASS_INHERIT__
 #define __VSF_DISP_FB_CLASS_IMPLEMENT

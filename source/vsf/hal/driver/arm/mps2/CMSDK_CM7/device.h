@@ -52,7 +52,7 @@
 /*============================ MACROS ========================================*/
 
 #define __def_idx(__name, __no)     __CONNECT2(__name, _idx) = (__no)
-#define __def_msk(__name)           __CONNECT2(__name, _msk) = _BV(__CONNECT2(__name, _idx) & 0x1F)
+#define __def_msk(__name)           __CONNECT2(__name, _msk) = BIT(__CONNECT2(__name, _idx) & 0x1F)
 
 #define GPIO_COUNT                  1
 
@@ -136,7 +136,7 @@ enum pm_periph_async_clk_no_t{
 
 //! \name Peripheral AHB Clock Macros
 //! @{
-enum pm_sync_clk_no_t { 
+enum pm_sync_clk_no_t {
                         // NAME         BUS_IDX,BIT_IDX
     // AHB
     __def_sync_clk_idx(   SyncCLK_UART0,   1,      16  ),
@@ -145,7 +145,7 @@ enum pm_sync_clk_no_t {
     __def_sync_clk_idx(   SyncCLK_UART3,   1,      19  ),
 };
 
-enum pm_sync_clk_msk_t { 
+enum pm_sync_clk_msk_t {
     __def_msk(SyncCLK_UART0),
     __def_msk(SyncCLK_UART1),
     __def_msk(SyncCLK_UART2),

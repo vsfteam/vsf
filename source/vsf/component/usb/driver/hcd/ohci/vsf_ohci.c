@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_OHCI == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_OHCI == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_HCD__
 #define __VSF_EDA_CLASS_INHERIT__
@@ -1076,8 +1076,7 @@ static uint_fast32_t __ohci_start(vk_ohci_t *ohci)
 static void __ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
 {
     switch (evt) {
-        case VSF_EVT_MESSAGE:
-        {
+        case VSF_EVT_MESSAGE: {
             ohci_ed_t *ed, *ed_dellist = vsf_eda_get_cur_msg();
             vk_usbh_hcd_urb_t *urb;
             ohci_urb_t *urb_ohci;
@@ -1088,7 +1087,6 @@ static void __ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
 
                 urb_ohci = ed->td_dummy->urb_ohci;
                 urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
-                vk_usbh_hcd_urb_free_buffer(urb);
                 __ohci_ed_fini(urb_ohci);
                 __ohci_free_urb_do(urb);
             }
@@ -1199,6 +1197,7 @@ static vk_usbh_hcd_urb_t * __ohci_alloc_urb(vk_usbh_hcd_t *hcd)
 static void __ohci_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
     ohci_urb_t *urb_ohci = (ohci_urb_t *)urb->priv;
+    vk_usbh_hcd_urb_free_buffer(urb);
     vsf_usbh_free(urb_ohci->ed);
 }
 
@@ -1221,7 +1220,6 @@ static void __ohci_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
             __ohci_ed_start_unlink(ohci, urb_ohci);
         }
     } else {
-        vk_usbh_hcd_urb_free_buffer(urb);
         __ohci_free_urb_do(urb);
     }
 }

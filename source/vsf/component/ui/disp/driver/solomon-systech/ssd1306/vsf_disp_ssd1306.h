@@ -14,14 +14,14 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_SSD1306_H___
-#define __VSF_DISP_SSD1306_H___
+#ifndef __VSF_DISP_SSD1306_H__
+#define __VSF_DISP_SSD1306_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_DISP_SSD1306 == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_SSD1306 == ENABLED
 
 #include "../common/vsf_disp_solomon_systech_common.h"
 
@@ -161,4 +161,4 @@ extern const vk_disp_drv_t vk_disp_drv_ssd1306;
 #endif
 
 #endif  // VSF_USE_UI
-#endif  // __VSF_DISP_SSD1306_H___
+#endif  // __VSF_DISP_SSD1306_H__

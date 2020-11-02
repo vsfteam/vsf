@@ -187,7 +187,7 @@ int vsf_json_num_of_entry(const char *json)
 char *vsf_json_get(const char *json, const char *key)
 {
     vsf_json_enumerator_t e;
-    unsigned long idx, curidx;
+    unsigned long idx, curidx = 0;
     char *cur;
 
     if (vsf_json_isdiv(*key)) {
@@ -418,7 +418,20 @@ int vsf_json_set_string(vsf_json_constructor_t *c, char *key, char *value)
     return (ret < 0) ? ret : 0;
 }
 
-int vsf_json_set_number(vsf_json_constructor_t *c, char *key, double value)
+int vsf_json_set_integer(vsf_json_constructor_t *c, char *key, int value)
+{
+    int ret;
+    char buf[64];
+
+    ret = vsf_json_set_key(c, key);
+    if (ret < 0) { return ret; }
+
+    ret = snprintf(buf, sizeof(buf), "%d", value);
+    ret = vsf_json_write_str(c, buf, ret);
+    return (ret < 0) ? ret : 0;
+}
+
+int vsf_json_set_double(vsf_json_constructor_t *c, char *key, double value)
 {
     int ret;
     char buf[64];
@@ -441,6 +454,20 @@ int vsf_json_set_null(vsf_json_constructor_t *c, char *key)
 {
     if (vsf_json_set_key(c, key) < 0) { return -1; }
     return vsf_json_set_token(c, "null");
+}
+
+int vsf_json_constructor_buffer_write_str(void *param, char *str, int len)
+{
+    vsf_mem_t *mem = param;
+
+    if (mem->size < (len + 1)) {
+        return -1;
+    }
+    memcpy(mem->buffer, str, len);
+    mem->buffer[len] = '\0';
+    mem->buffer += len;
+    mem->size -= len;
+    return len;
 }
 
 #endif      // VSF_USE_JSON

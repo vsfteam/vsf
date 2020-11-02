@@ -160,10 +160,10 @@
 //#define GENERAL_PBUF_POOL_BLOCK_COUNT                   16
 #define GENERAL_PBUF_POLL_PRIV_USER_COUNT               2
 
-#define VSF_USE_SERVICE_STREAM                          DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
+#define VSF_USE_STREAM                                  DISABLED
+#define VSF_USE_SIMPLE_STREAM                           ENABLED
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 
 /* \note uncomment this part to add dedicated pbuf pool
 enum {

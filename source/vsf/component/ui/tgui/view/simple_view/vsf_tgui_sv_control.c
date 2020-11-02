@@ -43,7 +43,7 @@ const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* control_ptr)
 
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
 {
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view init" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif
 
@@ -70,7 +70,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
     VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif
 

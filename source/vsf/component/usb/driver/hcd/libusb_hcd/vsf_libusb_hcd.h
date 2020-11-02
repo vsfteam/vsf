@@ -21,7 +21,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_LIBUSB == ENABLED
 
 #include "component/usb/host/vsf_usbh.h"
 #include "hal/vsf_hal.h"
@@ -35,7 +35,7 @@ extern "C" {
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
 #   error "libusb_hcd does not support root hub"
 #endif
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
 #   error "libusb_hcd does not support hub"
 #endif
 #if !defined(__CPU_X86__) && !defined(__CPU_X64__)

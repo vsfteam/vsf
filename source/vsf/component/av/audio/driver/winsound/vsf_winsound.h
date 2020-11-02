@@ -43,7 +43,7 @@ extern "C" {
 
 dcl_simple_class(vk_winsound_dev_t)
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
 
 // avoid to use windows.h, fix if any conflicts
 #define HWAVEOUT                        HANDLE
@@ -86,7 +86,7 @@ def_simple_class(vk_winsound_dev_t) {
 
     private_member(
         bool is_inited;
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
         vk_winsound_play_ctx_t play_ctx;
 #endif
     )

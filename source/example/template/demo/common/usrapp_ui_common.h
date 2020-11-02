@@ -23,10 +23,10 @@
 #include "vsf.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_DISP_FB == ENABLED)            \
-    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
+    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED)            \
+    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_AWTK == ENABLED || VSF_USE_LVGL == ENABLED)
 
-#if VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
 #   include "lv_conf.h"
 #   include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
@@ -37,28 +37,46 @@
 /*============================ TYPES =========================================*/
 
 typedef struct usrapp_ui_common_t {
-#if VSF_USE_DISP_SDL2 == ENABLED
+#if VSF_DISP_USE_SDL2 == ENABLED
     vk_disp_sdl2_t disp;
-#elif VSF_USE_DISP_FB == ENABLED
+#elif VSF_DISP_USE_FB == ENABLED
     vk_disp_fb_t disp;
 #endif
 
 #if VSF_USE_TINY_GUI == ENABLED
     struct {
         vk_input_notifier_t notifier;
+        vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
+        struct {
+            bool is_ready;
+            vsf_tgui_region_t request_region;
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABED
+            vsf_systimer_cnt_t start_cnt;
+            uint16_t refresh_cnt;
+            uint16_t fps;
+#endif
+        } port;
     } tgui;
 #endif
 
-#if VSF_USE_UI_AWTK == ENABLED
+#if VSF_USE_AWTK == ENABLED
     struct {
         vk_input_notifier_t notifier;
     } awtk;
 #endif
 
-#if VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_LVGL == ENABLED
     struct {
         vk_input_notifier_t notifier;
+#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
         vk_touchscreen_evt_t ts_evt;
+#else
+        vk_mouse_evt_t mouse_evt;
+#endif
+#if LV_USE_GROUP == ENABLED
+        vk_keyboard_evt_t kb_evt;
+        lv_group_t* group;
+#endif
         lv_disp_buf_t disp_buf;
         lv_color_t color[LV_VER_RES_MAX][LV_HOR_RES_MAX];
         vsf_eda_t *eda_poll;

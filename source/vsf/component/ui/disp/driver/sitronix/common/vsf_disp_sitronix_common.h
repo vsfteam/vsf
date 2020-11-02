@@ -14,16 +14,16 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_SITRONIX_COMMON_H___
-#define __VSF_DISP_SITRONIX_COMMON_H___
+#ifndef __VSF_DISP_SITRONIX_COMMON_H__
+#define __VSF_DISP_SITRONIX_COMMON_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (   (VSF_USE_DISP_ST7789 == ENABLED)                                    \
-        ||  (VSF_USE_DISP_ST7735 == ENABLED))
+    &&  (   (VSF_DISP_USE_ST7789 == ENABLED)                                    \
+        ||  (VSF_DISP_USE_ST7735 == ENABLED))
 
 #if     defined(__VSF_DISP_SITRONIX_CLASS_IMPLEMENT)
 #   undef __VSF_DISP_SITRONIX_CLASS_IMPLEMENT
@@ -101,4 +101,4 @@ extern vsf_err_t vk_disp_sitronix_seq(vk_disp_sitronix_t *disp_sitronix, uint8_t
 #endif
 
 #endif  // VSF_USE_UI
-#endif  // __VSF_DISP_SITRONIX_COMMON_H___
+#endif  // __VSF_DISP_SITRONIX_COMMON_H__

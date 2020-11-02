@@ -296,13 +296,13 @@ int window_pump_event(struct window_t * window, struct event_t * evt)
 #ifdef __XBOOT_CFG_EVENT_TRACE
             switch (evt->type) {
             case EVENT_TYPE_TOUCH_BEGIN:
-                vsf_trace(VSF_TRACE_DEBUG, "touch begin %d(%d, %d)" VSF_TRACE_CFG_LINEEND, evt->e.touch_begin.id, evt->e.touch_begin.x, evt->e.touch_begin.y);
+                vsf_trace_debug("touch begin %d(%d, %d)" VSF_TRACE_CFG_LINEEND, evt->e.touch_begin.id, evt->e.touch_begin.x, evt->e.touch_begin.y);
                 break;
             case EVENT_TYPE_TOUCH_MOVE:
-                vsf_trace(VSF_TRACE_DEBUG, "touch move %d(%d, %d)" VSF_TRACE_CFG_LINEEND, evt->e.touch_move.id, evt->e.touch_move.x, evt->e.touch_move.y);
+                vsf_trace_debug("touch move %d(%d, %d)" VSF_TRACE_CFG_LINEEND, evt->e.touch_move.id, evt->e.touch_move.x, evt->e.touch_move.y);
                 break;
             case EVENT_TYPE_TOUCH_END:
-                vsf_trace(VSF_TRACE_DEBUG, "touch end %d(%d, %d)" VSF_TRACE_CFG_LINEEND, evt->e.touch_end.id, evt->e.touch_end.x, evt->e.touch_end.y);
+                vsf_trace_debug("touch end %d(%d, %d)" VSF_TRACE_CFG_LINEEND, evt->e.touch_end.id, evt->e.touch_end.x, evt->e.touch_end.y);
                 break;
             }
 #endif
@@ -388,7 +388,7 @@ void vsf_xboot_bind(vk_disp_t *disp)
 
     if (__xboot.wm.disp != NULL) {
         // unsecure code to set color because param maybe really const
-        *(vk_disp_color_t *)&__xboot.wm.disp->param.color = VSF_DISP_COLOR_ARGB8888;
+        *(vk_disp_color_type_t *)&__xboot.wm.disp->param.color = VSF_DISP_COLOR_ARGB8888;
         __xboot.wm.disp->ui_on_ready = __xboot_disp_on_ready;
         vk_disp_init(__xboot.wm.disp);
 

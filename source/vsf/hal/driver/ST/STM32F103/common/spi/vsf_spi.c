@@ -96,7 +96,7 @@ uintalu_t vsf_spi_polarity_set(vsf_spi_t *spi_obj, uintalu_t polarity)
     
     uintalu_t uintalu;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         uintalu = spi_obj->hspi->CR1 & 0x0003;
         
         spi_obj->hspi->CR1 &= 0xFFFB;
@@ -111,7 +111,7 @@ uintalu_t vsf_spi_polarity_get(vsf_spi_t *spi_obj)
     
     uintalu_t uintalu;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         uintalu = spi_obj->hspi->CR1 & 0x0003;
     }
     return uintalu;
@@ -124,7 +124,7 @@ fsm_rt_t vsf_spi_exchange(vsf_spi_t *spi_obj, uintalu_t output, void *input)
     bool wait_for_read = false;
     bool exchange_cpl  = false;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
     
         spi_obj->hspi->CR1 |= SPI_EN;
         
@@ -151,7 +151,7 @@ fsm_rt_t vsf_spi_request_exchange(vsf_spi_t *spi_obj, void *output, void *input,
 {
     ASSERT((spi_obj != NULL) && (output != NULL) && (input != NULL) && (size != 0));
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         if(false == spi_obj->data_exchange) {
             spi_obj->output           = output;
             spi_obj->input            = input;
@@ -168,7 +168,7 @@ fsm_rt_t vsf_spi_request_exchange(vsf_spi_t *spi_obj, void *output, void *input,
     }
         
     if((spi_obj->rx_count >= spi_obj->data_size) && (spi_obj->tx_count >= spi_obj->data_size)) {
-        SAFE_ATOM_CODE() {
+        vsf_interrupt_safe() {
             spi_obj->hspi->CR1 &= ~SPI_EN;
             spi_obj->data_exchange = false;
         }

@@ -129,6 +129,7 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
 #endif
         if (evt == VSF_EVT_SYNC) {
             reason = VSF_SYNC_GET;
+            eda->state.bits.is_sync_got = false;
         } else if (evt == VSF_EVT_SYNC_CANCEL) {
             reason = VSF_SYNC_CANCEL;
         } else {

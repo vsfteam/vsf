@@ -218,7 +218,6 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
                 this_ptr->cur.msg = NULL;
                 eda->evt_cnt--;
             vsf_unprotect_int(orig);
-            this_ptr->cur.eda = NULL;
 
             if (eda->state.bits.is_to_exit) {
                 __vsf_eda_terminate(eda);

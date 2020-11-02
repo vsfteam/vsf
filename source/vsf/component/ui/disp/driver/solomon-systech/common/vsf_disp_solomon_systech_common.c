@@ -20,8 +20,8 @@
 #include "component/ui/vsf_ui_cfg.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (   (VSF_USE_DISP_SSD1306 == ENABLED)                                   \
-        ||  (VSF_USE_DISP_SSD1316 == ENABLED))
+    &&  (   (VSF_DISP_USE_SSD1306 == ENABLED)                                   \
+        ||  (VSF_DISP_USE_SSD1316 == ENABLED))
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

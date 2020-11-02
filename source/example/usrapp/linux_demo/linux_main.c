@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#if VSF_USE_LINUX_LIBUSB == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED
 #include <libusb.h>
 
 int lsusb_main(int argc, char *argv[])

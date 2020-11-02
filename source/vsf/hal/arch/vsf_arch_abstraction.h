@@ -42,21 +42,24 @@ extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
 #endif
 /*============================ INCLUDES ======================================*/
 #if !defined(VSF_ARCH_HEADER)
-# if      (defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'M') || __TARGET_PROFILE_M
+//! check rtos first
+# if    defined(__RTOS__)
+#   define  VSF_ARCH_HEADER     "./rtos/rtos_generic.h"
+# elif  (defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'M') || __TARGET_PROFILE_M
 #   define VSF_ARCH_HEADER      "./arm/cortex-m/cortex_m_generic.h"
-# elif    defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'A' || __TARGET_PROFILE_A
+# elif  defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'A' || __TARGET_PROFILE_A
 #   define VSF_ARCH_HEADER      "./arm/cortex-a/cortex_a_generic.h"
-# elif    defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'R' || __TARGET_PROFILE_R
+# elif  defined(__ARM_ARCH_PROFILE) && __ARM_ARCH_PROFILE == 'R' || __TARGET_PROFILE_R
 #   define VSF_ARCH_HEADER      "./arm/cortex-r/cortex_r_generic.h"
-# elif   (defined(__CPU_X86__) || defined(__CPU_X64__)) && __LINUX__
+# elif  (defined(__CPU_X86__) || defined(__CPU_X64__)) && __LINUX__
 #   define  VSF_ARCH_HEADER     "./x86/linux/linux_generic.h"
-# elif   (defined(__CPU_X86__) || defined(__CPU_X64__)) && __WIN__
+# elif  (defined(__CPU_X86__) || defined(__CPU_X64__)) && __WIN__
 #   define  VSF_ARCH_HEADER     "./x86/win/win_generic.h"
-# elif   defined(__CPU_MCS51__)
+# elif  defined(__CPU_MCS51__)
 #   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
-# elif   defined(__CPU_RV__)
+# elif  defined(__CPU_RV__)
 #   define  VSF_ARCH_HEADER     "./rv/rv_generic.h"
-# elif   defined(__CPU_ARM9__)
+# elif  defined(__CPU_ARM9__)
 #   define  VSF_ARCH_HEADER     "./arm/arm9/arm9_generic.h"
 # else
 #   warning no supported architecture found, use default arch template!
@@ -71,25 +74,25 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_ARCH_SWI_NUM
-#   define VSF_ARCH_SWI_NUM         0
+#   define VSF_ARCH_SWI_NUM                 0
 #endif
 #ifndef VSF_DEV_SWI_NUM
-#   define VSF_DEV_SWI_NUM          0
+#   define VSF_DEV_SWI_NUM                  0
 #endif
 
 #ifndef __BYTE_ORDER
 #   error "__BYTE_ORDER MUST be defined in arch"
 #endif
 
-#define VSF_SWI_NUM                 (VSF_ARCH_SWI_NUM + VSF_DEV_SWI_NUM)
+#define VSF_SWI_NUM                         (VSF_ARCH_SWI_NUM + VSF_DEV_SWI_NUM)
 
 #if __BYTE_ORDER == __BIG_ENDIAN
-#   define cpu_to_le16 bswap_16
-#   define cpu_to_le32 bswap_32
-#   define cpu_to_le64 bswap_64
-#   define le16_to_cpu bswap_16
-#   define le32_to_cpu bswap_32
-#   define le64_to_cpu bswap_64
+#   define cpu_to_le16                      bswap_16
+#   define cpu_to_le32                      bswap_32
+#   define cpu_to_le64                      bswap_64
+#   define le16_to_cpu                      bswap_16
+#   define le32_to_cpu                      bswap_32
+#   define le64_to_cpu                      bswap_64
 #   define cpu_to_be16
 #   define cpu_to_be32
 #   define cpu_to_be64
@@ -103,12 +106,12 @@ extern "C" {
 #   define le16_to_cpu
 #   define le32_to_cpu
 #   define le64_to_cpu
-#   define cpu_to_be16 bswap_16
-#   define cpu_to_be32 bswap_32
-#   define cpu_to_be64 bswap_64
-#   define be16_to_cpu bswap_16
-#   define be32_to_cpu bswap_32
-#   define be64_to_cpu bswap_64
+#   define cpu_to_be16                      bswap_16
+#   define cpu_to_be32                      bswap_32
+#   define cpu_to_be64                      bswap_64
+#   define be16_to_cpu                      bswap_16
+#   define be32_to_cpu                      bswap_32
+#   define be64_to_cpu                      bswap_64
 #endif
 
 #define DECLARE_ENDIAN_FUNC(__bitlen)                                           \
@@ -129,16 +132,75 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
 
 #ifndef ffs
-#   define ffs(__N)        vsf_ffs(__N)
+#   define ffs(__N)                         vsf_ffs(__N)
 #endif
 #ifndef ffz
-#   define ffz(__N)        vsf_ffz(__N)
+#   define ffz(__N)                         vsf_ffz(__N)
 #endif
 #ifndef msb
-#   define msb(__N)        vsf_msb(__N)
+#   define msb(__N)                         vsf_msb(__N)
 #endif
 #ifndef clz
-#   define clz(__N)        vsf_clz(__N)
+#   define clz(__N)                         vsf_clz(__N)
+#endif
+
+// Usage:
+//  __vsf_interrupt_safe(code)
+#ifndef __vsf_interrupt_safe
+#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#       define __vsf_interrupt_safe(__code)                                     \
+        {                                                                       \
+            vsf_gint_state_t gint_state = vsf_disable_interrupt();              \
+                __code;                                                         \
+            vsf_set_interrupt(gint_state);                                      \
+        }
+#   else
+#       define __vsf_interrupt_safe(...)                                        \
+        {                                                                       \
+            vsf_gint_state_t gint_state = vsf_disable_interrupt();              \
+                __VA_ARGS__;                                                    \
+            vsf_set_interrupt(gint_state);                                      \
+        }
+#   endif
+#endif
+
+// Usage:
+//  vsf_interrupt_safe() {
+//      code
+//  }
+#ifndef vsf_interrupt_safe
+#   define vsf_interrupt_safe               code_region(&DEFAULT_CODE_REGION_ATOM_CODE)
+#endif
+
+
+#define vsf_protect_t                       uint_fast32_t
+#define vsf_protect_interrupt()             vsf_disable_interrupt()
+#define vsf_unprotect_interrupt(__state)    vsf_set_interrupt(__state)
+#define vsf_protect_none()                  (0)
+#define vsf_unprotect_none(__state)         UNUSED_PARAM(__state)
+
+#define vsf_protect_int                     vsf_protect_interrupt
+#define vsf_unprotect_int                   vsf_unprotect_interrupt
+
+#define __vsf_protect(__type)               vsf_protect_##__type
+#define __vsf_unprotect(__type)             vsf_unprotect_##__type
+#define vsf_protect(__type)                 __vsf_protect(__type)
+#define vsf_unprotect(__type)               __vsf_unprotect(__type)
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   define vsf_protect_region(__type, __code)                                   \
+    do {                                                                        \
+        vsf_protect_t __state = vsf_protect(__type)();                          \
+            __code;                                                             \
+        vsf_unprotect(__type)(__state);                                         \
+    } while (0);
+#else
+#   define vsf_protect_region(__type, ...)                                      \
+    do {                                                                        \
+        vsf_protect_t __state = vsf_protect(__type)();                          \
+            __VA_ARGS__;                                                        \
+        vsf_unprotect(__type)(__state);                                         \
+    } while (0);
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -178,9 +240,9 @@ DECLARE_ENDIAN_FUNC(64)
 /*----------------------------------------------------------------------------*
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
-extern vsf_err_t vsf_swi_init(  uint_fast8_t idx, 
+extern vsf_err_t vsf_swi_init(  uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
-                                vsf_swi_handler_t *handler, 
+                                vsf_swi_handler_t *handler,
                                 void *param);
 extern void vsf_swi_trigger(uint_fast8_t idx);
 
@@ -217,7 +279,7 @@ extern void vsf_set_interrupt(vsf_gint_state_t level);
 extern vsf_gint_state_t vsf_disable_interrupt(void);
 extern void vsf_enable_interrupt(void);
 
-extern void vsf_arch_sleep(uint32_t mode);
+extern void vsf_arch_sleep(uint_fast32_t mode);
 
 #ifdef __cplusplus
 }

@@ -23,6 +23,7 @@
 #include "./vsf_tcpip_cfg.h"
 
 #include "./netdrv/vsf_netdrv.h"
+#include "./socket/vsf_socket.h"
 
 /*============================ MACROS ========================================*/
 

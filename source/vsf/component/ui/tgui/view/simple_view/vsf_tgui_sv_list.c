@@ -37,7 +37,7 @@ declare_class(vsf_tgui_t)
 
 fsm_rt_t vsf_tgui_list_v_init(vsf_tgui_list_t* ptList)
 {
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) list init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptList), ptList);
 #endif
@@ -56,7 +56,7 @@ fsm_rt_t vsf_tgui_list_v_rendering( vsf_tgui_list_t* ptList,
     VSF_TGUI_ASSERT(ptList != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) list rendering" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptList), ptList);
 #endif

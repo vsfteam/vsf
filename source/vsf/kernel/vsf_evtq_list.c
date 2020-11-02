@@ -50,7 +50,7 @@ extern vsf_evtq_t * __vsf_os_evtq_get(vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *this_ptr, vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *this_ptr);
 extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *this_ptr);
-extern vsf_prio_t __vsf_os_evtq_get_prio(vsf_evtq_t *this_ptr);
+extern vsf_prio_t __vsf_os_evtq_get_priority(vsf_evtq_t *this_ptr);
 
 extern vsf_evt_node_t * __vsf_os_alloc_evt_node(void);
 extern void __vsf_os_free_evt_node(vsf_evt_node_t *node);
@@ -146,7 +146,7 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *this_ptr)
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     this_ptr->cur.eda = NULL;
     this_ptr->cur.evt = VSF_EVT_INVALID;
-    this_ptr->cur.msg = NULL;
+    this_ptr->cur.msg = (uintptr_t)NULL;
     vsf_dlist_init(&this_ptr->rdy_list);
     return __vsf_os_evtq_init(this_ptr);
 }
@@ -284,7 +284,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
                 __vsf_dispatch_evt(eda, this_ptr->cur.evt);
             }
             this_ptr->cur.evt = VSF_EVT_INVALID;
-            this_ptr->cur.msg = NULL;
+            this_ptr->cur.msg = (uintptr_t)NULL;
 
             orig = vsf_protect_int();
             node_eda = eda->rdy_node.next;
@@ -308,7 +308,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
             if (eda->state.bits.is_new_prio) {
                 eda->state.bits.is_new_prio = false;
                 __vsf_eda_update_priotiry(eda, (vsf_prio_t)eda->new_priority);
-                __vsf_os_evtq_set_priority(this_ptr, __vsf_os_evtq_get_prio(this_ptr));
+                __vsf_os_evtq_set_priority(this_ptr, __vsf_os_evtq_get_priority(this_ptr));
             }
             if (eda->state.bits.is_to_exit) {
                 vsf_unprotect_int(orig);

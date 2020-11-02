@@ -20,6 +20,8 @@
 #include "../common.h"
 #include "./usb.h"
 
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -55,3 +57,5 @@ void __mt071_usb_irq(mt071_usb_t *usb)
         usb->callback.irq_handler(usb->callback.param);
     }
 }
+
+#endif      // VSF_HAL_USE_USBD && VSF_HAL_USE_USBH

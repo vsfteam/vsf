@@ -107,7 +107,7 @@ static vsfvm_compiler_func_t * __vsfvm_get_rootfunc(vsfvm_compiler_script_t *scr
 static int __vsfvm_push_bytecode(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code)
 {
 #if VSFVM_COMPILER_DEBUG_EN == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "%d:", compiler->bytecode_pos);
+    vsf_trace_debug("%d:", compiler->bytecode_pos);
     vsfvm_tkdump(code);
 #endif
     return vsfvm_set_bytecode_imp(compiler, code, compiler->bytecode_pos++);
@@ -414,11 +414,11 @@ static void __vsfvm_print_expr(vsf_dynstack_t *expr_stack)
     vsfvm_lexer_etoken_t *etoken;
     uint_fast16_t token, token_param;
 
-    vsf_trace(VSF_TRACE_DEBUG, "parser expr: ");
+    vsf_trace_debug("parser expr: ");
     for (uint_fast32_t i = 0; i < expr_stack->sp; i++) {
         etoken = vsf_dynarr_get(&expr_stack->use_as__vsf_dynarr_t, i);
         if (!etoken) {
-            vsf_trace(VSF_TRACE_ERROR, "fail to get token" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("fail to get token" VSF_TRACE_CFG_LINEEND);
             return;
         }
 
@@ -426,67 +426,67 @@ static void __vsfvm_print_expr(vsf_dynstack_t *expr_stack)
         token = etoken->token & 0xFFFF;
         switch (token) {
         case VSFVM_TOKEN_NUM:
-            vsf_trace(VSF_TRACE_DEBUG, "num=%d,", etoken->data.ival);
+            vsf_trace_debug("num=%d,", etoken->data.ival);
             break;
         case VSFVM_TOKEN_RESOURCES:
-            vsf_trace(VSF_TRACE_DEBUG, "res=%s,", etoken->data.sym->name);
+            vsf_trace_debug("res=%s,", etoken->data.sym->name);
             break;
         case VSFVM_TOKEN_VAR_ID:
-            vsf_trace(VSF_TRACE_DEBUG, "var=%s,", etoken->data.sym->name);
+            vsf_trace_debug("var=%s,", etoken->data.sym->name);
             break;
         case VSFVM_TOKEN_VAR_ID_REF:
-            vsf_trace(VSF_TRACE_DEBUG, "ref=%s,", etoken->data.sym->name);
+            vsf_trace_debug("ref=%s,", etoken->data.sym->name);
             break;
         case VSFVM_TOKEN_FUNC_ID:
-            vsf_trace(VSF_TRACE_DEBUG, "func=%s,", etoken->data.sym->name);
+            vsf_trace_debug("func=%s,", etoken->data.sym->name);
             break;
         case VSFVM_TOKEN_FUNC_CALL:
-            vsf_trace(VSF_TRACE_DEBUG, "call=%s(%d),", etoken->data.sym->name, token_param);
+            vsf_trace_debug("call=%s(%d),", etoken->data.sym->name, token_param);
             break;
         default:
             if (token > VSFVM_TOKEN_BINARY_OP) {
                 switch (token) {
-                case VSFVM_TOKEN_MUL:       vsf_trace(VSF_TRACE_DEBUG, "mul,");     break;
-                case VSFVM_TOKEN_DIV:       vsf_trace(VSF_TRACE_DEBUG, "div,");     break;
-                case VSFVM_TOKEN_MOD:       vsf_trace(VSF_TRACE_DEBUG, "mod,");     break;
-                case VSFVM_TOKEN_ADD:       vsf_trace(VSF_TRACE_DEBUG, "add,");     break;
-                case VSFVM_TOKEN_SUB:       vsf_trace(VSF_TRACE_DEBUG, "sub,");     break;
-                case VSFVM_TOKEN_SHL:       vsf_trace(VSF_TRACE_DEBUG, "shl,");     break;
-                case VSFVM_TOKEN_SHR:       vsf_trace(VSF_TRACE_DEBUG, "shr,");     break;
-                case VSFVM_TOKEN_LT:        vsf_trace(VSF_TRACE_DEBUG, "lt,");      break;
-                case VSFVM_TOKEN_LE:        vsf_trace(VSF_TRACE_DEBUG, "le,");      break;
-                case VSFVM_TOKEN_GT:        vsf_trace(VSF_TRACE_DEBUG, "gt,");      break;
-                case VSFVM_TOKEN_GE:        vsf_trace(VSF_TRACE_DEBUG, "ge,");      break;
-                case VSFVM_TOKEN_EQ:        vsf_trace(VSF_TRACE_DEBUG, "eq,");      break;
-                case VSFVM_TOKEN_NE:        vsf_trace(VSF_TRACE_DEBUG, "ne,");      break;
-                case VSFVM_TOKEN_AND:       vsf_trace(VSF_TRACE_DEBUG, "and,");     break;
-                case VSFVM_TOKEN_XOR:       vsf_trace(VSF_TRACE_DEBUG, "xor,");     break;
-                case VSFVM_TOKEN_OR:        vsf_trace(VSF_TRACE_DEBUG, "or,");      break;
-                case VSFVM_TOKEN_LAND:      vsf_trace(VSF_TRACE_DEBUG, "land,");    break;
-                case VSFVM_TOKEN_LOR:       vsf_trace(VSF_TRACE_DEBUG, "lor,");     break;
-                case VSFVM_TOKEN_ASSIGN:    vsf_trace(VSF_TRACE_DEBUG, "assign,");  break;
-                case VSFVM_TOKEN_COMMA_OP:  vsf_trace(VSF_TRACE_DEBUG, "comma,");   break;
+                case VSFVM_TOKEN_MUL:       vsf_trace_debug("mul,");      break;
+                case VSFVM_TOKEN_DIV:       vsf_trace_debug("div,");      break;
+                case VSFVM_TOKEN_MOD:       vsf_trace_debug("mod,");      break;
+                case VSFVM_TOKEN_ADD:       vsf_trace_debug("add,");      break;
+                case VSFVM_TOKEN_SUB:       vsf_trace_debug("sub,");      break;
+                case VSFVM_TOKEN_SHL:       vsf_trace_debug("shl,");      break;
+                case VSFVM_TOKEN_SHR:       vsf_trace_debug("shr,");      break;
+                case VSFVM_TOKEN_LT:        vsf_trace_debug("lt,");       break;
+                case VSFVM_TOKEN_LE:        vsf_trace_debug("le,");       break;
+                case VSFVM_TOKEN_GT:        vsf_trace_debug("gt,");       break;
+                case VSFVM_TOKEN_GE:        vsf_trace_debug("ge,");       break;
+                case VSFVM_TOKEN_EQ:        vsf_trace_debug("eq,");       break;
+                case VSFVM_TOKEN_NE:        vsf_trace_debug("ne,");       break;
+                case VSFVM_TOKEN_AND:       vsf_trace_debug("and,");      break;
+                case VSFVM_TOKEN_XOR:       vsf_trace_debug("xor,");      break;
+                case VSFVM_TOKEN_OR:        vsf_trace_debug("or,");       break;
+                case VSFVM_TOKEN_LAND:      vsf_trace_debug("land,");     break;
+                case VSFVM_TOKEN_LOR:       vsf_trace_debug("lor,");      break;
+                case VSFVM_TOKEN_ASSIGN:    vsf_trace_debug("assign,");   break;
+                case VSFVM_TOKEN_COMMA_OP:  vsf_trace_debug("comma,");    break;
                 default:
-                    vsf_trace(VSF_TRACE_ERROR, "token not support" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_error("token not support" VSF_TRACE_CFG_LINEEND);
                     return;
                 }
             } else if (token > VSFVM_TOKEN_UNARY_OP) {
                 switch (token) {
-                case VSFVM_TOKEN_NOT:       vsf_trace(VSF_TRACE_DEBUG, "not,");     break;
-                case VSFVM_TOKEN_REV:       vsf_trace(VSF_TRACE_DEBUG, "rev,");     break;
-                case VSFVM_TOKEN_NEGA:      vsf_trace(VSF_TRACE_DEBUG, "nega,");    break;
-                case VSFVM_TOKEN_POSI:      vsf_trace(VSF_TRACE_DEBUG, "posi,");    break;
+                case VSFVM_TOKEN_NOT:       vsf_trace_debug("not,");      break;
+                case VSFVM_TOKEN_REV:       vsf_trace_debug("rev,");      break;
+                case VSFVM_TOKEN_NEGA:      vsf_trace_debug("nega,");     break;
+                case VSFVM_TOKEN_POSI:      vsf_trace_debug("posi,");     break;
                 default:
-                    vsf_trace(VSF_TRACE_ERROR, "token not support" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_error("token not support" VSF_TRACE_CFG_LINEEND);
                     return;
                 }
             } else {
-                vsf_trace(VSF_TRACE_ERROR, "token not support" VSF_TRACE_CFG_LINEEND);
+                vsf_trace_error("token not support" VSF_TRACE_CFG_LINEEND);
                 return;
             }
         }
     }
-    vsf_trace(VSF_TRACE_DEBUG, VSF_TRACE_CFG_LINEEND);
+    vsf_trace_debug(VSF_TRACE_CFG_LINEEND);
 }
 #endif
 
@@ -537,20 +537,20 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             }
 
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: block begin, level = %d" VSF_TRACE_CFG_LINEEND, func->block_level);
+            vsf_trace_debug("parser: block begin, level = %d" VSF_TRACE_CFG_LINEEND, func->block_level);
 #endif
             func->block_level++;
         } else if (token == VSFVM_TOKEN_BLOCK_END) {
             func->block_level--;
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: block end, level = %d" VSF_TRACE_CFG_LINEEND, func->block_level);
+            vsf_trace_debug("parser: block end, level = %d" VSF_TRACE_CFG_LINEEND, func->block_level);
 #endif
 
             if (func->block_level < 0) {
                 return -VSFVM_PARSER_INVALID_CLOSURE;
             } else if (!func->block_level) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-                vsf_trace(VSF_TRACE_DEBUG, "parser: func %s end" VSF_TRACE_CFG_LINEEND, func->name->name);
+                vsf_trace_debug("parser: func %s end" VSF_TRACE_CFG_LINEEND, func->name->name);
 #endif
                 if (__vsfvm_push_bytecode(compiler, VSFVM_KEYWORD(VSFVM_CODE_KEYWORD_return, 0, 0)) < 0) {
                     return -VSFVM_BYTECODE_TOOLONG;
@@ -636,14 +636,14 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             char *path = data->sym->name;
 
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: import module \"%s\"" VSF_TRACE_CFG_LINEEND, path);
+            vsf_trace_debug("parser: import module \"%s\"" VSF_TRACE_CFG_LINEEND, path);
 #endif
 
             vsfvm_lexer_list_t *list = __vsfvm_get_lexer(compiler, vsfvm_module_get_lexer_imp(path));
             int err;
 
             if (!list) {
-                vsf_trace(VSF_TRACE_ERROR, "fail to find lexer for usrlib %s" VSF_TRACE_CFG_LINEEND, path);
+                vsf_trace_error("fail to find lexer for usrlib %s" VSF_TRACE_CFG_LINEEND, path);
                 return -VSFVM_COMPILER_FAIL_USRLIB;
             }
 
@@ -652,12 +652,12 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             vsfvm_lexer_ctx_delete(lexer);
 
             if (err) {
-                vsf_trace(VSF_TRACE_ERROR, "fail to import usrlib %s" VSF_TRACE_CFG_LINEEND, path);
+                vsf_trace_error("fail to import usrlib %s" VSF_TRACE_CFG_LINEEND, path);
                 return -VSFVM_COMPILER_FAIL_USRLIB;
             }
         } else if (token == VSFVM_TOKEN_VAR) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: variable \"%s\", type %s" VSF_TRACE_CFG_LINEEND, data->sym->name,
+            vsf_trace_debug("parser: variable \"%s\", type %s" VSF_TRACE_CFG_LINEEND, data->sym->name,
                     data->sym->c ? data->sym->c->name : "value");
             if (stack_exp->sp > 0) {
                 __vsfvm_print_expr(stack_exp);
@@ -700,7 +700,7 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             }
         } else if (token == VSFVM_TOKEN_CONST) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: const \"%s\" = %d" VSF_TRACE_CFG_LINEEND, data->sym->name, data->sym->ival);
+            vsf_trace_debug("parser: const \"%s\" = %d" VSF_TRACE_CFG_LINEEND, data->sym->name, data->sym->ival);
 #endif
         } else if (token == VSFVM_TOKEN_FUNC) {
             __vsfvm_func_push_ctx(func);
@@ -727,15 +727,15 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             }
 
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: function \"%s\"(%d)" VSF_TRACE_CFG_LINEEND, data->sym->name, stack_exp->sp);
+            vsf_trace_debug("parser: function \"%s\"(%d)" VSF_TRACE_CFG_LINEEND, data->sym->name, stack_exp->sp);
             if (stack_exp->sp > 0) {
-                vsf_trace(VSF_TRACE_DEBUG, "parser: function argument" VSF_TRACE_CFG_LINEEND);
+                vsf_trace_debug("parser: function argument" VSF_TRACE_CFG_LINEEND);
                 __vsfvm_print_expr(stack_exp);
             }
 #endif
         } else if (token == VSFVM_TOKEN_IF) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: if" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("parser: if" VSF_TRACE_CFG_LINEEND);
             __vsfvm_print_expr(stack_exp);
 #endif
 
@@ -762,7 +762,7 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             compiler->bytecode_pos++;
         } else if (token == VSFVM_TOKEN_WHILE) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: while" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("parser: while" VSF_TRACE_CFG_LINEEND);
             __vsfvm_print_expr(stack_exp);
 #endif
 
@@ -774,7 +774,7 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             goto push_if;
         } else if (token == VSFVM_TOKEN_RET) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: return" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("parser: return" VSF_TRACE_CFG_LINEEND);
             __vsfvm_print_expr(stack_exp);
 #endif
 
@@ -796,7 +796,7 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
             }
         } else if (token == VSFVM_TOKEN_EXPR) {
 #if VSFVM_PARSER_DEBUG_EN == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "parser: expression" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_debug("parser: expression" VSF_TRACE_CFG_LINEEND);
             __vsfvm_print_expr(stack_exp);
 #endif
 

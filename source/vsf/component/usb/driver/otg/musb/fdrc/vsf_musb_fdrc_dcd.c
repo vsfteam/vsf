@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
 
 #define __VSF_MUSB_FDRC_DCD_CLASS_IMPLEMENT
 
@@ -145,7 +145,7 @@ void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
 
     if (usbd->has_data_stage) {
         uint_fast8_t ep_orig = vk_musb_fdrc_set_ep(reg, 0);
-            reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND | MUSBD_CSR0_SERVICEDRXPKGRDY;
+        reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND | MUSBD_CSR0_SERVICEDRXPKGRDY;
         vk_musb_fdrc_set_ep(reg, ep_orig);
         usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
     }

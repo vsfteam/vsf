@@ -34,12 +34,6 @@
     <Filter Include="vsf\service\pool">
       <UniqueIdentifier>{87ee7aca-817c-4250-9053-4cdfbff8546a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\vsfstream">
-      <UniqueIdentifier>{f15d66bc-26cb-4a40-beea-94665651b182}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\service\vsfstream\fifo_stream">
-      <UniqueIdentifier>{9595061a-b5f8-49be-ad58-c8047b432a14}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\stream">
       <UniqueIdentifier>{631cd5e2-8cb5-497c-aa0f-5c0d0cdc4c67}</UniqueIdentifier>
     </Filter>
@@ -120,9 +114,6 @@
     </Filter>
     <Filter Include="vsf\component\fs\driver\winfs">
       <UniqueIdentifier>{ddd1648c-67f8-4502-b44e-65958c164dca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\service\vsfstream\mem_stream">
-      <UniqueIdentifier>{0837a06d-2cd0-4433-90b5-95b58d60a234}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\shell\sys\linux\include">
       <UniqueIdentifier>{fa47e9c8-171e-4416-aa2d-5fd7c91d943c}</UniqueIdentifier>
@@ -496,9 +487,6 @@
     <Filter Include="vsf\component\ui\tgui\view\template">
       <UniqueIdentifier>{6a11b5b7-e4a3-4866-95f3-7fd83c3bfb78}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\vsfstream\block_stream">
-      <UniqueIdentifier>{5a3bb6e4-4434-4813-a8ee-a8389b833db7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party\vsfvm">
       <UniqueIdentifier>{92896255-87d4-44f6-af59-3fd2209570af}</UniqueIdentifier>
     </Filter>
@@ -781,18 +769,6 @@
     <Filter Include="vsf\hal\driver\x86\win">
       <UniqueIdentifier>{d0f9b226-2086-4c83-a362-a34fcbc01344}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\osa_hal\driver\device_specific">
-      <UniqueIdentifier>{3e328104-431b-4d61-90e2-0884c2a8835d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\driver\device_specific\x86">
-      <UniqueIdentifier>{08b4654a-a634-42b9-bf29-a1aa13d0e128}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\driver\device_specific\x86\win">
-      <UniqueIdentifier>{9a0ee342-f6d6-4e8c-a036-c1d6fa79431c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\osa_hal\driver\device_specific\x86\win\uart">
-      <UniqueIdentifier>{a292d392-a782-499f-b802-abd934f664bc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\component\3rd-party\freetype\port\vsf_config">
       <UniqueIdentifier>{9dc19b0f-9932-43c4-8a50-f65e8b1b3995}</UniqueIdentifier>
     </Filter>
@@ -823,6 +799,81 @@
     <Filter Include="vsf\component\debugger\segger_rtt">
       <UniqueIdentifier>{d42ea5e5-b341-45be-b5d9-74b32e93eeaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\hal_demo">
+      <UniqueIdentifier>{4b85f110-bac8-47f4-9db7-9949521981bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\customised">
+      <UniqueIdentifier>{9c096bd0-f1a0-4e67-b7a8-f8844a51f163}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\customised\stream_hal">
+      <UniqueIdentifier>{daeef2ac-ac18-4f94-9c38-746faad78cc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\osa_hal\driver\customised\stream_hal\usart">
+      <UniqueIdentifier>{c530968a-2a9b-4a37-8e37-b9f7d85994a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\stream_hal_demo">
+      <UniqueIdentifier>{8331a6b9-fa8d-4d71-bc4e-5e1bdad1e9d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream">
+      <UniqueIdentifier>{39ad345b-387a-4ab1-a35e-cb80e63f81c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream\block_stream">
+      <UniqueIdentifier>{968d10d1-9dd7-426d-80c7-9c8228cbe07e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream\fifo_stream">
+      <UniqueIdentifier>{ce55d77b-9920-4a44-aacc-33ab930984ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream\mem_stream">
+      <UniqueIdentifier>{4c1e2742-4b3b-441b-b4ab-13536e0b5e8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\gato_demo">
+      <UniqueIdentifier>{843e6614-3d28-4b4c-b480-6c1d6dc3d0b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\gato">
+      <UniqueIdentifier>{5b71e24e-090a-4f55-8370-9abdf52d59b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\gato\raw">
+      <UniqueIdentifier>{183c897e-6607-4111-a48b-2e7fb07ad815}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\gato\raw\include">
+      <UniqueIdentifier>{9991797a-c06f-41f3-8a76-0468d7b884c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\gato\raw\image">
+      <UniqueIdentifier>{1d757c37-0afb-4cca-8866-21bb9b49d52f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\gato\raw\render">
+      <UniqueIdentifier>{1a5775b9-e2b7-4388-984a-4378742a713a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\fifo">
+      <UniqueIdentifier>{59c16c56-15ef-4f49-8e6e-8b332ec1fa95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\tcpip\socket">
+      <UniqueIdentifier>{cf4b43a9-e4f8-4de3-ab8d-45dfd5c61ee6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\tcpip\socket\driver">
+      <UniqueIdentifier>{f411d2b1-08b5-40db-9561-e6ed6022ba3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\tcpip\socket\driver\lwip">
+      <UniqueIdentifier>{2c76b41c-7cbe-4498-9823-21200b118779}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\tcpip\socket\driver\win">
+      <UniqueIdentifier>{0b47f4d5-67f8-439f-ab5a-c844e4fce8e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\usart">
+      <UniqueIdentifier>{1b30266e-50df-4730-bcc9-2931c49418c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\socket_demo">
+      <UniqueIdentifier>{a2bc7d06-b22c-4bfe-947b-5a0fdb7e7092}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\nuklear_demo">
+      <UniqueIdentifier>{b91a2a21-0544-4871-b0dd-18207ff714bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\nuklear">
+      <UniqueIdentifier>{621d39b7-9c10-4f90-af56-a32bf468859a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\nuklear\raw">
+      <UniqueIdentifier>{1f522aa9-d73c-48af-9541-376b466df1cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -836,9 +887,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\ooc_class.h">
       <Filter>vsf\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\compiler\x86\signal.h">
-      <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\x86\x86_compiler.h">
       <Filter>vsf\utilities\compiler</Filter>
@@ -923,12 +971,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\service\pool\vsf_pool.h">
       <Filter>vsf\service\pool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\vsfstream.h">
-      <Filter>vsf\service\vsfstream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h">
-      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\service\stream\interface.h">
       <Filter>vsf\service\stream</Filter>
@@ -1109,9 +1151,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.h">
       <Filter>vsf\component\fs\driver\winfs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
-      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\unistd.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
@@ -1971,9 +2010,6 @@
     <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.h">
       <Filter>vsf\component\ui\tgui\controls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\service\vsfstream\block_stream\vsf_block_stream.h">
-      <Filter>vsf\service\vsfstream\block_stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.h">
       <Filter>vsf\component\3rd-party\vsfvm\extension\vsf\kernel</Filter>
     </ClInclude>
@@ -2140,9 +2176,6 @@
       <Filter>vsf\component\usb\host\class\UAC</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\__common\__compiler.h">
-      <Filter>vsf\utilities\compiler\__common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\compiler\__common\__signal.h">
       <Filter>vsf\utilities\compiler\__common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\__common\__type.h">
@@ -2316,7 +2349,6 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID.h">
       <Filter>vsf\component\usb\device\class\HID</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\crypto\hash\vsf_hash.h" />
     <ClInclude Include="..\..\..\..\vsf\component\ui\disp\driver\fb\vsf_disp_fb.h">
       <Filter>vsf\component\ui\disp\driver\fb</Filter>
     </ClInclude>
@@ -2353,17 +2385,8 @@
     <ClInclude Include="..\..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\driver.h">
-      <Filter>vsf\osa_hal\driver\device_specific\x86</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h">
       <Filter>vsf\osa_hal\driver</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\driver.h">
-      <Filter>vsf\osa_hal\driver\device_specific\x86\win</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.h">
-      <Filter>vsf\osa_hal\driver\device_specific\x86\win\uart</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\device.h">
       <Filter>vsf\hal\driver\x86\win</Filter>
@@ -2407,11 +2430,83 @@
     <ClInclude Include="..\..\..\..\vsf\utilities\vsf_utilities_cfg.h">
       <Filter>vsf\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\hal\interface\vsf_interface_spi.h">
+      <Filter>vsf\hal\interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\crypto\hash\vsf_hash.h">
+      <Filter>vsf\component\crypto\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\customised\driver.h">
+      <Filter>vsf\osa_hal\driver\customised</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\customised\stream_hal\driver.h">
+      <Filter>vsf\osa_hal\driver\customised\stream_hal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.h">
+      <Filter>vsf\osa_hal\driver\customised\stream_hal\usart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\vsf_simple_stream.h">
+      <Filter>vsf\service\simple_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.h">
+      <Filter>vsf\service\simple_stream\block_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.h">
+      <Filter>vsf\service\simple_stream\fifo_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\simple_stream\mem_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\color.h">
+      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\consolas-font.h">
+      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\image.h">
+      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\render.h">
+      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\surface.h">
+      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\include\svg.h">
+      <Filter>vsf\component\3rd-party\gato\raw\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\stb_image.h">
+      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\stb_image_resize.h">
+      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\stb_image_write.h">
+      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\service\fifo\vsf_fifo.h">
+      <Filter>vsf\service\fifo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\socket\vsf_socket.h">
+      <Filter>vsf\component\tcpip\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\socket\driver\lwip\vsf_socket_lwip.h">
+      <Filter>vsf\component\tcpip\socket\driver\lwip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\tcpip\socket\driver\win\vsf_socket_win.h">
+      <Filter>vsf\component\tcpip\socket\driver\win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\win\uart\uart.h">
+      <Filter>vsf\hal\driver\x86\win\usart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\nuklear\raw\nuklear.h">
+      <Filter>vsf\component\3rd-party\nuklear\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\nuklear_demo\sdl2surface_rawfb.h">
+      <Filter>usrapp\demo\nuklear_demo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\vsf\utilities\compiler\x86\signal.c">
-      <Filter>vsf\utilities\compiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\utilities\template\vsf_bitmap.c">
       <Filter>vsf\utilities\template</Filter>
     </ClCompile>
@@ -2450,12 +2545,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\service\pool\vsf_pool.c">
       <Filter>vsf\service\pool</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\vsfstream.c">
-      <Filter>vsf\service\vsfstream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c">
-      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\service\stream\vsf_stream.c">
       <Filter>vsf\service\stream</Filter>
@@ -2558,9 +2647,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\fs\driver\winfs\vsf_winfs.c">
       <Filter>vsf\component\fs\driver\winfs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
-      <Filter>vsf\service\vsfstream\mem_stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
@@ -3267,9 +3353,6 @@
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.c">
       <Filter>vsf\component\ui\tgui\controls</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\service\vsfstream\block_stream\vsf_block_stream.c">
-      <Filter>vsf\service\vsfstream\block_stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.c">
       <Filter>vsf\component\3rd-party\vsfvm\extension\vsf\kernel</Filter>
     </ClCompile>
@@ -3660,9 +3743,6 @@
     <ClCompile Include="..\..\..\..\vsf\component\usb\driver\hcd\libusb_hcd\vsf_libusb_hcd.c">
       <Filter>vsf\component\usb\driver\hcd\libusb_hcd</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\osa_hal\driver\device_specific\x86\win\uart\uart.c">
-      <Filter>vsf\osa_hal\driver\device_specific\x86\win\uart</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\driver.c">
       <Filter>vsf\hal\driver\x86\win</Filter>
     </ClCompile>
@@ -3683,6 +3763,69 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\debugger\segger_rtt\segger_rtt_stream.c">
       <Filter>vsf\component\debugger\segger_rtt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\usart_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\osa_hal\driver\customised\stream_hal\usart\vsf_stream_usart.c">
+      <Filter>vsf\osa_hal\driver\customised\stream_hal\usart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\stream_hal_demo\stream_usart_demo.c">
+      <Filter>usrapp\demo\stream_hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\vsf_simple_stream.c">
+      <Filter>vsf\service\simple_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.c">
+      <Filter>vsf\service\simple_stream\block_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.c">
+      <Filter>vsf\service\simple_stream\fifo_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\simple_stream\mem_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\image.c">
+      <Filter>vsf\component\3rd-party\gato\raw\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\render.c">
+      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\surface.c">
+      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\svg.c">
+      <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\gato_demo\gato_demo.c">
+      <Filter>usrapp\demo\gato_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\gato_demo\gato_application.c">
+      <Filter>usrapp\demo\gato_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\service\fifo\vsf_fifo.c">
+      <Filter>vsf\service\fifo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\socket\vsf_socket.c">
+      <Filter>vsf\component\tcpip\socket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\socket\driver\lwip\vsf_socket_lwip.c">
+      <Filter>vsf\component\tcpip\socket\driver\lwip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\tcpip\socket\driver\win\vsf_socket_win.c">
+      <Filter>vsf\component\tcpip\socket\driver\win</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_user.c">
+      <Filter>usrapp\demo\usbd_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\uart\uart.c">
+      <Filter>vsf\hal\driver\x86\win\usart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\socket_demo\socket_demo.c">
+      <Filter>usrapp\demo\socket_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\nuklear_demo\main.c">
+      <Filter>usrapp\demo\nuklear_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

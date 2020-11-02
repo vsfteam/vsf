@@ -24,10 +24,10 @@
 #include "service/vsf_service.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
- *!        definition and there is NO ANY OTHER module-interface-header file 
+ *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
  */
-   
+
 #if     defined(__VSF_EDA_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
 #elif   defined(__VSF_EDA_CLASS_INHERIT__)
@@ -131,12 +131,12 @@ extern "C" {
             __vsf_eda_call_eda( (uintptr_t)__param_evthandler,                  \
                                 (uintptr_t)__param,                             \
                                 (0, ##__VA_ARGS__))
-                                
+
 #   define vsf_eda_get_local(...)                                               \
-            __vsf_eda_get_local((vsf_eda_t *)(vsf_eda_get_cur(), ##__VA_ARGS__))                                
-                                
+            __vsf_eda_get_local((vsf_eda_t *)(vsf_eda_get_cur(), ##__VA_ARGS__))
+
 #   define __vsf_peda_local(__name)     peda_local_##__name
-#   define vsf_peda_local(__name)       __vsf_peda_local(__name)      
+#   define vsf_peda_local(__name)       __vsf_peda_local(__name)
 
 #   define __vsf_peda_arg(__name)       peda_arg_##__name
 #   define vsf_peda_arg(__name)         __vsf_peda_arg(__name)
@@ -148,7 +148,7 @@ extern "C" {
 #   define __vsf_peda_param(__name)     peda_cb_##__name
 #   define vsf_peda_param(__name)       __vsf_peda_param(__name)
 
-            
+
 #   define __declare_vsf_peda_ctx(__name)                                       \
             typedef struct vsf_peda_param(__name)   vsf_peda_param(__name);     \
             typedef struct vsf_peda_arg(__name)     vsf_peda_arg(__name);       \
@@ -160,7 +160,7 @@ extern "C" {
 
 #   define __declare_vsf_peda(__name)                                           \
             typedef struct __name __name;                                       \
-            __declare_vsf_peda_ctx(__name)   
+            __declare_vsf_peda_ctx(__name)
 #   define declare_vsf_peda(__name)     __declare_vsf_peda(__name)
 
 #   define dcl_vsf_peda(__name)                                                 \
@@ -332,7 +332,7 @@ extern "C" {
         struct vsf_peda_local(__name) {                                         \
             implement(vsf_peda_arg(__name))                                     \
             __local                                                             \
-        };                                                                      
+        };
 #   else
 #       define __def_vsf_peda_ctx4(__name, __param, __arg, __local)             \
         struct vsf_peda_param(__name) {                                         \
@@ -344,7 +344,7 @@ extern "C" {
         struct vsf_peda_local(__name) {                                         \
             implement(vsf_peda_arg(__name))                                     \
             __local                                                             \
-        };                                                                      
+        };
 #endif
 
 #   define __def_vsf_peda4(__name, __param, __arg, __local)                     \
@@ -352,7 +352,7 @@ extern "C" {
         struct __name {                                                         \
             implement(vsf_peda_t)                                               \
             implement_ex(vsf_peda_param(__name), param)                         \
-        }; 
+        };
 
 #   if __IS_COMPILER_IAR__
 #       define __def_vsf_peda_ctx3(__name, __param, __arg)                      \
@@ -366,7 +366,7 @@ extern "C" {
         };                                                                      \
         struct vsf_peda_local(__name) {                                         \
             implement(vsf_peda_arg(__name))                                     \
-        };                                                                      
+        };
 #   else
 #       define __def_vsf_peda_ctx3(__name, __param, __arg)                      \
         struct vsf_peda_param(__name) {                                         \
@@ -377,7 +377,7 @@ extern "C" {
         };                                                                      \
         struct vsf_peda_local(__name) {                                         \
             implement(vsf_peda_arg(__name))                                     \
-        };                                                                      
+        };
 #endif
 
 #   define __def_vsf_peda3(__name, __param, __arg)                              \
@@ -385,8 +385,8 @@ extern "C" {
         struct __name {                                                         \
             implement(vsf_peda_t)                                               \
             implement_ex(vsf_peda_param(__name), param)                         \
-        };                                                                      
-                                                                        
+        };
+
 
 #   if __IS_COMPILER_IAR__
 #       define __def_vsf_peda_ctx2(__name, __param)                             \
@@ -399,7 +399,7 @@ extern "C" {
         };                                                                      \
         struct vsf_peda_local(__name) {                                         \
             implement(vsf_peda_arg(__name))                                     \
-        };                                                                      
+        };
 #   else
 #       define __def_vsf_peda_ctx2(__name, __param)                             \
         struct vsf_peda_param(__name) {                                         \
@@ -409,7 +409,7 @@ extern "C" {
         };                                                                      \
         struct vsf_peda_local(__name) {                                         \
             implement(vsf_peda_arg(__name))                                     \
-        };                                                                      
+        };
 #endif
 
 #   define __def_vsf_peda_ctx1(__name)                                          \
@@ -420,18 +420,18 @@ extern "C" {
         struct __name {                                                         \
             implement(vsf_peda_t)                                               \
             implement_ex(vsf_peda_param(__name), param)                         \
-        };        
+        };
 
 #   define __def_vsf_peda1(__name)                                              \
         __def_vsf_peda_ctx1(__name)                                             \
         struct __name {                                                         \
             implement(vsf_peda_t)                                               \
             implement_ex(vsf_peda_param(__name), param)                         \
-        };                                                              
+        };
 
 #   define def_vsf_peda(...)                                                    \
-                __PLOOC_EVAL(__def_vsf_peda, __VA_ARGS__) (__VA_ARGS__)                    
-                    
+                __PLOOC_EVAL(__def_vsf_peda, __VA_ARGS__) (__VA_ARGS__)
+
 #   define end_def_vsf_peda(...)
 
 #   define def_vsf_peda_ctx(...)                                                \
@@ -441,7 +441,7 @@ extern "C" {
 
 #   define define_vsf_peda_ctx(__name, ...)                                     \
                 def_vsf_peda_ctx(__name, __VA_ARGS__)
-                
+
 #   define end_define_vsf_peda_ctx(...)
 
 #   define def_locals(...)              ,##__VA_ARGS__
@@ -463,9 +463,9 @@ extern "C" {
 #   define end_define_parameters(...)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define vsf_peda_start          vsf_teda_init_ex
+#   define vsf_peda_start          vsf_teda_start
 #else
-#   define vsf_peda_start          vsf_eda_init_ex
+#   define vsf_peda_start          vsf_eda_start
 #endif
 
 #   define __init_vsf_peda(__name, __param_eda, __pri, ...)                     \
@@ -480,7 +480,7 @@ extern "C" {
             };                                                                  \
             vsf_peda_start((vsf_peda_t *)(__param_eda),                         \
                             &CONNECT3(__,__LINE__,cfg));                        \
-        } while(0)                                                                                             
+        } while(0)
 
 #   define init_vsf_peda(__name, __param_eda, __pri, ...)                       \
             __init_vsf_peda(__name, (__param_eda), (__pri), __VA_ARGS__)
@@ -503,11 +503,11 @@ extern "C" {
                 *(vsf_peda_param(__name) **)                                    \
                     ((uintptr_t)local_ptr - sizeof(uintptr_t));                 \
             ASSERT(NULL != this_ptr || NULL != local_ptr);
-            
-#   define vsf_peda_begin()  
+
+#   define vsf_peda_begin()
 
 #   define vsf_peda_end()                                                       \
-            } 
+            }
 
 #   define implement_vsf_peda(...)                                              \
                 __PLOOC_EVAL(__implement_vsf_peda, __VA_ARGS__)(__VA_ARGS__)
@@ -520,8 +520,8 @@ extern "C" {
                                         (__param),                              \
                                         sizeof(vsf_peda_local(__name)))
 
-#   define vsf_local        (*local_ptr)     
-           
+#   define vsf_local        (*local_ptr)
+
 #endif
 #   define vsf_this         (*this_ptr)
 
@@ -533,7 +533,7 @@ typedef vsf_systimer_cnt_t     vsf_timer_tick_t;
 
 enum {
     /*!\ note wait for invalid also means wait for any evt */
-    VSF_EVT_INVALID             = -1,       //!< compatible with fsm_rt_err 
+    VSF_EVT_INVALID             = -1,       //!< compatible with fsm_rt_err
     VSF_EVT_NONE                = 0,        //!< compatible with fsm_rt_cpl
     VSF_EVT_YIELD               = 1,        //!< compatible with fsm_rt_on_going
 
@@ -543,8 +543,8 @@ enum {
     VSF_EVT_FINI                = VSF_EVT_SYSTEM + 2,
     VSF_EVT_ENTER               = VSF_EVT_SYSTEM + 3,
     VSF_EVT_EXIT                = VSF_EVT_SYSTEM + 4,
-    VSF_EVT_RETURN              = VSF_EVT_EXIT,        
-    
+    VSF_EVT_RETURN              = VSF_EVT_EXIT,
+
     // events for time
     VSF_EVT_TIMER               = VSF_EVT_SYSTEM + 5,
 
@@ -613,7 +613,7 @@ def_simple_class(__vsf_eda_frame_t) {
         } fn;
 
 #   if  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
-    ||  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+    ||  VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
         protected_member (
             __vsf_eda_frame_state_t             state;
         )
@@ -635,9 +635,9 @@ def_simple_class(__vsf_eda_frame_t) {
             vsf_param_eda_evthandler_t      param_evthandler;
             vsf_fsm_entry_t                 fsm_entry;
         } fn;
-        
+
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                               \
-    ||  VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+    ||  VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
         __vsf_eda_frame_state_t             state;
 #endif
 
@@ -689,18 +689,18 @@ typedef union __vsf_eda_state_t {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         uint8_t         is_use_frame    : 1;
 #   if      VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                           \
-        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED 
-        uint8_t         is_evt_incoming : 1;        
+        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
+        uint8_t         is_evt_incoming : 1;
 #   endif
 #endif
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+#if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
         uint8_t         polling_state   : 1;
         uint8_t         is_stack_owner  : 1;
 #endif
     } bits;
     // TODO: flag is not always 16-bit here
-    uint16_t            flag;                       
+    uint16_t            flag;
 } __vsf_eda_state_t;
 
 //! \name eda
@@ -762,20 +762,20 @@ def_simple_class(vsf_eda_t) {
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
     protected_member(
         /* value holder for enum fsm_rt_t */
-        int8_t              fsm_return_state;         
+        int8_t              fsm_return_state;
     )
 #   endif
 
     protected_member(
         __vsf_eda_state_t   state;
     )
-    
+
 #else
     protected_member(
 #   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
         vsf_dlist_node_t    pending_node;
 #   endif
-    
+
 #   if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #       if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
         vsf_dlist_node_t    rdy_node;
@@ -793,7 +793,7 @@ def_simple_class(vsf_eda_t) {
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
         /* value holder for enum fsm_rt_t */
-        int8_t              fsm_return_state; 
+        int8_t              fsm_return_state;
 #   endif
         __vsf_eda_state_t   state;
     )
@@ -880,7 +880,7 @@ typedef struct vsf_bmpevt_adapter_op_t {
     vsf_err_t (*reset)(vsf_bmpevt_adapter_t *this_ptr);
 } vsf_bmpevt_adapter_op_t;
 #endif
- 
+
 //! \name bmpevt_adapter
 //! @{
 def_simple_class(vsf_bmpevt_adapter_t) {
@@ -957,7 +957,7 @@ typedef struct vsf_eda_queue_op_t {
     bool (*dequeue)(vsf_eda_queue_t *this_ptr, void **node);
 } vsf_eda_queue_op_t;
 
-//! \brief define alias for vsf_eda_queue_t. osa means os-aware 
+//! \brief define alias for vsf_eda_queue_t. osa means os-aware
 typedef struct vsf_eda_queue_t vsf_osa_queue_t;
 typedef struct vsf_eda_queue_op_t vsf_osa_queue_op_t;
 
@@ -967,7 +967,7 @@ def_simple_class(vsf_eda_queue_t) {
     union {
         implement(vsf_sync_t)
 #if VSF_KERNEL_CFG_QUEUE_MULTI_TX_EN == ENABLED
-            
+
         protected_member(
             union {
                 uint16_t        __cur_value;
@@ -1077,19 +1077,16 @@ extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
 #endif
 
 #if defined(__VSF_EDA_CLASS_INHERIT__) || defined(__VSF_EDA_CLASS_IMPLEMENT)
+SECTION(".text.vsf.kernel.eda")
+extern vsf_err_t vsf_eda_init(vsf_eda_t *this_ptr, vsf_prio_t priotiry, bool is_stack_owner);
+
 SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
-extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *this_ptr, 
-                                        vsf_eda_evthandler_t evthandler);
-                                        
+extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *this_ptr, vsf_eda_evthandler_t evthandler);
+
 SECTION(".text.vsf.kernel.eda")
 extern void vsf_kernel_init( const vsf_kernel_cfg_t *cfg_ptr);
 
-SECTION(".text.vsf.kernel.eda")
-extern vsf_err_t vsf_eda_init(  vsf_eda_t *this_ptr, 
-                                vsf_prio_t priotiry, 
-                                bool is_stack_owner);
-
-#   if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+#   if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
 
 SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
 extern bool vsf_eda_polling_state_get(vsf_eda_t *this_ptr);
@@ -1098,14 +1095,13 @@ SECTION(".text.vsf.kernel.vsf_eda_polling_state_set")
 extern void vsf_eda_polling_state_set(vsf_eda_t *this_ptr, bool state);
 
 #   endif
-
 #endif
 
 SECTION(".text.vsf.kernel.vsf_eda_set_evthandler")
 extern vsf_err_t vsf_eda_go_to(uintptr_t evthandler);
 
-SECTION(".text.vsf.kernel.vsf_eda_init_ex")
-vsf_err_t vsf_eda_init_ex(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg);
+SECTION(".text.vsf.kernel.vsf_eda_start")
+vsf_err_t vsf_eda_start(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg);
 
 SECTION(".text.vsf.kernel.eda")
 extern vsf_eda_t *vsf_eda_get_cur(void);
@@ -1116,7 +1112,7 @@ extern vsf_evt_t vsf_eda_get_cur_evt(void);
 SECTION(".text.vsf.kernel.vsf_eda_get_cur_msg")
 extern void *vsf_eda_get_cur_msg(void);
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED
+#if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_is_stack_owner")
 extern bool vsf_eda_is_stack_owner(vsf_eda_t *this_ptr);
 #endif
@@ -1146,17 +1142,17 @@ extern vsf_err_t vsf_eda_fini(vsf_eda_t *this_ptr);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 SECTION(".text.vsf.kernel.__vsf_eda_call_eda")
-extern 
-vsf_err_t __vsf_eda_call_eda(   uintptr_t evthandler, 
-                                uintptr_t param, 
+extern
+vsf_err_t __vsf_eda_call_eda(   uintptr_t evthandler,
+                                uintptr_t param,
                                 size_t local_size);
 
 SECTION(".text.vsf.kernel.__vsf_eda_go_to_ex")
 extern vsf_err_t __vsf_eda_go_to_ex(uintptr_t evthandler, uintptr_t param);
 
 SECTION(".text.vsf.kernel.eda_nesting")
-extern vsf_err_t __vsf_eda_call_eda_ex( uintptr_t func, 
-                                        uintptr_t param, 
+extern vsf_err_t __vsf_eda_call_eda_ex( uintptr_t func,
+                                        uintptr_t param,
                                         __vsf_eda_frame_state_t state,
                                         bool is_sub_call);
 
@@ -1179,9 +1175,9 @@ vsf_err_t vsf_eda_frame_user_value_get(__vsf_frame_uint_t* pvalue);
 
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
-extern 
-fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry, 
-                            uintptr_t param, 
+extern
+fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry,
+                            uintptr_t param,
                             size_t local_size);
 #   endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 
@@ -1189,12 +1185,10 @@ fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry,
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 SECTION(".text.vsf.kernel.teda")
-extern vsf_err_t vsf_teda_init(vsf_teda_t *this_ptr, 
-                        vsf_prio_t priority, 
-                        bool is_stack_owner);
+extern vsf_err_t vsf_teda_init(vsf_teda_t *this_ptr, vsf_prio_t priority, bool is_stack_owner);
 
-SECTION(".text.vsf.kernel.vsf_teda_init_ex")
-extern vsf_err_t vsf_teda_init_ex(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg);
+SECTION(".text.vsf.kernel.vsf_teda_start")
+extern vsf_err_t vsf_teda_start(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 extern vsf_err_t vsf_teda_set_timer(uint_fast32_t tick);

@@ -312,7 +312,7 @@ static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
 {
     stopwatch_t *ptPanel = (stopwatch_t *)node_ptr;
 
-    vsf_systimer_cnt_t tTimeElapsedInMS = vsf_systimer_tick_to_ms( vsf_systimer_get());
+    vsf_systimer_cnt_t tTimeElapsedInMS = vsf_systimer_tick_to_ms( vsf_systimer_get_tick());
     uint8_t ch10Ms = (tTimeElapsedInMS / 10) % 100;
     uint8_t chSecond = (tTimeElapsedInMS / 1000) % 60;
     uint8_t chMinute = (tTimeElapsedInMS / 60000) % 60;
@@ -463,7 +463,7 @@ implement_vsf_pt(tgui_demo_t)
 
         //! refresh timer
         do {
-            vsf_systimer_cnt_t tTimeElapsedInMS = vsf_systimer_tick_to_ms( vsf_systimer_get());
+            vsf_systimer_cnt_t tTimeElapsedInMS = vsf_systimer_tick_to_ms( vsf_systimer_get_tick());
             uint8_t ch10Ms = (tTimeElapsedInMS / 10) % 100;
             uint8_t chSecond = (tTimeElapsedInMS / 1000) % 60;
             uint8_t chMinute = (tTimeElapsedInMS / 60000) % 60;

@@ -22,7 +22,7 @@
 
 #include "../../../vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_NETDRV_USE_WPCAP == ENABLED
 
 #if     defined(__VSF_NETDRV_WPCAP_CLASS_IMPLEMENT)
 #   undef __VSF_NETDRV_WPCAP_CLASS_IMPLEMENT
@@ -62,5 +62,5 @@ extern const struct vk_netlink_op_t vk_netdrv_wpcap_netlink_op;
 }
 #endif
 
-#endif      // VSF_USE_FS && VSF_USE_FATFS
+#endif      // VSF_USE_TCPIP && VSF_NETDRV_USE_WPCAP
 #endif      // __VSF_MEMFS_H__

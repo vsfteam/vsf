@@ -19,9 +19,9 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_UAC == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UAC == ENABLED
 
-#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define __VSF_USBH_UAC_CLASS_IMPLEMENT
@@ -38,8 +38,8 @@
 #   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
 #endif
 
-#if VSF_USE_SERVICE_VSFSTREAM != ENABLED
-#   error "VSF_USE_SERVICE_VSFSTREAM is required"
+#if VSF_USE_SIMPLE_STREAM != ENABLED
+#   error "VSF_USE_SIMPLE_STREAM is required"
 #endif
 
 #ifndef VSF_USBD_UAC_CFG_STREAM_NUM
@@ -113,7 +113,7 @@ typedef struct vk_usbh_uac_t {
     union {
         usb_uac_ac_interface_header_desc_t ac_header;
         // seems IAR does not support zero-length array
-        uint8_t ac_interface_desc[1]; 
+        uint8_t ac_interface_desc[1];
     };
 } vk_usbh_uac_t;
 
@@ -223,7 +223,7 @@ static bool __vk_usbh_uac_submit_iso_urb(vk_usbh_uac_t *uac, vk_usbh_uac_stream_
 
     if (uac_stream->is_in) {
         // for IN, use epsize
-        frame_size = vk_usbh_urb_get_pipe(urb).size + 1;
+        frame_size = vk_usbh_urb_get_pipe(urb).size;
 #if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
         size = vsf_stream_get_free_size(stream);
 #else
@@ -317,7 +317,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 if ((stream != NULL) && !uac_stream->is_connected) {
                     if (URB_OK == status) {
 #if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
-                        uint_fast16_t epsize = vk_usbh_urb_get_pipe(&uac_stream->urb[0]).size + 1;
+                        uint_fast16_t epsize = vk_usbh_urb_get_pipe(&uac_stream->urb[0]).size;
                         uint_fast16_t frame_size = uac_stream->channel_num * uac_stream->sample_size * uac_stream->sample_rate / 1000;
 #endif
 #if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1

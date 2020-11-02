@@ -22,7 +22,7 @@
 #include "./vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
-#include "hal/vsf_hal.h"
+#include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

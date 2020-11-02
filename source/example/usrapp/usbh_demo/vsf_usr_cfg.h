@@ -141,23 +141,23 @@
 
 
 #define VSF_USE_INPUT                                   ENABLED
-#define VSF_USE_INPUT_HID                               ENABLED
-#define VSF_USE_INPUT_DS4                               ENABLED
-#define VSF_USE_INPUT_NSPRO                             ENABLED
-#define VSF_USE_INPUT_XB360                             ENABLED
-#define VSF_USE_INPUT_XB1                               ENABLED
+#define VSF_INPUT_USE_HID                               ENABLED
+#define VSF_INPUT_USE_DS4                               ENABLED
+#define VSF_INPUT_USE_NSPRO                             ENABLED
+#define VSF_INPUT_USE_XB360                             ENABLED
+#define VSF_INPUT_USE_XB1                               ENABLED
 
 #define VSF_USE_AV                                      ENABLED
 
 #define VSF_USE_USB_HOST                                ENABLED
-#define VSF_USE_USB_HOST_HUB                            ENABLED
-#define VSF_USE_USB_HOST_HID                            ENABLED
-#define VSF_USE_USB_HOST_DS4                            ENABLED
-#define VSF_USE_USB_HOST_NSPRO                          ENABLED
-#define VSF_USE_USB_HOST_XB360                          ENABLED
-#define VSF_USE_USB_HOST_XB1                            ENABLED
-#define VSF_USE_USB_HOST_ECM                            DISABLED
-#define VSF_USE_USB_HOST_LIBUSB                         ENABLED
+#define VSF_USBH_USE_HUB                                ENABLED
+#define VSF_USBH_USE_HID                                ENABLED
+#define VSF_USBH_USE_DS4                                ENABLED
+#define VSF_USBH_USE_NSPRO                              ENABLED
+#define VSF_USBH_USE_XB360                              ENABLED
+#define VSF_USBH_USE_XB1                                ENABLED
+#define VSF_USBH_USE_ECM                                DISABLED
+#define VSF_USBH_USE_LIBUSB                             ENABLED
 
 #define VSF_USE_TCPIP                                   DISABLED
 #define VSFIP_CFG_NETIF_HEADLEN                         64
@@ -165,8 +165,8 @@
 #define VSF_USE_TRACE                                   ENABLED
 #define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
-#define VSF_USE_SERVICE_STREAM                          DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
+#define VSF_USE_STREAM                                  DISABLED
+#define VSF_USE_SIMPLE_STREAM                           ENABLED
 
 #define VSF_USE_HEAP                                    ENABLED
 #define VSF_HEAP_CFG_MCB_MAGIC_EN                       ENABLED
@@ -174,11 +174,11 @@
 #if     defined(__M484__)
 #   define VSF_HEAP_SIZE                                0x4000
 #   define VSF_SYSTIMER_FREQ                            (192000000ul)
-#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#   define VSF_USBH_USE_HCD_OHCI                        ENABLED
 #elif   defined(__NUC505__)
 #   define VSF_HEAP_SIZE                                0x4000
 #   define VSF_SYSTIMER_FREQ                            (96000000ul)
-#   define VSF_USE_USB_HOST_HCD_OHCI                    ENABLED
+#   define VSF_USBH_USE_HCD_OHCI                        ENABLED
 #elif   defined(__WIN__)
 #   define VSF_HEAP_SIZE                                0x100000
 //! GetSystemTimeAsFileTime has 100ns resolution, which is 10MHz

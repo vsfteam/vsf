@@ -27,7 +27,7 @@
 // enable the 3 configurations below to use simple implementation for x86
 //  simple implementation will not use ThreadSuspend and ThreadResume and has better CPU usage
 //  **** but preempt is not supported ****
-//  priority configurations below will depend on these, so but it at top
+//  priority configurations are dependent on MACROs below, so put them here(at top)
 //#define VSF_ARCH_PRI_NUM                                1
 //#define VSF_ARCH_SWI_NUM                                0
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
@@ -35,48 +35,56 @@
 //#define __WIN7__
 
 // Application configure
-#define APP_CFG_USE_LINUX_DEMO                          ENABLED
-#   define APP_CFG_USE_LINUX_LIBUSB_DEMO                ENABLED
-#   define APP_CFG_USE_LINUX_MOUNT_FILE_DEMO            ENABLED
-#define APP_CFG_USE_USBH_DEMO                           ENABLED
-#   define APP_CFG_USE_DFU_HOST_DEMO                    ENABLED
-#define APP_CFG_USE_USBD_DEMO                           ENABLED
-#   define APP_CFG_USE_USBD_CDC_DEMO                    ENABLED
-#   define APP_CFG_USE_USBD_MSC_DEMO                    ENABLED
-#   define APP_CFG_USE_USBD_UVC_DEMO                    ENABLED
-#define APP_CFG_USE_SCSI_DEMO                           ENABLED
-#define APP_CFG_USE_AUDIO_DEMO                          ENABLED
-#define APP_CFG_USE_TGUI_DEMO                           ENABLED
-#define APP_CFG_USE_SDL2_DEMO                           ENABLED
-#define APP_CFG_USE_KERNEL_TEST                         ENABLED
-#define APP_CFG_USE_JSON_DEMO                           ENABLED
+#define APP_USE_LINUX_DEMO                              ENABLED
+#   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
+#   define APP_USE_LINUX_MOUNT_FILE_DEMO                ENABLED
+#define APP_USE_USBH_DEMO                               ENABLED
+#   define APP_USE_DFU_HOST_DEMO                        ENABLED
+#define APP_USE_USBD_DEMO                               ENABLED
+#   define APP_USE_USBD_CDC_DEMO                        ENABLED
+#   define APP_USE_USBD_MSC_DEMO                        ENABLED
+#   define APP_USE_USBD_UVC_DEMO                        ENABLED
+#   define APP_USE_USBD_USER_DEMO                       ENABLED
+#define APP_USE_SCSI_DEMO                               ENABLED
+#define APP_USE_AUDIO_DEMO                              ENABLED
+#define APP_USE_TGUI_DEMO                               ENABLED
+#define APP_USE_SDL2_DEMO                               ENABLED
+#define APP_USE_KERNEL_TEST                             ENABLED
+#define APP_USE_JSON_DEMO                               ENABLED
+#define APP_USE_HAL_DEMO                                ENABLED
+#   define APP_USE_HAL_USART_DEMO                       ENABLED
+#define APP_USE_STREAM_HAL_DEMO                         ENABLED
+#   define APP_USE_STREAM_USART_DEMO                    ENABLED
 
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
-#define APP_CFG_USE_CPP_DEMO                            ENABLED
+#define APP_USE_CPP_DEMO                                DISABLED
 #define VSF_LINUX_USE_SIMPLE_LIBC                       DISABLED
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
 #define VSF_USE_SIMPLE_SSCANF                           DISABLED
 #define VSF_USE_SIMPLE_SPRINTF                          DISABLED
 
 // 3rd-party demos
-#define APP_CFG_USE_XBOOT_XUI_DEMO                      DISABLED
-#define APP_CFG_USE_AWTK_DEMO                           ENABLED
-#define APP_CFG_USE_NNOM_DEMO                           ENABLED
-#define APP_CFG_USE_LVGL_DEMO                           ENABLED
+#define APP_USE_XBOOT_XUI_DEMO                          DISABLED
+#define APP_USE_AWTK_DEMO                               ENABLED
+#define APP_USE_NNOM_DEMO                               ENABLED
+#define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES         4
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    256
 #   define APP_LVGL_DEMO_CFG_VER_RES                    256
-#define APP_CFG_USE_BTSTACK_DEMO                        ENABLED
-#define APP_CFG_USE_VSFVM_DEMO                          ENABLED
+#define APP_USE_BTSTACK_DEMO                            ENABLED
+#define APP_USE_VSFVM_DEMO                              ENABLED
 // select one for tcpip stack
-#define APP_CFG_USE_VSFIP_DEMO                          DISABLED
-#define APP_CFG_USE_LWIP_DEMO                           ENABLED
+#define APP_USE_VSFIP_DEMO                              DISABLED
+#define APP_USE_LWIP_DEMO                               ENABLED
+#define APP_USE_SOCKET_DEMO                             ENABLED
+#define APP_USE_GATO_DEMO                               ENABLED
+#define APP_USE_NUKLEAR_DEMO                            ENABLED
 
-#if APP_CFG_USE_TGUI_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
-#   define APP_CFG_USE_FREETYPE_DEMO                    ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+#   define APP_USE_FREETYPE_DEMO                        ENABLED
 #endif
 
 // component configure
@@ -87,12 +95,12 @@
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED
-#   define VSF_USE_DECODER_WAV                          ENABLED
-#   define VSF_AUDIO_CFG_USE_PLAY                       ENABLED
-#   define VSF_AUDIO_CFG_USE_CATURE                     DISABLED
+#   define VSF_AUDIO_USE_DECODER_WAV                    ENABLED
+#   define VSF_AUDIO_USE_PLAY                           ENABLED
+#   define VSF_AUDIO_USE_CATURE                         DISABLED
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_1
-#if APP_CFG_USE_AWTK_DEMO == ENABLED || APP_CFG_USE_LVGL_DEMO == ENABLED || APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED || APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED
 #   if VSF_ARCH_SWI_NUM == 0
 #       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_0
 #   else
@@ -106,40 +114,40 @@
 #endif
 
 #define VSF_USE_INPUT                                   ENABLED
-#   define VSF_USE_INPUT_HID                            ENABLED
-#   define VSF_USE_INPUT_DS4                            ENABLED
-#   define VSF_USE_INPUT_NSPRO                          ENABLED
-#   define VSF_USE_INPUT_XB360                          ENABLED
-#   define VSF_USE_INPUT_XB1                            ENABLED
+#   define VSF_INPUT_USE_HID                            ENABLED
+#   define VSF_INPUT_USE_DS4                            ENABLED
+#   define VSF_INPUT_USE_NSPRO                          ENABLED
+#   define VSF_INPUT_USE_XB360                          ENABLED
+#   define VSF_INPUT_USE_XB1                            ENABLED
 
 // VSF_USE_USB_DEVICE will be enabled if target chip supports USBD
 //#define VSF_USE_USB_DEVICE                              ENABLED
 #   define VSF_USBD_CFG_USE_EDA                         ENABLED
-#   define VSF_USE_USB_DEVICE_CDCACM                    ENABLED
-#   define VSF_USE_USB_DEVICE_MSC                       ENABLED
-#   define VSF_USE_USB_DEVICE_UVC                       ENABLED
+#   define VSF_USBD_USE_CDCACM                          ENABLED
+#   define VSF_USBD_USE_MSC                             ENABLED
+#   define VSF_USBD_USE_UVC                             ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
 #define VSF_USE_MAL                                     ENABLED
-#   define VSF_USE_MEM_MAL                              ENABLED
-#   define VSF_USE_FAKEFAT32_MAL                        ENABLED
-#   define VSF_USE_SCSI_MAL                             ENABLED
-#   define VSF_USE_FILE_MAL                             ENABLED
+#   define VSF_MAL_USE_MEM_MAL                          ENABLED
+#   define VSF_MAL_USE_FAKEFAT32_MAL                    ENABLED
+#   define VSF_MAL_USE_SCSI_MAL                         ENABLED
+#   define VSF_MAL_USE_FILE_MAL                         ENABLED
 
 #define VSF_USE_SCSI                                    ENABLED
-#   define VSF_USE_MAL_SCSI                             ENABLED
+#   define VSF_SCSI_USE_MAL_SCSI                        ENABLED
 
 #define VSF_USE_FS                                      ENABLED
-#   define VSF_USE_MEMFS                                ENABLED
-#   define VSF_USE_FATFS                                ENABLED
+#   define VSF_FS_USE_MEMFS                             ENABLED
+#   define VSF_FS_USE_FATFS                             ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
 #define VSF_USE_LINUX                                   ENABLED
-#   define VSF_USE_LINUX_LIBUSB                         VSF_USE_USB_HOST
-#   define VSF_USE_LINUX_BUSYBOX                        ENABLED
+#   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
+#   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
@@ -148,8 +156,8 @@
 #endif
 #   define USRAPP_CFG_LINUX_TTY                         USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 
-#define VSF_USE_SERVICE_STREAM                          DISABLED
-#define VSF_USE_SERVICE_VSFSTREAM                       ENABLED
+#define VSF_USE_STREAM                                  DISABLED
+#define VSF_USE_SIMPLE_STREAM                           ENABLED
 
 
 #ifndef USRAPP_CFG_DCD_TYPE_DEFAULT
@@ -180,7 +188,7 @@
 #define VSF_SYSTIMER_FREQ                               (0ul)
 
 #define VSF_USE_USB_DEVICE                              ENABLED
-#   define VSF_USE_USB_DEVICE_DCD_USBIP                 ENABLED
+#   define VSF_USBD_USE_DCD_USBIP                       ENABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG               ENABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC       DISABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG_URB           ENABLED
@@ -197,15 +205,17 @@
 #   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 
 #define VSF_USBH_CFG_ENABLE_ROOT_HUB                    DISABLED
-#define VSF_USE_USB_HOST_HUB                            DISABLED
+#define VSF_USBH_USE_HUB                                DISABLED
 #ifdef __WIN7__
 // winusb seems fail on win7
-#   define VSF_USE_USB_HOST_HCD_LIBUSB                  ENABLED
+#   define VSF_USBH_USE_HCD_LIBUSB                      ENABLED
+#       define VSF_LIBUSB_CFG_INSTALL_DRIVER            ENABLED
 #else
-#   define VSF_USE_USB_HOST_HCD_WINUSB                  ENABLED
+#   define VSF_USBH_USE_HCD_WINUSB                      ENABLED
+#       define VSF_WINUSB_CFG_INSTALL_DRIVER            ENABLED
 #endif
 
-#if VSF_USE_USB_HOST_HCD_WINUSB == ENABLED
+#if VSF_USBH_USE_HCD_WINUSB == ENABLED
 #   define VSF_WINUSB_HCD_CFG_DEV_NUM                   8
 #   define VSF_WINUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
 #   define VSF_WINUSB_HCD_DEV0_PID                      0x0001
@@ -232,7 +242,7 @@
 //#   define VSF_WINUSB_HCD_DEV8_VID                      0x045E      // XB1
 //#   define VSF_WINUSB_HCD_DEV8_PID                      0x02EA
 #endif
-#if VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#if VSF_USBH_USE_HCD_LIBUSB == ENABLED
 // for libusb
 //#   define VSF_LIBUSB_CFG_INCLUDE                       "lib\libusb\libusb.h"
 // for libusb-win32
@@ -244,28 +254,24 @@
 #   define VSF_LIBUSB_HCD_DEV1_PID                      0x21E8
 #endif
 
-#define VSF_USE_WINFS                                   ENABLED
+#define VSF_FS_USE_WINFS                                ENABLED
 
-#if APP_CFG_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED
 #   define APP_CFG_TGUI_RES_DIR                         "./winfs_root/ui/"
 #endif
 
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
 #   define APP_CFG_XBOOT_RES_DIR                        "./winfs_root/ui/"
 #endif
 
-#if APP_CFG_USE_JSON_DEMO == ENABLED
-#   define VSF_USE_JSON                                 ENABLED
-#endif
-
-#if APP_CFG_USE_VSFIP_DEMO == ENABLED || APP_CFG_USE_LWIP_DEMO == ENABLED
-#   define VSF_USE_NETDRV_WPCAP                         ENABLED
+#if APP_USE_VSFIP_DEMO == ENABLED || APP_USE_LWIP_DEMO == ENABLED
+#   define VSF_NETDRV_USE_WPCAP                         ENABLED
 #       define VSF_NETDRV_WPCAP_CFG_HW_PRIORITY         vsf_arch_prio_0
 //  TODO: modify the virtual mac address
 #   define APP_NETDRV_WPCAP_CFG_MAC                     0xDC,0xFB,0x48,0x7B,0x9C,0x88
 #endif
 
-#define VSF_USE_DISP_SDL2                               ENABLED
+#define VSF_DISP_USE_SDL2                               ENABLED
 #   define VSF_DISP_SDL2_CFG_INCLUDE                    "lib\SDL2\include\SDL.h"
 #   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
 #   if VSF_ARCH_PRI_NUM == 1
@@ -279,7 +285,7 @@
 #   define APP_DISP_SDL2_COLOR                          VSF_DISP_COLOR_RGB565
 #   define APP_DISP_SDL2_AMPLIFIER                      1
 
-#if APP_CFG_USE_SDL2_DEMO == ENABLED
+#if APP_USE_SDL2_DEMO == ENABLED
 #   define APP_CFG_SDL2_DEMO_COLOR_RGB565
 #endif
 
@@ -313,7 +319,7 @@
 #   define WEAK_VSF_LINUX_CREATE_FHS
 #endif
 
-#if APP_CFG_USE_BTSTACK_DEMO == ENABLED && APP_CFG_USE_USBH_DEMO == ENABLED
+#if APP_USE_BTSTACK_DEMO == ENABLED && APP_USE_USBH_DEMO == ENABLED
 #   define WEAK_VSF_USBH_BTHCI_ON_NEW
 #   define WEAK_VSF_USBH_BTHCI_ON_DEL
 #   define WEAK_VSF_USBH_BTHCI_ON_PACKET
@@ -324,11 +330,11 @@
 #define WEAK_VSF_SCSI_ON_NEW
 #define WEAK_VSF_SCSI_ON_DELETE
 
-#if APP_CFG_USE_USBH_DEMO == ENABLED
+#if APP_USE_USBH_DEMO == ENABLED
 #   define WEAK_VSF_USBH_UAC_ON_NEW
 #endif
 
-#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#if APP_USE_VSFVM_DEMO == ENABLED
 #   define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE
 
 #   define WEAK_VSFVM_SET_BYTECODE_IMP
@@ -336,11 +342,11 @@
 #   define WEAK_VSFVM_GET_BYTECODE_IMP
 #endif
 
-#if APP_CFG_USE_VSFIP_DEMO == ENABLED || APP_CFG_USE_LWIP_DEMO == ENABLED
+#if APP_USE_VSFIP_DEMO == ENABLED || APP_USE_LWIP_DEMO == ENABLED
 #   define WEAK_VSF_PNP_ON_NETDRV_CONNECT
 #   define WEAK_VSF_PNP_ON_NETDRV_CONNECTED
 
-#   if APP_CFG_USE_VSFIP_DEMO == ENABLED
+#   if APP_USE_VSFIP_DEMO == ENABLED
 #       define WEAK_VSFIP_DHCPC_ON_FINISH
 
 #       define WEAK_VSFIP_MEM_SOCKET_GET

@@ -78,11 +78,11 @@
         }
 #endif
 
-#define VSF_TGUI_CTRL_STATUS_INITIALISED                _BV(0)
-#define VSF_TGUI_CTRL_STATUS_ENABLED                    _BV(1)
-#define VSF_TGUI_CTRL_STATUS_VISIBLE                    _BV(2)
-#define VSF_TGUI_CTRL_STATUS_ACTIVE                     _BV(3)
-#define VSF_TGUI_CTRL_STATUS_HIDE_CONTAINER_CONTENT     _BV(4)
+#define VSF_TGUI_CTRL_STATUS_INITIALISED                BIT(0)
+#define VSF_TGUI_CTRL_STATUS_ENABLED                    BIT(1)
+#define VSF_TGUI_CTRL_STATUS_VISIBLE                    BIT(2)
+#define VSF_TGUI_CTRL_STATUS_ACTIVE                     BIT(3)
+#define VSF_TGUI_CTRL_STATUS_HIDE_CONTAINER_CONTENT     BIT(4)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -511,10 +511,10 @@ def_class(__vsf_tgui_control_core_t,
             vsf_tgui_control_t *ptAlignTo;
 
             /* \note Only following mode supported:
-                    VSF_TGUI_ALIGN_LEFT     = _BV(0),
-                    VSF_TGUI_ALIGN_RIGHT    = _BV(1),
-                    VSF_TGUI_ALIGN_TOP      = _BV(2),
-                    VSF_TGUI_ALIGN_BOTTOM   = _BV(3),
+                    VSF_TGUI_ALIGN_LEFT     = BIT(0),
+                    VSF_TGUI_ALIGN_RIGHT    = BIT(1),
+                    VSF_TGUI_ALIGN_TOP      = BIT(2),
+                    VSF_TGUI_ALIGN_BOTTOM   = BIT(3),
              */
             vsf_tgui_align_mode_t  tMode;
         } tAlign;
@@ -679,11 +679,11 @@ bool vsf_tgui_timer_is_working(vsf_tgui_timer_t *ptTimer);
 /*----------------------------------------------------------------------------*
  *  Region                                                                    *
  *----------------------------------------------------------------------------*/
-extern 
+extern
 vsf_tgui_location_t *vsf_tgui_control_get_location(
                                     const vsf_tgui_control_t* control_ptr);
 
-extern 
+extern
 vsf_tgui_size_t *vsf_tgui_control_get_size(
                                     const vsf_tgui_control_t* control_ptr);
 
@@ -804,7 +804,7 @@ bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *control_ptr,
 #endif
 
 extern
-bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr, 
+bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr,
                                     vsf_tgui_evt_t event);
 
 extern

@@ -60,7 +60,7 @@ extern const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles;
 
 fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* container_ptr)
 {
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) container init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t *)container_ptr), container_ptr);
 #endif
@@ -182,7 +182,7 @@ fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
     VSF_TGUI_ASSERT(container_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) container rendering" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t *)container_ptr), container_ptr);
 #endif

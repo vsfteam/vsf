@@ -23,43 +23,43 @@
 #include "vsf.h"
 
 #if     VSF_USE_USB_DEVICE == ENABLED                                           \
-    &&  (   VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED                         \
-        ||  VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED                            \
-        ||  VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED)
+    &&  (   VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                               \
+        ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED                                  \
+        ||  VSF_USBD_USE_DCD_USBIP == ENABLED)
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct usrapp_usbd_common_const_t {
-#if VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED
+#if VSF_USBD_USE_DCD_USBIP == ENABLED
     vk_usbip_dcd_param_t usbip_dcd_param;
 #endif
-#if VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED
+#if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
     vk_musb_fdrc_dcd_param_t musb_fdrc_dcd_param;
 #endif
-#if VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED
+#if VSF_USBD_USE_DCD_DWCOTG == ENABLED
     vk_dwcotg_dcd_param_t dwcotg_dcd_param;
 #endif
 } usrapp_usbd_common_const_t;
 
 typedef struct usrapp_usbd_common_t {
-#if VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED
+#if VSF_USBD_USE_DCD_USBIP == ENABLED
     vk_usbip_dcd_t usbip_dcd;
 #endif
-#if VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED
+#if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
     vk_musb_fdrc_dcd_t musb_fdrc_dcd;
 #endif
-#if VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED
+#if VSF_USBD_USE_DCD_DWCOTG == ENABLED
     vk_dwcotg_dcd_t dwcotg_dcd;
 #endif
 } usrapp_usbd_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if     VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED                             \
-    ||  VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED                                \
-    ||  VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED
+#if     VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                                   \
+    ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED                                      \
+    ||  VSF_USBD_USE_DCD_USBIP == ENABLED
 extern const i_usb_dc_t VSF_USB_DC0;
 #endif
 
@@ -70,6 +70,6 @@ extern const i_usb_dc_t VSF_USB_DC0;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_DCD_[IP]
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_DCD_[IP]
 #endif      // __USRAPP_USBD_COMMON_H__
 /* EOF */

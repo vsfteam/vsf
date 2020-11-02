@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_LIBUSB == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_LIBUSB == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_HCD__
 #define __VSF_USBH_CLASS_IMPLEMENT_HUB__
@@ -35,7 +35,11 @@
 #   include VSF_LIBUSB_CFG_INCLUDE
 #endif
 
-/*============================ MACROS ========================================*/
+#if defined(__WIN__) && VSF_LIBUSB_CFG_INSTALL_DRIVER == ENABLED
+#   include "libwdi.h"
+#endif
+
+/*=================== replacement for libusb 1.0 APIs ========================*/
 
 #ifndef LIBUSB_API_VERSION
 // seems libusb 0.1
@@ -65,7 +69,7 @@ enum libusb_error {
 #define libusb_close                    usb_close
 // TODO: usb_reset will make device handle invalid
 //#define libusb_reset_device             usb_reset
-#define libusb_reset_device             
+#define libusb_reset_device
 #define libusb_claim_interface          usb_claim_interface
 #define libusb_control_transfer         usb_control_msg
 
@@ -168,6 +172,8 @@ int LIBUSB_CALL libusb_interrupt_transfer(libusb_device_handle *dev_handle,
 }
 
 #endif
+
+/*============================ MACROS ========================================*/
 
 // TODO: remove to user configuration
 //#define VSF_LIBUSB_HCD_CFG_TRACE_URB_EN             ENABLED
@@ -303,7 +309,7 @@ static vk_libusb_hcd_t __vk_libusb_hcd = {
 static void __vk_libusb_hcd_trace_urb(vk_usbh_hcd_urb_t *urb, char *msg)
 {
     vk_usbh_pipe_t pipe = urb->pipe;
-    vsf_trace(VSF_TRACE_INFO, "libusb_urb EP%d_%s(%08X): %s\r\n", pipe.endpoint,
+    vsf_trace_info("libusb_urb EP%d_%s(%08X): %s\r\n", pipe.endpoint,
         pipe.dir_in1out0 ? "IN" : "OUT", urb, msg);
 }
 #endif
@@ -311,19 +317,63 @@ static void __vk_libusb_hcd_trace_urb(vk_usbh_hcd_urb_t *urb, char *msg)
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
 static void __vk_libusb_hcd_trace_dev_irq(vk_libusb_hcd_dev_t *libusb_dev, char *msg)
 {
-    vsf_trace(VSF_TRACE_INFO, "libusb_dev_irq(%08X): %s\r\n", &libusb_dev->irq_thread, msg);
+    vsf_trace_info("libusb_dev_irq(%08X): %s\r\n", &libusb_dev->irq_thread, msg);
 }
 
 static void __vk_libusb_hcd_trace_hcd_irq(char *msg)
 {
-    vsf_trace(VSF_TRACE_INFO, "libusb_hcd_irq(%08X): %s\r\n", &__vk_libusb_hcd.init_thread, msg);
+    vsf_trace_info("libusb_hcd_irq(%08X): %s\r\n", &__vk_libusb_hcd.init_thread, msg);
 }
 
 static void __vk_libusb_hcd_trace_urb_irq(vk_usbh_hcd_urb_t *urb, char *msg)
 {
     vk_usbh_pipe_t pipe = urb->pipe;
-    vsf_trace(VSF_TRACE_INFO, "libusb_urb EP%d_%s(%08X): irq %s\r\n", pipe.endpoint,
+    vsf_trace_info("libusb_urb EP%d_%s(%08X): irq %s\r\n", pipe.endpoint,
         pipe.dir_in1out0 ? "IN" : "OUT", urb, msg);
+}
+#endif
+
+#if defined(__WIN__) && VSF_LIBUSB_CFG_INSTALL_DRIVER == ENABLED
+static bool __vk_libusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool force)
+{
+    struct wdi_options_create_list cl_options = {
+        .list_all           = TRUE,
+        .list_hubs          = TRUE,
+        .trim_whitespaces   = TRUE,
+    };
+    struct wdi_options_prepare_driver pd_options = {
+#   ifndef LIBUSB_API_VERSION
+        .driver_type        = WDI_LIBUSB0,
+#   else
+        .driver_type        = WDI_WINUSB,
+#   endif
+    };
+    struct wdi_device_info *device, *list;
+    int r = WDI_ERROR_OTHER;
+
+    wdi_set_log_level(3);
+    r = wdi_create_list(&list, &cl_options);
+    if (r != WDI_SUCCESS) {
+        return false;
+    }
+
+    for (device = list; device != NULL; device = device->next) {
+        if (    (device->vid == vid) && (device->pid == pid) && !device->is_composite
+            &&  (   force ||
+#   ifndef LIBUSB_API_VERSION
+                    strcmp(device->driver, "libusb0")
+#   else
+                    strcmp(device->driver, "WinUSB")
+#   endif
+                )) {
+            if (wdi_prepare_driver(device, "usb_driver", "libusb_device.inf", &pd_options) == WDI_SUCCESS) {
+                wdi_install_driver(device, "usb_driver", "libusb_device.inf", NULL);
+            }
+            break;
+        }
+    }
+    wdi_destroy_list(list);
+    return true;
 }
 #endif
 
@@ -404,8 +454,7 @@ static int __vk_libusb_hcd_init(void)
 
     err = libusb_init(&__vk_libusb_hcd.ctx);
     if (err < 0) {
-        vsf_trace(VSF_TRACE_ERROR,
-            "fail to init libusb, errcode is %d\r\n", err);
+        vsf_trace_error("fail to init libusb, errcode is %d\r\n", err);
         return err;
     }
 
@@ -642,6 +691,9 @@ static void __vk_libusb_hcd_init_thread(void *arg)
         vk_libusb_hcd_dev_t *libusb_dev = &__vk_libusb_hcd.devs[0];
         for (int i = 0; i < dimof(__vk_libusb_hcd.devs); i++, libusb_dev++) {
             if ((NULL == libusb_dev->handle) && (0 == libusb_dev->evt_mask.value)) {
+#if defined(__WIN__) && VSF_LIBUSB_CFG_INSTALL_DRIVER == ENABLED
+                __vk_libusb_ensure_driver(libusb_dev->vid, libusb_dev->pid, false);
+#endif
                 libusb_dev->handle = libusb_open_device_with_vid_pid(
                     __vk_libusb_hcd.ctx, libusb_dev->vid, libusb_dev->pid);
                 if (libusb_dev->handle != NULL) {
@@ -678,6 +730,7 @@ static bool __vk_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
         __vk_libusb_hcd_trace_urb(urb, "freed");
 #endif
+        vk_usbh_hcd_urb_free_buffer(urb);
         vsf_usbh_free(urb);
         return true;
     }
@@ -851,7 +904,7 @@ static void __vk_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 }
                 break;
             }
-        }   
+        }
     }
 }
 

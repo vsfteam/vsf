@@ -32,19 +32,19 @@ typedef struct usbh_demo_const_t usbh_demo_const_t;
 struct usbh_demo_t {
     struct {
         vk_usbh_t host;
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
         vk_usbh_class_t hub;
 #endif
-#if VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USBH_USE_ECM == ENABLED
         vk_usbh_class_t ecm;
 #endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
+#if VSF_USBH_USE_BTHCI == ENABLED
         vk_usbh_class_t bthci;
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
         vk_usbh_class_t hid;
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
         vk_usbh_class_t ds4;
 #endif
     } usbh;
@@ -66,19 +66,19 @@ static usbh_demo_t usbh_demo = {
         .host.drv               = &vk_ohci_drv,
         .host.param             = (void *)&usbh_demo_const.usbh.ohci_param,
 
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
         .hub.drv                = &vk_usbh_hub_drv,
 #endif
-#if VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USBH_USE_ECM == ENABLED
         .ecm.drv                = &vk_usbh_ecm_drv,
 #endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
+#if VSF_USBH_USE_BTHCI == ENABLED
         .bthci.drv              = &vk_usbh_bthci_drv,
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
         .hid.drv                = &vk_usbh_hid_drv,
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
         .ds4.drv                = &vk_usbh_ds4_drv,
 #endif
     },
@@ -91,19 +91,19 @@ void usbh_demo_start(void)
 {
     vk_ohci_init();
     vk_usbh_init(&usbh_demo.usbh.host);
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
     vk_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.hub);
 #endif
-#if VSF_USE_USB_HOST_ECM == ENABLED
+#if VSF_USBH_USE_ECM == ENABLED
     vk_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.ecm);
 #endif
-#if VSF_USE_USB_HOST_BTHCI == ENABLED
+#if VSF_USBH_USE_BTHCI == ENABLED
     vk_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.bthci);
 #endif
-#if VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USBH_USE_HID == ENABLED
     vk_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.hid);
 #endif
-#if VSF_USE_USB_HOST_DS4 == ENABLED
+#if VSF_USBH_USE_DS4 == ENABLED
     vk_usbh_register_class(&usbh_demo.usbh.host, &usbh_demo.usbh.ds4);
 #endif
 }

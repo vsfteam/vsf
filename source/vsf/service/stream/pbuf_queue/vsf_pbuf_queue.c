@@ -19,7 +19,7 @@
 #define __VSF_PBUF_QUEUE_CLASS_IMPLEMENT
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 #include "./vsf_pbuf_queue.h"
 
 

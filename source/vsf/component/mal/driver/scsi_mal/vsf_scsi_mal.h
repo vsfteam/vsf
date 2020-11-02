@@ -22,7 +22,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_SCSI == ENABLED && VSF_USE_SCSI_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_USE_SCSI == ENABLED && VSF_MAL_USE_SCSI_MAL == ENABLED
 
 #include "component/scsi/vsf_scsi.h"
 
@@ -72,5 +72,5 @@ extern const vk_mal_drv_t vk_scsi_mal_drv;
 }
 #endif
 
-#endif      // VSF_USE_MAL && VSF_USE_SCSI && VSF_USE_SCSI_MAL
+#endif      // VSF_USE_MAL && VSF_USE_SCSI && VSF_MAL_USE_SCSI_MAL
 #endif      // __VSF_SCSI_MAL_H__

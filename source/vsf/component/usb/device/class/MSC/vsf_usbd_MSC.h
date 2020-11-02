@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_MSC == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_MSC == ENABLED
 
 #include "component/usb/common/class/MSC/vsf_usb_MSC.h"
 #include "./vsf_usbd_MSC_desc.h"
@@ -55,7 +55,7 @@ extern "C" {
 
 #define USB_MSC_IFS_NUM             1
 #define USB_MSCBOT_IFS_NUM          USB_MSC_IFS_NUM
-#define USB_MSC_IFS(__MSC_PARAM)    __USB_IFS(&vk_usbd_msc, &(__MSC_PARAM))
+#define USB_MSC_IFS(__MSC_PARAM)    USB_IFS(&vk_usbd_msc, &(__MSC_PARAM))
 
 
 
@@ -123,5 +123,5 @@ extern const vk_usbd_class_op_t vk_usbd_msc;
 }
 #endif
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_MSC
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_MSC
 #endif      // __VSF_USBD_MSC_H__

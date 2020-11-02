@@ -31,13 +31,13 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(__NAME, __BITOFFSET, __BITLEN, __IS_SIGNED, __CONFIG)\
-            [__CONNECT2(GAMEPAD_ID_, __NAME)] = VSF_INPUT_ITEM_EX(                 \
-                __CONNECT2(GAMEPAD_ID_, __NAME),                                   \
+            [__CONNECT2(GAMEPAD_ID_, __NAME)] = VSF_INPUT_ITEM_EX(              \
+                __CONNECT2(GAMEPAD_ID_, __NAME),                                \
                 (__BITOFFSET), (__BITLEN), (__IS_SIGNED), (__CONFIG))
 
 #define VSF_GAMEPAD_DEF_ITEM_INFO(__NAME, __BITOFFSET, __BITLEN, __IS_SIGNED)   \
-            [__CONNECT2(GAMEPAD_ID_, __NAME)] = VSF_INPUT_ITEM(                    \
-                __CONNECT2(GAMEPAD_ID_, __NAME),                                   \
+            [__CONNECT2(GAMEPAD_ID_, __NAME)] = VSF_INPUT_ITEM(                 \
+                __CONNECT2(GAMEPAD_ID_, __NAME),                                \
                 (__BITOFFSET), (__BITLEN), (__IS_SIGNED))
 
 /*============================ TYPES =========================================*/

@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 
 #define __VSF_STREAM_BASE_CLASS_IMPLEMENT
 #include "./vsf_stream.h"

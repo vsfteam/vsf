@@ -84,11 +84,11 @@ typedef enum vsf_msgt_node_status_t {
     __VSF_MSGT_NODE_STATUS_LEAST_MAX    = INT16_MAX,
     __VSF_MSGT_NODE_STATUS_LEAST_MIN    = INT16_MIN,
 
-    VSF_MSGT_NODE_VALID                 = _BV(0),                               //!< whether the node is valid/initialised or not
-    VSF_MSGT_NODE_ENABLED               = _BV(1),                               //!< whether the node is enabled or not
-    VSF_MSGT_NODE_VISIBLE               = _BV(2),                               //!< whether the node is visible
-    VSF_MSGT_NODE_ACTIVE                = _BV(3),
-    VSF_MSGT_NODE_HIDE_CONTENT          = _BV(4),                               //!< whether hide the content inside container
+    VSF_MSGT_NODE_VALID                 = BIT(0),                               //!< whether the node is valid/initialised or not
+    VSF_MSGT_NODE_ENABLED               = BIT(1),                               //!< whether the node is enabled or not
+    VSF_MSGT_NODE_VISIBLE               = BIT(2),                               //!< whether the node is visible
+    VSF_MSGT_NODE_ACTIVE                = BIT(3),
+    VSF_MSGT_NODE_HIDE_CONTENT          = BIT(4),                               //!< whether hide the content inside container
 }vsf_msgt_node_status_t;
 
 typedef enum vsf_msgt_handler_type_t {
@@ -286,7 +286,7 @@ void vsf_msgt_forward_propagate_msg_pre_order_traversal_init(vsf_msgt_t* obj_ptr
 SECTION(".text.vsf.osa_service.msg_tree"
         ".vsf_msgt_forward_propagate_msg_pre_order_traversal_setting")
 extern
-void vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(vsf_msgt_t* obj_ptr, 
+void vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(vsf_msgt_t* obj_ptr,
                                                 bool is_support_container_post_handling);
 
 SECTION(".text.vsf.osa_service.msg_tree"
@@ -300,14 +300,14 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern
-void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* obj_ptr, 
-                                                uint16_t *fifo_buffer_ptr, 
+void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* obj_ptr,
+                                                uint16_t *fifo_buffer_ptr,
                                                 uint_fast16_t buff_size,
                                                 bool is_support_container_post_handling);
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs_setting")
 extern
-void vsf_msgt_forward_propagate_msg_bfs_setting(vsf_msgt_t* obj_ptr, 
+void vsf_msgt_forward_propagate_msg_bfs_setting(vsf_msgt_t* obj_ptr,
                                                 bool is_support_container_post_handling);
 
 SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")

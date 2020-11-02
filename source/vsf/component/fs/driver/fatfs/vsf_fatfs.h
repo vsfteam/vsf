@@ -22,7 +22,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_FATFS == ENABLED
 
 #include "../malfs/vsf_malfs.h"
 
@@ -151,5 +151,5 @@ extern bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser);
 }
 #endif
 
-#endif      // VSF_USE_FS && VSF_USE_FATFS
+#endif      // VSF_USE_FS && VSF_FS_USE_FATFS
 #endif      // __VSF_FATFS_H__

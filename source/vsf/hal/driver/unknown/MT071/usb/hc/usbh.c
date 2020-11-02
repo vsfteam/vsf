@@ -20,6 +20,8 @@
 #include "../../common.h"
 #include "./usbh.h"
 
+#if VSF_HAL_USE_USBH == ENABLED
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -34,7 +36,10 @@ extern void __mt071_usb_irq(mt071_usb_t *usb);
 
 vsf_err_t mt071_usbh_init(mt071_usb_t *hc, usb_hc_ip_cfg_t *cfg)
 {
+#if VSF_HAL_USE_USBD == ENABLED
+    // hc->is_host only exists when both host and device modes are enabled
     hc->is_host = true;
+#endif
     hc->callback.irq_handler = cfg->irq_handler;
     hc->callback.param = cfg->param;
 
@@ -43,7 +48,7 @@ vsf_err_t mt071_usbh_init(mt071_usb_t *hc, usb_hc_ip_cfg_t *cfg)
     RCC->USBCLKUEN = 0;
     RCC->USBCLKUEN = 1;
     RCC->PDRUNCFG &= ~RCC_PDRUNCFG_USB;
-    RCC->AHBCLKCTRL0_SET = SYNC_CLK_USB_msk;
+    RCC->AHBCLKCTRL0_SET = SCLK_USB_MSK;
 
     // no info in doc, do same as sample code in official sdk
     RCC->USBCTRL = 0x1170;
@@ -64,3 +69,5 @@ void mt071_usbh_irq(mt071_usb_t *hc)
 {
     __mt071_usb_irq(hc);
 }
+
+#endif      // VSF_HAL_USE_USBH

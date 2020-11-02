@@ -22,9 +22,8 @@
 
 #include "../../vsf_input_cfg.h"
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_HID == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
 
-#include "component/input/vsf_input.h"
 #include "../../vsf_input_get_type.h"
 #include "utilities/vsf_utilities.h"
 
@@ -138,7 +137,7 @@ typedef struct vk_input_hid_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint_fast32_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t desc_len);
+extern uint_fast8_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t desc_len);
 extern void vk_hid_process_input(vk_input_hid_t *dev, uint8_t *buf, uint_fast32_t len);
 extern void vk_hid_new_dev(vk_input_hid_t *dev);
 extern void vk_hid_free_dev(vk_input_hid_t *dev);
@@ -149,5 +148,5 @@ extern void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt);
 }
 #endif
 
-#endif      // VSF_USE_INPUT && VSF_USE_INPUT_HID
+#endif      // VSF_USE_INPUT && VSF_INPUT_USE_HID
 #endif      // __VSF_INPUT_HID_H__

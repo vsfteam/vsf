@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HUB == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__

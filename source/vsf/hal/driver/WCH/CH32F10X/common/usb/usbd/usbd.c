@@ -192,8 +192,7 @@ static void __ch32f10x_usbd_trace(vsf_usbd_trace_t item)
         __trace_items[__trace_pos++] = item;
     }
 #   elif CH32F10X_USBD_CFG_TRACE == CH32F10X_USBD_CFG_TRACE_SYS
-    vsf_trace(VSF_TRACE_DEBUG, "usbd: %s" VSF_TRACE_CFG_LINEEND,
-                __ch32f10x_usbd_trace_str[item]);
+    vsf_trace_debug("usbd: %s" VSF_TRACE_CFG_LINEEND, __ch32f10x_usbd_trace_str[item]);
 #   endif
 }
 #else

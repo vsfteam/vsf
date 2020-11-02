@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_HCD__
@@ -43,8 +43,7 @@ typedef struct vk_musb_fdrc_hcd_t {
         MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR,
         MUSB_FDRC_HCD_STATE_CONNECTED,
     } state;
-    uint8_t epidx_cur;
-    uint8_t errcode_cur;
+    uint8_t epnum;
 
     // ep_in_mask and ep_out_mask is used to mask the ep_idx used
     uint16_t ep_in_mask;
@@ -53,23 +52,16 @@ typedef struct vk_musb_fdrc_hcd_t {
     vsf_teda_t teda;
     vk_usbh_hcd_t *hcd;
     vk_usbh_dev_t *dev;
-    vk_usbh_hcd_urb_t *urb_cur;
 
     // singleton device
-    union {
-        struct {
-            // ep_out to ep_idx
-            int8_t ep_out_idx[16];
-            // ep_in to ep_idx
-            int8_t ep_in_idx[16];
-        };
-        int8_t ep_idx[32];
+    struct {
+        vsf_slist_t urb_list;
     } dev_priv;
 } vk_musb_fdrc_hcd_t;
 
 typedef struct vk_musb_fdrc_urb_t {
-    vsf_dlist_node_t urb_node;
-    uint8_t epidx;
+    vsf_slist_node_t urb_node;
+    int8_t epidx;
     enum vk_musb_fdrc_urb_state_t {
         MUSB_FDRC_URB_STATE_IDLE,
         MUSB_FDRC_URB_STATE_START_SUBMITTING,
@@ -83,15 +75,19 @@ typedef struct vk_musb_fdrc_urb_t {
         MUSB_FDRC_USBH_EP0_STATUS,
     } ep0_state;
     uint16_t cur_size;
+    uint16_t fifo;
 } vk_musb_fdrc_urb_t;
 
 typedef enum vk_musb_fdrc_hcd_evt_t {
-    VSF_MUSB_FDRC_HCD_EVT_EP        = VSF_EVT_USER + 0,
-    VSF_MUSB_FDRC_HCD_EVT_CONN      = VSF_EVT_USER + 1,
-    VSF_MUSB_FDRC_HCD_EVT_DISCONN   = VSF_EVT_USER + 2,
+    VSF_MUSB_FDRC_HCD_EVT_EP        = VSF_EVT_USER + 0x000,
+    VSF_MUSB_FDRC_HCD_EVT_CONN      = VSF_EVT_USER + 0x100,
+    VSF_MUSB_FDRC_HCD_EVT_DISCONN   = VSF_EVT_USER + 0x200,
 } vk_musb_fdrc_hcd_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
+
+extern uint_fast16_t vsf_musb_fdrc_hcd_alloc_fifo(vk_usbh_hcd_t *hcd, vk_usbh_pipe_t pipe);
+extern void vsf_musb_fdrc_hcd_free_fifo(vk_usbh_hcd_t *hcd, uint_fast16_t fifo);
 
 static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_musb_fdrc_hcd_fini(vk_usbh_hcd_t *hcd);
@@ -120,19 +116,35 @@ const vk_usbh_hcd_drv_t vk_musb_fdrc_hcd_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vk_musb_fdrc_hcd_free_ep(vk_musb_fdrc_hcd_t *musb, uint_fast8_t idx, bool is_in)
+#ifndef WEAK_VSF_DWCOTG_HCD_ALLOC_FIFO
+WEAK(vsf_musb_fdrc_hcd_alloc_fifo)
+uint_fast16_t vsf_musb_fdrc_hcd_alloc_fifo(vk_usbh_hcd_t *hcd, vk_usbh_pipe_t pipe)
 {
-    VSF_USB_ASSERT(idx != 0);
-    vk_musb_fdrc_reg_t *reg = musb->reg;
-    vsf_protect_t orig = vsf_protect_sched();
-        if (is_in) {
-            vk_musb_fdrc_clear_mask(&reg->Common.IntrRx1E, idx);
-            musb->ep_in_mask &= ~(1 << idx);
-        } else {
-            vk_musb_fdrc_clear_mask(&reg->Common.IntrTx1E, idx);
-            musb->ep_out_mask &= ~(1 << idx);
+    VSF_USB_ASSERT(false);
+    return 0;
+}
+#endif
+
+#ifndef WEAK_VSF_DWCOTG_HCD_FREE_FIFO
+WEAK(vsf_musb_fdrc_hcd_free_fifo)
+void vsf_musb_fdrc_hcd_free_fifo(vk_usbh_hcd_t *hcd, uint_fast16_t fifo)
+{
+    VSF_USB_ASSERT(false);
+}
+#endif
+
+vk_usbh_hcd_urb_t *__vk_musb_fdrc_hcd_get_urb(vk_musb_fdrc_hcd_t *musb, uint_fast8_t epidx)
+{
+    if (!(epidx & 0x0F)) {
+        epidx = 0;
+    }
+
+    __vsf_slist_foreach_unsafe(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list) {
+        if (_->epidx == epidx) {
+            return container_of(_, vk_usbh_hcd_urb_t, priv);
         }
-    vsf_unprotect_sched(orig);
+    }
+    return NULL;
 }
 
 static void __vk_musb_fdrc_hcd_interrupt(void *param)
@@ -165,48 +177,44 @@ static void __vk_musb_fdrc_hcd_interrupt(void *param)
 
     // EP interrupt
     // lower 16-bit is ep_out, higher 16-bit is ep_in
+    status = 0;
     status =    (vk_musb_fdrc_get_mask(&reg->Common.IntrTx1) << 0)
             |   (vk_musb_fdrc_get_mask(&reg->Common.IntrRx1) << 16);
     status &=   (vk_musb_fdrc_get_mask(&reg->Common.IntrTx1E) << 0)
             |   (vk_musb_fdrc_get_mask(&reg->Common.IntrRx1E) << 16);
 
-    if (status > 0) {
-        uint_fast8_t epidx = musb->epidx_cur & 0x0F;
-        bool is_in = (musb->epidx_cur & 0x80) > 0;
-        uint_fast32_t mask = (1 << epidx) << (is_in ? 16 : 0);
-
-        VSF_USB_ASSERT(status == mask);
-        if (0 == epidx) {
-            musb->errcode_cur = reg->EP0.CSR0 & MUSBH_CSR0_ERRMASK;
-            reg->EP0.CSR0 &= ~MUSBH_CSR0_ERRMASK;
-        } else if (is_in) {
-            musb->errcode_cur = reg->EPN.RxCSR1 & MUSBH_RXCSR1_ERRMASK;
-            reg->EPN.RxCSR1 &= ~MUSBH_RXCSR1_ERRMASK;
-        } else {
-            musb->errcode_cur = reg->EPN.TxCSR1 & MUSBH_TXCSR1_ERRMASK;
-            reg->EPN.TxCSR1 &= ~MUSBH_TXCSR1_ERRMASK;
-        }
-        vsf_eda_post_evt(&musb->teda.use_as__vsf_eda_t, VSF_MUSB_FDRC_HCD_EVT_EP);
+    while (status > 0) {
+        uint_fast8_t ep = ffs(status);
+        status &= ~(1 << ep);
+        vsf_eda_post_evt(&musb->teda.use_as__vsf_eda_t, VSF_MUSB_FDRC_HCD_EVT_EP + ep);
     }
 }
 
 static void __vk_musb_fdrc_hcd_free_urb_do(vk_musb_fdrc_hcd_t *musb, vk_usbh_hcd_urb_t *urb)
 {
+    vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_musb_fdrc_hcd_free_fifo(musb->hcd, musb_urb->fifo);
+    vsf_unprotect_sched(orig);
+
+    vk_usbh_hcd_urb_free_buffer(urb);
     vsf_usbh_free(urb);
 }
 
 // TODO: verify ZLP indicated by urb->transfer_flags with URB_ZERO_PACKET
-static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
+static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hcd_urb_t *urb)
 {
     vk_musb_fdrc_reg_t *reg = musb->reg;
-    vk_usbh_hcd_urb_t *urb = musb->urb_cur;
     vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
 
     vk_usbh_pipe_t pipe = urb->pipe;
     bool is_iso = pipe.type == USB_ENDPOINT_XFER_ISOC;
     bool is_in = pipe.dir_in1out0 > 0;
-    uint_fast16_t epsize = pipe.size + (is_iso ? 1 : 0);
+    uint_fast16_t epsize = pipe.size;
     uint8_t *buffer = urb->buffer;
+    uint_fast8_t errcode = 0;
+
+    vk_musb_fdrc_set_ep(reg, musb_urb->epidx & 0x0F);
 
     switch (musb_urb->state) {
     case MUSB_FDRC_URB_STATE_START_SUBMITTING:
@@ -214,9 +222,6 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
 
         urb->actual_length = 0;
         urb->status = VSF_ERR_NONE;
-        VSF_USB_ASSERT(reg->Common.FAddr == pipe.address);
-        vk_musb_fdrc_set_ep(reg, musb_urb->epidx);
-        musb->epidx_cur = musb_urb->epidx;
 
         if (0 == pipe.endpoint) {
             musb_urb->ep0_state = MUSB_FDRC_USBH_EP0_SETUP;
@@ -226,8 +231,6 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
             break;
         } else {
             if (is_in) {
-                musb->epidx_cur |= 0x80;
-
                 reg->EPN.RxType = (pipe.type << 4) | pipe.endpoint;
                 reg->EPN.RxMAXP = (epsize + 7) >> 3;
                 if (is_iso) {
@@ -236,9 +239,8 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
                     reg->EPN.RxInterval = 0;
                 }
 
-                // FIFO start from 128 with 1024 size
-                reg->EPN.RxFIFO1 = 128 >> 3;
-                reg->EPN.RxFIFO2 = 3 << 5;
+                reg->EPN.RxFIFO1 = (musb_urb->fifo >> 0) & 0xFF;
+                reg->EPN.RxFIFO2 = (musb_urb->fifo >> 8) & 0xFF;
                 reg->EPN.RxCSR1 |= MUSBH_RXCSR1_FLUSHFIFO;
             } else {
                 reg->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
@@ -249,15 +251,20 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
                     reg->EPN.TxInterval = 0;
                 }
 
-                // FIFO start from 128 with 1024 size
-                reg->EPN.TxFIFO1 = 128 >> 3;
-                reg->EPN.TxFIFO2 = 3 << 5;
+                reg->EPN.TxFIFO1 = (musb_urb->fifo >> 0) & 0xFF;
+                reg->EPN.TxFIFO2 = (musb_urb->fifo >> 8) & 0xFF;
             }
             goto do_tx_rx;
         }
         // fall through
     case MUSB_FDRC_URB_STATE_SUBMITTING:
         if (0 == pipe.endpoint) {
+            errcode = reg->EP0.CSR0 & MUSBH_CSR0_ERRMASK;
+            reg->EP0.CSR0 &= ~MUSBH_CSR0_ERRMASK;
+            if (errcode) {
+                return VSF_ERR_FAIL;
+            }
+
             switch (musb_urb->ep0_state) {
             case MUSB_FDRC_USBH_EP0_SETUP:
                 musb_urb->ep0_state = MUSB_FDRC_USBH_EP0_DATA;
@@ -267,8 +274,8 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
                     musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, 0);
                     if (musb_urb->cur_size > 0) {
                         vk_musb_fdrc_read_fifo(reg, 0, &buffer[urb->actual_length], musb_urb->cur_size);
-                        reg->EP0.CSR0 &= ~MUSBH_CSR0_RXPKTRDY;
                     }
+                    reg->EP0.CSR0 &= ~MUSBH_CSR0_RXPKTRDY;
                 }
                 urb->actual_length += musb_urb->cur_size;
                 if (is_in && (musb_urb->cur_size < epsize)) {
@@ -293,6 +300,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
                         reg->EP0.CSR0 |= MUSBH_CSR0_REQPKT;
                     } else {
                         vk_musb_fdrc_write_fifo(reg, 0, &buffer[urb->actual_length], musb_urb->cur_size);
+                        reg->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_TXPKTRDY);
                         reg->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY;
                     }
                 }
@@ -301,12 +309,23 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
                 goto urb_finished;
             }
         } else {
+            if (is_in) {
+                errcode = reg->EPN.RxCSR1 & MUSBH_RXCSR1_ERRMASK;
+                reg->EPN.RxCSR1 &= ~MUSBH_RXCSR1_ERRMASK;
+            } else {
+                errcode = reg->EPN.TxCSR1 & MUSBH_TXCSR1_ERRMASK;
+                reg->EPN.TxCSR1 &= ~MUSBH_TXCSR1_ERRMASK;
+            }
+            if (errcode) {
+                return VSF_ERR_FAIL;
+            }
+
             if ((musb_urb->cur_size > 0) && is_in) {
-                musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, musb_urb->epidx);
+                musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, musb_urb->epidx & 0x0F);
                 if (musb_urb->cur_size > 0) {
-                    vk_musb_fdrc_read_fifo(reg, musb_urb->epidx, &buffer[urb->actual_length], musb_urb->cur_size);
-                    reg->EPN.RxCSR1 &= ~MUSBH_RXCSR1_RXPKTRDY;
+                    vk_musb_fdrc_read_fifo(reg, musb_urb->epidx & 0x0F, &buffer[urb->actual_length], musb_urb->cur_size);
                 }
+                reg->EPN.RxCSR1 &= ~MUSBH_RXCSR1_RXPKTRDY;
             }
             urb->actual_length += musb_urb->cur_size;
             if (is_in) {
@@ -324,7 +343,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb)
                 if (is_in) {
                     reg->EPN.RxCSR1 |= MUSBH_RXCSR1_REQPKT;
                 } else {
-                    vk_musb_fdrc_write_fifo(reg, musb_urb->epidx, &buffer[urb->actual_length], musb_urb->cur_size);
+                    vk_musb_fdrc_write_fifo(reg, musb_urb->epidx & 0x0F, &buffer[urb->actual_length], musb_urb->cur_size);
                     reg->EPN.TxCSR1 |= MUSBH_TXCSR1_TXPKTRDY;
                 }
             }
@@ -338,9 +357,6 @@ urb_finished:
     if ((0 == pipe.endpoint) && (0 == urb->setup_packet.bRequestType) && (0x05 == urb->setup_packet.bRequest)) {
         reg->Common.FAddr = urb->setup_packet.wValue & 0xFF;
     }
-    musb_urb->state = MUSB_FDRC_URB_STATE_IDLE;
-    vsf_eda_post_msg(urb->eda_caller, urb);
-    musb->urb_cur = NULL;
     return VSF_ERR_NONE;
 }
 
@@ -350,39 +366,7 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vk_musb_fdrc_reg_t *reg = musb->reg;
 
     switch (evt) {
-    case VSF_EVT_MESSAGE: {
-            vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
-            VSF_USB_ASSERT(urb != NULL);
-            vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
-
-            musb_urb->state = MUSB_FDRC_URB_STATE_START_SUBMITTING;
-            musb->urb_cur = urb;
-            musb->errcode_cur = 0;
-        }
-        // fall through
-    case VSF_MUSB_FDRC_HCD_EVT_EP: {
-            vk_usbh_hcd_urb_t *urb = musb->urb_cur;
-            vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
-
-            if (MUSB_FDRC_URB_STATE_TO_FREE == musb_urb->state) {
-                __vk_musb_fdrc_hcd_free_urb_do(musb, urb);
-            } else if (MUSB_FDRC_HCD_STATE_CONNECTED == musb->state) {
-                if (musb->errcode_cur != 0) {
-                    goto urb_fail;
-                }
-
-                vsf_err_t err = __vk_musb_fdrc_hcd_urb_fsm(musb);
-                if (err < 0) {
-                    goto urb_fail;
-                }
-            } else {
-            urb_fail:
-                musb_urb->state = MUSB_FDRC_URB_STATE_IDLE;
-                urb->status = VSF_ERR_FAIL;
-                vsf_eda_post_msg(urb->eda_caller, urb);
-                musb->urb_cur = NULL;
-            }
-        }
+    case VSF_EVT_INIT:
         break;
     case VSF_MUSB_FDRC_HCD_EVT_CONN:
         if (MUSB_FDRC_HCD_STATE_WAIE_CONNECT == musb->state) {
@@ -422,6 +406,53 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             reg->Common.IntrUSBE = MUSB_INTRUSBE_DISCON;
         }
         break;
+    case VSF_EVT_MESSAGE: {
+            vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
+            VSF_USB_ASSERT(urb != NULL);
+
+            vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
+            musb_urb->state = MUSB_FDRC_URB_STATE_START_SUBMITTING;
+            VSF_USB_ASSERT(!vsf_slist_is_in(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list, musb_urb));
+            vsf_slist_add_to_head(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list, musb_urb);
+
+            evt = VSF_MUSB_FDRC_HCD_EVT_EP + musb_urb->epidx;
+        }
+        // fall through
+    default: {
+            evt -= VSF_EVT_USER;
+
+            uint_fast8_t epidx = evt & 0xFF;
+            vk_usbh_hcd_urb_t *urb = __vk_musb_fdrc_hcd_get_urb(musb, epidx);
+            if (NULL == urb) {
+                VSF_USB_ASSERT(false);
+                return;
+            }
+            vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
+
+            evt &= ~0xFF;
+            switch (evt) {
+            case VSF_MUSB_FDRC_HCD_EVT_EP - VSF_EVT_USER:
+                if (MUSB_FDRC_URB_STATE_TO_FREE == musb_urb->state) {
+                    __vk_musb_fdrc_hcd_free_urb_do(musb, urb);
+                } else if (MUSB_FDRC_HCD_STATE_CONNECTED == musb->state) {
+                    vsf_err_t err = __vk_musb_fdrc_hcd_urb_fsm(musb, urb);
+                    if (err < 0) {
+                        goto urb_fail;
+                    } else if (VSF_ERR_NONE == err) {
+                        goto urb_finish;
+                    }
+                } else {
+                urb_fail:
+                    urb->status = VSF_ERR_FAIL;
+                urb_finish:
+                    musb_urb->state = MUSB_FDRC_URB_STATE_IDLE;
+                    vsf_slist_remove(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list, musb_urb);
+                    vsf_eda_post_msg(urb->eda_caller, urb);
+                }
+                break;
+            }
+        }
+        break;
     }
 }
 
@@ -449,12 +480,6 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         memset(musb, 0, sizeof(*musb));
         musb->hcd = hcd;
 
-        // initialize all members in musb->dev
-        memset(musb->dev_priv.ep_idx, -1, sizeof(musb->dev_priv.ep_idx));
-        // IN0 and OUT0 uses shared ep0
-        musb->dev_priv.ep_in_idx[0] = 0;
-        musb->dev_priv.ep_out_idx[0] = 0;
-
         {
             usb_hc_ip_cfg_t cfg = {
                 .priority       = param->priority,
@@ -467,15 +492,16 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
             usb_hc_ip_info_t info;
             param->op->GetInfo(&info);
             reg = musb->reg = info.regbase;
-            // shared ep0 is reserved for control transfer
-            musb->ep_out_mask = musb->ep_in_mask = (0xFFFF & ~((1 << info.ep_num) - 1)) | 1;
+            musb->epnum = info.ep_num;
+            // ep0 is reserved for control transfer
+            musb->ep_out_mask = musb->ep_in_mask = (0xFFFF & ~((1 << musb->epnum) - 1)) | 1;
         }
 
         // POWER MUST be cleared in param->op->Init
 //        reg->Common.Power = 0;
         vk_musb_fdrc_interrupt_init(reg);
         reg->Common.IntrUSBE = MUSB_INTRUSBE_CONN;
-        reg->Common.IntrTx1E = 1 << 0;      // enable shared ep0 interrupt
+        reg->Common.IntrTx1E = 1 << 0;      // enable ep0 interrupt
         reg->Common.DevCtl = MUSB_DEVCTL_SESSION;
         musb->state = MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE;
         // fall through
@@ -512,20 +538,27 @@ static vsf_err_t __vk_musb_fdrc_hcd_resume(vk_usbh_hcd_t *hcd)
 static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vk_musb_fdrc_hcd_t *musb = hcd->priv;
+    vk_musb_fdrc_reg_t *reg = musb->reg;
+    uint_fast16_t epmask = (1 << musb->epnum) - 1;
+    int_fast8_t idx;
 
-    // DO NOT free ep0, which is shared by all devices
-    // ep resources can only be freed here,
-    //  because hardware maintain the data toggle status
-    for (int i = 1; i < dimof(musb->dev_priv.ep_in_idx); i++) {
-        if (musb->dev_priv.ep_in_idx[i] > 0) {
-            __vk_musb_fdrc_hcd_free_ep(musb, i, true);
+    vsf_protect_t orig = vsf_protect_sched();
+        while ((musb->ep_in_mask & epmask) != 0) {
+            idx = ffs(musb->ep_in_mask);
+            vk_musb_fdrc_clear_mask(&reg->Common.IntrRx1E, idx);
+            musb->ep_in_mask &= ~(1 << idx);
         }
-    }
-    for (int i = 1; i < dimof(musb->dev_priv.ep_out_idx); i++) {
-        if (musb->dev_priv.ep_out_idx[i] > 0) {
-            __vk_musb_fdrc_hcd_free_ep(musb, i, false);
+        while ((musb->ep_out_mask & epmask) != 0) {
+            idx = ffs(musb->ep_out_mask);
+            vk_musb_fdrc_clear_mask(&reg->Common.IntrTx1E, idx);
+            musb->ep_out_mask &= ~(1 << idx);
         }
+    vsf_unprotect_sched(orig);
+
+    __vsf_slist_foreach_next_unsafe(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list) {
+        __vk_musb_fdrc_hcd_free_urb_do(musb, container_of(_, vk_usbh_hcd_urb_t, priv));
     }
+    vsf_slist_init(&musb->dev_priv.urb_list);
 }
 
 static vk_usbh_hcd_urb_t * __vk_musb_fdrc_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
@@ -539,6 +572,9 @@ static vk_usbh_hcd_urb_t * __vk_musb_fdrc_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
     urb = vsf_usbh_malloc(size);
     if (urb != NULL) {
         memset(urb, 0, size);
+
+        vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
+        musb_urb->epidx = -1;
     }
     return urb;
 }
@@ -568,37 +604,43 @@ static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
 
     // allocate ep resources
     vk_usbh_pipe_t pipe = urb->pipe;
-    int8_t *ep_idx_arr;
     uint16_t *ep_mask;
     uint8_t *ep_inten;
+    uint_fast8_t dir_mask;
 
     if (pipe.dir_in1out0) {
-        ep_idx_arr = musb->dev_priv.ep_in_idx;
+        dir_mask = 0x10;
         ep_mask = &musb->ep_in_mask;
         ep_inten = (uint8_t *)&musb->reg->Common.IntrRx1E;
     } else {
-        ep_idx_arr = musb->dev_priv.ep_out_idx;
+        dir_mask = 0x00;
         ep_mask = &musb->ep_out_mask;
         ep_inten = (uint8_t *)&musb->reg->Common.IntrTx1E;
     }
 
-    if (ep_idx_arr[pipe.endpoint] < 0) {
-        bool alloced = false;
+    if (0 == pipe.endpoint) {
+        musb_urb->epidx = 0;
+    } else if (musb_urb->epidx < 0) {
+        bool is_alloced = false;
+        int_fast8_t idx;
+
         // allocate new ep
         vsf_protect_t orig = vsf_protect_sched();
-            int idx = ffz(*ep_mask);
+            idx = ffz(*ep_mask);
             if (idx < 16) {
                 *ep_mask |= 1 << idx;
-                ep_idx_arr[pipe.endpoint] = idx;
                 vk_musb_fdrc_set_mask(ep_inten, idx);
-                alloced = true;
+                is_alloced = true;
+                musb_urb->fifo = vsf_musb_fdrc_hcd_alloc_fifo(hcd, pipe);
             }
         vsf_unprotect_sched(orig);
-        if (!alloced) {
+        if (!is_alloced) {
+            VSF_USB_ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
+        musb_urb->epidx = idx | dir_mask;
+        VSF_USB_ASSERT(musb_urb->fifo != 0);
     }
-    musb_urb->epidx = ep_idx_arr[pipe.endpoint];
 
     return __vk_musb_fdrc_hcd_relink_urb(hcd, urb);
 }

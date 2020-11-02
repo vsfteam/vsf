@@ -45,7 +45,7 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 #   define vsf_sched_safe_exit()        vsf_forced_sched_safe_exit(lock_status)
 
 #else
-            
+
 #   define VSF_SCHED_SAFE_CODE_REGION   DEFAULT_CODE_REGION_NONE
 #   define vsf_sched_lock()             0
 #   define vsf_sched_unlock(__level)    UNUSED_PARAM(__level)
@@ -78,11 +78,6 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 #define vsf_unprotect_forced_scheduler(__state)                                 \
             vsf_forced_sched_unlock((vsf_sched_lock_status_t)(__state))
 #endif
-
-
-
-#define __vsf_interrupt_safe            __SAFE_ATOM_CODE
-#define vsf_interrupt_safe              SAFE_ATOM_CODE
 
 #define vsf_protect_sched()             (vsf_protect_t)vsf_protect_scheduler()
 #define vsf_unprotect_sched(__prot)     vsf_unprotect_scheduler(__prot)
@@ -125,7 +120,7 @@ typedef struct vsf_kernel_resource_t {
         uint8_t                             node_bit_sz;
 #endif
 #   if defined(__VSF_OS_CFG_EVTQ_LIST)
-        vsf_pool_block(vsf_evt_node_pool)   *nodes_buf_ptr;
+        vsf_pool_item(vsf_evt_node_pool)    *nodes_buf_ptr;
         uint16_t                            node_cnt;
 #   endif
 
@@ -135,7 +130,7 @@ typedef struct vsf_kernel_resource_t {
 #endif
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     struct {
-        vsf_pool_block(vsf_eda_frame_pool)  *frame_buf_ptr;
+        vsf_pool_item(vsf_eda_frame_pool)   *frame_buf_ptr;
         uint16_t                            frame_cnt;
     } frame_stack;
 #endif

@@ -22,7 +22,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_WINFS == ENABLED
 
 #if     defined(__VSF_WINFS_CLASS_IMPLEMENT)
 #   undef __VSF_WINFS_CLASS_IMPLEMENT
@@ -78,5 +78,5 @@ extern const vk_fs_op_t vk_winfs_op;
 }
 #endif
 
-#endif      // VSF_USE_FS && VSF_USE_FATFS
+#endif      // VSF_USE_FS && VSF_FS_USE_WINFS
 #endif      // __VSF_WINFS_H__

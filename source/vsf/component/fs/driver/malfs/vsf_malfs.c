@@ -19,7 +19,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_USE_MALFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MALFS == ENABLED
 
 #define __VSF_FS_CLASS_INHERIT__
 #define __VSF_MAL_CLASS_INHERIT__
@@ -274,7 +274,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                 // not supported
             case VSF_MBR_PARTITION_TYPE_NONE:
                 goto next_partition;
-#if VSF_USE_FATFS == ENABLED
+#if VSF_FS_USE_FATFS == ENABLED
             case VSF_MBR_PARTITION_TYPE_FAT12_CHS:
             case VSF_MBR_PARTITION_TYPE_FAT16_16_32_CHS:
             case VSF_MBR_PARTITION_TYPE_FAT16_32_CHS:

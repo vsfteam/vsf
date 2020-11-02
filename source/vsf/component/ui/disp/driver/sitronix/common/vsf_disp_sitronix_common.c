@@ -20,8 +20,8 @@
 #include "component/ui/vsf_ui_cfg.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (   (VSF_USE_DISP_ST7789 == ENABLED)                                    \
-        ||  (VSF_USE_DISP_ST7735 == ENABLED))
+    &&  (   (VSF_DISP_USE_ST7789 == ENABLED)                                    \
+        ||  (VSF_DISP_USE_ST7735 == ENABLED))
 
 #define __VSF_DISP_SITRONIX_CLASS_IMPLEMENT
 #include "../../vsf_disp.h"

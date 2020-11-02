@@ -19,7 +19,7 @@
 
 #include "../../vsf_scsi_cfg.h"
 
-#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_USE_MAL_SCSI == ENABLED
+#if VSF_USE_SCSI == ENABLED && VSF_USE_MAL == ENABLED && VSF_SCSI_USE_MAL_SCSI == ENABLED
 
 #define __VSF_SCSI_CLASS_INHERIT__
 #define __VSF_VIRTUAL_SCSI_CLASS_INHERIT__
@@ -69,7 +69,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_init, vk_virtual_scsi_init)
 
     switch (evt) {
     case VSF_EVT_INIT:
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         mal_scsi->mal_stream.mal = mal_scsi->mal;
 #endif
         vk_mal_init(mal_scsi->mal);
@@ -89,7 +89,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_read, vk_virtual_scsi_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         if (mal_scsi->is_stream) {
             vk_mal_read_stream(&mal_scsi->mal_stream,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
@@ -99,7 +99,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_read, vk_virtual_scsi_read)
             vk_mal_read(mal_scsi->mal,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
                 ((vsf_mem_t *)vsf_local.mem_stream)->buffer);
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         }
 #endif
         break;
@@ -118,7 +118,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_write, vk_virtual_scsi_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         if (mal_scsi->is_stream) {
             vk_mal_write_stream(&mal_scsi->mal_stream,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
@@ -128,7 +128,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_write, vk_virtual_scsi_write)
             vk_mal_write(mal_scsi->mal,
                 vsf_local.addr * param->block_size, vsf_local.size * param->block_size,
                 ((vsf_mem_t *)vsf_local.mem_stream)->buffer);
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         }
 #endif
         break;

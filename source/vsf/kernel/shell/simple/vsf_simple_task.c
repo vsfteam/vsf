@@ -20,7 +20,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL == ENABLED && VSF_USE_KERNEL == ENABLED
+#if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED && VSF_USE_KERNEL == ENABLED
 #define __VSF_EDA_CLASS_INHERIT__
 #include "../../vsf_kernel_common.h"
 #include "./vsf_simple.h"

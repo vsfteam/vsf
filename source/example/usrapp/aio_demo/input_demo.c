@@ -35,7 +35,7 @@ static void input_demo_trace_hid(vk_hid_event_t *hid_evt)
         usage_page = HID_GET_USAGE_PAGE(hid_evt->id);
         usage_id = HID_GET_USAGE_ID(hid_evt->id);
 
-        vsf_trace(VSF_TRACE_DEBUG, "hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
             generic_usage, usage_page, usage_id, hid_evt->pre, hid_evt->cur);
     }
 }
@@ -43,7 +43,7 @@ static void input_demo_trace_hid(vk_hid_event_t *hid_evt)
 static void input_demo_trace_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     if (gamepad_evt->id != GAMEPAD_ID_DUMMY) {
-        vsf_trace(VSF_TRACE_DEBUG, "gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
             (vsf_gamepad_id_t)gamepad_evt->id, gamepad_evt->cur, gamepad_evt->pre);
     }
 }
@@ -102,7 +102,7 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
     }
 
     if (value_cnt >= 6) {
-        vsf_trace(VSF_TRACE_DEBUG, "6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
             (int)acc_x, (int)acc_y, (int)acc_z, (int)gyro_pitch, (int)gyro_yaw, (int)gyro_roll);
     }
 }
@@ -110,7 +110,7 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
 void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
 {
     switch (type) {
-#if VSF_USE_INPUT_HID == ENABLED
+#if VSF_INPUT_USE_HID == ENABLED
     case VSF_INPUT_TYPE_HID:
         input_demo_trace_hid((vk_hid_event_t *)event);
         break;
@@ -118,7 +118,7 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
     case VSF_INPUT_TYPE_SENSOR:
         input_demo_trace_sensor((vk_sensor_evt_t *)event);
         break;
-#if VSF_USE_INPUT_DS4 == ENABLED
+#if VSF_INPUT_USE_DS4 == ENABLED
     case VSF_INPUT_TYPE_DS4:
         input_demo_trace_gamepad((vk_gamepad_evt_t *)event);
         break;

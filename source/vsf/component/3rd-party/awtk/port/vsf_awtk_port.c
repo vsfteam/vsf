@@ -23,7 +23,7 @@
 
 #include "component/ui/vsf_ui_cfg.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_AWTK == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_AWTK == ENABLED
 
 #include "awtk.h"
 #include "./platforms/vsf/main_loop_vsf.h"

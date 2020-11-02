@@ -26,7 +26,7 @@
 
 
 #define VSF_USE_UI                                          ENABLED
-#   define VSF_USE_DISP_SDL2                                ENABLED
+#   define VSF_DISP_USE_SDL2                                ENABLED
 #       define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
 
 #   define VSF_USE_TINY_GUI                                 ENABLED
@@ -46,8 +46,8 @@
 #       define VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR    VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
 
 #       define VSF_TGUI_LOG                                 vsf_trace
-#           define VSF_TGUI_SV_CFG_PORT_LOG                 DISABLED
-#           define VSF_TGUI_SV_CFG_DRAW_LOG                 DISABLED
+#           define VSF_TGUI_CFG_SV_PORT_LOG                 DISABLED
+#           define VSF_TGUI_CFG_SV_DRAW_LOG                 DISABLED
 
 #   define VSF_USE_MSG_TREE                                 ENABLED
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING         ENABLED         /* Enabled for debug */

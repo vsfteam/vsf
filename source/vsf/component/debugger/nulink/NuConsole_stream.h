@@ -28,27 +28,27 @@ extern "C" {
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 #   define VSF_DEBUG_STREAM_NEED_POLL
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 extern vsf_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 extern const vsf_stream_tx_t VSF_DEBUG_STREAM_TX;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 extern void VSF_DEBUG_STREAM_POLL(void);
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 #endif
 
 #endif      // VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE

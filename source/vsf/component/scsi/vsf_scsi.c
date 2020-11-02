@@ -31,8 +31,8 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
 #endif
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL != ENABLED
-#   error VSF_USE_KERNEL_SIMPLE_SHELL must be enabled
+#if VSF_KERNEL_USE_SIMPLE_SHELL != ENABLED
+#   error VSF_KERNEL_USE_SIMPLE_SHELL must be enabled
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -82,14 +82,14 @@ vsf_err_t vk_scsi_execute(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
     __vsf_component_call_peda_ifs(vk_scsi_execute, err, pthis->drv->execute, 0, pthis,
         .cbd    = cbd,
         .mem    = execute_mem,
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
         .stream = NULL,
 #endif
     );
     return err;
 }
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *stream)
 {
     vsf_err_t err;

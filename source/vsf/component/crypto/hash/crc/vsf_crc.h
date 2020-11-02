@@ -22,7 +22,7 @@
 
 #include "../../vsf_crypto_cfg.h"
 
-#if VSF_USE_CRC == ENABLED
+#if VSF_HASH_USE_CRC == ENABLED
 
 #ifdef __cplusplus
 extern "C" {

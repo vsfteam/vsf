@@ -41,7 +41,7 @@ static void __vk_tgui_change_actived_control(
 
 /*============================ IMPLEMENTATION ================================*/
 
-implement_vsf_rng_buf(__vsf_tgui_evt_queue_t, vsf_tgui_evt_t, __safe_atom_code)
+implement_vsf_rng_buf(__vsf_tgui_evt_queue_t, vsf_tgui_evt_t, __vsf_interrupt_safe)
 
 
 vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
@@ -149,7 +149,7 @@ bool vk_tgui_send_message(vsf_tgui_t* gui_ptr, vsf_tgui_evt_t event)
         return false;
     }
 
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         if (this.consumer.param.Attribute.is_queue_drain) {
             this.consumer.param.Attribute.is_queue_drain = false;
             //! wake pt task up
@@ -459,7 +459,7 @@ loop_start:
         result = false;
 
         do {
-            __SAFE_ATOM_CODE(
+            __vsf_interrupt_safe(
                 result = vsf_rng_buf_get_one(__vsf_tgui_evt_queue_t, this.queue_ptr, &this.event);
                 if (!result) {
                     this.Attribute.is_queue_drain = true;

@@ -174,7 +174,7 @@ bool vsf_iic_master_init(vsf_iic_t *iic_obj, iic_cfg_t *cfg_obj)
         iic_obj->slave_evt_handler->s_w_evt_txe      = &vsf_iic_s_w_evt_txe_handler;
     }
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
     
         if(I2C1 == iic_obj->iic_reg) {
             RCC->APB2ENR |= IIC1_GPIO_CLK_EN;
@@ -242,7 +242,7 @@ bool vsf_iic_slave_init(vsf_iic_t *iic_obj, iic_cfg_t *cfg_obj)
     iic_obj->slave_evt_handler->s_w_evt_addr   = &vsf_iic_s_w_evt_addr_handler;
     iic_obj->slave_evt_handler->s_w_evt_txe    = &vsf_iic_s_w_evt_txe_handler;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
     
         if(I2C1 == iic_obj->iic_reg) {
             RCC->APB2ENR |= IIC1_GPIO_CLK_EN;
@@ -324,7 +324,7 @@ bool vsf_iic_master_write(vsf_iic_t *iic_obj, uint8_t slave_address, uint8_t *ou
         iic_obj->no_stop = true;
     }
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         iic_obj->iic_reg->CR1 |= IIC_EN;
         iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
         
@@ -356,7 +356,7 @@ bool vsf_iic_master_read(vsf_iic_t *iic_obj, uint8_t slave_address, uint8_t *inp
     iic_obj->iic_is_busy   = true;
     iic_obj->is_write      = false;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         iic_obj->iic_reg->CR1 |= IIC_EN;
         iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
         iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
@@ -385,7 +385,7 @@ bool vsf_iic_slave_write(vsf_iic_t *iic_obj, uint8_t *output, uint16_t size)
     iic_obj->iic_is_busy = true;
     iic_obj->is_write    = true;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         iic_obj->iic_reg->CR1 |= IIC_EN;
         iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
         iic_obj->iic_reg->CR1 |= IIC_ACK_EN;
@@ -413,7 +413,7 @@ bool vsf_iic_slave_read(vsf_iic_t *iic_obj, uint8_t *input, uint16_t size)
     iic_obj->iic_is_busy = true;
     iic_obj->is_write    = false;
     
-    SAFE_ATOM_CODE() {
+    vsf_interrupt_safe() {
         iic_obj->iic_reg->CR1 |= IIC_EN;
         iic_obj->iic_reg->CR1 &= ~IIC_POS_EN;
         iic_obj->iic_reg->CR1 |= IIC_ACK_EN;

@@ -24,7 +24,8 @@
 #undef VSF_DEVICE_HEADER
 
 #if     defined(__MT071__)
-#   define  VSF_DEVICE_HEADER       "./MT071/device.h"
+//#   define  VSF_DEVICE_HEADER       "./MT071/device.h"
+#   define  VSF_DEVICE_HEADER       "./device.h"
 #else
 #   error No supported device found.
 #endif

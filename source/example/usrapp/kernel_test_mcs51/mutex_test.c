@@ -105,6 +105,6 @@ void usrapp_mutex_test_start(void)
         usrapp_mutex.mutex_eda[i].i = i;
 
         cfg.priority = (vsf_prio_t)((int)vsf_prio_0 + i),
-        vsf_teda_init_ex(&usrapp_mutex.mutex_eda[i].teda, (vsf_eda_cfg_t *)&cfg);
+        vsf_teda_start(&usrapp_mutex.mutex_eda[i].teda, (vsf_eda_cfg_t *)&cfg);
     }
 }

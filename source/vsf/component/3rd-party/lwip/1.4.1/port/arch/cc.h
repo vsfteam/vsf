@@ -47,7 +47,7 @@ typedef u32_t       mem_ptr_t;
 #define X32_F       "lx"
 #define SZT_F       "uz"
 
-#define lwip_trace(format ...) vsf_trace(VSF_TRACE_DEBUG, format)
+#define lwip_trace(format ...) vsf_trace_debug(format)
 
 /* Plaform specific diagnostic output */
 #define LWIP_PLATFORM_DIAG(...)                                                 \
@@ -59,7 +59,7 @@ typedef u32_t       mem_ptr_t;
 
 #define LWIP_PLATFORM_ASSERT(__str)                                             \
         do {                                                                    \
-            vsf_trace(  VSF_TRACE_ERROR,                                        \
+            vsf_trace_error(                                                    \
                         "Assertion\"%s\" failed at line %d in %s\n",            \
                         __str,                                                  \
                         __LINE__,                                               \

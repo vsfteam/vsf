@@ -185,9 +185,9 @@ extern "C" {
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define vsf_pt_start                 vsf_teda_init_ex
+#   define vsf_pt_start                 vsf_teda_start
 #else
-#   define vsf_pt_start                 vsf_eda_init_ex
+#   define vsf_pt_start                 vsf_eda_start
 #endif
 
 

@@ -18,7 +18,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI_AWTK == ENABLED && VSF_USE_UI_AWTK == ENABLED && APP_CFG_USE_AWTK_DEMO == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_AWTK == ENABLED && APP_USE_AWTK_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 
@@ -50,7 +50,7 @@ static void __vsf_awtk_on_evt(vk_input_type_t tpye, vk_touchscreen_evt_t *ts_evt
     }
 }
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int awtk_main(int argc, char *argv[])
 {
 #else

@@ -23,7 +23,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_USE_USB_HOST == ENABLED
-#define __USB_HC_IMPLEMENT(__N, __TYPE)                                         \
+#define ____USB_HC_IMPLEMENT(__N, __TYPE)                                       \
 static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  \
     USB_HC##__N##_CONFIG                                                        \
 };                                                                              \
@@ -35,7 +35,7 @@ ROOT ISR(USB_HC##__N##_IRQHandler)                                              
     m480_##__TYPE##_irq(&USB_HC##__N##_IP);                                     \
 }
 #else
-#define __USB_HC_IMPLEMENT(__N, __TYPE)                                         \
+#define ____USB_HC_IMPLEMENT(__N, __TYPE)                                       \
 static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  \
     USB_HC##__N##_CONFIG                                                        \
 };                                                                              \
@@ -48,8 +48,8 @@ ISR(USB_HC##__N##_IRQHandler)                                                   
 }
 #endif
 
-#define _USB_HC_IMPLEMENT(__N, __TYPE)      __USB_HC_IMPLEMENT(__N, __TYPE)
-#define USB_HC_IMPLEMENT(__N, __VALUE)      _USB_HC_IMPLEMENT(__N, USB_HC##__N##_TYPE)
+#define __USB_HC_IMPLEMENT(__N, __TYPE)     ____USB_HC_IMPLEMENT(__N, __TYPE)
+#define USB_HC_IMPLEMENT(__N, __VALUE)      __USB_HC_IMPLEMENT(__N, USB_HC##__N##_TYPE)
 
 
 

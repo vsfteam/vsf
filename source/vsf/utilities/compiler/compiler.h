@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 //#ifndef __USE_COMPILER_H__
-//#define __USE_COMPILER_H__            
+//#define __USE_COMPILER_H__
 
 //! \brief CPU io
 
@@ -29,8 +29,8 @@
 #elif   defined(__CPU_RV__)
 #   include "./rv/rv_compiler.h"
 #else
-//#warning No specified MCU type! use arm as default
-#   include "./arm/arm_compiler.h"
+//#warning No specified MCU type! use default which support gcc/clang only
+#   include "./default/default_compiler.h"
 #endif
 
 #include "../preprocessor/vsf_connect.h"

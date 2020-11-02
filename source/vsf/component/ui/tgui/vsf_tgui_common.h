@@ -232,10 +232,10 @@ typedef struct vsf_tgui_region_t {
 
 typedef enum {
     VSF_TGUI_ALIGN_CENTER   = 0,
-    VSF_TGUI_ALIGN_LEFT     = _BV(0),
-    VSF_TGUI_ALIGN_RIGHT    = _BV(1),
-    VSF_TGUI_ALIGN_TOP      = _BV(2),
-    VSF_TGUI_ALIGN_BOTTOM   = _BV(3),
+    VSF_TGUI_ALIGN_LEFT     = BIT(0),
+    VSF_TGUI_ALIGN_RIGHT    = BIT(1),
+    VSF_TGUI_ALIGN_TOP      = BIT(2),
+    VSF_TGUI_ALIGN_BOTTOM   = BIT(3),
     VSF_TGUI_ALIGN_FILL     = VSF_TGUI_ALIGN_LEFT
                             | VSF_TGUI_ALIGN_RIGHT
                             | VSF_TGUI_ALIGN_TOP
@@ -244,10 +244,10 @@ typedef enum {
 
 typedef enum {
     VSF_TGUI_DOCK_NONE      = 0,
-    VSF_TGUI_DOCK_LEFT      = _BV(0),
-    VSF_TGUI_DOCK_RIGHT     = _BV(1),
-    VSF_TGUI_DOCK_TOP       = _BV(2),
-    VSF_TGUI_DOCK_BOTTOM    = _BV(3),
+    VSF_TGUI_DOCK_LEFT      = BIT(0),
+    VSF_TGUI_DOCK_RIGHT     = BIT(1),
+    VSF_TGUI_DOCK_TOP       = BIT(2),
+    VSF_TGUI_DOCK_BOTTOM    = BIT(3),
     VSF_TGUI_DOCK_FILL      =   VSF_TGUI_DOCK_LEFT
                             |   VSF_TGUI_DOCK_RIGHT
                             |   VSF_TGUI_DOCK_TOP
@@ -256,10 +256,10 @@ typedef enum {
 
 typedef enum {
     VSF_TGUI_ANCHOR_NONE    = 0,
-    VSF_TGUI_ANCHOR_LEFT    = _BV(0),
-    VSF_TGUI_ANCHOR_RIGHT   = _BV(1),
-    VSF_TGUI_ANCHOR_TOP     = _BV(2),
-    VSF_TGUI_ANCHOR_BOTTOM  = _BV(3),
+    VSF_TGUI_ANCHOR_LEFT    = BIT(0),
+    VSF_TGUI_ANCHOR_RIGHT   = BIT(1),
+    VSF_TGUI_ANCHOR_TOP     = BIT(2),
+    VSF_TGUI_ANCHOR_BOTTOM  = BIT(3),
 }vsf_tgui_anchor_mode_t;
 
 
@@ -299,7 +299,7 @@ typedef struct vsf_tgui_text_info_t {
     uint8_t                         : 2;
     uint8_t             bIsChanged  : 1;
     uint8_t             bIsAutoSize : 1;
-    int8_t              chInterLineSpace; 
+    int8_t              chInterLineSpace;
 #   if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
     struct {
         vsf_tgui_size_t tStringSize;
@@ -324,7 +324,7 @@ typedef struct vsf_tgui_tile_core_t {
         uint8_t         u2RootTileType      : 2;    /* 0: buf tile, 1: index tile, 2 and 3 undefined*/
         uint8_t         u2ColorType         : 2;    /* reserved */
         uint8_t         u3ColorSize         : 3;    /* 0: 1bit, 2: 4bit, 3: 8bit 4: 16bit, 5: 32bit, 6: 24bit */
-        uint8_t         bIsRootTile         : 1;    /* 0: Child Tile, u3ColorSize and u4RootTileType have no meaning 
+        uint8_t         bIsRootTile         : 1;    /* 0: Child Tile, u3ColorSize and u4RootTileType have no meaning
                                                        1: Root Tile, u3ColorSize and u4RootTileType have meaning*/
     } Attribute;
 } vsf_tgui_tile_core_t;
@@ -435,16 +435,16 @@ enum {
 
         /*! pointer stay in the region of a control for a while,
          *! it is different from VSF_TGUI_EVT_POINTER_HOLD. Hold requires that
-         *! the pointer is down at the same control. Hover requires no pointer 
+         *! the pointer is down at the same control. Hover requires no pointer
          *! down at the target control.
-         *! 
+         *!
          *! this event is currently not supported but reserved.
          */
         VSF_TGUI_EVT_POINTER_HOVER,                                             //!< not all device support this
 
         VSF_TGUI_EVT_POINTER_MOVE,                                              //!< not all device support this
 
-        
+
 
     //! key events
     VSF_TGUI_MSG_KEY_EVT            = VSF_TGUI_MSG + 0x20,
@@ -465,8 +465,8 @@ enum {
         VSF_TGUI_EVT_GESTURE_ROTATE_ANTICLOCKWISE,                              //!< not all device support this
 
     //! All control specific events share the same code region
-    VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT   = VSF_TGUI_MSG + 0x40,  
-    
+    VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT   = VSF_TGUI_MSG + 0x40,
+
     VSF_TGUI_MSG_LIST_EVT           = VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT,
         VSF_TGUI_EVT_LIST_SELECTION_CHANGED = VSF_TGUI_MSG_LIST_EVT,
         VSF_TGUI_EVT_LIST_SLIDING_STARTED,
@@ -533,7 +533,7 @@ extern
 bool vsf_tgui_tile_is_root(const vsf_tgui_tile_t* ptTile);
 
 extern
-void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo, 
+void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo,
                         const vsf_tgui_string_t *pstrNew);
 #endif
 

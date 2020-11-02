@@ -34,7 +34,7 @@ typedef enum {
     IIC_REQ_ARLO                        = 5
 }em_vsf_iic_request_state_t;
 
-typedef enum em_iic_mode_t{    
+typedef enum {    
     IIC_MASTER_READ                     = 0x00000001U,
     
     IIC_DUTYCYCLE_2                     = 0x00000000U,
@@ -51,9 +51,9 @@ typedef enum em_iic_mode_t{
     
     IIC_NOSTRETCH_DISABLE               = 0x00000000U,
     IIC_NOSTRETCH_ENABLE                = 0x00000080U,
-};
+} em_iic_mode_t;
 
-typedef enum em_iic_low_hardware_cfg_t{
+typedef enum {
     IIC1_GPIO_CLK_EN                    = 0x00000008U,
     IIC1_CLK_EN                         = 0x00200000U,
     IIC1_GPIO_MODE                      = 0xFF000000U,
@@ -61,23 +61,23 @@ typedef enum em_iic_low_hardware_cfg_t{
     IIC2_GPIO_CLK_EN                    = 0x00000008U,
     IIC2_CLK_EN                         = 0x00400000U,
     IIC2_GPIO_MODE                      = 0x0000FF00U,
-};
+} em_iic_low_hardware_cfg_t;
 
-typedef enum em_iic_cr1_reg_t {
+typedef enum  {
     IIC_EN                              = 0x00000001U,
     IIC_START                           = 0x00000100U,
     IIC_STOP                            = 0x00000200U,
     IIC_ACK_EN                          = 0x00000400U,
     IIC_POS_EN                          = 0x00000800U,
-};
+} em_iic_cr1_reg_t;
 
-typedef enum em_iic_it_t {
+typedef enum  {
     IIC_IT_ERR_EN                       = 0x00000100U,
     IIC_IT_EVT_EN                       = 0x00000200U,
     IIC_IT_BUF_EN                       = 0x00000400U,
-};
+} em_iic_it_t;
 
-typedef enum em_iic_status_t {
+typedef enum  {
     IIC_SB_SET                          = 0x00000001U,
     IIC_ADDR_SET                        = 0x00000002U,
     IIC_BTF_SET                         = 0x00000004U,
@@ -88,13 +88,13 @@ typedef enum em_iic_status_t {
     IIC_AF_SET                          = 0x00000400U,
     
     IIC_BUSY                            = 0x00000002U,
-};
+} em_iic_status_t;
 
-typedef enum em_process_sele_t {
+typedef enum  {
     NO_START                            = 0x00000001U,
     NO_ADDR                             = 0x00000002U,
     NO_STOP                             = 0x00000004U,
-};
+} em_process_sele_t;
 
 typedef struct vsf_iic_m_evt_interface_t vsf_iic_m_evt_interface_t;
 typedef struct vsf_iic_s_evt_interface_t vsf_iic_s_evt_interface_t;
@@ -121,7 +121,7 @@ typedef struct vsf_iic_t{
     void                             (*callback_handler)(vsf_iic_t *iic_obj);
     vsf_iic_m_evt_interface_t        *master_evt_handler;
     vsf_iic_s_evt_interface_t        *slave_evt_handler;
-};
+} vsf_iic_t;
 
 struct vsf_iic_m_evt_interface_t{
     void (*m_w_evt_sb)(vsf_iic_t *iic_obj);

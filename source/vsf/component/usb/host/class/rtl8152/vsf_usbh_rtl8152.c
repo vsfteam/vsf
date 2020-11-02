@@ -38,7 +38,7 @@ static const vk_usbh_dev_id_t __vk_usbh_rtl8152_dev_id[] = {
 
 static void *__vk_usbh_rtl8152_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
 
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
 extern void __vk_usbh_libusb_block_dev(vk_usbh_dev_t *dev);
 #endif
 
@@ -55,7 +55,7 @@ const vk_usbh_class_drv_t vk_usbh_rtl8152_drv = {
 
 static void *__vk_usbh_rtl8152_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
 {
-#if VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USBH_USE_LIBUSB == ENABLED
     __vk_usbh_libusb_block_dev(dev);
 #endif
     return NULL;

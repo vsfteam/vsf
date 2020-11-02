@@ -39,20 +39,20 @@ extern "C" {
 #include "vsf_usr_cfg.h"
 
 
-/*! \note IMPORTANT 
+/*! \note IMPORTANT
  *!       - Everytime when you try to add some 'common' header file including
- *!         into __type.h, please take more time to think your decision, and 
- *!         make sure that the header file is available in all the compiler 
- *!         environment and platforms. 
- *! 
- *!       - If you know what you are doing, and there is still some concerns 
- *!         which others need to know, please DO add necessary information  
+ *!         into __type.h, please take more time to think your decision, and
+ *!         make sure that the header file is available in all the compiler
+ *!         environment and platforms.
+ *!
+ *!       - If you know what you are doing, and there is still some concerns
+ *!         which others need to know, please DO add necessary information
  *!         besides the "#include <xxxx>"
- *!     
- *!       - If you want to introduce a system header file (as part of c 
+ *!
+ *!       - If you want to introduce a system header file (as part of c
  *!         standard) and you haven't encounter any known case where the header
  *!         file is absent, we can assume that it is safe to put it in __type.h.
- *!         If you do encounter scenarios where the header files is missing, 
+ *!         If you do encounter scenarios where the header files is missing,
  *!         please move it to the plaform specific type.h
  */
 
@@ -66,71 +66,67 @@ extern "C" {
 
 //! \brief system macros
 #ifndef ASSERT
-#   define ASSERT           assert
+#   define ASSERT                           assert
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   ifndef __STR
-#       define __STR(__STRING)      #__STRING  
+#       define __STR(__STRING)              #__STRING
 #   endif
 #   ifndef STR
-#       define STR(__STRING)        __STR(__STRING)
+#       define STR(__STRING)                __STR(__STRING)
 #   endif
 #else
 #   ifndef __STR
-#       define __STR(...)           #__VA_ARGS__  
+#       define __STR(...)                   #__VA_ARGS__
 #   endif
 #   ifndef STR
-#       define STR(...)             __STR(__VA_ARGS__)
+#       define STR(...)                     __STR(__VA_ARGS__)
 #   endif
 #endif
 
 #ifndef __cplusplus
 //  conflict with std::max, std::min
-#   define max(__A, __B)    (((__A) > (__B)) ? (__A) : (__B))
-#   define min(__A, __B)    (((__A) < (__B)) ? (__A) : (__B))
+#   define max(__A, __B)                    (((__A) > (__B)) ? (__A) : (__B))
+#   define min(__A, __B)                    (((__A) < (__B)) ? (__A) : (__B))
 #endif
 
 #ifndef dimof
-#   define dimof(arr)       (sizeof(arr) / sizeof((arr)[0]))
+#   define dimof(arr)                       (sizeof(arr) / sizeof((arr)[0]))
 #endif
 #ifndef UBOUND
-#   define UBOUND(__ARR)    dimof(__ARR)
+#   define UBOUND(__ARR)                    dimof(__ARR)
 #endif
 
 #ifndef offset_of
-#   define offset_of(s, m)  (uintptr_t)(&(((s *)0)->m))
+#   define offset_of(s, m)                  (uintptr_t)(&(((s *)0)->m))
 #endif
 #ifndef container_of
-#   define container_of(ptr, type, member)      \
+#   define container_of(ptr, type, member)                                      \
         ((type *)((uintptr_t)(ptr) - offset_of(type, member)))
 #endif
 #ifndef safe_container_of
-#   define safe_container_of(ptr, type, member) \
+#   define safe_container_of(ptr, type, member)                                 \
         (ptr ? container_of(ptr, type, member) : NULL)
 #endif
 
 #ifndef SIGN
-#   define SIGN(__N)        ((int)((int)((int)(__N) > 0) - (int)((int)(__N) < 0)))
+#   define SIGN(__N)                        ((int)((int)((int)(__N) > 0) - (int)((int)(__N) < 0)))
 #endif
 #undef sign
-#define sign(__n)           SIGN(__n)
+#define sign(__n)                           SIGN(__n)
 
-#define ABS(__NUM)          (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
+#define ABS(__NUM)                          (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
 
 #ifndef BIT
-#define BIT(__N)            ((uint32_t)1 << (__N))
+#   define BIT(__N)                         ((uint32_t)1 << (__N))
 #endif
-#ifndef _BV
-#define _BV(__N)            ((uint32_t)1 << (__N))
-#endif
-#ifndef _BM
-#define __MASK(__N)         (_BV(__N) - 1)
-#define _BM(__FROM,__TO)    (__MASK((__TO)+1)-__MASK(__FROM))
+#ifndef BITMASK
+#   define BITMASK(__N)                     (BIT(__N) - 1)
 #endif
 
 #ifndef UNUSED_PARAM
-# define UNUSED_PARAM(__VAL)    (__VAL) = (__VAL)
+#   define UNUSED_PARAM(__VAL)              (__VAL) = (__VAL)
 #endif
 
 //! \brief This macro convert variable types between different datatypes.
@@ -139,8 +135,8 @@ extern "C" {
 #define type_convert(__ADDR, __TYPE)        TYPE_CONVERT(__ADDR, __TYPE)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-#define IS_FSM_ERR(__FSM_RT)        ((__FSM_RT) < fsm_rt_cpl)
-#define is_fsm_err(__FSM_RT)        IS_FSM_ERR(__FSM_RT)
+#define IS_FSM_ERR(__FSM_RT)                ((__FSM_RT) < fsm_rt_cpl)
+#define is_fsm_err(__FSM_RT)                IS_FSM_ERR(__FSM_RT)
 /*============================ TYPES =========================================*/
 
 //! \name standard error code
@@ -175,15 +171,15 @@ typedef enum {
 //! \name finit state machine state
 //! @{
 typedef enum {
-    fsm_rt_err          = -1,    //!< fsm error, error code can be get from other interface
-    fsm_rt_cpl          = 0,     //!< fsm complete
-    fsm_rt_on_going     = 1,     //!< fsm on-going
-    fsm_rt_yield        = 1,
-    fsm_rt_wait_for_obj = 2,     //!< fsm wait for object
-    fsm_rt_wait_for_evt = 2,    
-    fsm_rt_wfe          = 2,
-    fsm_rt_asyn         = 3,     //!< fsm asynchronose complete, you can check it later.
-    fsm_rt_user         = 4
+    fsm_rt_err                              = -1,    //!< fsm error, error code can be get from other interface
+    fsm_rt_cpl                              = 0,     //!< fsm complete
+    fsm_rt_on_going                         = 1,     //!< fsm on-going
+    fsm_rt_yield                            = 1,
+    fsm_rt_wait_for_obj                     = 2,     //!< fsm wait for object
+    fsm_rt_wait_for_evt                     = 2,
+    fsm_rt_wfe                              = 2,
+    fsm_rt_asyn                             = 3,     //!< fsm asynchronose complete, you can check it later.
+    fsm_rt_user                             = 4
 } fsm_rt_t;
 //! @}
 
@@ -196,9 +192,9 @@ typedef enum {
 
 
 #if defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L && !defined(__cplusplus)
-/*! \note if your compiler raises warning about "redefine" type, 
+/*! \note if your compiler raises warning about "redefine" type,
  *!       please ignore and suppress the warning
- *! 
+ *!
  *! \note char32_t and char16_t should only be used when C11 is enabled.
  */
 typedef uint_least32_t char32_t;
@@ -219,149 +215,99 @@ typedef volatile uint8_t            reg8_t;
 typedef volatile uint16_t           reg16_t;
 typedef volatile uint32_t           reg32_t;
 
-#if (defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__)                       \
+#if defined(__IAR_SYSTEMS_ICC__)                                                \
     ||  (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L)
-
-#undef ____RESERVED
-#undef __RESERVED
-#define ____RESERVED(__BIT, __NAME)                                             \
-        uint##__BIT##_t __unused_##__NAME : __BIT;
-#define __RESERVED(__BIT, __NAME)                                               \
-            ____RESERVED(__BIT, __NAME)
-
-#define __RESERVED_B(__BYTE_CNT, __LINE)                                        \
-                                    uint32_t __unused_##__LINE[__BYTE_CNT >> 2]
-#define RESERVED_B(__BYTE_CNT)      __RESERVED_B(__BYTE_CNT, __LINE__)
-
-#   ifndef RESERVED_U8           
-#       define RESERVED_U8          __RESERVED( 8, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_U16            
-#       define RESERVED_U16         __RESERVED( 16, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_U32             
-#       define RESERVED_U32         __RESERVED( 32, __LINE__ )
-#   endif
-
-#   ifndef RESERVED_16B             
-#       define RESERVED_16B         RESERVED_B(16);
-#   endif
-
-#   ifndef RESERVED_64B             
-#       define RESERVED_64B         RESERVED_B(64);
-#   endif
-
-#   ifndef RESERVED_256B             
-#       define RESERVED_256B        RESERVED_B(256);
-#   endif
-
-#   ifndef RESERVED_1K             
-#       define RESERVED_1K          RESERVED_B(1024);
-#   endif
-
-#   ifndef RESERVED_4K             
-#       define RESERVED_4K          RESERVED_B(4096);
-#   endif
-
-#   ifndef RESERVED_16K             
-#       define RESERVED_16K         RESERVED_B(16*1024);
-#   endif
-
-#   ifndef RESERVED_64K             
-#       define RESERVED_64K         RESERVED_B(64*1024);
-#   endif
-
-#   ifndef RESERVED_256K             
-#       define RESERVED_256K        RESERVED_B(256*1024);
-#   endif
-
-
-#   ifndef RESERVED_1M             
-#       define RESERVED_1M          RESERVED_B(1024*1024);
-#   endif
-
+#   define __REG_CONNECT(__A, __B)  __A##__B
+#   define __REG_RSVD_NAME(__NAME)  __REG_CONNECT(__unused_, __NAME)
 #else
-#   ifndef RESERVED_U8           
-#       define RESERVED_U8          uint8_t  : 8;
-#   endif
-
-#   ifndef RESERVED_U16            
-#       define RESERVED_U16         uint16_t : 16;
-#   endif
-
-#   ifndef RESERVED_U32             
-#       define RESERVED_U32         uint32_t : 32;
-#   endif
-
-#   ifndef RESERVED_16B             
-#       define RESERVED_16B     RESERVED_U32                                    \
-                                RESERVED_U32                                    \
-                                RESERVED_U32                                    \
-                                RESERVED_U32
-#   endif
-
-#   ifndef RESERVED_64B             
-#       define RESERVED_64B     RESERVED_16B                                    \
-                                RESERVED_16B                                    \
-                                RESERVED_16B                                    \
-                                RESERVED_16B
-#   endif
-
-#   ifndef RESERVED_256B             
-#       define RESERVED_256B    RESERVED_64B                                    \
-                                RESERVED_64B                                    \
-                                RESERVED_64B                                    \
-                                RESERVED_64B
-#   endif
-
-#   ifndef RESERVED_1K             
-#       define RESERVED_1K      RESERVED_256B                                   \
-                                RESERVED_256B                                   \
-                                RESERVED_256B                                   \
-                                RESERVED_256B
-#   endif
-
-#   ifndef RESERVED_4K             
-#       define RESERVED_4K      RESERVED_1K                                     \
-                                RESERVED_1K                                     \
-                                RESERVED_1K                                     \
-                                RESERVED_1K
-#   endif
-
-#   ifndef RESERVED_16K             
-#       define RESERVED_16K     RESERVED_4K                                     \
-                                RESERVED_4K                                     \
-                                RESERVED_4K                                     \
-                                RESERVED_4K
-#   endif
-
-#   ifndef RESERVED_64K             
-#       define RESERVED_64K     RESERVED_16K                                    \
-                                RESERVED_16K                                    \
-                                RESERVED_16K                                    \
-                                RESERVED_16K
-#   endif
-
-#   ifndef RESERVED_256K             
-#       define RESERVED_256K    RESERVED_64K                                    \
-                                RESERVED_64K                                    \
-                                RESERVED_64K                                    \
-                                RESERVED_64K
-#   endif
-
-
-#   ifndef RESERVED_1M             
-#       define RESERVED_1M      RESERVED_256K                                   \
-                                RESERVED_256K                                   \
-                                RESERVED_256K                                   \
-                                RESERVED_256K
-#   endif
-
+#   define __REG_RSVD_NAME(__NAME)
 #endif
 
-#endif
+#define ____REG_RSVD(__NAME, __BIT)                                             \
+        reg##__BIT##_t              __NAME : __BIT;
+#define ____REG_RSVD_N(__NAME, __BIT, __N)                                      \
+        reg##__BIT##_t              __NAME[__N];
+#define __REG_RSVD(__BIT)           ____REG_RSVD(REG_RSVD_NAME, __BIT)
+#define __REG_RSVD_N(__BIT, __N)    ____REG_RSVD_N(REG_RSVD_NAME, __BIT, (__N))
+
+#define REG_RSVD_NAME               __REG_RSVD_NAME(__LINE__)
+#define REG_RSVD(__BIT)             __REG_RSVD(__BIT)
+#define REG_RSVD_N(__BIT, __N)      __REG_RSVD_N(__BIT, (__N))
+
+#define REG_RSVD_U8                 REG_RSVD(8)
+#define REG_RSVD_U16                REG_RSVD(16)
+#define REG_RSVD_U32                REG_RSVD(32)
+
+#define REG_RSVD_U8N(__N)           REG_RSVD_N(8, (__N))
+#define REG_RSVD_U16N(__N)          REG_RSVD_N(16, (__N))
+#define REG_RSVD_U32N(__N)          REG_RSVD_N(32, (__N))
+
+#define REG8_RSVD_N(__N)            REG_RSVD_U8N(__N)
+#define REG8_RSVD_B(__BYTE_CNT)     REG8_RSVD_N(__BYTE_CNT)
+#define REG8_RSVD_8B                REG8_RSVD_B(8)
+#define REG8_RSVD_16B               REG8_RSVD_B(16)
+#define REG8_RSVD_32B               REG8_RSVD_B(32)
+#define REG8_RSVD_64B               REG8_RSVD_B(64)
+#define REG8_RSVD_128B              REG8_RSVD_B(128)
+#define REG8_RSVD_256B              REG8_RSVD_B(256)
+#define REG8_RSVD_512B              REG8_RSVD_B(512)
+#define REG8_RSVD_1K                REG8_RSVD_B(1024)
+#define REG8_RSVD_2K                REG8_RSVD_B(2048)
+#define REG8_RSVD_4K                REG8_RSVD_B(4096)
+#define REG8_RSVD_8K                REG8_RSVD_B(8192)
+#define REG8_RSVD_16K               REG8_RSVD_B(16 * 1024)
+#define REG8_RSVD_32K               REG8_RSVD_B(32 * 1024)
+#define REG8_RSVD_64K               REG8_RSVD_B(64 * 1024)
+#define REG8_RSVD_128K              REG8_RSVD_B(128 * 1024)
+#define REG8_RSVD_256K              REG8_RSVD_B(256 * 1024)
+#define REG8_RSVD_512K              REG8_RSVD_B(512 * 1024)
+#define REG8_RSVD_1M                REG8_RSVD_B(1024 * 1024)
+
+#define REG16_RSVD_N(__N)           REG_RSVD_U16N(__N)
+// __BYTE_CNT MUST be mutiple of 2
+#define REG16_RSVD_B(__BYTE_CNT)    REG16_RSVD_N(__BYTE_CNT >> 1)
+#define REG16_RSVD_8B               REG16_RSVD_B(8)
+#define REG16_RSVD_16B              REG16_RSVD_B(16)
+#define REG16_RSVD_32B              REG16_RSVD_B(32)
+#define REG16_RSVD_64B              REG16_RSVD_B(64)
+#define REG16_RSVD_128B             REG16_RSVD_B(128)
+#define REG16_RSVD_256B             REG16_RSVD_B(256)
+#define REG16_RSVD_512B             REG16_RSVD_B(512)
+#define REG16_RSVD_1K               REG16_RSVD_B(1024)
+#define REG16_RSVD_2K               REG16_RSVD_B(2048)
+#define REG16_RSVD_4K               REG16_RSVD_B(4096)
+#define REG16_RSVD_8K               REG16_RSVD_B(8192)
+#define REG16_RSVD_16K              REG16_RSVD_B(16 * 1024)
+#define REG16_RSVD_32K              REG16_RSVD_B(32 * 1024)
+#define REG16_RSVD_64K              REG16_RSVD_B(64 * 1024)
+#define REG16_RSVD_128K             REG16_RSVD_B(128 * 1024)
+#define REG16_RSVD_256K             REG16_RSVD_B(256 * 1024)
+#define REG16_RSVD_512K             REG16_RSVD_B(512 * 1024)
+#define REG16_RSVD_1M               REG16_RSVD_B(1024 * 1024)
+
+#define REG32_RSVD_N(__N)           REG_RSVD_U32N(__N)
+// __BYTE_CNT MUST be mutiple of 4
+#define REG32_RSVD_B(__BYTE_CNT)    REG_RSVD_U32N(__BYTE_CNT >> 2)
+#define REG32_RSVD_8B               REG32_RSVD_B(8)
+#define REG32_RSVD_16B              REG32_RSVD_B(16)
+#define REG32_RSVD_32B              REG32_RSVD_B(32)
+#define REG32_RSVD_64B              REG32_RSVD_B(64)
+#define REG32_RSVD_128B             REG32_RSVD_B(128)
+#define REG32_RSVD_256B             REG32_RSVD_B(256)
+#define REG32_RSVD_512B             REG32_RSVD_B(512)
+#define REG32_RSVD_1K               REG32_RSVD_B(1024)
+#define REG32_RSVD_2K               REG32_RSVD_B(2048)
+#define REG32_RSVD_4K               REG32_RSVD_B(4096)
+#define REG32_RSVD_8K               REG32_RSVD_B(8192)
+#define REG32_RSVD_16K              REG32_RSVD_B(16 * 1024)
+#define REG32_RSVD_32K              REG32_RSVD_B(32 * 1024)
+#define REG32_RSVD_64K              REG32_RSVD_B(64 * 1024)
+#define REG32_RSVD_128K             REG32_RSVD_B(128 * 1024)
+#define REG32_RSVD_256K             REG32_RSVD_B(256 * 1024)
+#define REG32_RSVD_512K             REG32_RSVD_B(512 * 1024)
+#define REG32_RSVD_1M               REG32_RSVD_B(1024 * 1024)
+
+#endif      // __REG_TYPE__
 
 
 
@@ -380,7 +326,7 @@ typedef volatile uint32_t           reg32_t;
 
 /*============================ Multiple-Entry ================================*/
 
-/*! \note it is forseeable that in certain platform or compiler, people might 
+/*! \note it is forseeable that in certain platform or compiler, people might
  *!       have their own version of those system header files listed below
  */
 

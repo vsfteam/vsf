@@ -18,7 +18,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI_AWTK == ENABLED && VSF_USE_UI_AWTK == ENABLED && APP_CFG_USE_AWTK_DEMO == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_AWTK == ENABLED && APP_USE_AWTK_DEMO == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

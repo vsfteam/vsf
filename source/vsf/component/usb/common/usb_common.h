@@ -198,7 +198,7 @@ typedef struct usb_device_desc_t {
     uint8_t  iProduct;
     uint8_t  iSerialNumber;
     uint8_t  bNumConfigurations;
-}PACKED usb_device_desc_t;
+} PACKED usb_device_desc_t;
 
 typedef struct usb_config_desc_t {
     uint8_t  bLength;

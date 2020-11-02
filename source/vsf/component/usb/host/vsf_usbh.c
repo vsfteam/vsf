@@ -125,7 +125,7 @@ extern void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs);
 WEAK(vsf_usbh_on_dev_parsed)
 void vsf_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser)
 {
-    
+
 }
 #endif
 
@@ -134,7 +134,7 @@ WEAK(vsf_usbh_on_match_interface)
 vsf_err_t vsf_usbh_on_match_interface(
         vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs)
 {
-    vsf_trace(VSF_TRACE_INFO, "%s: vid%04X pid%04X interface%d" VSF_TRACE_CFG_LINEEND,
+    vsf_trace_info("%s: vid%04X pid%04X interface%d" VSF_TRACE_CFG_LINEEND,
                 parser_ifs->ifs->drv->name,
                 parser->desc_device->idVendor, parser->desc_device->idProduct,
                 parser_ifs->parser_alt[parser_ifs->ifs->cur_alt].desc_ifs->bInterfaceNumber);
@@ -146,7 +146,7 @@ vsf_err_t vsf_usbh_on_match_interface(
 WEAK(vsf_usbh_on_remove_interface)
 void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 {
-    vsf_trace(VSF_TRACE_INFO, "%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
+    vsf_trace_info("%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
 }
 #endif
 
@@ -156,24 +156,14 @@ vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
     uint_fast8_t direction = endpoint & USB_DIR_MASK;
     vk_usbh_pipe_t pipe;
 
-    if ((type & 0x03) == USB_EP_TYPE_ISO) {
-        // epsize of ISO is 1K max, avoid to overflow 10-bit size in pipe
-        size -= 1;
-    }
-
     endpoint &= 0x0F;
     pipe.value =   1|   (size << 2)             /* 10-bit size */
-                    |   (endpoint << 12)        /* 4-bit endpoint */
-                    |   (type << 16)            /* 2-bit type */
-                    |   (dev->speed << 18)      /* 2-bit speed */
-                    |   (dev->devnum << 20)     /* 7-bit address */
-                    |   (direction << 20);      /* 1-bit direction */
+                    |   (endpoint << 13)        /* 4-bit endpoint */
+                    |   (type << 17)            /* 2-bit type */
+                    |   (dev->speed << 19)      /* 2-bit speed */
+                    |   (dev->devnum << 21)     /* 7-bit address */
+                    |   (direction << 21);      /* 1-bit direction */
     return pipe;
-}
-
-uint_fast16_t vk_usbh_get_ep_size_from_pipe(vk_usbh_pipe_t pipe)
-{
-    return pipe.size + (pipe.type == USB_EP_TYPE_ISO ? 1 : 0);
 }
 
 vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,
@@ -291,7 +281,7 @@ vk_usbh_dev_t * vk_usbh_new_device(vk_usbh_t *usbh, enum usb_device_speed_t spee
     if (dev_new != NULL) {
         dev_new->speed = speed;
         if (dev_parent != NULL) {
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
             dev_new->index = idx;
             dev_new->dev_parent = dev_parent;
             vsf_slist_add_to_head(vk_usbh_dev_t, child_node, &dev_parent->children_list, dev_new);
@@ -322,7 +312,7 @@ static void __vk_usbh_clean_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 
 void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
     if (dev->dev_parent != NULL) {
         vk_usbh_hub_reset_dev(dev);
     } else
@@ -338,7 +328,7 @@ void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 
 static bool __vk_usbh_is_dev_resetting(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
     if (dev->dev_parent != NULL) {
         return vk_usbh_hub_is_dev_resetting(dev);
     } else
@@ -382,7 +372,6 @@ void vk_usbh_free_urb(vk_usbh_t *usbh, vk_usbh_urb_t *urb)
 
     if (vk_usbh_urb_is_alloced(urb)) {
         vk_usbh_pipe_t pipe = urb->urb_hcd->pipe;
-        vk_usbh_urb_free_buffer(urb);
         usbh->drv->free_urb(&usbh->use_as__vk_usbh_hcd_t, urb->urb_hcd);
         urb->pipe = pipe;
     }
@@ -485,7 +474,7 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 {
     VSF_USB_ASSERT((usbh != NULL) && (dev != NULL));
 
-#if VSF_USE_USB_HOST_HUB == ENABLED    
+#if VSF_USBH_USE_HUB == ENABLED
     vsf_slist_remove(vk_usbh_dev_t, child_node, &dev->dev_parent->children_list, dev);
 #endif
 
@@ -496,7 +485,7 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
         }
     }
 
-#if VSF_USE_USB_HOST_HUB == ENABLED
+#if VSF_USBH_USE_HUB == ENABLED
     vk_usbh_dev_t *dev_child;
     while (!vsf_slist_is_empty(&dev->children_list)) {
         vsf_slist_remove_from_head_unsafe(vk_usbh_dev_t, child_node, &dev->children_list, dev_child);
@@ -687,7 +676,7 @@ vsf_err_t vk_usbh_submit_urb_iso(vk_usbh_t *usbh, vk_usbh_urb_t *urb, uint_fast8
     vk_usbh_hcd_iso_packet_t *iso_packet = &urb->urb_hcd->iso_packet;
     vk_usbh_hcd_iso_packet_descriptor_t *frame_desc = iso_packet->frame_desc;
     int_fast32_t size = urb->urb_hcd->transfer_length, cur_offset = 0;
-    uint_fast16_t ep_size = urb->urb_hcd->pipe.size + 1, cur_size;
+    uint_fast16_t ep_size = urb->urb_hcd->pipe.size, cur_size;
 
     VSF_USB_ASSERT(size <= ep_size * dimof(iso_packet->frame_desc));
     iso_packet->start_frame = start_frame;
@@ -1234,6 +1223,25 @@ vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         size -= header->bLength;
     }
     return VSF_ERR_FAIL;
+}
+
+usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(usb_endpoint_desc_t *desc_ep, uint_fast16_t size)
+{
+    if (size > desc_ep->bLength) {
+        desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + desc_ep->bLength);
+        size -= desc_ep->bLength;
+
+        if (USB_DT_SS_ENDPOINT_COMP == desc_ep->bDescriptorType) {
+            if (size > desc_ep->bLength) {
+                desc_ep = (struct usb_endpoint_desc_t *)((uintptr_t)desc_ep + desc_ep->bLength);
+            } else {
+                desc_ep = NULL;
+            }
+        }
+    } else {
+        desc_ep = NULL;
+    }
+    return desc_ep;
 }
 
 #endif

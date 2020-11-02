@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#if VSF_USE_LINUX_LIBUSB == ENABLED && APP_CFG_USE_LINUX_LIBUSB_DEMO == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED && APP_USE_LINUX_LIBUSB_DEMO == ENABLED
 #include <libusb.h>
 
 int lsusb_main(int argc, char *argv[])
@@ -70,8 +70,8 @@ int lsusb_main(int argc, char *argv[])
             struct libusb_interface_descriptor *interface_desc;
             struct libusb_endpoint_descriptor *endpoint_desc;
             struct libusb_interface *interface;
-            for (int i = 0; i < desc.bNumConfigurations; i++) {
-                if (LIBUSB_SUCCESS != libusb_get_config_descriptor(devs[i], i, &config_desc)) {
+            for (int j = 0; j < desc.bNumConfigurations; j++) {
+                if (LIBUSB_SUCCESS != libusb_get_config_descriptor(devs[i], j, &config_desc)) {
                     continue;
                 }
 
@@ -83,10 +83,10 @@ int lsusb_main(int argc, char *argv[])
                 printf("    bmAttributes:         %02xh\n", config_desc->bmAttributes);
                 printf("    bMaxPower:            %d\n",    config_desc->bMaxPower);
 
-                for (int j = 0; j < config_desc->bNumInterfaces; j++) {
-                    interface = (struct libusb_interface *)&config_desc->interface[j];
-                    for (int k = 0; k < interface->num_altsetting; k++) {
-                        interface_desc = (struct libusb_interface_descriptor *)&interface->altsetting[k];
+                for (int k = 0; k < config_desc->bNumInterfaces; k++) {
+                    interface = (struct libusb_interface *)&config_desc->interface[k];
+                    for (int l = 0; l < interface->num_altsetting; l++) {
+                        interface_desc = (struct libusb_interface_descriptor *)&interface->altsetting[l];
 
                         printf("    Interface:\n");
                         printf("      bInterfaceNumber:   %d\n", interface_desc->bInterfaceNumber);
@@ -97,8 +97,8 @@ int lsusb_main(int argc, char *argv[])
                         printf("      bInterfaceProtocol: %d\n", interface_desc->bInterfaceProtocol);
                         printf("      iInterface:         %d\n", interface_desc->iInterface);
 
-                        for (int l = 0; l < interface_desc->bNumEndpoints; l++) {
-                            endpoint_desc = (struct libusb_endpoint_descriptor *)&interface_desc->endpoint[l];
+                        for (int m = 0; m < interface_desc->bNumEndpoints; m++) {
+                            endpoint_desc = (struct libusb_endpoint_descriptor *)&interface_desc->endpoint[m];
                             printf("      Endpoint:\n");
                             printf("        bEndpointAddress: %02xh\n", endpoint_desc->bEndpointAddress);
                             printf("        bmAttributes:     %02xh\n", endpoint_desc->bmAttributes);

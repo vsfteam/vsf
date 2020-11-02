@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_NETDRV_CLASS_INHERIT_NETIF__
 #include "./usrapp_net_common.h"
 
 #if VSF_USE_TCPIP == ENABLED
@@ -26,9 +27,9 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_NETDRV_USE_WPCAP == ENABLED
 usrapp_net_common_t usrapp_net_common = {
-#   if VSF_USE_NETDRV_WPCAP == ENABLED
+#   if VSF_NETDRV_USE_WPCAP == ENABLED
     .netdrv                 = {
         .macaddr.size       = TCPIP_ETH_ADDRLEN,
         .macaddr.addr_buf   = {APP_NETDRV_WPCAP_CFG_MAC},
@@ -45,7 +46,7 @@ usrapp_net_common_t usrapp_net_common = {
 /*============================ IMPLEMENTATION ================================*/
 
 vsf_err_t usrapp_net_common_init(
-#if VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_NETDRV_USE_WPCAP == ENABLED
     char *name
 #else
     void
@@ -54,9 +55,9 @@ vsf_err_t usrapp_net_common_init(
 {
     vsf_err_t err = VSF_ERR_NONE;
 
-#if VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_NETDRV_USE_WPCAP == ENABLED
 
-#   if VSF_USE_NETDRV_WPCAP == ENABLED
+#   if VSF_NETDRV_USE_WPCAP == ENABLED
     usrapp_net_common.netdrv.name = name;
     vk_netdrv_set_netlink_op((vk_netdrv_t *)&usrapp_net_common.netdrv, &vk_netdrv_wpcap_netlink_op, NULL);
 #   endif

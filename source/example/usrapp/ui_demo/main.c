@@ -93,7 +93,7 @@ void usrapp_trans_disp_line(uint8_t *buffer, uint_fast32_t size) {}
 static void lvgl_printf(lv_log_level_t level, const char *file, uint32_t line,  const char *dsc)
 {
     static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error"};
-    vsf_trace(VSF_TRACE_DEBUG, "%s: %s \t(%s #%d)\r\n", lvl_prefix[level], dsc,  file, line);
+    vsf_trace_debug("%s: %s \t(%s #%d)\r\n", lvl_prefix[level], dsc,  file, line);
 }
 #endif
 

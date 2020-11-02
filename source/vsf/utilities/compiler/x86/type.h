@@ -29,12 +29,12 @@ typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned char       uint_fast8_t;
 typedef signed char         int_fast8_t;
-    
+
 typedef unsigned short      uint16_t;
 typedef signed short        int16_t;
 typedef unsigned short      uint_fast16_t;
 typedef signed short        int_fast16_t;
-    
+
 typedef unsigned long int   uint32_t;
 typedef signed long int     int32_t;
 typedef unsigned long int   uint_fast32_t;
@@ -71,8 +71,14 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if     defined(__CPU_X86__)
 typedef uint32_t            uintalu_t;
-typedef int32_t             intalu_t;   
+typedef int32_t             intalu_t;
+#elif   defined(__CPU_X64__)
+typedef uint64_t            uintalu_t;
+typedef int64_t             intalu_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

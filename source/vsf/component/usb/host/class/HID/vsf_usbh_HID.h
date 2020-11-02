@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_HID == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HID == ENABLED
 
 #include "kernel/vsf_kernel.h"
 
@@ -42,16 +42,16 @@ extern "C" {
 
 #define vk_usbh_hid_send_report(__hid, __buffer, __size)                       \
             __vk_usbh_hid_send_report_imp(                                     \
-                (vk_usbh_hid_eda_t *)(__hid), (__buffer), (__size))
+                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size))
 
 #define vk_usbh_hid_recv_report(__hid, __buffer, __size)                       \
             __vk_usbh_hid_recv_report_imp(                                     \
-                (vk_usbh_hid_eda_t *)(__hid), (__buffer), (__size))
+                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size))
 
 #define vk_usbh_hid_get_rx_report(__hid)                                       \
-            __vk_usbh_hid_get_rx_report_imp((vk_usbh_hid_eda_t *)(__hid))
+            __vk_usbh_hid_get_rx_report_imp((vk_usbh_hid_teda_t *)(__hid))
 #define vk_usbh_hid_get_tx_report(__hid)                                       \
-            __vk_usbh_hid_get_tx_report_imp((vk_usbh_hid_eda_t *)(__hid))
+            __vk_usbh_hid_get_tx_report_imp((vk_usbh_hid_teda_t *)(__hid))
 
 #define vk_usbh_hid_set_idle(__hid, __id, __duration)                          \
             __vk_usbh_hid_set_idle_imp(                                        \
@@ -68,7 +68,6 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 dcl_simple_class(vk_usbh_hid_base_t)
-dcl_simple_class(vk_usbh_hid_eda_t)
 dcl_simple_class(vk_usbh_hid_teda_t)
 
 def_simple_class(vk_usbh_hid_base_t) {
@@ -94,14 +93,11 @@ def_simple_class(vk_usbh_hid_base_t) {
     )
 };
 
-def_simple_class(vk_usbh_hid_eda_t) {
-    implement(vk_usbh_hid_base_t)
-    implement(vsf_eda_t)
-};
-
 def_simple_class(vk_usbh_hid_teda_t) {
-    implement(vk_usbh_hid_base_t)
-    implement(vsf_teda_t)
+    public_member(
+        implement(vk_usbh_hid_base_t)
+        implement(vsf_teda_t)
+    )
 };
 
 // user callback will need this
@@ -116,12 +112,12 @@ extern const vk_usbh_class_drv_t vk_usbh_hid_drv;
 #ifdef __VSF_USBH_HID_CLASS_INHERIT__
 extern void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             vk_usbh_ifs_parser_t *parser_ifs, uint_fast32_t obj_size, bool has_hid_desc);
-extern void vk_usbh_hid_disconnect(vk_usbh_hid_eda_t *hid);
+extern void vk_usbh_hid_disconnect(vk_usbh_hid_teda_t *hid);
 
-extern uint8_t * __vk_usbh_hid_get_tx_report_imp(vk_usbh_hid_eda_t *hid);
-extern uint8_t * __vk_usbh_hid_get_rx_report_imp(vk_usbh_hid_eda_t *hid);
+extern uint8_t * __vk_usbh_hid_get_tx_report_imp(vk_usbh_hid_teda_t *hid);
+extern uint8_t * __vk_usbh_hid_get_rx_report_imp(vk_usbh_hid_teda_t *hid);
 
-extern vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
+extern vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size);
 extern vsf_err_t __vk_usbh_hid_recv_report_req_imp(vk_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
 extern vsf_err_t __vk_usbh_hid_send_report_req_imp(vk_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
 
@@ -129,7 +125,7 @@ extern vsf_err_t __vk_usbh_hid_set_idle_imp(vk_usbh_hid_base_t *hid, uint_fast8_
 #endif
 
 // user can call vk_usbh_hid_send_report in callbacks
-extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *buffer, int_fast32_t size);
+extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size);
 
 #ifdef __cplusplus
 }
@@ -138,5 +134,5 @@ extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_eda_t *hid, uint8_t *
 #undef __VSF_USBH_HID_CLASS_IMPLEMENT
 #undef __VSF_USBH_HID_CLASS_INHERIT__
 
-#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_HID
+#endif      // VSF_USE_USB_HOST && VSF_USBH_USE_HID
 #endif      // __VSF_USBH_HID_H__

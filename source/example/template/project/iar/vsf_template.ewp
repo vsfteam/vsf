@@ -4431,6 +4431,12 @@
                 </file>
             </group>
             <group>
+                <name>hal_demo</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\usart_demo.c</name>
+                </file>
+            </group>
+            <group>
                 <name>linux_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\linux_demo\libusb_demo.c</name>
@@ -6805,6 +6811,42 @@
                                 </file>
                             </group>
                             <group>
+                                <name>rtp</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\mean.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\mean.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\median.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\median.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\rtp.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\rtp.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\tsfilter.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\rtp\tsfilter.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>uart</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\uart\uart.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\uart\uart.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>usb</name>
                                 <group>
                                     <name>dc</name>
@@ -6813,6 +6855,15 @@
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\usb\dc\usbd.h</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>hc</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\usb\hc\usbh.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\usb\hc\usbh.h</name>
                                     </file>
                                 </group>
                                 <file>
@@ -6959,6 +7010,39 @@
                         <name>GD32E10X</name>
                         <group>
                             <name>common</name>
+                            <group>
+                                <name>usb</name>
+                                <group>
+                                    <name>dc</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\dc\usbd.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\dc\usbd.h</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>hc</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\hc\usbh.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\hc\usbh.h</name>
+                                    </file>
+                                </group>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\usb.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\usb.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\usb_common.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\GigaDevice\GD32E10X\common\usb\usb_lv0.c</name>
+                                </file>
+                            </group>
                             <group>
                                 <name>vendor</name>
                                 <group>
@@ -7517,6 +7601,15 @@
                     <group>
                         <name>MT071</name>
                         <group>
+                            <name>usart</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usart\usart.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\unknown\MT071\usart\usart.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>usb</name>
                             <group>
                                 <name>dc</name>
@@ -7681,6 +7774,9 @@
                     <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_pm.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_spi.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_usart.h</name>
                 </file>
                 <file>
@@ -7838,100 +7934,6 @@
                 </group>
                 <group>
                     <name>device_specific</name>
-                    <group>
-                        <name>Allwinner</name>
-                        <excluded>
-                            <configuration>vsf_template_m484</configuration>
-                            <configuration>vsf_template_gd32e103</configuration>
-                            <configuration>vsf_template_mt071</configuration>
-                        </excluded>
-                        <group>
-                            <name>F1CX00S</name>
-                            <group>
-                                <name>common</name>
-                                <group>
-                                    <name>usb</name>
-                                    <group>
-                                        <name>hc</name>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\common\usb\hc\usbh.c</name>
-                                        </file>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\common\usb\hc\usbh.h</name>
-                                        </file>
-                                    </group>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\common\usb\usb.h</name>
-                                    </file>
-                                </group>
-                            </group>
-                            <group>
-                                <name>F1C100S</name>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\F1CX00S\F1C100S\driver.h</name>
-                                </file>
-                            </group>
-                        </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\Allwinner\driver.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>GigaDevice</name>
-                        <excluded>
-                            <configuration>vsf_template_m484</configuration>
-                            <configuration>vsf_template_f1c100s</configuration>
-                            <configuration>vsf_template_mt071</configuration>
-                        </excluded>
-                        <group>
-                            <name>GD32E10X</name>
-                            <group>
-                                <name>common</name>
-                                <group>
-                                    <name>usb</name>
-                                    <group>
-                                        <name>dc</name>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\dc\usbd.c</name>
-                                        </file>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\dc\usbd.h</name>
-                                        </file>
-                                    </group>
-                                    <group>
-                                        <name>hc</name>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\hc\usbh.c</name>
-                                        </file>
-                                        <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\hc\usbh.h</name>
-                                        </file>
-                                    </group>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb.h</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb_common.c</name>
-                                    </file>
-                                    <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\common\usb\usb_lv0.c</name>
-                                    </file>
-                                </group>
-                            </group>
-                            <group>
-                                <name>GD32E103</name>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\GD32E10X\GD32E103\driver.h</name>
-                                </file>
-                            </group>
-                        </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\GigaDevice\driver.h</name>
-                        </file>
-                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h</name>
                     </file>
@@ -8028,6 +8030,15 @@
                 </file>
             </group>
             <group>
+                <name>fifo</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\service\fifo\vsf_fifo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\service\fifo\vsf_fifo.h</name>
+                </file>
+            </group>
+            <group>
                 <name>heap</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\service\heap\vsf_heap.c</name>
@@ -8067,6 +8078,42 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\service\pool\vsf_pool.h</name>
+                </file>
+            </group>
+            <group>
+                <name>simple_stream</name>
+                <group>
+                    <name>block_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>fifo_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>mem_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\vsf_simple_stream.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\service\simple_stream\vsf_simple_stream.h</name>
                 </file>
             </group>
             <group>
@@ -8115,42 +8162,6 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\service\trace\vsf_trace.h</name>
-                </file>
-            </group>
-            <group>
-                <name>vsfstream</name>
-                <group>
-                    <name>block_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\block_stream\vsf_block_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\block_stream\vsf_block_stream.h</name>
-                    </file>
-                </group>
-                <group>
-                    <name>fifo_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h</name>
-                    </file>
-                </group>
-                <group>
-                    <name>mem_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\vsfstream.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\service\vsfstream\vsfstream.h</name>
                 </file>
             </group>
             <file>
@@ -8371,9 +8382,6 @@
                         <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\__common\__retarget_io.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\__common\__signal.h</name>
-                    </file>
-                    <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\__common\__type.h</name>
                     </file>
                 </group>
@@ -8558,12 +8566,6 @@
                     <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\retarget_io.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\signal.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\signal.h</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\type.h</name>
                 </file>
             </group>
@@ -8591,13 +8593,10 @@
                     <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\mrepeat.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_connect.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\preprocessor.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\tpaste.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_repeat_macro.h</name>
                 </file>
             </group>
             <group>

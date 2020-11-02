@@ -35,7 +35,7 @@ static void input_demo_trace_hid(vk_hid_event_t *hid_evt)
         usage_page = HID_GET_USAGE_PAGE(hid_evt->id);
         usage_id = HID_GET_USAGE_ID(hid_evt->id);
 
-        vsf_trace(VSF_TRACE_DEBUG, "hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("hid(%d): page=%d, id=%d, pre=%d, cur=%d" VSF_TRACE_CFG_LINEEND,
             generic_usage, usage_page, usage_id, hid_evt->pre, hid_evt->cur);
     }
 }
@@ -43,14 +43,14 @@ static void input_demo_trace_hid(vk_hid_event_t *hid_evt)
 static void input_demo_trace_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     if (gamepad_evt->id != GAMEPAD_ID_DUMMY) {
-        vsf_trace(VSF_TRACE_DEBUG, "gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("gamepad(%d): cur=%d, pre=%d" VSF_TRACE_CFG_LINEEND,
             (vsf_gamepad_id_t)gamepad_evt->id, gamepad_evt->cur, gamepad_evt->pre);
     }
 }
 
 static void input_demo_trace_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
-    vsf_trace(VSF_TRACE_DEBUG, "touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
+    vsf_trace_debug("touchscreen(%d): %s x=%d, y=%d" VSF_TRACE_CFG_LINEEND,
         vsf_input_touchscreen_get_id(ts_evt),
         vsf_input_touchscreen_is_down(ts_evt) ? "down" : "up",
         vsf_input_touchscreen_get_x(ts_evt),
@@ -59,7 +59,7 @@ static void input_demo_trace_touchscreen(vk_touchscreen_evt_t *ts_evt)
 
 static void input_demo_trace_keyboard(vk_keyboard_evt_t *kb_evt)
 {
-    vsf_trace(VSF_TRACE_DEBUG, "keyboard: %d %s" VSF_TRACE_CFG_LINEEND,
+    vsf_trace_debug("keyboard: %d %s" VSF_TRACE_CFG_LINEEND,
         vsf_input_keyboard_get_keycode(kb_evt),
         vsf_input_keyboard_is_down(kb_evt) ? "down" : "up");
 }
@@ -68,19 +68,19 @@ static void input_demo_trace_mouse(vk_mouse_evt_t *mouse_evt)
 {
     switch (vk_input_mouse_evt_get(mouse_evt)) {
     case VSF_INPUT_MOUSE_EVT_BUTTON:
-        vsf_trace(VSF_TRACE_DEBUG, "mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
             vk_input_mouse_evt_button_get(mouse_evt),
             vk_input_mouse_evt_button_is_down(mouse_evt) ? "down" : "up",
             vk_input_mouse_evt_get_x(mouse_evt),
             vk_input_mouse_evt_get_y(mouse_evt));
         break;
     case VSF_INPUT_MOUSE_EVT_MOVE:
-        vsf_trace(VSF_TRACE_DEBUG, "mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
             vk_input_mouse_evt_get_x(mouse_evt),
             vk_input_mouse_evt_get_y(mouse_evt));
         break;
     case VSF_INPUT_MOUSE_EVT_WHEEL:
-        vsf_trace(VSF_TRACE_DEBUG, "mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
             vk_input_mouse_evt_get_x(mouse_evt),
             vk_input_mouse_evt_get_y(mouse_evt));
         break;
@@ -141,7 +141,7 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
     }
 
     if (value_cnt >= 6) {
-        vsf_trace(VSF_TRACE_DEBUG, "6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("6-asix: acc_x=%d, acc_y=%d, acc_z=%d, gyro_pitch=%d, gyro_yaw=%d, gyro_roll=%d" VSF_TRACE_CFG_LINEEND,
             (int)acc_x, (int)acc_y, (int)acc_z, (int)gyro_pitch, (int)gyro_yaw, (int)gyro_roll);
     }
 }
@@ -149,7 +149,7 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
 void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
 {
     switch (type) {
-#if VSF_USE_INPUT_HID == ENABLED
+#if VSF_INPUT_USE_HID == ENABLED
     case VSF_INPUT_TYPE_HID:
         input_demo_trace_hid((vk_hid_event_t *)event);
         break;
@@ -160,7 +160,7 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *event)
     case VSF_INPUT_TYPE_TOUCHSCREEN:
         input_demo_trace_touchscreen((vk_touchscreen_evt_t*)event);
         break;
-#if VSF_USE_INPUT_DS4 == ENABLED
+#if VSF_INPUT_USE_DS4 == ENABLED
     case VSF_INPUT_TYPE_DS4:
         input_demo_trace_gamepad((vk_gamepad_evt_t *)event);
         break;

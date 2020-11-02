@@ -122,7 +122,7 @@ void usrapp_msgq_test_start(void)
             .fn.evthandler  = usrapp_msgq_recv_evthandler,
             .priority       = vsf_prio_0,     // TODO: test other priority
         };
-        vsf_eda_init_ex(&usrapp_msgq.eda_recv, (vsf_eda_cfg_t *)&cfg);
+        vsf_eda_start(&usrapp_msgq.eda_recv, (vsf_eda_cfg_t *)&cfg);
     }
 
     for (int i = 0; i < dimof(usrapp_msgq.eda_send); i++) {
@@ -130,6 +130,6 @@ void usrapp_msgq_test_start(void)
             .fn.evthandler  = usrapp_msgq_send_evthandler,
             .priority       = vsf_prio_0 + i,
         };
-        vsf_teda_init_ex(&usrapp_msgq.eda_send[i], (vsf_eda_cfg_t *)&cfg);
+        vsf_teda_start(&usrapp_msgq.eda_send[i], (vsf_eda_cfg_t *)&cfg);
     }
 }

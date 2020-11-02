@@ -22,10 +22,10 @@
 /*============================ INCLUDES ======================================*/
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_XB1 == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_XB1 == ENABLED
 
 #include "component/usb/common/class/XB1/vsf_usb_xb1.h"
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 #   include "component/input/vsf_input.h"
 #endif
 
@@ -41,14 +41,14 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_USB_HOST_HID != ENABLED
-#   error "XB1 driver need VSF_USE_USB_HOST_HID"
+#if VSF_USBH_USE_HID != ENABLED
+#   error "XB1 driver need VSF_USBH_USE_HID"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 enum {
     VSF_INPUT_TYPE_XB1 = VSF_INPUT_USER_TYPE,
 };
@@ -65,7 +65,7 @@ dcl_simple_class(vk_usbh_xb1_t)
 def_simple_class(vk_usbh_xb1_t) {
 
     implement(vk_usbh_hid_teda_t)
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
     implement(vk_input_xb1_t)
 #endif
 
@@ -80,7 +80,7 @@ def_simple_class(vk_usbh_xb1_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 extern const vk_input_item_info_t vk_xb1_gamepad_item_info[GAMEPAD_ID_NUM];
 #endif
 
@@ -88,7 +88,7 @@ extern const vk_usbh_class_drv_t vk_usbh_xb1_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_XB1 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB1 == ENABLED
 extern void vk_xb1_process_input(vk_input_xb1_t *dev, vsf_usb_xb1_gamepad_in_report_t *data);
 extern void vk_xb1_new_dev(vk_input_xb1_t *dev);
 extern void vk_xb1_free_dev(vk_input_xb1_t *dev);

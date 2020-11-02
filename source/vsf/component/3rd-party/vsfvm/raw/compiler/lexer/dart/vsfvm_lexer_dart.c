@@ -238,17 +238,17 @@ static vsf_err_t __vsfvm_dart_parse_token(vsfvm_lexer_t *lexer, vsfvm_pt_t *pt,
 
 #if VSFVM_LEXER_DEBUG_EN == ENABLED
     if (token & VSFVM_DART_TOKEN_2EQ) {
-        vsf_trace(VSF_TRACE_DEBUG, "token: %c=" VSF_TRACE_CFG_LINEEND, token & 0xFF);
+        vsf_trace_debug("token: %c=" VSF_TRACE_CFG_LINEEND, token & 0xFF);
     } else if (token & VSFVM_DART_TOKEN_DOUBLE) {
-        vsf_trace(VSF_TRACE_DEBUG, "token: %c%c" VSF_TRACE_CFG_LINEEND, token & 0xFF, token & 0xFF);
+        vsf_trace_debug("token: %c%c" VSF_TRACE_CFG_LINEEND, token & 0xFF, token & 0xFF);
     } else if (token & VSFVM_DART_TOKEN_NUM) {
-        vsf_trace(VSF_TRACE_DEBUG, "token: %d" VSF_TRACE_CFG_LINEEND, data->ival);
+        vsf_trace_debug("token: %d" VSF_TRACE_CFG_LINEEND, data->ival);
     } else if (token & VSFVM_DART_TOKEN_SYM) {
-        vsf_trace(VSF_TRACE_DEBUG, "token: %s" VSF_TRACE_CFG_LINEEND, data->sym->name + (('"' == data->sym->name[0]) ? 1 : 0));
+        vsf_trace_debug("token: %s" VSF_TRACE_CFG_LINEEND, data->sym->name + (('"' == data->sym->name[0]) ? 1 : 0));
     } else if (token == '\n') {
-        vsf_trace(VSF_TRACE_DEBUG, "token: \\n" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_debug("token: \\n" VSF_TRACE_CFG_LINEEND);
     } else {
-        vsf_trace(VSF_TRACE_DEBUG, "token: %s" VSF_TRACE_CFG_LINEEND, (char *)&token);
+        vsf_trace_debug("token: %s" VSF_TRACE_CFG_LINEEND, (char *)&token);
     }
 #endif
 

@@ -18,7 +18,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_UI_LVGL == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LVGL == ENABLED
 
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
@@ -247,9 +247,9 @@ static void ui_demo_event_cb(lv_obj_t *obj, lv_event_t event)
     // TODO: add event handler
     if (obj == gamepad->pad_left.btn_up) {
         if (lv_btn_is_down(obj)) {
-            vsf_trace(VSF_TRACE_DEBUG, "btn_lu down\r\n");
+            vsf_trace_debug("btn_lu down\r\n");
         } else {
-            vsf_trace(VSF_TRACE_DEBUG, "btn_lu up\r\n");
+            vsf_trace_debug("btn_lu up\r\n");
         }
     } else if (obj == gamepad->pad_left.btn_down) {
     } else if (obj == gamepad->pad_left.btn_left) {

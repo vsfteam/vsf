@@ -24,9 +24,6 @@
 /* non standard customised lv2 driver */
 #include "./customised/driver.h"
 
-/* device specific drivers, including but not limited to lv0 and lv1 drivers */
-#include "./device_specific/driver.h"
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

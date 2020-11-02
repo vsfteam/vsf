@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#if APP_CFG_USE_VSFVM_DEMO == ENABLED
+#if APP_USE_VSFVM_DEMO == ENABLED
 
 #include "vsf_vm.h"
 
@@ -29,7 +29,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if APP_CFG_USE_LINUX_DEMO != ENABLED
+#if APP_USE_LINUX_DEMO != ENABLED
 #   error THIS VSFVM_DEMO NEED LINUX
 #endif
 
@@ -143,7 +143,7 @@ int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, ui
     return 0;
 }
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 void vsfvm_user_poll(void) {
 #else
 void vsf_plug_in_on_kernel_idle(void) {
@@ -160,7 +160,7 @@ void vsf_plug_in_on_kernel_idle(void) {
         }
     }
 
-#if APP_CFG_USE_LINUX_DEMO != ENABLED
+#if APP_USE_LINUX_DEMO != ENABLED
     vsf_arch_sleep(0);
 #endif
 }
@@ -220,7 +220,7 @@ int vsfvm_main(int argc, char *argv[])
     // 1. register extension(s)
     vsfvm_ext_register_std();
     vsfvm_ext_register_kernel();
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_LIBUSB == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_LIBUSB == ENABLED
     vsfvm_ext_register_libusb();
 #endif
 
@@ -273,4 +273,4 @@ int vsfvm_main(int argc, char *argv[])
     return 0;
 }
 
-#endif      // APP_CFG_USE_VSFVM_DEMO
+#endif      // APP_USE_VSFVM_DEMO

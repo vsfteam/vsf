@@ -158,7 +158,7 @@
 #   define VSF_USBD_CFG_STREAM_EN                   DISABLED
 
 #define VSF_USE_TRACE                               ENABLED
-#define VSF_USE_SERVICE_VSFSTREAM                   ENABLED
+#define VSF_USE_SIMPLE_STREAM                       ENABLED
 
 // heap is enabled by default, disable manually
 #define VSF_USE_HEAP                                DISABLED
@@ -181,7 +181,7 @@
 #   define VSF_HAL_USE_DEBUG_STREAM                 ENABLED
 
 #   if VSF_USE_USB_DEVICE == ENABLED
-#       define VSF_USE_USB_DEVICE_DCD_USBIP         ENABLED
+#       define VSF_USBD_USE_DCD_USBIP               ENABLED
 #       define APP_CFG_USBD_SPEED                   USB_DC_SPEED_HIGH
 
 #       define VSF_USBD_CFG_DRV_LV0_OO

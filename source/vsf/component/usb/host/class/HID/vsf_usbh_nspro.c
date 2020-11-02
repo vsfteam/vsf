@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_HOST_NSPRO == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_NSPRO == ENABLED
 
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
 #define __VSF_USBH_HID_CLASS_INHERIT__
@@ -49,7 +49,7 @@ static void __vk_usbh_nspro_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
 const vk_input_item_info_t vk_nspro_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_UP,           25, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_DOWN,         26, 1,  false),
@@ -100,7 +100,7 @@ extern void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro);
 extern void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro);
 extern void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro);
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
 extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
@@ -109,7 +109,7 @@ extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
 #ifndef WEAK_VSF_NSPRO_ON_NEW_DEV
 WEAK(vsf_nspro_on_new_dev)
 void vsf_nspro_on_new_dev(vk_input_nspro_t *dev)
@@ -223,7 +223,7 @@ void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_repo
 WEAK(vsf_usbh_nspro_on_report_input)
 void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
     vk_nspro_process_input(&nspro->use_as__vk_input_nspro_t, report);
 #   endif
 }
@@ -240,7 +240,7 @@ void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
 WEAK(vsf_usbh_nspro_on_new)
 void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
     vk_nspro_new_dev(&nspro->use_as__vk_input_nspro_t);
 #   endif
 }
@@ -250,7 +250,7 @@ void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 WEAK(vsf_usbh_nspro_on_free)
 void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_USE_INPUT_NSPRO == ENABLED
+#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
     vk_nspro_free_dev(&nspro->use_as__vk_input_nspro_t);
 #   endif
 }
@@ -260,12 +260,12 @@ static void __vk_usbh_nspro_send_usb_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cm
 {
     nspro->gamepad_out_buf.buffer[0] = 0x80;
     nspro->gamepad_out_buf.buffer[1] = cmd;
-    vk_usbh_hid_send_report((vk_usbh_hid_eda_t *)&nspro->use_as__vk_usbh_hid_teda_t, (uint8_t *)&nspro->gamepad_out_buf, 2);
+    vk_usbh_hid_send_report(&nspro->use_as__vk_usbh_hid_teda_t, (uint8_t *)&nspro->gamepad_out_buf, 2);
 }
 
 static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_nspro_t *nspro = (vk_usbh_nspro_t *)container_of(eda, vk_usbh_hid_eda_t, use_as__vsf_eda_t);
+    vk_usbh_nspro_t *nspro = (vk_usbh_nspro_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT: {
@@ -284,7 +284,7 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
                 nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
                 __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
-                vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
+                vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
                 __vk_usbh_nspro_send_usb_cmd(nspro, 1);
             } else /* if (USB_ENDPOINT_XFER_INT == pipe.type) */ {
                 if (pipe.dir_in1out0) {
@@ -317,7 +317,7 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             }
                             break;
                         }
-                        vk_usbh_hid_recv_report((vk_usbh_hid_eda_t *)&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
+                        vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
                     }
                 } else {
                     if (VSF_USBH_NSPRO_RUNNING == nspro->start_state) {
@@ -344,7 +344,7 @@ static void * __vk_usbh_nspro_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
 static void __vk_usbh_nspro_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
     vsf_usbh_nspro_on_free((vk_usbh_nspro_t *)param);
-    vk_usbh_hid_disconnect((vk_usbh_hid_eda_t *)param);
+    vk_usbh_hid_disconnect((vk_usbh_hid_teda_t *)param);
 }
 
-#endif      // VSF_USE_USB_HOST && VSF_USE_USB_HOST_NSPRO
+#endif      // VSF_USE_USB_HOST && VSF_USBH_USE_NSPRO

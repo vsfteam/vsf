@@ -1,0 +1,16 @@
+diff --git a/source/vsf/component/3rd-party/littlevgl/6.1.2/raw/lvgl/src/lv_core/lv_group.c b/source/vsf/component/3rd-party/littlevgl/6.1.2/raw/lvgl/src/lv_core/lv_group.c
+index b26de56ef..1bc2df1d2 100644
+--- a/source/vsf/component/3rd-party/littlevgl/6.1.2/raw/lvgl/src/lv_core/lv_group.c
++++ b/source/vsf/component/3rd-party/littlevgl/6.1.2/raw/lvgl/src/lv_core/lv_group.c
+@@ -361,9 +361,9 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
+         focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL); /*Focus again to properly leave/open edit/navigate mode*/
+         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
+         if(res != LV_RES_OK) return;
+-    }
+ 
+-    lv_obj_invalidate(focused);
++        lv_obj_invalidate(focused);
++    }
+ }
+ 
+ /**

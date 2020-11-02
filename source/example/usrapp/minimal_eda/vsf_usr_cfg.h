@@ -24,7 +24,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//#define ASSERT(...)         if (!(__VA_ARGS__)) {SAFE_ATOM_CODE() {while(1);}};
+//#define ASSERT(...)         if (!(__VA_ARGS__)) {vsf_interrupt_safe() {while(1);}};
 #define ASSERT(...)
 
 #define VSF_SYSTIMER_FREQ               25000000ul

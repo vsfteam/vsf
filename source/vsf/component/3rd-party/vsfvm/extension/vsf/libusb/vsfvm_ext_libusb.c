@@ -20,7 +20,7 @@
 #include "vsf_vm_cfg.h"
 
 #if     ((VSFVM_CFG_RUNTIME_EN == ENABLED) || (VSFVM_CFG_COMPILER_EN == ENABLED))\
-    &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USE_USB_HOST_LIBUSB == ENABLED)
+    &&  (VSF_USE_USB_HOST == ENABLED) && (VSF_USBH_USE_LIBUSB == ENABLED)
 
 #define __VSFVM_RUNTIME_CLASS_INHERIT__
 #define __VSF_EDA_CLASS_INHERIT__
@@ -490,7 +490,7 @@ static void __vsfvm_ext_libusb_dev_print(vsfvm_instance_t *inst)
         vsfvm_ext_libusb_dev_t *ext_ldev = inst->obj_ptr;
         vk_usbh_libusb_dev_t *ldev = ext_ldev->ldev;
 
-        vsf_trace(VSF_TRACE_INFO, "libusb_dev@(%02X_%04X:%04X)",
+        vsf_trace_info("libusb_dev@(%02X_%04X:%04X)",
                     ldev->address, ldev->vid, ldev->pid);
     }
 }
@@ -517,4 +517,4 @@ void vsfvm_ext_register_libusb(void)
     vsfvm_register_ext(&__vsfvm_ext_libusb.use_as__vsfvm_ext_t);
 }
 
-#endif      // (VSFVM_CFG_RUNTIME_EN || VSFVM_CFG_COMPILER_EN) && VSF_USE_USB_HOST && VSF_USE_USB_HOST_LIBUSB
+#endif      // (VSFVM_CFG_RUNTIME_EN || VSFVM_CFG_COMPILER_EN) && VSF_USE_USB_HOST && VSF_USBH_USE_LIBUSB

@@ -20,9 +20,9 @@
 #include "component/usb/vsf_usb_cfg.h"
 
 #if     (   (VSF_USE_USB_DEVICE == ENABLED)                                     \
-        && (VSF_USE_USB_DEVICE_DCD_MUSB_FDRC == ENABLED))                       \
+        && (VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED))                             \
     ||  (   (VSF_USE_USB_HOST == ENABLED)                                       \
-        && (VSF_USE_USB_HOST_HCD_MUSB_FDRC == ENABLED))
+        && (VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED))
 
 #define VSF_MUSB_FDRC_IMPLEMENT
 #include "./__vsf_musb_fdrc_common.h"

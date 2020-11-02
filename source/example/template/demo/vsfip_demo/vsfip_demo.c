@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
+#if APP_USE_VSFIP_DEMO == ENABLED && VSF_USE_VSFIP == ENABLED
 
 #include "../common/usrapp_common.h"
 
@@ -32,7 +32,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if APP_CFG_USE_LINUX_DEMO != ENABLED
+#if APP_USE_LINUX_DEMO != ENABLED
 #   error vsfip_demo runs under linux subsystem
 #endif
 
@@ -169,7 +169,7 @@ int vsfip_main(int argc, char *argv[])
     vsfip_init();
     vsfip_dnsc_init();
 
-#if VSF_USE_NETDRV_WPCAP
+#if VSF_NETDRV_USE_WPCAP == ENABLED
     if (argc != 2) {
         printf("format: %s NETDRV_NAME\r\n", argv[0]);
         return -1;
@@ -187,4 +187,4 @@ int vsfip_main(int argc, char *argv[])
     return 0;
 }
 
-#endif      // APP_CFG_USE_TCPIP_DEMO && VSF_USE_VSFIP
+#endif      // APP_USE_TCPIP_DEMO && VSF_USE_VSFIP

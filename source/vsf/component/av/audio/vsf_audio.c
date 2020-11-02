@@ -21,8 +21,8 @@
 
 #if VSF_USE_AUDIO == ENABLED
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#   define __VSFSTREAM_CLASS_INHERIT__
+#if VSF_USE_SIMPLE_STREAM == ENABLED
+#   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #endif
 #define __VSF_AUDIO_CLASS_IMPLEMENT
 
@@ -35,8 +35,8 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use scsi
 #endif
 
-#if VSF_USE_KERNEL_SIMPLE_SHELL != ENABLED
-#   error VSF_USE_KERNEL_SIMPLE_SHELL must be enabled
+#if VSF_KERNEL_USE_SIMPLE_SHELL != ENABLED
+#   error VSF_KERNEL_USE_SIMPLE_SHELL must be enabled
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -57,7 +57,7 @@ vsf_err_t vk_audio_init(vk_audio_dev_t *pthis)
     return err;
 }
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
 vsf_err_t vk_audio_play_set_volume(vk_audio_dev_t *pthis, uint_fast16_t volume)
 {
     vsf_err_t err;

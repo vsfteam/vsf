@@ -14,16 +14,16 @@
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
-#ifndef __VSF_DISP_SOLOMON_SYSTECH_COMMON_H___
-#define __VSF_DISP_SOLOMON_SYSTECH_COMMON_H___
+#ifndef __VSF_DISP_SOLOMON_SYSTECH_COMMON_H__
+#define __VSF_DISP_SOLOMON_SYSTECH_COMMON_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/ui/vsf_ui_cfg.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (   (VSF_USE_DISP_SSD1306 == ENABLED)                                   \
-        ||  (VSF_USE_DISP_SSD1316 == ENABLED))
+    &&  (   (VSF_DISP_USE_SSD1306 == ENABLED)                                   \
+        ||  (VSF_DISP_USE_SSD1316 == ENABLED))
 
 #include "osa_hal/driver/customised/multiplex_hal/iic/vsf_multiplex_iic.h"
 
@@ -77,4 +77,4 @@ typedef struct vsf_disp_solomon_systech_hw_ebi_t {
 #endif
 
 #endif  // VSF_USE_UI
-#endif  // __VSF_DISP_SOLOMON_SYSTECH_COMMON_H___
+#endif  // __VSF_DISP_SOLOMON_SYSTECH_COMMON_H__

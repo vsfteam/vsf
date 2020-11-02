@@ -22,7 +22,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_UVC == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_UVC == ENABLED
 
 #include "utilities/vsf_utilities.h"
 
@@ -89,5 +89,5 @@ typedef struct usb_uvc_ct_roi_t {
 }
 #endif
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USE_USB_DEVICE_UVC
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_UVC
 #endif      // __VSFUSB_UVC_H__

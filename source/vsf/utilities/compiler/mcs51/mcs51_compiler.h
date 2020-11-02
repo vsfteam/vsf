@@ -198,8 +198,7 @@ extern void vsf_stdio_init(void);
 
 /*============================ INCLUDES ======================================*/
 
-//! \brief for interrupt 
-#include "./signal.h"
+#include "./msc51_interrupt.h"
 
 #endif /* __USE_MCS51_COMPILER_H_PART_2__ */
 

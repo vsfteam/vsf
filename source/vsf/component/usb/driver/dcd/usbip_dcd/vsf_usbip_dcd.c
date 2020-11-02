@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_USBIP == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_USBIP == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__
@@ -38,7 +38,7 @@
 
 #if VSF_USBIP_SERVER_CFG_DEBUG == ENABLED
 #   define __vk_usbip_server_trace(...)                                         \
-            vsf_trace(VSF_TRACE_DEBUG, "usbip_server: " __VA_ARGS__)
+            vsf_trace_debug("usbip_server: " __VA_ARGS__)
 #   define __vk_usbip_server_trace_buffer(...)                                  \
             vsf_trace_buffer(VSF_TRACE_DEBUG, __VA_ARGS__, VSF_TRACE_DF_DEFAULT)
 #else

@@ -78,15 +78,14 @@ def_simple_class(vk_netdrv_adapter_op_t) {
     )
 };
 
-struct vk_netdrv_addr_t {
+typedef struct vk_netdrv_addr_t {
     uint32_t size;
     union {
         uint32_t addr32;
         uint64_t addr64;
         uint8_t addr_buf[16];
     };
-};
-typedef struct vk_netdrv_addr_t vk_netdrv_addr_t;
+} vk_netdrv_addr_t;
 
 def_simple_class(vk_netdrv_t) {
 
@@ -124,12 +123,6 @@ def_simple_class(vk_netdrv_t) {
     )
 };
 
-/*============================ INCLUDES ======================================*/
-
-#if VSF_USE_NETDRV_WPCAP == ENABLED
-#   include "./driver/wpcap/vsf_netdrv_wpcap.h"
-#endif
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -163,6 +156,12 @@ extern vsf_err_t vk_netdrv_output(vk_netdrv_t *netdrv, void *netbuf);
 
 #ifdef __cplusplus
 }
+#endif
+
+/*============================ INCLUDES ======================================*/
+
+#if VSF_NETDRV_USE_WPCAP == ENABLED
+#   include "./driver/wpcap/vsf_netdrv_wpcap.h"
 #endif
 
 #undef __VSF_NETDRV_CLASS_IMPLEMENT

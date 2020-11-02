@@ -19,7 +19,7 @@
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_SCSI == ENABLED && VSF_USE_SCSI_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_USE_SCSI == ENABLED && VSF_MAL_USE_SCSI_MAL == ENABLED
 
 #define __VSF_MAL_CLASS_INHERIT__
 #define __VSF_SCSI_MAL_CLASS_IMPLEMENT
@@ -31,7 +31,7 @@
 
 #if VSF_SCSI_MAL_CFG_DEBUG == ENABLED
 #   define __vk_scsi_mal_trace(...)                                             \
-            vsf_trace(VSF_TRACE_DEBUG, "scsi_mal: " __VA_ARGS__)
+            vsf_trace_debug("scsi_mal: " __VA_ARGS__)
 #else
 #   define __vk_scsi_mal_trace(...)
 #endif
@@ -106,7 +106,7 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
                 vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
                 break;
             case STATE_INQUIRY:
-                vsf_trace(VSF_TRACE_INFO, "scsi_mal: vendor %8s, product %16s, revision %4s" VSF_TRACE_CFG_LINEEND,
+                vsf_trace_info("scsi_mal: vendor %8s, product %16s, revision %4s" VSF_TRACE_CFG_LINEEND,
                         pthis->buffer.inquiry.vendor, pthis->buffer.inquiry.product, pthis->buffer.inquiry.revision);
 
                 pthis->cbd[0] = 0x25;

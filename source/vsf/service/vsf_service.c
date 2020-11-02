@@ -21,7 +21,7 @@
 #include "./vsf_service.h"
 
 /*============================ MACROS ========================================*/
-#if !defined(VSF_PBUF_ADAPTERS) && VSF_USE_SERVICE_STREAM == ENABLED
+#if !defined(VSF_PBUF_ADAPTERS) && VSF_USE_STREAM == ENABLED
 #warning No defined VSF_PBUF_ADAPTERS, all allocated pbuf objects need to be \
 free-ed explicitly to their origins or General PBUF Pool should be Enabled.
 #endif
@@ -40,10 +40,7 @@ VSF_SERVICE_CFG_INSERTION
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#ifndef WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR
-//! user must implement this interface
 extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
-#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -53,11 +50,7 @@ void vsf_service_init(void)
 {
 #if VSF_USE_HEAP == ENABLED
     vsf_heap_init();
-#   ifndef WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR
     vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
-#   else
-    vsf_heap_add_memory(WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR());
-#   endif
 #endif
 
 #if VSF_USE_PBUF == ENABLED && (                                                \
@@ -81,7 +74,7 @@ void vsf_service_init(void)
     } while(0);
 #endif
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
     //! initialise pbuf pool
     vsf_service_stream_init();
 #endif

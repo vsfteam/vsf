@@ -63,7 +63,7 @@ typedef struct vk_audio_capture_drv_t {
 def_simple_class(vk_audio_drv_t) {
     protected_member(
         vsf_peda_evthandler_t init;
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
         const vk_audio_play_drv_t play_drv;
 #endif
 #if VSF_AUDIO_CFG_USE_CATURE == ENABLED
@@ -89,10 +89,10 @@ def_simple_class(vk_audio_dev_t) {
         vsf_arch_prio_t hw_prio;
     )
     protected_member(
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
         vk_audio_stream_t play;
 #endif
-#if VSF_AUDIO_CFG_USE_CAPTURE == ENABLED
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
         vk_audio_stream_t capture;
 #endif
     )
@@ -100,7 +100,7 @@ def_simple_class(vk_audio_dev_t) {
 
 __vsf_component_peda_ifs(vk_audio_init)
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
 __vsf_component_peda_ifs(vk_audio_play_set_volume,
     uint16_t volume;
 )
@@ -116,7 +116,7 @@ __vsf_component_peda_ifs(vk_audio_play_stop)
 
 vsf_err_t vk_audio_init(vk_audio_dev_t *pthis);
 
-#if VSF_AUDIO_CFG_USE_PLAY == ENABLED
+#if VSF_AUDIO_USE_PLAY == ENABLED
 vsf_err_t vk_audio_play_set_volume(vk_audio_dev_t *pthis, uint_fast16_t volume);
 vsf_err_t vk_audio_play_set_mute(vk_audio_dev_t *pthis, bool mute);
 vsf_err_t vk_audio_play_start(vk_audio_dev_t *pthis, vsf_stream_t *stream, vk_audio_format_t *format);
@@ -124,7 +124,7 @@ vsf_err_t vk_audio_play_pause(vk_audio_dev_t *pthis);
 vsf_err_t vk_audio_play_stop(vk_audio_dev_t *pthis);
 #endif
 
-#if VSF_AUDIO_CFG_USE_CAPTURE == ENABLED
+#if VSF_AUDIO_USE_CAPTURE == ENABLED
 vsf_err_t vk_audio_capture_set_volume(vk_audio_dev_t *pthis, uint_fast16_t volume);
 vsf_err_t vk_audio_capture_set_mute(vk_audio_dev_t *pthis, bool mute);
 vsf_err_t vk_audio_capture_start(vk_audio_dev_t *pthis, vsf_stream_t *stream);

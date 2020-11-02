@@ -19,7 +19,7 @@
 
 #include "../../../vsf_tcpip_cfg.h"
 
-#if VSF_USE_TCPIP == ENABLED && VSF_USE_NETDRV_WPCAP == ENABLED
+#if VSF_USE_TCPIP == ENABLED && VSF_NETDRV_USE_WPCAP == ENABLED
 
 #define __VSF_NETDRV_CLASS_INHERIT_NETLINK__
 #define __VSF_NETDRV_WPCAP_CLASS_IMPLEMENT
@@ -29,7 +29,9 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_NETDRV_WPCAP_CFG_TRACE              DISABLED
+#ifndef VSF_NETDRV_WPCAP_CFG_TRACE
+#   define VSF_NETDRV_WPCAP_CFG_TRACE           DISABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -60,12 +62,12 @@ static void * __vk_netdrv_wpcap_open(char *name)
     void *fp = NULL;
 
     if (pcap_findalldevs_ex("rpcap://", NULL, &alldevs, errbuf) == -1) {
-        vsf_trace(VSF_TRACE_ERROR, "Error in pcap_findalldevs: %s\n", errbuf);
+        vsf_trace_error("Error in pcap_findalldevs: %s\n", errbuf);
     } else {
         for (pcap_if_t *d = alldevs; d != NULL; d = d->next) {
             if (    strstr(d->description, name)
                 ||  strstr(d->name, name)) {
-                vsf_trace(VSF_TRACE_INFO, "wpcap: try to open %s at %s"VSF_TRACE_CFG_LINEEND, d->description, d->name);
+                vsf_trace_info("wpcap: try to open %s at %s"VSF_TRACE_CFG_LINEEND, d->description, d->name);
                 fp = pcap_open_live(d->name, 65536, 1, 1, errbuf);
                 break;
             }
@@ -111,8 +113,8 @@ static void __vk_netdrv_wpcap_netlink_thread(void *arg)
         __vsf_arch_irq_start(irq_thread);
 
 #if VSF_NETDRV_WPCAP_CFG_TRACE == ENABLED
-            vsf_trace(VSF_TRACE_DEBUG, "wpcap_rx:" VSF_TRACE_CFG_LINEEND);
-            vsf_trace_buffer(VSF_TRACE_DEBUG, pkt_data, pkt_header.len);
+            vsf_trace_debug("wpcap_rx:" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_buffer(VSF_TRACE_DEBUG, (void *)pkt_data, pkt_header.len);
 #endif
 
             netbuf = vk_netdrv_alloc_buf(&wpcap_netdrv->use_as__vk_netdrv_t);
@@ -149,7 +151,7 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_init(vk_netdrv_t *netdrv)
         return VSF_ERR_NONE;
     }
 
-    vsf_trace(VSF_TRACE_ERROR, "%s" VSF_TRACE_CFG_LINEEND, errbuf);
+    vsf_trace_error("%s" VSF_TRACE_CFG_LINEEND, errbuf);
     return VSF_ERR_FAIL;
 }
 
@@ -182,7 +184,7 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *net
     }
 
 #if VSF_NETDRV_WPCAP_CFG_TRACE == ENABLED
-    vsf_trace(VSF_TRACE_DEBUG, "wpcap_tx:" VSF_TRACE_CFG_LINEEND);
+    vsf_trace_debug("wpcap_tx:" VSF_TRACE_CFG_LINEEND);
     vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, mem.size);
 #endif
 
@@ -193,7 +195,8 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *net
         mem.size = 60;
     }
     pcap_sendpacket(wpcap_netdrv->fp, buffer, mem.size);
+    vk_netdrv_on_outputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, mem.size);
     return VSF_ERR_NONE;
 }
 
-#endif      // VSF_USE_TCPIP && VSF_USE_NETDRV_WPCAP
+#endif      // VSF_USE_TCPIP && VSF_NETDRV_USE_WPCAP

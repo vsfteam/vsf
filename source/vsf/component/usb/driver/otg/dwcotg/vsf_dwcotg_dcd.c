@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USE_USB_DEVICE_DCD_DWCOTG == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED
 
 #define __VSF_DWCOTG_DCD_CLASS_IMPLEMENT
 #include "./vsf_dwcotg_dcd.h"
@@ -180,6 +180,11 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     dwcotg_dcd->callback.evt_handler = cfg->evt_handler;
     dwcotg_dcd->callback.param = cfg->param;
 
+    if (param->dma_en) {
+        VSF_USB_ASSERT(info.use_as__vk_dwcotg_hw_info_t.dma_en);
+    }
+    dwcotg_dcd->dma_en = param->dma_en;
+
     {
         usb_dc_ip_cfg_t ip_cfg = {
             .priority       = cfg->priority,
@@ -247,7 +252,7 @@ void vk_dwcotg_dcd_reset(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     dwcotg_dcd->param->op->GetInfo(&info.use_as__usb_dc_ip_info_t);
     dwcotg_dcd->buffer_word_pos = info.buffer_word_size;
     dwcotg_dcd->ep_num = info.ep_num >> 1;
-    dwcotg_dcd->dma_en = info.dma_en;
+    dwcotg_dcd->dma_en = dwcotg_dcd->param->dma_en;
     dwcotg_dcd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
 
     for (uint_fast8_t i = 0; i < dwcotg_dcd->ep_num; i++) {
@@ -337,7 +342,7 @@ vsf_err_t vk_dwcotg_dcd_ep_add(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, usb
 #else
     VSF_USB_ASSERT(ep < dwcotg_dcd->ep_num);
 #endif
-    
+
     *ep_ctrl &= ~USB_OTG_DIEPCTL_MPSIZ;
     if (0 == ep) {
         *ep_ctrl |= USB_OTG_DIEPCTL_USBAEP;
@@ -802,9 +807,11 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
                 // transfer complete interrupt
                 if (int_status & USB_OTG_DOEPINT_XFRC) {
                     if ((ep_idx == 0) && (dwcotg_dcd->ctrl_transfer_state == DWCOTG_STATUS_STAGE)) {
-                        dwcotg_dcd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
-                        debug_add_evt(__USB_ON_STATUS);
-                        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_STATUS, 0);
+                        if (!(int_status & USB_OTG_DOEPINT_STSPHSERCVD)) {
+                            dwcotg_dcd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
+                            debug_add_evt(__USB_ON_STATUS);
+                            __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_STATUS, 0);
+                        }
                     } else if (((ep_idx == 0) && dwcotg_dcd->ctrl_transfer_state == DWCOTG_DATA_STAGE) || (ep_idx > 0)) {
                         trans = &dwcotg_dcd->trans[ep_idx];
                         if (!trans->zlp) {

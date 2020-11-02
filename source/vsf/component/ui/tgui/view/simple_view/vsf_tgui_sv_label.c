@@ -46,7 +46,7 @@ static const vsf_tgui_align_mode_t sTilesAlign[] = {
 
 fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_label_t* ptLabel)
 {
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptLabel), ptLabel);
 #endif
@@ -60,7 +60,7 @@ void __vsf_tgui_label_v_rendering(  vsf_tgui_label_t* ptLabel,
     VSF_TGUI_ASSERT(ptLabel != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label rendering" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptLabel), ptLabel);
 #endif
@@ -157,7 +157,7 @@ fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* ptLabel,
     VSF_TGUI_ASSERT(ptLabel != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if (VSF_TGUI_SV_CFG_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label rendering" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptLabel), ptLabel);
 #endif

@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if APP_CFG_USE_NNOM_DEMO == ENABLED
+#if APP_USE_NNOM_DEMO == ENABLED
 
 #include "../common/usrapp_common.h"
 #include <stdio.h>
@@ -91,7 +91,7 @@ void ai_demo_mnist(uint_fast8_t index)
 	printf("Total Memory cost (Network and NNoM): %d\n", nnom_mem_stat());
 }
 
-#if APP_CFG_USE_LINUX_DEMO == ENABLED
+#if APP_USE_LINUX_DEMO == ENABLED
 int nnom_main(int argc, char *argv[])
 {
 #else
@@ -116,6 +116,6 @@ int main(void)
     return 0;
 }
 
-#endif      // APP_CFG_USE_NNOM_DEMO
+#endif      // APP_USE_NNOM_DEMO
 
 /* EOF */

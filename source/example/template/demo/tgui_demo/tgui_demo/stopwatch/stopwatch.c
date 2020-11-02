@@ -37,7 +37,7 @@
 static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG);
 
-static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr, 
+static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG);
 static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_control_t* node_ptr,
                                             vsf_msgt_msg_t* ptMSG);
@@ -171,7 +171,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
                     tgui_text_list(tNumberList, &(ptPanel->tContainerA), tVContainer, tNumberList,
                         tgui_size(100, 100),
-                        tgui_margin(8, 0, 8, 0),                                            
+                        tgui_margin(8, 0, 8, 0),
 
                         tgui_text_list_content(
 
@@ -196,7 +196,7 @@ static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* node_ptr,
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 
-static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr, 
+static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG)
 {
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\tCall User Handler");
@@ -245,7 +245,7 @@ implement_vsf_pt(tgui_demo_t)
             //! update existing text content
             vsf_tgui_text_set(&(base.tTime.tLabel), &(base.tTime.tLabel.tString));
 
-            vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.gui_ptr, 
+            vk_tgui_refresh_ex(base.use_as__vsf_tgui_panel_t.gui_ptr,
                                 (vsf_tgui_control_t *)&(base.tTime), NULL);
                                 //&s_tRefreshRegion);
         } while(0);

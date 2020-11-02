@@ -27,9 +27,10 @@
 #include "./dynstack/vsf_dynstack.h"
 #include "./pbuf/vsf_pbuf.h"
 #include "./pbuf/vsf_pbuf_pool.h"
+#include "./fifo/vsf_fifo.h"
 
 #include "./stream/vsf_stream.h"
-#include "./vsfstream/vsfstream.h"
+#include "./simple_stream/vsf_simple_stream.h"
 
 #include "./trace/vsf_trace.h"
 #include "./json/vsf_json.h"

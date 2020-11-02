@@ -158,9 +158,4 @@ extern void vsf_stdio_init(void);
 }
 #endif
 
-/*============================ INCLUDES ======================================*/
-
-//! \brief for interrupt 
-#include "./signal.h"
-
 #endif /* end of __USE_RV_COMPILER_H_PART_2__ */

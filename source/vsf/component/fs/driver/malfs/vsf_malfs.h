@@ -22,7 +22,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_USE_MALFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MALFS == ENABLED
 
 #include "component/mal/vsf_mal.h"
 
@@ -155,5 +155,5 @@ extern vsf_err_t vk_malfs_mount_mbr(vk_malfs_mounter_t *mounter);
 }
 #endif
 
-#endif      // VSF_USE_FS && VSF_USE_MALFS
+#endif      // VSF_USE_FS && VSF_FS_USE_MALFS
 #endif      // __VSF_MALFS_H__

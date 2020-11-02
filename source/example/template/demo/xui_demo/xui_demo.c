@@ -5,7 +5,7 @@
 #include "vsf.h"
 #include "../common/usrapp_common.h"
 
-#if APP_CFG_USE_XBOOT_XUI_DEMO == ENABLED
+#if APP_USE_XBOOT_XUI_DEMO == ENABLED
 
 /*
  * kernel/command/cmd-overview.c
@@ -336,4 +336,4 @@ int xui_main(int argc, char ** argv)
 	return 0;
 }
 
-#endif		// APP_CFG_USE_XBOOT_XUI_DEMO
+#endif		// APP_USE_XBOOT_XUI_DEMO

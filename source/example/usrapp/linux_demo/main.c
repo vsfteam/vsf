@@ -20,11 +20,11 @@
 #include "vsf.h"
 
 // define USRAPP_CF_XXXX and include usrapp_common.h
-#if VSF_USE_MEMFS == ENABLED
+#if VSF_FS_USE_MEMFS == ENABLED
 #   include "fakefat32.h"
 #   define USRAPP_CFG_MEMFS_ROOT    __fakefat32_root
 #endif
-#if VSF_USE_WINFS == ENABLED
+#if VSF_FS_USE_WINFS == ENABLED
 #   define USRAPP_CFG_WINFS_ROOT    "winfs_root"
 #endif
 #include "../usrapp_common.h"
@@ -32,7 +32,7 @@
 #define VSF_LINUX_INHERIT
 #include "shell/sys/linux/vsf_linux.h"
 #include "shell/sys/linux/port/busybox/busybox.h"
-#if VSF_USE_LINUX_LIBUSB == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED
 #   include <libusb.h>
 #endif
 #include <sys/mount.h>
@@ -44,7 +44,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_USE_LINUX_LIBUSB == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED
 extern int lsusb_main(int argc, char *argv[]);
 #endif
 
@@ -59,17 +59,17 @@ int vsf_linux_create_fhs(void)
 {
     int fd;
 
-#if VSF_USE_LINUX_BUSYBOX == ENABLED
+#if VSF_LINUX_USE_BUSYBOX == ENABLED
     busybox_install();
 #endif
 
-#if VSF_USE_LINUX_LIBUSB == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED
     busybox_bind("/sbin/lsusb", lsusb_main);
     vsf_linux_libusb_startup();
 #endif
 
-#if VSF_USE_MAL == ENABLED && VSF_USE_FAKEFAT32_MAL == ENABLED                  \
-    && VSF_USE_FS == ENABLED && VSF_USE_FATFS == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED              \
+    && VSF_USE_FS == ENABLED && VSF_FS_USE_FATFS == ENABLED
     vk_mal_init(&__usrapp_common.mal.fakefat32.use_as__vk_mal_t);
     if (mkdir("/fatfs_fakefat32", 0)) {
         return -1;
@@ -81,7 +81,7 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
-#if VSF_USE_FS == ENABLED && VSF_USE_MEMFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED
     if (mkdir("/memfs", 0)) {
         return -1;
     }
@@ -92,7 +92,7 @@ int vsf_linux_create_fhs(void)
     }
 #endif
 
-#if VSF_USE_FS == ENABLED && VSF_USE_WINFS == ENABLED
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_WINFS == ENABLED
     if (mkdir("/winfs", 0)) {
         return -1;
     }

@@ -169,7 +169,7 @@ static void __vk_tgui_text_list_update_line_selection(
                     ptTextList->tList.tContent.tLabel.chInterLineSpace);
 
     __vk_tgui_text_list_get_real_container_x(
-                        (const vsf_tgui_text_list_t* )ptTextList, &iYOffset);
+                        (const vsf_tgui_text_list_t* )ptTextList, iYOffset);
 
     vsf_tgui_control_get_core(
             (const vsf_tgui_control_t *)&(ptTextList->tList.use_as__vsf_tgui_container_t))

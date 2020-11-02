@@ -19,7 +19,7 @@
 
 #include "vsf.h"
 
-#if VSF_USE_SERVICE_STREAM == ENABLED
+#if VSF_USE_STREAM == ENABLED
 #include <stdio.h>
 #include <stdarg.h>
 

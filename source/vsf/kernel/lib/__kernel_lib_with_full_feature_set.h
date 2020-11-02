@@ -38,7 +38,7 @@
 #define         VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ                 ENABLED
 #define         VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT             ENABLED
 #define         VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE                ENABLED
-#define         VSF_USE_KERNEL_SIMPLE_SHELL                     ENABLED
+#define         VSF_KERNEL_USE_SIMPLE_SHELL                     ENABLED
 
 #define     VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                    ENABLED
 #define         VSF_KERNEL_CFG_CALLBACK_TIMER                   ENABLED

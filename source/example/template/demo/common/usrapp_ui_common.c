@@ -20,14 +20,14 @@
 #include "./usrapp_ui_common.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_USE_DISP_SDL2 == ENABLED || VSF_USE_DISP_FB == ENABLED)            \
-    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_UI_AWTK == ENABLED || VSF_USE_UI_LVGL == ENABLED)
+    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED)            \
+    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_AWTK == ENABLED || VSF_USE_LVGL == ENABLED)
 
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_DISP_SDL2 == ENABLED
+#if VSF_DISP_USE_SDL2 == ENABLED
 #   ifndef APP_DISP_SDL2_TITLE
 #       define APP_DISP_SDL2_TITLE              "title"
 #   endif
@@ -40,7 +40,7 @@
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if VSF_USE_DISP_FB == ENABLED
+#if VSF_DISP_USE_FB == ENABLED
 #   ifdef __F1C100S__
 static const f1cx00s_fb_param_t __fb_param = {
     // TODO: fix according to hw
@@ -73,7 +73,7 @@ static f1cx00s_fb_t __fb = {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 usrapp_ui_common_t usrapp_ui_common = {
-#if VSF_USE_DISP_SDL2 == ENABLED
+#if VSF_DISP_USE_SDL2 == ENABLED
     .disp                       = {
         .param                  = {
             .height             = APP_DISP_SDL2_HEIGHT,
@@ -84,7 +84,7 @@ usrapp_ui_common_t usrapp_ui_common = {
         .title                  = APP_DISP_SDL2_TITLE,
         .amplifier              = APP_DISP_SDL2_AMPLIFIER,
     },
-#elif VSF_USE_DISP_FB == ENABLED
+#elif VSF_DISP_USE_FB == ENABLED
     .disp                       = {
         .param                  = {
             .height             = APP_DISP_FB_HEIGHT,

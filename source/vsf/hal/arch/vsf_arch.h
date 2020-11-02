@@ -19,12 +19,18 @@
 #define __VSF_ARCH_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
+
+#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/vsf_hal.h"
+
 #include "vsf_arch_abstraction.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -34,7 +40,7 @@ extern "C" {
 
 
 
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed

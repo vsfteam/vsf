@@ -312,7 +312,7 @@
                 </option>
                 <option>
                     <name>CCPreprocLine</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCListCFile</name>
@@ -1040,7 +1040,7 @@
                 </option>
                 <option>
                     <name>Linker Extra Options Edit</name>
-                    <state>-e__cmain=main
+                    <state>-e__cmain=main
 </state>
                 </option>
                 <option>
@@ -3392,6 +3392,9 @@
             <group>
                 <name>config</name>
                 <file>
+                    <name>$PROJ_DIR$\..\..\usrapp\mvc_demo_mcs51\config\vsf_tgui_cfg.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\usrapp\mvc_demo_mcs51\config\vsf_usr_cfg.h</name>
                 </file>
             </group>
@@ -3602,186 +3605,198 @@
             <group>
                 <name>ui</name>
                 <group>
-                    <name>disp_drv</name>
+                    <name>disp</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.c</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp\vsf_disp.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp_drv\vsf_disp_drv.h</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\disp\vsf_disp.h</name>
                     </file>
                 </group>
                 <group>
                     <name>tgui</name>
                     <group>
-                        <name>gui_mc</name>
-                        <group>
-                            <name>controls</name>
-                        </group>
+                        <name>controls</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\__vsf_tgui_mc_common.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_msg_tree_cfg.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\__vk_tgui_slider.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\__vsf_tgui_controls_common.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_button.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_msg_tree_cfg.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_control.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_button.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_label.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_control.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_list.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_controls_common.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_label.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_mc.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_label.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.c</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_list.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_mc\vsf_tgui_panel.h</name>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_list.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_panel.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\controls\vsf_tgui_text_list.h</name>
                         </file>
                     </group>
                     <group>
-                        <name>gui_v</name>
+                        <name>view</name>
                         <group>
                             <name>simple_view</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_button.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_container.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_control.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_draw.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_label.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_list.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_panel.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_port.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\simple_view\vsf_tgui_v_template.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_port.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_style.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_text_list.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_v_template.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_v_type.h</name>
                             </file>
                         </group>
                         <group>
                             <name>template</name>
-                            <excluded>
-                                <configuration>Debug</configuration>
-                            </excluded>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_button.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_button.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_container.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_button.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_container.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_control.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_container.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_control.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_label.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_control.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_label.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_panel.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_label.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\template\vsf_tgui_v_template.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>utilities</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_panel.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_color.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_panel.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.c</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_template.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_font.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_style.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h</name>
+                                <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\view\template\vsf_tgui_v_type.h</name>
                             </file>
                         </group>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\gui_v\vsf_tgui_v.h</name>
-                        </file>
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui.c</name>
@@ -3791,12 +3806,6 @@
                     </file>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui_cfg.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.h</name>
                     </file>
                 </group>
                 <file>
@@ -3901,10 +3910,13 @@
                         <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.c</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmevt.h</name>
+                        <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.h</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c</name>
                     </file>
                 </group>
                 <file>
@@ -3982,6 +3994,18 @@
             </file>
         </group>
         <group>
+            <name>osa_hal</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\osa_hal\vsf_osa_hal.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\osa_hal\vsf_osa_hal.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</name>
+            </file>
+        </group>
+        <group>
             <name>osa_service</name>
             <file>
                 <name>$PROJ_DIR$\..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c</name>
@@ -4029,30 +4053,87 @@
                 </file>
             </group>
             <group>
+                <name>simple_stream</name>
+                <group>
+                    <name>block_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>fifo_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>mem_stream</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\vsf_simple_stream.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\simple_stream\vsf_simple_stream.h</name>
+                </file>
+            </group>
+            <group>
+                <name>stream</name>
+                <group>
+                    <name>pbuf_queue</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\vsf\service\stream\pbuf_queue\vsf_pbuf_queue.h</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\interface.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_base.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_base.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_reader.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_reader.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_writer.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\service\stream\vsf_stream_writer.h</name>
+                </file>
+            </group>
+            <group>
                 <name>trace</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\trace\vsf_trace.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\service\trace\vsf_trace.h</name>
-                </file>
-            </group>
-            <group>
-                <name>vsfstream</name>
-                <group>
-                    <name>fifo_stream</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\service\vsfstream\vsfstream.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\service\vsfstream\vsfstream.h</name>
                 </file>
             </group>
             <file>
@@ -4109,17 +4190,17 @@
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\mcs51_compiler.h</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\mcs51_interrupt.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\msc51_interrupt.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\retarget_io.c</name>
                     <excluded>
                         <configuration>Debug</configuration>
                         <configuration>vsfvm</configuration>
                     </excluded>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\signal.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\signal.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\compiler\mcs51\type.h</name>
@@ -4171,6 +4252,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\template\vsf_queue.c</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\vsf\utilities\template\vsf_queue.h</name>

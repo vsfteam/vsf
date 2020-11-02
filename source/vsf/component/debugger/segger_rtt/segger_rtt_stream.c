@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSFSTREAM_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #include "../vsf_debugger.h"
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
@@ -28,7 +28,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 #   ifndef VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE
 #       define VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE         32
 #   endif
@@ -37,14 +37,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 static void __vsf_segger_rtt_stream_init(vsf_stream_t *stream);
 static uint_fast32_t __vsf_segger_rtt_stream_write(   vsf_stream_t *stream, 
                                                     uint8_t *buf, 
                                                     uint_fast32_t size);
 static uint_fast32_t __vsf_segger_rtt_stream_get_data_length(vsf_stream_t *stream);
 static uint_fast32_t __vsf_segger_rtt_stream_get_avail_length(vsf_stream_t *stream);
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
                                                     vsf_pbuf_t *pblock);
 static 
@@ -57,7 +57,7 @@ static vsf_err_t __vsf_segger_rtt_stream_tx_dat_drn_evt_reg(
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 static uint8_t __vsf_debug_stream_rx_buff[VSF_DEBUG_STREAM_CFG_RX_BUF_SIZE];
 static const vsf_stream_op_t __vsf_segger_rtt_stream_tx_op = {
     .init               = __vsf_segger_rtt_stream_init,
@@ -69,7 +69,7 @@ static const vsf_stream_op_t __vsf_segger_rtt_stream_tx_op = {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if     VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if     VSF_USE_SIMPLE_STREAM == ENABLED
 vsf_stream_t VSF_DEBUG_STREAM_TX = {
     .op = &__vsf_segger_rtt_stream_tx_op,
 };
@@ -80,7 +80,7 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
     .size       = sizeof(__vsf_debug_stream_rx_buff),
 };
 
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 static const i_stream_pbuf_tx_t __segger_rtt_stream_tx = {
     .Send =         &__vsf_segger_rtt_stream_tx_send_pbuf,
     .GetStatus =    &__vsf_segger_rtt_stream_tx_get_status,
@@ -143,7 +143,7 @@ int vsf_stdin_getchar(void)
     return ch;
 }
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 void VSF_DEBUG_STREAM_POLL(void)
 {
     uint_fast32_t size = SEGGER_RTT_HasData(0);
@@ -178,7 +178,7 @@ uint_fast32_t __vsf_segger_rtt_stream_get_avail_length(vsf_stream_t *stream)
     return -1;
 }
 
-#elif   VSF_USE_SERVICE_STREAM == ENABLED
+#elif   VSF_USE_STREAM == ENABLED
 
 static vsf_err_t __vsf_segger_rtt_stream_tx_send_pbuf(vsf_stream_tx_t *obj_ptr, 
                                                     vsf_pbuf_t *block_ptr)

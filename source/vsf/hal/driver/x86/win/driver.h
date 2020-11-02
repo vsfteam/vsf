@@ -15,6 +15,10 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#else
+
 #ifndef __HAL_DRIVER_X86_WIN_H__
 #define __HAL_DRIVER_X86_WIN_H__
 
@@ -25,8 +29,8 @@
 #include "service/vsf_service.h"
 
 #include "./device.h"
+#include "./uart/uart.h"
 #include "hal/interface/vsf_interface_usb.h"
-#include "hal/interface/vsf_interface_usart.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +41,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 extern vsf_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 #endif
@@ -49,6 +53,6 @@ extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 }
 #endif
 
-
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #endif
 /* EOF */

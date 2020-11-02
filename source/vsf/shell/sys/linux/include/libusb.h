@@ -7,16 +7,25 @@
 extern "C" {
 #endif
 
-#define LIBUSB_HOTPLUG_MATCH_ANY    -1
+#define LIBUSB_HOTPLUG_MATCH_ANY        -1
 
-#define libusb_device_descriptor    usb_device_desc_t
+#define libusb_device_descriptor        usb_device_desc_t
 
 enum libusb_error {
-    LIBUSB_SUCCESS,
-    LIBUSB_ERROR_NO_MEM,
-    LIBUSB_ERROR_NOT_SUPPORTED,
-    LIBUSB_ERROR_NOT_FOUND,
-    LIBUSB_ERROR_IO,
+    LIBUSB_SUCCESS                      = 0,
+    LIBUSB_ERROR_IO                     = -1,
+    LIBUSB_ERROR_INVALID_PARAM          = -2,
+    LIBUSB_ERROR_ACCESS                 = -3,
+    LIBUSB_ERROR_NO_DEVICE              = -4,
+    LIBUSB_ERROR_NOT_FOUND              = -5,
+    LIBUSB_ERROR_BUSY                   = -6,
+    LIBUSB_ERROR_TIMEOUT                = -7,
+    LIBUSB_ERROR_OVERFLOW               = -8,
+    LIBUSB_ERROR_PIPE                   = -9,
+    LIBUSB_ERROR_INTERRUPTED            = -10,
+    LIBUSB_ERROR_NO_MEM                 = -11,
+    LIBUSB_ERROR_NOT_SUPPORTED          = -12,
+    LIBUSB_ERROR_OTHER                  = -99,
 };
 
 enum libusb_capability {
@@ -133,8 +142,8 @@ typedef struct libusb_device libusb_device;
 typedef libusb_device libusb_device_handle;
 
 typedef enum {
-    LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT,
+    LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED = 1 << 1,
+    LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT    = 1 << 2,
 } libusb_hotplug_event;
 
 typedef enum {
@@ -217,6 +226,9 @@ struct libusb_transfer {
 #define libusb_free_pollfds                             __vsf_libusb_free_pollfds
 #define libusb_get_ss_endpoint_companion_descriptor     __vsf_libusb_get_ss_endpoint_companion_descriptor
 #define libusb_free_ss_endpoint_companion_descriptor    __vsf_libusb_free_ss_endpoint_companion_descriptor
+#define libusb_claim_interface                          __vsf_libusb_claim_interface
+#define libusb_release_interface                        __vsf_libusb_release_interface
+#define libusb_hotplug_register_callback                __vsf_libusb_hotplug_register_callback
 
 int __vsf_libusb_init(libusb_context **context);
 void __vsf_libusb_exit(struct libusb_context *ctx);
@@ -227,6 +239,8 @@ int __vsf_libusb_open(libusb_device *dev, libusb_device_handle **dev_handle);
 void __vsf_libusb_close(libusb_device_handle *dev_handle);
 uint8_t __vsf_libusb_get_device_address(libusb_device *dev);
 uint8_t __vsf_libusb_get_bus_number(libusb_device *dev);
+int __vsf_libusb_release_interface(libusb_device_handle *dev_handle, int interface_number);
+int __vsf_libusb_claim_interface(libusb_device_handle *dev_handle, int interface_number);
 
 struct libusb_transfer *__vsf_libusb_alloc_transfer(int iso_packets);
 void __vsf_libusb_free_transfer(struct libusb_transfer *transfer);
@@ -242,7 +256,17 @@ int __vsf_libusb_interrupt_transfer(libusb_device_handle *dev_handle,
     unsigned char endpoint, unsigned char *data, int length,
     int *actual_length, unsigned int timeout);
 
-static inline void __vsf_libusb_fill_control_transfer(
+int __vsf_libusb_hotplug_register_callback(libusb_context *ctx,
+        libusb_hotplug_event events,
+        libusb_hotplug_flag flags,
+        int vendor_id,
+        int product_id,
+        int dev_class,
+        libusb_hotplug_callback_fn cb_fn,
+        void *user_data,
+        libusb_hotplug_callback_handle *callback_handle);
+
+static inline void libusb_fill_control_transfer(
     struct libusb_transfer *transfer, libusb_device_handle *dev_handle,
     unsigned char *buffer, libusb_transfer_cb_fn callback, void *user_data,
     unsigned int timeout)

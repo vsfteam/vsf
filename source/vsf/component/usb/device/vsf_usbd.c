@@ -23,9 +23,9 @@
 
 #define __VSF_EDA_CLASS_INHERIT__
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
-#   if VSF_USE_SERVICE_VSFSTREAM == ENABLED
-#       define __VSFSTREAM_CLASS_INHERIT__
-#   elif VSF_USE_SERVICE_STREAM == ENABLED
+#   if VSF_USE_SIMPLE_STREAM == ENABLED
+#       define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
+#   elif VSF_USE_STREAM == ENABLED
 #       define __VSF_STREAM_BASE_CLASS_INHERIT__
 #   endif
 #endif
@@ -53,13 +53,13 @@ extern vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *p
 
 vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
         uint_fast8_t desc_num, uint_fast8_t type,
-        uint_fast8_t index, uint_fast16_t lanid)
+        uint_fast8_t index, uint_fast16_t langid)
 {
     VSF_USB_ASSERT(desc != NULL);
     for (uint_fast8_t i = 0; i < desc_num; i++) {
         if (    (desc->type == type)
             &&  (desc->index == index)
-            &&  (desc->lanid == lanid)) {
+            &&  (desc->langid == langid)) {
             return desc;
         }
         desc++;
@@ -322,9 +322,9 @@ static vsf_err_t __vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
         case USB_REQ_GET_DESCRIPTOR: {
                 uint_fast8_t type = (request->wValue >> 8) & 0xFF;
                 uint_fast8_t index = request->wValue & 0xFF;
-                uint_fast16_t lanid = request->wIndex;
+                uint_fast16_t langid = request->wIndex;
                 vk_usbd_desc_t *desc = vk_usbd_get_descriptor(dev->desc,
-                        dev->num_of_desc, type, index, lanid);
+                        dev->num_of_desc, type, index, langid);
 
                 if (NULL == desc) {
                     return VSF_ERR_FAIL;
@@ -702,7 +702,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     case USB_ON_ERROR:
     case USB_ON_SOF:
     case USB_ON_NAK:
-        vsf_usbd_notify_user(dev, evt, (void *)value);
+        vsf_usbd_notify_user(dev, evt, (void *)(uintptr_t)value);
         break;
     case USB_ON_RESET: {
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
@@ -755,7 +755,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             if (    VSF_ERR_NONE != vsf_usbd_notify_user(dev, evt, request)
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
                 ||  (VSF_ERR_NONE != __vk_usbd_ctrl_prepare(dev))
-#endif                
+#endif
                 ) {
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
                 vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
@@ -940,7 +940,7 @@ void vk_usbd_fini(vk_usbd_dev_t *dev)
 
 // TODO: move stream related code into vk_usbd_stream.c
 #if VSF_USBD_CFG_STREAM_EN == ENABLED
-#if VSF_USE_SERVICE_VSFSTREAM == ENABLED
+#if VSF_USE_SIMPLE_STREAM == ENABLED
 
 static void __vk_usbd_stream_tx_recv(vk_usbd_ep_stream_t *stream_ep, uint_fast16_t ep_size)
 {
@@ -1108,7 +1108,7 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
     return VSF_ERR_NONE;
 }
 
-#elif VSF_USE_SERVICE_STREAM == ENABLED
+#elif VSF_USE_STREAM == ENABLED
 
 static vsf_err_t __vk_usbd_ep_rcv_pbuf(vk_usbd_ep_stream_t *this_ptr)
 {
@@ -1120,10 +1120,10 @@ static vsf_err_t __vk_usbd_ep_rcv_pbuf(vk_usbd_ep_stream_t *this_ptr)
             break ;
         }
 
-        this_ptr->rx_current = vsf_stream_src_new_pbuf(  
-            &this_ptr->use_as__vsf_stream_src_t, 
+        this_ptr->rx_current = vsf_stream_src_new_pbuf(
+            &this_ptr->use_as__vsf_stream_src_t,
             //!//! require a big enough pbuf
-            vk_usbd_drv_ep_get_size(this_ptr->rx_trans.ep),        
+            vk_usbd_drv_ep_get_size(this_ptr->rx_trans.ep),
             -1);
 
         if (NULL == this_ptr->rx_current) {
@@ -1134,7 +1134,7 @@ static vsf_err_t __vk_usbd_ep_rcv_pbuf(vk_usbd_ep_stream_t *this_ptr)
 
         vk_usbd_trans_t *trans = &this_ptr->rx_trans;
         trans->param = this_ptr;
-        
+
         trans->use_as__vsf_mem_t.src_ptr = vsf_pbuf_buffer_get(this_ptr->rx_current);
         trans->use_as__vsf_mem_t.size = vsf_pbuf_size_get(this_ptr->rx_current);
         vk_usbd_ep_recv(this_ptr->dev, trans);
@@ -1152,16 +1152,16 @@ static vsf_err_t __vk_usbd_on_ep_rcv(vk_usbd_ep_stream_t *this_ptr)
     uint_fast16_t ep_left_size;
     VSF_USBD_DRV_PREPARE(this_ptr->dev);
 
-    __SAFE_ATOM_CODE(                   //! this protection might not be necessary
+    __vsf_interrupt_safe(                               //! this protection might not be necessary
         pbuf = this_ptr->rx_current;
         this_ptr->rx_current = NULL;
         if (pbuf != NULL) {
             ep_left_size = this_ptr->rx_trans.use_as__vsf_mem_t.size;
         }
-        result = __vk_usbd_ep_rcv_pbuf(this_ptr);    //! start next rcv
+        result = __vk_usbd_ep_rcv_pbuf(this_ptr);       //! start next rcv
     )
     if (NULL != pbuf) {
-        vsf_pbuf_size_set(  pbuf, 
+        vsf_pbuf_size_set(  pbuf,
                             vk_usbd_drv_ep_get_size(this_ptr->rx_trans.ep) - ep_left_size);
         vsf_stream_src_send_pbuf(&this_ptr->use_as__vsf_stream_src_t, pbuf);
     }
@@ -1172,7 +1172,7 @@ static vsf_err_t __vk_usbd_on_ep_rcv(vk_usbd_ep_stream_t *this_ptr)
 vsf_err_t vk_usbd_ep_recv_stream(vk_usbd_ep_stream_t *this_ptr)
 {
     vsf_err_t result = VSF_ERR_NOT_READY;
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         if (NULL == this_ptr->rx_current) {
             result = __vk_usbd_on_ep_rcv(this_ptr);
         }
@@ -1203,7 +1203,7 @@ static vsf_err_t __vk_usbd_ep_send_pbuf(vk_usbd_ep_stream_t *this_ptr)
 
         vk_usbd_trans_t *trans = &this_ptr->tx_trans;
         trans->param = this_ptr;
-        
+
         trans->use_as__vsf_mem_t.src_ptr = vsf_pbuf_buffer_get(this_ptr->tx_current);
         trans->use_as__vsf_mem_t.size = vsf_pbuf_size_get(this_ptr->tx_current);
 
@@ -1219,7 +1219,7 @@ static void __vk_usbd_ep_on_stream_tx_finish(void *param)
 
     vsf_pbuf_t *ptBuff;
 
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         ptBuff = this_ptr->tx_current;
         this_ptr->tx_current = NULL;
         __vk_usbd_ep_send_pbuf(this_ptr);
@@ -1235,7 +1235,7 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *this_ptr)
     vsf_err_t result = VSF_ERR_NOT_READY;
     VSF_USB_ASSERT(NULL != this_ptr);
 
-    __SAFE_ATOM_CODE(
+    __vsf_interrupt_safe(
         if (NULL == this_ptr->tx_current) {
             result = __vk_usbd_ep_send_pbuf(this_ptr);
         }
@@ -1243,15 +1243,15 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *this_ptr)
     return result;
 }
 
-static void __vk_usbd_on_data_ready_event( void *target_ptr, 
-                                            vsf_stream_rx_t *ptRX, 
+static void __vk_usbd_on_data_ready_event( void *target_ptr,
+                                            vsf_stream_rx_t *ptRX,
                                             vsf_stream_status_t Status)
 {
     vk_usbd_ep_stream_t *this_ptr = (vk_usbd_ep_stream_t *)target_ptr;
     vk_usbd_ep_send_stream(this_ptr);
 }
 
-void vk_usbd_ep_stream_init(   vk_usbd_ep_stream_t *this_ptr, 
+void vk_usbd_ep_stream_init(   vk_usbd_ep_stream_t *this_ptr,
                                 vk_usbd_ep_stream_cfg_t *cfg)
 {
     VSF_USB_ASSERT(NULL != this_ptr);
@@ -1276,7 +1276,7 @@ void vk_usbd_ep_stream_init(   vk_usbd_ep_stream_t *this_ptr,
         }
     });
 
-    
+
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
     vsf_stream_usr_open(&(this_ptr->use_as__vsf_stream_usr_t));
 #endif
@@ -1289,6 +1289,6 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *this_ptr, vk_usbd_dev_t 
     vk_usbd_ep_send_stream(this_ptr);
 }
 
-#endif      // VSF_USE_SERVICE_STREAM || VSF_USE_SERVICE_VSFSTREAM
+#endif      // VSF_USE_STREAM || VSF_USE_SIMPLE_STREAM
 #endif      // VSF_USBD_CFG_STREAM_EN
 #endif      // VSF_USE_USB_DEVICE

@@ -16,27 +16,38 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "../common.h"
 #include "./usb.h"
 
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+
 /*============================ MACROS ========================================*/
 
-#define __USB_HC_INTERFACE_DEF(__N, __VALUE)                                    \
+#if VSF_HAL_USE_USBH == ENABLED
+#   define __USB_HC_INTERFACE_DEF(__N, __VALUE)                                 \
 const i_usb_hc_ip_t VSF_USB_HC##__N##_IP = __USB_HC_IP_INTERFACE_FUNC_DEF(__N, __VALUE);
+#endif
 
-#define __USB_DC_INTERFACE_DEF(__N, __VALUE)                                    \
+#if VSF_HAL_USE_USBD == ENABLED
+#   define __USB_DC_INTERFACE_DEF(__N, __VALUE)                                 \
 const i_usb_dc_ip_t VSF_USB_DC##__N##_IP = __USB_DC_IP_INTERFACE_FUNC_DEF(__N, __VALUE);
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if USB_OTG_COUNT > 0
+#   if VSF_HAL_USE_USBH == ENABLED
 REPEAT_MACRO(USB_OTG_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
-REPEAT_MACRO(USB_OTG_COUNT, __USB_DC_IP_FUNC_DEF, NULL)
-
 REPEAT_MACRO(USB_OTG_COUNT, __USB_HC_INTERFACE_DEF, NULL)
+#   endif
+
+#   if VSF_HAL_USE_USBD == ENABLED
+REPEAT_MACRO(USB_OTG_COUNT, __USB_DC_IP_FUNC_DEF, NULL)
 REPEAT_MACRO(USB_OTG_COUNT, __USB_DC_INTERFACE_DEF, NULL)
+#   endif
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -44,6 +55,12 @@ REPEAT_MACRO(USB_OTG_COUNT, __USB_DC_INTERFACE_DEF, NULL)
 /*============================ IMPLEMENTATION ================================*/
 
 #if USB_OTG_COUNT > 0
+#   if VSF_HAL_USE_USBH == ENABLED
 REPEAT_MACRO(USB_OTG_COUNT, __USB_OTG_HC_IP_BODY, mt071_usbh)
+#   endif
+#   if VSF_HAL_USE_USBD == ENABLED
 REPEAT_MACRO(USB_OTG_COUNT, __USB_OTG_DC_IP_BODY, mt071_usbd)
+#   endif
 #endif
+
+#endif      // VSF_HAL_USE_USBD || VSF_HAL_USE_USBH
