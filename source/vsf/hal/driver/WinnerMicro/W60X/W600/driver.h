@@ -15,15 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_WINNERMICRO_W600_DEVICE_H__
-#define __HAL_DRIVER_WINNERMICRO_W600_DEVICE_H__
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+
+#   include "__device.h"
+
+#else
+
+#ifndef __HAL_DRIVER_WINNERMICRO_W600_H__
+#   define __HAL_DRIVER_WINNERMICRO_W600_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
-#include "./device.h"
-#include "../common/io/io.h"
-//#include "../common/pm/pm.h"
-#include "../common/usart/usart.h"
+
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+#       include "../common/io/io.h"
+//#       include "../common/pm/pm.h"
+#       include "../common/usart/usart.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -32,6 +39,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#   endif   // __HAL_DRIVER_WINNERMICRO_W600_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

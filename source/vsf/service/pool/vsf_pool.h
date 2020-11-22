@@ -127,12 +127,12 @@ extern "C" {
             dcl_class(vsf_pool(__name))
 
 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
-#   define __define_vsf_pool_tag(__name)                                        \
+#   define ____define_vsf_pool_tag(__name)                                      \
             SECTION(".text." #__name "_pool_get_tag")                           \
             extern uintptr_t __name##_pool_get_tag(vsf_pool(__name) *);         \
             SECTION(".text." #__name "_pool_set_tag")                           \
             extern uintptr_t __name##_pool_set_tag(vsf_pool(__name) *, uintptr_t);
-#   define __implement_vsf_pool_tag(__name)                                     \
+#   define ____implement_vsf_pool_tag(__name)                                   \
             WEAK(__name##_pool_get_tag)                                         \
             SECTION(".text." #__name "_pool_get_tag")                           \
             uintptr_t __name##_pool_get_tag(vsf_pool(__name) *this_ptr)         \
@@ -146,6 +146,8 @@ extern "C" {
             {                                                                   \
                 return vsf_pool_set_tag((vsf_pool_t *)this_ptr, target_ptr);    \
             }
+#   define __define_vsf_pool_tag(__name)    ____define_vsf_pool_tag(__name)
+#   define __implement_vsf_pool_tag(__name) ____implement_vsf_pool_tag(__name)
 #else
 #   define __define_vsf_pool_tag(__name)
 #   define __implement_vsf_pool_tag(__name)
@@ -626,7 +628,7 @@ extern uintptr_t vsf_pool_alloc(vsf_pool_t *obj_ptr);
  */
 extern void vsf_pool_free(vsf_pool_t *obj_ptr, uintptr_t item_ptr);
 
-SECTION("text.vsf.utilities.vsf_pool_get_count")
+SECTION(".text.vsf.utilities.vsf_pool_get_count")
 /*! \brief get the number of memory blocks available in the target pool
  *! \param obj_ptr    address of the target pool
  *! \return the number of memory blocks
@@ -634,14 +636,14 @@ SECTION("text.vsf.utilities.vsf_pool_get_count")
 extern uint_fast16_t vsf_pool_get_count(vsf_pool_t *obj_ptr);
 
 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
-SECTION("text.vsf.utilities.vsf_pool_get_tag")
+SECTION(".text.vsf.utilities.vsf_pool_get_tag")
 /*! \brief get the address of the object which is attached to the pool
  *! \param obj_ptr    address of the target pool
  *! \return the address of the object
  */
 extern uintptr_t vsf_pool_get_tag(vsf_pool_t *obj_ptr);
 
-SECTION("text.vsf.utilities.vsf_pool_set_tag")
+SECTION(".text.vsf.utilities.vsf_pool_set_tag")
 /*! \brief set the address of the object which is attached to the pool
  *! \param obj_ptr    address of the target pool
  *! \return the address of the object
@@ -649,7 +651,7 @@ SECTION("text.vsf.utilities.vsf_pool_set_tag")
 extern uintptr_t vsf_pool_set_tag(vsf_pool_t *obj_ptr, uintptr_t target_ptr);
 #endif
 
-SECTION("text.vsf.utilities.vsf_pool_get_region")
+SECTION(".text.vsf.utilities.vsf_pool_get_region")
 /*! \brief get the address of the code region used by this pool
  *! \param obj_ptr    address of the target pool
  *! \return the address of the code region

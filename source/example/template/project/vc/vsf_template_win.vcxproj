@@ -784,13 +784,13 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\pthread.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\semaphore.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\signal.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\ctype.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stddef.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdio.h" />
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdlib.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\string.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\time.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\wchar.h" />
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\stdio.h" />
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\string.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\mount.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\select.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\stat.h" />
@@ -798,9 +798,7 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\types.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\wait.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\termios.h" />
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\time.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\unistd.h" />
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\wchar.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\port\busybox\busybox.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\port\busybox\config.h" />
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\vsf_linux.h" />
@@ -1599,6 +1597,7 @@
     <ClCompile Include="..\..\..\..\vsf\service\vsf_service.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\vsf_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
+    <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_sem.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdio.c" />
@@ -1747,7 +1746,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>

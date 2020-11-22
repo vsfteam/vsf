@@ -15,21 +15,31 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
+
+// TODO: change to vsf_arch_cfg.h
+#include "hal/vsf_hal_cfg.h"
+
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+// __VSF_HEADER_ONLY_SHOW_ARCH_INFO__ is defined outside, only extract arch info from hal
+#include "hal/vsf_hal.h"
+//__VSF_HEADER_ONLY_SHOW_ARCH_INFO__ will be undefined in vsf_hal.h
+
+#else       // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
 #ifndef __VSF_ARCH_H__
 #define __VSF_ARCH_H__
 
-/*============================ INCLUDES ======================================*/
+#   define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   include "hal/vsf_hal.h"
+//__VSF_HEADER_ONLY_SHOW_ARCH_INFO__ will be undefined in vsf_hal.h
 
-#include "hal/vsf_hal_cfg.h"
+#   include "vsf_arch_abstraction.h"
 
-#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-#include "hal/vsf_hal.h"
-
-#include "vsf_arch_abstraction.h"
-
-#ifdef __cplusplus
+#   ifdef __cplusplus
 extern "C" {
-#endif
+#   endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -47,9 +57,10 @@ extern "C" {
  */
 extern bool vsf_arch_init(void);
 
-#ifdef __cplusplus
+#   ifdef __cplusplus
 }
-#endif
+#   endif
 
-#endif
+#endif      // __VSF_ARCH_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

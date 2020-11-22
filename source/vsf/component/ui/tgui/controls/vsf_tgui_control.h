@@ -58,7 +58,7 @@
         }
 #else
 #define __VSF_TGUI_INTERFACE_CONTROLS_CONTROL         {                         \
-            .msg_handler = {                                                \
+            .msg_handler = {                                                    \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_control_msg_handler,         \
             },                                                                  \
@@ -68,7 +68,7 @@
         }
 
 #define __VSF_TGUI_INTERFACE_CONTROLS_CONTAINER           {                     \
-            .msg_handler = {                                                \
+            .msg_handler = {                                                    \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_container_msg_handler,       \
             },                                                                  \
@@ -98,16 +98,16 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME =  {                                                        \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)          \
+                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)           \
                                 - (intptr_t)&((__PARENT_ADDR)->__PREVIOUS),     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
-                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                        \
+                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                      \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
                 VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
@@ -123,16 +123,16 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME = (__TYPE) {                                                \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)          \
+                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)           \
                                 - (intptr_t)&((__PARENT_ADDR)->__PREVIOUS),     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
-                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                        \
+                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                      \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
                 VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
@@ -149,13 +149,13 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME =  {                                                        \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)          \
+                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)           \
                                 - (intptr_t)&((__PARENT_ADDR)->__PREVIOUS),     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
                 .bIsEnabled = true,                                             \
@@ -173,13 +173,13 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME = (__TYPE){                                                 \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)          \
+                    .previous =  (intptr_t)&((__PARENT_ADDR)->__NAME)           \
                                 - (intptr_t)&((__PARENT_ADDR)->__PREVIOUS),     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
                 .bIsEnabled = true,                                             \
@@ -199,14 +199,14 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME =  {                                                        \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
-                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                        \
+                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                      \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
                 VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
@@ -222,14 +222,14 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME = (__TYPE) {                                                \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
-                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                        \
+                .node_name_ptr = "["#__TYPE"]["#__NAME"]",                      \
                 .bIsEnabled = true,                                             \
                 .bIsVisible = true,                                             \
                 VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                          \
@@ -246,11 +246,11 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME =  {                                                        \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
                 .bIsEnabled = true,                                             \
@@ -268,11 +268,11 @@
                         __NEXT,                                                 \
                         ...)                                                    \
             .__NAME = (__TYPE){                                                 \
-                .parent_ptr = (vsf_msgt_container_t *)                            \
+                .parent_ptr = (vsf_msgt_container_t *)                          \
                                 &((__PARENT_ADDR)->use_as__vsf_msgt_node_t),    \
-                .id = (__ID),                                                 \
+                .id = (__ID),                                                   \
                 .Offset = {                                                     \
-                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)              \
+                    .next =  (intptr_t)&((__PARENT_ADDR)->__NEXT)               \
                             - (intptr_t)&((__PARENT_ADDR)->__NAME),             \
                 },                                                              \
                 .bIsEnabled = true,                                             \
@@ -375,10 +375,10 @@
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
                             .is_container = true,                               \
-                            .node_ptr =                                           \
+                            .node_ptr =                                         \
                                 (vsf_msgt_node_t*)                              \
                                &((__PARENT_ADDR)->__NAME.__NAME##_FirstNode),   \
-                            .node_name_ptr =                                      \
+                            .node_name_ptr =                                    \
                                 "[vsf_tgui_container_t]["#__NAME"]",            \
                             .bIsEnabled = true,                                 \
                             .bIsVisible = true,                                 \
@@ -398,7 +398,7 @@
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
                             .is_container = true,                               \
-                            .node_ptr =                                           \
+                            .node_ptr =                                         \
                                 (vsf_msgt_node_t*)                              \
                                &((__PARENT_ADDR)->__NAME.__NAME##_FirstNode),   \
                             .bIsEnabled = true,                                 \
@@ -436,14 +436,14 @@ typedef union vsf_tgui_status_t {
         uint8_t bIsVisible                      : 1;
         uint8_t bIsActive                       : 1;
         uint8_t bIsHideContentInsideContainer   : 1;
-        uint8_t is_control_transparent           : 1;
+        uint8_t is_control_transparent          : 1;
         uint8_t                                 : 2;
         //! @}
 
         //! \name internal bits
         //! @{
-        uint8_t __is_the_first_node_for_refresh        : 1;
-        uint8_t __does_contain_builtin_structure      : 1;
+        uint8_t __is_the_first_node_for_refresh : 1;
+        uint8_t __does_contain_builtin_structure: 1;
         uint8_t                                 : 6;
         //! @}
     } Values;
@@ -457,7 +457,9 @@ typedef struct vsf_tgui_control_subcall_t {
     vsf_tgui_control_t          *control_ptr;
 } vsf_tgui_control_subcall_t;
 
-typedef fsm_rt_t vsf_tgui_controal_fsm_t(vsf_tgui_control_t* node_ptr, vsf_tgui_msg_t* ptMSG);
+typedef fsm_rt_t vsf_tgui_controal_fsm_t(
+        vsf_tgui_control_t* node_ptr, 
+        vsf_tgui_msg_t* ptMSG);
 
 typedef struct vsf_tgui_control_handler_t {
     uint16_t    u2Type              : 2;                    //!< vsf_msgt_handler_type_t
@@ -480,7 +482,8 @@ typedef struct vsf_tgui_user_evt_handler {
 } vsf_tgui_user_evt_handler;
 
 
-#if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+#if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED  ||\
+    VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
 typedef struct vsf_tgui_margin_t {
     uint8_t chLeft;
     uint8_t chTop;
@@ -545,8 +548,8 @@ def_class(__vsf_tgui_control_core_t,
             uint8_t bIsVisible                      : 1;
             uint8_t                                 : 1;
             uint8_t bIsHideContentInsideContainer   : 1;
-            uint8_t is_control_transparent           : 1;
-            uint8_t                                 : 2;
+            uint8_t is_control_transparent          : 1;
+            uint8_t dummy_bits                      : 2;
             //! @}
         };
     };
@@ -574,9 +577,10 @@ def_class(vsf_tgui_container_t,
 
     implement_ex(
         struct {
-            uint8_t         u5Type                          : 5;    /* vsf_tgui_container_type_t */
-            uint8_t         bIsAutoSize                     : 1;
-            uint8_t         is_forced_to_refresh_whole_background  : 1;
+            /* vsf_tgui_container_type_t */
+            uint8_t u5Type                                  : 5;    
+            uint8_t bIsAutoSize                             : 1;
+            uint8_t is_forced_to_refresh_whole_background   : 1;
             uint8_t                                         : 1;
         },
         ContainerAttribute

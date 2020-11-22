@@ -33,6 +33,10 @@
 #endif
 
 /*============================ MACROS ========================================*/
+#ifndef VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE
+#   define VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE \
+              (VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX / 10)
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -46,16 +50,7 @@ typedef struct usrapp_ui_common_t {
 #if VSF_USE_TINY_GUI == ENABLED
     struct {
         vk_input_notifier_t notifier;
-        vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
-        struct {
-            bool is_ready;
-            vsf_tgui_region_t request_region;
-#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABED
-            vsf_systimer_cnt_t start_cnt;
-            uint16_t refresh_cnt;
-            uint16_t fps;
-#endif
-        } port;
+        vsf_tgui_color_t color[VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE];
     } tgui;
 #endif
 
@@ -68,7 +63,7 @@ typedef struct usrapp_ui_common_t {
 #if VSF_USE_LVGL == ENABLED
     struct {
         vk_input_notifier_t notifier;
-#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
+#if APP_LVGL_DEMO_USE_TOUCHSCREEN == ENABLED
         vk_touchscreen_evt_t ts_evt;
 #else
         vk_mouse_evt_t mouse_evt;

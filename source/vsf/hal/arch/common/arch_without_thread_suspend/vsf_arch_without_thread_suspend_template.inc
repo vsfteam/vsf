@@ -144,7 +144,7 @@ void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate)
 
 void __vsf_arch_irq_fini(vsf_arch_irq_thread_t *irq_thread)
 {
-    
+
 }
 
 void __vsf_arch_irq_init(vsf_arch_irq_thread_t *irq_thread, char *name,
@@ -213,7 +213,7 @@ void vsf_enable_interrupt(void)
  * Others: sleep, reset and etc.                                              *
  *----------------------------------------------------------------------------*/
 
-void vsf_arch_sleep(uint32_t mode)
+void vsf_arch_sleep(uint_fast32_t mode)
 {
     // vsf_arch_sleep can be called with interrupt disabled
 //    VSF_HAL_ASSERT(__vsf_arch_common.gint_state);

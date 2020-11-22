@@ -69,8 +69,8 @@ enum {
             vsf_arch_prio_##__N = (__N),
 
 enum vsf_arch_prio_t {
-    VSF_ARCH_PRIO_IVALID = -1,
-    vsf_arch_prio_ivalid = -1,
+    VSF_ARCH_PRIO_INVALID = -1,
+    vsf_arch_prio_invalid = -1,
     REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 };

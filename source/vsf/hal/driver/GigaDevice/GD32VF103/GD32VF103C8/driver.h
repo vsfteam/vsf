@@ -16,9 +16,9 @@
  ****************************************************************************/
 
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   include "hal/vsf_hal_cfg.h"
-#   include "./device.h"
-#   undef   __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#   include "../__device.h"
+
 #else
 
 #   ifndef __HAL_DRIVER_GIGADEVICE_GD32VF103C8_H__
@@ -27,7 +27,7 @@
 /*============================ INCLUDES ======================================*/
 #       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
-#		include "./Vendor/gd32vf103_libopt.h"		//!< official driver
+#		    include "./Vendor/gd32vf103_libopt.h"		//!< official driver
 #       include "../common/usb/usb.h"
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

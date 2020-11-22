@@ -89,6 +89,11 @@ static const vk_usbh_dev_id_t __vk_usbh_msc_dev_id[] = {
     { VSF_USBH_MATCH_IFS_CLASS(USB_CLASS_MASS_STORAGE, 6, 0x50) },
 };
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_scsi_drv_t __vk_usbh_msc_scsi_drv = {
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_fini),
@@ -98,7 +103,10 @@ const vk_scsi_drv_t __vk_usbh_msc_scsi_drv = {
     .execute_stream = (vsf_peda_evthandler_t)vsf_peda_func(__vk_usbh_msc_scsi_execute_stream),
 #endif
 };
-typedef struct vk_scsi_drv_t vk_scsi_drv_t;
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

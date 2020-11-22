@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level Application Configuration
 
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
@@ -24,7 +24,11 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(...)                     //if (!(__VA_ARGS__)) {while(1);};
+#ifdef __WIN__
+#   define ASSERT(...)                   assert(__VA_ARGS__)
+#else
+#   define ASSERT(...)                   if (!(__VA_ARGS__)) {while(1);};
+#endif
 //#define ASSERT(...)
 
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
@@ -71,7 +75,7 @@
 #define VSF_KERNEL_CFG_SUPPORT_SYNC                     ENABLED
 //      </c>
 
-//      <h> Schedule Policy 
+//      <h> Schedule Policy
 //          <c1>Enable Preemption
 //          <i>Simon, please add description here...
 #define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED     ENABLED
@@ -115,7 +119,7 @@
 //#define VSF_OS_CFG_MAIN_STACK_SIZE                    2048
 
 //          <c1>Run main as a thread
-//          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
+//          <i>This feature will run main function as a thread. RTOS thread support must be enabled.
 #define VSF_OS_CFG_MAIN_MODE                            VSF_OS_CFG_MAIN_MODE_IDLE
 //          </c>
 //      </h>
@@ -128,7 +132,7 @@
 
 //      <h> Task Form Configuration
 //          <c1>Enable the VSF Co-oprative task support
-//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant. 
+//          <i>Enable this feature will provide cooperative task support, the task can be written as RTOS, PT and etc. The stack is shared and the call depth will be constant.
 #define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                  ENABLED
 //          </c>
 //          <c1>Enable the RTOS thread support
@@ -162,6 +166,7 @@
 
 #define VSF_USE_STREAM                                  DISABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
+#define VSF_USE_FIFO                                    ENABLED
 
 #if VSF_USE_STREAM == ENABLED
 
@@ -192,40 +197,13 @@ enum {
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/
 
-#define WEAK_VSF_KERNEL_ERR_REPORT_EXTERN                                       \
-        extern void vsf_kernel_err_report(vsf_kernel_error_t err);
-#define WEAK_VSF_KERNEL_ERR_REPORT(__ERR)                                       \
-        vsf_kernel_err_report(__ERR)
-
-#define WEAK___POST_VSF_KERNEL_INIT_EXTERN                                      \
-        extern void __post_vsf_kernel_init(void);
-#define WEAK___POST_VSF_KERNEL_INIT()                                           \
-        __post_vsf_kernel_init()
-
-#define WEAK_VSF_SYSTIMER_EVTHANDLER_EXTERN                                     \
-        extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
-#define WEAK_VSF_SYSTIMER_EVTHANDLER(__TICK)                                    \
-        vsf_systimer_evthandler(__TICK)
-
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR_EXTERN               \
-        extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR()                    \
-        vsf_arch_req___systimer_resolution___from_usr()
-
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR_EXTERN                     \
-        extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR()                          \
-        vsf_arch_req___systimer_freq___from_usr()
-
-#define WEAK_VSF_DRIVER_INIT_EXTERN                                             \
-        bool vsf_driver_init(void);
-#define WEAK_VSF_DRIVER_INIT()                                                  \
-        vsf_driver_init()
-
-#define WEAK_VSF_HEAP_MALLOC_ALIGNED_EXTERN                                     \
-        extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
-#define WEAK_VSF_HEAP_MALLOC_ALIGNED(__SIZE, __ALIGNMENT)                       \
-        vsf_heap_malloc_aligned((__SIZE), (__ALIGNMENT))
+#define WEAK_VSF_KERNEL_ERR_REPORT
+#define WEAK___POST_VSF_KERNEL_INIT
+#define WEAK_VSF_SYSTIMER_EVTHANDLER
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
+#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
+#define WEAK_VSF_DRIVER_INIT
+#define WEAK_VSF_HEAP_MALLOC_ALIGNED
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

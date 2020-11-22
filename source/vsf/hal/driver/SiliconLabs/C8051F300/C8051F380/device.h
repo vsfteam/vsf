@@ -15,21 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_SILICONLABS_C8051F380_H__
-#define __HAL_DEVICE_SILICONLABS_C8051F380_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-#endif
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             0
+
+#else
+
+#ifndef __HAL_DEVICE_SILICONLABS_C8051F380_H__
+#define __HAL_DEVICE_SILICONLABS_C8051F380_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -49,6 +50,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_SILICONLABS_C8051F380_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

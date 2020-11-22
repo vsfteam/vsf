@@ -8,4 +8,5 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vsf_linux_glibc_stdlib.c
     vsf_linux_glibc_string.c
     vsf_linux_glibc_time.c
+    vsf_linux_glibc_ctype.c
 )

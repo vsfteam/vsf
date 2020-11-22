@@ -353,6 +353,13 @@ static void __vk_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
         break;
+    case VSF_EVT_USER:
+        if (!hub->is_waiting_next_round) {
+            break;
+        }
+
+        // cancel timer and force to polling next
+        vsf_teda_cancel_timer();
     case VSF_EVT_TIMER:
         switch (hub->state) {
         default:
@@ -511,8 +518,7 @@ vsf_err_t vk_usbh_hub_reset_dev(vk_usbh_dev_t *dev)
             hub->reset_mask |= (1 << index);
             __vsf_sched_safe(
                 if (hub->is_waiting_next_round) {
-                    vsf_teda_cancel_timer(&hub->teda);
-                    vsf_eda_post_evt(&hub->teda.use_as__vsf_eda_t, VSF_EVT_TIMER);
+                    vsf_eda_post_evt(&hub->teda.use_as__vsf_eda_t, VSF_EVT_USER);
                 } else {
                     hub->is_go_on_next_round = true;
                 }

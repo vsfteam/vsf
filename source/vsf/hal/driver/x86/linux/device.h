@@ -15,23 +15,27 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_X86_WIN_H__
-#define __HAL_DEVICE_X86_WIN_H__
-
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#else
+
+#ifndef __HAL_DEVICE_X86_LINUX_H__
+#define __HAL_DEVICE_X86_LINUX_H__
+
 /*============================ MACROS ========================================*/
 
-#ifndef USART_CONT
-#   define USART_COUNT                          1
+#ifndef USART_MAX_PORT
+#   define USART_MAX_PORT                       1
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_X86_LINUX_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#define tcgetattr   __vsf_linux_tcgetattr
+#define tcsetattr   __vsf_linux_tcsetattr
+
 typedef unsigned int tcflag_t;
 
 #define IGNBRK      0000001

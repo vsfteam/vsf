@@ -50,9 +50,16 @@
 #       define tgui_dock(...)       __tgui_attribute(tDock,         __VA_ARGS__)
 #   endif
 
-#   if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+#   if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
 #       define tgui_margin(...)     __tgui_attribute(tMargin,       {__VA_ARGS__})
-#       define tgui_padding(...)    __tgui_attribute(tConatinerPadding,      {__VA_ARGS__})
+#   else
+#       define tgui_margin(...)     .dummy_bits = 0
+#   endif
+#   if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+#       define tgui_padding(...)                                                \
+            __tgui_attribute(tConatinerPadding, {__VA_ARGS__})
+#   else
+#       define tgui_padding(...)    .dummy_bits = 0
 #   endif
 
 #   if VSF_TGUI_CFG_SUPPORT_MULTI_LANGUAGE_EXTERNSION == ENABLED
@@ -65,7 +72,7 @@
 #       if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
 #           define __tgui_text(__NAME, __TEXT, ...)                             \
                 .__NAME.tString.pstrText = __TEXT,                              \
-                .__NAME.tString.s16_size = sizeof(__TEXT) - 1,                     \
+                .__NAME.tString.s16_size = sizeof(__TEXT) - 1,                  \
                 .__NAME.bIsChanged = true,                                      \
                 .__NAME.u4Align = (0, ##__VA_ARGS__)
 #       else

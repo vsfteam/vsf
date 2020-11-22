@@ -25,22 +25,57 @@
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_IMPLEMENT
-#include "./vsf_linux.h"
 
-#include <unistd.h>
-#include <semaphore.h>
-#include <signal.h>
-#include <poll.h>
-#include <sys/stat.h>
-#include <sys/select.h>
-#include <fcntl.h>
-#include <errno.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./include/unistd.h"
+#   include "./include/semaphore.h"
+#   include "./include/signal.h"
+#   include "./include/poll.h"
+#   include "./include/sys/stat.h"
+#   include "./include/sys/select.h"
+#   include "./include/sys/wait.h"
+#   include "./include/sys/mount.h"
+#   include "./include/fcntl.h"
+#   include "./include/errno.h"
+#   include "./include/termios.h"
+#else
+#   include <unistd.h>
+#   include <semaphore.h>
+#   include <signal.h>
+#   include <poll.h>
+#   include <sys/stat.h>
+#   include <sys/select.h>
+#   include <sys/wait.h>
+#   include <sys/mount.h>
+#   include <fcntl.h>
+#   include <errno.h>
+#   include <termios.h>
+#endif
 #include <stdarg.h>
-#include <termios.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
+#   include "./include/simple_libc/stdlib.h"
+#else
+#   include <stdlib.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
+#   include "./include/simple_libc/string.h"
+#else
+#   include <string.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
+#   include "./include/simple_libc/stdio.h"
+#else
+#   include <stdio.h>
+#endif
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
+#endif
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
 /*============================ MACROS ========================================*/
@@ -49,8 +84,8 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE MUST be enbled
 #endif
 
-#ifndef VSF_LINUX_CFG_STACKSIZE
-#   define VSF_LINUX_CFG_STACKSIZE          1024
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL MUST be enabled
 #endif
 
 #ifndef VSF_LINUX_CFG_PRIO_LOWEST
@@ -120,18 +155,18 @@ static const vsf_linux_thread_op_t __vsf_linux_main_op = {
 
 const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .priv_size          = sizeof(vsf_linux_fs_priv_t),
-    .fcntl              = __vsf_linux_fs_fcntl,
-    .read               = __vsf_linux_fs_read,
-    .write              = __vsf_linux_fs_write,
-    .close              = __vsf_linux_fs_close,
+    .fn_fcntl           = __vsf_linux_fs_fcntl,
+    .fn_read            = __vsf_linux_fs_read,
+    .fn_write           = __vsf_linux_fs_write,
+    .fn_close           = __vsf_linux_fs_close,
 };
 
 static const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .priv_size          = sizeof(vsf_linux_stream_priv_t),
-    .fcntl              = __vsf_linux_stream_fcntl,
-    .read               = __vsf_linux_stream_read,
-    .write              = __vsf_linux_stream_write,
-    .close              = __vsf_linux_stream_close,
+    .fn_fcntl           = __vsf_linux_stream_fcntl,
+    .fn_read            = __vsf_linux_stream_read,
+    .fn_write           = __vsf_linux_stream_write,
+    .fn_close           = __vsf_linux_stream_close,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -232,10 +267,19 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int s
     if (!stack_size) {
         stack_size = VSF_LINUX_CFG_STACKSIZE;
     }
+    stack_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+    stack_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
 
-    int size = (op->priv_size + sizeof(*thread) + 3) & ~3;
-    thread = calloc(1, size + stack_size);
+    uint_fast32_t thread_size = op->priv_size + sizeof(*thread);
+    thread_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+    thread_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
+
+    uint_fast32_t all_size = thread_size + stack_size;
+    all_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+
+    thread = (vsf_linux_thread_t *)vsf_heap_malloc_aligned(all_size, 1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
     if (thread != NULL) {
+        memset(thread, 0, thread_size);
         thread->process = process;
 
         // set entry and on_terminate
@@ -244,7 +288,7 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int s
 
         // set stack
         thread->stack_size = stack_size;
-        thread->stack = (void *)((uintptr_t)thread + size);
+        thread->stack = (void *)((uintptr_t)thread + thread_size);
 
         vsf_protect_t orig = vsf_protect_sched();
             thread->tid = __vsf_linux.cur_tid++;
@@ -256,7 +300,7 @@ vsf_linux_thread_t * vsf_linux_create_thread(vsf_linux_process_t *process, int s
 
 int vsf_linux_start_thread(vsf_linux_thread_t *thread)
 {
-    vk_thread_start(&thread->use_as__vsf_thread_t,
+    vsf_thread_start(&thread->use_as__vsf_thread_t,
         &thread->use_as__vsf_thread_cb_t, thread->process->prio);
     return 0;
 }
@@ -399,7 +443,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
     vsf_unprotect_sched(orig);
-    free(thread);
+    vsf_heap_free(thread);
 
     if (thread == thread_main) {
         vsf_protect_t orig = vsf_protect_sched();
@@ -1011,7 +1055,7 @@ int close(int fd)
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
     if (!sfd) { return -1; }
 
-    int err = sfd->op->close(sfd);
+    int err = sfd->op->fn_close(sfd);
     vsf_linux_delete_fd(fd);
     return err;
 }
@@ -1026,21 +1070,21 @@ int fcntl(int fd, int cmd, ...)
     va_start(ap, cmd);
         arg = va_arg(ap, long);
     va_end(ap);
-    return sfd->op->fcntl(sfd, cmd, arg);
+    return sfd->op->fn_fcntl(sfd, cmd, arg);
 }
 
 ssize_t read(int fd, void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
     if (!sfd || (sfd->flags & O_WRONLY)) { return -1; }
-    return sfd->op->read(sfd, buf, count);
+    return sfd->op->fn_read(sfd, buf, count);
 }
 
 ssize_t write(int fd, void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_get_fd(fd);
     if (!sfd || (sfd->flags & O_RDONLY)) { return -1; }
-    return sfd->op->write(sfd, buf, count);
+    return sfd->op->fn_write(sfd, buf, count);
 }
 
 off_t lseek(int fd, off_t offset, int whence)
@@ -1164,11 +1208,15 @@ int mount(const char *source, const char *target,
         vk_fs_mount(dir, filesystem, (void *)data);
         err = (vsf_err_t)vsf_eda_get_return_value();
     } else {
+#if VSF_FS_USE_MALFS == ENABLED
         vk_malfs_mounter_t mounter;
         mounter.dir = dir;
         mounter.mal = (vk_mal_t *)data;
         vk_malfs_mount_mbr(&mounter);
         err = mounter.err;
+#else
+        err = VSF_ERR_NOT_SUPPORT;
+#endif
     }
 
     close(fd);
@@ -1227,8 +1275,9 @@ int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *en
     return fd;
 }
 
-int vsf_linux_fs_bind_target(int fd, void *target, vsf_param_eda_evthandler_t read,
-        vsf_param_eda_evthandler_t write)
+int vsf_linux_fs_bind_target(int fd, void *target,
+        vsf_param_eda_evthandler_t peda_read,
+        vsf_param_eda_evthandler_t peda_write)
 {
     vk_vfs_file_t *vfs_file = vsf_linux_fs_get_vfs(fd);
     if (NULL == vfs_file) {
@@ -1236,8 +1285,8 @@ int vsf_linux_fs_bind_target(int fd, void *target, vsf_param_eda_evthandler_t re
     }
 
     vfs_file->f.data = target;
-    vfs_file->f.callback.read = read;
-    vfs_file->f.callback.write = write;
+    vfs_file->f.callback.fn_read = peda_read;
+    vfs_file->f.callback.fn_write = peda_write;
     return 0;
 }
 
@@ -1277,9 +1326,14 @@ unsigned sleep(unsigned sec)
 }
 #endif
 
+// malloc.h
 void * memalign(size_t alignment, size_t size)
 {
     return vsf_heap_malloc_aligned(size, alignment);
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 #endif      // VSF_USE_LINUX

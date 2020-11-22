@@ -17,6 +17,10 @@
 
 /*============================ INCLUDES ======================================*/
 
+#include "component/tcpip/vsf_tcpip_cfg.h"
+
+#if VSF_USE_TCPIP == ENABLED && VSF_USE_LWIP == ENABLED
+
 #define __VSF_EDA_CLASS_INHERIT__
 #include "kernel/vsf_kernel.h"
 
@@ -43,7 +47,7 @@ struct vsf_rtos_thread_t {
 typedef struct vsf_rtos_thread_t vsf_rtos_thread_t;
 */
 
-declare_vsf_thread_ex(vsf_rtos_thread_t)
+dcl_vsf_thread_ex(vsf_rtos_thread_t)
 def_vsf_thread_ex(vsf_rtos_thread_t,
     def_params(
         void *arg;
@@ -76,7 +80,7 @@ u32_t sys_now(void)
 #else
 
 // thread
-static void vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
+static void __vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
 {
     vsf_heap_free(eda);
 }
@@ -92,35 +96,43 @@ static void vsf_rtos_thread_entry(vsf_thread_t *thread)
     sys_thread->fn(sys_thread->arg);
 }
 */
-sys_thread_t sys_thread_new(const char *name, 
-                            lwip_thread_fn fn, 
-                            void *arg, 
-                            int stacksize, 
+sys_thread_t sys_thread_new(const char *name,
+                            lwip_thread_fn fn,
+                            void *arg,
+                            int stacksize,
                             int prio)
 {
     sys_thread_t thread;
-    uint_fast32_t thread_size = (sizeof(*thread) + 7) & ~7;
+    uint_fast32_t thread_size = sizeof(*thread);
+    uint64_t *stack;
 
-    thread = vsf_heap_malloc_aligned(thread_size + ((stacksize + 7) & ~7), 8);
+    thread_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+    thread_size &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
+    stacksize   += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+    stacksize   &= ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1);
+
+    thread = vsf_heap_malloc_aligned(thread_size + stacksize,
+                        1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
     if (NULL == thread) {
         return NULL;
     }
 
-    thread->on_terminate = vsf_rtos_thread_on_terminate;
-    
+    thread->on_terminate = __vsf_rtos_thread_on_terminate;
+
     thread->arg = arg;
     thread->lwip_thread = fn;
 
-    init_vsf_thread_ex( vsf_rtos_thread_t, 
-                        thread, 
+    stack = (uint64_t *)((uintptr_t)thread + thread_size);
+    init_vsf_thread_ex( vsf_rtos_thread_t,
+                        thread,
                         prio,
-                        (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7), 
+                        stack,
                         stacksize);
     /*
-    thread->stack = (uint64_t *)((((uint32_t)&thread[1]) + 7) & ~7);
+    thread->stack = (uint64_t *)((uintptr_t)thread + thread_size);
     thread->stack_size = stacksize;
-    
-    vk_thread_start(&(thread->use_as__vsf_thread_t), prio);
+
+    vsf_thread_start(&(thread->use_as__vsf_thread_t), prio);
     */
     return thread;
 }
@@ -134,7 +146,7 @@ err_t sys_sem_new(sys_sem_t *sem, u8_t count)
 
 void sys_sem_free(sys_sem_t *sem)
 {
-    
+
 }
 
 int sys_sem_valid(sys_sem_t *sem)
@@ -173,7 +185,7 @@ err_t sys_mutex_new(sys_mutex_t *mutex)
 
 void sys_mutex_free(sys_mutex_t *mutex)
 {
-    
+
 }
 
 void sys_mutex_lock(sys_mutex_t *mutex)
@@ -311,3 +323,5 @@ void sys_init(void)
 {
 }
 #endif      // NO_SYS
+
+#endif      // VSF_USE_TCPIP && VSF_USE_LWIP

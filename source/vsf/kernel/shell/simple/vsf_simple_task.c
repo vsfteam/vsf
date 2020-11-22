@@ -46,7 +46,7 @@
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
-SECTION("text.vsf.kernel.__vsf_delay")
+SECTION(".text.vsf.kernel.__vsf_delay")
 vsf_evt_t __vsf_delay(uint_fast32_t tick)
 {
     vsf_evt_t result = VSF_EVT_INVALID;
@@ -64,7 +64,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
     if (vsf_eda_is_stack_owner(&(pteda->use_as__vsf_eda_t))) {
         vsf_thread_delay(tick);
         result = vsf_eda_get_cur_evt();
-    } else 
+    } else
 #   endif
     {
         if (vsf_eda_polling_state_get(&(pteda->use_as__vsf_eda_t))) {
@@ -81,7 +81,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
                                         (bool)VSF_APP_STATE_WAIT_TIMER_EVT);
         }
     }
-    
+
     return result;
 }
 
@@ -99,7 +99,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
 
 
 
-SECTION("text.vsf.kernel.__vsf_sem_pend")
+SECTION(".text.vsf.kernel.__vsf_sem_pend")
 vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
 {
     vsf_sync_reason_t result = VSF_SYNC_PENDING;
@@ -112,12 +112,12 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
 
     vsf_eda_t *eda = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != eda);
-    
+
     do {
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
         if (vsf_eda_is_stack_owner(eda)) {
             result = vsf_thread_sem_pend(sem_ptr, time_out);
-        } else 
+        } else
 #endif
         {
             if (vsf_eda_polling_state_get(eda)) {
@@ -130,23 +130,23 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
             } else {
                 /* VSF_APP_STATE_PENDING */
                 err = vsf_eda_sem_pend(sem_ptr, time_out);
-                if (!err) { 
-                    result = VSF_SYNC_GET; 
+                if (!err) {
+                    result = VSF_SYNC_GET;
                     break;
-                } else if (err < 0) { 
-                    result = VSF_SYNC_FAIL; 
+                } else if (err < 0) {
+                    result = VSF_SYNC_FAIL;
                     break;
-                } 
+                }
                 vsf_eda_polling_state_set(  eda,
                                             (bool)VSF_APP_STATE_WAIT_PENDING);
             }
         }
     } while(false);
-    
+
     return result;
 }
 
-SECTION("text.vsf.kernel.vsf_mutex_enter")
+SECTION(".text.vsf.kernel.vsf_mutex_enter")
 vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out)
 {
     VSF_KERNEL_ASSERT(NULL != mtx_ptr);
@@ -155,9 +155,9 @@ vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out)
 
 #endif
 
-SECTION("text.vsf.kernel.vsf_yield")
+SECTION(".text.vsf.kernel.vsf_yield")
 vsf_evt_t __vsf_yield(void)
-{    
+{
     vsf_evt_t result = VSF_EVT_YIELD;
     vsf_eda_t *eda = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != eda);
@@ -171,7 +171,7 @@ vsf_evt_t __vsf_yield(void)
     if (vsf_eda_is_stack_owner(eda)) {
         vsf_eda_yield();
         vsf_thread_wait();          //!< wait for any evt
-    } else 
+    } else
 #endif
     {
         if (vsf_eda_polling_state_get(eda)) {
@@ -189,24 +189,24 @@ vsf_evt_t __vsf_yield(void)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 
-SECTION("text.vsf.kernel.vsf_call_eda_ex")
-extern vsf_err_t __vsf_call_eda(uintptr_t evthandler, 
-                                uintptr_t param, 
+SECTION(".text.vsf.kernel.vsf_call_eda_ex")
+extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
+                                uintptr_t param,
                                 size_t local_size,
                                 size_t local_buff_size,
                                 uintptr_t local_buff)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != eda);
-    
+
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(eda)) {
-        return vk_thread_call_eda(  evthandler, 
-                                    param, 
+        return vk_thread_call_eda(  evthandler,
+                                    param,
                                     local_size,
                                     local_buff_size,
                                     local_buff );
-    } else 
+    } else
 #endif
     {
         vsf_err_t err = __vsf_eda_call_eda(evthandler, param, local_size);
@@ -221,16 +221,16 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
     }
 }
 
-SECTION("text.vsf.kernel.__vsf_call_fsm")
+SECTION(".text.vsf.kernel.__vsf_call_fsm")
 fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param, size_t local_size)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     VSF_KERNEL_ASSERT(NULL != eda);
-    
+
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(eda)) {
         return vk_thread_call_fsm(entry, param, local_size);
-    } else 
+    } else
 #endif
     {
         return __vsf_eda_call_fsm(entry, param, local_size);

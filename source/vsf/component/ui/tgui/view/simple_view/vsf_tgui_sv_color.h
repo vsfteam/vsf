@@ -33,8 +33,8 @@
 #       define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){ .tColor = { .tChannel = {.chB = _B, .chG =_G, .chR = _R, .chA =   _A}}, .bIsColorTransparency = 1})
 #       define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((vsf_tgui_sv_color_t){ .tColor = { .tChannel = {.chB = _B, .chG =_G, .chR = _R, .chA = 0xFF}}, .bIsColorTransparency = 0})
 #   else
-#       define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((svf_tgui_sv_color_t){{_B, _G, _R, _A  }, 1})
-#       define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((svf_tgui_sv_color_t){{_B, _G, _R, 0xFF}, 0})
+#       define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){{_B, _G, _R, _A  }, 1})
+#       define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((vsf_tgui_sv_color_t){{_B, _G, _R, 0xFF}, 0})
 #   endif
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
 #   if VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED

@@ -15,10 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GIGADEVICE_GD32VF103_DEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_GD32VF103_DEVICE_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 #undef VSF_DEVICE_HEADER
@@ -32,6 +30,15 @@
 /* include specified device driver header file */
 #include VSF_DEVICE_HEADER
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   ifndef __CPU_RV__
+#       define __CPU_RV__
+#   endif
+#else
+
+#ifndef __HAL_DEVICE_GIGADEVICE_GD32VF103_H__
+#define __HAL_DEVICE_GIGADEVICE_GD32VF103_H__
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -40,5 +47,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif
+#endif      // __HAL_DRIVER_GIGADEVICE_GD32VF103_DEVICE_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

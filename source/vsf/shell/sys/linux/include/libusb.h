@@ -1,11 +1,72 @@
 #ifndef __LIBUSB_H__
 #define __LIBUSB_H__
 
-#include <poll.h>
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./poll.h"
+#   include "./sys/time.h"
+#else
+#   include <poll.h>
+#   include <sys/time.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define libusb_init                                     __vsf_libusb_init
+#define libusb_exit                                     __vsf_libusb_exit
+#define libusb_get_device_list                          __vsf_libusb_get_device_list
+#define libusb_free_device_list                         __vsf_libusb_free_device_list
+#define libusb_open                                     __vsf_libusb_open
+#define libusb_close                                    __vsf_libusb_close
+#define libusb_get_device_descriptor                    __vsf_libusb_get_device_descriptor
+#define libusb_get_device_address                       __vsf_libusb_get_device_address
+#define libusb_get_bus_number                           __vsf_libusb_get_bus_number
+#define libusb_alloc_transfer                           __vsf_libusb_alloc_transfer
+#define libusb_fill_control_transfer                    __vsf_libusb_fill_control_transfer
+#define libusb_fill_bulk_transfer                       __vsf_libusb_fill_bulk_transfer
+#define libusb_fill_interrupt_transfer                  __vsf_libusb_fill_interrupt_transfer
+#define libusb_fill_iso_transfer                        __vsf_libusb_fill_iso_transfer
+#define libusb_get_iso_packet_buffer_simple             __vsf_libusb_get_iso_packet_buffer_simple
+#define libusb_set_iso_packet_lengths                   __vsf_libusb_set_iso_packet_lengths
+#define libusb_free_transfer                            __vsf_libusb_free_transfer
+#define libusb_submit_transfer                          __vsf_libusb_submit_transfer
+#define libusb_cancel_transfer                          __vsf_libusb_cancel_transfer
+#define libusb_control_transfer                         __vsf_libusb_control_transfer
+#define libusb_bulk_transfer                            __vsf_libusb_bulk_transfer
+#define libusb_interrupt_transfer                       __vsf_libusb_interrupt_transfer
+#define libusb_get_string_descriptor_ascii              __vsf_libusb_get_string_descriptor_ascii
+#define libusb_get_config_descriptor                    __vsf_libusb_get_config_descriptor
+#define libusb_get_active_config_descriptor             __vsf_libusb_get_active_config_descriptor
+#define libusb_free_config_descriptor                   __vsf_libusb_free_config_descriptor
+#define libusb_get_descriptor                           __vsf_libusb_get_descriptor
+#define libusb_get_string_descriptor                    __vsf_libusb_get_string_descriptor
+#define libusb_set_interface_alt_setting                __vsf_libusb_set_interface_alt_setting
+#define libusb_handle_events_timeout_completed          __vsf_libusb_handle_events_timeout_completed
+#define libusb_handle_events_completed                  __vsf_libusb_handle_events_completed
+#define libusb_handle_events_timeout                    __vsf_libusb_handle_events_timeout
+#define libusb_handle_events                            __vsf_libusb_handle_events
+#define libusb_get_pollfds                              __vsf_libusb_get_pollfds
+#define libusb_free_pollfds                             __vsf_libusb_free_pollfds
+#define libusb_get_ss_endpoint_companion_descriptor     __vsf_libusb_get_ss_endpoint_companion_descriptor
+#define libusb_free_ss_endpoint_companion_descriptor    __vsf_libusb_free_ss_endpoint_companion_descriptor
+#define libusb_claim_interface                          __vsf_libusb_claim_interface
+#define libusb_release_interface                        __vsf_libusb_release_interface
+#define libusb_hotplug_register_callback                __vsf_libusb_hotplug_register_callback
+#define libusb_hotplug_deregister_callback              __vsf_libusb_hotplug_deregister_callback
+#define libusb_get_next_timeout                         __vsf_libusb_get_next_timeout
+#define libusb_has_capability                           __vsf_libusb_has_capability
+#define libusb_attach_kernel_driver                     __vsf_libusb_attach_kernel_driver
+#define libusb_detach_kernel_driver                     __vsf_libusb_detach_kernel_driver
+#define libusb_kernel_driver_active                     __vsf_libusb_kernel_driver_active
+#define libusb_ref_device                               __vsf_libusb_ref_device
+#define libusb_unref_device                             __vsf_libusb_unref_device
+#define libusb_get_max_packet_size                      __vsf_libusb_get_max_packet_size
+#define libusb_get_device_speed                         __vsf_libusb_get_device_speed
+#define libusb_set_configuration                        __vsf_libusb_set_configuration
+#define libusb_get_configuration                        __vsf_libusb_get_configuration
 
 #define LIBUSB_HOTPLUG_MATCH_ANY        -1
 
@@ -200,63 +261,33 @@ struct libusb_transfer {
     struct libusb_iso_packet_descriptor iso_packet_desc[0];
 };
 
-#define libusb_init                                     __vsf_libusb_init
-#define libusb_exit                                     __vsf_libusb_exit
-#define libusb_get_device_list                          __vsf_libusb_get_device_list
-#define libusb_free_device_list                         __vsf_libusb_free_device_list
-#define libusb_open                                     __vsf_libusb_open
-#define libusb_close                                    __vsf_libusb_close
-#define libusb_get_device_descriptor                    __vsf_libusb_get_device_descriptor
-#define libusb_get_device_address                       __vsf_libusb_get_device_address
-#define libusb_get_bus_number                           __vsf_libusb_get_bus_number
-#define libusb_alloc_transfer                           __vsf_libusb_alloc_transfer
-#define libusb_free_transfer                            __vsf_libusb_free_transfer
-#define libusb_submit_transfer                          __vsf_libusb_submit_transfer
-#define libusb_cancel_transfer                          __vsf_libusb_cancel_transfer
-#define libusb_control_transfer                         __vsf_libusb_control_transfer
-#define libusb_bulk_transfer                            __vsf_libusb_bulk_transfer
-#define libusb_interrupt_transfer                       __vsf_libusb_interrupt_transfer
-#define libusb_get_string_descriptor_ascii              __vsf_libusb_get_string_descriptor_ascii
-#define libusb_get_config_descriptor                    __vsf_libusb_get_config_descriptor
-#define libusb_get_active_config_descriptor             __vsf_libusb_get_active_config_descriptor
-#define libusb_free_config_descriptor                   __vsf_libusb_free_config_descriptor
-#define libusb_get_descriptor                           __vsf_libusb_get_descriptor
-#define libusb_get_string_descriptor                    __vsf_libusb_get_string_descriptor
-#define libusb_set_interface_alt_setting                __vsf_libusb_set_interface_alt_setting
-#define libusb_free_pollfds                             __vsf_libusb_free_pollfds
-#define libusb_get_ss_endpoint_companion_descriptor     __vsf_libusb_get_ss_endpoint_companion_descriptor
-#define libusb_free_ss_endpoint_companion_descriptor    __vsf_libusb_free_ss_endpoint_companion_descriptor
-#define libusb_claim_interface                          __vsf_libusb_claim_interface
-#define libusb_release_interface                        __vsf_libusb_release_interface
-#define libusb_hotplug_register_callback                __vsf_libusb_hotplug_register_callback
+int libusb_init(libusb_context **context);
+void libusb_exit(struct libusb_context *ctx);
+ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list);
+void libusb_free_device_list(libusb_device **list, int unref_devices);
+int libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc);
+int libusb_open(libusb_device *dev, libusb_device_handle **dev_handle);
+void libusb_close(libusb_device_handle *dev_handle);
+uint8_t libusb_get_device_address(libusb_device *dev);
+uint8_t libusb_get_bus_number(libusb_device *dev);
+int libusb_release_interface(libusb_device_handle *dev_handle, int interface_number);
+int libusb_claim_interface(libusb_device_handle *dev_handle, int interface_number);
 
-int __vsf_libusb_init(libusb_context **context);
-void __vsf_libusb_exit(struct libusb_context *ctx);
-ssize_t __vsf_libusb_get_device_list(libusb_context *ctx, libusb_device *** list);
-void __vsf_libusb_free_device_list(libusb_device **list, int unref_devices);
-int __vsf_libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc);
-int __vsf_libusb_open(libusb_device *dev, libusb_device_handle **dev_handle);
-void __vsf_libusb_close(libusb_device_handle *dev_handle);
-uint8_t __vsf_libusb_get_device_address(libusb_device *dev);
-uint8_t __vsf_libusb_get_bus_number(libusb_device *dev);
-int __vsf_libusb_release_interface(libusb_device_handle *dev_handle, int interface_number);
-int __vsf_libusb_claim_interface(libusb_device_handle *dev_handle, int interface_number);
-
-struct libusb_transfer *__vsf_libusb_alloc_transfer(int iso_packets);
-void __vsf_libusb_free_transfer(struct libusb_transfer *transfer);
-int __vsf_libusb_submit_transfer(struct libusb_transfer *transfer);
-int __vsf_libusb_cancel_transfer(struct libusb_transfer *transfer);
-int __vsf_libusb_control_transfer(libusb_device_handle *dev_handle,
+struct libusb_transfer *libusb_alloc_transfer(int iso_packets);
+void libusb_free_transfer(struct libusb_transfer *transfer);
+int libusb_submit_transfer(struct libusb_transfer *transfer);
+int libusb_cancel_transfer(struct libusb_transfer *transfer);
+int libusb_control_transfer(libusb_device_handle *dev_handle,
     uint8_t bRequestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex,
     unsigned char *data, uint16_t wLength, unsigned int timeout);
-int __vsf_libusb_bulk_transfer(libusb_device_handle *dev_handle,
+int libusb_bulk_transfer(libusb_device_handle *dev_handle,
     unsigned char endpoint, unsigned char *data, int length,
     int *actual_length, unsigned int timeout);
-int __vsf_libusb_interrupt_transfer(libusb_device_handle *dev_handle,
+int libusb_interrupt_transfer(libusb_device_handle *dev_handle,
     unsigned char endpoint, unsigned char *data, int length,
     int *actual_length, unsigned int timeout);
 
-int __vsf_libusb_hotplug_register_callback(libusb_context *ctx,
+int libusb_hotplug_register_callback(libusb_context *ctx,
         libusb_hotplug_event events,
         libusb_hotplug_flag flags,
         int vendor_id,
@@ -265,6 +296,8 @@ int __vsf_libusb_hotplug_register_callback(libusb_context *ctx,
         libusb_hotplug_callback_fn cb_fn,
         void *user_data,
         libusb_hotplug_callback_handle *callback_handle);
+void libusb_hotplug_deregister_callback(libusb_context *ctx,
+        libusb_hotplug_callback_handle callback_handle);
 
 static inline void libusb_fill_control_transfer(
     struct libusb_transfer *transfer, libusb_device_handle *dev_handle,
@@ -330,20 +363,20 @@ static inline void libusb_fill_iso_transfer(struct libusb_transfer *transfer,
     transfer->callback = callback;
 }
 
-int __vsf_libusb_get_string_descriptor_ascii(libusb_device_handle *dev_handle,
+int libusb_get_string_descriptor_ascii(libusb_device_handle *dev_handle,
     uint8_t desc_index, unsigned char *data, int length);
-int __vsf_libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
+int libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
         struct libusb_config_descriptor **config);
-int __vsf_libusb_get_active_config_descriptor(libusb_device *dev,
+int libusb_get_active_config_descriptor(libusb_device *dev,
         struct libusb_config_descriptor **config);
-void __vsf_libusb_free_config_descriptor(struct libusb_config_descriptor *config);
-int __vsf_libusb_get_descriptor(libusb_device_handle *dev_handle,
+void libusb_free_config_descriptor(struct libusb_config_descriptor *config);
+int libusb_get_descriptor(libusb_device_handle *dev_handle,
     uint8_t desc_type, uint8_t desc_index, unsigned char *data, int length);
-int __vsf_libusb_get_string_descriptor(libusb_device_handle *dev_handle,
+int libusb_get_string_descriptor(libusb_device_handle *dev_handle,
     uint8_t desc_index, uint16_t langid, unsigned char *data, int length);
-int __vsf_libusb_set_interface_alt_setting(libusb_device_handle *dev_handle,
+int libusb_set_interface_alt_setting(libusb_device_handle *dev_handle,
         int interface_number, int alternate_setting);
-void __vsf_libusb_free_pollfds(const struct libusb_pollfd **pollfds);
+void libusb_free_pollfds(const struct libusb_pollfd **pollfds);
 
 struct libusb_ss_endpoint_companion_descriptor {
     uint8_t  bLength;
@@ -353,11 +386,11 @@ struct libusb_ss_endpoint_companion_descriptor {
     uint16_t wBytesPerInterval;
 } PACKED;
 
-int __vsf_libusb_get_ss_endpoint_companion_descriptor(
+int libusb_get_ss_endpoint_companion_descriptor(
     struct libusb_context *ctx,
     const struct libusb_endpoint_descriptor *endpoint,
     struct libusb_ss_endpoint_companion_descriptor **ep_comp);
-void __vsf_libusb_free_ss_endpoint_companion_descriptor(
+void libusb_free_ss_endpoint_companion_descriptor(
     struct libusb_ss_endpoint_companion_descriptor *ep_comp);
 
 static inline unsigned char *libusb_get_iso_packet_buffer_simple(
@@ -382,6 +415,29 @@ static inline void libusb_set_iso_packet_lengths(
         transfer->iso_packet_desc[i].length = length;
 }
 
+int libusb_get_next_timeout(libusb_context *ctx, struct timeval *tv);
+int libusb_has_capability(uint32_t capability);
+
+int libusb_attach_kernel_driver(libusb_device_handle *dev_handle, int interface_number);
+int libusb_detach_kernel_driver(libusb_device_handle *dev_handle, int interface_number);
+int libusb_kernel_driver_active(libusb_device_handle *dev_handle, int interface_number);
+
+libusb_device * libusb_ref_device(libusb_device *dev);
+void libusb_unref_device(libusb_device *dev);
+
+int libusb_get_max_packet_size(libusb_device *dev, unsigned char endpoint);
+int libusb_get_device_speed(libusb_device *dev);
+
+int libusb_set_configuration(libusb_device_handle *dev_handle, int configuration);
+int libusb_get_configuration(libusb_device_handle *dev_handle, int *config);
+
+int libusb_handle_events_timeout_completed(libusb_context *ctx,
+    struct timeval *tv, int *completed);
+int libusb_handle_events_completed(libusb_context *ctx, int *completed);
+int libusb_handle_events_timeout(libusb_context *ctx, struct timeval *tv);
+int libusb_handle_events(libusb_context *ctx);
+const struct libusb_pollfd** libusb_get_pollfds(libusb_context *ctx);
+void libusb_free_pollfds(const struct libusb_pollfd **pollfds);
 
 void vsf_linux_libusb_startup(void);
 

@@ -31,7 +31,7 @@
 
 typedef enum em_usart_mode_t em_usart_mode_t;
 /*
-//! \name usart working mode 
+//! \name usart working mode
 //! @{
 enum em_usart_mode_t {
     USART_NO_AUTO_BAUD      = 0x00,
@@ -56,7 +56,7 @@ enum em_usart_mode_t {
     USART_6_BIT_LENGTH      = 0x0100,
     USART_7_BIT_LENGTH      = 0x0200,
     USART_8_BIT_LENGTH      = 0x0300,
-       
+
     USART_SYNC_MODE         = 0x0400,
     USART_ASYNC_MODE        = 0x0000
 };
@@ -88,7 +88,7 @@ typedef struct usart_capability_t usart_capability_t;
 
 
 
-typedef void vsf_usart_evt_handler_t(   void *target_ptr, 
+typedef void vsf_usart_evt_handler_t(   void *target_ptr,
                                         vsf_usart_t *,
                                         usart_status_t tStatus);
 
@@ -165,7 +165,8 @@ end_def_interface(i_usart_t)
 typedef struct vsf_usart_t vsf_usart_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
-extern const i_usart_t VSF_USART[USART_COUNT];
+
+extern const i_usart_t VSF_USART[USART_MAX_PORT + 1];
 
 /*============================ PROTOTYPES ====================================*/
 

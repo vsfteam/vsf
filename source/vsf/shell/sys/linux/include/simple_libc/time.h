@@ -5,6 +5,10 @@
 extern "C" {
 #endif
 
+#define clock_gettime       __vsf_linux_clock_gettime
+#define nanosleep           __vsf_linux_nanosleep
+#define clock               __vsf_linux_clock
+
 typedef long long   time_t;
 typedef long        clock_t;
 
@@ -46,8 +50,6 @@ struct tm *localtime(const time_t *t);
 time_t mktime(struct tm *tm);
 size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *tm);
 
-void usleep(int usec);
-unsigned sleep(unsigned sec);
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining);
 
 #ifdef __cplusplus

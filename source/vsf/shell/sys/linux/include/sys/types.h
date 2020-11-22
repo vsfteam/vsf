@@ -10,9 +10,9 @@ extern "C" {
 #   pragma diag_suppress=pe301
 #endif
 
-#if defined(__WIN__) && defined(__CPU_X64__)
+#if defined(__CPU_X64__)
 typedef int                 ssize_t;
-typedef unsigned long long  size_t;
+typedef unsigned long int   size_t;
 #else
 typedef int                 ssize_t;
 typedef unsigned int        size_t;

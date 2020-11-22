@@ -15,22 +15,31 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal_cfg.h"
+
+/*============================ MACROS ========================================*/
+
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+
+/*\note first define basic info for arch. */
+//! arch info
+#   define VSF_ARCH_PRI_NUM         16
+#   define VSF_ARCH_PRI_BIT         4
+
+#else
+
 #ifndef __HAL_DEVICE_MT071_H__
 #define __HAL_DEVICE_MT071_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+
 #include "./vendor/Include/mt071x.h"
 #include "./vendor/Include/usb_regs.h"
 #include "utilities/vsf_utilities.h"
-/*============================ MACROS ========================================*/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-//! arch info
-#   define VSF_ARCH_PRI_NUM         16
-#   define VSF_ARCH_PRI_BIT         4
-#endif
+/*============================ MACROS ========================================*/
 
 // TODO: implement pm
 #define __SYSTEM_FREQ               VSF_SYSTIMER_FREQ
@@ -57,7 +66,7 @@
 #   define DMA_CHANNEL_MAX_TRANS_SIZES                                          \
                                     1023, 511, 255, 255
 
-#define USART_COUNT                 2
+#define USART_MAX_PORT              1
 #   define USART0_TX_DMA            0
 #   define USART0_RX_DMA            1
 #   define USART1_TX_DMA            2
@@ -259,6 +268,6 @@ struct pm_mclk_cfg_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_MT071_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

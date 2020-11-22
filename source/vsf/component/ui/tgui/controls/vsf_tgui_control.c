@@ -497,7 +497,7 @@ vk_tgui_control_get_top(const vsf_tgui_control_t* control_ptr)
     return (const vsf_tgui_top_container_t*)control_ptr;
 }
 
-bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr, 
+bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr,
                                     vsf_tgui_evt_t event)
 {
     const vsf_tgui_top_container_t* ptTopContainer
@@ -710,7 +710,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                     "[Control Event]%s" VSF_TRACE_CFG_LINEEND "\t",
                     control_ptr->use_as__vsf_msgt_node_t.node_name_ptr);
 #else
-    VSF_TGUI_LOG(   VSF_TRACE_WARNING, 
+    VSF_TGUI_LOG(   VSF_TRACE_WARNING,
                     VSF_TRACE_CFG_LINEEND
                     "[Control Event]");
 #endif
@@ -748,12 +748,12 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 
             #if VSF_TGUI_CFG_REFRESH_SCHEME != VSF_TGUI_REFRESH_SCHEME_NONE
                 case VSF_TGUI_EVT_REFRESH & VSF_TGUI_EVT_MSK: {
-                    
+
                     vsf_tgui_control_refresh_mode_t tMode = VSF_TGUI_CONTROL_REFRESHED_BY_PARENT;
                     vsf_tgui_refresh_evt_t *event_ptr = (vsf_tgui_refresh_evt_t*)ptMSG;
                     vsf_tgui_region_t *temp_ptr = event_ptr->region_ptr;
-                    
-                    
+
+
                 #if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
                     vsf_tgui_region_t tRegion = { 0 };
                     if (!vsf_tgui_control_get_visible_region(control_ptr, &tRegion)) {
@@ -774,12 +774,12 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                 #   endif
                 #endif
                     event_ptr->region_ptr = &tRegion;
-                    
+
                     if (ptCore->Status.Values.__is_the_first_node_for_refresh) {
                         ptCore->Status.Values.__is_the_first_node_for_refresh = false;
                         tMode = VSF_TGUI_CONTROL_REFRESHED_DIRECTLY_BY_USER;
                     }
-                
+
                     if (control_ptr->use_as__vsf_msgt_node_t.Attribute._.is_visited) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(   VSF_TRACE_WARNING,
@@ -792,7 +792,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                         ptMSG->use_as__vsf_msgt_msg_t.msg = VSF_TGUI_EVT_POST_REFRESH;
                         result = __vk_tgui_control_user_message_handling(control_ptr, (const vsf_tgui_evt_t *)ptMSG);
 
-                        if (    (VSF_MSGT_ERR_MSG_NOT_HANDLED == result) 
+                        if (    (VSF_MSGT_ERR_MSG_NOT_HANDLED == result)
                             &&  (NULL != ptMethods->tView.ContainerPostRender)) {
                             result = ptMethods->tView.ContainerPostRender(control_ptr, &tRegion, tMode);
                         }
@@ -810,9 +810,9 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                         result = __vk_tgui_control_user_message_handling(control_ptr, (const vsf_tgui_evt_t *)ptMSG);
                         if (VSF_MSGT_ERR_MSG_NOT_HANDLED == result) {
                             result = ptMethods->tView.Render(control_ptr, &tRegion, tMode);
-                        }   
+                        }
                     }
-                    
+
                     event_ptr->region_ptr = temp_ptr;
 
                     return result;
@@ -831,7 +831,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                     if (result < 0) {
             #if VSF_TGUI_CFG_REFRESH_CONTROL_ON_ACTIVE_STATE_CHANGE == ENABLED
                         result = (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH;
-            #else   
+            #else
                         result = fsm_rt_cpl;
             #endif
                     }
@@ -843,7 +843,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                     if (result < 0) {
             #if VSF_TGUI_CFG_REFRESH_CONTROL_ON_ACTIVE_STATE_CHANGE == ENABLED
                         result = (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH;
-            #else   
+            #else
                         result = fsm_rt_cpl;
             #endif
                     }
@@ -1002,8 +1002,8 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
         case VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT & VSF_TGUI_MSG_MSK: {
 
         #if VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG == ENABLED
-            VSF_TGUI_LOG(VSF_TRACE_INFO, 
-                        "VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT : [0x%04x]\t", 
+            VSF_TGUI_LOG(VSF_TRACE_INFO,
+                        "VSF_TGUI_MSG_CONTROL_SPECIFIC_EVT : [0x%04x]\t",
                         ptMSG->use_as__vsf_msgt_msg_t.msg);
         #endif
             do {

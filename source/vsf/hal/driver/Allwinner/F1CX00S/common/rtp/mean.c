@@ -4,6 +4,8 @@
 
 #include <math.h>
 #include <stddef.h>
+// for malloc
+#include <stdlib.h>
 
 #include "./mean.h"
 

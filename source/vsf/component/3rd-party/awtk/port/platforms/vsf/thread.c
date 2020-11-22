@@ -26,6 +26,8 @@ struct _tk_thread_t {
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
   vsf_thread_cb_t cb;
   bool_t running;
+#else
+  uint32_t stack_size;
 #endif
   const char* name;
   uint32_t thread_priority;
@@ -76,9 +78,13 @@ static void tk_thread_entry(vsf_thread_cb_t *cb) {
   tk_thread_t* thread = (tk_thread_t*)vsf_eda_get_cur();
 
   tk_mutex_lock(thread->mutex);
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
   thread->running = TRUE;
+#endif
   thread->entry(thread->args);
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
   thread->running = FALSE;
+#endif
   tk_mutex_unlock(thread->mutex);
 }
 #else
@@ -111,15 +117,22 @@ ret_t tk_thread_start(tk_thread_t* thread) {
   return_value_if_fail(thread != NULL && !thread->running, RET_BAD_PARAMS);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+  uint_fast32_t stack_size = thread->cb.stack_size;
+#else
+  uint_fast32_t stack_size = thread->stack_size;
+#endif
+
+  stack_size += (1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
   thread->cb.entry = tk_thread_entry;
-  thread->cb.stack = TKMEM_ALLOC(thread->cb.stack_size);
+  thread->cb.stack = (uint64_t *)((uintptr_t)TKMEM_ALLOC(stack_size) & ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1));
   return_value_if_fail(thread->cb.stack != NULL, RET_OOM);
-  vk_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->thread_priority);
+  vsf_thread_start(&thread->use_as__vsf_thread_t, &thread->cb, (vsf_prio_t)thread->thread_priority);
 #else
   thread->entry = tk_thread_entry;
-  thread->stack = TKMEM_ALLOC(thread->stack_size);
+  thread->stack = (uint64_t *)((uintptr_t)TKMEM_ALLOC(stack_size) & ~((1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT) - 1));
   return_value_if_fail(thread->stack != NULL, RET_OOM);
-  vk_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->thread_priority);
+  vsf_thread_start(&thread->use_as__vsf_thread_t, (vsf_prio_t)thread->thread_priority);
 #endif
 
   return RET_OK;

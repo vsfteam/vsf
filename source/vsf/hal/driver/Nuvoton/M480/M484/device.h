@@ -15,25 +15,28 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_NUVOTON_M484_H__
-#define __HAL_DEVICE_NUVOTON_M484_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 /*============================ MACROS ========================================*/
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
 /*\note first define basic info for arch. */
-//#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-//#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-//#endif
 //! arch info
 #   define VSF_ARCH_PRI_NUM         16
 #   define VSF_ARCH_PRI_BIT         4
 
-
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             9
+
+#else
+
+#ifndef __HAL_DEVICE_NUVOTON_M484_H__
+#define __HAL_DEVICE_NUVOTON_M484_H__
+
+// software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_LIST            5, 45, 50, 69, 81, 83, 91, 94, 95
 
 /*============================ INCLUDES ======================================*/
@@ -682,5 +685,6 @@ struct pm_mclk_cfg_t {
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif
+#endif      // __HAL_DEVICE_NUVOTON_M484_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

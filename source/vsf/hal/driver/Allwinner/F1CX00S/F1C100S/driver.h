@@ -15,10 +15,10 @@
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   include "hal/vsf_hal_cfg.h"
-#   include "./device.h"
-#   undef   __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#   include "../__device.h"
+
 #else
 
 #   ifndef __HAL_DRIVER_ALLWINNER_F1C100S_H__

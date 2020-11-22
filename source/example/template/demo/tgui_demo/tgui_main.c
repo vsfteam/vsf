@@ -30,7 +30,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-extern void vsf_tgui_bind_disp(vk_disp_t* disp, void* ui_data);
+extern void vsf_tgui_bind_disp(vk_disp_t* disp, void* bitmap_data, size_t bitmap_size);
 extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
 extern void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* keyboard_evt);
 extern vsf_err_t tgui_demo_init(void);
@@ -67,7 +67,7 @@ int main(void)
 
     // insecure operation
     ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_ARGB8888;
-	vsf_tgui_bind_disp(&(usrapp_ui_common.disp.use_as__vk_disp_t), &usrapp_ui_common.tgui.color);
+	vsf_tgui_bind_disp(&(usrapp_ui_common.disp.use_as__vk_disp_t), &usrapp_ui_common.tgui.color, dimof(usrapp_ui_common.tgui.color));
 
     tgui_demo_init();
 

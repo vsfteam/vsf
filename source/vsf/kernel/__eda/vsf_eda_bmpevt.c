@@ -28,6 +28,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
+
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
@@ -408,7 +412,7 @@ vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_
     }
     if (reason != VSF_SYNC_PENDING) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-        vsf_teda_cancel_timer((vsf_teda_t *)eda);
+        __vsf_teda_cancel_timer((vsf_teda_t *)eda);
 #endif
         eda->state.bits.is_limitted = false;
     }

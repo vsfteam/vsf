@@ -19,13 +19,21 @@
 #define __VSF_ARCH_ABSTRACTION_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifndef VSF_ARCH_ASSERT
+#   define VSF_ARCH_ASSERT(...)                 ASSERT(__VA_ARGS__)
+#endif
+
 /*============================ TYPES =========================================*/
 
 /*\note generic prototypes MUST be defined before including the arch header. */
@@ -33,6 +41,7 @@ typedef void vsf_irq_handler_t(void *p);
 typedef vsf_irq_handler_t vsf_swi_handler_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
 extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -40,7 +49,9 @@ extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
 #ifdef __cplusplus
 }
 #endif
+
 /*============================ INCLUDES ======================================*/
+
 #if !defined(VSF_ARCH_HEADER)
 //! check rtos first
 # if    defined(__RTOS__)
@@ -71,6 +82,7 @@ extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_ARCH_SWI_NUM
@@ -132,16 +144,16 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 
 
 #ifndef ffs
-#   define ffs(__N)                         vsf_ffs(__N)
+#   define ffs(__n)                         vsf_ffs(__n)
 #endif
 #ifndef ffz
-#   define ffz(__N)                         vsf_ffz(__N)
+#   define ffz(__n)                         vsf_ffz(__n)
 #endif
 #ifndef msb
-#   define msb(__N)                         vsf_msb(__N)
+#   define msb(__n)                         vsf_msb(__n)
 #endif
 #ifndef clz
-#   define clz(__N)                         vsf_clz(__N)
+#   define clz(__n)                         vsf_clz(__n)
 #endif
 
 // Usage:

@@ -77,6 +77,7 @@ extern "C" {
 
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
+#   define LOW_LEVEL_INIT_RET_T char
 #   define ROM_FLASH            _Pragma(__STR(location=".rom.flash")) const
 #   define ROM_EEPROM           _Pragma(__STR(location=".rom.eeprom")) const
 #   define NO_INIT              __no_init

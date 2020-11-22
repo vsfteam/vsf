@@ -43,6 +43,11 @@ dcl_vsf_peda_methods(static, __vk_virtual_scsi_execute_stream)
 
 /*============================ LOCAL VARIABLES ===============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_scsi_drv_t vk_virtual_scsi_drv = {
     .init               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_init),
     .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_fini),
@@ -52,6 +57,10 @@ const vk_scsi_drv_t vk_virtual_scsi_drv = {
     .execute_stream     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_virtual_scsi_execute_stream),
 #endif
 };
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -81,6 +90,14 @@ static bool __vk_virtual_scsi_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
+#endif
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
 __vsf_component_peda_ifs_entry(__vk_virtual_scsi_init, vk_scsi_init)
@@ -376,6 +393,12 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute_stream, vk_scsi_execute
     }
     vsf_peda_end();
 }
+#endif
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
 #endif
 
 #endif

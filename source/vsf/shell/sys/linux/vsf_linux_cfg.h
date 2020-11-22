@@ -48,6 +48,12 @@
 #   ifndef VSF_LINUX_USE_SIMPLE_TIME
 #       define VSF_LINUX_USE_SIMPLE_TIME        ENABLED
 #   endif
+#   ifndef VSF_LINUX_USE_SIMPLE_STDLIB
+#       define VSF_LINUX_USE_SIMPLE_STDLIB      ENABLED
+#   endif
+#   ifndef VSF_LINUX_USE_SIMPLE_CTYPE
+#       define VSF_LINUX_USE_SIMPLE_CTYPE       ENABLED
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

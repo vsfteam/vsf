@@ -80,8 +80,8 @@ extern "C" {
 typedef uint64_t vsf_systimer_cnt_t;
 
 typedef enum vsf_arch_prio_t {
-    VSF_ARCH_PRIO_IVALID = -1,
-    vsf_arch_prio_ivalid = -1,
+    VSF_ARCH_PRIO_INVALID = -1,
+    vsf_arch_prio_invalid = -1,
     REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, VSF_ARCH_PRI_BIT)
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 } vsf_arch_prio_t;
@@ -93,8 +93,7 @@ typedef void (*vsf_arch_irq_entry_t)(void*);
 
 def_simple_class(vsf_arch_irq_request_t) {
     private_member(
-        pthread_cond_t cond;
-        pthread_mutex_t mutex;
+        int id;
         void *arch_thread;
         bool is_triggered;
         bool is_inited;

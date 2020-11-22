@@ -27,64 +27,71 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if USART_COUNT > 0
+#if USART_MAX_PORT >= 0
 #ifndef VSF_HAL_DRV_CFG_USART0_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART0_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 1
+#if USART_MAX_PORT >= 1
 #ifndef VSF_HAL_DRV_CFG_USART1_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART1_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 2
+#if USART_MAX_PORT >= 2
 #ifndef VSF_HAL_DRV_CFG_USART2_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART2_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 3
+#if USART_MAX_PORT >= 3
 #ifndef VSF_HAL_DRV_CFG_USART3_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART3_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 4
+#if USART_MAX_PORT >= 4
 #ifndef VSF_HAL_DRV_CFG_USART4_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART4_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 5
+#if USART_MAX_PORT >= 5
 #ifndef VSF_HAL_DRV_CFG_USART5_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART5_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
 
-#if USART_COUNT > 6
+#if USART_MAX_PORT >= 6
 #ifndef VSF_HAL_DRV_CFG_USART6_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART6_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 7
+#if USART_MAX_PORT >= 7
 #ifndef VSF_HAL_DRV_CFG_USART7_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART7_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
-#if USART_COUNT > 8
+#if USART_MAX_PORT >= 8
 #ifndef VSF_HAL_DRV_CFG_USART8_POLL_MODE_EN
 #   define VSF_HAL_DRV_CFG_USART8_POLL_MODE_EN     DISABLED
 #endif
 #endif
 
+#if USART_MAX_PORT >= 0
+//  get macro for USART_MAX_PORT + 1
+#   define MFUNC_IN_U8_DEC_VALUE       (USART_MAX_PORT + 1)
+#   include "utilities/preprocessor/mf_u8_dec2str.h"
+#   define __USART_MAX_NORNIMAL_PORT   MFUNC_OUT_DEC_STR
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if USART_COUNT > 0
+#if USART_MAX_PORT >= 0
 #   define __USART_POLL_AGENT(__N, ...)                                         \
     if (VSF_HAL_DRV_CFG_USART##__N##_POLL_MODE_EN) {                            \
         ret &= vsf_usart##__N##_poll();                                         \
@@ -93,7 +100,7 @@ extern "C" {
 #   define __USART_POLL_ENTRY(__N, ...)                                         \
     extern bool vsf_usart##__N##_poll(void);
 
-#   define USART_POLL_AGENTS   REPEAT_MACRO(USART_COUNT, __USART_POLL_AGENT, NULL)
+#   define USART_POLL_AGENTS   REPEAT_MACRO(__USART_MAX_NORNIMAL_PORT, __USART_POLL_AGENT, NULL)
 #else
 #   define USART_POLL_AGENTS
 #endif
@@ -103,8 +110,8 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#if USART_COUNT > 0
-REPEAT_MACRO(USART_COUNT, __USART_POLL_ENTRY, NULL)
+#if USART_MAX_PORT >= 0
+REPEAT_MACRO(__USART_MAX_NORNIMAL_PORT, __USART_POLL_ENTRY, NULL)
 #endif
 
 

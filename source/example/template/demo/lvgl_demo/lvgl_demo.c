@@ -46,7 +46,7 @@
 static void __lvgl_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
     switch (type) {
-#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
+#if APP_LVGL_DEMO_USE_TOUCHSCREEN == ENABLED
     case VSF_INPUT_TYPE_TOUCHSCREEN: {
             vk_touchscreen_evt_t *ts_evt = (vk_touchscreen_evt_t *)evt;
             if (0 == vsf_input_touchscreen_get_id(ts_evt)) {
@@ -82,7 +82,7 @@ static void __lvgl_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
     }
 }
 
-#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
+#if APP_LVGL_DEMO_USE_TOUCHSCREEN == ENABLED
 static bool __lvgl_touchscreen_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
     vk_touchscreen_evt_t *ts_evt = &usrapp_ui_common.lvgl.ts_evt;
@@ -211,7 +211,7 @@ static bool __lvgl_keyboard_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *dat
 
 static void __lvgl_input_init(void)
 {
-#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
+#if APP_LVGL_DEMO_USE_TOUCHSCREEN == ENABLED
     uint8_t mask = (1 << VSF_INPUT_TYPE_TOUCHSCREEN) | (1 << VSF_INPUT_TYPE_KEYBOARD);
 #else
     uint8_t mask = (1 << VSF_INPUT_TYPE_MOUSE) | (1 << VSF_INPUT_TYPE_KEYBOARD);
@@ -291,7 +291,7 @@ int main(void)
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.disp = disp;
-#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
+#if APP_LVGL_DEMO_USE_TOUCHSCREEN == ENABLED
     indev_drv.read_cb = __lvgl_touchscreen_read;
 #else
     indev_drv.read_cb = __lvgl_mouse_read;

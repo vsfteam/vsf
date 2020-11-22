@@ -23,7 +23,6 @@
 
 #define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #include "hal/driver/driver.h"
-
 #undef  __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 #ifdef __cplusplus
@@ -78,8 +77,8 @@ extern "C" {
 typedef enum vsf_arch_prio_t {
     __VSF_ARCH_PRIO_LEAST_MAX       = INT16_MAX,
     __VSF_ARCH_PRIO_LEAST_MIN       = INT16_MIN,
-    VSF_ARCH_PRIO_IVALID            = -1,
-    vsf_arch_prio_ivalid            = -1,
+    VSF_ARCH_PRIO_INVALID           = -1,
+    vsf_arch_prio_invalid           = -1,
 
     REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
     vsf_arch_prio_highest           = VSF_ARCH_PRI_NUM - 1,

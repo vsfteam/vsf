@@ -40,6 +40,11 @@ dcl_vsf_peda_methods(static, __vk_mal_scsi_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_virtual_scsi_drv_t vk_mal_virtual_scsi_drv = {
     .drv_type               = VSF_VIRTUAL_SCSI_DRV_PARAM_SUBCALL,
     .param_subcall          = {
@@ -50,8 +55,20 @@ const vk_virtual_scsi_drv_t vk_mal_virtual_scsi_drv = {
     },
 };
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
 
 static bool __vk_mal_scsi_buffer(vk_scsi_t *scsi, bool is_read, uint_fast64_t addr, uint_fast32_t size, vsf_mem_t *mem)
 {
@@ -138,5 +155,11 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_write, vk_virtual_scsi_write)
     }
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 #endif

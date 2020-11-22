@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#define mount               __vsf_linux_mount
+#define umount              __vsf_linux_umount
+
 // TODO: implement standard mount after device mapping is implemented
 //int mount(const char *source, const char *target,
 //   const char *filesystemtype, unsigned long mountflags, const void *data);

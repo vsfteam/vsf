@@ -23,10 +23,15 @@
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
-
-#include <unistd.h>
-#include <time.h>
-#include <pthread.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../include/unistd.h"
+#   include "../../include/simple_libc/time.h"
+#   include "../../include/pthread.h"
+#else
+#   include <unistd.h>
+#   include <time.h>
+#   include <pthread.h>
+#endif
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
@@ -57,34 +62,17 @@ static const vsf_linux_thread_op_t __vsf_linux_pthread_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+#   pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
+#endif
+
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 {
     vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
     thread->retval = (int)priv->entry(priv->param);
-}
-
-pthread_t pthread_self(void)
-{
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    return (NULL == thread) ? 0 : thread->tid;
-}
-
-int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg)
-{
-    vsf_linux_pthread_priv_t *priv;
-    vsf_linux_thread_t *thread = vsf_linux_create_thread(NULL, 0, &__vsf_linux_pthread_op);
-    if (!thread) { return -1; }
-
-    priv = vsf_linux_thread_get_priv(thread);
-    priv->entry = start_rtn;
-    priv->param = arg;
-
-    if (tidp != NULL) {
-        *tidp = thread->tid;
-    }
-    vsf_linux_start_thread(thread);
-    return 0;
 }
 
 int pthread_join(pthread_t tid, void **retval)
@@ -116,17 +104,44 @@ void pthread_exit(void *retval)
     VSF_LINUX_ASSERT(false);
 }
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
+
+pthread_t pthread_self(void)
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    return (NULL == thread) ? 0 : thread->tid;
+}
+
+int pthread_create(pthread_t *tidp, const pthread_attr_t *attr, void * (*start_rtn)(void *), void *arg)
+{
+    vsf_linux_pthread_priv_t *priv;
+    vsf_linux_thread_t *thread = vsf_linux_create_thread(NULL, 0, &__vsf_linux_pthread_op);
+    if (!thread) { return -1; }
+
+    priv = vsf_linux_thread_get_priv(thread);
+    priv->entry = start_rtn;
+    priv->param = arg;
+
+    if (tidp != NULL) {
+        *tidp = thread->tid;
+    }
+    vsf_linux_start_thread(thread);
+    return 0;
+}
+
 int pthread_cancel(pthread_t thread)
 {
     VSF_LINUX_ASSERT(false);
-    // TODO: 
+    // TODO:
     return 0;
 }
 
 int pthread_kill(pthread_t thread, int sig)
 {
     VSF_LINUX_ASSERT(false);
-    // TODO: 
+    // TODO:
     return 0;
 }
 

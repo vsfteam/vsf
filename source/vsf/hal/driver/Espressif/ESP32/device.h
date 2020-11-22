@@ -15,22 +15,50 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_WINNERMICRO_W60X_DEVICE_H__
-#define __HAL_DRIVER_WINNERMICRO_W60X_DEVICE_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_DEVICE_HEADER
+/*============================ MACROS ========================================*/
 
-#if     defined(__W600__)
-#   define  VSF_DEVICE_HEADER       "./W600/device.h"
-#else
-#   error No supported device found.
+/*\note first define basic info for arch. */
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+
+#ifndef VSF_ARCH_SWI_NUM
+#   define VSF_ARCH_SWI_NUM                     4
 #endif
 
-/* include specified device driver header file */
-#include VSF_DEVICE_HEADER
+#ifndef VSF_ARCH_RTOS_CFG_STACK_DEPTH
+#   define VSF_ARCH_RTOS_CFG_STACK_DEPTH        4096
+#endif
+
+#define VSF_ARCH_FREERTOS_CFG_IS_IN_ISR         xPortInIsrContext
+
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_NUM                         0
+
+#ifndef __RTOS__
+#   define __RTOS__
+#endif
+#ifndef __FREERTOS__
+#   define __FREERTOS__
+#endif
+
+// SET_STACK will fail to pass stack check
+//#include "xt_instr_macros.h"
+//#define VSF_ARCH_RTOS_CFG_SET_STACK(__STACK)    SET_STACK(__STACK)
+
+// 16-byte align, necessary if > 8
+#define VSF_ARCH_CFG_STACK_ALIGN_BIT            4
+
+#else
+
+#ifndef __HAL_DEVICE_ESPRESSIF_ESP32_H__
+#define __HAL_DEVICE_ESPRESSIF_ESP32_H__
+
+/*============================ INCLUDES ======================================*/
+
+#include "soc/periph_defs.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -39,6 +67,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_ESPRESSIF_ESP32_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

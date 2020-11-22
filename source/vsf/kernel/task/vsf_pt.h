@@ -60,22 +60,22 @@ extern "C" {
 #   define __implement_vsf_pt(__name)                                           \
             __implement_vsf_pt_common(  __name,                                 \
                                         __internal_##__name *obj_ptr) {           \
-                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);              
+                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);
 
 #   define __implement_vsf_pt_ex(__name, __func_name)                           \
             __implement_vsf_pt_common(  __func_name,                            \
                                         __internal_##__name *obj_ptr) {           \
-                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);              
+                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);
 
 #else
 
 #   define __implement_vsf_pt(__name)                                           \
             __implement_vsf_pt_common(__name, __name *obj_ptr) {                  \
-                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);              
+                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);
 
 #   define __implement_vsf_pt_ex(__name, __func_name)                           \
             __implement_vsf_pt_common(__func_name, __name *obj_ptr) {             \
-                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);              
+                __vsf_pt_common(__name) *this_ptr = &(obj_ptr->param);
 #endif
 
 #define __vsf_pt_state()         (this_ptr->fsm_state)
@@ -102,36 +102,35 @@ extern "C" {
 
 #define vsf_pt_end()                __vsf_pt_end() }
 
-#define __vsf_pt_wait_cond(__con)   __vsf_pt_wait_cond_common(__vsf_pt_state(), __con)
-#define vsf_pt_wfe(__evt)           __vsf_pt_wait_cond((evt != __evt))
-#define vsf_pt_wait_for_evt(__evt)  vsf_pt_wfe(__evt)
+#define vsf_pt_wait_for_evt(__evt)  __vsf_pt_wfe_common(__vsf_pt_state(), __evt)
+#define vsf_pt_wfe(__evt)           vsf_pt_wait_for_evt(__evt)
 
 #define vsf_pt_yield()              vsf_pt_entry(vsf_eda_yield();)
 
 
 /*! \note please use if-then clause in the vsf_pt_wait_until()
- *!       E.g. 
+ *!       E.g.
  *!       vsf_pt_wait_until( if (...) );
- *!       
+ *!
  *!
  *!       NOTE: wait_for_one(), wait_for_any() and wait_for_all() can be seen as
  *!             an if-then clause. So you can use them directly here. E.g.
  *!
  *!       vsf_pt_wait_until( wait_for_one(&__user_grouped_evts, sem_evt_msk) );
- *!             
+ *!
  */
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_pt_wait_until(__if_clause)                                       \
             vsf_pt_entry();                                                     \
             __if_clause {} else {                                               \
                 return ;                                                        \
-            }   
+            }
 #else
 #   define vsf_pt_wait_until(...)                                               \
             vsf_pt_entry();                                                     \
             __VA_ARGS__ {} else {                                               \
                 return ;                                                        \
-            }                                                                   
+            }
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
@@ -146,7 +145,7 @@ extern "C" {
         if (VSF_ERR_NONE != __vsf_pt_call_sub(__name, (__target))) {            \
             return ;                                                            \
         }                                                                       \
-        vsf_pt_entry(return;); 
+        vsf_pt_entry(return;);
 
 
 #   define vsf_pt_call_pt(__name, __target)                                     \
@@ -156,7 +155,7 @@ extern "C" {
 #endif
 
 #define vsf_eda_call_pt(__name, __target)                                       \
-            __vsf_pt_call_sub(vsf_pt_func(__name), (__target))            
+            __vsf_pt_call_sub(vsf_pt_func(__name), (__target))
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 #   define __vsf_pt_call_fsm(__name, __target, ...)                             \
@@ -179,7 +178,7 @@ extern "C" {
                 *(__ret_addr) = CONNECT3(__vsf_pt_call_fsm,__LINE__,tReturn);   \
             }                                                                   \
         } while(0)
-        
+
 #   define vsf_pt_call_task(__name, __target, __ret_addr, ...)                  \
         vsf_pt_call_fsm(vsf_task_func(__name), __target, __ret_addr, (0, ##__VA_ARGS__))
 #endif
@@ -195,7 +194,7 @@ extern "C" {
 #define implement_vsf_pt(__name)        __implement_vsf_pt(__name)
 #define implement_vsf_pt_ex(__name, __FUNC_NAME)                                \
             __implement_vsf_pt_ex(__name, __FUNC_NAME)
-            
+
 #define imp_vsf_pt(__name)              implement_vsf_pt(__name)
 #define imp_vsf_pt_ex(__name, __FUNC_NAME)                                      \
             implement_vsf_pt_ex(__name, __FUNC_NAME)
@@ -213,12 +212,12 @@ extern "C" {
             __def_vsf_pt_common(__name,                                         \
                                 uint16_t fsm_state;                             \
                                 vsf_sync_reason_t reason;                       \
-                                __member)           
+                                __member)
 #   else
 #       define __def_vsf_pt(__name,__member)                                    \
             __def_vsf_pt_common(__name,                                         \
                                 uint16_t fsm_state;                             \
-                                __member) 
+                                __member)
 #   endif
 
 #   define def_vsf_pt(__name,__member)      __def_vsf_pt(__name, __member)
@@ -229,7 +228,7 @@ extern "C" {
 #   define __def_vsf_pt(__name,...)                                             \
             __def_vsf_pt_common(__name,                                         \
                                 uint8_t fsm_state;                                 \
-                                __VA_ARGS__)           
+                                __VA_ARGS__)
 
 #   define def_vsf_pt(__name,...)       __def_vsf_pt(__name,__VA_ARGS__)
 #   define end_def_vsf_pt(...)
@@ -293,7 +292,7 @@ extern "C" {
         if (VSF_ERR_NONE != vsf_eda_call_thread(__target)) {                    \
             return ;                                                            \
         }                                                                       \
-        vsf_pt_entry(return;); 
+        vsf_pt_entry(return;);
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

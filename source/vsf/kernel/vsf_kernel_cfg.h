@@ -291,11 +291,18 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
  * Forced disabled features/modules when C89/90 is used                       *
  *----------------------------------------------------------------------------*/
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   undef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM            DISABLED
 
-#   undef VSF_KERNEL_CFG_SUPPORT_THREAD
-#   define VSF_KERNEL_CFG_SUPPORT_THREAD                    DISABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
+#       warning VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM need c99
+#       undef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
+#       define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM        DISABLED
+#   endif
+
+#   if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#       warning VSF_KERNEL_CFG_SUPPORT_THREAD need c99
+#       undef VSF_KERNEL_CFG_SUPPORT_THREAD
+#       define VSF_KERNEL_CFG_SUPPORT_THREAD                DISABLED
+#   endif
 #endif
 
 

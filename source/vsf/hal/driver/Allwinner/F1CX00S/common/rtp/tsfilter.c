@@ -3,6 +3,8 @@
  */
 
 #include <stddef.h>
+// for malloc
+#include <stdlib.h>
 
 #include "./tsfilter.h"
 

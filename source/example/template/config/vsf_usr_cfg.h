@@ -24,10 +24,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//! check rtos first
-#if     defined(__FREERTOS__)
-#   include "./vsf_usr_cfg/vsf_usr_cfg_freertos.h"
-#elif   defined(__M484__)
+#if     defined(__M484__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_m484.h"
 #elif   defined(__F1C100S__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_f1c100s.h"
@@ -41,6 +38,10 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_mt071.h"
 #elif   defined(__MPS2__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_mps2.h"
+#elif   defined(__ESP32__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_esp32.h"
+#elif   defined(__ESP32S2__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_esp32s2.h"
 #endif
 
 // software independent components, if not used, compiler will optimize

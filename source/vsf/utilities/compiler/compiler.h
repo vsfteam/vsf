@@ -20,6 +20,10 @@
 
 //! \brief CPU io
 
+// extract arch info only to include different compiler header
+#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#include "hal/arch/vsf_arch.h"
+
 #if   defined(__CPU_ARM__)                                                      //!< ARM series
 #   include "./arm/arm_compiler.h"
 #elif   defined(__CPU_MCS51__)                                                  //!< MCS-51 series

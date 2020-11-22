@@ -186,9 +186,9 @@ void vsf_arch_sleep(uint32_t mode)
 }
 #endif
 
-void __low_level_init(void)
+int __low_level_init(void)
 {
-    
+    return 1; 
 }
 
 /*! \note initialize device driver

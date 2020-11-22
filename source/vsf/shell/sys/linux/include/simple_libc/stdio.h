@@ -1,20 +1,55 @@
 #ifndef __SIMPLE_LIBC_STDIO_H__
 #define __SIMPLE_LIBC_STDIO_H__
 
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wbuiltin-requires-header"
-#pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
-#pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../sys/types.h"
+#else
+#   include <sys/types.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "./stddef.h"
+#else
+#   include <stddef.h>
 #endif
 
-#include <sys/types.h>
 #include <stdarg.h>
 #include <stdint.h>
+
+//! \note libc belongs to compiler layer in utilities, so only include compiler.h
+#include "utilities/compiler/compiler.h"
+
+#if     __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#   pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
+#   pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define getchar             __vsf_linux_getchar
+#define fopen               __vsf_linux_fopen
+#define fclose              __vsf_linux_fclose
+#define fseek               __vsf_linux_fseek
+#define ftell               __vsf_linux_ftell
+#define rewind              __vsf_linux_rewind
+#define fwrite              __vsf_linux_fwrite
+#define fread               __vsf_linux_fread
+#define fgets               __vsf_linux_fgets
+#define gets                __vsf_linux_gets
+#define fputs               __vsf_linux_fputs
+#define puts                __vsf_linux_puts
+#define printf              __vsf_linux_printf
+#define fprintf             __vsf_linux_fprintf
+#define perror              __vsf_linux_perror
+
+#define stdin               __vsf_linux_stdin
+#define stdout              __vsf_linux_stdout
+#define stderr              __vsf_linux_stderr
 
 typedef int FILE;
 extern FILE *stdin, *stdout, *stderr;
@@ -91,8 +126,8 @@ char * tmpnam(char *str);
 }
 #endif
 
-#if defined(__clang__)
-#pragma clang diagnostic pop
+#if     __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
 #endif
 
 #endif

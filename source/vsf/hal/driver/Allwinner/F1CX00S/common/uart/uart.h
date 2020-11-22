@@ -19,11 +19,15 @@
 #define __HAL_DRIVER_ALLWINNER_F1CX00S_UART_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "../../__device.h"
 
 #if VSF_HAL_USE_USART == ENABLED
 #include "hal/interface/vsf_interface_usart.h"
+
+#define VSF_HAL_USART_IMP_REQUEST_BY_FIFO
+#include "hal/driver/common/usart/__usart_common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -50,96 +54,65 @@ enum em_gpio_reg_rw_t {
 };
 
 enum em_usart_mode_t {
+    USART_5_BIT_LENGTH          = LCR_DLS_5,
+    USART_6_BIT_LENGTH          = LCR_DLS_6,
+    USART_7_BIT_LENGTH          = LCR_DLS_7,
+    USART_8_BIT_LENGTH          = LCR_DLS_8,
+                                
+    USART_1_STOPBIT             = LCR_STOP_1,
+    USART_2_STOPBIT             = LCR_STOP_2,
+                                
+    USART_NO_PARITY             = 0x0000U,
+    USART_EVEN_PARITY           = LCR_PEN | LCR_EPS_EVEN,
+    USART_ODD_PARITY            = LCR_PEN | LCR_EPS_ODD,
+                                
+    USART_LOOP_BACK_MODE        = MCR_LOOP << 8,
+    USART_AUTO_FLOW_CONTROL     = MCR_AFCE << 8,
+    USART_IRDA_SIR_MODE         = MCR_SIRE << 8,
+    
+    USART_TX_FIFO_THRES_EMPTY   = FCR_TFT_EMPTY   << 16,
+    USART_TX_FIFO_THRES_2       = FCR_TFT_2       << 16,
+    USART_TX_FIFO_THRES_QUARTER = FCR_TFT_QUARTER << 16,
+    USART_TX_FIFO_THRES_HALF    = FCR_TFT_HALF    << 16,
+    
+    USART_RX_FIFO_THRES_1       = FCR_RT_1        << 16,
+    USART_RX_FIFO_THRES_QUARTER = FCR_RT_QUARTER  << 16,
+    USART_RX_FIFO_THRES_HALF    = FCR_RT_HALF     << 16,
+    USART_RX_FIFO_THRES_2_LESS  = FCR_RT_2_LESS   << 16,
 
-    USART_5_BIT_LENGTH      = LCR_DLS_5,
-    USART_6_BIT_LENGTH      = LCR_DLS_6,
-    USART_7_BIT_LENGTH      = LCR_DLS_7,
-    USART_8_BIT_LENGTH      = LCR_DLS_8,
-
-    USART_1_STOPBIT         = LCR_STOP_1,
-    USART_2_STOPBIT         = LCR_STOP_2,
-
-    USART_NO_PARITY         = 0x0000U,
-    USART_EVEN_PARITY       = LCR_PEN | LCR_EPS_EVEN,
-    USART_ODD_PARITY        = LCR_PEN | LCR_EPS_ODD,
-
-    USART_LOOP_BACK_MODE    = MCR_LOOP << 8,
-    USART_AUTO_FLOW_CONTROL = MCR_AFCE << 8,
-    USART_IRDA_SIR_MODE     = MCR_SIRE << 8,
+    // TODO:
+    USART_TX_EN             = 0,
+    USART_RX_EN             = 0,
 };
 
 enum em_usart_irq_mask_t {
-    USART_IRQ_MASK_RX          = BIT(0),
-    USART_IRQ_MASK_TX          = BIT(1),
-    USART_IRQ_MASK_RX_CPL      = BIT(2),
-    USART_IRQ_MASK_TX_CPL      = BIT(3),
+    USART_IRQ_MASK_RX           = IER_ERBFI,
+    USART_IRQ_MASK_TX           = IER_ETBEI,
 };
 
 struct usart_status_t {
     union {
         inherit(peripheral_status_t)
         struct {
-            uint32_t    is_busy    : 1;
-            uint32_t    ir : 8;
+            uint32_t        is_busy : 1;
+            uint32_t        ir      : 8;
         };
     };
 };
 
-struct vsf_usart_request_t {
-    uint8_t               * buffer_ptr;
-    uint32_t                max_count;
-    uint32_t                count;
-    bool                    is_busy;
-};
-typedef struct vsf_usart_request_t vsf_usart_request_t;
-
 struct vsf_usart_t {
-    uart_reg_t         * reg;
-    IRQn_Type            UART_IRQn;
+    uart_reg_t            * reg;
 
-    vsf_usart_request_t  rx;
-    vsf_usart_request_t  tx;
+    IRQn_Type               UART_IRQn;
+    vsf_usart_isr_t         isr;
 
-    vsf_usart_isr_t      isr;
-    usart_status_t       event_status;
-    uint8_t              irq_mask;
+    vsf_hal_usart_def_req_by_fifo()
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-#if USART_COUNT > 0 && VSF_HAL_USE_USART0 == ENABLED
-extern const i_usart_t VSF_USART0;
-extern vsf_usart_t vsf_usart0;
-#endif
-#if USART_COUNT > 1 && VSF_HAL_USE_USART1 == ENABLED
-extern const i_usart_t VSF_USART1;
-extern vsf_usart_t vsf_usart1;
-#endif
-#if USART_COUNT > 2 && VSF_HAL_USE_USART2 == ENABLED
-extern const i_usart_t VSF_USART2;
-extern vsf_usart_t vsf_usart2;
-#endif
-#if USART_COUNT > 3 && VSF_HAL_USE_USART3 == ENABLED
-extern const i_usart_t VSF_USART3;
-extern vsf_usart_t vsf_usart3;
-#endif
-#if USART_COUNT > 4 && VSF_HAL_USE_USART4 == ENABLED
-extern const i_usart_t VSF_USART4;
-extern vsf_usart_t vsf_usart4;
-#endif
-#if USART_COUNT > 5 && VSF_HAL_USE_USART5 == ENABLED
-extern const i_usart_t VSF_USART5;
-extern vsf_usart_t vsf_usart5;
-#endif
-#if USART_COUNT > 6 && VSF_HAL_USE_USART6 == ENABLED
-extern const i_usart_t VSF_USART6;
-extern vsf_usart_t vsf_usart6;
-#endif
-#if USART_COUNT > 7 && VSF_HAL_USE_USART7 == ENABLED
-extern const i_usart_t VSF_USART7;
-extern vsf_usart_t vsf_usart7;
-#endif
+
 
 #endif /*VSF_HAL_USE_USART*/
 

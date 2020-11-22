@@ -35,8 +35,16 @@
 #   define APP_USART_DEMO_CFG_USART                     vsf_usart0
 #endif
 
-#ifndef APP_USART_DEMO_CFG_FIFO_TEST
-#   define APP_USART_DEMO_CFG_FIFO_TEST                 DISABLED
+#ifndef APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST
+#   define APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST  DISABLED
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST
+#   define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
+#endif
+
+#ifndef APP_USART_DEMO_CFG_FIFO_ECHO_TEST
+#   define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            DISABLED
 #endif
 
 #ifndef APP_USART_DEMO_CFG_REQUEST_TEST
@@ -66,7 +74,9 @@ typedef struct app_usart_demo_t {
     uint8_t txbuff[APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE];
 #endif
     uint8_t rxbuff[APP_USART_DEMO_CFG_READ_WRITE_ECHO_SIZE];
-    bool is_to_exit;
+    volatile bool is_to_exit;
+    uint32_t cnt;
+
 
 #ifdef __WIN__
     bool is_inited;
@@ -165,7 +175,71 @@ static void __usart_demo_disable(vsf_usart_t * usart, em_usart_irq_mask_t mask)
     } while (disalbe_status != fsm_rt_cpl);
 }
 
-#if APP_USART_DEMO_CFG_FIFO_TEST == ENABLED
+#if APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST == ENABLED
+uint32_t __cnts[100];
+uint32_t __cnt_index = 0;
+
+static void __usart_read_isr_handler(void *target, vsf_usart_t *usart, em_usart_irq_mask_t irq_mask)
+{
+    __app_usart_demo.cnt += vsf_usart_fifo_read(usart, 
+                                                (void *)&__app_usart_demo.rxbuff[__app_usart_demo.cnt],
+                                                dimof(__app_usart_demo.rxbuff) - __app_usart_demo.cnt);
+    
+    if (__app_usart_demo.cnt >= dimof(__app_usart_demo.rxbuff)) {
+        vsf_usart_irq_disable(usart, USART_IRQ_MASK_RX);
+        __app_usart_demo.is_to_exit = true;
+    }
+}
+
+static void __usart_echo_demo_read_with_isr(vsf_usart_t * usart)
+{
+    ASSERT(usart != NULL);
+
+    __app_usart_demo.cnt = 0;
+
+    vsf_err_t err = __usart_demo_init(usart, __usart_read_isr_handler, NULL, vsf_arch_prio_0, USART_IRQ_MASK_RX);
+    ASSERT (err == VSF_ERR_NONE);
+
+    while (!__app_usart_demo.is_to_exit);
+
+    __usart_demo_disable(usart, 0);
+}
+#endif
+
+#if APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST == ENABLED
+static void __usart_write_isr_handler(void *target,
+                                                  vsf_usart_t *usart,
+                                                  em_usart_irq_mask_t irq_mask)
+{
+    if (__app_usart_demo.cnt < dimof(__app_usart_demo.rxbuff)) {
+        __app_usart_demo.cnt += vsf_usart_fifo_write(usart,
+                                                     (void *)&__app_usart_demo.rxbuff[__app_usart_demo.cnt], 
+                                                     dimof(__app_usart_demo.rxbuff) - __app_usart_demo.cnt);
+    } else {
+        vsf_usart_irq_disable(usart, USART_IRQ_MASK_TX);
+        __app_usart_demo.is_to_exit = true;
+    }
+}
+
+static void __usart_echo_demo_write_with_isr(vsf_usart_t * usart)
+{
+    ASSERT(usart != NULL);
+
+    __app_usart_demo.cnt = 0;
+    for (int i = 0; i < sizeof(__app_usart_demo.rxbuff); i++) {
+        __app_usart_demo.rxbuff[i] = i + '!'; // first printable and not empty characters
+    }
+
+    vsf_err_t err = __usart_demo_init(usart, __usart_write_isr_handler, NULL, vsf_arch_prio_0, USART_IRQ_MASK_TX);
+    ASSERT (err == VSF_ERR_NONE);
+
+    while (!__app_usart_demo.is_to_exit);
+
+    __usart_demo_disable(usart, 0);
+}
+#endif
+
+#if APP_USART_DEMO_CFG_FIFO_ECHO_TEST == ENABLED
 static void __usart_echo_demo_by_fifo(vsf_usart_t * usart)
 {
     uint_fast16_t cur_size;
@@ -275,7 +349,11 @@ int main(void)
     __update_vsf_usart_win();
 #endif
 
-#if APP_USART_DEMO_CFG_FIFO_TEST == ENABLED
+#if APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST == ENABLED
+    __usart_echo_demo_read_with_isr(&APP_USART_DEMO_CFG_USART);
+#elif APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST == ENABLED
+    __usart_echo_demo_write_with_isr(&APP_USART_DEMO_CFG_USART);
+#elif APP_USART_DEMO_CFG_FIFO_ECHO_TEST == ENABLED
     __usart_echo_demo_by_fifo(&APP_USART_DEMO_CFG_USART);
 #elif APP_USART_DEMO_CFG_REQUEST_TEST == ENABLED
     __usart_echo_demo_by_request(&APP_USART_DEMO_CFG_USART);

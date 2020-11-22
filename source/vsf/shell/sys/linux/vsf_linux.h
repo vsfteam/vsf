@@ -15,21 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
-
-
 #ifndef __VSF_LINUX_H__
 #define __VSF_LINUX_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "./vsf_linux_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED
 
-#include "vsf.h"
-
-#include <unistd.h>
-#include <signal.h>
-#include <dirent.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./include/signal.h"
+#   include "./include/dirent.h"
+#else
+#   include <signal.h>
+#   include <dirent.h>
+#endif
 
 #if     defined(__VSF_LINUX_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
@@ -53,6 +54,9 @@ extern "C" {
 #   define VSF_LINUX_CFG_MAX_ARG_NUM        31
 #endif
 
+#ifndef VSF_LINUX_CFG_STACKSIZE
+#   define VSF_LINUX_CFG_STACKSIZE          1024
+#endif
 #if VSF_LINUX_CFG_STACKSIZE > 0xFFFF
 #   error VSF_LINUX_CFG_STACKSIZE should be 16-bit
 #endif
@@ -158,10 +162,10 @@ def_simple_class(vsf_linux_process_t) {
 
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
-    int (*fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
-    ssize_t (*read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
-    ssize_t (*write)(vsf_linux_fd_t *sfd, void *buf, size_t count);
-    int (*close)(vsf_linux_fd_t *sfd);
+    int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, long arg);
+    ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
+    ssize_t (*fn_write)(vsf_linux_fd_t *sfd, void *buf, size_t count);
+    int (*fn_close)(vsf_linux_fd_t *sfd);
 } vsf_linux_fd_op_t;
 
 def_simple_class(vsf_linux_fd_t) {
@@ -206,8 +210,9 @@ typedef struct vsf_linux_fs_priv_t {
 
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
-extern int vsf_linux_fs_bind_target(int fd, void *target, vsf_param_eda_evthandler_t read,
-        vsf_param_eda_evthandler_t write);
+extern int vsf_linux_fs_bind_target(int fd, void *target,
+        vsf_param_eda_evthandler_t peda_read,
+        vsf_param_eda_evthandler_t peda_write);
 extern int vsf_linux_fs_bind_executable(int fd, vsf_linux_main_entry_t entry);
 
 #if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)

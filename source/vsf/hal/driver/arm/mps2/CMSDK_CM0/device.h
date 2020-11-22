@@ -15,31 +15,36 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_ARM_CMSDK_CM0_H__
-#define __HAL_DEVICE_ARM_CMSDK_CM0_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
-//#include "CMSDK_CM0.h"
+
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-#endif
+
 //! arch info
 #   define VSF_ARCH_PRI_NUM         4
 #   define VSF_ARCH_PRI_BIT         2
 
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             8
+#   define VSF_DEV_SWI_NUM          8
+
+#else
+
+#ifndef __HAL_DEVICE_ARM_CMSDK_CM0_H__
+#define __HAL_DEVICE_ARM_CMSDK_CM0_H__
+
+// software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_LIST            24,25,26,27,28,29,30,31
 
 /*============================ INCLUDES ======================================*/
 
 /*\note this is should be the only place where __common.h is included.*/
 #include "../common/__common.h"
+//#include "CMSDK_CM0.h"
 
 /*============================ MACROS ========================================*/
 
@@ -73,11 +78,11 @@
 // bit14- bit27:    clkdiv bitfield
 // bit28- bit31:    clkdiv_remap
 #define __def_periph_clk(__name, __bf_clksel, __bf_clkdiv, __clksel_map_idx)    \
-        __CONNECT2(__name, _idx) = ((__bf_clksel) << 0)                            \
+        __CONNECT2(__name, _idx) = ((__bf_clksel) << 0)                         \
                             |   ((__bf_clkdiv) << 14)                           \
                             |   ((__clksel_map_idx) << 28)
 
-#define __def_sync_clk_idx(__name, __bus_idx, __bit_idx)                          \
+#define __def_sync_clk_idx(__name, __bus_idx, __bit_idx)                        \
             __CONNECT2(__name, _idx) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
 
 #define __def_clk_src(__name, __value)      __name = (__value)
@@ -131,17 +136,17 @@ enum pm_periph_async_clk_no_t{
 enum pm_sync_clk_no_t {
                         // NAME         BUS_IDX,BIT_IDX
     // AHB
-    __def_sync_clk_idx(   SyncCLK_UART0,   1,      16  ),
-    __def_sync_clk_idx(   SyncCLK_UART1,   1,      17  ),
-    __def_sync_clk_idx(   SyncCLK_UART2,   1,      18  ),
-    __def_sync_clk_idx(   SyncCLK_UART3,   1,      19  ),
+    __def_sync_clk_idx(   SCLK_UART0,   1,      16  ),
+    __def_sync_clk_idx(   SCLK_UART1,   1,      17  ),
+    __def_sync_clk_idx(   SCLK_UART2,   1,      18  ),
+    __def_sync_clk_idx(   SCLK_UART3,   1,      19  ),
 };
 
 enum pm_sync_clk_msk_t {
-    __def_msk(SyncCLK_UART0),
-    __def_msk(SyncCLK_UART1),
-    __def_msk(SyncCLK_UART2),
-    __def_msk(SyncCLK_UART3),
+    __def_msk(SCLK_UART0),
+    __def_msk(SCLK_UART1),
+    __def_msk(SCLK_UART2),
+    __def_msk(SCLK_UART3),
 };
 //! @}
 
@@ -192,6 +197,6 @@ struct pm_main_clk_cfg_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_ARM_CMSDK_CM0_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

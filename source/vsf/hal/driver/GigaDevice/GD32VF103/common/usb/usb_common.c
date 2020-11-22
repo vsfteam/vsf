@@ -54,7 +54,7 @@ vsf_err_t gd32vf103_usb_init(gd32vf103_usb_t *usb, vsf_arch_prio_t priority)
     global_regs = param->reg;
     global_regs->gahbcfg &= ~USB_OTG_GAHBCFG_GINT;
 
-    if (priority != vsf_arch_prio_ivalid) {
+    if (priority != vsf_arch_prio_invalid) {
         eclic_set_irq_lvl(param->irq, priority << (8 - VSF_ARCH_PRI_BIT));
         eclic_enable_interrupt(param->irq);
     } else {

@@ -124,14 +124,14 @@ enum em_usart_irq_mask_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if USART_COUNT > 0 && VSF_HAL_USE_USART0 == ENABLED
+#if USART_MAX_PORT >= 0 && VSF_HAL_USE_USART0 == ENABLED
 #   if VSF_HAL_USE_LV1
 extern const i_usart_t VSF_USART0;
 #   endif
 extern vsf_usart_t vsf_usart0;
 #endif
 
-#if USART_COUNT > 1 && VSF_HAL_USE_USART1 == ENABLED
+#if USART_MAX_PORT >= 1 && VSF_HAL_USE_USART1 == ENABLED
 #   if VSF_HAL_USE_LV1
 extern const i_usart_t VSF_USART1;
 #   endif

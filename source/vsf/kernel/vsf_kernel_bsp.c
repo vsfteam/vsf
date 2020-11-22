@@ -28,23 +28,27 @@
 #include "./vsf_os.h"
 #include "utilities/vsf_utilities.h"
 
-// for VSF_USER_ENTRY macro if exists in arch
-#include "hal/arch/vsf_arch.h"
-
 /*============================ MACROS ========================================*/
 
-#define __VSF_OS_EVTQ_SWI_PRIO_INIT(__index, __unused)                          \
-    VSF_ARCH_PRIO_##__index,
+// for __RTOS__ arch, VSF_KERNEL_CFG_NON_STANDALONE MUST be enabled
+//  because the standard entry is for RTOS, not for VSF
+#ifdef __RTOS__
+#   ifndef VSF_KERNEL_CFG_NON_STANDALONE
+#       define VSF_KERNEL_CFG_NON_STANDALONE                ENABLED
+#   endif
+#   if VSF_KERNEL_CFG_NON_STANDALONE != ENABLED
+#       error VSF_KERNEL_CFG_NON_STANDALONE MUST be enabled for __RTOS__ support
+#   endif
+#endif
+
+#define __VSF_OS_EVTQ_SWI_PRIO_INIT(__INDEX, __UNUSED)                          \
+    VSF_ARCH_PRIO_##__INDEX,
 
 #if VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD
 #   ifndef VSF_OS_CFG_MAIN_STACK_SIZE
 #       warning VSF_OS_CFG_MAIN_STACK_SIZE not defined, set to 4K by default
 #       define VSF_OS_CFG_MAIN_STACK_SIZE                   (4096)
 #   endif
-#endif
-
-#ifndef VSF_USER_ENTRY
-#   define VSF_USER_ENTRY                                   main
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -319,7 +323,7 @@ __asm(".global __ARM_use_no_argv\n\t");
  *----------------------------------------------------------------------------*/
 #if __IS_COMPILER_IAR__
 WEAK(__low_level_init)
-char __low_level_init(void)
+LOW_LEVEL_INIT_RET_T __low_level_init(void)
 {
     return 1;
 }

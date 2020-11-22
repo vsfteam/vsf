@@ -50,7 +50,7 @@
 
 // VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
 #define APP_USE_CPP_DEMO                                DISABLED
-#define VSF_LINUX_USE_SIMPLE_LIBC                       DISABLED
+#define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
 // the sscanf and sprintf in libc maybe corrupt in linux
 #define VSF_USE_SIMPLE_SSCANF                           ENABLED
 #define VSF_USE_SIMPLE_SPRINTF                          ENABLED

@@ -49,12 +49,6 @@
     <Filter Include="vsf\service\trace">
       <UniqueIdentifier>{2be5827e-853c-4e28-b8bd-078ac6d2af65}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\vsfstream">
-      <UniqueIdentifier>{f15d66bc-26cb-4a40-beea-94665651b182}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\service\vsfstream\fifo_stream">
-      <UniqueIdentifier>{9595061a-b5f8-49be-ad58-c8047b432a14}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\service\stream">
       <UniqueIdentifier>{631cd5e2-8cb5-497c-aa0f-5c0d0cdc4c67}</UniqueIdentifier>
     </Filter>
@@ -166,9 +160,6 @@
     <Filter Include="vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services">
       <UniqueIdentifier>{958f215d-6876-434c-9670-b8faac6367d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\service\vsfstream\mem_stream">
-      <UniqueIdentifier>{50956042-3474-4551-97e9-63435d54faa3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="usrapp\mvc_demo_win\tgui_demo\stopwatch">
       <UniqueIdentifier>{125644a1-849b-44c9-a557-faea05558c55}</UniqueIdentifier>
     </Filter>
@@ -232,6 +223,21 @@
     <Filter Include="vsf\hal\driver\x86\win">
       <UniqueIdentifier>{a1c83283-d847-4465-8e93-c61585a14f62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\simple_stream">
+      <UniqueIdentifier>{f15d66bc-26cb-4a40-beea-94665651b182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream\fifo_stream">
+      <UniqueIdentifier>{9595061a-b5f8-49be-ad58-c8047b432a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream\mem_stream">
+      <UniqueIdentifier>{50956042-3474-4551-97e9-63435d54faa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\simple_stream\block_stream">
+      <UniqueIdentifier>{4acbc060-bc6f-4139-9cae-610a8ab6b497}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\service\fifo">
+      <UniqueIdentifier>{3b3b3616-b921-42a6-adfd-ccd0f6002a55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\vsf\vsf.h">
@@ -248,9 +254,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h">
       <Filter>vsf\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\signal.h">
-      <Filter>vsf\utilities\compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\compiler\x86\x86_compiler.h">
       <Filter>vsf\utilities\compiler</Filter>
@@ -344,12 +347,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\pool\vsf_pool.h">
       <Filter>vsf\service\pool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\vsfstream\vsfstream.h">
-      <Filter>vsf\service\vsfstream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.h">
-      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\vsf\service\stream\interface.h">
       <Filter>vsf\service\stream</Filter>
@@ -765,9 +762,6 @@
     <ClInclude Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgldict.h">
       <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.h">
-      <Filter>vsf\service\vsfstream\mem_stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\usrapp\mvc_demo_win\tgui_demo\stopwatch\stopwatch.h">
       <Filter>usrapp\mvc_demo_win\tgui_demo\stopwatch</Filter>
     </ClInclude>
@@ -954,11 +948,23 @@
     <ClInclude Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.h">
       <Filter>vsf\kernel\shell\simple</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\simple_stream\vsf_simple_stream.h">
+      <Filter>vsf\service\simple_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.h">
+      <Filter>vsf\service\simple_stream\fifo_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.h">
+      <Filter>vsf\service\simple_stream\mem_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.h">
+      <Filter>vsf\service\simple_stream\block_stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\service\fifo\vsf_fifo.h">
+      <Filter>vsf\service\fifo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\vsf\utilities\compiler\x86\signal.c">
-      <Filter>vsf\utilities\compiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c">
       <Filter>vsf\utilities\template</Filter>
     </ClCompile>
@@ -997,12 +1003,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\pool\vsf_pool.c">
       <Filter>vsf\service\pool</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\vsfstream\vsfstream.c">
-      <Filter>vsf\service\vsfstream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\vsfstream\fifo_stream\vsf_fifo_stream.c">
-      <Filter>vsf\service\vsfstream\fifo_stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\service\stream\vsf_stream.c">
       <Filter>vsf\service\stream</Filter>
@@ -1220,9 +1220,6 @@
     <ClCompile Include="..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\builds\windows\ftdebug.c">
       <Filter>vsf\component\3rd-party\freetype\2.10.1\raw\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\service\vsfstream\mem_stream\vsf_mem_stream.c">
-      <Filter>vsf\service\vsfstream\mem_stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\stopwatch\stopwatch.c">
       <Filter>usrapp\mvc_demo_win\tgui_demo\stopwatch</Filter>
     </ClCompile>
@@ -1330,6 +1327,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c">
       <Filter>vsf\kernel\shell\simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\simple_stream\vsf_simple_stream.c">
+      <Filter>vsf\service\simple_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\simple_stream\fifo_stream\vsf_fifo_stream.c">
+      <Filter>vsf\service\simple_stream\fifo_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\simple_stream\mem_stream\vsf_mem_stream.c">
+      <Filter>vsf\service\simple_stream\mem_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\simple_stream\block_stream\vsf_block_stream.c">
+      <Filter>vsf\service\simple_stream\block_stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\service\fifo\vsf_fifo.c">
+      <Filter>vsf\service\fifo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

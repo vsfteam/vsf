@@ -19,9 +19,7 @@
 
 #ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
-#   include "hal/vsf_hal_cfg.h"
 #   include "./driver/driver.h"
-#   include "./driver/common/common.h"
 #   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 #else

@@ -42,53 +42,38 @@ extern vk_file_t * __vk_file_get_fs_parent(vk_file_t *file);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_fs_op_t vk_winfs_op = {
-    .mount          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_mount),
-    .unmount        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_mount       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_mount),
+    .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .sync           = vk_file_dummy,
+    .fn_sync        = vk_file_dummy,
 #endif
     .fop            = {
-        .read       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_read),
-        .write      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_write),
-        .close      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_close),
-        .resize     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_read),
+        .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_write),
+        .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_close),
+        .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
     .dop            = {
-        .lookup     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_lookup),
-        .create     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .unlink     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .chmod      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .rename     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_winfs_lookup),
+        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
 };
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
-
-__vsf_component_peda_ifs_entry(__vk_winfs_mount, vk_fs_mount)
-{
-    vsf_peda_begin();
-    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
-    vk_winfs_info_t *fsinfo = dir->subfs.data;
-    VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->root.name != NULL));
-
-    WIN32_FIND_DATAA FindFileData;
-    HANDLE hFind = FindFirstFileA(fsinfo->root.name, &FindFileData);
-    if (hFind == INVALID_HANDLE_VALUE) {
-        vsf_eda_return(VSF_ERR_NOT_AVAILABLE);
-        return;
-    }
-    if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-        vsf_eda_return(VSF_ERR_INVALID_PARAMETER);
-        return;
-    }
-    FindClose(hFind);
-
-    dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
-    vsf_eda_return(VSF_ERR_NONE);
-    vsf_peda_end();
-}
 
 static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_fast16_t len)
 {
@@ -123,6 +108,49 @@ static uint_fast16_t __vk_winfs_file_get_path(vk_file_t *file, char *path, uint_
         }
     }
     return real_len;
+}
+
+static bool __vk_winfs_set_pos(vk_winfs_file_t *file, uint_fast64_t pos)
+{
+    LARGE_INTEGER li;
+    li.QuadPart = pos;
+    li.LowPart = SetFilePointer(file->f.hFile, li.LowPart, &li.HighPart, FILE_BEGIN);
+    if ((INVALID_SET_FILE_POINTER == li.LowPart) && (GetLastError() != NO_ERROR)) {
+        return VSF_ERR_FAIL;
+    }
+    return VSF_ERR_NONE;
+}
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
+__vsf_component_peda_ifs_entry(__vk_winfs_mount, vk_fs_mount)
+{
+    vsf_peda_begin();
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
+    vk_winfs_info_t *fsinfo = dir->subfs.data;
+    VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->root.name != NULL));
+
+    WIN32_FIND_DATAA FindFileData;
+    HANDLE hFind = FindFirstFileA(fsinfo->root.name, &FindFileData);
+    if (hFind == INVALID_HANDLE_VALUE) {
+        vsf_eda_return(VSF_ERR_NOT_AVAILABLE);
+        return;
+    }
+    if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+        vsf_eda_return(VSF_ERR_INVALID_PARAMETER);
+        return;
+    }
+    FindClose(hFind);
+
+    dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
+    vsf_eda_return(VSF_ERR_NONE);
+    vsf_peda_end();
 }
 
 __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
@@ -275,17 +303,6 @@ do_return:
     vsf_peda_end();
 }
 
-static bool __vk_winfs_set_pos(vk_winfs_file_t *file, uint_fast64_t pos)
-{
-    LARGE_INTEGER li;
-    li.QuadPart = pos;
-    li.LowPart = SetFilePointer(file->f.hFile, li.LowPart, &li.HighPart, FILE_BEGIN);
-    if ((INVALID_SET_FILE_POINTER == li.LowPart) && (GetLastError() != NO_ERROR)) {
-        return VSF_ERR_FAIL;
-    }
-    return VSF_ERR_NONE;
-}
-
 __vsf_component_peda_ifs_entry(__vk_winfs_read, vk_file_read)
 {
     vsf_peda_begin();
@@ -342,5 +359,11 @@ __vsf_component_peda_ifs_entry(__vk_winfs_close, vk_file_close)
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 #endif

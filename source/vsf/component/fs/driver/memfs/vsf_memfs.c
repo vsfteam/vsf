@@ -37,26 +37,35 @@ dcl_vsf_peda_methods(static, __vk_memfs_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_fs_op_t vk_memfs_op = {
-    .mount          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_mount),
-    .unmount        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_mount       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_mount),
+    .fn_unmount     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .sync           = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+    .fn_sync        = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
 #endif
     .fop            = {
-        .read       = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_read),
-        .write      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_write),
-        .close      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
-        .resize     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_read),
+        .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_write),
+        .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_succeed),
+        .fn_resize  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
     .dop            = {
-        .lookup     = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_lookup),
-        .create     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .unlink     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .chmod      = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .rename     = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_lookup),
+        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_rename  = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
 };
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -73,6 +82,14 @@ static void __vk_memfs_init(vk_memfs_info_t *info, vk_memfs_file_t *file)
         }
     }
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
 
 __vsf_component_peda_ifs_entry(__vk_memfs_mount, vk_fs_mount)
 {
@@ -193,6 +210,12 @@ __vsf_component_peda_ifs_entry(__vk_memfs_write, vk_file_write)
     }
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 void vk_memfs_init(vk_memfs_info_t *memfs)
 {

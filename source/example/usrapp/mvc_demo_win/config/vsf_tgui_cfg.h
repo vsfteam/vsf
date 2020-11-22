@@ -87,29 +87,10 @@
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN                             \
-        extern vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE(__PTTILE)                          \
-        vsf_tgui_sdl_idx_root_tile_get_size(__PTTILE)
-
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
-#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vsf_input_on_touchscreen((__TS_EVT))
-
-#   define WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN                                    \
-        extern void vsf_input_on_keyboard(vk_keyboard_evt_t *evt);
-#   define WEAK_VSF_INPUT_ON_KEYBOARD(__EVT)                                    \
-        vsf_input_on_keyboard((__EVT))
-#endif
-
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN                      \
-        extern void vsf_tgui_low_level_on_ready_to_refresh(void);
-
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH()                           \
-        vsf_tgui_low_level_on_ready_to_refresh()
-
+#define WEAK_VSF_INPUT_ON_TOUCHSCREEN
+#define WEAK_VSF_INPUT_ON_KEYBOARD
+#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
+#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
 //#define WEAK_VSF_INPUT_ON_MOUSE
 
 #endif
@@ -154,34 +135,11 @@
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN                             \
-        extern vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE(__PTTILE)                          \
-        vsf_tgui_sdl_idx_root_tile_get_size(__PTTILE)
-
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
-#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN_EXTERN                                 \
-        extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
-#   define WEAK_VSF_INPUT_ON_TOUCHSCREEN(__TS_EVT)                              \
-        vsf_input_on_touchscreen((__TS_EVT))
-
-#   define WEAK_VSF_INPUT_ON_KEYBOARD_EXTERN                                    \
-        extern void vsf_input_on_keyboard(vk_keyboard_evt_t *evt);
-#   define WEAK_VSF_INPUT_ON_KEYBOARD(__EVT)                                    \
-        vsf_input_on_keyboard((__EVT))
-#endif
-
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN                      \
-        extern void vsf_tgui_low_level_on_ready_to_refresh(void);
-
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH()                           \
-        vsf_tgui_low_level_on_ready_to_refresh()
-
-#define WEAK_VSF_INPUT_ON_MOUSE_EXTERN                                          \
-            extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
-#define WEAK_VSF_INPUT_ON_MOUSE(__EVT)                                          \
-            vsf_input_on_mouse((__EVT))
-
+#define WEAK_VSF_INPUT_ON_TOUCHSCREEN
+#define WEAK_VSF_INPUT_ON_KEYBOARD
+#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
+#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
+#define WEAK_VSF_INPUT_ON_MOUSE
 
 #endif
 

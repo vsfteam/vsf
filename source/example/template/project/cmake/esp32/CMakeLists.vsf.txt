@@ -1,0 +1,43 @@
+idf_component_register(REQUIRES freertos main soc esp_system
+    INCLUDE_DIRS "source/vsf"
+)
+
+
+cmake_minimum_required(VERSION 3.13)
+
+idf_component_get_property( FREERTOS_ORIG_INCLUDE_PATH freertos ORIG_INCLUDE_PATH)
+idf_component_get_property( MAIN_ORIG_INCLUDE_PATH main ORIG_INCLUDE_PATH)
+
+target_compile_options(${COMPONENT_TARGET} INTERFACE
+    "-std=gnu11"
+    "-fdata-sections"
+    "-ffunction-sections"
+    "-fms-extensions"
+    "-Wall"
+    "-fno-builtin"
+    "-fno-strict-aliasing"
+    "-Og"
+    "-g3"
+    "-gstabs+"
+)
+
+set(VSF_HAL_CHIP_VENDOR     Espressif)
+set(VSF_HAL_CHIP_NAME       ESP32)
+set(VSF_ARCH_SERIES         rtos)
+set(VSF_ARCH_NAME           freertos)
+set(VSF_LIB_NAME            ${COMPONENT_TARGET})
+
+include(source/cmake/extensions.cmake)
+
+add_subdirectory(source)
+
+target_include_directories(${COMPONENT_TARGET} INTERFACE
+    "${FREERTOS_ORIG_INCLUDE_PATH}"
+    "${MAIN_ORIG_INCLUDE_PATH}"
+)
+
+target_compile_definitions(${COMPONENT_TARGET} INTERFACE
+    __Espressif__ __ESP32__)
+
+#target_link_libraries(${COMPONENT_LIB} INTERFACE ${COMPONENT_TARGET})
+

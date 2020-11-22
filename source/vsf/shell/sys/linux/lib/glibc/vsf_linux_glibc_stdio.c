@@ -22,10 +22,20 @@
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
-
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../include/unistd.h"
+#   include "../../include/sys/types.h"
+#   include "../../include/simple_libc/stdio.h"
+#else
+#   include <unistd.h>
+#   include <sys/types.h>
+#   include <stdio.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
+#   include "../../include/simple_libc/string.h"
+#else
+#   include <string.h>
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -37,7 +47,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-int stdin_fd = 0, stdout_fd = 1, stderr_fd = 2;
+static int stdin_fd = STDIN_FILENO, stdout_fd = STDOUT_FILENO, stderr_fd = STDERR_FILENO;
 FILE *stdin = (FILE *)&stdin_fd, *stdout = (FILE *)&stdout_fd, *stderr = (FILE *)&stderr_fd;
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -98,6 +108,11 @@ int fseek(FILE *f, long offset, int fromwhere)
     return lseek(fd, offset, fromwhere);
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 long ftell(FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
@@ -106,6 +121,19 @@ long ftell(FILE *f)
 
     return (long)priv->pos;
 }
+
+void rewind(FILE *f)
+{
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
+    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+
+    priv->pos = 0;
+}
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f)
 {
@@ -208,4 +236,4 @@ void perror(const char *str)
 }
 #endif
 
-#endif      // VSF_USE_LINUX
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_STDIO

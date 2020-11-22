@@ -1,8 +1,13 @@
 #ifndef __SIMPLE_LIBC_STDDEF_H__
 #define __SIMPLE_LIBC_STDDEF_H__
 
-//! \note please do not modify this to avoid circular-including
-#include "utilities/compiler/compiler.h"
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../sys/types.h"
+#else
+#   include <sys/types.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,14 +21,21 @@ extern "C" {
 #   endif
 #endif
 
-enum {
-    FALSE               = 0,
-    TRUE                = 1,
-};
+#ifndef TRUE
+#   define TRUE         1
+#endif
+#ifndef FALSE
+#   define FALSE        0
+#endif
+
+#define offsetof        offset_of
 
 #ifndef __WIN__
 typedef long int        ptrdiff_t;
 #endif
+
+typedef unsigned short  wchar_t;
+typedef unsigned short  wint_t;
 
 #ifdef __cplusplus
 }

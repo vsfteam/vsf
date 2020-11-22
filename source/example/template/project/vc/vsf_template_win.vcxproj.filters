@@ -1161,9 +1161,6 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\sys\time.h">
       <Filter>vsf\shell\sys\linux\include\sys</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\stdio.h">
-      <Filter>vsf\shell\sys\linux\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\semaphore.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
@@ -1184,9 +1181,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\driver\hcd\winusb_hcd\vsf_winusb_hcd.h">
       <Filter>vsf\component\usb\driver\hcd\winusb_hcd</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\time.h">
-      <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\termios.h">
       <Filter>vsf\shell\sys\linux\include</Filter>
@@ -1905,9 +1899,6 @@
     <ClInclude Include="..\..\..\..\vsf\component\av\audio\decoder\wav\vsf_wav.h">
       <Filter>vsf\component\av\audio\decoder\wav</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\string.h">
-      <Filter>vsf\shell\sys\linux\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.h">
       <Filter>vsf\component\usb\driver\dcd\usbip_dcd</Filter>
     </ClInclude>
@@ -2162,9 +2153,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc.h">
       <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\wchar.h">
-      <Filter>vsf\shell\sys\linux\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL.h">
       <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
@@ -2504,6 +2492,12 @@
     </ClInclude>
     <ClInclude Include="..\..\demo\nuklear_demo\sdl2surface_rawfb.h">
       <Filter>usrapp\demo\nuklear_demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdlib.h">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\ctype.h">
+      <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3826,6 +3820,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\nuklear_demo\main.c">
       <Filter>usrapp\demo\nuklear_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

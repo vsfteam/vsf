@@ -36,6 +36,91 @@ extern "C" {
 #   define VSF_SDL_CFG_V1_COMPATIBLE            ENABLED
 #endif
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define SDL_assert                      VSF_SDL2_ASSERT
+
+#define SDL_Init                        __vsf_sdl2_init
+#define SDL_InitSubSystem               __vsf_sdl2_init_subsystem
+#define SDL_Quit                        __vsf_sdl2_quit
+
+#define SDL_GetError                    __vsf_sdl2_get_error
+#define SDL_SetHint(...)
+
+#define SDL_CreateWindow                __vsf_sdl2_create_window
+#define SDL_DestroyWindow               __vsf_sdl2_destroy_window
+
+#define SDL_GetDesktopDisplayMode       __vsf_sdl2_get_desktop_display_mode
+
+#define SDL_CreateRGBSurfaceWithFormat  __vsf_sdl2_create_rgb_sruface_with_format
+#define SDL_FreeSurface                 __vsf_sdl2_free_surface
+
+#define SDL_DestroyTexture              __vsf_sdl2_destroy_texture
+
+#define SDL_CreateRenderer              __vsf_sdl2_create_renderer
+#define SDL_DestroyRenderer             __vsf_sdl2_destroy_renderer
+#define SDL_RenderClear                 __vsf_sdl2_render_clear
+#define SDL_RenderCopy                  __vsf_sdl2_render_copy
+#define SDL_RenderPresent               __vsf_sdl2_render_present
+
+#define SDL_CreateTexture               __vsf_sdl2_create_texture
+#define SDL_CreateTextureFromSurface    __vsf_sdl2_create_texture_from_surface
+#define SDL_UpdateTexture               __vsf_sdl2_update_texture
+
+#define SDL_LockSurface                 __vsf_sdl2_lock_surface
+#define SDL_UnlockSurface               __vsf_sdl2_unlock_surface
+
+#define SDL_CreateSemaphore             __vsf_sdl2_create_sem
+#define SDL_DestroySemaphore            __vsf_sdl2_destroy_sem
+#define SDL_SemWait(__sem)              __vsf_sdl2_sem_wait((__sem), -1)
+#define SDL_SemWaitTimeout(__sem, __ms) __vsf_sdl2_sem_wait((__sem), (__ms))
+#define SDL_SemTryWait(__sem)           __vsf_sdl2_sem_wait((__sem), 0)
+#define SDL_SemPost                     __vsf_sdl2_sem_post
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   define SDL_Delay                    __vsf_sdl2_delay
+#   define SDL_GetTicks                 __vsf_sdl2_get_ticks
+#endif
+
+#define SDL_OpenAudio                   __vsf_sdl2_open_audio
+#define SDL_PauseAudio                  __vsf_sdl2_pause_audio
+#define SDL_GetAudioStatus              __vsf_sdl2_get_audio_status
+#define SDL_CloseAudio                  __vsf_sdl2_close_audio
+
+#define SDL_CreateCursor                __vsf_sdl2_create_cursor
+#define SDL_CreateColorCursor           __vsf_sdl2_create_color_curosr
+#define SDL_CreateSystemCursor          __vsf_sdl2_create_system_cursor
+#define SDL_SetCursor                   __vsf_sdl2_set_curser
+#define SDL_GetCursor                   __vsf_sdl2_get_cursor
+#define SDL_GetDefaultCursor            __vsf_sdl2_get_default_cursor
+#define SDL_FreeCursor                  __vsf_sdl2_free_curser
+#define SDL_ShowCursor                  __vsf_sdl2_show_curser
+
+#define SDL_PollEvent                   __vsf_sdl2_poll_event
+
+#define SDL_NumJoysticks                __vsf_sdl2_num_joysticks
+#define SDL_JoystickOpen                __vsf_sdl2_joystick_open
+#define SDL_JoystickNumButtons          __vsf_sdl2_joystick_num_buttons
+#define SDL_JoystickNumAxes             __vsf_sdl2_joystick_num_axes
+#define SDL_JoystickNumBalls            __vsf_sdl2_joystick_num_balls
+#define SDL_JoystickNumHats             __vsf_sdl2_joystick_num_hats
+#define SDL_JoystickEventState          __vsf_sdl2_joystick_event_state
+
+#if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
+#define SDL_CreateYUVOverlay            __vsf_sdl_create_yuv_overlay
+#define SDL_FreeYUVOverlay              __vsf_sdl_free_yuv_overlay
+#define SDL_LockYUVOverlay              __vsf_sdl_lock_yuv_overlay
+#define SDL_UnlockYUVOverlay            __vsf_sdl_unlock_yuv_overlay
+#define SDL_DisplayYUVOverlay           __vsf_sdl_display_yuv_overlay
+
+#define SDL_SetVideoMode                __vsf_sdl_set_video_mode
+#define SDL_Flip                        __vsf_sdl_flip
+
+#define SDL_WM_SetCaption               __vsf_sdl_wm_set_caption
+#endif
+
+/*============================ MACROS ========================================*/
+
 #define SDL_INIT_TIMER          (1 << 0)
 #define SDL_INIT_AUDIO          (1 << 1)
 #define SDL_INIT_VIDEO          (1 << 2)
@@ -45,89 +130,6 @@ extern "C" {
 #define SDL_INIT_EVENTS         (1 << 6)
 #define SDL_INIT_NOPARACHUTE    (1 << 7)
 #define SDL_INIT_EVERYTHING     (0xFFFFFFFF)
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define SDL_assert              VSF_SDL2_ASSERT
-
-#define SDL_Init                __vsf_sdl2_init
-#define SDL_InitSubSystem       __vsf_sdl2_init_subsystem
-#define SDL_Quit                __vsf_sdl2_quit
-
-#define SDL_GetError            __vsf_sdl2_get_error
-#define SDL_SetHint(...)
-
-#define SDL_CreateWindow        __vsf_sdl2_create_window
-#define SDL_DestroyWindow       __vsf_sdl2_destroy_window
-
-#define SDL_GetDesktopDisplayMode           __vsf_sdl2_get_desktop_display_mode
-
-#define SDL_CreateRGBSurfaceWithFormat      __vsf_sdl2_create_rgb_sruface_with_format
-#define SDL_FreeSurface         __vsf_sdl2_free_surface
-
-#define SDL_DestroyTexture      __vsf_sdl2_destroy_texture
-
-#define SDL_CreateRenderer      __vsf_sdl2_create_renderer
-#define SDL_DestroyRenderer     __vsf_sdl2_destroy_renderer
-#define SDL_RenderClear         __vsf_sdl2_render_clear
-#define SDL_RenderCopy          __vsf_sdl2_render_copy
-#define SDL_RenderPresent       __vsf_sdl2_render_present
-
-#define SDL_CreateTexture       __vsf_sdl2_create_texture
-#define SDL_CreateTextureFromSurface        __vsf_sdl2_create_texture_from_surface
-#define SDL_UpdateTexture       __vsf_sdl2_update_texture
-
-#define SDL_LockSurface         __vsf_sdl2_lock_surface
-#define SDL_UnlockSurface       __vsf_sdl2_unlock_surface
-
-#define SDL_CreateSemaphore     __vsf_sdl2_create_sem
-#define SDL_DestroySemaphore    __vsf_sdl2_destroy_sem
-#define SDL_SemWait(__sem)      __vsf_sdl2_sem_wait((__sem), -1)
-#define SDL_SemWaitTimeout(__sem, __ms)     __vsf_sdl2_sem_wait((__sem), (__ms))
-#define SDL_SemTryWait(__sem)   __vsf_sdl2_sem_wait((__sem), 0)
-#define SDL_SemPost             __vsf_sdl2_sem_post
-
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define SDL_Delay            __vsf_sdl2_delay
-#   define SDL_GetTicks         __vsf_sdl2_get_ticks
-#endif
-
-#define SDL_OpenAudio           __vsf_sdl2_open_audio
-#define SDL_PauseAudio          __vsf_sdl2_pause_audio
-#define SDL_GetAudioStatus      __vsf_sdl2_get_audio_status
-#define SDL_CloseAudio          __vsf_sdl2_close_audio
-
-#define SDL_CreateCursor        __vsf_sdl2_create_cursor
-#define SDL_CreateColorCursor   __vsf_sdl2_create_color_curosr
-#define SDL_CreateSystemCursor  __vsf_sdl2_create_system_cursor
-#define SDL_SetCursor           __vsf_sdl2_set_curser
-#define SDL_GetCursor           __vsf_sdl2_get_cursor
-#define SDL_GetDefaultCursor    __vsf_sdl2_get_default_cursor
-#define SDL_FreeCursor          __vsf_sdl2_free_curser
-#define SDL_ShowCursor          __vsf_sdl2_show_curser
-
-#define SDL_PollEvent           __vsf_sdl2_poll_event
-
-#define SDL_NumJoysticks        __vsf_sdl2_num_joysticks
-#define SDL_JoystickOpen        __vsf_sdl2_joystick_open
-#define SDL_JoystickNumButtons  __vsf_sdl2_joystick_num_buttons
-#define SDL_JoystickNumAxes     __vsf_sdl2_joystick_num_axes
-#define SDL_JoystickNumBalls    __vsf_sdl2_joystick_num_balls
-#define SDL_JoystickNumHats     __vsf_sdl2_joystick_num_hats
-#define SDL_JoystickEventState  __vsf_sdl2_joystick_event_state
-
-#if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
-#define SDL_CreateYUVOverlay    __vsf_sdl_create_yuv_overlay
-#define SDL_FreeYUVOverlay      __vsf_sdl_free_yuv_overlay
-#define SDL_LockYUVOverlay      __vsf_sdl_lock_yuv_overlay
-#define SDL_UnlockYUVOverlay    __vsf_sdl_unlock_yuv_overlay
-#define SDL_DisplayYUVOverlay   __vsf_sdl_display_yuv_overlay
-
-#define SDL_SetVideoMode        __vsf_sdl_set_video_mode
-#define SDL_Flip                __vsf_sdl_flip
-
-#define SDL_WM_SetCaption       __vsf_sdl_wm_set_caption
-#endif
 
 /*============================ TYPES =========================================*/
 
@@ -672,80 +674,81 @@ typedef union SDL_Event {
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_sdl2_init(vk_disp_t *disp);
-extern int __vsf_sdl2_init(uint32_t flags);
-extern int __vsf_sdl2_init_subsystem(uint32_t flags);
-extern void __vsf_sdl2_quit(void);
 
-extern const char *__vsf_sdl2_get_error(void);
+extern int SDL_Init(uint32_t flags);
+extern int SDL_InitSubSystem(uint32_t flags);
+extern void SDL_Quit(void);
 
-extern SDL_Window * __vsf_sdl2_create_window(const char *title, int x, int y, int w, int h, uint32_t flags);
-extern void __vsf_sdl2_destroy_window(SDL_Window * window);
+extern const char *SDL_GetError(void);
 
-extern int __vsf_sdl2_get_desktop_display_mode(int display_index, SDL_DisplayMode *mode);
+extern SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uint32_t flags);
+extern void SDL_DestroyWindow(SDL_Window * window);
 
-extern SDL_Surface * __vsf_sdl2_create_rgb_sruface_with_format(uint32_t flags, int w, int h, int depth, uint32_t format);
-extern void __vsf_sdl2_free_surface(SDL_Surface *surface);
+extern int SDL_GetDesktopDisplayMode(int display_index, SDL_DisplayMode *mode);
 
-extern SDL_Renderer * __vsf_sdl2_create_renderer(SDL_Window * window, int index, uint32_t flags);
-extern void __vsf_sdl2_destroy_renderer(SDL_Renderer * renderer);
-extern int __vsf_sdl2_render_clear(SDL_Renderer * renderer);
-extern int __vsf_sdl2_render_copy(SDL_Renderer * renderer, SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
-extern void __vsf_sdl2_render_present(SDL_Renderer * renderer);
+extern SDL_Surface * SDL_CreateRGBSurfaceWithFormat(uint32_t flags, int w, int h, int depth, uint32_t format);
+extern void SDL_FreeSurface(SDL_Surface *surface);
 
-extern SDL_Texture * __vsf_sdl2_create_texture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
-extern SDL_Texture * __vsf_sdl2_create_texture_from_surface(SDL_Renderer *renderer, SDL_Surface *surface);
-extern void __vsf_sdl2_destroy_texture(SDL_Texture * texture);
-extern int __vsf_sdl2_update_texture(SDL_Texture * texture, const SDL_Rect * rect, const void *pixels, int pitch);
+extern SDL_Renderer * SDL_CreateRenderer(SDL_Window * window, int index, uint32_t flags);
+extern void SDL_DestroyRenderer(SDL_Renderer * renderer);
+extern int SDL_RenderClear(SDL_Renderer * renderer);
+extern int SDL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
+extern void SDL_RenderPresent(SDL_Renderer * renderer);
 
-extern int __vsf_sdl2_lock_surface(SDL_Surface * surface);
-extern void __vsf_sdl2_unlock_surface(SDL_Surface * surface);
+extern SDL_Texture * SDL_CreateTexture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
+extern SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);
+extern void SDL_DestroyTexture(SDL_Texture * texture);
+extern int SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect, const void *pixels, int pitch);
 
-extern SDL_sem * __vsf_sdl2_create_sem(uint32_t initial_value);
-extern void __vsf_sdl2_destroy_sem(SDL_sem * sem);
+extern int SDL_LockSurface(SDL_Surface * surface);
+extern void SDL_UnlockSurface(SDL_Surface * surface);
+
+extern SDL_sem * SDL_CreateSemaphore(uint32_t initial_value);
+extern void SDL_DestroySemaphore(SDL_sem * sem);
 extern int __vsf_sdl2_sem_wait(SDL_sem * sem, int32_t ms);
-extern int __vsf_sdl2_sem_post(SDL_sem * sem);
+extern int SDL_SemPost(SDL_sem * sem);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-extern void __vsf_sdl2_delay(uint32_t ms);
-extern uint32_t __vsf_sdl2_get_ticks(void);
+extern void SDL_Delay(uint32_t ms);
+extern uint32_t SDL_GetTicks(void);
 #endif
 
-extern int __vsf_sdl2_open_audio(SDL_AudioSpec * desired, SDL_AudioSpec * obtained);
-extern void __vsf_sdl2_pause_audio(int pause_on);
-extern SDL_AudioStatus __vsf_sdl2_get_audio_status(void);
-extern void __vsf_sdl2_close_audio(void);
+extern int SDL_OpenAudio(SDL_AudioSpec * desired, SDL_AudioSpec * obtained);
+extern void SDL_PauseAudio(int pause_on);
+extern SDL_AudioStatus SDL_GetAudioStatus(void);
+extern void SDL_CloseAudio(void);
 
-extern int __vsf_sdl2_poll_event(SDL_Event * event);
+extern int SDL_PollEvent(SDL_Event * event);
 
-extern SDL_Cursor * __vsf_sdl2_create_cursor(const uint8_t * data, const uint8_t * mask,
+extern SDL_Cursor * SDL_CreateCursor(const uint8_t * data, const uint8_t * mask,
                                             int w, int h, int hot_x, int hot_y);
-extern SDL_Cursor * __vsf_sdl2_create_color_curosr(SDL_Surface *surface, int hot_x, int hot_y);
-extern SDL_Cursor * __vsf_sdl2_create_system_cursor(SDL_SystemCursor id);
-extern void __vsf_sdl2_set_curser(SDL_Cursor * cursor);
-extern SDL_Cursor * __vsf_sdl2_get_cursor(void);
-extern SDL_Cursor * __vsf_sdl2_get_default_cursor(void);
-extern void __vsf_sdl2_free_curser(SDL_Cursor * cursor);
-extern int __vsf_sdl2_show_curser(int toggle);
+extern SDL_Cursor * SDL_CreateColorCursor(SDL_Surface *surface, int hot_x, int hot_y);
+extern SDL_Cursor * SDL_CreateSystemCursor(SDL_SystemCursor id);
+extern void SDL_SetCursor(SDL_Cursor * cursor);
+extern SDL_Cursor * SDL_GetCursor(void);
+extern SDL_Cursor * SDL_GetDefaultCursor(void);
+extern void SDL_FreeCursor(SDL_Cursor * cursor);
+extern int SDL_ShowCursor(int toggle);
 
-extern int __vsf_sdl2_num_joysticks(void);
-extern SDL_Joystick * __vsf_sdl2_joystick_open(int device_index);
-extern int __vsf_sdl2_joystick_event_state(int state);
-extern int __vsf_sdl2_joystick_num_buttons(SDL_Joystick * joystick);
-extern int __vsf_sdl2_joystick_num_axes(SDL_Joystick * joystick);
-extern int __vsf_sdl2_joystick_num_balls(SDL_Joystick * joystick);
-extern int __vsf_sdl2_joystick_num_hats(SDL_Joystick * joystick);
+extern int SDL_NumJoysticks(void);
+extern SDL_Joystick * SDL_JoystickOpen(int device_index);
+extern int SDL_JoystickEventState(int state);
+extern int SDL_JoystickNumButtons(SDL_Joystick * joystick);
+extern int SDL_JoystickNumAxes(SDL_Joystick * joystick);
+extern int SDL_JoystickNumBalls(SDL_Joystick * joystick);
+extern int SDL_JoystickNumHats(SDL_Joystick * joystick);
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
-extern SDL_Overlay * __vsf_sdl_create_yuv_overlay(int width, int height, uint32_t format, SDL_Surface *display);
-extern void __vsf_sdl_free_yuv_overlay(SDL_Overlay * overlay);
-extern int __vsf_sdl_lock_yuv_overlay(SDL_Overlay *overlay);
-extern void __vsf_sdl_unlock_yuv_overlay(SDL_Overlay *overlay);
-extern int __vsf_sdl_display_yuv_overlay(SDL_Overlay *overlay, SDL_Rect *dstrect);
+extern SDL_Overlay * SDL_CreateYUVOverlay(int width, int height, uint32_t format, SDL_Surface *display);
+extern void SDL_FreeYUVOverlay(SDL_Overlay * overlay);
+extern int SDL_LockYUVOverlay(SDL_Overlay *overlay);
+extern void SDL_UnlockYUVOverlay(SDL_Overlay *overlay);
+extern int SDL_DisplayYUVOverlay(SDL_Overlay *overlay, SDL_Rect *dstrect);
 
-extern SDL_Surface * __vsf_sdl_set_video_mode(int width, int height, int bpp, uint32_t flags);
-extern int __vsf_sdl_flip(SDL_Surface *screen);
+extern SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags);
+extern int SDL_Flip(SDL_Surface *screen);
 
-extern void __vsf_sdl_wm_set_caption(const char *title, const char *icon);
+extern void SDL_WM_SetCaption(const char *title, const char *icon);
 #endif
 
 #ifdef __cplusplus

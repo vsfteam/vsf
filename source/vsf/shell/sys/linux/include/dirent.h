@@ -1,11 +1,21 @@
 #ifndef __DIRENT_H__
 #define __DIRENT_H__
 
-#include <sys/types.h>
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./sys/types.h"
+#else
+#   include <sys/types.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define opendir         __vsf_linux_opendir
+#define readdir         __vsf_linux_readdir
+#define closedir        __vsf_linux_closedir
 
 struct dirent {
     long d_ino;

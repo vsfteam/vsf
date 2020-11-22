@@ -106,7 +106,9 @@ SECTION(".text.vsf.kernel.eda")
 static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *this_ptr, vsf_evt_t evt, bool force);
 
 //! should be provided by user
+SECTION(".text.vsf.kernel.vsf_eda_new_frame")
 extern __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size);
+SECTION(".text.vsf.kernel.vsf_eda_free_frame")
 extern void vsf_eda_free_frame(__vsf_eda_frame_t *frame);
 
 extern void vsf_kernel_err_report(enum vsf_kernel_error_t err);
@@ -805,12 +807,12 @@ static void __vsf_eda_init( vsf_eda_t *this_ptr,
 {
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     if (priority == vsf_prio_inherit) {
-
-        if (__vsf_eda.evtq.cur == NULL) {
+        vsf_evtq_t *evtq = __vsf_get_cur_evtq();
+        if (NULL == evtq) {
             vsf_kernel_err_report(
                 VSF_KERNEL_ERR_SHOULD_NOT_USE_PRIO_INHERIT_IN_IDLE_OR_ISR);
         }
-        this_ptr->priority = __vsf_os_evtq_get_priority(__vsf_eda.evtq.cur);
+        this_ptr->priority = __vsf_os_evtq_get_priority(evtq);
     } else {
         this_ptr->priority = priority;
     }
@@ -918,7 +920,7 @@ vsf_err_t vsf_eda_fini(vsf_eda_t *this_ptr)
     this_ptr = (vsf_eda_t *)__vsf_eda_get_valid_eda(this_ptr);
     VSF_KERNEL_ASSERT(this_ptr != NULL);
 #if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
-    vsf_teda_cancel_timer((vsf_teda_t *)this_ptr);
+    __vsf_teda_cancel_timer((vsf_teda_t *)this_ptr);
 #endif
 
     vsf_evtq_on_eda_fini(this_ptr);

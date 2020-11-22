@@ -159,7 +159,9 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
         #endif
             break;
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
+        #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
             nXOffset = ptInnerContainer->tConatinerPadding.chLeft;
+        #endif
             while (chIndex--) {
                 control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
             }
@@ -501,9 +503,11 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
     switch (ptInnerContainer->ContainerAttribute.u5Type) {
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
             iListRawSize = ptListSize->iHeight;
-            iInnerContainerRawSize =    ptListInnerContainerSize->iHeight 
-                                    -   ptInnerContainer->tConatinerPadding.chTop
-                                    -   ptInnerContainer->tConatinerPadding.chBottom;
+            iInnerContainerRawSize =    ptListInnerContainerSize->iHeight;
+        #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+            iInnerContainerRawSize -=   ptInnerContainer->tConatinerPadding.chTop
+                                    +   ptInnerContainer->tConatinerPadding.chBottom;
+        #endif
             iScrollbarSize = iListRawSize/chScalingRatio;
             iScrollbarTrackPieceSize = iInnerContainerRawSize/chScalingRatio;
 
@@ -536,9 +540,11 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
 
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
             iListRawSize = ptListSize->iWidth;
-            iInnerContainerRawSize =    ptListInnerContainerSize->iWidth 
-                                    -   ptInnerContainer->tConatinerPadding.chLeft
-                                    -   ptInnerContainer->tConatinerPadding.chRight;
+            iInnerContainerRawSize = ptListInnerContainerSize->iWidth;
+        #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+            iInnerContainerRawSize -=   ptInnerContainer->tConatinerPadding.chLeft
+                                    +   ptInnerContainer->tConatinerPadding.chRight;
+        #endif
             iScrollbarSize = iListRawSize/chScalingRatio;
             iScrollbarTrackPieceSize = iInnerContainerRawSize/chScalingRatio;
             iOriginOffset = (ptPanelSize->iWidth / 2) - (iScrollbarTrackPieceSize/2); // ¾ÓÖÐ

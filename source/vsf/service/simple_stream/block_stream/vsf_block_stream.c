@@ -63,6 +63,14 @@ const vsf_stream_op_t vsf_block_stream_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 static void __vsf_block_stream_init(vsf_stream_t *stream)
 {
     __vsf_block_stream_t *block_stream = (__vsf_block_stream_t *)stream;
@@ -151,5 +159,11 @@ static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf,
     }
     return 0;
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 #endif      // VSF_USE_SIMPLE_STREAM

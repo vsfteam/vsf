@@ -15,25 +15,28 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_ALLWINNER_F1C100S_H__
-#define __HAL_DEVICE_ALLWINNER_F1C100S_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 /*============================ MACROS ========================================*/
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
 /*\note first define basic info for arch. */
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-#endif
 //! arch info
 #define VSF_ARCH_PRI_NUM            4
 #define VSF_ARCH_PRI_BIT            2
 
-
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             4
+
+#else       // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#ifndef __HAL_DEVICE_ALLWINNER_F1C100S_H__
+#define __HAL_DEVICE_ALLWINNER_F1C100S_H__
+
+// software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_LIST            60, 61, 62, 63
 
 /*============================ INCLUDES ======================================*/
@@ -58,12 +61,14 @@
 //! \brief intc register base address
 #define F1CX00S_INTC_BASE_ADDRESS   (0x01C20400ul)
 
+#define USART_MAX_PORT              0x03
+#define USART_PORT_MASK             0x07
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_ALLWINNER_F1C100S_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

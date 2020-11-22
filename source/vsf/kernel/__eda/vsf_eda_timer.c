@@ -48,6 +48,9 @@ extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
 
 SECTION(".text.vsf.kernel.teda")
 static void __vsf_teda_timer_enqueue(vsf_teda_t *this_ptr, vsf_timer_tick_t due);
+
+SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
@@ -105,7 +108,7 @@ static void __vsf_timer_start(void)
     vsf_systimer_start();
 }
 
-SECTION(".text.vsf.kernel.teda")
+// DO NOT add section on vsf_systimer_evthandler, it's a weak function in arch
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 {
     UNUSED_PARAM(tick);
@@ -216,7 +219,7 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
         vsf_callback_timq_insert(&__vsf_eda.timer.callback_timq, timer);
 
         if (NULL == timer->timer_node.prev) {
-            vsf_teda_cancel_timer(&__vsf_eda.teda);
+            __vsf_teda_cancel_timer(&__vsf_eda.teda);
 
             vsf_callback_timq_peek(&__vsf_eda.timer.callback_timq, timer);
             __vsf_teda_set_timer_imp(&__vsf_eda.teda, timer->due);
@@ -355,8 +358,8 @@ vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
-SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
-vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *this_ptr)
+SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr)
 {
     vsf_protect_t lock_status;
     this_ptr = (vsf_teda_t *)__vsf_eda_get_valid_eda((vsf_eda_t *)this_ptr);
@@ -369,6 +372,14 @@ vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *this_ptr)
             this_ptr->use_as__vsf_eda_t.state.bits.is_timed = false;
         }
     vsf_unprotect_sched(lock_status);
+    return VSF_ERR_NONE;
+}
+
+SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
+vsf_err_t vsf_teda_cancel_timer(void)
+{
+    __vsf_teda_cancel_timer(NULL);
+    vsf_evtq_clean_evt(VSF_EVT_TIMER);
     return VSF_ERR_NONE;
 }
 

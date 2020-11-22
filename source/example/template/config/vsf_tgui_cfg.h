@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level Application Configuration
 
 #ifndef __TOP_TGUI_USER_CFG_H__
 #define __TOP_TGUI_USER_CFG_H__
@@ -56,22 +56,14 @@
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN                             \
-        extern vsf_tgui_size_t vsf_tgui_sdl_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE(__PTTILE)                          \
-        vsf_tgui_sdl_idx_root_tile_get_size(__PTTILE)
-
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH_EXTERN                      \
-        extern void vsf_tgui_low_level_on_ready_to_refresh(void);
-
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH()                           \
-        vsf_tgui_low_level_on_ready_to_refresh()
+#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
+#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
 
 /*============================ TYPES =========================================*/
 
-/*! \note Users should assign values to those enum symbols according to the 
+/*! \note Users should assign values to those enum symbols according to the
  *!       target platform.
- *! 
+ *!
  *! \note Platform: PC
  */
 enum {

@@ -1047,7 +1047,7 @@ bool vsf_arch_low_level_init(void)
 {
     memset(&__vsf_x86, 0, sizeof(__vsf_x86));
 
-    __vsf_x86.prio_base = vsf_arch_prio_ivalid;
+    __vsf_x86.prio_base = vsf_arch_prio_invalid;
     __vsf_x86.gint_state = true;
 
     InitializeCriticalSection(&__vsf_x86.lock);
@@ -1055,15 +1055,15 @@ bool vsf_arch_low_level_init(void)
 
     __vsf_x86.por_thread.thread_id = GetCurrentThreadId();
     __vsf_x86.por_thread.thread = OpenThread(THREAD_ALL_ACCESS, false, __vsf_x86.por_thread.thread_id);
-    __vsf_x86.por_thread.priority = vsf_arch_prio_ivalid;
+    __vsf_x86.por_thread.priority = vsf_arch_prio_invalid;
     strcpy((char *)__vsf_x86.por_thread.name, "por");
     __vsf_x86.por_thread.state = VSF_ARCH_IRQ_STATE_FOREGROUND;
-    __vsf_x86.cur_priority = vsf_arch_prio_ivalid;
+    __vsf_x86.cur_priority = vsf_arch_prio_invalid;
     __vsf_x86.cur_thread = &__vsf_x86.por_thread;
     vsf_dlist_init(&__vsf_x86.irq_rdy_list);
     vsf_dlist_insert(vsf_arch_irq_thread_t, rdy_node,
         &__vsf_x86.irq_rdy_list, &__vsf_x86.por_thread,
-        _->priority < vsf_arch_prio_ivalid);
+        _->priority < vsf_arch_prio_invalid);
     vsf_dlist_add_to_head(vsf_arch_irq_thread_t, irq_node, &__vsf_x86.irq_list, &__vsf_x86.por_thread);
 
     return true;

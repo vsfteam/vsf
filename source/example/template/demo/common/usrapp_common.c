@@ -24,9 +24,14 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_FS == ENABLED
+#if     VSF_USE_FS == ENABLED                                                   \
+    &&  (   VSF_MAL_USE_FAKEFAT32_MAL == ENABLED                                \
+        ||  VSF_FS_USE_MEMFS == ENABLED                                         \
+        ||  VSF_FS_USE_WINFS == ENABLED)
+
 usrapp_common_t usrapp_common = {
-#   if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
+#   if      VSF_USE_MAL == ENABLED                                              \
+        &&  VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     .mal                        = {
 #       if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         .fakefat32              = {
@@ -46,7 +51,8 @@ usrapp_common_t usrapp_common = {
     },
 #   endif
 
-#   if VSF_USE_FS == ENABLED
+#   if      VSF_USE_FS == ENABLED                                               \
+        &&  (VSF_FS_USE_MEMFS == ENABLED || VSF_FS_USE_WINFS == ENABLED)
     .fs                         = {
 #       if VSF_FS_USE_MEMFS == ENABLED
         .memfs_info             = {

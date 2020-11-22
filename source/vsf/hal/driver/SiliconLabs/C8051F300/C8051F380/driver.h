@@ -16,9 +16,9 @@
  ****************************************************************************/
 
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   include "hal/vsf_hal_cfg.h"
-#   include "./device.h"
-#   undef   __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#   include "../__device.h"
+
 #else
 
 #   ifndef __HAL_DRIVER_SILICONLABS_C8051F380_H__

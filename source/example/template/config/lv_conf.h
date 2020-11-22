@@ -13,9 +13,6 @@
 #define LV_CONF_H
 /* clang-format off */
 
-#undef __USE_LOCAL_STDIO__
-#define __USE_LOCAL_STDIO__     1
-
 #include "vsf_cfg.h"
 #include <stdint.h>
 

@@ -198,13 +198,13 @@ extern void vsf_fifo_init(vsf_fifo_t *fifo, vsf_fifo_fast_index_t fifo_depth);
 extern bool vsf_fifo_push(vsf_fifo_t *fifo, uintptr_t item, vsf_fifo_fast_item_size_t item_size);
 extern bool vsf_fifo_pop(vsf_fifo_t *fifo, uintptr_t item, vsf_fifo_fast_item_size_t item_size);
 
-SECTION("text.vsf.utilities.vsf_fifo_get_head")
+SECTION(".text.vsf.utilities.vsf_fifo_get_head")
 extern uintptr_t vsf_fifo_get_head(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_size);
 
-SECTION("text.vsf.utilities.vsf_fifo_get_tail")
+SECTION(".text.vsf.utilities.vsf_fifo_get_tail")
 extern uintptr_t vsf_fifo_get_tail(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_size);
 
-SECTION("text.vsf.utilities.vsf_fifo_get_number")
+SECTION(".text.vsf.utilities.vsf_fifo_get_number")
 extern vsf_fifo_index_t vsf_fifo_get_number(vsf_fifo_t *fifo);
 
 #ifdef __cplusplus

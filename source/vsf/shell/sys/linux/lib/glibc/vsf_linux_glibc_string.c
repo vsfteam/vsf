@@ -21,7 +21,20 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
 
-#include <unistd.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../include/unistd.h"
+#   include "../../include/simple_libc/string.h"
+#else
+#   include <unistd.h>
+#   include <string.h>
+#endif
+
+// for malloc
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
+#   include "../../include/simple_libc/stdlib.h"
+#else
+#   include <stdlib.h>
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -40,4 +53,4 @@ char * strdup(const char *str)
     return newstr;
 }
 
-#endif      // VSF_USE_LINUX
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_STRING

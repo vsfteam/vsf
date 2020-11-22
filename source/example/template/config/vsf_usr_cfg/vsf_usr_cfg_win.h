@@ -68,6 +68,7 @@
 #define APP_USE_AWTK_DEMO                               ENABLED
 #define APP_USE_NNOM_DEMO                               ENABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
+#   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES         4
@@ -82,6 +83,7 @@
 #define APP_USE_SOCKET_DEMO                             ENABLED
 #define APP_USE_GATO_DEMO                               ENABLED
 #define APP_USE_NUKLEAR_DEMO                            ENABLED
+#define APP_USE_EVM_DEMO                                DISABLED
 
 #if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
 #   define APP_USE_FREETYPE_DEMO                        ENABLED
@@ -148,6 +150,11 @@
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
+#if APP_USE_EVM_DEMO == ENABLED
+// evm console need printf and getchar
+// TODO: add back
+//#   define VSF_LINUX_USE_SIMPLE_STDIO                   ENABLED
+#endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0

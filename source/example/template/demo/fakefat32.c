@@ -83,6 +83,11 @@ while (i < 2) {\r\n\
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 vk_fakefat32_file_t fakefat32_root[ 3
                                 +   (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
                                 ] = {
@@ -112,6 +117,10 @@ vk_fakefat32_file_t fakefat32_root[ 3
     },
 #endif
 };
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 

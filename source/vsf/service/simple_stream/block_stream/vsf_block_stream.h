@@ -53,8 +53,8 @@ extern "C" {
 
 #define __VSF_BLOCK_STREAM_INIT(__BLOCK_NUM, __BLOCK_SIZE)                      \
             .op                 = &vsf_block_stream_op,                         \
-            .block_size         = (__BLOCK_SIZE),                               \
-            .block_num          = (__BLOCK_NUM),
+            .block_size         = (vsf_fifo_item_size_t)(__BLOCK_SIZE),         \
+            .block_num          = (vsf_fifo_index_t)(__BLOCK_NUM),
 #define VSF_BLOCK_STREAM_INIT(__BLOCK_NUM, __BLOCK_SIZE)                        \
             __VSF_BLOCK_STREAM_INIT((__BLOCK_NUM), (__BLOCK_SIZE))
 

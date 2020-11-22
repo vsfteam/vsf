@@ -108,6 +108,8 @@ extern vsf_err_t vsf_evtq_post_evt(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t vsf_evtq_post_msg(vsf_eda_t *eda, void *msg);
 extern bool vsf_evtq_is_empty(vsf_evtq_t *this_ptr);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr);
+
+extern void vsf_evtq_clean_evt(vsf_evt_t evt);
 #endif
 
 #ifdef __cplusplus

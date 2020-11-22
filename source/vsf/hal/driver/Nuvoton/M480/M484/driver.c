@@ -62,31 +62,25 @@
 /*============================ TYPES =========================================*/
 
 // test only, remove later
-enum m480_hclksrc_t
-{
+typedef enum m480_hclksrc_t {
     M480_HCLKSRC_HIRC = 7,
     M480_HCLKSRC_PLL2FOUT = 4,
     M480_HCLKSRC_LIRC = 3,
     M480_HCLKSRC_PLLFOUT = 2,
     M480_HCLKSRC_LXT = 1,
     M480_HCLKSRC_HXT = 0,
-};
-typedef enum m480_hclksrc_t m480_hclksrc_t;
+} m480_hclksrc_t;
 
-enum m480_pclksrc_t
-{
+typedef enum m480_pclksrc_t {
     M480_PCLKSRC_HCLK = 0,
     M480_PCLKSRC_HCLKd2 = 1,
-};
-typedef enum m480_pclksrc_t m480_pclksrc_t;
+} m480_pclksrc_t;
 
-enum m480_pllsrc_t
-{
+typedef enum m480_pllsrc_t {
     M480_PLLSRC_HXT = 0,
     M480_PLLSRC_HIRC = 1,
     M480_PLLSRC_NONE = -1,
-};
-typedef enum m480_pllsrc_t m480_pllsrc_t;
+} m480_pllsrc_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -94,7 +88,7 @@ typedef enum m480_pllsrc_t m480_pllsrc_t;
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO: if these initialization is implemented in startup file, remove here
-char __low_level_init(void)
+int __low_level_init(void)
 {
     // to use SRAM BANK2
     CLK->AHBCLK |= CLK_AHBCLK_SPIMCKEN_Msk;

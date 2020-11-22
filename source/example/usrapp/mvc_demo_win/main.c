@@ -19,17 +19,20 @@
 
 #include "vsf.h"
 
+#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
+#ifndef VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE
+#   define VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE \
+              (VSF_TGUI_HOR_MAX * VSF_TGUI_VER_MAX / 10)
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 struct usrapp_t {
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
     struct {
         vk_disp_sdl2_t disp;
-        vsf_tgui_color_t color[VSF_TGUI_VER_MAX][VSF_TGUI_HOR_MAX];
+        vsf_tgui_color_t color[VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE];
     } ui;
-#endif
 };
 typedef struct usrapp_t usrapp_t;
 
@@ -56,9 +59,10 @@ static usrapp_t __usrapp = {
 };
 
 /*============================ PROTOTYPES ====================================*/
+extern void vsf_tgui_bind_disp(vk_disp_t* disp, void* bitmap_data, size_t bitmap_size);
+extern vsf_err_t tgui_demo_init(void);
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_UI == ENABLED
 extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
@@ -86,7 +90,6 @@ void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
 }
 #endif
 
-#endif
 
 // TODO: SDL require that main need argc and argv
 int main(int argc, char *argv[])
@@ -94,16 +97,11 @@ int main(int argc, char *argv[])
     vsf_trace_init((vsf_stream_t *)&VSF_DEBUG_STREAM_TX);
     vsf_stdio_init();
 
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
+    vsf_tgui_bind_disp(&(__usrapp.ui.disp.use_as__vk_disp_t), &__usrapp.ui.color, dimof(__usrapp.ui.color));
 
-	extern void vsf_tgui_bind(vk_disp_t * disp, void* ui_data);
-	vsf_tgui_bind(  &(__usrapp.ui.disp.use_as__vk_disp_t), 
-                    &__usrapp.ui.color);
-
-    extern vsf_err_t tgui_demo_init(void);
     tgui_demo_init();
-#endif
     return 0;
 }
+#endif
 
 /* EOF */

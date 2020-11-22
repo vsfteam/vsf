@@ -89,6 +89,14 @@ void __vk_malfs_cache_init(__vk_malfs_info_t *info, __vk_malfs_cache_t *cache)
     cache->info = info;
 }
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 __vsf_component_peda_private_entry(__vk_malfs_alloc_cache,
     uint64_t block_addr;
     __vk_malfs_cache_node_t *result;
@@ -140,15 +148,6 @@ __vsf_component_peda_private_entry(__vk_malfs_alloc_cache,
     vsf_peda_end();
 }
 
-vsf_err_t __vk_malfs_alloc_cache(__vk_malfs_info_t *info, __vk_malfs_cache_t *cache, uint_fast64_t block_addr)
-{
-    vsf_err_t err;
-    __vsf_component_call_peda(__vk_malfs_alloc_cache, err, cache,
-        .block_addr     = block_addr,
-    )
-    return err;
-}
-
 __vsf_component_peda_private_entry(__vk_malfs_read,
     uint64_t block_addr;
     uint32_t block_num;
@@ -196,6 +195,21 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     vsf_peda_end();
 }
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
+
+vsf_err_t __vk_malfs_alloc_cache(__vk_malfs_info_t *info, __vk_malfs_cache_t *cache, uint_fast64_t block_addr)
+{
+    vsf_err_t err;
+    __vsf_component_call_peda(__vk_malfs_alloc_cache, err, cache,
+        .block_addr     = block_addr,
+    )
+    return err;
+}
+
 vsf_err_t __vk_malfs_read(__vk_malfs_info_t *info, uint_fast64_t block_addr, uint_fast32_t block_num, uint8_t *buff)
 {
     // TODO: add lock and unlock
@@ -221,6 +235,14 @@ void __vk_malfs_unmount(__vk_malfs_info_t *info)
         vsf_heap_free(info->total_cb);
     }
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
 
 __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
 {
@@ -354,6 +376,12 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
     }
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 vsf_err_t vk_malfs_mount_mbr(vk_malfs_mounter_t *mounter)
 {

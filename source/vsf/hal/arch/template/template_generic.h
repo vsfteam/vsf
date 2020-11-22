@@ -65,8 +65,8 @@ enum vsf_arch_prio_t {
     // avoid vsf_arch_prio_t to be optimized to 8bit
     __VSF_ARCH_PRIO_LEAST_MAX       = INT16_MAX,
     __VSF_ARCH_PRIO_LEAST_MIN       = INT16_MIN,
-    VSF_ARCH_PRIO_IVALID            = -1,
-    vsf_arch_prio_ivalid            = -1,
+    VSF_ARCH_PRIO_INVALID           = -1,
+    vsf_arch_prio_invalid           = -1,
 
     REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, 0)
 };

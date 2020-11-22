@@ -1,0 +1,67 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "gdb",
+            "request": "launch",
+            "name" : "Flash and Debug",
+            "target": "./build/${workspaceFolderBasename}.elf",
+            "cwd": "${workspaceFolder}",
+            "gdbpath" : "xtensa-esp32-elf-gdb",
+            //"valuesFormatting": "disabled",
+            //"valuesFormatting": "parseText",
+            "valuesFormatting": "prettyPrinters",
+            "autorun": [
+                "target remote :3333",
+                "mon reset halt",
+                "mon program_esp ./build/${workspaceFolderBasename}.bin 0x10000 verify",
+                "mon reset halt",
+                "flushregs",
+                "thb app_main",
+                "c"
+            ],
+            //"preLaunchTask": "openocd"
+        },
+        {
+            "type": "gdb",
+            "request": "launch",
+            "name" : "Debug without Flash",
+            "target": "./build/${workspaceFolderBasename}.elf",
+            "cwd": "${workspaceFolder}",
+            "gdbpath" : "xtensa-esp32-elf-gdb",
+            //"valuesFormatting": "disabled",
+            //"valuesFormatting": "parseText",
+            "valuesFormatting": "prettyPrinters",
+            "autorun": [
+                "target remote :3333",
+                "mon reset halt",
+                "flushregs",
+                "thb app_main",
+                "c"
+            ],
+            //"preLaunchTask": "openocd"
+        },
+        {
+            "type": "gdb",
+            "request": "launch",
+            "name" : "Qemu Debug",
+            "target": "./build/${workspaceFolderBasename}.elf",
+            "cwd": "${workspaceFolder}",
+            "gdbpath" : "xtensa-esp32-elf-gdb",
+            //"valuesFormatting": "disabled",
+            //"valuesFormatting": "parseText",
+            "valuesFormatting": "prettyPrinters",
+            "autorun": [
+                "target remote :1234",
+                "mon reset halt",
+                "flushregs",
+                "thb app_main",
+                "c"
+            ],
+            //"preLaunchTask": "openocd"
+        }
+    ]
+}

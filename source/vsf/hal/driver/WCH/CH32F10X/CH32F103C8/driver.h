@@ -16,9 +16,9 @@
  ****************************************************************************/
 
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   include "hal/vsf_hal_cfg.h"
-#   include "./device.h"
-#   undef   __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#   include "../__device.h"
+
 #else
 
 #   ifndef __HAL_DRIVER_WCH_CH32F103C8_H__

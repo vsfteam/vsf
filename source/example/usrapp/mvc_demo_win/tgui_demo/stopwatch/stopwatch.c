@@ -163,7 +163,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                 tgui_contains(
 
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-                    tgui_text_list(tNumberList, &(ptPanel->tContainerA), tNumberList, tVContainer, 
+                    tgui_text_list(tNumberList, &(ptPanel->tContainerA), tNumberList, tVContainer,
                         tgui_size(100, 100),
                         tgui_margin(8, 0, 8, 0),
                     #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABELD
@@ -179,13 +179,13 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                             tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
                         )
                     ),
-                
+
 #   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                    tgui_list(tVContainer, &(ptPanel->tContainerA), tNumberList, tVContainer, 
+                    tgui_list(tVContainer, &(ptPanel->tContainerA), tNumberList, tVContainer,
 #   endif
 #else
 #   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                    tgui_list(tVContainer, &(ptPanel->tContainerA), tVContainer, tVContainer, 
+                    tgui_list(tVContainer, &(ptPanel->tContainerA), tVContainer, tVContainer,
 #   endif
 #endif
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
@@ -409,7 +409,7 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
 {
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
-    
+
 #define VSF_TGUI_SCROLLBAR_TRACK_PIECE_COLOR_WHITE      VSF_TGUI_COLOR_RGBA(0xff, 0xff, 0xff, 0x24)
 #define VSF_TGUI_SCROLLBAR_COLOR_BLUE                   VSF_TGUI_COLOR_RGBA(0x4c, 0xa1, 0xff, 0x80)
 
@@ -420,21 +420,21 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
         return fsm_rt_cpl;
     }
 
-    if (NULL == vsf_tgui_list_scrollbar_regions_generate(   (const vsf_tgui_control_t *)ptList, 
-                                                            ptList, 
-                                                            2, 
+    if (NULL == vsf_tgui_list_scrollbar_regions_generate(   (const vsf_tgui_control_t *)ptList,
+                                                            ptList,
+                                                            2,
                                                             &tScrollbarRegion)) {
         return fsm_rt_cpl;
     }
 
-    vsf_tgui_control_v_draw_rect(   (const vsf_tgui_control_t *)ptList, 
-                                    ptDirtyRegion, 
-                                    &tScrollbarRegion.tTrack, 
+    vsf_tgui_control_v_draw_rect(   (const vsf_tgui_control_t *)ptList,
+                                    ptDirtyRegion,
+                                    &tScrollbarRegion.tTrack,
                                     VSF_TGUI_SCROLLBAR_TRACK_PIECE_COLOR_WHITE);
 
-    vsf_tgui_control_v_draw_rect(   (const vsf_tgui_control_t *)ptList, 
-                                    ptDirtyRegion, 
-                                    &tScrollbarRegion.tBar, 
+    vsf_tgui_control_v_draw_rect(   (const vsf_tgui_control_t *)ptList,
+                                    ptDirtyRegion,
+                                    &tScrollbarRegion.tBar,
                                     VSF_TGUI_SCROLLBAR_COLOR_BLUE);
 #endif
 

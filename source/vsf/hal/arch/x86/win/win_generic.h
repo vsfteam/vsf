@@ -123,8 +123,8 @@ typedef ULONG_PTR           DWORD_PTR, *PDWORD_PTR;
 typedef uint64_t vsf_systimer_cnt_t;
 
 typedef enum vsf_arch_prio_t {
-    VSF_ARCH_PRIO_IVALID = -1,
-    vsf_arch_prio_ivalid = -1,
+    VSF_ARCH_PRIO_INVALID = -1,
+    vsf_arch_prio_invalid = -1,
     REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, __UNUSED)
     vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
 } vsf_arch_prio_t;

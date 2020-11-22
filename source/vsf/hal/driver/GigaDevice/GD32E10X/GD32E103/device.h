@@ -15,13 +15,12 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_GIGADEVICE_GD32E103_H__
-#define __HAL_DEVICE_GIGADEVICE_GD32E103_H__
-
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
 /*============================ MACROS ========================================*/
+
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 /*\note first define basic info for arch. */
 #define VSF_ARCH_PRI_NUM            16
@@ -29,6 +28,13 @@
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             5
+
+#else
+
+#ifndef __HAL_DEVICE_GIGADEVICE_GD32E103_H__
+#define __HAL_DEVICE_GIGADEVICE_GD32E103_H__
+
+// software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_LIST            SWI0_IRQn,SWI1_IRQn,SWI2_IRQn,SWI3_IRQn,SWI4_IRQn
 
 /*============================ INCLUDES ======================================*/
@@ -60,6 +66,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_GIGADEVICE_GD32E103_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

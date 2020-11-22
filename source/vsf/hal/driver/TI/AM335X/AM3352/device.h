@@ -15,25 +15,27 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_TI_AM3352_H__
-#define __HAL_DEVICE_TI_AM3352_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 /*============================ MACROS ========================================*/
 
 /*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 //! arch info
 #   define VSF_ARCH_PRI_NUM         16
 #   define VSF_ARCH_PRI_BIT         4
-#endif
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM             0
+
+#else
+
+#ifndef __HAL_DEVICE_TI_AM3352_H__
+#define __HAL_DEVICE_TI_AM3352_H__
+
 //#define VSF_DEV_SWI_LIST            5, 45, 50, 69, 81, 83, 91, 94, 95
 
 
@@ -50,6 +52,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_TI_AM3352_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

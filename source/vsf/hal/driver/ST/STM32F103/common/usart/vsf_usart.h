@@ -115,40 +115,6 @@ struct vsf_usart_t {
     usart_event_status_t event_mask;
 };
 
-
-#if USART_COUNT > 0 && VSF_HAL_USE_USART0 == ENABLED
-extern const i_usart_t VSF_USART0;
-extern vsf_usart_t vsf_usart0;
-#endif
-#if USART_COUNT > 1 && VSF_HAL_USE_USART1 == ENABLED
-extern const i_usart_t VSF_USART1;
-extern vsf_usart_t vsf_usart1;
-#endif
-#if USART_COUNT > 2 && VSF_HAL_USE_USART2 == ENABLED
-extern const i_usart_t VSF_USART2;
-extern vsf_usart_t vsf_usart2;
-#endif
-#if USART_COUNT > 3 && VSF_HAL_USE_USART3 == ENABLED
-extern const i_usart_t VSF_USART3;
-extern vsf_usart_t vsf_usart3;
-#endif
-#if USART_COUNT > 4 && VSF_HAL_USE_USART4 == ENABLED
-extern const i_usart_t VSF_USART4;
-extern vsf_usart_t vsf_usart4;
-#endif
-#if USART_COUNT > 5 && VSF_HAL_USE_USART5 == ENABLED
-extern const i_usart_t VSF_USART5;
-extern vsf_usart_t vsf_usart5;
-#endif
-#if USART_COUNT > 6 && VSF_HAL_USE_USART6 == ENABLED
-extern const i_usart_t VSF_USART6;
-extern vsf_usart_t vsf_usart6;
-#endif
-#if USART_COUNT > 7 && VSF_HAL_USE_USART7 == ENABLED
-extern const i_usart_t VSF_USART7;
-extern vsf_usart_t vsf_usart7;
-#endif
-
 #endif
 
 #endif

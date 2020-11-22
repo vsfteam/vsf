@@ -3,27 +3,48 @@
 #if VSF_USE_LINUX == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <sys/wait.h>
-#include <dirent.h>
-#include <ctype.h>
-#include <string.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../../include/unistd.h"
+#   include "../../../include/errno.h"
+#   include "../../../include/sys/wait.h"
+#   include "../../../include/dirent.h"
+#else
+#   include <unistd.h>
+#   include <errno.h>
+#   include <sys/wait.h>
+#   include <dirent.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
+#   include "../../../include/simple_libc/ctype.h"
+#else
+#   include <ctype.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
+#   include "../../../include/simple_libc/stdlib.h"
+#else
+#   include <stdlib.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
+#   include "../../../include/simple_libc/stdio.h"
+#else
+#   include <stdio.h>
+#endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
+#   include "../../../include/simple_libc/string.h"
+#else
+#   include <string.h>
+#endif
 
 #define VSH_PROMPT                  ">>>"
 
 #ifndef PATH_MAX
 #   define PATH_MAX                 256
 #endif
-#ifndef VSH_CMD_SIZE
-#   define VSH_CMD_SIZE             128
-#endif
 
 #if VSH_HAS_COLOR
-#define VSH_COLOR_EXECUTABLE        "\033[1;32m"
-#define VSH_COLOR_DIRECTORY         "\033[1;34m"
-#define VSH_COLOR_NORMAL            "\033[1;37m"
+#   define VSH_COLOR_EXECUTABLE     "\033[1;32m"
+#   define VSH_COLOR_DIRECTORY      "\033[1;34m"
+#   define VSH_COLOR_NORMAL         "\033[1;37m"
 #endif
 
 #if VSH_HISTORY_NUM && !VSH_ECHO
@@ -66,7 +87,7 @@ typedef enum vsh_shell_state_t {
 static char __vsh_working_dir[PATH_MAX];
 static char **__vsh_path;
 
-char * getcwd(char * buffer, int maxlen)
+char * getcwd(char * buffer, size_t maxlen)
 {
     int len = strlen(__vsh_working_dir) + 1;
 
@@ -190,6 +211,12 @@ int vsh_generate_path(char *path, int pathlen, char *dir, char *path_in)
     while ((tmp = (char *)strstr(path, "/./")) != NULL) {
         strcpy(tmp, &tmp[2]);
     }
+
+    // fix surfix "/."
+    size_t len = strlen(path);
+    if ((len >= 2) && ('.' == path[len - 1]) && ('/' == path[len - 2])) {
+        path[len - 1] = '\0';
+    }
     return 0;
 }
 
@@ -309,7 +336,7 @@ int vsh_main(int argc, char *argv[])
                 }
 
                 switch (ch) {
-                case '\r':
+                case VSH_ENTER_CHAR:
 #if VSH_ECHO
                     printf(VSH_LINEEND);
 #endif
@@ -327,10 +354,18 @@ int vsh_main(int argc, char *argv[])
                         }
                         ctx.history.cur_disp_entry = ctx.history.cur_save_entry;
 #endif
-                        __vsh_run_cmd(&ctx);
+                        if (__vsh_run_cmd(&ctx) < 0) {
+                            fprintf(stderr, "fail to execute %s\r\n", ctx.cmd);
+                        }
                     }
                     goto input_cmd;
+#if     VSH_ENTER_CHAR == '\r'
                 case '\n':
+#elif   VSH_ENTER_CHAR == '\n'
+                case '\r':
+#else
+#   error invalid VSH_ENTER_CHAR
+#endif
                     continue;
                 case '\b':
                 case 0x7F:
@@ -380,7 +415,10 @@ int cd_main(int argc, char *argv[])
 
     char pathname[PATH_MAX];
     int err = vsh_generate_path(pathname, sizeof(pathname), __vsh_working_dir, argv[1]);
-    if (err != 0) { return err; }
+    if (err != 0) {
+        printf("invalid path" VSH_LINEEND, argv[1]);
+        return err;
+    }
 
     if (pathname[strlen(pathname) - 1] != '/') {
         strcat(pathname, "/");

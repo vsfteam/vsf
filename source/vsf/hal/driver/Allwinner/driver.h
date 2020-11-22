@@ -30,8 +30,6 @@
 /* include specified device driver header file */
 #include VSF_ALLWINNER_DRIVER_HEADER
 
-
-
 #ifndef __HAL_DRIVER_ALLWINNER_H__
 #define __HAL_DRIVER_ALLWINNER_H__
 
@@ -43,5 +41,5 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif
+#endif      // __HAL_DRIVER_ALLWINNER_H__
 /* EOF */

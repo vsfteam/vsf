@@ -15,9 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_MT071_DEVICE_H__
-#define __HAL_DRIVER_MT071_DEVICE_H__
-
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 
@@ -33,6 +30,15 @@
 /* include specified device driver header file */
 #include VSF_DEVICE_HEADER
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   ifndef __CPU_ARM__
+#       define __CPU_ARM__
+#   endif
+#else
+
+#ifndef __HAL_DEVICE_MT07X_H__
+#define __HAL_DEVICE_MT07X_H__
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -40,6 +46,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_MT07X_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

@@ -21,42 +21,66 @@
 #include "hal/arch/vsf_arch_abstraction.h"
 #include "hal/arch/__vsf_arch_interface.h"
 
+#include "FreeRTOS.h"
+#include "event_groups.h"
+#include "timers.h"
+
 /*============================ MACROS ========================================*/
 
-// skip tskIDLE_PRIORITY(0) and main priority(tskIDLE_PRIORITY + 1)
-#define arch_prio_to_rtos_prio(__arch_prio)     ((__arch_prio) + 2)
-
-/*============================ MACROFIED FUNCTIONS ===========================*/
-
-#ifndef VSF_ARCH_ASSERT
-#   define VSF_ARCH_ASSERT(...)                 ASSERT(__VA_ARGS__)
+#if !configSUPPORT_STATIC_ALLOCATION
+// stack is maybe provided from upper layer,
+//  so xTaskCreateStatic MUST be used to create task, which accept static stack.
+#   error configSUPPORT_STATIC_ALLOCATION MUST be enabled
+#endif
+#if !configSUPPORT_DYNAMIC_ALLOCATION
+#   error configSUPPORT_DYNAMIC_ALLOCATION MUST be enabled
 #endif
 
+#ifndef VSF_ARCH_RTOS_CFG_BASE_PRIORITY
+#   define VSF_ARCH_RTOS_CFG_BASE_PRIORITY      1
+#endif
+
+// skip tskIDLE_PRIORITY(0) and main priority(tskIDLE_PRIORITY + VSF_ARCH_RTOS_CFG_BASE_PRIORITY)
+#define arch_prio_to_rtos_prio(__arch_prio)     ((__arch_prio) + VSF_ARCH_RTOS_CFG_BASE_PRIORITY + 1)
+
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
+#   define rtos_prio_to_arch_prio(__rtos_prio)  ((__rtos_prio) - (VSF_ARCH_RTOS_CFG_BASE_PRIORITY + 1))
+#endif
+
+#ifndef VSF_ARCH_RTOS_CFG_MAIN_STACK_DEPTH
+#   define VSF_ARCH_RTOS_CFG_MAIN_STACK_DEPTH   VSF_ARCH_RTOS_CFG_STACK_DEPTH
+#endif
+
+#ifndef VSF_ARCH_FREERTOS_CFG_IS_IN_ISR
+#   error VSF_ARCH_FREERTOS_CFG_IS_IN_ISR MUST be defined
+#endif
+
+#ifndef VSF_ARCH_FREERTOS_CFG_IRQ_DEPTH
+#   define VSF_ARCH_FREERTOS_CFG_IRQ_DEPTH      8
+#endif
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct __vsf_freertos_t {
     struct {
         TimerHandle_t               handle;
-#if configSUPPORT_STATIC_ALLOCATION
-        StaticTimer_t               static_timer;
-#endif
         vsf_systimer_cnt_t          due;
-        bool                        is_running;
     } timer;
-#if configSUPPORT_STATIC_ALLOCATION
     struct {
-        StaticTask_t                task;
-        StackType_t                 stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH];
-    } main;
-#endif
+        BaseType_t                  stack[VSF_ARCH_FREERTOS_CFG_IRQ_DEPTH];
+        int8_t                      pos;
+    } irq;
+    struct {
+        vsf_gint_state_t            state;
+        UBaseType_t                 os_state;
+    } gint;
 } __vsf_freertos_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 static NO_INIT __vsf_freertos_t __vsf_freertos;
-// use a standalone variable for better optimization if interrupt part is over-written
-static vsf_gint_state_t __gint_state = true;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -65,27 +89,24 @@ static vsf_gint_state_t __gint_state = true;
  * interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 
-WEAK(vsf_get_interrupt)
 vsf_gint_state_t vsf_get_interrupt(void)
 {
-    return __gint_state;
+    return __vsf_freertos.gint.state;
 }
 
-WEAK(vsf_set_interrupt)
 void vsf_set_interrupt(vsf_gint_state_t level)
 {
-    if (__gint_state != level) {
+    if (__vsf_freertos.gint.state != level) {
         if (level) {
-            __gint_state = level;
-            portENABLE_INTERRUPTS();
+            __vsf_freertos.gint.state = level;
+            taskEXIT_CRITICAL_FROM_ISR(__vsf_freertos.gint.os_state);
         } else {
-            portDISABLE_INTERRUPTS();
-            __gint_state = level;
+            __vsf_freertos.gint.os_state = taskENTER_CRITICAL_FROM_ISR();
+            __vsf_freertos.gint.state = level;
         }
     }
 }
 
-WEAK(vsf_disable_interrupt)
 vsf_gint_state_t vsf_disable_interrupt(void)
 {
     vsf_gint_state_t orig = vsf_get_interrupt();
@@ -93,22 +114,49 @@ vsf_gint_state_t vsf_disable_interrupt(void)
     return orig;
 }
 
-WEAK(vsf_enable_interrupt)
 void vsf_enable_interrupt(void)
 {
     vsf_set_interrupt(true);
 }
 
 /*----------------------------------------------------------------------------*
+ * irq_ctx                                                                    *
+ *----------------------------------------------------------------------------*/
+
+void __vsf_arch_irq_enter(void)
+{
+    int_fast8_t pos;
+    vsf_gint_state_t orig = vsf_disable_interrupt();
+        pos = ++__vsf_freertos.irq.pos;
+        if (pos >= dimof(__vsf_freertos.irq.stack)) {
+            VSF_ARCH_ASSERT(false);
+        }
+    vsf_set_interrupt(orig);
+
+    __vsf_freertos.irq.stack[pos] = pdFALSE;
+}
+
+void __vsf_arch_irq_leave(void)
+{
+    BaseType_t is_to_switch;
+
+    vsf_gint_state_t orig = vsf_disable_interrupt();
+        is_to_switch = __vsf_freertos.irq.stack[__vsf_freertos.irq.pos--];
+    vsf_set_interrupt(orig);
+
+    if (is_to_switch) {
+        portYIELD_FROM_ISR(is_to_switch);
+    }
+}
+
+/*----------------------------------------------------------------------------*
  * irq_request                                                                *
  *----------------------------------------------------------------------------*/
-void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request)
+
+void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request, bool is_auto_reset)
 {
-#if configSUPPORT_STATIC_ALLOCATION
-    request->event = xEventGroupCreateStatic(&request->static_event);
-#else
+    request->is_auto_reset = is_auto_reset;
     request->event = xEventGroupCreate();
-#endif
 }
 
 void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request)
@@ -119,26 +167,81 @@ void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request)
 
 void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
 {
-    xEventGroupWaitBits(request->event, 1, pdTRUE, pdFALSE, -1);
+    BaseType_t is_to_reset = request->is_auto_reset ? pdTRUE : pdFALSE;
+    EventBits_t bits;
+
+    do {
+        bits = xEventGroupWaitBits(request->event, 1, is_to_reset, pdFALSE, portMAX_DELAY);
+    } while (!(bits & 1));
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 {
-    xEventGroupSetBits(request->event, 1);
+    if (VSF_ARCH_FREERTOS_CFG_IS_IN_ISR()) {
+        BaseType_t ret = xEventGroupSetBitsFromISR(request->event, 1, &__vsf_freertos.irq.stack[__vsf_freertos.irq.pos]);
+        VSF_ARCH_ASSERT(ret == pdPASS);
+    } else {
+        xEventGroupSetBits(request->event, 1);
+    }
+}
+
+void __vsf_arch_irq_request_reset(vsf_arch_irq_request_t *request)
+{
+    VSF_ARCH_ASSERT(!request->is_auto_reset);
+    xEventGroupClearBits(request->event, 1);
 }
 
 /*----------------------------------------------------------------------------*
  * irq_thread                                                                 *
  *----------------------------------------------------------------------------*/
-void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread, vsf_arch_irq_thread_entry_t entry, vsf_arch_prio_t priority)
+
+void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread,
+        const char * const name, vsf_arch_irq_thread_entry_t entry, vsf_arch_prio_t priority,
+        VSF_ARCH_RTOS_STACK_T *stack, uint_fast32_t stack_depth)
 {
-#if configSUPPORT_STATIC_ALLOCATION
-    irq_thread->thread = xTaskCreateStatic(entry, "irq_thread", dimof(irq_thread->stack), irq_thread,
-        arch_prio_to_rtos_prio(priority), irq_thread->stack, &irq_thread->static_task);
+    UBaseType_t rtos_priority;
+    if (priority < 0) {
+        rtos_priority = uxTaskPriorityGet(xTaskGetCurrentTaskHandle());
+    } else {
+        rtos_priority = arch_prio_to_rtos_prio(priority);
+    }
+
+    // because dynamic xTaskCreate does not support stack from user, so xTaskCreateStatic is sued
+    // and part of the stack is used as StaticTask_t.
+#ifdef VSF_ARCH_CFG_STACK_ALIGN_BIT
+    VSF_ARCH_ASSERT(!((1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) % sizeof(StackType_t)));
+    VSF_ARCH_ASSERT(!((uintptr_t)stack & ((1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) - 1)));
+    uint_fast32_t reserved_stack_depth = sizeof(StaticTask_t) + (1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) - 1;
+    reserved_stack_depth &= ~((1 << VSF_ARCH_CFG_STACK_ALIGN_BIT) - 1);
 #else
-    xTaskCreate(entry, "irq_thread", VSF_ARCH_RTOS_CFG_STACK_DEPTH, irq_thread,
-        arch_prio_to_rtos_prio(priority), &irq_thread->thread);
+    uint_fast32_t reserved_stack_depth = sizeof(StaticTask_t) + sizeof(StackType_t) - 1;
+    if (sizeof(StackType_t) < sizeof(VSF_ARCH_RTOS_STACK_T)) {
+        reserved_stack_depth += sizeof(VSF_ARCH_RTOS_STACK_T) - 1;
+        reserved_stack_depth &= ~(sizeof(VSF_ARCH_RTOS_STACK_T) - 1);
+    }
 #endif
+
+    // if assert here, modify VSF_ARCH_RTOS_STACK_T in freerots_generic.h to fit StackType_t
+    VSF_ARCH_ASSERT(sizeof(VSF_ARCH_RTOS_STACK_T) >= sizeof(StackType_t));
+    VSF_ARCH_ASSERT((stack != NULL) && (stack_depth * sizeof(VSF_ARCH_RTOS_STACK_T) > reserved_stack_depth));
+    StaticTask_t *static_task = (StaticTask_t *)stack;
+
+    reserved_stack_depth /= sizeof(StackType_t);
+    stack_depth = stack_depth * sizeof(VSF_ARCH_RTOS_STACK_T) / sizeof(StackType_t) - reserved_stack_depth;
+    stack = (VSF_ARCH_RTOS_STACK_T *)((uintptr_t)stack + reserved_stack_depth);
+
+    // if thread is restarted, delete first
+    if (irq_thread->thread != NULL) {
+        vTaskDelete(irq_thread->thread);
+    }
+    irq_thread->thread = xTaskCreateStatic(entry, name, stack_depth, irq_thread,
+        rtos_priority, (StackType_t *)stack, static_task);
+    VSF_ARCH_ASSERT(irq_thread->thread != NULL);
+}
+
+void __vsf_arch_irq_thread_exit(void)
+{
+    vTaskDelete(NULL);
 }
 
 void __vsf_arch_irq_thread_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority)
@@ -146,6 +249,7 @@ void __vsf_arch_irq_thread_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_a
     vTaskPrioritySet(irq_thread->thread, arch_prio_to_rtos_prio(priority));
 }
 
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
 void __vsf_arch_irq_thread_suspend(vsf_arch_irq_thread_t *irq_thread)
 {
     vTaskSuspend(irq_thread->thread);
@@ -155,6 +259,13 @@ void __vsf_arch_irq_thread_resume(vsf_arch_irq_thread_t *irq_thread)
 {
     vTaskResume(irq_thread->thread);
 }
+
+vsf_arch_prio_t __vsf_arch_irq_thread_get_priority(vsf_arch_irq_thread_t *irq_thread)
+{
+    UBaseType_t rtos_priority = uxTaskPriorityGet(irq_thread->thread);
+    return (vsf_arch_prio_t)rtos_prio_to_arch_prio(rtos_priority);
+}
+#endif
 
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
@@ -166,13 +277,22 @@ void __vsf_arch_irq_thread_resume(vsf_arch_irq_thread_t *irq_thread)
  */
 bool __vsf_arch_model_low_level_init(void)
 {
+    __vsf_freertos.irq.pos = -1;
     return true;
 }
 
-bool __vsf_arch_model_is_current_task(vsf_arch_irq_thread_t *irq_thread)
+void __vsf_arch_delay_ms(uint_fast32_t ms)
 {
-    return irq_thread->thread == xTaskGetCurrentTaskHandle();
+    vTaskDelay(pdMS_TO_TICKS(ms));
 }
+
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
+vsf_arch_prio_t __vsf_arch_model_get_current_priority(void)
+{
+    UBaseType_t rtos_priority = uxTaskPriorityGet(xTaskGetCurrentTaskHandle());
+    return (vsf_arch_prio_t)rtos_prio_to_arch_prio(rtos_priority);
+}
+#endif
 
 /*----------------------------------------------------------------------------*
  * System Timer Implementation                                                *
@@ -196,14 +316,10 @@ static void __vsf_systimer_callback(TimerHandle_t xTimer)
  */
 vsf_err_t vsf_systimer_init(void)
 {
-    __vsf_freertos.timer.is_running = false;
-#if configSUPPORT_STATIC_ALLOCATION
-    __vsf_freertos.timer.handle = xTimerCreateStatic("vsf_timer", 1, pdFALSE,
-            NULL, __vsf_systimer_callback, &__vsf_freertos.timer.static_timer);
-#else
+    // if assert here, modify vsf_systimer_cnt_t in freerots_generic.h to fit TickType_t
+    VSF_ARCH_ASSERT(sizeof(vsf_systimer_cnt_t) == sizeof(TickType_t));
     __vsf_freertos.timer.handle = xTimerCreate("vsf_timer", 1, pdFALSE,
             NULL, __vsf_systimer_callback);
-#endif
     return VSF_ERR_NONE;
 }
 
@@ -219,15 +335,15 @@ void vsf_systimer_set_idle(void)
 
 bool vsf_systimer_set(vsf_systimer_cnt_t due)
 {
-    vsf_systimer_cnt_t diff;
-    if (due > vsf_systimer_get()) {
-        diff = due - vsf_systimer_get();
-    } else {
-        diff = 1;
-    }
+    vsf_systimer_cnt_t cur = vsf_systimer_get();
 
-    xTimerChangePeriod(__vsf_freertos.timer.handle, diff, 0);
-    return true;
+    if (due > cur) {
+        vsf_systimer_cnt_t diff = due - cur;
+        BaseType_t ret = xTimerChangePeriod(__vsf_freertos.timer.handle, diff, 0);
+        VSF_ARCH_ASSERT(pdPASS == ret);
+        return true;
+    }
+    return false;
 }
 
 bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
@@ -244,7 +360,10 @@ vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 
 vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    return pdMS_TO_TICKS(time_ms);
+    vsf_systimer_cnt_t tick = pdMS_TO_TICKS(time_ms);
+    // if assert here, try increase configTICK_RATE_HZ in freertos configuration
+    VSF_ARCH_ASSERT(tick != 0);
+    return tick;
 }
 
 uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
@@ -256,7 +375,7 @@ uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
 
 uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
 {
-    return tick / portTICK_PERIOD_MS;
+    return tick * portTICK_PERIOD_MS;
 }
 
 void vsf_systimer_prio_set(vsf_arch_prio_t priority)
@@ -276,22 +395,13 @@ static void __vsf_main_task(void *param)
 
 void vsf_freertos_start(void)
 {
-#if configSUPPORT_STATIC_ALLOCATION
-    xTaskCreateStatic(  __vsf_main_task,                        /* The function that implements the task being created. */
-                        "vsf",                                  /* Text name for the task - not used by the RTOS, its just to assist debugging. */
-                        dimof(__vsf_freertos.main.stack),       /* Size of the buffer passed in as the stack - in words, not bytes! */
-                        NULL,                                   /* Parameter passed into the task - not used in this case. */
-                        tskIDLE_PRIORITY + 1,                   /* Priority of the task. */
-                        __vsf_freertos.main.stack,              /* The buffer to use as the task's stack. */
-                        &__vsf_freertos.main.task);             /* The variable that will hold the task's TCB. */
-#else
     xTaskCreate(        __vsf_main_task,                        /* The function that implements the task being created. */
-                        "vsf",                                  /* Text name for the task - not used by the RTOS, its just to assist debugging. */
-                        VSF_ARCH_RTOS_CFG_STACK_DEPTH,          /* Size of the buffer passed in as the stack - in words, not bytes! */
+                        "vsf_main",                             /* Text name for the task - not used by the RTOS, its just to assist debugging. */
+                        VSF_ARCH_RTOS_CFG_MAIN_STACK_DEPTH,     /* Size of the buffer passed in as the stack - in words, not bytes! */
                         NULL,                                   /* Parameter passed into the task - not used in this case. */
-                        tskIDLE_PRIORITY + 1,                   /* Priority of the task. */
+                        tskIDLE_PRIORITY + VSF_ARCH_RTOS_CFG_BASE_PRIORITY,
+                                                                /* Priority of the task. */
                         NULL);                                  /* The pointer to the task_id. */
-#endif
 }
 
 WEAK(vAssertCalled)
@@ -318,7 +428,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
 }
 
 WEAK(vApplicationGetTimerTaskMemory)
-void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )
+void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )
 {
     static StaticTask_t xTimerTaskTCB;
     static StackType_t uxTimerTaskStack[configTIMER_TASK_STACK_DEPTH];

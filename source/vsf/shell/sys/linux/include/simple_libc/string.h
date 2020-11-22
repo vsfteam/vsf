@@ -1,17 +1,29 @@
 #ifndef __SIMPLE_LIBC_STRING_H__
 #define __SIMPLE_LIBC_STRING_H__
 
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
-#pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../sys/types.h"
+#else
+#   include <sys/types.h>
 #endif
 
-#include "sys/types.h"
+//! \note libc belongs to compiler layer in utilities, so only include compiler.h
+#include "utilities/compiler/compiler.h"
+
+#if     __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wbuiltin-requires-header"
+#   pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
+#   pragma clang diagnostic ignored "-Winconsistent-dllimport"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define strdup              __vsf_linux_strdup
 
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);
@@ -29,8 +41,6 @@ size_t strspn(const char *str1, const char *str2);
 size_t strcspn(const char *str1, const char *str2);
 char * strpbrk(const char *str1, const char *str2);
 char * strerror(int errnum);
-
-int toupper (int c);
 
 #if defined(__WIN__)
 int stricmp(const char *s1, const char *s2);
@@ -71,8 +81,8 @@ const void *memchr(const void *buf, int ch, size_t count);
 }
 #endif
 
-#if defined(__clang__)
-#pragma clang diagnostic pop
+#if     __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
 #endif
 
 // TODO: add cpp related code outside extern "C"

@@ -15,9 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-
-
-
 #ifndef __COMMON_TYPE_H__
 #define __COMMON_TYPE_H__
 
@@ -38,6 +35,55 @@ extern "C" {
 /* do not modify this */
 #include "vsf_usr_cfg.h"
 
+/*============================ TYPES =========================================*/
+
+//! \name standard error code
+//! @{
+typedef enum {
+    VSF_ERR_NOT_READY                       =1,     //!< service not ready yet
+    VSF_ERR_NONE                            =0,     //!< none error
+    VSF_ERR_UNKNOWN                         =-1,    //!< unknown error
+    VSF_ERR_NOT_SUPPORT                     =-2,    //!< function not supported
+    VSF_ERR_NOT_AVAILABLE                   =-4,    //!< service not available
+    VSF_ERR_NOT_ACCESSABLE                  =-5,    //!< target not acceesable
+    VSF_ERR_NOT_ENOUGH_RESOURCES            =-6,    //!< no enough resources
+    VSF_ERR_FAIL                            =-7,    //!< failed
+    VSF_ERR_INVALID_PARAMETER               =-8,    //!< invalid parameter
+    VSF_ERR_INVALID_RANGE                   =-9,    //!< invalid range
+    VSF_ERR_INVALID_PTR                     =-10,   //!< invalid pointer
+    VSF_ERR_INVALID_KEY                     =-11,   //!< invalid key
+    VSF_ERR_IO                              =-12,   //!< IO error
+    VSF_ERR_ALREADY_EXISTS                  =-13,   //!< already exists
+    VSF_ERR_REQ_ALREADY_REGISTERED          =-13,   //!< request all ready exist
+    VSF_ERR_BUG                             =-14,   //!< bug
+    VSF_ERR_OVERRUN                         =-15,   //!< overrun
+    VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT
+                                            =-17,   //!< the resource provided by user is not sufficient
+    VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED
+                                            =-18    //!< the provided resource is not aligned to certain size (2^N)
+} vsf_err_t;
+//! @}
+
+#ifndef __FSM_RT_TYPE__
+#define __FSM_RT_TYPE__
+//! \name finit state machine state
+//! @{
+typedef enum {
+    fsm_rt_err                              = -1,    //!< fsm error, error code can be get from other interface
+    fsm_rt_cpl                              = 0,     //!< fsm complete
+    fsm_rt_on_going                         = 1,     //!< fsm on-going
+    fsm_rt_yield                            = 1,
+    fsm_rt_wait_for_obj                     = 2,     //!< fsm wait for object
+    fsm_rt_wait_for_evt                     = 2,
+    fsm_rt_wfe                              = 2,
+    fsm_rt_asyn                             = 3,     //!< fsm asynchronose complete, you can check it later.
+    fsm_rt_user                             = 4
+} fsm_rt_t;
+//! @}
+
+#endif
+
+/*============================ INCLUDES ======================================*/
 
 /*! \note IMPORTANT
  *!       - Everytime when you try to add some 'common' header file including
@@ -56,11 +102,15 @@ extern "C" {
  *!         please move it to the plaform specific type.h
  */
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stddef.h>
-#include <assert.h>
+#if !defined(__USE_LOCAL_LIBC__)
+#   include <ctype.h>
+#   include <stdlib.h>
+#   include <string.h>
+#   include <stddef.h>
+#   include <assert.h>
+#else
+#   undef __USE_LOCAL_LIBC__
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -119,7 +169,7 @@ extern "C" {
 #define ABS(__NUM)                          (((__NUM) < 0) ? (-(__NUM)) : (__NUM))
 
 #ifndef BIT
-#   define BIT(__N)                         ((uint32_t)1 << (__N))
+#   define BIT(__N)                         (1UL << (__N))
 #endif
 #ifndef BITMASK
 #   define BITMASK(__N)                     (BIT(__N) - 1)
@@ -138,52 +188,6 @@ extern "C" {
 #define IS_FSM_ERR(__FSM_RT)                ((__FSM_RT) < fsm_rt_cpl)
 #define is_fsm_err(__FSM_RT)                IS_FSM_ERR(__FSM_RT)
 /*============================ TYPES =========================================*/
-
-//! \name standard error code
-//! @{
-typedef enum {
-    VSF_ERR_NOT_READY                       =1,     //!< service not ready yet
-    VSF_ERR_NONE                            =0,     //!< none error
-    VSF_ERR_UNKNOWN                         =-1,    //!< unknown error
-    VSF_ERR_NOT_SUPPORT                     =-2,    //!< function not supported
-    VSF_ERR_NOT_AVAILABLE                   =-4,    //!< service not available
-    VSF_ERR_NOT_ACCESSABLE                  =-5,    //!< target not acceesable
-    VSF_ERR_NOT_ENOUGH_RESOURCES            =-6,    //!< no enough resources
-    VSF_ERR_FAIL                            =-7,    //!< failed
-    VSF_ERR_INVALID_PARAMETER               =-8,    //!< invalid parameter
-    VSF_ERR_INVALID_RANGE                   =-9,    //!< invalid range
-    VSF_ERR_INVALID_PTR                     =-10,   //!< invalid pointer
-    VSF_ERR_INVALID_KEY                     =-11,   //!< invalid key
-    VSF_ERR_IO                              =-12,   //!< IO error
-    VSF_ERR_ALREADY_EXISTS                  =-13,   //!< already exists
-    VSF_ERR_REQ_ALREADY_REGISTERED          =-13,   //!< request all ready exist
-    VSF_ERR_BUG                             =-14,   //!< bug
-    VSF_ERR_OVERRUN                         =-15,   //!< overrun
-    VSF_ERR_PROVIDED_RESOURCE_NOT_SUFFICIENT
-                                            =-17,   //!< the resource provided by user is not sufficient
-    VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED
-                                            =-18    //!< the provided resource is not aligned to certain size (2^N)
-} vsf_err_t;
-//! @}
-
-#ifndef __FSM_RT_TYPE__
-#define __FSM_RT_TYPE__
-//! \name finit state machine state
-//! @{
-typedef enum {
-    fsm_rt_err                              = -1,    //!< fsm error, error code can be get from other interface
-    fsm_rt_cpl                              = 0,     //!< fsm complete
-    fsm_rt_on_going                         = 1,     //!< fsm on-going
-    fsm_rt_yield                            = 1,
-    fsm_rt_wait_for_obj                     = 2,     //!< fsm wait for object
-    fsm_rt_wait_for_evt                     = 2,
-    fsm_rt_wfe                              = 2,
-    fsm_rt_asyn                             = 3,     //!< fsm asynchronose complete, you can check it later.
-    fsm_rt_user                             = 4
-} fsm_rt_t;
-//! @}
-
-#endif
 
 #if __IS_COMPILER_IAR__
 //! start of typedef name has already been declared
@@ -321,15 +325,11 @@ typedef volatile uint32_t           reg32_t;
 #endif
 
 
-#endif // __APP_TYPE_H_INCLUDED__
-
-
 /*============================ Multiple-Entry ================================*/
 
 /*! \note it is forseeable that in certain platform or compiler, people might
  *!       have their own version of those system header files listed below
  */
-
 
 #if !defined(__USE_LOCAL_STDIO__)
 //#warning including stdio.h                                                    //! uncomment this for debugging purpose only
@@ -354,3 +354,5 @@ typedef volatile uint32_t           reg32_t;
 //#   warning user ignored standard stdarg.h                                     //! uncomment this for debugging purpose only
 #   undef __USE_LOCAL_STDARG__
 #endif
+
+#endif // __COMMON_TYPE_H__

@@ -169,28 +169,37 @@ dcl_vsf_peda_methods(static, __vk_fatfs_close)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_fs_op_t vk_fatfs_op = {
-    .mount                  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_mount),
-    .unmount                = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_unmount),
+    .fn_mount               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_mount),
+    .fn_unmount             = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_unmount),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
-    .sync                   = vk_file_dummy,
+    .fn_sync                = vk_file_dummy,
 #endif
     .fop                    = {
         .read_local_size    = sizeof(vk_fatfs_read_local),
-        .read               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_read),
-        .write              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_write),
-        .close              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_close),
-        .resize             = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_read            = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_read),
+        .fn_write           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_write),
+        .fn_close           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_close),
+        .fn_resize          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
     .dop                    = {
         .lookup_local_size  = sizeof(vk_fatfs_lookup_local),
-        .lookup             = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_lookup),
-        .create             = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .unlink             = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .chmod              = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
-        .rename             = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_lookup          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_lookup),
+        .fn_create          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_unlink          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_chmod           = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
+        .fn_rename          = (vsf_peda_evthandler_t)vsf_peda_func(vk_dummyfs_not_support),
     },
 };
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -231,104 +240,6 @@ bool vk_fatfs_is_lfn(char *name)
         }
     }
     return has_lower && has_upper;
-}
-
-// entry_num is the number of entry remain in buffer,
-//     and the entry_num of entry for current filename parsed
-// lfn is unicode encoded, but we just support ascii
-// if a filename parsed, parser->entry will point to the sfn
-bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
-{
-    fatfs_dentry_t *entry = (fatfs_dentry_t *)parser->entry;
-    bool parsed = false;
-
-    while (parser->entry_num-- > 0) {
-        if (!entry->fat.Name[0]) {
-            break;
-        } else if (entry->fat.Name[0] != (char)0xE5) {
-            char *ptr;
-            int i;
-
-            if (entry->fat.Attr == FAT_ATTR_LFN) {
-                const uint8_t lfn_offsets[] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
-                uint_fast8_t index = entry->fat.Name[0];
-                uint_fast8_t pos = ((index & 0x0F) - 1) * 13;
-                uint_fast16_t uchar;
-                uint8_t *buf = (uint8_t *)entry;
-
-                parser->lfn = index & 0x0F;
-                ptr = parser->filename + (pos << 1);
-
-                for (uint_fast8_t i = 0; i < dimof(lfn_offsets); i++) {
-                    uchar = buf[lfn_offsets[i]] + (buf[lfn_offsets[i] + 1] << 8);
-                    if (0 == uchar) {
-                        break;
-                    } else {
-                        *ptr++ = (char)(uchar >> 0);
-                        *ptr++ = (char)(uchar >> 8);
-                    }
-                }
-
-                if ((index & 0xF0) == 0x40) {
-                    *ptr++ = '\0';
-                    *ptr = '\0';
-                }
-            } else if (entry->fat.Attr != FAT_ATTR_VOLUME_ID) {
-                bool lower;
-                if (parser->lfn == 1) {
-                    // previous lfn parsed, igure sfn and return
-                    uint16_t *uchar = (uint16_t *)parser->filename;
-                    parser->is_unicode = false;
-                    while (*uchar != 0) {
-                        if (*uchar++ >= 128) {
-                            parser->is_unicode = true;
-                            break;
-                        }
-                    }
-                    if (!parser->is_unicode) {
-                        char *ptr = parser->filename;
-                        uchar = (uint16_t *)parser->filename;
-                        while (*uchar != 0) {
-                            *ptr++ = *uchar++;
-                        }
-                    }
-
-                    parser->lfn = 0;
-                    parsed = true;
-                    break;
-                }
-
-                parser->lfn = 0;
-                ptr = parser->filename;
-                lower = (entry->fat.LCase & 0x08) > 0;
-                for (i = 0; (i < 8) && (entry->fat.Name[i] != ' '); i++) {
-                    *ptr = entry->fat.Name[i];
-                    if (lower) *ptr = tolower(*ptr);
-                    ptr++;
-                }
-                if (entry->fat.Ext[0] != ' ') {
-                    *ptr++ = '.';
-                    lower = (entry->fat.LCase & 0x10) > 0;
-                    for (i = 0; (i < 3) && (entry->fat.Ext[i] != ' '); i++) {
-                        *ptr = entry->fat.Ext[i];
-                        if (lower) *ptr = tolower(*ptr);
-                        ptr++;
-                    }
-                }
-                *ptr = '\0';
-                parser->is_unicode = false;
-                parsed = true;
-                break;
-            }
-        } else if (parser->lfn > 0) {
-            // an erased entry with previous parsed lfn entry?
-            parser->lfn = 0;
-        }
-
-        entry++;
-    }
-    parser->entry = (uint8_t *)entry;
-    return parsed;
 }
 
 static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
@@ -475,6 +386,112 @@ static bool __vk_fatfs_fat_entry_is_eof(__vk_fatfs_info_t *fsinfo, uint_fast32_t
 
     cluster &= (32 == fat_bit) ? 0x0FFFFFFF : mask;
     return (cluster >= (mask - 8)) && (cluster <= mask);
+}
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
+// entry_num is the number of entry remain in buffer,
+//     and the entry_num of entry for current filename parsed
+// lfn is unicode encoded, but we just support ascii
+// if a filename parsed, parser->entry will point to the sfn
+bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
+{
+    fatfs_dentry_t *entry = (fatfs_dentry_t *)parser->entry;
+    bool parsed = false;
+
+    while (parser->entry_num-- > 0) {
+        if (!entry->fat.Name[0]) {
+            break;
+        } else if (entry->fat.Name[0] != (char)0xE5) {
+            char *ptr;
+            int i;
+
+            if (entry->fat.Attr == FAT_ATTR_LFN) {
+                const uint8_t lfn_offsets[] = {1, 3, 5, 7, 9, 14, 16, 18, 20, 22, 24, 28, 30};
+                uint_fast8_t index = entry->fat.Name[0];
+                uint_fast8_t pos = ((index & 0x0F) - 1) * 13;
+                uint_fast16_t uchar;
+                uint8_t *buf = (uint8_t *)entry;
+
+                parser->lfn = index & 0x0F;
+                ptr = parser->filename + (pos << 1);
+
+                for (uint_fast8_t i = 0; i < dimof(lfn_offsets); i++) {
+                    uchar = buf[lfn_offsets[i]] + (buf[lfn_offsets[i] + 1] << 8);
+                    if (0 == uchar) {
+                        break;
+                    } else {
+                        *ptr++ = (char)(uchar >> 0);
+                        *ptr++ = (char)(uchar >> 8);
+                    }
+                }
+
+                if ((index & 0xF0) == 0x40) {
+                    *ptr++ = '\0';
+                    *ptr = '\0';
+                }
+            } else if (entry->fat.Attr != FAT_ATTR_VOLUME_ID) {
+                bool lower;
+                if (parser->lfn == 1) {
+                    // previous lfn parsed, igure sfn and return
+                    uint16_t *uchar = (uint16_t *)parser->filename;
+                    parser->is_unicode = false;
+                    while (*uchar != 0) {
+                        if (*uchar++ >= 128) {
+                            parser->is_unicode = true;
+                            break;
+                        }
+                    }
+                    if (!parser->is_unicode) {
+                        char *ptr = parser->filename;
+                        uchar = (uint16_t *)parser->filename;
+                        while (*uchar != 0) {
+                            *ptr++ = *uchar++;
+                        }
+                    }
+
+                    parser->lfn = 0;
+                    parsed = true;
+                    break;
+                }
+
+                parser->lfn = 0;
+                ptr = parser->filename;
+                lower = (entry->fat.LCase & 0x08) > 0;
+                for (i = 0; (i < 8) && (entry->fat.Name[i] != ' '); i++) {
+                    *ptr = entry->fat.Name[i];
+                    if (lower) *ptr = tolower(*ptr);
+                    ptr++;
+                }
+                if (entry->fat.Ext[0] != ' ') {
+                    *ptr++ = '.';
+                    lower = (entry->fat.LCase & 0x10) > 0;
+                    for (i = 0; (i < 3) && (entry->fat.Ext[i] != ' '); i++) {
+                        *ptr = entry->fat.Ext[i];
+                        if (lower) *ptr = tolower(*ptr);
+                        ptr++;
+                    }
+                }
+                *ptr = '\0';
+                parser->is_unicode = false;
+                parsed = true;
+                break;
+            }
+        } else if (parser->lfn > 0) {
+            // an erased entry with previous parsed lfn entry?
+            parser->lfn = 0;
+        }
+
+        entry++;
+    }
+    parser->entry = (uint8_t *)entry;
+    return parsed;
 }
 
 __vsf_component_peda_ifs_entry(__vk_fatfs_unmount, vk_fs_unmount)
@@ -962,5 +979,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write)
     vsf_peda_begin();
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 #endif

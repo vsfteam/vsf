@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_ARCH_RTOS_IMPLEMENT
 #include "hal/arch/vsf_arch_abstraction.h"
 #include "hal/arch/__vsf_arch_interface.h"
 
@@ -26,7 +27,7 @@
 
 #if VSF_ARCH_SWI_NUM > 0
 typedef struct vsf_arch_swi_ctx_t {
-    implement(vsf_arch_irq_thread_t)
+    implement_ex(vsf_arch_irq_thread_with_stack_t, thread)
     implement(vsf_arch_irq_request_t)
 
     bool                            is_inited;
@@ -43,6 +44,10 @@ typedef struct vsf_rtos_t {
     } wakeup;
 
     vsf_arch_prio_t                 prio_base;
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_REQUEST
+    vsf_arch_irq_request_t          prio_change_req;
+#endif
+
 #if VSF_ARCH_SWI_NUM > 0
     vsf_arch_swi_ctx_t              swi[VSF_ARCH_SWI_NUM];
 #endif
@@ -59,6 +64,7 @@ static NO_INIT vsf_rtos_t __vsf_rtos;
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
+
 /*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
@@ -67,8 +73,11 @@ static NO_INIT vsf_rtos_t __vsf_rtos;
 bool vsf_arch_low_level_init(void)
 {
     memset(&__vsf_rtos, 0, sizeof(__vsf_rtos));
-    __vsf_rtos.prio_base = vsf_arch_prio_ivalid;
-    __vsf_arch_irq_request_init(&__vsf_rtos.wakeup.request);
+    __vsf_rtos.prio_base = vsf_arch_prio_invalid;
+    __vsf_arch_irq_request_init(&__vsf_rtos.wakeup.request, true);
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_REQUEST
+    __vsf_arch_irq_request_init(&__vsf_rtos.prio_change_req, false);
+#endif
     return __vsf_arch_model_low_level_init();
 }
 
@@ -76,12 +85,18 @@ bool vsf_arch_low_level_init(void)
 /*----------------------------------------------------------------------------*
  * SWI Implementation                                                         *
  *----------------------------------------------------------------------------*/
+
 static void __vsf_arch_swi_thread(void *arg)
 {
-    vsf_arch_swi_ctx_t *ctx = container_of(arg, vsf_arch_swi_ctx_t, use_as__vsf_arch_irq_thread_t);
+    vsf_arch_swi_ctx_t *ctx = container_of(arg, vsf_arch_swi_ctx_t, thread);
 
     while (1) {
         __vsf_arch_irq_request_pend(&ctx->use_as__vsf_arch_irq_request_t);
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_REQUEST
+        while (ctx->priority <= __vsf_rtos.prio_base) {
+            __vsf_arch_irq_request_pend(&__vsf_rtos.prio_change_req);
+        }
+#endif
 
         if (ctx->handler != NULL) {
             ctx->handler(ctx->param);
@@ -102,22 +117,28 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, vsf_arch_prio_t priority, vsf_swi_
         ctx->param = param;
 
         if (!ctx->is_inited) {
+            char swi_name[11];
+
             ctx->is_inited = true;
             ctx->priority = priority;
 
-            __vsf_arch_irq_request_init(&ctx->use_as__vsf_arch_irq_request_t);
-            __vsf_arch_irq_thread_start(&ctx->use_as__vsf_arch_irq_thread_t, __vsf_arch_swi_thread, priority);
-            if (ctx->priority < __vsf_rtos.prio_base) {
-                __vsf_arch_irq_thread_suspend(&ctx->use_as__vsf_arch_irq_thread_t);
+            sprintf(swi_name, "vsf_swi%d", idx);
+            __vsf_arch_irq_request_init(&ctx->use_as__vsf_arch_irq_request_t, true);
+            __vsf_arch_irq_thread_start((vsf_arch_irq_thread_t *)&ctx->thread, swi_name,
+                    __vsf_arch_swi_thread, priority, ctx->thread.stack, dimof(ctx->thread.stack));
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
+            if (ctx->priority <= __vsf_rtos.prio_base) {
+                __vsf_arch_irq_thread_suspend((vsf_arch_irq_thread_t *)&ctx->thread);
             }
+#endif
         } else if (priority != ctx->priority) {
             ctx->priority = priority;
-            __vsf_arch_irq_thread_set_priority(&ctx->use_as__vsf_arch_irq_thread_t, priority);
+            __vsf_arch_irq_thread_set_priority((vsf_arch_irq_thread_t *)&ctx->thread, priority);
         }
 
         return VSF_ERR_NONE;
     }
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
     return VSF_ERR_INVALID_PARAMETER;
 }
 
@@ -130,27 +151,36 @@ void vsf_arch_swi_trigger(uint_fast8_t idx)
         __vsf_arch_irq_request_send(&__vsf_rtos.swi[idx].use_as__vsf_arch_irq_request_t);
         return;
     }
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
 }
 
 vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 {
     vsf_arch_prio_t orig = __vsf_rtos.prio_base;
-    vsf_arch_swi_ctx_t *ctx = &__vsf_rtos.swi[0];
 
     if (orig != priority) {
         __vsf_rtos.prio_base = priority;
 
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
+        vsf_arch_swi_ctx_t *ctx = &__vsf_rtos.swi[0];
         // simply suspend thread with lower priority, resume thread with higher priority
         for (uint_fast8_t i = 0; i < dimof(__vsf_rtos.swi); i++, ctx++) {
-            if (ctx->is_inited && !__vsf_arch_model_is_current_task(&ctx->use_as__vsf_arch_irq_thread_t)) {
+            if (    ctx->is_inited
+                // do not process current irq_thread, which has same priority as current thread
+                && (    __vsf_arch_model_get_current_priority()
+                    !=  __vsf_arch_irq_thread_get_priority((vsf_arch_irq_thread_t *)&ctx->thread))) {
+
                 if (ctx->priority > priority) {
-                    __vsf_arch_irq_thread_resume(&ctx->use_as__vsf_arch_irq_thread_t);
+                    __vsf_arch_irq_thread_resume((vsf_arch_irq_thread_t *)&ctx->thread);
                 } else {
-                    __vsf_arch_irq_thread_suspend(&ctx->use_as__vsf_arch_irq_thread_t);
+                    __vsf_arch_irq_thread_suspend((vsf_arch_irq_thread_t *)&ctx->thread);
                 }
             }
         }
+#else
+        __vsf_arch_irq_request_send(&__vsf_rtos.prio_change_req);
+        __vsf_arch_irq_request_reset(&__vsf_rtos.prio_change_req);
+#endif
     }
     return orig;
 }

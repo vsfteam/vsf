@@ -27,10 +27,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-#if     defined(WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN)                            \
-    &&  defined(WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE)
-WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE_EXTERN
-#endif
+extern vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
@@ -49,11 +46,7 @@ vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
     VSF_TGUI_ASSERT(ptTile->_.tCore.Attribute.bIsRootTile == 1);
 
     if (ptTile->_.tCore.Attribute.u2RootTileType == 1) {   //vsf_tgui_tile_idx_root_t
-#ifndef WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
         return vsf_tgui_idx_root_tile_get_size(ptTile);
-#else
-        return WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE(ptTile);
-#endif
     } else {                                            //vsf_tgui_tile_buf_root_t
         return ptTile->tBufRoot.tSize;
     }

@@ -22,8 +22,13 @@
 #if VSF_USE_LINUX == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
-#include <unistd.h>
-#include <errno.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../include/unistd.h"
+#   include "../../include/errno.h"
+#else
+#   include <unistd.h>
+#   include <errno.h>
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -35,7 +40,7 @@
 
 void vsf_linux_glibc_init(void)
 {
-    
+
 }
 
 int __sync_pend(vsf_sync_t *sem)

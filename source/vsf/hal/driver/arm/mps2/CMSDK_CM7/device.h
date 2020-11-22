@@ -15,11 +15,32 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal_cfg.h"
+
+/*============================ MACROS ========================================*/
+
+/*\note first define basic info for arch. */
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+
+//! arch info
+#   define VSF_ARCH_PRI_NUM         8
+#   define VSF_ARCH_PRI_BIT         3
+
+
+// software interrupt provided by a dedicated device
+#   define VSF_DEV_SWI_NUM          7
+
+#else
+
 #ifndef __HAL_DEVICE_ARM_CMSDK_CM7_H__
 #define __HAL_DEVICE_ARM_CMSDK_CM7_H__
 
+#define VSF_DEV_SWI_LIST            24,25,26,27,28,29,30
+
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+
 /*
 #if defined(CMSDK_CM7)
 #   include "CMSDK_CM7.h"
@@ -29,22 +50,6 @@
 #   include "CMSDK_CM7_DP.h"
 #endif
 */
-/*============================ MACROS ========================================*/
-
-/*\note first define basic info for arch. */
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-#endif
-//! arch info
-#   define VSF_ARCH_PRI_NUM         8
-#   define VSF_ARCH_PRI_BIT         3
-
-
-// software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             7
-#define VSF_DEV_SWI_LIST            24,25,26,27,28,29,30
-
-/*============================ INCLUDES ======================================*/
 
 /*\note this is should be the only place where __common.h is included.*/
 #include "../common/__common.h"
@@ -139,17 +144,17 @@ enum pm_periph_async_clk_no_t{
 enum pm_sync_clk_no_t {
                         // NAME         BUS_IDX,BIT_IDX
     // AHB
-    __def_sync_clk_idx(   SyncCLK_UART0,   1,      16  ),
-    __def_sync_clk_idx(   SyncCLK_UART1,   1,      17  ),
-    __def_sync_clk_idx(   SyncCLK_UART2,   1,      18  ),
-    __def_sync_clk_idx(   SyncCLK_UART3,   1,      19  ),
+    __def_sync_clk_idx(   SCLK_UART0,   1,      16  ),
+    __def_sync_clk_idx(   SCLK_UART1,   1,      17  ),
+    __def_sync_clk_idx(   SCLK_UART2,   1,      18  ),
+    __def_sync_clk_idx(   SCLK_UART3,   1,      19  ),
 };
 
 enum pm_sync_clk_msk_t {
-    __def_msk(SyncCLK_UART0),
-    __def_msk(SyncCLK_UART1),
-    __def_msk(SyncCLK_UART2),
-    __def_msk(SyncCLK_UART3),
+    __def_msk(SCLK_UART0),
+    __def_msk(SCLK_UART1),
+    __def_msk(SCLK_UART2),
+    __def_msk(SCLK_UART3),
 };
 //! @}
 
@@ -200,6 +205,6 @@ struct pm_main_clk_cfg_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_ARM_CMSDK_CM7_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

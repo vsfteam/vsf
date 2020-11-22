@@ -49,6 +49,11 @@ dcl_vsf_peda_methods(static, __vk_scsi_mal_write)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 const vk_mal_drv_t vk_scsi_mal_drv = {
     .blksz          = __vk_scsi_mal_blksz,
     .buffer         = __vk_scsi_mal_buffer,
@@ -57,6 +62,10 @@ const vk_mal_drv_t vk_scsi_mal_drv = {
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_read),
     .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_write),
 };
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -75,6 +84,14 @@ static bool __vk_scsi_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_
     put_unaligned_be16((uint16_t)(size / pthis->block_size), &pthis->cbd[7]);
     return vk_scsi_prepare_buffer(pthis->scsi, pthis->cbd, mem);
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
 
 __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
 {
@@ -174,5 +191,11 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_write, vk_mal_write)
     }
     vsf_peda_end();
 }
+
+#if     __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
 
 #endif

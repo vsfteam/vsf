@@ -15,12 +15,18 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_X86_WIN_H__
-#define __HAL_DRIVER_X86_WIN_H__
-
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#else
+
+#ifndef __HAL_DRIVER_X86_LINUX_H__
+#define __HAL_DRIVER_X86_LINUX_H__
+
+/*============================ INCLUDES ======================================*/
 
 #include "service/vsf_service.h"
 
@@ -49,6 +55,6 @@ extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 }
 #endif
 
-
-#endif
+#endif      // __HAL_DRIVER_X86_LINUX_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

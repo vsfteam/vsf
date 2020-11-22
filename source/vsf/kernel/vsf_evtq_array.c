@@ -41,9 +41,6 @@
 SECTION(".text.vsf.kernel.eda")
 extern void vsf_eda_on_terminate(vsf_eda_t *this_ptr);
 
-SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
-extern vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq);
-
 SECTION(".text.vsf.kernel.eda")
 extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
 
@@ -84,7 +81,7 @@ vsf_err_t vsf_evtq_init(vsf_evtq_t *this_ptr)
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     this_ptr->cur.eda = NULL;
     this_ptr->cur.evt = VSF_EVT_INVALID;
-    this_ptr->cur.msg = NULL;
+    this_ptr->cur.msg = (uintptr_t)NULL;
     this_ptr->head = 0;
     this_ptr->tail = 0;
     return __vsf_os_evtq_init(this_ptr);
@@ -169,9 +166,44 @@ bool vsf_evtq_is_empty(vsf_evtq_t *this_ptr)
     return this_ptr->head == this_ptr->tail;
 }
 
+void vsf_evtq_clean_evt(vsf_evt_t evt)
+{
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    VSF_KERNEL_ASSERT(eda != NULL);
+    vsf_evtq_t *evtq = __vsf_os_evtq_get((vsf_prio_t)eda->priority);
+    uint_fast8_t size = 1 << evtq->bitsize;
+    uint_fast8_t head_idx, tail_idx;
+    vsf_evt_node_t *node;
+    vsf_evt_t node_evt;
+
+    vsf_protect_t orig = vsf_protect_int();
+        head_idx = evtq->head;
+        tail_idx = evtq->tail;
+    vsf_unprotect_int(orig);
+
+    while (head_idx != tail_idx) {
+        node = &evtq->node[head_idx];
+#if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+        node_evt = node->evt;
+#else
+        {
+            uintptr_t value = node->evt_union.value;
+            if (value & 1) {
+                node_evt = (vsf_evt_t)(value >> 1);
+            } else {
+                node_evt = VSF_EVT_MESSAGE;
+            }
+        }
+#endif
+        if ((node->eda == eda) && (node_evt == evt)) {
+            node->eda = NULL;
+        }
+        head_idx = (head_idx + 1) & (size - 1);
+    }
+}
+
 vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
 {
-    vsf_evtq_t *evtq_orig;
     vsf_evt_node_t *node;
     vsf_eda_t *eda;
     uint_fast8_t size;
@@ -180,14 +212,12 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     size = 1 << this_ptr->bitsize;
 
-    evtq_orig = __vsf_set_cur_evtq(this_ptr);
     while (!vsf_evtq_is_empty(this_ptr)) {
         node = &this_ptr->node[this_ptr->head];
         this_ptr->head = (this_ptr->head + 1) & (size - 1);
         eda = node->eda;
 
         if (eda != NULL) {
-
             if (!eda->state.bits.is_to_exit) {
                 orig = vsf_protect_int();
                     this_ptr->cur.eda = eda;
@@ -215,7 +245,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
             orig = vsf_protect_int();
                 this_ptr->cur.eda = NULL;
                 this_ptr->cur.evt = VSF_EVT_INVALID;
-                this_ptr->cur.msg = NULL;
+                this_ptr->cur.msg = (uintptr_t)NULL;
                 eda->evt_cnt--;
             vsf_unprotect_int(orig);
 
@@ -224,7 +254,6 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
             }
         }
     }
-    __vsf_set_cur_evtq(evtq_orig);
     return VSF_ERR_NONE;
 }
 #endif

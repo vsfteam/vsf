@@ -99,10 +99,10 @@ def_simple_class(vk_fs_fop_t) {
         uint8_t read_local_size;
         uint8_t write_local_size;
         uint8_t resize_local_size;
-        vsf_peda_evthandler_t close;
-        vsf_peda_evthandler_t read;
-        vsf_peda_evthandler_t write;
-        vsf_peda_evthandler_t resize;
+        vsf_peda_evthandler_t fn_close;
+        vsf_peda_evthandler_t fn_read;
+        vsf_peda_evthandler_t fn_write;
+        vsf_peda_evthandler_t fn_resize;
     )
 };
 
@@ -113,11 +113,11 @@ def_simple_class(vk_fs_dop_t) {
         uint8_t unlink_local_size;
         uint8_t chmod_local_size;
         uint8_t rename_local_size;
-        vsf_peda_evthandler_t lookup;
-        vsf_peda_evthandler_t create;
-        vsf_peda_evthandler_t unlink;
-        vsf_peda_evthandler_t chmod;
-        vsf_peda_evthandler_t rename;
+        vsf_peda_evthandler_t fn_lookup;
+        vsf_peda_evthandler_t fn_create;
+        vsf_peda_evthandler_t fn_unlink;
+        vsf_peda_evthandler_t fn_chmod;
+        vsf_peda_evthandler_t fn_rename;
     )
 };
 
@@ -130,8 +130,8 @@ def_simple_class(vk_fs_op_t) {
 #if VSF_FS_CFG_USE_CACHE == ENABLED
         uint8_t sync_local_size;
 #endif
-        vsf_peda_evthandler_t mount;
-        vsf_peda_evthandler_t unmount;
+        vsf_peda_evthandler_t fn_mount;
+        vsf_peda_evthandler_t fn_unmount;
 #if VSF_FS_CFG_USE_CACHE == ENABLED
         vsf_peda_evthandler_t sync;
 #endif
@@ -187,8 +187,8 @@ def_simple_class(vk_vfs_file_t) {
             struct {
                 void *data;
                 struct {
-                    void (*read)(uintptr_t target, vsf_evt_t evt);
-                    void (*write)(uintptr_t target, vsf_evt_t evt);
+                    void (*fn_read)(uintptr_t target, vsf_evt_t evt);
+                    void (*fn_write)(uintptr_t target, vsf_evt_t evt);
                 } callback;
             } f;
             struct {

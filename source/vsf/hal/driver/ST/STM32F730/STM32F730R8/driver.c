@@ -28,7 +28,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO: if these initialization is implemented in startup file, remove here
-char __low_level_init(void)
+int __low_level_init(void)
 {
     return 1;
 }

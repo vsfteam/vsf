@@ -1,11 +1,40 @@
 #ifndef __PTHREAD_H__
 #define __PTHREAD_H__
 
-#include <time.h>
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
+#   include "./simple_libc/time.h"
+#else
+#   include <time.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define pthread_self                __vsf_linux_pthread_self
+#define pthread_create              __vsf_linux_pthread_create
+#define pthread_join                __vsf_linux_pthread_join
+#define pthread_exit                __vsf_linux_pthread_exit
+#define pthread_cancel              __vsf_linux_pthread_cancel
+#define pthread_kill                __vsf_linux_pthread_kill
+
+#define pthread_key_create          __vsf_linux_pthread_key_create
+#define pthread_setspecific         __vsf_linux_pthread_setspecific
+#define pthread_getspecific         __vsf_linux_pthread_getspecific
+
+#define pthread_mutex_init          __vsf_linux_pthread_mutex_init
+#define pthread_mutex_destroy       __vsf_linux_pthread_mutex_destroy
+#define pthread_mutex_lock          __vsf_linux_pthread_mutex_lock
+#define pthread_mutex_unlock        __vsf_linux_pthread_mutex_unlock
+
+#define pthread_cond_init           __vsf_linux_pthread_cond_init
+#define pthread_cond_destroy        __vsf_linux_pthread_cond_destroy
+#define pthread_cond_signal         __vsf_linux_pthread_cond_signal
+#define pthread_cond_broadcast      __vsf_linux_pthread_cond_broadcast
+#define pthread_cond_wait           __vsf_linux_pthread_cond_wait
+#define pthread_cond_timedwait      __vsf_linux_pthread_cond_timedwait
 
 // PTHREAD_MUTEX_INITIALIZER is not support, please use pthread_mutex_init
 //#define PTHREAD_MUTEX_INITIALIZER       { 0 }

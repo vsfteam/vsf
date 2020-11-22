@@ -21,6 +21,7 @@
 #include "kernel/vsf_kernel_cfg.h"
 
 #if VSF_USE_KERNEL == ENABLED
+#include "hal/arch/vsf_arch.h"
 #include "service/vsf_service.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
@@ -1205,7 +1206,7 @@ extern vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us);
 #   endif
 
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
-extern vsf_err_t vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
+extern vsf_err_t vsf_teda_cancel_timer(void);
 
 #if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_init")

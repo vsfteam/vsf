@@ -1,0 +1,7 @@
+{
+    "idf.adapterTargetName": "esp32s2",
+    "idf.openOcdConfigs": [
+        "./esp32s2_jlink.cfg"
+        //"./esp32s2_xds100v2.cfg"
+    ]
+}

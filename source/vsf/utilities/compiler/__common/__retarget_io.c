@@ -33,12 +33,7 @@
 
 #if VSF_USE_POSIX == ENABLED
 #include <sys/types.h>
-
-extern ssize_t read(int fd, void *buf, size_t size);
-extern ssize_t write(int fd, const void *buf, size_t size);
-extern off_t lseek(int fd, off_t offset, int whence);
-extern void close(int fd);
-extern int open(const char *path_name, int flags, mode_t mode);
+#include <unistd.h>
 
 void vsf_stdio_init(void)
 {
@@ -123,7 +118,7 @@ SECTION(".vsf.utilities.stdio.iar.__write")
 size_t __write(int handle, const unsigned char *buf, size_t buf_size)
 {
 #if VSF_USE_POSIX == ENABLED
-    return write(handle, buf, buf_size);
+    return write(handle, (void *)buf, buf_size);
 #else
     size_t nChars = 0;
     /* Check for the command to flush all handles */

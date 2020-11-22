@@ -21,9 +21,11 @@
 
 #if VSF_USE_LINUX == ENABLED
 
-#include "./vsf_linux.h"
-
-#include <unistd.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "./include/unistd.h"
+#else
+#   include <unistd.h>
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

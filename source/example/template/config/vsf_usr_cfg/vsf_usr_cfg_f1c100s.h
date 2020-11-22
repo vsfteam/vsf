@@ -41,12 +41,20 @@
 #define APP_USE_TGUI_DEMO                               DISABLED
 //  TODO: need test for c++ support
 #define APP_USE_CPP_DEMO                                DISABLED
+#define APP_USE_HAL_DEMO                                ENABLED
+#   define APP_USE_HAL_USART_DEMO                       ENABLED
+// TODO: USART DMA is implemented in f1c100s, so REQUEST_TEST is not supported
+#       define APP_USART_DEMO_CFG_REQUEST_TEST              DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST  DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
+#       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               ENABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
+#   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                32
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    640
@@ -105,6 +113,7 @@
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
+#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0

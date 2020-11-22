@@ -186,11 +186,11 @@
 #else
 #   define __describ_tgui_panel(__NAME, __VAR, ...)                             \
     __VAR = (__NAME){                                                           \
-        .parent_ptr = NULL,                                                       \
-        .id = VSF_TGUI_COMPONENT_ID_PANEL,                                    \
+        .parent_ptr = NULL,                                                     \
+        .id = VSF_TGUI_COMPONENT_ID_PANEL,                                      \
         .is_container = true,                                                   \
         .is_top = true,                                                         \
-        .node_ptr =  (vsf_msgt_node_t*)&((__VAR).__NAME##_FirstNode),             \
+        .node_ptr =  (vsf_msgt_node_t*)&((__VAR).__NAME##_FirstNode),           \
         .bIsEnabled = true,                                                     \
         .bIsVisible = true,                                                     \
         VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                    \

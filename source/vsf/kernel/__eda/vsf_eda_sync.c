@@ -28,6 +28,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
+
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -82,19 +86,6 @@ static vsf_eda_t *__vsf_eda_sync_get_eda_pending(vsf_sync_t *sync)
     return eda;
 }
 
-SECTION(".text.vsf.kernel.vsf_sync")
-static vsf_err_t __vsf_eda_sync_remove_eda(vsf_sync_t *sync, vsf_eda_t *eda)
-{
-    vsf_protect_t lock_status = vsf_protect_sched();
-        vsf_dlist_remove(
-            vsf_eda_t, pending_node,
-            &sync->pending_list,
-            eda);
-    vsf_unprotect_sched(lock_status);
-
-    return VSF_ERR_NONE;
-}
-
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
@@ -110,20 +101,27 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     vsf_sync_reason_t reason = VSF_SYNC_FAIL;
+    vsf_protect_t origlevel;
 
     VSF_KERNEL_ASSERT((sync != NULL) && (eda != NULL));
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     if (evt == VSF_EVT_TIMER) {
+        origlevel = vsf_protect_sched();
         if (eda->state.bits.is_sync_got) {
+            vsf_unprotect_sched(origlevel);
             return VSF_SYNC_PENDING;
         }
         if (dequeue_eda) {
-            __vsf_eda_sync_remove_eda(sync, eda);
+            vsf_dlist_remove(
+                vsf_eda_t, pending_node,
+                &sync->pending_list,
+                eda);
         }
+        vsf_unprotect_sched(origlevel);
         reason = VSF_SYNC_TIMEOUT;
     } else {
-        vsf_teda_cancel_timer((vsf_teda_t *)eda);
+        __vsf_teda_cancel_timer((vsf_teda_t *)eda);
 #else
     {
 #endif

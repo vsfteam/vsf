@@ -57,6 +57,8 @@
 #define APP_USE_LWIP_DEMO                               DISABLED
 
 
+#define VSF_OS_CFG_MAIN_MODE                            VSF_OS_CFG_MAIN_MODE_IDLE
+
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED

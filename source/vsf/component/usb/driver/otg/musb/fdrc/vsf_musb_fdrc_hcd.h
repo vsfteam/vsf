@@ -25,6 +25,8 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED
 
 #include "component/usb/vsf_usb.h"
+// for i_usb_hc_ip_t
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

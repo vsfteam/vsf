@@ -21,8 +21,15 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 
-#include <unistd.h>
-#include <sys/time.h>
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "../../include/unistd.h"
+#   include "../../include/simple_libc/time.h"
+#   include "../../include/sys/time.h"
+#else
+#   include <unistd.h>
+#   include <time.h>
+#   include <sys/time.h>
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -96,4 +103,4 @@ int setitimer(int which, const struct itimerval *new_valie, struct itimerval *ol
 #   pragma clang diagnostic pop
 #endif
 
-#endif      // VSF_USE_LINUX
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_TIME

@@ -15,11 +15,26 @@
  *                                                                           *
  ****************************************************************************/
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal_cfg.h"
+
+/*============================ MACROS ========================================*/
+
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+
+/*\note first define basic info for arch. */
+//! arch info
+#   define VSF_ARCH_PRI_NUM         16
+#   define VSF_ARCH_PRI_BIT         4
+
+#else
+
 #ifndef __HAL_DEVICE_WINNERMICRO_W600_H__
 #define __HAL_DEVICE_WINNERMICRO_W600_H__
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+
 #include "../common/common.h"
 
 /*============================ MACROS ========================================*/
@@ -41,6 +56,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __HAL_DEVICE_WINNERMICRO_W600_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

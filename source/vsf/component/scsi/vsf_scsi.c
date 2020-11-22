@@ -113,6 +113,7 @@ uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd)
     case SCSI_GROUPCODE12:      return 12;
     }
     VSF_SCSI_ASSERT(false);
+    return 0;
 }
 
 bool vk_scsi_get_rw_param(uint8_t *cbd, uint64_t *addr, uint32_t *size)

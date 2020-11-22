@@ -83,14 +83,14 @@ static void __vsf_usart_dma_irqhandler(void *param, __dma_channel_t *channel);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if USART_COUNT > 0 && VSF_HAL_USE_USART0 == ENABLED
+#if USART_MAX_PORT >= 0 && VSF_HAL_USE_USART0 == ENABLED
 #   if VSF_HAL_USE_LV1
 __VSF_USART_LV1_IMPL(0)
 #   endif
 __USART_LV0_IMPL(0, NULL)
 #endif
 
-#if USART_COUNT > 1 && VSF_HAL_USE_USART1 == ENABLED
+#if USART_MAX_PORT >= 1 && VSF_HAL_USE_USART1 == ENABLED
 #   if VSF_HAL_USE_LV1
 __VSF_USART_LV1_IMPL(1)
 #   endif

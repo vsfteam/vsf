@@ -15,11 +15,14 @@
  *                                                                           *
  ****************************************************************************/
 
-
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
-#include "utilities/vsf_utilities.h"
+
+#ifndef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   include "utilities/vsf_utilities.h"
+#endif
+
 /*! \note User can define VSF_DRIVER_HEADER to specify the targer device driver
  *!       header file. If it is not specified, this driver abstraction header
  *!       file will use predefined device-specific macros to decide which device
@@ -42,15 +45,17 @@
 #   elif    defined(__SiliconLabs__)
 #       define  VSF_DRIVER_HEADER       "./SiliconLabs/driver.h"
 #   elif    defined(__GigaDevice__)
-#		define  VSF_DRIVER_HEADER       "./GigaDevice/driver.h"
+#       define  VSF_DRIVER_HEADER       "./GigaDevice/driver.h"
 #   elif    defined(__TI__)
-#		define  VSF_DRIVER_HEADER       "./TI/driver.h"
+#       define  VSF_DRIVER_HEADER       "./TI/driver.h"
 #   elif    defined(__ST__)
 #       define  VSF_DRIVER_HEADER       "./ST/driver.h"
 #   elif    defined(__WCH__)
 #       define  VSF_DRIVER_HEADER       "./WCH/driver.h"
 #   elif    defined(__Allwinner__)
 #       define  VSF_DRIVER_HEADER       "./Allwinner/driver.h"
+#   elif    defined(__Espressif__)
+#       define  VSF_DRIVER_HEADER       "./Espressif/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"
@@ -76,7 +81,7 @@
 #   include    VSF_DRIVER_HEADER
 #endif
 
-#ifndef __HAL_DRIVER_H__
+#if !defined(__HAL_DRIVER_H__) && !defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 #define __HAL_DRIVER_H__
 
 #ifdef __cplusplus

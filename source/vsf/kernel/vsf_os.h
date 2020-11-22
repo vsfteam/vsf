@@ -26,41 +26,46 @@
 #include "./vsf_evtq.h"
 #include "./task/vsf_task.h"
 
+// for VSF_USER_ENTRY macro if exists in arch
+#include "hal/arch/vsf_arch.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
 
-typedef vsf_arch_prio_t vsf_sched_lock_status_t;
+#ifndef VSF_USER_ENTRY
+#   define VSF_USER_ENTRY                   main
+#endif
 
 #if VSF_OS_CFG_PRIORITY_NUM > 1
 
-#   define VSF_SCHED_SAFE_CODE_REGION   VSF_FORCED_SCHED_SAFE_CODE_REGION
-#   define __vsf_sched_safe(...)        __vsf_forced_sched_safe(__VA_ARGS__)
+#   define VSF_SCHED_SAFE_CODE_REGION       VSF_FORCED_SCHED_SAFE_CODE_REGION
+#   define __vsf_sched_safe(...)            __vsf_forced_sched_safe(__VA_ARGS__)
 
-#   define vsf_sched_lock()             vsf_forced_sched_lock()
-#   define vsf_sched_unlock(__level)    vsf_forced_sched_unlock((vsf_sched_lock_status_t)(__level))
-#   define vsf_sched_safe()             vsf_forced_sched_safe()
-#   define vsf_sched_safe_exit()        vsf_forced_sched_safe_exit(lock_status)
+#   define vsf_sched_lock()                 vsf_forced_sched_lock()
+#   define vsf_sched_unlock(__level)        vsf_forced_sched_unlock((vsf_sched_lock_status_t)(__level))
+#   define vsf_sched_safe()                 vsf_forced_sched_safe()
+#   define vsf_sched_safe_exit()            vsf_forced_sched_safe_exit(lock_status)
 
 #else
 
-#   define VSF_SCHED_SAFE_CODE_REGION   DEFAULT_CODE_REGION_NONE
-#   define vsf_sched_lock()             0
-#   define vsf_sched_unlock(__level)    UNUSED_PARAM(__level)
-#   define vsf_sched_safe()             if (1)
+#   define VSF_SCHED_SAFE_CODE_REGION       DEFAULT_CODE_REGION_NONE
+#   define vsf_sched_lock()                 0
+#   define vsf_sched_unlock(__level)        UNUSED_PARAM(__level)
+#   define vsf_sched_safe()                 if (1)
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#       define __vsf_sched_safe(__code) __code
+#       define __vsf_sched_safe(__code)     __code
 #   else
-#       define __vsf_sched_safe(...)    __VA_ARGS__
+#       define __vsf_sched_safe(...)        __VA_ARGS__
 #   endif
 #   define vsf_sched_safe_exit()
 
 #endif
 
-#   define vsf_protect_scheduler()              vsf_sched_lock()
-#   define vsf_unprotect_scheduler(__state)     vsf_sched_unlock((__state))
+#define vsf_protect_scheduler()             vsf_sched_lock()
+#define vsf_unprotect_scheduler(__state)    vsf_sched_unlock((__state))
 
 
 
@@ -72,18 +77,20 @@ typedef vsf_arch_prio_t vsf_sched_lock_status_t;
             vsf_forced_sched_unlock(lock_status);                               \
         }
 
-#define vsf_forced_sched_safe()         code_region(&VSF_SCHED_SAFE_CODE_REGION)
-#define vsf_forced_sched_safe_exit()    vsf_forced_sched_unlock((vsf_sched_lock_status_t)(lock_status))
-#define vsf_protect_forced_scheduler()  vsf_forced_sched_lock()
+#define vsf_forced_sched_safe()             code_region(&VSF_SCHED_SAFE_CODE_REGION)
+#define vsf_forced_sched_safe_exit()        vsf_forced_sched_unlock((vsf_sched_lock_status_t)(lock_status))
+#define vsf_protect_forced_scheduler()      vsf_forced_sched_lock()
 #define vsf_unprotect_forced_scheduler(__state)                                 \
             vsf_forced_sched_unlock((vsf_sched_lock_status_t)(__state))
 #endif
 
-#define vsf_protect_sched()             (vsf_protect_t)vsf_protect_scheduler()
-#define vsf_unprotect_sched(__prot)     vsf_unprotect_scheduler(__prot)
+#define vsf_protect_sched()                 (vsf_protect_t)vsf_protect_scheduler()
+#define vsf_unprotect_sched(__prot)         vsf_unprotect_scheduler(__prot)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef vsf_arch_prio_t vsf_sched_lock_status_t;
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 declare_vsf_pool(vsf_evt_node_pool)

@@ -22,14 +22,6 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if !defined(VSF_ARCH_RTOS_MODEL_HEADER)
-#   if   defined(__FREERTOS__)
-#       define VSF_ARCH_RTOS_MODEL_HEADER           "./freertos/freertos_generic.h"
-#   else
-#       error no supported rtos found
-# endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,7 +56,40 @@ extern "C" {
 #   define VSF_USER_ENTRY                   vsf_main
 #endif
 
+#define VSF_ARCH_RTOS_MODE_SUSPEND_RESUME   1
+#define VSF_ARCH_RTOS_MODE_REQUEST          2
+
+// TODO: remove suspend/resume mode later if request mode is tested OK
+#define VSF_ARCH_RTOS_CFG_MODE              VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __VSF_ARCH_PRI(__N, __UNUSED)                                           \
+            VSF_ARCH_PRIO_##__N = (__N),                                        \
+            vsf_arch_prio_##__N = (__N),
+
+/*============================ TYPES =========================================*/
+
+typedef enum vsf_arch_prio_t {
+    VSF_ARCH_PRIO_INVALID = -1,
+    vsf_arch_prio_invalid = -1,
+    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, __UNUSED)
+    vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
+} vsf_arch_prio_t;
+
 /*============================ INCLUDES ======================================*/
+
+#if !defined(VSF_ARCH_RTOS_MODEL_HEADER)
+#   if   defined(__FREERTOS__)
+#       define VSF_ARCH_RTOS_MODEL_HEADER           "./freertos/freertos_generic.h"
+#   else
+#       error no supported rtos found
+# endif
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 // rtos_model contains:
 //  1. vsf_systimer_cnt_t if sys timer is enabled
@@ -77,57 +102,80 @@ extern "C" {
 //  8. gint
 #include VSF_ARCH_RTOS_MODEL_HEADER
 
+#if     defined(__VSF_ARCH_RTOS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#endif
+
+#include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_ARCH_RTOS_CFG_SET_STACK
+#   define VSF_ARCH_LIMIT_NO_SET_STACK
+#endif
 
 #if VSF_ARCH_SWI_NUM > VSF_ARCH_RTOS_PRIORITY_NUM
 #   error too many SWI to support in the current rtos configuration
 #endif
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
-
-#define __VSF_ARCH_PRI(__N, __UNUSED)                                           \
-            VSF_ARCH_PRIO_##__N = (__N),                                        \
-            vsf_arch_prio_##__N = (__N),
-
 /*============================ TYPES =========================================*/
 
 typedef void (*vsf_arch_irq_thread_entry_t)(void*);
 
-typedef enum vsf_arch_prio_t {
-    VSF_ARCH_PRIO_IVALID = -1,
-    vsf_arch_prio_ivalid = -1,
-    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI, __UNUSED)
-    vsf_arch_prio_highest = VSF_ARCH_PRI_NUM - 1,
-} vsf_arch_prio_t;
+dcl_simple_class(vsf_arch_irq_thread_with_stack_t)
+def_simple_class(vsf_arch_irq_thread_with_stack_t) {
+    private_member(
+        implement(vsf_arch_irq_thread_t)
+
+#ifdef VSF_ARCH_CFG_STACK_ALIGN_BIT
+        VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH] ALIGN(1 << VSF_ARCH_CFG_STACK_ALIGN_BIT);
+#else
+        VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH];
+#endif
+    )
+};
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request);
+extern void __vsf_arch_delay_ms(uint_fast32_t ms);
+
+extern void __vsf_arch_irq_request_init(vsf_arch_irq_request_t *request, bool auto_reset);
 extern void __vsf_arch_irq_request_fini(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request);
 extern void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request);
+extern void __vsf_arch_irq_request_reset(vsf_arch_irq_request_t *request);
 
-extern void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread, vsf_arch_irq_thread_entry_t entry, vsf_arch_prio_t priority);
+extern void __vsf_arch_irq_enter(void);
+extern void __vsf_arch_irq_leave(void);
+
+// if priority < 0, then inherit from current priority
+extern void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread,
+        const char * const name, vsf_arch_irq_thread_entry_t entry, vsf_arch_prio_t priority,
+        VSF_ARCH_RTOS_STACK_T *stack, uint_fast32_t stack_depth);
+extern void __vsf_arch_irq_thread_exit(void);
 extern void __vsf_arch_irq_thread_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority);
+
+#if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
 extern void __vsf_arch_irq_thread_suspend(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_thread_resume(vsf_arch_irq_thread_t *irq_thread);
+extern vsf_arch_prio_t __vsf_arch_irq_thread_get_priority(vsf_arch_irq_thread_t *irq_thread);
+#endif
 
 // for rtos support, vsf_arch_wakeup is used to wakeup vsf thread
 extern void vsf_arch_wakeup(void);
 
-// TODO: how to implement vsf_arch_set_stack ?
+#ifndef VSF_ARCH_LIMIT_NO_SET_STACK
 static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
 {
-//    VSF_ARCH_ASSERT(false);
-    // TODO: remove after tested
-#if     defined(__CPU_X86__)
-    __asm__("movl %0, %%esp" : : "r"(stack));
-#elif   defined(__CPU_X64__)
-    __asm__("movq %0, %%rsp" : : "r"(stack));
-#endif
+    VSF_ARCH_RTOS_CFG_SET_STACK(stack);
 }
+#endif
 
 #ifdef __cplusplus
 }

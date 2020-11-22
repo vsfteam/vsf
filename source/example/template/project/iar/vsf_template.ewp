@@ -228,6 +228,7 @@
                     <state>HAS_STD_MALLOC</state>
                     <state>HAS_AWTK_CONFIG</state>
                     <state>FT2_BUILD_LIBRARY</state>
+                    <state>CONFIG_EVM_ECMA=1</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -288,7 +289,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>01011110</state>
+                    <state>11111110</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -353,6 +354,8 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\demo\evm_demo\evm\include</state>
+                    <state>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\DSP\Include</state>
@@ -1365,7 +1368,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>01011110</state>
+                    <state>11111110</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -2434,7 +2437,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>01011110</state>
+                    <state>11111110</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -3503,7 +3506,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>01011110</state>
+                    <state>11111110</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -4428,6 +4431,96 @@
                 <name>cpp_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\cpp_demo\cpp_demo.cpp</name>
+                </file>
+            </group>
+            <group>
+                <name>evm_demo</name>
+                <excluded>
+                    <configuration>vsf_template_m484</configuration>
+                    <configuration>vsf_template_f1c100s</configuration>
+                    <configuration>vsf_template_gd32e103</configuration>
+                    <configuration>vsf_template_mt071</configuration>
+                </excluded>
+                <group>
+                    <name>evm</name>
+                    <group>
+                        <name>components</name>
+                    </group>
+                    <group>
+                        <name>lib</name>
+                        <group>
+                            <name>cortex-m3</name>
+                            <excluded>
+                                <configuration>vsf_template_m484</configuration>
+                            </excluded>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m3\libejs.a</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m3\libepy.a</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m3\libeqml.a</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>cortex-m4</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m4\libejs.a</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
+                        <name>modules</name>
+                        <group>
+                            <name>ecma</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_array.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_math.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_number.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_object.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_regexp.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_string.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\re.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\re.h</name>
+                            </file>
+                        </group>
+                    </group>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_board.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_library_patch.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_main.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_module.c</name>
                 </file>
             </group>
             <group>
@@ -6986,6 +7079,15 @@
                 </group>
                 <group>
                     <name>common</name>
+                    <group>
+                        <name>usart</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\usart\__usart_common.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\usart\__usart_common.inc</name>
+                        </file>
+                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\common.h</name>
                     </file>
@@ -7474,6 +7576,27 @@
                         <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
+                        <name>STM32F103</name>
+                        <group>
+                            <name>STM32F103ZE</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\device.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\driver.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\driver.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\startup_stm32f103xe.s</name>
+                            </file>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\__device.h</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>STM32F730</name>
                         <group>
                             <name>common</name>
@@ -7491,21 +7614,6 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\common\__common.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>STM32F103ZE</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\device.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\driver.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\driver.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F103\STM32F103ZE\startup_stm32f103xe.s</name>
                             </file>
                         </group>
                         <group>
@@ -7586,6 +7694,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\AM335X\AM3352\driver.h</name>
                             </file>
                         </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\AM335X\__device.h</name>
+                        </file>
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\driver.h</name>
@@ -7750,6 +7861,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\W600\driver.h</name>
                             </file>
                         </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\__device.h</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\device.h</name>
                         </file>
@@ -7930,12 +8044,6 @@
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\customised\driver.h</name>
-                    </file>
-                </group>
-                <group>
-                    <name>device_specific</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\osa_hal\driver\device_specific\driver.h</name>
                     </file>
                 </group>
                 <file>
@@ -8209,10 +8317,16 @@
                         <group>
                             <name>simple_libc</name>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\ctype.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stddef.h</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdio.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\stdlib.h</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc\string.h</name>
@@ -8284,6 +8398,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_pthread.c</name>
                             </file>
                             <file>
@@ -8294,6 +8411,9 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_stdlib.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_string.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_time.c</name>

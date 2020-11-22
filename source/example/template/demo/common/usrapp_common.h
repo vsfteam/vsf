@@ -70,9 +70,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_FS == ENABLED
+#if     VSF_USE_FS == ENABLED                                                   \
+    &&  (   VSF_MAL_USE_FAKEFAT32_MAL == ENABLED                                \
+        ||  VSF_FS_USE_MEMFS == ENABLED                                         \
+        ||  VSF_FS_USE_WINFS == ENABLED)
+
 typedef struct usrapp_common_t {
-#   if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
+#   if      VSF_USE_MAL == ENABLED                                              \
+        &&  VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
     struct {
 #       if VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
         vk_fakefat32_mal_t fakefat32;
@@ -80,7 +85,8 @@ typedef struct usrapp_common_t {
     } mal;
 #   endif
 
-#   if VSF_USE_FS == ENABLED
+#   if      VSF_USE_FS == ENABLED                                               \
+        &&  (VSF_FS_USE_MEMFS == ENABLED || VSF_FS_USE_WINFS == ENABLED)
     struct {
 #       if VSF_FS_USE_MEMFS == ENABLED
         vk_memfs_info_t memfs_info;
@@ -95,7 +101,10 @@ typedef struct usrapp_common_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_USE_FS == ENABLED
+#if     VSF_USE_FS == ENABLED                                                   \
+    &&  (   VSF_MAL_USE_FAKEFAT32_MAL == ENABLED                                \
+        ||  VSF_FS_USE_MEMFS == ENABLED                                         \
+        ||  VSF_FS_USE_WINFS == ENABLED)
 extern usrapp_common_t usrapp_common;
 #endif
 
