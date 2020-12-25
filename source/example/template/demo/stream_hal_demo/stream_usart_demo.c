@@ -65,7 +65,7 @@ static vsf_stream_usart_t __stream_usart = {
 int stream_usart_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

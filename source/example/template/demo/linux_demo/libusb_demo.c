@@ -1,8 +1,26 @@
-#include <unistd.h>
-#include <stdio.h>
+#include "shell/sys/linux/vsf_linux_cfg.h"
 
 #if VSF_LINUX_USE_LIBUSB == ENABLED && APP_USE_LINUX_LIBUSB_DEMO == ENABLED
-#include <libusb.h>
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
+#   include "shell/sys/linux/include/unistd.h"
+#   include "shell/sys/linux/include/libusb.h"
+#else
+#   include <unistd.h>
+#   include <libusb.h>
+#endif
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
+#   include "shell/sys/linux/include/simple_libc/stdio.h"
+#else
+#   include <stdio.h>
+#endif
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
+#   include "shell/sys/linux/include/simple_libc/string.h"
+#else
+#   include <string.h>
+#endif
 
 int lsusb_main(int argc, char *argv[])
 {

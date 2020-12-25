@@ -32,10 +32,6 @@ declare_class(vsf_tgui_t)
 #   define VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES 			    DISABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR       VSF_TGUI_COLOR_BLACK
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -78,7 +74,7 @@ fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
     VSF_TGUI_ASSERT(container_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-    if (!container_ptr->use_as__vsf_tgui_v_container_t.bIsNoBackgroundColor) {
+    if (!container_ptr->bIsNoBackgroundColor) {
         vsf_tgui_control_t* control_ptr = (vsf_tgui_control_t*)container_ptr;
         vsf_tgui_sv_color_t tColor = tBackground;
         vsf_tgui_region_t tRegion = { 0 };
@@ -169,7 +165,7 @@ fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
     }
 #endif
 
-    return vsf_tgui_control_v_rendering((vsf_tgui_control_t *)container_ptr, ptDirtyRegion, tMode);
+    return __vk_tgui_control_v_rendering((vsf_tgui_control_t *)container_ptr, ptDirtyRegion, tMode, true);
 }
 
 
@@ -187,7 +183,7 @@ fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t *)container_ptr), container_ptr);
 #endif
 
-    return __vk_tgui_container_v_rendering(container_ptr, ptDirtyRegion, tMode, VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR);
+    return __vk_tgui_container_v_rendering(container_ptr, ptDirtyRegion, tMode,  container_ptr->tBackgroundColor);
 }
 
 fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_container_t* container_ptr,

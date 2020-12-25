@@ -47,7 +47,10 @@ static NO_INIT usrapp_msgq_test_t usrapp_msgq;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-implement_vsf_pool(usrapp_msg_pool, usrapp_msg_t);
+//implement_vsf_pool(usrapp_msg_pool, usrapp_msg_t);
+#define __name usrapp_msg_pool
+#define __type usrapp_msg_t
+#include "service/pool/impl_vsf_pool.inc"
 
 static void usrapp_msgq_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {

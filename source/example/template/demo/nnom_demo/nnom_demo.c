@@ -95,7 +95,7 @@ void ai_demo_mnist(uint_fast8_t index)
 int nnom_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

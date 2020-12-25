@@ -26,8 +26,13 @@
 #if VSF_HAL_USE_USART == ENABLED
 #include "hal/interface/vsf_interface_usart.h"
 
-#define VSF_HAL_USART_IMP_REQUEST_BY_FIFO
-#include "hal/driver/common/usart/__usart_common.h"
+#ifndef VSF_HAL_USART_IMP_REQUEST_BY_FIFO
+#   define VSF_HAL_USART_IMP_REQUEST_BY_FIFO    ENABLED
+#endif
+
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
+#   include "hal/driver/common/usart/__usart_common.h"
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -58,23 +63,23 @@ enum em_usart_mode_t {
     USART_6_BIT_LENGTH          = LCR_DLS_6,
     USART_7_BIT_LENGTH          = LCR_DLS_7,
     USART_8_BIT_LENGTH          = LCR_DLS_8,
-                                
+
     USART_1_STOPBIT             = LCR_STOP_1,
     USART_2_STOPBIT             = LCR_STOP_2,
-                                
+
     USART_NO_PARITY             = 0x0000U,
     USART_EVEN_PARITY           = LCR_PEN | LCR_EPS_EVEN,
     USART_ODD_PARITY            = LCR_PEN | LCR_EPS_ODD,
-                                
+
     USART_LOOP_BACK_MODE        = MCR_LOOP << 8,
     USART_AUTO_FLOW_CONTROL     = MCR_AFCE << 8,
     USART_IRDA_SIR_MODE         = MCR_SIRE << 8,
-    
+
     USART_TX_FIFO_THRES_EMPTY   = FCR_TFT_EMPTY   << 16,
     USART_TX_FIFO_THRES_2       = FCR_TFT_2       << 16,
     USART_TX_FIFO_THRES_QUARTER = FCR_TFT_QUARTER << 16,
     USART_TX_FIFO_THRES_HALF    = FCR_TFT_HALF    << 16,
-    
+
     USART_RX_FIFO_THRES_1       = FCR_RT_1        << 16,
     USART_RX_FIFO_THRES_QUARTER = FCR_RT_QUARTER  << 16,
     USART_RX_FIFO_THRES_HALF    = FCR_RT_HALF     << 16,
@@ -88,6 +93,11 @@ enum em_usart_mode_t {
 enum em_usart_irq_mask_t {
     USART_IRQ_MASK_RX           = IER_ERBFI,
     USART_IRQ_MASK_TX           = IER_ETBEI,
+
+#ifdef VSF_HAL_USART_IMP_REQUEST_BY_FIFO
+    USART_IRQ_MASK_TX_CPL       = (1UL << 2),
+    USART_IRQ_MASK_RX_CPL       = (1UL << 3),
+#endif
 };
 
 struct usart_status_t {

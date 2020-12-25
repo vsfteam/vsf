@@ -30,7 +30,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_usb_xb360_gamepad_in_report_t {
+typedef struct vsf_usb_xb360_gamepad_in_report_t vsf_usb_xb360_gamepad_in_report_t;
+struct vsf_usb_xb360_gamepad_in_report_t {
     uint8_t type;           // data0
     uint8_t length;         // data1
     uint8_t up:1;           // data2
@@ -56,11 +57,12 @@ typedef struct vsf_usb_xb360_gamepad_in_report_t {
     int16_t rx;             // data10 - data11
     int16_t ry;             // data12 - data13
     uint8_t dummy2[6];      // data14 - data19
-} PACKED vsf_usb_xb360_gamepad_in_report_t;
+} PACKED;
 
-typedef struct vsf_usb_xb360_gamepad_out_report_t {
+typedef struct vsf_usb_xb360_gamepad_out_report_t vsf_usb_xb360_gamepad_out_report_t;
+struct vsf_usb_xb360_gamepad_out_report_t {
     uint8_t buffer[8];
-} PACKED vsf_usb_xb360_gamepad_out_report_t;
+} PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

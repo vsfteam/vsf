@@ -52,20 +52,7 @@
 #   define VSF_USBH_UAC_CFG_URB_WITH_BUFFER     ENABLED
 #endif
 
-#ifndef VSF_USBH_UAC_CFG_URB_RELINK_1MS
-//  if enabled, for single urb per stream, urb will not be committed after complete
-//      but committed every 1m interval.
-#   define VSF_USBH_UAC_CFG_URB_RELINK_1MS      DISABLED
-#endif
-
-#if VSF_USBH_UAC_CFG_URB_RELINK_1MS == ENABLED
-#   if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
-#       error VSF_USBH_UAC_CFG_URB_RELINK_1MS is only used for single urb per stream
-#   endif
-#   define vsf_usbh_uac_task_t                  vsf_teda_t
-#else
-#   define vsf_usbh_uac_task_t                  vsf_eda_t
-#endif
+#define vsf_usbh_uac_task_t                     vsf_eda_t
 
 #if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
 #   if VSF_USBH_UAC_CFG_URB_WITH_BUFFER != ENABLED
@@ -73,10 +60,6 @@
 #       undef VSF_USBH_UAC_CFG_URB_WITH_BUFFER
 #       define VSF_USBH_UAC_CFG_URB_WITH_BUFFER ENABLED
 #   endif
-#endif
-
-#if VSF_USBH_UAC_CFG_URB_RELINK_1MS == ENABLED
-#   error VSF_USBH_UAC_CFG_URB_RELINK_1MS is not supported now
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -92,11 +75,13 @@ enum {
     VSF_USBH_UAC_SUBEVT_MASK            = 0x300,
     VSF_USBH_UAC_SUBEVT_CONNECT         = 0x000,
     VSF_USBH_UAC_SUBEVT_DISCONNECT      = 0x100,
-    VSF_USBH_UAC_SUBEVT_START_STREAM    = 0x200,
+    VSF_USBH_UAC_SUBEVT_STREAM          = 0x200,
+    VSF_USBH_UAC_SUBEVT_SUBMIT_REQ      = 0x300,
 
     VSF_USBH_UAC_EVT_CONNECT            = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_CONNECT,
     VSF_USBH_UAC_EVT_DISCONNECT         = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_DISCONNECT,
-    VSF_USBH_UAC_EVT_START_STREAM       = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_START_STREAM,
+    VSF_USBH_UAC_EVT_STREAM             = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_STREAM,
+    VSF_USBH_UAC_EVT_SUBMIT_REQ         = VSF_EVT_USER + VSF_USBH_UAC_SUBEVT_SUBMIT_REQ,
 };
 
 typedef struct vk_usbh_uac_t {
@@ -106,7 +91,12 @@ typedef struct vk_usbh_uac_t {
 
     uint8_t stream_cur;
     uint8_t stream_num;
-    bool is_ep0_busy;
+    uint8_t is_ep0_busy         : 1;
+    uint8_t is_req_pending      : 1;
+    uint8_t is_cur_req          : 1;
+
+    struct usb_ctrlrequest_t req;
+    void *req_data;
 
     vsf_usbh_uac_task_t task;
     vk_usbh_uac_stream_t streams[VSF_USBD_UAC_CFG_STREAM_NUM];
@@ -149,6 +139,21 @@ vk_usbh_uac_stream_t * vsf_usbh_uac_get_stream_info(void *param, uint_fast8_t st
     vk_usbh_uac_t *uac = param;
     VSF_USB_ASSERT(stream_idx < uac->stream_num);
     return &uac->streams[stream_idx];
+}
+
+vsf_err_t __vsf_usbh_uac_submit_req(void *uac_ptr, void *data, struct usb_ctrlrequest_t *req)
+{
+    vk_usbh_uac_t *uac = uac_ptr;
+
+    VSF_USB_ASSERT((uac != NULL) && (req != NULL));
+
+    if (uac->is_req_pending) {
+        return VSF_ERR_NOT_AVAILABLE;
+    }
+    uac->is_req_pending = true;
+    uac->req = *req;
+    uac->req_data = data;
+    return vsf_eda_post_evt((vsf_eda_t *)&uac->task, VSF_USBH_UAC_EVT_SUBMIT_REQ);
 }
 
 vsf_err_t vsf_usbh_uac_connect_stream(void *param, uint_fast8_t stream_idx, vsf_stream_t *stream)
@@ -211,7 +216,7 @@ static void __vk_usbh_uac_on_eda_terminate(vsf_eda_t *eda)
     vsf_usbh_free(uac);
 }
 
-static bool __vk_usbh_uac_submit_iso_urb(vk_usbh_uac_t *uac, vk_usbh_uac_stream_t *uac_stream, uint_fast8_t urb_idx)
+static bool __vk_usbh_uac_submit_urb_iso(vk_usbh_uac_t *uac, vk_usbh_uac_stream_t *uac_stream, uint_fast8_t urb_idx)
 {
     vk_usbh_urb_t *urb = &uac_stream->urb[urb_idx];
     vsf_stream_t *stream = uac_stream->stream;
@@ -247,50 +252,41 @@ static bool __vk_usbh_uac_submit_iso_urb(vk_usbh_uac_t *uac, vk_usbh_uac_stream_
 #else
         vk_usbh_urb_set_buffer(urb, ptr, frame_size);
 #endif
-        vk_usbh_submit_urb_iso(uac->usbh, urb, urb_idx);
+
+        uint_fast8_t start_frame = uac_stream->next_frame;
+        uint_fast16_t cur_frame = vk_usbh_get_frame(uac->usbh);
+        bool positive = start_frame >= cur_frame;
+        if ((start_frame != 0) && (positive || ((cur_frame - start_frame) > (0x07FF >> 1)))) {
+            start_frame = start_frame - cur_frame;
+            if (!positive) {
+                start_frame += 0x07FF;
+            }
+
+            uac_stream->next_frame++;
+        } else {
+            uac_stream->next_frame = cur_frame + 1;
+            start_frame = 0;
+        }
+        uac_stream->urb_mask |= 1 << urb_idx;
+        vk_usbh_submit_urb_iso(uac->usbh, urb, start_frame);
         return true;
     }
-    return false;
-}
 
-static void __vk_usbh_uac_start_stream(vk_usbh_uac_t *uac, vk_usbh_uac_stream_t *uac_stream)
-{
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
-    for (uint_fast8_t i = 0; i < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; i++) {
-        if (!__vk_usbh_uac_submit_iso_urb(uac, uac_stream, i)) {
-            VSF_USB_ASSERT(false);
-        }
-    }
-#else
-    __vk_usbh_uac_submit_iso_urb(uac, uac_stream, 0);
-#endif
+    uac_stream->urb_mask &= ~(1 << urb_idx);
+    return false;
 }
 
 void __vk_usbh_uac_stream_evthandler(void *param, vsf_stream_evt_t evt)
 {
     vk_usbh_uac_stream_t *uac_stream = param;
-    vsf_stream_t *stream = uac_stream->stream;
-    uint_fast16_t frame_size = uac_stream->channel_num * uac_stream->sample_size * uac_stream->sample_rate / 1000;
 
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
     vk_usbh_uac_stream_t *uac_stream_base = uac_stream - uac_stream->idx;
     vk_usbh_uac_t *uac = container_of(uac_stream_base, vk_usbh_uac_t, streams);
-#else
-    vk_usbh_uac_t *uac = container_of(uac_stream, vk_usbh_uac_t, streams);
-#endif
 
-    switch (evt) {
-    case VSF_STREAM_ON_CONNECT:
-    case VSF_STREAM_ON_RX:
-        if (vsf_stream_get_data_size(stream) >= VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM * frame_size) {
-            stream->rx.evthandler = NULL;
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
-            vsf_eda_post_evt((vsf_eda_t *)&uac->task, VSF_USBH_UAC_EVT_START_STREAM + uac_stream->idx);
-#else
-            vsf_eda_post_evt((vsf_eda_t *)&uac->task, VSF_USBH_UAC_EVT_START_STREAM + 0);
-#endif
-        }
-        break;
+    if (    (VSF_STREAM_ON_CONNECT == evt)
+        ||  ((VSF_STREAM_ON_TX == evt) && uac_stream->is_in)
+        ||  ((VSF_STREAM_ON_RX == evt) && !uac_stream->is_in)) {
+        vsf_eda_post_evt((vsf_eda_t *)&uac->task, VSF_USBH_UAC_EVT_STREAM + uac_stream->idx);
     }
 }
 
@@ -312,6 +308,12 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             pipe = vk_usbh_urb_get_pipe(&urb);
             if (0 == pipe.endpoint) {
+                if (uac->is_cur_req) {
+                    // TODO: notify user
+                    uac->is_req_pending = false;
+                    goto check_next_ctrl_transfer;
+                }
+
                 uac_stream = &uac->streams[uac->stream_cur];
                 stream = uac_stream->stream;
                 if ((stream != NULL) && !uac_stream->is_connected) {
@@ -320,7 +322,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         uint_fast16_t epsize = vk_usbh_urb_get_pipe(&uac_stream->urb[0]).size;
                         uint_fast16_t frame_size = uac_stream->channel_num * uac_stream->sample_size * uac_stream->sample_rate / 1000;
 #endif
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
+
                         for (uint_fast8_t i = 0; i < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; i++) {
                             if (    (VSF_ERR_NONE != vk_usbh_alloc_urb(uac->usbh, dev, &uac_stream->urb[i]))
 #   if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
@@ -330,19 +332,12 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                                 goto disconnect_stream;
                             }
                         }
-#else
-                        if (    (VSF_ERR_NONE != vk_usbh_alloc_urb(uac->usbh, dev, &uac_stream->urb[0]))
-#   if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
-                            ||  (NULL == vk_usbh_urb_alloc_buffer(&uac_stream->urb[0], uac_stream->is_in ? epsize : frame_size))
-#   endif
-                        ) {
-                            goto disconnect_stream;
-                        }
-#endif
+
                         uac_stream->is_connected = true;
                         if (uac_stream->is_in) {
-                            // start in stream after connected
-                            __vk_usbh_uac_start_stream(uac, uac_stream);
+                            stream->tx.param = uac_stream;
+                            stream->tx.evthandler = __vk_usbh_uac_stream_evthandler;
+                            vsf_stream_connect_tx(stream);
                         } else {
                             stream->rx.param = uac_stream;
                             stream->rx.evthandler = __vk_usbh_uac_stream_evthandler;
@@ -355,25 +350,22 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         } else {
                             vsf_stream_disconnect_rx(stream);
                         }
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
+
                         for (uint_fast8_t i = 0; i < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; i++) {
                             if (vk_usbh_urb_is_alloced(&uac_stream->urb[i])) {
                                 vk_usbh_free_urb(uac->usbh, &uac_stream->urb[i]);
                             }
                         }
-#else
-                        if (vk_usbh_urb_is_alloced(&uac_stream->urb[0])) {
-                            vk_usbh_free_urb(uac->usbh, &uac_stream->urb[0]);
-                        }
-#endif
+
                         uac_stream->stream = NULL;
                     }
                 } else if (uac_stream->is_to_disconnect) {
                     uac_stream->is_to_disconnect = false;
                     uac_stream->is_connected = false;
+                    uac_stream->next_frame = 0;
                     goto disconnect_stream;
                 }
-                goto check_stream;
+                goto check_next_ctrl_transfer;
             } else {
                 int_fast8_t urb_idx = -1;
                 uac_stream = &uac->streams[0];
@@ -381,8 +373,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (vk_usbh_urb_get_pipe(&uac_stream->urb[0]).value == pipe.value) {
 #if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
                         for (uint_fast8_t j = 0; j < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; j++) {
-                            if (    vk_usbh_urb_is_alloced(&uac_stream->urb[j])
-                                &&  (uac_stream->urb[j].urb_hcd == urb.urb_hcd)) {
+                            if (uac_stream->urb[j].urb_hcd == urb.urb_hcd) {
                                 urb_idx = j;
                                 break;
                             }
@@ -411,12 +402,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #endif
                 }
 
-#if VSF_USBH_UAC_CFG_URB_RELINK_1MS != ENABLED
-                bool result = __vk_usbh_uac_submit_iso_urb(uac, uac_stream, urb_idx);
-                // if fail to submit, audio streaming will be broken
-                // check audio stream processing in upper layer
-                VSF_USB_ASSERT(result);
-#endif
+                __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
             }
         }
         break;
@@ -434,24 +420,33 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             case VSF_USBH_UAC_SUBEVT_CONNECT:
                 // connect stream first, if set interface failed, disconnect stream to indicate failure
                 uac_stream->param = uac;
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
                 uac_stream->idx = stream_idx;
-#endif
-                if (uac_stream->is_in) {
-                    stream->tx.param = uac_stream;
-                    stream->tx.evthandler = NULL;
-                    vsf_stream_connect_tx(stream);
+                break;
+            case VSF_USBH_UAC_SUBEVT_STREAM: {
+                    uint_fast16_t frame_size = uac_stream->channel_num * uac_stream->sample_size * uac_stream->sample_rate / 1000;
+                    int_fast8_t urb_idx;
+
+                    if (uac_stream->is_in) {
+                        if (vsf_stream_get_free_size(uac_stream->stream) < frame_size) {
+                            break;
+                        }
+                    } else {
+                        if (vsf_stream_get_data_size(uac_stream->stream) < frame_size) {
+                            break;
+                        }
+                    }
+
+                    urb_idx = vsf_ffz(uac_stream->urb_mask | ~((1 << sizeof(uac_stream->urb_mask)) - 1));
+                    if (urb_idx >= 0) {
+                        __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
+                    }
                 }
                 break;
-            case VSF_USBH_UAC_SUBEVT_START_STREAM:
-                VSF_USB_ASSERT(!uac_stream->is_in);
-                VSF_USB_ASSERT(uac_stream->is_connected);
-                // start out stream after enough data in stream
-                __vk_usbh_uac_start_stream(uac, uac_stream);
-                return;
+            case VSF_USBH_UAC_SUBEVT_SUBMIT_REQ:
+                break;
             }
 
-            // run here means no error, will send set_interface requet
+            // run here means no error, will send control requet
             if (uac->is_ep0_busy) {
                 break;
             }
@@ -462,7 +457,8 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         // fall through
     case VSF_EVT_SYNC:
-    check_stream:
+    check_next_ctrl_transfer:
+        uac->is_cur_req = false;
         for (uint_fast8_t i = 0; i < uac->stream_num; i++) {
             uint_fast8_t alt_setting;
             uac_stream = &uac->streams[i];
@@ -482,8 +478,22 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 return;
             }
         }
-        // if run here, no pending operation, exit critical section
+
+        if (uac->is_req_pending) {
+            uac->is_cur_req = true;
+            if (uac->req_data != NULL) {
+                vk_usbh_urb_set_buffer(&uac->dev->ep0.urb, uac->req_data, uac->req.wLength);
+            }
+            if (VSF_ERR_NONE == vk_usbh_control_msg(uac->usbh, uac->dev, &uac->req)) {
+                return;
+            } else {
+                // TODO: notify user
+            }
+        }
+
+        // if runs here, no pending operation, exit critical section
         __vsf_eda_crit_npb_leave(&dev->ep0.crit);
+        uac->is_ep0_busy = false;
         break;
     }
 }
@@ -576,6 +586,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 #else
                     vk_usbh_urb_prepare(&uac_stream->urb[0], uac->dev, parser_vs_alt->desc_ep);
 #endif
+                    uac_stream->urb_mask = ~((1UL << VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM) - 1);
                     uac_stream->is_in = uac_stream->urb[0].pipe.dir_in1out0;
                     __vk_usbh_uac_parse_stream_format(uac_stream, (uint8_t *)desc_ifs + desc_ifs->bLength);
                     break;
@@ -598,7 +609,18 @@ free_all:
 static void __vk_usbh_uac_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
     vk_usbh_uac_t *uac = (vk_usbh_uac_t *)param;
+    vk_usbh_uac_stream_t *uac_stream;
     __vk_usbh_uac_free_urb(uac);
+
+    for (uint_fast8_t i = 0; i < uac->stream_num; i++) {
+        uac_stream = vsf_usbh_uac_get_stream_info(uac, i);
+        if (uac_stream->is_in) {
+            vsf_stream_disconnect_tx(uac_stream->stream);
+        } else {
+            vsf_stream_disconnect_rx(uac_stream->stream);
+        }
+    }
+    vsf_eda_fini((vsf_eda_t *)&uac->task);
 }
 
 #endif

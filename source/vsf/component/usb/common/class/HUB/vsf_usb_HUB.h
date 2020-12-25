@@ -37,7 +37,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct usb_hub_desc_t {
+typedef struct usb_hub_desc_t usb_hub_desc_t;
+struct usb_hub_desc_t {
     uint8_t  bDescLength;
     uint8_t  bDescriptorType;
     uint8_t  bNbrPorts;
@@ -59,12 +60,13 @@ typedef struct usb_hub_desc_t {
             uint16_t DeviceRemovable;
         } PACKED ss;
     } PACKED u;
-} PACKED usb_hub_desc_t;
+} PACKED;
 
-typedef struct usb_port_status_t {
+typedef struct usb_port_status_t usb_port_status_t;
+struct usb_port_status_t {
     uint16_t wPortStatus;
     uint16_t wPortChange;
-} PACKED usb_port_status_t;
+} PACKED;
 
 enum usb_port_feature_t {
     USB_PORT_FEAT_CONNECTION        = 0,

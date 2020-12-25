@@ -40,14 +40,14 @@
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
-#   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
+#   define APP_USE_LINUX_LIBUSB_DEMO                    APP_USE_USBH_DEMO
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
-#define APP_USE_USBH_DEMO                               DISABLED
-#define APP_USE_USBD_DEMO                               ENABLED
-// CDC conflicts with JTAG debug in esp32s2, no idea why
+#define APP_USE_USBH_DEMO                               ENABLED
+#define APP_USE_USBD_DEMO                               DISABLED
 #   define APP_USE_USBD_CDC_DEMO                        DISABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        DISABLED
+#   define APP_USE_USBD_UAC_DEMO                        ENABLED
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_SDL2_DEMO                               DISABLED
@@ -72,7 +72,7 @@
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                32
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    640
 #   define APP_LVGL_DEMO_CFG_VER_RES                    480
-#define APP_USE_BTSTACK_DEMO                            DISABLED
+#define APP_USE_BTSTACK_DEMO                            ENABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
@@ -86,12 +86,12 @@
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   2       // 4-byte alignment
 
 #define VSF_USE_VIDEO                                   DISABLED
-#define VSF_USE_AUDIO                                   DISABLED
+#define VSF_USE_AUDIO                                   ENABLED
 #   define VSF_AUDIO_USE_DECODER_WAV                    ENABLED
 #   define VSF_AUDIO_USE_PLAY                           ENABLED
 #   define VSF_AUDIO_USE_CATURE                         DISABLED
 
-#define VSF_USE_INPUT                                   DISABLED
+#define VSF_USE_INPUT                                   ENABLED
 #   define VSF_INPUT_USE_HID                            ENABLED
 #   define VSF_INPUT_USE_DS4                            ENABLED
 #   define VSF_INPUT_USE_NSPRO                          ENABLED
@@ -117,6 +117,7 @@
 #       define VSF_USBD_USE_CDCACM                      ENABLED
 #       define VSF_USBD_USE_MSC                         ENABLED
 #       define VSF_USBD_USE_UVC                         DISABLED
+#       define VSF_USBD_USE_UAC                         ENABLED
 #       define VSF_USBD_CFG_USE_EDA                     ENABLED
 #       define VSF_USBD_USE_CDCACM                      ENABLED
 #       define USRAPP_CFG_USBD_SPEED                    USB_DC_SPEED_FULL
@@ -139,6 +140,7 @@
 
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
+#   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_CFG_STACKSIZE                      4096
 #   define VSF_LINUX_CFG_PRIO_LOWEST                    vsf_prio_1
 #   define VSF_LINUX_CFG_PRIO_HIGHEST                   vsf_prio_1
@@ -175,6 +177,19 @@ extern void vsf_assert(int expression);
 #   define VSF_USBH_BTHCI_CFG_SCO_OUT_NUM               0
 #   define VSF_USBH_BTHCI_CFG_ACL_IN_NUM                1
 #   define VSF_USBH_BTHCI_CFG_ACL_OUT_NUM               1
+#endif
+
+// WEAK, why esp32s2 environment does not support weak functions?
+#if APP_USE_SCSI_DEMO == ENABLED
+#   define WEAK_VSF_SCSI_ON_NEW
+#   define WEAK_VSF_SCSI_ON_DELETE
+#endif
+#if APP_USE_BTSTACK_DEMO == ENABLED && APP_USE_USBH_DEMO == ENABLED
+#   define WEAK_VSF_USBH_BTHCI_ON_NEW
+#   define WEAK_VSF_USBH_BTHCI_ON_DEL
+#   define WEAK_VSF_USBH_BTHCI_ON_PACKET
+
+#   define WEAK_VSF_BLUETOOTH_H2_ON_NEW
 #endif
 
 /*============================ TYPES =========================================*/

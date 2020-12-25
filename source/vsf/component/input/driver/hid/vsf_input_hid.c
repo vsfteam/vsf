@@ -235,12 +235,17 @@ static vk_hid_report_t * __vk_hid_get_report(vk_input_hid_t *dev, vk_hid_desc_t 
     return report;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#endif
+
 static vsf_err_t __vk_hid_parse_item(vk_input_hid_t *dev,
         vk_hid_desc_t *desc, uint_fast8_t tag, uint_fast32_t size, uint8_t *buf)
 {
     vk_hid_report_t *report;
     vk_hid_usage_t *usage;
-    uint_fast32_t value, ival;
+    uint_fast32_t value = 0, ival;
 
     if (size == 1) {
         value = *buf;
@@ -469,6 +474,10 @@ static vsf_err_t __vk_hid_parse_item(vk_input_hid_t *dev,
     return VSF_ERR_NONE;
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
+
 void vk_hid_new_dev(vk_input_hid_t *dev)
 {
     vsf_hid_on_new_dev(dev);
@@ -511,7 +520,7 @@ uint_fast8_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast
     vk_hid_desc_t *desc = vsf_heap_malloc(sizeof(vk_hid_desc_t));
     uint8_t *end = desc_buf + len;
     int item_size;
-    vsf_err_t err;
+    vsf_err_t err = VSF_ERR_NONE;
 
     if (desc == NULL) { return 0; }
     memset(desc, 0, sizeof(*desc));

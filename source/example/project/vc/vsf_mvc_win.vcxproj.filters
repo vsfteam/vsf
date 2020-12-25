@@ -261,15 +261,6 @@
     <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h">
       <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mrepeat.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\preprocessor.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\tpaste.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\vsf\utilities\template\template.h">
       <Filter>vsf\utilities\template</Filter>
     </ClInclude>
@@ -963,6 +954,15 @@
     <ClInclude Include="..\..\..\vsf\service\fifo\vsf_fifo.h">
       <Filter>vsf\service\fifo</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\delegate.h">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\vsf_connect.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\vsf_repeat_macro.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c">
@@ -1343,11 +1343,20 @@
     <ClCompile Include="..\..\..\vsf\service\fifo\vsf_fifo.c">
       <Filter>vsf\service\fifo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\delegate.c">
+      <Filter>vsf\utilities\language_externsion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_input.c">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\README.md">
       <Filter>vsf\utilities\3rd-party\PLOOC\raw</Filter>
     </None>
     <None Include="cpp.hint" />
+    <None Include="..\..\..\vsf\service\pool\impl_vsf_pool.inc">
+      <Filter>vsf\service\pool</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -32,15 +32,19 @@
 #define __vsf_usart_protect                 vsf_protect(VSF_USART_CFG_PROTECT_LEVEL)
 #define __vsf_usart_unprotect               vsf_unprotect(VSF_USART_CFG_PROTECT_LEVEL)
 
+#define IIR_IID_MASK                        0x0Ful
+#define IIR_IID_MODEM_STATUS                0x00ul // 0b0000
+#define IIR_IID_NO_INTERRUPT_PENDING        0x01ul // 0b0001
+#define IIR_IID_THR_EMPTY                   0x02ul // 0b0010
+#define IIR_IID_RECEIVED_DATA_AVAILABLE     0x04ul // 0b0100
+#define IIR_IID_RECEIVED_LINE_STATUS        0x06ul // 0b0110
+#define IIR_IID_BUSY_DELECT                 0x07ul // 0b0111
+#define IIR_IID_CHARACTER_TIMEOUT           0x0Cul // 0b1100
 
-#define IIR_IID_MASK                            0x0Ful
-#define IIR_IID_MODEM_STATUS                    0x00ul // 0b0000
-#define IIR_IID_NO_INTERRUPT_PENDING            0x01ul // 0b0001
-#define IIR_IID_THR_EMPTY                       0x02ul // 0b0010
-#define IIR_IID_RECEIVED_DATA_AVAILABLE         0x04ul // 0b0100
-#define IIR_IID_RECEIVED_LINE_STATUS            0x06ul // 0b0110
-#define IIR_IID_BUSY_DELECT                     0x07ul // 0b0111
-#define IIR_IID_CHARACTER_TIMEOUT               0x0Cul // 0b1100
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
+#   define vsf_usart_irq_enable  __vsf_usart_irq_enable
+#   define vsf_usart_irq_disable __vsf_usart_irq_disable
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -242,7 +246,9 @@ void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/usart/__usart_common.inc"
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
+#   include "hal/driver/common/usart/__usart_common.inc"
+#endif
 
 #endif
 

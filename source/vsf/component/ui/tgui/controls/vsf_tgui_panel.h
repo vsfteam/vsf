@@ -1,3 +1,20 @@
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************
  *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
@@ -40,18 +57,8 @@
 
 /*============================ MACROS ========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define __VSF_TGUI_INTERFACE_CONTROLS_PANEL           {                      \
-            {                                                                   \
-                VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_panel_msg_handler            \
-            },                                                                  \
-            (vsf_msgt_method_status_t *)&vsf_tgui_control_status_get,           \
-            (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
-        }
-#else
-#   define __VSF_TGUI_INTERFACE_CONTROLS_PANEL           {                      \
-            .msg_handler = {                                                \
+            .msg_handler = {                                                    \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_panel_msg_handler,           \
             },                                                                  \
@@ -59,29 +66,8 @@
                         &vsf_tgui_control_status_get,                           \
             .Shoot = (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot,        \
         }
-#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#define __tgui_panel(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)            \
-        tgui_control_base(       __NAME,                                        \
-                            VSF_TGUI_COMPONENT_ID_PANEL,                        \
-                            vsf_tgui_panel_t,                                   \
-                            (__PARENT_ADDR),                                    \
-                            __PREVIOUS,                                         \
-                            __NEXT,                                             \
-                            VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                \
-                            __VA_ARGS__                                         \
-                            VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE)
-
-#define tgui_panel(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)              \
-            __tgui_panel(   __NAME,                                             \
-                            (__PARENT_ADDR),                                    \
-                            __PREVIOUS,                                         \
-                            __NEXT,                                             \
-                            __VA_ARGS__)
-
 
 #define __tgui_set_internal_panel( __OWNER_ADDR,                                \
                                 __MEMBER,                                       \
@@ -134,74 +120,57 @@
 
 #define end_def_tgui_panel(...)                                                 \
     };
-
-#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-#define __implement_tgui_panel(__NAME, __VAR, ...)                              \
-    __NAME __VAR = {                                                            \
-            .parent_ptr = NULL,                                                   \
-            .id = VSF_TGUI_COMPONENT_ID_PANEL,                                \
-            .is_container = true,                                               \
-            .is_top = true,                                                     \
-            .node_ptr =  (vsf_msgt_node_t*)&((__VAR).__NAME##_FirstNode),         \
-            .node_name_ptr = "[TOP][vsf_tgui_panel_t]["#__NAME"]",                \
-            .bIsEnabled = true,                                                 \
-            .bIsVisible = true,                                                 \
+                                            
+#define __describ_tgui_panel(__NAME, __VAR, ...)                                \
+        describe_tgui_container_base(                                           \
+            __VAR,                                                              \
+            VSF_TGUI_COMPONENT_ID_PANEL,                                        \
+            __NAME,                                                             \
             VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                \
             __VA_ARGS__                                                         \
             VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                               \
-        }
-#else
-#define __implement_tgui_panel(__NAME, __VAR, ...)                              \
-    __NAME __VAR = {                                                            \
-            .parent_ptr = NULL,                                                   \
-            .id = VSF_TGUI_COMPONENT_ID_PANEL,                                \
-            .is_container = true,                                               \
             .is_top = true,                                                     \
-            .node_ptr =  (vsf_msgt_node_t*)&((__VAR).__NAME##_FirstNode),         \
-            .bIsEnabled = true,                                                 \
-            .bIsVisible = true,                                                 \
-            VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                \
-            __VA_ARGS__                                                         \
-            VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                               \
-        }
-#endif
-#define implement_tgui_panel(__NAME, __VAR, ...)                                \
-            __implement_tgui_panel(__NAME, __VAR, __VA_ARGS__)
+        )  
 
-#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-#   define __describ_tgui_panel(__NAME, __VAR, ...)                             \
-    __VAR = (__NAME){                                                           \
-        .parent_ptr = NULL,                                                       \
-        .id = VSF_TGUI_COMPONENT_ID_PANEL,                                    \
-        .is_container = true,                                                   \
-        .is_top = true,                                                         \
-        .node_ptr =  (vsf_msgt_node_t*)&((__VAR).__NAME##_FirstNode),             \
-        .node_name_ptr = "[TOP][vsf_tgui_panel_t]["#__NAME"]",                    \
-        .bIsEnabled = true,                                                     \
-        .bIsVisible = true,                                                     \
-        VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                    \
-        __VA_ARGS__                                                             \
-        VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                                   \
-    }
-#else
-#   define __describ_tgui_panel(__NAME, __VAR, ...)                             \
-    __VAR = (__NAME){                                                           \
-        .parent_ptr = NULL,                                                     \
-        .id = VSF_TGUI_COMPONENT_ID_PANEL,                                      \
-        .is_container = true,                                                   \
-        .is_top = true,                                                         \
-        .node_ptr =  (vsf_msgt_node_t*)&((__VAR).__NAME##_FirstNode),           \
-        .bIsEnabled = true,                                                     \
-        .bIsVisible = true,                                                     \
-        VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                    \
-        __VA_ARGS__                                                             \
-        VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                                   \
-    }
-#endif
 
 #define describ_tgui_panel(__NAME, __VAR, ...)                                  \
             __describ_tgui_panel(__NAME, __VAR, __VA_ARGS__)
-#endif
+
+#define __use_tgui_panel(__NAME, ...)                                           \
+    struct {                                                                    \
+        implement(vsf_tgui_panel_t)                                             \
+                                                                                \
+        union {                                                                 \
+            vsf_msgt_node_t __NAME##_FirstNode ;                                \
+            struct {                                                            \
+                __VA_ARGS__;                                                    \
+            };                                                                  \
+        };                                                                      \
+    } __NAME;
+
+#define use_tgui_panel(__NAME, ...) __use_tgui_panel(__NAME, ##__VA_ARGS__)
+
+
+#define __tgui_panel(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)            \
+        tgui_container_base(                                                    \
+                        __NAME,                                                 \
+                        VSF_TGUI_COMPONENT_ID_PANEL,                            \
+                        vsf_tgui_panel_t,                                       \
+                        (__PARENT_ADDR),                                        \
+                        __PREVIOUS,                                             \
+                        __NEXT,                                                 \
+                        VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                    \
+                        __VA_ARGS__                                             \
+                        VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                   \
+                        .is_top = false,                                        \
+                    )
+
+#define tgui_panel(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)              \
+            __tgui_panel(   __NAME,                                             \
+                            (__PARENT_ADDR),                                    \
+                            __PREVIOUS,                                         \
+                            __NEXT,                                             \
+                            __VA_ARGS__)
 
 /*============================ TYPES =========================================*/
 
@@ -209,7 +178,7 @@ declare_class(vsf_tgui_panel_t)
 
 def_class(vsf_tgui_panel_t,
     which(
-        implement(vsf_tgui_top_container_t)
+        implement(vsf_tgui_root_container_t)
         implement(vsf_tgui_v_panel_t)
     )
 
@@ -218,9 +187,11 @@ def_class(vsf_tgui_panel_t,
         vsf_tgui_text_info_t tTitle;
     )
 
+#if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
     protected_member(
         vsf_tgui_label_t     tTitleLabel;
     )
+#endif
 )
 
 end_def_class(vsf_tgui_panel_t)

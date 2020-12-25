@@ -1,6 +1,5 @@
 /****************************************************************************
-*  2020 Modified by VSF Team                                                *
-*  Copyright 2017-2019 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)  *
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -16,13 +15,43 @@
 *                                                                           *
 ****************************************************************************/
 
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
 #ifndef __DELEGATE_H__
 #define __DELEGATE_H__
 
 /*============================ INCLUDES ======================================*/
 #include "../compiler/compiler.h"
 
-#define __PLOOC_CLASS_USE_BLACK_BOX_TEMPLATE__
+/*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
+ *!        definition and there is NO ANY OTHER module-interface-header file
+ *!        included in this file
+ */
+#define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
+
+#if     defined(__VSF_DELEGATE_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSF_DELEGATE_CLASS_IMPLEMENT
+#elif   defined(__VSF_DELEGATE_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_DELEGATE_CLASS_INHERIT__
+#endif   
+
 #include "../ooc_class.h"
 
 
@@ -38,26 +67,30 @@ extern "C" {
 typedef fsm_rt_t delegate_handler_func_t(void *arg_ptr, void *param_ptr);
 
 
-declare_class( delegate_handler_t )
+dcl_class( delegate_handler_t )
 //! \name general event handler
 //! @{
-extern_class( delegate_handler_t ,,
-    delegate_handler_func_t     *handler_fn;                                    //!< event handler
-    void                        *arg_ptr;                                       //!< Argument
-    delegate_handler_t          *next_ptr;                                      //!< next 
+def_class( delegate_handler_t,
+    private_member(
+        delegate_handler_func_t     *handler_fn;                                    //!< event handler
+        void                        *arg_ptr;                                       //!< Argument
+        delegate_handler_t          *next_ptr;                                      //!< next 
+    )
 )
-end_extern_class(delegate_handler_t)
+end_def_class(delegate_handler_t)
 //! @}
 
-declare_class( delegate_t )
+dcl_class( delegate_t )
 //! \name event
 //! @{
-extern_class(delegate_t,,
-    delegate_handler_t     *event_ptr;
-    delegate_handler_t     *blocked_list_ptr;
-    delegate_handler_t     **handler_pptr;
+def_class(delegate_t,
+    private_member(
+        delegate_handler_t     *event_ptr;
+        delegate_handler_t     *blocked_list_ptr;
+        delegate_handler_t     **handler_pptr;
+    )
 )
-end_extern_class(delegate_t)
+end_def_class(delegate_t)
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/

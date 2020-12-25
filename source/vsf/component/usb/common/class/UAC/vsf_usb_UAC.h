@@ -35,6 +35,17 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef enum usb_uac_req_t {
+    USB_UAC_REQ_CUR     = 1,
+    USB_UAC_REQ_MIN     = 2,
+    USB_UAC_REQ_MAX     = 3,
+    USB_UAC_REQ_RES     = 4,
+    USB_UAC_REQ_MEM     = 5,
+    USB_UAC_REQ_SET     = 0,
+    USB_UAC_REQ_GET     = 0x80,
+} usb_uac_req_t;
+
+typedef struct usb_uac_ac_interface_header_desc_t usb_uac_ac_interface_header_desc_t;
 struct usb_uac_ac_interface_header_desc_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -44,8 +55,8 @@ struct usb_uac_ac_interface_header_desc_t {
     uint8_t bInCollection;
     uint8_t baInterfaceNr[1];
 } PACKED;
-typedef struct usb_uac_ac_interface_header_desc_t usb_uac_ac_interface_header_desc_t;
 
+typedef struct usb_uac_as_interface_desc_t usb_uac_as_interface_desc_t;
 struct usb_uac_as_interface_desc_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -54,8 +65,8 @@ struct usb_uac_as_interface_desc_t {
     uint8_t bDelay;
     uint16_t wFormatTag;
 } PACKED;
-typedef struct usb_uac_as_interface_desc_t usb_uac_as_interface_desc_t;
 
+typedef struct usb_uac_as_format_i_desc_t usb_uac_as_format_i_desc_t;
 struct usb_uac_as_format_i_desc_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -67,7 +78,6 @@ struct usb_uac_as_format_i_desc_t {
     uint8_t bSamFreqType;
     uint8_t tSamFreq[1][3];
 } PACKED;
-typedef struct usb_uac_as_format_i_desc_t usb_uac_as_format_i_desc_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

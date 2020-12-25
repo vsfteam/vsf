@@ -54,7 +54,7 @@ static void __vsf_awtk_on_evt(vk_input_type_t tpye, vk_touchscreen_evt_t *ts_evt
 int awtk_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

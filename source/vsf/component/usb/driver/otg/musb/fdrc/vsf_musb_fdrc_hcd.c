@@ -93,6 +93,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
 static vsf_err_t __vk_musb_fdrc_hcd_fini(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_musb_fdrc_hcd_suspend(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_musb_fdrc_hcd_resume(vk_usbh_hcd_t *hcd);
+static uint_fast16_t __vk_musb_fdrc_hcd_get_frame_number(vk_usbh_hcd_t *hcd);
 static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 static vk_usbh_hcd_urb_t * __vk_musb_fdrc_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
 static void __vk_musb_fdrc_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
@@ -106,6 +107,7 @@ const vk_usbh_hcd_drv_t vk_musb_fdrc_hcd_drv = {
     .fini               = __vk_musb_fdrc_hcd_fini,
     .suspend            = __vk_musb_fdrc_hcd_suspend,
     .resume             = __vk_musb_fdrc_hcd_resume,
+    .get_frame_number   = __vk_musb_fdrc_hcd_get_frame_number,
     .free_device        = __vk_musb_fdrc_hcd_free_device,
     .alloc_urb          = __vk_musb_fdrc_hcd_alloc_urb,
     .free_urb           = __vk_musb_fdrc_hcd_free_urb,
@@ -211,6 +213,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
     bool is_iso = pipe.type == USB_ENDPOINT_XFER_ISOC;
     bool is_in = pipe.dir_in1out0 > 0;
     uint_fast16_t epsize = pipe.size;
+    VSF_USB_ASSERT(!(epsize & 7));
     uint8_t *buffer = urb->buffer;
     uint_fast8_t errcode = 0;
 
@@ -232,7 +235,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
         } else {
             if (is_in) {
                 reg->EPN.RxType = (pipe.type << 4) | pipe.endpoint;
-                reg->EPN.RxMAXP = (epsize + 7) >> 3;
+                reg->EPN.RxMAXP = epsize >> 3;
                 if (is_iso) {
                     reg->EPN.RxInterval = 1;
                 } else {
@@ -244,7 +247,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 reg->EPN.RxCSR1 |= MUSBH_RXCSR1_FLUSHFIFO;
             } else {
                 reg->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
-                reg->EPN.TxMAXP = (epsize + 7) >> 3;
+                reg->EPN.TxMAXP = epsize >> 3;
                 if (is_iso) {
                     reg->EPN.TxInterval = 1;
                 } else {
@@ -533,6 +536,13 @@ static vsf_err_t __vk_musb_fdrc_hcd_suspend(vk_usbh_hcd_t *hcd)
 static vsf_err_t __vk_musb_fdrc_hcd_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
+}
+
+static uint_fast16_t __vk_musb_fdrc_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
+{
+    vk_musb_fdrc_hcd_t *musb = hcd->priv;
+    vk_musb_fdrc_reg_t *reg = musb->reg;
+    return reg->Common.Frame1 + (reg->Common.Frame2 << 8);
 }
 
 static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)

@@ -60,11 +60,13 @@ fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
+
+
+fsm_rt_t __vk_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
-                                        vsf_tgui_control_refresh_mode_t tMode)
+                                        vsf_tgui_control_refresh_mode_t tMode,
+                                        bool bIsIgnoreBackground)
 {
-    __vsf_tgui_control_core_t* ptCore;
     const vsf_tgui_tile_t* ptTile;
 
     VSF_TGUI_ASSERT(control_ptr != NULL);
@@ -74,13 +76,30 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif
 
-    ptCore = vsf_tgui_control_get_core(control_ptr);
-    ptTile = ptCore->tBackground.ptTile;
+    if (!control_ptr->bIsNoBackgroundColor && !bIsIgnoreBackground) {
+        vsf_tgui_region_t tRegion = { 0 };
+        tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
+
+        vsf_tgui_control_v_draw_rect(   control_ptr,
+                                        ptDirtyRegion,
+                                        &tRegion,
+                                        control_ptr->use_as____vsf_tgui_control_core_t.use_as__vsf_tgui_v_control_t.tBackgroundColor);
+    }
+
+    ptTile = control_ptr->tBackground.ptTile;
     if (ptTile != NULL) {
-        vsf_tgui_control_v_draw_tile(control_ptr, ptDirtyRegion, ptTile, ptCore->tBackground.tAlign);
+        vsf_tgui_control_v_draw_tile(control_ptr, ptDirtyRegion, ptTile, control_ptr->tBackground.tAlign);
     }
 
     return fsm_rt_cpl;
+}
+
+
+fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
+                                        vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
+                                        vsf_tgui_control_refresh_mode_t tMode)
+{
+    return __vk_tgui_control_v_rendering(control_ptr, ptDirtyRegion, tMode, false);
 }
 
 fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* control_ptr)

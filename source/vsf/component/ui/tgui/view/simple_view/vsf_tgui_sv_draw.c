@@ -41,7 +41,7 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static char* __sv_get_node_name(const vsf_tgui_control_t* control_ptr)
+static const char* __sv_get_node_name(const vsf_tgui_control_t* control_ptr)
 {
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING
     return (char *)control_ptr->use_as__vsf_msgt_node_t.node_name_ptr;
@@ -151,7 +151,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
 
     // use absolute coordinates
     tAbsoluteRegion = tControlRelativeDirtyRegion;
-    vsf_tgui_control_get_absolute_location(control_ptr, &tAbsoluteRegion.tLocation);
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &tAbsoluteRegion.tLocation);
 
 #if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
@@ -236,8 +236,8 @@ uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* co
 		const vsf_msgt_node_t* node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
 		const vsf_tgui_container_t* container_ptr = (const vsf_tgui_container_t*)node_ptr;
 
-        bIsTileTransparency = container_ptr->use_as__vsf_tgui_v_container_t.bIsTileTransparency;
-        chTileTransparencyRate = container_ptr->use_as__vsf_tgui_v_container_t.chTileTransparencyRate;
+        bIsTileTransparency = container_ptr->bIsTileTransparency;
+        chTileTransparencyRate = container_ptr->chTileTransparencyRate;
     } else {
         bIsTileTransparency = control_ptr->use_as__vsf_tgui_v_control_t.bIsTileTransparency;
         chTileTransparencyRate = control_ptr->use_as__vsf_tgui_v_control_t.chTileTransparencyRate;
@@ -266,11 +266,11 @@ void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* control_ptr, uin
 		const vsf_msgt_node_t* node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
 		vsf_tgui_container_t* container_ptr = (vsf_tgui_container_t *)node_ptr;
 
-        container_ptr->use_as__vsf_tgui_v_container_t.bIsTileTransparency = bIsTileTransparency;
-        container_ptr->use_as__vsf_tgui_v_container_t.chTileTransparencyRate = chTileTransparencyRate;
+        container_ptr->bIsTileTransparency = bIsTileTransparency;
+        container_ptr->chTileTransparencyRate = chTileTransparencyRate;
     } else {
-        control_ptr->use_as__vsf_tgui_v_control_t.bIsTileTransparency = bIsTileTransparency;
-        control_ptr->use_as__vsf_tgui_v_control_t.chTileTransparencyRate = chTileTransparencyRate;
+        control_ptr->bIsTileTransparency = bIsTileTransparency;
+        control_ptr->chTileTransparencyRate = chTileTransparencyRate;
     }
 }
 
@@ -350,22 +350,94 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
     }
 }
 
-static void vsf_tgui_sv_text_draw(vsf_tgui_location_t* ptLocation,
-                               vsf_tgui_region_t* ptRelativeRegion,
-                               vsf_tgui_string_t* ptString,
-                               const uint8_t chFontIndex,
-                               const vsf_tgui_sv_color_t tColor,
-                               int_fast8_t chInterLineSpace)
+static bool __sv_text_get_size(const uint8_t chFontIndex, vsf_tgui_text_info_t* ptStringInfo, vsf_tgui_size_t* ptSize)
 {
-    vsf_tgui_region_t tVisualCharRegion = { 0 };
+    VSF_TGUI_ASSERT(ptStringInfo != NULL);
+    VSF_TGUI_ASSERT(ptStringInfo->tString.pstrText != NULL);
+    VSF_TGUI_ASSERT(ptSize != NULL);
+
+#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
+    if (ptStringInfo->bIsChanged) {
+        ptStringInfo->bIsChanged = false;
+        ptStringInfo->tInfoCache.tStringSize = vsf_tgui_text_get_size(chFontIndex,
+                                                                      &(ptStringInfo->tString),
+                                                                      &(ptStringInfo->tInfoCache.hwLines),
+                                                                      &(ptStringInfo->tInfoCache.chCharHeight),
+                                                                      ptStringInfo->chInterLineSpace);
+    }
+    *ptSize = ptStringInfo->tInfoCache.tStringSize;
+#else
+    * ptSize = vsf_tgui_text_get_size(  chFontIndex, 
+                                        &(ptStringInfo->tString), 
+                                        NULL, 
+                                        NULL, 
+                                        ptStringInfo->chInterLineSpace);
+#endif
+
+    if (ptSize->iWidth <= 0 || ptSize->iHeight <= 0) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+#if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT == ENABLED
+static int16_t __sv_text_draw_get_x(const vsf_tgui_string_t* ptString, const uint8_t chFontIndex, size_t tCharOffset, const vsf_tgui_align_mode_t tMode, int16_t iMaxWidth)
+{
+#if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT_ALIGN != ENABLED
+    return 0;
+#else
+    uint32_t wChar;
+    int16_t iWidth = 0;
+
+    if (tMode & VSF_TGUI_ALIGN_LEFT) {
+        return 0;
+    }
+
+    while (((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
+#if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
+           && (tCharOffset <= ptString->s16_size)
+#endif
+           ) {
+        if (wChar == '\n') {
+            break;
+        }
+
+        if (wChar == '\r') {
+            continue;
+        }
+
+        iWidth += vsf_tgui_font_get_char_width(chFontIndex, wChar);
+    }
+
+    if (tMode & VSF_TGUI_ALIGN_RIGHT){
+        return iMaxWidth - iWidth;
+    } else {
+        return (iMaxWidth - iWidth) / 2;
+    }
+#endif
+}
+#endif
+
+static void __sv_text_draw(const vsf_tgui_location_t* ptLocation,
+                           const vsf_tgui_size_t *ptOriginResourceSize,
+                           const vsf_tgui_region_t* ptDirtyRegion,
+                           const vsf_tgui_string_t* ptString,
+                           const uint8_t chFontIndex,
+                           const vsf_tgui_sv_color_t tColor,
+                           const int_fast8_t chInterLineSpace,
+                           const vsf_tgui_align_mode_t tMode)
+{
+    vsf_tgui_region_t tCharDrawRegion = { 0 };
     vsf_tgui_location_t tLocation;
     vsf_tgui_region_t tDirtyCharRegion = { 0 };
     vsf_tgui_location_t tRelativeCharLocation = { 0 };
+    vsf_tgui_location_t tBaseLocation = { 0 };
     uint32_t wChar;
     size_t tCharOffset = 0;
 
     VSF_TGUI_ASSERT(ptLocation != NULL);
-    VSF_TGUI_ASSERT(ptRelativeRegion != NULL);
+    VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
     VSF_TGUI_ASSERT(ptString != NULL);
     VSF_TGUI_ASSERT(ptString->pstrText != NULL);
 
@@ -373,50 +445,52 @@ static void vsf_tgui_sv_text_draw(vsf_tgui_location_t* ptLocation,
     VSF_TGUI_ASSERT(ptString->s16_size > 0);
 #endif
 
-    VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));  // x_start point in screen
-    VSF_TGUI_ASSERT((0 <= ptLocation->iY) && (ptLocation->iY < VSF_TGUI_VER_MAX));  // y_start point in screen
-    VSF_TGUI_ASSERT(0 <= (ptLocation->iX + ptRelativeRegion->tSize.iWidth));                        // x_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->iX + ptRelativeRegion->tSize.iWidth) <= VSF_TGUI_HOR_MAX);
-    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + ptRelativeRegion->tSize.iHeight));                       // y_end   point in screen
-    VSF_TGUI_ASSERT((ptLocation->iY + ptRelativeRegion->tSize.iHeight) <= VSF_TGUI_VER_MAX);
+    VSF_TGUI_ASSERT((0 <= ptLocation->iX) && (ptLocation->iX < VSF_TGUI_HOR_MAX));                  // x_start point in screen
+    VSF_TGUI_ASSERT((0 <= ptLocation->iY) && (ptLocation->iY < VSF_TGUI_VER_MAX));                  // y_start point in screen
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iX + ptDirtyRegion->tSize.iWidth));                        // x_end   point in screen
+    VSF_TGUI_ASSERT((ptLocation->iX + ptDirtyRegion->tSize.iWidth) <= VSF_TGUI_HOR_MAX);
+    VSF_TGUI_ASSERT(0 <= (ptLocation->iY + ptDirtyRegion->tSize.iHeight));                       // y_end   point in screen
+    VSF_TGUI_ASSERT((ptLocation->iY + ptDirtyRegion->tSize.iHeight) <= VSF_TGUI_VER_MAX);
 
-    tVisualCharRegion.tSize.iHeight = vsf_tgui_font_get_char_height(chFontIndex) + chInterLineSpace;
+    tCharDrawRegion.tSize.iHeight = vsf_tgui_font_get_char_height(chFontIndex);
+#if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT == ENABLED
+    tCharDrawRegion.tLocation.iX = __sv_text_draw_get_x(ptString, chFontIndex, tCharOffset, tMode, ptOriginResourceSize->iWidth);
+#endif
 
-    tLocation = *ptLocation;
+    tBaseLocation.iX = ptLocation->iX - ptDirtyRegion->tLocation.iX;
+    tBaseLocation.iY = ptLocation->iY - ptDirtyRegion->tLocation.iY;
 
     while (((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
         && (tCharOffset <= ptString->s16_size)
 #endif
         ) {
-#if VSF_TGUI_CFG_SV_MULTI_LINE_TEXT == ENABLED
         if (wChar == '\n') {
-            tVisualCharRegion.tLocation.iX = 0;
-            tVisualCharRegion.tLocation.iY += tVisualCharRegion.tSize.iHeight;
-
-            tLocation.iX = ptLocation->iX;
-            if (tDirtyCharRegion.tSize.iHeight) {
-                tLocation.iY += tDirtyCharRegion.tSize.iHeight;
-            }
-        }
-        else if (wChar == '\r') {
+#if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT == ENABLED
+            tCharDrawRegion.tLocation.iX = __sv_text_draw_get_x(ptString, chFontIndex, tCharOffset, tMode, ptOriginResourceSize->iWidth);
+            tCharDrawRegion.tLocation.iY += tCharDrawRegion.tSize.iHeight + chInterLineSpace;
+#endif
             continue;
         }
-        else
-#endif
-        {
-            tVisualCharRegion.tSize.iWidth = vsf_tgui_font_get_char_width(chFontIndex, wChar);
-            if (vsf_tgui_region_intersect(&tDirtyCharRegion, &tVisualCharRegion, ptRelativeRegion)) {
-                tRelativeCharLocation.iX = tDirtyCharRegion.tLocation.iX - tVisualCharRegion.tLocation.iX,
-                tRelativeCharLocation.iY = tDirtyCharRegion.tLocation.iY - tVisualCharRegion.tLocation.iY,
 
-                vsf_tgui_sv_port_draw_char(&tLocation, &tRelativeCharLocation, &tDirtyCharRegion.tSize, chFontIndex, wChar, tColor);
-                tLocation.iX += tDirtyCharRegion.tSize.iWidth;
-            }
-            tVisualCharRegion.tLocation.iX += tVisualCharRegion.tSize.iWidth;
+        if (wChar == '\r') {
+            continue;
+        }
+
+        tCharDrawRegion.tSize.iWidth = vsf_tgui_font_get_char_width(chFontIndex, wChar);
+        if (vsf_tgui_region_intersect(&tDirtyCharRegion, &tCharDrawRegion, ptDirtyRegion)) {
+            tRelativeCharLocation.iX = tDirtyCharRegion.tLocation.iX - tCharDrawRegion.tLocation.iX;
+            tRelativeCharLocation.iY = tDirtyCharRegion.tLocation.iY - tCharDrawRegion.tLocation.iY;
+            tLocation.iX = tBaseLocation.iX + tDirtyCharRegion.tLocation.iX;
+            tLocation.iY = tBaseLocation.iY + tDirtyCharRegion.tLocation.iY;
+
+            vsf_tgui_sv_port_draw_char(&tLocation, &tRelativeCharLocation, &tDirtyCharRegion.tSize, chFontIndex, wChar, tColor);
+
+            tCharDrawRegion.tLocation.iX += tCharDrawRegion.tSize.iWidth;
         }
     }
 }
+
 
 void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* ptDirtyRegion,
@@ -426,13 +500,9 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_align_mode_t tMode)
 {
     vsf_tgui_region_t tResourceRegion = {{0, 0}, {0,0}};
+    vsf_tgui_size_t tSize;
     vsf_tgui_location_t tRealLocation;
     vsf_tgui_sv_color_t tTmpColor = tColor;
-
-#if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-    vsf_tgui_string_t tString = {0};
-    int16_t iOffset = 0;
-#endif
 
     VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
@@ -448,136 +518,21 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* control_ptr,
         vsf_tgui_sv_color_set_trans_rate(&tTmpColor, 0xFF);
     }
 
-#if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-
-#   if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
-    if (ptStringInfo->bIsChanged) {
-        ptStringInfo->bIsChanged = false;
-        ptStringInfo->tInfoCache.tStringSize = vsf_tgui_text_get_size( chFontIndex,
-                                                    &(ptStringInfo->tString),
-                                                    &(ptStringInfo->tInfoCache.hwLines),
-                                                    ptStringInfo->chInterLineSpace);
-    }
-
-    tResourceRegion.tSize = ptStringInfo->tInfoCache.tStringSize;
-#   else
-    tResourceRegion.tSize = vsf_tgui_text_get_size( chFontIndex,
-                                                    &(ptStringInfo->tString),
-                                                    NULL,
-                                                    ptStringInfo->chInterLineSpace);
-#   endif
-    if (tResourceRegion.tSize.iWidth <= 0 || tResourceRegion.tSize.iHeight <= 0) {
+    if (!__sv_text_get_size(chFontIndex, ptStringInfo, &tSize)) {
         return ;
     }
+    tResourceRegion.tSize = tSize;
 
-    if (__sv_update_place_resouce_with_align(   control_ptr,
-                                                   ptDirtyRegion,
-                                                   tMode,
-                                                   &tRealLocation,
-                                                   &tResourceRegion)) {
-
-        //! get the tailored size
-        vsf_tgui_region_t tAbsoluteDirtyRegion = {.tLocation = tRealLocation, .tSize = tResourceRegion.tSize};
-
-        do {
-            vsf_tgui_size_t tSize;
-            vsf_tgui_location_t tAbsoluteLocation;
-            if (NULL == vsf_tgui_text_get_line(&(ptStringInfo->tString), &iOffset, &tString)) {
-                break;
-            }
-
-            tSize = vsf_tgui_text_get_size( chFontIndex, &tString, NULL, 0);
-            tResourceRegion.tSize = tSize;
-
-            if (__sv_update_place_resouce_with_align(   control_ptr,
-                                                           ptDirtyRegion,
-                                                           tMode,
-                                                           &tAbsoluteLocation,
-                                                           &tResourceRegion)) {
-        #if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
-                VSF_TGUI_LOG(VSF_TRACE_INFO,
-                    "[Simple View]%s draw text(%s) in "
-                        "(x:%d, y:%d), size(w:%d, h:%d)"
-                        VSF_TRACE_CFG_LINEEND,
-                    __sv_get_node_name(control_ptr),
-                    ptString->pstrText,
-                    tRealLocation.iX,
-                    tRealLocation.iY,
-                    tResourceRegion.tSize.iWidth,
-                    tResourceRegion.tSize.iHeight);
-        #endif
-                tResourceRegion.tSize = tSize;
-                tRealLocation.iX = tAbsoluteLocation.iX;
-
-                vsf_tgui_region_t temp_region = {.tLocation = tRealLocation, .tSize = tSize};
-
-                if (vsf_tgui_region_intersect(&temp_region, &temp_region, &tAbsoluteDirtyRegion)) {
-                    tResourceRegion.tSize = temp_region.tSize;
-
-                    vsf_tgui_sv_text_draw( &temp_region.tLocation,
-                                        &tResourceRegion,
-                                        &tString,
-                                        chFontIndex,
-                                        tColor,
-                                        ptStringInfo->chInterLineSpace/*,
-                                        control_ptr->use_as__vsf_tgui_v_control_t.chTileTransparencyRate*/);
-                }
-
-                tRealLocation.iY += tResourceRegion.tSize.iHeight + ptStringInfo->chInterLineSpace;
-            } else {
-                break;
-            }
-
-        } while(true);
-
-    }
-
-#else
-#   if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
-    if (ptStringInfo->bIsChanged) {
-        ptStringInfo->bIsChanged = false;
-        ptStringInfo->tInfoCache.tStringSize = vsf_tgui_text_get_size( chFontIndex,
-                                                    &(ptStringInfo->tString),
-                                                    &(ptStringInfo->tInfoCache.hwLines),
-                                                    ptStringInfo->chInterLineSpace);
-    }
-
-    tResourceRegion.tSize = ptStringInfo->tInfoCache.tStringSize;
-#   else
-    tResourceRegion.tSize = vsf_tgui_text_get_size( chFontIndex,
-                                                    &(ptStringInfo->tString),
-                                                    NULL,
-                                                    ptStringInfo->chInterLineSpace);
-#endif
-    if (tResourceRegion.tSize.iWidth <= 0 || tResourceRegion.tSize.iHeight <= 0) {
-        return ;
-    }
-
-    if (__sv_update_place_resouce_with_align(   control_ptr,
-                                                   ptDirtyRegion,
-                                                   tMode,
-                                                   &tRealLocation,
-                                                   &tResourceRegion)) {
+    if (__sv_update_place_resouce_with_align(control_ptr, ptDirtyRegion, tMode, &tRealLocation, &tResourceRegion)) {
 #if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_INFO,
-            "[Simple View]%s draw text(%s) in "
-                "(x:%d, y:%d), size(w:%d, h:%d)"
-                VSF_TRACE_CFG_LINEEND,
-            __sv_get_node_name(control_ptr),
-            ptStringInfo->tString,
-            tRealLocation.iX,
-            tRealLocation.iY,
-            tResourceRegion.tSize.iWidth,
-            tResourceRegion.tSize.iHeight);
+            "[Simple View]%s draw text(%s) in (:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
+            __sv_get_node_name(control_ptr), ptStringInfo->tString, tRealLocation.iX, tRealLocation.iY,
+            tResourceRegion.tSize.iWidth, tResourceRegion.tSize.iHeight);
 #endif
-        vsf_tgui_sv_text_draw( &tRealLocation,
-                               &tResourceRegion,
-                               &(ptStringInfo->tString),
-                               chFontIndex,
-                               tTmpColor, ptStringInfo->chInterLineSpace);
+        __sv_text_draw(&tRealLocation, &tSize, &tResourceRegion, &(ptStringInfo->tString),
+                       chFontIndex, tTmpColor, ptStringInfo->chInterLineSpace, tMode);
     }
-#endif
-
 }
 
 #endif

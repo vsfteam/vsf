@@ -60,6 +60,10 @@ struct vsf_tgui_font_t {
     const char* pchFontPath;
     void *ptData;
 #endif
+
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+    const char* name_ptr;
+#endif
 };
 typedef struct vsf_tgui_font_t vsf_tgui_font_t;
 /*============================ GLOBAL VARIABLES ==============================*/

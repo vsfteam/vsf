@@ -23,6 +23,11 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
+#define VSF_TGUI_FONTS_TEXT \
+    "wqy microhei s24\n"    \
+    "wqy microhei s20\n"    \
+    "wqy microhei s16\n"    \
+    "wqy dejavuserif s24"
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 enum {
@@ -32,8 +37,9 @@ enum {
     VSF_TGUI_FONT_WQY_MICROHEI_S20,
     VSF_TGUI_FONT_WQY_MICROHEI_S16,
 
-    VSF_TGUI_FONT_DEJAVUSERIF_S24, 
+    VSF_TGUI_FONT_DEJAVUSERIF_S24,
 };
+
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

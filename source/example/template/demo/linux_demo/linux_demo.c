@@ -121,6 +121,9 @@ extern int usbd_cdc_main(int argc, char *argv[]);
 #   if APP_USE_USBD_UVC_DEMO == ENABLED
 extern int usbd_uvc_main(int argc, char *argv[]);
 #   endif
+#   if APP_USE_USBD_UAC_DEMO == ENABLED
+extern int usbd_uac_main(int argc, char *argv[]);
+#   endif
 #   if APP_USE_USBD_MSC_DEMO == ENABLED
 extern int usbd_msc_main(int argc, char *argv[]);
 #   endif
@@ -288,6 +291,9 @@ int vsf_linux_create_fhs(void)
 #   endif
 #   if APP_USE_USBD_UVC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_uvc", usbd_uvc_main);
+#   endif
+#   if APP_USE_USBD_UAC_DEMO == ENABLED
+    busybox_bind("/sbin/usbd_uac", usbd_uac_main);
 #   endif
 #   if APP_USE_USBD_MSC_DEMO == ENABLED
     busybox_bind("/sbin/usbd_msc", usbd_msc_main);

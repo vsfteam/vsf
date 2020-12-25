@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*============================ INCLUDES ======================================*/
 #include "osa_service/vsf_osa_service_cfg.h"
 
@@ -503,6 +520,12 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
                 ((vsf_msgt_node_t* )item_ptr)->Attribute._.is_visited = true;
                 if (item_ptr->Attribute._.is_container && fsm_rt == fsm_rt_cpl) {
                     temp_ptr = container_ptr->node_ptr;
+                    if (NULL == temp_ptr && this.FWPOT.is_support_container_post_handling) {
+                        //! a corner case for container post handling
+                        this.FWPOT.msg_handling.node_ptr = (const vsf_msgt_node_t *)item_ptr;
+                        THIS_FSM_STATE = VISIT_ITEM;
+                        break;
+                    }
                 } else if (item_ptr == root_ptr) {
                     RESET_MSGT_FW_POT_PROPAGATE_MSG_FSM();
                     return fsm_rt_cpl;

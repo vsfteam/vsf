@@ -490,7 +490,17 @@ vsf_err_t vk_usbh_bthci_send(void *dev, uint8_t type, uint8_t *packet, uint16_t 
 
             ocb->is_ep0_claimed = true;
             ocb->is_busy = true;
-            vk_usbh_urb_set_buffer(urb, packet, size);
+
+            // allocate a new buffer in case original buffer is not aligned
+            // TODO: only necessary if hcd does not support unaligned access
+            uint8_t *buffer = vk_usbh_urb_alloc_buffer(&bthci->dev->ep0.urb, size);
+            if (NULL == buffer) {
+                VSF_USB_ASSERT(false);
+                return VSF_ERR_NOT_ENOUGH_RESOURCES;
+            }
+            memcpy(buffer, packet, size);
+
+//            vk_usbh_urb_set_buffer(urb, packet, size);
             return vk_usbh_control_msg_ex(usbh, bthci->dev, &req, 0, &bthci->eda);
         }
         break;

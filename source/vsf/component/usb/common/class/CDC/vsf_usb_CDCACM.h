@@ -27,12 +27,13 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct usb_cdcacm_line_coding_t {
+typedef struct usb_cdcacm_line_coding_t usb_cdcacm_line_coding_t;
+struct usb_cdcacm_line_coding_t {
     uint32_t bitrate;
     uint8_t stop;
     uint8_t parity;
     uint8_t datalen;
-} PACKED usb_cdcacm_line_coding_t;
+} PACKED;
 
 #define USB_CDCACM_CONTROLLINE_RTS          0x02
 #define USB_CDCACM_CONTROLLINE_DTR          0x01

@@ -240,12 +240,12 @@
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__signal.h" />
     <ClInclude Include="..\..\..\vsf\utilities\compiler\__common\__type.h" />
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\code_region.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\language_extension\delegate.h" />
     <ClInclude Include="..\..\..\vsf\utilities\language_extension\language_extension.h" />
     <ClInclude Include="..\..\..\vsf\utilities\ooc_class.h" />
     <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mf_u8_dec2str.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\mrepeat.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\preprocessor.h" />
-    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\tpaste.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\vsf_connect.h" />
+    <ClInclude Include="..\..\..\vsf\utilities\preprocessor\vsf_repeat_macro.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\template.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_bitmap.h" />
     <ClInclude Include="..\..\..\vsf\utilities\template\vsf_list.h" />
@@ -339,6 +339,7 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\vsf_tgui_v.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui.c" />
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c" />
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_input.c" />
     <ClCompile Include="..\..\..\vsf\component\vsf_component.c" />
     <ClCompile Include="..\..\..\vsf\hal\arch\vsf_arch_abstraction.c" />
     <ClCompile Include="..\..\..\vsf\hal\arch\x86\win\win_generic.c" />
@@ -381,6 +382,7 @@
     <ClCompile Include="..\..\..\vsf\service\vsf_service.c" />
     <ClCompile Include="..\..\..\vsf\utilities\compiler\__common\__retarget_io.c" />
     <ClCompile Include="..\..\..\vsf\utilities\language_extension\code_region.c" />
+    <ClCompile Include="..\..\..\vsf\utilities\language_extension\delegate.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_bitmap.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_list.c" />
     <ClCompile Include="..\..\..\vsf\utilities\template\vsf_queue.c" />
@@ -392,6 +394,7 @@
     <ClCompile Include="..\..\usrapp\mvc_demo_win\tgui_demo\tgui_port.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\vsf\service\pool\impl_vsf_pool.inc" />
     <None Include="..\..\..\vsf\utilities\3rd-party\PLOOC\raw\README.md" />
     <None Include="cpp.hint" />
   </ItemGroup>

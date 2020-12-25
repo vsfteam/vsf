@@ -179,13 +179,14 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
     uint32_t wChar;
     size_t tCharOffset;
     bool bFindFirstChar = true;
-    size_t tStart = 0;
+    size_t tStart;
 
     VSF_TGUI_ASSERT(NULL != ptStringIn);
     VSF_TGUI_ASSERT(NULL != piOffSet);
     VSF_TGUI_ASSERT(NULL != ptStringOut);
 
     tCharOffset = *piOffSet;
+    tStart = tCharOffset;
 
     if (    (NULL == ptStringIn->pstrText)
         ||  (ptStringIn->s16_size <= 0)
@@ -193,25 +194,26 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
         return NULL;
     }
 
-    ptStringOut->pstrText = (uintptr_t)(ptStringIn->pstrText);
+    ptStringOut->pstrText = (VSF_TGUI_CFG_STRING_TYPE *)(ptStringIn->pstrText);
 
     while ( ((wChar = vsf_tgui_text_get_next(ptStringIn->pstrText, &tCharOffset)) != '\0')
         &&  (tCharOffset <= ptStringIn->s16_size)
     ) {
         if (wChar == '\n') {
             break;
-        } else if (wChar == '\r') {
-            continue;
         }
 
         if (bFindFirstChar) {
-            bFindFirstChar = false;
-            ptStringOut->pstrText = (uintptr_t)(ptStringIn->pstrText) + tCharOffset - 1;
-            tStart = (tCharOffset - 1);
+            if (wChar == '\r') {
+                tStart = tCharOffset; // next char offset
+            } else {
+                bFindFirstChar = false;
+                ptStringOut->pstrText = (VSF_TGUI_CFG_STRING_TYPE*)(ptStringIn->pstrText) + tStart;
+            }
         }
     }
 
-    ptStringOut->s16_size = tCharOffset - tStart - 1;
+    ptStringOut->s16_size = tCharOffset - tStart - 1; // \n always is 1 byte
     *piOffSet = tCharOffset;
 
     return ptStringOut;
@@ -221,16 +223,16 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
 vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
                                         vsf_tgui_string_t* ptString,
                                         uint16_t *phwLineCount,
+                                        uint8_t *pchCharHeight,
                                         int_fast8_t chInterlineSpace)
 {
     vsf_tgui_size_t tSize = {0, 0};
     int16_t iWidth = 0;
-    int16_t nFontHeight;
+    int16_t iFontHeight;
     uint32_t wChar;
     size_t tCharOffset = 0;
     uint8_t chWidth;
     uint_fast16_t hwLineCount = 0;
-    bool bFoundANewLine = true;
 
     VSF_TGUI_ASSERT(NULL != ptString);
 
@@ -240,44 +242,43 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
     #endif
     ) {
 
-        nFontHeight = vsf_tgui_font_get_char_height(chFontIndex);
+        iFontHeight = vsf_tgui_font_get_char_height(chFontIndex);
 
         while ( ((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
         #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
             &&  (tCharOffset <= ptString->s16_size)
         #endif
         ) {
-        #if VSF_TGUI_CFG_SV_MULTI_LINE_TEXT == ENABLED
             if (wChar == '\n') {
-                tSize.iHeight += nFontHeight + chInterlineSpace;
+        #if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT == ENABLED
                 tSize.iWidth = max(tSize.iWidth, iWidth);
                 iWidth = 0;
-                bFoundANewLine = true;
-            } else if (wChar == '\r') {
-                continue;
-            } else
+                hwLineCount++;
         #endif
-            {
-                if (bFoundANewLine) {
-                    bFoundANewLine = false;
-                    hwLineCount++;
-                }
-                chWidth = vsf_tgui_font_get_char_width(chFontIndex, wChar);
-                if (chWidth > 0) {
-                    iWidth += chWidth;
-                }
+                continue;
+            }
+
+            if (wChar == '\r') {
+                continue;
+            }
+
+            chWidth = vsf_tgui_font_get_char_width(chFontIndex, wChar);
+            if (chWidth > 0) {
+                iWidth += chWidth;
             }
         }
 
-        if (iWidth) {
-            tSize.iHeight += nFontHeight;
-        }
-
         tSize.iWidth = max(tSize.iWidth, iWidth);
+        tSize.iHeight = hwLineCount * (iFontHeight + chInterlineSpace) + iFontHeight;
+        VSF_TGUI_ASSERT(tSize.iHeight > 0);
+        hwLineCount++;
     }
 
     if (NULL != phwLineCount) {
         *phwLineCount = hwLineCount;
+    }
+    if (NULL != pchCharHeight) {
+        *pchCharHeight = iFontHeight;
     }
 
     return tSize;

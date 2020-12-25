@@ -358,6 +358,7 @@ static vsf_err_t __ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_h
 static vsf_err_t __ohci_fini(vk_usbh_hcd_t *hcd);
 static vsf_err_t __ohci_suspend(vk_usbh_hcd_t *hcd);
 static vsf_err_t __ohci_resume(vk_usbh_hcd_t *hcd);
+static uint_fast16_t __ohci_get_frame_number(vk_usbh_hcd_t *hcd);
 static vk_usbh_hcd_urb_t * __ohci_alloc_urb(vk_usbh_hcd_t *hcd);
 static void __ohci_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 static vsf_err_t __ohci_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
@@ -371,6 +372,7 @@ const vk_usbh_hcd_drv_t vk_ohci_drv = {
     .fini = __ohci_fini,
     .suspend = __ohci_suspend,
     .resume = __ohci_resume,
+    .get_frame_number = __ohci_get_frame_number,
     .alloc_urb = __ohci_alloc_urb,
     .free_urb = __ohci_free_urb,
     .submit_urb = __ohci_submit_urb,
@@ -1172,6 +1174,12 @@ static vsf_err_t __ohci_suspend(vk_usbh_hcd_t *hcd)
 static vsf_err_t __ohci_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
+}
+
+static uint_fast16_t __ohci_get_frame_number(vk_usbh_hcd_t *hcd)
+{
+    vk_ohci_t *ohci = hcd->priv;
+    return ohci->frame_no;
 }
 
 static vk_usbh_hcd_urb_t * __ohci_alloc_urb(vk_usbh_hcd_t *hcd)

@@ -64,7 +64,7 @@ vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
         }
         desc++;
     }
-    return 0;
+    return NULL;
 }
 
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
@@ -1084,6 +1084,7 @@ static void __vk_usbd_stream_rx_evthandler(void *param, vsf_stream_evt_t evt)
             if (stream_ep->size > 0) {
                 stream_ep->cur_size = stream_ep->size;
                 stream_ep->on_finish = __vk_usbd_stream_rx_on_trans_finish;
+                stream_ep->use_as__vk_usbd_trans_t.zlp = stream_ep->zlp_save;
                 vk_usbd_ep_send(dev, &stream_ep->use_as__vk_usbd_trans_t);
             }
         }
@@ -1096,6 +1097,7 @@ vsf_err_t vk_usbd_ep_send_stream(vk_usbd_ep_stream_t *stream_ep, uint_fast32_t s
     vk_usbd_trans_t *trans = &stream_ep->use_as__vk_usbd_trans_t;
     vsf_stream_t *stream = stream_ep->stream;
 
+    stream_ep->zlp_save = trans->zlp;
     stream_ep->total_size = size;
     stream_ep->transfered_size = 0;
     stream->rx.param = stream_ep;

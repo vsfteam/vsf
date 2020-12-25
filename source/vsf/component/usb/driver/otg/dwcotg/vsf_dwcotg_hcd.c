@@ -24,6 +24,7 @@
 #define __VSF_USBH_CLASS_IMPLEMENT_HCD__
 #define __VSF_USBH_CLASS_IMPLEMENT_HUB__
 #define __VSF_DWCOTG_HCD_CLASS_IMPLEMENT
+#define __VSF_EDA_CLASS_INHERIT__
 
 #include "kernel/vsf_kernel.h"
 #include "component/usb/host/vsf_usbh.h"
@@ -39,22 +40,44 @@ enum {
     DWCOTG_HCD_DPIP_SETUP = 3,
 };
 
+enum vk_dwcotg_hcd_urb_channel_phase_t {
+    VSF_DWCOTG_HCD_PHASE_IDLE = 0,
+    VSF_DWCOTG_HCD_PHASE_PERIOD,
+    VSF_DWCOTG_HCD_PHASE_SETUP,
+    VSF_DWCOTG_HCD_PHASE_DATA,
+    VSF_DWCOTG_HCD_PHASE_STATUS,
+    VSF_DWCOTG_HCD_PHASE_DONE,
+} vk_dwcotg_hcd_urb_channel_phase_t;
+
+enum vk_dwcotg_hcd_urb_channel_result_t {
+    VSF_DWCOTG_HCD_CHANNEL_DONE = 0,
+    VSF_DWCOTG_HCD_CHANNEL_NAK,
+    VSF_DWCOTG_HCD_CHANNEL_NYET,
+    VSF_DWCOTG_HCD_CHANNEL_ERROR,
+    VSF_DWCOTG_HCD_CHANNEL_STALL,
+    VSF_DWCOTG_HCD_CHANNEL_TOGGLE_ERROR,
+    VSF_DWCOTG_HCD_CHANNEL_FRAME_ERROR,
+    VSF_DWCOTG_HCD_CHANNEL_TRANSACT_ERROR,
+} vk_dwcotg_hcd_urb_channel_result_t;
+
 typedef struct vk_dwcotg_hcd_urb_t {
-    int8_t idx;
+    vsf_slist_node_t node;
 
-    uint8_t phase           : 3;
-    uint8_t state           : 3;
-
-    uint8_t toggle_start    : 1;
-    uint8_t toggle_next     : 1;
-    uint8_t do_ping         : 1;
-    uint8_t discarded       : 1;
+    uint16_t channel_idx    : 4;
+    uint16_t is_alloced     : 1;
+    uint16_t is_discarded   : 1;
+    uint16_t err_cnt        : 2;
+    uint16_t phase          : 3;
+    uint16_t toggle         : 1;
+    uint16_t do_ping        : 1;
 
     uint16_t current_size;
 } vk_dwcotg_hcd_urb_t;
 
 typedef struct vk_dwcotg_hcd_t {
     implement(vk_dwcotg_t)
+    implement(vk_dwcotg_param_t)
+
     enum {
         DWCOTG_HCD_STATE_WAIT_ABH_IDLE,
         DWCOTG_HCD_STATE_WAIT_RESET,
@@ -64,13 +87,18 @@ typedef struct vk_dwcotg_hcd_t {
         DWCOTG_HCD_STATE_WORKING,
     } state;
 
+    uint8_t is_port_changed : 1;
+    uint8_t is_connected    : 1;
     uint16_t ep_mask;
-    vsf_teda_t teda;
+    volatile uint32_t softick;
+
+    vsf_eda_t task;
     vk_usbh_hcd_t *hcd;
     vk_usbh_dev_t *dev;
-    implement(vk_dwcotg_param_t)
+    vsf_slist_queue_t ready_queue;
+    vsf_slist_queue_t pending_queue;
 
-    vk_dwcotg_hcd_urb_t *urb[0];
+    vk_usbh_hcd_urb_t *urb[0];
 } vk_dwcotg_hcd_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -82,11 +110,14 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 static vsf_err_t __vk_dwcotg_hcd_fini(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_dwcotg_hcd_suspend(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_dwcotg_hcd_resume(vk_usbh_hcd_t *hcd);
+static uint_fast16_t __vk_dwcotg_hcd_get_frame_number(vk_usbh_hcd_t *hcd);
 static vk_usbh_hcd_urb_t * __vk_dwcotg_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
 static void __vk_dwcotg_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 static vsf_err_t __vk_dwcotg_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 static vsf_err_t __vk_dwcotg_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 static int __vk_dwcotg_hcd_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+
+static void __vk_dwcotg_hcd_interrupt(void *param);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -95,6 +126,7 @@ const vk_usbh_hcd_drv_t vk_dwcotg_hcd_drv = {
     .fini               = __vk_dwcotg_hcd_fini,
     .suspend            = __vk_dwcotg_hcd_suspend,
     .resume             = __vk_dwcotg_hcd_resume,
+    .get_frame_number   = __vk_dwcotg_hcd_get_frame_number,
     .alloc_urb          = __vk_dwcotg_hcd_alloc_urb,
     .free_urb           = __vk_dwcotg_hcd_free_urb,
     .submit_urb         = __vk_dwcotg_hcd_submit_urb,
@@ -134,16 +166,133 @@ static void __vk_dwcotg_hcd_init_regs(vk_dwcotg_hcd_t *dwcotg_hcd, void *regbase
     dwcotg_hcd->reg.host.hprt0 = (void *)((uint8_t *)regbase + 0x440);
     dwcotg_hcd->reg.host.hc_regs = (void *)((uint8_t *)regbase + 0x500);
 
+    VSF_USB_ASSERT(dimof(dwcotg_hcd->reg.dfifo) >= ep_num);
     for (uint_fast8_t i = 0; i < ep_num; i++) {
         dwcotg_hcd->reg.dfifo[i] = (void *)((uint8_t *)regbase + (i + 1) * 0x1000);
     }
 }
 
+static void __vk_dwcotg_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
+{
+    vk_usbh_hcd_urb_free_buffer(urb);
+    vsf_usbh_free(urb);
+}
+
+static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8_t channel_idx)
+{
+    struct dwcotg_hc_regs_t *channel_regs = &dwcotg_hcd->reg.host.hc_regs[channel_idx];
+    vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
+    VSF_USB_ASSERT(urb != NULL);
+
+    channel_regs->hcchar |= USB_OTG_HCCHAR_CHDIS;
+    if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
+        ||  (urb->pipe.type == USB_ENDPOINT_XFER_INT)) {
+        if (dwcotg_hcd->reg.global_regs->gnptxsts & 0xFFFF) {
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
+            // skip delay
+        } else {
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+        }
+    } else {
+        if (dwcotg_hcd->reg.host.global_regs->hptxsts & 0xFFFF) {
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            channel_regs->hcchar &= ~USB_OTG_HCCHAR_EPDIR;
+            // skip delay
+        } else {
+            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+        }
+    }
+}
+
+static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb,
+                        uint_fast8_t dpid, bool dir_in1out0, uint8_t *buffer, uint_fast16_t size)
+{
+    const uint8_t eptype_to_dwctype[4] = {
+        [USB_ENDPOINT_XFER_CONTROL] = 0,
+        [USB_ENDPOINT_XFER_ISOC]    = 1,
+        [USB_ENDPOINT_XFER_BULK]    = 2,
+        [USB_ENDPOINT_XFER_INT]     = 3,
+    };
+
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    struct dwcotg_hc_regs_t *channel_regs = &dwcotg_hcd->reg.host.hc_regs[dwcotg_urb->channel_idx];
+    vk_usbh_pipe_t pipe = urb->pipe;
+    uint_fast32_t pkt_num;
+
+    VSF_USB_ASSERT(!(dwcotg_hcd->reg.host.global_regs->haintmsk & (1 << dwcotg_urb->channel_idx)));
+//    VSF_USB_ASSERT(!(channel_regs->hcchar & USB_OTG_HCCHAR_CHDIS));
+
+    channel_regs->hcchar =  (pipe.address << 22) | (pipe.endpoint << 11) |
+                            (dir_in1out0 ? USB_OTG_HCCHAR_EPDIR : 0) |
+                            ((pipe.speed == USB_SPEED_LOW) << 17) |
+                            ((uint32_t)eptype_to_dwctype[pipe.type] << 18) |
+                            (pipe.size & USB_OTG_HCCHAR_MPSIZ);
+    if (pipe.type == USB_ENDPOINT_XFER_INT) {
+        channel_regs->hcchar |= USB_OTG_HCCHAR_ODDFRM;
+    }
+
+    if (size > 0) {
+        pkt_num = (size + pipe.size - 1) / pipe.size;
+        VSF_USB_ASSERT(pkt_num <= 256);
+    } else {
+        pkt_num = 1;
+    }
+
+    if (dir_in1out0) {
+        size = pipe.size * pkt_num;
+    }
+    dwcotg_urb->current_size = size;
+    channel_regs->hctsiz = ((pkt_num << 19) & USB_OTG_HCTSIZ_PKTCNT) | ((uint32_t)dpid << 29) | size;
+
+    if (dwcotg_hcd->dma_en) {
+        VSF_USB_ASSERT(!((uintptr_t)buffer & 0x03));
+        channel_regs->hcdma = (uint32_t)buffer;
+    }
+
+    channel_regs->hcchar |= ((dwcotg_hcd->reg.host.global_regs->hfnum & 1) ^ 1) << 29;
+    channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+
+    channel_regs->hcintmsk = USB_OTG_HCINTMSK_CHHM;
+    vsf_protect_t orig = vsf_protect_int();
+        dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << dwcotg_urb->channel_idx;
+    vsf_unprotect_int(orig);
+
+    if (!dwcotg_hcd->dma_en && !dir_in1out0 && (dwcotg_urb->current_size > 0)) {
+        // TODO: check FIFO space
+        uint32_t *fifo_reg = dwcotg_hcd->reg.dfifo[dwcotg_urb->channel_idx];
+        for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
+            *fifo_reg = get_unaligned_le32(buffer);
+        }
+    }
+}
+
+static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+//    vk_dwcotg_hcd_t *dwcotg_hcd = container_of(eda, vk_dwcotg_hcd_t, task);
+
+    switch (evt) {
+    case VSF_EVT_MESSAGE: {
+            vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
+            vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+
+            if (dwcotg_urb->is_discarded) {
+                __vk_dwcotg_hcd_free_urb_do(urb);
+                return;
+            }
+            VSF_USB_ASSERT(false);
+        }
+        break;
+    }
+}
+
 static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
 {
-    vk_dwcotg_hcd_t *dwcotg_hcd;
+    vk_dwcotg_hcd_t *dwcotg_hcd = NULL;
     vk_dwcotg_hcd_param_t *param;
-    vk_dwcotg_reg_t *reg;
+    vk_dwcotg_reg_t *reg = NULL;
 
     VSF_USB_ASSERT(hcd != NULL);
     if (hcd->priv != NULL) {
@@ -156,14 +305,15 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
     case VSF_EVT_INIT: {
             vk_dwcotg_hc_ip_info_t info;
             param->op->GetInfo(&info.use_as__usb_hc_ip_info_t);
-            info.ep_num >>= 1£»
+            VSF_USB_ASSERT(info.dma_en);
 
-            dwcotg_hcd = hcd->priv = vsf_usbh_malloc(sizeof(*dwcotg_hcd) + info.ep_num * sizeof(vk_dwcotg_hcd_urb_t *));
+            uint_fast32_t dwcotg_size = sizeof(*dwcotg_hcd) + info.ep_num * sizeof(vk_usbh_hcd_urb_t *);
+            dwcotg_hcd = hcd->priv = vsf_usbh_malloc(dwcotg_size);
             if (NULL == dwcotg_hcd) {
                 VSF_USB_ASSERT(false);
                 return VSF_ERR_NOT_ENOUGH_RESOURCES;
             }
-            memset(dwcotg_hcd, 0, sizeof(*dwcotg_hcd));
+            memset(dwcotg_hcd, 0, dwcotg_size);
             dwcotg_hcd->hcd = hcd;
 
             {
@@ -178,7 +328,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 
             dwcotg_hcd->dma_en = info.dma_en;
             hcd->rh_speed = dwcotg_hcd->speed = info.speed;
-            dwcotg_hcd->ep_num = info.ep_num >> 1;
+            dwcotg_hcd->ep_num = info.ep_num;
             dwcotg_hcd->ep_mask = ~((1 << info.ep_num) - 1);
             __vk_dwcotg_hcd_init_regs(dwcotg_hcd, info.regbase, dwcotg_hcd->ep_num);
             reg = &dwcotg_hcd->reg;
@@ -234,11 +384,15 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         case DWCOTG_HCD_STATE_WAIT_ENABLE:
             // USBx->GCCFG |= USB_OTG_GCCFG_VBDEN;
             reg->global_regs->gccfg |= USB_OTG_GCCFG_VBDEN;
+            reg->host.global_regs->hcfg &= ~USB_OTG_HCFG_FSLSPCS;
             if (dwcotg_hcd->speed == USB_SPEED_HIGH) {
                 reg->host.global_regs->hcfg &= ~USB_OTG_HCFG_FSLSS;
+            } else if (dwcotg_hcd->speed == USB_SPEED_FULL) {
+                reg->host.global_regs->hcfg |= USB_OTG_HCFG_FSLSS | USB_OTG_HCFG_FSLSPCS_0;
             } else {
-                reg->host.global_regs->hcfg |= USB_OTG_HCFG_FSLSS;
+                VSF_USB_ASSERT(false);
             }
+            // TODO: set reg->host.global_regs->hfir if SOF interval is not 1ms
 
             // Flush FIFO
             reg->global_regs->grstctl = USB_OTG_GRSTCTL_TXFFLSH | USB_OTG_GRSTCTL_TXFNUM_4;
@@ -283,9 +437,13 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             if (!dwcotg_hcd->dma_en) {
                 reg->global_regs->gintmsk |= USB_OTG_GINTMSK_RXFLVLM;
             }
-            reg->global_regs->gintmsk |= USB_OTG_GINTMSK_HCIM | USB_OTG_GINTMSK_SOFM | USB_OTG_GINTMSK_PXFRM_IISOOXFRM;
+            // TODO: add back USB_OTG_GINTMSK_PXFRM_IISOOXFRM if know how to process
+            reg->global_regs->gintmsk |= USB_OTG_GINTMSK_HCIM | USB_OTG_GINTMSK_SOFM;
             reg->global_regs->gahbcfg |= USB_OTG_GAHBCFG_GINT;
             dwcotg_hcd->state = DWCOTG_HCD_STATE_WORKING;
+
+            dwcotg_hcd->task.fn.evthandler = __vk_dwcotg_hcd_evthandler;
+            vsf_eda_init(&dwcotg_hcd->task, vsf_prio_inherit, false);
             return VSF_ERR_NONE;
         }
     }
@@ -308,6 +466,13 @@ static vsf_err_t __vk_dwcotg_hcd_resume(vk_usbh_hcd_t *hcd)
     return VSF_ERR_NONE;
 }
 
+static uint_fast16_t __vk_dwcotg_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
+{
+    vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
+    vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
+    return reg->host.global_regs->hfnum & 0xFFFF;
+}
+
 static vk_usbh_hcd_urb_t * __vk_dwcotg_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
     uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vk_dwcotg_hcd_urb_t);
@@ -320,135 +485,213 @@ static vk_usbh_hcd_urb_t * __vk_dwcotg_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 
 static void __vk_dwcotg_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    vsf_usbh_free(urb);
-}
-
-static vsf_err_t __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb,
-                        uint_fast8_t dpid, bool dir_in1out0, uint8_t *buffer, uint_fast16_t size)
-{
-    const uint8_t eptype_to_dwctype[4] = {
-        [USB_ENDPOINT_XFER_CONTROL] = 1,
-        [USB_ENDPOINT_XFER_ISOC]    = 3,
-        [USB_ENDPOINT_XFER_BULK]    = 0,
-        [USB_ENDPOINT_XFER_INT]     = 2
-    };
-
-    vk_dwcotg_hcd_urb_t *urb_priv = (vk_dwcotg_hcd_urb_t *)&urb->priv;
-    struct dwcotg_hc_regs_t *hc_regs = &dwcotg_hcd->reg.host.hc_regs[urb_priv->idx];
-    vk_usbh_pipe_t pipe = urb->pipe;
-    uint_fast32_t tmp;
-
-    switch (pipe.type) {
-    case USB_ENDPOINT_XFER_ISOC:
-        hc_regs->hcintmsk = USB_OTG_HCINTMSK_XFRCM | USB_OTG_HCINTMSK_ACKM |
-                            USB_OTG_HCINTMSK_AHBERR | USB_OTG_HCINTMSK_FRMORM ;
-        if (dir_in1out0) {
-            hc_regs->hcintmsk |= USB_OTG_HCINTMSK_TXERRM;
-        }
-        break;
-    case USB_ENDPOINT_XFER_INT:
-        hc_regs->hcintmsk = USB_OTG_HCINTMSK_XFRCM | USB_OTG_HCINTMSK_STALLM |
-                            USB_OTG_HCINTMSK_TXERRM | USB_OTG_HCINTMSK_DTERRM|
-                            USB_OTG_HCINTMSK_NAKM | USB_OTG_HCINTMSK_AHBERR |
-                            USB_OTG_HCINTMSK_FRMORM;
-        break;
-    case USB_ENDPOINT_XFER_CONTROL:
-    case USB_ENDPOINT_XFER_BULK:
-        hc_regs->hcintmsk = USB_OTG_HCINTMSK_XFRCM  | USB_OTG_HCINTMSK_STALLM |
-                            USB_OTG_HCINTMSK_TXERRM | USB_OTG_HCINTMSK_DTERRM |
-                            USB_OTG_HCINTMSK_AHBERR | USB_OTG_HCINTMSK_NAKM;
-        if (!dir_in1out0) {
-            hc_regs->hcintmsk |= USB_OTG_HCINTMSK_NYET;
-        }
-        break;
-    }
-    if (hc->dir_o0_i1) {
-        reg->hcintmsk |= USB_OTG_HCINTMSK_BBERRM;
-    }
-
-    dwcotg_hcd->reg.host.global_regs->haintmsk |= 1 << urb_priv->idx;
-    hc_regs->hcchar =   (pipe.address << 22) | (pipe.endpoint << 11) |
-                        (dir_in1out0 ? USB_OTG_HCCHAR_EPDIR : 0) |
-                        ((pipe.speed == USB_SPEED_LOW) << 17) |
-                        ((uint32_t)eptype_to_dwctype[pipe.type] << 18) |
-                        (pipe.size & USB_OTG_HCCHAR_MPSIZ);
-    if (urb_priv->type == USB_ENDPOINT_XFER_INT) {
-        reg->hcchar |= USB_OTG_HCCHAR_ODDFRM;
-    }
-
-    if (size > 0) {
-        tmp = (size + pipe.size - 1) / pipe.size;
-        if (tmp > 256) {
-            tmp = 256;
-            size = pipe.size * 256;
-        }
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    vsf_protect_t orig = vsf_protect_int();
+    if (dwcotg_urb->is_alloced) {
+        dwcotg_urb->is_discarded = true;
+        vsf_unprotect_int(orig);
+//        __vk_dwcotg_hcd_halt_channel((vk_dwcotg_hcd_t *)hcd->priv, dwcotg_urb->channel_idx);
     } else {
-        tmp = 1;
+        vsf_unprotect_int(orig);
+        __vk_dwcotg_hcd_free_urb_do(urb);
     }
-    if (dir_in1out0) {
-        size = pipe.size * tmp;
-    }
-    urb_priv->current_size = size;
-    hc_regs->hctsiz = ((tmp << 19) & USB_OTG_HCTSIZ_PKTCNT) | ((uint32_t)dpid << 29) | size;
-    urb_priv->toggle_next = urb_priv->toggle_start ^ (tmp & 1);
-
-    if (dwcotg_hcd->dma_en) {
-        hc_regs->hcdma = (uint32_t)buffer;
-    }
-
-    hc_regs->hcchar |= (dwcotg_hcd->reg.host.global_regs->hfnum & 1) << 29;
-    hc_regs->hcchar = (hc_regs->hcchar & ~USB_OTG_HCCHAR_CHDIS) | USB_OTG_HCCHAR_CHENA;
-
-    if (!dwcotg_hcd->dma_en && !dir_in1out0 && (urb_priv->current_size > 0)) {
-        
-    }
-    return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_dwcotg_hcd_urb_handler(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb)
+static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb)
 {
-    vk_dwcotg_hcd_urb_t *urb_priv = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    uint_fast32_t interval = urb->interval;
+    if (!interval) {
+        return true;
+    }
+    if (USB_SPEED_HIGH == dwcotg_hcd->speed) {
+        interval <<= 3;
+    }
+    return dwcotg_hcd->softick % interval == 0;
+}
+
+static void __vk_dwcotg_hcd_urb_fsm(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb)
+{
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
     vk_usbh_pipe_t pipe = urb->pipe;
 
-    switch (urb_priv->phase) {
-    case VSF_DWCOTG_HCD_PHASE_PERIOD: {
-            uint_fast32_t interval = urb->interval;
-            if (USB_SPEED_HIGH == dwcotg_hcd->speed) {
-                interval <<= 3;
-            }
-            if (!(dwcotg_hcd->softtick & interval)) {
-                urb_priv->state = VSF_DWCOTG_HCD_STATE_START;
-                urb_priv->phase = VSF_DWCOTG_HCD_PHASE_DATA;
-                goto data_phase;
+    if (!dwcotg_urb->is_alloced) {
+        int_fast8_t index;
+        vsf_protect_t orig = vsf_protect_int();
+            index = vsf_ffz(dwcotg_hcd->ep_mask);
+            if (index >= 0) {
+                dwcotg_hcd->ep_mask |= 1 << index;
+                dwcotg_urb->is_alloced = true;
+                dwcotg_hcd->urb[index] = urb;
+                dwcotg_urb->channel_idx = index;
             } else {
-                urb_priv->state = VSF_DWCOTG_HCD_STATE_WAIT;
+                vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->ready_queue, dwcotg_urb);
             }
+        vsf_unprotect_int(orig);
+
+        if (index < 0) {
+            return;
         }
+    }
+
+    switch (dwcotg_urb->phase) {
+    case VSF_DWCOTG_HCD_PHASE_PERIOD:
+        VSF_USB_ASSERT(false);
         break;
     case VSF_DWCOTG_HCD_PHASE_SETUP:
-        return __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, DWCOTG_HCD_DPIP_SETUP, 0, &urb->setup_packet, sizeof(urb->setup_packet));
-    case VSF_DWCOTG_HCD_PHASE_DATA:
-    data_phase: {
+        __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, DWCOTG_HCD_DPIP_SETUP, 0, (uint8_t *)&urb->setup_packet, sizeof(urb->setup_packet));
+        break;
+    case VSF_DWCOTG_HCD_PHASE_DATA: {
             uint_fast8_t dpid;
             switch (pipe.type) {
             case USB_ENDPOINT_XFER_CONTROL:
                 dpid = DWCOTG_HCD_DPIP_DATA1;
                 break;
-            case USB_ENDPOINT_XFER_ISO:
+            case USB_ENDPOINT_XFER_ISOC:
                 dpid = DWCOTG_HCD_DPIP_DATA0;
                 break;
             case USB_ENDPOINT_XFER_BULK:
             case USB_ENDPOINT_XFER_INT:
-                dpid = urb_priv->toggle_start ? DWCOTG_HCD_DPIP_DATA1 : DWCOTG_HCD_DPIP_DATA0;
+                dpid = dwcotg_urb->toggle ? DWCOTG_HCD_DPIP_DATA1 : DWCOTG_HCD_DPIP_DATA0;
                 break;
             }
-            return __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, dpid, pipe.dir_in1out0, urb_priv->transfer_buffer, urb_priv->transfer_length);
+            __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, dpid, pipe.dir_in1out0, (uint8_t *)urb->buffer, urb->transfer_length);
         }
-    case VSF_DWCOTG_HCD_PHASE_STATE:
-        return __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, HC_DPID_DATA1, NULL, 0);
+        break;
+    case VSF_DWCOTG_HCD_PHASE_STATUS:
+        __vk_dwcotg_hcd_commit_urb(dwcotg_hcd, urb, DWCOTG_HCD_DPIP_DATA1, !pipe.dir_in1out0, NULL, 0);
+        break;
     default:
         VSF_USB_ASSERT(false);
-        return VSF_ERR_FAIL;
+        break;
+    }
+}
+
+static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8_t channel_idx)
+{
+    vk_usbh_hcd_urb_t *urb = dwcotg_hcd->urb[channel_idx];
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    struct dwcotg_hc_regs_t *channel_regs = &dwcotg_hcd->reg.host.hc_regs[channel_idx];
+    uint_fast32_t channel_intsts = channel_regs->hcint;
+    bool is_in = channel_regs->hcchar & USB_OTG_HCCHAR_EPDIR;
+    vsf_protect_t orig;
+
+    if (channel_intsts & USB_OTG_HCINT_CHH) {
+        orig = vsf_protect_int();
+            dwcotg_hcd->reg.host.global_regs->haintmsk &= ~(1 << channel_idx);
+        vsf_unprotect_int(orig);
+
+        channel_regs->hcintmsk = 0;
+        channel_regs->hcint = channel_regs->hcint;
+
+        if (dwcotg_urb->is_discarded) {
+            goto free_channel;
+        }
+
+        channel_intsts &= ~USB_OTG_HCINT_CHH;
+        if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
+            bool is_stall = channel_intsts & USB_OTG_HCINT_STALL;
+            if (is_in) {
+                dwcotg_urb->current_size -= channel_regs->hctsiz & USB_OTG_HCTSIZ_XFRSIZ;
+            }
+
+            switch (urb->pipe.type) {
+            case USB_ENDPOINT_XFER_CONTROL:
+                if (is_stall) {
+                    goto urb_done_check_stall;
+                }
+                switch (dwcotg_urb->phase) {
+                case VSF_DWCOTG_HCD_PHASE_SETUP:
+                    if (0 == urb->transfer_length) {
+                        // skip data phase
+                        dwcotg_urb->phase++;
+                    }
+                    break;
+                case VSF_DWCOTG_HCD_PHASE_DATA:
+                    urb->actual_length = dwcotg_urb->current_size;
+                    break;
+                }
+                dwcotg_urb->phase++;
+                if (dwcotg_urb->phase != VSF_DWCOTG_HCD_PHASE_DONE) {
+                    __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+                    return;
+                } else {
+                urb_done_check_stall:
+                    urb->status = is_stall ? URB_FAIL : URB_OK;
+                urb_done:
+                    vsf_eda_post_msg(urb->eda_caller, urb);
+                }
+                break;
+            case USB_ENDPOINT_XFER_INT:
+            case USB_ENDPOINT_XFER_BULK: {
+                    int toggle = 0;
+                    switch ((channel_regs->hctsiz >> 29) & 3) {
+                    case 0: toggle = 0; break;  // DATA0
+                    case 2: toggle = 1; break;  // DATA1
+                    }
+                    usb_settoggle(urb->dev_hcd, urb->pipe.endpoint, !urb->pipe.dir_in1out0, toggle);
+                }
+                // fall through
+            case USB_ENDPOINT_XFER_ISOC:
+                urb->actual_length = dwcotg_urb->current_size;
+                goto urb_done_check_stall;
+            }
+        } else if (channel_intsts & USB_OTG_HCINT_NAK) {
+        urb_retry:
+            switch (urb->pipe.type) {
+            case USB_ENDPOINT_XFER_INT:
+                orig = vsf_protect_int();
+                    vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, dwcotg_urb);
+                vsf_unprotect_int(orig);
+                break;
+            case USB_ENDPOINT_XFER_CONTROL:
+                if (VSF_DWCOTG_HCD_PHASE_SETUP == dwcotg_urb->phase) {
+                    __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+                    break;
+                }
+                // fall through
+            case USB_ENDPOINT_XFER_BULK:
+                // re-activate the channel, no need to halt and re-submit
+                channel_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
+                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+                break;
+            }
+            return;
+        } else if (channel_intsts & (USB_OTG_HCINT_TXERR | USB_OTG_HCINT_BBERR | USB_OTG_HCINT_DTERR)) {
+            // data toggle error, babble error, usb bus error
+            urb->status = URB_FAIL;
+            goto urb_done;
+        } else if (channel_intsts & USB_OTG_HCINT_FRMOR) {
+            // frame error
+            // TODO: update err_cnt
+            goto urb_retry;
+        }
+
+    free_channel: {
+            bool is_discarded;
+
+            orig = vsf_protect_int();
+                dwcotg_hcd->urb[channel_idx] = NULL;
+                channel_regs->hctsiz = 0;
+
+                is_discarded = dwcotg_urb->is_discarded;
+                dwcotg_urb->is_alloced = false;
+                vsf_slist_queue_dequeue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->ready_queue, dwcotg_urb);
+                if (NULL == dwcotg_urb) {
+                    dwcotg_hcd->ep_mask &= ~(1UL << channel_idx);
+                } else {
+                    urb = container_of(dwcotg_urb, vk_usbh_hcd_urb_t, priv);
+                    dwcotg_hcd->urb[channel_idx] = urb;
+                    dwcotg_urb->channel_idx = channel_idx;
+                }
+            vsf_unprotect_int(orig);
+
+            if (is_discarded) {
+                vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb);
+            }
+            if (dwcotg_urb != NULL) {
+                __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+            }
+        }
     }
 }
 
@@ -458,126 +701,76 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
     uint_fast32_t intsts = dwcotg_hcd->reg.global_regs->gintmsk;
     volatile uint32_t *intsts_reg = &dwcotg_hcd->reg.global_regs->gintsts;
     intsts &= *intsts_reg;
+    vsf_protect_t orig;
 
-    if (intsts != 0) {
-        if (intsts & USB_OTG_GINTSTS_SOF) {
-            *intsts_reg = USB_OTG_GINTSTS_SOF;
-            dwcotg_hcd->softtick++;
-            // TODO: commit urb in wait state
-        }
-        if (intsts & USB_OTG_GINTSTS_RXFLVL) {
-        }
-        if (intsts & USB_OTG_GINTSTS_NPTXFE) {
-        }
-        if (intsts & USB_OTG_GINTSTS_HPRTINT) {
-        }
-        if (intsts & USB_OTG_GINTSTS_PTXFE) {
-        }
-        if (intsts & USB_OTG_GINTSTS_HCINT) {
-            *intsts_reg = USB_OTG_GINTSTS_HCINT;
+    if (!intsts) {
+        VSF_USB_ASSERT(false);
+        return;
+    }
 
-            uint_fast32_t haint = dwcotg_hcd->reg.host.global_regs->haint;
-            vk_dwcotg_hcd_urb_t *dwcotg_urb;
-            struct dwcotg_hc_regs_t *hc_regs;
-            vk_usbh_urb_t *urb;
-            uint_fast32_t hc_intsts;
+    if (intsts & USB_OTG_GINTSTS_SOF) {
+        vk_usbh_hcd_urb_t *urb;
+        vsf_slist_t queue;
 
-            for (uint_fast8_t i = 0; i < dwcotg_hcd->ep_num; i++) {
-                if (haint & (1UL << i)) {
-                    dwcotg_urb = dwcotg_hcd->urb[i];
-                    urb = container_of(dwcotg_urb, vk_usbh_urb_t, priv);
-                    hc_regs = &dwcotg_hcd->reg.host.hc_regs[i];
-                    hc_intsts = hc_regs->hcintmsk;
-                    hc_intsts &= hc_regs->hcint;
+        *intsts_reg = USB_OTG_GINTSTS_SOF;
+        dwcotg_hcd->softick++;
 
-                    if (hc_intsts & USB_OTG_HCINT_AHBERR) {
-                        hc_regs->hcint = USB_OTG_HCINT_AHBERR;
-                        hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                    } else if (hc_intsts & USB_OTG_HCINT_STALL) {
-                        dwcotg_urb->state = DWCOTG_HCD_URB_STATE_STALL;
-                        hc_regs->hcint = USB_OTG_HCINT_NAK | USB_OTG_HCINT_STALL;
-                        hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                        __vk_dwcotg_hcd_hc_halt(dwcotg_hcd, i);
-                    } else if (hc_intsts & USB_OTG_HCINT_DTERR) {
-                        dwcotg_urb->state = DWCOTG_HCD_URB_STATE_DTERR;
-                        hc_regS->hcint = USB_OTG_HCINT_NAK | USB_OTG_HCINT_DTERR;
-                        hc_regS->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                        __vk_dwcotg_hcd_hc_halt(dwcotg_hcd, i);
-                    } else if (hc_intsts & USB_OTG_HCINT_FRMOR) {
-                        hc_regs->hcint = USB_OTG_HCINT_FRMOR;
-                        hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                        __vk_dwcotg_hcd_hc_halt(dwcotg_hcd, i);
-                    } else if (hc_intsts & USB_OTG_HCINT_TXERR) {
-                        dwcotg_urb->state = DWCOTG_HCD_URB_STATE_XACTERR;
-                        hc_regs->hcint = USB_OTG_HCINT_TXERR;
-                        hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                        __vk_dwcotg_hcd_hc_halt(dwcotg_hcd, i);
-                    } else if (hc_intsts & USB_OTG_HCINT_ACK) {
-                        hc_regs->hcint = USB_OTG_HCINT_ACK;
+        orig = vsf_protect_int();
+            queue.head = dwcotg_hcd->pending_queue.head.next;
+            vsf_slist_queue_init(&dwcotg_hcd->pending_queue);
+        vsf_unprotect_int(orig);
 
-                        if (dwcotg_urb->do_ping) {
-                            dwcotg_urb->state = DWCOTG_HCD_URB_STATE_NYET;
-                            hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                            __vk_dwcotg_hcd_hc_halt(dwcotg_hcd, i);
-                            // TODO
-                            dwcotg_urb->state = URB_PRIV_STATE_NOTREADY;
-                        }
-                    }
-
-                    if (hc_regs->hcchar & USB_OTG_HCCHAR_EPDIR) {
-                        if (hc_intsts & USB_OTG_HCINT_XFRC) {
-                            if (dwcotg_hcd->dma_en) {
-                                urb->actual_length = dwcotg_urb->transfer_size - (hc_regs->hctsiz & USB_OTG_HCTSIZ_XFRSIZ);
-                            }
-
-                            dwcotg_urb->state = DWCOTG_HCD_URB_STATE_XFRC;
-                            hc_regs->hcint = USB_OTG_HCINT_XFRC;
-                            hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-
-                            switch (urb->pipe.type) {
-                            case USB_ENDPOINT_XFER_CONTROL:
-                            case USB_ENDPOINT_XFER_BULK:
-                                __vk_dwcotg_hcd_hc_halt(dwcotg_hcd, i);
-                                hc_regs->hcint = USB_OTG_HCINT_NAK;
-                                break;
-                            case USB_ENDPOINT_XFER_INT:
-                                hc_regs->hcchar |= USB_OTG_HCCHAR_ODDFRM;
-                                urb_priv->state = URB_PRIV_STATE_DONE;
-                                break;
-                            }
-                        } else if (hc_intsts & USB_OTG_HCINT_NAK) {
-                            dwcotg_urb->state = HC_NAK;
-                            hc_regs->hcint = USB_OTG_HCINT_NAK;
-
-                            switch (urb->pipe.type) {
-                            case USB_ENDPOINT_XFER_CONTROL:
-                            case USB_ENDPOINT_XFER_BULK:
-                                hc_regs->hcchar &= ~USB_OTG_HCCHAR_CHDIS;
-                                hc_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
-                                break;
-                            case USB_ENDPOINT_XFER_INT:
-                                hc_regs->hcintmsk |= USB_OTG_HCINTMSK_CHHM;
-                                __vk_dwcotg_hcd_hc_halt(otgh, hc_num);
-                                break;
-                            }
-                        }
-
-                        hc_intsts = hc_regs->hcintmsk;
-                        hc_intsts &= hc_regs->hcint;
-
-                        if (hc_intsts & USB_OTG_HCINT_CHH) {
-                            hc_regs->hcintmsk &= ~USB_OTG_HCINTMSK_CHHM;
-                            hc_regs->hcint = USB_OTG_HCINT_CHH;
-
-                            switch (hc->hc_state) {
-                            case HC_XFRC:
-                                break;
-                            }
-                        }
-                    } else {
-                        
-                    }
+        // after device connecting to roothub is removed, there is possibility that the channel
+        //  can not be halted, so check in SOF, if the channel need to be halted
+        for (uint_fast8_t i = 0; (dwcotg_hcd->ep_mask != 0) && (i < dwcotg_hcd->ep_num); i++) {
+            if (dwcotg_hcd->ep_mask & (1 << i)) {
+                VSF_USB_ASSERT(dwcotg_hcd->urb[i] != NULL);
+                vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&dwcotg_hcd->urb[i]->priv;
+                if (dwcotg_urb->is_discarded) {
+                    __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, i);
                 }
+            }
+        }
+
+        __vsf_slist_foreach_next_unsafe(vk_dwcotg_hcd_urb_t, node, &queue) {
+            urb = container_of(_, vk_usbh_hcd_urb_t, priv);
+            if (__vk_dwcotg_hcd_is_period_hit(dwcotg_hcd, urb)) {
+                if (USB_ENDPOINT_XFER_CONTROL == urb->pipe.type) {
+                    _->phase = VSF_DWCOTG_HCD_PHASE_SETUP;
+                } else {
+                    _->phase = VSF_DWCOTG_HCD_PHASE_DATA;
+                }
+                __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+            } else {
+                vsf_slist_init_node(vk_dwcotg_hcd_urb_t, node, _);
+                orig = vsf_protect_int();
+                    vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, _);
+                vsf_unprotect_int(orig);
+            }
+        }
+    }
+    if (intsts & USB_OTG_GINTSTS_RXFLVL) {
+        *intsts_reg = USB_OTG_GINTSTS_RXFLVL;
+    }
+    if (intsts & USB_OTG_GINTSTS_NPTXFE) {
+        *intsts_reg = USB_OTG_GINTSTS_NPTXFE;
+    }
+    if (intsts & USB_OTG_GINTSTS_HPRTINT) {
+        *intsts_reg = USB_OTG_GINTSTS_HPRTINT;
+    }
+    if (intsts & USB_OTG_GINTSTS_PTXFE) {
+        *intsts_reg = USB_OTG_GINTSTS_PTXFE;
+    }
+
+    if (intsts & USB_OTG_GINTSTS_HCINT) {
+        *intsts_reg = USB_OTG_GINTSTS_HCINT;
+
+        uint_fast32_t haint = dwcotg_hcd->reg.host.global_regs->haint;
+        haint &= dwcotg_hcd->reg.host.global_regs->haintmsk;
+
+        for (uint_fast8_t i = 0; i < dwcotg_hcd->ep_num; i++) {
+            if (haint & (1UL << i)) {
+                __vk_dwcotg_hcd_channel_interrupt(dwcotg_hcd, i);
             }
         }
     }
@@ -586,47 +779,71 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
 static vsf_err_t __vk_dwcotg_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
-    vk_usbh_dev_t *dev = dwcotg_hcd->dev;
     vk_usbh_pipe_t pipe = urb->pipe;
-    vk_dwcotg_hcd_urb_t *urb_priv = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
 
-    memset(urb_priv, 0, sizeof(*urb_priv));
-    switch (pipe.type) {
-    case USB_ENDPOINT_XFER_CONTROL:
-        urb_priv->phase = VSF_DWCOTG_HCD_PHASE_SETUP;
-        break;
-    case USB_ENDPOINT_XFER_BULK:
-        urb_priv->phase = VSF_DWCOTG_HCD_PHASE_DATA;
-        // fall through
-    case USB_ENDPOINT_XFER_INT:
-        urb_priv->toggle_start = usb_gettoggle(urb->dev_hcd, pipe.endpoint, !pipe.dir_in1out0);
-        urb_priv->do_ping = dwcotg_hcd->dma_en ? 0 : (pipe.speed == USB_SPEED_HIGH);
-        break;
-    default:
-        urb_priv->phase = VSF_DWCOTG_HCD_PHASE_PERIOD;
-        break;
+    if (!dwcotg_hcd->is_connected) {
+        return VSF_ERR_FAIL;
     }
 
-    return __vk_dwcotg_hcd_urb_handler(dwcotg_hcd, urb);
+    memset(dwcotg_urb, 0, sizeof(*dwcotg_urb));
+    switch (pipe.type) {
+    case USB_ENDPOINT_XFER_CONTROL:
+        dwcotg_urb->phase = VSF_DWCOTG_HCD_PHASE_SETUP;
+        break;
+    case USB_ENDPOINT_XFER_BULK:
+        dwcotg_urb->phase = VSF_DWCOTG_HCD_PHASE_DATA;
+        goto init_toggle;
+    case USB_ENDPOINT_XFER_INT:
+        dwcotg_urb->phase = VSF_DWCOTG_HCD_PHASE_PERIOD;
+        if (urb->transfer_length > pipe.size) {
+            /* IMPORTANT PATCH:
+                dwcotg_hcd does not support this kind of transfer,
+                patch the endpoint to act as a bulk with period support.
+            */
+            // TODO: simply path to bulk type will make NAK be operated as bulk type
+            urb->pipe.type = USB_ENDPOINT_XFER_BULK;
+        }
+    init_toggle:
+        dwcotg_urb->toggle = usb_gettoggle(urb->dev_hcd, pipe.endpoint, !pipe.dir_in1out0);
+        dwcotg_urb->do_ping = dwcotg_hcd->dma_en ? false : (pipe.speed == USB_SPEED_HIGH);
+        break;
+    case USB_ENDPOINT_XFER_ISOC:
+        dwcotg_urb->phase = VSF_DWCOTG_HCD_PHASE_PERIOD;
+        break;
+    default:
+        VSF_USB_ASSERT(false);
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    if (dwcotg_urb->phase == VSF_DWCOTG_HCD_PHASE_PERIOD) {
+        if (__vk_dwcotg_hcd_is_period_hit(dwcotg_hcd, urb)) {
+            dwcotg_urb->phase = VSF_DWCOTG_HCD_PHASE_DATA;
+        } else {
+            vsf_protect_t orig = vsf_protect_int();
+                vsf_slist_queue_enqueue(vk_dwcotg_hcd_urb_t, node, &dwcotg_hcd->pending_queue, dwcotg_urb);
+            vsf_unprotect_int(orig);
+            return VSF_ERR_NONE;
+        }
+    }
+    __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+    return VSF_ERR_NONE;
 }
 
 static vsf_err_t __vk_dwcotg_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
-    return __vk_dwcotg_hcd_urb_handler(hcd->priv, urb);
+    return __vk_dwcotg_hcd_submit_urb(hcd, urb);
 }
 
-static uint_fast32_t __vk_dwcotg_hcd_rh_portstat(uint_fast32_t hprt0)
+static uint_fast32_t __vk_dwcotg_hcd_rh_portstat(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast32_t hprt0)
 {
     uint_fast32_t value = 0;
+    bool is_connected = false;
 
     if ((hprt0 & USB_OTG_HPRT_PSPD) == 0) {
         value |= USB_PORT_STAT_HIGH_SPEED;
     } else if ((hprt0 & USB_OTG_HPRT_PSPD) == USB_OTG_HPRT_PSPD_1) {
         value |= USB_PORT_STAT_LOW_SPEED;
-    }
-
-    if (hprt0 & USB_OTG_HPRT_PCDET) {
-        value |= (USB_PORT_STAT_C_CONNECTION << 16);
     }
 
     if (hprt0 & USB_OTG_HPRT_PENA) {
@@ -635,6 +852,15 @@ static uint_fast32_t __vk_dwcotg_hcd_rh_portstat(uint_fast32_t hprt0)
 
     if (hprt0 & USB_OTG_HPRT_PCSTS) {
         value |= USB_PORT_STAT_CONNECTION;
+    }
+
+    is_connected = !!(value & USB_PORT_STAT_CONNECTION);
+    if (dwcotg_hcd->is_connected != is_connected) {
+        dwcotg_hcd->is_connected = is_connected;
+        dwcotg_hcd->is_port_changed = true;
+    }
+    if (dwcotg_hcd->is_port_changed) {
+        value |= (USB_PORT_STAT_C_CONNECTION << 16);
     }
 
     return value;
@@ -662,7 +888,7 @@ static int __vk_dwcotg_hcd_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb
         len = 4;
         break;
     case GetPortStatus:
-        datadw[0] = __vk_dwcotg_hcd_rh_portstat((uint_fast32_t)*reg->host.hprt0);
+        datadw[0] = __vk_dwcotg_hcd_rh_portstat(dwcotg_hcd, (uint_fast32_t)*reg->host.hprt0);
         len = 4;
         break;
     case SetPortFeature:
@@ -696,7 +922,8 @@ static int __vk_dwcotg_hcd_rh_control(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb
             len = 0;
             break;
         case USB_PORT_FEAT_C_CONNECTION:
-            *reg->host.hprt0 |= USB_OTG_HPRT_PCDET;
+            dwcotg_hcd->is_port_changed = false;
+//            *reg->host.hprt0 |= USB_OTG_HPRT_PCDET;
             len = 0;
             break;
         case USB_PORT_FEAT_C_ENABLE:

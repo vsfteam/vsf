@@ -26,10 +26,6 @@
 #if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED
 
 /*============================ MACROS ========================================*/
-
-#define esp32s2_usbh_ep_number         8
-#define esp32s2_usbh_ep_is_dma         false
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

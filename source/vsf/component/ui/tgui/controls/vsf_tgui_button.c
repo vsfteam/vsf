@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*============================ INCLUDES ======================================*/
 #include "../vsf_tgui_cfg.h"
 
@@ -33,17 +50,7 @@ declare_class(vsf_tgui_t)
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 static const i_tgui_control_methods_t c_tVLabel= {
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    {
-        (vsf_tgui_method_t *)&vsf_tgui_button_v_init,
-        (vsf_tgui_method_t *)&vsf_tgui_button_v_depose,
-        (vsf_tgui_v_method_render_t *)&vsf_tgui_button_v_rendering,
-        NULL,
-        (vsf_tgui_method_t *)&vsf_tgui_button_v_update
-    },
-    (vsf_tgui_method_t *)vk_tgui_button_init,
-    (vsf_tgui_method_t *)&vk_tgui_button_update
-#else
+
     .tView = {
         .Init =     (vsf_tgui_method_t *)&vsf_tgui_button_v_init,
         .Depose =   (vsf_tgui_method_t*)&vsf_tgui_button_v_depose,
@@ -52,7 +59,7 @@ static const i_tgui_control_methods_t c_tVLabel= {
     },
     .Init =     (vsf_tgui_method_t *)vk_tgui_button_init,
     .Update =   (vsf_tgui_method_t*)&vk_tgui_button_update,
-#endif
+
 };
 
 
@@ -62,16 +69,55 @@ static const i_tgui_control_methods_t c_tVLabel= {
 
 fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t* ptMSG)
 {
-    fsm_rt_t fsm = __vsf_tgui_control_msg_handler(
-                        &(ptButton->use_as__vsf_tgui_label_t.use_as__vsf_tgui_control_t),
-                        ptMSG,
-                        &c_tVLabel);
+    fsm_rt_t fsm;
+
+    //! some message has to be handled before calling user handler
+    switch(ptMSG->use_as__vsf_msgt_msg_t.msg) {
+
+        case VSF_TGUI_EVT_POINTER_DOWN:
+            if (!ptButton->_.bIsCheckButton) {
+                ptButton->_.bIsChecked = true;
+            }
+            break;
+
+        case VSF_TGUI_EVT_POINTER_UP:
+            if (!ptButton->_.bIsCheckButton) {
+                ptButton->_.bIsChecked = false;
+            }
+            break;
+
+        case VSF_TGUI_EVT_POINTER_CLICK:
+            if (ptButton->_.bIsCheckButton) {
+                //! toggle the bIsChecked flag
+                ptButton->_.bIsChecked = !ptButton->_.bIsChecked;
+            }
+            break;
+
+    #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+        case VSF_TGUI_EVT_POINTER_ENTER:
+            if (ptButton->_.bIsAllowEmphasize) {
+                ptButton->_.bIsEmphasized = true;
+            }
+            break;
+
+        case VSF_TGUI_EVT_POINTER_LEFT:
+            if (ptButton->_.bIsAllowEmphasize) {
+                ptButton->_.bIsEmphasized = false;
+            }
+            break;
+    #endif
+
+    }
+
+    fsm = __vsf_tgui_control_msg_handler(
+                &(ptButton->use_as__vsf_tgui_label_t.use_as__vsf_tgui_control_t),
+                ptMSG,
+                &c_tVLabel);
 
     //if (fsm != VSF_MSGT_ERR_MSG_NOT_HANDLED) {
         switch (ptMSG->use_as__vsf_msgt_msg_t.msg){
             case VSF_TGUI_EVT_POINTER_DOWN:
                 if (!ptButton->_.bIsCheckButton) {
-                    ptButton->_.bIsChecked = true;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
@@ -84,7 +130,6 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
             case VSF_TGUI_EVT_POINTER_UP:
                 if (!ptButton->_.bIsCheckButton) {
-                    ptButton->_.bIsChecked = false;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
@@ -97,8 +142,6 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
             case VSF_TGUI_EVT_POINTER_CLICK:
                 if (ptButton->_.bIsCheckButton) {
-                    //! toggle the bIsChecked flag
-                    ptButton->_.bIsChecked = !ptButton->_.bIsChecked;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
@@ -111,7 +154,6 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
         #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
             case VSF_TGUI_EVT_POINTER_ENTER:
                 if (ptButton->_.bIsAllowEmphasize) {
-                    ptButton->_.bIsEmphasized = true;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
@@ -123,7 +165,6 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
             case VSF_TGUI_EVT_POINTER_LEFT:
                 if (ptButton->_.bIsAllowEmphasize) {
-                    ptButton->_.bIsEmphasized = false;
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");

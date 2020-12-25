@@ -53,9 +53,8 @@
 #   define VSF_TGUI_CFG_SV_REFRESH_RATE             ENABLED
 #endif
 
-// TODO: fixed VDB
-#ifndef VSF_TGUI_CFG_SV_PORT_PARTIAL_REFRESH
-#   define VSF_TGUI_CFG_SV_PORT_PARTIAL_REFRESH     ENABLED
+#ifndef VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY
+#   define VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY         DISABLED
 #endif
 
 #if VSF_TGUI_CFG_SV_PORT_LOG != ENABLED
@@ -75,6 +74,9 @@ typedef struct {
     size_t bitmap_size;
 
     bool is_ready;
+#if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
+    volatile bool is_draw_ready;
+#endif
     vsf_tgui_region_t request_region;
     vsf_tgui_region_t current_region;
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
@@ -110,20 +112,10 @@ static void vk_disp_sdl_set_pixel(vsf_tgui_location_t* location_ptr, vsf_tgui_co
 vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* tile_ptr)
 {
     VSF_TGUI_ASSERT(tile_ptr != NULL);
+    VSF_TGUI_ASSERT(tile_ptr->_.tCore.Attribute.bIsRootTile);
+    VSF_TGUI_ASSERT(tile_ptr->_.tCore.Attribute.u2RootTileType == 0);
 
-    uint8_t index = tile_ptr->tIndexRoot.chIndex;
-    if (tile_ptr->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
-        VSF_TGUI_ASSERT(index < dimof(gIdxRootRGBTileSizes));
-        return gIdxRootRGBTileSizes[index];
-    } else if (tile_ptr->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
-        VSF_TGUI_ASSERT(index < dimof(gIdxRootRGBATileSizes));
-        return gIdxRootRGBATileSizes[index];
-    }
-
-    VSF_TGUI_ASSERT(0);
-    return (vsf_tgui_size_t) {
-        -1, -1
-    };
+    return tile_ptr->tBufRoot.tSize;
 }
 #endif
 
@@ -132,19 +124,9 @@ static char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* tile_ptr)
     VSF_TGUI_ASSERT(tile_ptr != NULL);
 
     if (tile_ptr->_.tCore.Attribute.u2RootTileType == 0) {     // buf tile
-        return (char*)tile_ptr->tBufRoot.ptBitmap;
+        return (char*)&__tiles_data[(uint32_t)tile_ptr->tBufRoot.ptBitmap];
     } else {                                                // index tile
-        uint8_t index = tile_ptr->tIndexRoot.chIndex;
-        if (tile_ptr->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGB) {           // RGB color
-            VSF_TGUI_ASSERT(index < dimof(rgb_pixmap_array));
-            return (char*)rgb_pixmap_array[index];
-        } else if (tile_ptr->_.tCore.Attribute.u2ColorType == VSF_TGUI_COLORTYPE_RGBA) {    // RGBA color
-            VSF_TGUI_ASSERT(index < dimof(rgba_pixmap_array));
-            return (char*)rgba_pixmap_array[index];
-        } else {
-            VSF_TGUI_ASSERT(0);
-        }
-
+        VSF_TGUI_ASSERT(0);
         return NULL;
     }
 }
@@ -264,6 +246,41 @@ static void __vsf_tgui_get_info(vsf_tgui_location_t* location_ptr, vsf_tgui_port
         + location_ptr->iX - current_region_ptr->tLocation.iX;
 }
 
+#if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
+static void __vsf_tgui_draw_debug_on_ready(vk_disp_t* disp)
+{
+    __vsf_tgui_port.is_draw_ready = true;
+}
+
+static void __vsf_tgui_draw_wait_for_done(void)
+{
+    vk_disp_t* disp = __vsf_tgui_port.disp;
+    vk_disp_on_ready_t old_ready_func = disp->ui_on_ready;
+    disp->ui_on_ready = __vsf_tgui_draw_debug_on_ready;
+    __vsf_tgui_port.is_draw_ready = false;
+    vsf_tgui_region_t* current_region_ptr = &__vsf_tgui_port.current_region;
+    vk_disp_area_t area = {
+        .pos = {
+            .x = current_region_ptr->tLocation.iX,
+            .y = current_region_ptr->tLocation.iY,
+        },
+        .size = {
+            .x = current_region_ptr->tSize.iWidth,
+            .y = current_region_ptr->tSize.iHeight,
+        },
+    };
+    vsf_tgui_color_t* pixmap = disp->ui_data;
+    vk_disp_refresh(disp, &area, pixmap);
+    while (!__vsf_tgui_port.is_draw_ready);
+    disp->ui_on_ready = old_ready_func;
+}
+#else
+static void __vsf_tgui_draw_wait_for_done(void)
+{
+}
+#endif
+
+
 void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t* location_ptr,
                                 vsf_tgui_size_t* size_ptr,
                                 vsf_tgui_sv_color_t rect_color)
@@ -306,6 +323,7 @@ void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t* location_ptr,
             pixel_location++;
         }
     }
+    __vsf_tgui_draw_wait_for_done();
 }
 
 void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
@@ -371,7 +389,9 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
             pixel_location++;
         }
     }
+    __vsf_tgui_draw_wait_for_done();
 }
+
 void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
                                 vsf_tgui_location_t* font_location_ptr,
                                 vsf_tgui_size_t* size_ptr,
@@ -400,7 +420,6 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
     uint32_t base_line = face->size->metrics.ascender >> 6;
     int32_t top = glyph->bitmap_top;
     int32_t left = glyph->bitmap_left;
-    VSF_TGUI_ASSERT(base_line >= top);
 
     vsf_tgui_location_t bitmap_start = {
         .iX = max(0, left),    // todo: support negative advance
@@ -444,6 +463,7 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
             pixel_location++;
         }
     }
+    __vsf_tgui_draw_wait_for_done();
 }
 
 /**********************************************************************************/

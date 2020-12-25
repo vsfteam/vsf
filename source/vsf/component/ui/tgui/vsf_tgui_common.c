@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*============================ INCLUDES ======================================*/
 #include "./vsf_tgui_cfg.h"
 
@@ -65,8 +82,8 @@ vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
         ptTile = vsf_tgui_tile_get_root((const vsf_tgui_tile_t *)ptChildTile->parent_ptr, region_ptr);
 
 
-        region_ptr->tLocation.iX += ptChildTile->_.tLocation.iX;
-        region_ptr->tLocation.iY += ptChildTile->_.tLocation.iY;
+        region_ptr->tLocation.iX += ptChildTile->tLocation.iX;
+        region_ptr->tLocation.iY += ptChildTile->tLocation.iY;
         region_ptr->tSize = ptChildTile->tSize;
 
         VSF_TGUI_ASSERT(ptTile != NULL);

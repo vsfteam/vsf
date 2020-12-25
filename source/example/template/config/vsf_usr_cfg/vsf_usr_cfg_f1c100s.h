@@ -34,6 +34,7 @@
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
+#   define APP_USE_USBD_UAC_DEMO                        ENABLED
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_SDL2_DEMO                               ENABLED
@@ -91,6 +92,7 @@
 #   define VSF_USBD_USE_CDCACM                          ENABLED
 #   define VSF_USBD_USE_MSC                             ENABLED
 #   define VSF_USBD_USE_UVC                             ENABLED
+#   define VSF_USBD_USE_UAC                             ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 

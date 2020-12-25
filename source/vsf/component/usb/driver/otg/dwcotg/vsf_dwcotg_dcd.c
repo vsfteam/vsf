@@ -135,7 +135,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
 
     global_regs->gintmsk = USB_OTG_GINTMSK_USBRST | USB_OTG_GINTMSK_ENUMDNEM |
             USB_OTG_GINTMSK_IEPINT | USB_OTG_GINTMSK_OEPINT |
-            USB_OTG_GINTMSK_IISOIXFRM | USB_OTG_GINTMSK_PXFRM_IISOOXFRM |
+//            USB_OTG_GINTMSK_IISOIXFRM | USB_OTG_GINTMSK_PXFRM_IISOOXFRM |
             USB_OTG_GINTMSK_RXFLVLM;
 
     global_regs->gahbcfg |= USB_OTG_GAHBCFG_GINT;
@@ -452,6 +452,7 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
     VSF_USB_ASSERT(ep_idx < dwcotg_dcd->ep_num);
 
     uint_fast16_t ep_size = vk_dwcotg_dcd_ep_get_size(dwcotg_dcd, ep_idx);
+    volatile uint32_t *ep_ctrl = __vk_dwcotg_dcd_get_ep_ctrl(dwcotg_dcd, ep_idx);
     struct dwcotg_dev_out_ep_regs_t *out_regs = &dwcotg_dcd->reg.dev.ep.out_regs[ep_idx];
     vk_dwcotg_dcd_trans_t *trans = &dwcotg_dcd->trans[ep_idx];
     uint_fast32_t size = trans->remain, max_size;
@@ -476,6 +477,16 @@ static vsf_err_t __vk_dwcotg_dcd_ep_out_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, ui
     if (trans->use_dma) {
         out_regs->doepdma = (uint32_t)trans->buffer;
     }
+
+    // set odd/even frame for iso endpoint
+    if (1 == ((*ep_ctrl >> 18) & 0x03)) {
+        if (vk_dwcotg_dcd_get_frame_number(dwcotg_dcd) & 1) {
+            out_regs->doepctl |= USB_OTG_DOEPCTL_SD0PID_SEVNFRM;
+        } else {
+            out_regs->doepctl |= USB_OTG_DOEPCTL_SODDFRM;
+        }
+    }
+
     out_regs->doepctl |= USB_OTG_DOEPCTL_EPENA | USB_OTG_DOEPCTL_CNAK;
     return VSF_ERR_NONE;
 }
@@ -502,6 +513,7 @@ static vsf_err_t __vk_dwcotg_dcd_ep_in_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, uin
     VSF_USB_ASSERT(ep_idx < dwcotg_dcd->ep_num);
 
     uint_fast16_t ep_size = vk_dwcotg_dcd_ep_get_size(dwcotg_dcd, ep_idx | 0x80);
+    volatile uint32_t *ep_ctrl = __vk_dwcotg_dcd_get_ep_ctrl(dwcotg_dcd, ep_idx | 0x80);
     struct dwcotg_dev_in_ep_regs_t *in_regs = &dwcotg_dcd->reg.dev.ep.in_regs[ep_idx];
     vk_dwcotg_dcd_trans_t *trans = &dwcotg_dcd->trans[VSF_DWCOTG_DCD_CFG_EP_NUM + ep_idx];
 
@@ -529,6 +541,19 @@ static vsf_err_t __vk_dwcotg_dcd_ep_in_transfer(vk_dwcotg_dcd_t *dwcotg_dcd, uin
         pkt_cnt++;
     }
     in_regs->dieptsiz = (pkt_cnt << 19) | size;
+
+    // set odd/even frame and mulcnt for iso endpoint
+    if (1 == ((*ep_ctrl >> 18) & 0x03)) {
+        in_regs->dieptsiz &= ~USB_OTG_DIEPTSIZ_MULCNT;
+        in_regs->dieptsiz |= 1 << 29;
+
+        if (vk_dwcotg_dcd_get_frame_number(dwcotg_dcd) & 1) {
+            in_regs->diepctl |= USB_OTG_DIEPCTL_SD0PID_SEVNFRM;
+        } else {
+            in_regs->diepctl |= USB_OTG_DIEPCTL_SODDFRM;
+        }
+    }
+
     if (trans->use_dma) {
         in_regs->diepdma = (uint32_t)trans->buffer;
         in_regs->diepctl |= USB_OTG_DIEPCTL_EPENA | USB_OTG_DIEPCTL_CNAK;

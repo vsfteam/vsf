@@ -110,11 +110,16 @@ static void __vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
         // fall through
     case VSF_EVT_SYNC:
-        if (VSF_ERR_NONE != vk_usbh_get_class_descriptor(hid->usbh, hid->dev, hid->ifs->no, USB_DT_REPORT, 0, hid->desc_len)) {
-            vk_usbh_remove_interface(hid->usbh, dev, hid->ifs);
-            return;
+        if (hid->desc_len > 0) {
+            if (VSF_ERR_NONE != vk_usbh_get_class_descriptor(hid->usbh, hid->dev,
+                    hid->ifs->no, USB_DT_REPORT, 0, hid->desc_len)) {
+
+                vk_usbh_remove_interface(hid->usbh, dev, hid->ifs);
+                return;
+            }
+            break;
         }
-        break;
+        // fall through
     case VSF_EVT_MESSAGE:
         // hid->ep0 and hid->user_evthandler share the same memory
         //  so user_evthandler MUST first be used, and then set ep0

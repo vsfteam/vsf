@@ -46,6 +46,9 @@ extern "C" {
 #ifndef VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM
 #   define VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM  1
 #endif
+#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 8
+#   error VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM MUST be <= 8
+#endif
 
 #if VSF_USE_SIMPLE_STREAM != ENABLED
 #   error VSF_USE_SIMPLE_STREAM is needed for USBH UAC driver
@@ -66,11 +69,11 @@ def_simple_class(vk_usbh_uac_stream_t) {
     )
 
     private_member(
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
-        uint8_t idx;
-#endif
+        uint8_t idx                         : 6;
         uint8_t is_connected                : 1;
         uint8_t is_to_disconnect            : 1;
+        uint8_t urb_mask;
+        uint16_t next_frame;
 
         vk_usbh_urb_t urb[VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM];
         vsf_stream_t *stream;
@@ -87,6 +90,7 @@ extern const vk_usbh_class_drv_t vk_usbh_uac_drv;
 extern vk_usbh_uac_stream_t * vsf_usbh_uac_get_stream_info(void *param, uint_fast8_t stream_idx);
 extern vsf_err_t vsf_usbh_uac_connect_stream(void *param, uint_fast8_t stream_idx, vsf_stream_t *stream);
 extern void vsf_usbh_uac_disconnect_stream(void *param, uint_fast8_t stream_idx);
+extern vsf_err_t __vsf_usbh_uac_submit_req(void *uac_ptr, void *data, struct usb_ctrlrequest_t *req);
 
 #ifdef __cplusplus
 }

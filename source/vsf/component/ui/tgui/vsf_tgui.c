@@ -1,3 +1,20 @@
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************
  *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
@@ -32,7 +49,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr, 
-                                            vsf_tgui_top_container_t *top_ptr, 
+                                            vsf_tgui_root_container_t *top_ptr, 
                                             vsf_tgui_evt_t *evt_ptr);
 
 static void __vk_tgui_change_actived_control(
@@ -92,13 +109,19 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
 
         vsf_msgt_forward_propagate_msg_dfs_init(&(this.use_as__vsf_msgt_t));
 
+        //! initialise input
+        do {
+            this.input.finger_idx_pre = -1; /* -1 means no valid finger index */
+
+        } while(0);
+
         //! initialise consumer pt task
         do {
             this.consumer.param.queue_ptr = &this.msg_queue;
             this.consumer.param.msg_tree_ptr = &this.use_as__vsf_msgt_t;
 
             if (NULL != cfg_ptr->root_node_ptr) {
-                vk_tgui_set_top_container(gui_ptr, (vsf_tgui_top_container_t *)cfg_ptr->root_node_ptr);
+                vk_tgui_set_root_container(gui_ptr, (vsf_tgui_root_container_t *)cfg_ptr->root_node_ptr);
             }
 
             //! start pt task
@@ -110,8 +133,8 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
 }
 
 
-vsf_err_t vk_tgui_set_top_container(vsf_tgui_t* gui_ptr, 
-                                    vsf_tgui_top_container_t *root_node_ptr)
+vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr, 
+                                    vsf_tgui_root_container_t *root_node_ptr)
 {
     VSF_TGUI_ASSERT(NULL != gui_ptr);
     VSF_TGUI_ASSERT(NULL != root_node_ptr);
@@ -413,6 +436,39 @@ const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *gui_ptr)
 }
 #endif
 
+bool vsf_tgui_set_pointer_location(  vsf_tgui_t *gui_ptr, 
+                                        int_fast8_t idx, 
+                                        vsf_tgui_location_t *location_ptr)
+{
+    VSF_TGUI_ASSERT(NULL != gui_ptr);
+    VSF_TGUI_ASSERT(idx < dimof(gui_ptr->input.current));
+
+    if (idx < 0) {
+        idx = 0;
+    }
+
+    if (NULL == location_ptr) {
+        location_ptr = gui_ptr->input.current + idx;
+    }
+
+    return __vk_tgui_send_touch_evt(gui_ptr, 
+                                    idx,
+                                    VSF_TGUI_EVT_POINTER_MOVE,
+                                    *location_ptr);
+}
+
+const vsf_tgui_location_t *vsf_tgui_get_pointer_location(vsf_tgui_t *gui_ptr, int_fast8_t idx)
+{
+    VSF_TGUI_ASSERT(NULL != gui_ptr);
+
+    if (idx < 0) {
+        return (const vsf_tgui_location_t *)gui_ptr->input.current;
+    } else if (idx < dimof(gui_ptr->input.current)) {
+        return (const vsf_tgui_location_t *)gui_ptr->input.current + idx;
+    }
+
+    return NULL;
+}
 
 
 void vsf_tgui_low_level_refresh_ready(vsf_tgui_t *gui_ptr)
@@ -494,7 +550,7 @@ loop_start:
                 #if VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME == ENABLED
                         if (NULL != this.root_node_ptr) {
                              __vk_tgui_depose_top_container(gui_ptr, 
-                                                            (vsf_tgui_top_container_t *)this.root_node_ptr, 
+                                                            (vsf_tgui_root_container_t *)this.root_node_ptr, 
                                                             NULL);
                         }
                 #endif
@@ -511,8 +567,8 @@ loop_start:
 
                             //! set new top container
                             this.Activated.current_ptr = (const vsf_tgui_control_t *)this.node_ptr;
-                            this.root_node_ptr = (const vsf_tgui_top_container_t *)this.node_ptr;
-                            ((vsf_tgui_top_container_t *)this.root_node_ptr)->gui_ptr = gui_ptr;
+                            this.root_node_ptr = (const vsf_tgui_root_container_t *)this.node_ptr;
+                            ((vsf_tgui_root_container_t *)this.root_node_ptr)->gui_ptr = gui_ptr;
 
                     #if VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME == ENABLED
                             //! send on load message 
@@ -564,7 +620,7 @@ loop_start:
 
                 #if VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME == ENABLED
                     case VSF_TGUI_EVT_ON_DEPOSE & VSF_TGUI_EVT_MSK: {
-                        __vk_tgui_depose_top_container(gui_ptr, (vsf_tgui_top_container_t *)this.node_ptr, &this.event);
+                        __vk_tgui_depose_top_container(gui_ptr, (vsf_tgui_root_container_t *)this.node_ptr, &this.event);
 
                         goto loop_start;
                     }
@@ -675,6 +731,7 @@ loop_start:
                         goto loop_start;
                     }
 
+                    
                 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
                     __vk_tgui_change_focus_control( gui_ptr, 
                                     (const vsf_tgui_control_t *)this.node_ptr, 
@@ -682,10 +739,21 @@ loop_start:
                                     VSF_TGUI_EVT_POINTER_ENTER);
                 #endif
 
-                    __vk_tgui_change_focus_control( gui_ptr, 
-                                    (const vsf_tgui_control_t *)this.node_ptr, 
-                                    &this.Activated, 
-                                    VSF_TGUI_EVT_GET_ACTIVE);
+                    /*! \IMPORTANT only pointer/finger 0 can active controls. 
+                     *             tGUI is mainly designed to support touch screen
+                     *             rather than a device with a mouse. So when you
+                     *             use PC to simulate a touchscreen, a right click
+                     *             won't change the actived controls. It is a *KNOWN
+                     *             ISSUE* and we will *NOT* fix this, because designing  
+                     *             an application with normal mouse support is out of 
+                     *             original scope. 
+                     */
+                    if (0 == this.event.PointerEvt.idx) {
+                        __vk_tgui_change_focus_control( gui_ptr, 
+                                        (const vsf_tgui_control_t *)this.node_ptr, 
+                                        &this.Activated, 
+                                        VSF_TGUI_EVT_GET_ACTIVE);
+                    }
                 }
             #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
                 else if (VSF_TGUI_EVT_POINTER_MOVE == msg) {
@@ -699,7 +767,9 @@ loop_start:
                                     (const vsf_tgui_control_t *)this.node_ptr, 
                                     &this.pointer_above, 
                                     VSF_TGUI_EVT_POINTER_ENTER);
-
+                    if (this.event.PointerEvt.idx < dimof(gui_ptr->input.current)) {
+                        gui_ptr->input.current[this.event.PointerEvt.idx] = this.event.PointerEvt.use_as__vsf_tgui_location_t;
+                    }
                 #if VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING == ENABLED
                     if (NULL == this.node_ptr) {
                         //! missed all node (control)
@@ -785,7 +855,7 @@ refresh_loop :
 
 
 static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr, 
-                                            vsf_tgui_top_container_t *top_ptr, 
+                                            vsf_tgui_root_container_t *top_ptr, 
                                             vsf_tgui_evt_t *evt_ptr)
 {
     vsf_tgui_evt_t event;

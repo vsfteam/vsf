@@ -62,16 +62,15 @@ fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_button_t* ptButton,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)ptButton), ptButton);
 #endif
 
-#ifdef VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR
-    if (!ptButton->use_as__vsf_tgui_v_label_t.bIsNoBackgroundColor) {
+    if (!ptButton->bIsNoBackgroundColor) {
         vsf_tgui_control_t* control_ptr = (vsf_tgui_control_t*)ptButton;
-        vsf_tgui_sv_color_t tColor = VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR;
         vsf_tgui_region_t tRegion = { 0 };
+        vsf_tgui_sv_color_t tColor;
 
         tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
 
 #if VSF_TGUI_CFG_SV_BUTTON_ADDITIONAL_TILES == ENABLED
-        do {
+        if (!ptButton->use_as__vsf_tgui_v_label_t.bIsUseRawView) {
             vsf_tgui_tile_t* ptTile;
             vsf_tgui_region_t tLeftRegion;
             vsf_tgui_region_t tRightRegion;
@@ -84,24 +83,33 @@ fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_button_t* ptButton,
 
             tRegion.tLocation.iX += tLeftRegion.tSize.iWidth;
             tRegion.tSize.iWidth -= tLeftRegion.tSize.iWidth + tRightRegion.tSize.iWidth;
-        } while (0);
+        }
 #endif
 
+#if VSF_TGUI_CFG_SV_BUTTON_SUPPORT_CLICKED_BACKGROUND_COLOR == ENABLED
+        if (ptButton->_.bIsChecked) {
+            tColor = ptButton->tClickedBackgroundColor;
+        } else {
+            tColor = ptButton->tBackgroundColor;
+        }
+#else
+        tColor = ptButton->tBackgroundColor;
+#endif
         vsf_tgui_control_v_draw_rect(   control_ptr,
                                         ptDirtyRegion,
                                         &tRegion,
                                         tColor);
     }
-#endif
 
 #if VSF_TGUI_CFG_SV_BUTTON_ADDITIONAL_TILES == ENABLED
-    do {
+    if (!ptButton->use_as__vsf_tgui_v_label_t.bIsUseRawView) {
         vsf_tgui_control_t* control_ptr = &ptButton->use_as__vsf_tgui_label_t.use_as__vsf_tgui_control_t;
-    #ifdef VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR
+
         uint_fast8_t tRate = vsf_tgui_control_v_get_tile_trans_rate(control_ptr);
-        uint_fast8_t tBackGroundRate = vsf_tgui_sv_color_get_trans_rate(VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR);
+        uint_fast8_t tBackGroundRate =
+            vsf_tgui_sv_color_get_trans_rate(control_ptr->tBackgroundColor);
         vsf_tgui_control_v_set_tile_trans_rate(control_ptr, tBackGroundRate);
-    #endif
+
 
         for (int i = 0; i < dimof(sTilesAlign); i++) {
             vsf_tgui_control_v_draw_tile(   control_ptr,
@@ -110,10 +118,8 @@ fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_button_t* ptButton,
                                             sTilesAlign[i]);
         }
 
-    #ifdef VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR
         vsf_tgui_control_v_set_tile_trans_rate(control_ptr, tRate);
-#endif
-    } while (0);
+    }
 #endif
 
     __vsf_tgui_label_v_rendering((vsf_tgui_label_t *)ptButton, ptDirtyRegion, tMode);

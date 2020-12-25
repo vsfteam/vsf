@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 #ifndef __VSF_TGUI_CONTROLS_TEXT_LIST_H__
 #define __VSF_TGUI_CONTROLS_TEXT_LIST_H__
 
@@ -43,18 +60,8 @@
 
 /*============================ MACROS ========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __VSF_TGUI_INTERFACE_CONTROLS_TEXT_LIST           {                  \
-            {                                                                   \
-                VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
-                (vsf_msgt_method_fsm_t *)&vsf_tgui_text_list_msg_handler        \
-            },                                                                  \
-            (vsf_msgt_method_status_t *)&vsf_tgui_control_status_get,           \
-            (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot                  \
-        }
-#else
-#   define __VSF_TGUI_INTERFACE_CONTROLS_TEXT_LIST           {                  \
-            .msg_handler = {                                                \
+#define __VSF_TGUI_INTERFACE_CONTROLS_TEXT_LIST           {                     \
+            .msg_handler = {                                                    \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
                 (vsf_msgt_method_fsm_t *)&vsf_tgui_text_list_msg_handler,       \
             },                                                                  \
@@ -62,105 +69,54 @@
                         &vsf_tgui_control_status_get,                           \
             .Shoot = (vsf_msgt_method_shoot_t *)&vsf_tgui_control_shoot,        \
         }
-#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
-#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
 
-#   define __tgui_text_list(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)     \
+#define __tgui_text_list(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)        \
             tgui_control_base(   __NAME,                                        \
                             VSF_TGUI_COMPONENT_ID_TEXT_LIST,                    \
-                            vsf_tgui_list_t,                                    \
+                            vsf_tgui_text_list_t,                               \
                             (__PARENT_ADDR),                                    \
                             __PREVIOUS,                                         \
                             __NEXT,                                             \
+                VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                        \
+                                                                                \
+                tgui_container( tList, &((__PARENT_ADDR)->__NAME), tList, tList,\
+                    __tgui_name_string_tag(__NAME.tList, vsf_tgui_text_list_t)  \
+                ),                                                              \
+                                                                                \
                 VSF_TGUI_V_TEST_LIST_STATIC_INIT_DEFAULT                        \
                 __VA_ARGS__                                                     \
                 VSF_TGUI_V_TEST_LIST_STATIC_INIT_OVERRIDE                       \
-                .tList.tContent.parent_ptr = (vsf_msgt_container_t *)             \
+                .tList.tContent.parent_ptr = (vsf_msgt_container_t *)           \
                                 &((__PARENT_ADDR)->__NAME.tList),               \
-                .tList.tContent.id = VSF_TGUI_COMPONENT_ID_LABEL,             \
+                .tList.tContent.id = VSF_TGUI_COMPONENT_ID_LABEL,               \
                 .tList.tContent.Offset = {                                      \
-                    .next =  sizeof(vsf_tgui_label_t),                         \
+                    .next =  sizeof(vsf_tgui_label_t),                          \
                 },                                                              \
-                .tList.tContent.node_name_ptr = "[vsf_tgui_label_t][tContent]",   \
+                .tList.tContent                                                 \
+                    __tgui_name_string_tag(tContent, vsf_tgui_label_t)          \
                 .tList.tContent.bIsEnabled = true,                              \
                 .tList.tContent.bIsVisible = true,                              \
                 .tList.tContent.tLabel.bIsAutoSize = true,                      \
                                                                                 \
-                .tList.node_name_ptr =                                            \
-                    "[vsf_tgui_text_list_t][" #__NAME ".tList]",                \
-                .tList.parent_ptr =                                               \
-                    (vsf_msgt_container_t *)&((__PARENT_ADDR)->                 \
-                        __NAME.use_as__vsf_msgt_node_t),                        \
-                .tList.node_ptr =                                                 \
-                    (vsf_msgt_node_t*)                                          \
-                        &((__PARENT_ADDR)->__NAME.tList.tList_FirstNode),       \
-                .tList.id = VSF_TGUI_COMPONENT_ID_CONTAINER,                  \
-                .tList.Offset = {0},                                            \
-                .tList.is_container = true,                                     \
-                .tList.is_control_transparent = true,                            \
-                .tList.bIsAutoSize = true,                                      \
+                .tList.is_control_transparent = true,                           \
                 .tList.bIsEnabled = true,                                       \
                 .tList.bIsVisible = true,                                       \
-                .tList.u5Type = VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL,   \
-                                                                                \
+                .tList.ContainerAttribute                                       \
+                    .u5Type = VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL,     \
+                .tList.ContainerAttribute                                       \
+                    .bIsAutoSize = true,                                        \
                 .is_container = true,                                           \
-                .node_ptr =                                                       \
+                .node_ptr =                                                     \
                     (vsf_msgt_node_t*)                                          \
                         &((__PARENT_ADDR)->__NAME.tList),                       \
-                .node_name_ptr =                                                  \
-                    "[vsf_tgui_text_list_t][" #__NAME "]",                      \
-                .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,                        \
+                .ContainerAttribute                                             \
+                    .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,                    \
                 .bIsHideContentInsideContainer = true,                          \
+                VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE                       \
             )                                                                   
-#else
-
-#   define __tgui_text_list(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)     \
-            tgui_control_base(   __NAME,                                        \
-                            VSF_TGUI_COMPONENT_ID_TEXT_LIST,                    \
-                            vsf_tgui_list_t,                                    \
-                            (__PARENT_ADDR),                                    \
-                            __PREVIOUS,                                         \
-                            __NEXT,                                             \
-                VSF_TGUI_V_TEST_LIST_STATIC_INIT_DEFAULT                        \
-                __VA_ARGS__                                                     \
-                VSF_TGUI_V_TEST_LIST_STATIC_INIT_OVERRIDE                       \
-                .tList.tContent.parent_ptr = (vsf_msgt_container_t *)             \
-                                &((__PARENT_ADDR)->__NAME.tList),               \
-                .tList.tContent.id = VSF_TGUI_COMPONENT_ID_LABEL,             \
-                .tList.tContent.Offset = {                                      \
-                    .next =  sizeof(vsf_tgui_label_t),                         \
-                },                                                              \
-                .tList.tContent.bIsEnabled = true,                              \
-                .tList.tContent.bIsVisible = true,                              \
-                .tList.tContent.tLabel.bIsAutoSize = true,                      \
-                                                                                \
-                .tList.parent_ptr =                                               \
-                    (vsf_msgt_container_t *)&((__PARENT_ADDR)->                 \
-                        __NAME.use_as__vsf_msgt_node_t),                        \
-                .tList.node_ptr =                                                 \
-                    (vsf_msgt_node_t*)                                          \
-                        &((__PARENT_ADDR)->__NAME.tList.tList_FirstNode),       \
-                .tList.id = VSF_TGUI_COMPONENT_ID_CONTAINER,                  \
-                .tList.Offset = {0},                                            \
-                .tList.is_container = true,                                     \
-                .tList.is_control_transparent = true,                            \
-                .tList.bIsAutoSize = true,                                      \
-                .tList.bIsEnabled = true,                                       \
-                .tList.bIsVisible = true,                                       \
-                .tList.u5Type = VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL,   \
-                                                                                \
-                .is_container = true,                                           \
-                .node_ptr =                                                       \
-                    (vsf_msgt_node_t*)                                          \
-                        &((__PARENT_ADDR)->__NAME.tList),                       \
-                .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,                        \
-                .bIsHideContentInsideContainer = true,                          \
-            )                                                                   
-#endif
 
 
 #define tgui_text_list(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)          \
@@ -170,9 +126,13 @@
                             __NEXT,                                             \
                             __VA_ARGS__)
 
-#   define tgui_text_list_content(...)      .tList.tContent = {__VA_ARGS__},
+#   define tgui_text_list_content(...)                                          \
+                .tList.tContent = {                                             \
+                    VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT                        \
+                    __VA_ARGS__                                                 \
+                    VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE                       \
+                },
 
-#endif
 /*============================ TYPES =========================================*/
 
 declare_class(vsf_tgui_text_list_t)

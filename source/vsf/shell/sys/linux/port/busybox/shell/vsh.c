@@ -355,7 +355,7 @@ int vsh_main(int argc, char *argv[])
                         ctx.history.cur_disp_entry = ctx.history.cur_save_entry;
 #endif
                         if (__vsh_run_cmd(&ctx) < 0) {
-                            fprintf(stderr, "fail to execute %s\r\n", ctx.cmd);
+                            printf("fail to execute %s\r\n", ctx.cmd);
                         }
                     }
                     goto input_cmd;
@@ -416,7 +416,7 @@ int cd_main(int argc, char *argv[])
     char pathname[PATH_MAX];
     int err = vsh_generate_path(pathname, sizeof(pathname), __vsh_working_dir, argv[1]);
     if (err != 0) {
-        printf("invalid path" VSH_LINEEND, argv[1]);
+        printf("invalid path %s" VSH_LINEEND, argv[1]);
         return err;
     }
 

@@ -173,13 +173,20 @@ void __vsf_arch_irq_request_pend(vsf_arch_irq_request_t *request)
     do {
         bits = xEventGroupWaitBits(request->event, 1, is_to_reset, pdFALSE, portMAX_DELAY);
     } while (!(bits & 1));
+    request->is_set_pending = false;
 }
 
 void __vsf_arch_irq_request_send(vsf_arch_irq_request_t *request)
 {
     if (VSF_ARCH_FREERTOS_CFG_IS_IN_ISR()) {
-        BaseType_t ret = xEventGroupSetBitsFromISR(request->event, 1, &__vsf_freertos.irq.stack[__vsf_freertos.irq.pos]);
-        VSF_ARCH_ASSERT(ret == pdPASS);
+        // avoid xEventGroupSetBitsFromISR to be called too many times in isr
+        // because it will take a node in timer queue
+        if (!request->is_set_pending) {
+            request->is_set_pending = true;
+
+            BaseType_t ret = xEventGroupSetBitsFromISR(request->event, 1, &__vsf_freertos.irq.stack[__vsf_freertos.irq.pos]);
+            VSF_ARCH_ASSERT(ret == pdPASS);
+        }
     } else {
         xEventGroupSetBits(request->event, 1);
     }
@@ -231,12 +238,12 @@ void __vsf_arch_irq_thread_start(vsf_arch_irq_thread_t *irq_thread,
     stack = (VSF_ARCH_RTOS_STACK_T *)((uintptr_t)stack + reserved_stack_depth);
 
     // if thread is restarted, delete first
-    if (irq_thread->thread != NULL) {
-        vTaskDelete(irq_thread->thread);
+    if (irq_thread->thread_handle != NULL) {
+        vTaskDelete(irq_thread->thread_handle);
     }
-    irq_thread->thread = xTaskCreateStatic(entry, name, stack_depth, irq_thread,
+    irq_thread->thread_handle = xTaskCreateStatic(entry, name, stack_depth, irq_thread,
         rtos_priority, (StackType_t *)stack, static_task);
-    VSF_ARCH_ASSERT(irq_thread->thread != NULL);
+    VSF_ARCH_ASSERT(irq_thread->thread_handle != NULL);
 }
 
 void __vsf_arch_irq_thread_exit(void)
@@ -246,23 +253,23 @@ void __vsf_arch_irq_thread_exit(void)
 
 void __vsf_arch_irq_thread_set_priority(vsf_arch_irq_thread_t *irq_thread, vsf_arch_prio_t priority)
 {
-    vTaskPrioritySet(irq_thread->thread, arch_prio_to_rtos_prio(priority));
+    vTaskPrioritySet(irq_thread->thread_handle, arch_prio_to_rtos_prio(priority));
 }
 
 #if VSF_ARCH_RTOS_CFG_MODE == VSF_ARCH_RTOS_MODE_SUSPEND_RESUME
 void __vsf_arch_irq_thread_suspend(vsf_arch_irq_thread_t *irq_thread)
 {
-    vTaskSuspend(irq_thread->thread);
+    vTaskSuspend(irq_thread->thread_handle);
 }
 
 void __vsf_arch_irq_thread_resume(vsf_arch_irq_thread_t *irq_thread)
 {
-    vTaskResume(irq_thread->thread);
+    vTaskResume(irq_thread->thread_handle);
 }
 
 vsf_arch_prio_t __vsf_arch_irq_thread_get_priority(vsf_arch_irq_thread_t *irq_thread)
 {
-    UBaseType_t rtos_priority = uxTaskPriorityGet(irq_thread->thread);
+    UBaseType_t rtos_priority = uxTaskPriorityGet(irq_thread->thread_handle);
     return (vsf_arch_prio_t)rtos_prio_to_arch_prio(rtos_priority);
 }
 #endif

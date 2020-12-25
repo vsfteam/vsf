@@ -397,7 +397,7 @@ def_simple_class(vk_usbd_trans_t) {
         };
     )
 
-	private_member(
+    private_member(
         vsf_slist_node_t node;
         uint8_t *cur;
     )
@@ -499,7 +499,8 @@ def_simple_class(vk_usbd_ep_stream_t) {
         vk_usbd_dev_t *dev;
         uint32_t total_size;
         uint32_t transfered_size;
-        uint32_t cur_size;
+        uint32_t cur_size       : 31;
+        uint32_t zlp_save       : 1;
     )
 };
 
@@ -585,6 +586,7 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
 #include "./class/CDC/vsf_usbd_CDCACM.h"
 #include "./class/HID/vsf_usbd_HID.h"
 #include "./class/UVC/vsf_usbd_UVC.h"
+#include "./class/UAC/vsf_usbd_UAC.h"
 #include "./class/MSC/vsf_usbd_MSC.h"
 
 

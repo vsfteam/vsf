@@ -1,6 +1,5 @@
 /****************************************************************************
-*  2020 Modified by VSF Team                                                *
-*  Copyright 2017-2019 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)  *
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
 *                                                                           *
 *  Licensed under the Apache License, Version 2.0 (the "License");          *
 *  you may not use this file except in compliance with the License.         *
@@ -16,9 +15,27 @@
 *                                                                           *
 ****************************************************************************/
 
+/*****************************************************************************
+ *   Copyright(C)2009-2019 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_DELEGATE_CLASS_IMPLEMENT
 #include "./delegate.h"
 
 /*============================ MACROS ========================================*/
@@ -26,38 +43,13 @@
 /*============================ MACROS ========================================*/
 #define EVENT_RT_UNREGISTER         4
 
-#ifndef this
-#   define this             (*this_ptr)
-#endif
+#undef this
+#define this                (*this_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef fsm_rt_t delegate_handler_func_t(void *arg_ptr, void *param_ptr);
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-//! \name general event handler
-//! @{
-def_class(delegate_handler_t,,
-    delegate_handler_func_t     *handler_fn;         //!< event handler
-    void                        *arg_ptr;              //!< Argument
-    class(delegate_handler_t)   *next_ptr;            //!< next 
-)
-end_def_class(delegate_handler_t)
-//! @}
-
-//! \name event
-//! @{
-def_class(delegate_t,,
-    delegate_handler_t          *event_ptr;
-    delegate_handler_t          *blocked_list_ptr;
-    class(delegate_handler_t)   **handler_pptr;
-)
-end_def_class(delegate_t)
-//! @}
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -78,8 +70,8 @@ delegate_t *delegate_init(delegate_t *event_ptr)
 
         this.event_ptr = NULL;
         this.blocked_list_ptr = NULL;
-        this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
-        
+        //this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
+        this.handler_pptr = &(this.event_ptr);
     } while (0);
 
     return event_ptr;
@@ -116,7 +108,7 @@ static class(delegate_handler_t) **search_list(
         if ((*handler_pptr) == hnd_ptr) {
             return handler_pptr;
         }
-        handler_pptr = &((*handler_pptr)->next_ptr);      //!< get next item
+        handler_pptr = (class(delegate_handler_t) **)&((*handler_pptr)->next_ptr);      //!< get next item
     }
     return NULL;
 }
@@ -140,7 +132,7 @@ vsf_err_t register_delegate_handler(delegate_t *event_ptr, delegate_handler_t *h
 
         if (NULL != handler_pptr) {
             //! safe to remove
-            (*handler_pptr) = hnd_ptr->next_ptr;
+            (*handler_pptr) = (class(delegate_handler_t) *)hnd_ptr->next_ptr;
             hnd_ptr->next_ptr = NULL;
         } else {        
             return VSF_ERR_REQ_ALREADY_REGISTERED;
@@ -148,7 +140,8 @@ vsf_err_t register_delegate_handler(delegate_t *event_ptr, delegate_handler_t *h
     }
 
     //! add handler to the ready list
-    hnd_ptr->next_ptr = (class(delegate_handler_t) *)(this.event_ptr);
+    //hnd_ptr->next_ptr = (class(delegate_handler_t) *)(this.event_ptr);
+    hnd_ptr->next_ptr = this.event_ptr;
     this.event_ptr = handler_ptr;
 
     return VSF_ERR_NONE;
@@ -177,10 +170,10 @@ vsf_err_t unregister_delegate_handler( delegate_t *event_ptr, delegate_handler_t
                                     hnd_ptr );
         if (NULL != handler_pptr) {
             //! safe to remove
-            (*handler_pptr) = hnd_ptr->next_ptr;
+            (*handler_pptr) = (class(delegate_handler_t) *)hnd_ptr->next_ptr;
             hnd_ptr->next_ptr = NULL;
             if (this.handler_pptr == &(hnd_ptr->next_ptr)) {
-                this.handler_pptr = handler_pptr;
+                this.handler_pptr = (delegate_handler_t **)handler_pptr;
             }
             break;
         }
@@ -189,10 +182,10 @@ vsf_err_t unregister_delegate_handler( delegate_t *event_ptr, delegate_handler_t
                                     hnd_ptr );
         if (NULL != handler_pptr) {
             //! safe to remove
-            (*handler_pptr) = hnd_ptr->next_ptr;
+            (*handler_pptr) = (class(delegate_handler_t) *)hnd_ptr->next_ptr;
             hnd_ptr->next_ptr = NULL;
             if (this.handler_pptr == &(hnd_ptr->next_ptr)) {
-                this.handler_pptr = handler_pptr;
+                this.handler_pptr = (delegate_handler_t **)handler_pptr;
             }
             break;
         }
@@ -207,7 +200,8 @@ static fsm_rt_t __move_to_block_list(class(delegate_t) *this_ptr, class(delegate
     //! remove handler from ready list
     (*this.handler_pptr) = hnd_ptr->next_ptr;
     //! add handler to block list
-    hnd_ptr->next_ptr = (class(delegate_handler_t) *)this.blocked_list_ptr;
+    //hnd_ptr->next_ptr = (class(delegate_handler_t) *)this.blocked_list_ptr;
+    hnd_ptr->next_ptr = this.blocked_list_ptr;
     this.blocked_list_ptr = (delegate_handler_t *)hnd_ptr;
 
     if (NULL == this.event_ptr) {
@@ -243,18 +237,20 @@ fsm_rt_t invoke_delegate( delegate_t *event_ptr, void *param_ptr)
         //! initialize state
         this.event_ptr = this.blocked_list_ptr;
         this.blocked_list_ptr = NULL;
-        this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
+        //this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
+        this.handler_pptr = &(this.event_ptr);
     } 
 
     if (NULL == (*this.handler_pptr)) {
         //! finish visiting the ready list
-        this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
+        //this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
+        this.handler_pptr = &(this.event_ptr);
         if (NULL == (*this.handler_pptr)) {
             //! complete
             return fsm_rt_cpl;
         }
     } else {
-        class(delegate_handler_t) *handler_ptr = (*this.handler_pptr);
+        class(delegate_handler_t) *handler_ptr = (class(delegate_handler_t) *)(*this.handler_pptr);
         
         if (NULL != handler_ptr->handler_fn) {
             //! run the event handler

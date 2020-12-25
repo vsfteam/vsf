@@ -38,16 +38,18 @@ typedef enum usb_cdc_req_t {
     USB_CDCREQ_CLEAR_COMM_FEATURE           = 0x04,
 } usb_cdc_req_t;
 
-typedef struct usb_cdc_union_descriptor_t {
+typedef struct usb_cdc_union_descriptor_t usb_cdc_union_descriptor_t;
+struct usb_cdc_union_descriptor_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
 
     uint8_t bControlInterface;
     uint8_t bSubordinateInterface[1];
-} PACKED usb_cdc_union_descriptor_t;
+} PACKED;
 
-typedef struct usb_cdc_ecm_descriptor_t {
+typedef struct usb_cdc_ecm_descriptor_t usb_cdc_ecm_descriptor_t;
+struct usb_cdc_ecm_descriptor_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
@@ -57,7 +59,7 @@ typedef struct usb_cdc_ecm_descriptor_t {
     uint16_t wMaxSegmentSize;
     uint16_t wNumberMCFilters;
     uint8_t bNumberPowerFilters;
-} PACKED usb_cdc_ecm_descriptor_t;
+} PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

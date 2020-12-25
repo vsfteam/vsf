@@ -11,7 +11,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "__ESP32S2__"
             ],
             "windowsSdkVersion": "10.0.18362.0",
             "cStandard": "gnu11",

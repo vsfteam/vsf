@@ -69,8 +69,8 @@
 
 #       define VSF_TGUI_LOG                                 vsf_trace
 #           define VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG        DISABLED
-#           define VSF_TGUI_CFG_SHOW_USER_INPUT_LOG         DISABLED
-#               define  VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG   DISABLED
+#           define VSF_TGUI_CFG_SHOW_USER_INPUT_LOG         ENABLED
+#               define  VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG   ENABLED
 #               define  VSF_TGUI_CFG_SHOW_KEY_EVT_LOG       DISABLED
 #               define  VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG   DISABLED
 
@@ -100,13 +100,15 @@
 #define VSF_USE_UI                                          ENABLED
 #   define VSF_USE_LVGL                                     DISABLED
 #   define VSF_DISP_USE_SDL2                                ENABLED
-#       define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       DISABLED
+
 
 #   define VSF_USE_TINY_GUI                                 ENABLED
 #       define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL          VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #       define VSF_TGUI_CFG_COLOR_MODE                      VSF_TGUI_COLOR_ARGB_8888
 #       define VSF_TGUI_CFG_SUPPORT_NAME_STRING             ENABLED        /* Enabled for debug */
 #       define VSF_TGUI_CFG_REFRESH_SCHEME                  VSF_TGUI_REFRESH_SCHEME_Z_ORDER
+#       define VSF_TGUI_CFG_SUPPORT_MOUSE                   ENABLED
+
 
 #       define VSF_TGUI_CFG_USER_FONTS                      ENABLED
 
@@ -139,7 +141,13 @@
 #define WEAK_VSF_INPUT_ON_KEYBOARD
 #define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
 #define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
-#define WEAK_VSF_INPUT_ON_MOUSE
+
+#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#   define WEAK_VSF_INPUT_ON_MOUSE
+#   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       DISABLED
+#else
+#   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
+#endif
 
 #endif
 

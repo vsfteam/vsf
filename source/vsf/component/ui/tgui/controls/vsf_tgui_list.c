@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*============================ INCLUDES ======================================*/
 #include "../vsf_tgui_cfg.h"
 
@@ -36,17 +53,7 @@ static bool __vk_tgui_list_invoke_event(vsf_tgui_list_t* ptList, vsf_evt_t msg);
 
 /*============================ LOCAL VARIABLES ===============================*/
 static const i_tgui_control_methods_t c_tVList = {
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    {
-        (vsf_tgui_method_t *)&vsf_tgui_list_v_init,
-        (vsf_tgui_method_t *)&vsf_tgui_list_v_depose,
-        (vsf_tgui_v_method_render_t *)&vsf_tgui_list_v_rendering,
-        (vsf_tgui_v_method_render_t *)&vsf_tgui_list_v_post_rendering,
-        (vsf_tgui_method_t *)&vsf_tgui_list_v_update
-    },
-    (vsf_tgui_method_t*)&vk_tgui_list_init,
-    (vsf_tgui_method_t *)&vk_tgui_list_update
-#else
+
     .tView = {
         .Init = (vsf_tgui_method_t *)&vsf_tgui_list_v_init,
         .Depose = (vsf_tgui_method_t *)&vsf_tgui_list_v_depose,
@@ -56,7 +63,7 @@ static const i_tgui_control_methods_t c_tVList = {
     },
     .Init =     (vsf_tgui_method_t *)&vk_tgui_list_init,
     .Update =   (vsf_tgui_method_t *)&vk_tgui_list_update,
-#endif
+
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -75,7 +82,7 @@ static int_fast16_t __vk_tgui_calculate_offset_for_make_target_control_visible(
         iListPosition = -ptInnerContainer->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iY;
         iListLength = vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iHeight;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-        iListLength -= ptInnerContainer->tConatinerPadding.chTop + ptInnerContainer->tConatinerPadding.chBottom;
+        iListLength -= ptInnerContainer->tContainerPadding.chTop + ptInnerContainer->tContainerPadding.chBottom;
     #endif
 
         iControlLength = vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iHeight;
@@ -86,7 +93,7 @@ static int_fast16_t __vk_tgui_calculate_offset_for_make_target_control_visible(
         iListPosition = -ptInnerContainer->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iX;
         iListLength = vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iWidth;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-        iListLength -= ptInnerContainer->tConatinerPadding.chLeft + ptInnerContainer->tConatinerPadding.chRight;
+        iListLength -= ptInnerContainer->tContainerPadding.chLeft + ptInnerContainer->tContainerPadding.chRight;
     #endif
 
         iControlLength = vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iWidth;
@@ -122,7 +129,7 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
     switch (ptInnerContainer->ContainerAttribute.u5Type) {
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-            nYOffset = ptInnerContainer->tConatinerPadding.chTop;
+            nYOffset = ptInnerContainer->tContainerPadding.chTop;
         #endif
             while (chIndex--) {
                 control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
@@ -160,7 +167,7 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
             break;
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-            nXOffset = ptInnerContainer->tConatinerPadding.chLeft;
+            nXOffset = ptInnerContainer->tContainerPadding.chLeft;
         #endif
             while (chIndex--) {
                 control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
@@ -226,19 +233,12 @@ static void __vk_tgui_list_update_inner_container_location(vsf_tgui_list_t* ptLi
 
 static bool __vk_tgui_list_invoke_event(vsf_tgui_list_t* ptList, vsf_evt_t msg)
 {
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    vsf_tgui_evt_t event = {0};
-    event.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.msg = msg;
-    return VSf_tgui_control_send_message(
-        (const vsf_tgui_control_t *)ptList, event);
 
-#else
     return vsf_tgui_control_send_message(
         (const vsf_tgui_control_t *)ptList,
         (vsf_tgui_evt_t) {
             .msg = msg,
         });
-#endif
 }
 
 static bool __vk_tgui_list_previous(vsf_tgui_list_t* ptList)
@@ -326,22 +326,22 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
         }
     } 
 #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
-    else if (VSF_TGUI_EVT_GESTURE_SLIDE == ptMSG->use_as__vsf_msgt_msg_t.msg) {
+    else if (VSF_TGUI_EVT_GESTURE_WHEEL == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         vsf_tgui_gesture_evt_t* ptEvt = (vsf_tgui_gesture_evt_t*)ptMSG;
         switch (ptList->ptList->ContainerAttribute.u5Type) {
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
-                if (ptEvt->tDelta.use_as__vsf_tgui_location_t.iX > 0) {
+                if (ptEvt->delta.use_as__vsf_tgui_location_t.iX > 0) {
                     bStatusChanged = __vk_tgui_list_previous(ptList);
                     break;
-                } else if (ptEvt->tDelta.use_as__vsf_tgui_location_t.iX < 0) {
+                } else if (ptEvt->delta.use_as__vsf_tgui_location_t.iX < 0) {
                     bStatusChanged = __vk_tgui_list_next(ptList);
                     break;
                 }
                 //! fall-through
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
-                if (ptEvt->tDelta.use_as__vsf_tgui_location_t.iY > 0) {
+                if (ptEvt->delta.use_as__vsf_tgui_location_t.iY > 0) {
                     bStatusChanged = __vk_tgui_list_previous(ptList);
-                } else if (ptEvt->tDelta.use_as__vsf_tgui_location_t.iY < 0) {
+                } else if (ptEvt->delta.use_as__vsf_tgui_location_t.iY < 0) {
                     bStatusChanged = __vk_tgui_list_next(ptList);
                 }
                 break;
@@ -505,8 +505,8 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
             iListRawSize = ptListSize->iHeight;
             iInnerContainerRawSize =    ptListInnerContainerSize->iHeight;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-            iInnerContainerRawSize -=   ptInnerContainer->tConatinerPadding.chTop
-                                    +   ptInnerContainer->tConatinerPadding.chBottom;
+            iInnerContainerRawSize -=   ptInnerContainer->tContainerPadding.chTop
+                                    +   ptInnerContainer->tContainerPadding.chBottom;
         #endif
             iScrollbarSize = iListRawSize/chScalingRatio;
             iScrollbarTrackPieceSize = iInnerContainerRawSize/chScalingRatio;
@@ -542,8 +542,8 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
             iListRawSize = ptListSize->iWidth;
             iInnerContainerRawSize = ptListInnerContainerSize->iWidth;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-            iInnerContainerRawSize -=   ptInnerContainer->tConatinerPadding.chLeft
-                                    +   ptInnerContainer->tConatinerPadding.chRight;
+            iInnerContainerRawSize -=   ptInnerContainer->tContainerPadding.chLeft
+                                    +   ptInnerContainer->tContainerPadding.chRight;
         #endif
             iScrollbarSize = iListRawSize/chScalingRatio;
             iScrollbarTrackPieceSize = iInnerContainerRawSize/chScalingRatio;

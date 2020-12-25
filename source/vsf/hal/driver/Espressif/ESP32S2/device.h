@@ -66,16 +66,15 @@
 
 /*============================ MACROS ========================================*/
 
-#define USB_OTG_COUNT                           1
+#define USB_OTG_COUNT               1
 // required by dwcotg, define the max ep number of dwcotg include ep0
-#define USB_DWCOTG_MAX_EP_NUM                   5
+#define USB_DWCOTG_MAX_EP_NUM       8
 
-#define USB_BASE_REG                            0x60080000
-//#define ETS_USB_INTR_SOURCE                     48
-#define ETS_USB_INUM                            9
+#define USB_BASE_REG                0x60080000
 
 #define USB_OTG0_CONFIG                                                         \
-            .ep_num                 = 10,                                       \
+            .dc_ep_num              = 7 << 1,                                   \
+            .hc_ep_num              = 8,                                        \
             .periph_module          = PERIPH_USB_MODULE,                        \
             .intr_source            = ETS_USB_INTR_SOURCE,                      \
             .reg                    = (void *)USB_BASE_REG,                     \

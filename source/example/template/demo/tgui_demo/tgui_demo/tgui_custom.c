@@ -84,24 +84,36 @@ static vsf_tgui_font_t g_tUserFonts[] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 24,
         .pchFontPath = "font/wqy-microhei.ttc",
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+        .name_ptr = "VSF_TGUI_FONT_WQY_MICROHEI_S24",
+#endif
     },
 
     [VSF_TGUI_FONT_WQY_MICROHEI_S20] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 20,
         .pchFontPath = "font/wqy-microhei.ttc",
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+        .name_ptr = "VSF_TGUI_FONT_WQY_MICROHEI_S20",
+#endif
     },
 
     [VSF_TGUI_FONT_WQY_MICROHEI_S16] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 16,
         .pchFontPath = "font/wqy-microhei.ttc",
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+        .name_ptr = "VSF_TGUI_FONT_WQY_MICROHEI_S16",
+#endif
     },
 
     [VSF_TGUI_FONT_DEJAVUSERIF_S24] = {
         .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
         .chFontSize = 24,
         .pchFontPath = "font/DejaVuSerif.ttf",
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+        .name_ptr = "VSF_TGUI_FONT_DEJAVUSERIF_S24",
+#endif
     },
 
 };

@@ -177,9 +177,9 @@ typedef struct vk_musb_fdrc_reg_t {
             volatile uint8_t RxCSR2;
             volatile uint8_t RxCount1;
             volatile uint8_t RxCount2;
-            volatile uint8_t TxType;        // for host onkly
+            volatile uint8_t TxType;        // for host only
             volatile uint8_t TxInterval;    // for host only
-            volatile uint8_t RxType;        // for host onkly
+            volatile uint8_t RxType;        // for host only
             volatile uint8_t RxInterval;    // for host only
             volatile uint8_t TxFIFO1;
             volatile uint8_t TxFIFO2;

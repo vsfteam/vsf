@@ -131,6 +131,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #ifdef __VSF_USBH_CLASS_IMPLEMENT_HCD__
+// available for hcd only if alloc_device is not implemented
 #   define usb_gettoggle(__dev, __ep, __out)    (((__dev)->toggle[__out] >> (__ep)) & 1)
 #   define usb_dotoggle(__dev, __ep, __out)     ((__dev)->toggle[__out] ^= (1 << (__ep)))
 #   define usb_settoggle(__dev, __ep, __out, __bit)                             \
@@ -294,6 +295,7 @@ def_simple_class(vk_usbh_hcd_drv_t) {
         vsf_err_t (*fini)(vk_usbh_hcd_t *hcd);
         vsf_err_t (*suspend)(vk_usbh_hcd_t *hcd);
         vsf_err_t (*resume)(vk_usbh_hcd_t *hcd);
+        uint_fast16_t (*get_frame_number)(vk_usbh_hcd_t *hcd);
         vsf_err_t (*alloc_device)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
         void (*free_device)(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
         vk_usbh_hcd_urb_t * (*alloc_urb)(vk_usbh_hcd_t *hcd);
@@ -532,6 +534,7 @@ extern void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev);
 
 #if defined(__VSF_USBH_CLASS_IMPLEMENT) || defined(__VSF_USBH_CLASS_IMPLEMENT_CLASS__)
 // APIs to be called by class drivers
+extern uint_fast16_t vk_usbh_get_frame(vk_usbh_t *usbh);
 extern vk_usbh_pipe_t vk_usbh_get_pipe(vk_usbh_dev_t *dev,
             uint_fast8_t endpoint, uint_fast8_t type, uint_fast16_t size);
 extern vk_usbh_pipe_t vk_usbh_get_pipe_from_ep_desc(vk_usbh_dev_t *dev,

@@ -107,6 +107,7 @@ static vsf_err_t __f1cx00s_usbh_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
 static vsf_err_t __f1cx00s_usbh_hcd_fini(vk_usbh_hcd_t *hcd);
 static vsf_err_t __f1cx00s_usbh_hcd_suspend(vk_usbh_hcd_t *hcd);
 static vsf_err_t __f1cx00s_usbh_hcd_resume(vk_usbh_hcd_t *hcd);
+static uint_fast16_t __f1cx00s_usbh_hcd_get_frame_number(vk_usbh_hcd_t *hcd);
 static vsf_err_t __f1cx00s_usbh_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 static void __f1cx00s_usbh_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 static vk_usbh_hcd_urb_t * __f1cx00s_usbh_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
@@ -133,6 +134,7 @@ const vk_usbh_hcd_drv_t vsf_usb_hcd_drv = {
     .fini               = __f1cx00s_usbh_hcd_fini,
     .suspend            = __f1cx00s_usbh_hcd_suspend,
     .resume             = __f1cx00s_usbh_hcd_resume,
+    .get_frame_number   = __f1cx00s_usbh_hcd_get_frame_number,
     .alloc_device       = __f1cx00s_usbh_hcd_alloc_device,
     .free_device        = __f1cx00s_usbh_hcd_free_device,
     .alloc_urb          = __f1cx00s_usbh_hcd_alloc_urb,
@@ -637,6 +639,11 @@ static vsf_err_t __f1cx00s_usbh_hcd_suspend(vk_usbh_hcd_t *hcd)
 static vsf_err_t __f1cx00s_usbh_hcd_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
+}
+
+static uint_fast16_t __f1cx00s_usbh_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
+{
+    return MUSB_BASE->Common.Frame;
 }
 
 static vsf_err_t __f1cx00s_usbh_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)

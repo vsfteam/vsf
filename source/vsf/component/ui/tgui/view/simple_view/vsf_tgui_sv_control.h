@@ -46,9 +46,17 @@ extern fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* control_ptr);
 
 extern fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_control_t* control_ptr);
 
+#if 0
 extern bool vsf_tgui_get_child_dirty_region(const vsf_tgui_control_t* control_ptr,
                                             const vsf_tgui_region_t* ptParentDirtyRegion,
                                             vsf_tgui_region_t* ptChildDirtyRegion);
+#endif
+
+extern 
+fsm_rt_t __vk_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
+                                        vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
+                                        vsf_tgui_control_refresh_mode_t tMode,
+                                        bool bIsIgnoreBackground);
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
 extern const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* control_ptr);

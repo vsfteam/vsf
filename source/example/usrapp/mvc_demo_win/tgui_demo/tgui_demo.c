@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
  /*============================ INCLUDES ======================================*/
 #include "vsf.h"
 
@@ -75,7 +92,7 @@ vsf_err_t tgui_demo_init(void)
 
     my_stopwatch_init(&s_tMyStopwatch, &s_tTGUIDemo);
 
-    vk_tgui_set_top_container(&s_tTGUIDemo, (vsf_tgui_top_container_t *)&s_tMyStopwatch);
+    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tMyStopwatch);
 
     return err;
 }
@@ -104,25 +121,17 @@ void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* evt)
 void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 {
     //! this block of code is used for test purpose only
+    vsf_err_t result = 
+        vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                                0,  /* only one finger is used for now*/
+                                (vsf_tgui_location_t) {
+                                    vsf_input_touchscreen_get_x(ts_evt),
+                                    vsf_input_touchscreen_get_y(ts_evt)},
+                                vsf_input_touchscreen_is_down(ts_evt),
+                                ts_evt->use_as__vk_input_evt_t.duration
+                                );
 
-    vsf_tgui_evt_t event = {
-        .PointerEvt = {
-            .msg = vsf_input_touchscreen_is_down(ts_evt)
-                                ?   VSF_TGUI_EVT_POINTER_DOWN
-                                :   VSF_TGUI_EVT_POINTER_UP,
-
-            .iX = vsf_input_touchscreen_get_x(ts_evt),
-            .iY = vsf_input_touchscreen_get_y(ts_evt),
-        },
-    };
-
-    vk_tgui_send_message(&s_tTGUIDemo, event);
-
-
-    if (!vsf_input_touchscreen_is_down(ts_evt)) {
-        event.PointerEvt.msg = VSF_TGUI_EVT_POINTER_CLICK;
-        vk_tgui_send_message(&s_tTGUIDemo, event);
-    }
+    ASSERT(result == VSF_ERR_NONE);
 }
 
 #if (VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED) && defined(VSF_TGUI_CFG_SUPPORT_MOUSE)
@@ -151,55 +160,85 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 
 */
     //! this block of code is used for test purpose only
-
-
+    int_fast8_t button_id = vk_input_mouse_evt_button_get(mouse_evt) == 0 ? 0 : 1;
+    static uint_fast8_t __button_status = 0;
+    vsf_err_t result = VSF_ERR_NONE;
 
     switch (vk_input_mouse_evt_get(mouse_evt)) {
         case VSF_INPUT_MOUSE_EVT_BUTTON: {
 
-            vsf_tgui_evt_t event = {
-                .PointerEvt = {
-                    .msg = vk_input_mouse_evt_button_is_down(mouse_evt)
-                                        ?   VSF_TGUI_EVT_POINTER_DOWN
-                                        :   VSF_TGUI_EVT_POINTER_UP,
-
-                    .iX = vk_input_mouse_evt_get_x(mouse_evt),
-                    .iY = vk_input_mouse_evt_get_y(mouse_evt),
-                },
-            };
-
-            vk_tgui_send_message(&s_tTGUIDemo, event);
-
-
-            if (!vk_input_mouse_evt_button_is_down(mouse_evt)) {
-                event.PointerEvt.msg = VSF_TGUI_EVT_POINTER_CLICK;
-                vk_tgui_send_message(&s_tTGUIDemo, event);
+            result = 
+                vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                                        button_id, 
+                                        (vsf_tgui_location_t) {
+                                            vk_input_mouse_evt_get_x(mouse_evt),
+                                            vk_input_mouse_evt_get_y(mouse_evt)},
+                                        vk_input_mouse_evt_button_is_down(mouse_evt),
+                                        mouse_evt->use_as__vk_input_evt_t.duration
+                                        );
+            
+            if (vk_input_mouse_evt_button_is_down(mouse_evt)) {
+                __button_status |= BIT(button_id);
+            } else {
+                __button_status &= ~BIT(button_id);
             }
+
+
+            ASSERT(result == VSF_ERR_NONE);
             break;
         }
 
         case VSF_INPUT_MOUSE_EVT_MOVE: {
-            vsf_tgui_evt_t event = {
-                .PointerEvt = {
-                    .msg = VSF_TGUI_EVT_POINTER_MOVE,
-                    .iX = vk_input_mouse_evt_get_x(mouse_evt),
-                    .iY = vk_input_mouse_evt_get_y(mouse_evt),
-                },
-            };
-
-            vk_tgui_send_message(&s_tTGUIDemo, event);
-
+            if (0 == __button_status) {
+                //! pure mouse move
+                result = 
+                    vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                                            button_id, 
+                                            (vsf_tgui_location_t) {
+                                                vk_input_mouse_evt_get_x(mouse_evt),
+                                                vk_input_mouse_evt_get_y(mouse_evt)},
+                                            __button_status & BIT(button_id),
+                                            mouse_evt->use_as__vk_input_evt_t.duration
+                                            );
+            } else {
+                if (__button_status & BIT(0)) {
+                    //! simulate finger 0 move
+                    result = 
+                    vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                                            0, 
+                                            (vsf_tgui_location_t) {
+                                                vk_input_mouse_evt_get_x(mouse_evt),
+                                                vk_input_mouse_evt_get_y(mouse_evt)},
+                                            __button_status & BIT(0),
+                                            mouse_evt->use_as__vk_input_evt_t.duration
+                                            );
+                }
+                if (__button_status & BIT(1)) {
+                    //! simulate finger 1 move
+                    result = 
+                    vsf_tgui_send_touch_evt(&s_tTGUIDemo,
+                                            1, 
+                                            (vsf_tgui_location_t) {
+                                                vk_input_mouse_evt_get_x(mouse_evt),
+                                                vk_input_mouse_evt_get_y(mouse_evt)},
+                                            __button_status & BIT(1),
+                                            mouse_evt->use_as__vk_input_evt_t.duration
+                                            );
+                }
+            }
+            //ASSERT(result == VSF_ERR_NONE);
             break;
         }
+
 
         case VSF_INPUT_MOUSE_EVT_WHEEL:  {
                 vsf_tgui_evt_t event = {
                     .tGestureEvt = {
-                        .msg = VSF_TGUI_EVT_GESTURE_SLIDE,
-                        .tDelta = {
+                        .msg = VSF_TGUI_EVT_GESTURE_WHEEL,
+                        .delta = {
                             .iX = 0,
                             .iY = vk_input_mouse_evt_get_y(mouse_evt),
-                            .hwMillisecond = 20,            //! 50Hz
+                            .ms = 20,            //! 50Hz
                         },
                     },
                 };

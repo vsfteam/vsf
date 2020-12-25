@@ -65,13 +65,14 @@ def_simple_class(vsf_arch_irq_request_t) {
         // should be EventGroupHandle_t event, but avoid to expose header(s) of host os
         void                        * event;
         bool                        is_auto_reset;
+        bool                        is_set_pending;
     )
 };
 
 def_simple_class(vsf_arch_irq_thread_t) {
     private_member(
         // should be TaskHandle_t thread, but avoid to expose header(s) of host os
-        void                        * thread;
+        void                        * thread_handle;
     )
 };
 

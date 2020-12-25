@@ -251,7 +251,7 @@ int lvgl_main(int argc, char *argv[])
         return -1;
     }
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
     uint_fast8_t gamepad_num = 1;
 #   if VSF_USE_TRACE == ENABLED

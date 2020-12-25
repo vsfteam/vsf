@@ -874,6 +874,9 @@
     <Filter Include="vsf\component\3rd-party\nuklear\raw">
       <UniqueIdentifier>{1f522aa9-d73c-48af-9541-376b466df1cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\tgui_demo\tgui_demo\tgui_designer">
+      <UniqueIdentifier>{d6c919d6-509b-40e6-aca1-98c128803726}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -2499,6 +2502,21 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\linux\include\simple_libc\ctype.h">
       <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\vsf_tgui_designer_cfg.h">
+      <Filter>usrapp\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_create.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_tree_dump.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\utilities\template\vsf_bitmap.c">
@@ -3823,6 +3841,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_input.c">
+      <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_create.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_tree_dump.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.c">
+      <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

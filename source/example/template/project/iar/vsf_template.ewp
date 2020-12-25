@@ -4637,6 +4637,9 @@
                     <name>$PROJ_DIR$\..\..\demo\usbd_demo\usbd_demo_msc.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\usbd_demo\usbd_demo_uac.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\usbd_demo\usbd_demo_uvc.c</name>
                 </file>
             </group>
@@ -6271,6 +6274,15 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\device\class\MSC\vsf_usbd_MSC_desc.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>UAC</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\device\class\UAC\vsf_usbd_UAC.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\device\class\UAC\vsf_usbd_UAC.h</name>
                             </file>
                         </group>
                         <group>

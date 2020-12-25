@@ -30,7 +30,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_usb_nspro_gamepad_in_report_common_t {
+typedef struct vsf_usb_nspro_gamepad_in_report_common_t vsf_usb_nspro_gamepad_in_report_common_t;
+struct vsf_usb_nspro_gamepad_in_report_common_t {
     uint8_t id;         // 0x21/0x30/0x31
     uint8_t tick;
 
@@ -89,9 +90,10 @@ typedef struct vsf_usb_nspro_gamepad_in_report_common_t {
 
     // Vibrator input report. Decides if next vibration pattern should be sent. 12
     uint8_t vivrator;
-} PACKED vsf_usb_nspro_gamepad_in_report_common_t;
+} PACKED;
 
-typedef struct vsf_usb_nspro_gamepad_in_report_full_t {
+typedef struct vsf_usb_nspro_gamepad_in_report_full_t vsf_usb_nspro_gamepad_in_report_full_t;
+struct vsf_usb_nspro_gamepad_in_report_full_t {
     implement(vsf_usb_nspro_gamepad_in_report_common_t)
 
     struct {
@@ -102,16 +104,18 @@ typedef struct vsf_usb_nspro_gamepad_in_report_full_t {
         uint16_t pitch;
         uint16_t yaw;
     } PACKED gyro_acc[3];
-} PACKED vsf_usb_nspro_gamepad_in_report_full_t;
+} PACKED;
 
-typedef struct vsf_usb_nspro_gamepad_in_report_t {
+typedef struct vsf_usb_nspro_gamepad_in_report_t vsf_usb_nspro_gamepad_in_report_t;
+struct vsf_usb_nspro_gamepad_in_report_t {
     implement(vsf_usb_nspro_gamepad_in_report_full_t)
     uint8_t zero[15];   // fill data to make 64 bytes report
-} PACKED vsf_usb_nspro_gamepad_in_report_t;
+} PACKED;
 
-typedef struct vsf_usb_nspro_gamepad_out_report_t {
+typedef struct vsf_usb_nspro_gamepad_out_report_t vsf_usb_nspro_gamepad_out_report_t;
+struct vsf_usb_nspro_gamepad_out_report_t {
     uint8_t buffer[64];
-} PACKED vsf_usb_nspro_gamepad_out_report_t;
+} PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

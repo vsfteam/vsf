@@ -78,7 +78,11 @@ extern const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void);
 
 
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
+//implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
+#define __name vsf_eda_frame_pool
+#define __type __vsf_eda_frame_t
+#include "service/pool/impl_vsf_pool.inc"
+
 
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
 __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
@@ -125,7 +129,10 @@ void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
 #endif
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
-implement_vsf_pool( vsf_evt_node_pool, vsf_evt_node_t)
+//implement_vsf_pool( vsf_evt_node_pool, vsf_evt_node_t)
+#define __name vsf_evt_node_pool
+#define __type vsf_evt_node_t
+#include "service/pool/impl_vsf_pool.inc"
 #endif
 
 static void __vsf_kernel_os_init(void)

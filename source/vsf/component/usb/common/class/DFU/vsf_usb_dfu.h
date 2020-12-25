@@ -44,7 +44,8 @@ typedef enum usb_dfu_desc_t {
     USB_DFU_FUNCTIONAL_DESC = 0x21,
 } usb_dfu_desc_t;
 
-typedef struct usb_dfu_functional_descriptor_t {
+typedef struct usb_dfu_functional_descriptor_t usb_dfu_functional_descriptor_t;
+struct usb_dfu_functional_descriptor_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
 
@@ -60,14 +61,15 @@ typedef struct usb_dfu_functional_descriptor_t {
     uint16_t wDetachTimeOut;
     uint16_t wTransferSize;
     uint16_t bcdDFUVersion;
-} PACKED usb_dfu_functional_descriptor_t;
+} PACKED;
 
-typedef struct usb_dfu_status_t {
+typedef struct usb_dfu_status_t usb_dfu_status_t;
+struct usb_dfu_status_t {
     uint8_t bStatus;
     uint8_t bwPollTimeout[3];
     uint8_t bState;
     uint8_t iString;
-} PACKED usb_dfu_status_t;
+} PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

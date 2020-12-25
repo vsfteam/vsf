@@ -47,11 +47,19 @@ static void __tgui_on_input_evt(vk_input_type_t type, vk_input_evt_t *evt)
     }
 }
 
+#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+extern void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt);
+void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
+{
+    vsf_tgui_on_mouse_evt(mouse_evt);
+}
+#endif
+
 #if APP_USE_LINUX_DEMO == ENABLED
 int tgui_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

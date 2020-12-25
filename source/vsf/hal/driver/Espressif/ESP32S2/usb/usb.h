@@ -41,7 +41,8 @@
 /*============================ TYPES =========================================*/
 
 typedef struct esp32s2_usb_const_t {
-    uint8_t ep_num;
+    uint8_t dc_ep_num;
+    uint8_t hc_ep_num;
     periph_module_t periph_module;
     int intr_source;
     void *reg;

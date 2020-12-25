@@ -847,6 +847,7 @@
     <ClInclude Include="..\..\config\lv_conf.h" />
     <ClInclude Include="..\..\config\lwipopts.h" />
     <ClInclude Include="..\..\config\vsf_tgui_cfg.h" />
+    <ClInclude Include="..\..\config\vsf_tgui_designer_cfg.h" />
     <ClInclude Include="..\..\config\vsf_usr_cfg.h" />
     <ClInclude Include="..\..\config\vsf_usr_cfg\vsf_usr_cfg_win.h" />
     <ClInclude Include="..\..\demo\common\usrapp_audio_common.h" />
@@ -863,6 +864,10 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_create.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_tree_dump.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer.h" />
+    <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\awtk\port\platforms\vsf\fs_os.c" />
@@ -1524,6 +1529,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\vsf_tgui_v.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui.c" />
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_common.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\vsf_tgui_input.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDC.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\CDC\vsf_usbd_CDCACM.c" />
     <ClCompile Include="..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID.c" />
@@ -1653,6 +1659,10 @@
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_demo.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_create.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_tree_dump.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer.c" />
+    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_port.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_main.c" />
     <ClCompile Include="..\..\demo\usbd_demo\usbd_demo_cdc.c" />

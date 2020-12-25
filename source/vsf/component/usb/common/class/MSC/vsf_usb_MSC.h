@@ -33,7 +33,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct usb_msc_cbw_t {
+typedef struct usb_msc_cbw_t usb_msc_cbw_t;
+struct usb_msc_cbw_t {
     uint32_t dCBWSignature;
     uint32_t dCBWTag;
     uint32_t dCBWDataTransferLength;
@@ -41,14 +42,15 @@ typedef struct usb_msc_cbw_t {
     uint8_t bCBWLUN;
     uint8_t bCBWCBLength;
     uint8_t CBWCB[16];
-} PACKED usb_msc_cbw_t;
+} PACKED;
 
-typedef struct usb_msc_csw_t {
+typedef struct usb_msc_csw_t usb_msc_csw_t;
+struct usb_msc_csw_t {
     uint32_t dCSWSignature;
     uint32_t dCSWTag;
     uint32_t dCSWDataResidue;
     uint8_t dCSWStatus;
-} PACKED usb_msc_csw_t;
+} PACKED;
 
 typedef enum usb_msc_req_t {
     USB_MSC_REQ_GET_MAX_LUN = 0xFE,

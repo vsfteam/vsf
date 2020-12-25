@@ -15,8 +15,16 @@
  *                                                                           *
  ****************************************************************************/
 
+#if VSF_HAL_USART_IMP_REQUEST_BY_FIFO == ENABLED
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+// todo: custom isr handler
+#ifndef VSF_HAL_USART_CUSTOM_ISR_HANDLER
+#   define VSF_HAL_USART_CUSTOM_ISR_HANDLER  __usart_request_isr_handler
+#endif
+
+#undef vsf_usart_irq_enable
+#undef vsf_usart_irq_disable
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -24,54 +32,161 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifdef VSF_HAL_USART_IMP_REQUEST_BY_FIFO
-
-vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart, void *buffer, uint_fast32_t count)
+static void __usart_request_write(vsf_usart_t *usart_ptr)
 {
-    VSF_HAL_ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
+    __vsf_usart_req_t *tx_ptr = &usart_ptr->__req_by_fifo.tx;
 
-    // TODO: implement by fifo APIs
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NOT_SUPPORT;
+    if (tx_ptr->count < tx_ptr->max_count) {
+        uint8_t * buffer = (uint8_t *)tx_ptr->buffer;
+#if VSF_USART_CFG_9_BIT == ENABLED
+        buffer += __vsf_usart_get_word_length(usart_ptr) * tx_ptr->count;
+#else
+        buffer += tx_ptr->count;
+#endif
+        tx_ptr->count += vsf_usart_fifo_write(usart_ptr, buffer, tx_ptr->max_count - tx_ptr->count);
+    }
+
+    if (tx_ptr->count >= tx_ptr->max_count) {
+        __vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_TX);
+
+        vsf_usart_isr_t *req_isr_ptr = &usart_ptr->__req_by_fifo.isr;
+        if (req_isr_ptr->handler_fn != NULL) {
+            req_isr_ptr->handler_fn(req_isr_ptr->target_ptr, usart_ptr, USART_IRQ_MASK_TX_CPL);
+        }
+    }
 }
 
-vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart, void *buffer, uint_fast32_t count)
+static void __usart_request_read(vsf_usart_t *usart_ptr)
 {
-    VSF_HAL_ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
+    __vsf_usart_req_t *rx_ptr = &usart_ptr->__req_by_fifo.rx;
 
-    // TODO: implement by fifo APIs
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NOT_SUPPORT;
+    if (rx_ptr->count < rx_ptr->max_count) {
+        uint8_t * buffer = (uint8_t *)rx_ptr->buffer;
+#if VSF_USART_CFG_9_BIT == ENABLED
+        buffer += __vsf_usart_get_word_length(usart_ptr) * rx_ptr->count;
+#else
+        buffer += rx_ptr->count;
+#endif
+        rx_ptr->count += vsf_usart_fifo_read(usart_ptr, buffer, rx_ptr->max_count - rx_ptr->count);
+    }
+
+    if (rx_ptr->count >= rx_ptr->max_count) {
+        __vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_RX);
+
+        vsf_usart_isr_t *req_isr_ptr = &usart_ptr->__req_by_fifo.isr;
+        if (req_isr_ptr->handler_fn != NULL) {
+            req_isr_ptr->handler_fn(req_isr_ptr->target_ptr, usart_ptr, USART_IRQ_MASK_RX_CPL);
+        }
+    }
 }
 
-vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart)
+static void __usart_request_isr_handler(void *target, vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 {
-    VSF_HAL_ASSERT(NULL != usart);
+    if (irq_mask & USART_IRQ_MASK_TX) {
+        __usart_request_write(usart_ptr);
+    }
 
-    // TODO: implement by fifo APIs
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NOT_SUPPORT;
+    if (irq_mask & USART_IRQ_MASK_RX) {
+        __usart_request_read(usart_ptr);
+    }
 }
 
-vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart)
+static void __usart_req_isr_init(vsf_usart_t *usart_ptr)
 {
-    VSF_HAL_ASSERT(NULL != usart);
-
-    // TODO: implement by fifo APIs
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NOT_SUPPORT;
+    if ((usart_ptr->isr.handler_fn != NULL) && (usart_ptr->isr.handler_fn != __usart_request_isr_handler)) {
+        usart_ptr->__req_by_fifo.isr = usart_ptr->isr;
+        usart_ptr->isr.handler_fn = __usart_request_isr_handler;
+    }
 }
 
-int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart)
+static void __usart_req_init(__vsf_usart_req_t *req_ptr, void *buffer, uint_fast32_t max_count)
 {
-    VSF_HAL_ASSERT(false);
-    return -1;
+    VSF_HAL_ASSERT(req_ptr != NULL);
+
+    req_ptr->buffer = buffer;
+    req_ptr->max_count = max_count;
+    req_ptr->count = 0;
 }
 
-int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart)
+
+vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer, uint_fast32_t max_count)
 {
-    VSF_HAL_ASSERT(false);
-    return -1;
+    VSF_HAL_ASSERT((NULL != usart_ptr) && (NULL != buffer) && (max_count > 0));
+
+    __usart_req_isr_init(usart_ptr);
+    __usart_req_init(&usart_ptr->__req_by_fifo.rx, buffer, max_count);
+    __vsf_usart_irq_enable(usart_ptr, USART_IRQ_MASK_RX);
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer, uint_fast32_t max_count)
+{
+    VSF_HAL_ASSERT((NULL != usart_ptr) && (NULL != buffer) && (max_count > 0));
+
+    __usart_req_isr_init(usart_ptr);
+    __usart_req_init(&usart_ptr->__req_by_fifo.tx, buffer, max_count);
+    __vsf_usart_irq_enable(usart_ptr, USART_IRQ_MASK_TX);
+
+    // todo: use vsf_set_base_priority instead ?
+    vsf_protect_t orig = __vsf_usart_protect();
+    __usart_request_isr_handler(NULL, usart_ptr, USART_IRQ_MASK_TX);
+    __vsf_usart_unprotect(orig);
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+    __vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_RX);
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+    __vsf_usart_irq_disable(usart_ptr, USART_IRQ_MASK_TX);
+    return VSF_ERR_NONE;
+}
+
+int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(usart_ptr != NULL);
+    return usart_ptr->__req_by_fifo.rx.count;
+}
+
+int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr)
+{
+    VSF_HAL_ASSERT(usart_ptr != NULL);
+    return usart_ptr->__req_by_fifo.tx.count;
+}
+
+void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+{
+    em_usart_irq_mask_t fifo_mask = 0;
+    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
+        fifo_mask |= USART_IRQ_MASK_RX;
+    }
+    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+        fifo_mask |= USART_IRQ_MASK_TX;
+    }
+    __vsf_usart_irq_enable(usart_ptr, fifo_mask);
+}
+
+void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
+{
+    em_usart_irq_mask_t fifo_mask = 0;
+    if (irq_mask & USART_IRQ_MASK_RX_CPL) {
+        fifo_mask |= USART_IRQ_MASK_RX;
+    }
+    if (irq_mask & USART_IRQ_MASK_TX_CPL) {
+        fifo_mask |= USART_IRQ_MASK_TX;
+    }
+    if (irq_mask & (USART_IRQ_MASK_RX | USART_IRQ_MASK_TX)) {
+        VSF_HAL_ASSERT(0);
+    }
+    __vsf_usart_irq_disable(usart_ptr, fifo_mask);
 }
 
 #endif

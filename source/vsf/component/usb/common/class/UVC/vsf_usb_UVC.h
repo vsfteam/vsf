@@ -48,7 +48,8 @@ typedef enum usb_uvc_req_t {
 } usb_uvc_req_t;
 
 // Stream Controls
-typedef struct usb_uvc_vs_t {
+typedef struct usb_uvc_vs_t usb_uvc_vs_t;
+struct usb_uvc_vs_t {
     uint16_t bmHint;
     uint8_t bFormatIndex;
     uint8_t bFrameIndex;
@@ -71,16 +72,17 @@ typedef struct usb_uvc_vs_t {
     uint8_t bMaxNumberOfFramesPlus1;
     uint16_t bmRateControlModes;
     uint64_t bmLayoutPerStream;
-} PACKED usb_uvc_vs_t;
+} PACKED;
 
 // Camera Terminal
-typedef struct usb_uvc_ct_roi_t {
+typedef struct usb_uvc_ct_roi_t usb_uvc_ct_roi_t;
+struct usb_uvc_ct_roi_t {
     uint16_t wROI_Top;
     uint16_t wROI_Left;
     uint16_t wROI_Bottom;
     uint16_t wROI_Right;
     uint16_t bmAutoControls;
-} PACKED usb_uvc_ct_roi_t;
+} PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -69,7 +69,7 @@ void vm_free(void * mem)
 int evm_demo(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

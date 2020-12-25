@@ -69,7 +69,7 @@ end_describe_usbd(__user_usbd_cdc, VSF_USB_DC0)
 int usbd_cdc_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

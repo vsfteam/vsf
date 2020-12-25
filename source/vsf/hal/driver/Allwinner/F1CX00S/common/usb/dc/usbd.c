@@ -179,12 +179,12 @@ void f1cx00s_usbd_wakeup(f1cx00s_usb_dcd_t *usbd)
 
 void f1cx00s_usbd_set_address(f1cx00s_usb_dcd_t *usbd, uint_fast8_t addr)
 {
-    MUSB_BASE->Index.FAddr = addr;
+    MUSB_BASE->Index.TxFuncAddr = addr;
 }
 
 uint_fast8_t f1cx00s_usbd_get_address(f1cx00s_usb_dcd_t *usbd)
 {
-    return MUSB_BASE->Index.FAddr;
+    return MUSB_BASE->Index.TxFuncAddr;
 }
 
 uint_fast16_t f1cx00s_usbd_get_frame_number(f1cx00s_usb_dcd_t *usbd)

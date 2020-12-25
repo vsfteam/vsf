@@ -1,3 +1,20 @@
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
 /*****************************************************************************
  *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
@@ -39,17 +56,7 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const i_tgui_control_methods_t c_tVPanel= {
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    {
-        (vsf_tgui_method_t *)&vsf_tgui_panel_v_init,
-        (vsf_tgui_method_t *)&vsf_tgui_panel_v_depose,
-        (vsf_tgui_v_method_render_t *)&__vsf_tgui_panel_v_rendering,
-        (vsf_tgui_v_method_render_t *)&vsf_tgui_panel_v_post_rendering,
-        (vsf_tgui_method_t *)&vsf_tgui_panel_v_update,
-    },
-    (vsf_tgui_method_t*)&vk_tgui_panel_init,
-    (vsf_tgui_method_t *)&vk_tgui_panel_update
-#else
+
     .tView = {
         .Init =     (vsf_tgui_method_t*)&vsf_tgui_panel_v_init,
         .Depose =   (vsf_tgui_method_t*)&vsf_tgui_panel_v_depose,
@@ -59,7 +66,7 @@ static const i_tgui_control_methods_t c_tVPanel= {
     },
     .Init =     (vsf_tgui_method_t*)&vk_tgui_panel_init,
     .Update =   (vsf_tgui_method_t*)&vk_tgui_panel_update,
-#endif
+
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -76,12 +83,14 @@ fsm_rt_t vk_tgui_panel_update(vsf_tgui_panel_t* ptPanel)
 {
     if (fsm_rt_cpl == vk_tgui_container_update(
                 &(ptPanel->
-                    use_as__vsf_tgui_top_container_t.
+                    use_as__vsf_tgui_root_container_t.
                         use_as__vsf_tgui_container_t))) {
 
+    #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
         ptPanel->tTitleLabel.tLabel = ptPanel->tTitle;
 
         vk_tgui_label_update(&(ptPanel->tTitleLabel));
+    #endif
 
         return fsm_rt_cpl;
     }
@@ -92,9 +101,11 @@ fsm_rt_t vk_tgui_panel_update(vsf_tgui_panel_t* ptPanel)
 fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
 {
     if (fsm_rt_cpl == vk_tgui_container_init(
-            &(ptPanel->use_as__vsf_tgui_top_container_t.use_as__vsf_tgui_container_t))) {
+            &(ptPanel->use_as__vsf_tgui_root_container_t.use_as__vsf_tgui_container_t))) {
 
+    #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
         vk_tgui_label_init(&(ptPanel->tTitleLabel));
+    #endif
 
         do {
             vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptPanel);
@@ -114,6 +125,7 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
                                             vsf_tgui_control_refresh_mode_t tMode)
 {
     if (fsm_rt_cpl == vsf_tgui_panel_v_rendering(ptPanel, ptDirtyRegion, tMode)) {
+    #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
         vsf_tgui_label_t* ptLabel = &(ptPanel->tTitleLabel);
         if (    (NULL != ptPanel->tTitle.tString.pstrText)
     #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
@@ -134,6 +146,7 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
             }
 
         }
+    #endif
         return fsm_rt_cpl;
     }
 

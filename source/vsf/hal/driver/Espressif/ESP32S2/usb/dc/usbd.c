@@ -24,11 +24,9 @@
 // for vk_dwcotg_dc_ip_info_t
 #include "component/vsf_component.h"
 
-#include "esp_rom_gpio.h"
 #include "driver/gpio.h"
 #include "driver/periph_ctrl.h"
-#include "hal/gpio_ll.h"
-#include "hal/usb_ll.h"
+#include "soc/usb_periph.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -39,38 +37,26 @@
 
 extern vsf_err_t __esp32s2_usb_init(esp32s2_usb_t *usb, vsf_arch_prio_t priority,
                 usb_ip_irq_handler_t handler, void *param);
+extern void __esp32s2_usb_extphy_io_init(void);
+extern void __esp32s2_usb_io_configure(int func, int value);
+extern void __esp32s2_usb_phy_init(bool use_external_phy);
 
 /*============================ IMPLEMENTATION ================================*/
 
 static void __esp32s2_usbd_configure_pins(bool use_external_phy)
 {
-    for (const usb_iopin_dsc_t *iopin = usb_periph_iopins; iopin->pin != -1; ++iopin) {
-        if ((use_external_phy) || (iopin->ext_phy_only == 0)) {
-            esp_rom_gpio_pad_select_gpio(iopin->pin);
-            if (iopin->is_output) {
-                esp_rom_gpio_connect_out_signal(iopin->pin, iopin->func, false, false);
-            } else {
-                esp_rom_gpio_connect_in_signal(iopin->pin, iopin->func, false);
-                if ((iopin->pin != GPIO_FUNC_IN_LOW) && (iopin->pin != GPIO_FUNC_IN_HIGH)) {
-                    gpio_ll_input_enable(&GPIO, iopin->pin);
-                }
-            }
-            esp_rom_gpio_pad_unhold(iopin->pin);
-        }
-    }
-    if (!use_external_phy) {
+    if (use_external_phy) {
+        __esp32s2_usb_extphy_io_init();
+    } else {
         gpio_set_drive_capability(USBPHY_DM_NUM, GPIO_DRIVE_CAP_3);
         gpio_set_drive_capability(USBPHY_DP_NUM, GPIO_DRIVE_CAP_3);
     }
-}
 
-static void __esp32s2_usbd_phy_init(bool use_external_phy)
-{
-    if (use_external_phy) {
-        usb_ll_ext_phy_enable();
-    } else {
-        usb_ll_int_phy_enable();
-    }
+    // connect dwcotg ip pins
+    __esp32s2_usb_io_configure(USB_OTG_IDDIG_IN_IDX, 1);
+    __esp32s2_usb_io_configure(USB_SRP_BVALID_IN_IDX, 1);
+    __esp32s2_usb_io_configure(USB_OTG_VBUSVALID_IN_IDX, 1);
+    __esp32s2_usb_io_configure(USB_OTG_AVALID_IN_IDX, 0);
 }
 
 vsf_err_t esp32s2_usbd_init(esp32s2_usb_t *dc, usb_dc_ip_cfg_t *cfg)
@@ -79,7 +65,7 @@ vsf_err_t esp32s2_usbd_init(esp32s2_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 
     periph_module_reset(dc->param->periph_module);
     periph_module_enable(dc->param->periph_module);
-    __esp32s2_usbd_phy_init(false);
+    __esp32s2_usb_phy_init(false);
     __esp32s2_usbd_configure_pins(false);
 
     return __esp32s2_usb_init(dc, cfg->priority, cfg->irq_handler, cfg->param);
@@ -96,7 +82,7 @@ void esp32s2_usbd_get_info(esp32s2_usb_t *dc, usb_dc_ip_info_t *info)
 
     VSF_HAL_ASSERT(dwcotg_info != NULL);
     dwcotg_info->regbase = param->reg;
-    dwcotg_info->ep_num = param->ep_num;
+    dwcotg_info->ep_num = param->dc_ep_num;
     dwcotg_info->buffer_word_size = param->buffer_word_size;
     dwcotg_info->feature = param->feature;
 }

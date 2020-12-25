@@ -44,6 +44,18 @@
 #   include <sys/time.h>
 #endif
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
+#   include "../../include/simple_libc/stdlib.h"
+#else
+#   include <stdlib.h>
+#endif
+
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
+#   include "../../include/simple_libc/string.h"
+#else
+#   include <string.h>
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED
@@ -207,6 +219,7 @@ static void * __vsf_libusb_libusb_core_thread(void *param)
             __vsf_linux_libusb_process_cb(ldev, VSF_USBH_LIBUSB_EVT_ON_ARRIVED);
         }
     }
+    return NULL;
 }
 
 static void * __vsf_libusb_libusb_user_thread(void *param)
@@ -239,6 +252,7 @@ static void * __vsf_libusb_libusb_user_thread(void *param)
             pthread_exit(0);
         }
     }
+    return NULL;
 }
 
 void vsf_linux_libusb_startup(void)
@@ -678,7 +692,7 @@ static int __raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf
     struct libusb_endpoint_descriptor *endpoint_desc;
 
     uint_fast16_t size = desc_config->wTotalLength, len, tmpsize;
-    uint_fast8_t ifs_no, alt_num, ep_num, reach_endpoint;
+    uint_fast8_t ifs_no, alt_num, ep_num, reach_endpoint = false;
 
     enum {
         STAGE_NONE = 0,

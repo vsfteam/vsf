@@ -38,46 +38,57 @@ declare_tgui_panel(stopwatch_t)
 
 def_tgui_panel(stopwatch_t,
     tgui_contains(
-        vsf_tgui_label_t     tTime;
-        vsf_tgui_button_t    tStartStop;
-        vsf_tgui_button_t    tLap;
-        vsf_tgui_button_t    tSetting;
 
+        use_tgui_container(tLeftContainer,
+            tgui_contains(
+                vsf_tgui_label_t     tTime;
+                vsf_tgui_button_t    tStartStop;
+                vsf_tgui_button_t    tLap;
+                vsf_tgui_button_t    tSetting;
 
-        use_tgui_container(tContainerA,
+                use_tgui_container(tContainerA,
+                    tgui_contains(
+                    #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
+                        vsf_tgui_text_list_t  tNumberList;
+                    #endif
 
-        #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-            vsf_tgui_text_list_t  tNumberList;
-        #endif
+                    #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
+                        use_tgui_list(tVContainer,
+                            tgui_contains(
 
-        #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-            use_tgui_list(tVContainer,
-                tgui_contains(
-                
-                    vsf_tgui_button_t    tButton1;
-                    vsf_tgui_button_t    tButton2;
+                                vsf_tgui_button_t    tButton1;
+                                vsf_tgui_button_t    tButton2;
 
-                    use_tgui_list(tHContainer,
-                        tgui_contains(
-                            vsf_tgui_button_t    tButtonA;
-                            vsf_tgui_button_t    tButtonB;
-                            vsf_tgui_button_t    tButtonC;
+                                use_tgui_list(tHContainer,
+                                    tgui_contains(
+                                        vsf_tgui_button_t    tButtonA;
+                                        vsf_tgui_button_t    tButtonB;
+                                        vsf_tgui_button_t    tButtonC;
+                                    )
+                                )
+
+                                vsf_tgui_label_t     tHistory;
+                            )
                         )
+                    #else
+                        vsf_tgui_button_t    tButton1;
+                        vsf_tgui_button_t    tButton2;
+                        vsf_tgui_label_t     tHistory;
+                    #endif
                     )
-
-                    vsf_tgui_label_t     tHistory;
                 )
+        ))
+
+        use_tgui_panel(tRightPanel,
+            tgui_contains(
+                vsf_tgui_button_t tKey[10];
             )
-        #else
-            vsf_tgui_button_t    tButton1;
-            vsf_tgui_button_t    tButton2;
-            vsf_tgui_label_t     tHistory;
-        #endif
         )
 
-#if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-        vsf_tgui_timer_t tTimer;
-#endif
+        #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
+            vsf_tgui_timer_t tTimer;
+        #endif
+
 	))
 
     char        chTimeBuffer[sizeof("00:00:00")];

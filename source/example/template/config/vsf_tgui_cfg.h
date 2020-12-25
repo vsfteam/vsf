@@ -27,23 +27,18 @@
 
 #define VSF_USE_UI                                          ENABLED
 #   define VSF_DISP_USE_SDL2                                ENABLED
-#       define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
 
 #   define VSF_USE_TINY_GUI                                 ENABLED
 #       define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL          VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #       define VSF_TGUI_CFG_COLOR_MODE                      VSF_TGUI_COLOR_ARGB_8888
 #       define VSF_TGUI_CFG_SUPPORT_NAME_STRING             ENABLED         /* Enabled for debug */
+#       define VSF_TGUI_CFG_SUPPORT_MOUSE                   ENABLED
 
 #       define VSF_TGUI_CFG_USER_FONTS                      ENABLED
 
 #       define VSF_TGUI_CFG_SV_BUTTON_ADDITIONAL_TILES      ENABLED
-#       define VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR      VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
 #       define VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES   ENABLED
-#       define VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
 #       define VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES       ENABLED
-#       define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR       VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR    VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
 
 #       define VSF_TGUI_LOG                                 vsf_trace
 #           define VSF_TGUI_CFG_SV_PORT_LOG                 DISABLED
@@ -56,8 +51,16 @@
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
  *----------------------------------------------------------------------------*/
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
 #define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
+#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
+
+#undef VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN
+#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#   define WEAK_VSF_INPUT_ON_MOUSE
+#   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN           DISABLED
+#else
+#   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN           ENABLED
+#endif
 
 /*============================ TYPES =========================================*/
 
@@ -95,6 +98,9 @@ enum {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
+#   include "vsf_tgui_designer_cfg.h"
+#endif
 
 #endif
 /* EOF */

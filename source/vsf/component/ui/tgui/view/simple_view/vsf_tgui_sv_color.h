@@ -74,8 +74,67 @@
 #define VSF_TGUI_COLOR_NAVY		VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x80)    //  Red:  0%  Green: 0%   Blue: 50%
 #define VSF_TGUI_COLOR_FUCHSIA	VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0xFF)    //  Red:100%  Green: 0%   Blue:100%
 #define VSF_TGUI_COLOR_PURPLE	VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x80)    //  Red: 50%  Green: 0%   Blue: 50%
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+
+/*----------------------------------------------------------------------------*
+ *  Color                                                                     *
+ *----------------------------------------------------------------------------*/
+
+/*! \note vsf_tgui_color is for most used by view (rendering) part
+ */
+typedef union vsf_tgui_color_t vsf_tgui_color_t;
+
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+union vsf_tgui_color_t {
+    implement_ex(
+        struct {
+            uint16_t     u5R    : 5;
+            uint16_t     u6G    : 6;
+            uint16_t     u5B    : 5;
+        },
+        tChannel
+    )
+    uint16_t        hwValue;
+    uint16_t        Value;          //!< generic symbol name
+};
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+union vsf_tgui_color_t {
+    implement_ex(
+        struct {
+            uint16_t     u5B    : 5;
+            uint16_t     u6G    : 6;
+            uint16_t     u5R    : 5;
+        },
+        tChannel
+    )
+    uint16_t        hwValue;
+    uint16_t        Value;          //!< generic symbol name
+};
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE
+union vsf_tgui_color_t {
+    uint8_t chColorID;
+    uint8_t Value;                  //!< generic symbol name
+};
+#else /*VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888 */
+union vsf_tgui_color_t {
+    implement_ex(
+        struct {
+            uint8_t     chB;
+            uint8_t     chG;
+            uint8_t     chR;
+            uint8_t     chA;
+        },
+        tChannel
+    )
+    uint8_t         chValues[4];
+    uint32_t        wValue;
+    uint32_t        Value;          //!< generic symbol name
+};
+#endif
+
 struct vsf_tgui_sv_color_t {
     vsf_tgui_color_t tColor;
 #if (VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED) && !(__VSF_TGUI_IS_COLOR_SUPPORT_ALPHA__)
@@ -90,14 +149,14 @@ typedef struct vsf_tgui_sv_color_t vsf_tgui_sv_color_t;
 union vsf_tgui_sv_argb8888_color_t {
     implement_ex(
         struct {
-        uint8_t     chB;
-        uint8_t     chG;
-        uint8_t     chR;
-        uint8_t     chA;
-    },
+                uint8_t     chB;
+                uint8_t     chG;
+                uint8_t     chR;
+                uint8_t     chA;
+        },
         tChannel
-        )
-        uint8_t         chValues[4];
+    )
+    uint8_t         chValues[4];
     uint32_t        wValue;
     uint32_t        Value;          //!< generic symbol name
 };

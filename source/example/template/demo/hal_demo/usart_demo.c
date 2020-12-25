@@ -335,7 +335,7 @@ static void __usart_echo_demo_by_request(vsf_usart_t * usart)
 int usart_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

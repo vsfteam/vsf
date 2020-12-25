@@ -93,7 +93,7 @@ extern "C" {
             declare_block_stream(__name)                                        \
             define_block_stream(__name, (__block_num), (__block_size))          \
             vsf_block_stream_type(__name) __name = {                            \
-                VSF_BLOCK_STREAM_INIT(__block_size, __block_num)                \
+                VSF_BLOCK_STREAM_INIT(__block_num, __block_size)                \
             };
 
 #define describe_block_stream(__name, __block_num, __block_size)                \

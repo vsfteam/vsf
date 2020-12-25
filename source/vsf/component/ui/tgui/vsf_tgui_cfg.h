@@ -15,6 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+/****************************************************************************
+*  Copyright 2020 by Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)    *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+
  /*============================ INCLUDES ======================================*/
 //! \note do not move this pre-processor statement to other places
 #include "../vsf_ui_cfg.h"
@@ -24,6 +41,11 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#    error tGUI requies ANSI-C99 and above
+#endif
+
 
 /*----------------------------------------------------------------------------*
  *  Rendering                                                                 *
@@ -60,33 +82,25 @@
  *  Designer & Layout                                                         *
  *----------------------------------------------------------------------------*/
 
-#ifndef VSF_TGUI_HOR_MAX
-#	define VSF_TGUI_HOR_MAX					                    800
-#endif
-
-#ifndef VSF_TGUI_VER_MAX
-#	define VSF_TGUI_VER_MAX					                    600
-#endif
-
-
-#ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR           DISABLED
-#endif
-
-#ifndef  VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK             DISABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN
-#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN            DISABLED
-#endif
-
 #ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING
 #   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING          ENABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN
 #   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN           ENABLED
+#endif
+
+
+#ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ANCHOR           DISABLED        /* haven't support */
+#endif
+
+#ifndef  VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_DOCK             DISABLED        /* haven't support */
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN
+#   define VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_ALIGN            DISABLED        /* haven't support */
 #endif
 
 /*----------------------------------------------------------------------------*
@@ -120,7 +134,7 @@ warning."
 #endif
 
 #ifndef VSF_TGUI_CFG_SAFE_STRING_MODE
-#   define VSF_TGUI_CFG_SAFE_STRING_MODE                        DISABLED
+#   define VSF_TGUI_CFG_SAFE_STRING_MODE                        ENABLED
 #endif
 
 /*----------------------------------------------------------------------------*
@@ -171,7 +185,7 @@ warning."
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_STREAM_CONTAINER
-#   define VSF_TGUI_CFG_SUPPORT_STREAM_CONTAINER                DISABLED        /*!< haven't implemented yet*/
+#   define VSF_TGUI_CFG_SUPPORT_STREAM_CONTAINER                ENABLED        /*!< haven't implemented yet*/
 #endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER
@@ -210,6 +224,10 @@ warning."
 #   define VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR                  ENABLED
 #endif
 
+#ifndef VSF_TGUI_CFG_PANEL_HAS_LABEL
+#   define VSF_TGUI_CFG_PANEL_HAS_LABEL                         ENABLED
+#endif
+
 /*----------------------------------------------------------------------------*
  * miscellaneous                                                              *
  *----------------------------------------------------------------------------*/
@@ -220,8 +238,29 @@ warning."
 #ifndef VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG
 #   define VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG                    DISABLED
 #endif
+
+#ifndef VSF_TGUI_CFG_SHOW_ON_LOAD_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_ON_LOAD_EVT_LOG                    ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_UPDATE_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_UPDATE_EVT_LOG                     ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_ON_DEPOSE_EVT_LOG
+#   define VSF_TGUI_CFG_SHOW_ON_DEPOSE_EVT_LOG                  ENABLED
+#endif
+
 #ifndef VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG
 #   define VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG                    DISABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG                
+#   define VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG                 ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG                
+#   define VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG                ENABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG
@@ -238,6 +277,29 @@ warning."
 
 #ifndef VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG
 #   define VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG           ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SHOW_SYSTEM_LOG
+#   define VSF_TGUI_CFG_SHOW_SYSTEM_LOG                         ENABLED
+#endif
+#if VSF_TGUI_CFG_SHOW_SYSTEM_LOG != ENABLED
+#   undef VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_ON_LOAD_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_UPDATE_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_ON_DEPOSE_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG
+#   undef VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG
+
+#   define VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG                    DISABLED
+#   define VSF_TGUI_CFG_SHOW_ON_LOAD_EVT_LOG                    DISABLED
+#   define VSF_TGUI_CFG_SHOW_UPDATE_EVT_LOG                     DISABLED
+#   define VSF_TGUI_CFG_SHOW_ON_DEPOSE_EVT_LOG                  DISABLED
+#   define VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG                    DISABLED
+#   define VSF_TGUI_CFG_SHOW_CONTROL_SPECIFIC_EVT_LOG           DISABLED
+#   define VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG                 DISABLED
+#   define VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG                DISABLED
 #endif
 
 #ifndef VSF_TGUI_CFG_SHOW_USER_INPUT_LOG

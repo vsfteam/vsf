@@ -65,7 +65,8 @@ void __vsf_tgui_label_v_rendering(  vsf_tgui_label_t* ptLabel,
 
 extern
 vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* ptLabel,
-                                                uint16_t *phwLineCount);
+                                                uint16_t *phwLineCount,
+                                                uint8_t *pchCharHeight);
 
 extern
 vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* ptLabel);

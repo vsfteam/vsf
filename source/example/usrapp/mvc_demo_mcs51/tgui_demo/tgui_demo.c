@@ -84,7 +84,7 @@ vsf_err_t tgui_demo_init(void)
             .s32_size = sizeof(__bfs_buffer),
         },
 #endif
-        .root_node_ptr = (const vsf_tgui_top_container_t *)&s_tMyStopwatch,
+        .root_node_ptr = (const vsf_tgui_root_container_t *)&s_tMyStopwatch,
     };
     vsf_err_t err = vk_tgui_init(&s_tTGUIDemo, &cfg);
     

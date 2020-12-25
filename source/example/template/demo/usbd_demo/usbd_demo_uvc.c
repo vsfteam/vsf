@@ -44,7 +44,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct usbd_uvc_const_t {
+typedef struct usbd_uvc_const_t {
     struct {
         uint8_t dev_desc[18];
         uint8_t config_desc[167];
@@ -65,10 +65,9 @@ struct usbd_uvc_const_t {
             } stream;
         } uvc;
     } usbd;
-};
-typedef struct usbd_uvc_const_t usbd_uvc_const_t;
+} usbd_uvc_const_t;
 
-struct usbd_uvc_t {
+typedef struct usbd_uvc_t {
     struct {
         struct {
             struct {
@@ -91,8 +90,7 @@ struct usbd_uvc_t {
         vk_usbd_cfg_t config[1];
         vk_usbd_dev_t dev;
     } usbd;
-};
-typedef struct usbd_uvc_t usbd_uvc_t;
+} usbd_uvc_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -409,7 +407,7 @@ static usbd_uvc_t __user_usbd_uvc = {
 int usbd_uvc_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

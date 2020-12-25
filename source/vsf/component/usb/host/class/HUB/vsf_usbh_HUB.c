@@ -251,11 +251,10 @@ static void __vk_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_teda_set_timer_ms(20);
             break;
         case HUB_STAT_RESET_CHILD_WAIT_GET_PORT_STATUS:
-            // clear reset mask here
-            hub->reset_mask &= ~(1 << (hub->cur_dev_idx - 1));
-
             // check port status after reset
             if (hub->hub_portsts.wPortStatus & USB_PORT_STAT_ENABLE) {
+                hub->reset_mask &= ~(1 << (hub->cur_dev_idx - 1));
+
                 // reset ready
                 if (hub->is_child_connecting) {
                     // reset child while connecting

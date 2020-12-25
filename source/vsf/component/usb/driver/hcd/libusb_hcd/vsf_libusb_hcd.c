@@ -267,6 +267,7 @@ static vsf_err_t __vk_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
 static vsf_err_t __vk_libusb_hcd_fini(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_libusb_hcd_suspend(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_libusb_hcd_resume(vk_usbh_hcd_t *hcd);
+static uint_fast16_t __vk_libusb_hcd_get_frame_number(vk_usbh_hcd_t *hcd);
 static vsf_err_t __vk_libusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 static void __vk_libusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 static vk_usbh_hcd_urb_t * __vk_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
@@ -285,6 +286,7 @@ const vk_usbh_hcd_drv_t vk_libusb_hcd_drv = {
     .fini               = __vk_libusb_hcd_fini,
     .suspend            = __vk_libusb_hcd_suspend,
     .resume             = __vk_libusb_hcd_resume,
+    .get_frame_number   = __vk_libusb_hcd_get_frame_number,
     .alloc_device       = __vk_libusb_hcd_alloc_device,
     .free_device        = __vk_libusb_hcd_free_device,
     .alloc_urb          = __vk_libusb_hcd_alloc_urb,
@@ -946,6 +948,11 @@ static vsf_err_t __vk_libusb_hcd_suspend(vk_usbh_hcd_t *hcd)
 static vsf_err_t __vk_libusb_hcd_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
+}
+
+static uint_fast16_t __vk_libusb_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
+{
+    return 0;
 }
 
 static vsf_err_t __vk_libusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)

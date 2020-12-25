@@ -87,7 +87,7 @@ void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_heade
 int usbh_main(int argc, char *argv[])
 {
 #else
-int main(void)
+int VSF_USER_ENTRY(void)
 {
 #   if VSF_USE_TRACE == ENABLED
     vsf_start_trace();

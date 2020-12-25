@@ -251,6 +251,11 @@ void * vk_usbh_hcd_urb_alloc_buffer(vk_usbh_hcd_urb_t *urb_hcd, uint_fast16_t si
     return urb_hcd->buffer;
 }
 
+uint_fast16_t vk_usbh_get_frame(vk_usbh_t *usbh)
+{
+    return usbh->drv->get_frame_number(&usbh->use_as__vk_usbh_hcd_t);
+}
+
 static vk_usbh_dev_t * __vk_usbh_alloc_device(vk_usbh_t *usbh)
 {
     vk_usbh_dev_t *dev;
@@ -630,6 +635,7 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
         urb_hcd->eda_caller = eda;
     }
 
+    urb_hcd->actual_length = 0;
 #if VSF_USBH_CFG_ENABLE_ROOT_HUB == ENABLED
     if (urb_hcd->dev_hcd == &usbh->dev_rh->use_as__vk_usbh_hcd_dev_t) {
         return __vk_usbh_rh_submit_urb(&usbh->use_as__vk_usbh_hcd_t, urb_hcd);

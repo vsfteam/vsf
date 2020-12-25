@@ -20,9 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include "./code_region.h"
-// TODO: add delegate back when it's compatible with other modules,
-//  because black box ooc is not compatible with other ooc module
-//#include "./delegate.h"
+#include "./delegate.h"
 
 #ifdef __cplusplus
 extern "C" {

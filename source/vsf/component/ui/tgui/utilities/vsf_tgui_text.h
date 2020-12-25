@@ -23,9 +23,14 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
-#ifndef VSF_TGUI_CFG_SV_MULTI_LINE_TEXT
-#   define VSF_TGUI_CFG_SV_MULTI_LINE_TEXT ENABLED
+#ifndef VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT
+#   define VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT           ENABLED
 #endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT_ALIGN
+#   define VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT_ALIGN ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -42,6 +47,7 @@ extern
 vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
                                         vsf_tgui_string_t* ptString,
                                         uint16_t *phwLineCount,
+                                        uint8_t *pchCharHeight,
                                         int_fast8_t chInterlineSpace);
 
 extern
