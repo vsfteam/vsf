@@ -3,7 +3,7 @@ Please read the "vsf_swi_template.h" header file for usage
 *******************************************************************************/
 
 #include "hal/driver/driver.h"
-#include "./vsf_swi_template.h"
+#include "hal/driver/common/swi/vsf_swi_template.h"
 
 #if !defined(__VSF_HAL_SWI_NUM)
 //! when there is no defined __VSF_HAL_SWI_NUM, use the maximum available value

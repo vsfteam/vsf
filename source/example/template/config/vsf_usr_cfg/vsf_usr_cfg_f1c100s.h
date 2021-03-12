@@ -53,7 +53,8 @@
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
-#define APP_USE_NNOM_DEMO                               ENABLED
+// nnom minst demo seems to be broken
+#define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
@@ -212,7 +213,7 @@ typedef int vsf_systimer_cnt_signed_t;
 //#   define APP_DISP_FB_HEIGHT                           480
 
 #if APP_USE_SDL2_DEMO == ENABLED
-#   define APP_CFG_SDL2_DEMO_COLOR_RGB666
+#   define APP_SDL2_DEMO_CFG_COLOR_RGB666
 #endif
 
 #if APP_USE_BTSTACK_DEMO == ENABLED

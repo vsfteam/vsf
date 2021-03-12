@@ -49,7 +49,8 @@
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
-#define APP_USE_NNOM_DEMO                               ENABLED
+// nnom minst demo seems to be broken
+#define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
