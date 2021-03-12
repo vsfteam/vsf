@@ -219,6 +219,8 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmorecfg.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jpegint.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jpeglib.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jsimd.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jsimddct.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jversion.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\transupp.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\port\pnglibconf.h" />
@@ -230,335 +232,91 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngstruct.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\port\vsf_lvgl_port.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_conf_checker.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_debug.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_disp.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_group.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_indev.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_obj.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_refr.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_style.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_arc.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_basic.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_img.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_label.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_line.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_rect.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_triangle.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_cache.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_decoder.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_fmt_txt.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_symbol_def.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_disp.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_indev.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_tick.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_anim.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_area.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_async.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_bidi.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_circ.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_color.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_fs.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_gc.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_ll.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_log.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_math.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_mem.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_printf.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_task.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_templ.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_txt.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_types.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_utils.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_arc.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_bar.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btn.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btnm.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_calendar.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_canvas.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cb.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_chart.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cont.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cpicker.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ddlist.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_gauge.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_img.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_imgbtn.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_kb.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_label.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_led.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_line.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_list.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_lmeter.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_mbox.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_objx_templ.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_page.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_preload.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_roller.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_slider.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_spinbox.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_sw.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ta.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_table.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tabview.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tileview.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_win.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_alien.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_default.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_material.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_mono.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_nemo.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_night.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_templ.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_zen.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_version.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_conf_checker.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_debug.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_disp.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_group.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_indev.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_obj.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_refr.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_style.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_arc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_basic.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_img.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_label.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_line.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_rect.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_triangle.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_cache.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_fmt_txt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_symbol_def.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_disp.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_indev.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_tick.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_anim.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_area.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_async.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_bidi.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_circ.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_color.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_fs.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_gc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_ll.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_log.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_math.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_mem.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_printf.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_task.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_templ.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_txt.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_types.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_utils.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_arc.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_bar.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_btn.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_btnm.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_calendar.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_canvas.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_cb.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_chart.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_cont.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_cpicker.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_ddlist.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_gauge.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_img.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_imgbtn.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_kb.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_label.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_led.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_line.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_lmeter.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_mbox.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_objx_templ.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_page.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_preload.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_roller.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_slider.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_spinbox.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_sw.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_ta.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_table.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_tabview.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_tileview.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_win.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_alien.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_default.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_nemo.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_night.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_templ.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_zen.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\lovevsf.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\extension\oo\lua_oo.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lapi.h" />
@@ -583,12 +341,12 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltable.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltm.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lua.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lua.hpp" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\luaconf.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lualib.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lundump.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lvm.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lzio.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_version.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\cc.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\sys_arch.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwippools.h" />
@@ -946,8 +704,6 @@
     <ClInclude Include="..\..\demo\common\usrapp_usbd_common.h" />
     <ClInclude Include="..\..\demo\common\usrapp_usbh_common.h" />
     <ClInclude Include="..\..\demo\fakefat32.h" />
-    <ClInclude Include="..\..\demo\nnom_demo\model\mnist\image.h" />
-    <ClInclude Include="..\..\demo\nnom_demo\model\mnist\weights.h" />
     <ClInclude Include="..\..\demo\nuklear_demo\sdl2surface_rawfb.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
@@ -1106,8 +862,10 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\winfonts\winfnt.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\image\image.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\render.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\shape.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\surface.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\svg.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\gato\raw\render\text.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\cdjpeg.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jaricom.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcapimin.c" />
@@ -1123,6 +881,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcmaster.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcomapi.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcparam.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcphuff.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcprepct.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcsample.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jctrans.c" />
@@ -1140,6 +899,7 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmarker.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmaster.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmerge.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdphuff.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdpostct.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdsample.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdtrans.c" />
@@ -1150,10 +910,12 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctflt.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctfst.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctint.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctred.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmemmgr.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmemnobs.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jquant1.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jquant2.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jsimd_none.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jutils.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdbmp.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdcolmap.c" />
@@ -1183,337 +945,85 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngwutil.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\port\vsf_lvgl_port.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_debug.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_disp.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_group.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_indev.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_obj.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_refr.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_style.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_arc.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_basic.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_img.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_label.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_line.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_rect.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_triangle.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_cache.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_decoder.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_fmt_txt.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_12.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_12_subpx.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_16.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_22.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_28.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_28_compressed.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_unscii_8.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_disp.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_indev.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_tick.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_anim.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_area.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_async.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_bidi.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_circ.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_color.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_fs.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_gc.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_ll.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_log.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_math.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_mem.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_printf.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_task.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_templ.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_txt.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_utils.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_arc.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_bar.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btn.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btnm.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_calendar.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_canvas.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cb.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_chart.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cont.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cpicker.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ddlist.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_gauge.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_img.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_imgbtn.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_kb.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_label.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_led.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_line.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_list.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_lmeter.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_mbox.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_objx_templ.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_page.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_preload.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_roller.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_slider.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_spinbox.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_sw.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ta.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_table.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tabview.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tileview.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_win.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_alien.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_default.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_material.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_mono.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_nemo.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_night.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_templ.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_zen.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_debug.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_disp.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_group.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_indev.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_obj.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_refr.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_core\lv_style.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_arc.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_basic.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_img.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_label.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_line.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_rect.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_draw_triangle.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_cache.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_fmt_txt.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_roboto_12.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_roboto_12_subpx.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_roboto_16.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_roboto_22.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_roboto_28.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_roboto_28_compressed.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_font\lv_font_unscii_8.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_disp.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_indev.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_hal\lv_hal_tick.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_anim.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_area.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_async.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_bidi.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_circ.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_color.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_fs.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_gc.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_ll.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_log.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_math.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_mem.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_printf.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_task.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_templ.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_txt.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_misc\lv_utils.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_arc.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_bar.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_btn.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_btnm.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_calendar.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_canvas.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_cb.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_chart.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_cont.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_cpicker.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_ddlist.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_gauge.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_img.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_imgbtn.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_kb.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_label.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_led.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_line.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_lmeter.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_mbox.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_objx_templ.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_page.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_preload.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_roller.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_slider.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_spinbox.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_sw.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_ta.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_table.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_tabview.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_tileview.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_objx\lv_win.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\lovevsf.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_filesystem.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_font.c" />
@@ -1550,11 +1060,19 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltablib.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltm.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lua.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\luac.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lundump.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lutf8lib.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lvm.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lzio.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_alien.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_default.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_nemo.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_night.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_templ.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_zen.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\sys_arch.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwip_netdrv_adapter.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\api_lib.c" />
@@ -1604,6 +1122,8 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\timeouts.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\udp.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\netif\ethernet.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\backends\nnom_local.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\backends\nnom_local_q15.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom_layers.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom_tensor.c" />
@@ -2017,7 +1537,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;PREDEF_STANDARD_C_1999;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\lwip;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\lwip;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>false</ExceptionHandling>

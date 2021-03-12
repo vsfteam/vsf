@@ -25,7 +25,7 @@
 #include "shell/sys/linux/vsf_linux.h"
 #include "shell/sys/linux/port/busybox/busybox.h"
 
-#include "component/3rd-party/lwip/2.1.2/port/lwip_netdrv_adapter.h"
+#include "component/3rd-party/lwip/port/lwip_netdrv_adapter.h"
 
 /* lwIP core includes */
 #include "lwip/opt.h"

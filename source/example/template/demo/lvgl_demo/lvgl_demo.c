@@ -24,10 +24,10 @@
 
 #include "lvgl/lvgl.h"
 #include "lv_conf.h"
-#include "component/3rd-party/littlevgl/6.1.2/port/vsf_lvgl_port.h"
+#include "component/3rd-party/lvgl/port/vsf_lvgl_port.h"
 
 #if APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
-#include "component/3rd-party/littlevgl/6.1.2/extension/lv_lib_freetype/raw/lv_freetype.h"
+#include "component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.h"
 #endif
 
 #if APP_USE_LINUX_DEMO == ENABLED

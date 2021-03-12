@@ -73,7 +73,8 @@
 // 3rd-party demos
 #define APP_USE_XBOOT_XUI_DEMO                          DISABLED
 #define APP_USE_AWTK_DEMO                               ENABLED
-#define APP_USE_NNOM_DEMO                               ENABLED
+// nnom minst demo seems to be broken
+#define APP_USE_NNOM_DEMO                               DISABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
 // _vsnprintf of lvgl conflicts with ucrt
 #   define LV_SPRINTF_CUSTOM                            1

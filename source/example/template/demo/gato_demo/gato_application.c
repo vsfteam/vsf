@@ -47,7 +47,7 @@ void sample(surface_t *base, float fps)
                     stroke_width : w,
                     stroke_color : (color_t){0, 255, 0, 128}
                 });
-    draw_rectage(base, 300, 300, 100, 50, 0,
+    draw_rectangle(base, 300, 300, 100, 50, 0,
                  (style_t){
                      stroke_width : 10,
                      stroke_color : (color_t){0, 255, 255, 255}

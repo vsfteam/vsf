@@ -40,3 +40,6 @@
 [submodule "source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw"]
 	path = source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw
 	url = ../lv_lib_freetype
+[submodule "source/vsf/component/3rd-party/lvgl/raw/lvgl"]
+	path = source/vsf/component/3rd-party/lvgl/raw/lvgl
+	url = ../lvgl

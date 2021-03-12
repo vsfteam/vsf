@@ -29,7 +29,7 @@
 #if VSF_USE_LVGL == ENABLED
 #   include "lvgl/lvgl.h"
 #   include "lv_conf.h"
-#   include "component/3rd-party/littlevgl/6.0/port/vsf_lvgl_port.h"
+#   include "component/3rd-party/lvgl/port/vsf_lvgl_port.h"
 #endif
 
 /*============================ MACROS ========================================*/

@@ -26,8 +26,8 @@
 
 #include "nnom.h"
 
-#include "./model/mnist/image.h"
-#include "./model/mnist/weights.h"
+#include "component/3rd-party/nnom/raw/examples/mnist-simple/mcu/image.h"
+#include "component/3rd-party/nnom/raw/examples/mnist-simple/mcu/weights.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -55,7 +55,7 @@ void print_img(int8_t * buf)
 {
     for(int y = 0; y < 28; y++)  {
         for (int x = 0; x < 28; x++)  {
-            int index = 69 / 127.0 * (127 - buf[y*28+x]); 
+            int index = 69 / 127.0 * (127 - buf[y*28+x]);
             if(index > 69) index = 69;
             if(index < 0) index = 0;
             printf("%c",codeLib[index]);
@@ -73,20 +73,20 @@ void ai_demo_mnist(uint_fast8_t index)
 
     printf("\nprediction start.. \n");
     tick = vsf_systimer_get_tick();
-    
+
     // copy data and do prediction
     memcpy(ai_demo.mnist_data.input_data, (int8_t*)&img[index][0], 784);
     nnom_predict(ai_demo.model, &predic_label, &prob);
     time = vsf_systimer_get_tick() - tick;
-    
+
     //print original image to console
     print_img((int8_t*)&img[index][0]);
-    
+
     printf("Time: %d ms\n", vsf_systimer_tick_to_ms(time));
     printf("Truth label: %d\n", label[index]);
     printf("Predicted label: %d\n", predic_label);
     printf("Probability: %d%%\n", (int)(prob*100));
-    
+
     model_stat(ai_demo.model);
 	printf("Total Memory cost (Network and NNoM): %d\n", nnom_mem_stat());
 }
