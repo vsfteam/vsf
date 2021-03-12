@@ -1,0 +1,88 @@
+ source/vsf/component/3rd-party/btstack/raw/src/l2cap.c | 4 ++--
+ source/vsf/component/3rd-party/coremark/raw/core_main.c | 2 +-
+ source/vsf/component/3rd-party/lua/raw/lua.c | 2 +-
+ source/vsf/component/3rd-party/lvgl/raw/lvgl/src/lv_core/lv_group.c | 4 ++--
+ source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c | 2 +-
+ 5 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/source/vsf/component/3rd-party/btstack/raw/src/l2cap.c b/source/vsf/component/3rd-party/btstack/raw/src/l2cap.c
+index fe9f5ca8e..edac99c75 100644
+--- a/source/vsf/component/3rd-party/btstack/raw/src/l2cap.c
++++ b/source/vsf/component/3rd-party/btstack/raw/src/l2cap.c
+@@ -164,7 +164,7 @@ static inline l2cap_service_t * l2cap_le_get_service(uint16_t psm);
+ #endif
+ #ifdef L2CAP_USES_CHANNELS
+ static uint16_t l2cap_next_local_cid(void);
+-static l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid);
++l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid);
+ static void l2cap_emit_simple_event_with_cid(l2cap_channel_t * channel, uint8_t event_code);
+ static void l2cap_dispatch_to_channel(l2cap_channel_t *channel, uint8_t type, uint8_t * data, uint16_t size);
+ static l2cap_channel_t * l2cap_create_channel_entry(btstack_packet_handler_t packet_handler, l2cap_channel_type_t channel_type, bd_addr_t address, bd_addr_type_t address_type,
+@@ -1135,7 +1135,7 @@ static l2cap_fixed_channel_t * l2cap_fixed_channel_for_channel_id(uint16_t local
+ 
+ // used for Classic Channels + LE Data Channels. local_cid >= 0x40
+ #ifdef L2CAP_USES_CHANNELS
+-static l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid){
++l2cap_channel_t * l2cap_get_channel_for_local_cid(uint16_t local_cid){
+     if (local_cid < 0x40u) return NULL;
+     return (l2cap_channel_t*) l2cap_channel_item_by_cid(local_cid);
+ }
+
+diff --git a/source/vsf/component/3rd-party/coremark/raw/core_main.c b/source/vsf/component/3rd-party/coremark/raw/core_main.c
+index 356f4e8..5f58366 100644
+--- a/source/vsf/component/3rd-party/coremark/raw/core_main.c
++++ b/source/vsf/component/3rd-party/coremark/raw/core_main.c
+@@ -112,7 +112,7 @@ main(void)
+     char *argv[1];
+ #else
+ MAIN_RETURN_TYPE
+-main(int argc, char *argv[])
++coremark_main(int argc, char *argv[])
+ {
+ #endif
+     ee_u16       i, j = 0, num_algorithms = 0;
+
+diff --git a/source/vsf/component/3rd-party/lua/raw/lua.c b/source/vsf/component/3rd-party/lua/raw/lua.c
+index b5b884b6..ee995e78 100644
+--- a/source/vsf/component/3rd-party/lua/raw/lua.c
++++ b/source/vsf/component/3rd-party/lua/raw/lua.c
+@@ -620,7 +620,7 @@ static int pmain (lua_State *L) {
+ }
+ 
+ 
+-int main (int argc, char **argv) {
++int lua_main (int argc, char **argv) {
+   int status, result;
+   lua_State *L = luaL_newstate();  /* create state */
+   if (L == NULL) {
+
+diff --git a/source/vsf/component/3rd-party/lvgl/raw/lvgl/src/lv_core/lv_group.c b/source/vsf/component/3rd-party/lvgl/raw/lvgl/src/lv_core/lv_group.c
+index b26de56e..1bc2df1d 100644
+--- a/source/vsf/component/3rd-party/lvgl/raw/lvgl/src/lv_core/lv_group.c
++++ b/source/vsf/component/3rd-party/lvgl/raw/lvgl/src/lv_core/lv_group.c
+@@ -361,9 +361,9 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
+         focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL); /*Focus again to properly leave/open edit/navigate mode*/
+         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
+         if(res != LV_RES_OK) return;
+-    }
+ 
+-    lv_obj_invalidate(focused);
++        lv_obj_invalidate(focused);
++    }
+ }
+ 
+ /**
+
+diff --git a/source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c b/source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c
+index c366c9c..7dc65b6 100644
+--- a/source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c
++++ b/source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw/lv_freetype.c
+@@ -8,7 +8,7 @@
+  *********************/
+ 
+ #include "lv_freetype.h"
+-#include "lvgl/src/lv_misc/lv_debug.h"
++//#include "lvgl/src/lv_misc/lv_debug.h"
+ 
+ /*********************
+  *      DEFINES
