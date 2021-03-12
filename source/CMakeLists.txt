@@ -1,4 +1,14 @@
 # CMakeLists head
 
-add_subdirectory(vsf)
-add_subdirectory_existed(vsf_private)
+target_include_directories(${VSF_LIB_NAME} INTERFACE
+  .
+)
+
+add_subdirectory(component)
+add_subdirectory(hal)
+add_subdirectory(kernel)
+add_subdirectory(osa_hal)
+add_subdirectory(osa_service)
+add_subdirectory(service)
+add_subdirectory(shell)
+add_subdirectory(utilities)

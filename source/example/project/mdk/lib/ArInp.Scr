@@ -1,2 +1,0 @@
---create .\lib\vsf_stdio_lib.lib
-.\lib\retarget_io.o
