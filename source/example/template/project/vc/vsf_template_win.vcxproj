@@ -9,38 +9,15 @@
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\awtk\port\platforms\vsf\main_loop_vsf.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\awtk\port\vsf_awtk_port.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm_download_firmware.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm_download_firmware.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\ancs_client.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db_util.h" />
@@ -51,59 +28,20 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\le_device_db.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\sm.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_crypto.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_tlv.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.h" />
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\coremark\port\core_portme.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\coremark.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\ft2build.h" />
@@ -351,10 +289,7 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\sys_arch.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwippools.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwip_netdrv_adapter.h" />
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\nnom\port\nnom_port.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\nnom\port\nnom_port.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\nuklear\raw\nuklear.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\eth\vsfip_eth.h" />
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\netif\vsfip_netdrv_adapter.h" />
@@ -723,34 +658,13 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\awtk\port\platforms\vsf\thread.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\awtk\port\vsf_awtk_port.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\firmware\bcm\bcm20702\bt_firmware_image.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\hci_dump_vsf.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\hci_transport_h2_vsf.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm_download_firmware.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\hci_dump_vsf.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\port\hci_transport_h2_vsf.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\bcm\btstack_chipset_bcm_download_firmware.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset\csr\btstack_chipset_csr.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ad_parser.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\ancs_client.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db_util.c" />
@@ -760,59 +674,20 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\le_device_db_memory.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\sm.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_crypto.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_linked_list.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_memory_pool.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_run_loop.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_tlv.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_util.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\rfcomm.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_server.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\sdp_util.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\spp_server.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\hci_cmd.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\l2cap_signaling.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\port\core_portme.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_list_join.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_main.c" />
@@ -1160,46 +1035,16 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dhcp\vsfip_dhcp_common.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dns\vsfip_dnsc.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\vsfip.c" />
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\libusb\vsfvm_ext_libusb.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\common\vsfvm_objdump.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\lexer\dart\vsfvm_lexer_dart.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\lexer\vsfvm_lexer.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\vsfvm_compiler.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\vsfvm_snapshot.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\extension\std\vsfvm_ext_std.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\extension\vsfvm_ext.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\runtime\vsfvm_runtime.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\kernel\vsfvm_ext_kernel.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\extension\vsf\libusb\vsfvm_ext_libusb.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\common\vsfvm_objdump.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\lexer\dart\vsfvm_lexer_dart.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\lexer\vsfvm_lexer.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\vsfvm_compiler.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\compiler\vsfvm_snapshot.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\extension\std\vsfvm_ext_std.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\extension\vsfvm_ext.c" />
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfvm\raw\runtime\vsfvm_runtime.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\adler32.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\compress.c" />
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\crc32.c" />
@@ -1373,8 +1218,7 @@
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xpm.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xv.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xxx.c" />
-    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.c">
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\vsf_sdl2.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
     <ClCompile Include="..\..\..\..\vsf\shell\sys\linux\lib\glibc\vsf_linux_glibc_ctype.c" />
@@ -1481,19 +1325,6 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>ClangCL</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -1505,12 +1336,6 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -1518,14 +1343,7 @@
     <OutDir>$(SolutionDir)\$(ProjectName)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <UseMultiToolTask>true</UseMultiToolTask>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -1552,28 +1370,6 @@
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>__VSF__;__CPU_X64__;__WIN__;WIN64;_DEBUG;_CONSOLE;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Wno-empty-body -Wno-microsoft-anon-tag -Wno-int-conversion -Wno-int-to-pointer-cast -Wno-missing-braces -Wno-pragma-pack -Wno-deprecated-declarations -Wno-unused-variable  -Wno-bitfield-constant-conversion -Wno-sometimes-uninitialized -Wno-unused-function -Wno-switch -Wno-pointer-integer-compare -fms-extensions %(AdditionalOptions)</AdditionalOptions>
-      <ExceptionHandling>false</ExceptionHandling>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\lib\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -1597,27 +1393,6 @@
       <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;$(ProjectDir)\lib\libwdi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;libwdi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\vsf;$(ProjectDir)..\..\..\..\vsf\shell\sys\linux\include;$(ProjectDir)..\..\..\..\vsf\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\vsf\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\littlevgl\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\vsf\component\3rd-party\nuklear\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
