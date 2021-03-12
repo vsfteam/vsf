@@ -1,0 +1,3 @@
+[submodule "source/vsf/component/3rd-party/btstack/raw"]
+	path = source/vsf/component/3rd-party/btstack/raw
+	url = ../btstack
