@@ -1,0 +1,16 @@
+ core_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core_main.c b/core_main.c
+index 356f4e8..5f58366 100644
+--- a/core_main.c
++++ b/core_main.c
+@@ -112,7 +112,7 @@ main(void)
+     char *argv[1];
+ #else
+ MAIN_RETURN_TYPE
+-main(int argc, char *argv[])
++coremark_main(int argc, char *argv[])
+ {
+ #endif
+     ee_u16       i, j = 0, num_algorithms = 0;
