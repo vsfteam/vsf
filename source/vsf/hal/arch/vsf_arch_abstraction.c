@@ -298,10 +298,10 @@ int_fast8_t vsf_msb(uint_fast32_t a)
 #endif
         index -= __optimal_bit_sz;
         if (temp >= 0) {
-            index += temp+1;
+            index += temp + 1;
             break;
         }
-    } while(--word_size);
+    } while (--word_size);
 
     return index;
 }
