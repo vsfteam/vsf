@@ -473,6 +473,7 @@ SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, in
     VSF_SDL2_ASSERT(__vsf_sdl2.disp != NULL);
     SDL_Surface * surface = __SDL_CreateRGBSurfaceWithFormat(w, h, depth, format, 0);
     if (surface != NULL) {
+        surface->flags      |= SDL_PREALLOC;
         surface->pitch      = pitch;
         surface->pixels     = pixels;
     }
@@ -494,9 +495,6 @@ SDL_Surface * SDL_CreateRGBSurfaceFrom(void *pixels, int w, int h, int depth, in
 void SDL_FreeSurface(SDL_Surface *surface)
 {
     VSF_SDL2_ASSERT(surface != NULL);
-    if (!(surface->flags & SDL_PREALLOC) && (surface->pixels != NULL)) {
-        SDL_free(surface->pixels);
-    }
     vsf_heap_free(surface);
 }
 
