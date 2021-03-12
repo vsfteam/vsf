@@ -46,11 +46,16 @@ extern "C" {
 // bit8 - 12:   bitlen - 1
 // bit13 - 14:  bytelen - 1
 // bit15:       has_alpha
-#define VSF_DISP_COLOR_DEF(__NAME, __BITLEN, __BYTELEN, __HAS_ALPHA)            \
-            VSF_DISP_COLOR_##__NAME =   ((VSF_DISP_COLOR_IDX_##__NAME)          \
+#define VSF_DISP_COLOR_VALUE(__INDEX, __BITLEN, __BYTELEN, __HAS_ALPHA)         \
+                                (       (__INDEX)                               \
                                     |   ((((__BITLEN) - 1) & 0x1F) << 8)        \
                                     |   ((((__BYTELEN) - 1) & 0x03) << 13)      \
-                                    |   ((__HAS_ALPHA) << 15))
+                                    |   ((__HAS_ALPHA) ? 1 << 15 : 0)           \
+                                )
+
+#define VSF_DISP_COLOR_DEF(__NAME, __BITLEN, __BYTELEN, __HAS_ALPHA)            \
+            VSF_DISP_COLOR_##__NAME = VSF_DISP_COLOR_VALUE(                     \
+                (VSF_DISP_COLOR_IDX_##__NAME), __BITLEN, __BYTELEN, __HAS_ALPHA)
 
 #define vsf_disp_get_pixel_format_bytesize(__color_format)                      \
             ((((__color_format) >> 13) & 0x03) + 1)

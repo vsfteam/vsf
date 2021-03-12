@@ -443,53 +443,74 @@ uint32_t SDL_GetWindowFlags(SDL_Window * window)
 
 SDL_Surface * __SDL_CreateRGBSurfaceWithFormat(int w, int h, int depth, uint32_t format, uint_fast8_t pixel_size)
 {
-    VSF_SDL2_ASSERT(__vsf_sdl2.disp != NULL);
-    VSF_SDL2_ASSERT(format == __vsf_sdl2.disp->param.color);
-
     SDL_Surface *surface = vsf_heap_malloc(sizeof(SDL_Surface) + pixel_size * w * h);
     if (surface != NULL) {
         surface->__format.format = format;
-        surface->format     = &surface->__format;
-        surface->w          = w;
-        surface->h          = h;
+        surface->format             = &surface->__format;
+        surface->w                  = w;
+        surface->h                  = h;
     }
     return surface;
 }
 
 SDL_Surface * SDL_CreateRGBSurfaceWithFormat(uint32_t flags, int w, int h, int depth, uint32_t format)
 {
-    VSF_SDL2_ASSERT(__vsf_sdl2.disp != NULL);
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(format);
     SDL_Surface *surface = __SDL_CreateRGBSurfaceWithFormat(w, h, depth, format, pixel_size);
     if (surface != NULL) {
-        surface->pitch      = w * pixel_size;
-        surface->pixels     = &surface->__pixels;
+        surface->pitch              = w * pixel_size;
+        surface->pixels             = &surface->__pixels;
     }
     return surface;
 }
 
 SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, int depth, int pitch, uint32_t format)
 {
-    VSF_SDL2_ASSERT(__vsf_sdl2.disp != NULL);
     SDL_Surface * surface = __SDL_CreateRGBSurfaceWithFormat(w, h, depth, format, 0);
     if (surface != NULL) {
-        surface->flags      |= SDL_PREALLOC;
-        surface->pitch      = pitch;
-        surface->pixels     = pixels;
+        surface->flags              |= SDL_PREALLOC;
+        surface->pitch              = pitch;
+        surface->pixels             = pixels;
     }
     return surface;
 }
 
 SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    // TODO: implement
-    return NULL;
+    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
+    if (pixel_bitlen < 0) {
+        return NULL;
+    }
+
+    uint_fast8_t pixel_bytelen = (pixel_bitlen + 8) >> 3;
+    uint32_t format = VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
+    SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
+    if (surface != NULL) {
+        surface->__format.Rmask     = Rmask;
+        surface->__format.Gmask     = Gmask;
+        surface->__format.Bmask     = Bmask;
+        surface->__format.Amask     = Amask;
+    }
+    return surface;
 }
 
-SDL_Surface * SDL_CreateRGBSurfaceFrom(void *pixels, int w, int h, int depth, int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
+SDL_Surface * SDL_CreateRGBSurfaceFrom(void * pixels, int w, int h, int depth, int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    // TODO: implement
-    return NULL;
+    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
+    if (pixel_bitlen < 0) {
+        return NULL;
+    }
+
+    uint_fast8_t pixel_bytelen = (pixel_bitlen + 8) >> 3;
+    uint32_t format = VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
+    SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, depth, pitch, format);
+    if (surface != NULL) {
+        surface->__format.Rmask     = Rmask;
+        surface->__format.Gmask     = Gmask;
+        surface->__format.Bmask     = Bmask;
+        surface->__format.Amask     = Amask;
+    }
+    return surface;
 }
 
 void SDL_FreeSurface(SDL_Surface *surface)
