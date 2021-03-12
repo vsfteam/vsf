@@ -45,17 +45,19 @@ extern "C" {
 // bit0 - 7:    index
 // bit8 - 12:   bitlen - 1
 // bit13 - 14:  bytelen - 1
-// bit15:       msb_fisrt, reserved, not used now
-#define VSF_DISP_COLOR_DEF(__NAME, __BITLEN, __BYTELEN, __MSB)                  \
+// bit15:       has_alpha
+#define VSF_DISP_COLOR_DEF(__NAME, __BITLEN, __BYTELEN, __HAS_ALPHA)            \
             VSF_DISP_COLOR_##__NAME =   ((VSF_DISP_COLOR_IDX_##__NAME)          \
                                     |   ((((__BITLEN) - 1) & 0x1F) << 8)        \
                                     |   ((((__BYTELEN) - 1) & 0x03) << 13)      \
-                                    |   ((__MSB) << 15))
+                                    |   ((__HAS_ALPHA) << 15))
 
 #define vsf_disp_get_pixel_format_bytesize(__color_format)                      \
             ((((__color_format) >> 13) & 0x03) + 1)
 #define vsf_disp_get_pixel_format_bitsize(__color_format)                       \
             ((((__color_format) >> 8) & 0x1F) + 1)
+#define vsf_disp_get_pixel_format_has_alpha(__color_format)                     \
+            ((__color_format) & (1 << 15))
 
 #define vsf_disp_get_pixel_format(__disp)                                       \
             ((vk_disp_t *)(__disp))->param.color
@@ -64,6 +66,8 @@ extern "C" {
             vsf_disp_get_pixel_format_bitsize(vsf_disp_get_pixel_format(__disp))
 #define vsf_disp_get_pixel_bytesize(__disp)                                     \
             vsf_disp_get_pixel_format_bytesize(vsf_disp_get_pixel_format(__disp))
+#define vsf_disp_get_has_alpha(__disp)                                          \
+            vsf_disp_get_pixel_format_has_alpha(vsf_disp_get_pixel_format(__disp))
 
 #ifndef vk_disp_coord_t
 #   define vk_disp_coord_t          uint16_t
@@ -95,9 +99,9 @@ typedef enum vk_disp_color_type_t {
     __VSF_DISP_COLOR_LEAST_MIN  = INT16_MIN,
     VSF_DISP_COLOR_DEF(INVALID, 0, 0, 0),
     VSF_DISP_COLOR_DEF(RGB565, 16, 2, 0),
-    VSF_DISP_COLOR_DEF(RGBA8888, 32, 4, 0),
-    VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 0),
-    VSF_DISP_COLOR_DEF(ABGR8888, 32, 4, 0),
+    VSF_DISP_COLOR_DEF(RGBA8888, 32, 4, 1),
+    VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 1),
+    VSF_DISP_COLOR_DEF(ABGR8888, 32, 4, 1),
     VSF_DISP_COLOR_DEF(RGB666_32, 18, 4, 0),
     VSF_DISP_COLOR_DEF(RGB24, 24, 3, 0),
     VSF_DISP_COLOR_DEF(BGR24, 24, 3, 0),
