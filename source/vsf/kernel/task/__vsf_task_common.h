@@ -30,51 +30,32 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-
-#   define __vsf_pt_begin_common(__state)                                       \
-            switch ((__state)) {                                                \
-                case 0:
-
-#   define __vsf_pt_entry_common_ex(__state, __code)                            \
-            (__state) = __LINE__; __code; case __LINE__:
-
-#   define __vsf_pt_entry_common(__state)                                       \
-            (__state) = __LINE__; case __LINE__:
-
-#else
-
-#   define __vsf_pt_begin_common(__state)                                       \
+#define __vsf_pt_begin_common(__state)                                          \
             enum {                                                              \
                 count_offset = __COUNTER__ + 1,                                 \
             };                                                                  \
             switch ((__state)) {                                                \
                 case __COUNTER__ - count_offset:
 
-#   define __vsf_pt_entry_common(__state, ...)                                  \
-            (__state) = (__COUNTER__ - count_offset + 1) >> 1;                  \
+#define __vsf_pt_raw_next_common(__state)                                       \
+            (__state) = (__COUNTER__ - count_offset + 1) >> 1
+#define __vsf_pt_raw_entry_common(__state, ...)                                 \
             __VA_ARGS__;                                                        \
             case (__COUNTER__ - count_offset) >> 1:
 
-#endif
+#define __vsf_pt_entry_common(__state, ...)                                     \
+            __vsf_pt_raw_entry_common(__state,                                  \
+                __vsf_pt_raw_next_common(__state);                              \
+                __VA_ARGS__                                                     \
+            )
 
-#   define __vsf_pt_end_common()       } vsf_eda_return();
+#define __vsf_pt_end_common()       } vsf_eda_return();
 
 //#define __vsf_pt_end_closure_common()                                         \
 //                }   /* for switch */                                          \
 //            __vsf_pt_end_common()
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __vsf_pt_wait_cond_common(__state, __cond)                           \
-    do {                                                                        \
-        evt = VSF_EVT_INVALID;                                                  \
-        __vsf_pt_entry_common(__state);                                         \
-        if (!(__cond)) {                                                        \
-            return ;                                                            \
-        }                                                                       \
-    } while (0)
-#else
-#   define __vsf_pt_wait_cond_common(__state, ...)                              \
+#define __vsf_pt_wait_cond_common(__state, ...)                                 \
     do {                                                                        \
         evt = VSF_EVT_INVALID;                                                  \
         __vsf_pt_entry_common(__state);                                         \
@@ -82,7 +63,6 @@ extern "C" {
             return ;                                                            \
         }                                                                       \
     } while (0)
-#endif
 
 
 #define __vsf_pt_wfe_common(__state, __evt)                                     \
@@ -91,27 +71,7 @@ extern "C" {
 #define __vsf_pt_func_common(__name)        vsf_pt_func_##__name
 #define __vsf_pt_common(__name)             pt_cb_##__name
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define __def_vsf_pt_common(__name, __member)                                \
-        struct __vsf_pt_common(__name) {                                        \
-            __member                                                            \
-        };                                                                      \
-        struct __name {                                                         \
-            implement(vsf_pt_t)                                                 \
-            implement_ex(__vsf_pt_common(__name), param)                        \
-        };                                                                      \
-        struct __internal_##__name {                                            \
-            implement(vsf_pt_t)                                                 \
-            __member                                                            \
-        };
-
-#   define __declare_vsf_pt_common(__name)                                      \
-            typedef struct __name __name;                                       \
-            typedef struct __vsf_pt_common(__name) __vsf_pt_common(__name);     \
-            typedef struct __internal_##__name __internal_##__name;
-
-#else
-#   define __def_vsf_pt_common(__name, ...)                                     \
+#define __def_vsf_pt_common(__name, ...)                                        \
         struct __vsf_pt_common(__name) {                                        \
             __VA_ARGS__                                                         \
         };                                                                      \
@@ -120,16 +80,15 @@ extern "C" {
             implement_ex(__vsf_pt_common(__name), param)                        \
         };
 
-#   define __declare_vsf_pt_common(__name)                                      \
+#define __declare_vsf_pt_common(__name)                                         \
             typedef struct __name __name;                                       \
             typedef struct __vsf_pt_common(__name) __vsf_pt_common(__name);
 
-#endif
 
-#   define __implement_vsf_pt_common(__name, __arg0)                            \
+#define __implement_vsf_pt_common(__name, __arg0)                               \
         void __vsf_pt_func_common(__name)(__arg0, vsf_evt_t evt)
 
-#   define __extern_vsf_pt_common(__name, __arg0)                               \
+#define __extern_vsf_pt_common(__name, __arg0)                                  \
         extern void __vsf_pt_func_common(__name)(__arg0, vsf_evt_t evt);
 
 

@@ -78,7 +78,7 @@ extern void vsf_usr_swi_trigger(uint_fast8_t idx);
 
 // SWI
 #if __VSF_DEV_SWI_NUM > 0
-REPEAT_MACRO(__VSF_DEV_SWI_NUM, __STM32F730_SWI, NULL)
+VSF_MREPEAT(__VSF_DEV_SWI_NUM, __STM32F730_SWI, NULL)
 
 static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 
                                                 vsf_arch_prio_t priority,

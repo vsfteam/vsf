@@ -48,7 +48,7 @@ vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, int_fast32_t timeout)
 
     if (timeout > 0) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-        eda->state.bits.is_limitted = true;
+        eda->flag.state.is_limitted = true;
         vsf_teda_set_timer(timeout);
 #else
     #ifndef WEAK_VSF_KERNEL_ERR_REPORT
@@ -65,6 +65,7 @@ SECTION(".text.vsf.kernel.vsf_sync")
 static void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, int_fast32_t timeout)
 {
     eda = __vsf_eda_get_valid_eda(eda);
+    VSF_KERNEL_ASSERT(eda != NULL);
 
     vsf_dlist_queue_enqueue(
         vsf_eda_t, pending_node,
@@ -108,7 +109,7 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     if (evt == VSF_EVT_TIMER) {
         origlevel = vsf_protect_sched();
-        if (eda->state.bits.is_sync_got) {
+        if (eda->flag.state.is_sync_got) {
             vsf_unprotect_sched(origlevel);
             return VSF_SYNC_PENDING;
         }
@@ -127,14 +128,14 @@ static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t e
 #endif
         if (evt == VSF_EVT_SYNC) {
             reason = VSF_SYNC_GET;
-            eda->state.bits.is_sync_got = false;
+            eda->flag.state.is_sync_got = false;
         } else if (evt == VSF_EVT_SYNC_CANCEL) {
             reason = VSF_SYNC_CANCEL;
         } else {
             VSF_KERNEL_ASSERT(false);
         }
     }
-    eda->state.bits.is_limitted = false;
+    eda->flag.state.is_limitted = false;
     return reason;
 }
 
@@ -159,9 +160,9 @@ vsf_err_t vsf_eda_sync_init(vsf_sync_t *this_ptr, uint_fast16_t cur, uint_fast16
     return VSF_ERR_NONE;
 }
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SYNC_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *this_ptr)
+vsf_err_t vsf_eda_sync_increase_isr(vsf_sync_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
 #   if defined(__VSF_KERNEL_TASK_TEDA)
@@ -170,7 +171,7 @@ vsf_err_t vsf_eda_sync_increase_irq(vsf_sync_t *this_ptr)
     return vsf_eda_post_msg(&__vsf_eda.eda, this_ptr);
 #   endif
 }
-#endif          // VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ
+#endif          // VSF_KERNEL_CFG_SUPPORT_SYNC_ISR
 
 SECTION(".text.vsf.kernel.vsf_sync")
 vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda)
@@ -201,7 +202,7 @@ vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda)
         if (this_ptr->cur_union.bits.cur > 0) {
             eda_pending = __vsf_eda_sync_get_eda_pending(this_ptr);
             if (eda_pending != NULL) {
-                eda_pending->state.bits.is_sync_got = true;
+                eda_pending->flag.state.is_sync_got = true;
                 if (!this_ptr->max_union.bits.manual_rst) {
                     this_ptr->cur_union.bits.cur--;
                 }
@@ -316,7 +317,7 @@ void vsf_eda_sync_cancel(vsf_sync_t *this_ptr)
         origlevel = vsf_protect_sched();
         eda = __vsf_eda_sync_get_eda_pending(this_ptr);
         if (eda != NULL) {
-            eda->state.bits.is_sync_got = true;
+            eda->flag.state.is_sync_got = true;
             vsf_unprotect_sched(origlevel);
             __vsf_eda_post_evt_ex(eda, VSF_EVT_SYNC_CANCEL, true);
         } else {

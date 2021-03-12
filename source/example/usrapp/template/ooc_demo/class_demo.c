@@ -33,27 +33,27 @@
 vsf_err_t class_base_init(class_base_t *obj_ptr, uint_fast8_t chParam)
 {
     class_internal(obj_ptr, this_ptr, class_base_t);
-    this.chPrivateParamBase = chParam;
+    vsf_this.chPrivateParamBase = chParam;
     return VSF_ERR_NONE;
 }
 
 uint_fast8_t class_base_get_param(class_base_t *obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, class_base_t);
-    return this.chPrivateParamBase;
+    return vsf_this.chPrivateParamBase;
 }
 
 vsf_err_t class_demo_init(class_demo_t *obj_ptr, uint_fast8_t chParam, uint_fast8_t chParamBase)
 {
     class_internal(obj_ptr, this_ptr, class_demo_t);
-    this.chPrivateParamDemo = chParam;
-    return class_base_init(&this.use_as__class_base_t, chParamBase);
+    vsf_this.chPrivateParamDemo = chParam;
+    return class_base_init(&vsf_this.use_as__class_base_t, chParamBase);
 }
 
 uint_fast8_t class_demo_get_param(class_demo_t *obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, class_demo_t);
-    return this.chPrivateParamDemo;
+    return vsf_this.chPrivateParamDemo;
 }
 
 uint_fast8_t class_demo_get_base_param(class_demo_t *obj_ptr)
@@ -61,10 +61,10 @@ uint_fast8_t class_demo_get_base_param(class_demo_t *obj_ptr)
     class_internal(obj_ptr, this_ptr, class_demo_t);
     uint_fast8_t chBaseParam;
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    class_internal(&this.use_as__class_base_t, ptBase, class_base_t);
+    class_internal(&vsf_this.use_as__class_base_t, ptBase, class_base_t);
     chBaseParam = ptBase->chPrivateParamBase;
 #else
-    with_class(class_base_t, &this.use_as__class_base_t,
+    with_class(class_base_t, &vsf_this.use_as__class_base_t,
                     chBaseParam = _->chPrivateParamBase;
                 );
 #endif

@@ -476,7 +476,7 @@ static vsf_err_t __vk_disp_vga_m480_init(vk_disp_t *pthis)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     disp_vga->eda.on_terminate = NULL;
 #endif
-    return vsf_eda_init(&disp_vga->eda, vsf_prio_inherit, false);
+    return vsf_eda_init(&disp_vga->eda);
 }
 
 static vsf_err_t __vk_disp_vga_m480_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)

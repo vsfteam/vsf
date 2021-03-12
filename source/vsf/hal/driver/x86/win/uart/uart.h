@@ -80,8 +80,11 @@ typedef struct vsf_usart_win_expression_t {
     vsf_usart_t                         *vsf_usart_instance_ptr;
     uint8_t                             win_serial_port_num;
 }vsf_usart_win_expression_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-REPEAT_MACRO(VSF_USART_CFG_PORT_NUM, __VSF_USART_EXTERN_REPEAD, NULL)
+
+VSF_MREPEAT(VSF_USART_CFG_PORT_NUM, __VSF_USART_EXTERN_REPEAD, NULL)
+
 /*============================ PROTOTYPES ====================================*/
 
 void vsf_usart_get_can_used_port(uint8_t *available_number_port);

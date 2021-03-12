@@ -53,7 +53,7 @@ static int __hci_transport_h2_send_packet(uint8_t packet_type, uint8_t *packet, 
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-static const hci_transport_t hci_transport_h2 = {
+static const hci_transport_t __hci_transport_h2 = {
     .name = "H2_VSF",
     .init = __hci_transport_h2_init,
     .open = __hci_transport_h2_open,
@@ -159,7 +159,7 @@ static void __hci_transport_h2_init(const void *transport_config)
 
 const hci_transport_t * hci_transport_usb_instance(void)
 {
-    return &hci_transport_h2;
+    return &__hci_transport_h2;
 }
 
 #endif      // VSF_USE_USB_HOST && VSF_USBH_USE_BTHCI

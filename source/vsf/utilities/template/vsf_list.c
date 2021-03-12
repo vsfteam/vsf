@@ -51,7 +51,7 @@
 uint_fast16_t __vsf_slist_get_length_imp(vsf_slist_t *this_ptr, size_t list_offset)
 {
     uint_fast16_t length = 0;
-    ASSERT(NULL != this_ptr);
+    VSF_ASSERT(NULL != this_ptr);
 
     while (NULL != this_ptr->head) {
         length++;
@@ -74,7 +74,7 @@ void * __vsf_slist_get_item_by_index_imp(
                             size_t list_offset)
 {
     void *item = NULL;
-    ASSERT(NULL != this_ptr);
+    VSF_ASSERT(NULL != this_ptr);
 
     do {
         if (NULL == this_ptr->head) {
@@ -100,7 +100,7 @@ int_fast16_t __vsf_slist_get_index_imp( vsf_slist_t *this_ptr,
                                         size_t list_offset)
 {
     int_fast16_t index = -1, n = 0;
-    ASSERT((NULL != this_ptr) && (NULL != item));
+    VSF_ASSERT((NULL != this_ptr) && (NULL != item));
 
     while (NULL != this_ptr->head) {
         if (this_ptr->head == item) {
@@ -124,7 +124,7 @@ int_fast16_t __vsf_slist_get_index_imp( vsf_slist_t *this_ptr,
 void * __vsf_slist_remove_imp(vsf_slist_t *this_ptr, void *item, size_t list_offset)
 {
     void *item_tmp = NULL;
-    ASSERT((NULL != this_ptr) && (NULL != item));
+    VSF_ASSERT((NULL != this_ptr) && (NULL != item));
 
     while (NULL != this_ptr->head) {
         if ((void *)(this_ptr->head) == item) {
@@ -150,7 +150,7 @@ void * __vsf_slist_remove_imp(vsf_slist_t *this_ptr, void *item, size_t list_off
  */
 void * __vsf_slist_append_imp(vsf_slist_t *this_ptr, void *item, size_t list_offset)
 {
-    ASSERT((NULL != this_ptr) && (NULL != item));
+    VSF_ASSERT((NULL != this_ptr) && (NULL != item));
 
     while (NULL != this_ptr->head) {
         this_ptr = __vsf_get_slist_address(this_ptr->head, list_offset);

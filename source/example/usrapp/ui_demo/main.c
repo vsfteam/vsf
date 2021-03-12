@@ -102,14 +102,14 @@ static void lvgl_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv
     uint_fast32_t pixel_number = LV_HOR_RES;
 
     if ((0 == area->x1) && ((LV_HOR_RES - 1) == area->x2) && (area->y1 == area->y2)) {
-        ASSERT(NULL == usrapp.ui.cur_buffer);
+        VSF_ASSERT(NULL == usrapp.ui.cur_buffer);
         usrapp.ui.last = (area->y1 == 0);
         usrapp.ui.cur_buffer = container_of(color_p, usrapp_ui_buffer_t, color);
         vsf_eda_post_evt(&usrapp.ui.eda, VSF_EVT_USER);
     } else {
         vsf_trace(0, "non-line disp area [%d,%d], [%d,%d]\r\n",
                     area->x1, area->y1, area->x2, area->y2);
-        ASSERT(false);
+        VSF_ASSERT(false);
     }
 }
 
@@ -119,7 +119,7 @@ void usrapp_on_ready(void)
 #ifndef __OOC_DEBUG__
     vsf_eda_set_evthandler(&usrapp.ui.eda, usrapp_ui_disp_evthandler);
 #endif
-    vsf_eda_init(&usrapp.ui.eda, vsf_prio_0, false);
+    vsf_eda_init(&usrapp.ui.eda, vsf_prio_0);
 }
 
 static void usrapp_ui_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -132,7 +132,7 @@ static void usrapp_ui_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         usrapp.ui.buffer[0].header[1] = usrapp.ui.buffer[1].header[1] = 0;
         break;
     case VSF_EVT_USER:
-        ASSERT(buffer != NULL);
+        VSF_ASSERT(buffer != NULL);
         usrapp_trans_disp_line((uint8_t *)buffer, sizeof(*buffer));
         break;
     case VSF_EVT_MESSAGE:

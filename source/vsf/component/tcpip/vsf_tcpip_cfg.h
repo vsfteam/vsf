@@ -25,7 +25,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TCPIP_ASSERT
-#   define VSF_TCPIP_ASSERT             ASSERT
+#   define VSF_TCPIP_ASSERT             VSF_ASSERT
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

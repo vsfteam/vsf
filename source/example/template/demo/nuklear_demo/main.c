@@ -100,7 +100,9 @@ int nuklear_main(int argc, char **argv)
     struct nk_rect bounds = {40,40,0,0};
 
     // insecure operation
-    ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_ARGB8888;
+    if (usrapp_ui_common.disp->param.color != VSF_DISP_COLOR_ARGB8888) {
+        ((vk_disp_param_t *)&usrapp_ui_common.disp->param)->color = VSF_DISP_COLOR_ARGB8888;
+    }
 
     SDL_Init(SDL_INIT_VIDEO);
     printf("sdl init called...\n");

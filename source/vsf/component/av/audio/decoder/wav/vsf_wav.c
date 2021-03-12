@@ -170,7 +170,7 @@ vsf_err_t vk_wav_play_start(vk_wav_t *wav)
     wav->eda.on_terminate = NULL;
 #endif
     wav->eda.fn.evthandler = __vk_wav_play_evthandler;
-    return vsf_eda_init(&wav->eda, vsf_prio_inherit, false);
+    return vsf_eda_init(&wav->eda);
 }
 
 vsf_err_t vk_wav_play_stop(vk_wav_t *wav)

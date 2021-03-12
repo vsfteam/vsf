@@ -129,7 +129,7 @@ static float __lvgl_demo_calc_joystick_offset(vk_gamepad_evt_t *gamepad_evt)
         cur_i32 = cur - (1 << (gamepad_evt->bitlen - 1));
     }
 
-    ASSERT(mask != 0);
+    VSF_ASSERT(mask != 0);
     result = (float)cur_i32 / (float)mask;
     if (gamepad_evt->config) {
         result = -result;
@@ -158,7 +158,7 @@ static lvgl_demo_gamepad_t * __lvgl_demo_get_gamepad(void *dev)
 static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *gamepad_evt)
 {
     lvgl_demo_gamepad_t *gamepad = __lvgl_demo_get_gamepad(gamepad_evt->dev);
-    ASSERT(gamepad != NULL);
+    VSF_ASSERT(gamepad != NULL);
 
     lv_coord_t radius = gamepad->margin + (gamepad->margin >> 1);
     uint32_t mask = (1UL << gamepad_evt->bitlen) - 1;
@@ -242,7 +242,7 @@ static bool lv_btn_is_down(lv_obj_t *obj)
 static void lvgl_demo_event_cb(lv_obj_t *obj, lv_event_t event)
 {
     lvgl_demo_gamepad_t *gamepad = obj->user_data;
-    ASSERT(gamepad != NULL);
+    VSF_ASSERT(gamepad != NULL);
 
     if (event != LV_EVENT_CLICKED) {
         return;
@@ -386,7 +386,7 @@ void lvgl_application(uint_fast8_t gamepad_num)
     lv_obj_t *obj, *screen;
     lv_coord_t margin_x, margin_y, margin, top_margin;
 
-    ASSERT((gamepad_num > 0) && (gamepad_num <= dimof(__lvgl_demo.gamepad)));
+    VSF_ASSERT((gamepad_num > 0) && (gamepad_num <= dimof(__lvgl_demo.gamepad)));
 
     screen = lv_scr_act();
     margin_x = lv_obj_get_width(screen) / 30;

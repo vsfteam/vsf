@@ -23,31 +23,19 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
+#if 0
 #define VSF_TGUI_FONTS_TEXT \
     "wqy microhei s24\n"    \
     "wqy microhei s20\n"    \
     "wqy microhei s16\n"    \
     "wqy dejavuserif s24"
+#endif
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-enum {
-    VSF_TGUI_FONT_DEFAULT = 0,
-
-    VSF_TGUI_FONT_WQY_MICROHEI_S24 = 0,
-    VSF_TGUI_FONT_WQY_MICROHEI_S20,
-    VSF_TGUI_FONT_WQY_MICROHEI_S16,
-
-    VSF_TGUI_FONT_DEJAVUSERIF_S24,
-};
-
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
-extern const vsf_tgui_font_t* vsf_tgui_font_get(uint8_t chFontIndex);
-
-extern uint8_t vsf_tgui_font_number(void);
 #endif
 #endif
 

@@ -24,8 +24,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(__COND)                     if (!(__COND)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(__COND)                     if (!(__COND)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define APP_CFG_USBD_VID                A7A8
 #define APP_CFG_USBD_PID                2348

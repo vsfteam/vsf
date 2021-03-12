@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DEBUGGER_ASSERT
-#   define VSF_DEBUGGER_ASSERT                      ASSERT
+#   define VSF_DEBUGGER_ASSERT                      VSF_ASSERT
 #endif
 
 #define VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT         1

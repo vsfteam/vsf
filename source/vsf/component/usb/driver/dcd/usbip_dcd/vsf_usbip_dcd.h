@@ -26,9 +26,9 @@
 
 #include "hal/vsf_hal.h"
 #include "component/usb/common/usb_common.h"
+#include "kernel/vsf_kernel.h"
 
 #if     defined(__VSF_USBIP_DCD_CLASS_IMPLEMENT)
-#   undef __VSF_USBIP_DCD_CLASS_IMPLEMENT
 #   define __PLOOC_CLASS_IMPLEMENT__
 #endif
 
@@ -40,22 +40,99 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define VSF_USBIP_DCD_CFG_BACKEND_WIN   1
-#define VSF_USBIP_DCD_CFG_BACKEND_VSF   2
-#define VSF_USBIP_DCD_CFG_BACKEND_LIB   3
+#define VSF_USBIP_DCD_CFG_BACKEND_WIN       1
+#define VSF_USBIP_DCD_CFG_BACKEND_VSFSOCK   2
+#define VSF_USBIP_DCD_CFG_BACKEND_LWIP      3
 
 #ifndef VSF_USBIP_DCD_CFG_BACKEND
-#   define VSF_USBIP_DCD_CFG_BACKEND    VSF_USBIP_DCD_CFG_BACKEND_WIN
+// 1. paltform related backend
+// 2. tcpip stack related backend
+// 3. vsf socket backend
+#   if      defined(__WIN__)
+#       define VSF_USBIP_DCD_CFG_BACKEND    VSF_USBIP_DCD_CFG_BACKEND_WIN
+#   elif    VSF_USE_LWIP == ENABLED
+#       define VSF_USBIP_DCD_CFG_BACKEND    VSF_USBIP_DCD_CFG_BACKEND_LWIP
+#   elif    VSF_USE_TCPIP == ENABLED
+#       define VSF_USBIP_DCD_CFG_BACKEND    VSF_USBIP_DCD_CFG_BACKEND_VSFSOCK
+#   endif
 #endif
 
 #ifndef VSF_USBIP_DCD_CFG_PATH
-#   define VSF_USBIP_DCD_CFG_PATH       "/vsf/usbd/0"
+#   define VSF_USBIP_DCD_CFG_PATH           "/vsf/usbd/0"
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_usb_dc_from_usbip_ip(__n, __obj, __drv_name)                        \
         __USB_DC_FROM_IP(__n, (__obj), __drv_name, vk_usbip_usbd)
+
+#if VSF_USBIP_SERVER_CFG_DEBUG == ENABLED
+#   define __vk_usbip_server_trace(...)                                         \
+            vsf_trace_debug("usbip_server: " __VA_ARGS__)
+#   define __vk_usbip_server_trace_buffer(...)                                  \
+            vsf_trace_buffer(VSF_TRACE_DEBUG, __VA_ARGS__, VSF_TRACE_DF_DEFAULT)
+#else
+#   define __vk_usbip_server_trace(...)
+#   define __vk_usbip_server_trace_buffer(...)
+#endif
+
+#if VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC == ENABLED
+#   define __vk_usbip_server_trace_rx(__buffer, __size)                         \
+        do {                                                                    \
+            __vk_usbip_server_trace("recv %d bytes" VSF_TRACE_CFG_LINEEND, __size);\
+            __vk_usbip_server_trace_buffer(__buffer, __size);                   \
+        } while (0)
+
+#   define __vk_usbip_server_trace_tx(__buffer, __size)                         \
+        do {                                                                    \
+            __vk_usbip_server_trace("send %d bytes" VSF_TRACE_CFG_LINEEND, __size);\
+            __vk_usbip_server_trace_buffer(__buffer, __size);                   \
+        } while (0)
+#else
+#   define __vk_usbip_server_trace_rx(__buffer, __size)
+#   define __vk_usbip_server_trace_tx(__buffer, __size)
+#endif
+
+#if VSF_USBIP_SERVER_CFG_DEBUG_URB == ENABLED
+#   define __vk_usbip_server_trace_urb_submit(__urb)                            \
+        do {                                                                    \
+            __vk_usbip_server_trace("submit urb%d %s%d %d bytes" VSF_TRACE_CFG_LINEEND,\
+                                    (__urb)->req.seqnum,                        \
+                                    (__urb)->req.direction ? "IN" : "OUT",      \
+                                    (__urb)->req.ep,                            \
+                                    (__urb)->req.transfer_length);              \
+            if (!(__urb)->req.ep) {                                             \
+                __vk_usbip_server_trace_buffer(&((__urb)->req.setup), 8);       \
+            }                                                                   \
+            if (!(__urb)->req.direction && (__urb)->req.transfer_length) {      \
+                __vk_usbip_server_trace_buffer((__urb)->dynmem.buffer, (__urb)->req.transfer_length);\
+            }                                                                   \
+        } while (0)
+
+#   define __vk_usbip_server_trace_urb_done(__urb)                              \
+        do {                                                                    \
+            __vk_usbip_server_trace("done urb%d %s%d " VSF_TRACE_CFG_LINEEND,   \
+                                    (__urb)->req.seqnum,                        \
+                                    (__urb)->req.direction ? "IN" : "OUT",      \
+                                    (__urb)->req.ep);                           \
+            uint_fast32_t actual_length = be32_to_cpu((__urb)->rep.actual_length);\
+            if ((__urb)->req.direction && actual_length) {                      \
+                __vk_usbip_server_trace_buffer((__urb)->dynmem.buffer, actual_length);\
+            }                                                                   \
+        } while (0)
+
+#   define __vk_usbip_server_trace_urb_unlink(__urb)                            \
+        do {                                                                    \
+            __vk_usbip_server_trace("unlink urb%d %s%d " VSF_TRACE_CFG_LINEEND, \
+                                    (__urb)->req.seqnum,                        \
+                                    (__urb)->req.direction ? "IN" : "OUT",      \
+                                    (__urb)->req.ep);                           \
+        } while (0)
+#else
+#   define __vk_usbip_server_trace_urb_submit(__urb)
+#   define __vk_usbip_server_trace_urb_done(__urb)
+#   define __vk_usbip_server_trace_urb_unlink(__urb)
+#endif
 
 /*============================ TYPES =========================================*/
 
@@ -106,8 +183,21 @@ def_simple_class(vk_usbip_dcd_t) {
     )
 };
 
-#ifdef __VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__
+#if     defined(__VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__)                      \
+    ||  defined(__VSF_USBIP_DCD_CLASS_IMPLEMENT)
+
 #   undef __VSF_USBIP_DCD_CLASS_IMPLEMENT_BACKEND__
+
+enum {
+    VSF_USBIP_SERVER_EVT                        = VSF_EVT_USER + 0,
+    VSF_USBIP_SERVER_EVT_BACKEND_INIT_DONE      = VSF_USBIP_SERVER_EVT + 0,
+    VSF_USBIP_SERVER_EVT_BACKEND_CONNECTED      = VSF_USBIP_SERVER_EVT + 1,
+    VSF_USBIP_SERVER_EVT_BACKEND_DISCONNECTED   = VSF_USBIP_SERVER_EVT + 2,
+    VSF_USBIP_SERVER_EVT_BACKEND_RECV_DONE      = VSF_USBIP_SERVER_EVT + 3,
+    VSF_USBIP_SERVER_EVT_BACKEND_SEND_DONE      = VSF_USBIP_SERVER_EVT + 4,
+
+    VSF_USBIP_USBD_EVT                          = VSF_EVT_USER + 0x10,
+};
 
 typedef struct vk_usbip_rep_ifs_t {
     uint8_t     bInterfaceClass;
@@ -314,7 +404,6 @@ typedef struct vk_usbip_server_t {
     vk_usbip_rep_dev_t dev;
     vsf_pool(vk_usbip_urb_poll) urb_pool;
     vsf_dlist_t urb_list;
-    vsf_dlist_t urb_done_list;
     vsf_dlist_t urb_free_list;
     vk_usbip_urb_t *cur_urb;
 } vk_usbip_server_t;
@@ -360,6 +449,8 @@ extern vsf_err_t vk_usbip_usbd_ep_transfer_recv(vk_usbip_dcd_t *usbd, uint_fast8
 extern vsf_err_t vk_usbip_usbd_ep_transfer_send(vk_usbip_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast32_t size, bool zlp);
 
 extern void vk_usbip_usbd_irq(vk_usbip_dcd_t *usbd);
+
+#undef __VSF_USBIP_DCD_CLASS_IMPLEMENT
 
 #ifdef __cplusplus
 }

@@ -130,19 +130,19 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __def_idx(__name, __no)     CONNECT2(__name, _IDX) = (__no)
-#define __def_msk(__name)           CONNECT2(__name, _MSK) = BIT(CONNECT2(__name, _IDX) & 0x1F)
+#define __def_idx(__name, __no)     VSF_MCONNECT2(__name, _IDX) = (__no)
+#define __def_msk(__name)           VSF_MCONNECT2(__name, _MSK) = BIT(VSF_MCONNECT2(__name, _IDX) & 0x1F)
 
 // bit0 - bit13:    clksrc bitfield
 // bit14- bit27:    clkdiv bitfield
 // bit28- bit31:    clkdiv_remap
 #define __def_pclk(__name, __bf_clksel, __bf_clkdiv, __clksel_map_idx)          \
-            CONNECT2(__name, _IDX) = ((__bf_clksel) << 0)                       \
+            VSF_MCONNECT2(__name, _IDX) = ((__bf_clksel) << 0)                  \
                                 |   ((__bf_clkdiv) << 14)                       \
                                 |   ((__clksel_map_idx) << 28)
 
 #define __def_sclk_idx(__name, __bus_idx, __bit_idx)                            \
-            CONNECT2(__name, _IDX) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
+            VSF_MCONNECT2(__name, _IDX) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
 
 #define __def_clk_src(__name, __value)                                          \
             __name = (__value)

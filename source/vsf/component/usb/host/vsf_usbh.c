@@ -285,6 +285,10 @@ vk_usbh_dev_t * vk_usbh_new_device(vk_usbh_t *usbh, enum usb_device_speed_t spee
     vk_usbh_dev_t *dev_new = __vk_usbh_alloc_device(usbh);
     if (dev_new != NULL) {
         dev_new->speed = speed;
+        vsf_trace_info("usbh: new %s speed device connected" VSF_TRACE_CFG_LINEEND,
+                        USB_SPEED_HIGH == speed ? "high" :
+                        USB_SPEED_FULL == speed ? "full" :
+                        USB_SPEED_LOW == speed ? "low" : "unknown");
         if (dev_parent != NULL) {
 #if VSF_USBH_USE_HUB == ENABLED
             dev_new->index = idx;
@@ -482,7 +486,7 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
 #if VSF_USBH_USE_HUB == ENABLED
     vsf_slist_remove(vk_usbh_dev_t, child_node, &dev->dev_parent->children_list, dev);
 #endif
-
+    vsf_trace_info("usbh: device disconnected" VSF_TRACE_CFG_LINEEND);
     if (dev->num_of_ifs && (dev->ifs != NULL)) {
         vk_usbh_ifs_t *ifs = dev->ifs;
         for (uint_fast8_t i = 0; i < dev->num_of_ifs; i++, ifs++) {
@@ -504,9 +508,8 @@ void vk_usbh_disconnect_device(vk_usbh_t *usbh, vk_usbh_dev_t *dev)
     }
 
     if (usbh->dev_new == dev) {
-        __vk_usbh_free_parser(usbh);
-        vsf_eda_fini(&usbh->teda.use_as__vsf_eda_t);
         usbh->dev_new = NULL;
+        vsf_eda_post_evt(&usbh->teda.use_as__vsf_eda_t, VSF_EVT_USER);
     }
     vsf_usbh_free(dev);
 }
@@ -523,8 +526,6 @@ static vsf_err_t __vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *
         // WARNING: not support int transfer for HUB
         return VSF_ERR_NOT_SUPPORT;
     }
-
-    urb_hcd->actual_length = 0;
 
     typeReq = (req->bRequestType << 8) | req->bRequest;
     wValue = req->wValue;
@@ -1044,9 +1045,18 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         parser = usbh->parser;
     }
     dev = usbh->dev_new;
+    if (NULL == dev) {
+        urb = NULL;
+        goto probe_cleanup;
+    }
     urb = &dev->ep0.urb;
 
     switch (evt) {
+    case VSF_EVT_USER:
+    probe_cleanup:
+        vsf_teda_cancel_timer();
+        goto parse_failed;
+        break;
     case VSF_EVT_INIT:
         parser = vsf_usbh_malloc(sizeof(*parser));
         if (NULL == parser) { goto parse_failed; }
@@ -1069,8 +1079,15 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             buffer = vk_usbh_urb_take_buffer(urb);
             urb->urb_hcd->pipe.size = buffer[7];
             __vk_usbh_free_buffer(buffer);
-            vk_usbh_reset_dev(usbh, dev);
-            goto check_device_reset;
+            if (dev->speed < USB_SPEED_HIGH) {
+                vk_usbh_reset_dev(usbh, dev);
+                goto device_reset_wait;
+            } else {
+            __set_address:
+                dev->devnum = parser->devnum_temp;
+                err = vk_usbh_set_address(usbh, dev);
+            }
+            break;
         case VSF_USBH_PROBE_WAIT_SET_ADDRESS:
             vsf_teda_set_timer_ms(10);
             break;
@@ -1119,14 +1136,12 @@ static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_TIMER:
         switch (parser->probe_state) {
         case VSF_USBH_PROBE_WAIT_DEVICE_RESET:
-        check_device_reset:
             if (__vk_usbh_is_dev_resetting(usbh, dev)) {
+            device_reset_wait:
                 vsf_teda_set_timer_ms(20);
                 return;
             } else {
-                // set address
-                dev->devnum = parser->devnum_temp;
-                err = vk_usbh_set_address(usbh, dev);
+                goto __set_address;
             }
             break;
         case VSF_USBH_PROBE_WAIT_ADDRESS_STABLE:
@@ -1149,7 +1164,9 @@ parse_failed:
         __vk_usbh_clean_device(usbh, dev);
     }
 parse_ok:
-    vk_usbh_urb_free_buffer(urb);
+    if (urb != NULL) {
+        vk_usbh_urb_free_buffer(urb);
+    }
     __vk_usbh_free_parser(usbh);
     usbh->dev_new = NULL;
 }
@@ -1163,7 +1180,7 @@ static void __vk_usbh_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     if (VSF_ERR_NONE == err) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         // init_evthandler should not use frame
-        VSF_USB_ASSERT(!eda->state.bits.is_use_frame);
+        VSF_USB_ASSERT(!eda->flag.feature.is_use_frame);
 #endif
         eda->fn.evthandler = __vk_usbh_probe_evthandler;
 
@@ -1188,7 +1205,7 @@ vsf_err_t vk_usbh_init(vk_usbh_t *usbh)
     usbh->teda.on_terminate = NULL;
 #endif
     usbh->teda.fn.evthandler = __vk_usbh_init_evthandler;
-    return vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY, false);
+    return vsf_teda_init(&usbh->teda, VSF_USBH_CFG_EDA_PRIORITY);
 }
 
 vsf_err_t vk_usbh_fini(vk_usbh_t *usbh)

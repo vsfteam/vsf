@@ -62,7 +62,7 @@ typedef struct vsf_stream_fifo_cfg_t {
         uint32_t                    chDataDrainThreshold : 8;
     };
 #if !defined(VSF_PBUF_QUEUE_CFG_ATOM_ACCESS)
-    code_region_t *pregion;         /*!< protection region defined by user */
+    vsf_protect_region_t *pregion;         /*!< protection region defined by user */
 #endif
 }vsf_stream_fifo_cfg_t;
 
@@ -83,7 +83,7 @@ def_class(vsf_stream_fifo_t,
                 vsf_stream_status_t Status;
 
         #if !defined(VSF_PBUF_QUEUE_CFG_ATOM_ACCESS)
-                code_region_t *pregion;     /*!< protection region defined by user */
+                vsf_protect_region_t *pregion;     /*!< protection region defined by user */
         #endif
             };
         };

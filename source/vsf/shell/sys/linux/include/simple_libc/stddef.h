@@ -8,6 +8,7 @@
 #else
 #   include <sys/types.h>
 #endif
+#include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,17 +32,23 @@ extern "C" {
 #define offsetof        offset_of
 
 #ifndef __WIN__
-typedef long int        ptrdiff_t;
+
+#if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
+typedef __PTRDIFF_TYPE__ ptrdiff_t;
+#else
+typedef long int         ptrdiff_t;
 #endif
 
-typedef unsigned short  wchar_t;
-typedef unsigned short  wint_t;
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#ifdef __cplusplus
+#if     !defined(__cplusplus)
+typedef unsigned short  wchar_t;
+typedef unsigned short  wint_t;
+#elif   defined(__WIN__)
 namespace std {
     typedef decltype(__nullptr) nullptr_t;
 }

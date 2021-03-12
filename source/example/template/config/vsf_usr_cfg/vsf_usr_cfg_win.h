@@ -24,13 +24,14 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-// enable the 3 configurations below to use simple implementation for x86
+// enable the 4 configurations below to use simple implementation for x86
 //  simple implementation will not use ThreadSuspend and ThreadResume and has better CPU usage
 //  **** but preempt is not supported ****
 //  priority configurations are dependent on MACROs below, so put them here(at top)
 //#define VSF_ARCH_PRI_NUM                                1
 //#define VSF_ARCH_SWI_NUM                                0
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
+//#define __VSF_X86_WIN_SINGLE_PRIORITY
 
 //#define __WIN7__
 
@@ -57,18 +58,25 @@
 #define APP_USE_STREAM_HAL_DEMO                         ENABLED
 #   define APP_USE_STREAM_USART_DEMO                    ENABLED
 
-// VSF_LINUX_USE_SIMPLE_LIBC conflicts with c++
 #define APP_USE_CPP_DEMO                                DISABLED
-#define VSF_LINUX_USE_SIMPLE_LIBC                       DISABLED
+#define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
+#   define VSF_LINUX_CFG_PRINT_BUFF_SIZE                4096
 // if VSF_LINUX_USE_SIMPLE_LIBC is enabled, need VSF_USE_SIMPLE_SSCANF and VSF_USE_SIMPLE_SPRINTF
-#define VSF_USE_SIMPLE_SSCANF                           DISABLED
-#define VSF_USE_SIMPLE_SPRINTF                          DISABLED
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   define VSF_USE_SIMPLE_SSCANF                        ENABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       ENABLED
+#else
+#   define VSF_USE_SIMPLE_SSCANF                        DISABLED
+#   define VSF_USE_SIMPLE_SPRINTF                       DISABLED
+#endif
 
 // 3rd-party demos
 #define APP_USE_XBOOT_XUI_DEMO                          DISABLED
 #define APP_USE_AWTK_DEMO                               ENABLED
 #define APP_USE_NNOM_DEMO                               ENABLED
 #define APP_USE_LVGL_DEMO                               ENABLED
+// _vsnprintf of lvgl conflicts with ucrt
+#   define LV_SPRINTF_CUSTOM                            1
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                DISABLED
 #   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
@@ -85,6 +93,9 @@
 #define APP_USE_GATO_DEMO                               ENABLED
 #define APP_USE_NUKLEAR_DEMO                            ENABLED
 #define APP_USE_EVM_DEMO                                DISABLED
+#   define VSF_EVM_USE_BLUETOOTH                        DISABLED
+#define APP_USE_LUA_DEMO                                ENABLED
+#define APP_USE_COREMARK_DEMO                           ENABLED
 
 #if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
 #   define APP_USE_FREETYPE_DEMO                        ENABLED
@@ -93,7 +104,7 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                0x1000000
+#   define VSF_HEAP_SIZE                                0x2000000
 #   define VSF_HEAP_CFG_MCB_ALIGN_BIT                   12      // 4K alignment
 
 #define VSF_USE_VIDEO                                   ENABLED
@@ -104,14 +115,11 @@
 
 // UI runs in vsf_prio_0, other modules runs above vsf_prio_1
 #if APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED
-#   if VSF_ARCH_SWI_NUM == 0
+#   ifdef __VSF_X86_WIN_SINGLE_PRIORITY
 #       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_0
-#   else
-#       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_1
-#   endif
-#   if VSF_ARCH_PRI_NUM == 1
 #       define APP_CFG_USBH_HW_PRIO                     vsf_arch_prio_0
 #   else
+#       define VSF_USBH_CFG_EDA_PRIORITY                vsf_prio_1
 #       define APP_CFG_USBH_HW_PRIO                     vsf_arch_prio_1
 #   endif
 #endif
@@ -129,6 +137,7 @@
 #   define VSF_USBD_USE_CDCACM                          ENABLED
 #   define VSF_USBD_USE_MSC                             ENABLED
 #   define VSF_USBD_USE_UVC                             ENABLED
+#   define VSF_USBD_USE_HID                             ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
@@ -154,7 +163,6 @@
 #if APP_USE_EVM_DEMO == ENABLED
 // evm console need printf and getchar
 // TODO: add back
-//#   define VSF_LINUX_USE_SIMPLE_STDIO                   ENABLED
 #endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
@@ -188,8 +196,8 @@
 #   error x64 is currently not supported
 #endif
 
-#define ASSERT(...)                                     assert(__VA_ARGS__)
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                                 assert(__VA_ARGS__)
+//#define VSF_ASSERT(...)
 
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 
@@ -200,20 +208,19 @@
 #       define VSF_USBIP_SERVER_CFG_DEBUG               ENABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC       DISABLED
 #       define VSF_USBIP_SERVER_CFG_DEBUG_URB           ENABLED
-#   if VSF_ARCH_SWI_NUM == 0
+#   ifdef __VSF_X86_WIN_SINGLE_PRIORITY
 #       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
-#   else
-#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_1
-#   endif
-#   if VSF_ARCH_PRI_NUM == 1
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
 #   else
+#       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_1
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_1
 #   endif
 #   define USRAPP_CFG_USBD_DEV                          VSF_USB_DC0
 
 #define VSF_USBH_CFG_ENABLE_ROOT_HUB                    DISABLED
 #define VSF_USBH_USE_HUB                                DISABLED
+#define VSF_USBH_USE_DL1X5                              ENABLED
+#   define VSF_DISP_USE_DL1X5                           ENABLED
 #ifdef __WIN7__
 // winusb seems fail on win7
 #   define VSF_USBH_USE_HCD_LIBUSB                      ENABLED
@@ -224,7 +231,7 @@
 #endif
 
 #if VSF_USBH_USE_HCD_WINUSB == ENABLED
-#   define VSF_WINUSB_HCD_CFG_DEV_NUM                   8
+#   define VSF_WINUSB_HCD_CFG_DEV_NUM                   10
 #   define VSF_WINUSB_HCD_DEV0_VID                      0x0A12      // CSR8510 bthci
 #   define VSF_WINUSB_HCD_DEV0_PID                      0x0001
 #   define VSF_WINUSB_HCD_DEV1_VID                      0x0A5C      // BCM20702 bthci
@@ -243,12 +250,10 @@
 //    rtl8152 is not supported in ecm mode, because winusb does not support set_configuration
 #   define VSF_WINUSB_HCD_DEV7_VID                      0x0BDA      // rtl8152
 #   define VSF_WINUSB_HCD_DEV7_PID                      0x8152
-//#   define VSF_WINUSB_HCD_DEV6_VID                      0xA7A8      // usbd_demo
-//#   define VSF_WINUSB_HCD_DEV6_PID                      0x2348
-//#   define VSF_WINUSB_HCD_DEV7_VID                      0x045E      // XB360
-//#   define VSF_WINUSB_HCD_DEV7_PID                      0x028E
-//#   define VSF_WINUSB_HCD_DEV8_VID                      0x045E      // XB1
-//#   define VSF_WINUSB_HCD_DEV8_PID                      0x02EA
+#   define VSF_WINUSB_HCD_DEV8_VID                      0x17E9      // dl165
+#   define VSF_WINUSB_HCD_DEV8_PID                      0x019E
+#   define VSF_WINUSB_HCD_DEV9_VID                      0x0EEF      // hid touch screen
+#   define VSF_WINUSB_HCD_DEV9_PID                      0x0005
 #endif
 #if VSF_USBH_USE_HCD_LIBUSB == ENABLED
 // for libusb
@@ -264,12 +269,24 @@
 
 #define VSF_FS_USE_WINFS                                ENABLED
 
+#if APP_USE_BTSTACK_DEMO == ENABLED
+#   define HCI_RESET_RESEND_TIMEOUT_MS                  2000
+#endif
+
 #if APP_USE_TGUI_DEMO == ENABLED
-#   define APP_CFG_TGUI_RES_DIR                         "./winfs_root/ui/"
+#   if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#       define APP_CFG_TGUI_RES_DIR                     "/winfs/ui/"
+#   else
+#       define APP_CFG_TGUI_RES_DIR                     "./winfs_root/ui/"
+#   endif
 #endif
 
 #if APP_USE_XBOOT_XUI_DEMO == ENABLED
-#   define APP_CFG_XBOOT_RES_DIR                        "./winfs_root/ui/"
+#   if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#       define APP_CFG_XBOOT_RES_DIR                    "/winfs/ui/"
+#   else
+#       define APP_CFG_XBOOT_RES_DIR                    "./winfs_root/ui/"
+#   endif
 #endif
 
 #if APP_USE_VSFIP_DEMO == ENABLED || APP_USE_LWIP_DEMO == ENABLED
@@ -282,7 +299,7 @@
 #define VSF_DISP_USE_SDL2                               ENABLED
 #   define VSF_DISP_SDL2_CFG_INCLUDE                    "lib\SDL2\include\SDL.h"
 #   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
-#   if VSF_ARCH_PRI_NUM == 1
+#   ifdef __VSF_X86_WIN_SINGLE_PRIORITY
 #       define VSF_DISP_SDL2_CFG_HW_PRIORITY            vsf_arch_prio_0
 #   else
 #       define VSF_DISP_SDL2_CFG_HW_PRIORITY            vsf_arch_prio_1
@@ -294,7 +311,7 @@
 #   define APP_DISP_SDL2_AMPLIFIER                      1
 
 #if APP_USE_SDL2_DEMO == ENABLED
-#   define APP_CFG_SDL2_DEMO_COLOR_RGB565
+#   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #endif
 
 #define VSF_USE_WINSOUND                                ENABLED
@@ -309,7 +326,6 @@
 #else
 #    define VSF_TRACE_CFG_COLOR_EN                      ENABLED
 #endif
-#define VSH_ECHO                                        1
 
 /*----------------------------------------------------------------------------*
  * Regarget Weak interface                                                    *
@@ -333,6 +349,12 @@
 #   define WEAK_VSF_USBH_BTHCI_ON_PACKET
 
 #   define WEAK_VSF_BLUETOOTH_H2_ON_NEW
+
+// if btstack_application does not contain btstack_install
+//  undef WEAK_BTSTACK_INSTALL
+#   define WEAK_BTSTACK_INSTALL
+// use btstack_main in btstack_application instead of in btstack_demo
+#   define WEAK_BTSTACK_MAIN
 #endif
 
 #define WEAK_VSF_SCSI_ON_NEW
@@ -364,6 +386,10 @@
 #       define WEAK_VSFIP_MEM_NETBUF_GET
 #       define WEAK_VSFIP_MEM_NETBUF_FREE
 #   endif
+#endif
+
+#if VSF_USBH_USE_DL1X5 == ENABLED && VSF_DISP_USE_DL1X5 == ENABLED
+#   define WEAK_VSF_DL1X5_ON_NEW_DISP
 #endif
 
 /*============================ TYPES =========================================*/

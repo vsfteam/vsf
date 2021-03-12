@@ -34,7 +34,7 @@
 
 int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
-    if(!str || !format) {
+    if (!str || !format) {
         return 0;
     }
 
@@ -58,12 +58,14 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 union {
                     struct {
                         int has_prefix0     : 1;
-                        int has_prefix      : 1; 
+                        int has_prefix      : 1;
                         int align_left      : 1;
                         int has_plus_minus  : 1;
                         int is_upper        : 1;
                         int is_signed       : 1;
                         int is_plus         : 1;
+                        int is_halfword     : 1;
+                        int long_cnt        : 2;
                     };
                     int all;
                 } flags;
@@ -72,7 +74,6 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 int radix;
                 int width;
                 int actual_width;
-                int integer_wordsize;
 
                 flags.all = 0;
                 switch (*format) {
@@ -90,32 +91,41 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 
             next:
                 ch = *format++;
-                flags.is_upper = isupper(ch) ? 1 : 0;
                 switch (ch) {
+                case 'h':
+                    if (flags.long_cnt) {
+                        return 0;
+                    }
+                    flags.is_halfword = 1;
+                    goto next;
+                case 'l':
+                    if (flags.is_halfword || (flags.long_cnt >= 2)) {
+                        return 0;
+                    }
+                    flags.long_cnt++;
+                    goto next;
                 case 'u':
-                    integer_wordsize = 1;
                     flags.is_signed = 0;
                     radix = 10;
                     goto print_integer;
                 case 'i':
                 case 'd':
-                    integer_wordsize = 1;
                     flags.is_signed = 1;
                     radix = 10;
                     goto print_integer;
                 case 'b':
-                    integer_wordsize = 1;
                     flags.is_signed = 0;
                     radix = 2;
                     goto print_integer;
                 case 'o':
-                    integer_wordsize = 1;
                     flags.is_signed = 0;
                     radix = 8;
                     goto print_integer;
-                case 'x':
                 case 'X':
-                    integer_wordsize = 1;
+                case 'P':
+                    flags.is_upper = 1;
+                case 'p':
+                case 'x':
                     flags.is_signed = 0;
                     radix = 16;
                     goto print_integer;
@@ -125,16 +135,26 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 
                 // TODO: support %llx etc
                 print_integer:
-                    if (1 == integer_wordsize) {
-                        arg.uinteger = va_arg(ap, unsigned int);
-                        if (flags.is_signed) {
-                            arg.integer <<= 32;
-                            arg.integer >>= 32;
+                    if (flags.is_signed) {
+                        if (flags.is_halfword) {
+                            arg.integer = va_arg(ap, short);
+                        } else if (1 == flags.long_cnt) {
+                            arg.integer = va_arg(ap, long);
+                        } else if (2 == flags.long_cnt) {
+                            arg.integer = va_arg(ap, long long);
+                        } else {
+                            arg.integer = va_arg(ap, int);
                         }
-                    } else if (2 == integer_wordsize) {
-                        // endian??, not tested
-                        arg.uinteger = va_arg(ap, unsigned int);
-                        arg.uinteger += ((unsigned long long)va_arg(ap, unsigned int) << 32);
+                    } else {
+                        if (flags.is_halfword) {
+                            arg.uinteger = va_arg(ap, unsigned short);
+                        } else if (1 == flags.long_cnt) {
+                            arg.uinteger = va_arg(ap, unsigned long);
+                        } else if (2 == flags.long_cnt) {
+                            arg.uinteger = va_arg(ap, unsigned long long);
+                        } else {
+                            arg.uinteger = va_arg(ap, unsigned int);
+                        }
                     }
 
                     {

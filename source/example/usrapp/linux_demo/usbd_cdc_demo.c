@@ -178,7 +178,7 @@ static const usrapp_usbd_cdc_const_t __usrapp_usbd_cdc_const = {
         },
         .config_desc            = {
             USB_DESC_CFG(sizeof(__usrapp_usbd_cdc_const.usbd.config_desc), 2 * USRAPP_CFG_CDC_NUM, 1, 0, 0x80, 100)
-            REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_CFG, NULL)
+            VSF_MREPEAT(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_CFG, NULL)
         },
         .str_lanid              = {
             USB_DESC_STRING(2, 0x09, 0x04)
@@ -195,14 +195,14 @@ static const usrapp_usbd_cdc_const_t __usrapp_usbd_cdc_const = {
                 'i', 0, 'C', 0, 'D', 0, 'C', 0
             )
         },
-        REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING, NULL)
+        VSF_MREPEAT(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING, NULL)
         .std_desc               = {
             VSF_USBD_DESC_DEVICE(__usrapp_usbd_cdc_const.usbd.dev_desc, sizeof(__usrapp_usbd_cdc_const.usbd.dev_desc)),
             VSF_USBD_DESC_CONFIG(0, __usrapp_usbd_cdc_const.usbd.config_desc, sizeof(__usrapp_usbd_cdc_const.usbd.config_desc)),
             VSF_USBD_DESC_STRING(0, 0, __usrapp_usbd_cdc_const.usbd.str_lanid, sizeof(__usrapp_usbd_cdc_const.usbd.str_lanid)),
             VSF_USBD_DESC_STRING(0x0409, 1, __usrapp_usbd_cdc_const.usbd.str_vendor, sizeof(__usrapp_usbd_cdc_const.usbd.str_vendor)),
             VSF_USBD_DESC_STRING(0x0409, 2, __usrapp_usbd_cdc_const.usbd.str_product, sizeof(__usrapp_usbd_cdc_const.usbd.str_product)),
-            REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING_DECLARE, __usrapp_usbd_cdc_const.usbd)
+            VSF_MREPEAT(USRAPP_CFG_CDC_NUM, USRAPP_DESC_CDC_STRING_DECLARE, __usrapp_usbd_cdc_const.usbd)
         },
     },
 };
@@ -226,7 +226,7 @@ static usrapp_usbd_cdc_t __usrapp_usbd_cdc = {
 #   endif
         },
 #endif
-        REPEAT_MACRO(USRAPP_CFG_CDC_NUM, USRAPP_CDC_INSTANCE, __usrapp_usbd_cdc.usbd)
+        VSF_MREPEAT(USRAPP_CFG_CDC_NUM, USRAPP_CDC_INSTANCE, __usrapp_usbd_cdc.usbd)
 
         .config[0].num_of_ifs   = dimof(__usrapp_usbd_cdc.usbd.ifs),
         .config[0].ifs          = __usrapp_usbd_cdc.usbd.ifs,

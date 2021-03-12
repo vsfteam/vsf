@@ -90,8 +90,7 @@ fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel)
             vsf_tgui_size_t tNewSize =
                 __vk_tgui_label_v_get_minimal_rendering_size(ptLabel);
             vsf_tgui_size_t *ptControlSize =
-                    &(ptLabel->use_as__vsf_tgui_control_t.
-                        use_as____vsf_tgui_control_core_t.tRegion.tSize);
+                    &(ptLabel->use_as__vsf_tgui_control_t.tRegion.tSize);
 
             ptControlSize->iHeight = tNewSize.iHeight;
             ptControlSize->iWidth = max(tNewSize.iWidth, ptControlSize->iWidth);

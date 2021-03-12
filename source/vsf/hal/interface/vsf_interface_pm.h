@@ -330,7 +330,7 @@ typedef enum pm_clk_src_sel_t pm_clk_src_sel_t;
 //! \name main clock prescaler
 //! @{
 typedef enum {
-    REPEAT_MACRO(255,DIV_,0)
+    VSF_MREPEAT(255, DIV_, 0)
 } pm_divider_t;
 //! @}
 

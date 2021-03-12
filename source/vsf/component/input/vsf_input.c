@@ -33,11 +33,11 @@
  *!         in the case when you want to disable it,
  *!         please use following macro:
  *!         #define VSF_INPUT_CFG_PROTECT_LEVEL  none
- *!         
+ *!
  *!         in the case when you want to use scheduler-safe,
  *!         please use following macro:
  *!         #define VSF_INPUT_CFG_PROTECT_LEVEL  scheduler
- *!         
+ *!
  *!         NOTE: This macro should be defined in vsf_usr_cfg.h
  */
 #   define VSF_INPUT_CFG_PROTECT_LEVEL      interrupt
@@ -171,7 +171,7 @@ void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt)
 WEAK(vsf_input_on_touchscreen)
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
-#if VSF_TOUCH_SCREEN_CFG_TRACE == ENABLED
+#if VSF_INPUT_TOUCH_SCREEN_CFG_TRACE == ENABLED
     if (vsf_input_touchscreen_is_down(ts_evt)) {
         vsf_trace_debug("touch_screen(%d): (%d, %d) %d\n",
             vsf_input_touchscreen_get_id(ts_evt), vsf_input_touchscreen_get_x(ts_evt),

@@ -163,7 +163,7 @@ typedef struct vsf_x86_t {
     vsf_arch_irq_thread_t *lock_owner;
     vsf_arch_prio_t cur_priority;
     vsf_arch_prio_t prio_base;
-    vsf_gint_state_t gint_state;
+    vsf_arch_prio_t gint_state;
 } vsf_x86_t;
 
 //! preempt_param
@@ -1070,20 +1070,21 @@ bool vsf_arch_low_level_init(void)
 }
 
 
-vsf_gint_state_t vsf_get_interrupt(void)
+vsf_arch_prio_t vsf_get_interrupt(void)
 {
     vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     __vsf_arch_lock();
-        vsf_gint_state_t state = __vsf_x86.gint_state;
+        vsf_arch_prio_t state = __vsf_x86.gint_state;
     __vsf_arch_unlock();
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, state);
     return state;
 }
 
-void vsf_set_interrupt(vsf_gint_state_t level)
+vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
 {
     vsf_arch_trace_function("%s(level: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, level);
     __vsf_arch_lock();
+    vsf_arch_prio_t orig = __vsf_x86.gint_state;
     if (__vsf_x86.gint_state != level) {
         __vsf_x86.gint_state = level;
         vsf_arch_trace_status("gint_state: %d\r\n", __vsf_x86.gint_state);
@@ -1096,19 +1097,20 @@ void vsf_set_interrupt(vsf_gint_state_t level)
             if (__vsf_arch_can_preempt(irq_thread, true)) {
                 __vsf_arch_preempt(VSF_ARCH_IRQ_PP_NORMAL);
                 vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-                return;
+                return orig;
             }
         }
     }
     __vsf_arch_unlock();
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    return orig;
 }
 
-vsf_gint_state_t vsf_disable_interrupt(void)
+vsf_arch_prio_t vsf_disable_interrupt(void)
 {
     vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     __vsf_arch_lock();
-    vsf_gint_state_t orig = __vsf_x86.gint_state;
+    vsf_arch_prio_t orig = __vsf_x86.gint_state;
     if (orig != false) {
         __vsf_x86.gint_state = false;
         vsf_arch_trace_status("gint_state: %d\r\n", __vsf_x86.gint_state);
@@ -1119,11 +1121,13 @@ vsf_gint_state_t vsf_disable_interrupt(void)
     return orig;
 }
 
-void vsf_enable_interrupt(void)
+vsf_arch_prio_t vsf_enable_interrupt(void)
 {
+    vsf_arch_prio_t orig = __vsf_x86.gint_state;
     vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
     vsf_set_interrupt(true);
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
+    return orig;
 }
 
 /*----------------------------------------------------------------------------*

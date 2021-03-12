@@ -60,7 +60,7 @@ void mt071_usbd_fini(mt071_usb_t *dc)
 
 void mt071_usbd_get_info(mt071_usb_t *dc, usb_dc_ip_info_t *info)
 {
-    ASSERT(info != NULL);
+    VSF_HAL_ASSERT(info != NULL);
     info->regbase = dc->param->reg;
     info->ep_num = mt071_usbd_ep_number;
     info->is_dma = mt071_usbd_ep_is_dma;

@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_LINUX_ASSERT
-#   define VSF_LINUX_ASSERT                     ASSERT
+#   define VSF_LINUX_ASSERT                     VSF_ASSERT
 #endif
 
 // signal support is not implemented

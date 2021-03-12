@@ -920,7 +920,7 @@ void vk_usbd_init(vk_usbd_dev_t *dev)
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     dev->eda.on_terminate = NULL;
 #   endif
-    vsf_eda_init(&dev->eda, VSF_USBD_CFG_EDA_PRIORITY, false);
+    vsf_eda_init(&dev->eda, VSF_USBD_CFG_EDA_PRIORITY);
 #endif
 
     __vk_usbd_hw_init_reset(dev, false);

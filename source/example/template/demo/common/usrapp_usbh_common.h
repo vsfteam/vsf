@@ -94,6 +94,9 @@ typedef struct usrapp_usbh_common_t {
 #if VSF_USBH_USE_UAC == ENABLED
     vk_usbh_class_t uac;
 #endif
+#if VSF_USBH_USE_DL1X5 == ENABLED
+    vk_usbh_class_t dl1x5;
+#endif
 } usrapp_usbh_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -186,7 +186,7 @@ void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
 
     hid->fn.evthandler = __vk_usbh_hid_evthandler;
     hid->on_terminate = __vk_usbh_hid_on_eda_terminate;
-    vsf_eda_init(&hid->use_as__vsf_eda_t, vsf_prio_inherit, false);
+    vsf_eda_init(&hid->use_as__vsf_eda_t);
 
     return hid;
 free_all:

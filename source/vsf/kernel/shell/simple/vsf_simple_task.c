@@ -209,14 +209,28 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
     } else
 #endif
     {
-        vsf_err_t err = __vsf_eda_call_eda(evthandler, param, local_size);
-        if ((VSF_ERR_NONE == err) && ((uintptr_t)NULL != local_buff)) {
+        vsf_err_t err = __vsf_eda_call_eda_prepare(evthandler, param, local_size);
+        if (VSF_ERR_NONE != err) {
+            return err;
+        }
+
+        if ((uintptr_t)NULL != local_buff) {
             size_t size = min(local_buff_size, local_size);
             if (size > 0) {
                 uintptr_t local = vsf_eda_get_local();
                 memcpy((void *)local, (void *)local_buff, size);
             }
         }
+
+        vsf_eda_t *eda = vsf_eda_get_cur();
+#if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
+        extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
+        __vsf_dispatch_evt(eda, VSF_EVT_INIT);
+#else
+        if (VSF_ERR_NONE != vsf_eda_post_evt(eda, VSF_EVT_INIT)) {
+            VSF_KERNEL_ASSERT(false);
+        }
+#endif
         return err;
     }
 }

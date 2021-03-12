@@ -56,6 +56,8 @@
 #       define  VSF_DRIVER_HEADER       "./Allwinner/driver.h"
 #   elif    defined(__Espressif__)
 #       define  VSF_DRIVER_HEADER       "./Espressif/driver.h"
+#   elif    defined(__AIC__)
+#       define  VSF_DRIVER_HEADER       "./AIC/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"

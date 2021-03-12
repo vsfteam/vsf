@@ -86,9 +86,9 @@
                     __tgui_name_string_tag(__NAME.tList, vsf_tgui_text_list_t)  \
                 ),                                                              \
                                                                                 \
-                VSF_TGUI_V_TEST_LIST_STATIC_INIT_DEFAULT                        \
+                VSF_TGUI_V_TEXT_LIST_STATIC_INIT_DEFAULT                        \
                 __VA_ARGS__                                                     \
-                VSF_TGUI_V_TEST_LIST_STATIC_INIT_OVERRIDE                       \
+                VSF_TGUI_V_TEXT_LIST_STATIC_INIT_OVERRIDE                       \
                 .tList.tContent.parent_ptr = (vsf_msgt_container_t *)           \
                                 &((__PARENT_ADDR)->__NAME.tList),               \
                 .tList.tContent.id = VSF_TGUI_COMPONENT_ID_LABEL,               \
@@ -116,7 +116,7 @@
                     .u5Type = VSF_TGUI_CONTAINER_TYPE_PLANE,                    \
                 .bIsHideContentInsideContainer = true,                          \
                 VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE                       \
-            )                                                                   
+            )
 
 
 #define tgui_text_list(__NAME, __PARENT_ADDR, __PREVIOUS, __NEXT, ...)          \

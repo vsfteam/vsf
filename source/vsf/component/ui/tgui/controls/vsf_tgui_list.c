@@ -79,27 +79,27 @@ static int_fast16_t __vk_tgui_calculate_offset_for_make_target_control_visible(
     int_fast16_t iListLength = 0;
     int_fast16_t iControlLength = 0;
     if (bIsVertical) {
-        iListPosition = -ptInnerContainer->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iY;
-        iListLength = vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iHeight;
+        iListPosition = -ptInnerContainer->tRegion.tLocation.iY;
+        iListLength = ptList->tRegion.tSize.iHeight;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
         iListLength -= ptInnerContainer->tContainerPadding.chTop + ptInnerContainer->tContainerPadding.chBottom;
     #endif
 
-        iControlLength = vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iHeight;
+        iControlLength = control_ptr->tRegion.tSize.iHeight;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
-        iControlLength += vsf_tgui_control_get_core(control_ptr)->tMargin.chBottom;
+        iControlLength += control_ptr->tMargin.chBottom;
     #endif
     } else {
-        iListPosition = -ptInnerContainer->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iX;
-        iListLength = vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iWidth;
+        iListPosition = -ptInnerContainer->tRegion.tLocation.iX;
+        iListLength = ptList->tRegion.tSize.iWidth;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
         iListLength -= ptInnerContainer->tContainerPadding.chLeft + ptInnerContainer->tContainerPadding.chRight;
     #endif
 
-        iControlLength = vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iWidth;
+        iControlLength = control_ptr->tRegion.tSize.iWidth;
     #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
 
-        iControlLength += vsf_tgui_control_get_core(control_ptr)->tMargin.chRight;
+        iControlLength += control_ptr->tMargin.chRight;
     #endif
     }
 
@@ -134,7 +134,7 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
             while (chIndex--) {
                 control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
             }
-            nYOffset += vsf_tgui_control_get_core(control_ptr)->tRegion.tLocation.iY;
+            nYOffset += control_ptr->tRegion.tLocation.iY;
 
             switch (ptList->tMode.u2WorkMode) {
                 case VSF_TGUI_LIST_MODE_FREE_MOVE:
@@ -152,8 +152,8 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
                                 );
                     break;
                 case VSF_TGUI_LIST_MODE_ITEM_SELECTION_CENTER_ALIGN:
-                    nYOffset -= (   vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iHeight
-                                -   vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iHeight) / 2;
+                    nYOffset -= (   ptList->tRegion.tSize.iHeight
+                                -   control_ptr->tRegion.tSize.iHeight) / 2;
                     break;
                 default:
                     break;
@@ -172,7 +172,7 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
             while (chIndex--) {
                 control_ptr = __vk_tgui_control_get_next_visible_one_within_container(control_ptr);
             }
-            nXOffset += vsf_tgui_control_get_core(control_ptr)->tRegion.tLocation.iX;
+            nXOffset += control_ptr->tRegion.tLocation.iX;
 
             switch (ptList->tMode.u2WorkMode) {
                 case VSF_TGUI_LIST_MODE_FREE_MOVE:
@@ -190,8 +190,8 @@ static void __vsf_tgui_list_adjust_inner_container_location(vsf_tgui_list_t* ptL
                                 );
                     break;
                 case VSF_TGUI_LIST_MODE_ITEM_SELECTION_CENTER_ALIGN:
-                    nXOffset -= (   vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptList)->tRegion.tSize.iWidth
-                                -   vsf_tgui_control_get_core(control_ptr)->tRegion.tSize.iWidth) / 2;
+                    nXOffset -= (   ptList->tRegion.tSize.iWidth
+                                -   control_ptr->tRegion.tSize.iWidth) / 2;
                     break;
                 default:
                     break;
@@ -220,11 +220,11 @@ static void __vk_tgui_list_update_inner_container_location(vsf_tgui_list_t* ptLi
 
     switch (ptInnerContainer->ContainerAttribute.u5Type) {
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
-            vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptInnerContainer)
+            ptInnerContainer
                 ->tRegion.tLocation.iY = vk_tgui_slider_on_timer_event_handler(&(ptList->tSlider));
             break;
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
-            vsf_tgui_control_get_core((const vsf_tgui_control_t *)ptInnerContainer)
+            ptInnerContainer
                 ->tRegion.tLocation.iX = vk_tgui_slider_on_timer_event_handler(&(ptList->tSlider));
             break;
     }
@@ -296,7 +296,9 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
         if (VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
             fsm = (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
         }
-    } else if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.msg){
+    }
+#if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+    else if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.msg){
         vsf_tgui_key_evt_t* ptEvt = (vsf_tgui_key_evt_t*)ptMSG;
         switch (ptList->ptList->ContainerAttribute.u5Type) {
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
@@ -324,8 +326,9 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
                 /* should not happen, do nothing */
                 break;
         }
-    } 
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+    }
+#endif
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
     else if (VSF_TGUI_EVT_GESTURE_WHEEL == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         vsf_tgui_gesture_evt_t* ptEvt = (vsf_tgui_gesture_evt_t*)ptMSG;
         switch (ptList->ptList->ContainerAttribute.u5Type) {

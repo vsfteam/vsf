@@ -301,7 +301,7 @@ const vk_usbh_hcd_drv_t vk_libusb_hcd_drv = {
 
 static vk_libusb_hcd_t __vk_libusb_hcd = {
     .devs = {
-        REPEAT_MACRO(VSF_LIBUSB_HCD_CFG_DEV_NUM, VSF_LIBUSB_HCD_DEF_DEV, NULL)
+        VSF_MREPEAT(VSF_LIBUSB_HCD_CFG_DEV_NUM, VSF_LIBUSB_HCD_DEF_DEV, NULL)
     },
 };
 
@@ -921,7 +921,7 @@ static vsf_err_t __vk_libusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         __vk_libusb_hcd.cur_dev_idx = 0;
 
         __vk_libusb_hcd.teda.fn.evthandler = __vk_libusb_hcd_evthandler;
-        vsf_teda_init(&__vk_libusb_hcd.teda, vsf_prio_inherit, false);
+        vsf_teda_init(&__vk_libusb_hcd.teda);
 
         __vk_libusb_hcd.init_eda = eda;
 #if VSF_LIBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED

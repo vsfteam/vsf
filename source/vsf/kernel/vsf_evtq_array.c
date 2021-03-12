@@ -72,7 +72,7 @@ static bool __vsf_eda_terminate(vsf_eda_t *this_ptr)
 void vsf_evtq_on_eda_fini(vsf_eda_t *this_ptr)
 {
     if (!__vsf_eda_terminate((vsf_eda_t *)this_ptr)) {
-        this_ptr->state.bits.is_to_exit = true;
+        this_ptr->flag.state.is_to_exit = true;
     }
 }
 
@@ -99,12 +99,13 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 
     VSF_KERNEL_ASSERT(eda != NULL);
     evtq = __vsf_os_evtq_get((vsf_prio_t)eda->priority);
+    VSF_KERNEL_ASSERT(evtq != NULL);
     mask = (1 << evtq->bitsize) - 1;
 
     orig = vsf_protect_int();
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-    if (eda->evt_cnt && eda->state.bits.is_limitted && !force) {
+    if (eda->evt_cnt && eda->flag.state.is_limitted && !force) {
         vsf_unprotect_int(orig);
         return VSF_ERR_FAIL;
     }
@@ -218,7 +219,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
         eda = node->eda;
 
         if (eda != NULL) {
-            if (!eda->state.bits.is_to_exit) {
+            if (!eda->flag.state.is_to_exit) {
                 orig = vsf_protect_int();
                     this_ptr->cur.eda = eda;
 
@@ -249,7 +250,7 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr)
                 eda->evt_cnt--;
             vsf_unprotect_int(orig);
 
-            if (eda->state.bits.is_to_exit) {
+            if (eda->flag.state.is_to_exit) {
                 __vsf_eda_terminate(eda);
             }
         }

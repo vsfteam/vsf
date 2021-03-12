@@ -60,7 +60,7 @@ vsf_pool_t into your project and follow the step 1).
 
 enum {
     VSF_PBUF_FREE_TO_ANY = 0,
-    REPEAT_MACRO(254, __BLOCK_FREE_TO, NULL)
+    VSF_MREPEAT(254, __BLOCK_FREE_TO, NULL)
     VSF_PBUF_NO_FREE     = 255
 };
 

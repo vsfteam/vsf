@@ -156,7 +156,7 @@ static NO_INIT f1cx00s_usbh_hcd_t USB_HC0;
 
 static void __f1cx00s_usbh_hcd_free_ep(f1cx00s_usbh_hcd_t *musb_hcd, uint_fast8_t idx, bool is_in)
 {
-    VSF_OSA_HAL_ASSERT(idx != 0);
+    VSF_HAL_ASSERT(idx != 0);
     vsf_protect_t orig = vsf_protect_sched();
         if (is_in) {
             MUSB_BASE->Common.IntrRxE &= ~(1 << idx);
@@ -474,7 +474,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 // TODO: check if full speed
                 speed = USB_SPEED_HIGH;
             } else {
-                VSF_OSA_HAL_ASSERT(false);
+                VSF_HAL_ASSERT(false);
                 speed = USB_SPEED_UNKNOWN;
             }
 
@@ -502,7 +502,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     on_ep: {
             evt -= VSF_EVT_USER;
             vk_usbh_hcd_urb_t *urb = __f1cx00s_usbh_hcd_get_urb(musb_hcd, evt & 0xFF);
-            VSF_OSA_HAL_ASSERT(urb != NULL);
+            VSF_HAL_ASSERT(urb != NULL);
             evt &= 0xF00;
 
             if ((HCD_EVT_EP - VSF_EVT_USER) == evt) {
@@ -531,7 +531,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     goto wait_next_urb;
                 }
             } else {
-                VSF_OSA_HAL_ASSERT(false);
+                VSF_HAL_ASSERT(false);
             }
         }
         break;
@@ -543,12 +543,12 @@ static vsf_err_t __f1cx00s_usbh_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
     f1cx00s_usbh_hcd_t *musb_hcd;
     vsf_usb_hcd_param_t *param;
 
-    VSF_OSA_HAL_ASSERT(hcd != NULL);
+    VSF_HAL_ASSERT(hcd != NULL);
     if (hcd->priv != NULL) {
         musb_hcd = hcd->priv;
     }
     param = hcd->param;
-    VSF_OSA_HAL_ASSERT(param != NULL);
+    VSF_HAL_ASSERT(param != NULL);
 
     switch (evt) {
     case VSF_EVT_INIT: {
@@ -606,14 +606,14 @@ static vsf_err_t __f1cx00s_usbh_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         }
         // fall through
     case VSF_EVT_TIMER:
-        VSF_OSA_HAL_ASSERT(HCD_STATE_WAIT_HOSTMODE == musb_hcd->state);
+        VSF_HAL_ASSERT(HCD_STATE_WAIT_HOSTMODE == musb_hcd->state);
         if (!MUSB_BASE->Common.DevCtl & MUSB_DevCtl_HostMode) {
             vsf_teda_set_timer_ms(1);
         } else {
             musb_hcd->state = HCD_STATE_WAIT_CONNECT;
             vsf_eda_sem_init(&musb_hcd->sem, 0);
             musb_hcd->teda.fn.evthandler = __f1cx00s_usbh_hcd_evthandler;
-            vsf_teda_init(&musb_hcd->teda, vsf_prio_inherit, false);
+            vsf_teda_init(&musb_hcd->teda);
 
             // if device is already connected on startup, Connect interupt will not issue
             if (MUSB_BASE->Common.DevCtl & (MUSB_DevCtl_LSDev | MUSB_DevCtl_FSDev)) {
@@ -691,7 +691,7 @@ static vk_usbh_hcd_urb_t * __f1cx00s_usbh_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
     vk_usbh_hcd_urb_t *urb;
     uint_fast32_t size;
 
-    VSF_OSA_HAL_ASSERT(hcd != NULL);
+    VSF_HAL_ASSERT(hcd != NULL);
 
     size = sizeof(vk_usbh_hcd_urb_t) + sizeof(f1cx00s_usbh_hcd_urb_t);
     urb = vsf_usbh_malloc(size);

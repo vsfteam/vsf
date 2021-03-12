@@ -25,11 +25,11 @@
 /*============================ MACROS ========================================*/
 
 #ifdef __WIN__
-#   define ASSERT(...)                   assert(__VA_ARGS__)
+#   define VSF_ASSERT(...)                   assert(__VA_ARGS__)
 #else
-#   define ASSERT(...)                   if (!(__VA_ARGS__)) {while(1);};
+#   define VSF_ASSERT(...)                   if (!(__VA_ARGS__)) {while(1);};
 #endif
-//#define ASSERT(...)
+//#define VSF_ASSERT(...)
 
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED
 #define VSF_HEAP_SIZE                   0x10000

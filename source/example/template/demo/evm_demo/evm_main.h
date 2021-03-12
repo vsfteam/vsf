@@ -24,10 +24,10 @@
 #define NEVM_STACK_SIZE        (1 * 1024)
 #define NEVM_MODULE_SIZE       3
 
-#define EVM_HEAP_SIZE          (5 * 1024)
+#define EVM_HEAP_SIZE          (32 * 1024)
 #define EVM_STACK_SIZE         (2 * 1024)
 #define EVM_MODULE_SIZE        5
 
-int evm_main(void);
+//int evm_main(void);
 
 #endif

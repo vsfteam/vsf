@@ -36,7 +36,7 @@
 #   include "utilities/preprocessor/mf_u8_dec2str.h"
 typedef enum vsf_prio_t {
     vsf_prio_inherit                    = -1,
-    REPEAT_MACRO(MFUNC_OUT_DEC_STR, __VSF_SWI_PRIO_INIT, NULL)
+    VSF_MREPEAT(MFUNC_OUT_DEC_STR, __VSF_SWI_PRIO_INIT, NULL)
     vsf_prio_highest                    = MFUNC_OUT_DEC_STR - 1,
 } vsf_prio_t;
 

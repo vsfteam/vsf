@@ -26,7 +26,7 @@
     &&  VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 #define __VSF_EDA_CLASS_INHERIT__
 #   include "../../vsf_kernel_common.h"
-#   include "../../vsf_eda.h" 
+#   include "../../vsf_eda.h"
 #   include "./vsf_simple.h"
 #   include "../../task/vsf_thread.h"
 /*============================ MACROS ========================================*/
@@ -56,7 +56,7 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *bmpevt_ptr,
     if (vsf_eda_is_stack_owner(peda)) {
         //! a thread
         reason =  vsf_thread_bmpevt_pend(bmpevt_ptr, pender_ptr, time_out);
-    } else 
+    } else
 #endif
     {
         switch(vsf_eda_bmpevt_pend(bmpevt_ptr, pender_ptr, time_out)) {
@@ -71,7 +71,7 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *bmpevt_ptr,
                 break;
         }
     }
-    
+
     return reason;
 }
 
@@ -85,9 +85,9 @@ vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *bmpevt_ptr,
         VSF_APP_STATE_PEND = 0,
         VSF_APP_STATE_POLL,
     };
-    
+
     do {
-        vsf_eda_t *peda = vsf_eda_get_cur();                                
+        vsf_eda_t *peda = vsf_eda_get_cur();
         if (vsf_eda_polling_state_get(peda)) {
             /* VSF_APP_STATE_POLL */
             if (time_out < 0) {
@@ -95,41 +95,41 @@ vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *bmpevt_ptr,
                     break;
                 }
             }
-            result = vsf_eda_bmpevt_poll(   bmpevt_ptr, 
-                                        (vsf_bmpevt_pender_t *)pender_ptr, 
+            result = vsf_eda_bmpevt_poll(   bmpevt_ptr,
+                                        (vsf_bmpevt_pender_t *)pender_ptr,
                                         VSF_EVT_SYNC_POLL);
             if (VSF_SYNC_GET == result) {
                 vsf_eda_polling_state_set(peda, (bool)VSF_APP_STATE_PEND);
             }
         } else {
             /* VSF_APP_STATE_PEND */
-            result = __vsf_bmpevt_pend( bmpevt_ptr, 
-                                        (vsf_bmpevt_pender_t *)pender_ptr, 
-                                        time_out); 
-            if (    vsf_eda_is_stack_owner(peda) 
+            result = __vsf_bmpevt_pend( bmpevt_ptr,
+                                        (vsf_bmpevt_pender_t *)pender_ptr,
+                                        time_out);
+            if (    vsf_eda_is_stack_owner(peda)
                 ||  VSF_SYNC_GET == result
                 ||  VSF_SYNC_CANCEL == result) {
                 break;
             }
             vsf_eda_polling_state_set(peda, (bool)VSF_APP_STATE_POLL);
-            
+
         }
-    } while(false); 
+    } while(false);
 
     return result;
 }
 
 SECTION(".text.vsf.kernel.__vsf_grouped_evts_init")
-void __vsf_grouped_evts_init(vsf_bmpevt_t *this_ptr, 
-                    vsf_bmpevt_adapter_t **adapters_pptr, 
+void __vsf_grouped_evts_init(vsf_bmpevt_t *this_ptr,
+                    vsf_bmpevt_adapter_t **adapters_pptr,
                     uint_fast8_t adapter_count,
                     uint_fast32_t auto_reset)
 {
     VSF_KERNEL_ASSERT(NULL != this_ptr && NULL != adapters_pptr);
-    this.auto_reset = auto_reset;
-    
+    vsf_this.auto_reset = auto_reset;
+
     if (adapter_count) {
-        this.adapters = adapters_pptr;
+        vsf_this.adapters = adapters_pptr;
     }
     vsf_eda_bmpevt_init(this_ptr, adapter_count);
 }

@@ -79,17 +79,17 @@ Output:
  *!                 //! put your code here
  *!             }
  *!
- *! \note <Address of i_code_region_t obj>: this can be NULL, if so, 
+ *! \note <Address of i_code_region_t obj>: this can be NULL, if so,
  *!         DEFAULT_CODE_REGION_NONE will be used.
- *! 
- *! \note <Object Address>: it is the address of the object you want to pass to 
+ *!
+ *! \note <Object Address>: it is the address of the object you want to pass to
  *!         your OnEnter and OnLeave functions. It can be NULL
  *!
  *! \note A local object will be generated from users' stack, the size is specified
  *!         by i_code_region_t.chLocalSize. The address of this local object will
  *!         be passed to your OnEnter and OnLeave functions. You can use it to
  *!         store some local status.
- *! 
+ *!
  *! \name   List of Default Code Regions
  *! @{
  *!         DEFAULT_CODE_REGION_ATOM_CODE           //!< interrupt-safe region
@@ -111,37 +111,42 @@ extern "C" {
 
 #if __IS_COMPILER_IAR__
 #   define __CODE_REGION(__REGION_ADDR)                                         \
-    for(code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);         \
-        NULL != code_region_ptr;                                                   \
-        code_region_ptr = NULL)                                                    \
+    for(code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
+        NULL != code_region_ptr;                                                \
+        code_region_ptr = NULL)                                                 \
         for(uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE],               \
-                __CONNECT2(__code_region_, __LINE__) = 1;                          \
-            __CONNECT2(__code_region_, __LINE__)-- ?                               \
-                (code_region_ptr->methods_ptr->OnEnter(  code_region_ptr->target_ptr, local)\
+                VSF_MCONNECT2(__code_region_, __LINE__) = 1;                    \
+            VSF_MCONNECT2(__code_region_, __LINE__)-- ?                         \
+                (code_region_ptr->methods_ptr->OnEnter(                         \
+                    code_region_ptr->target_ptr, local)                         \
                     ,1)                                                         \
                 : 0;                                                            \
-            code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local))
+            code_region_ptr->methods_ptr->OnLeave(                              \
+                code_region_ptr->target_ptr, local))
 
 #   define __CODE_REGION_START(__REGION_ADDR)   __CODE_REGION(__REGION_ADDR) {
 #   define __CODE_REGION_END()                  }
 
 #   define __CODE_REGION_SIMPLE(__REGION_ADDR, ...)                             \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);         \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          \
+        code_region_ptr->methods_ptr->OnEnter(                                  \
+            code_region_ptr->target_ptr, local);                                \
         __VA_ARGS__;                                                            \
-        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local);          \
+        code_region_ptr->methods_ptr->OnLeave(                                  \
+            code_region_ptr->target_ptr, local);                                \
     } } while(0);
 
 #   define __CODE_REGION_SIMPLE_START(__REGION_ADDR, ...)                       \
     do {if (NULL != (__REGION_ADDR)) {                                          \
-        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);         \
+        code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);
 
 #   define __CODE_REGION_SIMPLE_END(__REGION_ADDR, ...)                         \
-        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local);          \
+        code_region_ptr->methods_ptr->OnLeave(                                  \
+            code_region_ptr->target_ptr, local);                                \
     } } while(0);
 
 
@@ -160,19 +165,22 @@ extern "C" {
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local); \
+        code_region_ptr->methods_ptr->OnEnter(                                  \
+            code_region_ptr->target_ptr, local);                                \
         __CODE;                                                                 \
-        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
+        code_region_ptr->methods_ptr->OnLeave(                                  \
+            code_region_ptr->target_ptr, local);                                \
     } }while(0);
 
 #       define __CODE_REGION_SIMPLE_START(__REGION_ADDR)                        \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[COMPILER_PATCH_CODE_REGION_LOCAL_SIZE];                   \
-        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);
 
 #       define __CODE_REGION_SIMPLE_END(__REGION_ADDR)                          \
-        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
+            code_region_ptr->methods_ptr->OnLeave(                              \
+                code_region_ptr->target_ptr, local);                            \
     } } while(0);
 #   else
 
@@ -182,13 +190,14 @@ extern "C" {
         NULL != code_region_ptr;                                                \
         code_region_ptr = NULL)                                                 \
         for(uint8_t local[code_region_ptr->methods_ptr->local_obj_size],        \
-                __CONNECT2(__code_region_, __LINE__) = 1;                          \
-            __CONNECT2(__code_region_, __LINE__)-- ?                               \
+                VSF_MCONNECT2(__code_region_, __LINE__) = 1;                    \
+            VSF_MCONNECT2(__code_region_, __LINE__)-- ?                         \
                 (code_region_ptr->methods_ptr->OnEnter(                         \
-                    code_region_ptr->target_ptr, local)                            \
+                    code_region_ptr->target_ptr, local)                         \
                     ,1)                                                         \
                 : 0;                                                            \
-            code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local))
+            code_region_ptr->methods_ptr->OnLeave(                              \
+                code_region_ptr->target_ptr, local))
 
 #       define __CODE_REGION_START(__REGION_ADDR) __CODE_REGION(__REGION_ADDR) {
 #       define __CODE_REGION_END()                  }
@@ -198,19 +207,22 @@ extern "C" {
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[code_region_ptr->methods_ptr->local_obj_size];            \
-        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local); \
+        code_region_ptr->methods_ptr->OnEnter(                                  \
+            code_region_ptr->target_ptr, local);                                \
         __VA_ARGS__;                                                            \
-        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
+        code_region_ptr->methods_ptr->OnLeave(                                  \
+            code_region_ptr->target_ptr, local);                                \
     } }while(0);
-    
+
 #       define __CODE_REGION_SIMPLE_START(__REGION_ADDR, ...)                   \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
         uint8_t local[code_region_ptr->methods_ptr->local_obj_size];            \
-        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);          
+        code_region_ptr->methods_ptr->OnEnter(code_region_ptr->target_ptr, local);
 
 #       define __CODE_REGION_SIMPLE_END(__REGION_ADDR, ...)                     \
-        code_region_ptr->methods_ptr->OnLeave(code_region_ptr->target_ptr, local); \
+        code_region_ptr->methods_ptr->OnLeave(                                  \
+            code_region_ptr->target_ptr, local);                                \
     } } while(0);
 #   endif
 
@@ -238,7 +250,7 @@ extern "C" {
 #define code_region_simple(__REGION_ADDR, ...)                                  \
             __CODE_REGION_SIMPLE((__REGION_ADDR), __VA_ARGS__)
 #endif
-    
+
 #define CODE_REGION_SIMPLE_START(__REGION_ADDR)                                 \
             __CODE_REGION_SIMPLE_START((__REGION_ADDR))
 #define CODE_REGION_SIMPLE_END()                                                \

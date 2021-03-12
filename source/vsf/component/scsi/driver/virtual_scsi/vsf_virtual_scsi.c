@@ -230,7 +230,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_REQUEST_SENSE: {
                         uint_fast8_t len = scsi_cmd[4];
 
-                        ASSERT(reply_len >= len);
+                        VSF_SCSI_ASSERT(reply_len >= len);
                         reply[0] = 0x70;
                         reply[2] = pthis->sense_key;
                         reply[7] = 0x0A;
@@ -251,7 +251,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                             goto exit_invalid_field_in_cmd;
                         }
 
-                        ASSERT(reply_len >= 5);
+                        VSF_SCSI_ASSERT(reply_len >= 5);
                         reply_len = 5;
                         break;
                     } else {
@@ -264,7 +264,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                             goto exit_invalid_field_in_cmd;
                         }
 
-                        ASSERT(reply_len >= 36);
+                        VSF_SCSI_ASSERT(reply_len >= 36);
                         reply_len = 36;
 
                         reply[0] = param->type;
@@ -279,7 +279,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                     }
                     break;
                 case SCSI_CMDCODE_MODE_SENSE:
-                    ASSERT(reply_len >= 4);
+                    VSF_SCSI_ASSERT(reply_len >= 4);
                     reply_len = 4;
                     reply[0] = 3;
                     break;
@@ -290,7 +290,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
             case SCSI_GROUPCODE10_1:
                 switch (cmd_code) {
                 case SCSI_CMDCODE_READ_FORMAT_CAPACITIES:
-                    ASSERT(reply_len >= 12);
+                    VSF_SCSI_ASSERT(reply_len >= 12);
                     reply_len = 12;
                     reply[3] = 8;
                     put_unaligned_be32(param->block_num, &reply[4]);
@@ -298,7 +298,7 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                     reply[8] = 2;
                     break;
                 case SCSI_CMDCODE_READ_CAPACITY:
-                    ASSERT(reply_len >= 8);
+                    VSF_SCSI_ASSERT(reply_len >= 8);
                     reply_len = 8;
                     put_unaligned_be32(param->block_num - 1, &reply[0]);
                     put_unaligned_be32(param->block_size, &reply[4]);

@@ -77,10 +77,10 @@ ROOT void USB_OTG##__N##_IRQHandler(void)                                       
 /*============================ IMPLEMENTATION ================================*/
 
 WEAK(mt071_usbd_irq)
-void mt071_usbd_irq(mt071_usb_t *dc) { ASSERT(false); }
+void mt071_usbd_irq(mt071_usb_t *dc) { VSF_HAL_ASSERT(false); }
 WEAK(mt071_usbh_irq)
-void mt071_usbh_irq(mt071_usb_t *dc) { ASSERT(false); }
+void mt071_usbh_irq(mt071_usb_t *dc) { VSF_HAL_ASSERT(false); }
 
-REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
 
 #endif      // VSF_HAL_USE_USBD || VSF_HAL_USE_USBH

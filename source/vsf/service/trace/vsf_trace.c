@@ -30,7 +30,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_SIMPLE_STREAM != ENABLED && VSF_USE_STREAMVSF_USE_STREAM != ENABLED
+#if VSF_USE_SIMPLE_STREAM != ENABLED && VSF_USE_STREAM != ENABLED
 #   error stream MUST be enabled to use trace
 #endif
 
@@ -41,7 +41,7 @@
 #define VSF_TRACE_LINEBUF_SIZE              128
 
 #ifndef VSF_TRACE_CFG_PROTECT_LEVEL
-/*! \note   By default, the driver tries to make all APIs scheduler-safe,
+/*! \note   By default, the driver tries to make all APIs interrupt-safe,
  *!
  *!         in the case when you want to disable it,
  *!         please use following macro:
@@ -53,7 +53,7 @@
  *!         
  *!         NOTE: This macro should be defined in vsf_usr_CFG.h
  */
-#   define VSF_TRACE_CFG_PROTECT_LEVEL      scheduler
+#   define VSF_TRACE_CFG_PROTECT_LEVEL      interrupt
 #endif
 
 #define vsf_trace_protect                   vsf_protect(VSF_TRACE_CFG_PROTECT_LEVEL)
@@ -61,6 +61,7 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 #if VSF_USE_SIMPLE_STREAM == ENABLED
 typedef struct vsf_trace_t {
     vsf_stream_t *stream;
@@ -69,8 +70,10 @@ typedef struct vsf_trace_t {
 #elif VSF_USE_STREAM == ENABLED
 
 #endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
 #if VSF_USE_SIMPLE_STREAM == ENABLED
 static vsf_trace_t __vsf_trace;
 #elif VSF_USE_STREAM == ENABLED
@@ -88,23 +91,7 @@ static const char *__vsf_trace_color[VSF_TRACE_LEVEL_NUM] = {
 #endif
 
 /*============================ PROTOTYPES ====================================*/
-
-static uint_fast32_t __vsf_trace_output(const char* buff, uint_fast32_t size);
-
 /*============================ IMPLEMENTATION ================================*/
-
-void vsf_trace_output_string(const char* str)
-{
-    __vsf_trace_output(str, strlen(str));
-}
-
-static void __vsf_trace_set_level(vsf_trace_level_t level)
-{
-#if VSF_TRACE_CFG_COLOR_EN == ENABLED
-    VSF_SERVICE_ASSERT(level < dimof(__vsf_trace_color));
-    vsf_trace_output_string((char *)__vsf_trace_color[level]);
-#endif
-}
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED
 static uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size)
@@ -125,6 +112,11 @@ void __vsf_trace_init(vsf_stream_t *stream)
     if (stream) {
         vsf_stream_connect_tx(stream);
     }
+}
+
+static bool __vsf_trace_is_inited(void)
+{
+    return __vsf_trace.stream != NULL;
 }
 
 void vsf_trace_fini(void)
@@ -217,6 +209,19 @@ static void __vsf_trace_arg(const char *format, va_list *arg)
     vsf_stream_writer_send_pbuf(&__vsf_trace, block);
 }
 #endif
+
+void vsf_trace_output_string(const char* str)
+{
+    __vsf_trace_output(str, strlen(str));
+}
+
+static void __vsf_trace_set_level(vsf_trace_level_t level)
+{
+#if VSF_TRACE_CFG_COLOR_EN == ENABLED
+    VSF_SERVICE_ASSERT(level < dimof(__vsf_trace_color));
+    vsf_trace_output_string((char *)__vsf_trace_color[level]);
+#endif
+}
 
 void vsf_trace_string(vsf_trace_level_t level, const char *str)
 {
@@ -312,6 +317,43 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
     va_start(ap, format);
     __vsf_trace_arg(format, &ap);
     va_end(ap);
+}
+
+// default retarget to vsf_trace
+WEAK(vsf_stdout_init)
+void vsf_stdout_init(void)
+{
+    VSF_SERVICE_ASSERT(__vsf_trace_is_inited());
+}
+
+WEAK(vsf_stderr_init)
+void vsf_stderr_init(void)
+{
+    VSF_SERVICE_ASSERT(__vsf_trace_is_inited());
+}
+
+WEAK(vsf_stdin_init)
+void vsf_stdin_init(void)
+{
+    VSF_SERVICE_ASSERT(__vsf_trace_is_inited());
+}
+
+WEAK(vsf_stdout_putchar)
+int vsf_stdout_putchar(char ch)
+{
+    return __vsf_trace_output(&ch, 1);
+}
+
+WEAK(vsf_stderr_putchar)
+int vsf_stderr_putchar(char ch)
+{
+    return __vsf_trace_output(&ch, 1);
+}
+
+WEAK(vsf_stdin_getchar)
+int vsf_stdin_getchar(void)
+{
+    while(1);
 }
 
 #endif      // VSF_USE_TRACE

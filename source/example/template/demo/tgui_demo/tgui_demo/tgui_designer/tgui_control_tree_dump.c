@@ -185,21 +185,31 @@ static void __control_code_dump(vsf_tgui_control_t* control_ptr, uint_fast8_t ta
 
     // control_ptr->bIsEnabled init by macro __tgui_control_base
     // control_ptr->bIsVisible init by macro __tgui_control_base
-
-    if (force || control_ptr->bIsHideContentInsideContainer) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(bIsHideContentInsideContainer, %s),\n",
-            tab_cnt * SPACE_CNT_IN_TAB, ' ', control_ptr->bIsHideContentInsideContainer ? "true" : "false");
-    }
+    // control_ptr->bIsHideContentInsideContainer init by macro
 
     if (force || control_ptr->is_control_transparent) {
         TOP_DEF_SNPRINTF("%*ctgui_attribute(is_control_transparent, %s),\n",
             tab_cnt * SPACE_CNT_IN_TAB, ' ', control_ptr->is_control_transparent ? "true" : "false");
     }
 
-    if (force || control_ptr->tBackgroundColor.tColor.Value != 0) {
-        const char *color_buffer = vsf_tgui_color_to_string(control_ptr->tBackgroundColor);
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(tBackgroundColor, %s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', color_buffer);
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+    if (force || control_ptr->background_color.value != 0) {
+        const char* color_buffer = vsf_tgui_color_to_string(control_ptr->background_color);
+        TOP_DEF_SNPRINTF("%*ctgui_sv_background_color(%s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', color_buffer);
     }
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
+    if (force || control_ptr->show_corner_tile) {
+        TOP_DEF_SNPRINTF("%*ctgui_sv_tile_show_corner(%s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', control_ptr->show_corner_tile ? "true" : "false");
+    }
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
+    if (force || control_ptr->tile_trans_rate != 0xFF) {
+        TOP_DEF_SNPRINTF("%*ctgui_sv_tile_trans_rate(0x%x),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', control_ptr->tile_trans_rate);
+    }
+#endif
 }
 
 static void __label_code_dump(vsf_tgui_control_t* control_ptr, uint_fast8_t tab_cnt, bool force, char* top_container_name)
@@ -210,26 +220,18 @@ static void __label_code_dump(vsf_tgui_control_t* control_ptr, uint_fast8_t tab_
 
     vsf_tgui_label_t* label = (vsf_tgui_label_t*)control_ptr;
 
-    if (force || label->bIsUseRawView) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(bIsUseRawView, %s),\n",
-            tab_cnt * SPACE_CNT_IN_TAB, ' ', label->bIsUseRawView ? "true" : "false");
-    }
-
-    if (force || label->bIsNoBackgroundColor) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(bIsNoBackgroundColor, %s),\n",
-            tab_cnt * SPACE_CNT_IN_TAB, ' ', label->bIsNoBackgroundColor ? "true" : "false");
-    }
-
-    if (force || label->chFontIndex != 0) {
+    if (force || label->font_index != 0) {
         // TODO : using font name
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(chFontIndex, %s),\n",
-            tab_cnt * SPACE_CNT_IN_TAB, ' ', vsf_tgui_font_get_var_name(label->chFontIndex));
+        TOP_DEF_SNPRINTF("%*ctgui_attribute(font_index, %s),\n",
+            tab_cnt * SPACE_CNT_IN_TAB, ' ', vsf_tgui_font_get_var_name(label->font_index));
     }
 
-    if (force || label->tFontColor.tColor.Value != 0) {
-        const char *color_buffer = vsf_tgui_color_to_string(label->tFontColor);
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(tFontColor, %s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', color_buffer);
+#if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
+    if (force || label->font_color.value != 0) {
+        const char *color_buffer = vsf_tgui_color_to_string(label->font_color);
+        TOP_DEF_SNPRINTF("%*ctgui_sv_font_color(%s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', color_buffer);
     }
+#endif
 
     if (force || label->tLabel.tString.pstrText != NULL || label->tLabel.u4Align != VSF_TGUI_ALIGN_CENTER) {
         char __string_buffer[1024];
@@ -281,29 +283,6 @@ static void __container_code_dump(vsf_tgui_control_t* control_ptr, uint_fast8_t 
 
     vsf_tgui_container_t* container = (vsf_tgui_container_t*)control_ptr;
 
-    // container->use_as__vsf_msgt_container_t init by macro
-
-#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
-    if (force || container->bIsShowCornerTile) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(bIsShowCornerTile, %s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ',
-            container->bIsShowCornerTile ? "true" : "false");
-    }
-    if (force || container->bIsNoBackgroundColor) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(bIsNoBackgroundColor, %s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ',
-            container->bIsNoBackgroundColor ? "true" : "false");
-    }
-    if (force || container->bIsTileTransparency) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(bIsTileTransparency, %s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ',
-            container->bIsTileTransparency ? "true" : "false");
-    }
-    if (force || container->chTileTransparencyRate != 0xFF) {
-        TOP_DEF_SNPRINTF("%*ctgui_attribute(chTileTransparencyRate, 0x%02X),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ',
-            container->chTileTransparencyRate);
-    }
-#endif
-
-    // container->u5Type init by macro
-    // container->bIsAutoSize init by macro
     if (force || container->bIsAutoSize || container->u5Type) {
         TOP_DEF_SNPRINTF("%*ctgui_container_type(%s),\n", tab_cnt * SPACE_CNT_IN_TAB, ' ', vsf_tgui_container_type_to_string(container->u5Type));
     }
@@ -606,10 +585,10 @@ void vsf_tgui_control_tree_dump(vsf_tgui_panel_t* panel_ptr, bool force,
 
     __code_dump((vsf_tgui_control_t*)panel_ptr, 0, force, NULL, NULL, NULL);
 
-    ASSERT(strlen(declaration_buffer) < declaration_buffer_size);
+    VSF_ASSERT(strlen(declaration_buffer) < declaration_buffer_size);
     strcat(declaration_buffer, __tree_dump.panel_declaration_code);
 
-    ASSERT((strlen(__tree_dump.msgmap_declaration_code) + strlen(__tree_dump.panel_definition_code) + strlen(__tree_dump.msgmap_definition_code)) < definition_buffer_size);
+    VSF_ASSERT((strlen(__tree_dump.msgmap_declaration_code) + strlen(__tree_dump.panel_definition_code) + strlen(__tree_dump.msgmap_definition_code)) < definition_buffer_size);
     strcat(definition_buffer, __tree_dump.msgmap_declaration_code);
     strcat(definition_buffer, __tree_dump.panel_definition_code);
     strcat(definition_buffer, __tree_dump.msgmap_definition_code);

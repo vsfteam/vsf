@@ -103,7 +103,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 
 #   include "utilities/preprocessor/mf_u8_dec2str.h"
     static const vsf_arch_prio_t __vsf_os_swi_priority[] = {
-        REPEAT_MACRO(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
+        VSF_MREPEAT(MFUNC_OUT_DEC_STR, __VSF_OS_EVTQ_SWI_PRIO_INIT, NULL)
     };
 #endif
 
@@ -341,11 +341,34 @@ __stackless void __cmain(void)
 }
 
 #   else
+
 __root
 __noreturn
-__stackless void __cmain(void)
+#ifndef __VSF_WORKAROUND_IAR_CPP__
+__stackless
+#endif
+void __cmain(void)
 {
     if (__low_level_init() != 0) {
+
+        // __IAR_STARTUP_DATA_INIT will call __iar_cstart_call_ctors to create
+        //  some cpp instances if eg. file stream(including stdout/stdin/stderr)
+        //  is used, this will need malloc.
+        // So if malloc is implemented in VSF simple libc, define __VSF_WORKAROUND_IAR_CPP__
+        // Note that if headers of simple libc is used, malloc is acutally __vsf_linux_malloc
+#ifdef __VSF_WORKAROUND_IAR_CPP__
+        vsf_disable_interrupt();
+        vsf_heap_init();
+
+        // vsf_heap_add_memory will need scheduler protection, which is not available here
+        //  call __vsf_kernel_os_raw_init to disable scheduler protection before DATA_INIT
+        void __vsf_kernel_os_raw_init(void);
+        __vsf_kernel_os_raw_init();
+
+        extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
+        vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
+#endif
+
         __IAR_STARTUP_DATA_INIT();
     }
     __vsf_main_entry();

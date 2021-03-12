@@ -23,6 +23,7 @@ typedef int                 mode_t;
 typedef unsigned int        uid_t;
 typedef unsigned int        gid_t;
 typedef long                off_t;
+typedef long long           off64_t;
 
 #if __IS_COMPILER_IAR__
 //! end of typedef name has already been declared (with same type)

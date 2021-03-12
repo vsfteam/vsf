@@ -309,7 +309,7 @@ static void *__vk_usbh_dfu_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
 
         dfu->teda.fn.evthandler = __vk_usbh_dfu_evthandler;
         dfu->teda.on_terminate = __vk_usbh_dfu_on_eda_terminate;
-        if (VSF_ERR_NONE == vsf_teda_init(&dfu->teda, vsf_prio_inherit, false)) {
+        if (VSF_ERR_NONE == vsf_teda_init(&dfu->teda)) {
             vsf_usbh_dfu_on_new(dfu);
         }
     }

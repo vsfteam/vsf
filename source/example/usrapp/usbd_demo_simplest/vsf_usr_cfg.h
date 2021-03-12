@@ -1,8 +1,8 @@
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
 
-#define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define VSF_SYSTIMER_FREQ               (192000000ul)
 

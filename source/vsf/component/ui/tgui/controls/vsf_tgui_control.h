@@ -85,9 +85,9 @@
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
 #   define ____tgui_name_string_tag(__name, __type)                             \
-                .node_name_ptr = "["#__type"]["#__name"]",                      
+                .node_name_ptr = "["#__type"]["#__name"]",
 #else
-#   define ____tgui_name_string_tag(__name, __type)                               
+#   define ____tgui_name_string_tag(__name, __type)
 #endif
 
 #define __tgui_name_string_tag(__name, __type)                                  \
@@ -100,7 +100,7 @@
                                 - (intptr_t)&((__parent_addr)->__previous),     \
                     .next =  (intptr_t)&((__parent_addr)->__next)               \
                             - (intptr_t)&((__parent_addr)->__name),             \
-                },                                                              
+                },
 #else
 #   define ____tgui_node_list_init(__name, __parent_addr, __previous, __next)   \
                 .Offset = {                                                     \
@@ -192,7 +192,7 @@
             __describe_tgui_container_base( __VAR,                              \
                                             __ID,                               \
                                             __TYPE,                             \
-                                            __VA_ARGS__) 
+                                            __VA_ARGS__)
 
 #define tgui_control_base(   __NAME,                                            \
                         __ID,                                                   \
@@ -359,7 +359,7 @@
                                         __PARENT_ADDR,                          \
                                         __PREVIOUS,                             \
                                         __NEXT,                                 \
-                                        __VA_ARGS__)  
+                                        __VA_ARGS__)
 
 #   define __tgui_container(   __NAME,                                          \
                             __PARENT_ADDR,                                      \
@@ -413,7 +413,7 @@ typedef union vsf_tgui_status_t {
     } Values;
 }vsf_tgui_status_t;
 
-declare_class(__vsf_tgui_control_core_t)
+declare_class(vsf_tgui_control_t)
 
 
 typedef struct vsf_tgui_control_subcall_t {
@@ -422,7 +422,7 @@ typedef struct vsf_tgui_control_subcall_t {
 } vsf_tgui_control_subcall_t;
 
 typedef fsm_rt_t vsf_tgui_controal_fsm_t(
-        vsf_tgui_control_t* node_ptr, 
+        vsf_tgui_control_t* node_ptr,
         vsf_tgui_msg_t* ptMSG);
 
 typedef struct vsf_tgui_control_handler_t {
@@ -460,7 +460,7 @@ typedef struct vsf_tgui_margin_t {
 } vsf_tgui_margin_t;
 #endif
 
-def_class(__vsf_tgui_control_core_t,
+def_class(vsf_tgui_control_t,
 
     public_member(
         implement(vsf_msgt_node_t)
@@ -530,15 +530,8 @@ def_class(__vsf_tgui_control_core_t,
 
     implement(vsf_tgui_v_control_t)
 )
-end_def_class(__vsf_tgui_control_core_t)
-
-
-def_class(vsf_tgui_control_t,
-    which(
-        implement(__vsf_tgui_control_core_t)
-    )
-)
 end_def_class(vsf_tgui_control_t)
+
 
 declare_class(vsf_tgui_container_t)
 
@@ -546,7 +539,7 @@ def_class(vsf_tgui_container_t,
     which(
         union {
             inherit(vsf_msgt_container_t)
-            implement(__vsf_tgui_control_core_t)
+            implement(vsf_tgui_control_t)
         };
         implement(vsf_tgui_v_container_t)
     )
@@ -554,7 +547,7 @@ def_class(vsf_tgui_container_t,
     implement_ex(
         struct {
             /* vsf_tgui_container_type_t */
-            uint8_t u5Type                                  : 5;    
+            uint8_t u5Type                                  : 5;
             uint8_t bIsAutoSize                             : 1;
             uint8_t is_forced_to_refresh_whole_background   : 1;
             uint8_t                                         : 1;
@@ -698,16 +691,16 @@ vsf_tgui_location_t * vsf_tgui_control_calculate_absolute_location(
 /*! \brief If you get a relative region inside a control, this function can calculate
  *!        the absolute location and store the result in the region you specified.
  *!
- *! \NOTE  As the location info of the region you passed to this 
- *!        function will be changed, please do **NOT** pass the control's own region 
+ *! \NOTE  As the location info of the region you passed to this
+ *!        function will be changed, please do **NOT** pass the control's own region
  *!        to this function.
- *!        Due to this reason aforementioned, you should creat a copy of the target 
- *!        region and use it with this function. 
+ *!        Due to this reason aforementioned, you should creat a copy of the target
+ *!        region and use it with this function.
  *!
  *! \param control_ptr  the address of the target control
  *! \param region_ptr   the address of the region which you want to calculate
  *! \return the same region address you passed to the function
- *! 
+ *!
  */
 extern
 vsf_tgui_region_t* vsf_tgui_control_calculate_absolute_region(
@@ -767,10 +760,6 @@ void vsf_tgui_control_status_set(   vsf_tgui_control_t* control_ptr,
 
 extern
 bool vsf_tgui_control_is_container(const vsf_tgui_control_t* control_ptr);
-
-extern
-__vsf_tgui_control_core_t* vsf_tgui_control_get_core(
-                                        const vsf_tgui_control_t* control_ptr);
 
 extern
 vsf_tgui_control_t* vsf_tgui_control_get_parent(

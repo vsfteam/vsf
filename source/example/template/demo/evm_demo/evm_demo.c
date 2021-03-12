@@ -66,7 +66,7 @@ void vm_free(void * mem)
 }
 
 #if APP_USE_LINUX_DEMO == ENABLED
-int evm_demo(int argc, char *argv[])
+int evm_main(int argc, char *argv[])
 {
 #else
 int VSF_USER_ENTRY(void)

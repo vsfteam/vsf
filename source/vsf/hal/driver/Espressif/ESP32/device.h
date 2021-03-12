@@ -44,6 +44,11 @@
 #   define __FREERTOS__
 #endif
 
+// alu types, should be defined in target-specified compiler header
+// but xtensa uses generic compiler header, so define alu types here
+typedef unsigned int                            uintalu_t;
+typedef int                                     intalu_t;
+
 // SET_STACK will fail to pass stack check
 //#include "xt_instr_macros.h"
 //#define VSF_ARCH_RTOS_CFG_SET_STACK(__STACK)    SET_STACK(__STACK)

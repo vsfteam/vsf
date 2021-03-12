@@ -21,7 +21,7 @@
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
-#include "hal/driver/common/vsf_swi_template.h"
+#include "hal/driver/common/swi/vsf_swi_template.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

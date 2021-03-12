@@ -75,29 +75,29 @@ implement_vsf_pt(user_pt_sub_task_t)
 {
     vsf_pt_begin();
    
-    printf("receive semaphore...[%08x]\r\n", this.cnt++);
+    printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
      
     vsf_pt_end();
 }
 #endif
 
-#define USER_TASK_RESET_FSM()   do { this.state = 0;} while(0)
+#define USER_TASK_RESET_FSM()   do { vsf_this.state = 0;} while(0)
 
 implement_vsf_pt(user_pt_task_t) 
 {
     vsf_pt_begin();
 
-    this.cnt = 0;
+    vsf_this.cnt = 0;
     while(1) {
-        vsf_pt_wait_until(vsf_sem_pend(this.sem_ptr));                             //!< wait for semaphore forever
+        vsf_pt_wait_until(vsf_sem_pend(vsf_this.sem_ptr));                             //!< wait for semaphore forever
             
     #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-        this.print_task.cnt = this.cnt;                                         //!< Pass parameter
-        vsf_pt_call_pt(user_pt_sub_task_t, &this.print_task);
+        vsf_this.print_task.cnt = vsf_this.cnt;                                         //!< Pass parameter
+        vsf_pt_call_pt(user_pt_sub_task_t, &vsf_this.print_task);
         //! pt call complete
-        this.cnt = this.print_task.cnt;                                         //!< read parameter
+        vsf_this.cnt = vsf_this.print_task.cnt;                                         //!< read parameter
     #else
-        printf("receive semaphore...[%08x]\r\n", this.cnt++);
+        printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
     #endif
     }
 
@@ -111,8 +111,8 @@ implement_vsf_pt(user_pt_task_b_t)
     
     while(1) {
         vsf_pt_wait_until( vsf_delay_ms(3000));                                //!< wait 10s
-        printf("post semaphore...   [%08x]\r\n", this.cnt++);
-        vsf_sem_post(this.sem_ptr);                                                //!< post a semaphore
+        printf("post semaphore...   [%08x]\r\n", vsf_this.cnt++);
+        vsf_sem_post(vsf_this.sem_ptr);                                                //!< post a semaphore
     }
     
     vsf_pt_end();
@@ -124,7 +124,7 @@ implement_vsf_thread(user_thread_a_t)
     while (1) {
         vsf_delay_ms(3000);
         printf("post semaphore...   [%08x]\r\n", cnt++);
-        vsf_sem_post(this.sem_ptr);            //!< post a semaphore
+        vsf_sem_post(vsf_this.sem_ptr);            //!< post a semaphore
     }
 }
 
@@ -203,7 +203,7 @@ void main(void)
     
     vsf_kernel_pt_simple_demo();
     
-    this.cnt = 0;
+    vsf_this.cnt = 0;
     while(1) {
         printf("hello world! \r\n");
         vsf_pt_wait_until(vsf_delay_ms(1000));

@@ -54,10 +54,10 @@ ROOT void USB_OTG##__N##_IRQHandler(void)                                       
 /*============================ IMPLEMENTATION ================================*/
 
 WEAK(gd32e10x_usbd_irq)
-void gd32e10x_usbd_irq(gd32e10x_usb_t *dc) { ASSERT(false); }
+void gd32e10x_usbd_irq(gd32e10x_usb_t *dc) { VSF_HAL_ASSERT(false); }
 WEAK(gd32e10x_usbh_irq)
-void gd32e10x_usbh_irq(gd32e10x_usb_t *dc) { ASSERT(false); }
+void gd32e10x_usbh_irq(gd32e10x_usb_t *dc) { VSF_HAL_ASSERT(false); }
 
-REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
 
 #endif

@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_FS_ASSERT
-#   define VSF_FS_ASSERT                ASSERT
+#   define VSF_FS_ASSERT                VSF_ASSERT
 #endif
 
 #if VSF_FS_USE_FATFS == ENABLED

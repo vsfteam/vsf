@@ -303,10 +303,9 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_EVT_MESSAGE: {
             vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_pipe_t pipe;
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
             int_fast16_t status = vk_usbh_urb_get_status(&urb);
 
-            pipe = vk_usbh_urb_get_pipe(&urb);
             if (0 == pipe.endpoint) {
                 if (uac->is_cur_req) {
                     // TODO: notify user
@@ -597,7 +596,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 
     uac->task.fn.evthandler = __vk_usbh_uac_evthandler;
     uac->task.on_terminate = __vk_usbh_uac_on_eda_terminate;
-    vsf_eda_init((vsf_eda_t *)&uac->task, vsf_prio_inherit, false);
+    vsf_eda_init((vsf_eda_t *)&uac->task);
     return uac;
 
 free_all:

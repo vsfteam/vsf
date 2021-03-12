@@ -105,53 +105,18 @@ static void __vsf_segger_rtt_stream_init_imp(void)
     }
 }
 
-WEAK(vsf_stdout_init) 
-void vsf_stdout_init(void)
-{
-    __vsf_segger_rtt_stream_init_imp();
-}
-
-WEAK(vsf_stderr_init) 
-void vsf_stderr_init(void)
-{
-    __vsf_segger_rtt_stream_init_imp();
-}
-
-WEAK(vsf_stdin_init) 
-void vsf_stdin_init(void)
-{
-    __vsf_segger_rtt_stream_init_imp();
-}
-
-WEAK(vsf_stdout_putchar)
-int vsf_stdout_putchar(char ch)
-{
-    return SEGGER_RTT_Write(0, (const void *)&ch, 1);
-}
-
-WEAK(vsf_stderr_putchar) 
-int vsf_stderr_putchar(char ch)
-{
-    return SEGGER_RTT_Write(0, (const void *)&ch, 1);
-}
-
-WEAK(vsf_stdin_getchar) 
-int vsf_stdin_getchar(void)
-{
-    int ch = 0;
-    SEGGER_RTT_Read(0, (void *)&ch, 1);
-    return ch;
-}
-
 #if VSF_USE_SIMPLE_STREAM == ENABLED
 void VSF_DEBUG_STREAM_POLL(void)
 {
-    uint_fast32_t size = SEGGER_RTT_HasData(0);
+    unsigned has_data = SEGGER_RTT_HasData(0);
     uint8_t ch;
 
-    while (size-- > 0) {
-        SEGGER_RTT_Read(0, (void *)&ch, 1);
-        VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, &ch, 1);
+    while (has_data) {
+        if (1 == SEGGER_RTT_Read(0, (void *)&ch, 1)) {
+            VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, &ch, 1);
+        } else {
+            has_data = 0;
+        }
     }
 }
 

@@ -37,7 +37,6 @@
 #   include "./default/default_compiler.h"
 #endif
 
-#include "../preprocessor/vsf_connect.h"
-#include "../preprocessor/vsf_repeat_macro.h"
+#include "../preprocessor/vsf_preprocessor.h"
 
 //#endif

@@ -109,8 +109,8 @@ imp_vsf_pt(user_pt_called_by_thread_t)
     
     printf("\t\t\trun pt task: delay 1000ms\r\n");
     vsf_pt_wait_until(vsf_delay_ms(100));
-    this.cnt++;
-    printf("\t\t\tdelay complete [0x%08x]\r\n", this.cnt);
+    vsf_this.cnt++;
+    printf("\t\t\tdelay complete [0x%08x]\r\n", vsf_this.cnt);
     
     vsf_pt_end();
 }
@@ -124,7 +124,7 @@ imp_vsf_thread(user_thread_b_t)
     
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     printf("\t\tcall pt task\r\n");
-    vsf_thread_call_pt( user_pt_called_by_thread_t, &this.pt_task);
+    vsf_thread_call_pt( user_pt_called_by_thread_t, &vsf_this.pt_task);
     printf("\t\treturn from pt task\r\n");
 #endif
 }
@@ -135,7 +135,7 @@ private imp_vsf_pt(user_pt_sub_t)
 {
     vsf_pt_begin();
    
-    printf("receive semaphore...[%08x]\r\n", this.cnt++);
+    printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
      
     vsf_pt_end();
 }
@@ -156,19 +156,19 @@ private imp_vsf_task(user_sub_task_t)
      */
     switch (vsf_task_state) {
         case START:
-            this.cnt = 0;
+            vsf_this.cnt = 0;
             vsf_task_state = PRINT_PROGRESS;
             printf("\r\n[");
             //break;
         case PRINT_PROGRESS:
-            if (this.cnt >= 100) {
+            if (vsf_this.cnt >= 100) {
                 printf("]\r\n");
                 RESET_FSM();
                 return fsm_rt_cpl;
             }
             printf(".");
-            this.cnt += 5;
-            if (0 == (this.cnt % 25)) {
+            vsf_this.cnt += 5;
+            if (0 == (vsf_this.cnt % 25)) {
                 return fsm_rt_asyn;
             }
             break;
@@ -181,35 +181,35 @@ private imp_vsf_task(user_sub_task_t)
 private imp_vsf_pt(user_pt_task_t) 
 {
     vsf_pt_begin();
-
-    this.cnt = 0;
+    
+    vsf_this.cnt = 0;
     while(1) {
-        vsf_pt_wait_until(vsf_sem_pend(this.sem_ptr));
+        vsf_pt_wait_until(vsf_sem_pend(vsf_this.sem_ptr));
 
     #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-        this.print_task.cnt = this.cnt;                                         //!< Pass parameter
-        vsf_pt_call_pt(user_pt_sub_t, &this.print_task);
+        vsf_this.print_task.cnt = vsf_this.cnt;                                         //!< Pass parameter
+        vsf_pt_call_pt(user_pt_sub_t, &vsf_this.print_task);
         //! pt call complete
-        this.cnt = this.print_task.cnt;                                         //!< read parameter
+        vsf_this.cnt = vsf_this.print_task.cnt;                                         //!< read parameter
     #else
-        printf("receive semaphore...[%08x]\r\n", this.cnt++);
+        printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
     #endif
     
     #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        prepare_vsf_task(user_sub_task_t,&this.progress_task);
+        prepare_vsf_task(user_sub_task_t,&vsf_this.progress_task);
         do {
             fsm_rt_t ret;
-            vsf_pt_call_task(user_sub_task_t, &this.progress_task, &ret);
+            vsf_pt_call_task(user_sub_task_t, &vsf_this.progress_task, &ret);
             if (fsm_rt_cpl == ret) {
                 break;
             } /* else if (fsm_rt_asyn == ret ) */
-            printf("%2d%%", this.progress_task.cnt);
+            printf("%2d%%", vsf_this.progress_task.cnt);
         } while(true);
     #endif
     
     #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
         &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        vsf_pt_call_thread(user_thread_b_t, &(this.thread_task));
+        vsf_pt_call_thread(user_thread_b_t, &(vsf_this.thread_task));
     #endif
         
     }
@@ -225,8 +225,8 @@ private imp_vsf_pt(user_pt_task_b_t)
     
     while(1) {
         vsf_pt_wait_until( vsf_delay_ms(3000) );                               //!< wait 10s
-        printf("post semaphore...   [%08x]\r\n", this.cnt++);
-        vsf_sem_post(this.sem_ptr);                                                //!< post a semaphore
+        printf("post semaphore...   [%08x]\r\n", vsf_this.cnt++);
+        vsf_sem_post(vsf_this.sem_ptr);                                                //!< post a semaphore
     }
     
     vsf_pt_end();

@@ -83,6 +83,8 @@
 /*============================ INCLUDES ======================================*/
 #include "service/vsf_service_cfg.h"
 #include "utilities/vsf_utilities.h"
+// for vsf_protect_region support
+#include "hal/arch/vsf_arch.h"
 
 #if VSF_USE_POOL == ENABLED
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
@@ -181,7 +183,7 @@ extern "C" {
     SECTION(".text." #__name "_get_pool_item_count")                            \
     extern uint_fast32_t __name##_get_pool_item_count(vsf_pool(__name) *);      \
     SECTION(".text." #__name "_pool_get_region")                                \
-    extern code_region_t *__name##_pool_get_region(vsf_pool(__name) *);         \
+    extern vsf_protect_region_t *__name##_pool_get_region(vsf_pool(__name) *);  \
     __define_vsf_pool_tag(__name)
 
 
@@ -242,7 +244,7 @@ uint_fast32_t __name##_get_pool_item_count(vsf_pool(__name) *this_ptr)          
 }                                                                               \
 WEAK(__name##_pool_get_region)                                                  \
 SECTION(".text." #__name "_pool_get_region")                                    \
-code_region_t *__name##_pool_get_region(vsf_pool(__name) *this_ptr)             \
+vsf_protect_region_t *__name##_pool_get_region(vsf_pool(__name) *this_ptr)      \
 {                                                                               \
     return vsf_pool_get_region((vsf_pool_t *)this_ptr);                         \
 }                                                                               \
@@ -293,7 +295,7 @@ __implement_vsf_pool_tag(__name)
                 __NAME##_pool_init((__VSF_POOL), &cfg);                         \
                 static NO_INIT vsf_pool_item(__NAME) __buffer[__SIZE];          \
                 vsf_pool_add_buffer((vsf_pool_t *)(__VSF_POOL),                 \
-                                    __buffer,                                   \
+                                    (uintptr_t)__buffer,                        \
                                     sizeof(__buffer),                           \
                                     sizeof(vsf_pool_item(__NAME)));             \
             } while(0)
@@ -311,7 +313,7 @@ __implement_vsf_pool_tag(__name)
                 __NAME##_pool_init((__VSF_POOL), &cfg);                         \
                 static NO_INIT vsf_pool_item(__NAME) __buffer[__SIZE];          \
                 vsf_pool_add_buffer((vsf_pool_t *)(__VSF_POOL),                 \
-                                    __buffer,                                   \
+                                    (uintptr_t)__buffer,                        \
                                     sizeof(__buffer),                           \
                                     sizeof(vsf_pool_item(__NAME)));             \
             } while(0)
@@ -514,7 +516,7 @@ def_class(vsf_pool_t,
 #if !defined(VSF_POOL_CFG_ATOM_ACCESS)
     private_member(
         /*! protection region defined by user */
-        code_region_t *region_ptr;
+        vsf_protect_region_t *region_ptr;
     )
 #endif
 
@@ -532,7 +534,7 @@ end_def_class(vsf_pool_t)
 typedef struct vsf_pool_cfg_t {
     const uint8_t *pool_name_str;
     uintptr_t target_ptr;
-    code_region_t *region_ptr;
+    vsf_protect_region_t *region_ptr;
     vsf_pool_item_init_evt_handler_t *item_init_fn;
 }vsf_pool_cfg_t;
 
@@ -656,7 +658,7 @@ SECTION(".text.vsf.utilities.vsf_pool_get_region")
  *! \param obj_ptr    address of the target pool
  *! \return the address of the code region
  */
-extern code_region_t *vsf_pool_get_region(vsf_pool_t *obj_ptr);
+extern vsf_protect_region_t *vsf_pool_get_region(vsf_pool_t *obj_ptr);
 
 #ifdef __cplusplus
 }

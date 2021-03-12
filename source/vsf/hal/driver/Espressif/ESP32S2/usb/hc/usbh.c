@@ -77,7 +77,7 @@ void esp32s2_usbh_get_info(esp32s2_usb_t *hc, usb_hc_ip_info_t *info)
     const esp32s2_usb_const_t *param = hc->param;
     vk_dwcotg_hc_ip_info_t *dwcotg_info = (vk_dwcotg_hc_ip_info_t *)info;
 
-    ASSERT(info != NULL);
+    VSF_HAL_ASSERT(info != NULL);
     dwcotg_info->regbase = hc->param->reg;
     dwcotg_info->ep_num = hc->param->hc_ep_num;
     dwcotg_info->is_dma = false;

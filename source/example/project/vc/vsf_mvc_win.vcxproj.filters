@@ -1301,9 +1301,6 @@
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.c">
       <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c">
-      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\disp\vsf_disp.c">
       <Filter>vsf\component\ui\disp</Filter>
     </ClCompile>
@@ -1348,6 +1345,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\vsf\component\ui\tgui\vsf_tgui_input.c">
       <Filter>vsf\component\ui\tgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c">
+      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

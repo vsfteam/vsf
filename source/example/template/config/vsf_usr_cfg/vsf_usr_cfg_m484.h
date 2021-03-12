@@ -24,6 +24,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
+#define VSF_SYSTIMER_FREQ                               (192000000ul)
+
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
@@ -42,13 +44,21 @@
 #define APP_USE_SDL2_DEMO                               DISABLED
 //  TODO: need test for c++ support
 #define APP_USE_CPP_DEMO                                ENABLED
+#   define __VSF_WORKAROUND_IAR_CPP__
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               ENABLED
-//  current M484 hardware has no display
-#define APP_USE_LVGL_DEMO                               DISABLED
+#define APP_USE_LVGL_DEMO                               ENABLED
+#   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
+#   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
+// if using dl1x5(DL1X5 chips from DisplayLink), color_depth should be 16,
+//  and hor_res/ver_res should smaller than the hardware resolution
+#   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
+#   define APP_LVGL_DEMO_CFG_HOR_RES                    320
+#   define APP_LVGL_DEMO_CFG_VER_RES                    240
+#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (4 * 1024)
 #define APP_USE_BTSTACK_DEMO                            ENABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
 // select one for tcpip stack
@@ -60,7 +70,6 @@
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
 #   define VSF_HEAP_SIZE                                0x10000
-#   define VSF_SYSTIMER_FREQ                            (192000000ul)
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED
@@ -109,6 +118,13 @@
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
+#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
+#       define VSF_LINUX_USE_SIMPLE_STDIO               DISABLED
+#       define VSF_LINUX_USE_SIMPLE_STRING              ENABLED
+#       define VSF_LINUX_USE_SIMPLE_TIME                DISABLED
+#       define VSF_LINUX_USE_SIMPLE_STDLIB              ENABLED
+#       define VSF_LINUX_USE_SIMPLE_CTYPE               DISABLED
+
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
@@ -129,8 +145,8 @@
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
-#define ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
@@ -146,13 +162,19 @@
 #       define USRAPP_CFG_STREAM_ALIGN                  1
 #endif
 
-#define VSF_USBH_CFG_ENABLE_ROOT_HUB                    ENABLED
-#define VSF_USBH_USE_HUB                                ENABLED
-#define VSF_USBH_USE_HCD_OHCI                           ENABLED
+#if APP_USE_USBH_DEMO == ENABLED
+#   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 ENABLED
+#   define VSF_USBH_USE_HUB                             ENABLED
+#   define VSF_USBH_USE_HCD_OHCI                        ENABLED
+#   define VSF_USBH_USE_DL1X5                           ENABLED
+#       define VSF_DISP_USE_DL1X5                       ENABLED
+#endif
 
 #define USRAPP_CFG_USBD_DEV                             VSF_USB_DC0
 
-#define VSF_LINUX_CFG_STACKSIZE                         2048
+// if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL is enabled, use 4096
+//  else 2048 is enough
+#define VSF_LINUX_CFG_STACKSIZE                         4096
 #define VSF_TRACE_CFG_COLOR_EN                          DISABLED
 #define VSH_HAS_COLOR                                   0
 

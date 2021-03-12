@@ -86,7 +86,12 @@ static uint8_t * __vk_malfs_get_cache_buff(__vk_malfs_cache_t *cache, __vk_malfs
 
 void __vk_malfs_cache_init(__vk_malfs_info_t *info, __vk_malfs_cache_t *cache)
 {
+    __vk_malfs_cache_node_t *nodes = cache->nodes;
+
     cache->info = info;
+    for (uint_fast16_t i = 0; i < cache->number; i++) {
+        nodes[i].block_addr = (uint64_t)-1;
+    }
 }
 
 #if     __IS_COMPILER_GCC__
@@ -165,30 +170,33 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     case VSF_EVT_INIT:
         if (NULL == vsf_local.buff) {
             VSF_FS_ASSERT(1 == vsf_local.block_num);
-            vsf_eda_frame_user_value_set(STATE_GET_CACHE);
+            vsf_eda_set_user_value(STATE_GET_CACHE);
             __vk_malfs_alloc_cache(info, &info->cache, vsf_local.block_addr);
             return;
         }
-        vsf_eda_frame_user_value_set(STATE_COMMIT_READ);
-    case VSF_EVT_RETURN: {
-            __vsf_frame_uint_t state;
-            vsf_eda_frame_user_value_get(&state);
-            switch (state) {
-            case STATE_GET_CACHE: {
-                    __vk_malfs_cache_node_t *node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
-                    VSF_FS_ASSERT(node != NULL);
-                    vsf_local.buff = __vk_malfs_get_cache_buff(&info->cache, node);
+        vsf_eda_set_user_value(STATE_COMMIT_READ);
+    case VSF_EVT_RETURN:
+        switch (vsf_eda_get_user_value()) {
+        case STATE_GET_CACHE: {
+                __vk_malfs_cache_node_t *node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
+                VSF_FS_ASSERT(node != NULL);
+
+                vsf_local.buff = __vk_malfs_get_cache_buff(&info->cache, node);
+                if (node->block_addr == vsf_local.block_addr) {
+                    vsf_eda_return(vsf_local.buff);
+                    break;
                 }
-                // fall through
-            case STATE_COMMIT_READ:
-                vsf_eda_frame_user_value_set(STATE_FINISH_READ);
-                vk_mal_read(info->mal, info->block_size * vsf_local.block_addr,
-                            info->block_size * vsf_local.block_num, vsf_local.buff);
-                break;
-            case STATE_FINISH_READ:
-                vsf_eda_return((int32_t)vsf_eda_get_return_value() > 0 ? vsf_local.buff : NULL);
-                break;
+                node->block_addr = vsf_local.block_addr;
             }
+            // fall through
+        case STATE_COMMIT_READ:
+            vsf_eda_set_user_value(STATE_FINISH_READ);
+            vk_mal_read(info->mal, info->block_size * vsf_local.block_addr,
+                        info->block_size * vsf_local.block_num, vsf_local.buff);
+            break;
+        case STATE_FINISH_READ:
+            vsf_eda_return((int32_t)vsf_eda_get_return_value() > 0 ? vsf_local.buff : NULL);
+            break;
         }
         break;
     }
@@ -303,21 +311,22 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
             case VSF_MBR_PARTITION_TYPE_FAT32_CHS:
             case VSF_MBR_PARTITION_TYPE_FAT32_LBA:
             case VSF_MBR_PARTITION_TYPE_FAT16_32_2G_LBA: {
-                    struct vk_malfs_fat_t {
+                    typedef struct vk_malfs_fat_t {
                         vk_mim_mal_t fat_mal;
                         char root_name[6];
                         implement_fatfs_info(512, 1);
-                    };
-                    typedef struct vk_malfs_fat_t vk_malfs_fat_t;
+                    } vk_malfs_fat_t;
 
                     vk_malfs_fat_t *malfs_fat = (vk_malfs_fat_t *)vsf_heap_malloc(sizeof(vk_malfs_fat_t));
+                    if (NULL == malfs_fat) {
+                        goto return_not_enough_resources;
+                    }
+                    memset(malfs_fat, 0, sizeof(*malfs_fat));
+
                     malfs_fat->total_cb = malfs_fat;
                     partition->fsinfo = &malfs_fat->use_as____vk_fatfs_info_t;
                     partition->malfs_info = &malfs_fat->use_as____vk_malfs_info_t;
                     partition->fsop = &vk_fatfs_op;
-                    if (NULL == malfs_fat) {
-                        goto return_not_enough_resources;
-                    }
 
                     malfs_fat->fat_mal.host_mal = mal;
                     malfs_fat->fat_mal.drv = &vk_mim_mal_drv;

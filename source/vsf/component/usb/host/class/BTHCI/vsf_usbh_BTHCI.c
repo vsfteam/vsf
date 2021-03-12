@@ -432,7 +432,7 @@ static void * __vk_usbh_bthci_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
 
     bthci->eda.fn.evthandler = __vk_usbh_bthci_evthandler;
     bthci->eda.on_terminate = __vk_usbh_bthci_on_eda_terminate;
-    vsf_eda_init(&bthci->eda, vsf_prio_inherit, false);
+    vsf_eda_init(&bthci->eda);
     return bthci;
 
 free_all:

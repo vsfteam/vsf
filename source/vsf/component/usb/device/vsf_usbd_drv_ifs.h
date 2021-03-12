@@ -30,7 +30,7 @@
 #   undef VSF_USBD_DRV_PREPARE
 #   define VSF_USBD_DRV_PREPARE(__dev)
 
-#   define vk_usbd_drv_func_name(__header, __func) __CONNECT3(__header, _, __func)
+#   define vk_usbd_drv_func_name(__header, __func)  VSF_MCONNECT3(__header, _, __func)
 
 // lv0 API used as usbd driver
 #   define vk_usbd_drv_init(__cfg)                                              \

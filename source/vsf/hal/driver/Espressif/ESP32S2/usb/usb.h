@@ -68,7 +68,7 @@ typedef struct esp32s2_usb_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_DEF, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/

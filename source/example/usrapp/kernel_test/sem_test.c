@@ -62,7 +62,7 @@ static void usrapp_sem_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto process_sem;
             case VSF_SYNC_CANCEL:
             case VSF_SYNC_FAIL:
-                ASSERT(false);
+                VSF_ASSERT(false);
                 break;
             case VSF_SYNC_TIMEOUT:
                 vsf_trace(VSF_TRACE_INFO, "%d: eda_recv[%d] time out\r\n",

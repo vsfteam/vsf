@@ -23,7 +23,7 @@
 
 #include "service/vsf_service.h"
 #include "hal/vsf_hal.h"
-#include "component/input/vsf_input.h"
+#include "../../vsf_input.h"
 #include "./vsf_input_hid.h"
 
 /*============================ MACROS ========================================*/
@@ -512,7 +512,11 @@ static uint_fast8_t __vk_hid_get_max_input_size(vk_input_hid_t *dev)
             maxsize = _->bitlen;
         }
     }
-    return (maxsize + 7) >> 3;
+    maxsize = (maxsize + 7) >> 3;
+    if (dev->report_has_id) {
+        maxsize++;
+    }
+    return maxsize;
 }
 
 uint_fast8_t vk_hid_parse_desc(vk_input_hid_t *dev, uint8_t *desc_buf, uint_fast32_t len)

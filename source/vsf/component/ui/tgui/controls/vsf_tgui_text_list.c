@@ -308,7 +308,14 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
                                             ptMSG,
                                             &c_tVTextList);
 
-    if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.msg){
+    if (VSF_TGUI_EVT_LIST_SELECTION_CHANGED == ptMSG->use_as__vsf_msgt_msg_t.msg) {
+        //! block backward propagation
+        if (VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
+            fsm = (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
+        }
+    }
+#if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+    else if (VSF_TGUI_EVT_KEY_PRESSED == ptMSG->use_as__vsf_msgt_msg_t.msg){
         vsf_tgui_key_evt_t* ptEvt = (vsf_tgui_key_evt_t*)ptMSG;
 
         switch (ptEvt->hwKeyValue) {
@@ -324,7 +331,8 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
                 break;
         }
     }
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#endif
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
     else if (VSF_TGUI_EVT_GESTURE_WHEEL == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         vsf_tgui_gesture_evt_t* ptEvt = (vsf_tgui_gesture_evt_t*)ptMSG;
         if (ptEvt->delta.use_as__vsf_tgui_location_t.iY > 0) {

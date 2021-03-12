@@ -45,9 +45,11 @@ typedef struct vk_usbh_hub_t {
     vk_usbh_dev_t *dev;
     vk_usbh_ifs_t *ifs;
 
-    struct usb_hub_desc_t desc_hub;
+    // hub_status, hub_portsts and desc_hub should be all aligned
+    //  DO NOT change order here, or compiler may use wrong alignment
     //struct usb_hub_status_t hub_status;
     struct usb_port_status_t hub_portsts;
+    struct usb_hub_desc_t desc_hub;
 
     enum {
         HUB_STAT_ENUM_START,
@@ -410,7 +412,7 @@ static void __vk_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (hub->usbh->dev_new != NULL) {
                 // should not run to here, because after dev_new is set,
                 //  hub driver will poll current port only
-                ASSERT(false);
+                VSF_USB_ASSERT(false);
             } else {
                 enum usb_device_speed_t speed =
                         (hub->hub_portsts.wPortStatus & USB_PORT_STAT_LOW_SPEED) ? USB_SPEED_LOW :
@@ -478,7 +480,7 @@ static void *__vk_usbh_hub_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
 
     hub->teda.fn.evthandler = __vk_usbh_hub_evthandler;
     hub->teda.on_terminate = __vk_usbh_hub_on_eda_terminate;
-    vsf_teda_init(&hub->teda, vsf_prio_inherit, false);
+    vsf_teda_init(&hub->teda);
 
     return hub;
 }

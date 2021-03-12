@@ -27,11 +27,11 @@ const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE);
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-REPEAT_MACRO(USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
-REPEAT_MACRO(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
+VSF_MREPEAT(USB_DC_COUNT, __USB_DC_FUNC_DEF, NULL)
+VSF_MREPEAT(USB_DC_COUNT, __USB_DC_INTERFACE_DEF, NULL)
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-REPEAT_MACRO(USB_DC_COUNT, __USB_DC_BODY, ch32f10x_usbd)
+VSF_MREPEAT(USB_DC_COUNT, __USB_DC_BODY, ch32f10x_usbd)

@@ -161,24 +161,28 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  *----------------------------------------------------------------------------*/
 
 
-vsf_gint_state_t vsf_get_interrupt(void)
+vsf_arch_prio_t vsf_get_interrupt(void)
 {
     return GET_GLOBAL_INTERRUPT_STATE();
 }
 
-void vsf_set_interrupt(vsf_gint_state_t level)
+vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
 {
+    vsf_arch_prio_t orig = vsf_get_interrupt();
     SET_GLOBAL_INTERRUPT_STATE(level);
+    return orig;
 }
 
-vsf_gint_state_t vsf_disable_interrupt(void)
+vsf_arch_prio_t vsf_disable_interrupt(void)
 {
     return DISABLE_GLOBAL_INTERRUPT();
 }
 
-void vsf_enable_interrupt(void)
+vsf_arch_prio_t vsf_enable_interrupt(void)
 {
+    vsf_arch_prio_t orig = vsf_get_interrupt();
     ENABLE_GLOBAL_INTERRUPT();
+    return orig;
 }
 
 

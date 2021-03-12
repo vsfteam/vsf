@@ -30,101 +30,101 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-extern uint8_t vsf_tgui_font_get_char_height(const uint8_t chFontIndex);
-extern uint8_t vsf_tgui_font_get_char_width(const uint8_t chFontIndex, uint32_t wChar);
+extern uint8_t vsf_tgui_font_get_char_height(const uint8_t font_index);
+extern uint8_t vsf_tgui_font_get_char_width(const uint8_t font_index, uint32_t char_u32);
 
 /*============================ IMPLEMENTATION ================================*/
 
-uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize)
+uint32_t vsf_tgui_text_get_next(const char* string_ptr, size_t* size_ptr)
 {
 #if VSF_TGUI_CFG_TEXT_MODE == VSF_TGUI_TEXT_ASCII
-    uint32_t wChar;
+    uint32_t char_u32;
 
-    VSF_TGUI_ASSERT(pchString != NULL);
-    VSF_TGUI_ASSERT(ptSize != NULL);
+    VSF_TGUI_ASSERT(string_ptr != NULL);
+    VSF_TGUI_ASSERT(size_ptr != NULL);
 
-    wChar = pchString[*ptSize];
-    (*ptSize)++;
-    return wChar;
+    char_u32 = string_ptr[*size_ptr];
+    (*size_ptr)++;
+    return char_u32;
 #elif VSF_TGUI_CFG_TEXT_MODE == VSF_TGUI_TEXT_UTF8
-    uint32_t wFirst;
-    uint32_t wSecond;
-    uint32_t wThird;
-    uint32_t wFourth;
+    uint32_t first;
+    uint32_t second;
+    uint32_t third;
+    uint32_t fourth;
 
-    VSF_TGUI_ASSERT(pchString != NULL);
-    VSF_TGUI_ASSERT(ptSize != NULL);
+    VSF_TGUI_ASSERT(string_ptr != NULL);
+    VSF_TGUI_ASSERT(size_ptr != NULL);
 
     // UTF-8
     // 0zzzzzzz (00-7F)                              ==> 00000000 00000000 00000000 0zzzzzzz
     // 110yyyyy（C0-DF） 10zzzzzz（80-BF）           ==> 00000000 00000000 00000yyy yyzzzzzz
     // 1110xxxx（E0-EF） 10yyyyyy 10zzzzzz           ==> 00000000 00000000 xxxxyyyy yyzzzzzz
     // 11110www（F0-F7） 10xxxxxx 10yyyyyy 10zzzzzz  ==> 00000000 000wwwxx xxxxyyyy yyzzzzzz
-    wFirst = (uint8_t)pchString[*ptSize];
-    (*ptSize)++;
+    first = (uint8_t)string_ptr[*size_ptr];
+    (*size_ptr)++;
 
-    if ((wFirst & 0x80) != 0x80) {                  // U+0000 ~ U+007F
-        return wFirst;
+    if ((first & 0x80) != 0x80) {                  // U+0000 ~ U+007F
+        return first;
     }
 
-    if ((wFirst & 0xE0) == 0xC0) {                  // U+0080 ~ U+07FF
-        wSecond = (uint8_t)pchString[*ptSize];
-        (*ptSize)++;
+    if ((first & 0xE0) == 0xC0) {                  // U+0080 ~ U+07FF
+        second = (uint8_t)string_ptr[*size_ptr];
+        (*size_ptr)++;
 
-        if ((wSecond & 0xC0) != 0x80) {
+        if ((second & 0xC0) != 0x80) {
             VSF_TGUI_ASSERT(0);
             return 0;
         }
 
-        return ((wFirst & 0x1F) << 6) + (wSecond & 0x3F);
+        return ((first & 0x1F) << 6) + (second & 0x3F);
     }
 
-    if ((wFirst & 0xF0) == 0xE0) {                  // U+0800 ~ U+FFFF
-        wSecond = (uint8_t)pchString[*ptSize];
-        (*ptSize)++;
+    if ((first & 0xF0) == 0xE0) {                  // U+0800 ~ U+FFFF
+        second = (uint8_t)string_ptr[*size_ptr];
+        (*size_ptr)++;
 
-        if ((wSecond & 0xC0) != 0x80) {
+        if ((second & 0xC0) != 0x80) {
             VSF_TGUI_ASSERT(0);
             return 0;
         }
 
-        wThird = (uint8_t)pchString[*ptSize];
-        (*ptSize)++;
+        third = (uint8_t)string_ptr[*size_ptr];
+        (*size_ptr)++;
 
-        if ((wThird & 0xC0) != 0x80) {
+        if ((third & 0xC0) != 0x80) {
             VSF_TGUI_ASSERT(0);
             return 0;
         }
 
-        return ((wFirst & 0x0F) << 12) + ((wSecond & 0x3F) << 6) + (wThird & 0x3F);
+        return ((first & 0x0F) << 12) + ((second & 0x3F) << 6) + (third & 0x3F);
     }
 
-    if ((wFirst & 0xF8) == 0xF0) {                  // U+10000 ~ U+10FFFF
-        wSecond = (uint8_t)pchString[*ptSize];
-        (*ptSize)++;
+    if ((first & 0xF8) == 0xF0) {                  // U+10000 ~ U+10FFFF
+        second = (uint8_t)string_ptr[*size_ptr];
+        (*size_ptr)++;
 
-        if ((wSecond & 0xC0) != 0x80) {
+        if ((second & 0xC0) != 0x80) {
             VSF_TGUI_ASSERT(0);
             return 0;
         }
 
-        wThird = (uint8_t)pchString[*ptSize];
-        (*ptSize)++;
+        third = (uint8_t)string_ptr[*size_ptr];
+        (*size_ptr)++;
 
-        if ((wThird & 0xC0) != 0x80) {
+        if ((third & 0xC0) != 0x80) {
             VSF_TGUI_ASSERT(0);
             return 0;
         }
 
-        wFourth = (uint8_t)pchString[*ptSize];
-        (*ptSize)++;
+        fourth = (uint8_t)string_ptr[*size_ptr];
+        (*size_ptr)++;
 
-        if ((wFourth & 0xC0) != 0x80) {
+        if ((fourth & 0xC0) != 0x80) {
             VSF_TGUI_ASSERT(0);
             return 0;
         }
 
-        return ((wFirst & 0x07) << 18) + ((wSecond & 0x3F) << 12) + ((wThird & 0x3F) << 6) + (wFourth & 0x3F);
+        return ((first & 0x07) << 18) + ((second & 0x3F) << 12) + ((third & 0x3F) << 6) + (fourth & 0x3F);
     }
 
     VSF_TGUI_ASSERT(0);
@@ -134,158 +134,118 @@ uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize)
 #endif
 }
 
-#if VSF_TGUI_CFG_TEXT_MODE == VSF_TGUI_TEXT_UTF8
-
-#if 0
-struct text_test_t {
-    uint32_t wValue;
-    char* pchString;
-};
-static struct text_test_t _test_case[] = {
-    {/*.wValue = */0x00000001, /*.pchString = */"\x01"},
-    {/*.wValue = */0x0000007F, /*.pchString = */"\x7F"},
-    {/*.wValue = */0x00000080, /*.pchString = */"\xC2\x80"},
-    {/*.wValue = */0x000007FF, /*.pchString = */"\xDF\xBF"},
-    {/*.wValue = */0x00000800, /*.pchString = */"\xE0\xA0\x80"},
-    {/*.wValue = */0x0000FFFF, /*.pchString = */"\xEF\xBF\xBF"},
-    {/*.wValue = */0x00010000, /*.pchString = */"\xF0\x90\x80\x80"},
-    {/*.wValue = */0x0010FFFF, /*.pchString = */"\xF4\x8F\xBF\xBF"},
-
-};
-
-void vsf_tgui_text_get_next_test_case0(void)
-{
-    int i;
-    size_t tSize;
-    uint32_t wValue;
-
-    for (i = 0; i < dimof(_test_case); i++) {
-        tSize = 0;
-        wValue = vsf_tgui_text_get_next(_test_case[i].pchString, &tSize);
-
-        if (_test_case[i].wValue != wValue) {
-            while (1);
-        }
-    }
-}
-#endif
-#endif
-
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
-                                            int16_t *piOffSet,
-                                            vsf_tgui_string_t* ptStringOut)
+vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* string_in_ptr,
+                                            int16_t *offSet_ptr,
+                                            vsf_tgui_string_t* string_out_ptr)
 {
-    uint32_t wChar;
-    size_t tCharOffset;
-    bool bFindFirstChar = true;
-    size_t tStart;
+    uint32_t char_u32;
+    size_t char_offset;
+    bool find_first_char = true;
+    size_t start;
 
-    VSF_TGUI_ASSERT(NULL != ptStringIn);
-    VSF_TGUI_ASSERT(NULL != piOffSet);
-    VSF_TGUI_ASSERT(NULL != ptStringOut);
+    VSF_TGUI_ASSERT(NULL != string_in_ptr);
+    VSF_TGUI_ASSERT(NULL != offSet_ptr);
+    VSF_TGUI_ASSERT(NULL != string_out_ptr);
 
-    tCharOffset = *piOffSet;
-    tStart = tCharOffset;
+    char_offset = *offSet_ptr;
+    start = char_offset;
 
-    if (    (NULL == ptStringIn->pstrText)
-        ||  (ptStringIn->s16_size <= 0)
-        ||  (tCharOffset >= ptStringIn->s16_size)) {
+    if (    (NULL == string_in_ptr->pstrText)
+        ||  (string_in_ptr->s16_size <= 0)
+        ||  (char_offset >= string_in_ptr->s16_size)) {
         return NULL;
     }
 
-    ptStringOut->pstrText = (VSF_TGUI_CFG_STRING_TYPE *)(ptStringIn->pstrText);
+    string_out_ptr->pstrText = (VSF_TGUI_CFG_STRING_TYPE *)(string_in_ptr->pstrText);
 
-    while ( ((wChar = vsf_tgui_text_get_next(ptStringIn->pstrText, &tCharOffset)) != '\0')
-        &&  (tCharOffset <= ptStringIn->s16_size)
+    while ( ((char_u32 = vsf_tgui_text_get_next(string_in_ptr->pstrText, &char_offset)) != '\0')
+        &&  (char_offset <= string_in_ptr->s16_size)
     ) {
-        if (wChar == '\n') {
+        if (char_u32 == '\n') {
             break;
         }
 
-        if (bFindFirstChar) {
-            if (wChar == '\r') {
-                tStart = tCharOffset; // next char offset
+        if (find_first_char) {
+            if (char_u32 == '\r') {
+                start = char_offset; // next char offset
             } else {
-                bFindFirstChar = false;
-                ptStringOut->pstrText = (VSF_TGUI_CFG_STRING_TYPE*)(ptStringIn->pstrText) + tStart;
+                find_first_char = false;
+                string_out_ptr->pstrText = (VSF_TGUI_CFG_STRING_TYPE*)(string_in_ptr->pstrText) + start;
             }
         }
     }
 
-    ptStringOut->s16_size = tCharOffset - tStart - 1; // \n always is 1 byte
-    *piOffSet = tCharOffset;
+    string_out_ptr->s16_size = char_offset - start - 1; // \n always is 1 byte
+    *offSet_ptr = char_offset;
 
-    return ptStringOut;
+    return string_out_ptr;
 }
 #endif
 
-vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
-                                        vsf_tgui_string_t* ptString,
-                                        uint16_t *phwLineCount,
-                                        uint8_t *pchCharHeight,
-                                        int_fast8_t chInterlineSpace)
+vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
+                                        vsf_tgui_string_t* string_ptr,
+                                        uint16_t *line_count_ptr,
+                                        uint8_t *char_height_ptr,
+                                        int_fast8_t inter_line_space)
 {
     vsf_tgui_size_t tSize = {0, 0};
-    int16_t iWidth = 0;
-    int16_t iFontHeight;
-    uint32_t wChar;
-    size_t tCharOffset = 0;
-    uint8_t chWidth;
+    int16_t width = 0;
+    int16_t font_height;
+    uint32_t char_u32;
+    size_t char_offset = 0;
+    uint8_t char_width;
     uint_fast16_t hwLineCount = 0;
 
-    VSF_TGUI_ASSERT(NULL != ptString);
+    VSF_TGUI_ASSERT(NULL != string_ptr);
 
-    if (    (NULL != ptString->pstrText)
+    if (    (NULL != string_ptr->pstrText)
     #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-        &&  (ptString->s16_size > 0)
+        &&  (string_ptr->s16_size > 0)
     #endif
     ) {
 
-        iFontHeight = vsf_tgui_font_get_char_height(chFontIndex);
+        font_height = vsf_tgui_font_get_char_height(font_index);
 
-        while ( ((wChar = vsf_tgui_text_get_next(ptString->pstrText, &tCharOffset)) != '\0')
+        while ( ((char_u32 = vsf_tgui_text_get_next(string_ptr->pstrText, &char_offset)) != '\0')
         #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-            &&  (tCharOffset <= ptString->s16_size)
+            &&  (char_offset <= string_ptr->s16_size)
         #endif
         ) {
-            if (wChar == '\n') {
+            if (char_u32 == '\n') {
         #if VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT == ENABLED
-                tSize.iWidth = max(tSize.iWidth, iWidth);
-                iWidth = 0;
+                tSize.iWidth = max(tSize.iWidth, width);
+                width = 0;
                 hwLineCount++;
         #endif
                 continue;
             }
 
-            if (wChar == '\r') {
+            if (char_u32 == '\r') {
                 continue;
             }
 
-            chWidth = vsf_tgui_font_get_char_width(chFontIndex, wChar);
-            if (chWidth > 0) {
-                iWidth += chWidth;
+            char_width = vsf_tgui_font_get_char_width(font_index, char_u32);
+            if (char_width > 0) {
+                width += char_width;
             }
         }
 
-        tSize.iWidth = max(tSize.iWidth, iWidth);
-        tSize.iHeight = hwLineCount * (iFontHeight + chInterlineSpace) + iFontHeight;
+        tSize.iWidth = max(tSize.iWidth, width);
+        tSize.iHeight = hwLineCount * (font_height + inter_line_space) + font_height;
         VSF_TGUI_ASSERT(tSize.iHeight > 0);
         hwLineCount++;
     }
 
-    if (NULL != phwLineCount) {
-        *phwLineCount = hwLineCount;
+    if (NULL != line_count_ptr) {
+        *line_count_ptr = hwLineCount;
     }
-    if (NULL != pchCharHeight) {
-        *pchCharHeight = iFontHeight;
+    if (NULL != char_height_ptr) {
+        *char_height_ptr = font_height;
     }
 
     return tSize;
 }
-
-
-
 
 #endif
 

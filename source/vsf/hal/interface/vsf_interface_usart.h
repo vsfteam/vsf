@@ -144,7 +144,7 @@ void vsf_usart##__N##_irq_disable(em_usart_irq_mask_t irq_mask)                 
                                                                                 \
 ____VSF_USART_LV1_INTTERFACE_BODY(__USART_INDEX, NULL)                          \
                                                                                 \
-const i_usart_t CONNECT(VSF_USART, __USART_INDEX) =                             \
+const i_usart_t VSF_MCONNECT(VSF_USART, __USART_INDEX) =                        \
         ____VSF_USART_LV1_INTERFACE_INIT(__USART_INDEX, NULL);
 
 /*============================ TYPES =========================================*/

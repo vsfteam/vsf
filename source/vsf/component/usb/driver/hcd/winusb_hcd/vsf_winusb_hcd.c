@@ -177,7 +177,7 @@ const vk_usbh_hcd_drv_t vk_winusb_hcd_drv = {
 
 static vk_winusb_hcd_t __vk_winusb_hcd = {
     .devs = {
-        REPEAT_MACRO(VSF_WINUSB_HCD_CFG_DEV_NUM, VSF_WINUSB_HCD_DEF_DEV, NULL)
+        VSF_MREPEAT(VSF_WINUSB_HCD_CFG_DEV_NUM, VSF_WINUSB_HCD_DEF_DEV, NULL)
     },
 };
 
@@ -794,7 +794,7 @@ static vsf_err_t __vk_winusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         __vk_winusb_hcd.cur_dev_idx = 0;
 
         __vk_winusb_hcd.teda.fn.evthandler = __vk_winusb_hcd_evthandler;
-        vsf_teda_init(&__vk_winusb_hcd.teda, vsf_prio_inherit, false);
+        vsf_teda_init(&__vk_winusb_hcd.teda);
 
         __vk_winusb_hcd.init_eda = eda;
         __vsf_arch_irq_init(&__vk_winusb_hcd.init_thread, "winusb_hcd_init", __vk_winusb_hcd_init_thread, param->priority);

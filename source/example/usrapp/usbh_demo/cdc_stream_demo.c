@@ -105,7 +105,7 @@ void usrapp_log_info(const char *fmt, ...)
         va_start(ap, fmt);
 
         vsf_pbuf_capability_t tCapability = vsf_pbuf_capability_get(block_ptr);
-        ASSERT(0 == tCapability.is_no_write && 0 == tCapability.is_no_read);
+        VSF_ASSERT(0 == tCapability.is_no_write && 0 == tCapability.is_no_read);
 #if VSF_PBUF_CFG_INDIRECT_RW_SUPPORT == ENABLED
         if (tCapability.is_no_direct_access) {
             /*! \Note NO Direct Memory Access is supported. If you assume this

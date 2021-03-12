@@ -176,26 +176,24 @@ static vsf_err_t __vk_netdrv_wpcap_netlink_output(vk_netdrv_t *netdrv, void *net
 {
     vk_netdrv_wpcap_t *wpcap_netdrv = (vk_netdrv_wpcap_t *)netdrv;
     uint8_t buffer[wpcap_netdrv->mtu];
+    void *netbuf_cur = netbuf;
+    uint_fast32_t tot_size = 0;
     vsf_mem_t mem;
 
-    if (vk_netdrv_read_buf(netdrv, netbuf, &mem) != NULL) {
-        VSF_TCPIP_ASSERT(false);
-        return VSF_ERR_FAIL;
-    }
+    do {
+        netbuf_cur = vk_netdrv_read_buf(netdrv, netbuf_cur, &mem);
+        VSF_TCPIP_ASSERT(tot_size + mem.size < sizeof(buffer));
+        memcpy(&buffer[tot_size], mem.buffer, mem.size);
+        tot_size += mem.size;
+    } while (netbuf_cur != NULL);
 
 #if VSF_NETDRV_WPCAP_CFG_TRACE == ENABLED
     vsf_trace_debug("wpcap_tx:" VSF_TRACE_CFG_LINEEND);
-    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, mem.size);
+    vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, tot_size);
 #endif
 
-    VSF_TCPIP_ASSERT(sizeof(buffer) >= mem.size);
-    memcpy(buffer, mem.buffer, mem.size);
-    if (mem.size < 60) {
-        memset(&buffer[mem.size], 0, 60 - mem.size);
-        mem.size = 60;
-    }
-    pcap_sendpacket(wpcap_netdrv->fp, buffer, mem.size);
-    vk_netdrv_on_outputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, mem.size);
+    pcap_sendpacket(wpcap_netdrv->fp, buffer, tot_size);
+    vk_netdrv_on_outputted(&wpcap_netdrv->use_as__vk_netdrv_t, netbuf, tot_size);
     return VSF_ERR_NONE;
 }
 

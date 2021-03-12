@@ -25,7 +25,7 @@
 /*============================ MACROS ========================================*/
 
 // Application configure
-#   define APP_USE_LINUX_DEMO                           DISABLED
+#   define APP_USE_LINUX_DEMO                           ENABLED
 #       define APP_USE_LINUX_LIBUSB_DEMO                DISABLED
 #       define APP_USE_LINUX_MOUNT_FILE_DEMO            DISABLED
 #   define APP_USE_USBH_DEMO                            DISABLED
@@ -41,13 +41,20 @@
 #   define APP_USE_SDL2_DEMO                            DISABLED
 //  TODO: need test for c++ support
 #   define APP_USE_CPP_DEMO                             DISABLED
+#		define APP_USE_KERNEL_TEST						ENABLED
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #   define APP_USE_AWTK_DEMO                            DISABLED
-#   define APP_USE_NNOM_DEMO                            ENABLED
+#   define APP_USE_NNOM_DEMO                            DISABLED
 //  current M484 hardware has no display
 #   define APP_USE_LVGL_DEMO                            DISABLED
+#   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
+#       define APP_LVGL_DEMO_CFG_TOUCH_REMAP            ENABLED
+#       define APP_LVGL_DEMO_CFG_COLOR_DEPTH            32
+#       define APP_LVGL_DEMO_CFG_HOR_RES                640
+#       define APP_LVGL_DEMO_CFG_VER_RES                480
+
 #   define APP_USE_BTSTACK_DEMO                         DISABLED
 #   define APP_USE_VSFVM_DEMO                           DISABLED
 // select one for tcpip stack
@@ -101,14 +108,17 @@
 #   define VSF_FS_USE_MEMFS                             ENABLED
 #   define VSF_FS_USE_FATFS                             ENABLED
 
-//#define VSF_USE_TRACE                                   ENABLED
+#define VSF_USE_TRACE                                   ENABLED
 #define USRAPP_CFG_STDIO_EN                             ENABLED
 
-#define VSF_USE_LINUX                                   DISABLED
+#define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
+#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
+#   define VSF_LINUX_CFG_RELATIVE_PATH                  ENABLED
 
-#ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
+
+#ifndef USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
 #   define USRAPP_CFG_LINUX_TTY_UART                    1
 #   define USRAPP_CFG_LINUX_TTY_CDC                     2
@@ -127,8 +137,8 @@
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
-#define ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 

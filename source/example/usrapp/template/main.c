@@ -212,7 +212,7 @@ implement_vsf_thread(user_task_t)
 #endif
         printf("user_thread post user sem:\r\n");
 #if VSF_KERNEL_CFG_SUPPORT_SYNC
-        vsf_sem_post(this.sem_ptr);
+        vsf_sem_post(vsf_this.sem_ptr);
 #endif
     }
 }
@@ -227,7 +227,7 @@ implement_vsf_pt(user_pt_bmpevt_demo_slave_t)
 {
     vsf_pt_begin();
     
-    vsf_pt_wait_until( wait_for_one(this.pgroup_evts, this.mask) );
+    vsf_pt_wait_until( wait_for_one(vsf_this.pgroup_evts, vsf_this.mask) );
     printf("get timer4_evt in pt slave thread\r\n");
         
     vsf_pt_wait_until( vsf_sem_pend_timeout_ms(&user_sem, 2000) );
@@ -248,11 +248,11 @@ implement_vsf_pt(user_pt_bmpevt_demo_thread_t)
 
     while (1) {
     
-        this.slave.mask = this.mask;
-        this.slave.pgroup_evts = this.pgroup_evts;
-        vsf_pt_call_pt(user_pt_bmpevt_demo_slave_t, &this.slave);
+        vsf_this.slave.mask = vsf_this.mask;
+        vsf_this.slave.pgroup_evts = vsf_this.pgroup_evts;
+        vsf_pt_call_pt(user_pt_bmpevt_demo_slave_t, &vsf_this.slave);
     
-        vsf_pt_wait_until( wait_for_one(this.pgroup_evts, this.mask) );
+        vsf_pt_wait_until( wait_for_one(vsf_this.pgroup_evts, vsf_this.mask) );
         printf("get timer4_evt in pt master thread\r\n");
             
         

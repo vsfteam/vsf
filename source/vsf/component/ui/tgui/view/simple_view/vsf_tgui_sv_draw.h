@@ -35,25 +35,23 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_tgui_control_v_draw_rect(const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* ptDirtyRegion,
+                                         const vsf_tgui_region_t* dirty_region_ptr,
                                          const vsf_tgui_region_t* ptRectRegion,
-                                         const vsf_tgui_sv_color_t tColor);
+                                         const vsf_tgui_sv_color_t color);
 
 extern void vsf_tgui_control_v_draw_tile(const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* ptDirtyRegion,
-                                         const vsf_tgui_tile_t* ptTile,
-                                         const vsf_tgui_align_mode_t tMode);
+                                         const vsf_tgui_region_t* dirty_region_ptr,
+                                         const vsf_tgui_tile_t* tile_ptr,
+                                         const vsf_tgui_align_mode_t mode,
+                                         const uint8_t trans_rate,
+                                         vsf_tgui_region_t* ptPlacedRegion);
 
 extern void vsf_tgui_control_v_draw_text(const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* ptDirtyRegion,
+                                         const vsf_tgui_region_t* dirty_region_ptr,
                                          vsf_tgui_text_info_t *ptStringInfo,
-                                         const uint8_t chFontIndex,
-                                         const vsf_tgui_sv_color_t tColor,
-                                         const vsf_tgui_align_mode_t tMode);
-
-extern uint_fast8_t vsf_tgui_control_v_get_tile_trans_rate(const vsf_tgui_control_t* control_ptr);
-extern void vsf_tgui_control_v_set_tile_trans_rate(vsf_tgui_control_t* control_ptr, uint_fast8_t chTileTransparencyRate);
-
+                                         const uint8_t font_index,
+                                         const vsf_tgui_sv_color_t color,
+                                         const vsf_tgui_align_mode_t mode);
 
 #endif
 

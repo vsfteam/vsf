@@ -62,17 +62,17 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
         case SENSOR_ID_GYRO:
             switch (info->subid) {
             case SENSOR_SUBID_PITCH:
-                ASSERT(info->bitlen == 16);
+                VSF_ASSERT(info->bitlen == 16);
                 gyro_pitch = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_YAW:
-                ASSERT(info->bitlen == 16);
+                VSF_ASSERT(info->bitlen == 16);
                 gyro_yaw = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_ROLL:
-                ASSERT(info->bitlen == 16);
+                VSF_ASSERT(info->bitlen == 16);
                 gyro_roll = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
@@ -81,17 +81,17 @@ static void input_demo_trace_sensor(vk_sensor_evt_t *sensor_evt)
         case SENSOR_ID_ACC:
             switch (info->subid) {
             case SENSOR_SUBID_X:
-                ASSERT(info->bitlen == 16);
+                VSF_ASSERT(info->bitlen == 16);
                 acc_x = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_Y:
-                ASSERT(info->bitlen == 16);
+                VSF_ASSERT(info->bitlen == 16);
                 acc_y = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;
             case SENSOR_SUBID_Z:
-                ASSERT(info->bitlen == 16);
+                VSF_ASSERT(info->bitlen == 16);
                 acc_z = vk_input_buf_get_value(buffer, pos, info->bitlen);
                 value_cnt++;
                 break;

@@ -123,11 +123,18 @@ typedef struct vsf_linux_libusb_t {
 } vsf_linux_libusb_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
+
+static int __vsf_linux_libusb_fd_close(vsf_linux_fd_t *sfd);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static vsf_linux_libusb_t __vsf_libusb = { 0 };
 
-/*============================ PROTOTYPES ====================================*/
+static const vsf_linux_fd_op_t __vsf_linux_libusb_fdop = {
+    .fn_close           = __vsf_linux_libusb_fd_close,
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
 static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, vk_usbh_libusb_evt_t evt)
@@ -267,13 +274,21 @@ void vsf_linux_libusb_startup(void)
     }
 }
 
+static int __vsf_linux_libusb_fd_close(vsf_linux_fd_t *sfd)
+{
+    __vsf_libusb.fd = 0;
+    // TODO: call fini
+    return 0;
+}
+
 int libusb_init(libusb_context **context)
 {
     if (__vsf_libusb.fd != 0) {
-        VSF_LINUX_ASSERT(false);
+        // already initialized
+        return LIBUSB_SUCCESS;
     }
 
-    __vsf_libusb.fd = vsf_linux_create_fd(NULL, NULL);
+    __vsf_libusb.fd = vsf_linux_create_fd(NULL, &__vsf_linux_libusb_fdop);
     __vsf_libusb.pollfd[0].fd = __vsf_libusb.fd;
     __vsf_libusb.pollfd[0].events = POLLIN;
 
@@ -285,7 +300,7 @@ int libusb_init(libusb_context **context)
     return LIBUSB_SUCCESS;
 }
 
-void libusb_exit(struct libusb_context *ctx)
+void libusb_exit(libusb_context *ctx)
 {
     if (__vsf_libusb.fd >= 0) {
         __vsf_libusb.is_to_exit = true;
@@ -297,6 +312,11 @@ void libusb_exit(struct libusb_context *ctx)
         __vsf_libusb.fd = 0;
         vsf_linux_delete_fd(fd);
     }
+}
+
+void libusb_set_debug(libusb_context *ctx, int level)
+{
+    // do nothing
 }
 
 #if __IS_COMPILER_IAR__
@@ -955,7 +975,7 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
     }
 
     ltransfer->eda.fn.evthandler = __vsf_libusb_transfer_evthandler;
-    vsf_eda_init(&ltransfer->eda, vsf_prio_inherit, false);
+    vsf_eda_init(&ltransfer->eda);
 
     if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
         err = LIBUSB_ERROR_IO;
@@ -1031,6 +1051,109 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds)
     if (pollfds != NULL) {
         free(pollfds);
     }
+}
+
+// libusb 0.1 compatibility
+int usb_get_driver_np(usb_dev_handle *dev, int interface, char *name, unsigned int namelen)
+{
+    return 0;
+}
+
+int usb_detach_kernel_driver_np(usb_dev_handle *dev, int interface)
+{
+    return 0;
+}
+
+int usb_find_devices(void)
+{
+    return __vsf_libusb.devnum;
+}
+
+struct usb_bus *usb_get_busses(void)
+{
+    static struct usb_bus __bus = { 0 };
+    if (__bus.devices != NULL) {
+        free(__bus.devices);
+        __bus.devices = NULL;
+    }
+
+    int devnum = __vsf_libusb.devnum;
+    if (devnum > 0) {
+        __bus.devices = malloc(sizeof(struct usb_device) * devnum);
+        memset(__bus.devices, 0, sizeof(struct usb_device) * devnum);
+
+        struct usb_device *dev = __bus.devices;
+        vsf_linux_libusb_dev_t *ldev;
+        vsf_dlist_peek_head(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist, ldev);
+        for (int i = 0; i < devnum; i++) {
+            if (i < (devnum - 1)) {
+                dev[i].next = &dev[i + 1];
+            }
+            if (i > 0) {
+                dev[i].prev = &dev[i - 1];
+            }
+
+            VSF_LINUX_ASSERT(ldev != NULL);
+            dev[i].dev = ldev;
+            libusb_get_device_descriptor((libusb_device *)ldev, &dev[i].descriptor);
+
+            // TODO: support multi-config device
+            struct libusb_config_descriptor *config;
+            if (!libusb_get_active_config_descriptor((libusb_device *)ldev, &config)) {
+                memcpy(&dev[i].__config, config, sizeof(*config));
+                dev[i].config = &dev[i].__config;
+                libusb_free_config_descriptor(config);
+            }
+
+            vsf_dlist_peek_next(vsf_linux_libusb_dev_t, devnode, ldev, ldev);
+        }
+    }
+    return &__bus;
+}
+
+usb_dev_handle *usb_open(struct usb_device *dev)
+{
+    usb_dev_handle *handle = NULL;
+    libusb_open((libusb_device *)dev->dev, &handle);
+    return handle;
+}
+
+int usb_close(usb_dev_handle *dev)
+{
+    libusb_close((libusb_device_handle *)dev);
+    return 0;
+}
+
+int usb_bulk_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+    int actual_length = 0;
+    VSF_LINUX_ASSERT(!(ep & 0x80));
+    libusb_bulk_transfer((libusb_device_handle *)dev, ep, (unsigned char *)bytes, size, &actual_length, timeout);
+    return actual_length;
+}
+
+int usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+    int actual_length = 0;
+    VSF_LINUX_ASSERT(ep & 0x80);
+    libusb_bulk_transfer((libusb_device_handle *)dev, ep, (unsigned char *)bytes, size, &actual_length, timeout);
+    return actual_length;
+}
+
+int usb_interrupt_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+    int actual_length = 0;
+    VSF_LINUX_ASSERT(!(ep & 0x80));
+    libusb_interrupt_transfer((libusb_device_handle *)dev, ep, (unsigned char *)bytes, size, &actual_length, timeout);
+    return actual_length;
+}
+
+int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+    int actual_length = 0;
+    VSF_LINUX_ASSERT(ep & 0x80);
+    libusb_interrupt_transfer((libusb_device_handle *)dev, ep, (unsigned char *)bytes, size, &actual_length, timeout);
+    return actual_length;
 }
 
 #endif      // VSF_USE_LINUX

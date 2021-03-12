@@ -39,7 +39,7 @@
 #       define VSF_TGUI_CFG_SUPPORT_NAME_STRING             ENABLED        /* Enabled for debug */
 #       define VSF_TGUI_CFG_REFRESH_SCHEME                  VSF_TGUI_REFRESH_SCHEME_Z_ORDER
 
-#       define VSF_TGUI_CFG_SUPPORT_MOUSE                   DISABLED
+#       define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS                   DISABLED
 #       define VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME       DISABLED
 #       define VSF_TGUI_CFG_SUPPORT_TIMER                   DISABLED
 #       define VSF_TGUI_CFG_SUPPORT_SLIDER                  DISABLED
@@ -57,15 +57,7 @@
 
 
 #       define VSF_TGUI_CFG_USER_FONTS                      ENABLED
-
-#       define VSF_TGUI_CFG_SV_BUTTON_ADDITIONAL_TILES      DISABLED
-#       define VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR      VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES   DISABLED
-#       define VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
-#       define VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES       DISABLED
-#       define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR       VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR    VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
+#       define VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE          DISABLED
 
 #       define VSF_TGUI_LOG                                 vsf_trace
 #           define VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG        DISABLED
@@ -107,19 +99,11 @@
 #       define VSF_TGUI_CFG_COLOR_MODE                      VSF_TGUI_COLOR_ARGB_8888
 #       define VSF_TGUI_CFG_SUPPORT_NAME_STRING             ENABLED        /* Enabled for debug */
 #       define VSF_TGUI_CFG_REFRESH_SCHEME                  VSF_TGUI_REFRESH_SCHEME_Z_ORDER
-#       define VSF_TGUI_CFG_SUPPORT_MOUSE                   ENABLED
+#       define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS                   ENABLED
 
 
 #       define VSF_TGUI_CFG_USER_FONTS                      ENABLED
-
-#       define VSF_TGUI_CFG_SV_BUTTON_ADDITIONAL_TILES      ENABLED
-#       define VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR      VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_CONTAINER_ADDITIONAL_TILES   ENABLED
-#       define VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
-#       define VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES       ENABLED
-#       define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR       VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
-#       define VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR    VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
+#       define VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE          ENABLED
 
 #       define VSF_TGUI_LOG                                 vsf_trace
 #           define VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG        DISABLED
@@ -141,15 +125,24 @@
 #define WEAK_VSF_INPUT_ON_KEYBOARD
 #define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
 #define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
+#define WEAK_VSF_TGUI_SV_GET_CORNOR_TILE
 
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
 #   define WEAK_VSF_INPUT_ON_MOUSE
 #   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       DISABLED
 #else
 #   define VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN       ENABLED
 #endif
 
+#define APP_DISP_SDL2_COLOR                             VSF_DISP_COLOR_RGB565
+
 #endif
+
+#define VSF_TGUI_SV_FONTS                                                                  \
+    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S24, "wqy-microhei.ttc", 24),     \
+    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S20, "wqy-microhei.ttc", 20),     \
+    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S16, "wqy-microhei.ttc", 16),     \
+    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_DEJAVUSERIF_S24,  "DejaVuSerif.ttf",  24)
 
 /*============================ TYPES =========================================*/
 
@@ -161,7 +154,8 @@
 enum {
 
     VSF_TGUI_KEY_BACKSPACE      = 0x08,
-    VSF_TGUI_KEY_OK             = 0x0D,
+    VSF_TGUI_KEY_OK             = 0x28,
+    VSF_TGUI_KEY_ENTER          = 0x28,
     VSF_TGUI_KEY_CANCEL         = 0x1B,
 
     VSF_TGUI_KEY_INSERT         = 0x49,

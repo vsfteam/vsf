@@ -81,8 +81,12 @@ dcl_simple_class(vk_disp_drv_t)
 typedef enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(INVALID),
     VSF_DISP_COLOR_IDX_DEF(RGB565),
+    VSF_DISP_COLOR_IDX_DEF(RGBA8888),
     VSF_DISP_COLOR_IDX_DEF(ARGB8888),
+    VSF_DISP_COLOR_IDX_DEF(ABGR8888),
     VSF_DISP_COLOR_IDX_DEF(RGB666_32),
+    VSF_DISP_COLOR_IDX_DEF(RGB24),
+    VSF_DISP_COLOR_IDX_DEF(BGR24),
 } vk_disp_color_idx_t;
 
 typedef enum vk_disp_color_type_t {
@@ -91,8 +95,12 @@ typedef enum vk_disp_color_type_t {
     __VSF_DISP_COLOR_LEAST_MIN  = INT16_MIN,
     VSF_DISP_COLOR_DEF(INVALID, 0, 0, 0),
     VSF_DISP_COLOR_DEF(RGB565, 16, 2, 0),
+    VSF_DISP_COLOR_DEF(RGBA8888, 32, 4, 0),
     VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 0),
+    VSF_DISP_COLOR_DEF(ABGR8888, 32, 4, 0),
     VSF_DISP_COLOR_DEF(RGB666_32, 18, 4, 0),
+    VSF_DISP_COLOR_DEF(RGB24, 24, 3, 0),
+    VSF_DISP_COLOR_DEF(BGR24, 24, 3, 0),
 } vk_disp_color_type_t;
 
 typedef struct vk_disp_point {

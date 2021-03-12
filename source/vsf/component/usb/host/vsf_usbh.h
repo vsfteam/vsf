@@ -614,6 +614,7 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #include "./class/UAC/vsf_usbh_uac.h"
 #include "./class/rtl8152/vsf_usbh_rtl8152.h"
 #include "./class/DFU/vsf_usbh_dfu.h"
+#include "./class/DL1x5/vsf_usbh_dl1x5.h"
 
 #include "../driver/hcd/ohci/vsf_ohci.h"
 #include "../driver/otg/dwcotg/vsf_dwcotg_hcd.h"

@@ -83,14 +83,14 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __def_idx(__name, __no)     CONNECT2(__name, _IDX) = (__no)
-#define __def_msk(__name)           CONNECT2(__name, _MSK) = BIT(CONNECT2(__name, _IDX) & 0x1F)
+#define __def_idx(__name, __no)     VSF_MCONNECT2(__name, _IDX) = (__no)
+#define __def_msk(__name)           VSF_MCONNECT2(__name, _MSK) = BIT(VSF_MCONNECT2(__name, _IDX) & 0x1F)
 
 // bit0  - bit7 :   clksel
 // bit8  - bit15:   clkdiv
 // bit16 - bit23:   clkref
 #define __def_clk_idx(__name, __clksel, __clkdiv, __clkref)                     \
-        CONNECT2(__name, _IDX) = ((__clksel) << 0)                              \
+        VSF_MCONNECT2(__name, _IDX) = ((__clksel) << 0)                         \
                             |   ((__clkdiv) << 8)                               \
                             |   ((__clkref) << 16)
 

@@ -109,7 +109,12 @@ typedef struct vk_input_notifier_t {
 #include "./protocol/vsf_input_keyboard.h"
 #include "./protocol/vsf_input_mouse.h"
 
-#include "./driver/hid/vsf_input_hid.h"
+#if VSF_INPUT_USE_HID == ENABLED
+#   include "./driver/hid/vsf_input_hid.h"
+#endif
+#if VSF_INPUT_USE_NSPRO == ENABLED
+#   include "./driver/nspro/vsf_input_nspro.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

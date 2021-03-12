@@ -169,11 +169,15 @@ warning."
 #   define VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME              ENABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_SUPPORT_MOUSE
-#   define VSF_TGUI_CFG_SUPPORT_MOUSE                           ENABLED
+#ifndef VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS
+#   define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS               ENABLED
 #endif
 #ifndef VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING
 #   define VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING             DISABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SUPPORT_KEY_EVENTS
+#   define VSF_TGUI_CFG_SUPPORT_KEY_EVENTS                      ENABLED
 #endif
 
 /*----------------------------------------------------------------------------*
@@ -190,7 +194,7 @@ warning."
 
 #ifndef VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER
 #   define VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER           ENABLED
-#endif 
+#endif
 
 #ifndef VSF_TGUI_CFG_SUPPORT_SLIDER
 #   define VSF_TGUI_CFG_SUPPORT_SLIDER                          ENABLED
@@ -232,7 +236,7 @@ warning."
  * miscellaneous                                                              *
  *----------------------------------------------------------------------------*/
 #ifndef VSF_TGUI_ASSERT
-#   define VSF_TGUI_ASSERT                                      ASSERT
+#   define VSF_TGUI_ASSERT                                      VSF_ASSERT
 #endif
 
 #ifndef VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG
@@ -255,11 +259,11 @@ warning."
 #   define VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG                    DISABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG                
+#ifndef VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG
 #   define VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG                 ENABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG                
+#ifndef VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG
 #   define VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG                ENABLED
 #endif
 
@@ -322,7 +326,7 @@ warning."
 #       warning 'macro VSF_TGUI_LOG() is not defined. Use vsf_trace() by default \
 as VSF_USE_TRACE is ENABLED. You can remove the log output by putting following\
  code in vsf_usr_cfg.h:   #define VSF_TGUI_LOG'
-   
+
 #       define VSF_TGUI_LOG         vsf_trace
 #   elif defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L
 
@@ -331,8 +335,8 @@ as VSF_USE_TRACE is DISABLED.You can remove the log output by putting following\
 code in vsf_usr_cfg.h:   #define VSF_TGUI_LOG'
 
 #       define VSF_TGUI_LOG(__LEVEL, __STRING, ...)     printf(__STRING, ##__VA_ARGS__)
-#   else 
-#       define VSF_TGUI_LOG         
+#   else
+#       define VSF_TGUI_LOG
 #   endif
 #endif
 

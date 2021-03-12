@@ -50,7 +50,7 @@ static void __vk_usbh_nspro_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-const vk_input_item_info_t vk_nspro_gamepad_item_info[GAMEPAD_ID_NUM] = {
+const vk_input_item_info_t vk_nspro_usb_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_UP,           25, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_DOWN,         26, 1,  false),
     VSF_GAMEPAD_DEF_ITEM_INFO(  R_LEFT,         24, 1,  false),
@@ -75,7 +75,7 @@ const vk_input_item_info_t vk_nspro_gamepad_item_info[GAMEPAD_ID_NUM] = {
     VSF_GAMEPAD_DEF_ITEM_INFO(  L_RIGHT,        42, 1,  false),
 };
 
-const vk_sensor_item_info_t vk_nspro_sensor_item_info[6] = {
+const vk_sensor_item_info_t vk_nspro_usb_sensor_item_info[6] = {
     VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_X,     16),
     VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_Y,     16),
     VSF_SENSOR_DEF_ITEM_INFO(   SENSOR_ID_ACC,  SENSOR_SUBID_Z,     16),
@@ -100,68 +100,10 @@ extern void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro);
 extern void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro);
 extern void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro);
 
-#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
-extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);
-extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
-extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
-#endif
-
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-#ifndef WEAK_VSF_NSPRO_ON_NEW_DEV
-WEAK(vsf_nspro_on_new_dev)
-void vsf_nspro_on_new_dev(vk_input_nspro_t *dev)
-{
-    vsf_input_on_new_dev(VSF_INPUT_TYPE_NSPRO, dev);
-}
-#endif
-
-#ifndef WEAK_VSF_NSPRO_ON_FREE_DEV
-WEAK(vsf_nspro_on_free_dev)
-void vsf_nspro_on_free_dev(vk_input_nspro_t *dev)
-{
-    vsf_input_on_free_dev(VSF_INPUT_TYPE_NSPRO, dev);
-}
-#endif
-
-#ifndef WEAK_VSF_NSPRO_ON_REPORT_INPUT
-WEAK(vsf_nspro_on_report_input)
-void vsf_nspro_on_report_input(vk_gamepad_evt_t *gamepad_evt)
-{
-    vsf_input_on_gamepad(gamepad_evt);
-}
-#endif
-
-#ifndef WEAK_VSF_NSPRO_ON_SENSOR
-WEAK(vsf_nspro_on_sensor)
-void vsf_nspro_on_sensor(vk_sensor_evt_t *sensor_evt)
-{
-    vsf_input_on_sensor(sensor_evt);
-}
-#endif
-
-void vk_nspro_new_dev(vk_input_nspro_t *dev)
-{
-    memset(&dev->data, 0, sizeof(dev->data));
-#ifndef WEAK_VSF_NSPRO_ON_NEW_DEV
-    vsf_nspro_on_new_dev(dev);
-#else
-    WEAK_VSF_NSPRO_ON_NEW_DEV(dev);
-#endif
-}
-
-void vk_nspro_free_dev(vk_input_nspro_t *dev)
-{
-#ifndef WEAK_VSF_NSPRO_ON_FREE_DEV
-    vsf_nspro_on_free_dev(dev);
-#else
-    WEAK_VSF_NSPRO_ON_FREE_DEV(dev);
-#endif
-}
-
-void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data)
+static void __vk_usbh_nspro_process_input(vk_usbh_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data)
 {
     union {
         struct {
@@ -179,8 +121,8 @@ void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_repo
     parser.gamepad.evt.dev          = dev;
 
     parser.gamepad.event_sent       = false;
-    parser.gamepad.parser.info      = (vk_input_item_info_t *)vk_nspro_gamepad_item_info;
-    parser.gamepad.parser.num       = dimof(vk_nspro_gamepad_item_info);
+    parser.gamepad.parser.info      = (vk_input_item_info_t *)vk_nspro_usb_gamepad_item_info;
+    parser.gamepad.parser.num       = dimof(vk_nspro_usb_gamepad_item_info);
     do {
         parser.gamepad.info = vk_input_parse(&parser.gamepad.parser, (uint8_t *)&dev->data, (uint8_t *)data);
         if (parser.gamepad.info != NULL) {
@@ -188,32 +130,20 @@ void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_repo
             parser.gamepad.evt.info = *parser.gamepad.info;
             parser.gamepad.evt.pre = parser.gamepad.parser.pre;
             parser.gamepad.evt.cur = parser.gamepad.parser.cur;
-#ifndef WEAK_VSF_NSPRO_ON_REPORT_INPUT
-            vsf_nspro_on_report_input(&parser.gamepad.evt);
-#else
-            WEAK_VSF_NSPRO_ON_REPORT_INPUT(&parser.gamepad.evt);
-#endif
+            vsf_nspro_on_gamepad(&parser.gamepad.evt);
             parser.gamepad.event_sent = true;
         }
     } while (parser.gamepad.info != NULL);
     if (parser.gamepad.event_sent) {
         parser.gamepad.evt.id = GAMEPAD_ID_DUMMY;
-#ifndef WEAK_VSF_NSPRO_ON_REPORT_INPUT
-        vsf_nspro_on_report_input(&parser.gamepad.evt);
-#else
-        WEAK_VSF_NSPRO_ON_REPORT_INPUT(&parser.gamepad.evt);
-#endif
+        vsf_nspro_on_gamepad(&parser.gamepad.evt);
     }
 
     // sensor
-    parser.sensor.evt.desc.item_info    = (vk_sensor_item_info_t *)vk_nspro_sensor_item_info;
-    parser.sensor.evt.desc.item_num     = dimof(vk_nspro_sensor_item_info);
+    parser.sensor.evt.desc.item_info    = (vk_sensor_item_info_t *)vk_nspro_usb_sensor_item_info;
+    parser.sensor.evt.desc.item_num     = dimof(vk_nspro_usb_sensor_item_info);
     parser.sensor.evt.data              = (uint8_t *)&data->gyro_acc[0];
-#ifndef WEAK_VSF_NSPRO_ON_SENSOR
     vsf_nspro_on_sensor(&parser.sensor.evt);
-#else
-    WEAK_VSF_NSPRO_ON_SENSOR(&parser.sensor.evt);
-#endif
 
     dev->data = *data;
 }
@@ -224,7 +154,7 @@ WEAK(vsf_usbh_nspro_on_report_input)
 void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
 #   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-    vk_nspro_process_input(&nspro->use_as__vk_input_nspro_t, report);
+    __vk_usbh_nspro_process_input(nspro, report);
 #   endif
 }
 #endif
@@ -241,7 +171,7 @@ WEAK(vsf_usbh_nspro_on_new)
 void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
 #   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-    vk_nspro_new_dev(&nspro->use_as__vk_input_nspro_t);
+    vsf_nspro_on_new_dev(nspro);
 #   endif
 }
 #endif
@@ -251,7 +181,7 @@ WEAK(vsf_usbh_nspro_on_free)
 void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
 #   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-    vk_nspro_free_dev(&nspro->use_as__vk_input_nspro_t);
+    vsf_nspro_on_free_dev(nspro);
 #   endif
 }
 #endif

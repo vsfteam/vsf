@@ -29,47 +29,28 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-typedef union {
-    vsf_tgui_tile_t tTiles[4];
-
-    implement_ex(
-        struct {
-            vsf_tgui_tile_t tTopLeft;
-            vsf_tgui_tile_t tTopRight;
-            vsf_tgui_tile_t tBottomLeft;
-            vsf_tgui_tile_t tBottomRight;
-        },
-        _
-    )
-} vsf_tgui_sv_container_corner_tiles_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern 
+extern
 fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* container_ptr);
 
-extern 
+extern
 fsm_rt_t vsf_tgui_container_v_rendering(
                                             vsf_tgui_container_t* container_ptr,
                                             vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 extern
 fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_container_t* container_ptr,
-                                            vsf_tgui_region_t* ptDirtyRegion,       
+                                            vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 
-extern 
+extern
 fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* container_ptr);
 
-extern 
+extern
 fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_container_t* container_ptr);
 
-extern
-fsm_rt_t __vk_tgui_container_v_rendering(vsf_tgui_container_t* container_ptr,
-                                        vsf_tgui_region_t* ptDirtyRegion,
-                                        vsf_tgui_control_refresh_mode_t tMode,
-                                        vsf_tgui_sv_color_t tBackground);
 #endif
 
 #endif

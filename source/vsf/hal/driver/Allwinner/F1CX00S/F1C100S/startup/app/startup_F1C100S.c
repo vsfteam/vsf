@@ -85,7 +85,7 @@ WEAK_ISR( PIOF_Handler)                               /*!< IRQ40 */
 #define __DECLARE_SWI_IRQ_HANDLER(__N, __NULL)                                  \
     WEAK_ISR(SWI##__N##_IRQHandler)                                             
 
-REPEAT_MACRO(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
+VSF_MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table

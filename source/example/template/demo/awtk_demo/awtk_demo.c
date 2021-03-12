@@ -37,7 +37,7 @@
 
 lcd_t *platform_create_lcd(wh_t w, wh_t h)
 {
-    return vsf_awtk_create_lcd_mem_fragment(&usrapp_ui_common.disp.use_as__vk_disp_t, w, h);
+    return vsf_awtk_create_lcd_mem_fragment(usrapp_ui_common.disp, w, h);
 }
 
 static void __vsf_awtk_on_evt(vk_input_type_t tpye, vk_touchscreen_evt_t *ts_evt)
@@ -70,7 +70,7 @@ int VSF_USER_ENTRY(void)
     usrapp_ui_common.awtk.notifier.on_evt = (vk_input_on_evt_t)__vsf_awtk_on_evt,
     vk_input_notifier_register(&usrapp_ui_common.awtk.notifier);
 
-    vsf_awtk_init(usrapp_ui_common.disp.param.width, usrapp_ui_common.disp.param.height, APP_MOBILE, NULL, NULL);
+    vsf_awtk_init(usrapp_ui_common.disp->param.width, usrapp_ui_common.disp->param.height, APP_MOBILE, NULL, NULL);
 
     assets_init();
     application_init();

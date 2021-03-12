@@ -106,7 +106,7 @@ static vsfvm_ret_t __vsfvm_ext_kernel_delay_ms(vsfvm_thread_t *thread)
         vsfvm_var_t *timeout = vsfvm_get_func_argu_ref(thread, 0);
 
         thread->fn.evthandler = __vsfvm_ext_kernel_evthandler;
-        vsf_teda_init(&thread->use_as__vsf_teda_t, VSFVM_CFG_PRIORITY, false);
+        vsf_teda_init(&thread->use_as__vsf_teda_t, VSFVM_CFG_PRIORITY);
         vsf_teda_set_timer_ex(&thread->use_as__vsf_teda_t, vsf_systimer_ms_to_tick(timeout->uval32));
         return VSFVM_RET_PEND;
     } else {

@@ -43,8 +43,8 @@
 /*============================ MACROS ========================================*/
 #define EVENT_RT_UNREGISTER         4
 
-#undef this
-#define this                (*this_ptr)
+#undef vsf_this
+#define vsf_this                (*this_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -68,10 +68,10 @@ delegate_t *delegate_init(delegate_t *event_ptr)
             break;
         }
 
-        this.event_ptr = NULL;
-        this.blocked_list_ptr = NULL;
-        //this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
-        this.handler_pptr = &(this.event_ptr);
+        vsf_this.event_ptr = NULL;
+        vsf_this.blocked_list_ptr = NULL;
+        //vsf_this.handler_pptr = (class(delegate_handler_t) **)&(vsf_this.event_ptr);
+        vsf_this.handler_pptr = &(vsf_this.event_ptr);
     } while (0);
 
     return event_ptr;
@@ -92,9 +92,9 @@ delegate_handler_t *delegate_handler_init(
     if (NULL == handler_ptr || NULL == routine_fn) {
         return NULL;
     }
-    this.handler_fn = routine_fn;
-    this.arg_ptr = arg_ptr;
-    this.next_ptr = NULL;
+    vsf_this.handler_fn = routine_fn;
+    vsf_this.arg_ptr = arg_ptr;
+    vsf_this.next_ptr = NULL;
 
     return handler_ptr;
 }
@@ -128,7 +128,7 @@ vsf_err_t register_delegate_handler(delegate_t *event_ptr, delegate_handler_t *h
     } else if (NULL != hnd_ptr->next_ptr) {     
         //! search ready list
         class(delegate_handler_t) **handler_pptr = search_list(   
-            (class(delegate_handler_t) **)&(this.blocked_list_ptr), hnd_ptr );
+            (class(delegate_handler_t) **)&(vsf_this.blocked_list_ptr), hnd_ptr );
 
         if (NULL != handler_pptr) {
             //! safe to remove
@@ -140,9 +140,9 @@ vsf_err_t register_delegate_handler(delegate_t *event_ptr, delegate_handler_t *h
     }
 
     //! add handler to the ready list
-    //hnd_ptr->next_ptr = (class(delegate_handler_t) *)(this.event_ptr);
-    hnd_ptr->next_ptr = this.event_ptr;
-    this.event_ptr = handler_ptr;
+    //hnd_ptr->next_ptr = (class(delegate_handler_t) *)(vsf_this.event_ptr);
+    hnd_ptr->next_ptr = vsf_this.event_ptr;
+    vsf_this.event_ptr = handler_ptr;
 
     return VSF_ERR_NONE;
 }
@@ -166,26 +166,26 @@ vsf_err_t unregister_delegate_handler( delegate_t *event_ptr, delegate_handler_t
 
     do {
         //! search ready list
-        handler_pptr = search_list(   (class(delegate_handler_t) **)&(this.event_ptr), 
+        handler_pptr = search_list(   (class(delegate_handler_t) **)&(vsf_this.event_ptr), 
                                     hnd_ptr );
         if (NULL != handler_pptr) {
             //! safe to remove
             (*handler_pptr) = (class(delegate_handler_t) *)hnd_ptr->next_ptr;
             hnd_ptr->next_ptr = NULL;
-            if (this.handler_pptr == &(hnd_ptr->next_ptr)) {
-                this.handler_pptr = (delegate_handler_t **)handler_pptr;
+            if (vsf_this.handler_pptr == &(hnd_ptr->next_ptr)) {
+                vsf_this.handler_pptr = (delegate_handler_t **)handler_pptr;
             }
             break;
         }
         //! search ready list
-        handler_pptr = search_list(   (class(delegate_handler_t) **)&(this.blocked_list_ptr), 
+        handler_pptr = search_list(   (class(delegate_handler_t) **)&(vsf_this.blocked_list_ptr), 
                                     hnd_ptr );
         if (NULL != handler_pptr) {
             //! safe to remove
             (*handler_pptr) = (class(delegate_handler_t) *)hnd_ptr->next_ptr;
             hnd_ptr->next_ptr = NULL;
-            if (this.handler_pptr == &(hnd_ptr->next_ptr)) {
-                this.handler_pptr = (delegate_handler_t **)handler_pptr;
+            if (vsf_this.handler_pptr == &(hnd_ptr->next_ptr)) {
+                vsf_this.handler_pptr = (delegate_handler_t **)handler_pptr;
             }
             break;
         }
@@ -198,13 +198,13 @@ static fsm_rt_t __move_to_block_list(class(delegate_t) *this_ptr, class(delegate
 {
     class(delegate_handler_t) *hnd_ptr = handler_ptr;
     //! remove handler from ready list
-    (*this.handler_pptr) = hnd_ptr->next_ptr;
+    (*vsf_this.handler_pptr) = hnd_ptr->next_ptr;
     //! add handler to block list
-    //hnd_ptr->next_ptr = (class(delegate_handler_t) *)this.blocked_list_ptr;
-    hnd_ptr->next_ptr = this.blocked_list_ptr;
-    this.blocked_list_ptr = (delegate_handler_t *)hnd_ptr;
+    //hnd_ptr->next_ptr = (class(delegate_handler_t) *)vsf_this.blocked_list_ptr;
+    hnd_ptr->next_ptr = vsf_this.blocked_list_ptr;
+    vsf_this.blocked_list_ptr = (delegate_handler_t *)hnd_ptr;
 
-    if (NULL == this.event_ptr) {
+    if (NULL == vsf_this.event_ptr) {
         return fsm_rt_cpl;
     }
 
@@ -214,7 +214,7 @@ static fsm_rt_t __move_to_block_list(class(delegate_t) *this_ptr, class(delegate
 #define RAISE_EVENT_START               0
 #define RAISE_EVENT_CHECK_HANDLER       1
 #define RAISE_EVENT_RUN_HANDLER         2
-#define RAISE_EVENT_RESET_FSM()     do { this.chState = 0; } while (0)
+#define RAISE_EVENT_RESET_FSM()     do { vsf_this.chState = 0; } while (0)
 
 /*! \brief raise target event
  *! \param event_ptr the target event
@@ -228,40 +228,40 @@ fsm_rt_t invoke_delegate( delegate_t *event_ptr, void *param_ptr)
         return (fsm_rt_t)VSF_ERR_INVALID_PTR;
     }
 
-    if (NULL == this.event_ptr) {
-        if (NULL == this.blocked_list_ptr) {
+    if (NULL == vsf_this.event_ptr) {
+        if (NULL == vsf_this.blocked_list_ptr) {
             //! nothing to do
             return fsm_rt_cpl;
         }
         
         //! initialize state
-        this.event_ptr = this.blocked_list_ptr;
-        this.blocked_list_ptr = NULL;
-        //this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
-        this.handler_pptr = &(this.event_ptr);
+        vsf_this.event_ptr = vsf_this.blocked_list_ptr;
+        vsf_this.blocked_list_ptr = NULL;
+        //vsf_this.handler_pptr = (class(delegate_handler_t) **)&(vsf_this.event_ptr);
+        vsf_this.handler_pptr = &(vsf_this.event_ptr);
     } 
 
-    if (NULL == (*this.handler_pptr)) {
+    if (NULL == (*vsf_this.handler_pptr)) {
         //! finish visiting the ready list
-        //this.handler_pptr = (class(delegate_handler_t) **)&(this.event_ptr);
-        this.handler_pptr = &(this.event_ptr);
-        if (NULL == (*this.handler_pptr)) {
+        //vsf_this.handler_pptr = (class(delegate_handler_t) **)&(vsf_this.event_ptr);
+        vsf_this.handler_pptr = &(vsf_this.event_ptr);
+        if (NULL == (*vsf_this.handler_pptr)) {
             //! complete
             return fsm_rt_cpl;
         }
     } else {
-        class(delegate_handler_t) *handler_ptr = (class(delegate_handler_t) *)(*this.handler_pptr);
+        class(delegate_handler_t) *handler_ptr = (class(delegate_handler_t) *)(*vsf_this.handler_pptr);
         
         if (NULL != handler_ptr->handler_fn) {
             //! run the event handler
             fsm_rt_t tFSM = handler_ptr->handler_fn(handler_ptr->arg_ptr,param_ptr);
 
             if (fsm_rt_on_going == tFSM) { 
-                this.handler_pptr = &(handler_ptr->next_ptr);    //!< get next item
+                vsf_this.handler_pptr = &(handler_ptr->next_ptr);    //!< get next item
             } else if (EVENT_RT_UNREGISTER == tFSM) {
                 //! return EVENT_RT_UNREGISTER means event handler could be removed
                 class(delegate_handler_t) *hnd_ptr = handler_ptr;
-                (*this.handler_pptr) = hnd_ptr->next_ptr;
+                (*vsf_this.handler_pptr) = hnd_ptr->next_ptr;
                 hnd_ptr->next_ptr = NULL;
             } else {
                 return __move_to_block_list(this_ptr, handler_ptr);

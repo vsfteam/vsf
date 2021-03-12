@@ -25,7 +25,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_UI_ASSERT
-#   define VSF_UI_ASSERT                ASSERT
+#   define VSF_UI_ASSERT                VSF_ASSERT
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

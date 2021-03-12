@@ -129,17 +129,17 @@ extern "C" {
  *!        these macros should be used in gpio.c. E.g.
  *!
 
-        REPEAT_MACRO(GPIO_COUNT, __GPIO_FUNC_DEF, NULL)  // declare the api functions
+        VSF_MREPEAT(GPIO_COUNT, __GPIO_FUNC_DEF, NULL)  // declare the api functions
 
         //! \brief io interface
         const io_t IO = {
             &vsfhal_gpio_config,                  //!< general io configuration
             {
-                {REPEAT_MACRO(GPIO_COUNT, __GPIO_INTERFACE_DEF, NULL)}
+                {VSF_MREPEAT(GPIO_COUNT, __GPIO_INTERFACE_DEF, NULL)}
             }
         };
 
-        REPEAT_MACRO(GPIO_COUNT, __GPIO_FUNC_BODY, NULL) // api function body
+        VSF_MREPEAT(GPIO_COUNT, __GPIO_FUNC_BODY, NULL) // api function body
         
  */
 
@@ -252,16 +252,16 @@ static void gpio##__N##_toggle(uint32_t pin_mask)                               
 //! @{
 enum io_pin_no_t {
 #if defined(PIO_PORTA)
-    REPEAT_MACRO(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
+    VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_NUM, 0)
 #endif
 #if defined(PIO_PORTB)
-    REPEAT_MACRO(PIO_PORTB_PIN_NUM, __IO_PINB_NUM, 32)
+    VSF_MREPEAT(PIO_PORTB_PIN_NUM, __IO_PINB_NUM, 32)
 #endif
 #if defined(PIO_PORTC)
-    REPEAT_MACRO(PIO_PORTC_PIN_NUM, __IO_PINC_NUM, 64)
+    VSF_MREPEAT(PIO_PORTC_PIN_NUM, __IO_PINC_NUM, 64)
 #endif
 #if defined(PIO_PORTD)
-    REPEAT_MACRO(PIO_PORTD_PIN_NUM, __IO_PIND_NUM, 96)
+    VSF_MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_NUM, 96)
 #endif
 }em_io_pin_no_t;
 //! @}
@@ -270,16 +270,16 @@ enum io_pin_no_t {
 //! @{
 enum io_pin_msk_t{
 #if defined(PIO_PORTA)
-    REPEAT_MACRO(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
+    VSF_MREPEAT(PIO_PORTA_PIN_NUM, __IO_PINA_MSK, 0)
 #endif
 #if defined(PIO_PORTB)
-    REPEAT_MACRO(PIO_PORTB_PIN_NUM, __IO_PINB_MSK, 0)
+    VSF_MREPEAT(PIO_PORTB_PIN_NUM, __IO_PINB_MSK, 0)
 #endif
 #if defined(PIO_PORTC)
-    REPEAT_MACRO(PIO_PORTC_PIN_NUM, __IO_PINC_MSK, 0)
+    VSF_MREPEAT(PIO_PORTC_PIN_NUM, __IO_PINC_MSK, 0)
 #endif
 #if defined(PIO_PORTD)
-    REPEAT_MACRO(PIO_PORTD_PIN_NUM, __IO_PIND_MSK, 0)
+    VSF_MREPEAT(PIO_PORTD_PIN_NUM, __IO_PIND_MSK, 0)
 #endif
 };
 //! @}
@@ -402,7 +402,7 @@ def_interface(i_io_t)
     union {
         i_gpio_t  PORT[GPIO_COUNT];         //!< dedicated gpio control interface
         struct {
-            REPEAT_MACRO(GPIO_COUNT, __GPIO_INTERFACE, NULL)
+            VSF_MREPEAT(GPIO_COUNT, __GPIO_INTERFACE, NULL)
         };
     };
 end_def_interface(i_io_t)

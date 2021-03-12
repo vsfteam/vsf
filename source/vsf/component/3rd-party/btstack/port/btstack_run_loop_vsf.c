@@ -44,7 +44,7 @@ typedef struct btstack_vsf_t {
 static uint32_t __btstack_run_loop_vsf_get_time_ms(void);
 static void __btstack_run_loop_vsf_set_timer(btstack_timer_source_t *ts, uint32_t timeout_in_ms);
 static void __btstack_run_loop_vsf_add_timer(btstack_timer_source_t *ts);
-static int __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts);
+static bool __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts);
 static void __btstack_run_loop_vsf_dump_timer(void);
 static void __btstack_run_loop_vsf_init(void);
 
@@ -94,7 +94,7 @@ static void __btstack_run_loop_vsf_add_timer(btstack_timer_source_t *ts)
     it->next = (btstack_linked_item_t *)ts;
 }
 
-static int __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts)
+static bool __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts)
 {
     return btstack_linked_list_remove(&__btstack_vsf.timers, (btstack_linked_item_t *)ts);
 }

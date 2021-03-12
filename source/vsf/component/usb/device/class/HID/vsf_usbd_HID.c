@@ -213,7 +213,7 @@ static vsf_err_t __vk_usbd_hid_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     hid->teda.on_terminate = NULL;
 #endif
-    return vsf_teda_init(&hid->teda, VSF_USBD_CFG_EDA_PRIORITY, false);
+    return vsf_teda_init(&hid->teda, VSF_USBD_CFG_EDA_PRIORITY);
 }
 
 static vsf_err_t __vk_usbh_hid_fini(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
@@ -233,7 +233,7 @@ static vk_usbd_desc_t * __vk_usbd_hid_get_desc(vk_usbd_dev_t *dev,
         return NULL;
     }
 
-    return vk_usbd_get_descriptor(hid->desc, 1, type, index, lanid);
+    return vk_usbd_get_descriptor(hid->desc, hid->desc_num, type, index, lanid);
 }
 
 static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
@@ -241,7 +241,7 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     vk_usbd_hid_t *hid = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
-    uint_fast8_t type = request->wValue >> 8, id = request->wValue;
+    uint_fast8_t type = request->wValue >> 8, id = request->wValue & 0xFF;
     vk_usbd_hid_report_t *report = __vk_usbd_hid_find_report(hid, type, id);
     uint8_t *buffer = NULL;
     uint_fast32_t size = 0;
@@ -254,10 +254,6 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
 
         buffer = report->mem.buffer;
         size = report->mem.size;
-        if (hid->has_report_id) {
-            size--;
-            buffer++;
-        }
         break;
     case USB_HID_REQ_GET_IDLE:
         if ((NULL == report) || (request->wLength != 1)) {
@@ -282,10 +278,6 @@ static vsf_err_t __vk_usbd_hid_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
 
         size = report->mem.size;
         buffer = report->mem.buffer;
-        if (hid->has_report_id) {
-            size--;
-            buffer++;
-        }
         break;
     case USB_HID_REQ_SET_IDLE:
         if (request->wLength != 0) {

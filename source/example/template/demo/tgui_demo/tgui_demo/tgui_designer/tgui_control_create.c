@@ -95,13 +95,13 @@ void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
         ),
 
         tgui_label(label, &__template, control, button,
-            tgui_attribute(bIsUseRawView, true),
+            tgui_attribute(show_corner_tile, true),
             tgui_region(0, 0, 100, 30),
             tgui_text(tLabel, "label", false),
         ),
 
         tgui_button(button, &__template, label, text_list,
-            tgui_attribute(bIsUseRawView, true),
+            tgui_attribute(show_corner_tile, true),
             tgui_region(0, 0, 100, 30),
             tgui_text(tLabel, "button", false),
         ),
@@ -114,13 +114,13 @@ void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
                 tgui_size(100, 0),
                 tgui_text(tLabel, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9", true),
                 tgui_line_space(tLabel, 8),
-                tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
+                tgui_attribute(font_color, VSF_TGUI_COLOR_GRAY),
             )
         ),
 
         tgui_panel(panel, &__template, text_list, container,
             tgui_attribute(bIsAutoSize, false),
-            tgui_attribute(bIsShowCornerTile, false),
+            tgui_attribute(show_corner_tile, false),
             tgui_region(0, 0, 150, 150),
         ),
 
@@ -248,10 +248,10 @@ vsf_tgui_control_t* vsf_tgui_control_create(vsf_tgui_container_t* parent_ptr, vs
     (void)result;
     result = vk_tgui_send_message(top_container_ptr->gui_ptr,
                                   (vsf_tgui_evt_t) { .msg = VSF_TGUI_EVT_ON_LOAD, .target_ptr = control_ptr});
-    ASSERT(result);
+    VSF_ASSERT(result);
     result = vk_tgui_send_message(top_container_ptr->gui_ptr,
                                   (vsf_tgui_evt_t) { .msg = VSF_TGUI_EVT_UPDATE, .target_ptr = (vsf_tgui_control_t*)parent_ptr});
-    ASSERT(result);
+    VSF_ASSERT(result);
 
     return control_ptr;
 }

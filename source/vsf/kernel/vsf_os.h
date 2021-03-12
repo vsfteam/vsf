@@ -47,7 +47,7 @@ extern "C" {
 #   define vsf_sched_lock()                 vsf_forced_sched_lock()
 #   define vsf_sched_unlock(__level)        vsf_forced_sched_unlock((vsf_sched_lock_status_t)(__level))
 #   define vsf_sched_safe()                 vsf_forced_sched_safe()
-#   define vsf_sched_safe_exit()            vsf_forced_sched_safe_exit(lock_status)
+#   define vsf_sched_safe_exit()            vsf_forced_sched_safe_exit()
 
 #else
 
@@ -72,16 +72,13 @@ extern "C" {
 #if __VSF_OS_SWI_NUM > 0
 #define __vsf_forced_sched_safe(...)                                            \
         {                                                                       \
-            vsf_sched_lock_status_t lock_status = vsf_forced_sched_lock();      \
-            __VA_ARGS__;                                                        \
-            vsf_forced_sched_unlock(lock_status);                               \
+            vsf_sched_lock_status_t VSF_MACRO_SAFE_NAME(status) = vsf_forced_sched_lock();\
+                __VA_ARGS__;                                                    \
+            vsf_forced_sched_unlock(VSF_MACRO_SAFE_NAME(status));               \
         }
 
-#define vsf_forced_sched_safe()             code_region(&VSF_SCHED_SAFE_CODE_REGION)
-#define vsf_forced_sched_safe_exit()        vsf_forced_sched_unlock((vsf_sched_lock_status_t)(lock_status))
-#define vsf_protect_forced_scheduler()      vsf_forced_sched_lock()
-#define vsf_unprotect_forced_scheduler(__state)                                 \
-            vsf_forced_sched_unlock((vsf_sched_lock_status_t)(__state))
+#define vsf_forced_sched_safe()             vsf_protect_region(&vsf_protect_region_sched)
+#define vsf_forced_sched_safe_exit()        vsf_forced_sched_unlock(VSF_MACRO_SAFE_NAME(status))
 #endif
 
 #define vsf_protect_sched()                 (vsf_protect_t)vsf_protect_scheduler()
@@ -147,6 +144,9 @@ typedef struct vsf_kernel_resource_t {
 
 #if __VSF_OS_SWI_NUM > 0
 extern const code_region_t VSF_FORCED_SCHED_SAFE_CODE_REGION;
+extern const vsf_protect_region_t vsf_protect_region_sched;
+#else
+#   define vsf_protect_region_sched         vsf_protect_region_none
 #endif
 
 /*============================ PROTOTYPES ====================================*/

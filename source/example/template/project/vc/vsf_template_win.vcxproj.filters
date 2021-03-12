@@ -877,6 +877,84 @@
     <Filter Include="usrapp\demo\tgui_demo\tgui_demo\tgui_designer">
       <UniqueIdentifier>{d6c919d6-509b-40e6-aca1-98c128803726}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw\src\ble">
+      <UniqueIdentifier>{d29b1b74-75ed-4a6f-976f-e7de16e698a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\btstack\raw\src\ble\gatt-service">
+      <UniqueIdentifier>{a01fd0a6-3a93-43c1-a130-f498fde80ebc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\config\lwip">
+      <UniqueIdentifier>{08d86521-019e-4eb0-b298-1958dd39c32e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\host\class\DL1x5">
+      <UniqueIdentifier>{fa67f0ca-ebf6-4b81-b34d-ee86ded3b199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\input\driver\nspro">
+      <UniqueIdentifier>{1003b842-5552-477b-8f6c-1c83371152cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\coremark">
+      <UniqueIdentifier>{0df1c125-dc93-466d-ba7b-d3f3a74c6cc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\coremark\raw">
+      <UniqueIdentifier>{36435bd5-d5e1-4aa1-8c24-2d697c02b6ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\coremark\port">
+      <UniqueIdentifier>{96fe6718-3d07-4158-8b7e-4a2ad65b4b23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lua">
+      <UniqueIdentifier>{31ff76a0-721d-4f53-aa7d-df420a9f814a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lua\raw">
+      <UniqueIdentifier>{10391b33-9848-4a40-8118-080f312f5f15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lua\extension">
+      <UniqueIdentifier>{813c0029-c4f9-4144-96d9-8b2bf74348ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lua\extension\lovevsf">
+      <UniqueIdentifier>{b123f862-ceda-4523-85a7-8e4e816ad201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lua\extension\lovevsf\modules">
+      <UniqueIdentifier>{c456be5c-2b93-4949-b287-bcd7813ef6d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\lua\extension\oo">
+      <UniqueIdentifier>{ba0f10c8-c5c9-402d-b25b-20f44e18c367}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\lua_demo">
+      <UniqueIdentifier>{3767d434-e22a-4b36-a56e-44ee29929b14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\media\sdl2\3rd-party">
+      <UniqueIdentifier>{fa22cd76-1911-4027-8791-bdf219d0afd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\media\sdl2\3rd-party\SDL_ttf">
+      <UniqueIdentifier>{6e96fa44-37e8-4362-bd35-085241d6166e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\media\sdl2\3rd-party\SDL_image">
+      <UniqueIdentifier>{36c37756-2b66-40c7-b47e-4b10aac50612}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\libpng">
+      <UniqueIdentifier>{821a87c5-4e37-4197-88b1-2305c3d607d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\libpng\raw">
+      <UniqueIdentifier>{258bfb07-adde-42a4-a9df-772b68b762cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\libpng\port">
+      <UniqueIdentifier>{a0a5efc7-7386-48c8-a61c-fc489dac7832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\zlib">
+      <UniqueIdentifier>{8e0840f8-c16c-4eea-9038-10535ca4fd73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\zlib\raw">
+      <UniqueIdentifier>{c1fe230e-2e61-4e49-875b-780558361e18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\libjpeg-turbo">
+      <UniqueIdentifier>{e112962a-66e3-47e1-8d81-eb30b7fd4850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\libjpeg-turbo\raw">
+      <UniqueIdentifier>{70d36578-cdca-4f25-8383-4af112191209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\libjpeg-turbo\port">
+      <UniqueIdentifier>{dfd39688-9ccb-4ad0-b724-3e9e06b7482e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\vsf\vsf.h">
@@ -2292,9 +2370,6 @@
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.h">
       <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\config\lwipopts.h">
-      <Filter>usrapp\config</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h">
       <Filter>vsf\component\usb\host\class\rtl8152</Filter>
     </ClInclude>
@@ -2353,9 +2428,6 @@
       <Filter>vsf\component\ui\disp\driver\vga\m480</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_connect.h">
-      <Filter>vsf\utilities\preprocessor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_repeat_macro.h">
       <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\utilities\compiler\compiler.h">
@@ -2516,6 +2588,330 @@
     </ClInclude>
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h">
       <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\ancs_client.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db_util.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_dispatch.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_server.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\core.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\gatt_client.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\le_device_db.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\sm.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_crypto.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_tlv.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\config\lwip\lwipopts.h">
+      <Filter>usrapp\config\lwip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.h">
+      <Filter>vsf\component\usb\host\class\DL1x5</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.h">
+      <Filter>vsf\component\input\driver\nspro</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\coremark.h">
+      <Filter>vsf\component\3rd-party\coremark\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\coremark\port\core_portme.h">
+      <Filter>vsf\component\3rd-party\coremark\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lapi.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lauxlib.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lcode.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lctype.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ldebug.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ldo.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lfunc.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lgc.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ljumptab.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\llex.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\llimits.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lmem.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lobject.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lopcodes.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lopnames.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lparser.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lprefix.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lstate.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lstring.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltable.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltm.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lua.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lua.hpp">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\luaconf.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lualib.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lundump.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lvm.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lzio.h">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\lovevsf.h">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lua\extension\oo\lua_oo.h">
+      <Filter>vsf\component\3rd-party\lua\extension\oo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_foreach.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID_desc.h">
+      <Filter>vsf\component\usb\device\class\HID</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.h">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_ttf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\begin_code.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\close_code.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_cpuinfo.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_endian.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_keyboard.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_mouse.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_stdinc.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_surface.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_timer.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\miniz.h">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\nanosvg.h">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\SDL_image.h">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\shell\media\sdl2\include\SDL2\SDL_version.h">
+      <Filter>vsf\shell\media\sdl2\include\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_macro_calc.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_preprocessor.h">
+      <Filter>vsf\utilities\preprocessor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\png.h">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngconf.h">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngdebug.h">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pnginfo.h">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngpriv.h">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngstruct.h">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\port\pnglibconf.h">
+      <Filter>vsf\component\3rd-party\libpng\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\crc32.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\deflate.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzguts.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inffast.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inffixed.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inflate.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inftrees.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\trees.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zconf.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zlib.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zutil.h">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cderror.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cdjpeg.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cmyk.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jchuff.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdcoefct.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdct.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdhuff.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmainct.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmaster.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmerge.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdsample.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jerror.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jinclude.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmemsys.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmorecfg.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpeg_nbits_table.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpegcomp.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpegint.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpeglib.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jsimd.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jsimddct.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jversion.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\transupp.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\turbojpeg.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\port\jconfig.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\port\jconfigint.h">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\port</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3431,9 +3827,6 @@
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c">
       <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c">
-      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c">
       <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClCompile>
@@ -3856,6 +4249,552 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.c">
       <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\ancs_client.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_db_util.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_dispatch.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\att_server.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\gatt_client.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\le_device_db_memory.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\ble\sm.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_crypto.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\btstack\raw\src\btstack_tlv.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\btstack_demo\btstack_application.c">
+      <Filter>usrapp\demo\btstack_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c">
+      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.c">
+      <Filter>vsf\component\usb\host\class\DL1x5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.c">
+      <Filter>vsf\component\input\driver\nspro</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_list_join.c">
+      <Filter>vsf\component\3rd-party\coremark\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_main.c">
+      <Filter>vsf\component\3rd-party\coremark\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_matrix.c">
+      <Filter>vsf\component\3rd-party\coremark\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_state.c">
+      <Filter>vsf\component\3rd-party\coremark\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\raw\core_util.c">
+      <Filter>vsf\component\3rd-party\coremark\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\coremark\port\core_portme.c">
+      <Filter>vsf\component\3rd-party\coremark\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\kernel_test\cross_task_test.c">
+      <Filter>usrapp\demo\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\kernel_test\eda_test.c">
+      <Filter>usrapp\demo\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\kernel_test\fsm_test.c">
+      <Filter>usrapp\demo\kernel_test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lapi.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lauxlib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lbaselib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lcode.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lcorolib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lctype.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ldblib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ldebug.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ldo.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ldump.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lfunc.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lgc.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\linit.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\liolib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\llex.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lmathlib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lmem.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\loadlib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lobject.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lopcodes.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\loslib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lparser.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lstate.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lstring.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lstrlib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltable.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltablib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\ltm.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\luac.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lundump.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lutf8lib.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lvm.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lzio.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\raw\lua.c">
+      <Filter>vsf\component\3rd-party\lua\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\lovevsf.c">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\oo\lua_oo.c">
+      <Filter>vsf\component\3rd-party\lua\extension\oo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\lua_demo\love_demo.c">
+      <Filter>usrapp\demo\lua_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_filesystem.c">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_font.c">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_graphics.c">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_image.c">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lua\extension\lovevsf\modules\l_timer.c">
+      <Filter>vsf\component\3rd-party\lua\extension\lovevsf\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_ttf\SDL_ttf.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_ttf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_bmp.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_gif.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_jpg.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_lbm.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_pcx.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_png.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_pnm.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_svg.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_tga.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_tif.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_webp.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_WIC.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xcf.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xpm.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xv.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xxx.c">
+      <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\png.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngerror.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngget.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngmem.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngpread.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngread.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngrio.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngrtran.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngrutil.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngset.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngtrans.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwio.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwrite.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwtran.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwutil.c">
+      <Filter>vsf\component\3rd-party\libpng\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\adler32.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\compress.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\crc32.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\deflate.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzclose.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzlib.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzread.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzwrite.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\infback.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inffast.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inflate.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inftrees.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\trees.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\uncompr.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zutil.c">
+      <Filter>vsf\component\3rd-party\zlib\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cdjpeg.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jaricom.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcapimin.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcapistd.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcarith.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jccoefct.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jccolor.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcdctmgr.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jchuff.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcicc.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcinit.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcmainct.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcmarker.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcmaster.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcomapi.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcparam.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcphuff.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcprepct.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcsample.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jctrans.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdapimin.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdapistd.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdarith.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatadst.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatadst-tj.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatasrc.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatasrc-tj.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdcoefct.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdcolor.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jddctmgr.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdhuff.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdicc.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdinput.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmainct.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmarker.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmaster.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmerge.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdphuff.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdpostct.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdsample.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdtrans.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jerror.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jfdctflt.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jfdctfst.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jfdctint.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctflt.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctfst.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctint.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctred.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmemmgr.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmemnobs.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jquant1.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jquant2.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jsimd_none.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jutils.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdbmp.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdcolmap.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdgif.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdppm.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdrle.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdswitch.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdtarga.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\transupp.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\turbojpeg.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrbmp.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrgif.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrppm.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrrle.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrtarga.c">
+      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

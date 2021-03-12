@@ -48,17 +48,6 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-enum {
-    VSF_INPUT_TYPE_NSPRO = VSF_INPUT_USER_TYPE,
-};
-
-typedef struct vk_input_nspro_t {
-    vsf_usb_nspro_gamepad_in_report_t data;
-    vk_input_timestamp_t timestamp;
-} vk_input_nspro_t;
-#endif
-
 dcl_simple_class(vk_usbh_nspro_t)
 
 typedef enum vk_usbh_nspro_state_t {
@@ -75,35 +64,33 @@ typedef enum vk_usbh_nspro_type_t {
 
 def_simple_class(vk_usbh_nspro_t) {
     implement(vk_usbh_hid_teda_t)
-#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-    implement(vk_input_nspro_t)
-#endif
 
     private_member(
+        // gamepad_out_buf should be aligned
+        vsf_usb_nspro_gamepad_out_report_t gamepad_out_buf;
         bool out_idle;
         vk_usbh_nspro_state_t start_state;
         uint8_t mac[6];
         vk_usbh_nspro_type_t type;
-        vsf_usb_nspro_gamepad_out_report_t gamepad_out_buf;
+
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
+        vk_input_timestamp_t timestamp;
+        // data should be aligned
+        vsf_usb_nspro_gamepad_in_report_t data;
+#endif
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-extern const vk_input_item_info_t vk_nspro_gamepad_item_info[GAMEPAD_ID_NUM];
-extern const vk_sensor_item_info_t vk_nspro_sensor_item_info[6];
+extern const vk_input_item_info_t vk_nspro_usb_gamepad_item_info[GAMEPAD_ID_NUM];
+extern const vk_sensor_item_info_t vk_nspro_usb_sensor_item_info[6];
 #endif
 
 extern const vk_usbh_class_drv_t vk_usbh_nspro_drv;
 
 /*============================ PROTOTYPES ====================================*/
-
-#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
-extern void vk_nspro_process_input(vk_input_nspro_t *dev, vsf_usb_nspro_gamepad_in_report_t *data);
-extern void vk_nspro_new_dev(vk_input_nspro_t *dev);
-extern void vk_nspro_free_dev(vk_input_nspro_t *dev);
-#endif
 
 #ifdef __cplusplus
 }

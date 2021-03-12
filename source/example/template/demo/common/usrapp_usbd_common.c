@@ -39,6 +39,18 @@ const usrapp_usbd_common_const_t usrapp_usbd_common_const = {
     .dwcotg_dcd_param       = {
         .op                 = &VSF_USB_DC0_IP,
         .speed              = USRAPP_CFG_USBD_SPEED,
+#   ifdef USRAPP_USBD_DWCOTG_CFG_ULPI_EN
+        .ulpi_en            = USRAPP_USBD_DWCOTG_CFG_ULPI_EN,
+#   endif
+#   ifdef USRAPP_USBD_DWCOTG_CFG_UTMI_EN
+        .utmi_en            = USRAPP_USBD_DWCOTG_CFG_UTMI_EN,
+#   endif
+#   ifdef USRAPP_USBD_DWCOTG_CFG_VBUS_EN
+        .vbus_en            = USRAPP_USBD_DWCOTG_CFG_VBUS_EN,
+#   endif
+#   ifdef USRAPP_USBD_DWCOTG_CFG_DMA_EN
+        .dma_en             = USRAPP_USBD_DWCOTG_CFG_DMA_EN,
+#   endif
     },
 #endif
 };

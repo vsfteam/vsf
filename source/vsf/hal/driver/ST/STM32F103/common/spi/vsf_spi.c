@@ -12,7 +12,7 @@ vsf_spi_t vsf_spi[SPI_COUNT] = {
 
 spi_status_t vsf_spi_get_status(vsf_spi_t *spi_obj)
 {
-    ASSERT(spi_obj != NULL);
+    VSF_ASSERT(spi_obj != NULL);
     
     spi_status_t spi_status;
     
@@ -54,7 +54,7 @@ spi_capability_t vsf_spi_get_capability(void)
 
 vsf_err_t vsf_spi_init(vsf_spi_t *spi_obj, spi_cfg_t *cfg_ptr)
 {
-    ASSERT((spi_obj != NULL) && (cfg_ptr != NULL));
+    VSF_ASSERT((spi_obj != NULL) && (cfg_ptr != NULL));
     
     if(SPI1 == spi_obj->hspi) {        
         RCC->APB2ENR |= SPI1_CLK_EN | SPI1_GPIO_CLK_EN;
@@ -92,7 +92,7 @@ vsf_err_t vsf_spi_init(vsf_spi_t *spi_obj, spi_cfg_t *cfg_ptr)
 
 uintalu_t vsf_spi_polarity_set(vsf_spi_t *spi_obj, uintalu_t polarity)
 {
-    ASSERT(spi_obj != NULL);
+    VSF_ASSERT(spi_obj != NULL);
     
     uintalu_t uintalu;
     
@@ -107,7 +107,7 @@ uintalu_t vsf_spi_polarity_set(vsf_spi_t *spi_obj, uintalu_t polarity)
 
 uintalu_t vsf_spi_polarity_get(vsf_spi_t *spi_obj)
 {
-    ASSERT(spi_obj != NULL);
+    VSF_ASSERT(spi_obj != NULL);
     
     uintalu_t uintalu;
     
@@ -119,7 +119,7 @@ uintalu_t vsf_spi_polarity_get(vsf_spi_t *spi_obj)
 
 fsm_rt_t vsf_spi_exchange(vsf_spi_t *spi_obj, uintalu_t output, void *input)
 {
-    ASSERT((spi_obj != NULL) && (input != NULL));
+    VSF_ASSERT((spi_obj != NULL) && (input != NULL));
             
     bool wait_for_read = false;
     bool exchange_cpl  = false;
@@ -149,7 +149,7 @@ fsm_rt_t vsf_spi_exchange(vsf_spi_t *spi_obj, uintalu_t output, void *input)
 
 fsm_rt_t vsf_spi_request_exchange(vsf_spi_t *spi_obj, void *output, void *input, uint_fast32_t size)
 {
-    ASSERT((spi_obj != NULL) && (output != NULL) && (input != NULL) && (size != 0));
+    VSF_ASSERT((spi_obj != NULL) && (output != NULL) && (input != NULL) && (size != 0));
     
     vsf_interrupt_safe() {
         if(false == spi_obj->data_exchange) {
@@ -257,8 +257,8 @@ void SPI##__N##_IRQHandler(void)                                             \
     
 #define __VSF_SPI_INTERFACE()          const i_spi_t VSF_SPI[SPI_COUNT]
     
-REPEAT_MACRO(SPI_COUNT, __VSF_SPI_FUNC_BODY, NULL)
+VSF_MREPEAT(SPI_COUNT, __VSF_SPI_FUNC_BODY, NULL)
 
 __VSF_SPI_INTERFACE() = {
-    REPEAT_MACRO(SPI_COUNT, __VSF_SPI_INTERFACE_DEF, NULL)
+    VSF_MREPEAT(SPI_COUNT, __VSF_SPI_INTERFACE_DEF, NULL)
 };

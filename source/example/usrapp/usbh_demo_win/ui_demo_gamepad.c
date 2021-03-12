@@ -122,7 +122,7 @@ static float ui_demo_calc_joystick_offset(vk_gamepad_evt_t *gamepad_evt)
         cur_i32 = cur - (1 << (gamepad_evt->bitlen - 1));
     }
 
-    ASSERT(mask != 0);
+    VSF_ASSERT(mask != 0);
     result = (float)cur_i32 / (float)mask;
     if (gamepad_evt->config) {
         result = -result;
@@ -151,7 +151,7 @@ static __ui_demo_gamepad_t * ui_demo_get_gamepad(void *dev)
 void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     __ui_demo_gamepad_t *gamepad = ui_demo_get_gamepad(gamepad_evt->dev);
-    ASSERT(gamepad != NULL);
+    VSF_ASSERT(gamepad != NULL);
 
     lv_coord_t radius = gamepad->margin + (gamepad->margin >> 1);
     uint32_t mask = (1UL << gamepad_evt->bitlen) - 1;
@@ -238,7 +238,7 @@ static bool lv_btn_is_down(lv_obj_t *obj)
 static void ui_demo_event_cb(lv_obj_t *obj, lv_event_t event)
 {
     __ui_demo_gamepad_t *gamepad = obj->user_data;
-    ASSERT(gamepad != NULL);
+    VSF_ASSERT(gamepad != NULL);
 
     if (event != LV_EVENT_CLICKED) {
         return;

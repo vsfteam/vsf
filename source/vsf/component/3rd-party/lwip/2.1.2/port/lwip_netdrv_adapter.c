@@ -85,7 +85,7 @@ void lwip_req___addr___from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_
 static err_t __ethernetif_low_level_output(struct netif *netif, struct pbuf *p)
 {
     vk_netdrv_t *netdrv = netif->state;
-  
+
 #if ETH_PAD_SIZE
     pbuf_header(p, -ETH_PAD_SIZE); /* drop the padding word */
 #endif
@@ -95,7 +95,7 @@ static err_t __ethernetif_low_level_output(struct netif *netif, struct pbuf *p)
     vsf_protect_t orig = vsf_protect_sched();
     if (!vk_netdrv_can_output(netdrv)) {
         vsf_eda_t *eda = vsf_eda_get_cur();
-        ASSERT((NULL == netdrv->adapter.eda_pending) && vsf_eda_is_stack_owner(eda));
+        VSF_ASSERT((NULL == netdrv->adapter.eda_pending) && vsf_eda_is_stack_owner(eda));
         netdrv->adapter.eda_pending = eda;
         vsf_unprotect_sched(orig);
         vsf_thread_wfe(VSF_EVT_USER);
@@ -111,9 +111,9 @@ err_t ethernetif_init(struct netif *netif)
 {
     vk_netdrv_t *netdrv;
 
-    ASSERT(netif != NULL);
+    VSF_ASSERT(netif != NULL);
     netdrv = netif->state;
-    ASSERT((netdrv != NULL) && (netdrv->macaddr.size <= NETIF_MAX_HWADDR_LEN));
+    VSF_ASSERT((netdrv != NULL) && (netdrv->macaddr.size <= NETIF_MAX_HWADDR_LEN));
 
 #if LWIP_NETIF_HOSTNAME
     /* Initialize interface hostname */
@@ -256,7 +256,7 @@ static void * __lwip_netdrv_adapter_alloc_buf(void *netif, uint_fast32_t size)
 
 static void * __lwip_netdrv_adapter_read_buf(void *netbuf, vsf_mem_t *mem)
 {
-    ASSERT((netbuf != NULL) && (mem != NULL));
+    VSF_ASSERT((netbuf != NULL) && (mem != NULL));
     struct pbuf *pbuf = netbuf;
 
     mem->buffer = pbuf->payload;

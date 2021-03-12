@@ -48,7 +48,7 @@ vsf_err_t gd32e10x_usbh_init(gd32e10x_usb_t *hc, usb_hc_ip_cfg_t *cfg)
 void gd32e10x_usbh_get_info(gd32e10x_usb_t *hc, usb_hc_ip_info_t *info)
 {
     vk_dwcotg_hc_ip_info_t *dwcotg_info = (vk_dwcotg_hc_ip_info_t *)info;
-    ASSERT(info != NULL);
+    VSF_ASSERT(info != NULL);
     dwcotg_info->regbase = hc->param->reg;
     dwcotg_info->ep_num = gd32e10x_usbh_ep_number;
     dwcotg_info->is_dma = gd32e10x_usbh_ep_is_dma;

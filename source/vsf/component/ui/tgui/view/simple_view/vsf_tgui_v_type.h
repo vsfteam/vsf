@@ -27,82 +27,197 @@
 #include "./vsf_tgui_sv_color.h"
 
 /*============================ MACROS ========================================*/
+#ifndef VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR        ENABLED
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == DISLABED
+#ifndef VSF_TGUI_CFG_SV_SUPPORT_FIXED_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_SV_SUPPORT_FIXED_BACKGROUND_COLOR           ENABLED
+#endif
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY
+#   define VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY                ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE
+#   define VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE                      ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR
+#   define VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR                 ENABLED
+#endif
+
 #ifndef VSF_TGUI_CFG_SV_CONTROL_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_CONTROL_BACKGROUND_COLOR             VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
+#   define VSF_TGUI_CFG_SV_CONTROL_BACKGROUND_COLOR             VSF_TGUI_COLOR_RGB(0xB4, 0xC7, 0xE7)
 #endif
 
 #ifndef VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR               VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
+#   define VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR               VSF_TGUI_COLOR_RGB(0xB4, 0xC7, 0xE7)
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_LABEL_TEXT_COLOR
+#   define VSF_TGUI_CFG_SV_LABEL_TEXT_COLOR                     VSF_TGUI_COLOR_BLACK
 #endif
 
 #ifndef VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR              VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
+#   define VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR              VSF_TGUI_COLOR_RGB(0xB4, 0xC7, 0xE7)
 #endif
 
-#ifndef VSF_TGUI_CFG_SV_BUTTON_SUPPORT_CLICKED_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_BUTTON_SUPPORT_CLICKED_BACKGROUND_COLOR  ENABLED
+#ifndef VSF_TGUI_CFG_SV_BUTTON_CLICKED_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_SV_BUTTON_CLICKED_BACKGROUND_COLOR      VSF_TGUI_COLOR_BLUE
 #endif
 
-#if VSF_TGUI_CFG_SV_BUTTON_SUPPORT_CLICKED_BACKGROUND_COLOR == ENABLED
-#   ifndef VSF_TGUI_CFG_SV_BUTTON_CLICKED_BACKGROUND_COLOR
-#       define VSF_TGUI_CFG_SV_BUTTON_CLICKED_BACKGROUND_COLOR  VSF_TGUI_COLOR_RGB(0x18, 0x53, 0x9C)
-#   endif
+#ifndef VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_COLOR
+#   define VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_COLOR             VSF_TGUI_COLOR_BLUE
+#endif
 
-#   define VSF_TGUI_V_BUTTON_STATIC_INIT_CLICKED_DEFAULT        .tClickedBackgroundColor = VSF_TGUI_CFG_SV_BUTTON_CLICKED_BACKGROUND_COLOR,
-#else
-#   define VSF_TGUI_V_BUTTON_STATIC_INIT_CLICKED_DEFAULT
+#ifndef VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_VALUE
+#   define VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_VALUE             128
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_BUTTON_TEXT_COLOR
+#   define VSF_TGUI_CFG_SV_BUTTON_TEXT_COLOR                    VSF_TGUI_COLOR_BLACK
 #endif
 
 #ifndef VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR   VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
+#   define VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR           VSF_TGUI_COLOR_RGB(0x44, 0x72, 0xC4)
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_PANEL_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_SV_PANEL_BACKGROUND_COLOR               VSF_TGUI_COLOR_RGB(0x44, 0x72, 0xC4)
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_LIST_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_SV_LIST_BACKGROUND_COLOR                VSF_TGUI_COLOR_RGBA(0xB4, 0xC7, 0xE7, 0x00)
 #endif
 
 #ifndef VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR           VSF_TGUI_COLOR_DEF(0xB4, 0xC7, 0xE7)
+#   define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR           VSF_TGUI_COLOR_RGB(0xB4, 0xC7, 0xE7)
 #endif
 
 #ifndef VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR
-#   define VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR            VSF_TGUI_COLOR_DEF(0x44, 0x72, 0xC4)
+#   define VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR            VSF_TGUI_COLOR_RGB(0x44, 0x72, 0xC4)
 #endif
 
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+#   define __SV_BACKGROUND_COLOR(__COLOR)                       .background_color = __COLOR,
+#else
+#   define __SV_BACKGROUND_COLOR(__COLOR)
+#endif
 
-#define VSF_TGUI_V_TEST_LIST_STATIC_INIT_DEFAULT                                \
-            .bIsNoBackgroundColor = false,                                      \
-            .tBackgroundColor = VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR,
+#if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
+#   define __SV_TILE_TRANS_RATE(__COLOR)                       .tile_trans_rate = __COLOR,
+#else
+#   define __SV_TILE_TRANS_RATE(__COLOR)
+#endif
 
-#define VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT
+#if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
+#   define __SV_SHOW_CORNER_TILE(__VALUE)                       .show_corner_tile  = __VALUE,
+#else
+#   define __SV_SHOW_CORNER_TILE(__VALUE)
+#endif
+
+#if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
+#   define __SV_TEXT_COLOR(__COLOR)                             .font_color = __COLOR,
+#else
+#   define __SV_TEXT_COLOR(__COLOR)
+#endif
 
 #define VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                                  \
-            .bIsNoBackgroundColor = false,                                      \
-            .tBackgroundColor = VSF_TGUI_CFG_SV_CONTROL_BACKGROUND_COLOR,
-
-#define VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                                \
-            .bIsNoBackgroundColor = false,                                      \
-            .tBackgroundColor = VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR,
+            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_TILE_TRANS_RATE(0xFF)                                          \
+            __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_SV_CONTROL_BACKGROUND_COLOR)     \
 
 #define VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT                                    \
-            .bIsNoBackgroundColor = false,                                      \
-            .tBackgroundColor = VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR,
+            __SV_SHOW_CORNER_TILE(true)                                         \
+            __SV_TILE_TRANS_RATE(0xFF)                                          \
+            __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR)       \
+            __SV_TEXT_COLOR(VSF_TGUI_CFG_SV_LABEL_TEXT_COLOR)
 
 #define VSF_TGUI_V_BUTTON_STATIC_INIT_DEFAULT                                   \
-            .bIsNoBackgroundColor = false,                                      \
-            .tBackgroundColor = VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR,        \
-            VSF_TGUI_V_BUTTON_STATIC_INIT_CLICKED_DEFAULT
+            __SV_SHOW_CORNER_TILE(true)                                         \
+            __SV_TILE_TRANS_RATE(0xFF)                                          \
+            __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR)      \
+            __SV_TEXT_COLOR(VSF_TGUI_CFG_SV_BUTTON_TEXT_COLOR)
+
+#define VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                                \
+            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_TILE_TRANS_RATE(0xFF)                                          \
+            __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR)   \
+
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_DEFAULT                                \
+            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_TILE_TRANS_RATE(0xFF)                                          \
+            __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR)
+
+#define VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT                                     \
+            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_TILE_TRANS_RATE(0xFF)                                          \
+
 
 #define VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                    \
-            .bIsShowCornerTile = true,
+            __SV_SHOW_CORNER_TILE(true)                                         \
+            __SV_TILE_TRANS_RATE(0xFF)
 
-#define VSF_TGUI_V_TEST_LIST_STATIC_INIT_OVERRIDE                               \
-            .tList.tContent.bIsUseRawView = true,                               \
-            .tList.tContent.bIsNoBackgroundColor = true,                        \
-            .tList.bIsNoBackgroundColor = true,
-
-#define VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE
 #define VSF_TGUI_V_CONTROL_STATIC_INIT_OVERRIDE
-#define VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE
 #define VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE
 #define VSF_TGUI_V_BUTTON_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE
+#define VSF_TGUI_V_LIST_STATIC_INIT_OVERRIDE
+
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE                             \
+            .tList.tContent.background_color = VSF_TGUI_COLOR_RGBA(0x00, 0x00, 0x00, 0x00),     \
+            .tList.background_color = VSF_TGUI_COLOR_RGBA(0x00, 0x00, 0x00, 0x00),
+#else
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE                                          \
+            .tList.tContent.show_corner_tile = true,
+#else
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE
+#endif
+
+#define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_OVERRIDE                                               \
+            VSF_TGUI_V_TEXT_LIST_STATIC_INIT_BACKGROUND_CLOLOR_OVERRIDE                         \
+            VSF_TGUI_V_TEXT_LIST_STATIC_INIT_TILE_OVERRIDE
+
 #define VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE
+
+#define tgui_sv_font(...)                                           \
+            __tgui_attribute(font_index, __VA_ARGS__)
+
+#if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
+#define tgui_sv_tile_show_corner(...)                               \
+            __tgui_attribute(show_corner_tile,  __VA_ARGS__)
+#else
+#define tgui_sv_tile_show_corner(...)
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
+#define tgui_sv_tile_trans_rate(...)                                \
+            __tgui_attribute(tile_trans_rate,  __VA_ARGS__)
+#else
+#define tgui_sv_tile_trans_rate(...)
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+#define tgui_sv_background_color(...)                               \
+            __tgui_attribute(background_color,  __VA_ARGS__)
+#else
+#define tgui_sv_background_color(...)
+#endif
+
+#if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
+#define tgui_sv_font_color(...)                                     \
+            __tgui_attribute(font_color,  __VA_ARGS__)
+#else
+#define tgui_sv_font_color(...)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -110,35 +225,40 @@
 declare_structure(vsf_tgui_v_control_t)
 
 def_structure(vsf_tgui_v_control_t)
-    union {
-        uint8_t ControlAttributes;
-        struct {
-            uint8_t bIsTileTransparency: 1;
-            uint8_t bIsNoBackgroundColor: 1;
-        };
-    };
-    uint8_t chTileTransparencyRate;
-    vsf_tgui_sv_color_t tBackgroundColor;
+    uint8_t font_index : 7;
+
+#if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
+    uint8_t show_corner_tile : 1;
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
+    uint8_t tile_trans_rate;
+#endif
+
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+    vsf_tgui_sv_color_t background_color;
+#endif
+
 end_def_structure(vsf_tgui_v_control_t)
 
 declare_structure(vsf_tgui_v_container_t)
 
 def_structure(vsf_tgui_v_container_t)
-    uint8_t bIsShowCornerTile;
+#if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
+    //please remove this if your structure is not emplty
+    REG_RSVD_U8
+#endif
 end_def_structure(vsf_tgui_v_container_t)
 
 declare_structure(vsf_tgui_v_label_t)
 def_structure(vsf_tgui_v_label_t)
-    uint8_t bIsUseRawView;
-    uint8_t chFontIndex;
-    vsf_tgui_sv_color_t tFontColor;
+#if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
+    vsf_tgui_sv_color_t font_color;
+#endif
 end_def_structure(vsf_tgui_v_label_t)
 
 declare_structure(vsf_tgui_v_button_t)
 def_structure(vsf_tgui_v_button_t)
-#if VSF_TGUI_CFG_SV_BUTTON_SUPPORT_CLICKED_BACKGROUND_COLOR == ENABLED
-    vsf_tgui_sv_color_t tClickedBackgroundColor;
-#endif
 #if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
     //please remove this if your structure is not emplty
     REG_RSVD_U8

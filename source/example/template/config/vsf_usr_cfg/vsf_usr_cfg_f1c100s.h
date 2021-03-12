@@ -117,7 +117,7 @@
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 
-#ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
+#ifndef USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
 #   define USRAPP_CFG_LINUX_TTY_UART                    1
 #   define USRAPP_CFG_LINUX_TTY_CDC                     2
@@ -137,8 +137,8 @@
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
 extern void VSF_DEBUG_STREAM_POLL(void);
-#define ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1){VSF_DEBUG_STREAM_POLL();}}
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) {while(1){VSF_DEBUG_STREAM_POLL();}}
+//#define VSF_ASSERT(...)
 
 #define VSF_HAL_DRV_CFG_SYSTIMER_POLL_MODE_EN           ENABLED
 

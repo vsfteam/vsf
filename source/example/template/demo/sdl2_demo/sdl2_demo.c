@@ -21,9 +21,18 @@
 
 #if VSF_USE_SDL2 == ENABLED && APP_USE_SDL2_DEMO == ENABLED
 
+#include "../common/usrapp_common.h"
 #include <SDL.h>
 
 /*============================ MACROS ========================================*/
+
+#ifndef APP_SDL2_DEMO_CFG_WIDTH
+#   define APP_SDL2_DEMO_CFG_WIDTH          320
+#endif
+#ifndef APP_SDL2_DEMO_CFG_HEIGHT
+#   define APP_SDL2_DEMO_CFG_HEIGHT         240
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -45,12 +54,15 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
+    // initialize first
+    vsf_sdl2_init(usrapp_ui_common.disp);
+
     // SDL application
     SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_Window *win = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 240, SDL_WINDOW_SHOWN);
+    SDL_Window *win = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, APP_SDL2_DEMO_CFG_WIDTH, APP_SDL2_DEMO_CFG_HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-#if defined(APP_CFG_SDL2_DEMO_COLOR_RGB565)
+#if defined(APP_SDL2_DEMO_CFG_COLOR_RGB565)
     SDL_Texture *texture = SDL_CreateTexture(renderer,
             SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STATIC, 34, 34);
 
@@ -64,8 +76,9 @@ int VSF_USER_ENTRY(void)
             .w = 34,
             .h = 34,
         }),
-        block, sizeof(block[0]) * 34);
-#elif defined(APP_CFG_SDL2_DEMO_COLOR_RGB666)
+        block, sizeof(block[0]) * 34
+    );
+#elif defined(APP_SDL2_DEMO_CFG_COLOR_RGB666)
     SDL_Texture *texture = SDL_CreateTexture(renderer,
             SDL_PIXELFORMAT_RGB666, SDL_TEXTUREACCESS_STATIC, 34, 34);
 
@@ -79,7 +92,8 @@ int VSF_USER_ENTRY(void)
             .w = 34,
             .h = 34,
         }),
-        block, sizeof(block[0]) * 34);
+        block, sizeof(block[0]) * 34
+    );
 #endif
 
     uint8_t x = 0, y = 0;
@@ -95,9 +109,12 @@ int VSF_USER_ENTRY(void)
                 .y = y,
                 .w = 34,
                 .h = 34,
-            }));
+            })
+        );
         x += rand();
+        x %= APP_SDL2_DEMO_CFG_WIDTH;
         y += rand();
+        y %= APP_SDL2_DEMO_CFG_HEIGHT;
         SDL_RenderPresent(renderer);
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         vsf_teda_set_timer_ms(1000);

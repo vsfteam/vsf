@@ -27,10 +27,12 @@
 #   include "../../include/unistd.h"
 #   include "../../include/simple_libc/time.h"
 #   include "../../include/pthread.h"
+#   include "../../include/signal.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
 #   include <pthread.h>
+#   include <signal.h>
 #endif
 
 #if __IS_COMPILER_IAR__
@@ -251,6 +253,11 @@ void *pthread_getspecific(pthread_key_t key)
 {
     VSF_LINUX_ASSERT(false);
     return NULL;
+}
+
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset)
+{
+    return 0;
 }
 
 #endif      // VSF_USE_LINUX

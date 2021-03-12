@@ -20,7 +20,7 @@
 #include "./usrapp_ui_common.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED)            \
+    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED || VSF_DISP_USE_DL1X5 == ENABLED)\
     &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_AWTK == ENABLED || VSF_USE_LVGL == ENABLED)
 
 #include "hal/vsf_hal.h"
@@ -74,7 +74,8 @@ static f1cx00s_fb_t __fb = {
 
 usrapp_ui_common_t usrapp_ui_common = {
 #if VSF_DISP_USE_SDL2 == ENABLED
-    .disp                       = {
+    .disp                       = &usrapp_ui_common.disp_sdl2.use_as__vk_disp_t,
+    .disp_sdl2                  = {
         .param                  = {
             .height             = APP_DISP_SDL2_HEIGHT,
             .width              = APP_DISP_SDL2_WIDTH,
@@ -85,7 +86,8 @@ usrapp_ui_common_t usrapp_ui_common = {
         .amplifier              = APP_DISP_SDL2_AMPLIFIER,
     },
 #elif VSF_DISP_USE_FB == ENABLED
-    .disp                       = {
+    .disp                       = &usrapp_ui_common.disp_fb.use_as__vk_disp_t,
+    .disp_fb                    = {
         .param                  = {
             .height             = APP_DISP_FB_HEIGHT,
             .width              = APP_DISP_FB_WIDTH,
@@ -101,11 +103,27 @@ usrapp_ui_common_t usrapp_ui_common = {
             .pixel_byte_size    = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
         },
     },
+#else
+    .disp                       = NULL,
+#endif
+
+#if VSF_USE_LVGL == ENABLED
+#   ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR
+    .lvgl.color                 = (lv_color_t *)(APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR),
+#   endif
 #endif
 };
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_DL1X5 == ENABLED
+void vsf_dl1x5_on_new_disp(vk_disp_t *disp)
+{
+    vsf_trace_info("ui: switch default display to dl1x5" VSF_TRACE_CFG_LINEEND);
+    usrapp_ui_common.disp = disp;
+}
+#endif
 
 #endif      // VSF_USE_UI
 /* EOF */

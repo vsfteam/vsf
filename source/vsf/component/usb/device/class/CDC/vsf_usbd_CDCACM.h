@@ -76,24 +76,24 @@ extern "C" {
 
 
 
-#define __cdc_acm_desc(__name, __ifs_start, __i_func, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
+#define __usbd_cdc_acm_desc_iad(__name, __ifs_start, __i_func, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
             USB_DESC_CDC_ACM_IAD((__ifs_start), (__i_func), (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval))
 
-#define __cdc_acm_func(__name, __func_id, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __stream_rx, __stream_tx, ...)\
+#define __usbd_cdc_acm_func(__name, __func_id, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __stream_rx, __stream_tx, ...)\
             vk_usbd_cdcacm_t __##__name##_CDCACM##__func_id = {                 \
                 USB_CDC_ACM_PARAM((__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__stream_rx), (__stream_tx), __VA_ARGS__)\
             };
 
-#define __cdc_acm_ifs(__name, __func_id)                                        \
+#define __usbd_cdc_acm_ifs(__name, __func_id)                                   \
             USB_CDC_ACM_IFS_CONTROL(__##__name##_CDCACM##__func_id)             \
             USB_CDC_ACM_IFS_DATA(__##__name##_CDCACM##__func_id)
 
-#define cdc_acm_desc(__name, __ifs_start, __i_func, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
-            __cdc_acm_desc(__name, (__ifs_start), 4 + (__i_func), (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval))
-#define cdc_acm_func(__name, __func_id, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __stream_rx, __stream_tx, ...)\
-            __cdc_acm_func(__name, __func_id, (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__stream_rx), (__stream_tx), __VA_ARGS__)
-#define cdc_acm_ifs(__name, __func_id)                                          \
-            __cdc_acm_ifs(__name, __func_id)
+#define usbd_cdc_acm_desc_iad(__name, __ifs_start, __i_func, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
+            __usbd_cdc_acm_desc_iad(__name, (__ifs_start), 4 + (__i_func), (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval))
+#define usbd_cdc_acm_func(__name, __func_id, __int_in_ep, __bulk_in_ep, __bulk_out_ep, __stream_rx, __stream_tx, ...)\
+            __usbd_cdc_acm_func(__name, __func_id, (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__stream_rx), (__stream_tx), __VA_ARGS__)
+#define usbd_cdc_acm_ifs(__name, __func_id)                                     \
+            __usbd_cdc_acm_ifs(__name, __func_id)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

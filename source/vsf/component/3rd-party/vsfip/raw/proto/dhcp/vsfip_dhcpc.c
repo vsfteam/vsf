@@ -292,7 +292,7 @@ static void __vsfip_dhcpc_on_eda_terminate(vsf_eda_t *eda)
 // vsfip_dhcpc_start MUST be called protected with netif
 vsf_err_t vsfip_dhcpc_start(vsfip_netif_t *netif, vsfip_dhcpc_t *dhcpc)
 {
-    ASSERT((netif != NULL) && (dhcpc != NULL));
+    VSF_ASSERT((netif != NULL) && (dhcpc != NULL));
 
     netif->dhcp.dhcpc = dhcpc;
     dhcpc->netif = netif;
@@ -307,7 +307,7 @@ vsf_err_t vsfip_dhcpc_start(vsfip_netif_t *netif, vsfip_dhcpc_t *dhcpc)
 
     dhcpc->teda.fn.evthandler = __vsfip_dhcpc_evthandler;
     dhcpc->teda.on_terminate = __vsfip_dhcpc_on_eda_terminate;
-    vsf_err_t err = vsf_teda_init(&dhcpc->teda, vsf_prio_inherit, false);
+    vsf_err_t err = vsf_teda_init(&dhcpc->teda);
     if (VSF_ERR_NONE != err) {
         __vsfip_dhcpc_on_eda_terminate(&dhcpc->teda.use_as__vsf_eda_t);
     }

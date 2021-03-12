@@ -29,30 +29,31 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
 
-const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
-    .tTopLeft = {
+static const vsf_tgui_tile_t __controls_container_corner_tiles[__CORNOR_TILE_NUM] = {
+    [CORNOR_TILE_IN_TOP_LEFT] = {
         .tChild = {
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tSize = {.iWidth = 12, .iHeight = 12, },
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
-    .tTopRight = {
+    [CORNOR_TILE_IN_TOP_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.iX = 200 - 12, .iY = 0},
         },
     },
-    .tBottomLeft = {
+    [CORNOR_TILE_IN_BOTTOM_LEFT] = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tLocation = {.iX = 0, .iY = 200 - 12},
         },
     },
-    .tBottomRight = {
+    [CORNOR_TILE_IN_BOTTOM_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
@@ -61,15 +62,15 @@ const vsf_tgui_sv_container_corner_tiles_t g_tContainerCornerTiles = {
     },
 };
 
-const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
-    .tLeft = {
+static const vsf_tgui_tile_t __controls_label_corner_tiles[2] = {
+    [CORNOR_TILE_IN_TOP_LEFT ] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 32, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
-    .tRight = {
+    [CORNOR_TILE_IN_TOP_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 32, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
@@ -78,49 +79,26 @@ const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles = {
     },
 };
 
-/*============================ LOCAL VARIABLES ===============================*/
-static vsf_tgui_font_t g_tUserFonts[] = {
-    [VSF_TGUI_FONT_WQY_MICROHEI_S24] = {
-        .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
-        .chFontSize = 24,
-        .pchFontPath = "font/wqy-microhei.ttc",
-    },
-
-    [VSF_TGUI_FONT_WQY_MICROHEI_S20] = {
-        .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
-        .chFontSize = 20,
-        .pchFontPath = "font/wqy-microhei.ttc",
-    },
-
-    [VSF_TGUI_FONT_WQY_MICROHEI_S16] = {
-        .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
-        .chFontSize = 16,
-        .pchFontPath = "font/wqy-microhei.ttc",
-    },
-
-    [VSF_TGUI_FONT_DEJAVUSERIF_S24] = {
-        .chFlags = VSF_TGUI_FONT_PROPORTIONAL,
-        .chFontSize = 24,
-        .pchFontPath = "font/DejaVuSerif.ttf",
-    },
-
-};
-
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-/*********************************************************************************/
 
-const vsf_tgui_font_t* vsf_tgui_font_get(uint8_t chFontIndex)
+#ifdef WEAK_VSF_TGUI_SV_GET_CORNOR_TILE
+const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_control_t* control_ptr, vsf_tgui_sv_cornor_tile_mode_t mode)
 {
-    VSF_TGUI_ASSERT(chFontIndex < dimof(g_tUserFonts));
-    return &g_tUserFonts[chFontIndex];
-}
+    if (control_ptr->id == VSF_TGUI_COMPONENT_ID_BUTTON || control_ptr->id == VSF_TGUI_COMPONENT_ID_LABEL) {
+        if (mode < dimof(__controls_label_corner_tiles)) {
+            return &__controls_label_corner_tiles[mode];
+        }
+    } else /*if (control_ptr->id == VSF_TGUI_COMPONENT_ID_CONTAINER || control_ptr->id == VSF_TGUI_COMPONENT_ID_PANEL)*/ {
+        if (mode < dimof(__controls_container_corner_tiles)) {
+            return &__controls_container_corner_tiles[mode];
+        }
+    }
 
-uint8_t vsf_tgui_font_number(void)
-{
-    return dimof(g_tUserFonts);
+    return NULL;
 }
+#endif
+
 #endif
 
 /* EOF */

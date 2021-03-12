@@ -26,8 +26,12 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SDL2_ASSERT
-#   define VSF_SDL2_ASSERT              ASSERT
+#   define VSF_SDL2_ASSERT              VSF_ASSERT
 #endif
+
+// enable libpng support for SDL_image
+#define LOAD_PNG
+#define LOAD_JPG
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

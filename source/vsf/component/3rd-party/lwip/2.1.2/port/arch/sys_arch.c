@@ -38,17 +38,17 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*
-struct vsf_rtos_thread_t {
+struct vsf_lwip_thread_t {
     implement(vsf_thread_t)
 
     void *arg;
     lwip_thread_fn fn;
 };
-typedef struct vsf_rtos_thread_t vsf_rtos_thread_t;
+typedef struct vsf_lwip_thread_t vsf_lwip_thread_t;
 */
 
-dcl_vsf_thread_ex(vsf_rtos_thread_t)
-def_vsf_thread_ex(vsf_rtos_thread_t,
+dcl_vsf_thread_ex(vsf_lwip_thread_t)
+def_vsf_thread_ex(vsf_lwip_thread_t,
     def_params(
         void *arg;
         lwip_thread_fn lwip_thread;
@@ -64,12 +64,12 @@ def_vsf_thread_ex(vsf_rtos_thread_t,
 #if SYS_LIGHTWEIGHT_PROT
 sys_prot_t sys_arch_protect(void)
 {
-    return vsf_protect_sched();
+    return vsf_protect_int();
 }
 
 void sys_arch_unprotect(sys_prot_t pval)
 {
-    vsf_unprotect_sched(pval);
+    vsf_unprotect_int(pval);
 }
 #endif
 
@@ -116,6 +116,9 @@ void sys_check_core_locking(void)
 
     if (__lwip_tcpip_thread != 0) {
         vsf_eda_t *current_thread = vsf_eda_get_cur();
+        if (current_thread != __lwip_core_lock_holder_thread) {
+            __asm("nop");
+        }
 
 #if LWIP_TCPIP_CORE_LOCKING
         LWIP_ASSERT("Function called without core lock", current_thread == __lwip_core_lock_holder_thread);
@@ -127,17 +130,17 @@ void sys_check_core_locking(void)
 }
 
 // thread
-static void __vsf_rtos_thread_on_terminate(vsf_eda_t *eda)
+static void __vsf_lwip_thread_on_terminate(vsf_eda_t *eda)
 {
     vsf_heap_free(eda);
 }
 
-implement_vsf_thread_ex(vsf_rtos_thread_t)
+implement_vsf_thread_ex(vsf_lwip_thread_t)
 {
-    this.lwip_thread(this.arg);
+    this_ptr->lwip_thread(this_ptr->arg);
 }
 /*
-static void vsf_rtos_thread_entry(vsf_thread_t *thread)
+static void __vsf_lwip_thread_entry(vsf_thread_t *thread)
 {
     sys_thread_t sys_thread = (sys_thread_t)thread;
     sys_thread->fn(sys_thread->arg);
@@ -164,13 +167,13 @@ sys_thread_t sys_thread_new(const char *name,
         return NULL;
     }
 
-    thread->on_terminate = __vsf_rtos_thread_on_terminate;
+    thread->on_terminate = __vsf_lwip_thread_on_terminate;
 
     thread->arg = arg;
     thread->lwip_thread = fn;
 
     stack = (uint64_t *)((uintptr_t)thread + thread_size);
-    init_vsf_thread_ex( vsf_rtos_thread_t,
+    init_vsf_thread_ex( vsf_lwip_thread_t,
                         thread,
                         prio,
                         stack,
@@ -286,7 +289,7 @@ static const vsf_eda_queue_op_t __sys_mbox_queue_op = {
 
 err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 {
-    ASSERT(size <= VSF_SYNC_MAX);
+    VSF_ASSERT(size <= VSF_SYNC_MAX);
 
     mbox->queue = vsf_heap_malloc(sizeof(void *) * size);
     if (NULL == mbox->queue) {

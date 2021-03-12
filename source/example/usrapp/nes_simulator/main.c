@@ -95,7 +95,7 @@ void uvc_app_on_fill_line_cpl(bool frame_cpl){}
 void ui_demo_on_ready(void)
 {
     __uvc_helper.flag.started = true;
-    vsf_eda_init(&__uvc_helper.eda, vsf_prio_0, false);
+    vsf_eda_init(&__uvc_helper.eda, vsf_prio_0);
 }
 
 void uvc_app_fill_line(void *line_buf, uint_fast16_t size, bool last_line)
@@ -206,7 +206,7 @@ vsf_err_t vk_usbd_uvc_helper_init(void)
 {
     if (VSF_ERR_NONE != vsf_eda_set_evthandler(&__uvc_helper.eda, 
                                                 __uvc_helper_refresh_evthandler)) {
-        ASSERT(false);
+        VSF_ASSERT(false);
     }
 
 #if VSF_UVC_HELPER_CFG_SUPPORT_LINE_BUFFER == ENABLED

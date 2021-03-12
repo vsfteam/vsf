@@ -72,7 +72,7 @@ typedef struct __vsf_freertos_t {
         int8_t                      pos;
     } irq;
     struct {
-        vsf_gint_state_t            state;
+        vsf_arch_prio_t             state;
         UBaseType_t                 os_state;
     } gint;
 } __vsf_freertos_t;
@@ -89,13 +89,14 @@ static NO_INIT __vsf_freertos_t __vsf_freertos;
  * interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 
-vsf_gint_state_t vsf_get_interrupt(void)
+vsf_arch_prio_t vsf_get_interrupt(void)
 {
     return __vsf_freertos.gint.state;
 }
 
-void vsf_set_interrupt(vsf_gint_state_t level)
+vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level)
 {
+    vsf_arch_prio_t orig = vsf_get_interrupt();
     if (__vsf_freertos.gint.state != level) {
         if (level) {
             __vsf_freertos.gint.state = level;
@@ -105,18 +106,21 @@ void vsf_set_interrupt(vsf_gint_state_t level)
             __vsf_freertos.gint.state = level;
         }
     }
+    return orig;
 }
 
-vsf_gint_state_t vsf_disable_interrupt(void)
+vsf_arch_prio_t vsf_disable_interrupt(void)
 {
-    vsf_gint_state_t orig = vsf_get_interrupt();
+    vsf_arch_prio_t orig = vsf_get_interrupt();
     vsf_set_interrupt(false);
     return orig;
 }
 
-void vsf_enable_interrupt(void)
+vsf_arch_prio_t vsf_enable_interrupt(void)
 {
+    vsf_arch_prio_t orig = vsf_get_interrupt();
     vsf_set_interrupt(true);
+    return orig;
 }
 
 /*----------------------------------------------------------------------------*
@@ -126,7 +130,7 @@ void vsf_enable_interrupt(void)
 void __vsf_arch_irq_enter(void)
 {
     int_fast8_t pos;
-    vsf_gint_state_t orig = vsf_disable_interrupt();
+    vsf_arch_prio_t orig = vsf_disable_interrupt();
         pos = ++__vsf_freertos.irq.pos;
         if (pos >= dimof(__vsf_freertos.irq.stack)) {
             VSF_ARCH_ASSERT(false);
@@ -140,7 +144,7 @@ void __vsf_arch_irq_leave(void)
 {
     BaseType_t is_to_switch;
 
-    vsf_gint_state_t orig = vsf_disable_interrupt();
+    vsf_arch_prio_t orig = vsf_disable_interrupt();
         is_to_switch = __vsf_freertos.irq.stack[__vsf_freertos.irq.pos--];
     vsf_set_interrupt(orig);
 

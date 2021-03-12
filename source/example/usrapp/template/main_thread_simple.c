@@ -81,7 +81,7 @@ implement_vsf_thread(user_thread_a_t)
     while (1) {
         vsf_delay_ms(1000);
         printf("post semaphore...     [%08x]\r\n", cnt++);
-        vsf_sem_post(this.sem_ptr);            //!< post a semaphore
+        vsf_sem_post(vsf_this.sem_ptr);            //!< post a semaphore
     }
 }
 
@@ -89,7 +89,7 @@ implement_vsf_thread(user_thread_b_t)
 {
     uint32_t cnt = 0;
     while (1) {
-        vsf_sem_pend(this.sem_ptr);            //! wait for semaphore forever
+        vsf_sem_pend(vsf_this.sem_ptr);            //! wait for semaphore forever
         printf("receive semaphore...  [%08x]\r\n", cnt++);
     }
 }
@@ -135,7 +135,7 @@ void main(void)
     
     vsf_kernel_thread_simple_demo();
     
-    this.cnt = 0;
+    vsf_this.cnt = 0;
     while(1) {
         printf("hello world! \r\n");
         vsf_pt_wait_until(vsf_delay_ms(1000));

@@ -31,7 +31,11 @@
 struct usrapp_t {
     struct {
         vk_disp_sdl2_t disp;
-        vsf_tgui_color_t color[VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE];
+#if APP_DISP_SDL2_COLOR == VSF_DISP_COLOR_RGB565
+        uint16_t color[VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE];
+#elif (APP_DISP_SDL2_COLOR == VSF_DISP_COLOR_ARGB8888) || (APP_DISP_SDL2_COLOR == VSF_DISP_COLOR_RGB666_32)
+        uint32_t color[VSF_TGUI_CFG_SV_PORT_COLOR_BUFFER_SIZE];
+#endif
     } ui;
 };
 typedef struct usrapp_t usrapp_t;
@@ -46,12 +50,7 @@ static usrapp_t __usrapp = {
             .height             = VSF_TGUI_VER_MAX,
             .width              = VSF_TGUI_HOR_MAX,
             .drv                = &vk_disp_drv_sdl2,
-
-        #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-            .color              = VSF_DISP_COLOR_ARGB8888,
-        #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-            .color              = VSF_DISP_COLOR_RGB565,
-        #endif
+            .color              = APP_DISP_SDL2_COLOR,
         },
         .amplifier              = 1,
     },
@@ -79,7 +78,7 @@ void vsf_input_on_keyboard(vk_keyboard_evt_t* keyboard_evt)
     }
 }
 
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
 extern void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt);
 void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
 {

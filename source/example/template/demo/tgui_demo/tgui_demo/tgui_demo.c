@@ -107,10 +107,10 @@ vsf_err_t tgui_demo_init(void)
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
     tgui_designer_init(&s_tDesigner, &s_tTGUIDemo);
-    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tDesigner);
+    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tDesigner, true);
 #else
     my_stopwatch_init(&s_tMyStopwatch, &s_tTGUIDemo);
-    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tMyStopwatch);
+    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tMyStopwatch, true);
 #endif
 
     return err;
@@ -150,10 +150,10 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
                                 ts_evt->use_as__vk_input_evt_t.duration
                                 );
 
-    ASSERT(result == VSF_ERR_NONE);
+    VSF_ASSERT(result == VSF_ERR_NONE);
 }
 
-#if (VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED) && defined(VSF_TGUI_CFG_SUPPORT_MOUSE)
+#if (VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED) && defined(VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS)
 void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 {
 /*
@@ -203,7 +203,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
             }
 
 
-            ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
             break;
         }
 
@@ -245,7 +245,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                                             );
                 }
             }
-            ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
             break;
         }
 

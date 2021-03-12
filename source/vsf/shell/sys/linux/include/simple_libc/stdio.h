@@ -31,21 +31,37 @@
 extern "C" {
 #endif
 
+// in cstdio, common macro overrides will be undefined
+#define ferror              __vsf_linux_ferror
+#define clearerr            __vsf_linux_clearerr
+#define feof                __vsf_linux_feof
+#define getc                __vsf_linux_getc
 #define getchar             __vsf_linux_getchar
+#define putc                __vsf_linux_putc
+#define putchar             __vsf_linux_putchar
+
+
 #define fopen               __vsf_linux_fopen
+#define freopen             __vsf_linux_freopen
 #define fclose              __vsf_linux_fclose
 #define fseek               __vsf_linux_fseek
+#define fseeko              __vsf_linux_fseeko
 #define ftell               __vsf_linux_ftell
+#define ftello              __vsf_linux_ftello
+#define ftello64            __vsf_linux_ftello64
 #define rewind              __vsf_linux_rewind
 #define fwrite              __vsf_linux_fwrite
 #define fread               __vsf_linux_fread
+#define fflush              __vsf_linux_fflush
 #define fgets               __vsf_linux_fgets
 #define gets                __vsf_linux_gets
 #define fputs               __vsf_linux_fputs
 #define puts                __vsf_linux_puts
 #define printf              __vsf_linux_printf
 #define fprintf             __vsf_linux_fprintf
+#define fscanf              __vsf_linux_fscanf
 #define perror              __vsf_linux_perror
+#define setvbuf             __vsf_linux_setvbuf
 
 #define stdin               __vsf_linux_stdin
 #define stdout              __vsf_linux_stdout
@@ -54,16 +70,24 @@ extern "C" {
 typedef int FILE;
 extern FILE *stdin, *stdout, *stderr;
 
-#define SEEK_SET    0
-#define SEEK_CUR    1
-#define SEEK_END    2
+#define BUFSIZ              512
+#define L_tmpnam            260
 
-#define PATH_MAX    255
-#define EOF         0xFF
+#define SEEK_SET            0
+#define SEEK_CUR            1
+#define SEEK_END            2
 
-#define fpos_t      uintmax_t
+#define PATH_MAX            255
+#define EOF                 0xFF
+
+#define fpos_t              uintmax_t
 
 void perror(const char *str);
+
+#define _IOFBF              0x0000
+#define _IOLBF              0x0040
+#define _IONBF              0x0004
+int setvbuf(FILE *stream, char *buffer, int mode, size_t size);
 
 int putchar(int ch);
 int getchar(void);
@@ -90,7 +114,10 @@ FILE * fopen(const char *filename, const char *mode);
 FILE * freopen(const char *filename, const char *mode, FILE *f);
 int fclose(FILE *f);
 int fseek(FILE *f, long offset, int fromwhere);
+int fseeko(FILE *f, off_t offset, int fromwhere);
 long ftell(FILE *f);
+off_t ftello(FILE *f);
+off64_t ftello64(FILE *f);
 void rewind(FILE *f);
 int fgetpos(FILE *f, fpos_t *pos);
 int fsetpos(FILE *f, const fpos_t *pos);

@@ -389,7 +389,7 @@ static vsfip_netif_t * __vsfip_ip_route(vsfip_ipaddr_t *addr)
 static void __vsfip_netbuf_route(vsfip_socket_t *socket,
         vsfip_netbuf_t *netbuf, vsfip_ipaddr_t *addr)
 {
-    ASSERT(socket != NULL);
+    VSF_ASSERT(socket != NULL);
     vsf_sched_lock_status_t origlevel = vsf_sched_lock();
         vsfip_netbuf_set_netif(netbuf,
             (socket->netif != NULL) ? socket->netif : __vsfip_ip_route(addr));
@@ -398,7 +398,7 @@ static void __vsfip_netbuf_route(vsfip_socket_t *socket,
 
 static void __vsfip_socket_route(vsfip_socket_t *socket, vsfip_ipaddr_t *addr)
 {
-    ASSERT(socket != NULL);
+    VSF_ASSERT(socket != NULL);
     if (!socket->netif) {
         vsf_sched_lock_status_t origlevel = vsf_sched_lock();
             vsfip_socket_set_netif(socket, __vsfip_ip_route(addr));
@@ -415,7 +415,7 @@ vsf_err_t vsfip_init(void)
 #endif
 
 //    __vsfip.teda.fn.evthandler = vsfip_evthandler;
-//    return vsf_teda_init(&__vsfip.teda, vsf_prio_inherit, false);
+//    return vsf_teda_init(&__vsfip.teda);
     return VSF_ERR_NONE;
 }
 

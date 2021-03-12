@@ -85,7 +85,7 @@ def_vsf_pt(__vsf_tgui_evt_shooter_t,
 
         __vk_tgui_focus_t Activated;
 
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
         __vk_tgui_focus_t pointer_above;
 #endif
 
@@ -132,7 +132,7 @@ typedef struct vsf_tgui_cfg_t {
 
     const vsf_tgui_root_container_t* root_node_ptr;
     vsf_prio_t                      priority;
-
+    bool                            is_ignore_first_refresh;
 
 }vsf_tgui_cfg_t;
 
@@ -145,7 +145,8 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t *cfg_ptr);
 
 extern 
 vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr, 
-                                    vsf_tgui_root_container_t *root_node_ptr);
+                                    vsf_tgui_root_container_t *root_node_ptr,
+                                    bool req_first_refresh);
 
 extern 
 bool vk_tgui_send_message(vsf_tgui_t *gui_ptr, vsf_tgui_evt_t event);
@@ -165,7 +166,7 @@ bool vk_tgui_send_timer_event(  vsf_tgui_t* gui_ptr,
 extern
 const vsf_tgui_control_t *vsf_tgui_actived_control_get(vsf_tgui_t *gui_ptr);
 
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
 extern
 const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *gui_ptr);
 #endif

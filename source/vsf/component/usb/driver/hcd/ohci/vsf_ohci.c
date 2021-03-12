@@ -1154,7 +1154,7 @@ static vsf_err_t __ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_h
             break;
         case OHCI_HCD_STATE_READY:
             ohci->eda.fn.evthandler = __ohci_ed_free_evthanlder;
-            vsf_eda_init(&ohci->eda, vsf_prio_inherit, false);
+            vsf_eda_init(&ohci->eda);
             return VSF_ERR_NONE;
         }
     }
@@ -1481,7 +1481,7 @@ void vk_ohci_init(void)
     /*
     vsf_pool_cfg_t cfg = {
         NULL,
-        (code_region_t *)&DEFAULT_CODE_REGION_NONE,
+        (vsf_protect_region_t *)&vsf_protect_region_none,
     };
     ohci_td_pool_pool_init(&__vk_ohci_td_pool, &cfg);
     */
@@ -1490,12 +1490,12 @@ void vk_ohci_init(void)
 #if defined(VSF_OHCI_CFG_MAX_TD_NUM)
     VSF_POOL_INIT_EX(ohci_td_pool, &__vk_ohci_td_pool, VSF_OHCI_CFG_MAX_TD_NUM, 32,
         .target_ptr = NULL,
-        .region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_NONE, 
+        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_none, 
     );
 #else
     VSF_POOL_PREPARE_EX(ohci_td_pool, &__vk_ohci_td_pool, 32,
         .target_ptr = NULL,
-        .region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_NONE,
+        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_none,
     );
 /*
     void *td_buffer = vsf_usbh_malloc_aligned(

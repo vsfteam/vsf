@@ -42,18 +42,22 @@
 #include "./vsf_tgui.h"
 
 /*============================ MACROS ========================================*/
+
+#undef this
+#define this                    (*this_ptr)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr, 
-                                            vsf_tgui_root_container_t *top_ptr, 
+static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr,
+                                            vsf_tgui_root_container_t *top_ptr,
                                             vsf_tgui_evt_t *evt_ptr);
 
 static void __vk_tgui_change_actived_control(
-                                        vsf_tgui_t* gui_ptr, 
+                                        vsf_tgui_t* gui_ptr,
                                         const vsf_tgui_control_t *control_ptr);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -103,7 +107,7 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
             cfg_ptr->bfs_queue.s32_size, false);
 #elif   VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_Z_ORDER
         vsf_msgt_forward_propagate_msg_pre_order_traversal_init(
-            &(this.use_as__vsf_msgt_t), 
+            &(this.use_as__vsf_msgt_t),
             false);
 #endif
 
@@ -121,7 +125,7 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
             this.consumer.param.msg_tree_ptr = &this.use_as__vsf_msgt_t;
 
             if (NULL != cfg_ptr->root_node_ptr) {
-                vk_tgui_set_root_container(gui_ptr, (vsf_tgui_root_container_t *)cfg_ptr->root_node_ptr);
+                vk_tgui_set_root_container(gui_ptr, (vsf_tgui_root_container_t *)cfg_ptr->root_node_ptr, !cfg_ptr->is_ignore_first_refresh);
             }
 
             //! start pt task
@@ -133,8 +137,9 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
 }
 
 
-vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr, 
-                                    vsf_tgui_root_container_t *root_node_ptr)
+vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr,
+                                    vsf_tgui_root_container_t *root_node_ptr,
+                                    bool req_first_refresh)
 {
     VSF_TGUI_ASSERT(NULL != gui_ptr);
     VSF_TGUI_ASSERT(NULL != root_node_ptr);
@@ -143,18 +148,21 @@ vsf_err_t vk_tgui_set_root_container(vsf_tgui_t* gui_ptr,
         return VSF_ERR_ALREADY_EXISTS;
     }
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    vsf_tgui_evt_t event = { { {VSF_TGUI_EVT_ON_SET_TOP_CONTAINER} } };
-    event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)root_node_ptr;
-    return vk_tgui_send_message(gui_ptr, event);
-
-#else
-    return vk_tgui_send_message(gui_ptr,
+    if (vk_tgui_send_message(gui_ptr,
         (vsf_tgui_evt_t) {
-        .msg = VSF_TGUI_EVT_ON_SET_TOP_CONTAINER,
+            .msg = VSF_TGUI_EVT_ON_SET_TOP_CONTAINER,
             .target_ptr = (vsf_tgui_control_t*)root_node_ptr,
-    });
-#endif
+    })) {
+        if (req_first_refresh) {
+            if (vk_tgui_refresh_ex(gui_ptr, (const vsf_tgui_control_t *)root_node_ptr, NULL)) {
+                return VSF_ERR_NONE;
+            }
+        } else {
+            return VSF_ERR_NONE;
+        }
+    }
+
+    return VSF_ERR_NOT_ENOUGH_RESOURCES;
 }
 
 /*! \brief tgui msg queue producer */
@@ -310,16 +318,16 @@ static fsm_rt_t __vsf_tgui_send_msg(vsf_tgui_t* gui_ptr,
             if (NULL == control_ptr->use_as__vsf_msgt_node_t.parent_ptr) {
                 vk_tgui_refresh_ex(gui_ptr, control_ptr, NULL);
             } else {
-                vk_tgui_refresh_ex( 
-                    gui_ptr, 
+                vk_tgui_refresh_ex(
+                    gui_ptr,
                     (const vsf_tgui_control_t *)control_ptr->
-                        use_as__vsf_msgt_node_t.parent_ptr, 
+                        use_as__vsf_msgt_node_t.parent_ptr,
                     NULL);
             }
         }
     }
 #endif
-    
+
     return fsm_rt;
 }
 
@@ -403,7 +411,7 @@ static void __vk_tgui_set_focus(vsf_tgui_t* gui_ptr,
     }
 }
 
-static void __vk_tgui_change_focus_control( vsf_tgui_t* gui_ptr, 
+static void __vk_tgui_change_focus_control( vsf_tgui_t* gui_ptr,
                                             const vsf_tgui_control_t *control_ptr,
                                             __vk_tgui_focus_t *focus_ptr,
                                             vsf_evt_t msg)
@@ -428,7 +436,7 @@ const vsf_tgui_control_t *vsf_tgui_actived_control_get(vsf_tgui_t *gui_ptr)
     return gui_ptr->consumer.param.Activated.current_ptr;
 }
 
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
 const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *gui_ptr)
 {
     VSF_TGUI_ASSERT(NULL != gui_ptr);
@@ -436,8 +444,8 @@ const vsf_tgui_control_t *vsf_tgui_pointed_control_get(vsf_tgui_t *gui_ptr)
 }
 #endif
 
-bool vsf_tgui_set_pointer_location(  vsf_tgui_t *gui_ptr, 
-                                        int_fast8_t idx, 
+bool vsf_tgui_set_pointer_location(  vsf_tgui_t *gui_ptr,
+                                        int_fast8_t idx,
                                         vsf_tgui_location_t *location_ptr)
 {
     VSF_TGUI_ASSERT(NULL != gui_ptr);
@@ -451,7 +459,7 @@ bool vsf_tgui_set_pointer_location(  vsf_tgui_t *gui_ptr,
         location_ptr = gui_ptr->input.current + idx;
     }
 
-    return __vk_tgui_send_touch_evt(gui_ptr, 
+    return __vk_tgui_send_touch_evt(gui_ptr,
                                     idx,
                                     VSF_TGUI_EVT_POINTER_MOVE,
                                     *location_ptr);
@@ -549,8 +557,8 @@ loop_start:
                     case VSF_TGUI_EVT_ON_SET_TOP_CONTAINER & VSF_TGUI_EVT_MSK:
                 #if VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME == ENABLED
                         if (NULL != this.root_node_ptr) {
-                             __vk_tgui_depose_top_container(gui_ptr, 
-                                                            (vsf_tgui_root_container_t *)this.root_node_ptr, 
+                             __vk_tgui_depose_top_container(gui_ptr,
+                                                            (vsf_tgui_root_container_t *)this.root_node_ptr,
                                                             NULL);
                         }
                 #endif
@@ -571,21 +579,21 @@ loop_start:
                             ((vsf_tgui_root_container_t *)this.root_node_ptr)->gui_ptr = gui_ptr;
 
                     #if VSF_TGUI_CFG_SUPPORT_CONSTRUCTOR_SCHEME == ENABLED
-                            //! send on load message 
+                            //! send on load message
                             this.event.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.msg = VSF_TGUI_EVT_ON_LOAD;
 
                     #   if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
                             vsf_msgt_forward_propagate_msg_bfs_setting(this.msg_tree_ptr, false);
                             /*! constructor message */
-                            __vk_tgui_send_bfs_msg( this.msg_tree_ptr, 
-                                                    this.node_ptr, 
+                            __vk_tgui_send_bfs_msg( this.msg_tree_ptr,
+                                                    this.node_ptr,
                                                     &this.event,
                                                     0);
                     #   elif VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_PRE_ORDER_TRAVERSAL
                             vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(this.msg_tree_ptr, false);
                             /*! constructor message */
-                            __vk_tgui_send_pot_msg( this.msg_tree_ptr, 
-                                                    this.node_ptr, 
+                            __vk_tgui_send_pot_msg( this.msg_tree_ptr,
+                                                    this.node_ptr,
                                                     &this.event,
                                                     0);
                     #   endif
@@ -602,20 +610,20 @@ loop_start:
                 #   if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
                         vsf_msgt_forward_propagate_msg_bfs_setting(this.msg_tree_ptr, false);
                         /*! constructor message */
-                        __vk_tgui_send_bfs_msg( this.msg_tree_ptr, 
-                                                this.node_ptr, 
+                        __vk_tgui_send_bfs_msg( this.msg_tree_ptr,
+                                                this.node_ptr,
                                                 &this.event,
                                                 0);
                 #   elif VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_PRE_ORDER_TRAVERSAL
                         vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(this.msg_tree_ptr, false);
                         /*! constructor message */
-                        __vk_tgui_send_pot_msg( this.msg_tree_ptr, 
-                                                this.node_ptr, 
+                        __vk_tgui_send_pot_msg( this.msg_tree_ptr,
+                                                this.node_ptr,
                                                 &this.event,
                                                 0);
                 #   endif
                         goto loop_start;
-                #endif 
+                #endif
 
 
                 #if VSF_TGUI_CFG_SUPPORT_DESTRUCTOR_SCHEME == ENABLED
@@ -664,14 +672,14 @@ loop_start:
 
                         //! if the target control is transparent, refresh its parent
                         do {
-                            __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core((vsf_tgui_control_t*)this.node_ptr);
-                            if (ptCore->Status.Values.is_control_transparent) {
+                            vsf_tgui_control_t * node_ptr = (vsf_tgui_control_t *)this.node_ptr;
+                            if (node_ptr->Status.Values.is_control_transparent) {
                                 //! try to fetch its parent
                                 if (NULL != this.node_ptr->parent_ptr) {
                                     this.node_ptr = (const vsf_msgt_node_t*)this.node_ptr->parent_ptr;
                                     bIsRequestRefreshParent = true;
                                     continue;
-                                } 
+                                }
                             }
                             break;
                         } while (true);
@@ -685,14 +693,14 @@ loop_start:
                             }
                         }
         #   endif
-                        
+
                         goto refresh_loop;
         #endif
 
-                    case VSF_TGUI_EVT_GET_ACTIVE& VSF_TGUI_EVT_MSK: 
-                        __vk_tgui_change_focus_control( gui_ptr, 
-                                                        (const vsf_tgui_control_t *)this.node_ptr, 
-                                                        &this.Activated, 
+                    case VSF_TGUI_EVT_GET_ACTIVE& VSF_TGUI_EVT_MSK:
+                        __vk_tgui_change_focus_control( gui_ptr,
+                                                        (const vsf_tgui_control_t *)this.node_ptr,
+                                                        &this.Activated,
                                                         VSF_TGUI_EVT_GET_ACTIVE);
                         goto loop_start;
 
@@ -714,7 +722,7 @@ loop_start:
                 //! send message to currently activated control
                 this.node_ptr = &(this.Activated.current_ptr->use_as__vsf_msgt_node_t);
                 VSF_TGUI_ASSERT( NULL != this.node_ptr );
-                
+
 
                 //! pointer up event could only be sent to active node
                 if (VSF_TGUI_EVT_POINTER_DOWN == msg) {
@@ -724,38 +732,38 @@ loop_start:
                         this.msg_tree_ptr,
                         (const vsf_msgt_node_t*)this.root_node_ptr,
                         (uintptr_t) & (this.event.PointerEvt.use_as__vsf_tgui_location_t));
-                
+
 
                     if (NULL == this.node_ptr) {
                         //! missed all node (control)
                         goto loop_start;
                     }
 
-                    
-                #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
-                    __vk_tgui_change_focus_control( gui_ptr, 
-                                    (const vsf_tgui_control_t *)this.node_ptr, 
-                                    &this.pointer_above, 
+
+                #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
+                    __vk_tgui_change_focus_control( gui_ptr,
+                                    (const vsf_tgui_control_t *)this.node_ptr,
+                                    &this.pointer_above,
                                     VSF_TGUI_EVT_POINTER_ENTER);
                 #endif
 
-                    /*! \IMPORTANT only pointer/finger 0 can active controls. 
+                    /*! \IMPORTANT only pointer/finger 0 can active controls.
                      *             tGUI is mainly designed to support touch screen
                      *             rather than a device with a mouse. So when you
                      *             use PC to simulate a touchscreen, a right click
                      *             won't change the actived controls. It is a *KNOWN
-                     *             ISSUE* and we will *NOT* fix this, because designing  
-                     *             an application with normal mouse support is out of 
-                     *             original scope. 
+                     *             ISSUE* and we will *NOT* fix this, because designing
+                     *             an application with normal mouse support is out of
+                     *             original scope.
                      */
                     if (0 == this.event.PointerEvt.idx) {
-                        __vk_tgui_change_focus_control( gui_ptr, 
-                                        (const vsf_tgui_control_t *)this.node_ptr, 
-                                        &this.Activated, 
+                        __vk_tgui_change_focus_control( gui_ptr,
+                                        (const vsf_tgui_control_t *)this.node_ptr,
+                                        &this.Activated,
                                         VSF_TGUI_EVT_GET_ACTIVE);
                     }
                 }
-            #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+            #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
                 else if (VSF_TGUI_EVT_POINTER_MOVE == msg) {
                     //! check new target of activation
                     this.node_ptr = vsf_msgt_shoot_node(
@@ -763,9 +771,9 @@ loop_start:
                         (const vsf_msgt_node_t*)this.root_node_ptr,
                         (uintptr_t) & (this.event.PointerEvt.use_as__vsf_tgui_location_t));
 
-                    __vk_tgui_change_focus_control( gui_ptr, 
-                                    (const vsf_tgui_control_t *)this.node_ptr, 
-                                    &this.pointer_above, 
+                    __vk_tgui_change_focus_control( gui_ptr,
+                                    (const vsf_tgui_control_t *)this.node_ptr,
+                                    &this.pointer_above,
                                     VSF_TGUI_EVT_POINTER_ENTER);
                     if (this.event.PointerEvt.idx < dimof(gui_ptr->input.current)) {
                         gui_ptr->input.current[this.event.PointerEvt.idx] = this.event.PointerEvt.use_as__vsf_tgui_location_t;
@@ -813,6 +821,9 @@ refresh_loop :
                     /*! wait until it is ready to refresh */
                     vsf_pt_wait_for_evt(VSF_TGUI_MSG_LOW_LEVEL_READY_TO_REFRESH);
                     region_ptr = NULL;
+                } else if ((intptr_t)region_ptr == -1) {
+                    /* if return -1, end refresh immediately */
+                    goto refresh_loop_end;
                 }
             } while(NULL == region_ptr);
             this.region_ptr = region_ptr;
@@ -822,15 +833,14 @@ refresh_loop :
 
             //! set first refresh node bit
             do {
-                __vsf_tgui_control_core_t* ptCore =
-                    vsf_tgui_control_get_core((const vsf_tgui_control_t*)this.node_ptr);
-                ptCore->Status.Values.__is_the_first_node_for_refresh = true;
+                vsf_tgui_control_t* node_ptr = (vsf_tgui_control_t *)this.node_ptr;
+                node_ptr->Status.Values.__is_the_first_node_for_refresh = true;
             } while (0);
 
         #if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
             vsf_msgt_forward_propagate_msg_bfs_setting(this.msg_tree_ptr, true);
-            __vk_tgui_send_bfs_msg( this.msg_tree_ptr, 
-                                    this.node_ptr, 
+            __vk_tgui_send_bfs_msg( this.msg_tree_ptr,
+                                    this.node_ptr,
                                     &this.event,
                                     (   VSF_TGUI_CTRL_STATUS_INITIALISED
                                     |   VSF_TGUI_CTRL_STATUS_ENABLED
@@ -838,8 +848,8 @@ refresh_loop :
                                     ));
         #elif VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_PRE_ORDER_TRAVERSAL
             vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(this.msg_tree_ptr, true);
-            __vk_tgui_send_pot_msg( this.msg_tree_ptr, 
-                                    this.node_ptr, 
+            __vk_tgui_send_pot_msg( this.msg_tree_ptr,
+                                    this.node_ptr,
                                     &this.event,
                                     (   VSF_TGUI_CTRL_STATUS_INITIALISED
                                     |   VSF_TGUI_CTRL_STATUS_ENABLED
@@ -847,15 +857,19 @@ refresh_loop :
                                     ));
         #endif
         } while (vsf_tgui_v_refresh_loop_end(gui_ptr));
+refresh_loop_end:
+        continue;
     #endif
     }
+
+
 
     vsf_pt_end();
 }
 
 
-static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr, 
-                                            vsf_tgui_root_container_t *top_ptr, 
+static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr,
+                                            vsf_tgui_root_container_t *top_ptr,
                                             vsf_tgui_evt_t *evt_ptr)
 {
     vsf_tgui_evt_t event;
@@ -871,7 +885,7 @@ static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr,
     if (NULL == evt_ptr) {
         evt_ptr = &event;
         event.use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.msg = VSF_TGUI_EVT_ON_DEPOSE;
-        event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t *)top_ptr;  
+        event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t *)top_ptr;
     }
 
     //! send message

@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_KERNEL_ASSERT
-#   define VSF_KERNEL_ASSERT                                ASSERT
+#   define VSF_KERNEL_ASSERT                                VSF_ASSERT
 #endif
 
 
@@ -37,8 +37,8 @@
 #   define VSF_KERNEL_CFG_SUPPORT_SYNC                      ENABLED
 #endif
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-#   ifndef VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ
-#       define VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ              ENABLED
+#   ifndef VSF_KERNEL_CFG_SUPPORT_SYNC_ISR
+#       define VSF_KERNEL_CFG_SUPPORT_SYNC_ISR              ENABLED
 #   endif
 #   ifndef VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
 #       define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT          ENABLED
@@ -50,8 +50,8 @@
 #   ifndef VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT
 #       define VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT          DISABLED
 #   endif
-#   ifndef VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ
-#       define VSF_KERNEL_CFG_SUPPORT_SYNC_IRQ              DISABLED
+#   ifndef VSF_KERNEL_CFG_SUPPORT_SYNC_ISR
+#       define VSF_KERNEL_CFG_SUPPORT_SYNC_ISR              DISABLED
 #   endif
 #endif
 
@@ -63,6 +63,9 @@
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER                 ENABLED
 #endif
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   ifndef VSF_KERNEL_TIMER_CFG_ISR
+#       define VSF_KERNEL_TIMER_CFG_ISR                     ENABLED
+#   endif
 #   ifndef VSF_KERNEL_CFG_CALLBACK_TIMER
 #       define VSF_KERNEL_CFG_CALLBACK_TIMER                ENABLED
 #   endif
@@ -105,6 +108,10 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUPPORT_FSM."
 #   ifndef __VSF_KERNEL_CFG_EDA_FRAME_POOL
 #       define __VSF_KERNEL_CFG_EDA_FRAME_POOL              ENABLED
 #   endif
+//  VSF_KERNEL_CFG_EDA_FAST_SUB_CALL will be disabled by default after stable
+#   ifndef VSF_KERNEL_CFG_EDA_FAST_SUB_CALL
+#       define VSF_KERNEL_CFG_EDA_FAST_SUB_CALL             ENABLED
+#   endif
 #endif
 
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE
@@ -124,7 +131,7 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUPPORT_FSM."
 #endif
 
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM            DISABLED
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM            ENABLED
 #endif
 
 
@@ -277,14 +284,6 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #if     !defined(VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)                     \
     &&  defined(VSF_ARCH_STACK_GUARDIAN_SIZE)
 #   define VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE        VSF_ARCH_STACK_GUARDIAN_SIZE
-#endif
-
-
-#ifndef VSF_KERNEL_CFG_FRAME_USER_BITS
-#   define VSF_KERNEL_CFG_FRAME_USER_BITS                   14
-#elif VSF_KERNEL_CFG_FRAME_USER_BITS <= 0
-#   undef VSF_KERNEL_CFG_FRAME_USER_BITS
-#   define VSF_KERNEL_CFG_FRAME_USER_BITS                   14
 #endif
 
 /*----------------------------------------------------------------------------*

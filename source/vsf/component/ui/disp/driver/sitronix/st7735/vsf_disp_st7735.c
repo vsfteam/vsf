@@ -148,7 +148,7 @@ static vsf_err_t __vk_disp_st7735_init(vk_disp_t *pthis)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     disp_st7735->teda.on_terminate = NULL;
 #endif
-    return vsf_teda_init(&disp_st7735->teda, vsf_prio_inherit, false);
+    return vsf_teda_init(&disp_st7735->teda);
 }
 
 static vsf_err_t __vk_disp_st7735_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)

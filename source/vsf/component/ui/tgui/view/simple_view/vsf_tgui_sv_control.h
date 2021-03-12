@@ -33,30 +33,28 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+typedef enum vsf_tgui_sv_cornor_tile_mode_t {
+    CORNOR_TILE_IN_TOP_LEFT      = 0,
+    CORNOR_TILE_IN_TOP_RIGHT,
+    CORNOR_TILE_IN_BOTTOM_LEFT,
+    CORNOR_TILE_IN_BOTTOM_RIGHT,
+
+    __CORNOR_TILE_NUM,
+} vsf_tgui_sv_cornor_tile_mode_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr);
 
 extern fsm_rt_t vsf_tgui_control_v_rendering(vsf_tgui_control_t* control_ptr,
-                                            vsf_tgui_region_t* ptDirtyRegion,
-                                            vsf_tgui_control_refresh_mode_t tMode);
+                                            vsf_tgui_region_t* dirty_region_ptr,
+                                            vsf_tgui_control_refresh_mode_t mode);
 
 extern fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* control_ptr);
 
 extern fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_control_t* control_ptr);
 
-#if 0
-extern bool vsf_tgui_get_child_dirty_region(const vsf_tgui_control_t* control_ptr,
-                                            const vsf_tgui_region_t* ptParentDirtyRegion,
-                                            vsf_tgui_region_t* ptChildDirtyRegion);
-#endif
-
-extern 
-fsm_rt_t __vk_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
-                                        vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
-                                        vsf_tgui_control_refresh_mode_t tMode,
-                                        bool bIsIgnoreBackground);
+extern const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_control_t* control_ptr, vsf_tgui_sv_cornor_tile_mode_t mode);
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
 extern const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* control_ptr);

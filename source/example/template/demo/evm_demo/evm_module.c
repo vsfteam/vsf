@@ -18,6 +18,13 @@
 #include "evm_module.h"
 #include "vsf.h"
 
+#if VSF_EVM_USE_USBH == ENABLED
+extern evm_val_t evm_class_usbh(evm_t * e);
+#endif
+#if VSF_EVM_USE_BLUETOOTH == ENABLED
+extern evm_val_t evm_class_bluetooth(evm_t * e);
+#endif
+
 #ifndef CONFIG_EVM_MODULE_CALLBACK_SIZE
     #define CONFIG_EVM_MODULE_CALLBACK_SIZE     16
 #endif
@@ -107,6 +114,12 @@ int evm_module(evm_t * e){
     evm_builtin_t module[] = {
         {"delay_ms", evm_mk_native((intptr_t)evm_module_delay_ms)},
         {"delay_us", evm_mk_native((intptr_t)evm_module_delay_us)},
+#if VSF_EVM_USE_EUSB == ENABLED
+        {"usb", evm_class_usbh(e)},
+#endif
+#if VSF_EVM_USE_BLUETOOTH == ENABLED
+        {"bt", evm_class_bluetooth(e)},
+#endif
         {NULL, EVM_VAL_UNDEFINED}
     };
     evm_module_create(e, "evm", module);

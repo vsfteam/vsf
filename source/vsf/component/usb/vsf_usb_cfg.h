@@ -25,7 +25,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USB_ASSERT
-#   define VSF_USB_ASSERT                       ASSERT
+#   define VSF_USB_ASSERT                       VSF_ASSERT
 #endif
 
 #if VSF_USE_USB_DEVICE == ENABLED

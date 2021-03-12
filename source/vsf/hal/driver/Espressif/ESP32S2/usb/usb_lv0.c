@@ -49,7 +49,7 @@ esp32s2_usb_t USB_OTG##__N##_IP = {                                             
 #   pragma GCC diagnostic ignored "-Wint-conversion"
 #endif
 
-REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop

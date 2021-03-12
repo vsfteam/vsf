@@ -95,7 +95,7 @@ static const i_tgui_control_methods_t c_tVContainer= {
 static void __vk_tgui_control_timer_handler(vsf_tgui_timer_t *ptTimer)
 {
     vsf_protect_t tProtectStatus;
-    VSF_COMPONENT_ASSERT(NULL != ptTimer);
+    VSF_TGUI_ASSERT(NULL != ptTimer);
 
     const vsf_tgui_root_container_t* ptTopContainer
         = vk_tgui_control_get_top(ptTimer->target_ptr);
@@ -120,8 +120,8 @@ static void __vk_tgui_control_timer_handler(vsf_tgui_timer_t *ptTimer)
 void vsf_tgui_timer_init(   vsf_tgui_timer_t *ptTimer,
                             const vsf_tgui_control_t *control_ptr)
 {
-    VSF_COMPONENT_ASSERT(NULL != ptTimer);
-    VSF_COMPONENT_ASSERT(NULL != control_ptr);
+    VSF_TGUI_ASSERT(NULL != ptTimer);
+    VSF_TGUI_ASSERT(NULL != control_ptr);
 
     ptTimer->target_ptr = control_ptr;
     ptTimer->use_as__vsf_callback_timer_t.on_timer
@@ -135,7 +135,7 @@ void vsf_tgui_timer_init(   vsf_tgui_timer_t *ptTimer,
 void vsf_tgui_timer_enable(vsf_tgui_timer_t *ptTimer)
 {
     vsf_protect_t tProtectStatus;
-    VSF_COMPONENT_ASSERT(NULL != ptTimer);
+    VSF_TGUI_ASSERT(NULL != ptTimer);
 
     tProtectStatus = vsf_protect_sched();
         do {
@@ -157,7 +157,7 @@ void vsf_tgui_timer_disable(vsf_tgui_timer_t *ptTimer)
 {
 
     vsf_protect_t tProtectStatus;
-    VSF_COMPONENT_ASSERT(NULL != ptTimer);
+    VSF_TGUI_ASSERT(NULL != ptTimer);
 
     tProtectStatus = vsf_protect_sched();
         do {
@@ -173,7 +173,7 @@ void vsf_tgui_timer_disable(vsf_tgui_timer_t *ptTimer)
 
 bool vsf_tgui_timer_is_working(vsf_tgui_timer_t *ptTimer)
 {
-    VSF_COMPONENT_ASSERT(NULL != ptTimer);
+    VSF_TGUI_ASSERT(NULL != ptTimer);
     return ptTimer->Status.bIsWorking;
 }
 
@@ -196,7 +196,7 @@ vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location
 {
     const vsf_msgt_node_t *node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
     const vsf_msgt_container_t* parent_ptr = NULL;
-    VSF_COMPONENT_ASSERT(NULL != control_ptr && NULL != ptLocation);
+    VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptLocation);
 
     do {
         parent_ptr = (const vsf_msgt_container_t *)node_ptr->parent_ptr;
@@ -206,8 +206,8 @@ vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location
         node_ptr = (const vsf_msgt_node_t*)parent_ptr;
         if (node_ptr->Attribute._.is_container) {
             vsf_tgui_container_t *container_ptr = (vsf_tgui_container_t*)node_ptr;
-            ptLocation->iX += container_ptr->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iX;
-            ptLocation->iY += container_ptr->use_as____vsf_tgui_control_core_t.tRegion.tLocation.iY;
+            ptLocation->iX += container_ptr->tRegion.tLocation.iX;
+            ptLocation->iY += container_ptr->tRegion.tLocation.iY;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
             ptLocation->iX += container_ptr->tContainerPadding.chLeft;
             ptLocation->iY += container_ptr->tContainerPadding.chTop;
@@ -220,14 +220,12 @@ vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location
 
 vsf_tgui_location_t *vsf_tgui_control_get_location(const vsf_tgui_control_t* control_ptr)
 {
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
-    return &(ptCore->tRegion.tLocation);
+    return (vsf_tgui_location_t *)&(control_ptr->tRegion.tLocation);
 }
 
 vsf_tgui_size_t *vsf_tgui_control_get_size(const vsf_tgui_control_t* control_ptr)
 {
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
-    return &(ptCore->tRegion.tSize);
+    return (vsf_tgui_size_t *)&(control_ptr->tRegion.tSize);
 }
 
 vsf_tgui_location_t * vsf_tgui_control_calculate_absolute_location(
@@ -235,13 +233,11 @@ vsf_tgui_location_t * vsf_tgui_control_calculate_absolute_location(
                                             vsf_tgui_location_t* ptOffset)
 {
     //const vsf_msgt_node_t* node_ptr;
-    __vsf_tgui_control_core_t* ptCore;
     VSF_TGUI_ASSERT(NULL != control_ptr);
     VSF_TGUI_ASSERT(NULL != ptOffset);
 
-    ptCore = vsf_tgui_control_get_core(control_ptr);
-    ptOffset->iX += ptCore->tRegion.tLocation.iX;
-    ptOffset->iY += ptCore->tRegion.tLocation.iY;
+    ptOffset->iX += control_ptr->tRegion.tLocation.iX;
+    ptOffset->iY += control_ptr->tRegion.tLocation.iY;
 
     return __vk_tgui_calculate_absolute_location_from_control_location(control_ptr, ptOffset);
 }
@@ -250,16 +246,16 @@ vsf_tgui_location_t * vsf_tgui_control_calculate_absolute_location(
 /*! \brief If you get a relative region inside a control, this function can calculate
  *!        the absolute location and store the result in the region you specified.
  *!
- *! \NOTE  As the location info of the region you passed to this 
- *!        function will be changed, please do **NOT** pass the control's own region 
+ *! \NOTE  As the location info of the region you passed to this
+ *!        function will be changed, please do **NOT** pass the control's own region
  *!        to this function.
- *!        Due to this reason aforementioned, you should creat a copy of the target 
- *!        region and use it with this function. 
+ *!        Due to this reason aforementioned, you should creat a copy of the target
+ *!        region and use it with this function.
  *!
  *! \param control_ptr  the address of the target control
  *! \param region_ptr   the address of the region which you want to calculate
  *! \return the same region address you passed to the function
- *! 
+ *!
  */
 vsf_tgui_region_t* vsf_tgui_control_calculate_absolute_region(
                                                 const vsf_tgui_control_t *control_ptr,
@@ -275,14 +271,9 @@ vsf_tgui_region_t * vsf_tgui_get_absolute_control_region(
                                                 const vsf_tgui_control_t* control_ptr,
                                                 vsf_tgui_region_t* ptRegionBuffer)
 {
-    const __vsf_tgui_control_core_t * ptCore;
+    VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptRegionBuffer);
 
-    VSF_COMPONENT_ASSERT(NULL != control_ptr && NULL != ptRegionBuffer);
-
-    ptCore = vsf_tgui_control_get_core(control_ptr);
-    VSF_COMPONENT_ASSERT(ptCore != NULL);
-
-    *ptRegionBuffer = ptCore->tRegion;
+    *ptRegionBuffer = control_ptr->tRegion;
 
     __vk_tgui_calculate_absolute_location_from_control_location(control_ptr, &(ptRegionBuffer->tLocation));
     return ptRegionBuffer;
@@ -292,7 +283,7 @@ bool vsf_tgui_control_is_in_range(      const vsf_tgui_region_t *region_ptr,
                                         const vsf_tgui_location_t *ptLocation)
 {
     bool result = false;
-    VSF_COMPONENT_ASSERT(NULL != region_ptr && NULL != ptLocation);
+    VSF_TGUI_ASSERT(NULL != region_ptr && NULL != ptLocation);
 
     do {
 
@@ -336,7 +327,7 @@ bool vsf_tgui_control_get_visible_region(   const vsf_tgui_control_t* control_pt
         vsf_tgui_region_t tParentRegion;
 
         while (NULL != parent_ptr) {
-            tParentRegion = parent_ptr->use_as____vsf_tgui_control_core_t.tRegion;
+            tParentRegion = parent_ptr->tRegion;
             __vk_tgui_calculate_absolute_location_from_control_location((vsf_tgui_control_t*)parent_ptr, &(tParentRegion.tLocation));
             bHasIntersect = vsf_tgui_region_intersect(ptRegionBuffer, ptRegionBuffer, &tParentRegion);
             if (!bHasIntersect) {
@@ -354,11 +345,9 @@ vsf_tgui_region_t* vsf_tgui_control_get_relative_region(
                                                 const vsf_tgui_control_t* control_ptr,
                                                 vsf_tgui_region_t* ptAbsoluteRegion)
 {
-    vsf_tgui_region_t tRegion;
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
-    tRegion = ptCore->tRegion;
+    vsf_tgui_region_t tRegion = control_ptr->tRegion;
 
-    VSF_COMPONENT_ASSERT(NULL != control_ptr && NULL != ptAbsoluteRegion);
+    VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptAbsoluteRegion);
 
     __vk_tgui_calculate_absolute_location_from_control_location(control_ptr, &(tRegion.tLocation));
 
@@ -379,7 +368,7 @@ vsf_tgui_region_t * vsf_tgui_control_generate_dirty_region_from_parent_dirty_reg
     if (NULL != ptParentDirtyRegion) {
         tParentDirtyRegion = *ptParentDirtyRegion;
     } else {
-        tParentDirtyRegion = vsf_tgui_control_get_core(parent_ptr)->tRegion;
+        tParentDirtyRegion = parent_ptr->tRegion;
     }
 
     vsf_tgui_control_calculate_absolute_region(parent_ptr, &tParentDirtyRegion);
@@ -398,13 +387,12 @@ vsf_tgui_region_t * vsf_tgui_control_generate_dirty_region_from_parent_dirty_reg
 bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* control_ptr,
                                 const vsf_tgui_location_t *ptLocation)
 {
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
     vsf_tgui_region_t tRegion;
-    VSF_COMPONENT_ASSERT(NULL != control_ptr && NULL != ptLocation);
+    VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptLocation);
     uint_fast8_t chMask =   (   VSF_TGUI_CTRL_STATUS_INITIALISED
                             |   VSF_TGUI_CTRL_STATUS_VISIBLE);
 
-    if (chMask != (ptCore->Status.chStatus & chMask)) {
+    if (chMask != (control_ptr->Status.chStatus & chMask)) {
         return false;
     }
 
@@ -430,14 +418,13 @@ bool vsf_tgui_control_set_is_transparent_bit(vsf_tgui_control_t* control_ptr,
                                              bool is_control_transparent)
 {
     bool result = false;
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
-    ASSERT(NULL != control_ptr);
+    VSF_TGUI_ASSERT(NULL != control_ptr);
 
     result =       is_control_transparent
-                !=  (ptCore->Status.Values.is_control_transparent);
+                !=  (control_ptr->Status.Values.is_control_transparent);
 
     if (result) {
-        ptCore->Status.Values.is_control_transparent = is_control_transparent;
+        control_ptr->Status.Values.is_control_transparent = is_control_transparent;
     }
 
     return result;
@@ -445,36 +432,22 @@ bool vsf_tgui_control_set_is_transparent_bit(vsf_tgui_control_t* control_ptr,
 
 vsf_tgui_status_t vsf_tgui_control_status_get(const vsf_tgui_control_t* control_ptr)
 {
-    __vsf_tgui_control_core_t *ptCore = vsf_tgui_control_get_core(control_ptr);
-    VSF_COMPONENT_ASSERT(NULL != control_ptr);
+    VSF_TGUI_ASSERT(NULL != control_ptr);
 
-    return ptCore->Status;
+    return control_ptr->Status;
 }
 
 void vsf_tgui_control_status_set(vsf_tgui_control_t* control_ptr, vsf_tgui_status_t Status)
 {
-    __vsf_tgui_control_core_t *ptCore = vsf_tgui_control_get_core(control_ptr);
-    VSF_COMPONENT_ASSERT(NULL != control_ptr);
+    VSF_TGUI_ASSERT(NULL != control_ptr);
 
-    ptCore->Status = Status;
+    control_ptr->Status = Status;
 }
 
 bool vsf_tgui_control_is_container(const vsf_tgui_control_t* control_ptr)
 {
     VSF_TGUI_ASSERT(NULL != control_ptr);
     return control_ptr->use_as__vsf_msgt_node_t.Attribute._.is_container;
-}
-
-__vsf_tgui_control_core_t* vsf_tgui_control_get_core(const vsf_tgui_control_t* control_ptr)
-{
-    VSF_TGUI_ASSERT(NULL != control_ptr);
-    if (vsf_tgui_control_is_container(control_ptr)) {
-        const vsf_msgt_node_t* node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
-        const vsf_tgui_container_t* container_ptr = (const vsf_tgui_container_t*)node_ptr;
-        return (__vsf_tgui_control_core_t *)&container_ptr->use_as____vsf_tgui_control_core_t;
-    }
-
-    return (__vsf_tgui_control_core_t*)&control_ptr->use_as____vsf_tgui_control_core_t;
 }
 
 vsf_tgui_control_t* vsf_tgui_control_get_parent(const vsf_tgui_control_t* control_ptr)
@@ -497,14 +470,13 @@ uint_fast8_t vk_tgui_container_visible_item_get(const vsf_tgui_container_t *cont
 const vsf_tgui_root_container_t *
 vk_tgui_control_get_top(const vsf_tgui_control_t* control_ptr)
 {
-    //const vsf_tgui_root_container_t* ptTopContainer = NULL;
-    VSF_COMPONENT_ASSERT(NULL != control_ptr);
+    VSF_TGUI_ASSERT (NULL != control_ptr);
 
     while (NULL != control_ptr->use_as__vsf_msgt_node_t.parent_ptr) {
         control_ptr = (const vsf_tgui_control_t*)
             control_ptr->use_as__vsf_msgt_node_t.parent_ptr;
     }
-    VSF_COMPONENT_ASSERT(control_ptr->use_as__vsf_msgt_node_t.Attribute._.is_top);
+    VSF_TGUI_ASSERT(control_ptr->use_as__vsf_msgt_node_t.Attribute._.is_top);
 
     return (const vsf_tgui_root_container_t*)control_ptr;
 }
@@ -512,6 +484,8 @@ vk_tgui_control_get_top(const vsf_tgui_control_t* control_ptr)
 bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr,
                                     vsf_tgui_evt_t event)
 {
+    VSF_TGUI_ASSERT (NULL != control_ptr);
+
     const vsf_tgui_root_container_t* ptTopContainer
         = vk_tgui_control_get_top(control_ptr);
 
@@ -528,6 +502,8 @@ bool vsf_tgui_control_send_message( const vsf_tgui_control_t* control_ptr,
 
 bool vsf_tgui_control_update(const vsf_tgui_control_t* control_ptr)
 {
+    VSF_TGUI_ASSERT (NULL != control_ptr);
+
     const vsf_tgui_root_container_t* ptTopContainer
         = vk_tgui_control_get_top(control_ptr);
 
@@ -540,6 +516,8 @@ bool vsf_tgui_control_update(const vsf_tgui_control_t* control_ptr)
 
 bool vsf_tgui_control_update_tree(const vsf_tgui_control_t* control_ptr)
 {
+    VSF_TGUI_ASSERT (NULL != control_ptr);
+
     const vsf_tgui_root_container_t* ptTopContainer
         = vk_tgui_control_get_top(control_ptr);
 
@@ -555,6 +533,8 @@ bool vsf_tgui_control_update_tree(const vsf_tgui_control_t* control_ptr)
 bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *control_ptr,
                                 const vsf_tgui_region_t *region_ptr)
 {
+   VSF_TGUI_ASSERT (NULL != control_ptr);
+
     const vsf_tgui_root_container_t* ptTopContainer
         = vk_tgui_control_get_top(control_ptr);
 
@@ -568,6 +548,8 @@ bool vsf_tgui_control_refresh(  const vsf_tgui_control_t *control_ptr,
 
 bool vsf_tgui_control_set_active(const vsf_tgui_control_t* control_ptr)
 {
+    VSF_TGUI_ASSERT (NULL != control_ptr);
+
     const vsf_tgui_root_container_t* ptTopContainer
         = vk_tgui_control_get_top(control_ptr);
     vsf_tgui_evt_t temp_event = {
@@ -584,7 +566,7 @@ bool vsf_tgui_control_set_active(const vsf_tgui_control_t* control_ptr)
 
 
 #undef THIS_FSM_STATE
-#define THIS_FSM_STATE  ptCore->tMSGMap.chState
+#define THIS_FSM_STATE  control_ptr->tMSGMap.chState
 
 #define RESET_TGUI_USER_MSG_HANDLING_FSM()                          \
         do { THIS_FSM_STATE = 0; } while(0)
@@ -592,13 +574,12 @@ bool vsf_tgui_control_set_active(const vsf_tgui_control_t* control_ptr)
 fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_ptr,
                                                     const vsf_tgui_evt_t* event_ptr)
 {
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
-    uint_fast8_t chCount = ptCore->tMSGMap.chCount;
-    const vsf_tgui_user_evt_handler *ptItems = ptCore->tMSGMap.ptItems;
+    uint_fast8_t chCount = control_ptr->tMSGMap.chCount;
+    const vsf_tgui_user_evt_handler *ptItems = control_ptr->tMSGMap.ptItems;
     uint_fast16_t hwMSG = event_ptr->use_as__vsf_tgui_msg_t.use_as__vsf_msgt_msg_t.msg;
 
 
-    VSF_COMPONENT_ASSERT(NULL != control_ptr && NULL != event_ptr);
+    VSF_TGUI_ASSERT(NULL != control_ptr && NULL != event_ptr);
 
     enum {
         START = 0,
@@ -612,7 +593,7 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
             if ((0 == chCount) || (NULL == ptItems) || (chCount > 254)) {
                 return (fsm_rt_t)VSF_MSGT_ERR_MSG_NOT_HANDLED;
             }
-            ptCore->tMSGMap.chIndex = 255;
+            control_ptr->tMSGMap.chIndex = 255;
             THIS_FSM_STATE++;
             //break;
         case SEARCH_MSG_MAP: {
@@ -624,7 +605,7 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
                 //! check message
                 if (    (ptItems->use_as__vsf_msgt_msg_t.msg & hwMask)
                     ==  (hwMSG & hwMask)) {
-                    ptCore->tMSGMap.chIndex = chIndex;
+                    control_ptr->tMSGMap.chIndex = chIndex;
                     THIS_FSM_STATE = CHECK_USER_HANDLER_TYPE;
                     break;
                 }
@@ -632,7 +613,7 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
                 ptItems++;
             } while(--chCount);
 
-            if (ptCore->tMSGMap.chIndex == 255) {
+            if (control_ptr->tMSGMap.chIndex == 255) {
                 RESET_TGUI_USER_MSG_HANDLING_FSM();
                 return (fsm_rt_t)VSF_MSGT_ERR_MSG_NOT_HANDLED;
             }
@@ -664,10 +645,10 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
                     #if VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG != ENABLED
                             (msg != VSF_TGUI_EVT_ON_TIME) &&
                     #endif
-                    #if VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG != ENABLED 
+                    #if VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG != ENABLED
                             (msg != VSF_TGUI_EVT_GET_ACTIVE) &&
                     #endif
-                    #if VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG != ENABLED 
+                    #if VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG != ENABLED
                             (msg != VSF_TGUI_EVT_LOST_ACTIVE) &&
                     #endif
 
@@ -712,7 +693,7 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
             break;
 
         case CALL_FSM: {
-            fsm_rt_t fsm_rt = ptItems[ptCore->tMSGMap.chIndex]
+            fsm_rt_t fsm_rt = ptItems[control_ptr->tMSGMap.chIndex]
                                 .use_as__vsf_tgui_control_handler_t
                                     .fn.FSM(control_ptr,
                                             (vsf_tgui_msg_t *)&(event_ptr->use_as__vsf_tgui_msg_t));
@@ -741,11 +722,10 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG,
                                         const i_tgui_control_methods_t*ptMethods)
 {
-    __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(control_ptr);
     vsf_evt_t msg = ptMSG->use_as__vsf_msgt_msg_t.msg;
     fsm_rt_t result = (fsm_rt_t)VSF_MSGT_ERR_MSG_NOT_HANDLED;
 
-    VSF_COMPONENT_ASSERT(NULL != control_ptr && NULL != ptMSG);
+    VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptMSG);
 
     if (
         (msg != VSF_TGUI_EVT_REFRESH) &&
@@ -762,17 +742,17 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 #if VSF_TGUI_CFG_SHOW_ON_TIME_EVT_LOG != ENABLED
         (msg != VSF_TGUI_EVT_ON_TIME) &&
 #endif
-#if VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG != ENABLED 
+#if VSF_TGUI_CFG_SHOW_GET_ACTIVE_EVT_LOG != ENABLED
         (msg != VSF_TGUI_EVT_GET_ACTIVE) &&
 #endif
-#if VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG != ENABLED 
+#if VSF_TGUI_CFG_SHOW_LOST_ACTIVE_EVT_LOG != ENABLED
         (msg != VSF_TGUI_EVT_LOST_ACTIVE) &&
 #endif
 
 #if VSF_TGUI_CFG_SHOW_POINTER_EVT_LOG != ENABLED
         ((msg & VSF_TGUI_MSG_MSK) != (VSF_TGUI_MSG_POINTER_EVT & VSF_TGUI_MSG_MSK)) &&
 #endif
-#if VSF_TGUI_CFG_SHOW_KEY_EVT_LOG != ENABLED
+#if VSF_TGUI_CFG_SHOW_KEY_EVT_LOG != ENABLED || VSF_TGUI_CFG_SUPPORT_KEY_EVENTS != ENABLED
         ((msg & VSF_TGUI_MSG_MSK) != (VSF_TGUI_MSG_KEY_EVT & VSF_TGUI_MSG_MSK)) &&
 #endif
 #if VSF_TGUI_CFG_SHOW_GESTURE_EVT_LOG != ENABLED
@@ -854,8 +834,8 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                 #endif
                     event_ptr->region_ptr = &tRegion;
 
-                    if (ptCore->Status.Values.__is_the_first_node_for_refresh) {
-                        ptCore->Status.Values.__is_the_first_node_for_refresh = false;
+                    if (control_ptr->Status.Values.__is_the_first_node_for_refresh) {
+                        control_ptr->Status.Values.__is_the_first_node_for_refresh = false;
                         tMode = VSF_TGUI_CONTROL_REFRESHED_DIRECTLY_BY_USER;
                     }
 
@@ -965,7 +945,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                     VSF_TGUI_LOG(VSF_TRACE_INFO, "Click");
                     break;
 
-            #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+            #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
 
                 case VSF_TGUI_EVT_POINTER_ENTER & VSF_TGUI_EVT_MSK:
                     VSF_TGUI_LOG(VSF_TRACE_INFO, "Enter");
@@ -994,7 +974,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                 result = __vk_tgui_control_user_message_handling(control_ptr, (const vsf_tgui_evt_t*)ptMSG);
             } while (fsm_rt_on_going == result);
 
-        #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+        #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
             switch(msg & VSF_TGUI_EVT_MSK) {
                 case VSF_TGUI_EVT_POINTER_ENTER & VSF_TGUI_EVT_MSK:
                 case VSF_TGUI_EVT_POINTER_LEFT & VSF_TGUI_EVT_MSK:
@@ -1007,7 +987,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 
             break;
         }
-
+    #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
         case VSF_TGUI_MSG_KEY_EVT & VSF_TGUI_MSG_MSK:{
             vsf_tgui_key_evt_t* event_ptr = (vsf_tgui_key_evt_t *)ptMSG;
             UNUSED_PARAM(event_ptr);
@@ -1057,6 +1037,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
             } while (fsm_rt_on_going == result);
             break;
         }
+    #endif
 
         case VSF_TGUI_MSG_GESTURE_EVT & VSF_TGUI_MSG_MSK: {
             vsf_tgui_gesture_evt_t* event_ptr = (vsf_tgui_gesture_evt_t *)ptMSG;
@@ -1136,7 +1117,7 @@ static void __vsf_tgui_container_update_size(vsf_tgui_container_t *container_ptr
 {
     vsf_tgui_size_t *ptControlSize = NULL;
 
-    ASSERT(NULL != container_ptr && NULL != ptSize);
+    VSF_TGUI_ASSERT(NULL != container_ptr && NULL != ptSize);
 #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
     do {
         vsf_tgui_margin_t tMargin = container_ptr->tContainerPadding;
@@ -1148,12 +1129,12 @@ static void __vsf_tgui_container_update_size(vsf_tgui_container_t *container_ptr
 
     switch(container_ptr->ContainerAttribute.u5Type) {
 
-#if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER == ENABLED  
+#if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER == ENABLED
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
             ptControlSize->iHeight = max(ptSize->iHeight, ptControlSize->iHeight);
             ptControlSize->iWidth = ptSize->iWidth;
             break;
-        
+
         case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
             ptControlSize->iHeight = ptSize->iHeight;
             ptControlSize->iWidth = max(ptSize->iWidth, ptControlSize->iWidth);
@@ -1203,12 +1184,11 @@ static vsf_tgui_size_t* __vsf_tgui_plane_container_update(
     container_ptr->chVisibleItemCount = 0;
 
     while (NULL != item_ptr) {
-        __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core (item_ptr);
         VSF_TGUI_ASSERT(container_ptr->chVisibleItemCount < 255);
         container_ptr->chVisibleItemCount++;
 
-        int16_t iWidth = ptCore->tRegion.tSize.iWidth + ptCore->tRegion.tLocation.iX;
-        int16_t iHeight = ptCore->tRegion.tSize.iHeight + ptCore->tRegion.tLocation.iY;
+        int16_t iWidth = item_ptr->tRegion.tSize.iWidth + item_ptr->tRegion.tLocation.iX;
+        int16_t iHeight = item_ptr->tRegion.tSize.iHeight + item_ptr->tRegion.tLocation.iY;
         tSize.iWidth =  max(tSize.iWidth, iWidth);
         tSize.iHeight = max(tSize.iHeight, iHeight);
         item_ptr = (vsf_tgui_control_t *)__vk_tgui_control_get_next_visible_one_within_container(item_ptr);
@@ -1231,19 +1211,18 @@ static vsf_tgui_size_t* __vsf_tgui_line_stream_update_vertical( vsf_tgui_contain
     container_ptr->chVisibleItemCount = 0;
 
     while(NULL != item_ptr) {
-        __vsf_tgui_control_core_t *ptCore = vsf_tgui_control_get_core(item_ptr);
         VSF_TGUI_ASSERT(container_ptr->chVisibleItemCount < 255);
         container_ptr->chVisibleItemCount++;
 
-        ptCore->tRegion.tLocation = tLocation;
-        iWidth = ptCore->tRegion.tSize.iWidth;
-        iHeight = ptCore->tRegion.tSize.iHeight;
+        item_ptr->tRegion.tLocation = tLocation;
+        iWidth = item_ptr->tRegion.tSize.iWidth;
+        iHeight = item_ptr->tRegion.tSize.iHeight;
 
 #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
-        ptCore->tRegion.tLocation.iX += ptCore->tMargin.chLeft;
-        ptCore->tRegion.tLocation.iY += ptCore->tMargin.chTop;
-        iWidth += ptCore->tRegion.tLocation.iX + ptCore->tMargin.chRight;
-        iHeight += ptCore->tMargin.chTop + ptCore->tMargin.chBottom;
+        item_ptr->tRegion.tLocation.iX += item_ptr->tMargin.chLeft;
+        item_ptr->tRegion.tLocation.iY += item_ptr->tMargin.chTop;
+        iWidth += item_ptr->tRegion.tLocation.iX + item_ptr->tMargin.chRight;
+        iHeight += item_ptr->tMargin.chTop + item_ptr->tMargin.chBottom;
 #endif
 
         tLocation.iY += iHeight;
@@ -1267,19 +1246,18 @@ static vsf_tgui_size_t* __vsf_tgui_line_stream_update_horizontal( vsf_tgui_conta
     container_ptr->chVisibleItemCount = 0;
 
     while (NULL != item_ptr) {
-        __vsf_tgui_control_core_t* ptCore = vsf_tgui_control_get_core(item_ptr);
         VSF_TGUI_ASSERT(container_ptr->chVisibleItemCount < 255);
         container_ptr->chVisibleItemCount++;
 
-        ptCore->tRegion.tLocation = tLocation;
-        iWidth = ptCore->tRegion.tSize.iWidth;
-        iHeight = ptCore->tRegion.tSize.iHeight;
+        item_ptr->tRegion.tLocation = tLocation;
+        iWidth = item_ptr->tRegion.tSize.iWidth;
+        iHeight = item_ptr->tRegion.tSize.iHeight;
 
 #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
-        ptCore->tRegion.tLocation.iX += ptCore->tMargin.chLeft;
-        ptCore->tRegion.tLocation.iY += ptCore->tMargin.chTop;
-        iWidth += ptCore->tMargin.chLeft + ptCore->tMargin.chRight;
-        iHeight += ptCore->tRegion.tLocation.iY + ptCore->tMargin.chBottom;
+        item_ptr->tRegion.tLocation.iX += item_ptr->tMargin.chLeft;
+        item_ptr->tRegion.tLocation.iY += item_ptr->tMargin.chTop;
+        iWidth += item_ptr->tMargin.chLeft + item_ptr->tMargin.chRight;
+        iHeight += item_ptr->tRegion.tLocation.iY + item_ptr->tMargin.chBottom;
 #endif
 
         tLocation.iX += iWidth;
@@ -1319,8 +1297,8 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_vertical(  vsf_tgui_container_t
             //! user doesn't give a resonable value
             iAllowedLineHeight = item_ptr->iHeight;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
-            tSize.iHeight = iAllowedLineHeight + item_ptr->tMargin.chTop + item_ptr->tMargin.chBottom;  
-        #else   
+            tSize.iHeight = iAllowedLineHeight + item_ptr->tMargin.chTop + item_ptr->tMargin.chBottom;
+        #else
             tSize.iHeight = iAllowedLineHeight;
         #endif
         }
@@ -1355,7 +1333,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_vertical(  vsf_tgui_container_t
             iLineMaxWidth = 0;
             is_first_node_in_a_line = true;
         }
-        
+
         item_ptr = (vsf_tgui_control_t *)__vk_tgui_control_get_next_visible_one_within_container(item_ptr);
         if (NULL == item_ptr){
             if (!is_first_node_in_a_line) {
@@ -1392,7 +1370,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_horizontal(vsf_tgui_container_t
     int16_t iLineMaxHeight = 0;
     bool is_first_node_in_a_line = true;
 #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-    int16_t iAllowedLineWidth =     container_ptr->iWidth 
+    int16_t iAllowedLineWidth =     container_ptr->iWidth
                                 -   container_ptr->tContainerPadding.chLeft;
 #else
     int16_t iAllowedLineWidth =     container_ptr->iWidth;
@@ -1406,7 +1384,7 @@ static vsf_tgui_size_t* __vsf_tgui_stream_update_horizontal(vsf_tgui_container_t
             iAllowedLineWidth = item_ptr->iWidth;
         #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
             tSize.iWidth = iAllowedLineWidth + item_ptr->tMargin.chLeft + item_ptr->tMargin.chRight;
-        #else   
+        #else
             tSize.iWidth = iAllowedLineWidth;
         #endif
         }
@@ -1471,7 +1449,7 @@ static fsm_rt_t __vsf_tgui_container_update(vsf_tgui_container_t* container_ptr)
 {
 
     vsf_tgui_size_t tSize;
-    ASSERT(NULL != container_ptr);
+    VSF_TGUI_ASSERT(NULL != container_ptr);
 
     switch(container_ptr->ContainerAttribute.u5Type) {
 
@@ -1521,7 +1499,7 @@ static fsm_rt_t __vsf_tgui_container_update(vsf_tgui_container_t* container_ptr)
 
 fsm_rt_t vk_tgui_control_update(vsf_tgui_control_t *control_ptr)
 {
-    ASSERT(NULL != control_ptr);
+    VSF_TGUI_ASSERT(NULL != control_ptr);
     if (vsf_tgui_control_is_container((const vsf_tgui_control_t *)control_ptr)) {
         return __vsf_tgui_container_update((vsf_tgui_container_t *)control_ptr);
     }

@@ -1,10 +1,12 @@
 #ifndef __BTSTACK_CONFIG
 #define __BTSTACK_CONFIG
 
+#define ENABLE_BTSTACK_ASSERT
+
 // BTstack features that can be enabled
-//#define ENABLE_BLE
+#define ENABLE_BLE
 //#define ENABLE_LE_PERIPHERAL
-//#define ENABLE_LE_CENTRAL
+#define ENABLE_LE_CENTRAL
 //#define ENABLE_LE_DATA_LENGTH_EXTENSION
 #define ENABLE_CLASSIC
 //#define ENABLE_LOG_INFO
@@ -29,6 +31,8 @@
 #define MAX_NR_BNEP_CHANNELS 0
 #define MAX_NR_SERVICE_RECORD_ITEMS 1
 #define MAX_NR_LE_DEVICE_DB_ENTRIES 1
+
+#define MAX_ATT_DB_SIZE 1024
 
 #endif
 

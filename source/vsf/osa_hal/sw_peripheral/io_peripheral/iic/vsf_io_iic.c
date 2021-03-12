@@ -242,7 +242,7 @@ static void __vsf_io_iic_on_timer(vsf_callback_timer_t *timer)
 
 vsf_err_t vsf_io_iic_init(vsf_io_iic_t *io_iic)
 {
-    ASSERT((io_iic != NULL) && (io_iic->io.port != NULL));
+    VSF_ASSERT((io_iic != NULL) && (io_iic->io.port != NULL));
     vsf_gpio_t *gpio = io_iic->io.port;
     io_iic->cb_timer.on_timer = __vsf_io_iic_on_timer;
 
@@ -254,7 +254,7 @@ vsf_err_t vsf_io_iic_init(vsf_io_iic_t *io_iic)
 vsf_err_t vsf_io_iic_transact(vsf_io_iic_t *io_iic, uint_fast8_t addr, uint8_t *buffer, uint_fast32_t size, uint_fast8_t flags)
 {
     // max byte size is 28-bit, 1-bit for state, 3-bit for bit size
-    ASSERT((io_iic != NULL) && (io_iic->io.port != NULL) && !io_iic->size);
+    VSF_ASSERT((io_iic != NULL) && (io_iic->io.port != NULL) && !io_iic->size);
 
     io_iic->cur_data = addr;
     io_iic->size = size;

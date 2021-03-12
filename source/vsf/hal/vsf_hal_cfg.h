@@ -33,11 +33,11 @@ extern "C" {
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #ifndef VSF_HAL_ASSERT
-#   define VSF_HAL_ASSERT(__CON)        ASSERT(__CON)
+#   define VSF_HAL_ASSERT(__CON)        VSF_ASSERT(__CON)
 #endif
 #else
 #ifndef VSF_HAL_ASSERT
-#   define VSF_HAL_ASSERT(...)          ASSERT(__VA_ARGS__)
+#   define VSF_HAL_ASSERT(...)          VSF_ASSERT(__VA_ARGS__)
 #endif
 #endif
 

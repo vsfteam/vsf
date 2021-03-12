@@ -272,7 +272,7 @@ bool vsf_usart_fifo_flush(vsf_usart_t *usart)
 
 vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart, void *buffer, uint_fast32_t count)
 {
-    ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
+    VSF_HAL_ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
 
     if (usart->dma.rx.channel != NULL) {
         return VSF_ERR_IO;
@@ -322,7 +322,7 @@ vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart, void *buffer, uint_fast32_t c
 
 vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart, void *buffer, uint_fast32_t count)
 {
-    ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
+    VSF_HAL_ASSERT((NULL != usart) && (NULL != buffer) && (count > 0));
 
     if (usart->dma.tx.channel != NULL) {
         return VSF_ERR_IO;
@@ -366,8 +366,8 @@ vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart, void *buffer, uint_fast32_t c
 
 vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart)
 {
-    ASSERT(NULL != usart);
-    ASSERT(NULL != usart->dma.rx.channel);
+    VSF_HAL_ASSERT(NULL != usart);
+    VSF_HAL_ASSERT(NULL != usart->dma.rx.channel);
 
     __vsf_dma_channel_stop(usart->dma.rx.channel);
     usart->ip.reg->CTRL2_CLR = USART_CTRL2_RXDMAE;
@@ -377,8 +377,8 @@ vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart)
 
 vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart)
 {
-    ASSERT(NULL != usart);
-    ASSERT(NULL != usart->dma.tx.channel);
+    VSF_HAL_ASSERT(NULL != usart);
+    VSF_HAL_ASSERT(NULL != usart->dma.tx.channel);
 
     __vsf_dma_channel_stop(usart->dma.tx.channel);
     usart->ip.reg->CTRL2_CLR = USART_CTRL2_TXDMAE;
@@ -388,13 +388,13 @@ vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart)
 
 int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart)
 {
-    ASSERT(false);
+    VSF_HAL_ASSERT(false);
     return -1;
 }
 
 int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart)
 {
-    ASSERT(false);
+    VSF_HAL_ASSERT(false);
     return -1;
 }
 

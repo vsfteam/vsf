@@ -360,7 +360,7 @@ static void * __vk_usbh_msc_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
     msc->scsi.drv = &__vk_usbh_msc_scsi_drv;
     msc->eda.fn.evthandler = __vk_usbh_msc_evthandler;
     msc->eda.on_terminate = __vk_usbh_msc_on_eda_terminate;
-    vsf_eda_init(&msc->eda, vsf_prio_inherit, false);
+    vsf_eda_init(&msc->eda);
     return msc;
 
 free_all:

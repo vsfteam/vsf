@@ -35,7 +35,7 @@ extern "C" {
 #define when(...)                               __when(__VA_ARGS__)
 #endif
 
-#define __vsf_list_tmp_name(__head)             CONNECT2(__head, __LINE__)
+#define __vsf_list_tmp_name(__head)             VSF_MCONNECT2(__head, __LINE__)
 
 /*-----------------------------------------------------------------------------*
  * Single Chain List internal macro                                            *

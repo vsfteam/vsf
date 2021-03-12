@@ -128,8 +128,8 @@
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
 
-#define ASSERT(...)                                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                                 if (!(__VA_ARGS__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define VSF_DEBUGGER_CFG_CONSOLE                        VSF_DEBUGGER_CFG_CONSOLE_SEGGER_RTT
 

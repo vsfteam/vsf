@@ -43,7 +43,10 @@
 #endif
 
 #if VSF_FS_USE_MEMFS == ENABLED
-#   include "../fakefat32.h"
+#   ifndef USRAPP_FAKEFAT32_CFG_HEADER
+#       define USRAPP_FAKEFAT32_CFG_HEADER      "../fakefat32.h"
+#   endif
+#   include USRAPP_FAKEFAT32_CFG_HEADER
 #endif
 
 /*============================ MACROS ========================================*/

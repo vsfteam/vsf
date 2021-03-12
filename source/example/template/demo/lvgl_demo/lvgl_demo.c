@@ -262,6 +262,15 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
+    if (NULL == usrapp_ui_common.disp) {
+        return -1;
+    }
+
+    if (usrapp_ui_common.disp->param.color != VSF_DISP_COLOR_RGB565) {
+        // insecure operation
+        ((vk_disp_param_t *)&usrapp_ui_common.disp->param)->color = VSF_DISP_COLOR_RGB565;
+    }
+
 #   if USE_LV_LOG
     lv_log_register_print(vsf_lvgl_printf);
 #   endif
@@ -275,7 +284,7 @@ int VSF_USER_ENTRY(void)
     lv_disp_buf_init(   &usrapp_ui_common.lvgl.disp_buf,
                         &usrapp_ui_common.lvgl.color,
                         NULL,
-                        LV_HOR_RES_MAX * LV_VER_RES_MAX);
+                        APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE);
     lv_disp_drv_init(&disp_drv);
 
     disp_drv.hor_res = LV_HOR_RES_MAX;
@@ -284,9 +293,7 @@ int VSF_USER_ENTRY(void)
     disp_drv.buffer = &usrapp_ui_common.lvgl.disp_buf;
     disp = lv_disp_drv_register(&disp_drv);
 
-    // insecure operation
-    ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_RGB565;
-    vsf_lvgl_disp_bind(&usrapp_ui_common.disp.use_as__vk_disp_t, &disp->driver);
+    vsf_lvgl_disp_bind(usrapp_ui_common.disp, &disp->driver);
 
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;

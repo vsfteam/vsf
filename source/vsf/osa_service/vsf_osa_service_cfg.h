@@ -32,7 +32,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_OSA_SERVICE_ASSERT
-#   define VSF_OSA_SERVICE_ASSERT               ASSERT
+#   define VSF_OSA_SERVICE_ASSERT               VSF_ASSERT
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

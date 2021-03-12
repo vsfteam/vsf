@@ -515,7 +515,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         } else {
             musb->state = MUSB_FDRC_HCD_STATE_WAIE_CONNECT;
             musb->teda.fn.evthandler = __vk_musb_fdrc_hcd_evthandler;
-            vsf_teda_init(&musb->teda, vsf_prio_inherit, false);
+            vsf_teda_init(&musb->teda);
             return VSF_ERR_NONE;
         }
         break;

@@ -76,10 +76,10 @@ int main(void)
     vsf_sem_init(&usrapp.sem, 0);
 
     vsf_eda_set_evthandler(&usrapp.eda_recv, usrapp_recv_evthandler);
-    vsf_eda_init(&usrapp.eda_recv, vsf_prio_0, false);
+    vsf_eda_init(&usrapp.eda_recv, vsf_prio_0);
 
     vsf_eda_set_evthandler(&usrapp.eda_send, usrapp_send_evthandler);
-    vsf_eda_init(&usrapp.eda_send, vsf_prio_0, false);
+    vsf_eda_init(&usrapp.eda_send, vsf_prio_0);
     return 0;
 }
 

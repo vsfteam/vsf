@@ -24,8 +24,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-//#define ASSERT(...)         if (!(__VA_ARGS__)) {vsf_interrupt_safe() {while(1);}};
-#define ASSERT(...)
+//#define VSF_ASSERT(...)         if (!(__VA_ARGS__)) {vsf_interrupt_safe() {while(1);}};
+#define VSF_ASSERT(...)
 
 #define VSF_SYSTIMER_FREQ               72000000ul
 

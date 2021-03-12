@@ -1,8 +1,8 @@
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
 
-#define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define M480_PLL_FREQ_HZ                (288 * 1000 * 1000)
 #define M480_HCLK_FREQ_HZ               (288 * 1000 * 1000)

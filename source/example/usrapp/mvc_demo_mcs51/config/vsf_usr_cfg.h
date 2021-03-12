@@ -24,8 +24,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(__VAR__)                     if (!(__VAR__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(__VAR__)                     if (!(__VAR__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define VSF_HEAP_SIZE                   0x800
 #define VSF_HEAP_CFG_MCB_MAGIC_EN       ENABLED

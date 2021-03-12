@@ -26,6 +26,15 @@
 
 #include "vsf.h"
 
+#include "SDL_cpuinfo.h"
+#include "SDL_endian.h"
+#include "SDL_stdinc.h"
+#include "SDL_version.h"
+
+#include "SDL_keyboard.h"
+#include "SDL_mouse.h"
+#include "SDL_surface.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,29 +42,63 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SDL_CFG_V1_COMPATIBLE
-#   define VSF_SDL_CFG_V1_COMPATIBLE            ENABLED
+#   define VSF_SDL_CFG_V1_COMPATIBLE    ENABLED
 #endif
+
+#define DECLSPEC
+#define SDLCALL
+#define SDL_INLINE                      INLINE
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define SDL_assert                      VSF_SDL2_ASSERT
+#define SDL_memset4                     __vsf_sdl2_memset4
 
 #define SDL_Init                        __vsf_sdl2_init
 #define SDL_InitSubSystem               __vsf_sdl2_init_subsystem
 #define SDL_Quit                        __vsf_sdl2_quit
+#define SDL_GetPlatform                 __vsf_sdl2_get_platform
 
+#define SDL_SetError                    __vsf_sdl2_set_error
 #define SDL_GetError                    __vsf_sdl2_get_error
 #define SDL_SetHint(...)
 
+#define SDL_RWFromFile                  __vsf_sdl2_rw_from_file
+#define SDL_RWsize                      __vsf_sdl2_rw_size
+#define SDL_RWclose                     __vsf_sdl2_rw_close
+#define SDL_RWseek                      __vsf_sdl2_rw_seek
+#define SDL_RWtell                      __vsf_sdl2_rw_tell
+#define SDL_RWread                      __vsf_sdl2_rw_read
+#define SDL_RWwrite                     __vsf_sdl2_rw_write
+
 #define SDL_CreateWindow                __vsf_sdl2_create_window
 #define SDL_DestroyWindow               __vsf_sdl2_destroy_window
+#define SDL_GetWindowPosition           __vsf_sdl2_get_window_position
+#define SDL_GetWindowSurface            __vsf_sdl2_get_window_surface
+#define SDL_GetWindowSize               __vsf_sdl2_get_window_size
+#define SDL_UpdateWindowSurface         __vsf_sdl2_update_window_surface
+#define SDL_UpdateWindowSurfaceRects    __vsf_sdl2_update_window_surface_rects
+#define SDL_ShowWindow                  __vsf_sdl2_show_window
+#define SDL_SetWindowIcon               __vsf_sdl2_set_window_icon
+#define SDL_SetWindowTitle              __vsf_sdl2_set_window_title
+#define SDL_SetWindowFullscreen         __vsf_sdl2_set_window_full_screen
+#define SDL_RestoreWindow               __vsf_sdl2_restore_window
+#define SDL_MaximizeWindow              __vsf_sdl2_maximize_window
+#define SDL_GetWindowFlags              __vsf_sdl2_get_window_flags
 
 #define SDL_GetDesktopDisplayMode       __vsf_sdl2_get_desktop_display_mode
+#define SDL_GetCurrentDisplayMode       __vsf_sdl2_get_current_display_mode
 
-#define SDL_CreateRGBSurfaceWithFormat  __vsf_sdl2_create_rgb_sruface_with_format
+#define SDL_CreateRGBSurface                __vsf_sdl2_create_rgb_surface
+#define SDL_CreateRGBSurfaceWithFormat      __vsf_sdl2_create_rgb_surface_with_format
+#define SDL_CreateRGBSurfaceWithFormatFrom  __vsf_sdl2_create_rgb_surface_with_format_from
+#define SDL_CreateRGBSurfaceFrom        __vsf_sdl2_create_rgb_surface_from
 #define SDL_FreeSurface                 __vsf_sdl2_free_surface
-
-#define SDL_DestroyTexture              __vsf_sdl2_destroy_texture
+#define SDL_LockSurface                 __vsf_sdl2_lock_surface
+#define SDL_UnlockSurface               __vsf_sdl2_unlock_surface
+#define SDL_SetSurfaceBlendMode         __vsf_sdl2_set_surface_blend_mode
+#define SDL_SetColorKey                 __vsf_sdl2_set_color_key
+#define SDL_FillRect                    __vsf_sdl2_fill_rect
+#define SDL_BlitSurface                 __vsf_sdl2_blit_surface
 
 #define SDL_CreateRenderer              __vsf_sdl2_create_renderer
 #define SDL_DestroyRenderer             __vsf_sdl2_destroy_renderer
@@ -66,9 +109,7 @@ extern "C" {
 #define SDL_CreateTexture               __vsf_sdl2_create_texture
 #define SDL_CreateTextureFromSurface    __vsf_sdl2_create_texture_from_surface
 #define SDL_UpdateTexture               __vsf_sdl2_update_texture
-
-#define SDL_LockSurface                 __vsf_sdl2_lock_surface
-#define SDL_UnlockSurface               __vsf_sdl2_unlock_surface
+#define SDL_DestroyTexture              __vsf_sdl2_destroy_texture
 
 #define SDL_CreateSemaphore             __vsf_sdl2_create_sem
 #define SDL_DestroySemaphore            __vsf_sdl2_destroy_sem
@@ -81,6 +122,14 @@ extern "C" {
 #   define SDL_Delay                    __vsf_sdl2_delay
 #   define SDL_GetTicks                 __vsf_sdl2_get_ticks
 #endif
+
+#define SDL_GetDisplayDPI               __vsf_sdl2_get_display_dpi
+#define SDL_EnableScreenSaver           __vsf_sdl2_enable_screen_saver
+#define SDL_HasClipboardText            __vsf_sdl2_has_clipboard_text
+#define SDL_GetClipboardText            __vsf_sdl2_get_clipboard_text
+#define SDL_SetClipboardText            __vsf_sdl2_set_clipboard_text
+#define SDL_GetPerformanceCounter       __vsf_sdl2_get_performance_counter
+#define SDL_GetPerformanceFrequency     __vsf_sdl2_get_performance_frequency
 
 #define SDL_OpenAudio                   __vsf_sdl2_open_audio
 #define SDL_PauseAudio                  __vsf_sdl2_pause_audio
@@ -97,6 +146,11 @@ extern "C" {
 #define SDL_ShowCursor                  __vsf_sdl2_show_curser
 
 #define SDL_PollEvent                   __vsf_sdl2_poll_event
+#define SDL_WaitEventTimeout            __vsf_sdl2_wait_event_timeout
+#define SDL_FlushEvent                  __vsf_sdl2_flush_event
+#define SDL_EventState                  __vsf_sdl2_event_state
+
+#define SDL_GetKeyName                  __vsf_sdl2_get_key_name
 
 #define SDL_NumJoysticks                __vsf_sdl2_num_joysticks
 #define SDL_JoystickOpen                __vsf_sdl2_joystick_open
@@ -105,6 +159,9 @@ extern "C" {
 #define SDL_JoystickNumBalls            __vsf_sdl2_joystick_num_balls
 #define SDL_JoystickNumHats             __vsf_sdl2_joystick_num_hats
 #define SDL_JoystickEventState          __vsf_sdl2_joystick_event_state
+
+#define SDL_CaptureMouse                __vsf_sdl2_capture_mouse
+#define SDL_GetGlobalMouseState         __vsf_sdl2_get_global_mouse_state
 
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
 #define SDL_CreateYUVOverlay            __vsf_sdl_create_yuv_overlay
@@ -131,6 +188,9 @@ extern "C" {
 #define SDL_INIT_NOPARACHUTE    (1 << 7)
 #define SDL_INIT_EVERYTHING     (0xFFFFFFFF)
 
+#define SDL_ALPHA_OPAQUE        255
+#define SDL_ALPHA_TRANSPARENT   0
+
 /*============================ TYPES =========================================*/
 
 // basic types
@@ -139,37 +199,51 @@ typedef enum SDL_bool {
     SDL_TRUE = 1
 } SDL_bool;
 
-#define SDL_MAX_SINT8   INT8_MAX
-#define SDL_MIN_SINT8   INT8_MIN
+typedef union SDL_Color {
+    struct {
+        uint8_t b, g, r, a;
+    };
+    uint32_t value;
+} SDL_Color;
+
+enum {
+    RW_SEEK_SET                 = SEEK_SET,
+    RW_SEEK_CUR                 = SEEK_CUR,
+    RW_SEEK_END                 = SEEK_END,
+};
+typedef FILE SDL_RWops;
+
+#define SDL_MAX_SINT8           INT8_MAX
+#define SDL_MIN_SINT8           INT8_MIN
 typedef int8_t Sint8;
 
-#define SDL_MAX_UINT8   UINT8_MAX
-#define SDL_MIN_UINT8   0
+#define SDL_MAX_UINT8           UINT8_MAX
+#define SDL_MIN_UINT8           0
 typedef uint8_t Uint8;
 
-#define SDL_MAX_SINT16  INT16_MAX
-#define SDL_MIN_SINT16  INT16_MIN
+#define SDL_MAX_SINT16          INT16_MAX
+#define SDL_MIN_SINT16          INT16_MIN
 typedef int16_t Sint16;
 
-#define SDL_MAX_UINT16  UINT16_MAX
-#define SDL_MIN_UINT16  0
+#define SDL_MAX_UINT16          UINT16_MAX
+#define SDL_MIN_UINT16          0
 typedef uint16_t Uint16;
 
-#define SDL_MAX_SINT32  INT32_MAX
-#define SDL_MIN_SINT32  INT32_MIN
+#define SDL_MAX_SINT32          INT32_MAX
+#define SDL_MIN_SINT32          INT32_MIN
 typedef int32_t Sint32;
 
-#define SDL_MAX_UINT32  UINT32_MAX
-#define SDL_MIN_UINT32  0
+#define SDL_MAX_UINT32          UINT32_MAX
+#define SDL_MIN_UINT32          0
 typedef uint32_t Uint32;
 
 
-#define SDL_MAX_SINT64  INT64_MAX
-#define SDL_MIN_SINT64  INT64_MIN
+#define SDL_MAX_SINT64          INT64_MAX
+#define SDL_MIN_SINT64          INT64_MIN
 typedef int64_t Sint64;
 
-#define SDL_MAX_UINT64  UINT64_MAX
-#define SDL_MIN_UINT64  0
+#define SDL_MAX_UINT64          UINT64_MAX
+#define SDL_MIN_UINT64          0
 typedef uint64_t Uint64;
 
 
@@ -183,7 +257,7 @@ enum {
     SDL_WINDOWPOS_UNDEFINED,
 };
 
-typedef enum __sdl_window_flag_t {
+typedef enum SDL_WindowFlags {
     SDL_WINDOW_FULLSCREEN       = (1 <<0),
     SDL_WINDOW_OPENGL           = (1 << 1),
     SDL_WINDOW_SHOWN            = (1 << 2),
@@ -206,7 +280,7 @@ typedef enum __sdl_window_flag_t {
     SDL_WINDOW_TOOLTIP          = (1 << 18),
     SDL_WINDOW_POPUP_MENU       = (1 << 19),
     SDL_WINDOW_VULKAN           = (1 << 20),
-} __sdl_window_flag_t;
+} SDL_WindowFlags;
 
 typedef struct SDL_Window SDL_Window;
 
@@ -218,28 +292,56 @@ typedef enum {
 
 typedef enum {
     SDL_PIXELFORMAT_UNKNOWN     = VSF_DISP_COLOR_INVALID,
-    SDL_PIXELFORMAT_RGBA8888    = VSF_DISP_COLOR_INVALID,
+    SDL_PIXELFORMAT_RGBA8888    = VSF_DISP_COLOR_RGBA8888,
+    SDL_PIXELFORMAT_ABGR8888    = VSF_DISP_COLOR_ABGR8888,
 
     SDL_PIXELFORMAT_ARGB8888    = VSF_DISP_COLOR_ARGB8888,
     SDL_PIXELFORMAT_RGB565      = VSF_DISP_COLOR_RGB565,
     SDL_PIXELFORMAT_RGB666      = VSF_DISP_COLOR_RGB666_32,
+
+    SDL_PIXELFORMAT_RGB24       = VSF_DISP_COLOR_RGB24,
+    SDL_PIXELFORMAT_BGR24       = VSF_DISP_COLOR_BGR24,
+
+    VSF_DISP_COLOR_IDX_DEF(INDEX8)  = 100,
+    VSF_DISP_COLOR_DEF(INDEX8, 8, 1, 0),
+    SDL_PIXELFORMAT_INDEX8      = VSF_DISP_COLOR_INDEX8,
 } SDL_PixelFormatEnum;
 
+typedef enum SDL_BlendMode {
+    SDL_BLENDMODE_NONE,
+    SDL_BLENDMODE_BLEND,
+    SDL_BLENDMODE_ADD,
+    SDL_LBENDMODE_MOD,
+} SDL_BlendMode;
+
 typedef struct SDL_Texture SDL_Texture;
+
+typedef struct SDL_Palette {
+    int ncolors;
+    SDL_Color * colors;
+} SDL_Palette;
 
 typedef struct SDL_PixelFormat {
     uint32_t format;
 
+    SDL_Palette *palette;
     uint32_t Rmask;
     uint32_t Gmask;
     uint32_t Bmask;
     uint32_t Amask;
     uint8_t BitsPerPixel;
+    uint8_t BytesPerPixel;
 } SDL_PixelFormat;
 typedef struct SDL_Surface {
     SDL_PixelFormat *format;
     int w, h;
     int pitch;
+
+    enum {
+        SDL_PREALLOC            = 1 << 0,
+        SDL_SIMD_ALIGNED        = 1 << 1,
+    } flags;
+    SDL_BlendMode blend;
 
     SDL_PixelFormat __format;
     void *pixels;
@@ -271,6 +373,7 @@ typedef struct SDL_Overlay {
 
 // parameter for SDL_SetVideoMode
 enum {
+    SDL_SWSURFACE               = 0 << 0,            // Just here for compatibility
     SDL_ANYFORMAT               = 1 << 0,
     SDL_HWSURFACE               = 1 << 1,
     SDL_DOUBLEBUF               = 1 << 2,
@@ -367,8 +470,13 @@ typedef enum {
     SDL_FIRSTEVENT              = 0,
     SDL_QUIT                    = 0x100,
 
+    SDL_WINDOWEVENT             = 0x200,
+    SDL_SYSWMEVENT,
+
     SDL_KEYDOWN                 = 0x300,
     SDL_KEYUP,
+    SDL_TEXTEDITING,
+    SDL_TEXTINPUT,
 
     SDL_MOUSEMOTION             = 0x400,
     SDL_MOUSEBUTTONDOWN,
@@ -393,6 +501,11 @@ typedef enum {
     SDL_FINGERDOWN              = 0x700,
     SDL_FINGERUP,
     SDL_FINGERMOTION,
+
+    SDL_DROPFILE                = 0x1000,
+    SDL_DROPTEXT,
+    SDL_DROPBEGIN,
+    SDL_DROPCOMPLETE,
 
     SDL_AUDIODEVICEADDED        = 0x1100,
     SDL_AUDIODEVICEREMOVED,
@@ -438,6 +551,7 @@ enum {
     SDLK_RETURN                 = '\r',
     SDLK_ESCAPE                 = '\033',
     SDLK_SPACE                  = ' ',
+    SDLK_TAB                    = '\t',
 
     SDLK_1                      = '1',
     SDLK_2                      = '2',
@@ -631,6 +745,46 @@ typedef struct SDL_MouseWheelEvent {
     int32_t y;
     uint32_t direction;
 } SDL_MouseWheelEvent;
+typedef enum {
+    SDL_WINDOWEVENT_NONE,
+    SDL_WINDOWEVENT_SHOWN,
+    SDL_WINDOWEVENT_HIDDEN,
+    SDL_WINDOWEVENT_EXPOSED,
+    SDL_WINDOWEVENT_MOVED,
+    SDL_WINDOWEVENT_RESIZED,
+    SDL_WINDOWEVENT_SIZE_CHANGED,
+    SDL_WINDOWEVENT_MINIMIZED,
+    SDL_WINDOWEVENT_MAXIMIZED,
+    SDL_WINDOWEVENT_RESTORED,
+    SDL_WINDOWEVENT_ENTER,
+    SDL_WINDOWEVENT_LEAVE,
+    SDL_WINDOWEVENT_FOCUS_GAINED,
+    SDL_WINDOWEVENT_FOCUS_LOST,
+    SDL_WINDOWEVENT_CLOSE,
+} SDL_WindowEventID;
+typedef struct SDL_WindowEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    uint32_t windowID;
+    uint8_t event;
+    int32_t data1;
+    int32_t data2;
+} SDL_WindowEvent;
+#define SDL_TEXTINPUTEVENT_TEXT_SIZE        32
+typedef struct SDL_TextInputEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    uint32_t windowID;
+    char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+} SDL_TextInputEvent;
+typedef struct SDL_DropEvent {
+    uint32_t type;
+    uint32_t timestamp;
+    // file should be allocated by SDL_malloc
+    //  user should call SDL_free to free file
+    char *file;
+    uint32_t windowID;
+} SDL_DropEvent;
 
 typedef struct SDL_Cursor SDL_Cursor;
 typedef enum SDL_SystemCursor {
@@ -664,6 +818,10 @@ typedef union SDL_Event {
     SDL_MouseButtonEvent button;
     SDL_MouseWheelEvent wheel;
 
+    SDL_WindowEvent window;
+    SDL_TextInputEvent text;
+    SDL_DropEvent drop;
+
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
     SDL_ActiveEvent active;
 #endif
@@ -673,21 +831,54 @@ typedef union SDL_Event {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_sdl2_init(vk_disp_t *disp);
+extern void vsf_sdl2_init(vk_disp_t * disp);
 
 extern int SDL_Init(uint32_t flags);
 extern int SDL_InitSubSystem(uint32_t flags);
 extern void SDL_Quit(void);
+extern const char * SDL_GetPlatform(void);
 
-extern const char *SDL_GetError(void);
+extern void SDL_memset4(void *dst, int val, size_t dwords);
+extern const char * SDL_GetError(void);
+extern int SDL_SetError(const char* fmt, ...);
 
-extern SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uint32_t flags);
+extern SDL_RWops * SDL_RWFromFile(const char * file, const char * mode);
+extern int64_t SDL_RWsize(SDL_RWops * context);
+extern int SDL_RWclose(SDL_RWops * context);
+extern int64_t SDL_RWseek(SDL_RWops * context, int64_t offset, int whence);
+extern int64_t SDL_RWtell(SDL_RWops * context);
+extern size_t SDL_RWread(SDL_RWops * context, void * ptr, size_t size, size_t maxnum);
+extern size_t SDL_RWwrite(SDL_RWops * context, const void * ptr, size_t size, size_t num);
+
+extern SDL_Window * SDL_CreateWindow(const char * title, int x, int y, int w, int h, uint32_t flags);
 extern void SDL_DestroyWindow(SDL_Window * window);
+extern void SDL_GetWindowPosition(SDL_Window * window, int * x, int * y);
+extern SDL_Surface * SDL_GetWindowSurface(SDL_Window * window);
+extern void SDL_GetWindowSize(SDL_Window* window, int *w, int *h);
+extern int SDL_UpdateWindowSurface(SDL_Window * window);
+extern int SDL_UpdateWindowSurfaceRects(SDL_Window * window, const SDL_Rect * rects, int numrects);
+extern void SDL_ShowWindow(SDL_Window *window);
+extern void SDL_SetWindowIcon(SDL_Window * window, SDL_Surface * icon);
+extern void SDL_SetWindowTitle(SDL_Window * window, const char * title);
+extern int SDL_SetWindowFullscreen(SDL_Window * window, uint32_t flags);
+extern void SDL_RestoreWindow(SDL_Window * window);
+extern void SDL_MaximizeWindow(SDL_Window * window);
+extern uint32_t SDL_GetWindowFlags(SDL_Window * window);
 
-extern int SDL_GetDesktopDisplayMode(int display_index, SDL_DisplayMode *mode);
+extern int SDL_GetDesktopDisplayMode(int display_index, SDL_DisplayMode * mode);
+extern int SDL_GetCurrentDisplayMode(int display_index, SDL_DisplayMode * mode);
 
+extern SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask);
 extern SDL_Surface * SDL_CreateRGBSurfaceWithFormat(uint32_t flags, int w, int h, int depth, uint32_t format);
+extern SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, int depth, int pitch, uint32_t format);
+extern SDL_Surface * SDL_CreateRGBSurfaceFrom(void *pixels, int w, int h, int depth, int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask);
 extern void SDL_FreeSurface(SDL_Surface *surface);
+extern int SDL_LockSurface(SDL_Surface * surface);
+extern void SDL_UnlockSurface(SDL_Surface * surface);
+extern int SDL_SetSurfaceBlendMode(SDL_Surface * surface, SDL_BlendMode blendMode);
+extern int SDL_SetColorKey(SDL_Surface * surface, int flag, uint32_t key);
+extern int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color);
+extern int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * dst, SDL_Rect * dstrect);
 
 extern SDL_Renderer * SDL_CreateRenderer(SDL_Window * window, int index, uint32_t flags);
 extern void SDL_DestroyRenderer(SDL_Renderer * renderer);
@@ -696,12 +887,9 @@ extern int SDL_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture, const 
 extern void SDL_RenderPresent(SDL_Renderer * renderer);
 
 extern SDL_Texture * SDL_CreateTexture(SDL_Renderer * renderer, uint32_t format, int access, int w, int h);
-extern SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *surface);
+extern SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface);
 extern void SDL_DestroyTexture(SDL_Texture * texture);
-extern int SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect, const void *pixels, int pitch);
-
-extern int SDL_LockSurface(SDL_Surface * surface);
-extern void SDL_UnlockSurface(SDL_Surface * surface);
+extern int SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect, const void * pixels, int pitch);
 
 extern SDL_sem * SDL_CreateSemaphore(uint32_t initial_value);
 extern void SDL_DestroySemaphore(SDL_sem * sem);
@@ -713,16 +901,29 @@ extern void SDL_Delay(uint32_t ms);
 extern uint32_t SDL_GetTicks(void);
 #endif
 
+extern int SDL_GetDisplayDPI(int display_index, float * ddpi, float * hdpi, float * vdpi);
+extern void SDL_EnableScreenSaver(void);
+extern SDL_bool SDL_HasClipboardText(void);
+extern char * SDL_GetClipboardText(void);
+extern int SDL_SetClipboardText(const char * text);
+extern uint64_t SDL_GetPerformanceCounter(void);
+extern uint64_t SDL_GetPerformanceFrequency(void);
+
 extern int SDL_OpenAudio(SDL_AudioSpec * desired, SDL_AudioSpec * obtained);
 extern void SDL_PauseAudio(int pause_on);
 extern SDL_AudioStatus SDL_GetAudioStatus(void);
 extern void SDL_CloseAudio(void);
 
 extern int SDL_PollEvent(SDL_Event * event);
+extern int SDL_WaitEventTimeout(SDL_Event * event, int timeout);
+extern void SDL_FlushEvent(uint32_t type);
+extern uint8_t SDL_EventState(uint32_t type, int state);
+
+extern const char * SDL_GetKeyName(SDL_Keycode key);
 
 extern SDL_Cursor * SDL_CreateCursor(const uint8_t * data, const uint8_t * mask,
                                             int w, int h, int hot_x, int hot_y);
-extern SDL_Cursor * SDL_CreateColorCursor(SDL_Surface *surface, int hot_x, int hot_y);
+extern SDL_Cursor * SDL_CreateColorCursor(SDL_Surface * surface, int hot_x, int hot_y);
 extern SDL_Cursor * SDL_CreateSystemCursor(SDL_SystemCursor id);
 extern void SDL_SetCursor(SDL_Cursor * cursor);
 extern SDL_Cursor * SDL_GetCursor(void);
@@ -738,17 +939,20 @@ extern int SDL_JoystickNumAxes(SDL_Joystick * joystick);
 extern int SDL_JoystickNumBalls(SDL_Joystick * joystick);
 extern int SDL_JoystickNumHats(SDL_Joystick * joystick);
 
+extern int SDL_CaptureMouse(SDL_bool enabled);
+extern uint32_t SDL_GetGlobalMouseState(int * x, int * y);
+
 #if VSF_SDL_CFG_V1_COMPATIBLE == ENABLED
 extern SDL_Overlay * SDL_CreateYUVOverlay(int width, int height, uint32_t format, SDL_Surface *display);
 extern void SDL_FreeYUVOverlay(SDL_Overlay * overlay);
-extern int SDL_LockYUVOverlay(SDL_Overlay *overlay);
-extern void SDL_UnlockYUVOverlay(SDL_Overlay *overlay);
-extern int SDL_DisplayYUVOverlay(SDL_Overlay *overlay, SDL_Rect *dstrect);
+extern int SDL_LockYUVOverlay(SDL_Overlay * overlay);
+extern void SDL_UnlockYUVOverlay(SDL_Overlay * overlay);
+extern int SDL_DisplayYUVOverlay(SDL_Overlay * overlay, SDL_Rect * dstrect);
 
 extern SDL_Surface * SDL_SetVideoMode(int width, int height, int bpp, uint32_t flags);
-extern int SDL_Flip(SDL_Surface *screen);
+extern int SDL_Flip(SDL_Surface * screen);
 
-extern void SDL_WM_SetCaption(const char *title, const char *icon);
+extern void SDL_WM_SetCaption(const char * title, const char * icon);
 #endif
 
 #ifdef __cplusplus

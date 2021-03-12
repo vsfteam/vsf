@@ -106,17 +106,19 @@ a compile-time constant value.
 #endif
 
 
-#if __MFUNC_OUT_DEC_DIGIT_TEMP2 == 0 
+#if __MFUNC_OUT_DEC_DIGIT_TEMP2 == 0
 #   if __MFUNC_OUT_DEC_DIGIT_TEMP1 == 0
 #       define MFUNC_OUT_DEC_STR        __MFUNC_OUT_DEC_DIGIT_TEMP0
 #   else
-#       define MFUNC_OUT_DEC_STR        CONNECT2(   __MFUNC_OUT_DEC_DIGIT_TEMP1,\
-                                                    __MFUNC_OUT_DEC_DIGIT_TEMP0)
+#       define MFUNC_OUT_DEC_STR                                                \
+            VSF_MCONNECT2(  __MFUNC_OUT_DEC_DIGIT_TEMP1,                        \
+                            __MFUNC_OUT_DEC_DIGIT_TEMP0)
 #   endif
 #else
-#   define MFUNC_OUT_DEC_STR            CONNECT3(   __MFUNC_OUT_DEC_DIGIT_TEMP2,\
-                                                    __MFUNC_OUT_DEC_DIGIT_TEMP1,\
-                                                    __MFUNC_OUT_DEC_DIGIT_TEMP0)
+#   define MFUNC_OUT_DEC_STR                                                    \
+            VSF_MCONNECT3(  __MFUNC_OUT_DEC_DIGIT_TEMP2,                        \
+                            __MFUNC_OUT_DEC_DIGIT_TEMP1,                        \
+                            __MFUNC_OUT_DEC_DIGIT_TEMP0)
 #endif
 
 

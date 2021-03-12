@@ -234,7 +234,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_start(vsfvm_thread_t *thread)
     if (!__vsfvm_ext_libusb.fn.evthandler) {
         vsf_slist_init(&__vsfvm_ext_libusb.dev_list);
         __vsfvm_ext_libusb.fn.evthandler = __vsfvm_ext_libusb_evthandler;
-        vsf_eda_init(&__vsfvm_ext_libusb.use_as__vsf_eda_t, VSFVM_CFG_PRIORITY, false);
+        vsf_eda_init(&__vsfvm_ext_libusb.use_as__vsf_eda_t, VSFVM_CFG_PRIORITY);
         vk_usbh_libusb_set_evthandler(&__vsfvm_ext_libusb, __vsfvm_ext_libusb_on_evt);
     }
 
@@ -410,7 +410,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_transfer_ex(vsfvm_thread_t *thread)
         }
 
         thread->fn.evthandler = __vsfvm_ext_libusb_evthandler;
-        vsf_teda_init(&thread->use_as__vsf_teda_t, VSFVM_CFG_PRIORITY, false);
+        vsf_teda_init(&thread->use_as__vsf_teda_t, VSFVM_CFG_PRIORITY);
 
         if (!epnum) {
             // control transfer

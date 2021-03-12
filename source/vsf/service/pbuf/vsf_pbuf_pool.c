@@ -89,7 +89,7 @@ uint_fast32_t vsf_pbuf_get_pool_item_count(vsf_pbuf_pool_t *this_ptr)
                                 
                                        
 SECTION(".text." "vsf_pbuf" "_pool_get_region")                                    
-code_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *this_ptr)                 
+vsf_protect_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *this_ptr)                 
 {                                                                               
     return vsf_pool_get_region((vsf_pool_t *)this_ptr);                            
 }                                                                               

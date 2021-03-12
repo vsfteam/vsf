@@ -54,6 +54,6 @@ ISR(USB_DC##__N##_IRQHandler)                                                   
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-REPEAT_MACRO(USB_DC_COUNT, USB_DC_IMPLEMENT, NULL)
+VSF_MREPEAT(USB_DC_COUNT, USB_DC_IMPLEMENT, NULL)
 
 #endif      // VSF_USE_USB_DEVICE

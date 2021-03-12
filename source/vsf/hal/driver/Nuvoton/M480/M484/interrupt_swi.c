@@ -19,7 +19,7 @@
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
 
-#include "hal/driver/common/vsf_swi_template.inc"
+#include "hal/driver/common/swi/arm/vsf_swi_template.inc"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SCSI_ASSERT
-#   define VSF_SCSI_ASSERT                  ASSERT
+#   define VSF_SCSI_ASSERT                  VSF_ASSERT
 #endif
 
 #if VSF_USE_SCSI == ENABLED

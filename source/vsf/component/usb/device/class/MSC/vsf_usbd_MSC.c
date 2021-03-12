@@ -248,7 +248,7 @@ static vsf_err_t __vk_usbd_msc_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     msc->eda.on_terminate = NULL;
 #endif
-    return vsf_eda_init(&msc->eda, VSF_USBD_CFG_EDA_PRIORITY, false);
+    return vsf_eda_init(&msc->eda, VSF_USBD_CFG_EDA_PRIORITY);
 }
 
 static vsf_err_t __vk_usbd_msc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)

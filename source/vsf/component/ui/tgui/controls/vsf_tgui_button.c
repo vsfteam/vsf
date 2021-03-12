@@ -70,22 +70,43 @@ static const i_tgui_control_methods_t c_tVLabel= {
 fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm;
+    vsf_tgui_key_evt_t* key_evt_ptr = (vsf_tgui_key_evt_t*)ptMSG;
 
     //! some message has to be handled before calling user handler
     switch(ptMSG->use_as__vsf_msgt_msg_t.msg) {
-
+    #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+        case VSF_TGUI_EVT_KEY_DOWN: 
+            if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
+                break;
+            }
+            //! fall-through
+    #endif
         case VSF_TGUI_EVT_POINTER_DOWN:
             if (!ptButton->_.bIsCheckButton) {
                 ptButton->_.bIsChecked = true;
             }
             break;
 
+    #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+        case VSF_TGUI_EVT_KEY_UP: 
+            if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
+                break;
+            }
+            //! fall-through
+    #endif
         case VSF_TGUI_EVT_POINTER_UP:
             if (!ptButton->_.bIsCheckButton) {
                 ptButton->_.bIsChecked = false;
             }
             break;
 
+    #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+        case VSF_TGUI_EVT_KEY_PRESSED:
+            if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
+                break;
+            }
+            //! fall-through
+    #endif
         case VSF_TGUI_EVT_POINTER_CLICK:
             if (ptButton->_.bIsCheckButton) {
                 //! toggle the bIsChecked flag
@@ -93,7 +114,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
             }
             break;
 
-    #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+    #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
         case VSF_TGUI_EVT_POINTER_ENTER:
             if (ptButton->_.bIsAllowEmphasize) {
                 ptButton->_.bIsEmphasized = true;
@@ -116,6 +137,13 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
     //if (fsm != VSF_MSGT_ERR_MSG_NOT_HANDLED) {
         switch (ptMSG->use_as__vsf_msgt_msg_t.msg){
+        #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+            case VSF_TGUI_EVT_KEY_DOWN: 
+                if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
+                    break;
+                }
+                //! fall-through
+        #endif
             case VSF_TGUI_EVT_POINTER_DOWN:
                 if (!ptButton->_.bIsCheckButton) {
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
@@ -127,7 +155,13 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
                 }
                 break;
-
+        #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+            case VSF_TGUI_EVT_KEY_UP: 
+                if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
+                    break;
+                }
+                //! fall-through
+        #endif
             case VSF_TGUI_EVT_POINTER_UP:
                 if (!ptButton->_.bIsCheckButton) {
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
@@ -139,7 +173,14 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
                 }
                 break;
-
+        
+        #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
+            case VSF_TGUI_EVT_KEY_PRESSED: 
+                if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
+                    break;
+                }
+                //! fall-through
+        #endif
             case VSF_TGUI_EVT_POINTER_CLICK:
                 if (ptButton->_.bIsCheckButton) {
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
@@ -151,7 +192,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
                 }
                 break;
 
-        #if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
+        #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
             case VSF_TGUI_EVT_POINTER_ENTER:
                 if (ptButton->_.bIsAllowEmphasize) {
                     if (fsm != VSF_TGUI_MSG_RT_REFRESH) {

@@ -65,7 +65,7 @@ const char * strchr(const char *str, int c);
 const char * strrchr(const char *str, int c);
 #else
 int strcasecmp(const char *s1, const char *s2);
-int strncasecmp(char *s1, char *s2, size_t n);
+int strncasecmp(const char *s1, const char *s2, size_t n);
 
 void * memcpy(void *dest, const void *src, size_t n);
 

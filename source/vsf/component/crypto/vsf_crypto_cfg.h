@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_CRYPTO_ASSERT
-#   define VSF_CRYPTO_ASSERT            ASSERT
+#   define VSF_CRYPTO_ASSERT            VSF_ASSERT
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -73,7 +73,7 @@ static NO_INIT vsf_sem_t __user_sem;
 implement_vsf_task(user_sub_task_t) 
 {
     vsf_task_begin();
-    printf("receive semaphore...[%08x]\r\n", this.cnt++);
+    printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
     return fsm_rt_cpl;                  //!< return to caller
     vsf_task_end();
 }
@@ -90,16 +90,16 @@ implement_vsf_task(user_task_t)
     };
     
     on_vsf_task_init() {
-        this.cnt = 0;
+        vsf_this.cnt = 0;
     }
 
     switch (vsf_task_state) {
         case WAIT_FOR_SEM:    
             
-            vsf_task_wait_until(vsf_sem_pend(this.sem_ptr));                       //!< wait for semaphore forever  
+            vsf_task_wait_until(vsf_sem_pend(vsf_this.sem_ptr));                       //!< wait for semaphore forever  
         #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-            prepare_vsf_task(user_sub_task_t, &this.print_task);
-            this.print_task.cnt = this.cnt;                                     //!< passing parameter
+            prepare_vsf_task(user_sub_task_t, &vsf_this.print_task);
+            vsf_this.print_task.cnt = vsf_this.cnt;                                     //!< passing parameter
         #endif
             vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< tranfer to next state
             break;
@@ -107,13 +107,13 @@ implement_vsf_task(user_task_t)
         case CALL_SUB_TO_PRINT:
         #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
             if (fsm_rt_cpl == vsf_task_call_task(user_sub_task_t, 
-                                            &this.print_task)) {
+                                            &vsf_this.print_task)) {
                 //! task complete
-                this.cnt = this.print_task.cnt;                                 //!< read param value
+                vsf_this.cnt = vsf_this.print_task.cnt;                                 //!< read param value
                 USER_TASK_RESET_FSM();                                          //!< reset fsm
             }
         #else
-            printf("receive semaphore...[%08x]\r\n", this.cnt++);
+            printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
             USER_TASK_RESET_FSM();
         #endif
             break;
@@ -137,8 +137,8 @@ implement_vsf_task(user_task_b_t)
             break;
             
         case PRINT:
-            printf("post semaphore...   [%08x]\r\n", this.cnt++);
-            vsf_sem_post(this.sem_ptr);                                            //!< post a semaphore
+            printf("post semaphore...   [%08x]\r\n", vsf_this.cnt++);
+            vsf_sem_post(vsf_this.sem_ptr);                                            //!< post a semaphore
             USER_TASK_RESET_FSM();                                              //!< reset fsm
             break;
         
@@ -233,7 +233,7 @@ void main(void)
     
     vsf_kernel_task_simple_demo();
     
-    this.cnt = 0;
+    vsf_this.cnt = 0;
     while(1) {
         printf("hello world! \r\n");
         vsf_pt_wait_until(vsf_delay_ms(1000));

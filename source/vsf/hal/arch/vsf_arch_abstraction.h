@@ -31,7 +31,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #ifndef VSF_ARCH_ASSERT
-#   define VSF_ARCH_ASSERT(...)                 ASSERT(__VA_ARGS__)
+#   define VSF_ARCH_ASSERT(...)                 VSF_ASSERT(__VA_ARGS__)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -40,9 +40,15 @@ extern "C" {
 typedef void vsf_irq_handler_t(void *p);
 typedef vsf_irq_handler_t vsf_swi_handler_t;
 
-/*============================ GLOBAL VARIABLES ==============================*/
+typedef uintalu_t vsf_protect_t;
+typedef struct vsf_protect_region_t {
+    vsf_protect_t (*enter)(void);
+    void (*leave)(vsf_protect_t orig);
+} vsf_protect_region_t;
 
-extern const code_region_t DEFAULT_CODE_REGION_ATOM_CODE;
+/*============================ GLOBAL VARIABLES ==============================*/
+extern const vsf_protect_region_t vsf_protect_region_int;
+extern const vsf_protect_region_t vsf_protect_region_none;
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -156,22 +162,44 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #   define clz(__n)                         vsf_clz(__n)
 #endif
 
+#define __vsf_protect_region(__region)                                          \
+    for (vsf_protect_t VSF_MACRO_SAFE_NAME(protect_status),                     \
+            VSF_MACRO_SAFE_NAME(local_cnt) = 1;                                 \
+        (((__region) != NULL) && VSF_MACRO_SAFE_NAME(local_cnt)--) ?            \
+            ((VSF_MACRO_SAFE_NAME(protect_status) = (__region)->enter()), true) : false;\
+        (__region)->leave(VSF_MACRO_SAFE_NAME(protect_status)))
+#define vsf_protect_region(__region)        __vsf_protect_region(__region)
+#define vsf_protect_region_exit(__region)   continue
+
+#define vsf_protect_region_simple(__region, ...)                                \
+        do {                                                                    \
+            if (__region != NULL) {                                             \
+                vsf_protect_t VSF_MACRO_SAFE_NAME(protect_status) = (__region)->enter();\
+                    __VA_ARGS__;                                                \
+                (__region)->leave(VSF_MACRO_SAFE_NAME(protect_status));         \
+            }                                                                   \
+        } while (0);
+
+/*! \note TODO: looks like the following macro, i.e. __vsf_interrupt_safe is
+ *        deprecated, should remove it when sufficient time passed.
+ *        (start from Jan 01 2021)
+ */
 // Usage:
 //  __vsf_interrupt_safe(code)
 #ifndef __vsf_interrupt_safe
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #       define __vsf_interrupt_safe(__code)                                     \
         {                                                                       \
-            vsf_gint_state_t gint_state = vsf_disable_interrupt();              \
+            vsf_gint_state_t VSF_MACRO_SAFE_NAME(gint_state) = vsf_disable_interrupt();\
                 __code;                                                         \
-            vsf_set_interrupt(gint_state);                                      \
+            vsf_set_interrupt(VSF_MACRO_SAFE_NAME(gint_state));                 \
         }
 #   else
 #       define __vsf_interrupt_safe(...)                                        \
         {                                                                       \
-            vsf_gint_state_t gint_state = vsf_disable_interrupt();              \
+            vsf_gint_state_t VSF_MACRO_SAFE_NAME(gint_state) = vsf_disable_interrupt();\
                 __VA_ARGS__;                                                    \
-            vsf_set_interrupt(gint_state);                                      \
+            vsf_set_interrupt(VSF_MACRO_SAFE_NAME(gint_state));                 \
         }
 #   endif
 #endif
@@ -181,11 +209,22 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 //      code
 //  }
 #ifndef vsf_interrupt_safe
-#   define vsf_interrupt_safe               code_region(&DEFAULT_CODE_REGION_ATOM_CODE)
+#   define vsf_interrupt_safe()             vsf_protect_region(&vsf_protect_region_int)
 #endif
 
 
-#define vsf_protect_t                       uint_fast32_t
+// Usage:
+//  vsf_interrupt_safe_simple(
+//      code
+//  )
+#ifndef vsf_interrupt_safe_simple
+
+#   define vsf_interrupt_safe_simple(...)                                       \
+                vsf_protect_region_simple(&vsf_protect_region_int, __VA_ARGS__)
+
+#endif
+
+
 #define vsf_protect_interrupt()             vsf_disable_interrupt()
 #define vsf_unprotect_interrupt(__state)    vsf_set_interrupt(__state)
 #define vsf_protect_none()                  (0)
@@ -198,22 +237,6 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #define __vsf_unprotect(__type)             vsf_unprotect_##__type
 #define vsf_protect(__type)                 __vsf_protect(__type)
 #define vsf_unprotect(__type)               __vsf_unprotect(__type)
-
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#   define vsf_protect_region(__type, __code)                                   \
-    do {                                                                        \
-        vsf_protect_t __state = vsf_protect(__type)();                          \
-            __code;                                                             \
-        vsf_unprotect(__type)(__state);                                         \
-    } while (0);
-#else
-#   define vsf_protect_region(__type, ...)                                      \
-    do {                                                                        \
-        vsf_protect_t __state = vsf_protect(__type)();                          \
-            __VA_ARGS__;                                                        \
-        vsf_unprotect(__type)(__state);                                         \
-    } while (0);
-#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -285,11 +308,12 @@ extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
  * Interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 extern vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority);
+extern vsf_arch_prio_t vsf_get_base_priority(void);
 
-extern vsf_gint_state_t vsf_get_interrupt(void);
-extern void vsf_set_interrupt(vsf_gint_state_t level);
-extern vsf_gint_state_t vsf_disable_interrupt(void);
-extern void vsf_enable_interrupt(void);
+extern vsf_arch_prio_t vsf_get_interrupt(void);
+extern vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t level);
+extern vsf_arch_prio_t vsf_disable_interrupt(void);
+extern vsf_arch_prio_t vsf_enable_interrupt(void);
 
 extern void vsf_arch_sleep(uint_fast32_t mode);
 

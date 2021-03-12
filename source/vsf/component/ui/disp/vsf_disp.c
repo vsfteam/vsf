@@ -46,7 +46,10 @@ vsf_err_t vk_disp_init(vk_disp_t *pthis)
     const vk_disp_drv_t *drv = pthis->param.drv;
     VSF_UI_ASSERT(drv != NULL);
 
-    return drv->init(pthis);
+    if (drv->init != NULL) {
+        return drv->init(pthis);
+    }
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)

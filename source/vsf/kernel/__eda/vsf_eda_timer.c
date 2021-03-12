@@ -29,6 +29,15 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_KERNEL_TIMER_CFG_ISR == ENABLED
+#   define __vsf_timer_protect                  vsf_protect(interrupt)
+#   define __vsf_timer_unprotect                vsf_unprotect(interrupt)
+#else
+#   define __vsf_timer_protect                  vsf_protect(scheduler)
+#   define __vsf_timer_unprotect                vsf_unprotect(scheduler)
+#endif
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -184,15 +193,15 @@ static void __vsf_timer_init(void)
 SECTION(".text.vsf.kernel.teda")
 static void __vsf_teda_timer_enqueue(vsf_teda_t *this_ptr, vsf_timer_tick_t due)
 {
-    VSF_KERNEL_ASSERT((this_ptr != NULL) && !this_ptr->use_as__vsf_eda_t.state.bits.is_timed);
+    VSF_KERNEL_ASSERT((this_ptr != NULL) && !this_ptr->use_as__vsf_eda_t.flag.state.is_timed);
     this_ptr->due = due;
 
     vsf_timq_insert(&__vsf_eda.timer.timq, this_ptr);
-    this_ptr->use_as__vsf_eda_t.state.bits.is_timed = true;
+    this_ptr->use_as__vsf_eda_t.flag.state.is_timed = true;
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                      \
     &&  (   VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                       \
         ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
-    this_ptr->use_as__vsf_eda_t.state.bits.is_evt_incoming = true;
+    this_ptr->use_as__vsf_eda_t.flag.state.is_evt_incoming = true;
 #endif
 }
 
@@ -209,7 +218,7 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
     vsf_protect_t lock_status;
     VSF_KERNEL_ASSERT(timer != NULL);
 
-    lock_status = vsf_protect_sched();
+    lock_status = __vsf_timer_protect();
         if (timer->due != 0) {
             vsf_kernel_err_report(VSF_KERNEL_ERR_INVALID_USAGE);
             return VSF_ERR_FAIL;
@@ -224,25 +233,9 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
             vsf_callback_timq_peek(&__vsf_eda.timer.callback_timq, timer);
             __vsf_teda_set_timer_imp(&__vsf_eda.teda, timer->due);
         }
-    vsf_unprotect_sched(lock_status);
+    __vsf_timer_unprotect(lock_status);
     return VSF_ERR_NONE;
 }
-
-#if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
-SECTION(".text.vsf.kernel.vsf_callback_timer_add_ms")
-vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
-{
-    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
-    return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
-}
-
-SECTION(".text.vsf.kernel.vsf_callback_timer_add_us")
-vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t us)
-{
-    vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
-    return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
-}
-#endif
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
 vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer)
@@ -250,12 +243,12 @@ vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer)
     vsf_protect_t lock_status;
     VSF_KERNEL_ASSERT(timer != NULL);
 
-    lock_status = vsf_protect_sched();
+    lock_status = __vsf_timer_protect();
         if (timer->due != 0) {
             timer->due = 0;
             vsf_callback_timq_remove(&__vsf_eda.timer.callback_timq, timer);
         }
-    vsf_unprotect_sched(lock_status);
+    __vsf_timer_unprotect(lock_status);
     return VSF_ERR_NONE;
 }
 
@@ -277,13 +270,6 @@ uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time)
     return vsf_timer_get_duration(from_time, vsf_systimer_get_tick());
 }
 
-SECTION(".text.vsf.kernel.teda")
-vsf_err_t vsf_teda_init(vsf_teda_t *this_ptr, vsf_prio_t priority, bool is_stack_owner)
-{
-    VSF_KERNEL_ASSERT(this_ptr != NULL);
-    return vsf_eda_init(&this_ptr->use_as__vsf_eda_t, priority, is_stack_owner);
-}
-
 SECTION(".text.vsf.kernel.vsf_teda_start")
 vsf_err_t vsf_teda_start(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg)
 {
@@ -301,10 +287,9 @@ vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, uint_fast32_t tick)
         VSF_KERNEL_ASSERT(false);
         return VSF_ERR_NOT_AVAILABLE;
     }
-    origlevel = vsf_protect_sched();
-        err = __vsf_teda_set_timer_imp(
-                this_ptr, vsf_systimer_get_tick() + tick);
-    vsf_unprotect_sched(origlevel);
+    origlevel = __vsf_timer_protect();
+        err = __vsf_teda_set_timer_imp(this_ptr, vsf_systimer_get_tick() + tick);
+    __vsf_timer_unprotect(origlevel);
     return err;
 }
 
@@ -332,22 +317,6 @@ vsf_err_t vsf_teda_set_timer(uint_fast32_t tick)
 #   pragma GCC diagnostic pop
 #endif
 
-#if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
-SECTION(".text.vsf.kernel.vsf_teda_set_timer_ms")
-vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
-{
-    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
-    return vsf_teda_set_timer((uint_fast32_t)tick);
-}
-
-SECTION(".text.vsf.kernel.vsf_teda_set_timer_us")
-vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
-{
-    vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
-    return vsf_teda_set_timer((uint_fast32_t)tick);
-}
-#endif
-
 #if __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
@@ -366,12 +335,12 @@ vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr)
 
     VSF_KERNEL_ASSERT(this_ptr != NULL);
 
-    lock_status = vsf_protect_sched();
-        if (this_ptr->use_as__vsf_eda_t.state.bits.is_timed) {
+    lock_status = __vsf_timer_protect();
+        if (this_ptr->use_as__vsf_eda_t.flag.state.is_timed) {
             vsf_timq_remove(&__vsf_eda.timer.timq, this_ptr);
-            this_ptr->use_as__vsf_eda_t.state.bits.is_timed = false;
+            this_ptr->use_as__vsf_eda_t.flag.state.is_timed = false;
         }
-    vsf_unprotect_sched(lock_status);
+    __vsf_timer_unprotect(lock_status);
     return VSF_ERR_NONE;
 }
 

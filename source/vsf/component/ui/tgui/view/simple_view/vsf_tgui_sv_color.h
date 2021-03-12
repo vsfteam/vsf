@@ -24,152 +24,113 @@
 #if VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY
-#define VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY    ENABLED
+#ifndef VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA
+#   define VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA              ENABLED
 #endif
 
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-#   if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#       define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){ .tColor = { .tChannel = {.chB = _B, .chG =_G, .chR = _R, .chA =   _A}}, .bIsColorTransparency = 1})
-#       define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((vsf_tgui_sv_color_t){ .tColor = { .tChannel = {.chB = _B, .chG =_G, .chR = _R, .chA = 0xFF}}, .bIsColorTransparency = 0})
-#   else
-#       define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){{_B, _G, _R, _A  }, 1})
-#       define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((vsf_tgui_sv_color_t){{_B, _G, _R, 0xFF}, 0})
-#   endif
+#   undef VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA
+#   define VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA              ENABLED
+#endif
+
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+#   define __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	((vsf_tgui_sv_color_t){.red = __R, .green = __G, .blue = __B, .alpha = __A})
+#else
+#   define __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	((vsf_tgui_sv_color_t){.red = __R, .green = __G, .blue = __B,})
+#endif
+
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+#   define VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	    __VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-#   if VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED
-#       if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#           define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){ .tColor = { .tChannel = {.u5B = _B >> 3, .u6G =_G >> 2, .u5R = _R >> 3}}, .tTransparencyRate =  _A,  .bIsColorTransparency = 1})
-#           define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((vsf_tgui_sv_color_t){ .tColor = { .tChannel = {.u5B = _B >> 3, .u6G =_G >> 2, .u5R = _R >> 3}}, .tTransparencyRate = 0xFF, .bIsColorTransparency = 0})
-#       else
-#           define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){{{_B >> 3, _G >> 2, _R >> 3},   _A}, 1})
-#           define VSF_TGUI_COLOR_RGB(_R, _G, _B)	    ((vsf_tgui_sv_color_t){{{_B >> 3, _G >> 2, _R >> 3}, 0xFF}, 0})
-#       endif
-#   else
-#       if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#           define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){{ .tColor = { .tChannel = {.u5B = _B >> 3, .u6G =_G >> 2, .u5R = _R >> 3}}, .bIsColorTransparency = 0})
-#       else
-#           define VSF_TGUI_COLOR_RGBA(_R, _G, _B, _A)	((vsf_tgui_sv_color_t){{{_B >> 3, _G >> 2, _R >> 3}}, 0})
-#       endif
-#   endif
+#   define VSF_TGUI_COLOR_RGBA(__R, __G, __B, __A)	        __VSF_TGUI_COLOR_RGBA(__R >> 3, __G >> 2, __B >> 3, __A)
 #else
 #	error "TODO: add more color support"
 #endif
+#define VSF_TGUI_COLOR_RGB(__R, __G, __B)	            VSF_TGUI_COLOR_RGBA(__R, __G, __B, 0xFF)
 
-#define VSF_TGUI_COLOR_DEF(_R, _G, _B)	    VSF_TGUI_COLOR_RGB(_R, _G, _B)
-
-#define VSF_TGUI_COLOR_WHITE	VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0xFF)    //  Red:100%  Green:100%  Blue:100%
-#define VSF_TGUI_COLOR_SILVER	VSF_TGUI_COLOR_RGB(0xC0, 0xC0, 0xC0)    //  Red: 75%  Green: 75%  Blue: 75%
-#define VSF_TGUI_COLOR_GRAY		VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x80)    //  Red: 50%  Green: 50%  Blue: 50%
-#define VSF_TGUI_COLOR_BLACK	VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x00)    //  Red:  0%  Green: 0%   Blue:  0%
-#define VSF_TGUI_COLOR_RED      VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0x00)    //  Red:100%  Green: 0%   Blue:  0%
-#define VSF_TGUI_COLOR_MAROON	VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x00)    //  Red: 50%  Green: 0%   Blue:  0%
-#define VSF_TGUI_COLOR_YELLOW	VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0x00)    //  Red:100%  Green:100%  Blue:  0%
-#define VSF_TGUI_COLOR_OLIVE	VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x00)    //  Red: 50%  Green: 50%  Blue:  0%
-#define VSF_TGUI_COLOR_LIME		VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0x00)    //  Red:  0%  Green:100%  Blue:  0%
-#define VSF_TGUI_COLOR_GREEN	VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x00)    //  Red:  0%  Green: 50%  Blue:  0%
-#define VSF_TGUI_COLOR_AQUA		VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0xFF)    //  Red:  0%  Green:100%  Blue:100%
-#define VSF_TGUI_COLOR_TEAL		VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x80)    //  Red:  0%  Green: 50%  Blue: 50%
-#define VSF_TGUI_COLOR_BLUE		VSF_TGUI_COLOR_RGB(0x00, 0x00, 0xFF)    //  Red:  0%  Green: 0%   Blue:100%
-#define VSF_TGUI_COLOR_NAVY		VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x80)    //  Red:  0%  Green: 0%   Blue: 50%
-#define VSF_TGUI_COLOR_FUCHSIA	VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0xFF)    //  Red:100%  Green: 0%   Blue:100%
-#define VSF_TGUI_COLOR_PURPLE	VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x80)    //  Red: 50%  Green: 0%   Blue: 50%
+#define VSF_TGUI_COLOR_WHITE	                        VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0xFF)    //  Red:100%  Green:100%  Blue:100%
+#define VSF_TGUI_COLOR_SILVER	                        VSF_TGUI_COLOR_RGB(0xC0, 0xC0, 0xC0)    //  Red: 75%  Green: 75%  Blue: 75%
+#define VSF_TGUI_COLOR_GRAY		                        VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x80)    //  Red: 50%  Green: 50%  Blue: 50%
+#define VSF_TGUI_COLOR_BLACK	                        VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x00)    //  Red:  0%  Green: 0%   Blue:  0%
+#define VSF_TGUI_COLOR_RED                              VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0x00)    //  Red:100%  Green: 0%   Blue:  0%
+#define VSF_TGUI_COLOR_MAROON	                        VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x00)    //  Red: 50%  Green: 0%   Blue:  0%
+#define VSF_TGUI_COLOR_YELLOW	                        VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0x00)    //  Red:100%  Green:100%  Blue:  0%
+#define VSF_TGUI_COLOR_OLIVE	                        VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x00)    //  Red: 50%  Green: 50%  Blue:  0%
+#define VSF_TGUI_COLOR_LIME		                        VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0x00)    //  Red:  0%  Green:100%  Blue:  0%
+#define VSF_TGUI_COLOR_GREEN	                        VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x00)    //  Red:  0%  Green: 50%  Blue:  0%
+#define VSF_TGUI_COLOR_AQUA		                        VSF_TGUI_COLOR_RGB(0x00, 0xFF, 0xFF)    //  Red:  0%  Green:100%  Blue:100%
+#define VSF_TGUI_COLOR_TEAL		                        VSF_TGUI_COLOR_RGB(0x00, 0x80, 0x80)    //  Red:  0%  Green: 50%  Blue: 50%
+#define VSF_TGUI_COLOR_BLUE		                        VSF_TGUI_COLOR_RGB(0x00, 0x00, 0xFF)    //  Red:  0%  Green: 0%   Blue:100%
+#define VSF_TGUI_COLOR_NAVY		                        VSF_TGUI_COLOR_RGB(0x00, 0x00, 0x80)    //  Red:  0%  Green: 0%   Blue: 50%
+#define VSF_TGUI_COLOR_FUCHSIA	                        VSF_TGUI_COLOR_RGB(0xFF, 0x00, 0xFF)    //  Red:100%  Green: 0%   Blue:100%
+#define VSF_TGUI_COLOR_PURPLE	                        VSF_TGUI_COLOR_RGB(0x80, 0x00, 0x80)    //  Red: 50%  Green: 0%   Blue: 50%
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+typedef struct vsf_tgui_sv_color_rgb565_t {
+    union {
+        uint16_t     value;
+        struct {
+            uint16_t blue  : 5;
+            uint16_t green : 6;
+            uint16_t red   : 5;
+        };
+    };
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    uint8_t  alpha;
+#endif
+} vsf_tgui_sv_color_rgb565_t;
 
+typedef struct vsf_tgui_sv_color_bgr565_t {
+    union {
+        uint16_t     value;
+        struct {
+            uint16_t red   : 5;
+            uint16_t green : 6;
+            uint16_t blue  : 5;
+        };
+    };
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    uint8_t  alpha;
+#endif
+} vsf_tgui_sv_color_bgr565_t;
 
-/*----------------------------------------------------------------------------*
- *  Color                                                                     *
- *----------------------------------------------------------------------------*/
-
-/*! \note vsf_tgui_color is for most used by view (rendering) part
- */
-typedef union vsf_tgui_color_t vsf_tgui_color_t;
+typedef union vsf_tgui_sv_color_argb8888_t {
+    uint32_t     value;
+    struct {
+        uint8_t  blue;
+        uint8_t  green;
+        uint8_t  red;
+        uint8_t  alpha;
+    };
+} vsf_tgui_sv_color_argb8888_t;
 
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
-union vsf_tgui_color_t {
-    implement_ex(
-        struct {
-            uint16_t     u5R    : 5;
-            uint16_t     u6G    : 6;
-            uint16_t     u5B    : 5;
-        },
-        tChannel
-    )
-    uint16_t        hwValue;
-    uint16_t        Value;          //!< generic symbol name
-};
+typedef vsf_tgui_sv_color_bgr565_t vsf_tgui_sv_color_t;
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
-union vsf_tgui_color_t {
-    implement_ex(
-        struct {
-            uint16_t     u5B    : 5;
-            uint16_t     u6G    : 6;
-            uint16_t     u5R    : 5;
-        },
-        tChannel
-    )
-    uint16_t        hwValue;
-    uint16_t        Value;          //!< generic symbol name
-};
-#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB8_USER_TEMPLATE
-union vsf_tgui_color_t {
-    uint8_t chColorID;
-    uint8_t Value;                  //!< generic symbol name
-};
-#else /*VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888 */
-union vsf_tgui_color_t {
-    implement_ex(
-        struct {
-            uint8_t     chB;
-            uint8_t     chG;
-            uint8_t     chR;
-            uint8_t     chA;
-        },
-        tChannel
-    )
-    uint8_t         chValues[4];
-    uint32_t        wValue;
-    uint32_t        Value;          //!< generic symbol name
-};
+typedef vsf_tgui_sv_color_rgb565_t vsf_tgui_sv_color_t;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+typedef vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_t;
+#else
+typedef VSF_TGUI_CFG_COLOR_TYPE vsf_tgui_sv_color_t;
 #endif
-
-struct vsf_tgui_sv_color_t {
-    vsf_tgui_color_t tColor;
-#if (VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED) && !(__VSF_TGUI_IS_COLOR_SUPPORT_ALPHA__)
-    uint8_t tTransparencyRate;
-#endif
-
-    //Noto: Temporary code, Will be removed when style is supported
-    uint8_t bIsColorTransparency : 1;
-};
-typedef struct vsf_tgui_sv_color_t vsf_tgui_sv_color_t;
-
-union vsf_tgui_sv_argb8888_color_t {
-    implement_ex(
-        struct {
-                uint8_t     chB;
-                uint8_t     chG;
-                uint8_t     chR;
-                uint8_t     chA;
-        },
-        tChannel
-    )
-    uint8_t         chValues[4];
-    uint32_t        wValue;
-    uint32_t        Value;          //!< generic symbol name
-};
-typedef union vsf_tgui_sv_argb8888_color_t vsf_tgui_sv_argb8888_color_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-extern vsf_tgui_color_t vsf_tgui_color_mix(vsf_tgui_color_t tColor0, vsf_tgui_color_t tColor1, uint_fast8_t chMix);
-extern bool vsf_tgui_sv_color_is_opaque(vsf_tgui_sv_color_t tColor);
-extern vsf_tgui_color_t vsf_tgui_sv_color_get_color(vsf_tgui_sv_color_t tColor);
-extern uint_fast8_t vsf_tgui_sv_color_get_trans_rate(vsf_tgui_sv_color_t tColor);
-extern vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_argb8888_color_t tARGBColor);
-extern void vsf_tgui_sv_color_set_trans_rate(vsf_tgui_sv_color_t* ptColor, uint_fast8_t chRate);
+extern vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_sv_color_t color_1, uint_fast8_t mix);
+
+extern bool vsf_tgui_sv_color_is_opaque(vsf_tgui_sv_color_t color);
+extern uint_fast8_t vsf_tgui_sv_color_get_trans_rate(vsf_tgui_sv_color_t color);
+extern void vsf_tgui_sv_color_set_trans_rate(vsf_tgui_sv_color_t* color_ptr, uint_fast8_t alpha);
+
+extern vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t argb8888_color);
+extern vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb565_color);
+extern vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr565_color);
+
+extern vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_sv_color_t color);
+extern vsf_tgui_sv_color_rgb565_t   vsf_tgui_sv_color_to_rgb565(vsf_tgui_sv_color_t color);
+extern vsf_tgui_sv_color_bgr565_t   vsf_tgui_sv_color_to_bgr565(vsf_tgui_sv_color_t color);
+
 #endif
 
 #endif

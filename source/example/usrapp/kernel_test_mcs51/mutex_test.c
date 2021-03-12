@@ -80,7 +80,7 @@ static void usrapp_mutex_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto on_got_mutex;
             case VSF_SYNC_CANCEL:
             case VSF_SYNC_FAIL:
-                ASSERT(false);
+                VSF_ASSERT(false);
                 break;
             case VSF_SYNC_TIMEOUT:
                 vsf_trace(VSF_TRACE_INFO, "%d: eda[%d] time out\r\n",

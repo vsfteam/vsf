@@ -177,7 +177,7 @@ void vsfip_dhcpd_stop(vsfip_dhcpd_t *dhcpd)
 // vsfip_dhcpd_start MUST be called protected with netif
 vsf_err_t vsfip_dhcpd_start(vsfip_netif_t *netif, vsfip_dhcpd_t *dhcpd)
 {
-    ASSERT((netif != NULL) && (dhcpd != NULL));
+    VSF_ASSERT((netif != NULL) && (dhcpd != NULL));
 
     dhcpd->alloc_idx = 1;
     netif->dhcp.dhcpd = dhcpd;

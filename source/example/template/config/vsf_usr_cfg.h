@@ -42,6 +42,8 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_esp32.h"
 #elif   defined(__ESP32S2__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_esp32s2.h"
+#elif   defined(__AIC8800__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_aic8800.h"
 #endif
 
 // software independent components, if not used, compiler will optimize
@@ -70,7 +72,7 @@
 #endif
 
 #if APP_USE_BTSTACK_DEMO == ENABLED
-#   if APP_USE_USBH_DEMO == ENABLED
+#   if !defined(VSF_USBH_USE_BTHCI) && APP_USE_USBH_DEMO == ENABLED
 #      define VSF_USBH_USE_BTHCI                        ENABLED
 #   endif
 #   define VSF_USE_BTSTACK                              ENABLED
@@ -80,7 +82,9 @@
 #   define VSF_USE_SDL2                                 ENABLED
 #endif
 
-#if APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED
+#if     APP_USE_AWTK_DEMO == ENABLED || APP_USE_LVGL_DEMO == ENABLED            \
+    ||  APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_USE_TGUI_DEMO == ENABLED       \
+    ||  APP_USE_SDL2_DEMO == ENABLED
 #   define VSF_USE_UI                                   ENABLED
 #endif
 #if APP_USE_AWTK_DEMO == ENABLED
@@ -129,12 +133,27 @@
 #   define VSF_USE_POSIX                                ENABLED
 #endif
 
+#if APP_USE_EVM_DEMO == ENABLED
+#   define VSF_USE_EVM                                  ENABLED
+#   if !defined(VSF_EVM_USE_USBH) && VSF_USE_USB_HOST == ENABLED
+#       define VSF_EVM_USE_USBH                         ENABLED
+#   endif
+#   if !defined(VSF_EVM_USE_BLUETOOTH) && VSF_USE_BTSTACK == ENABLED
+#       define VSF_EVM_USE_BLUETOOTH                    ENABLED
+#   endif
+#endif
+
 // lv2 hal
 #if APP_USE_STREAM_HAL_DEMO == ENABLED
 #   define VSF_USE_STREAM_HAL                           ENABLED
 #   if APP_USE_STREAM_USART_DEMO == ENABLED
 #       define VSF_USE_STREAM_USART                     ENABLED
 #   endif
+#endif
+
+#if APP_USE_LUA_DEMO == ENABLED
+#   define VSF_USE_LUA                                  ENABLED
+#       define VSF_LUA_USE_LOVE                         ENABLED
 #endif
 
 /*============================ TYPES =========================================*/

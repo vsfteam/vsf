@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_MAL_ASSERT
-#   define VSF_MAL_ASSERT               ASSERT
+#   define VSF_MAL_ASSERT               VSF_ASSERT
 #endif
 
 #ifndef VSF_MAL_USE_MIM_MAL

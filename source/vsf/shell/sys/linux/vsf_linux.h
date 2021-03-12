@@ -147,6 +147,7 @@ def_simple_class(vsf_linux_process_t) {
         int cur_fd;
         vsf_linux_thread_t *thread_pending;
         vsf_linux_stdio_stream_t stdio_stream;
+        char *working_dir;
 
         struct {
             sigset_t pending;
@@ -209,6 +210,8 @@ typedef struct vsf_linux_fs_priv_t {
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
+extern int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in);
+extern int vsf_linux_chdir(vsf_linux_process_t *process, char *working_dir);
 
 extern int vsf_linux_fs_bind_target(int fd, void *target,
         vsf_param_eda_evthandler_t peda_read,

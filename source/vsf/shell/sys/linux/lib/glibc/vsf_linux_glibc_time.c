@@ -56,7 +56,7 @@ int nanosleep(const struct timespec *requested_time, struct timespec *remaining)
 
 clock_t clock(void)
 {
-    return vsf_systimer_get_us();
+    return vsf_systimer_get_ms();
 }
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp)

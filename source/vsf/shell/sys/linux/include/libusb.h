@@ -11,12 +11,18 @@
 #   include <sys/time.h>
 #endif
 
+// for USB constants
+#include "component/usb/common/usb_common.h"
+// for endian APIs
+#include "hal/arch/vsf_arch.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define libusb_init                                     __vsf_libusb_init
 #define libusb_exit                                     __vsf_libusb_exit
+#define libusb_set_debug                                __vsf_libusb_set_debug
 #define libusb_get_device_list                          __vsf_libusb_get_device_list
 #define libusb_free_device_list                         __vsf_libusb_free_device_list
 #define libusb_open                                     __vsf_libusb_open
@@ -262,7 +268,8 @@ struct libusb_transfer {
 };
 
 int libusb_init(libusb_context **context);
-void libusb_exit(struct libusb_context *ctx);
+void libusb_exit(libusb_context *ctx);
+void libusb_set_debug(libusb_context *ctx, int level);
 ssize_t libusb_get_device_list(libusb_context *ctx, libusb_device *** list);
 void libusb_free_device_list(libusb_device **list, int unref_devices);
 int libusb_get_device_descriptor(libusb_device *dev, struct libusb_device_descriptor *desc);
@@ -440,6 +447,67 @@ const struct libusb_pollfd** libusb_get_pollfds(libusb_context *ctx);
 void libusb_free_pollfds(const struct libusb_pollfd **pollfds);
 
 void vsf_linux_libusb_startup(void);
+
+// libusb 0.1 compatibility
+#define usb_dev_handle                  libusb_device_handle
+#define USB_ENDPOINT_IN                 LIBUSB_ENDPOINT_IN
+#define USB_ENDPOINT_OUT                LIBUSB_ENDPOINT_OUT
+
+#define usb_init()                      libusb_init(NULL)
+#define usb_set_debug(__level)          libusb_set_debug(NULL, (__level))
+#define usb_device(__handle)            (struct usb_device *)(__handle)
+#define usb_get_string                  libusb_get_string_descriptor
+#define usb_get_string_simple           libusb_get_string_descriptor_ascii
+#define usb_control_msg                 libusb_control_transfer
+#define usb_set_configuration           libusb_set_configuration
+#define usb_claim_interface             libusb_claim_interface
+#define usb_release_interface           libusb_release_interface
+#define usb_get_descriptor              libusb_get_descriptor
+#define usb_find_busses()               1
+#define usb_strerror()                  "usb_strerror not_supported!!!"
+
+// TODO: implement later
+//#define usb_get_descriptor_by_endpoint
+//#define usb_set_altinterface
+//#define usb_resetep
+//#define usb_clear_halt
+//#define usb_reset
+
+struct usb_device;
+struct usb_bus {
+    struct usb_bus                      *next, *prev;
+    struct usb_device                   *devices;
+    struct usb_device                   *root_dev;
+};
+struct usb_device {
+    struct usb_device                   *next, *prev;
+    struct libusb_device_descriptor     descriptor;
+    struct libusb_config_descriptor     *config;
+
+    // actually libusb_device
+    void                                *dev;
+    uint8_t                             devnum;
+    uint8_t                             num_children;
+    struct usb_device                   **children;
+
+    // private
+    struct libusb_config_descriptor     __config;
+};
+
+int usb_find_devices(void);
+struct usb_bus *usb_get_busses(void);
+
+int usb_get_driver_np(usb_dev_handle *dev, int interface, char *name, unsigned int namelen);
+int usb_detach_kernel_driver_np(usb_dev_handle *dev, int interface);
+
+usb_dev_handle *usb_open(struct usb_device *dev);
+int usb_close(usb_dev_handle *dev);
+
+int usb_bulk_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+
+int usb_interrupt_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
 
 #ifdef __cplusplus
 }

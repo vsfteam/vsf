@@ -215,7 +215,7 @@ bool vsf_driver_init(void)
 #if PLL_SRC == CLKREF_12MOSC || PLL_SRC == CLKREF_12MIRC
     uint_fast8_t div = __PLL_FREQ_HZ / 12000000;
     if (div < 4) {
-        ASSERT(false);
+        VSF_HAL_ASSERT(false);
     }
     RCC->PDRUNCFG &= ~RCC_PDRUNCFG_SYSPLL;
     RCC->SYSPLLCTRL = RCC_SYSPLLCTRL_FORCELOCK | (PLL_SRC << 30) | (div - 4);

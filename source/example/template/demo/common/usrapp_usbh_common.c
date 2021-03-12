@@ -114,6 +114,9 @@ usrapp_usbh_common_t usrapp_usbh_common = {
 #if VSF_USBH_USE_UAC == ENABLED
     .uac                = &vk_usbh_uac_drv,
 #endif
+#if VSF_USBH_USE_DL1X5 == ENABLED
+    .dl1x5              = &vk_usbh_dl1x5_drv,
+#endif
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -162,6 +165,9 @@ vsf_err_t usrapp_usbh_common_init(void)
 #endif
 #if VSF_USBH_USE_UAC == ENABLED
     vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.uac);
+#endif
+#if VSF_USBH_USE_DL1X5 == ENABLED
+    vk_usbh_register_class(&usrapp_usbh_common.host, &usrapp_usbh_common.dl1x5);
 #endif
 
     return VSF_ERR_NONE;

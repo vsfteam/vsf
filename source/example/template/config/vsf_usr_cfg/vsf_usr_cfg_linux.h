@@ -157,8 +157,8 @@
 #   pragma clang diagnostic ignored "-Wimplicit-function-declaration"
 #endif
 
-#define ASSERT(...)                                     assert(__VA_ARGS__)
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                                     assert(__VA_ARGS__)
+//#define VSF_ASSERT(...)
 
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 
@@ -218,7 +218,7 @@
 #   define APP_DISP_SDL2_AMPLIFIER                      1
 
 #if APP_USE_SDL2_DEMO == ENABLED
-#   define APP_CFG_SDL2_DEMO_COLOR_RGB565
+#   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #endif
 
 #define VSF_LINUX_CFG_STACKSIZE                         (60 * 1024)

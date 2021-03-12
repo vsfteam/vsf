@@ -478,7 +478,7 @@ static vsf_err_t __hc32f10x_usbhd_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
         usbhd_hcd->teda.on_terminate = NULL;
 #endif
-        vsf_teda_init(&usbhd_hcd->teda, vsf_prio_inherit, false);
+        vsf_teda_init(&usbhd_hcd->teda);
 
         // is device is already connected, send event
         if (reg->R8_USB_MIS_ST & RB_UMS_DEV_ATTACH) {

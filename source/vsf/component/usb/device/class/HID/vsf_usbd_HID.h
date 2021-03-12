@@ -25,6 +25,7 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_HID == ENABLED
 
 #include "../../../common/class/HID/vsf_usb_HID.h"
+#include "./vsf_usbd_HID_desc.h"
 
 #if     defined(__VSF_USBD_HID_CLASS_IMPLEMENT)
 #   undef __VSF_USBD_HID_CLASS_IMPLEMENT
@@ -74,6 +75,7 @@ def_simple_class(vk_usbd_hid_t) {
 
         uint8_t has_report_id   : 1;
         uint8_t notify_eda      : 1;
+        uint8_t desc_num        : 6;
 
         vsf_mem_t rx_buffer;
         vk_usbd_hid_report_t *reports;

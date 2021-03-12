@@ -105,7 +105,7 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t event)
         uint8_t cnt;
     )
     
-    vsf_eda_frame_user_value_get(&this.cnt);
+    vsf_eda_frame_user_value_get(&vsf_this.cnt);
     switch (evt) {
     case VSF_EVT_RETURN:
         vsf_trace_debug("get return from sub eda\r\n");
@@ -115,19 +115,19 @@ static void eda_sub_demo_teda_sub_evthandler(vsf_eda_t *eda, vsf_evt_t event)
          *!       This read will reset interal status to make sure any 
          *!       vsf_call_task()/__vsf_eda_call_fsm call working correctly
          */
-        fsm_rt_t ret = vsf_eda_call_task(vsf_task_a, &this.task_cb);            //! DUMMY CALL
+        fsm_rt_t ret = vsf_eda_call_task(vsf_task_a, &vsf_this.task_cb);            //! DUMMY CALL
         UNUSED_PARAM(ret);
         vsf_eda_return();
         break;
     case VSF_EVT_INIT:
     case VSF_EVT_TIMER:
-        if (this.cnt > 0) {
-            vsf_eda_frame_user_value_set(this.cnt - 1);
+        if (vsf_this.cnt > 0) {
+            vsf_eda_frame_user_value_set(vsf_this.cnt - 1);
             vsf_trace_debug("set 10ms timer in sub eda\r\n");
             vsf_teda_set_timer_ms(10);
         } else {
             vsf_trace_debug("call sub fsm A in sub eda\r\n");
-            vsf_eda_call_task(vsf_task_a, &this.task_cb);
+            vsf_eda_call_task(vsf_task_a, &vsf_this.task_cb);
         }
         break;
     }
@@ -169,7 +169,7 @@ void eda_sub_demo_start(void)
     vsf_eda_set_evthandler(&eda_sub_demo.teda.use_as__vsf_eda_t,
                             eda_sub_demo_teda_main_evthandler);
 
-    vsf_teda_init(&eda_sub_demo.teda, vsf_prio_0, false);
+    vsf_teda_init(&eda_sub_demo.teda, vsf_prio_0);
 /*
     {
         vsf_eda_cfg_t cfg = {

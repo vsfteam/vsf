@@ -48,8 +48,6 @@ typedef struct vsf_os_t {
     const vsf_kernel_resource_t *res_ptr;
 } vsf_os_t;
 
-
-/*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if __VSF_OS_SWI_NUM > 0
@@ -74,8 +72,21 @@ extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr);
 
 extern const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void);
 
-/*============================ IMPLEMENTATION ================================*/
+#if __VSF_OS_SWI_NUM > 0
+static vsf_protect_t __vsf_protect_region_sched_enter(void);
+static void __vsf_protect_region_sched_leave(vsf_protect_t orig);
+#endif
 
+/*============================ GLOBAL VARIABLES ==============================*/
+
+#if __VSF_OS_SWI_NUM > 0
+const vsf_protect_region_t vsf_protect_region_sched = {
+    .enter  = __vsf_protect_region_sched_enter,
+    .leave  = __vsf_protect_region_sched_leave,
+};
+#endif
+
+/*============================ IMPLEMENTATION ================================*/
 
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
 //implement_vsf_pool(vsf_eda_frame_pool, __vsf_eda_frame_t)
@@ -84,7 +95,9 @@ extern const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void);
 #include "service/pool/impl_vsf_pool.inc"
 
 
+#ifndef WEAK_VSF_EDA_NEW_FRAME
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
+WEAK(vsf_eda_new_frame)
 __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
 {
     //! make sure local_size is aligned with sizeof(uintalu_t);
@@ -115,8 +128,11 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
     }
     return frame;
 }
+#endif
 
+#ifndef WEAK_VSF_EDA_FREE_FRAME
 SECTION(".text.vsf.kernel.vsf_eda_free_frame")
+WEAK(vsf_eda_free_frame)
 void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
 {
     /* todo: add smart pool support in the future */
@@ -127,6 +143,7 @@ void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
 #endif
 }
 #endif
+#endif      // __VSF_KERNEL_CFG_EDA_FRAME_POOL
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 //implement_vsf_pool( vsf_evt_node_pool, vsf_evt_node_t)
@@ -148,12 +165,12 @@ static void __vsf_kernel_os_init(void)
     #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
         VSF_POOL_PREPARE(vsf_eda_frame_pool, &(__vsf_eda.eda_frame_pool))
             NULL,                                                               //!< target
-            (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,                       //!< region
+            (vsf_protect_region_t *)&vsf_protect_region_sched,                  //!< region
         END_VSF_POOL_PREPARE(vsf_eda_frame_pool)
     #else
         VSF_POOL_PREPARE(vsf_eda_frame_pool, &(__vsf_os.eda_frame_pool),
             .target_ptr = (uintptr_t)NULL,
-            .region_ptr = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
+            .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_sched,
         );
     #endif
 
@@ -196,12 +213,12 @@ static void __vsf_kernel_os_init(void)
     #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
         VSF_POOL_PREPARE(vsf_evt_node_pool, (&__vsf_os.node_pool))
             (uintptr_t)&__vsf_os,                                               //! target
-            (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE
+            (vsf_protect_region_t *)&vsf_protect_region_int
         END_VSF_POOL_PREPARE(vsf_evt_node_pool)
     #else
         VSF_POOL_PREPARE(vsf_evt_node_pool, (&__vsf_os.node_pool),
             .target_ptr = (uintptr_t)&__vsf_os,
-            .region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE,
+            .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int,
         );
     #endif
         if  (   (NULL == __vsf_os.res_ptr->evt_queue.nodes_buf_ptr)
@@ -371,6 +388,16 @@ static void __vsf_code_region_forced_sched_on_leave(void *pobj,void *plocal)
     vsf_sched_unlock(*pstate);
 }
 
+static vsf_protect_t __vsf_protect_region_sched_enter(void)
+{
+    return vsf_protect_sched();
+}
+
+static void __vsf_protect_region_sched_leave(vsf_protect_t orig)
+{
+    vsf_unprotect_sched(orig);
+}
+
 static const i_code_region_t __vsf_i_code_region_forced_sched_safe = {
     .local_obj_size =   sizeof(vsf_sched_lock_status_t),
     .OnEnter =          &__vsf_code_region_forced_sched_on_enter,
@@ -426,6 +453,16 @@ void __vsf_kernel_os_run_priority(vsf_prio_t priority)
     __vsf_os_evtq_swi_handler(&__vsf_os.res_ptr->evt_queue.queue_array[priority]);
 #endif
 }
+
+#ifdef __VSF_WORKAROUND_IAR_CPP__
+// if __VSF_WORKAROUND_IAR_CPP__ is defined,
+//  vsf_heap_add will be called before __vsf_os_is_inited is initlailized,
+//  and vsf_heap_add will call scheduler_protect, which need __vsf_os_is_inited
+void __vsf_kernel_os_raw_init(void)
+{
+    __vsf_os_is_inited = false;
+}
+#endif
 
 void __vsf_kernel_os_start(void)
 {

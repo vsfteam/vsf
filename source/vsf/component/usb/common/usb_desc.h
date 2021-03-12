@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #define USB_DESC_WORD(__VALUE)                                                  \
-            ((__VALUE) >> 0) & 0xFF, ((__VALUE) >> 8) & 0xFF
+            ((uint16_t)(__VALUE) >> 0) & 0xFF, ((uint16_t)(__VALUE) >> 8) & 0xFF
 
 #define USB_DESC_DWORD(__VALUE)                                                 \
             ((__VALUE) >> 0) & 0xFF, ((__VALUE) >> 8) & 0xFF,                   \

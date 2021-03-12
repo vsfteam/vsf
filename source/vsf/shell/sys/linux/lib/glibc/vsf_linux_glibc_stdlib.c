@@ -44,7 +44,6 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef __WIN__
 void * malloc(size_t size)
 {
     return vsf_heap_malloc(size);
@@ -80,7 +79,18 @@ void * calloc(size_t n, size_t size)
     }
     return buf;
 }
-#endif
+
+void exit(int status)
+{
+    // exit process is not supported, can exit current thread only
+    vsf_thread_exit();
+}
+
+int atexit(void (*func)(void))
+{
+    // TODO: since exit is not fully supported, any meaning to support atexit?
+    return 0;
+}
 
 char * itoa(int num, char *str, int radix)
 {

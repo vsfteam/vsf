@@ -59,7 +59,7 @@ vsf_err_t mt071_usbh_init(mt071_usb_t *hc, usb_hc_ip_cfg_t *cfg)
 
 void mt071_usbh_get_info(mt071_usb_t *hc, usb_hc_ip_info_t *info)
 {
-    ASSERT(info != NULL);
+    VSF_ASSERT(info != NULL);
     info->regbase = hc->param->reg;
     info->ep_num = mt071_usbh_ep_number;
     info->is_dma = mt071_usbh_ep_is_dma;

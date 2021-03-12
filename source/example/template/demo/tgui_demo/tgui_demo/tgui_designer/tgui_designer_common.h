@@ -57,6 +57,7 @@ extern const char* vsf_tgui_list_work_mode_to_string(vsf_tgui_list_work_mode_t m
 extern const char* vsf_tgui_msg_evt_to_string(vsf_evt_t msg);
 const char* vsf_tgui_msg_evt_to_short_name(vsf_evt_t msg);
 extern const char* vsf_tgui_evt_mask_to_string(uint32_t mask);
+extern const char* vsf_tgui_fonts_to_text(void);
 
 extern const char* vsf_tgui_control_get_var_name(vsf_tgui_control_t* control);
 extern const char* vsf_tgui_font_get_var_name(uint8_t font_index);

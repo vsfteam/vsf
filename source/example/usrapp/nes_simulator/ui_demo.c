@@ -40,7 +40,7 @@ static void lvgl_disp_flush(int32_t x1, int32_t y1, int32_t x2, int32_t y2, cons
         uvc_app_fill_line((void *)color, pixel_number * LV_COLOR_DEPTH / 8, (y1 == (LV_VER_RES - 1)));
     } else {
         vsf_trace(0, "non-line disp area [%d,%d], [%d,%d]\r\n", x1, y1, x2, y2);
-        ASSERT(false);
+        VSF_ASSERT(false);
     }
 }
 

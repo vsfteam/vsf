@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_COMPONENT_ASSERT
-#   define VSF_COMPONENT_ASSERT                     ASSERT
+#   define VSF_COMPONENT_ASSERT                     VSF_ASSERT
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -51,7 +51,18 @@ static const vk_usbd_class_op_t __vk_usbd_user = {
 };
 
 describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_SPEED)
-    usbd_common_desc(__user_usbd, u"VSF-USBD-User", u"SimonQian", u"1.0.0", 64, USB_DESC_IAD_LEN + USB_DESC_IFS_LEN + 2 * USB_DESC_EP_LEN, 1, USB_CONFIG_ATT_WAKEUP, 100)
+    usbd_common_desc_iad(__user_usbd,
+                        // str_product, str_vendor, str_serial
+                        u"VSF-USBD-User", u"SimonQian", u"1.0.0",
+                        // ep0_size
+                        64,
+                        // total function descriptor size
+                        USB_DESC_IAD_LEN + USB_DESC_IFS_LEN + 2 * USB_DESC_EP_LEN,
+                        // total function interface number
+                        1,
+                        // attribute, max_power
+                        USB_CONFIG_ATT_WAKEUP, 100
+    )
         USB_DESC_IAD(0, 1, 0xFF, 0xFF, 0, 0)
         USB_DESC_IFS(0, 0, 2, 0xFF, 0xFF, 0, 0)
         USB_DESC_EP(USB_DIR_IN | 1, USB_ENDPOINT_XFER_BULK, __APP_CFG_BULK_SIZE, 0x00)

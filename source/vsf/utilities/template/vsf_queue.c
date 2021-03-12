@@ -40,8 +40,8 @@
 #include "./vsf_queue.h"
 
 /*============================ MACROS ========================================*/
-#undef this
-#define this    (*this_ptr)
+#undef vsf_this
+#define vsf_this    (*this_ptr)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -55,8 +55,8 @@ void __vsf_rng_buf_init_ex( vsf_rng_buf_t* obj_ptr,
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
     memset(obj_ptr, 0, sizeof(vsf_rng_buf_t));
-    this.buffer_item_cnt = buffer_item_cnt;
-    this.length = is_init_as_full ? buffer_item_cnt : 0;
+    vsf_this.buffer_item_cnt = buffer_item_cnt;
+    vsf_this.length = is_init_as_full ? buffer_item_cnt : 0;
 }
 
 int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *obj_ptr)
@@ -64,17 +64,17 @@ int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t *obj_ptr)
     int32_t index = -1;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT( NULL != obj_ptr);
+    VSF_ASSERT( NULL != obj_ptr);
 
     do {
-        if ((this.head == this.tail) && (this.length > 0)) {
+        if ((vsf_this.head == vsf_this.tail) && (vsf_this.length > 0)) {
             /*! this queue is full */
             break;
         }
-        index = this.tail++;
-        this.length++;
-        if (this.tail >= this.buffer_item_cnt) {
-            this.tail = 0;
+        index = vsf_this.tail++;
+        vsf_this.length++;
+        if (vsf_this.tail >= vsf_this.buffer_item_cnt) {
+            vsf_this.tail = 0;
         }
     } while(0);
 
@@ -86,22 +86,22 @@ int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* obj_ptr)
     int32_t index = -1;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != obj_ptr);
+    VSF_ASSERT(NULL != obj_ptr);
 
     do {
-        if ((this.head == this.tail) && (this.length == 0)) {
+        if ((vsf_this.head == vsf_this.tail) && (vsf_this.length == 0)) {
             /*! this queue is empty */
             break;
         }
-        index = this.head++;
-        this.length--;
+        index = vsf_this.head++;
+        vsf_this.length--;
 
         /* reset peek */
-        this.peek = this.head;
-        this.peek_cnt = 0;
+        vsf_this.peek = vsf_this.head;
+        vsf_this.peek_cnt = 0;
 
-        if (this.head >= this.buffer_item_cnt) {
-            this.head = 0;
+        if (vsf_this.head >= vsf_this.buffer_item_cnt) {
+            vsf_this.head = 0;
         }
     } while (0);
 
@@ -113,9 +113,9 @@ uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != obj_ptr);
+    VSF_ASSERT(NULL != obj_ptr);
 
-    return this.length;
+    return vsf_this.length;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
@@ -128,27 +128,27 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr,
     uint_fast16_t hwSpaceLeft;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
     
-    ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
+    VSF_ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
-        if ((this.head == this.tail) && (this.length > 0)) {
+        if ((vsf_this.head == vsf_this.tail) && (vsf_this.length > 0)) {
             /*! this queue is full */
             break;
         }
-        index = this.tail;
+        index = vsf_this.tail;
 
-        hwSpaceLeft = this.buffer_item_cnt - this.length;
-        hwWritten = this.buffer_item_cnt - this.tail;
+        hwSpaceLeft = vsf_this.buffer_item_cnt - vsf_this.length;
+        hwWritten = vsf_this.buffer_item_cnt - vsf_this.tail;
         hwWritten = min((*item_cnt_ptr), hwWritten);
         hwWritten = min(hwWritten, hwSpaceLeft);
 
         *item_cnt_ptr = hwWritten;  /*!< update actual written number */
         
-        this.tail += hwWritten;
-        this.length += hwWritten;
+        vsf_this.tail += hwWritten;
+        vsf_this.length += hwWritten;
 
-        if (this.tail >= this.buffer_item_cnt) {
-            this.tail = 0;
+        if (vsf_this.tail >= vsf_this.buffer_item_cnt) {
+            vsf_this.tail = 0;
         }
     } while (0);
 
@@ -164,30 +164,30 @@ int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr,
     uint_fast16_t hwRead = 0;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
     
-    ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
+    VSF_ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
-        if ((this.head == this.tail) && (this.length == 0)) {
+        if ((vsf_this.head == vsf_this.tail) && (vsf_this.length == 0)) {
             /*! this queue is empty */
             break;
         }
-        index = this.head;
+        index = vsf_this.head;
 
-        hwRead = this.buffer_item_cnt - this.head;
+        hwRead = vsf_this.buffer_item_cnt - vsf_this.head;
         hwRead = min((*item_cnt_ptr), hwRead);
-        hwRead = min(this.length, hwRead);
+        hwRead = min(vsf_this.length, hwRead);
 
         *item_cnt_ptr = hwRead;     /*!< update actual written number */
 
-        this.head += hwRead;
-        this.length -= hwRead;
+        vsf_this.head += hwRead;
+        vsf_this.length -= hwRead;
 
         /* reset peek */
-        this.peek = this.head;
-        this.peek_cnt = 0;
+        vsf_this.peek = vsf_this.head;
+        vsf_this.peek_cnt = 0;
 
-        if (this.head >= this.buffer_item_cnt) {
-            this.head = 0;
+        if (vsf_this.head >= vsf_this.buffer_item_cnt) {
+            vsf_this.head = 0;
         }
     } while (0);
 
@@ -201,17 +201,17 @@ int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* obj_ptr)
     int32_t index = -1;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != obj_ptr);
+    VSF_ASSERT(NULL != obj_ptr);
 
     do {
-        if ((this.peek == this.tail) && (0 != this.peek_cnt)) {
+        if ((vsf_this.peek == vsf_this.tail) && (0 != vsf_this.peek_cnt)) {
             /*! all items have been peeked */
             break;
         }
-        index = this.peek++;
-        this.peek_cnt++;
-        if (this.peek >= this.buffer_item_cnt) {
-            this.peek = 0;
+        index = vsf_this.peek++;
+        vsf_this.peek_cnt++;
+        if (vsf_this.peek >= vsf_this.buffer_item_cnt) {
+            vsf_this.peek = 0;
         }
     } while (0);
 
@@ -222,21 +222,21 @@ SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
 void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
-    ASSERT(NULL != obj_ptr);
+    VSF_ASSERT(NULL != obj_ptr);
 
-    this.peek = this.head;
-    this.peek_cnt = 0;
+    vsf_this.peek = vsf_this.head;
+    vsf_this.peek_cnt = 0;
 }
 
 SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
 void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
-    ASSERT(NULL != obj_ptr);
+    VSF_ASSERT(NULL != obj_ptr);
 
-    this.head = this.peek;
-    this.length -= this.peek_cnt;
-    this.peek_cnt = 0;
+    vsf_this.head = vsf_this.peek;
+    vsf_this.length -= vsf_this.peek_cnt;
+    vsf_this.peek_cnt = 0;
 }
 
 
@@ -245,9 +245,9 @@ uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != obj_ptr);
+    VSF_ASSERT(NULL != obj_ptr);
 
-    return this.length - this.peek_cnt;
+    return vsf_this.length - vsf_this.peek_cnt;
 }
 
 
@@ -260,27 +260,27 @@ int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr,
     uint_fast16_t hwPeeked  = 0;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
 
-    ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
+    VSF_ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
-        if ((this.peek == this.tail) && (this.peek_cnt != 0)) {
+        if ((vsf_this.peek == vsf_this.tail) && (vsf_this.peek_cnt != 0)) {
             /*! this queue is empty */
             break;
         }
-        index = this.peek;
-        hwItemLeft = this.length - this.peek_cnt;
+        index = vsf_this.peek;
+        hwItemLeft = vsf_this.length - vsf_this.peek_cnt;
 
-        hwPeeked = this.buffer_item_cnt - this.peek;
+        hwPeeked = vsf_this.buffer_item_cnt - vsf_this.peek;
         hwPeeked = min((*item_cnt_ptr), hwPeeked);
         hwPeeked = min(hwItemLeft, hwPeeked);
 
         *item_cnt_ptr = hwPeeked;   /*!< update actual written number */
 
-        this.peek += hwPeeked;
-        this.peek_cnt += hwPeeked;
+        vsf_this.peek += hwPeeked;
+        vsf_this.peek_cnt += hwPeeked;
 
-        if (this.peek >= this.buffer_item_cnt) {
-            this.peek = 0;
+        if (vsf_this.peek >= vsf_this.buffer_item_cnt) {
+            vsf_this.peek = 0;
         }
     } while (0);
 

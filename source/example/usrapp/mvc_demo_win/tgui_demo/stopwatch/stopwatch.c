@@ -127,7 +127,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                         tgui_size(228, 32),
                         tgui_margin(0, 0, 0, 4),
                         tgui_text(tLabel, ptPanel->chTimeBuffer, false),
-                        tgui_attribute(chFontIndex, VSF_TGUI_FONT_WQY_MICROHEI_S20),
+                        tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
                         tgui_background(&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
                     ),
 
@@ -186,7 +186,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                                 "0\n1\n2\n3\n4\n5\n6\n7\n8\n9",
                                                 true),
                                     tgui_line_space(tLabel, 8),
-                                    tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
+                                    tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
                                 )
                             ),
 
@@ -211,7 +211,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                     tgui_button(tButton1, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
                                         tgui_size(150, 32),
                                         tgui_text(tLabel, "tButton1", false),
-                                           tgui_attribute(tFontColor, VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
+                                        tgui_sv_font_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
                                            tgui_margin(0, 2, 0, 2),
                                     ),
 
@@ -226,7 +226,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                         tgui_margin(0, 2, 0, 2),
                                     #if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABELD
                                         //! set the sliding speed. Usually, you don't have to modify it.
-                                        //tgui_attribute(tSlider, 500),   
+                                        //tgui_attribute(tSlider, 500),
                                     #endif
                                         tgui_attribute(u2WorkMode, VSF_TGUI_LIST_MODE_ITEM_SELECTION),
 
@@ -254,8 +254,8 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                                     tgui_label(tHistory, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
                                         tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
                                         tgui_size(150, 128),
-                                        tgui_attribute(bIsUseRawView, true),
-                                        tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
+                                        tgui_sv_tile_show_corner(false),
+                                        tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
                                         tgui_margin(0, 2, 0, 2),
                                     ),
 
@@ -298,13 +298,13 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                 )
             ),
 
-            tgui_panel(tRightPanel, ptPanel, tLeftContainer, tRightPanel, 
+            tgui_panel(tRightPanel, ptPanel, tLeftContainer, tRightPanel,
                 tgui_size(140, 0),
                 tgui_padding(10,10,10,10),
                 tgui_margin(0, 48, 0, 0),
 
-                tgui_attribute(tBackgroundColor, VSF_TGUI_COLOR_WHITE),
-                tgui_attribute(bIsShowCornerTile, false),
+                tgui_sv_background_color(VSF_TGUI_COLOR_WHITE),
+                tgui_sv_tile_show_corner(false),
 
                 //tgui_text(tTitle, "Right Panel", false),
                 tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
@@ -315,7 +315,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                 tgui_size(32, 32),                                                          \
                 tgui_margin(4, 4, 4, 4),                                                    \
                 tgui_text(tLabel, #__num, false),                                           \
-                tgui_attribute(bIsUseRawView, true),                                        \
+                tgui_sv_tile_show_corner(false),                                            \
                 __VA_ARGS__                                                                 \
             )
 
@@ -329,11 +329,11 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
                     __key(6, 5, 7),
                     __key(7, 6, 8),
                     __key(8, 7, 9),
-                    __key(9, 8, 9, 
+                    __key(9, 8, 9,
                         tgui_margin(44, 4, 44, 4),
                     ),
                 )
-            ), 
+            ),
 
         #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
             tgui_timer(tTimer, 97, false),
@@ -341,6 +341,7 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 
         );
     } while (0);
+
     return ptPanel;
 }
 
@@ -349,15 +350,18 @@ static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* node_ptr,
 {
     stopwatch_t *ptPanel = (stopwatch_t *)node_ptr;
 
-    UNUSED_PARAM(ptPanel);
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
+
+    /*!\ NOTE please only init tgui_timer in the on_load event of
+     *!       the panel to which the tgui_timer belongs, because
+     *!       the vsf_tgui_timer_init will enable the timer and
+     *!       the timer will start ticking immediately.
+     */
     vsf_tgui_timer_init(&ptPanel->tTimer,
                         (const vsf_tgui_control_t *)ptPanel);
 #endif
-    //vsf_tgui_text_list_select_set(&(ptPanel->tContainerA.tNumberList), 6);
 
     //init_vsf_pt(tgui_demo_t, &(ptPanel->tTask), vsf_prio_0);
-    vsf_tgui_control_refresh(node_ptr, NULL);
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 

@@ -427,7 +427,7 @@ bool vsf_iic_slave_read(vsf_iic_t *iic_obj, uint8_t *input, uint16_t size)
 /*************************vsf_iic_get_request_state***************************/
 em_vsf_iic_request_state_t vsf_iic_get_request_state(vsf_iic_t *iic_obj)
 {
-    ASSERT(iic_obj != NULL);
+    VSF_ASSERT(iic_obj != NULL);
     
     if(iic_obj->is_arlo != false) {
         return IIC_REQ_ARLO;

@@ -49,7 +49,7 @@
  *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h
  */
 #   define VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(...)                                  \
-        code_region_simple(this.pregion, __VA_ARGS__)
+        vsf_protect_region_simple(this.pregion, __VA_ARGS__)
 
 #elif defined(VSF_PBUF_QUEUE_CFG_ATOM_ACCESS_DEPENDENCY)
 #       include VSF_PBUF_QUEUE_CFG_ATOM_ACCESS_DEPENDENCY
@@ -120,7 +120,7 @@ vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr,
 
 #if defined(__VSF_PBUF_QUEUE_USE_DEFAULT_ATOM_ACCESS)
     if (NULL == this.pregion) {
-        this.pregion = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
+        this.pregion = (vsf_protect_region_t *)&vsf_protect_region_int;
     }
 #endif
     

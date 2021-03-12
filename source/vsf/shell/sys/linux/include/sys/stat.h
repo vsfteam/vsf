@@ -17,8 +17,16 @@ extern "C" {
 
 #define S_IFDIR         1
 
+// TODO:
+#define S_ISREG(__MODE) !((__MODE) & VSF_FILE_ATTR_DIRECTORY)
+#define S_ISDIR(__MODE) ((__MODE) & VSF_FILE_ATTR_DIRECTORY)
+
 struct stat {
-    mode_t     st_mode;
+    mode_t      st_mode;
+    off_t       st_size;
+    time_t      st_atime;
+    time_t      st_mtime;
+    time_t      st_ctime;
 };
 
 int stat(const char *pathname, struct stat *buf);

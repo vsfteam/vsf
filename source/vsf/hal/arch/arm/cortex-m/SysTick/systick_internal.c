@@ -24,19 +24,19 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-/*! \note   By default, the driver tries to make all APIs thread-safe, in the  
- *!         case when you want to disable it, please use following macro to 
+/*! \note   By default, the driver tries to make all APIs thread-safe, in the
+ *!         case when you want to disable it, please use following macro to
  *!         disable it:
  *!
  *!         #define __SYSTICK_ATOM_CODE(...)        \
- *!             for (int __CONNECT2(___, __LINE__) =1;__CONNECT2(___, __LINE__)--;)
- *!                 
- *!         
+ *!             for (int VSF_MCONNECT2(___, __LINE__) =1;VSF_MCONNECT2(___, __LINE__)--;)
+ *!
+ *!
  *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h
  */
 
 #ifndef __SYSTICK_ATOM_CODE
-#   define __SYSTICK_ATOM_CODE              __vsf_interrupt_safe
+#   define __SYSTICK_ATOM_CODE              vsf_interrupt_safe_simple
 #endif
 
 /*============================ TYPES =========================================*/
@@ -49,12 +49,12 @@ typedef enum {
     //! Enable the SysTick
     DISABLE_SYSTICK                         = 0x00,
     //! Enable the SysTick
-    ENABLE_SYSTICK                          = 0x01, 
+    ENABLE_SYSTICK                          = 0x01,
 
     //! Enable the SysTick interrupt
     DISABLE_SYSTICK_INTERRUPT               = 0x00,
     //! Enable the SysTick interrupt
-    ENABLE_SYSTICK_INTERRUPT                = 0x02, 
+    ENABLE_SYSTICK_INTERRUPT                = 0x02,
 
     //! Select the reference clock as SysTick source
     SYSTICK_SOURCE_REFERCLK                 = 0x00,

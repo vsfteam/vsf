@@ -159,6 +159,8 @@ def_tgui_panel(tgui_designer_t,
                         tgui_designer_int_label_t bottom;
                     )
 
+                    vsf_tgui_button_t show_corner;
+
                     use_tgui_container(msgmaps,
                         union {
                             tgui_designer_msgmap_buttons btns;
@@ -180,7 +182,6 @@ def_tgui_panel(tgui_designer_t,
 
                     vsf_tgui_label_t content;
                     tgui_designer_int_label_t line_height;
-                    vsf_tgui_button_t raw_view;
                     vsf_tgui_button_t auto_size;
                 )
 
@@ -190,7 +191,6 @@ def_tgui_panel(tgui_designer_t,
 
                 use_tgui_container(cont_attrs,
                     vsf_tgui_button_t auto_size;
-                    vsf_tgui_button_t show_corner;
                     vsf_tgui_button_t refresh_whole;
                     vsf_tgui_text_list_t type;
 

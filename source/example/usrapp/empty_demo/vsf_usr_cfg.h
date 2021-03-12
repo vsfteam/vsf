@@ -24,8 +24,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
-//#define ASSERT(...)
+#define VSF_ASSERT(...)                     if (!(__VA_ARGS__)) {while(1);};
+//#define VSF_ASSERT(...)
 
 #define VSF_HEAP_SIZE                   0x800
 

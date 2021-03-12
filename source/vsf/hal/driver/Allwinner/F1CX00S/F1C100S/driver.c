@@ -23,7 +23,7 @@
 #include "service/vsf_service.h"
 
 //! \note include usart poll util header file
-#include "hal/driver/common/vsf_drv_usart_poll_util.h"
+#include "hal/driver/common/usart/vsf_drv_usart_poll_util.h"
 
 /*============================ MACROS ========================================*/
 

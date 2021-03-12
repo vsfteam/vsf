@@ -178,7 +178,7 @@ SECTION(".text." "vsf_pbuf" "_get_pool_item_count")
 extern uint_fast32_t vsf_pbuf_get_pool_item_count(vsf_pbuf_pool_t *);
 
 SECTION(".text." "vsf_pbuf" "_pool_get_region")
-extern code_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *);
+extern vsf_protect_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *);
 
 SECTION(".text." "vsf_pbuf" "_pool_get_target")
 extern uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *);

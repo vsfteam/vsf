@@ -80,7 +80,7 @@ typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID           = -1,
     vsf_arch_prio_invalid           = -1,
 
-    REPEAT_MACRO(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
+    VSF_MREPEAT(VSF_ARCH_PRI_NUM, __VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
     vsf_arch_prio_highest           = VSF_ARCH_PRI_NUM - 1,
 } vsf_arch_prio_t;
 #else

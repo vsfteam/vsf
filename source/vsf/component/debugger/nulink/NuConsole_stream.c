@@ -114,44 +114,6 @@ static void __vsf_nu_console_stream_init_imp(void)
     }
 }
 
-WEAK(vsf_stdout_init) 
-void vsf_stdout_init(void)
-{
-    __vsf_nu_console_stream_init_imp();
-}
-
-WEAK(vsf_stderr_init) 
-void vsf_stderr_init(void)
-{
-    __vsf_nu_console_stream_init_imp();
-}
-
-WEAK(vsf_stdin_init) 
-void vsf_stdin_init(void)
-{
-    __vsf_nu_console_stream_init_imp();
-}
-
-WEAK(vsf_stdout_putchar)
-int vsf_stdout_putchar(char ch)
-{
-    return NuConsole_Write((const uint8_t *)&ch, 1);
-}
-
-WEAK(vsf_stderr_putchar) 
-int vsf_stderr_putchar(char ch)
-{
-    return NuConsole_Write((const uint8_t *)&ch, 1);
-}
-
-WEAK(vsf_stdin_getchar) 
-int vsf_stdin_getchar(void)
-{
-    int ch = 0;
-    NuConsole_Read((uint8_t *)&ch, 1);
-    return ch;
-}
-
 #if VSF_USE_SIMPLE_STREAM == ENABLED
 void VSF_DEBUG_STREAM_POLL(void)
 {

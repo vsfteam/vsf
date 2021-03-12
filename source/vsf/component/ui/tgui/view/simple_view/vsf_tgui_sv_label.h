@@ -30,49 +30,29 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-typedef union {
-    vsf_tgui_tile_t tTiles[2];
-    implement_ex(
-        struct {
-            vsf_tgui_tile_t tLeft;
-            vsf_tgui_tile_t tRight;
-        },
-        _
-    )
-} vsf_tgui_sv_label_tiles_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
-#if VSF_TGUI_CFG_SV_LABEL_ADDITIONAL_TILES == ENABLED
-extern const vsf_tgui_sv_label_tiles_t c_tLabelAdditionalTiles;
-#endif
-
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_label_t* ptLabel);
+extern fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_label_t* label_ptr);
 
-extern fsm_rt_t vsf_tgui_label_v_rendering( vsf_tgui_label_t* ptLabel,
-                                            vsf_tgui_region_t* ptDirtyRegion,
-                                            vsf_tgui_control_refresh_mode_t tMode);
+extern fsm_rt_t vsf_tgui_label_v_rendering( vsf_tgui_label_t* label_ptr,
+                                            vsf_tgui_region_t* dirty_region_ptr,
+                                            vsf_tgui_control_refresh_mode_t mode);
 
-extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_label_t* ptLabel);
+extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_label_t* label_ptr);
 
-extern fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_label_t* ptLabel);
-
-extern
-void __vsf_tgui_label_v_rendering(  vsf_tgui_label_t* ptLabel,
-                                    vsf_tgui_region_t* ptDirtyRegion,
-                                    vsf_tgui_control_refresh_mode_t tMode);
+extern fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_label_t* label_ptr);
 
 extern
-vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* ptLabel,
-                                                uint16_t *phwLineCount,
-                                                uint8_t *pchCharHeight);
+vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
+                                                uint16_t *line_count_ptr,
+                                                uint8_t *char_height_ptr);
 
 extern
-vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* ptLabel);
+vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
 
 extern
-int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* ptLabel);
+int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr);
 
 #endif
 

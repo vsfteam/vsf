@@ -77,7 +77,7 @@ typedef struct mt071_usb_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-REPEAT_MACRO(USB_OTG_COUNT, USB_OTG_DEF, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/

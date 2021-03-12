@@ -36,13 +36,13 @@
 /*============================ MACROS ========================================*/
 
 // __WIDTH in [6, 16, 32]
-#define DMA_CTRL_DST_WIDTH(__WIDTH)         CONNECT2(DMA_CTRL_DST_WIDTH_, __WIDTH)
+#define DMA_CTRL_DST_WIDTH(__WIDTH)         VSF_MCONNECT2(DMA_CTRL_DST_WIDTH_, __WIDTH)
 // __WIDTH in [6, 16, 32]
-#define DMA_CTRL_SRC_WIDTH(__WIDTH)         CONNECT2(DMA_CTRL_SRC_WIDTH_, __WIDTH)
+#define DMA_CTRL_SRC_WIDTH(__WIDTH)         VSF_MCONNECT2(DMA_CTRL_SRC_WIDTH_, __WIDTH)
 // __SIZE in [1, 4, 8, 16, 32, 64, 128, 256], does 256 supported?
-#define DMA_CTRL_DST_BURST(__SIZE)          CONNECT2(DMA_CTRL_DST_BURST, __WIDTH)
+#define DMA_CTRL_DST_BURST(__SIZE)          VSF_MCONNECT2(DMA_CTRL_DST_BURST, __WIDTH)
 // __SIZE in [1, 4, 8, 16, 32, 64, 128, 256], does 256 supported?
-#define DMA_CTRL_SRC_BURST(__SIZE)          CONNECT2(DMA_CTRL_SRC_BURST, __WIDTH)
+#define DMA_CTRL_SRC_BURST(__SIZE)          VSF_MCONNECT2(DMA_CTRL_SRC_BURST, __WIDTH)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

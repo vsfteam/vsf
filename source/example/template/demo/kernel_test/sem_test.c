@@ -40,7 +40,7 @@ static NO_INIT usrapp_sem_test_t __usrapp_sem;
 
 static void __usrapp_sem_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    uint_fast8_t idx = (vsf_teda_t *)eda - &__usrapp_sem.eda_recv[0];
+    uint_fast8_t idx = (uint_fast8_t)((vsf_teda_t *)eda - &__usrapp_sem.eda_recv[0]);
     vsf_trace(VSF_TRACE_INFO, "eda_recv[%d]: %d\r\n", idx, evt);
 
     switch (evt) {
@@ -62,7 +62,7 @@ static void __usrapp_sem_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 goto process_sem;
             case VSF_SYNC_CANCEL:
             case VSF_SYNC_FAIL:
-                ASSERT(false);
+                VSF_ASSERT(false);
                 break;
             case VSF_SYNC_TIMEOUT:
                 vsf_trace(VSF_TRACE_INFO, "%d: eda_recv[%d] time out\r\n", vsf_systimer_get_ms(), idx);
@@ -76,7 +76,7 @@ static void __usrapp_sem_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 static void __usrapp_sem_send_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    uint_fast8_t idx = (vsf_teda_t *)eda - &__usrapp_sem.eda_send[0];
+    uint_fast8_t idx = (uint_fast8_t)((vsf_teda_t *)eda - &__usrapp_sem.eda_send[0]);
     vsf_trace(VSF_TRACE_INFO, "eda_send[%d]: %d\r\n", idx, evt);
 
     switch (evt) {
@@ -114,9 +114,18 @@ void usrapp_sem_test_start(void)
 #if APP_USE_LINUX_DEMO == ENABLED
 int kernel_sem_test_main(int argc, char *argv[])
 {
+#else
+int VSF_USER_ENTRY(void)
+{
+#   if VSF_USE_TRACE == ENABLED
+    vsf_start_trace();
+#       if USRAPP_CFG_STDIO_EN == ENABLED
+    vsf_stdio_init();
+#       endif
+#   endif
+#endif
     usrapp_sem_test_start();
     return 0;
 }
-#endif
 
 #endif

@@ -8,6 +8,7 @@ set(vsf_template_srcs
     "${vsf_template_path}demo/linux_demo/libusb_demo.c"
     "${vsf_template_path}demo/scsi_demo/scsi_demo.c"
     "${vsf_template_path}demo/btstack_demo/btstack_demo.c"
+    "${vsf_template_path}demo/btstack_demo/btstack_application.c"
     "${vsf_template_path}demo/usbh_demo/usbh_demo.c"
     "${vsf_template_path}demo/usbd_demo/usbd_demo_cdc.c"
     "${vsf_template_path}demo/usbd_demo/usbd_demo_msc.c"

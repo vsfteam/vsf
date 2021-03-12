@@ -22,8 +22,8 @@
 #include "class_simple_demo.h"
 
 /*============================ MACROS ========================================*/
-#undef  this
-#define this    (*pthis)
+#undef  vsf_this
+#define vsf_this    (*pthis)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -31,29 +31,29 @@
 
 vsf_err_t class_simple_base_init(class_simple_base_t *pthis, uint_fast8_t param)
 {
-    this.private_param_base = param;
+    vsf_this.private_param_base = param;
     return VSF_ERR_NONE;
 }
 
 uint_fast8_t class_simple_base_get_param(class_simple_base_t *pthis)
 {
-    return this.private_param_base;
+    return vsf_this.private_param_base;
 }
 
 vsf_err_t class_simple_demo_init(   class_simple_demo_t *pthis, 
                                     uint_fast8_t param, 
                                     uint_fast8_t param_base)
 {
-    this.private_param_demo = param;
-    return class_simple_base_init(&this.use_as__class_simple_base_t, param_base);
+    vsf_this.private_param_demo = param;
+    return class_simple_base_init(&vsf_this.use_as__class_simple_base_t, param_base);
 }
 
 uint_fast8_t class_simple_demo_get_param(class_simple_demo_t *pthis)
 {
-    return this.private_param_demo;
+    return vsf_this.private_param_demo;
 }
 
 uint_fast8_t class_simple_demo_get_base_param(class_simple_demo_t *pthis)
 {
-    return this.use_as__class_simple_base_t.private_param_base;
+    return vsf_this.use_as__class_simple_base_t.private_param_base;
 }

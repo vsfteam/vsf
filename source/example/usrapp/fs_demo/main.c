@@ -7,7 +7,7 @@
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
- *  Unless requir by applicable law or agreed to in writing, software      *
+ *  Unless required by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
  *  See the License for the specific language governing permissions and      *
@@ -228,36 +228,36 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         result = (int32_t)vsf_eda_get_return_value();
         switch (__state) {
         case USRAPP_STATE_OPENED_ROOT:
-            ASSERT(__froot != NULL);
+            VSF_ASSERT(__froot != NULL);
             vk_file_create(__froot, "memfs", VSF_FILE_ATTR_DIRECTORY, 0);
             break;
         case USRAPP_STATE_CREATED_MEMFS:
-            ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
             __fmemfs = NULL;
             vk_file_open(__froot, "memfs", 0, &__fmemfs);
             break;
         case USRAPP_STATE_OPENED_MEMFS:
-            ASSERT(result == VSF_ERR_NONE);
-            ASSERT(__fmemfs != NULL);
+            VSF_ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(__fmemfs != NULL);
             vk_fs_mount(__fmemfs, &vk_memfs_op, &__usrapp_common.fs.memfs_info);
             break;
         case USRAPP_STATE_MOUNTED_MEMFS:
-            ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
 #if VSF_FS_USE_WINFS == ENABLED
             vk_file_create(__froot, "winfs", VSF_FILE_ATTR_DIRECTORY, 0);
             break;
         case USRAPP_STATE_CREATED_WINFS:
-            ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
             __fwinfs = NULL;
             vk_file_open(__froot, "winfs", 0, &__fwinfs);
             break;
         case USRAPP_STATE_OPENED_WINFS:
-            ASSERT(result == VSF_ERR_NONE);
-            ASSERT(__fwinfs != NULL);
+            VSF_ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(__fwinfs != NULL);
             vk_fs_mount(__fwinfs, &vk_winfs_op, &__usrapp_common.fs.winfs_info);
             break;
         case USRAPP_STATE_MOUNTED_WINFS:
-            ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(result == VSF_ERR_NONE);
 #endif
             if (VSF_ERR_NONE == vsf_eda_call_param_eda(__usrapp_fs_listall_evthandler, __froot)) {
                 break;
@@ -267,10 +267,10 @@ static void __usrapp_fs_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_file_open(__fmemfs, "control.bin", 0, &__fcontrol);
             break;
         case USRAPP_STATE_OPENED_CONTROL:
-            ASSERT(result == VSF_ERR_NONE);
-            ASSERT(__fcontrol != NULL);
+            VSF_ASSERT(result == VSF_ERR_NONE);
+            VSF_ASSERT(__fcontrol != NULL);
         case USRAPP_STATE_WRITTEN_CONTROL:
-            ASSERT(result == 1);
+            VSF_ASSERT(result == 1);
             vsf_teda_set_timer_ms(1000);
             return;
         }
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     __usrapp_common_init();
 
     vsf_eda_set_evthandler(&__usrapp.fs.task.use_as__vsf_eda_t, __usrapp_fs_evthandler);
-    vsf_teda_init(&__usrapp.fs.task, vsf_prio_0, false);
+    vsf_teda_init(&__usrapp.fs.task, vsf_prio_0);
     return 0;
 }
 

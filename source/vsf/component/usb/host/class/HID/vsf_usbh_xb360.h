@@ -70,8 +70,9 @@ def_simple_class(vk_usbh_xb360_t) {
 #endif
 
     private_member(
-        bool out_idle;
+        // gamepad_out_buf should be aligned
         vsf_usb_xb360_gamepad_out_report_t gamepad_out_buf;
+        bool out_idle;
     )
 };
 

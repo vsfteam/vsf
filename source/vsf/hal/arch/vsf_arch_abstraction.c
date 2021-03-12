@@ -128,9 +128,6 @@ typedef struct __systimer_t {
 
 /*============================ PROTOTYPES ====================================*/
 
-static void __default_code_region_atom_code_on_enter(void *obj_ptr, void *local_ptr);
-static void __default_code_region_atom_code_on_leave(void *obj_ptr,void *local_ptr);
-
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
 extern bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick);
@@ -151,6 +148,11 @@ extern vsf_err_t vsf_arch_swi_init( uint_fast8_t idx,
                                     vsf_swi_handler_t *handler,
                                     void *param);
 
+static vsf_protect_t __vsf_protect_region_int_enter(void);
+static void __vsf_protect_region_int_leave(vsf_protect_t orig);
+static vsf_protect_t __vsf_protect_region_none_enter(void);
+static void __vsf_protect_region_none_leave(vsf_protect_t orig);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
@@ -158,21 +160,40 @@ extern vsf_err_t vsf_arch_swi_init( uint_fast8_t idx,
 static volatile __systimer_t __systimer;
 #endif
 
-static const i_code_region_t __vsf_i_default_code_region_atom_code = {
-    sizeof(vsf_gint_state_t),
-    &__default_code_region_atom_code_on_enter,
-    &__default_code_region_atom_code_on_leave
-};
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-const code_region_t DEFAULT_CODE_REGION_ATOM_CODE = {
-    NULL,
-    (i_code_region_t *)&__vsf_i_default_code_region_atom_code
+const vsf_protect_region_t vsf_protect_region_int = {
+    .enter  = __vsf_protect_region_int_enter,
+    .leave  = __vsf_protect_region_int_leave,
+};
+
+const vsf_protect_region_t vsf_protect_region_none = {
+    .enter  = __vsf_protect_region_none_enter,
+    .leave  = __vsf_protect_region_none_leave,
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
+static vsf_protect_t __vsf_protect_region_int_enter(void)
+{
+    return vsf_protect_int();
+}
+
+static void __vsf_protect_region_int_leave(vsf_protect_t orig)
+{
+    vsf_unprotect_int(orig);
+}
+
+static vsf_protect_t __vsf_protect_region_none_enter(void)
+{
+    return vsf_protect_none();
+}
+
+static void __vsf_protect_region_none_leave(vsf_protect_t orig)
+{
+    vsf_unprotect_none(orig);
+}
 
 /*----------------------------------------------------------------------------*
  * Architecture Infrastructure                                                *
@@ -348,34 +369,6 @@ int_fast8_t vsf_ffz(uint_fast32_t a)
 }
 #endif
 
-
-/*----------------------------------------------------------------------------*
- * Default Code region for ATOM code                                          *
- *----------------------------------------------------------------------------*/
-
-static void __default_code_region_atom_code_on_enter(void *obj_ptr, void *local_ptr)
-{
-    vsf_gint_state_t *state_ptr = (vsf_gint_state_t *)local_ptr;
-
-    UNUSED_PARAM(obj_ptr);
-    UNUSED_PARAM(local_ptr);
-
-    ASSERT(NULL != local_ptr);
-    (*state_ptr) = vsf_disable_interrupt();
-}
-
-static void __default_code_region_atom_code_on_leave(void *obj_ptr,void *local_ptr)
-{
-    vsf_gint_state_t *state_ptr = (vsf_gint_state_t *)local_ptr;
-
-    UNUSED_PARAM(obj_ptr);
-    UNUSED_PARAM(local_ptr);
-
-    ASSERT(NULL != local_ptr);
-
-    vsf_set_interrupt(*state_ptr);
-}
-
 /*----------------------------------------------------------------------------*
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
@@ -384,7 +377,7 @@ WEAK(vsf_drv_usr_swi_trigger)
 void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 {
     UNUSED_PARAM(idx);
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
 }
 
 
@@ -422,10 +415,10 @@ void vsf_swi_trigger(uint_fast8_t idx)
 #   if (__VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM) || !defined(__VSF_HAL_SWI_NUM)
     vsf_drv_usr_swi_trigger(idx);
 #   else
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
 #   endif
 #else
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
 #endif
 }
 
@@ -445,7 +438,7 @@ vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx,
     UNUSED_PARAM(handler);
     UNUSED_PARAM(param);
 
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
     return VSF_ERR_FAIL;
 }
 
@@ -466,11 +459,11 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
 #   if (__VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM) || !defined(__VSF_HAL_SWI_NUM)
     return vsf_drv_usr_swi_init(idx, priority, handler, param);
 #   else
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
     return VSF_ERR_FAIL;
 #   endif
 #else
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
     return VSF_ERR_FAIL;
 #endif
 }
@@ -490,7 +483,7 @@ WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 {
     UNUSED_PARAM(tick);
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
 }
 #   endif
 
@@ -631,7 +624,7 @@ void vsf_systimer_set_idle(void)
 {
 //    vsf_trace_debug("systimer_idle\r\n");
     {
-        vsf_gint_state_t gint_state = vsf_disable_interrupt();
+        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
         __vsf_systimer_update();
         __vsf_systimer_set_target(__systimer.max_tick_per_round);
         vsf_set_interrupt(gint_state);
@@ -644,7 +637,7 @@ vsf_systimer_cnt_t vsf_systimer_get(void)
     vsf_systimer_cnt_t ticks = 0;
     bool auto_update = false;
     {
-        vsf_gint_state_t gint_state = vsf_disable_interrupt();
+        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
         if (vsf_systimer_low_level_disable()) {       //!< the match bit will be cleared
             ticks += __systimer.reload;
             auto_update = true;
@@ -665,7 +658,7 @@ WEAK(vsf_systimer_start)
 vsf_err_t vsf_systimer_start(void)
 {
     {
-        vsf_gint_state_t gint_state = vsf_disable_interrupt();
+        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
         __vsf_systimer_set_target(__systimer.max_tick_per_round);
         vsf_set_interrupt(gint_state);
     }
@@ -681,7 +674,7 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
     vsf_systimer_cnt_t max_tick_per_round = __systimer.max_tick_per_round;
 
     {
-        vsf_gint_state_t gint_state = vsf_disable_interrupt();
+        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
         vsf_systimer_cnt_t current = __vsf_systimer_update();
         //vsf_systick_disable();
         vsf_systimer_cnt_t tick_cnt;

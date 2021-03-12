@@ -72,11 +72,22 @@ static int __get_fd(FILE *f)
     }
 }
 
-int getchar(void)
+int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
+{
+    // TODO: add implementation
+    return 0;
+}
+
+int getc(FILE *f)
 {
     int ch = EOF;
-    fread(&ch, 1, 1, stdin);
+    fread(&ch, 1, 1, f);
     return ch;
+}
+
+int getchar(void)
+{
+    return getc(stdin);
 }
 
 FILE * fopen(const char *filename, const char *mode)
@@ -86,6 +97,11 @@ FILE * fopen(const char *filename, const char *mode)
         return NULL;
     }
     return (FILE *)vsf_linux_get_fd(fd);
+}
+
+FILE * freopen(const char *filename, const char *mode, FILE *f)
+{
+    return f;
 }
 
 int fclose(FILE *f)
@@ -99,7 +115,7 @@ int fclose(FILE *f)
     return err != 0 ? EOF : 0;
 }
 
-int fseek(FILE *f, long offset, int fromwhere)
+int fseeko(FILE *f, off_t offset, int fromwhere)
 {
     int fd = __get_fd(f);
     if (fd < 0) {
@@ -108,18 +124,33 @@ int fseek(FILE *f, long offset, int fromwhere)
     return lseek(fd, offset, fromwhere);
 }
 
+int fseek(FILE *f, long offset, int fromwhere)
+{
+    return fseeko(f, offset, fromwhere);
+}
+
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
-long ftell(FILE *f)
+off64_t ftello64(FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
     VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
 
-    return (long)priv->pos;
+    return (off64_t)priv->pos;
+}
+
+off_t ftello(FILE *f)
+{
+    return (off_t)ftello64(f);
+}
+
+long ftell(FILE *f)
+{
+    return (long)ftello(f);
 }
 
 void rewind(FILE *f)
@@ -165,6 +196,11 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
     return (size_t)ret;
 }
 
+int fflush(FILE *f)
+{
+    return 0;
+}
+
 char * fgets(char *str, int n, FILE *f)
 {
     char *result = str;
@@ -174,9 +210,22 @@ char * fgets(char *str, int n, FILE *f)
         if (fread(str, 1, 1, f) != 1) {
             break;
         }
+
+        if (stdin == f) {
+            if ('\n' == *str) {
+                continue;
+            }
+            if (('\b' == *str) || (0x7F == *str)) {
+                int back_cnt = min(rsize, 1);
+                rsize -= back_cnt;
+                str -= back_cnt;
+                continue;
+            }
+        }
+
         rsize++;
         str++;
-        if ('\n' == str[-1]) {
+        if ('\r' == str[-1]) {
             break;
         }
     }
@@ -199,6 +248,16 @@ int fputs(const char *str, FILE *f)
 int puts(const char *str)
 {
     return fputs(str, stdout);
+}
+
+int putc(int c, FILE* f)
+{
+    return fwrite(&c, 1, 1, f);;
+}
+
+int putchar(int c)
+{
+    return putc(c, stdout);
 }
 
 static int __print_arg(FILE *f, const char *format, va_list ap)
@@ -226,6 +285,30 @@ int fprintf(FILE *file, const char *format, ...)
         size = __print_arg(file, format, ap);
     va_end(ap);
     return size;
+}
+
+int fscanf(FILE *f, const char *format, ...)
+{
+    // TODO:
+    return -1;
+}
+
+int ferror(FILE *f)
+{
+    return 0;
+}
+
+void clearerr(FILE *f)
+{
+}
+
+int feof(FILE *f)
+{
+    vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
+    VSF_LINUX_ASSERT(&__vsf_linux_fs_fdop == sfd->op);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+
+    return !(priv->file->size - priv->pos);
 }
 
 #if !__IS_COMPILER_IAR__

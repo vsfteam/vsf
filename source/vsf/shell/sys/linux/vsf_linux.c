@@ -179,6 +179,49 @@ int vsf_linux_create_fhs(void)
 }
 #endif
 
+int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in)
+{
+    char working_dir[MAX_PATH];
+    if (NULL == dir) {
+        getcwd(working_dir, sizeof(working_dir));
+        dir = working_dir;
+    }
+
+    if (path_in[0] == '/') {
+        if (strlen(path_in) >= path_out_lenlen) {
+            return -ENOMEM;
+        }
+        strcpy(path_out, path_in);
+    } else {
+        if (strlen(dir) + strlen(path_in) >= path_out_lenlen) {
+            return -ENOMEM;
+        }
+        strcpy(path_out, dir);
+        strcat(path_out, path_in);
+    }
+
+    // process .. an .
+    char *tmp, *tmp_replace;
+    while ((tmp = (char *)strstr(path_out, "/..")) != NULL) {
+        tmp[0] = '\0';
+        tmp_replace = (char *)strrchr(path_out, '/');
+        if (NULL == tmp_replace) {
+            return -ENOENT;
+        }
+        strcpy(tmp_replace, &tmp[3]);
+    }
+    while ((tmp = (char *)strstr(path_out, "/./")) != NULL) {
+        strcpy(tmp, &tmp[2]);
+    }
+
+    // fix surfix "/."
+    size_t len = strlen(path_out);
+    if ((len >= 2) && ('.' == path_out[len - 1]) && ('/' == path_out[len - 2])) {
+        path_out[len - 2] = '\0';
+    }
+    return 0;
+}
+
 static int __vsf_linux_init_thread(int argc, char *argv[])
 {
     int err = vsf_linux_create_fhs();
@@ -305,7 +348,7 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread)
     return 0;
 }
 
-vsf_linux_process_t * vsf_linux_create_process(int stack_size)
+static vsf_linux_process_t * __vsf_linux_create_process(int stack_size)
 {
     vsf_linux_process_t *process = calloc(1, sizeof(vsf_linux_process_t));
     if (process != NULL) {
@@ -332,6 +375,18 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size)
     return process;
 }
 
+vsf_linux_process_t * vsf_linux_create_process(int stack_size)
+{
+    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
+    if (process != NULL) {
+        vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(parent_process != NULL);
+        process->working_dir = strdup(parent_process->working_dir);
+        VSF_LINUX_ASSERT(process->working_dir != NULL);
+    }
+    return process;
+}
+
 int vsf_linux_start_process(vsf_linux_process_t *process)
 {
     // TODO: check if already started
@@ -344,10 +399,12 @@ static vsf_linux_process_t * __vsf_linux_start_process_internal(int stack_size,
         vsf_linux_main_entry_t entry, vsf_prio_t prio)
 {
     VSF_LINUX_ASSERT((prio >= VSF_LINUX_CFG_PRIO_LOWEST) && (prio <= VSF_LINUX_CFG_PRIO_HIGHEST));
-    vsf_linux_process_t *process = vsf_linux_create_process(stack_size);
+    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size);
     if (process != NULL) {
         process->prio = prio;
         process->ctx.entry = entry;
+        process->working_dir = strdup("/");
+        VSF_LINUX_ASSERT(process->working_dir != NULL);
         vsf_linux_start_process(process);
     }
     return process;
@@ -453,6 +510,9 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         if (process->thread_pending != NULL) {
             vsf_eda_post_evt(&process->thread_pending->use_as__vsf_eda_t, VSF_EVT_USER);
         }
+        if (process->working_dir != NULL) {
+            free(process->working_dir);
+        }
         free(process);
     }
 }
@@ -463,9 +523,14 @@ intptr_t execv(const char *pathname, char const* const* argv)
 int execv(const char *pathname, char const* const* argv)
 #endif
 {
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(pathname, &entry);
+    int fd = vsf_linux_fs_get_executable(fullpath, &entry);
     if (fd < 0) {
         return -1;
     }
@@ -492,9 +557,14 @@ intptr_t execl(const char *pathname, const char *arg, ...)
 int execl(const char *pathname, const char *arg, ...)
 #endif
 {
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
     // fd will be closed after entry return
     vsf_linux_main_entry_t entry;
-    int fd = vsf_linux_fs_get_executable(pathname, &entry);
+    int fd = vsf_linux_fs_get_executable(fullpath, &entry);
     if (fd < 0) {
         return -1;
     }
@@ -528,6 +598,19 @@ int system(const char * cmd)
     return 0;
 }
 
+long sysconf(int name)
+{
+    switch (name) {
+    case _SC_PAGESIZE:      return 256;
+    }
+    return 0;
+}
+
+char *realpath(const char *path, char *resolved_path)
+{
+    return NULL;
+}
+
 int kill(pid_t pid, int sig)
 {
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
@@ -550,6 +633,15 @@ int kill(pid_t pid, int sig)
     }
 #endif
     return -1;
+}
+
+sighandler_t signal(int signum, sighandler_t handler)
+{
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    // not supported yet
+#else
+    return NULL;
+#endif
 }
 
 pid_t waitpid(pid_t pid, int *status, int options)
@@ -696,6 +788,27 @@ static ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         }
 
         cursize = vsf_stream_read(stream, buf, size);
+        if (sfd->fd == STDIN_FILENO) {
+            static int skip_echo = 0;
+            char ch;
+            for (uint_fast32_t i = 0; i < cursize; i++) {
+                ch = ((char *)buf)[i];
+                switch (ch) {
+                case '\033':skip_echo = 2;                      break;
+                case '\r':  write(STDOUT_FILENO, "\r\n", 2);    break;
+                case 0x7F:
+                case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
+                default:
+                    if (skip_echo) {
+                        skip_echo--;
+                        break;
+                    }
+                    write(STDOUT_FILENO, &ch, 1);
+                    break;
+                }
+            }
+        }
+
         size -= cursize;
         buf = (uint8_t *)buf + cursize;
     }
@@ -864,6 +977,11 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
 // conflicts with remove in ucrt
 int remove(const char * pathname)
 {
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
     // TODO: remove file by unlink, remove directory by rmdir
     VSF_LINUX_ASSERT(false);
     return -1;
@@ -1003,7 +1121,12 @@ do_return:
 
 int mkdir(const char* pathname, mode_t mode)
 {
-    int fd = __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY, 0);
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    int fd = __vsf_linux_fs_create(fullpath, mode, VSF_FILE_ATTR_DIRECTORY, 0);
     if (fd >= 0) {
         close(fd);
         fd = 0;
@@ -1011,17 +1134,76 @@ int mkdir(const char* pathname, mode_t mode)
     return fd;
 }
 
+int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
+{
+    VSF_LINUX_ASSERT(process != NULL);
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    int len = strlen(fullpath);
+    if (fullpath[len - 1] != '/') {
+        VSF_LINUX_ASSERT(len + 1 < MAX_PATH);
+        fullpath[len] = '/';
+        fullpath[len + 1] = '\0';
+    }
+
+    vk_file_t *file = __vsf_linux_fs_get_file(fullpath);
+    if (NULL == file) {
+        return -1;
+    }
+    vk_file_attr_t attr = file->attr;
+    __vsf_linux_fs_close_do(file);
+    if (!(attr & VSF_FILE_ATTR_DIRECTORY)) {
+        return -1;
+    }
+
+    free(process->working_dir);
+    process->working_dir = strdup(fullpath);
+    VSF_LINUX_ASSERT(process->working_dir != NULL);
+    return 0;
+}
+
+int chdir(const char *pathname)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    return vsf_linux_chdir(process, (char *)pathname);
+}
+
+char * getcwd(char *buffer, size_t maxlen)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    if (strlen(process->working_dir) >= maxlen) {
+        errno = ERANGE;
+        return NULL;
+    }
+    strcpy(buffer, process->working_dir);
+    return buffer;
+}
+
 int creat(const char *pathname, mode_t mode)
 {
-    return __vsf_linux_fs_create(pathname, mode, 0, 0);
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+    return __vsf_linux_fs_create(fullpath, mode, 0, 0);
 }
 
 int open(const char *pathname, int flags, ...)
 {
-    vk_file_t *file = __vsf_linux_fs_get_file(pathname);
+    vk_file_t *file;
     vsf_linux_fd_t *sfd;
+    char fullpath[MAX_PATH];
     int fd;
 
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    file = __vsf_linux_fs_get_file(fullpath);
     if (!file) {
         if (flags & O_CREAT) {
             va_list ap;
@@ -1031,7 +1213,7 @@ int open(const char *pathname, int flags, ...)
                 mode = va_arg(ap, mode_t);
             va_end(ap);
 
-            return creat(pathname, mode);
+            return creat(fullpath, mode);
         }
         return -1;
     }
@@ -1106,12 +1288,25 @@ off_t lseek(int fd, off_t offset, int whence)
         return -1;
     }
     priv->pos = new_pos;
-    return 0;
+    return (off_t)new_pos;
 }
 
 int stat(const char *pathname, struct stat *buf)
 {
-    VSF_LINUX_ASSERT(false);
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    vk_file_t *file = __vsf_linux_fs_get_file(fullpath);
+    if (NULL == file) {
+        return -1;
+    }
+
+    memset(buf, 0, sizeof(*buf));
+    buf->st_mode = file->attr;
+    buf->st_size = file->size;
+    __vsf_linux_fs_close_do(file);
     return 0;
 }
 
@@ -1126,13 +1321,18 @@ int access(const char *pathname, int mode)
 
 int unlink(const char *pathname)
 {
-    vk_file_t *file = __vsf_linux_fs_get_file(pathname), *dir;
+    char fullpath[MAX_PATH];
+    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        return -1;
+    }
+
+    vk_file_t *file = __vsf_linux_fs_get_file(fullpath), *dir;
     if (!file) {
         errno = ENOENT;
         return -1;
     }
 
-    pathname = &pathname[strlen(pathname) - strlen(file->name)];
+    pathname = &fullpath[strlen(fullpath) - strlen(file->name)];
     dir = vk_file_get_parent(file);
     __vsf_linux_fs_close_do(file);
 

@@ -166,10 +166,10 @@ struct vsf_usart_t {
     usart_cfg_t                         cfg;
     uint8_t                             *buf;
     uint_fast32_t                       buf_size;
-    intalu_t                            sended_buf_size;
+    int_fast32_t                        sended_buf_size;
     uint8_t                             *rec_buf;
     uint_fast32_t                       rec_buf_size;
-    intalu_t                            reced_buf_size;
+    int_fast32_t                        reced_buf_size;
     vsf_arch_irq_thread_t               irq_init_thread;
     HANDLE                              handle_com;
     vsf_arch_irq_thread_t               irq_read_thread;
@@ -226,9 +226,13 @@ static const char *__vsf_x86_trace_color[] = {
 static x86_usart_win_t __x86_usart_win = {
     .is_busy = 1,
 };
+
 /*============================ GLOBAL VARIABLES ==============================*/
-REPEAT_MACRO(VSF_USART_CFG_PORT_NUM, __USART_LOCAL, NULL)
+
+VSF_MREPEAT(VSF_USART_CFG_PORT_NUM, __USART_LOCAL, NULL)
+
 /*============================ IMPLEMENTATION ================================*/
+
 static DWORD  __calculate_rx_timeout(vsf_usart_t *usart, uint32_t times)
 {
     if (0 == times) {
@@ -936,7 +940,7 @@ vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart)
     return VSF_ERR_NONE;
 }
 
-intalu_t vsf_usart_get_rx_count(vsf_usart_t *usart)
+int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart)
 {
     vsf_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, usart);
     VSF_HAL_ASSERT(usart != NULL);
@@ -944,7 +948,7 @@ intalu_t vsf_usart_get_rx_count(vsf_usart_t *usart)
     return usart->reced_buf_size;
 }
 
-intalu_t vsf_usart_get_tx_count(vsf_usart_t *usart)
+int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart)
 {
     vsf_usart_trace_function("%s(0x"VSF_TRACE_POINTER_HEX")", __FUNCTION__, usart);
     VSF_HAL_ASSERT(usart != NULL);

@@ -49,16 +49,16 @@
                 <option>
                     <name>GRuntimeLibSelect</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GRuntimeLibSelectSlave</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>Use the full configuration of the C/C++ runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -112,7 +112,7 @@
                 </option>
                 <option>
                     <name>RTConfigPath2</name>
-                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</state>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
@@ -228,7 +228,6 @@
                     <state>HAS_STD_MALLOC</state>
                     <state>HAS_AWTK_CONFIG</state>
                     <state>FT2_BUILD_LIBRARY</state>
-                    <state>CONFIG_EVM_ECMA=1</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -354,9 +353,9 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
-                    <state>$PROJ_DIR$\..\..\demo\evm_demo\evm\include</state>
-                    <state>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr</state>
+                    <state>$PROJ_DIR$\..\..\config\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\demo\evm_demo</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\DSP\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\NN\Include</state>
@@ -374,6 +373,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\segger_rtt\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nuconsole\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\modules\ecma\zephyr</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1433,6 +1435,7 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\config\lwip</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include</state>
@@ -2204,16 +2207,16 @@
                 <option>
                     <name>GRuntimeLibSelect</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GRuntimeLibSelectSlave</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>Use the full configuration of the C/C++ runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -2267,7 +2270,7 @@
                 </option>
                 <option>
                     <name>RTConfigPath2</name>
-                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</state>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
@@ -3307,7 +3310,7 @@
                 </option>
                 <option>
                     <name>GenLowLevelInterface</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>GEndianModeBE</name>
@@ -4295,18 +4298,1151 @@
             <data />
         </settings>
     </configuration>
+    <configuration>
+        <name>vsf_template_aic8800</name>
+        <toolchain>
+            <name>ARM</name>
+        </toolchain>
+        <debug>1</debug>
+        <settings>
+            <name>General</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <version>31</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>ExePath</name>
+                    <state>vsf_template_aic8800\Exe</state>
+                </option>
+                <option>
+                    <name>ObjPath</name>
+                    <state>vsf_template_aic8800\Obj</state>
+                </option>
+                <option>
+                    <name>ListPath</name>
+                    <state>vsf_template_aic8800\List</state>
+                </option>
+                <option>
+                    <name>GEndianMode</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>Input description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>Output description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>GOutputBinary</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGCoreOrChip</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelect</name>
+                    <version>0</version>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelectSlave</name>
+                    <version>0</version>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>RTDescription</name>
+                    <state>Use the full configuration of the C/C++ runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
+                </option>
+                <option>
+                    <name>OGProductVersion</name>
+                    <state>8.30.1.17146</state>
+                </option>
+                <option>
+                    <name>OGLastSavedByProductVersion</name>
+                    <state>8.40.2.22864</state>
+                </option>
+                <option>
+                    <name>GeneralEnableMisra</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraVerbose</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGChipSelectEditMenu</name>
+                    <state>Default	None</state>
+                </option>
+                <option>
+                    <name>GenLowLevelInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GEndianModeBE</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OGBufferedTerminalOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenStdoutInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraRules98</name>
+                    <version>0</version>
+                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                </option>
+                <option>
+                    <name>GeneralMisraVer</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GeneralMisraRules04</name>
+                    <version>0</version>
+                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                </option>
+                <option>
+                    <name>RTConfigPath2</name>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</state>
+                </option>
+                <option>
+                    <name>GBECoreSlave</name>
+                    <version>27</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>OGUseCmsis</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGUseCmsisDspLib</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibThreads</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CoreVariant</name>
+                    <version>27</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>GFPUDeviceSlave</name>
+                    <state>Default	None</state>
+                </option>
+                <option>
+                    <name>FPU2</name>
+                    <version>0</version>
+                    <state>4</state>
+                </option>
+                <option>
+                    <name>NrRegs</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>NEON</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GFPUCoreSlave2</name>
+                    <version>27</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>OGCMSISPackSelectDevice</name>
+                </option>
+                <option>
+                    <name>OgLibHeap</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGLibAdditionalLocale</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenLocaleTags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>GenLocaleDisplayOnly</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>DSPExtension</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>TrustZone</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>TrustZoneModes</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>ICCARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>35</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>CCDefines</name>
+                    <state>__AIC__</state>
+                    <state>__AIC8800__</state>
+                    <state>__OOC_CPP__</state>
+                    <state>__INLINE=static inline</state>
+                    <state>LV_CONF_INCLUDE_SIMPLE</state>
+                    <state>CFG_HW_PLATFORM=2</state>
+                    <state>CFG_RF_MODE=0</state>
+                    <state>CFG_PMIC</state>
+                    <state>CFG_PMIC_VER_LITE</state>
+                    <state>CFG_PMIC_ITF_ASDMA</state>
+                    <state>CFG_WIFI_STACK</state>
+                    <state>CFG_RSSI_DATAPKT</state>
+                    <state>CFG_DBG</state>
+                    <state>LWIP_NO_STDINT_H=1</state>
+                    <state>MEMP_MEM_MALLOC=1</state>
+                    <state>BUFFER_SIZE_UP=4096</state>
+                </option>
+                <option>
+                    <name>CCPreprocFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocComments</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocLine</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCListCFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMnemonics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMessages</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagSuppress</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagRemark</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagWarning</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagError</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCAllowList</name>
+                    <version>1</version>
+                    <state>11111110</state>
+                </option>
+                <option>
+                    <name>CCDebugInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IEndianMode</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptionsCheck</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptions</name>
+                    <state>--no_unaligned_access</state>
+                </option>
+                <option>
+                    <name>CCLangConformance</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCSignedPlainChar</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCRequirePrototypes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagWarnAreErr</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCompilerRuntimeInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>CCLibConfigHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CompilerMisraOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCIncludePath2</name>
+                    <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf</state>
+                    <state>$PROJ_DIR$\..\..\demo\evm_demo</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\rtos</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include\lwip</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\ll</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\dbg\api</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\application</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\wlan</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\macif</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include</state>
+                    <state>//$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\shell\media\sdl2\include\SDL2</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfvm\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\raw\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\segger_rtt\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nuconsole\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\modules\ecma\zephyr</state>
+                </option>
+                <option>
+                    <name>CCStdIncCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCodeSection</name>
+                    <state>.text</state>
+                </option>
+                <option>
+                    <name>IProcessorMode2</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevel</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CCOptStrategy</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevelSlave</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CompilerMisraRules98</name>
+                    <version>0</version>
+                    <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                </option>
+                <option>
+                    <name>CompilerMisraRules04</name>
+                    <version>0</version>
+                    <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                </option>
+                <option>
+                    <name>CCPosIndRopi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndRwpi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndNoDynInit</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccLang</name>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>IccCDialect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccAllowVLA</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccStaticDestr</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccCppInlineSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccFloatSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptStrategySlave</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCGuardCalls</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccExceptions2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccRTTI2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OICompilerExtraOption</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>AARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>10</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>AObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AEndian</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>ACaseSensitivity</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacroChars</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnWhat</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnOne</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange1</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>ADebug</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AltRegisterNames</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ADefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AList</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AListHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AListing</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>Includes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacDefs</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacExps</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacExec</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OnlyAssed</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MultiLine</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLengthCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLength</name>
+                    <state>80</state>
+                </option>
+                <option>
+                    <name>TabSpacing</name>
+                    <state>8</state>
+                </option>
+                <option>
+                    <name>AXRef</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDefines</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefInternal</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDual</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AOutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsEdit</name>
+                    <state>100</state>
+                </option>
+                <option>
+                    <name>AIgnoreStdInclude</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AUserIncludes</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AExtraOptionsCheckV2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AExtraOptionsV2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AsmNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>OBJCOPY</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>1</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>OOCOutputFormat</name>
+                    <version>3</version>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>OCOutputOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OOCOutputFile</name>
+                    <state>vsf_template.bin</state>
+                </option>
+                <option>
+                    <name>OOCCommandLineProducer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OOCObjCopyEnable</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>CUSTOM</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <extensions></extensions>
+                <cmdline></cmdline>
+                <hasPrio>0</hasPrio>
+            </data>
+        </settings>
+        <settings>
+            <name>BICOMP</name>
+            <archiveVersion>0</archiveVersion>
+            <data />
+        </settings>
+        <settings>
+            <name>BUILDACTION</name>
+            <archiveVersion>1</archiveVersion>
+            <data>
+                <prebuild></prebuild>
+                <postbuild></postbuild>
+            </data>
+        </settings>
+        <settings>
+            <name>ILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>23</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IlinkLibIOConfig</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>XLinkMisraHandler</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkInputFileSlave</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOutputFile</name>
+                    <state>vsf_template_aic8800.out</state>
+                </option>
+                <option>
+                    <name>IlinkDebugInfoEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkKeepSymbols</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkConfigDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkMapFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogInitialization</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogModule</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogSection</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogVeneer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfOverride</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile</name>
+                    <state>$PROJ_DIR$\target\AIC8800\aic8800_ram_debug.icf</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFileSlave</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkSuppressDiags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsRem</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsWarn</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsErr</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkWarningsAreErrors</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkUseExtraOptions</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkExtraOptions</name>
+                    <state>--no_entry</state>
+                </option>
+                <option>
+                    <name>IlinkLowLevelInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAutoLibEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAdditionalLibs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkOverrideProgramEntryLabel</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabelSelect</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabel</name>
+                    <state>__iar_program_start</state>
+                </option>
+                <option>
+                    <name>DoFill</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FillerByte</name>
+                    <state>0xFF</state>
+                </option>
+                <option>
+                    <name>FillerStart</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>FillerEnd</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>CrcSize</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcAlign</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcPoly</name>
+                    <state>0x11021</state>
+                </option>
+                <option>
+                    <name>CrcCompl</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcBitOrder</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcInitialValue</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>DoCrc</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkBE8Slave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkBufferedTerminalOutput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkStdoutInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcFullSize</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkIElfToolPostProcess</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogAutoLibSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogRedirSymbols</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogUnusedFragments</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkCrcReverseByteOrder</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCrcUseAsInput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptInline</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsAllow</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsForce</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptMergeDuplSections</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptUseVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptForceVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackAnalysisEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackControlFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkStackCallGraphFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CrcAlgorithm</name>
+                    <version>1</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcUnitSize</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkThreadsSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogCallGraph</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile_AltDefault</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkHeapSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLocaleSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkTrustzoneImportLibraryOut</name>
+                    <state>vsf_template_m484_import_lib.o</state>
+                </option>
+                <option>
+                    <name>OILinkExtraOption</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign2</name>
+                    <state></state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>IARCHIVE</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IarchiveInputs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IarchiveOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IarchiveOutput</name>
+                    <state>###Unitialized###</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>BILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data />
+        </settings>
+    </configuration>
     <group>
         <name>usrapp</name>
         <group>
             <name>config</name>
             <group>
+                <name>lwip</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\lwip\lwipopts.h</name>
+                </file>
+            </group>
+            <group>
                 <name>vsf_usr_cfg</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_aic8800.h</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_f1c100s.h</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -4315,6 +5451,7 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -4323,6 +5460,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -4331,6 +5469,7 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -4340,6 +5479,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                 </file>
             </group>
@@ -4353,9 +5493,6 @@
                 <name>$PROJ_DIR$\..\..\config\lv_conf.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\config\lwipopts.h</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\config\vsf_tgui_cfg.h</name>
             </file>
             <file>
@@ -4364,6 +5501,30 @@
         </group>
         <group>
             <name>demo</name>
+            <group>
+                <name>aic8800</name>
+                <excluded>
+                    <configuration>vsf_template_m484</configuration>
+                    <configuration>vsf_template_f1c100s</configuration>
+                    <configuration>vsf_template_gd32e103</configuration>
+                    <configuration>vsf_template_mt071</configuration>
+                </excluded>
+                <group>
+                    <name>bt_demo</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\demo\aic8800\bt_demo\bt_demo.c</name>
+                    </file>
+                </group>
+                <group>
+                    <name>wifi_demo</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\demo\aic8800\wifi_demo\wifi_demo.c</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\aic8800\aic8800_demo.c</name>
+                </file>
+            </group>
             <group>
                 <name>audio_demo</name>
                 <file>
@@ -4384,6 +5545,9 @@
             </group>
             <group>
                 <name>btstack_demo</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\btstack_demo\btstack_application.c</name>
+                </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\btstack_demo\btstack_demo.c</name>
                 </file>
@@ -4440,81 +5604,13 @@
                     <configuration>vsf_template_f1c100s</configuration>
                     <configuration>vsf_template_gd32e103</configuration>
                     <configuration>vsf_template_mt071</configuration>
+                    <configuration>vsf_template_aic8800</configuration>
                 </excluded>
-                <group>
-                    <name>evm</name>
-                    <group>
-                        <name>components</name>
-                    </group>
-                    <group>
-                        <name>lib</name>
-                        <group>
-                            <name>cortex-m3</name>
-                            <excluded>
-                                <configuration>vsf_template_m484</configuration>
-                            </excluded>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m3\libejs.a</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m3\libepy.a</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m3\libeqml.a</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>cortex-m4</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\lib\arm-none-eabi-gcc\cortex-m4\libejs.a</name>
-                            </file>
-                        </group>
-                    </group>
-                    <group>
-                        <name>modules</name>
-                        <group>
-                            <name>ecma</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_array.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_math.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_number.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_object.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_regexp.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\ecma_string.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\re.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\demo\evm_demo\evm\modules\ecma\zephyr\re.h</name>
-                            </file>
-                        </group>
-                    </group>
-                </group>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_board.h</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_demo.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_library_patch.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_main.h</name>
@@ -4739,6 +5835,12 @@
                             <group>
                                 <name>classic</name>
                                 <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\btstack_link_key_db_memory.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\btstack_link_key_db_memory.h</name>
+                                </file>
+                                <file>
                                     <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src\classic\hid_device.c</name>
                                 </file>
                                 <file>
@@ -4788,9 +5890,73 @@
                     </group>
                 </group>
                 <group>
-                    <name>littlevgl</name>
+                    <name>evm</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
+                    </excluded>
+                    <group>
+                        <name>extension</name>
+                        <group>
+                            <name>bluetooth</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>usbh</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\extension\usbh\evm_module_usbh.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\extension\usbh\evm_module_usbh.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
+                        <name>port</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\port\evm_library_patch.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>raw</name>
+                        <group>
+                            <name>lib</name>
+                            <group>
+                                <name>cortex-m3</name>
+                                <excluded>
+                                    <configuration>vsf_template_m484</configuration>
+                                    <configuration>vsf_template_aic8800</configuration>
+                                </excluded>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m3\libejs.a</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m3\libepy.a</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m3\libeqml.a</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>cortex-m4</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m4\libejs.a</name>
+                                </file>
+                            </group>
+                        </group>
+                    </group>
+                </group>
+                <group>
+                    <name>littlevgl</name>
+                    <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                     </excluded>
@@ -5364,11 +6530,15 @@
                     <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>2.1.2</name>
                         <group>
                             <name>port</name>
+                            <excluded>
+                                <configuration>vsf_template_aic8800</configuration>
+                            </excluded>
                             <group>
                                 <name>arch</name>
                                 <file>
@@ -5411,6 +6581,9 @@
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\if_api.c</name>
+                                        <excluded>
+                                            <configuration>vsf_template_aic8800</configuration>
+                                        </excluded>
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netbuf.c</name>
@@ -5489,12 +6662,21 @@
                                     </group>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp.c</name>
+                                        <excluded>
+                                            <configuration>vsf_template_aic8800</configuration>
+                                        </excluded>
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_alloc.c</name>
+                                        <excluded>
+                                            <configuration>vsf_template_aic8800</configuration>
+                                        </excluded>
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_tcp.c</name>
+                                        <excluded>
+                                            <configuration>vsf_template_aic8800</configuration>
+                                        </excluded>
                                     </file>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\def.c</name>
@@ -5563,6 +6745,7 @@
                     <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -5624,6 +6807,9 @@
                 </group>
                 <group>
                     <name>nuconsole</name>
+                    <excluded>
+                        <configuration>vsf_template_aic8800</configuration>
+                    </excluded>
                     <group>
                         <name>raw</name>
                         <file>
@@ -5663,6 +6849,7 @@
                     <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>raw</name>
@@ -5736,6 +6923,7 @@
                     <excluded>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -5996,6 +7184,15 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\hid\vsf_input_hid.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>nspro</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\component\input\driver\nspro\vsf_input_nspro.h</name>
                         </file>
                     </group>
                 </group>
@@ -6263,6 +7460,9 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID.h</name>
                             </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\device\class\HID\vsf_usbd_HID_desc.h</name>
+                            </file>
                         </group>
                         <group>
                             <name>MSC</name>
@@ -6400,6 +7600,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>DL1x5</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>HID</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\vsf\component\usb\host\class\HID\vsf_usbh_ds4.c</name>
@@ -6517,6 +7726,7 @@
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
+                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>startup</name>
@@ -6799,6 +8009,279 @@
                                     </data>
                                 </settings>
                             </configuration>
+                            <configuration>
+                                <name>vsf_template_aic8800</name>
+                                <settings>
+                                    <name>ICCARM</name>
+                                    <data>
+                                        <version>35</version>
+                                        <wantNonLocal>1</wantNonLocal>
+                                        <debug>1</debug>
+                                        <option>
+                                            <name>CCDefines</name>
+                                            <state>__CPU_ARM9__</state>
+                                            <state>__Allwinner__</state>
+                                            <state>__F1C100S__</state>
+                                            <state>__OOC_CPP__</state>
+                                            <state>_DLIB_FILE_DESCRIPTOR=1</state>
+                                            <state>LV_CONF_INCLUDE_SIMPLE</state>
+                                            <state>HAS_STD_MALLOC</state>
+                                            <state>HAS_AWTK_CONFIG</state>
+                                            <state>FT2_BUILD_LIBRARY</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPreprocFile</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPreprocComments</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPreprocLine</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListCFile</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListCMnemonics</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListCMessages</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListAssFile</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListAssSource</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEnableRemarks</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagSuppress</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagRemark</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagWarning</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagError</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCObjPrefix</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCAllowList</name>
+                                            <version>1</version>
+                                            <state>11111110</state>
+                                        </option>
+                                        <option>
+                                            <name>CCDebugInfo</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IEndianMode</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IProcessor</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IExtraOptionsCheck</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IExtraOptions</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCLangConformance</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCSignedPlainChar</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCRequirePrototypes</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagWarnAreErr</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCCompilerRuntimeInfo</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IFpuProcessor</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>OutputFile</name>
+                                            <state>$FILE_BNAME$.o</state>
+                                        </option>
+                                        <option>
+                                            <name>CCLibConfigHeader</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>PreInclude</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CompilerMisraOverride</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCIncludePath2</name>
+                                            <state>$PROJ_DIR$\..\..\config</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\shell\sys\linux\include\simple_libc</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\shell\media\sdl2\include\SDL2</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\src</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\btstack\raw\chipset</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\vsfvm\raw</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\raw\inc</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\nnom\port</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include</state>
+                                        </option>
+                                        <option>
+                                            <name>CCStdIncCheck</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCCodeSection</name>
+                                            <state>.text</state>
+                                        </option>
+                                        <option>
+                                            <name>IProcessorMode2</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptLevel</name>
+                                            <state>3</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptStrategy</name>
+                                            <version>0</version>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptLevelSlave</name>
+                                            <state>3</state>
+                                        </option>
+                                        <option>
+                                            <name>CompilerMisraRules98</name>
+                                            <version>0</version>
+                                            <state>1000111110110101101110011100111111101110011011000101110111101101100111111111111100110011111001110111001111111111111111111111111</state>
+                                        </option>
+                                        <option>
+                                            <name>CompilerMisraRules04</name>
+                                            <version>0</version>
+                                            <state>111101110010111111111000110111111111111111111111111110010111101111010101111111111111111111111111101111111011111001111011111011111111111111111</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosIndRopi</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosIndRwpi</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosIndNoDynInit</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccLang</name>
+                                            <state>2</state>
+                                        </option>
+                                        <option>
+                                            <name>IccCDialect</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IccAllowVLA</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccStaticDestr</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IccCppInlineSemantics</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccCmsis</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IccFloatSemantics</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptimizationNoSizeConstraints</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCNoLiteralPool</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptStrategySlave</name>
+                                            <version>0</version>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncSource</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncOutput</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncOutputBom</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncInput</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccExceptions2</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccRTTI2</name>
+                                            <state>0</state>
+                                        </option>
+                                    </data>
+                                </settings>
+                            </configuration>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\arm9\arm9_generic.h</name>
@@ -6811,6 +8294,7 @@
                             <configuration>vsf_template_f1c100s</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
+                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-a\cortex_a_generic.c</name>
@@ -6866,11 +8350,852 @@
             <group>
                 <name>driver</name>
                 <group>
+                    <name>AIC</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                    </excluded>
+                    <group>
+                        <name>AIC8800</name>
+                        <group>
+                            <name>port</name>
+                            <group>
+                                <name>bt</name>
+                                <group>
+                                    <name>btstack</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\bt\btstack\hci_transport_aic8800.c</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
+                                <name>rtos</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\rtos\rtos.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\rtos\rtos_al.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\rtos\rtos_al.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\compiler.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\port\ll.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>usb</name>
+                            <group>
+                                <name>dc</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\dc\usbd.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\dc\usbd.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>hc</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\hc\usbh.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\hc\usbh.h</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\usb.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\usb.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\usb_common.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\usb\usb_lv0.c</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>vendor</name>
+                            <group>
+                                <name>lwip</name>
+                                <group>
+                                    <name>lwip-STABLE-2_0_2</name>
+                                    <group>
+                                        <name>ports</name>
+                                        <group>
+                                            <name>rtos</name>
+                                            <group>
+                                                <name>include</name>
+                                                <group>
+                                                    <name>arch</name>
+                                                    <file>
+                                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include\arch\bpstruct.h</name>
+                                                    </file>
+                                                    <file>
+                                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include\arch\cc.h</name>
+                                                    </file>
+                                                    <file>
+                                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include\arch\epstruct.h</name>
+                                                    </file>
+                                                    <file>
+                                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include\arch\perf.h</name>
+                                                    </file>
+                                                    <file>
+                                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include\arch\sys_arch.h</name>
+                                                    </file>
+                                                </group>
+                                            </group>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\sys_arch.c</name>
+                                            </file>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <name>src</name>
+                                        <group>
+                                            <name>api</name>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\api_lib.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\api_msg.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\err.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\netbuf.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\netdb.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\netifapi.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\sockets.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\api\tcpip.c</name>
+                                            </file>
+                                        </group>
+                                        <group>
+                                            <name>core</name>
+                                            <group>
+                                                <name>ipv4</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\autoip.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\dhcp.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\etharp.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\icmp.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\igmp.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\ip4.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\ip4_addr.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv4\ip4_frag.c</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>ipv6</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\dhcp6.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ethip6.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\icmp6.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\inet6.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ip6.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ip6_addr.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\ip6_frag.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\mld6.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ipv6\nd6.c</name>
+                                                </file>
+                                            </group>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\def.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\dns.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\inet_chksum.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\init.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\ip.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\mem.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\memp.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\netif.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\pbuf.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\raw.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\stats.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\sys.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\tcp.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\tcp_in.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\tcp_out.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\timeouts.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\core\udp.c</name>
+                                            </file>
+                                        </group>
+                                        <group>
+                                            <name>netif</name>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\netif\ethernet.c</name>
+                                            </file>
+                                        </group>
+                                    </group>
+                                </group>
+                                <group>
+                                    <name>net_al</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\lwiphooks.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\lwipopts.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_al.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_al.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_def.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_iperf_al.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_iperf_al.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_tg_al.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\lwip\net_al\net_tg_al.h</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
+                                <name>modules</name>
+                                <group>
+                                    <name>common</name>
+                                    <group>
+                                        <name>api</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_bool.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_dlist.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_endian.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_int.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_list.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_math.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_pool.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_ring.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_status.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\api\co_utils.h</name>
+                                        </file>
+                                    </group>
+                                    <group>
+                                        <name>src</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_dlist.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_list.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_math.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_pool.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\common\src\co_ring.c</name>
+                                        </file>
+                                    </group>
+                                </group>
+                                <group>
+                                    <name>dbg</name>
+                                    <group>
+                                        <name>api</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\dbg\api\dbg.h</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\dbg\api\dbg_assert.h</name>
+                                        </file>
+                                    </group>
+                                    <group>
+                                        <name>src</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\dbg\src\dbg.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\dbg\src\dbg_assert.c</name>
+                                        </file>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\modules\dbg\src\dbg_print.c</name>
+                                        </file>
+                                    </group>
+                                </group>
+                            </group>
+                            <group>
+                                <name>plf</name>
+                                <group>
+                                    <name>aic8800</name>
+                                    <group>
+                                        <name>lib</name>
+                                        <file>
+                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\lib\armgcc_4_8\libdrv.a</name>
+                                        </file>
+                                    </group>
+                                    <group>
+                                        <name>src</name>
+                                        <group>
+                                            <name>arch</name>
+                                            <group>
+                                                <name>ll</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\ll\ll.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\ll\ll.h</name>
+                                                </file>
+                                            </group>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\arch.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\plf.h</name>
+                                            </file>
+                                        </group>
+                                        <group>
+                                            <name>driver</name>
+                                            <group>
+                                                <name>aic1000lite_regs</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs\aic1000Lite_analog_reg.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs\aic1000Lite_iomux.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs\aic1000Lite_sys_ctrl.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>asdma_mst</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst\asdma_mst_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst\asdma_mst_api2.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>aud_proc</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aud_proc\aud_proc.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>bt</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_customer_driver.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\bt_hci.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>ce</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ce\ce_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ce\ce_common.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>common</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common\dma_common.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>dma</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma\dma_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma\dma_api_bt.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma\dma_generic.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma\reg_dma.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>flash</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash\flash_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash\flash_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>gpio</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\reg_gpio.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>i2cm</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\i2cm\reg_i2cm.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>iomux</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux\reg_iomux.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>ipc</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc\reg_g1_ipc_app.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc\reg_g1_ipc_emb.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc\reg_ipc_app.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc\reg_ipc_comreg.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc\reg_ipc_mutex.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>pmic</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic\pmic_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>reg</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg\reg_access.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>rf</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\rf\reg_bt_rf.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\rf\reg_riu.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\rf\reg_wcnaon.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\rf\reg_wlan_rf.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\rf\rf_config.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>sdmmc</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sdmmc\reg_sdmmc.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sdmmc\sdmmc_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sdmmc\sdmmc_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>sleep</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep\sleep_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>spi</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\spi\reg_spi.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>stdio_uart</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart\reg_stdio_uart.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart\stdio_uart.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart\stdio_uart.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>sysctrl</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl\reg_sysctrl.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl\sysctrl_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>ticker</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\lp_ticker.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\lp_ticker_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\lp_ticker_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\reg_timer.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\ticker_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\ticker_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\us_ticker.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\us_ticker_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\us_ticker_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>time</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time\time_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time\time_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>trans</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_bitreversal2.S</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_cfft_q15.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_cfft_radix4_q15.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\arm_common_tables.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\trans_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trans\trans_common.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>trng</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng\reg_trng.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng\trng_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng\trng_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>uart</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\reg_uart1.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\reg_uart2.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart2_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart2_api.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>usb_host</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\hal_hcd.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\hal_hcd.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\hal_usbh.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\hal_usbh.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\reg_usbh.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_conf.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_conf.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_core.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_core.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_ctlreq.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_ctlreq.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_def.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_ioreq.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_ioreq.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_msc.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_msc.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_msc_bot.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_msc_bot.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_msc_scsi.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_msc_scsi.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_pipes.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\usb_host\usbh_pipes.h</name>
+                                                </file>
+                                            </group>
+                                            <group>
+                                                <name>wdt</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\wdt\reg_wdt.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\wdt\wdt_api.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\wdt\wdt_api.h</name>
+                                                </file>
+                                            </group>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\chip.h</name>
+                                            </file>
+                                        </group>
+                                    </group>
+                                </group>
+                            </group>
+                            <group>
+                                <name>wifi</name>
+                                <group>
+                                    <name>fhost</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\cfgrwnx.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_api.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_cntrl.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_config.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_config.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_rtos.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_rx_def.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_tx.h</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\fhost\fhost_wpa.h</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>lib</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\vendor\wifi\lib\armgcc_4_8\libwifi.a</name>
+                                    </file>
+                                </group>
+                            </group>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\__device.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\common.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\device.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\driver.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\driver.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\AIC8800\startup_AIC8800.c</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\AIC\driver.h</name>
+                    </file>
+                </group>
+                <group>
                     <name>Allwinner</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>F1CX00S</name>
@@ -7036,6 +9361,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>mps2</name>
@@ -7092,6 +9418,18 @@
                 <group>
                     <name>common</name>
                     <group>
+                        <name>swi</name>
+                        <group>
+                            <name>arm</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\swi\arm\vsf_swi_template.inc</name>
+                            </file>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\swi\vsf_swi_template.h</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>usart</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\usart\__usart_common.h</name>
@@ -7099,18 +9437,12 @@
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\usart\__usart_common.inc</name>
                         </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\usart\vsf_drv_usart_poll_util.h</name>
+                        </file>
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\common.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\vsf_drv_usart_poll_util.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\vsf_swi_template.h</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\vsf_swi_template.inc</name>
                     </file>
                 </group>
                 <group>
@@ -7119,6 +9451,7 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>GD32E10X</name>
@@ -7268,6 +9601,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>M480</name>
@@ -7479,6 +9813,7 @@
                                             <configuration>vsf_template_f1c100s</configuration>
                                             <configuration>vsf_template_gd32e103</configuration>
                                             <configuration>vsf_template_mt071</configuration>
+                                            <configuration>vsf_template_aic8800</configuration>
                                         </excluded>
                                     </file>
                                 </group>
@@ -7522,6 +9857,7 @@
                             <configuration>vsf_template_f1c100s</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
+                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>common</name>
@@ -7586,6 +9922,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>STM32F103</name>
@@ -7658,6 +9995,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>__series_name__</name>
@@ -7691,6 +10029,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>AM335X</name>
@@ -7720,6 +10059,7 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>MT071</name>
@@ -7807,6 +10147,7 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>W60X</name>
@@ -8521,6 +10862,7 @@
                     <name>CMSIS</name>
                     <excluded>
                         <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>DSP</name>
@@ -8728,7 +11070,13 @@
                     <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_connect.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_repeat_macro.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_foreach.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_macro_calc.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\preprocessor\vsf_preprocessor.h</name>
                 </file>
             </group>
             <group>

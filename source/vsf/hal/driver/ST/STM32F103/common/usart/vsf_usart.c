@@ -51,7 +51,7 @@ ROOT void USART##__N##_IRQHandler(void)                                         
 
 vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 {
-    ASSERT((NULL != usart_ptr) && (NULL != cfg_ptr));
+    VSF_ASSERT((NULL != usart_ptr) && (NULL != cfg_ptr));
     USART_TypeDef *pusart = usart_ptr->reg_ptr;
 
     float usart_div;
@@ -132,7 +132,7 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
 /**********************************usart_enable**********************************/
 fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
     //! don't forget to enable sync clock and peripheral_clk here
     // should call
     //PM.Clock.SyncClock.Enable(usart_ptr->sync_clk_idx);
@@ -149,7 +149,7 @@ fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr)
 /**********************************usart_disable*********************************/
 fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     usart_ptr->reg_ptr->CR1 |= USART_DISEN;
 
@@ -168,7 +168,7 @@ fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr)
 /***********************************usart_status*********************************/
 usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     usart_status_t state_break = {
         .ip_is_busy = false,
@@ -194,7 +194,7 @@ usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
 /*********************************usart_read_byte********************************/
 bool vsf_usart_read_byte(vsf_usart_t *usart_ptr, uint8_t *byte_ptr)
 {
-    ASSERT((NULL != usart_ptr) && (NULL != byte_ptr));
+    VSF_ASSERT((NULL != usart_ptr) && (NULL != byte_ptr));
 
     vsf_protect_t state = __vsf_usart_protect();
 
@@ -218,7 +218,7 @@ bool vsf_usart_read_byte(vsf_usart_t *usart_ptr, uint8_t *byte_ptr)
 /*********************************usart_write_byte*******************************/
 bool vsf_usart_write_byte(vsf_usart_t *usart_ptr, uint_fast8_t byte)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     vsf_protect_t state;
 
@@ -250,7 +250,7 @@ bool vsf_usart_write_byte(vsf_usart_t *usart_ptr, uint_fast8_t byte)
 /********************************usart_request_read******************************/
 fsm_rt_t vsf_usart_request_read(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size)
 {
-    ASSERT((NULL != usart_ptr) && (NULL != buffer_ptr) && (size > 0));
+    VSF_ASSERT((NULL != usart_ptr) && (NULL != buffer_ptr) && (size > 0));
 
     vsf_protect_t state;
 
@@ -283,7 +283,7 @@ fsm_rt_t vsf_usart_request_read(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uin
 /*******************************usart_request_write******************************/
 fsm_rt_t vsf_usart_request_write(vsf_usart_t *usart_ptr, uint8_t *buffer_ptr, uint_fast32_t size)
 {
-    ASSERT((NULL != usart_ptr) && (NULL != buffer_ptr) && (size > 0));
+    VSF_ASSERT((NULL != usart_ptr) && (NULL != buffer_ptr) && (size > 0));
 
     vsf_protect_t state;
 
@@ -348,7 +348,7 @@ void vsf_usart_irqhandler(vsf_usart_t *usart_ptr)
 /*******************************vsf_event_usart_register***************************/
 void vsf_usart_event_register(vsf_usart_t *usart_ptr, vsf_usart_event_type_t type, vsf_usart_event_t event)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     switch(type) {
         case VSF_USART_EVT_RX:
@@ -372,7 +372,7 @@ void vsf_usart_event_register(vsf_usart_t *usart_ptr, vsf_usart_event_type_t typ
 /*******************************vsf_usart_event_enable*****************************/
 usart_event_status_t vsf_usart_event_enable(vsf_usart_t *usart_ptr, usart_event_status_t event_mask)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     if(usart_ptr->event_mask != 0xFF) {
         usart_ptr->event_mask |= event_mask;
@@ -383,7 +383,7 @@ usart_event_status_t vsf_usart_event_enable(vsf_usart_t *usart_ptr, usart_event_
 /*******************************vsf_usart_event_disable****************************/
 usart_event_status_t vsf_usart_event_disable(vsf_usart_t *usart_ptr, usart_event_status_t event_mask)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     if(usart_ptr->event_mask != 0x00) {
         usart_ptr->event_mask &= (~event_mask);
@@ -394,7 +394,7 @@ usart_event_status_t vsf_usart_event_disable(vsf_usart_t *usart_ptr, usart_event
 /*******************************vsf_usart_event_resume*****************************/
 void vsf_usart_event_resume(vsf_usart_t *usart_ptr, usart_event_status_t event_status)
 {
-    ASSERT(NULL != usart_ptr);
+    VSF_ASSERT(NULL != usart_ptr);
 
     usart_ptr->event_mask = event_status;
 }

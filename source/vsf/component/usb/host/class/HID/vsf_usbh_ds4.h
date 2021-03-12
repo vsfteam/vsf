@@ -68,8 +68,9 @@ def_simple_class(vk_usbh_ds4_t) {
 #endif
 
     private_member(
-        bool out_idle;
+        // gamepad_out_buf should be aligned
         vsf_usb_ds4_gamepad_out_report_t gamepad_out_buf;
+        bool out_idle;
     )
 };
 

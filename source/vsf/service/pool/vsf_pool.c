@@ -36,21 +36,16 @@
 
 /*============================ MACROS ========================================*/
 
-#undef  this
-#define this    (*this_ptr)
+#undef  vsf_this
+#define vsf_this    (*this_ptr)
 
 #if     defined(VSF_POOL_LOCK) && !defined(VSF_POOL_UNLOCK)
 #   define  VSF_POOL_UNLOCK()
 #elif   !defined(VSF_POOL_LOCK) && defined(VSF_POOL_UNLOCK)
 #   define  VSF_POOL_LOCK()
 #elif   !defined(VSF_POOL_LOCK) && !defined(VSF_POOL_UNLOCK)
-#   if defined( __STDC_VERSION__ ) && __STDC_VERSION__ >= 199901L
-#       define VSF_POOL_LOCK()      CODE_REGION_START(this.region_ptr)
-#       define VSF_POOL_UNLOCK()    CODE_REGION_END()
-#   else
-#       define VSF_POOL_LOCK()      CODE_REGION_SIMPLE_START(this.region_ptr)
-#       define VSF_POOL_UNLOCK()    CODE_REGION_SIMPLE_END()
-#   endif
+#   define VSF_POOL_LOCK()          vsf_this.region_ptr->enter()
+#   define VSF_POOL_UNLOCK()        vsf_this.region_ptr->leave(orig)
 #   define __VSF_POOL_USE_DEFAULT_ATOM_ACCESS
 #endif
 
@@ -136,31 +131,31 @@ void vsf_pool_init( vsf_pool_t *obj_ptr,
 
 #if defined(__VSF_POOL_USE_DEFAULT_ATOM_ACCESS)
     if (NULL == cfg_ptr) {
-        this.region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
+        vsf_this.region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int;
     } else {
         if (NULL == cfg_ptr->region_ptr) {
-            this.region_ptr = (code_region_t *)&DEFAULT_CODE_REGION_ATOM_CODE;
+            vsf_this.region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int;
         } else {
-            this.region_ptr = cfg_ptr->region_ptr;
+            vsf_this.region_ptr = cfg_ptr->region_ptr;
         }
     }
 #else
 #   if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
-    this.target_ptr = cfg_ptr->target_ptr;
+    vsf_this.target_ptr = cfg_ptr->target_ptr;
 #   endif
 #endif
 
 #if VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED
-    this.statistic.item_size = item_size;
+    vsf_this.statistic.item_size = item_size;
     if (0 == align) {
         align = sizeof(uint_fast8_t);
     }
-    this.statistic.u15_align = align;
-    this.item_init_fn = cfg_ptr->item_init_fn;
+    vsf_this.statistic.u15_align = align;
+    vsf_this.item_init_fn = cfg_ptr->item_init_fn;
 #endif
 
 #if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
-    this.statistic.pool_name = cfg_ptr->pool_name_str;
+    vsf_this.statistic.pool_name = cfg_ptr->pool_name_str;
     //! add pool to the pool list
     {
         __pool_statistic_chain.pool_cnt++;
@@ -169,13 +164,13 @@ void vsf_pool_init( vsf_pool_t *obj_ptr,
                          statistic.use_as__vsf_slist_node_t,
                          &(__pool_statistic_chain.pool_list),
                          this_ptr,
-                        (   (this.statistic.u15_align >= _->statistic.u15_align)
-                        &&  (this.statistic.item_size >= _->statistic.item_size)));
+                        (   (vsf_this.statistic.u15_align >= _->statistic.u15_align)
+                        &&  (vsf_this.statistic.item_size >= _->statistic.item_size)));
 
     }
 #endif
 
-    vsf_slist_init(&this.free_list);
+    vsf_slist_init(&vsf_this.free_list);
 }
 
 /*! \brief add memory to pool
@@ -254,39 +249,39 @@ uintptr_t vsf_pool_alloc(vsf_pool_t *obj_ptr)
 {
     __vsf_pool_node_t *node_ptr = NULL;
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
-
+    vsf_protect_t orig;
 
     VSF_SERVICE_ASSERT(this_ptr != NULL);
 
-    VSF_POOL_LOCK();
+    orig = VSF_POOL_LOCK();
         /* verify it again for safe */
-        if (!vsf_slist_is_empty(&this.free_list)) {
+        if (!vsf_slist_is_empty(&vsf_this.free_list)) {
             vsf_slist_stack_pop(__vsf_pool_node_t,
                                 node,
-                                &this.free_list,
+                                &vsf_this.free_list,
                                 node_ptr);
-            this.free_cnt--;
+            vsf_this.free_cnt--;
 #if VSF_POOL_CFG_STATISTIC_MODE == ENABLED
-            this.used_cnt++;
+            vsf_this.used_cnt++;
 #endif
         }
 #if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
-        else if (!this.statistic.is_no_feed_on_heap) {
+        else if (!vsf_this.statistic.is_no_feed_on_heap) {
             bool retry = false;
             do {
                 //! feed on heap
-                node_ptr = (__vsf_pool_node_t *)vsf_heap_malloc_aligned(this.statistic.item_size, this.statistic.u15_align);
+                node_ptr = (__vsf_pool_node_t *)vsf_heap_malloc_aligned(vsf_this.statistic.item_size, vsf_this.statistic.u15_align);
                 if (NULL != node_ptr) {
                 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
-                    if (this.item_init_fn != NULL) {
-                        (*(this.item_init_fn))(this.target_ptr, (uintptr_t)node_ptr, this.statistic.item_size);
+                    if (vsf_this.item_init_fn != NULL) {
+                        (*(vsf_this.item_init_fn))(vsf_this.target_ptr, (uintptr_t)node_ptr, vsf_this.statistic.item_size);
                     }
                 #else
-                    if (this.item_init_fn != NULL) {
-                        (*(this.item_init_fn))(NULL, (uintptr_t)node_ptr, this.item_size);
+                    if (vsf_this.item_init_fn != NULL) {
+                        (*(vsf_this.item_init_fn))(NULL, (uintptr_t)node_ptr, vsf_this.item_size);
                     }
                 #endif
-                    this.used_cnt++;
+                    vsf_this.used_cnt++;
                 } else {
                     retry = vsf_plug_in_on_failed_to_feed_pool_on_heap(obj_ptr);
                 }
@@ -302,11 +297,11 @@ static void __vsf_pool_add_item(vsf_pool_t *obj_ptr, uintptr_t pitem)
 {
     __vsf_pool_node_t *node_ptr = (__vsf_pool_node_t *)pitem;
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
+    vsf_protect_t orig;
 
-
-    VSF_POOL_LOCK();
-        vsf_slist_stack_push(__vsf_pool_node_t, node, &this.free_list, node_ptr);
-        this.free_cnt++;
+    orig = VSF_POOL_LOCK();
+        vsf_slist_stack_push(__vsf_pool_node_t, node, &vsf_this.free_list, node_ptr);
+        vsf_this.free_cnt++;
     VSF_POOL_UNLOCK();
 }
 
@@ -339,7 +334,7 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *obj_ptr,
     }
 
 #if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
-    this.statistic.is_no_feed_on_heap = true;
+    vsf_this.statistic.is_no_feed_on_heap = true;
 #endif
 
     node_ptr = (__vsf_pool_node_t *)buffer_ptr;
@@ -349,7 +344,7 @@ bool vsf_pool_add_buffer_ex(    vsf_pool_t *obj_ptr,
     #if VSF_POOL_CFG_SUPPORT_USER_ITEM_INIT == ENABLED
     #   if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
         if (item_init_fn != NULL) {
-            (*item_init_fn)(this.target_ptr, (uintptr_t)node_ptr, item_size);
+            (*item_init_fn)(vsf_this.target_ptr, (uintptr_t)node_ptr, item_size);
         }
     #   else
         if (item_init_fn != NULL) {
@@ -375,10 +370,11 @@ void vsf_pool_free(vsf_pool_t *obj_ptr, uintptr_t pItem)
 
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
     VSF_SERVICE_ASSERT((obj_ptr != NULL) && (pItem != 0));
+    vsf_protect_t orig;
 
-    VSF_POOL_LOCK();
+    orig = VSF_POOL_LOCK();
         __vsf_pool_add_item(obj_ptr, (uintptr_t)pItem);
-        this.used_cnt--;
+        vsf_this.used_cnt--;
     VSF_POOL_UNLOCK();
 
 }
@@ -393,7 +389,7 @@ uint_fast16_t vsf_pool_get_count(vsf_pool_t *obj_ptr)
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
     VSF_SERVICE_ASSERT(this_ptr != NULL);
 
-    return this.free_cnt;
+    return vsf_this.free_cnt;
 }
 
 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
@@ -407,7 +403,7 @@ uintptr_t vsf_pool_get_tag(vsf_pool_t *obj_ptr)
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
     VSF_SERVICE_ASSERT(this_ptr != NULL);
 
-    return this.target_ptr;
+    return vsf_this.target_ptr;
 }
 
 SECTION(".text.vsf.utilities.vsf_pool_set_tag")
@@ -419,9 +415,9 @@ uintptr_t vsf_pool_set_tag(vsf_pool_t *obj_ptr, uintptr_t target_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
     VSF_SERVICE_ASSERT(this_ptr != NULL);
-    this.target_ptr = target_ptr;
+    vsf_this.target_ptr = target_ptr;
 
-    return this.target_ptr;
+    return vsf_this.target_ptr;
 }
 #endif
 
@@ -430,13 +426,13 @@ SECTION(".text.vsf.utilities.vsf_pool_get_region")
  *! \param this_ptr    address of the target pool
  *! \return the address of the code region
  */
-code_region_t *vsf_pool_get_region(vsf_pool_t *obj_ptr)
+vsf_protect_region_t *vsf_pool_get_region(vsf_pool_t *obj_ptr)
 {
 #if defined(__VSF_POOL_USE_DEFAULT_ATOM_ACCESS)
     class_internal(obj_ptr, this_ptr, vsf_pool_t);
     VSF_SERVICE_ASSERT(this_ptr != NULL);
 
-    return this.region_ptr;
+    return vsf_this.region_ptr;
 #else
     return NULL;
 #endif

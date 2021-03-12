@@ -52,7 +52,7 @@ SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_eda_init")
 static vsf_err_t __vsf_eda_bmpevt_adapter_eda_init(vsf_bmpevt_adapter_eda_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
-    return vsf_eda_init(&this_ptr->eda, vsf_prio_inherit, false);
+    return vsf_eda_init(&this_ptr->eda);
 }
 
 SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_evthander")
@@ -61,7 +61,7 @@ static void __vsf_eda_bmpevt_adapter_sync_evthander(vsf_eda_t *eda, vsf_evt_t ev
     VSF_KERNEL_ASSERT(eda != NULL);
     vsf_bmpevt_adapter_sync_t *adapter_sync = (vsf_bmpevt_adapter_sync_t *)
             container_of(eda, vsf_bmpevt_adapter_eda_t, eda);
-    
+
     switch (evt) {
         case VSF_EVT_INIT:
             if (vsf_eda_sync_decrease(adapter_sync->sync, -1)) {
@@ -414,7 +414,7 @@ vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         __vsf_teda_cancel_timer((vsf_teda_t *)eda);
 #endif
-        eda->state.bits.is_limitted = false;
+        eda->flag.state.is_limitted = false;
     }
     return reason;
 }

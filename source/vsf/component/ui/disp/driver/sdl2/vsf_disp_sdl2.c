@@ -62,9 +62,8 @@ static vsf_disp_sdl2_t __vk_disp_sdl2 = {
 static vsf_err_t __vk_disp_sdl2_init(vk_disp_t *pthis);
 static vsf_err_t __vk_disp_sdl2_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
-extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
-
 #if VSF_USE_INPUT == ENABLED
+extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
 extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 extern void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);

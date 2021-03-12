@@ -19,35 +19,22 @@
 #define __VSF_HEAP_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "service/vsf_service_cfg.h"
 #include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
-#ifndef VSF_USE_HEAP
-#   define VSF_USE_HEAP         ENABLED     //!< enable vsf_heap_t by default
-#endif
 
 #if VSF_USE_HEAP == ENABLED
 
-#   ifndef VSF_HEAP_SIZE
-#       define VSF_HEAP_SIZE    (128 * 1024)
-#   endif
-
-#if 0
-/*! \brief free a target memory which belongs to a bigger memory chunk previouly
- *!        allocated from the heap
- */
-#define vsf_heap_free_ex(                                                       \
-        __ADDR,     /* the adress of target memory */                           \
-        __OFFSET,   /* the offset of the target mem from the original memory */ \
-        __SIZE)     /* the size of the target mem */                            \
-        vsf_heap_partial_free((uint8_t *)(__ADDR) - (__OFFSET),                 \
-                                (__OFFSET),                                     \
-                                (__SIZE))
+#ifndef VSF_HEAP_SIZE
+#   define VSF_HEAP_SIZE    (128 * 1024)
 #endif
+
 /*============================ TYPES =========================================*/
 
 declare_interface(i_heap_t)
@@ -74,9 +61,9 @@ extern const i_heap_t VSF_HEAP;
 
 extern void vsf_heap_init(void);
 
-/*!\note:This interface cannot add multiple misaligned spaces.
- *!\when a user needs to add space multiple times,
- *!\the space provided each time (including the first time) must be aligned according to the agreed alignment standard.
+/*!\note: vsf_heap_add and vsf_heap_add_memory cannot add misaligned memory spaces.
+ *!\when a user needs to add memory space, the space provided each time must be aligned
+ *!\according to the alignment defined by VSF_HEAP_CFG_MCB_ALIGN_BIT(4 if undefined).
 */
 extern void vsf_heap_add(uint8_t *heap, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
@@ -85,17 +72,6 @@ extern void * vsf_heap_malloc(uint_fast32_t size);
 extern void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t alignment);
 extern void * vsf_heap_realloc(void *buffer, uint_fast32_t size);
 extern void vsf_heap_free(void *buffer);
-
-/*! \brief partially free a target memory
- *! \param buffer the address of the target memory chunk
- *! \param pos the start position of the desired to be partially freed part
- *! \param size the size of the partially freed part.
- *! \retval true the free access is sucessful
- *! \retval false the free access failed.
- */
-extern bool vsf_heap_partial_free(  void *buffer,
-                                    uint_fast32_t pos,
-                                    uint_fast32_t size);
 
 #endif
 

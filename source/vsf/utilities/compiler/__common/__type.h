@@ -115,8 +115,8 @@ typedef enum {
 /*============================ MACROS ========================================*/
 
 //! \brief system macros
-#ifndef ASSERT
-#   define ASSERT                           assert
+#ifndef VSF_ASSERT
+#   define VSF_ASSERT                       assert
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

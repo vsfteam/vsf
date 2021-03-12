@@ -24,7 +24,7 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define ASSERT(...)
+#define VSF_ASSERT(...)
 #define VSF_USE_KERNEL                                          ENABLED
 #define VSF_KERNEL_CFG_DEPLOY_IN_LIB_WITH_FULL_FEATURE_SET      ENABLED
 

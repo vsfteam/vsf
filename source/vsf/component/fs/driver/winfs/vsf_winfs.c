@@ -257,21 +257,6 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
     strcpy(winfs_file->name, vk_file_getfilename(path));
     winfs_file->fsop = &vk_winfs_op;
 
-    if (dwAttribute & FILE_ATTRIBUTE_DIRECTORY) {
-        // TODO: Open Directory
-    } else {
-        winfs_file->f.hFile = CreateFileA(path, GENERIC_READ | GENERIC_WRITE,
-            FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL, NULL);
-        if (INVALID_HANDLE_VALUE == winfs_file->f.hFile) {
-            err = VSF_ERR_NOT_AVAILABLE;
-            goto do_free_and_return;
-        }
-
-        DWORD sizehigh;
-        winfs_file->size = GetFileSize(winfs_file->f.hFile, &sizehigh) | ((uint64_t)sizehigh << 32);
-    }
-
     if (dwAttribute & FILE_ATTRIBUTE_ARCHIVE) {
         winfs_file->attr |= VSF_WINFS_FILE_ATTR_ARCHIVE;
     }
@@ -287,6 +272,25 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
     if (dwAttribute & FILE_ATTRIBUTE_READONLY) {
         winfs_file->attr &= ~VSF_FILE_ATTR_WRITE;
     }
+    if (dwAttribute & FILE_ATTRIBUTE_DIRECTORY) {
+        // TODO: Open Directory
+    } else {
+        DWORD access_mode = GENERIC_READ, share_mode = FILE_SHARE_READ;
+        if (winfs_file->attr & VSF_FILE_ATTR_WRITE) {
+            access_mode |= GENERIC_WRITE;
+            share_mode |= FILE_SHARE_WRITE;
+        }
+        winfs_file->f.hFile = CreateFileA(path, access_mode, share_mode, NULL, OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL, NULL);
+        if (INVALID_HANDLE_VALUE == winfs_file->f.hFile) {
+            err = VSF_ERR_NOT_AVAILABLE;
+            goto do_free_and_return;
+        }
+
+        DWORD sizehigh;
+        winfs_file->size = GetFileSize(winfs_file->f.hFile, &sizehigh) | ((uint64_t)sizehigh << 32);
+    }
+
     orig = vsf_protect_sched();
         vsf_dlist_add_to_head(vk_winfs_file_t, child_node, &dir->d.child_list, winfs_file);
     vsf_unprotect_sched(orig);

@@ -135,11 +135,11 @@ vsf_err_t vsfip_netif_init(vsfip_netif_t *netif)
     vsf_err_t err = vk_netdrv_init(netif->netdrv);
     if (!err) {
         netif->arpc.teda.fn.evthandler = __vsfip_netif_arpc_evthandler;
-        err = vsf_teda_init(&netif->arpc.teda, vsf_prio_inherit, false);
+        err = vsf_teda_init(&netif->arpc.teda);
 
         if (!err) {
             netif->output_eda.fn.evthandler = __vsfip_netif_output_evthandler;
-            err = vsf_eda_init(&netif->output_eda, vsf_prio_inherit, false);
+            err = vsf_eda_init(&netif->output_eda);
         }
     }
     return err;

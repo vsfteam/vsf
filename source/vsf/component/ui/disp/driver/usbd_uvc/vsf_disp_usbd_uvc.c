@@ -87,7 +87,7 @@ static vsf_err_t __vk_disp_usbd_uvc_init(vk_disp_t *pthis)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     disp_uvc->eda.on_terminate = NULL;
 #endif
-    return vsf_eda_init(&disp_uvc->eda, vsf_prio_inherit, false);
+    return vsf_eda_init(&disp_uvc->eda);
 }
 
 // disp_buff MUST be a line_buffer with 2-byte header
@@ -108,7 +108,7 @@ static vsf_err_t __vk_disp_usbd_uvc_refresh(vk_disp_t *pthis, vk_disp_area_t *ar
     } else {
         vsf_trace_error("non-line disp area [%d,%d], [%d,%d]\r\n",
                     area->pos.x, area->pos.y, area->size.x, area->size.y);
-        ASSERT(false);
+        VSF_ASSERT(false);
     }
     return VSF_ERR_NONE;
 }

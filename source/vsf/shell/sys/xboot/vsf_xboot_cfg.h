@@ -26,7 +26,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_XBOOT_ASSERT
-#   define VSF_XBOOT_ASSERT                     ASSERT
+#   define VSF_XBOOT_ASSERT                     VSF_ASSERT
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

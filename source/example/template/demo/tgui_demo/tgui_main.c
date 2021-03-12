@@ -30,6 +30,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
 extern void vsf_tgui_bind_disp(vk_disp_t* disp, void* bitmap_data, size_t bitmap_size);
 extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
 extern void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* keyboard_evt);
@@ -45,15 +46,13 @@ static void __tgui_on_input_evt(vk_input_type_t type, vk_input_evt_t *evt)
     } else if (VSF_INPUT_TYPE_TOUCHSCREEN == type) {
         vsf_tgui_on_touchscreen_evt((vk_touchscreen_evt_t *)evt);
     }
-}
-
-#if VSF_TGUI_CFG_SUPPORT_MOUSE == ENABLED
-extern void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt);
-void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt)
-{
-    vsf_tgui_on_mouse_evt(mouse_evt);
-}
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
+    else if (VSF_INPUT_TYPE_MOUSE == type) {
+        extern void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt);
+        vsf_tgui_on_mouse_evt((vk_mouse_evt_t *)evt);
+    }
 #endif
+}
 
 #if APP_USE_LINUX_DEMO == ENABLED
 int tgui_main(int argc, char *argv[])
@@ -69,13 +68,19 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    usrapp_ui_common.tgui.notifier.mask = (1 << VSF_INPUT_TYPE_TOUCHSCREEN) | (1 << VSF_INPUT_TYPE_KEYBOARD);
+    usrapp_ui_common.tgui.notifier.mask =
+                    (1 << VSF_INPUT_TYPE_TOUCHSCREEN)
+                |   (1 << VSF_INPUT_TYPE_KEYBOARD)
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
+                |   (1 << VSF_INPUT_TYPE_MOUSE)
+#endif
+        ;
     usrapp_ui_common.tgui.notifier.on_evt = __tgui_on_input_evt;
     vk_input_notifier_register(&usrapp_ui_common.tgui.notifier);
 
     // insecure operation
-    ((vk_disp_param_t *)&usrapp_ui_common.disp.param)->color = VSF_DISP_COLOR_ARGB8888;
-	vsf_tgui_bind_disp(&(usrapp_ui_common.disp.use_as__vk_disp_t), &usrapp_ui_common.tgui.color, dimof(usrapp_ui_common.tgui.color));
+    //((vk_disp_param_t *)&usrapp_ui_common.disp->param)->color = VSF_DISP_COLOR_ARGB8888;
+	vsf_tgui_bind_disp(usrapp_ui_common.disp, &usrapp_ui_common.tgui.color, dimof(usrapp_ui_common.tgui.color));
 
     tgui_demo_init();
 

@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_SERVICE_ASSERT
-#   define VSF_SERVICE_ASSERT                   ASSERT
+#   define VSF_SERVICE_ASSERT                   VSF_ASSERT
 #endif
 
 #ifndef VSF_USE_HEAP

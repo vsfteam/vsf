@@ -244,6 +244,9 @@ extern "C" {
                                         __str_product,      /* product string in UTF16, eg: u"VSF_Board" */\
                                         __str_vendor,       /* vendor string in UTF16, eg: u"VSF" */\
                                         __str_serial,       /* serial string in UTF16, eg: u"1.0.0" */\
+                                        __class,            /* device class */\
+                                        __subclass,         /* device subclass */\
+                                        __protocol,         /* device protocol */\
                                         __ep0_size,         /* size of endpoint 0, 0 - 64 */\
                                         __func_desc_size,   /* size of all func descriptors, eg: USB_DESC_CDC_ACM_IAD_LEN + USB_DESC_MSCBOT_IAD_LEN */\
                                         __func_ifs_num,     /* number of all func interfaces, eg: USB_CDC_ACM_IFS_NUM + USB_MSC_IFS_NUM */\
@@ -255,8 +258,21 @@ extern "C" {
         usbd_str_product_desc(__name, __str_product)                            \
         usbd_str_vendor_desc(__name, __str_vendor)                              \
         usbd_str_serial_desc(__name, __str_serial)                              \
-        usbd_device_iad_desc(__name)                                            \
+        usbd_device_desc(__name, (__class), (__subclass), (__protocol))         \
         usbd_config_desc(__name, (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+
+#define __usbd_common_desc_iad(         __name,             /* name of the usbd, eg: user_usbd */\
+                                        __str_product,      /* product string in UTF16, eg: u"VSF_Board" */\
+                                        __str_vendor,       /* vendor string in UTF16, eg: u"VSF" */\
+                                        __str_serial,       /* serial string in UTF16, eg: u"1.0.0" */\
+                                        __ep0_size,         /* size of endpoint 0, 0 - 64 */\
+                                        __func_desc_size,   /* size of all func descriptors, eg: USB_DESC_CDC_ACM_IAD_LEN + USB_DESC_MSCBOT_IAD_LEN */\
+                                        __func_ifs_num,     /* number of all func interfaces, eg: USB_CDC_ACM_IFS_NUM + USB_MSC_IFS_NUM */\
+                                        __attribute,        /* mask attributes, eg: USB_CONFIG_ATT_[SELFPOWER/WAKEUP/BATTERY] */\
+                                        __max_power_ma      /* power consumption from USB host in mA, eg: 500 */\
+                                        )                                       \
+        __usbd_common_desc(__name, (__str_product), (__str_vendor), (__str_serial), USB_CLASS_MISC, 0x02, 0x02, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+            
 
 #define __usbd_func_desc(__name)                                                \
         };
@@ -317,8 +333,10 @@ extern "C" {
 #define describe_usbd(__name, __vid, __pid, __speed, ...)                       \
         extern vk_usbd_dev_t __name;                                            \
         __PLOOC_EVAL(__describe_usbd, __name, __vid, __pid, __speed, ##__VA_ARGS__)(__name, __vid, __pid, __speed, ##__VA_ARGS__)
-#define usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
-        __usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+#define usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
+        __usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+#define usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, __class, __subclass, __protocol, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
+        __usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, (__class), (__subclass), (__protocol), (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
 #define usbd_func_desc(__name)                                                  \
         __usbd_func_desc(__name)
 #define usbd_func_str_desc(__name, __func_id, __str_func)                       \

@@ -120,7 +120,7 @@
 
 #define end_def_tgui_panel(...)                                                 \
     };
-                                            
+
 #define __describ_tgui_panel(__NAME, __VAR, ...)                                \
         describe_tgui_container_base(                                           \
             __VAR,                                                              \
@@ -130,7 +130,7 @@
             __VA_ARGS__                                                         \
             VSF_TGUI_V_PANEL_STATIC_INIT_OVERRIDE                               \
             .is_top = true,                                                     \
-        )  
+        )
 
 
 #define describ_tgui_panel(__NAME, __VAR, ...)                                  \

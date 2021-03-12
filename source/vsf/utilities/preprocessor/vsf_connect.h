@@ -41,65 +41,65 @@
 extern "C" {
 #endif
 
-#define __CONNECT0()                                    
-#define __CONNECT1( a)                                  a
-#define __CONNECT2( a, b)                               a##b
-#define __CONNECT3( a, b, c)                            a##b##c
-#define __CONNECT4( a, b, c, d)                         a##b##c##d
-#define __CONNECT5( a, b, c, d, e)                      a##b##c##d##e
-#define __CONNECT6( a, b, c, d, e, f)                   a##b##c##d##e##f
-#define __CONNECT7( a, b, c, d, e, f, g)                a##b##c##d##e##f##g
-#define __CONNECT8( a, b, c, d, e, f, g, h)             a##b##c##d##e##f##g##h
-#define __CONNECT9( a, b, c, d, e, f, g, h, i)          a##b##c##d##e##f##g##h##i
-#define __CONNECT10(a, b, c, d, e, f, g, h, i, j)       a##b##c##d##e##f##g##h##i##j
-#define __CONNECT11(a, b, c, d, e, f, g, h, i, j, k)                            \
+#define __VSF_MCONNECT0()
+#define __VSF_MCONNECT1( a)                                  a
+#define __VSF_MCONNECT2( a, b)                               a##b
+#define __VSF_MCONNECT3( a, b, c)                            a##b##c
+#define __VSF_MCONNECT4( a, b, c, d)                         a##b##c##d
+#define __VSF_MCONNECT5( a, b, c, d, e)                      a##b##c##d##e
+#define __VSF_MCONNECT6( a, b, c, d, e, f)                   a##b##c##d##e##f
+#define __VSF_MCONNECT7( a, b, c, d, e, f, g)                a##b##c##d##e##f##g
+#define __VSF_MCONNECT8( a, b, c, d, e, f, g, h)             a##b##c##d##e##f##g##h
+#define __VSF_MCONNECT9( a, b, c, d, e, f, g, h, i)          a##b##c##d##e##f##g##h##i
+#define __VSF_MCONNECT10(a, b, c, d, e, f, g, h, i, j)       a##b##c##d##e##f##g##h##i##j
+#define __VSF_MCONNECT11(a, b, c, d, e, f, g, h, i, j, k)                       \
             a##b##c##d##e##f##g##h##i##j##k
-#define __CONNECT12(a, b, c, d, e, f, g, h, i, j, k, l)                         \
+#define __VSF_MCONNECT12(a, b, c, d, e, f, g, h, i, j, k, l)                    \
             a##b##c##d##e##f##g##h##i##j##k##l
-#define __CONNECT13(a, b, c, d, e, f, g, h, i, j, k, l, m)                      \
+#define __VSF_MCONNECT13(a, b, c, d, e, f, g, h, i, j, k, l, m)                 \
             a##b##c##d##e##f##g##h##i##j##k##l##m
-#define __CONNECT14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)                   \
+#define __VSF_MCONNECT14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)              \
             a##b##c##d##e##f##g##h##i##j##k##l##m##n
-#define __CONNECT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)                \
+#define __VSF_MCONNECT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)           \
             a##b##c##d##e##f##g##h##i##j##k##l##m##n##o
-#define __CONNECT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)             \
+#define __VSF_MCONNECT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)        \
             a##b##c##d##e##f##g##h##i##j##k##l##m##n##o##p
-#define __CONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)          \
+#define __VSF_MCONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)     \
             a##b##c##d##e##f##g##h##i##j##k##l##m##n##o##p##q
 
-#define CONNECT0()                                  __CONNECT1()
-#define CONNECT1( a )                               __CONNECT1( a )
-#define CONNECT2( a, b)                             __CONNECT2( a, b)
-#define CONNECT3( a, b, c)                          __CONNECT3( a, b, c)
-#define CONNECT4( a, b, c, d)                       __CONNECT4( a, b, c, d)
-#define CONNECT5( a, b, c, d, e)                    __CONNECT5( a, b, c, d, e)
-#define CONNECT6( a, b, c, d, e, f)                 __CONNECT6( a, b, c, d, e, f)
-#define CONNECT7( a, b, c, d, e, f, g)              __CONNECT7( a, b, c, d, e, f, g)
-#define CONNECT8( a, b, c, d, e, f, g, h)           __CONNECT8( a, b, c, d, e, f, g, h)
-#define CONNECT9( a, b, c, d, e, f, g, h, i)        __CONNECT9( a, b, c, d, e, f, g, h, i)
-#define CONNECT10(a, b, c, d, e, f, g, h, i, j)     __CONNECT10(a, b, c, d, e, f, g, h, i, j)
-#define CONNECT11(a, b, c, d, e, f, g, h, i, j, k)                              \
-            __CONNECT11(a, b, c, d, e, f, g, h, i, j, k)
-#define CONNECT12(a, b, c, d, e, f, g, h, i, j, k, l)                           \
-            __CONNECT12(a, b, c, d, e, f, g, h, i, j, k, l)
-#define CONNECT13(a, b, c, d, e, f, g, h, i, j, k, l, m)                        \
-            __CONNECT13(a, b, c, d, e, f, g, h, i, j, k, l, m)
-#define CONNECT14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)                     \
-            __CONNECT14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)
-#define CONNECT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)                  \
-            __CONNECT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-#define CONNECT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)               \
-            __CONNECT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
-#define CONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)            \
-            __CONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
+#define VSF_MCONNECT0()                                  __VSF_MCONNECT1()
+#define VSF_MCONNECT1( a )                               __VSF_MCONNECT1( a )
+#define VSF_MCONNECT2( a, b)                             __VSF_MCONNECT2( a, b)
+#define VSF_MCONNECT3( a, b, c)                          __VSF_MCONNECT3( a, b, c)
+#define VSF_MCONNECT4( a, b, c, d)                       __VSF_MCONNECT4( a, b, c, d)
+#define VSF_MCONNECT5( a, b, c, d, e)                    __VSF_MCONNECT5( a, b, c, d, e)
+#define VSF_MCONNECT6( a, b, c, d, e, f)                 __VSF_MCONNECT6( a, b, c, d, e, f)
+#define VSF_MCONNECT7( a, b, c, d, e, f, g)              __VSF_MCONNECT7( a, b, c, d, e, f, g)
+#define VSF_MCONNECT8( a, b, c, d, e, f, g, h)           __VSF_MCONNECT8( a, b, c, d, e, f, g, h)
+#define VSF_MCONNECT9( a, b, c, d, e, f, g, h, i)        __VSF_MCONNECT9( a, b, c, d, e, f, g, h, i)
+#define VSF_MCONNECT10(a, b, c, d, e, f, g, h, i, j)     __VSF_MCONNECT10(a, b, c, d, e, f, g, h, i, j)
+#define VSF_MCONNECT11(a, b, c, d, e, f, g, h, i, j, k)                         \
+            __VSF_MCONNECT11(a, b, c, d, e, f, g, h, i, j, k)
+#define VSF_MCONNECT12(a, b, c, d, e, f, g, h, i, j, k, l)                      \
+            __VSF_MCONNECT12(a, b, c, d, e, f, g, h, i, j, k, l)
+#define VSF_MCONNECT13(a, b, c, d, e, f, g, h, i, j, k, l, m)                   \
+            __VSF_MCONNECT13(a, b, c, d, e, f, g, h, i, j, k, l, m)
+#define VSF_MCONNECT14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)                \
+            __VSF_MCONNECT14(a, b, c, d, e, f, g, h, i, j, k, l, m, n)
+#define VSF_MCONNECT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)             \
+            __VSF_MCONNECT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
+#define VSF_MCONNECT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)          \
+            __VSF_MCONNECT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
+#define VSF_MCONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)       \
+            __VSF_MCONNECT17(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-//! overload connect
-#   define CONNECT(...)     __PLOOC_EVAL(CONNECT, __VA_ARGS__)(__VA_ARGS__)
+//! overload VSF_MCONNECT
+#   define VSF_MCONNECT(...)     __PLOOC_EVAL(VSF_MCONNECT, __VA_ARGS__)(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif 
+#endif

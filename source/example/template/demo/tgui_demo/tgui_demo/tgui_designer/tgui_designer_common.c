@@ -64,17 +64,17 @@ const char* vsf_tgui_color_to_string(vsf_tgui_sv_color_t color)
 
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
     for (int i = 0; i < dimof(__colors_name); i++) {
-        if (color.tColor.Value == __colors_name[i].color.tColor.Value) {
+        if (color.value == __colors_name[i].color.value) {
             return __colors_name[i].color_name;
         }
     }
 
-    if (color.tColor.tChannel.chA != 0xFF) {
+    if (color.alpha != 0xFF) {
         sprintf(__color_buffer, "VSF_TGUI_COLOR_RGBA(0x%02X, 0x%02X, 0x%02X, 0x%02X)",
-            color.tColor.tChannel.chR, color.tColor.tChannel.chG, color.tColor.tChannel.chB, color.tColor.tChannel.chA);
+            color.red, color.green, color.blue, color.alpha);
     } else {
         sprintf(__color_buffer, "VSF_TGUI_COLOR_RGB(0x%02X, 0x%02X, 0x%02X)",
-            color.tColor.tChannel.chR, color.tColor.tChannel.chG, color.tColor.tChannel.chB);
+            color.red, color.green, color.blue);
     }
     return __color_buffer;
 #else
@@ -255,7 +255,7 @@ const char* vsf_tgui_control_get_var_name(vsf_tgui_control_t* control)
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
     const char* node_name_ptr = node->node_name_ptr + 1; // skip first [
     node_name_ptr = strchr(node_name_ptr, '['); // search second [
-    ASSERT(node_name_ptr != NULL);
+    VSF_ASSERT(node_name_ptr != NULL);
     node_name_ptr++; // skip second [
 
     if (*node_name_ptr == '*') {
@@ -264,7 +264,7 @@ const char* vsf_tgui_control_get_var_name(vsf_tgui_control_t* control)
 
     char* node_name_end_ptr;
     node_name_end_ptr = strchr(node_name_ptr, ']');
-    ASSERT(node_name_end_ptr != NULL);
+    VSF_ASSERT(node_name_end_ptr != NULL);
     int len = node_name_end_ptr - node_name_ptr;
     memcpy(__name_buffer, node_name_ptr, len);
     __name_buffer[len] = '\0';
@@ -295,6 +295,50 @@ const char* vsf_tgui_tile_get_var_name(const vsf_tgui_tile_t* tile)
 #else
 #error "TODO"
 #endif
+}
+
+const char* vsf_tgui_fonts_to_text(void)
+{
+    static char __buffer[1024] = { 0 };
+
+    int number = vsf_tgui_font_number();
+    VSF_TGUI_ASSERT(number > 0);
+
+    for (int i = 0; i < number; i++) {
+        vsf_tgui_font_t* font = vsf_tgui_font_get(i);
+        char name_buffer[256] = { '\0' };
+        strcat(name_buffer, font->name_ptr);
+        char* name_ptr = name_buffer;
+        while (*name_ptr != '\0') {
+            if ('A' <= *name_ptr && *name_ptr <= 'Z') {
+                *name_ptr = *name_ptr - 'A' + 'a';
+            } else if ('_' == *name_ptr) {
+                *name_ptr = ' ';
+            }
+            name_ptr++;
+        }
+
+        static const char *__name_heads[] = {
+            "vsf tgui font ",
+            "tgui font "
+        };
+
+        int start = 0;
+        for (int i = 0; i < dimof(__name_heads); i++) {
+            int len = strlen(__name_heads[i]);
+            if (strncmp(name_buffer, __name_heads[0], len) == 0) {
+                start = len;
+                break;
+            }
+        }
+
+        strcat(__buffer, &name_buffer[start]);
+        strcat(__buffer, "\n");
+    }
+
+    __buffer[strlen(__buffer) - 1] = '\0';
+
+    return __buffer;
 }
 
 

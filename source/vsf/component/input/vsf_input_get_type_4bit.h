@@ -18,8 +18,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_INPUT_USER_TYPE_maker
-#   define VSF_INPUT_USER_TYPE_make(__x, __y)       __CONNECT3(0x, __x, __y)
+#ifndef VSF_INPUT_USER_TYPE_MAKE
+#   define VSF_INPUT_USER_TYPE_MAKE(__x, __y)       VSF_MCONNECT3(0x, __x, __y)
 #endif
 
 #ifndef VSF_INPUT_USER_TYPE
@@ -128,7 +128,7 @@
 #endif
 
 #undef VSF_INPUT_USER_TYPE
-#define VSF_INPUT_USER_TYPE         VSF_INPUT_USER_TYPE_make(VSF_INPUT_USER_TYPE_H4, VSF_INPUT_USER_TYPE_L4)
+#define VSF_INPUT_USER_TYPE         VSF_INPUT_USER_TYPE_MAKE(VSF_INPUT_USER_TYPE_H4, VSF_INPUT_USER_TYPE_L4)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

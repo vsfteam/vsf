@@ -104,8 +104,8 @@ void I2C##__N##_ER_IRQHandler(void)                                            \
 #define __VSF_IIC_INTERFACE()          const i_iic_t VSF_IIC[IIC_COUNT]
     
 /**********************************REPEAT_MACRO**********************************/
-REPEAT_MACRO(IIC_COUNT, __VSF_IIC_FUNC_BODY, NULL)
+VSF_MREPEAT(IIC_COUNT, __VSF_IIC_FUNC_BODY, NULL)
 
 __VSF_IIC_INTERFACE() = {
-    REPEAT_MACRO(IIC_COUNT, __VSF_IIC_INTERFACE_DEF, NULL)
+    VSF_MREPEAT(IIC_COUNT, __VSF_IIC_INTERFACE_DEF, NULL)
 };

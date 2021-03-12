@@ -132,7 +132,7 @@
 #   define VSF_LINUX_CFG_RELATIVE_PATH                  ENABLED
 
 extern void vsf_assert(int expression);
-#   define ASSERT(...)                                  vsf_assert(__VA_ARGS__)
+#   define VSF_ASSERT(...)                              vsf_assert(__VA_ARGS__)
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSH_ENTER_CHAR                               '\n'
 

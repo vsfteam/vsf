@@ -70,7 +70,7 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    vk_disp_t *disp = &usrapp_ui_common.disp.use_as__vk_disp_t;
+    vk_disp_t *disp = usrapp_ui_common.disp;
     // TODO: ugly and dangerous code to fix color to ARGB8888, only valid on disp_sdl2
     *(vk_disp_color_type_t *)&disp->param.color = VSF_DISP_COLOR_ARGB8888;
 

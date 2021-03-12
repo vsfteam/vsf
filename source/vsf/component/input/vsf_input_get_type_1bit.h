@@ -18,9 +18,9 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_INPUT_USER_TYPE_maker
-#   define VSF_INPUT_USER_TYPE_make(__bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)\
-            __CONNECT9(0b, __bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)
+#ifndef VSF_INPUT_USER_TYPE_MAKE
+#   define VSF_INPUT_USER_TYPE_MAKE(__bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)\
+            VSF_MCONNECT9(0b, __bit7, __bit6, __bit5, __bit4, __bit3, __bit2, __bit1, __bit0)
 #endif
 
 #ifndef VSF_INPUT_USER_TYPE
@@ -100,7 +100,7 @@
 #endif
 
 #undef VSF_INPUT_USER_TYPE
-#define VSF_INPUT_USER_TYPE         VSF_INPUT_USER_TYPE_make(                   \
+#define VSF_INPUT_USER_TYPE         VSF_INPUT_USER_TYPE_MAKE(                   \
                 VSF_INPUT_USER_TYPE_BIT7, VSF_INPUT_USER_TYPE_BIT6,             \
                 VSF_INPUT_USER_TYPE_BIT5, VSF_INPUT_USER_TYPE_BIT4,             \
                 VSF_INPUT_USER_TYPE_BIT3, VSF_INPUT_USER_TYPE_BIT2,             \

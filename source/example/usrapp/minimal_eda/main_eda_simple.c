@@ -159,7 +159,7 @@ implement_vsf_thread(caller_thread_t)
 static void user_task_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     user_task_t *pthis = (user_task_t *)eda;
-    ASSERT(NULL != eda);
+    VSF_ASSERT(NULL != eda);
 
     switch (evt) {
         case VSF_EVT_INIT:

@@ -58,7 +58,7 @@
                         __str,                                                  \
                         __LINE__,                                               \
                         __FILE__);                                              \
-            ASSERT(false);                                                      \
+            VSF_ASSERT(false);                                                  \
         } while (0)
 
 #define PACK_STRUCT_FIELD(x) x PACKED

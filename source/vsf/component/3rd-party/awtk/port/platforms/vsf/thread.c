@@ -23,8 +23,10 @@ struct _tk_thread_t {
   void* args;
   tk_thread_entry_t entry;
 
-#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
   vsf_thread_cb_t cb;
+#endif
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
   bool_t running;
 #else
   uint32_t stack_size;
@@ -114,7 +116,11 @@ tk_thread_t* tk_thread_create(tk_thread_entry_t entry, void* args) {
 }
 
 ret_t tk_thread_start(tk_thread_t* thread) {
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
   return_value_if_fail(thread != NULL && !thread->running, RET_BAD_PARAMS);
+#else
+  return_value_if_fail(thread != NULL, RET_BAD_PARAMS);
+#endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
   uint_fast32_t stack_size = thread->cb.stack_size;

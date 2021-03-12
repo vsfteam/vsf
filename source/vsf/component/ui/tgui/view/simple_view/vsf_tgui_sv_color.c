@@ -31,96 +31,195 @@ declare_class(vsf_tgui_t)
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_tgui_color_t vsf_tgui_color_mix(vsf_tgui_color_t tColor0, vsf_tgui_color_t tColor1, uint_fast8_t chMix)
+vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_sv_color_t color_1, uint_fast8_t mix)
 {
-    vsf_tgui_color_t result;
+    vsf_tgui_sv_color_t result;
 
-#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    result.tChannel.chR = ((uint32_t)tColor0.tChannel.chR * chMix + (uint32_t)tColor1.tChannel.chR * (255 - chMix)) / 255;
-    result.tChannel.chG = ((uint32_t)tColor0.tChannel.chG * chMix + (uint32_t)tColor1.tChannel.chG * (255 - chMix)) / 255;
-    result.tChannel.chB = ((uint32_t)tColor0.tChannel.chB * chMix + (uint32_t)tColor1.tChannel.chB * (255 - chMix)) / 255;
-    result.tChannel.chA = 0xFF;
-#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-    result.tChannel.u5R = ((uint32_t)tColor0.tChannel.u5R * chMix + (uint32_t)tColor1.tChannel.u5R * (255 - chMix)) / 255;
-    result.tChannel.u6G = ((uint32_t)tColor0.tChannel.u6G * chMix + (uint32_t)tColor1.tChannel.u6G * (255 - chMix)) / 255;
-    result.tChannel.u5B = ((uint32_t)tColor0.tChannel.u5B * chMix + (uint32_t)tColor1.tChannel.u5B * (255 - chMix)) / 255;
-#else
-#	error "TODO: add more color support"
+    result.red   = ((uint32_t)color_0.red   * mix + (uint32_t)color_1.red   * (255 - mix)) / 255;
+    result.green = ((uint32_t)color_0.green * mix + (uint32_t)color_1.green * (255 - mix)) / 255;
+    result.blue  = ((uint32_t)color_0.blue  * mix + (uint32_t)color_1.blue  * (255 - mix)) / 255;
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    result.alpha = 0xFF;
 #endif
 
     return result;
 }
 
-bool vsf_tgui_sv_color_is_opaque(vsf_tgui_sv_color_t tColor)
+bool vsf_tgui_sv_color_is_opaque(vsf_tgui_sv_color_t color)
 {
-#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    return tColor.tColor.tChannel.chA == 0xFF;
-#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-#   if VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED
-    return tColor.tTransparencyRate == 0xFF;
-#   else
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    return color.alpha == 0xFF;
+#else
     return true;
-#   endif
-#else
-#	error "TODO: add more color support"
 #endif
 }
 
-vsf_tgui_color_t vsf_tgui_sv_color_get_color(vsf_tgui_sv_color_t tColor)
+uint_fast8_t vsf_tgui_sv_color_get_trans_rate(vsf_tgui_sv_color_t color)
 {
-    return tColor.tColor;
-}
-
-uint_fast8_t vsf_tgui_sv_color_get_trans_rate(vsf_tgui_sv_color_t tColor)
-{
-#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    return tColor.tColor.tChannel.chA;
-#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-#   if VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED
-    return tColor.tTransparencyRate;
-#   else
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    return color.alpha;
+#else
     return 0xFF;
-#   endif
-#else
-#	error "TODO: add more color support"
 #endif
 }
 
-void vsf_tgui_sv_color_set_trans_rate(vsf_tgui_sv_color_t *ptColor, uint_fast8_t chRate)
+void vsf_tgui_sv_color_set_trans_rate(vsf_tgui_sv_color_t * color_ptr, uint_fast8_t alpha)
+{
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    color_ptr->alpha = alpha;
+#endif
+}
+
+vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t rgba888_color)
+{
+    vsf_tgui_sv_color_t color;
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+    color = rgba888_color;
+#elif (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565) ||  (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565)
+    color.red   = rgba888_color.red   >> 3;
+    color.green = rgba888_color.green >> 2;
+    color.blue  = rgba888_color.blue  >> 3;
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    color.alpha = rgba888_color.alpha;
+#endif
+#else
+#	error "TODO: add more color support"
+#endif
+
+    return color;
+}
+
+vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_sv_color_t color)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    ptColor->tColor.tChannel.chA = chRate;
-#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-#   if VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED
-    ptColor->tTransparencyRate = chRate;
-#   endif
+    return color;
+#elif (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565) ||  (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565)
+    vsf_tgui_sv_color_argb8888_t argb8888_color;
+    argb8888_color.red   = color.red   << 3;
+    argb8888_color.green = color.green << 2;
+    argb8888_color.blue  = color.blue  << 3;
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    argb8888_color.alpha = color.alpha;
+#else
+    argb8888_color.alpha = 0xFF;
+#endif
+    return argb8888_color;
 #else
 #	error "TODO: add more color support"
 #endif
 }
 
-
-vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_argb8888_color_t tARGBColor)
+vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb565_color)
 {
-    vsf_tgui_sv_color_t tColor;
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    tColor.tColor.tChannel.chA = tARGBColor.tChannel.chA;
-    tColor.tColor.tChannel.chR = tARGBColor.tChannel.chR;
-    tColor.tColor.tChannel.chG = tARGBColor.tChannel.chG;
-    tColor.tColor.tChannel.chB = tARGBColor.tChannel.chB;
-#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB16_565
-    tColor.tColor.tChannel.u5R = tARGBColor.tChannel.chR >> 3;
-    tColor.tColor.tChannel.u6G = tARGBColor.tChannel.chG >> 2;
-    tColor.tColor.tChannel.u5B = tARGBColor.tChannel.chB >> 3;
-#if VSF_TGUI_CFG_SV_SUPPORT_TRANS_RATE_ALWAY == ENABLED
-    tColor.tTransparencyRate = tARGBColor.tChannel.chA;
+    vsf_tgui_sv_color_t color = {
+        .red   = rgb565_color.red   << 3,
+        .green = rgb565_color.green << 2,
+        .blue  = rgb565_color.blue  << 3,
+        .alpha = rgb565_color.alpha,
+    };
+    return color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+    vsf_tgui_sv_color_t color = {
+        .red   = rgb565_color.red   >> 3,
+        .green = rgb565_color.green >> 2,
+        .blue  = rgb565_color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+        .alpha = rgb565_color.alpha,
 #endif
+    };
+    return color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+    return rgb565_color;
 #else
 #	error "TODO: add more color support"
 #endif
-    return tColor;
 }
 
+vsf_tgui_sv_color_rgb565_t vsf_tgui_sv_color_to_rgb565(vsf_tgui_sv_color_t color)
+{
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+    vsf_tgui_sv_color_rgb565_t rgb565_color = {
+        .red   = color.red   >> 3,
+        .green = color.green >> 2,
+        .blue  = color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+        .alpha = color.alpha,
+#endif
+    };
+    return rgb565_color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+    vsf_tgui_sv_color_rgb565_t rgb565_color = {
+        .red   = color.red   >> 3,
+        .green = color.green >> 2,
+        .blue  = color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+        .alpha = color.alpha,
+#endif
+    };
+    return color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+    return color;
+#else
+#	error "TODO: add more color support"
+#endif
+}
+
+vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr565_color)
+{
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+    vsf_tgui_sv_color_t color = {
+        .red   = bgr565_color.red   >> 3,
+        .green = bgr565_color.green >> 2,
+        .blue  = bgr565_color.blue  >> 3,
+        .alpha = bgr565_color.alpha,
+    };
+    return color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+    return bgr565_color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+    vsf_tgui_sv_color_t color = {
+        .red   = bgr565_color.red   >> 3,
+        .green = bgr565_color.green >> 2,
+        .blue  = bgr565_color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+        .alpha = bgr565_color.alpha,
+#endif
+    };
+    return color;
+#else
+#	error "TODO: add more color support"
+#endif
+}
+
+vsf_tgui_sv_color_bgr565_t vsf_tgui_sv_color_to_bgr565(vsf_tgui_sv_color_t color)
+{
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+    vsf_tgui_sv_color_bgr565_t bgr565_color = {
+        .red   = color.red   >> 3,
+        .green = color.green >> 2,
+        .blue  = color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+        .alpha = color.alpha,
+#endif
+    };
+    return bgr565_color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+    return color;
+#elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+    vsf_tgui_sv_color_bgr565_t bgr565_color = {
+        .red   = color.red   >> 3,
+        .green = color.green >> 2,
+        .blue  = color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+        .alpha = color.alpha,
+#endif
+    };
+    return bgr565_color;
+#else
+#	error "TODO: add more color support"
+#endif
+}
 #endif
 
 /* EOF */

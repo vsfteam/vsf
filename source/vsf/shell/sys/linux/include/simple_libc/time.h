@@ -1,6 +1,12 @@
 #ifndef __SIMPLE_LIBC_TIME_H__
 #define __SIMPLE_LIBC_TIME_H__
 
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "./stddef.h"
+#else
+#   include <stddef.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,10 +15,10 @@ extern "C" {
 #define nanosleep           __vsf_linux_nanosleep
 #define clock               __vsf_linux_clock
 
-typedef long long   time_t;
-typedef long        clock_t;
+typedef long long           time_t;
+typedef long                clock_t;
 
-#define CLOCKS_PER_SEC ((clock_t)1000000)
+#define CLOCKS_PER_SEC      ((clock_t)1000)
 
 struct tm {
     int tm_sec;

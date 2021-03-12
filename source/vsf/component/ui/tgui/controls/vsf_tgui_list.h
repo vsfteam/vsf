@@ -228,8 +228,8 @@ SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate")
 extern
 vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
                             const vsf_tgui_control_t* control_ptr,
-                            const vsf_tgui_list_t* ptList, 
-                            uint_fast8_t chScalingRatio, 
+                            const vsf_tgui_list_t* ptList,
+                            uint_fast8_t chScalingRatio,
                             vsf_tgui_list_scrollbar_region_t *ptOutputBuffer);
 #endif
 

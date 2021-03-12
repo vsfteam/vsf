@@ -32,24 +32,15 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if APP_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS == ENABLED
+#undef TGUI_SV_FT2_FONT_DEF
+#define TGUI_SV_FT2_FONT_DEF(__NAME, __PATH, __SIZE)                        \
+    {                                                                       \
+        .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,         \
+        .name           = __PATH,                                           \
+    }
 static FT_FILE __ft_font_dir[] = {
-    {
-        .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
-        .name           = "wqy-microhei.ttc",
-    },
-    {
-        .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
-        .name           = "DejaVuSerif.ttf",
-    },
-    {
-        .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
-        .name           = "DejaVuSans.ttf",
-    },
-    {
-        .attr           = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE,
-        .name           = "DejaVuSans-Bold.ttf",
-    },
+    VSF_TGUI_SV_FONTS
 };
 #endif
 
@@ -99,7 +90,7 @@ static FT_FILE __ft_xboot_framework_dir[] = {
 #endif
 
 static FT_FILE __ft_root_dir[] = {
-#if APP_USE_TGUI_DEMO == ENABLED
+#if APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS == ENABLED
     {
         .attr           = VSF_FILE_ATTR_DIRECTORY,
         .name           = "font",
@@ -133,13 +124,13 @@ FT_FILE ft_root         = {
 
 void freetype_demo_init(void)
 {
-#if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED
-    FILE *f;
+#if (APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS) || APP_USE_XBOOT_XUI_DEMO == ENABLED
+    FILE* f;
     char path[256];
 #endif
 
-#if APP_USE_TGUI_DEMO == ENABLED
-    for(int i = 0; i < dimof(__ft_font_dir); i++) {
+#if APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS == ENABLED
+    for (int i = 0; i < dimof(__ft_font_dir); i++) {
         strcpy(path, APP_CFG_TGUI_RES_DIR "font/");
         strcat(path, __ft_font_dir[i].name);
         f = fopen(path, "rb");
@@ -164,7 +155,7 @@ void freetype_demo_init(void)
 #endif
 
 #if APP_USE_XBOOT_XUI_DEMO == ENABLED
-    for(int i = 0; i < dimof(__ft_xboot_fonts_dir); i++) {
+    for (int i = 0; i < dimof(__ft_xboot_fonts_dir); i++) {
         strcpy(path, APP_CFG_XBOOT_RES_DIR "font/");
         strcat(path, __ft_xboot_fonts_dir[i].name);
         f = fopen(path, "rb");

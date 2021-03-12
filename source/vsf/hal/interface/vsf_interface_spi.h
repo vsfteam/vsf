@@ -25,7 +25,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define SPI_DATASIZE(__N)       CONNECT2(SPI_MODE_DATASIZE_, __N)
+#define SPI_DATASIZE(__N)       VSF_MCONNECT2(SPI_MODE_DATASIZE_, __N)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

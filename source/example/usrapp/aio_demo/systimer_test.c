@@ -68,7 +68,7 @@ int main(void)
 
 //    usrapp.one_tick_teda.evthandler = usrapp_one_tick_evthandler;
 //    usrapp.one_tick_teda.on_terminate = NULL;
-//    vsf_teda_init(&usrapp.one_tick_teda, vsf_prio_0, false);
+//    vsf_teda_init(&usrapp.one_tick_teda, vsf_prio_0);
 
     usrapp.one_tick_timer.on_timer = one_tick_timer_callback;
     vsf_callback_timer_add(&usrapp.one_tick_timer, 1);

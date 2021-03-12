@@ -49,7 +49,7 @@
     // 3. Implement your ring buffer with specific atom access protection macro:
     implement_vsf_rng_buf(<ring buffer name>, <item type>, <atom access macro>)
     
-    NOTE: You can use __vsf_interrupt_safe for interrupt, use __vsf_sched_safe for
+    NOTE: You can use vsf_interrupt_safe_simple for interrupt, use __vsf_sched_safe for
           scheduler, use NO_RNG_BUF_PROTECT for no protection
 
     // 4. Defining your ring buffer variable
@@ -314,9 +314,9 @@ int32_t __name##_peek_multiple( __name* queue_ptr,                              
 #define __implement_vsf_rng_buf(__name, __type, __queue_protect)                \
 void __name##_init(__name* queue_ptr, __name##_cfg_t* cfg_ptr)                  \
 {                                                                               \
-    ASSERT(NULL != queue_ptr && NULL != cfg_ptr);                               \
-    ASSERT(NULL != cfg_ptr->buffer_ptr);                                        \
-    ASSERT(cfg_ptr->size >= sizeof(__type));                                    \
+    VSF_ASSERT(NULL != queue_ptr && NULL != cfg_ptr);                           \
+    VSF_ASSERT(NULL != cfg_ptr->buffer_ptr);                                    \
+    VSF_ASSERT(cfg_ptr->size >= sizeof(__type));                                \
     queue_ptr->buffer_ptr = cfg_ptr->buffer_ptr;                                \
     __vsf_rng_buf_init_ex(&(queue_ptr->use_as__vsf_rng_buf_t),                  \
         cfg_ptr->size / sizeof(__type),                                         \
@@ -326,7 +326,7 @@ void __name##_init(__name* queue_ptr, __name##_cfg_t* cfg_ptr)                  
 bool __name##_send_one(__name *queue_ptr, __type item)                          \
 {                                                                               \
     bool result = false;                                                        \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         do {                                                                    \
             int32_t index =                                                     \
@@ -345,7 +345,7 @@ bool __name##_send_one(__name *queue_ptr, __type item)                          
 bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     \
 {                                                                               \
     bool result = false;                                                        \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         do {                                                                    \
             int32_t index =                                                     \
@@ -366,7 +366,7 @@ bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     
 SECTION(".text." #__name "_item_count")                                         \
 uint_fast16_t __name##_item_count(__name * queue_ptr)                           \
 {                                                                               \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     return __vsf_rng_buf_item_count(&(queue_ptr->use_as__vsf_rng_buf_t));       \
 }                                                                               \
                                                                                 \
@@ -376,7 +376,7 @@ int32_t __name##_send_multiple(  __name * queue_ptr,                            
                                     uint16_t count)                             \
 {                                                                               \
     int32_t result = -1, index = 0;                                             \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         do {                                                                    \
             if (NULL == item_ptr || 0 == count) {                               \
@@ -404,7 +404,7 @@ int32_t __name##_get_multiple(  __name * queue_ptr,                             
                                     uint16_t count)                             \
 {                                                                               \
     int32_t result = -1, index = 0;                                             \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         do {                                                                    \
             if (NULL == item_ptr || 0 == count) {                               \
@@ -430,7 +430,7 @@ SECTION(".text." #__name "_peek_one")                                           
 bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             \
 {                                                                               \
     bool result = false;                                                        \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         do {                                                                    \
             int32_t index = __vsf_rng_buf_peek_one(                             \
@@ -451,7 +451,7 @@ bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             
 SECTION(".text." #__name "_reset_peek")                                         \
 void __name##_reset_peek(__name *queue_ptr)                                     \
 {                                                                               \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         __vsf_rng_buf_reset_peek(&(queue_ptr->use_as__vsf_rng_buf_t));          \
     )                                                                           \
@@ -460,7 +460,7 @@ void __name##_reset_peek(__name *queue_ptr)                                     
 SECTION(".text." #__name "_get_all_peeked")                                     \
 void __name##_get_all_peeked(__name *queue_ptr)                                 \
 {                                                                               \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         __vsf_rng_buf_get_all_peeked(&(queue_ptr->use_as__vsf_rng_buf_t));      \
     )                                                                           \
@@ -469,7 +469,7 @@ void __name##_get_all_peeked(__name *queue_ptr)                                 
 SECTION(".text." #__name "_item_count_peekable")                                \
 uint_fast16_t __name##_item_count_peekable(__name *queue_ptr)                   \
 {                                                                               \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     return __vsf_rng_buf_item_count_peekable(&queue_ptr->use_as__vsf_rng_buf_t);\
 }                                                                               \
                                                                                 \
@@ -479,7 +479,7 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
                                 uint16_t count)                                 \
 {                                                                               \
     int32_t result = -1, index = 0;                                             \
-    ASSERT(NULL != queue_ptr);                                                  \
+    VSF_ASSERT(NULL != queue_ptr);                                              \
     __queue_protect(                                                            \
         do {                                                                    \
             if (NULL == item_pptr || 0 == count) {                              \

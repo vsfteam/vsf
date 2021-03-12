@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 #define kill                __vsf_linux_kill
+#define signal              __vsf_linux_signal
 #define sigprocmask         __vsf_linux_sigprocmask
 
 #define sigemptyset         __vsf_linux_sigemptyset
@@ -21,8 +22,12 @@ extern "C" {
 #define sigaddsetmask       __vsf_linux_sigaddsetmask
 #define sigdelsetmask       __vsf_linux_sigdelsetmask
 #define sigtestsetmask      __vsf_linux_sigtestsetmask
+#define pthread_sigmask     __vsf_linux_pthread_sigmask
 
 #define _NSIG           32
+
+typedef void (*sighandler_t)(int);
+typedef int sig_atomic_t;
 
 typedef struct {
     unsigned long sig[_NSIG / (sizeof(unsigned long) << 3)];
@@ -102,6 +107,9 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
 
 int kill(pid_t pid, int sig);
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+sighandler_t signal(int signum, sighandler_t handler);
+
+int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
 
 #ifdef __cplusplus
 }

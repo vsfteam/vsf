@@ -23,7 +23,7 @@
 #   pragma diag_suppress=pe174
 #endif
 
-#include "hal/driver/common/vsf_swi_template.inc"
+#include "hal/driver/common/swi/arm/vsf_swi_template.inc"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

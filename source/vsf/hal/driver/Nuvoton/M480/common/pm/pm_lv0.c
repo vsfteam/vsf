@@ -107,7 +107,7 @@ pm_pclk_status_t vsf_pm_peripheral_config(pm_pclk_no_t index, const pm_pclk_cfg_
 }
 
 #define __def_vsf_pm_peripheral_clksel(__name)                                  \
-            [__CONNECT2(__name, _MAP_IDX)] = __CONNECT2(__name, _MAP)
+            [VSF_MCONNECT2(__name, _MAP_IDX)] = VSF_MCONNECT2(__name, _MAP)
 
 static const pm_periph_clksel_t vsf_pm_peripheral_clksel[] = {
     __def_vsf_pm_peripheral_clksel(SDH_CLKSEL),

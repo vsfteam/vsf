@@ -55,8 +55,8 @@
 
 /*============================ MACROS ========================================*/
 
-#define __def_idx(__name, __no)     __CONNECT2(__name, _idx) = (__no)
-#define __def_msk(__name)           __CONNECT2(__name, _msk) = BIT(__CONNECT2(__name, _idx) & 0x1F)
+#define __def_idx(__name, __no)     VSF_MCONNECT2(__name, _idx) = (__no)
+#define __def_msk(__name)           VSF_MCONNECT2(__name, _msk) = BIT(VSF_MCONNECT2(__name, _idx) & 0x1F)
 
 #define GPIO_COUNT                  1
 
@@ -85,12 +85,12 @@
 // bit14- bit27:    clkdiv bitfield
 // bit28- bit31:    clkdiv_remap
 #define __def_periph_clk(__name, __bf_clksel, __bf_clkdiv, __clksel_map_idx)    \
-        __CONNECT2(__name, _idx) = ((__bf_clksel) << 0)                            \
+        VSF_MCONNECT2(__name, _idx) = ((__bf_clksel) << 0)                      \
                             |   ((__bf_clkdiv) << 14)                           \
                             |   ((__clksel_map_idx) << 28)
 
-#define __def_sync_clk_idx(__name, __bus_idx, __bit_idx)                          \
-            __CONNECT2(__name, _idx) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
+#define __def_sync_clk_idx(__name, __bus_idx, __bit_idx)                        \
+            VSF_MCONNECT2(__name, _idx) = ((__bit_idx) << 0) | ((__bus_idx) << 5)
 
 #define __def_clk_src(__name, __value)      __name = (__value)
 

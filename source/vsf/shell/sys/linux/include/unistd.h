@@ -30,6 +30,8 @@ extern "C" {
 #define execl               __vsf_linux_execl
 #define execv               __vsf_linux_execv
 #define system              __vsf_linux_system
+#define realpath            __vsf_linux_realpath
+#define sysconf             __vsf_linux_sysconf
 
 #if __IS_COMPILER_IAR__
 #else
@@ -43,6 +45,8 @@ extern "C" {
 #   define lseek            __vsf_linux_lseek
 #   define read             __vsf_linux_read
 #   define write            __vsf_linux_write
+#   define chdir            __vsf_linux_chdir
+#   define getcwd           __vsf_linux_getcwd
 #endif
 
 #define STDIN_FILENO        0
@@ -61,8 +65,6 @@ enum {
     DT_EXE,
 };
 
-char * getcwd(char *buffer, size_t maxlen);
-
 void usleep(int micro_seconds);
 unsigned sleep(unsigned seconds);
 
@@ -74,17 +76,25 @@ intptr_t execl(const char *pathname, const char *arg, ...);
 intptr_t execv(const char *pathname, char const* const* argv);
 #else
 int execl(const char *pathname, const char *arg, ...);
-int execv(const char *pathname, char const* const* argv);
+int execv(const char *pathname, char const * const * argv);
 #endif
 
-int system(const char * cmd);
+int system(const char *cmd);
+enum {
+    _SC_PAGESIZE,
+};
+long sysconf(int name);
+char *realpath(const char *path, char *resolved_path);
 
 int creat(const char *pathname, mode_t mode);
 int open(const char *pathname, int flags, ...);
 int access(const char *pathname, int mode);
 int unlink(const char *pathname);
 int remove(const char *pathname);
-int mkdir(const char* pathname, mode_t mode);
+int mkdir(const char *pathname, mode_t mode);
+
+int chdir(const char *pathname);
+char * getcwd(char *buffer, size_t maxlen);
 
 int close(int fd);
 off_t lseek(int fd, off_t offset, int whence);

@@ -34,14 +34,16 @@ typedef struct __vsf_cm_t {
         bool enabled;
         bool sw_pending_bit;
 #endif
-        vsf_gint_state_t global_int_state;
     } pendsv;
+    vsf_arch_prio_t  basepri;
 } __vsf_cm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __vsf_cm_t __vsf_cm;
+static __vsf_cm_t __vsf_cm = {
+    . basepri = 0x100,
+};
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -59,9 +61,8 @@ bool vsf_arch_low_level_init(void)
     //memset(&__vsf_cm, 0, sizeof(__vsf_cm));
     //vsf_systimer_init();
 
-#if defined(__VSF_DEBUG__) && __ARM_ARCH >= 7
-#   warning As __VSF_DEBUG__ is defined, all unaligned access will be\
- treated as faults.
+#if __ARM_ARCH >= 7 && VSF_ARCH_CFG_ALIGNMENT_TEST == ENABLED
+#   warning All unaligned access will be treated as faults for alignment test
     /*! disable processor's support for unaligned access for debug purpose */
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
 #endif
@@ -142,7 +143,9 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
             (uint32_t)ticks
         );
 
-        NVIC_ClearPendingIRQ(SysTick_IRQn);
+        // NVIC_ClearPendingIRQ has no effect on IRQn < 0
+//        NVIC_ClearPendingIRQ(SysTick_IRQn);
+        SCB->ICSR = SCB_ICSR_PENDSTCLR_Msk;
     vsf_set_interrupt(orig);
 
     return VSF_ERR_NONE;
@@ -192,7 +195,7 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
         NVIC_SetPriority(PendSV_IRQn, priority);
         return VSF_ERR_NONE;
     }
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
     return VSF_ERR_INVALID_PARAMETER;
 }
 
@@ -208,10 +211,11 @@ vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
 void vsf_arch_swi_trigger(uint_fast8_t idx)
 {
     if (0 == idx) {
+    //! todo: the code is simplified, we need to verify its reilability 
     #if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
         SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
     #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
-        __vsf_interrupt_safe(
+        vsf_interrupt_safe_simple(
             if (__vsf_cm.pendsv.enabled) {
                 SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             } else {
@@ -221,52 +225,85 @@ void vsf_arch_swi_trigger(uint_fast8_t idx)
     #endif
         return;
     }
-    VSF_HAL_ASSERT(false);
+    VSF_ARCH_ASSERT(false);
+}
+
+vsf_arch_prio_t vsf_get_base_priority(void)
+{
+    return __vsf_cm.basepri;
 }
 
 vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 {
 #if __ARM_ARCH >= 7 || __TARGET_ARCH_THUMB == 4
-    static vsf_gint_state_t __basepri = 0x100;
-    vsf_gint_state_t origlevel = __basepri;
+    //static vsf_gint_state_t __basepri = 0x100;
+    vsf_arch_prio_t origlevel = __vsf_cm.basepri;
 
-        if (0 == priority) {
-            __set_BASEPRI(0);
-            __vsf_cm.pendsv.global_int_state = DISABLE_GLOBAL_INTERRUPT();
-            __basepri = 0;
-        } else if (priority >= 0x100) {
-            __set_BASEPRI(0);
-            __basepri = 0x100;
-            SET_GLOBAL_INTERRUPT_STATE(__vsf_cm.pendsv.global_int_state);
+    VSF_ARCH_ASSERT(priority >= 0);
 
-        } else {
-            __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
-            __basepri = __get_BASEPRI();
-        }
+    /*! \note When BASEPRI = 0, the CPU execution priority level is not raised 
+     *!       to 0 as one may think (this would have the effect of masking all 
+     *!       interrupts). 
+     *!       Instead, with BASEPRI = 0 all masking is disabled.  With masking 
+     *!        disabled, any interrupt even with the max priority level can 
+     *!        interrupt the core. On reset, BASEPRI = 0.
+     *!
+     *!        The only way to raise the CPU execution priority level to 0 is 
+     *!        through PRIMASK.
+     */
+    DISABLE_GLOBAL_INTERRUPT();                                             //! do this first for atomicity
+    
+    if (0 == priority) {          
+        //DISABLE_GLOBAL_INTERRUPT();
+        __vsf_cm.basepri = 0;
+        //__set_BASEPRI(0);
+    } else if (priority >= 0x100) {
+        __vsf_cm.basepri = 0x100;
+        __set_BASEPRI(0);
+        ENABLE_GLOBAL_INTERRUPT();
+    } else {
+        __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
+        __vsf_cm.basepri = __get_BASEPRI();
+        ENABLE_GLOBAL_INTERRUPT();
+    }
 
     return (vsf_arch_prio_t)origlevel;
 
 #elif __ARM_ARCH == 6 || __TARGET_ARCH_THUMB == 3
-    // TODO: MUST pass multi-priority test case
-    static vsf_gint_state_t __basepri = 0x100;
 
-    vsf_gint_state_t origlevel = __basepri;
-    __vsf_interrupt_safe(
-        if (priority <= VSF_ARCH_PRIO_0) {
-            //! lock sched
-            __vsf_cm.pendsv.enabled = false;
-            __vsf_cm.pendsv.sw_pending_bit = 0;
-        } else /*if (0x100 == priority)*/ {
-            //! unload sched
+    vsf_arch_prio_t origlevel = __vsf_cm.basepri;
+    VSF_ARCH_ASSERT(priority >= 0);
+    
+    DISABLE_GLOBAL_INTERRUPT();
+
+    
+    if (priority) {
+        if (priority >= 0x100) {
+            __vsf_cm.basepri = 0x100;
+        }
+        
+        __vsf_cm.basepri = priority;
+        
+        if (priority > NVIC_GetPriority(PendSV_IRQn)) {
             __vsf_cm.pendsv.enabled = true;
             if (__vsf_cm.pendsv.sw_pending_bit) {
                 __vsf_cm.pendsv.sw_pending_bit = 0;
                 SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             }
+        } else {
+            __vsf_cm.pendsv.enabled = false;
+            __vsf_cm.pendsv.sw_pending_bit = 0;
         }
-        __basepri = priority;
-    )
+        
+        ENABLE_GLOBAL_INTERRUPT();
+    } else /* if (0 == priority) */{
+        __vsf_cm.basepri = 0;
+    }
+    
     return (vsf_arch_prio_t)origlevel;
+    
+#else
+    VSF_ARCH_ASSERT(false);
 #endif
 }
 
@@ -275,27 +312,27 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  *----------------------------------------------------------------------------*/
 
 WEAK(vsf_get_interrupt)
-vsf_gint_state_t vsf_get_interrupt(void)
+vsf_arch_prio_t vsf_get_interrupt(void)
 {
-    return GET_GLOBAL_INTERRUPT_STATE();
+    return vsf_get_base_priority();
 }
 
 WEAK(vsf_set_interrupt)
-void vsf_set_interrupt(vsf_gint_state_t level)
+vsf_arch_prio_t vsf_set_interrupt(vsf_arch_prio_t prio)
 {
-    SET_GLOBAL_INTERRUPT_STATE(level);
+    return vsf_set_base_priority(prio);
 }
 
 WEAK(vsf_disable_interrupt)
-vsf_gint_state_t vsf_disable_interrupt(void)
+vsf_arch_prio_t vsf_disable_interrupt(void)
 {
-    return DISABLE_GLOBAL_INTERRUPT();
+    return vsf_set_base_priority(0);
 }
 
 WEAK(vsf_enable_interrupt)
-void vsf_enable_interrupt(void)
+vsf_arch_prio_t vsf_enable_interrupt(void)
 {
-    ENABLE_GLOBAL_INTERRUPT();
+    return vsf_set_base_priority(0x100);
 }
 
 

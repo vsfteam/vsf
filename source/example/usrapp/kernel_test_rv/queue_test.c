@@ -58,7 +58,7 @@ static void usrapp_msgq_recv_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     recv_next:
         if (VSF_ERR_NONE == vsf_eda_msg_queue_recv(&usrapp_msgq.msgq, &node, -1)) {
         process_node:
-            ASSERT(node != NULL);
+            VSF_ASSERT(node != NULL);
             vsf_trace(VSF_TRACE_INFO, "%d: get msg from %d\r\n", vsf_systimer_get_ms(), node->idx);
             VSF_POOL_FREE(usrapp_msg_pool, &usrapp_msgq.pool, node);
             goto recv_next;
@@ -113,7 +113,7 @@ void usrapp_msgq_test_start(void)
 {
     VSF_POOL_PREPARE(usrapp_msg_pool, &usrapp_msgq.pool,
         .target_ptr = NULL,
-        .region_ptr = (code_region_t *)&VSF_SCHED_SAFE_CODE_REGION,
+        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_sched,
     );
     vsf_eda_msg_queue_init(&usrapp_msgq.msgq, 10);
 
