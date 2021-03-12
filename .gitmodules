@@ -37,9 +37,6 @@
 [submodule "source/vsf/shell/media/sdl2/3rd-party/SDL_image"]
 	path = source/vsf/shell/media/sdl2/3rd-party/SDL_image
 	url = ../SDL_image
-[submodule "source/vsf/component/3rd-party/lvgl/raw"]
-	path = source/vsf/component/3rd-party/lvgl/raw
-	url = ../lvgl
 [submodule "source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw"]
 	path = source/vsf/component/3rd-party/lvgl/extension/lv_lib_freetype/raw
 	url = ../lv_lib_freetype
