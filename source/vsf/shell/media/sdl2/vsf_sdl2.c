@@ -482,7 +482,7 @@ SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint
         return NULL;
     }
 
-    uint_fast8_t pixel_bytelen = (pixel_bitlen + 8) >> 3;
+    uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
     uint32_t format = VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
     if (surface != NULL) {
@@ -501,7 +501,7 @@ SDL_Surface * SDL_CreateRGBSurfaceFrom(void * pixels, int w, int h, int depth, i
         return NULL;
     }
 
-    uint_fast8_t pixel_bytelen = (pixel_bitlen + 8) >> 3;
+    uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
     uint32_t format = VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, depth, pitch, format);
     if (surface != NULL) {
@@ -547,6 +547,10 @@ int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color)
         .h      = surface->h,
     };
     SDL_Rect realrect;
+
+    if (NULL == rect) {
+        rect = &surface_rect;
+    }
     if (!__vsf_sdl2_rect_intersect(&realrect, rect, &surface_rect)) {
         return 0;
     }
