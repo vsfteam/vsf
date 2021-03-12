@@ -1,13 +1,13 @@
 /* Version ID for the JPEG library.
  * Might be useful for tests like "#if JPEG_LIB_VERSION >= 60".
  */
-#define JPEG_LIB_VERSION  62
+#define JPEG_LIB_VERSION  90
 
 /* libjpeg-turbo version */
-#define LIBJPEG_TURBO_VERSION  2.0.6
+#define LIBJPEG_TURBO_VERSION  2.0.90
 
 /* libjpeg-turbo version in integer form */
-#define LIBJPEG_TURBO_VERSION_NUMBER  2000006
+#define LIBJPEG_TURBO_VERSION_NUMBER  2000090
 
 /* Support arithmetic encoding */
 #define C_ARITH_CODING_SUPPORTED 1

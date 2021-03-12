@@ -238,37 +238,37 @@
     <Filter Include="vsf\component\3rd-party\nnom\raw\src">
       <UniqueIdentifier>{645ccc87-a3d4-407f-ae7f-63f44a174feb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl">
+    <Filter Include="vsf\component\3rd-party\lvgl">
       <UniqueIdentifier>{ecf7d1cf-7e1c-41df-8afd-62589d7d3463}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\port">
+    <Filter Include="vsf\component\3rd-party\lvgl\port">
       <UniqueIdentifier>{01b4e4b0-01bd-411c-a519-bf07a1c356ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw">
       <UniqueIdentifier>{d755b662-09ed-4b38-bf0a-e27d6bcdc3a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src">
       <UniqueIdentifier>{53981ef2-e463-4129-bc82-be84710f03ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_core">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_core">
       <UniqueIdentifier>{0535b1e8-8a19-47d1-95d3-07af9c296dbe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_draw">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_draw">
       <UniqueIdentifier>{48518390-4d9d-4c67-997c-9ed7e2b7e14d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_font">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_font">
       <UniqueIdentifier>{26f23f8d-8976-41e8-a4e7-fef7a34643a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_hal">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_hal">
       <UniqueIdentifier>{79de5c39-3dad-4395-9346-b454c7629381}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_misc">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_misc">
       <UniqueIdentifier>{8783acfa-5053-4867-97e7-dbbc1e06e20e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_objx">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_objx">
       <UniqueIdentifier>{a71ed2e5-41c7-4134-aa7b-b4284a9ec1df}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\raw\src\lv_themes">
+    <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_themes">
       <UniqueIdentifier>{53384fa7-74f3-4a8d-8bff-36796374a738}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\hal">
@@ -319,22 +319,22 @@
     <Filter Include="vsf\component\3rd-party\freetype\raw">
       <UniqueIdentifier>{e0baee1b-5fdd-44a2-8f01-e45c6b2f5fde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\raw\include">
+    <Filter Include="vsf\component\3rd-party\freetype\include">
       <UniqueIdentifier>{4d5f9860-1bcb-4339-8e46-e705fdfb3ecc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\raw\include\freetype">
+    <Filter Include="vsf\component\3rd-party\freetype\include\freetype">
       <UniqueIdentifier>{31971edb-e4f7-4099-8417-419c06d3a6df}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\raw\include\freetype\internal">
+    <Filter Include="vsf\component\3rd-party\freetype\include\freetype\internal">
       <UniqueIdentifier>{8a6c4153-41d7-4cf2-9fe9-103cc026d7ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\raw\include\freetype\internal\services">
+    <Filter Include="vsf\component\3rd-party\freetype\include\freetype\internal\services">
       <UniqueIdentifier>{8db4e984-2ba4-4320-95b7-3845774eac13}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\raw\src">
+    <Filter Include="vsf\component\3rd-party\freetype\src">
       <UniqueIdentifier>{4eaad3f0-1f31-4fd6-a905-62ccfa007937}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\freetype\raw\src\FT_MODULES">
+    <Filter Include="vsf\component\3rd-party\freetype\src\FT_MODULES">
       <UniqueIdentifier>{a330c4cd-915d-45d6-9a4c-970b378d674c}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\component\ui\tgui">
@@ -670,37 +670,34 @@
     <Filter Include="vsf\component\3rd-party\lwip">
       <UniqueIdentifier>{a49b4cbf-a23a-438c-bbe3-47d3c4e99fb6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2">
-      <UniqueIdentifier>{fb20a1de-71c3-48e6-9f7c-3b3bfdd61fce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw">
+    <Filter Include="vsf\component\3rd-party\lwip\raw">
       <UniqueIdentifier>{087a3b0c-6425-40f9-ad53-ec8d631675d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src">
       <UniqueIdentifier>{776aac50-94c3-4aa2-8295-24f7a91c3408}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\api">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\api">
       <UniqueIdentifier>{3a4d99c7-7a72-4404-9181-218d924e1832}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\apps">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\apps">
       <UniqueIdentifier>{f632b7ce-7bf2-4827-882f-0f92ba836d0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\core">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\core">
       <UniqueIdentifier>{1f043116-9908-4b91-b3cf-d1ac63c9667b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\core\ipv4">
       <UniqueIdentifier>{b5c0d298-108d-4d3c-a1f1-95cd2b20c0bd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\core\ipv6">
       <UniqueIdentifier>{37341559-6f22-441d-bc73-c76c5fb824c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\raw\src\netif">
+    <Filter Include="vsf\component\3rd-party\lwip\raw\src\netif">
       <UniqueIdentifier>{682b3ece-63f1-4f28-958a-8c5265f6bd4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\port">
+    <Filter Include="vsf\component\3rd-party\lwip\port">
       <UniqueIdentifier>{7e6a67f8-43ac-4d42-a5d3-9ebb1ec7ca4c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\lwip\2.1.2\port\arch">
+    <Filter Include="vsf\component\3rd-party\lwip\port\arch">
       <UniqueIdentifier>{8fc42111-22c6-4f6f-98ea-2e7d2f6720aa}</UniqueIdentifier>
     </Filter>
     <Filter Include="usrapp\demo\lwip_demo">
@@ -772,13 +769,13 @@
     <Filter Include="vsf\component\3rd-party\freetype\port\vsf_config">
       <UniqueIdentifier>{9dc19b0f-9932-43c4-8a50-f65e8b1b3995}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\extension">
+    <Filter Include="vsf\component\3rd-party\lvgl\extension">
       <UniqueIdentifier>{0f0113f1-71bb-4997-8664-98d9d5443111}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype">
+    <Filter Include="vsf\component\3rd-party\lvgl\extension\lv_lib_freetype">
       <UniqueIdentifier>{8e73a720-b005-4368-a373-2527ba676ba6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw">
+    <Filter Include="vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw">
       <UniqueIdentifier>{baf49705-00bb-4b6d-9396-5e8a88d7bb7f}</UniqueIdentifier>
     </Filter>
     <Filter Include="usrapp\demo\kernel_test">
@@ -954,6 +951,15 @@
     </Filter>
     <Filter Include="vsf\component\3rd-party\libjpeg-turbo\port">
       <UniqueIdentifier>{dfd39688-9ccb-4ad0-b724-3e9e06b7482e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\nnom\raw\src\core">
+      <UniqueIdentifier>{d51a4cda-372e-4e53-8f37-23369c3b9fd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\3rd-party\nnom\raw\src\layers">
+      <UniqueIdentifier>{e4660e05-9263-4e8a-8a32-3b0a9583f9ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\usb\driver\dcd\usbip_dcd\backend">
+      <UniqueIdentifier>{f5ca7c5e-0e35-4c32-ad06-11df7c2e6239}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1341,251 +1347,248 @@
     <ClInclude Include="..\..\demo\fakefat32.h">
       <Filter>usrapp\demo</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\port\vsf_lvgl_port.h">
-      <Filter>vsf\component\3rd-party\littlevgl\port</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_disp.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_disp.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_group.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_group.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_indev.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_indev.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_obj.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_obj.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_refr.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_refr.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_style.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_style.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_arc.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_arc.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_basic.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_basic.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_img.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_img.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_label.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_label.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_line.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_line.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_rect.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_rect.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_triangle.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_triangle.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_cache.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_img_cache.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_decoder.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_img_decoder.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_fmt_txt.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_fmt_txt.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_symbol_def.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_symbol_def.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_disp.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal_disp.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_indev.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal_indev.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_tick.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal_tick.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_anim.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_anim.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_area.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_area.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_circ.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_circ.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_color.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_color.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_fs.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_fs.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_gc.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_gc.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_ll.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_ll.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_log.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_log.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_math.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_math.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_mem.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_mem.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_task.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_task.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_templ.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_templ.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_txt.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_txt.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_types.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_types.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_utils.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_utils.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_arc.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_arc.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_bar.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_bar.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btn.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_btn.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btnm.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_btnm.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_calendar.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_calendar.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_canvas.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_canvas.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cb.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cb.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_chart.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_chart.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cont.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cont.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ddlist.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_ddlist.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_gauge.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_gauge.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_img.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_img.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_imgbtn.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_imgbtn.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_kb.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_kb.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_label.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_label.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_led.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_led.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_line.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_line.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_list.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_list.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_lmeter.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_lmeter.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_mbox.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_mbox.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_objx_templ.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_objx_templ.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_page.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_page.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_preload.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_preload.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_roller.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_roller.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_slider.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_slider.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_spinbox.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_spinbox.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_sw.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_sw.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ta.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_ta.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_table.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_table.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tabview.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_tabview.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tileview.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_tileview.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_win.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_win.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_alien.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_alien.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_default.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_default.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_material.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_material.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_mono.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_mono.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_nemo.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_nemo.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_night.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_night.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_templ.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_templ.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_zen.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_zen.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_conf_checker.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_conf_checker.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_version.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_version.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\btstack\port\btstack_run_loop_vsf.h">
       <Filter>vsf\component\3rd-party\btstack\port</Filter>
@@ -1662,269 +1665,269 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_custom.h">
       <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\ft2build.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\ft2build.h">
       <Filter>vsf\component\3rd-party\freetype\port</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\autohint.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\autohint.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cffotypes.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\cffotypes.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\cfftypes.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\cfftypes.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftcalc.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftcalc.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdebug.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftdebug.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftdrv.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftdrv.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftgloadr.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftgloadr.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fthash.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\fthash.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftmemory.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftmemory.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftobjs.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftobjs.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftpsprop.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftpsprop.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftrfork.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftrfork.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftserv.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftserv.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftstream.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftstream.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\fttrace.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\fttrace.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\ftvalid.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\ftvalid.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\internal.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\internal.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\psaux.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\psaux.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\pshints.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\pshints.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\sfnt.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\sfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\t1types.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\t1types.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\tttypes.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\tttypes.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\wofftypes.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\wofftypes.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svbdf.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svbdf.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcfftl.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svcfftl.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svcid.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svcid.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svfntfmt.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svfntfmt.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgldict.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svgldict.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svgxval.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svgxval.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svkern.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svkern.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmetric.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svmetric.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svmm.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svmm.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svotval.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svotval.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpfr.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svpfr.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpostnm.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svpostnm.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svprop.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svprop.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpscmap.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svpscmap.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svpsinfo.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svpsinfo.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svsfnt.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svsfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttcmap.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svttcmap.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svtteng.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svtteng.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svttglyf.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svttglyf.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\internal\services\svwinfnt.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype\internal\services</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\internal\services\svwinfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype\internal\services</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\freetype.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\freetype.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftadvanc.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftadvanc.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbbox.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftbbox.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbdf.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftbdf.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbitmap.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftbitmap.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftbzip2.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftbzip2.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcache.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftcache.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftchapters.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftchapters.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcid.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftcid.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftcolor.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftcolor.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftdriver.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftdriver.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrdef.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\fterrdef.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fterrors.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\fterrors.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftfntfmt.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftfntfmt.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgasp.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftgasp.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftglyph.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftglyph.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgxval.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftgxval.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftgzip.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftgzip.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftimage.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftimage.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftincrem.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftincrem.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlcdfil.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftlcdfil.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlist.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftlist.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftlzw.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftlzw.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmac.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftmac.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmm.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftmm.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmodapi.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftmodapi.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftmoderr.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftmoderr.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftotval.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftotval.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftoutln.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftoutln.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftparams.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftparams.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftpfr.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftpfr.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftrender.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftrender.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsizes.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftsizes.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsnames.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftsnames.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftstroke.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftstroke.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsynth.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftsynth.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftsystem.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftsystem.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttrigon.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\fttrigon.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\fttypes.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\fttypes.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ftwinfnt.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ftwinfnt.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\t1tables.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\t1tables.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\ttnameid.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\ttnameid.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttables.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\tttables.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\include\freetype\tttags.h">
-      <Filter>vsf\component\3rd-party\freetype\raw\include\freetype</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\include\freetype\tttags.h">
+      <Filter>vsf\component\3rd-party\freetype\include\freetype</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.h">
       <Filter>vsf\component\ui\tgui\utilities</Filter>
@@ -2301,20 +2304,20 @@
     <ClInclude Include="..\..\..\..\vsf\shell\sys\xboot\include\xfs\xfs.h">
       <Filter>vsf\shell\sys\xboot\include\xfs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_debug.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_debug.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_async.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_async.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_bidi.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_bidi.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_printf.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_printf.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cpicker.h">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cpicker.h">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.h">
       <Filter>vsf\component\tcpip\netdrv</Filter>
@@ -2355,20 +2358,8 @@
     <ClInclude Include="..\..\config\vsf_usr_cfg\vsf_usr_cfg_win.h">
       <Filter>usrapp\config\vsf_usr_cfg</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwip_netdrv_adapter.h">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwippools.h">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\cc.h">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\perf.h">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.h">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\sys_arch.h">
+      <Filter>vsf\component\3rd-party\lwip\port\arch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\usb\host\class\rtl8152\vsf_usbh_rtl8152.h">
       <Filter>vsf\component\usb\host\class\rtl8152</Filter>
@@ -2460,23 +2451,20 @@
     <ClInclude Include="..\..\..\..\vsf\hal\driver\x86\driver.h">
       <Filter>vsf\hal\driver\x86</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftmodule.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\vsf_config\ftmodule.h">
       <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftoption.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\vsf_config\ftoption.h">
       <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftstdlib.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\vsf_config\ftstdlib.h">
       <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftconfig.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\vsf_config\ftconfig.h">
       <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\port\vsf_config\ftheader.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\freetype\port\vsf_config\ftheader.h">
       <Filter>vsf\component\3rd-party\freetype\port\vsf_config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.h">
-      <Filter>vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.h">
       <Filter>vsf\hal\arch\common\arch_without_thread_suspend</Filter>
@@ -2781,130 +2769,91 @@
     <ClInclude Include="..\..\..\..\vsf\utilities\preprocessor\vsf_preprocessor.h">
       <Filter>vsf\utilities\preprocessor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\png.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\png.h">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngconf.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngconf.h">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngdebug.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngdebug.h">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pnginfo.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pnginfo.h">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngpriv.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngpriv.h">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngstruct.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngstruct.h">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libpng\port\pnglibconf.h">
       <Filter>vsf\component\3rd-party\libpng\port</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\crc32.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\crc32.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\deflate.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\deflate.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzguts.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\gzguts.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inffast.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inffast.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inffixed.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inffixed.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inflate.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inflate.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inftrees.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inftrees.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\trees.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\trees.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zconf.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\zconf.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zlib.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\zlib.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zutil.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\zutil.h">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cderror.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\cderror.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cdjpeg.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\cdjpeg.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cmyk.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdct.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jchuff.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jerror.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdcoefct.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jinclude.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdct.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmemsys.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdhuff.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmorecfg.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmainct.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jpegint.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmaster.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jpeglib.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmerge.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jversion.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdsample.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jerror.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jinclude.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmemsys.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmorecfg.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpeg_nbits_table.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpegcomp.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpegint.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jpeglib.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jsimd.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jsimddct.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jversion.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\transupp.h">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\turbojpeg.h">
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\transupp.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\port\jconfig.h">
@@ -2912,6 +2861,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\port\jconfigint.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\cc.h">
+      <Filter>vsf\component\3rd-party\lwip\port\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.h">
+      <Filter>vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lvgl\port\vsf_lvgl_port.h">
+      <Filter>vsf\component\3rd-party\lvgl\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwip_netdrv_adapter.h">
+      <Filter>vsf\component\3rd-party\lwip\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwippools.h">
+      <Filter>vsf\component\3rd-party\lwip\port</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3101,27 +3065,6 @@
     <ClCompile Include="..\..\..\..\vsf\component\mal\driver\mim_mal\vsf_mim_mal.c">
       <Filter>vsf\component\mal\driver\mim_mal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_activations.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_layers.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_local.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_out_shape.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_run.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\nnom_utils.c">
-      <Filter>vsf\component\3rd-party\nnom\raw\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\utilities\language_extension\simple_sscanf.c">
       <Filter>vsf\utilities\language_externsion</Filter>
     </ClCompile>
@@ -3161,251 +3104,248 @@
     <ClCompile Include="..\..\demo\usbh_demo\usbh_demo.c">
       <Filter>usrapp\demo\usbh_demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\port\vsf_lvgl_port.c">
-      <Filter>vsf\component\3rd-party\littlevgl\port</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_disp.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_disp.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_group.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_group.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_indev.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_indev.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_obj.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_obj.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_refr.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_refr.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_style.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_style.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_arc.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_arc.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_basic.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_basic.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_img.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_img.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_label.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_label.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_line.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_line.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_rect.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_rect.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_draw_triangle.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_draw_triangle.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_cache.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_img_cache.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_draw\lv_img_decoder.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_draw\lv_img_decoder.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_draw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_fmt_txt.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_fmt_txt.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_12.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_roboto_12.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_16.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_roboto_16.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_22.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_roboto_22.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_28.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_roboto_28.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_unscii_8.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_unscii_8.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_disp.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal_disp.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_indev.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal_indev.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_hal\lv_hal_tick.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_hal</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_hal\lv_hal_tick.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_hal</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_anim.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_anim.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_area.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_area.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_circ.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_circ.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_color.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_color.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_fs.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_fs.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_gc.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_gc.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_ll.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_ll.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_log.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_log.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_math.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_math.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_mem.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_mem.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_task.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_task.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_templ.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_templ.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_txt.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_txt.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_utils.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_utils.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_arc.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_arc.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_bar.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_bar.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btn.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_btn.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_btnm.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_btnm.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_calendar.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_calendar.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_canvas.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_canvas.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cb.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cb.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_chart.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_chart.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cont.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cont.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ddlist.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_ddlist.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_gauge.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_gauge.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_img.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_img.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_imgbtn.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_imgbtn.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_kb.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_kb.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_label.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_label.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_led.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_led.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_line.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_line.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_list.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_list.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_lmeter.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_lmeter.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_mbox.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_mbox.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_objx_templ.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_objx_templ.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_page.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_page.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_preload.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_preload.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_roller.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_roller.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_slider.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_slider.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_spinbox.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_spinbox.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_sw.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_sw.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_ta.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_ta.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_table.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_table.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tabview.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_tabview.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_tileview.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_tileview.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_win.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_win.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_alien.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_alien.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_default.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_default.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_material.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_material.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_mono.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_mono.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_nemo.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_nemo.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_night.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_night.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_templ.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_templ.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_themes\lv_theme_zen.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_themes</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_themes\lv_theme_zen.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_themes</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\lvgl_demo\lvgl_demo.c">
       <Filter>usrapp\demo\lvgl_demo</Filter>
@@ -3506,128 +3446,128 @@
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_port.c">
       <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\autofit\autofit.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\autofit\autofit.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bdf\bdf.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\bdf\bdf.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cff\cff.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\cff\cff.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbase.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftbase.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\bzip2\ftbzip2.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\bzip2\ftbzip2.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gzip\ftgzip.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\gzip\ftgzip.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftinit.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftinit.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\lzw\ftlzw.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\lzw\ftlzw.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsystem.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftsystem.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\gxvalid\gxvalid.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\gxvalid\gxvalid.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\otvalid\otvalid.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\otvalid\otvalid.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pcf\pcf.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\pcf\pcf.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pfr\pfr.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\pfr\pfr.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psaux\psaux.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\psaux\psaux.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\pshinter\pshinter.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\pshinter\pshinter.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\psnames\psnames.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\psnames\psnames.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\raster\raster.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\raster\raster.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\sfnt\sfnt.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\sfnt\sfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\smooth\smooth.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\smooth\smooth.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\truetype\truetype.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\truetype\truetype.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type1\type1.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\type1\type1.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cid\type1cid.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\cid\type1cid.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\type42\type42.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\type42\type42.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\winfonts\winfnt.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\winfonts\winfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\builds\windows\ftdebug.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\builds\windows\ftdebug.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbbox.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftbbox.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbdf.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftbdf.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftbitmap.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftbitmap.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftcid.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftcid.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftfstype.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftfstype.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgasp.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftgasp.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftglyph.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftglyph.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftgxval.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftgxval.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftmm.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftmm.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftotval.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftotval.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftpfr.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftpfr.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftstroke.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftstroke.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftsynth.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftsynth.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\fttype1.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\fttype1.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\base\ftwinfnt.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src\FT_MODULES</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\base\ftwinfnt.c">
+      <Filter>vsf\component\3rd-party\freetype\src\FT_MODULES</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\2.10.1\raw\src\cache\ftcache.c">
-      <Filter>vsf\component\3rd-party\freetype\raw\src</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\freetype\raw\src\cache\ftcache.c">
+      <Filter>vsf\component\3rd-party\freetype\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\ui\tgui\utilities\vsf_tgui_text.c">
       <Filter>vsf\component\ui\tgui\utilities</Filter>
@@ -3893,26 +3833,26 @@
     <ClCompile Include="..\..\demo\xui_demo\xui_demo.c">
       <Filter>usrapp\demo\xui_demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_core\lv_debug.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_core\lv_debug.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_roboto_28_compressed.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_28_compressed.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_font\lv_font_roboto_12_subpx.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_font</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_font\lv_font_roboto_12_subpx.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_bidi.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_bidi.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_async.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_async.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_misc\lv_printf.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_misc</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_misc\lv_printf.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_misc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\raw\lvgl\src\lv_objx\lv_cpicker.c">
-      <Filter>vsf\component\3rd-party\littlevgl\raw\src\lv_objx</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\raw\src\lv_objx\lv_cpicker.c">
+      <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_objx</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\component\tcpip\netdrv\vsf_netdrv.c">
       <Filter>vsf\component\tcpip\netdrv</Filter>
@@ -3950,152 +3890,146 @@
     <ClCompile Include="..\..\..\..\vsf\component\3rd-party\vsfip\raw\proto\dns\vsfip_dnsc.c">
       <Filter>vsf\component\3rd-party\vsfip\raw\proto\dns</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\lwip_netdrv_adapter.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\api_lib.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\port\arch\sys_arch.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\port\arch</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\api_msg.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\api_lib.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\err.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\api_msg.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\if_api.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\err.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\netbuf.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\if_api.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\netdb.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netbuf.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\netifapi.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netdb.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\sockets.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\netifapi.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\api\tcpip.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\sockets.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\altcp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\api\tcpip.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\api</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\altcp_alloc.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\altcp_tcp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_alloc.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\def.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\altcp_tcp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\dns.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\def.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\inet_chksum.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\dns.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\init.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\inet_chksum.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ip.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\init.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\mem.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ip.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\memp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\mem.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\netif.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\memp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\pbuf.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\netif.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\raw.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\pbuf.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\stats.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\raw.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\sys.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\stats.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\tcp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\sys.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\tcp_in.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\tcp_out.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp_in.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\timeouts.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\tcp_out.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\udp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\timeouts.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\autoip.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\udp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\dhcp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\autoip.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\etharp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\dhcp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\icmp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\etharp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\igmp.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\icmp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\ip4.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\igmp.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\ip4_addr.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv4\ip4_frag.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4_addr.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\dhcp6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4\ip4_frag.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv4</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\ethip6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\dhcp6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\icmp6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ethip6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\inet6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\icmp6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\ip6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\inet6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\ip6_addr.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\ip6_frag.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6_addr.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\mld6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\ip6_frag.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\core\ipv6\nd6.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\core\ipv6</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\mld6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6\nd6.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\core\ipv6</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\2.1.2\raw\src\netif\ethernet.c">
-      <Filter>vsf\component\3rd-party\lwip\2.1.2\raw\src\netif</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\raw\src\netif\ethernet.c">
+      <Filter>vsf\component\3rd-party\lwip\raw\src\netif</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\lwip_demo\lwip_demo.c">
       <Filter>usrapp\demo\lwip_demo</Filter>
@@ -4150,9 +4084,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\vsf\hal\driver\x86\win\driver.c">
       <Filter>vsf\hal\driver\x86\win</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\littlevgl\6.1.2\extension\lv_lib_freetype\raw\lv_freetype.c">
-      <Filter>vsf\component\3rd-party\littlevgl\extension\lv_lib_freetype\raw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\kernel_test\sem_test.c">
       <Filter>usrapp\demo\kernel_test</Filter>
@@ -4499,302 +4430,371 @@
     <ClCompile Include="..\..\..\..\vsf\shell\media\sdl2\3rd-party\SDL_image\IMG_xxx.c">
       <Filter>vsf\shell\media\sdl2\3rd-party\SDL_image</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\png.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\png.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngerror.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngerror.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngget.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngget.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngmem.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngmem.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngpread.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngpread.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngread.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngread.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngrio.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngrio.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngrtran.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngrtran.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngrutil.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngrutil.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngset.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngset.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngtrans.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngtrans.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwio.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngwio.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwrite.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngwrite.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwtran.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngwtran.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\1.6.37\pngwutil.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libpng\raw\pngwutil.c">
       <Filter>vsf\component\3rd-party\libpng\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\adler32.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\adler32.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\compress.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\compress.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\crc32.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\crc32.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\deflate.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\deflate.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzclose.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\gzclose.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzlib.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\gzlib.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzread.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\gzread.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\gzwrite.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\gzwrite.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\infback.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\infback.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inffast.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inffast.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inflate.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inflate.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\inftrees.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\inftrees.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\trees.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\trees.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\uncompr.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\uncompr.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\1.2.11\zutil.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\zlib\raw\zutil.c">
       <Filter>vsf\component\3rd-party\zlib\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\cdjpeg.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\cdjpeg.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jaricom.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jaricom.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcapimin.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcapimin.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcapistd.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcapistd.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcarith.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcarith.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jccoefct.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jccoefct.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jccolor.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jccolor.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcdctmgr.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcdctmgr.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jchuff.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jchuff.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcicc.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcinit.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcinit.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcmainct.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcmainct.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcmarker.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcmarker.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcmaster.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcmaster.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcomapi.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcomapi.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcparam.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcparam.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcprepct.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcphuff.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jcsample.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcprepct.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jctrans.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jcsample.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdapimin.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jctrans.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdapistd.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdapimin.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdarith.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdapistd.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdatadst.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdarith.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdatasrc.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatadst.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdcoefct.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatadst-tj.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdcolor.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatasrc.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jddctmgr.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdatasrc-tj.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdhuff.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdcoefct.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdinput.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdcolor.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmainct.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jddctmgr.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmarker.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdhuff.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmaster.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdicc.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdmerge.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdinput.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdpostct.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmainct.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdsample.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmarker.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jdtrans.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmaster.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jerror.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdmerge.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jfdctflt.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdphuff.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jfdctfst.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdpostct.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jfdctint.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdsample.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctflt.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jdtrans.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctfst.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jerror.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jidctint.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jfdctflt.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmemmgr.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jfdctfst.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jmemnobs.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jfdctint.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jquant1.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctflt.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jquant2.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctfst.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\jutils.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctint.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdbmp.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jidctred.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdcolmap.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmemmgr.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdgif.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jmemnobs.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdppm.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jquant1.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdswitch.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jquant2.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\rdtarga.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jsimd_none.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\transupp.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\jutils.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\wrbmp.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdbmp.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\wrgif.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdcolmap.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\wrppm.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdgif.c">
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\wrtarga.c">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdppm.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdrle.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom_layers.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdswitch.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom_tensor.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\rdtarga.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\core\nnom_utils.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\transupp.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_activation.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\turbojpeg.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_avgpool.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrbmp.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_baselayer.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrgif.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_concat.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrppm.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_conv2d.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrrle.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_conv2d_trans.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\libjpeg-turbo\raw\2.0.6\wrtarga.c">
-      <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_cropping.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_dense.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_dw_conv2d.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_flatten.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_global_pool.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_gru_cell.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_input.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_lambda.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_lstm_cell.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_matrix.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_maxpool.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_output.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_rnn.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_simple_cell.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_softmax.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_sumpool.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_upsample.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\nnom\raw\src\layers\nnom_zero_padding.c">
+      <Filter>vsf\component\3rd-party\nnom\raw\src\layers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\port\arch\sys_arch.c">
+      <Filter>vsf\component\3rd-party\lwip\port\arch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.c">
+      <Filter>vsf\component\3rd-party\lvgl\extension\lv_lib_freetype\raw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lvgl\port\vsf_lvgl_port.c">
+      <Filter>vsf\component\3rd-party\lvgl\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\3rd-party\lwip\port\lwip_netdrv_adapter.c">
+      <Filter>vsf\component\3rd-party\lwip\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_lwip.c">
+      <Filter>vsf\component\usb\driver\dcd\usbip_dcd\backend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\vsf\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_win.c">
+      <Filter>vsf\component\usb\driver\dcd\usbip_dcd\backend</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
