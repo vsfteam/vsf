@@ -177,6 +177,35 @@ void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_lin
 }
 #endif
 
+static uint32_t __SDL_MatchColor(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
+{
+#define __SDL_COLOR_MATCHER(__FORMAT, __RMASK, __GMASK, __BMASK, __AMASK)       \
+            { .format = (__FORMAT), .Rmask = (__RMASK), .Gmask = (__GMASK), .Bmask = (__BMASK), .Amask = (__AMASK) }
+    struct {
+        uint32_t Rmask, Gmask, Bmask, Amask;
+        uint32_t format;
+    } static const __color_matcher[] = {
+        __SDL_COLOR_MATCHER(SDL_PIXELFORMAT_ARGB8888, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000),
+    };
+
+    for (int i = 0; i < dimof(__color_matcher); i++) {
+        if (    __color_matcher[i].Rmask == Rmask
+            &&  __color_matcher[i].Gmask == Gmask
+            &&  __color_matcher[i].Bmask == Bmask
+            &&  __color_matcher[i].Amask == Amask) {
+            return __color_matcher[i].format;
+        }
+    }
+
+    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
+    if (pixel_bitlen < 0) {
+        return SDL_PIXELFORMAT_UNKNOWN;
+    }
+
+    uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
+    return VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
+}
+
 const SDL_version * SDL_Linked_Version(void)
 {
     static const SDL_version __sdl2_version = {
@@ -477,13 +506,8 @@ SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, in
 
 SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
-    if (pixel_bitlen < 0) {
-        return NULL;
-    }
-
-    uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
-    uint32_t format = VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
+    uint32_t format = __SDL_MatchColor(Rmask, Gmask, Bmask, Amask);
+    VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
     if (surface != NULL) {
         surface->__format.Rmask     = Rmask;
@@ -496,13 +520,8 @@ SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint
 
 SDL_Surface * SDL_CreateRGBSurfaceFrom(void * pixels, int w, int h, int depth, int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    int_fast8_t pixel_bitlen = vsf_msb(Rmask | Gmask | Bmask | Amask);
-    if (pixel_bitlen < 0) {
-        return NULL;
-    }
-
-    uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
-    uint32_t format = VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
+    uint32_t format = __SDL_MatchColor(Rmask, Gmask, Bmask, Amask);
+    VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, depth, pitch, format);
     if (surface != NULL) {
         surface->__format.Rmask     = Rmask;
