@@ -1,3 +1,33 @@
 [submodule "source/vsf/component/3rd-party/btstack/raw"]
 	path = source/vsf/component/3rd-party/btstack/raw
 	url = ../btstack
+[submodule "source/vsf/component/3rd-party/coremark/raw"]
+	path = source/vsf/component/3rd-party/coremark/raw
+	url = ../coremark
+[submodule "source/vsf/component/3rd-party/gato/raw"]
+	path = source/vsf/component/3rd-party/gato/raw
+	url = ../Gato
+[submodule "source/vsf/component/3rd-party/freetype/raw"]
+	path = source/vsf/component/3rd-party/freetype/raw
+	url = ../freetype
+[submodule "source/vsf/component/3rd-party/zlib/raw"]
+	path = source/vsf/component/3rd-party/zlib/raw
+	url = ../zlib
+[submodule "source/vsf/component/3rd-party/nuklear/raw"]
+	path = source/vsf/component/3rd-party/nuklear/raw
+	url = ../Nuklear
+[submodule "source/vsf/component/3rd-party/nnom/raw"]
+	path = source/vsf/component/3rd-party/nnom/raw
+	url = ../nnom
+[submodule "source/vsf/component/3rd-party/lua/raw"]
+	path = source/vsf/component/3rd-party/lua/raw
+	url = ../lua
+[submodule "source/vsf/component/3rd-party/lwip/raw"]
+	path = source/vsf/component/3rd-party/lwip/raw
+	url = ../lwip
+[submodule "source/vsf/component/3rd-party/libpng/raw"]
+	path = source/vsf/component/3rd-party/libpng/raw
+	url = ../libpng
+[submodule "source/vsf/component/3rd-party/libjpeg-turbo/raw"]
+	path = source/vsf/component/3rd-party/libjpeg-turbo/raw
+	url = ../libjpeg-turbo
