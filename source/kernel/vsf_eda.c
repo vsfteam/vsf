@@ -903,6 +903,18 @@ vsf_err_t vsf_eda_fini(vsf_eda_t *this_ptr)
     __vsf_teda_cancel_timer((vsf_teda_t *)this_ptr);
 #endif
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+    __vsf_eda_frame_t *frame = NULL;
+    while (this_ptr->flag.feature.is_use_frame) {
+        frame = __vsf_eda_pop_frame(&this_ptr->fn.frame_list);
+        if (NULL == frame) {
+            break;
+        }
+        this_ptr->flag.feature = frame->state.feature;
+        vsf_eda_free_frame(frame);
+    }
+#endif
+
     vsf_evtq_on_eda_fini(this_ptr);
     return VSF_ERR_NONE;
 }

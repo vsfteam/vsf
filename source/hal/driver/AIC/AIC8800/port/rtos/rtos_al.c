@@ -183,7 +183,30 @@ int rtos_task_create(   rtos_task_fct func,
                         (uint64_t *)&thread[1], // no need to align to 64-bit
                         (stack_depth << 2));
 
+    if (task_handle) {
+        *task_handle = thread;
+    }
     return 0;
+}
+
+rtos_task_handle rtos_get_task_handle(void)
+{
+    vsf_thread_t *thread = vsf_thread_get_cur();
+    return container_of(thread, vsf_rtos_thread_t, use_as__vsf_thread_t);
+}
+
+void rtos_task_delete(rtos_task_handle task_handle)
+{
+    rtos_task_handle cur_task_handle = rtos_get_task_handle();
+    if (!task_handle) {
+        task_handle = cur_task_handle;
+    }
+
+    if (task_handle == cur_task_handle) {
+        vsf_thread_exit();
+    } else {
+        vsf_eda_fini(&task_handle->use_as__vsf_eda_t);
+    }
 }
 
 void rtos_task_suspend(int duration)
@@ -204,6 +227,34 @@ void rtos_unprotect(uint32_t protect)
     vsf_unprotect_sched(protect);
 }
 
+// notification
+int rtos_task_init_notification(rtos_task_handle task)
+{
+    return 0;
+}
+
+uint32_t rtos_task_wait_notification(int timeout)
+{
+    VSF_ASSERT(false);
+    return 0;
+}
+
+void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
+{
+    VSF_ASSERT(false);
+    if (isr) {
+    } else {
+    }
+}
+
+void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool isr)
+{
+    VSF_ASSERT(false);
+    if (isr) {
+    } else {
+    }
+}
+
 // semaphore
 int rtos_semaphore_create(rtos_semaphore *semaphore, int max_count, int init_count)
 {
@@ -219,6 +270,15 @@ int rtos_semaphore_create(rtos_semaphore *semaphore, int max_count, int init_cou
 void rtos_semaphore_delete(rtos_semaphore semaphore)
 {
     vsf_heap_free(semaphore);
+}
+
+int rtos_semaphore_get_count(rtos_semaphore semaphore)
+{
+    int result;
+    vsf_protect_t orig = vsf_protect_sched();
+        result = semaphore->cur_union.bits.cur;
+    vsf_unprotect_sched(orig);
+    return result;
 }
 
 int rtos_semaphore_wait(rtos_semaphore semaphore, int timeout)

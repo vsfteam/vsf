@@ -4680,6 +4680,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst</state>
@@ -8445,9 +8446,6 @@
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\compiler.h</name>
                             </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\ll.h</name>
-                            </file>
                         </group>
                         <group>
                             <name>usb</name>
@@ -9222,6 +9220,15 @@
                                     <name>lib</name>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\lib\armgcc_4_8\libwifi.a</name>
+                                    </file>
+                                </group>
+                            </group>
+                            <group>
+                                <name>wpa_supplicant</name>
+                                <group>
+                                    <name>lib</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wpa_supplicant\lib\armgcc_4_8\libwpa.a</name>
                                     </file>
                                 </group>
                             </group>

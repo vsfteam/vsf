@@ -27,6 +27,7 @@
 #include "rwnx_defs.h"
 #include "rwnx_msg_tx.h"
 #include "wlan_if.h"
+#include "sleep_api.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -90,9 +91,35 @@ static int __wifi_scan_main(int argc, char *argv[])
     return 0;
 }
 
+static int __wifi_connect_main(int argc, char *argv[])
+{
+    if (!wlan_connected) {
+        char *ssid = "", *pw = "passwd";
+
+#if PLF_HW_PXP
+        rtos_task_suspend(5);   // wait for AP starting
+#endif
+        if (0 == wlan_start_sta((uint8_t *)ssid, (uint8_t *)pw, 0)) {
+            wlan_connected = 1;
+        }
+
+#if CONFIG_SLEEP_LEVEL == 1
+        sleep_level_set(PM_LEVEL_LIGHT_SLEEP);
+#elif CONFIG_SLEEP_LEVEL == 2
+        sleep_level_set(PM_LEVEL_DEEP_SLEEP);
+#elif CONFIG_SLEEP_LEVEL == 3
+        sleep_level_set(PM_LEVEL_HIBERNATE);
+#endif
+        user_sleep_allow(1);
+    }
+
+    return 0;
+}
+
 int fhost_application_init(void)
 {
     busybox_bind("/sbin/wifi_scan", __wifi_scan_main);
+    busybox_bind("/sbin/wifi_connect", __wifi_connect_main);
     return 0;
 }
 
