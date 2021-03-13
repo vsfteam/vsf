@@ -331,6 +331,14 @@ typedef struct SDL_PixelFormat {
     uint32_t Gmask;
     uint32_t Bmask;
     uint32_t Amask;
+    uint8_t Rshift;
+    uint8_t Gshift;
+    uint8_t Bshift;
+    uint8_t Ashift;
+    uint8_t Rloss;
+    uint8_t Gloss;
+    uint8_t Bloss;
+    uint8_t Aloss;
     uint8_t BitsPerPixel;
     uint8_t BytesPerPixel;
 } SDL_PixelFormat;
