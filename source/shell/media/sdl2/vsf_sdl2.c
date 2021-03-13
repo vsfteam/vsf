@@ -36,15 +36,6 @@
 #   error vsf_sdl2 can only run in thread mode
 #endif
 
-#define __SDL_DEF_COLOR(__FORMAT, __RMASK, __GMASK, __BMASK, __AMASK)           \
-            {                                                                   \
-                .format = (__FORMAT),                                           \
-                .Rmask = (__RMASK),                                             \
-                .Gmask = (__GMASK),                                             \
-                .Bmask = (__BMASK),                                             \
-                .Amask = (__AMASK),                                             \
-            }
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __vsf_sdl2_fast_copy(__pdst, __psrc, __num)                             \
@@ -87,7 +78,7 @@ struct SDL_Renderer {
 
 struct SDL_Texture {
     uint16_t w, h;
-    vk_disp_color_type_t format;
+    SDL_PixelFormat *format;
     void *pixels;
 
     uint32_t __pixels[0] ALIGN(4);
@@ -122,10 +113,19 @@ extern void vsf_sdl2_pixel_fill(uint_fast16_t data_line_num, uint_fast32_t pixel
 NO_INIT vsf_sdl2_t __vsf_sdl2;
 
 struct {
-    uint32_t Rmask, Gmask, Bmask, Amask;
-    uint32_t format;
+    uint32_t color;
+    SDL_PixelFormat format;
 } static const __vsf_sdl2_color[] = {
-    __SDL_DEF_COLOR(SDL_PIXELFORMAT_ARGB8888, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000),
+    {
+        .color          = SDL_PIXELFORMAT_ARGB8888,
+        .format         = {
+            .format     = SDL_PIXELFORMAT_ARGB8888,
+            .Rmask      = 0x00FF0000,
+            .Gmask      = 0x0000FF00,
+            .Bmask      = 0x000000FF,
+            .Amask      = 0xFF000000,
+        },
+    },
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -193,14 +193,14 @@ void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_lin
 }
 #endif
 
-static uint32_t __SDL_GetColorFormatFromMask(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
+static uint32_t __SDL_GetColorFromMask(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
     for (uint_fast16_t i = 0; i < dimof(__vsf_sdl2_color); i++) {
-        if (    __vsf_sdl2_color[i].Rmask == Rmask
-            &&  __vsf_sdl2_color[i].Gmask == Gmask
-            &&  __vsf_sdl2_color[i].Bmask == Bmask
-            &&  __vsf_sdl2_color[i].Amask == Amask) {
-            return __vsf_sdl2_color[i].format;
+        if (    __vsf_sdl2_color[i].format.Rmask == Rmask
+            &&  __vsf_sdl2_color[i].format.Gmask == Gmask
+            &&  __vsf_sdl2_color[i].format.Bmask == Bmask
+            &&  __vsf_sdl2_color[i].format.Amask == Amask) {
+            return __vsf_sdl2_color[i].color;
         }
     }
 
@@ -211,6 +211,34 @@ static uint32_t __SDL_GetColorFormatFromMask(uint32_t Rmask, uint32_t Gmask, uin
 
     uint_fast8_t pixel_bytelen = (++pixel_bitlen + 7) >> 3;
     return VSF_DISP_COLOR_VALUE(SDL_PIXELFORMAT_BYMASK_IDX, pixel_bitlen, pixel_bytelen, Amask != 0);
+}
+
+static const SDL_PixelFormat * __SDL_GetFormatFromColor(uint32_t color)
+{
+    for (uint_fast16_t i = 0; i < dimof(__vsf_sdl2_color); i++) {
+        if (__vsf_sdl2_color[i].color == color) {
+            return &__vsf_sdl2_color[i].format;
+        }
+    }
+    // all colors should be supported, if runs here, add color format to __vsf_sdl2_color
+    VSF_SDL2_ASSERT(false);
+    return NULL;
+}
+
+static void __SDL_CopyWithFormat(
+                            uint_fast16_t data_line_num, uint_fast32_t data_line_size,
+                            uint8_t *pdst, uint_fast32_t dst_pitch,
+                            uint8_t *psrc, uint_fast32_t src_pitch,
+                            SDL_PixelFormat * dst_fmt, SDL_PixelFormat * src_fmt)
+{
+    VSF_SDL2_ASSERT((dst_fmt != NULL) && (src_fmt != NULL));
+    if (dst_fmt->format == src_fmt->format) {
+        vsf_sdl2_pixel_copy(data_line_num, data_line_size, pdst, dst_pitch, psrc, src_pitch);
+        return;
+    }
+
+    // TODO: copy with color conversion
+    VSF_SDL2_ASSERT(false);
 }
 
 const SDL_version * SDL_Linked_Version(void)
@@ -513,7 +541,7 @@ SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, in
 
 SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    uint32_t format = __SDL_GetColorFormatFromMask(Rmask, Gmask, Bmask, Amask);
+    uint32_t format = __SDL_GetColorFromMask(Rmask, Gmask, Bmask, Amask);
     VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
     if (surface != NULL) {
@@ -527,7 +555,7 @@ SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint
 
 SDL_Surface * SDL_CreateRGBSurfaceFrom(void * pixels, int w, int h, int depth, int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    uint32_t format = __SDL_GetColorFormatFromMask(Rmask, Gmask, Bmask, Amask);
+    uint32_t format = __SDL_GetColorFromMask(Rmask, Gmask, Bmask, Amask);
     VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, depth, pitch, format);
     if (surface != NULL) {
@@ -586,7 +614,7 @@ int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color)
 
 int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * dst, SDL_Rect * dstrect)
 {
-    VSF_SDL2_ASSERT(src->format->format == dst->format->format);
+    VSF_SDL2_ASSERT((src != NULL) && (dst != NULL));
 
     SDL_Rect src_real_area, dst_real_area;
     SDL_Rect src_area = {
@@ -616,9 +644,10 @@ int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * d
     dst_real_area.h = src_real_area.h = min(dst_real_area.h, src_real_area.h);
 
     uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(src->format->format);
-    vsf_sdl2_pixel_copy(src_real_area.h, pixel_size * src_real_area.w,
+    __SDL_CopyWithFormat(src_real_area.h, pixel_size * src_real_area.w,
                 (uint8_t *)dst->pixels + pixel_size * (dst_real_area.y * dst_area.w + dst_real_area.x), dst->pitch,
-                (uint8_t *)src->pixels + pixel_size * (src_real_area.y * src_area.w + src_real_area.x), src->pitch);
+                (uint8_t *)src->pixels + pixel_size * (src_real_area.y * src_area.w + src_real_area.x), src->pitch,
+                dst->format, src->format);
     return 0;
 }
 
@@ -654,14 +683,10 @@ int SDL_RenderClear(SDL_Renderer *renderer)
 int SDL_RenderCopy(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect *srcrect, const SDL_Rect *dstrect)
 {
     VSF_SDL2_ASSERT((renderer != NULL) && (texture != NULL));
-    // not support format conversion now
-    VSF_SDL2_ASSERT(renderer->window->format == texture->format);
 
     SDL_Window *window = renderer->window;
     SDL_Rect src_area, dst_area;
     SDL_Rect texture_area = {
-        .x = 0,
-        .y = 0,
         .w = texture->w,
         .h = texture->h,
     };
@@ -683,10 +708,12 @@ int SDL_RenderCopy(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
     dst_area.w = src_area.w = min(dst_area.w, src_area.w);
     dst_area.h = src_area.h = min(dst_area.h, src_area.h);
 
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format);
-    vsf_sdl2_pixel_copy(src_area.h, pixel_size * src_area.w,
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format->format);
+    SDL_PixelFormat *dst_fmt = (SDL_PixelFormat *)__SDL_GetFormatFromColor(renderer->window->format);
+    __SDL_CopyWithFormat(src_area.h, pixel_size * src_area.w,
                 (uint8_t *)window->pixels + pixel_size * (dst_area.y * window->area.w + dst_area.x), pixel_size * window->area.w,
-                (uint8_t *)texture->pixels + pixel_size * (src_area.y * texture->w + src_area.x), pixel_size * texture->w);
+                (uint8_t *)texture->pixels + pixel_size * (src_area.y * texture->w + src_area.x), pixel_size * texture->w,
+                dst_fmt, texture->format);
     return 0;
 }
 
@@ -707,7 +734,8 @@ SDL_Texture * SDL_CreateTexture(SDL_Renderer *renderer, uint32_t format, int acc
     uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(format);
     SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Renderer) + pixel_size * w * h);
     if (texture != NULL) {
-        texture->format = format;
+        texture->format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(format);
+        VSF_SDL2_ASSERT(texture->format != NULL);
         texture->w      = w;
         texture->h      = h;
         texture->pixels = &texture->__pixels;
@@ -720,7 +748,7 @@ SDL_Texture * SDL_CreateTextureFromSurface(SDL_Renderer *renderer, SDL_Surface *
 {
     SDL_Texture *texture = vsf_heap_malloc(sizeof(struct SDL_Renderer));
     if (texture != NULL) {
-        texture->format = surface->format->format;
+        texture->format = surface->format;
         texture->w      = surface->w;
         texture->h      = surface->h;
         texture->pixels = surface->pixels;
@@ -749,7 +777,7 @@ int SDL_UpdateTexture(SDL_Texture *texture, const SDL_Rect *rect, const void *pi
         area.h  = texture->h;
     }
 
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format);
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(texture->format->format);
     vsf_sdl2_pixel_copy(area.h, pixel_size * area.w,
                 (uint8_t *)texture->pixels + pixel_size * (area.y * texture->w + area.x), pixel_size * texture->w,
                 (uint8_t *)pixels, pitch);
