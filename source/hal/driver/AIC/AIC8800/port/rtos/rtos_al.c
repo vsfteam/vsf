@@ -188,7 +188,10 @@ int rtos_task_create(   rtos_task_fct func,
 
 void rtos_task_suspend(int duration)
 {
-    VSF_ASSERT(false);
+    if (duration <= 0) {
+        return;
+    }
+    vsf_thread_delay_ms(duration);
 }
 
 uint32_t rtos_protect(void)
