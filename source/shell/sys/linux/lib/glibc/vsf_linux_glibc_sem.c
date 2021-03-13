@@ -24,9 +24,11 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/semaphore.h"
+#   include "../../include/errno.h"
 #else
 #   include <unistd.h>
 #   include <semaphore.h>
+#   include <errno.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDIO == ENABLED
 #   include "../../include/simple_libc/stdio.h"

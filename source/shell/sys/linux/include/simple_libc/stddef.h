@@ -33,11 +33,11 @@ extern "C" {
 
 #ifndef __WIN__
 
-#if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
+#   if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
 typedef __PTRDIFF_TYPE__ ptrdiff_t;
-#else
+#   else
 typedef long int         ptrdiff_t;
-#endif
+#   endif
 
 #endif
 
@@ -46,7 +46,7 @@ typedef long int         ptrdiff_t;
 #endif
 
 #if     !defined(__cplusplus)
-// TODO: it seems that ARM9 library in IAR does not support wchar_t
+// TODO: it seems that IAR for ARM9 does not support wchar_t if simple_libc is used
 #   if !(__IS_COMPILER_IAR__ && (__ARM_ARCH == 5))
 typedef unsigned short  wchar_t;
 #   endif
