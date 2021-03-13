@@ -59,10 +59,14 @@ long double strtold(const char *str, char **endptr);
 void *bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *));
 
 int mblen(const char *str, size_t n);
+
+// TODO: it seems that ARM9 library in IAR does not support wchar_t
+#if !(__IS_COMPILER_IAR__ && (__ARM_ARCH == 5))
 size_t mbstowcs(wchar_t *dst, const char *src, size_t len);
 int mbtowc(wchar_t *pwc, const char *str, size_t n);
 size_t wcstombs(char *str, const wchar_t *pwcs, size_t n);
 int wctomb(char *str, wchar_t wchar);
+#endif
 
 #ifndef RAND_MAX
 #   ifdef __WIN__

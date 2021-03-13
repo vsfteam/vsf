@@ -46,7 +46,10 @@ typedef long int         ptrdiff_t;
 #endif
 
 #if     !defined(__cplusplus)
+// TODO: it seems that ARM9 library in IAR does not support wchar_t
+#   if !(__IS_COMPILER_IAR__ && (__ARM_ARCH == 5))
 typedef unsigned short  wchar_t;
+#   endif
 typedef unsigned short  wint_t;
 #elif   defined(__WIN__)
 namespace std {
