@@ -100,7 +100,7 @@ static const uint8_t __usbd_langid_str_desc[] = {
 struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
-    USB_UNICODE str[dimof(APP_CFG_USBD_VENDOR_STR) - 1];
+    usb_unicode_t str[dimof(APP_CFG_USBD_VENDOR_STR) - 1];
 } PACKED static const __usbd_vendor_str_desc = {
     .bLength            = sizeof(__usbd_vendor_str_desc),
     .bDescriptorType    = USB_DT_STRING,
@@ -109,7 +109,7 @@ struct {
 struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
-    USB_UNICODE str[dimof(APP_CFG_USBD_PRODUCT_STR) - 1];
+    usb_unicode_t str[dimof(APP_CFG_USBD_PRODUCT_STR) - 1];
 } PACKED static const __usbd_product_str_desc = {
     .bLength            = sizeof(__usbd_product_str_desc),
     .bDescriptorType    = USB_DT_STRING,
@@ -118,7 +118,7 @@ struct {
 struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
-    USB_UNICODE str[dimof(APP_CFG_USBD_SERIAL_STR) - 1];
+    usb_unicode_t str[dimof(APP_CFG_USBD_SERIAL_STR) - 1];
 } PACKED static const __usbd_serial_str_desc = {
     .bLength            = sizeof(__usbd_serial_str_desc),
     .bDescriptorType    = USB_DT_STRING,
@@ -136,7 +136,7 @@ const uint8_t __usbd_bos_desc[USB_DT_BOS_SIZE + USB_BOS_CAP_WEBUSB_LEN] = {
 struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
-    USB_UNICODE str[dimof(USB_BOS_STR) - 1];
+    usb_unicode_t str[dimof(USB_BOS_STR) - 1];
 } PACKED static const __usbd_bos_str_desc = {
     .bLength            = sizeof(__usbd_bos_str_desc),
     .bDescriptorType    = USB_DT_STRING,
@@ -148,10 +148,10 @@ static const uint8_t __usbd_winusb_desc[] = {
     0x00, 0x01,
     0x04, 0x00,
     0x1,
-    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 
+    0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 
     0x0,
-    0x1, 
+    0x1,
     'W', 'I', 'N', 'U', 'S', 'B', 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
