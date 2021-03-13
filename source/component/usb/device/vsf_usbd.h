@@ -272,7 +272,7 @@ extern "C" {
                                         __max_power_ma      /* power consumption from USB host in mA, eg: 500 */\
                                         )                                       \
         __usbd_common_desc(__name, (__str_product), (__str_vendor), (__str_serial), USB_CLASS_MISC, 0x02, 0x02, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
-            
+
 
 #define __usbd_func_desc(__name)                                                \
         };
@@ -611,6 +611,10 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
 #include "../driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
 #include "../driver/otg/dwcotg/vsf_dwcotg_dcd.h"
 #include "../driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
+
+#if defined(VSF_USBD_CFG_DRV_LV0_OO) && defined(VSF_USBD_CFG_DRV_LV0_OO_OBJ_HEADER)
+#   include VSF_USBD_CFG_DRV_LV0_OO_OBJ_HEADER
+#endif
 
 #undef __VSF_USBD_CLASS_IMPLEMENT
 #undef __VSF_USBD_CLASS_INHERIT__
