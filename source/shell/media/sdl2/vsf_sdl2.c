@@ -343,8 +343,10 @@ static void __SDL_CopyWithFormat(
 
             color =     ((r >> dst_rloss) << dst_rshift)
                     |   ((g >> dst_gloss) << dst_gshift)
-                    |   ((b >> dst_bloss) << dst_bshift)
-                    |   ((a >> dst_aloss) << dst_ashift);
+                    |   ((b >> dst_bloss) << dst_bshift);
+            if (dst_amask != 0) {
+                color |= (a >> dst_aloss) << dst_ashift;
+            }
             switch (dst_pixel_size) {
             case 1: *(uint8_t *)dst_tmp = color;    dst_tmp += 1;   break;
             case 2: *(uint16_t *)dst_tmp = color;   dst_tmp += 2;   break;
