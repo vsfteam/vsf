@@ -103,6 +103,7 @@ int nuklear_main(int argc, char **argv)
     if (usrapp_ui_common.disp->param.color != VSF_DISP_COLOR_ARGB8888) {
         ((vk_disp_param_t *)&usrapp_ui_common.disp->param)->color = VSF_DISP_COLOR_ARGB8888;
     }
+    vsf_sdl2_init(usrapp_ui_common.disp);
 
     SDL_Init(SDL_INIT_VIDEO);
     printf("sdl init called...\n");
