@@ -102,8 +102,11 @@ static void __vsf_eda_fsm_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 
 SECTION(".text.vsf.kernel.__vsf_eda_get_valid_eda")
 static vsf_eda_t * __vsf_eda_get_valid_eda(vsf_eda_t *this_ptr);
+
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION(".text.vsf.kernel.eda")
 static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *this_ptr, vsf_evt_t evt, bool force);
+#endif
 
 //! should be provided by user
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
@@ -277,7 +280,7 @@ static void __vsf_evtq_post_do(vsf_eda_t *this_ptr, uintptr_t value)
     __vsf_eda.cur.eda = this_ptr;
     if (value & 1) {
         __vsf_eda.cur.evt = (vsf_evt_t)(value >> 1);
-        __vsf_eda.cur.msg = NULL;
+        __vsf_eda.cur.msg = (uintptr_t)NULL;
     } else {
         __vsf_eda.cur.evt = VSF_EVT_MESSAGE;
         __vsf_eda.cur.msg = value;
@@ -929,12 +932,14 @@ vsf_err_t vsf_eda_post_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
     return vsf_evtq_post_evt(this_ptr, evt);
 }
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION(".text.vsf.kernel.eda")
 static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *this_ptr, vsf_evt_t evt, bool force)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     return vsf_evtq_post_evt_ex(this_ptr, evt, force);
 }
+#endif
 
 SECTION(".text.vsf.kernel.vsf_eda_post_msg")
 vsf_err_t vsf_eda_post_msg(vsf_eda_t *this_ptr, void *msg)
@@ -1071,7 +1076,7 @@ vsf_err_t vsf_kernel_start(void)
     err = vsf_eda_init(&__vsf_eda.teda.use_as__vsf_eda_t, __vsf_eda.highest_prio);
 #   elif defined(__VSF_KERNEL_TASK_EDA)
     __vsf_eda.eda.fn.evthandler = __vsf_kernel_evthandler;
-    err = vsf_eda_init(&__vsf_eda.eda, __vsf_eda.highest_prio, false);
+    err = vsf_eda_init(&__vsf_eda.eda, __vsf_eda.highest_prio);
 #   endif
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED

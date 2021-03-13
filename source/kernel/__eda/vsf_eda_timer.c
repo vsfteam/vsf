@@ -348,7 +348,9 @@ SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 vsf_err_t vsf_teda_cancel_timer(void)
 {
     __vsf_teda_cancel_timer(NULL);
+#if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
     vsf_evtq_clean_evt(VSF_EVT_TIMER);
+#endif
     return VSF_ERR_NONE;
 }
 
@@ -360,11 +362,11 @@ vsf_err_t vsf_teda_cancel_timer(void)
 #   pragma GCC diagnostic pop
 #endif
 
-#endif
+#endif      // VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_warning=pe111
 #endif
 
-#endif
+#endif      // VSF_USE_KERNEL && __EDA_GADGET__

@@ -181,11 +181,13 @@ static vsf_err_t __vsf_evtq_post(vsf_eda_t *eda, uintptr_t value, bool force)
 #endif
 
     orig = vsf_protect_int();
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
     if (eda->flag.state.is_limitted && eda->flag.state.is_ready && !force) {
         vsf_unprotect_int(orig);
         __vsf_os_free_evt_node(node);
         return VSF_ERR_FAIL;
     }
+#endif
 
     vsf_slist_queue_enqueue(vsf_evt_node_t, use_as__vsf_slist_node_t, &eda->evt_list, node);
     evtq = __vsf_os_evtq_get((vsf_prio_t)eda->cur_priority);
