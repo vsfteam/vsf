@@ -36,6 +36,15 @@
 #   error vsf_sdl2 can only run in thread mode
 #endif
 
+#define __SDL_DEF_COLOR(__FORMAT, __RMASK, __GMASK, __BMASK, __AMASK)           \
+            {                                                                   \
+                .format = (__FORMAT),                                           \
+                .Rmask = (__RMASK),                                             \
+                .Gmask = (__GMASK),                                             \
+                .Bmask = (__BMASK),                                             \
+                .Amask = (__AMASK),                                             \
+            }
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __vsf_sdl2_fast_copy(__pdst, __psrc, __num)                             \
@@ -112,6 +121,13 @@ extern void vsf_sdl2_pixel_fill(uint_fast16_t data_line_num, uint_fast32_t pixel
 
 NO_INIT vsf_sdl2_t __vsf_sdl2;
 
+struct {
+    uint32_t Rmask, Gmask, Bmask, Amask;
+    uint32_t format;
+} static const __vsf_sdl2_color[] = {
+    __SDL_DEF_COLOR(SDL_PIXELFORMAT_ARGB8888, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000),
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -177,23 +193,14 @@ void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_lin
 }
 #endif
 
-static uint32_t __SDL_MatchColor(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
+static uint32_t __SDL_GetColorFormatFromMask(uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-#define __SDL_COLOR_MATCHER(__FORMAT, __RMASK, __GMASK, __BMASK, __AMASK)       \
-            { .format = (__FORMAT), .Rmask = (__RMASK), .Gmask = (__GMASK), .Bmask = (__BMASK), .Amask = (__AMASK) }
-    struct {
-        uint32_t Rmask, Gmask, Bmask, Amask;
-        uint32_t format;
-    } static const __color_matcher[] = {
-        __SDL_COLOR_MATCHER(SDL_PIXELFORMAT_ARGB8888, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000),
-    };
-
-    for (int i = 0; i < dimof(__color_matcher); i++) {
-        if (    __color_matcher[i].Rmask == Rmask
-            &&  __color_matcher[i].Gmask == Gmask
-            &&  __color_matcher[i].Bmask == Bmask
-            &&  __color_matcher[i].Amask == Amask) {
-            return __color_matcher[i].format;
+    for (uint_fast16_t i = 0; i < dimof(__vsf_sdl2_color); i++) {
+        if (    __vsf_sdl2_color[i].Rmask == Rmask
+            &&  __vsf_sdl2_color[i].Gmask == Gmask
+            &&  __vsf_sdl2_color[i].Bmask == Bmask
+            &&  __vsf_sdl2_color[i].Amask == Amask) {
+            return __vsf_sdl2_color[i].format;
         }
     }
 
@@ -506,7 +513,7 @@ SDL_Surface * SDL_CreateRGBSurfaceWithFormatFrom(void * pixels, int w, int h, in
 
 SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    uint32_t format = __SDL_MatchColor(Rmask, Gmask, Bmask, Amask);
+    uint32_t format = __SDL_GetColorFormatFromMask(Rmask, Gmask, Bmask, Amask);
     VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(flags, w, h, depth, format);
     if (surface != NULL) {
@@ -520,7 +527,7 @@ SDL_Surface * SDL_CreateRGBSurface(uint32_t flags, int w, int h, int depth, uint
 
 SDL_Surface * SDL_CreateRGBSurfaceFrom(void * pixels, int w, int h, int depth, int pitch, uint32_t Rmask, uint32_t Gmask, uint32_t Bmask, uint32_t Amask)
 {
-    uint32_t format = __SDL_MatchColor(Rmask, Gmask, Bmask, Amask);
+    uint32_t format = __SDL_GetColorFormatFromMask(Rmask, Gmask, Bmask, Amask);
     VSF_SDL2_ASSERT(format != SDL_PIXELFORMAT_UNKNOWN);
     SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormatFrom(pixels, w, h, depth, pitch, format);
     if (surface != NULL) {
