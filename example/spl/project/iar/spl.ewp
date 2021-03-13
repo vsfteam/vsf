@@ -66,7 +66,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>8.40.1.21529</state>
+                    <state>8.40.2.22864</state>
                 </option>
                 <option>
                     <name>GeneralEnableMisra</name>
@@ -348,8 +348,8 @@
                 <option>
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..</state>
-                    <state>$PROJ_DIR$\..\..\..\..\vsf</state>
-                    <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1073,7 +1073,7 @@
                     <group>
                         <name>arm9</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\arm9\arm9_generic.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\arm9\arm9_generic.c</name>
                             <configuration>
                                 <name>spl</name>
                                 <settings>
@@ -1212,8 +1212,8 @@
                                         <option>
                                             <name>CCIncludePath2</name>
                                             <state>$PROJ_DIR$\..\..</state>
-                                            <state>$PROJ_DIR$\..\..\..\..\vsf</state>
-                                            <state>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
                                         </option>
                                         <option>
                                             <name>CCStdIncCheck</name>
@@ -1332,7 +1332,7 @@
                             </configuration>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\arm9\arm9_generic.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\arm9\arm9_generic.h</name>
                         </file>
                     </group>
                     <group>
@@ -1341,10 +1341,10 @@
                             <configuration>spl</configuration>
                         </excluded>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-a\cortex_a_generic.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-a\cortex_a_generic.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-a\cortex_a_generic.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-a\cortex_a_generic.h</name>
                         </file>
                     </group>
                     <group>
@@ -1355,40 +1355,40 @@
                         <group>
                             <name>systick</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\i_io_systick.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\i_io_systick.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\systick.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\systick.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick_internal.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\systick_internal.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick_internal.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\systick_internal.h</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\cortex_m_generic.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-m\cortex_m_generic.h</name>
                         </file>
                     </group>
                 </group>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\__vsf_arch_interface.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\__vsf_arch_interface.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\vsf_arch.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\vsf_arch.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\vsf_arch_abstraction.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\arch\vsf_arch_abstraction.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\vsf_arch_abstraction.h</name>
                 </file>
             </group>
             <group>
@@ -1402,17 +1402,17 @@
                             <group>
                                 <name>dram</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\dram\dram.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\common\dram\dram.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\dram\dram.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\common\dram\dram.h</name>
                                 </file>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\__common.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\common\__common.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\common\__common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\common\__common.h</name>
                             </file>
                         </group>
                         <group>
@@ -1424,33 +1424,33 @@
                                     <group>
                                         <name>asm</name>
                                         <file>
-                                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\startup\spl\asm\iar\spl_entry.S</name>
+                                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\F1C100S\startup\spl\asm\iar\spl_entry.S</name>
                                         </file>
                                     </group>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\startup\spl\spl_c.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\F1C100S\startup\spl\spl_c.c</name>
                                     </file>
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\F1C100S\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\F1C100S\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\F1C100S\driver.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\F1C100S\f1c100s_reg.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\F1C100S\f1c100s_reg.h</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\F1CX00S\__device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\F1CX00S\__device.h</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Allwinner\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Allwinner\driver.h</name>
                     </file>
                 </group>
                 <group>
@@ -1463,57 +1463,57 @@
                         <group>
                             <name>CMSDK_CM0</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\driver.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\startup_ARMCM0.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\startup_ARMCM0.c</name>
                             </file>
                         </group>
                         <group>
                             <name>CMSDK_CM7</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\driver.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\startup_ARMCM7.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\startup_ARMCM7.c</name>
                             </file>
                         </group>
                         <group>
                             <name>common</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\common\__common.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\common\__common.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\common\__common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\common\__common.h</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\__device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\__device.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\mps2\driver.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\mps2\driver.h</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\arm\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\driver.h</name>
                     </file>
                 </group>
                 <group>
                     <name>common</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\common\common.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\common.h</name>
                     </file>
                 </group>
                 <group>
@@ -1528,37 +1528,37 @@
                             <group>
                                 <name>io</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\io\io.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\io\io.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\io\io_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io_lv0.c</name>
                                 </file>
                             </group>
                             <group>
                                 <name>pm</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\pm\pm.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\pm\pm.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\pm\pm_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm_lv0.c</name>
                                 </file>
                             </group>
                             <group>
                                 <name>usart</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usart\usart.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usart\usart.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usart\usart_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usart\usart_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -1566,29 +1566,29 @@
                                 <group>
                                     <name>dc</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\dc\usbd_hs.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\dc\usbd_hs.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\dc\usbd_hs.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\dc\usbd_hs.h</name>
                                     </file>
                                 </group>
                                 <group>
                                     <name>ohci</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\ohci\ohci.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\ohci\ohci.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\ohci\ohci.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\ohci\ohci.h</name>
                                     </file>
                                 </group>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\usb.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\usb.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\usb.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\usb.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\usb\usb_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\usb\usb_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -1596,136 +1596,136 @@
                                 <group>
                                     <name>Include</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\acmp_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\acmp_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\bpwm_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\bpwm_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\can_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\can_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\clk_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\clk_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\crc_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\crc_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\crypto_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\crypto_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\dac_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\dac_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\eadc_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\eadc_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\ebi_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\ebi_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\ecap_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\ecap_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\emac_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\emac_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\epwm_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\epwm_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\fmc_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\fmc_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\gpio_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\gpio_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\hsotg_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\hsotg_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\hsusbd_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\hsusbd_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\hsusbh_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\hsusbh_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\i2c_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\i2c_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\i2s_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\i2s_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\M480.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\M480.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\NuMicro.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\NuMicro.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\opa_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\opa_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\otg_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\otg_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\pdma_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\pdma_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\qei_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\qei_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\qspi_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\qspi_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\rtc_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\rtc_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\sc_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\sc_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\sdh_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\sdh_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\spi_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\spi_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\spim_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\spim_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\sys_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\sys_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\system_M480.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\system_M480.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\timer_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\timer_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\uart_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\uart_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\ui2c_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\ui2c_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\usbd_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\usbd_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\usbh_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\usbh_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\uspi_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\uspi_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\uuart_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\uuart_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\wdt_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\wdt_reg.h</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\Include\wwdt_reg.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\Include\wwdt_reg.h</name>
                                     </file>
                                 </group>
                                 <group>
                                     <name>startup</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\vendor\startup\IAR\startup_M480.s.template</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\vendor\startup\IAR\startup_M480.s.template</name>
                                         <excluded>
                                             <configuration>spl</configuration>
                                         </excluded>
@@ -1733,29 +1733,29 @@
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\__common.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\__common.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\common\__common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\__common.h</name>
                             </file>
                         </group>
                         <group>
                             <name>M484</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\M484\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\M484\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\M484\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\M484\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\M484\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\M484\driver.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\M484\startup_M484.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\M484\startup_M484.c</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\M480\__device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\__device.h</name>
                         </file>
                     </group>
                     <group>
@@ -1770,20 +1770,20 @@
                                 <group>
                                     <name>ohci</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\common\usb\ohci\ohci.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\common\usb\ohci\ohci.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\common\usb\ohci\ohci.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\common\usb\ohci\ohci.h</name>
                                     </file>
                                 </group>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\common\usb\usb.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\common\usb\usb.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\common\usb\usb.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\common\usb\usb.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\common\usb\usb_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\common\usb\usb_lv0.c</name>
                                 </file>
                             </group>
                         </group>
@@ -1794,29 +1794,29 @@
                                 <group>
                                     <name>Include</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\NUC505\vendor\Include\NUC505Series.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\NUC505\vendor\Include\NUC505Series.h</name>
                                     </file>
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\NUC505\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\NUC505\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\NUC505\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\NUC505\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\NUC505\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\NUC505\driver.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\NUC505\startup_NUC505.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\NUC505\startup_NUC505.c</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\NUC500\__device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\NUC500\__device.h</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\Nuvoton\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\driver.h</name>
                     </file>
                 </group>
                 <group>
@@ -1833,38 +1833,38 @@
                                 <group>
                                     <name>Include</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\common\vendor\Include\stm32f730xx.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\common\vendor\Include\stm32f730xx.h</name>
                                     </file>
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\common\__common.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\common\__common.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\common\__common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\common\__common.h</name>
                             </file>
                         </group>
                         <group>
                             <name>STM32F730R8</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\STM32F730R8\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\STM32F730R8\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\STM32F730R8\driver.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\STM32F730R8\startup_STM32F730R8.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\STM32F730R8\startup_STM32F730R8.c</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\STM32F730\__device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\STM32F730\__device.h</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\ST\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\ST\driver.h</name>
                     </file>
                 </group>
                 <group>
@@ -1877,10 +1877,10 @@
                         <group>
                             <name>__device_name_1__</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\template\__series_name__\__device_name_1__\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\template\__series_name__\__device_name_1__\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\template\__series_name__\__device_name_1__\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\template\__series_name__\__device_name_1__\driver.h</name>
                             </file>
                         </group>
                         <group>
@@ -1894,7 +1894,7 @@
                         </group>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\template\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\template\driver.h</name>
                     </file>
                 </group>
                 <group>
@@ -1907,18 +1907,18 @@
                         <group>
                             <name>AM3352</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\AM335X\AM3352\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\TI\AM335X\AM3352\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\AM335X\AM3352\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\TI\AM335X\AM3352\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\AM335X\AM3352\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\TI\AM335X\AM3352\driver.h</name>
                             </file>
                         </group>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\TI\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\TI\driver.h</name>
                     </file>
                 </group>
                 <group>
@@ -1933,13 +1933,13 @@
                             <group>
                                 <name>io</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\io\io.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\io\io.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\io\io.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\io\io.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\io\io_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\io\io_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -1948,13 +1948,13 @@
                             <group>
                                 <name>usart</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\usart\usart.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\usart\usart.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\usart\usart.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\usart\usart.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\usart\usart_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\usart\usart_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -1962,73 +1962,73 @@
                                 <group>
                                     <name>Include</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\vendor\Include\wm_regs.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\vendor\Include\wm_regs.h</name>
                                     </file>
                                 </group>
                                 <group>
                                     <name>startup</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\vendor\startup\IAR\startup_venus.s</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\vendor\startup\IAR\startup_venus.s</name>
                                     </file>
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\common.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\common.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\common\common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\common\common.h</name>
                             </file>
                         </group>
                         <group>
                             <name>W600</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\W600\device.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\W600\device.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\W600\driver.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\W600\driver.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\W600\driver.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\W600\driver.h</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\W60X\device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\W60X\device.h</name>
                         </file>
                     </group>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\WinnerMicro\driver.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\WinnerMicro\driver.h</name>
                     </file>
                 </group>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\driver\driver.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\driver.h</name>
                 </file>
             </group>
             <group>
                 <name>interface</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_common.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_common.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_io.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_io.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_pm.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_pm.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_usart.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_usart.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\hal\interface\vsf_interface_usb.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\interface\vsf_interface_usb.h</name>
                 </file>
             </group>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\vsf_hal.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\source\hal\vsf_hal.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\vsf_hal.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\source\hal\vsf_hal.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\vsf\hal\vsf_hal_cfg.h</name>
+                <name>$PROJ_DIR$\..\..\..\..\source\hal\vsf_hal_cfg.h</name>
             </file>
         </group>
         <group>
@@ -2038,46 +2038,28 @@
                 <group>
                     <name>__common</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\__common\__compiler.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__compiler.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\__common\__signal.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__signal.h</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\__common\__type.h</name>
+                        <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\__common\__type.h</name>
                     </file>
                 </group>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\arm_compiler.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\arm_compiler.h</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\vsf\utilities\compiler\arm\type.h</name>
+                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\type.h</name>
                 </file>
             </group>
         </group>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\vsf\vsf.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\source\vsf.h</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\vsf\vsf_cfg.h</name>
+            <name>$PROJ_DIR$\..\..\..\..\source\vsf_cfg.h</name>
         </file>
     </group>
-    <file>
-        <name>$PROJ_DIR$\..\..\..\..\vsf\kernel\lib\vsf_kernel_armv6m_full_size.a</name>
-        <excluded>
-            <configuration>spl</configuration>
-        </excluded>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\kernel_lib\vsf_kernel_armv7em_full_size.a</name>
-        <excluded>
-            <configuration>spl</configuration>
-        </excluded>
-    </file>
-    <file>
-        <name>$PROJ_DIR$\..\..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</name>
-        <excluded>
-            <configuration>spl</configuration>
-        </excluded>
-    </file>
 </project>
