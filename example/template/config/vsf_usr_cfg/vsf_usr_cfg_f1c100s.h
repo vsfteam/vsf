@@ -159,7 +159,7 @@ typedef int vsf_systimer_cnt_signed_t;
 //#define VSF_SYSTIMER_FREQ                               (24UL * 1000 * 1000)
 #define VSF_OS_CFG_PRIORITY_NUM                         1
 #define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
-// retarget-io for arm9 in iar seems to be mal-functioning, use dimple_stdio
+// retarget-io for arm9 in iar seems to be mal-functioning, use simple_stdio
 #define VSF_LINUX_USE_SIMPLE_STDIO                      ENABLED
 
 #if APP_USE_USBD_DEMO == ENABLED

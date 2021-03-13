@@ -19,7 +19,7 @@
 
 #include "../../vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED
+#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
@@ -43,17 +43,4 @@ void vsf_linux_glibc_init(void)
 
 }
 
-int __sync_pend(vsf_sync_t *sem)
-{
-    while (1) {
-        vsf_sync_reason_t reason = vsf_eda_sync_get_reason(sem, vsf_thread_wait());
-        switch (reason) {
-        case VSF_SYNC_TIMEOUT:      return -ETIMEDOUT;
-        case VSF_SYNC_PENDING:      break;
-        case VSF_SYNC_GET:          return 0;
-        case VSF_SYNC_CANCEL:       return -EAGAIN;
-        }
-    }
-}
-
-#endif      // VSF_USE_LINUX
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC

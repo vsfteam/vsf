@@ -45,10 +45,20 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern int __sync_pend(vsf_sync_t *sem);
-
 /*============================ IMPLEMENTATION ================================*/
+
+static int __sync_pend(vsf_sync_t *sem)
+{
+    while (1) {
+        vsf_sync_reason_t reason = vsf_eda_sync_get_reason(sem, vsf_thread_wait());
+        switch (reason) {
+        case VSF_SYNC_TIMEOUT:      return -ETIMEDOUT;
+        case VSF_SYNC_PENDING:      break;
+        case VSF_SYNC_GET:          return 0;
+        case VSF_SYNC_CANCEL:       return -EAGAIN;
+        }
+    }
+}
 
 int sem_init(sem_t *sem, int pshared, unsigned int value)
 {
