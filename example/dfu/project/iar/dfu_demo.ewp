@@ -4098,15 +4098,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\retarget_io.c</name>
-                    <excluded>
-                        <configuration>dfu_demo</configuration>
-                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\type.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</name>
                 </file>
             </group>
             <group>

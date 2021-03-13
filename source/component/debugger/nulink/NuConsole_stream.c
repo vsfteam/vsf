@@ -17,16 +17,16 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "../vsf_debugger.h"
+#include "../vsf_debugger_cfg.h"
 
 #if VSF_DEBUGGER_CFG_CONSOLE == VSF_DEBUGGER_CFG_CONSOLE_NULINK_NUCONSOLE
 
-#include "NuConsole.h"
-
 #if VSF_USE_SIMPLE_STREAM == ENABLED
-#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
-#include "service/vsf_service.h"
+#   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #endif
+#include "../vsf_debugger.h"
+
+#include "NuConsole.h"
 
 /*============================ MACROS ========================================*/
 
