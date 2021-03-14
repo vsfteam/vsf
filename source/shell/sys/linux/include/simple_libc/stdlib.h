@@ -60,8 +60,8 @@ void *bsearch(const void *key, const void *base, size_t nitems, size_t size, int
 
 int mblen(const char *str, size_t n);
 
-// TODO: it seems that IAR for ARM9 does not support wchar_t if simple_libc is used
-#if !(__IS_COMPILER_IAR__ && (__ARM_ARCH == 5))
+// TODO: it seems that IAR does not support wchar_t even if it's defined in stddef.h
+#if !__IS_COMPILER_IAR__
 size_t mbstowcs(wchar_t *dst, const char *src, size_t len);
 int mbtowc(wchar_t *pwc, const char *str, size_t n);
 size_t wcstombs(char *str, const wchar_t *pwcs, size_t n);

@@ -46,8 +46,8 @@ typedef long int         ptrdiff_t;
 #endif
 
 #if     !defined(__cplusplus)
-// TODO: it seems that IAR for ARM9 does not support wchar_t if simple_libc is used
-#   if !(__IS_COMPILER_IAR__ && (__ARM_ARCH == 5))
+// TODO: it seems that IAR does not support wchar_t even if it's defined here
+#   if !__IS_COMPILER_IAR__
 typedef unsigned short  wchar_t;
 #   endif
 typedef unsigned short  wint_t;

@@ -126,7 +126,9 @@ int errno;
 
 extern int vsf_linux_create_fhs(void);
 
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 extern void vsf_linux_glibc_init(void);
+#endif
 
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
 
@@ -291,7 +293,10 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     memset(&__vsf_linux, 0, sizeof(__vsf_linux));
     __vsf_linux.stdio_stream = *stdio_stream;
     vk_fs_init();
+
+#if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
     vsf_linux_glibc_init();
+#endif
 
     // create kernel process(pid0)
     if (NULL != __vsf_linux_start_process_internal(0, __vsf_linux_kernel_thread, VSF_LINUX_CFG_PRIO_LOWEST)) {
