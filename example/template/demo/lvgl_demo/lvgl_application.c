@@ -206,11 +206,11 @@ static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *game
                         1 * margin + (margin >> 1) - (int32_t)((float)radius * offset));
         break;
     case GAMEPAD_ID_LT:
-        itoa(cur, gamepad->lbl_lt_text, 10);
+        sprintf(gamepad->lbl_lt_text, "%d", cur);
         lv_label_set_text(gamepad->lbl_lt, gamepad->lbl_lt_text);
         break;
     case GAMEPAD_ID_RT:
-        itoa(cur, gamepad->lbl_rt_text, 10);
+        sprintf(gamepad->lbl_rt_text, "%d", cur);
         lv_label_set_text(gamepad->lbl_rt, gamepad->lbl_rt_text);
         break;
     case GAMEPAD_ID_DPAD: {
@@ -341,7 +341,7 @@ static void lvgl_demo_create_gamepad(lvgl_demo_gamepad_t *gamepad, lv_obj_t *con
                         6 * margin, 2 * margin);
     if (gamepad->btn_lt != NULL) {
         gamepad->lbl_lt = lv_label_create(gamepad->btn_lt, NULL);
-        itoa(0, gamepad->lbl_lt_text, 10);
+        sprintf(gamepad->lbl_lt_text, "%d", 0);
         lv_label_set_text(gamepad->lbl_lt, gamepad->lbl_lt_text);
     }
 
@@ -350,7 +350,7 @@ static void lvgl_demo_create_gamepad(lvgl_demo_gamepad_t *gamepad, lv_obj_t *con
                         6 * margin, 2 * margin);
     if (gamepad->btn_rt != NULL) {
         gamepad->lbl_rt = lv_label_create(gamepad->btn_rt, NULL);
-        itoa(0, gamepad->lbl_rt_text, 10);
+        sprintf(gamepad->lbl_rt_text, "%d", 0);
         lv_label_set_text(gamepad->lbl_rt, gamepad->lbl_rt_text);
     }
 
