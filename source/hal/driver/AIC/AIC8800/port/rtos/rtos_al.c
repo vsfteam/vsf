@@ -40,6 +40,7 @@ def_vsf_thread_ex(vsf_rtos_thread_t,
     def_params(
         void            *arg;
         rtos_task_fct   func;
+        uint32_t        notification;
     )
 )
 
@@ -235,24 +236,62 @@ int rtos_task_init_notification(rtos_task_handle task)
 
 uint32_t rtos_task_wait_notification(int timeout)
 {
-    VSF_ASSERT(false);
-    return 0;
+    uint32_t ret;
+    rtos_task_handle task_handle = rtos_get_task_handle();
+    if (timeout > 0) {
+        timeout = vsf_systimer_ms_to_tick(timeout);
+    }
+
+    vsf_protect_t orig = vsf_protect_int();
+        task_handle->flag.state.is_sync_got = false;
+
+        // private kernel API, can only be used here, so declear here
+        extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, int_fast32_t timeout);
+        __vsf_eda_set_timeout(&task_handle->use_as__vsf_eda_t, timeout);
+    vsf_unprotect_int(orig);
+
+    while (1) {
+        vsf_evt_t evt = vsf_thread_wait();
+
+        orig = vsf_protect_int();
+        if ((evt != VSF_EVT_SYNC) && task_handle->flag.state.is_sync_got) {
+            vsf_unprotect_int(orig);
+            continue;
+        }
+        break;
+    }
+
+    // private kernel API, can only be used here, so declear here
+    extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
+    __vsf_teda_cancel_timer(&task_handle->use_as__vsf_teda_t);
+    ret = task_handle->notification;
+    if (task_handle->flag.state.is_sync_got) {
+        task_handle->flag.state.is_sync_got = false;
+        task_handle->notification = 0;
+    }
+    vsf_unprotect_int(orig);
+
+    return ret;
 }
 
 void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
-    VSF_ASSERT(false);
-    if (isr) {
-    } else {
-    }
+    VSF_ASSERT(task_handle != NULL);
+    vsf_protect_t orig = vsf_protect_int();
+        task_handle->flag.state.is_sync_got = true;
+        task_handle->notification = value;
+    vsf_unprotect_int(orig);
+    vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
 
 void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
-    VSF_ASSERT(false);
-    if (isr) {
-    } else {
-    }
+    VSF_ASSERT(task_handle != NULL);
+    vsf_protect_t orig = vsf_protect_int();
+        task_handle->flag.state.is_sync_got = true;
+        task_handle->notification |= value;
+    vsf_unprotect_int(orig);
+    vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
 
 // semaphore
