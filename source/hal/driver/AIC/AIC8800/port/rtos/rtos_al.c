@@ -241,9 +241,13 @@ uint32_t rtos_task_wait_notification(int timeout)
     if (timeout > 0) {
         timeout = vsf_systimer_ms_to_tick(timeout);
     }
+    if (0 == timeout) {
+        return task_handle->notification;
+    }
 
     vsf_protect_t orig = vsf_protect_int();
         task_handle->flag.state.is_sync_got = false;
+        task_handle->flag.state.is_limitted = true;
 
         // private kernel API, can only be used here, so declear here
         extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, int_fast32_t timeout);
@@ -269,6 +273,7 @@ uint32_t rtos_task_wait_notification(int timeout)
         task_handle->flag.state.is_sync_got = false;
         task_handle->notification = 0;
     }
+    task_handle->flag.state.is_limitted = false;
     vsf_unprotect_int(orig);
 
     return ret;
@@ -278,8 +283,12 @@ void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
     VSF_ASSERT(task_handle != NULL);
     vsf_protect_t orig = vsf_protect_int();
-        task_handle->flag.state.is_sync_got = true;
         task_handle->notification = value;
+        if (!task_handle->flag.state.is_limitted) {
+            vsf_unprotect_int(orig);
+            return;
+        }
+        task_handle->flag.state.is_sync_got = true;
     vsf_unprotect_int(orig);
     vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
@@ -288,8 +297,12 @@ void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool
 {
     VSF_ASSERT(task_handle != NULL);
     vsf_protect_t orig = vsf_protect_int();
-        task_handle->flag.state.is_sync_got = true;
         task_handle->notification |= value;
+        if (!task_handle->flag.state.is_limitted) {
+            vsf_unprotect_int(orig);
+            return;
+        }
+        task_handle->flag.state.is_sync_got = true;
     vsf_unprotect_int(orig);
     vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
