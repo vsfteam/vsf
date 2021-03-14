@@ -93,8 +93,13 @@ static int __wifi_scan_main(int argc, char *argv[])
 
 static int __wifi_connect_main(int argc, char *argv[])
 {
+    if (argc < 2) {
+        printf("format: %s SSID [PASSWD]\n", argv[0]);
+        return -1;
+    }
+
     if (!wlan_connected) {
-        char *ssid = "", *pw = "passwd";
+        char *ssid = argv[1], *pw = argc >= 3 ? argv[2] : "";
 
 #if PLF_HW_PXP
         rtos_task_suspend(5);   // wait for AP starting
