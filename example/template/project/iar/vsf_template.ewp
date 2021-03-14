@@ -4520,7 +4520,6 @@
                     <state>__AIC__</state>
                     <state>__AIC8800__</state>
                     <state>__OOC_CPP__</state>
-                    <state>__INLINE=static inline</state>
                     <state>LV_CONF_INCLUDE_SIMPLE</state>
                     <state>CFG_HW_PLATFORM=2</state>
                     <state>CFG_RF_MODE=0</state>
