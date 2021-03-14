@@ -430,8 +430,8 @@ SECTION(".text.vsf.kernel.__vsf_thread_call_eda_ex")
 static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
                                             uintptr_t param,
                                             __vsf_eda_frame_state_t state,
-                                            uintptr_t local_buff,
-                                            size_t local_buff_size)
+                                            size_t local_buff_size,
+                                            uintptr_t local_buff)
 {
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     class_internal(thread_obj, thread, vsf_thread_t);
@@ -489,7 +489,7 @@ vsf_err_t vk_thread_call_eda(   uintptr_t eda_handler,
         .feature.is_fsm             = false,
         .local_size                 = local_size,
     };
-    return __vsf_thread_call_eda_ex(eda_handler, param, state, local_buff, local_buff_size);
+    return __vsf_thread_call_eda_ex(eda_handler, param, state, local_buff_size, local_buff);
 }
 
 SECTION(".text.vsf.kernel.vsf_thread_call_thread")
@@ -514,7 +514,7 @@ vsf_err_t vk_thread_call_thread(vsf_thread_cb_t *thread_cb,
     pthis->stack_size = cfg->stack_size;
 
     return __vsf_thread_call_eda_ex((uintptr_t)__vsf_thread_evthandler,
-                                    (uintptr_t)thread_cb, state, (uintptr_t)NULL, 0);
+                                    (uintptr_t)thread_cb, state, 0, (uintptr_t)NULL);
 }
 
 SECTION(".text.vsf.kernel.vk_thread_call_fsm")
