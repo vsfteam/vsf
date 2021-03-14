@@ -44,7 +44,9 @@
 #define APP_USE_SDL2_DEMO                               DISABLED
 //  TODO: need test for c++ support
 #define APP_USE_CPP_DEMO                                ENABLED
+#if APP_USE_CPP_DEMO == ENABLED
 #   define __VSF_WORKAROUND_IAR_CPP__
+#endif
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
@@ -119,13 +121,17 @@
 #define VSF_USE_LINUX                                   ENABLED
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
-#   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
-#       define VSF_LINUX_USE_SIMPLE_STDIO               DISABLED
-#       define VSF_LINUX_USE_SIMPLE_STRING              ENABLED
-#       define VSF_LINUX_USE_SIMPLE_TIME                DISABLED
-#       define VSF_LINUX_USE_SIMPLE_STDLIB              ENABLED
-#       define VSF_LINUX_USE_SIMPLE_CTYPE               DISABLED
 
+#   if APP_USE_CPP_DEMO != ENABLED
+// simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
+//  make sure in inclue path, simple_libc is removed if cpp is used
+#       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
+#           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
+#           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
+#           define VSF_LINUX_USE_SIMPLE_TIME            DISABLED
+#           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
+#           define VSF_LINUX_USE_SIMPLE_CTYPE           DISABLED
+#   endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
