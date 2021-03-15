@@ -32,8 +32,14 @@ extern "C" {
 
 #define RTOS_TASK_FCT(__NAME)               void __NAME(void *param)
 
-// __PRIO start from 1
-#define RTOS_TASK_PRIORITY(__PRIO)          (__PRIO - 1)
+// __PRIO start from 1, and rtos_task MUST support priority promotion,
+//  which is required by mutex if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY is enabled
+#if     VSF_OS_CFG_ADD_EVTQ_TO_IDLE != ENABLED                                  \
+    ||  VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY != ENABLED
+#   define RTOS_TASK_PRIORITY(__PRIO)       ((__PRIO) - 1)
+#else
+#   define RTOS_TASK_PRIORITY(__PRIO)       (__PRIO)
+#endif
 
 #define pdTRUE                              true
 #define pdFALSE                             false
