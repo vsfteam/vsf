@@ -104,6 +104,8 @@ static RTOS_TASK_FCT(__wifi_connect_task)
     if (0 == wlan_start_sta((uint8_t *)__wifi_ssid, (uint8_t *)__wifi_pass, 0)) {
         wlan_connected = 1;
     }
+    __wifi_ssid = NULL;
+    __wifi_pass = NULL;
 
 #if CONFIG_SLEEP_LEVEL == 1
     sleep_level_set(PM_LEVEL_LIGHT_SLEEP);
@@ -136,6 +138,12 @@ static int __wifi_connect_main(int argc, char *argv[])
         rtos_task_create(__wifi_connect_task, "connect_task",
                     APPLICATION_TASK, 512, NULL, RTOS_TASK_PRIORITY(1), NULL);
         vsf_thread_wfe(VSF_EVT_USER);
+
+        if (wlan_connected) {
+            printf("wifi connected.\n");
+        } else {
+            printf("fail to connect %s.\n", argv[1]);
+        }
     }
 
     return 0;
