@@ -33,6 +33,35 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifdef __AIC8800_OSAL_CFG_TRACE__
+#   define rtos_trace(...)                  vsf_trace_debug(__VA_ARGS__)
+#   define rtos_trace_buffer(...)           vsf_trace_buffer(VSF_TRACE_DEBUG, __VA_ARGS__)
+#else
+#   define rtos_trace(...)
+#   define rtos_trace_buffer(...)
+#endif
+
+#ifdef __AIC8800_OSAL_CFG_TRACE_TASK__
+#   define rtos_trace_task(...)             rtos_trace(__VA_ARGS__)
+#else
+#   define rtos_trace_task(...)
+#endif
+
+#ifdef __AIC8800_OSAL_CFG_TRACE_QUEUE__
+#   define rtos_trace_queue(...)            rtos_trace(__VA_ARGS__)
+#   define rtos_trace_queue_buffer(...)     rtos_trace_buffer(__VA_ARGS__)
+#else
+#   define rtos_trace_queue(...)
+#   define rtos_trace_queue_buffer(...)
+#endif
+
+#ifdef __AIC8800_OSAL_CFG_TRACE_NOTIFY__
+#   define rtos_trace_notify(...)           rtos_trace(__VA_ARGS__)
+#else
+#   define rtos_trace_notify(...)
+#endif
+
 /*============================ TYPES =========================================*/
 
 dcl_vsf_thread_ex(vsf_rtos_thread_t)
@@ -41,6 +70,7 @@ def_vsf_thread_ex(vsf_rtos_thread_t,
         void            *arg;
         rtos_task_fct   func;
         uint32_t        notification;
+        char            name[16];
     )
 )
 
@@ -170,6 +200,7 @@ int rtos_task_create(   rtos_task_fct func,
     // default alignment is ok for cortex-m4
     vsf_rtos_thread_t *thread = vsf_heap_malloc(sizeof(vsf_rtos_thread_t) + (stack_depth << 2));
     if (NULL == thread) {
+        rtos_trace_task("%s: %s fail\n", __FUNCTION__, name);
         return -1;
     }
 
@@ -177,7 +208,10 @@ int rtos_task_create(   rtos_task_fct func,
 
     thread->arg = param;
     thread->func = func;
+    strncpy(thread->name, name, sizeof(thread->name) - 1);
+    thread->name[sizeof(thread->name) - 1] = '\0';
 
+    rtos_trace_task("%s: %s(%p)\n", __FUNCTION__, name, thread);
     init_vsf_thread_ex( vsf_rtos_thread_t,
                         thread,
                         prio,
@@ -203,6 +237,7 @@ void rtos_task_delete(rtos_task_handle task_handle)
         task_handle = cur_task_handle;
     }
 
+    rtos_trace_task("%s: %s(%p)\n", __FUNCTION__, task_handle->name, task_handle);
     if (task_handle == cur_task_handle) {
         vsf_thread_exit();
     } else {
@@ -231,6 +266,7 @@ void rtos_unprotect(uint32_t protect)
 // notification
 int rtos_task_init_notification(rtos_task_handle task)
 {
+    rtos_trace_notify("%s: %s %p\n", __FUNCTION__, task->name, task);
     return 0;
 }
 
@@ -242,6 +278,8 @@ uint32_t rtos_task_wait_notification(int timeout)
         timeout = vsf_systimer_ms_to_tick(timeout);
     }
     if (0 == timeout) {
+        rtos_trace_notify("%s: %s(%p) %08X\n", __FUNCTION__, task_handle->name,
+                            task_handle, task_handle->notification);
         return task_handle->notification;
     }
 
@@ -276,6 +314,8 @@ uint32_t rtos_task_wait_notification(int timeout)
     task_handle->flag.state.is_limitted = false;
     vsf_unprotect_int(orig);
 
+    rtos_trace_notify("%s: %s(%p) %08X\n", __FUNCTION__, task_handle->name,
+                            task_handle, ret);
     return ret;
 }
 
@@ -290,6 +330,8 @@ void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
         }
         task_handle->flag.state.is_sync_got = true;
     vsf_unprotect_int(orig);
+    rtos_trace_notify("%s: %s(%p) %08X\n", __FUNCTION__, task_handle->name,
+                            task_handle, task_handle->notification);
     vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
 
@@ -304,6 +346,7 @@ void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool
         }
         task_handle->flag.state.is_sync_got = true;
     vsf_unprotect_int(orig);
+    rtos_trace_notify("%s: %p %08X\n", __FUNCTION__, task_handle, task_handle->notification);
     vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
 
@@ -408,6 +451,7 @@ int rtos_queue_create(int elt_size, int nb_elt, rtos_queue *queue)
         q->region = (vsf_protect_region_t *)&vsf_protect_region_int;
         vsf_eda_queue_init(&q->use_as__vsf_eda_queue_t, nb_elt);
         *queue = q;
+        rtos_trace_queue("%s: %p\n", __FUNCTION__, q);
         return 0;
     }
     return -1;
@@ -420,6 +464,8 @@ void rtos_queue_delete(rtos_queue queue)
 
 int rtos_queue_write(rtos_queue queue, void *msg, int timeout, bool isr)
 {
+    rtos_trace_queue("%s: %p\n", __FUNCTION__, queue);
+    rtos_trace_queue_buffer(msg, queue->node_size);
     if (isr) {
         vsf_err_t err;
         VSF_ASSERT(0 == timeout);
@@ -457,6 +503,8 @@ int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
 
     if (VSF_ERR_NONE == vsf_eda_queue_recv(&queue->use_as__vsf_eda_queue_t,
                                 msg, vsf_systimer_ms_to_tick(timeout))) {
+        rtos_trace_queue("%s: %p\n", __FUNCTION__, queue);
+        rtos_trace_queue_buffer(msg, queue->node_size);
         return 0;
     }
 
@@ -466,6 +514,10 @@ int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
                                 vsf_thread_wait(), msg);
         if (VSF_SYNC_PENDING == reason) {
             continue;
+        }
+        if (VSF_SYNC_GET == reason) {
+            rtos_trace_queue("%s: %p\n", __FUNCTION__, queue);
+            rtos_trace_queue_buffer(msg, queue->node_size);
         }
         break;
     }
