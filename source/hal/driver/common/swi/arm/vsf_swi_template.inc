@@ -140,7 +140,7 @@ void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 
 #ifndef WEAK_VSF_USR_SWI_INIT
 WEAK(vsf_usr_swi_init)
-vsf_err_t vsf_usr_swi_init(uint_fast8_t idx, 
+vsf_err_t vsf_usr_swi_init(     uint_fast8_t idx, 
                                 vsf_arch_prio_t priority,
                                 vsf_swi_handler_t *handler, 
                                 void *param)
