@@ -479,16 +479,19 @@ int rtos_queue_write(rtos_queue queue, void *msg, int timeout, bool isr)
         return 0;
     }
 
-    vsf_sync_reason_t reason;
-    while (1) {
-        reason = vsf_eda_queue_send_get_reason(&queue->use_as__vsf_eda_queue_t,
+    if (timeout != 0) {
+        vsf_sync_reason_t reason;
+        while (1) {
+            reason = vsf_eda_queue_send_get_reason(&queue->use_as__vsf_eda_queue_t,
                                 vsf_thread_wait(), msg);
-        if (VSF_SYNC_PENDING == reason) {
-            continue;
+            if (VSF_SYNC_PENDING == reason) {
+                continue;
+            }
+            break;
         }
-        break;
+        return (VSF_SYNC_GET == reason) ? 0 : -1;
     }
-    return (VSF_SYNC_GET == reason) ? 0 : -1;
+    return -1;
 }
 
 int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
@@ -508,20 +511,23 @@ int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
         return 0;
     }
 
-    vsf_sync_reason_t reason;
-    while (1) {
-        reason = vsf_eda_queue_recv_get_reason(&queue->use_as__vsf_eda_queue_t,
+    if (timeout != 0) {
+        vsf_sync_reason_t reason;
+        while (1) {
+            reason = vsf_eda_queue_recv_get_reason(&queue->use_as__vsf_eda_queue_t,
                                 vsf_thread_wait(), msg);
-        if (VSF_SYNC_PENDING == reason) {
-            continue;
+            if (VSF_SYNC_PENDING == reason) {
+                continue;
+            }
+            if (VSF_SYNC_GET == reason) {
+                rtos_trace_queue("%s: %p\n", __FUNCTION__, queue);
+                rtos_trace_queue_buffer(msg, queue->node_size);
+            }
+            break;
         }
-        if (VSF_SYNC_GET == reason) {
-            rtos_trace_queue("%s: %p\n", __FUNCTION__, queue);
-            rtos_trace_queue_buffer(msg, queue->node_size);
-        }
-        break;
+        return (VSF_SYNC_GET == reason) ? 0 : -1;
     }
-    return (VSF_SYNC_GET == reason) ? 0 : -1;
+    return -1;
 }
 
 bool rtos_queue_is_empty(rtos_queue queue)
