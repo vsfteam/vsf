@@ -319,8 +319,10 @@ void vsf_plug_in_on_kernel_idle(void)
 
 void vsf_plug_in_on_kernel_idle(void)
 {
+#   if APP_USE_VSFVM_DEMO == ENABLED
     extern void vsfvm_user_poll(void);
     vsfvm_user_poll();
+#   endif
     vsf_driver_poll();
 }
 

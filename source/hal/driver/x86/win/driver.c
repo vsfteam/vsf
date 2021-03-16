@@ -42,10 +42,10 @@
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
-static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t* stream,
-            uint8_t* buf, uint_fast32_t size);
-static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t* stream);
-static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t* stream);
+static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
+            uint8_t *buf, uint_fast32_t size);
+static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t *stream);
+static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t *stream);
 #   elif   VSF_USE_STREAM == ENABLED
 
 #   endif
@@ -90,20 +90,20 @@ vsf_mem_stream_t VSF_DEBUG_STREAM_RX = {
 
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
-static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t* stream,
-            uint8_t* buf, uint_fast32_t size)
+static uint_fast32_t __vsf_x86_debug_stream_tx_write(vsf_stream_t *stream,
+            uint8_t *buf, uint_fast32_t size)
 {
     DWORD wsize;
     WriteFile(hOut, buf, size, &wsize, NULL);
     return wsize;
 }
 
-static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t* stream)
+static uint_fast32_t __vsf_x86_debug_stream_tx_get_data_length(vsf_stream_t *stream)
 {
     return 0;
 }
 
-static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t* stream)
+static uint_fast32_t __vsf_x86_debug_stream_tx_get_avail_length(vsf_stream_t *stream)
 {
     return 0xFFFFFFFF;
 }

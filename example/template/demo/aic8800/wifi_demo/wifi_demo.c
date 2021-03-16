@@ -73,18 +73,18 @@ static int __wifi_scan_main(int argc, char *argv[])
 
     struct fhost_cntrl_link *cntrl_link = fhost_cntrl_cfgrwnx_link_open();
     if (cntrl_link == NULL) {
-        vsf_trace_error("Failed to open link with control task\n");
+        vsf_trace_error("Failed to open link with control task\r\n");
         return -1;
     }
 
     int nb_res = fhost_scan(cntrl_link, 0, NULL);
-    vsf_trace_info("Got %d scan results\n", nb_res);
+    vsf_trace_info("Got %d scan results\r\n", nb_res);
 
     nb_res = 0;
     struct mac_scan_result result;
     while (fhost_get_scan_results(cntrl_link, nb_res++, 1, &result)) {
         result.ssid.array[result.ssid.length] = '\0'; // set ssid string ending
-        vsf_trace_info("(%3d dBm) CH=%3d BSSID=%02x:%02x:%02x:%02x:%02x:%02x SSID=%s\n",
+        vsf_trace_info("(%3d dBm) CH=%3d BSSID=%02x:%02x:%02x:%02x:%02x:%02x SSID=%s\r\n",
             (int8_t)result.rssi, phy_freq_to_channel(result.chan->band, result.chan->freq),
             ((uint8_t *)result.bssid.array)[0], ((uint8_t *)result.bssid.array)[1],
             ((uint8_t *)result.bssid.array)[2], ((uint8_t *)result.bssid.array)[3],
@@ -125,7 +125,7 @@ static RTOS_TASK_FCT(__wifi_connect_task)
 static int __wifi_connect_main(int argc, char *argv[])
 {
     if (argc < 2) {
-        printf("format: %s SSID [PASSWD]\n", argv[0]);
+        printf("format: %s SSID [PASSWD]\r\n", argv[0]);
         return -1;
     }
 
@@ -140,9 +140,9 @@ static int __wifi_connect_main(int argc, char *argv[])
         vsf_thread_wfe(VSF_EVT_USER);
 
         if (wlan_connected) {
-            printf("wifi connected.\n");
+            printf("wifi connected.\r\n");
         } else {
-            printf("fail to connect %s.\n", argv[1]);
+            printf("fail to connect %s.\r\n", argv[1]);
         }
     }
 

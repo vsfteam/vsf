@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_ALLWINNER_F1CX00S_DEBUG_UART_H__
-#define __HAL_DRIVER_ALLWINNER_F1CX00S_DEBUG_UART_H__
+#ifndef __HAL_DRIVER_AIC_AIC8800_DEBUG_UART_H__
+#define __HAL_DRIVER_AIC_AIC8800_DEBUG_UART_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -37,29 +37,18 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#if     VSF_USE_SIMPLE_STREAM == ENABLED
-#   define VSF_DEBUG_STREAM_NEED_POLL
-#elif   VSF_USE_STREAM == ENABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     VSF_USE_SIMPLE_STREAM == ENABLED
-extern vsf_mem_stream_t VSF_DEBUG_STREAM_TX;
+extern vsf_stream_t VSF_DEBUG_STREAM_TX;
 extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 #elif   VSF_USE_STREAM == ENABLED
 #endif
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-
-#if     VSF_USE_SIMPLE_STREAM == ENABLED
-extern void VSF_DEBUG_STREAM_POLL(void);
-#elif   VSF_USE_STREAM == ENABLED
-#endif
 
 #ifdef __cplusplus
 }

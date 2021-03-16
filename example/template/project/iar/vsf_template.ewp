@@ -4532,6 +4532,7 @@
                     <state>LWIP_NO_STDINT_H=1</state>
                     <state>MEMP_MEM_MALLOC=1</state>
                     <state>BUFFER_SIZE_UP=4096</state>
+                    <state>__vsf_linux_ctype=_ctype_</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -8419,6 +8420,15 @@
                     </excluded>
                     <group>
                         <name>AIC8800</name>
+                        <group>
+                            <name>debug_uart</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\debug_uart\debug_uart.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\debug_uart\debug_uart.h</name>
+                            </file>
+                        </group>
                         <group>
                             <name>port</name>
                             <group>

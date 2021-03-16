@@ -33,6 +33,7 @@
 
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 #       include "./usb/usb.h"
+#       include "./debug_uart/debug_uart.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
