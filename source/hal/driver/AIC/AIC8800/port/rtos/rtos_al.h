@@ -93,6 +93,8 @@ enum rtos_task_id {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern int rtos_init(void);
+
 extern void * rtos_malloc(uint32_t size);
 extern void rtos_free(void *ptr);
 

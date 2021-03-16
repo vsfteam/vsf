@@ -24,6 +24,8 @@
 #include "time_api.h"
 #include "stdio_uart.h"
 
+#include "rtos_al.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -56,6 +58,10 @@ bool vsf_driver_init(void)
     dbg("\r\nhost_wb start\r\n");
 
     aic_time_init(0, 0);
+
+    if (rtos_init()) {
+        VSF_HAL_ASSERT(false);
+    }
 
     return true;
 }

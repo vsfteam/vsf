@@ -22,6 +22,11 @@
 
 #include "rtos_al.h"
 
+// library from vendor depends on this header,
+//  and tv_sec in timeval structure MUST BE 64-bit,
+//  this will be asserted in initializing code
+#include <sys/time.h>
+
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
@@ -537,7 +542,15 @@ bool rtos_queue_is_empty(rtos_queue queue)
 
 int rtos_init(void)
 {
-    return 0;
+// library from vendor depends on <sys/timer.h>,
+//  and tv_sec in timeval structure MUST BE 64-bit,
+//  assert if current environment is OK
+    volatile struct timeval time;
+    if (    (8 == sizeof(time.tv_sec))
+        &&  (4 == sizeof(time.tv_usec))) {
+        return 0;
+    }
+    return -1;
 }
 
 /* EOF */
