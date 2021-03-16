@@ -261,7 +261,7 @@ vsf_prio_t __vsf_os_evtq_get_priority(vsf_evtq_t *this_ptr)
 {
     uint_fast8_t index = this_ptr - __vsf_os.res_ptr->evt_queue.queue_array;
     VSF_KERNEL_ASSERT(      (this_ptr != NULL)
-                        && (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
+                        &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 
     return (vsf_prio_t)index;
 }
@@ -270,7 +270,7 @@ vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *this_ptr, vsf_prio_t priority)
 {
 #if defined(__VSF_OS_SWI_PRIORITY_BEGIN)
     uint_fast8_t index = this_ptr - __vsf_os.res_ptr->evt_queue.queue_array;
-    VSF_KERNEL_ASSERT((     this_ptr != NULL)
+    VSF_KERNEL_ASSERT(      (this_ptr != NULL)
                         &&  (index < __vsf_os.res_ptr->evt_queue.queue_cnt));
 #endif
 
