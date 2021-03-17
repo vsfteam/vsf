@@ -86,7 +86,7 @@
 #   define APP_LVGL_DEMO_CFG_VER_RES                    240
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (16 * 1024)
 // make sure 0x158000 - 0x15FFFF ram is available
-#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x158000
+#   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x00158000
 #define APP_USE_BTSTACK_DEMO                            DISABLED
 // DO NOT use bthci, use on-chip bluetooth
 #   define VSF_USBH_USE_BTHCI                           DISABLED
@@ -104,7 +104,7 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                0x10000
+#   define VSF_HEAP_SIZE                                0x18000
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED
@@ -246,7 +246,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   endif
 #endif
 
-#define VSF_LINUX_CFG_STACKSIZE                         (8 * 1024)
+#define VSF_LINUX_CFG_STACKSIZE                         (4 * 1024)
 #define VSF_TRACE_CFG_COLOR_EN                          ENABLED
 #define VSH_HAS_COLOR                                   1
 
