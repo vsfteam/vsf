@@ -60,6 +60,7 @@ bool vsf_driver_init(void)
     aic_time_init(0, 0);
 
     if (rtos_init()) {
+        // if assert failed here, review the check conditions in rtos_init
         VSF_HAL_ASSERT(false);
     }
 
