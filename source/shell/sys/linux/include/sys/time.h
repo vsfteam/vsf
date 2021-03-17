@@ -17,9 +17,14 @@ extern "C" {
 #define setitimer           __vsf_linux_setitimer
 #define gettimeofday        __vsf_linux_gettimeofday
 
+#ifndef __SUSECONDS_T
+#   define __SUSECONDS_T    long int
+#endif
+typedef __SUSECONDS_T       suseconds_t;
+
 struct timeval {
-    long            tv_sec;
-    long            tv_usec;
+    time_t          tv_sec;
+    suseconds_t     tv_usec;
 };
 
 struct timezone {

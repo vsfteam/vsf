@@ -15,8 +15,15 @@ extern "C" {
 #define nanosleep           __vsf_linux_nanosleep
 #define clock               __vsf_linux_clock
 
-typedef long long           time_t;
-typedef long                clock_t;
+#ifndef __TIME_T
+#   define __TIME_T         long long
+#endif
+typedef __TIME_T            time_t;
+
+#ifndef __CLOCK_T
+#   define __CLOCK_T        long
+#endif
+typedef __CLOCK_T           clock_t;
 
 #define CLOCKS_PER_SEC      ((clock_t)1000)
 
