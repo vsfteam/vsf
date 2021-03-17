@@ -42,7 +42,7 @@ struct tm {
 };
 
 struct timespec {
-    long    tv_sec;
+    time_t  tv_sec;
     long    tv_nsec;
 };
 
