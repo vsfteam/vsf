@@ -4528,6 +4528,7 @@
                     <state>CFG_PMIC_ITF_ASDMA</state>
                     <state>CFG_WIFI_STACK</state>
                     <state>CFG_RSSI_DATAPKT</state>
+                    <state>CFG_BAND5G</state>
                     <state>CFG_DBG</state>
                     <state>LWIP_NO_STDINT_H=1</state>
                     <state>MEMP_MEM_MALLOC=1</state>
@@ -4695,7 +4696,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\macif</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
-                    <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>

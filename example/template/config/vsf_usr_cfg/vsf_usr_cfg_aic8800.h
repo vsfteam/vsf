@@ -61,7 +61,7 @@
 //  current tgui demo depends on VSF_DISP_USE_SDL2, which is only available on __WIN__
 #define APP_USE_TGUI_DEMO                               DISABLED
 //  TODO: need test for c++ support
-#define APP_USE_CPP_DEMO                                ENABLED
+#define APP_USE_CPP_DEMO                                DISABLED
 #if APP_USE_CPP_DEMO == ENABLED
 #   define __VSF_WORKAROUND_IAR_CPP__
 #endif
@@ -76,7 +76,7 @@
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
-#define APP_USE_LVGL_DEMO                               ENABLED
+#define APP_USE_LVGL_DEMO                               DISABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
 // if using dl1x5(DL1X5 chips from DisplayLink), color_depth should be 16,
@@ -87,7 +87,7 @@
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (16 * 1024)
 // make sure 0x158000 - 0x15FFFF ram is available
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x158000
-#define APP_USE_BTSTACK_DEMO                            ENABLED
+#define APP_USE_BTSTACK_DEMO                            DISABLED
 // DO NOT use bthci, use on-chip bluetooth
 #   define VSF_USBH_USE_BTHCI                           DISABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
@@ -98,7 +98,7 @@
 
 // demo for AIC8800
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
-#define AIC8800_APP_USE_BT_DEMO                         ENABLED
+#define AIC8800_APP_USE_BT_DEMO                         DISABLED
 
 
 // component configure
@@ -153,11 +153,11 @@
 // simple_libc does not compatible with cpp, so if cpp is used, DO NOT use simple_libc
 //  make sure in inclue path, simple_libc is removed if cpp is used
 #       define VSF_LINUX_USE_SIMPLE_LIBC                ENABLED
-#           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
+#           define VSF_LINUX_USE_SIMPLE_STDIO           ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STRING          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_TIME            DISABLED
+#           define VSF_LINUX_USE_SIMPLE_TIME            ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STDLIB          ENABLED
-#           define VSF_LINUX_USE_SIMPLE_CTYPE           DISABLED
+#           define VSF_LINUX_USE_SIMPLE_CTYPE           ENABLED
 #   endif
 
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
