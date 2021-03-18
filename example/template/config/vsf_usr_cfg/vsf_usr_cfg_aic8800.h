@@ -210,7 +210,6 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false
 #           define USRAPP_USBD_DWCOTG_CFG_VBUS_EN       false
 #           define USRAPP_USBD_DWCOTG_CFG_DMA_EN        false
-//      TODO: use actual priority after arm9 arch is ready
 #       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
 #       define USRAPP_CFG_USBD_SPEED                    USB_SPEED_HIGH

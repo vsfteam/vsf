@@ -91,6 +91,7 @@ static int __wifi_scan_main(int argc, char *argv[])
             ((uint8_t *)result.bssid.array)[4], ((uint8_t *)result.bssid.array)[5],
             (char *)result.ssid.array);
     }
+    fhost_cntrl_cfgrwnx_link_close(cntrl_link);
 
     return 0;
 }
