@@ -194,7 +194,7 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
     usart_ptr->param.usart->FIFO &= ~(UART_FIFO_RFITL_Msk | UART_FIFO_RTSTRGLV_Msk| UART_FIFO_RXOFF_Msk);
 
     if (u32_uart_clk_src_sel == 1ul) {
-        u32_clk_tbl[u32_uart_clk_src_sel] = CLK_GetPLLClockFreq();
+        u32_clk_tbl[u32_uart_clk_src_sel] = __clk_get_pllclockfreq();
     }
     if (cfg_ptr->baudrate != 0ul) {
         u32_baud_div = (((u32_clk_tbl[u32_uart_clk_src_sel] / (u32_uart_clk_div_num + 1ul)) + cfg_ptr->baudrate / 2ul) / cfg_ptr->baudrate) - 2ul;
