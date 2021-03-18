@@ -187,10 +187,16 @@ vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, usart_cfg_t *cfg_ptr)
         u32_uart_clk_src_sel = (CLK->CLKSEL3 & CLK_CLKSEL3_UART5SEL_Msk) >> CLK_CLKSEL3_UART5SEL_Pos;
         u32_uart_clk_div_num = (CLK->CLKDIV4 & CLK_CLKDIV4_UART5DIV_Msk) >> CLK_CLKDIV4_UART5DIV_Pos;
     }
+    if (0 != cfg_ptr->rx_timeout) {
+        usart_ptr->param.usart->INTEN |= UART_INTEN_TOCNTEN_Msk;
+        usart_ptr->param.usart->TOUT |= ((cfg_ptr->rx_timeout & 0xfful) << UART_TOUT_TOIC_Pos);
+    }
     usart_ptr->param.usart->FUNCSEL = 0x0ul << UART_FUNCSEL_FUNCSEL_Pos;
     usart_ptr->param.usart->LINE =      (cfg_ptr->mode & USART_BIT_LENGTH)
                                     |   (((cfg_ptr->mode & USART_PARITY) >> 16) << UART_LINE_PBE_Pos)
-                                    |   (((cfg_ptr->mode & USART_STOPBIT) >> 8) << UART_LINE_NSB_Pos);
+                                    |   (((cfg_ptr->mode & USART_STOPBIT) >> 8) << UART_LINE_NSB_Pos)
+                                    |   ((cfg_ptr->mode & USART_TX_INVERTED >> 26) << UART_LINE_TXDINV_Pos)
+                                    |   ((cfg_ptr->mode & USART_RX_INVERTED >> 27) << UART_LINE_RXDINV_Pos);
     usart_ptr->param.usart->FIFO &= ~(UART_FIFO_RFITL_Msk | UART_FIFO_RTSTRGLV_Msk| UART_FIFO_RXOFF_Msk);
 
     if (u32_uart_clk_src_sel == 1ul) {
@@ -257,7 +263,7 @@ uint_fast16_t vsf_usart_fifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uin
             usart_ptr->status.tx_error_detected = true;
             return ret_count;
         }
-        usart_ptr->param.usart->DAT = *((uint8_t *)buffer_ptr + ret_count);
+        usart_ptr->param.usart->DAT = 0x5500;
     }
     usart_ptr->status.is_busy = false;
     return ret_count;

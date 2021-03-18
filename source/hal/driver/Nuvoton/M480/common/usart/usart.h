@@ -79,14 +79,19 @@ enum  em_usart_mode_t {
                                         |   USART_MARK_PARITY
                                         |   USART_SPACE_PARITY,
 
-    USART_1_BIT_FIFO                = 0x00000000U,
-    USART_4_BIT_FIFO                = 0x01000000U,
-    USART_8_BIT_FIFO                = 0x02000000U,
-    USART_14_BIT_FIFO               = 0x03000000U,
+    USART_1_BIT_FIFO                = 0x00000000ul,
+    USART_4_BIT_FIFO                = 0x01000000ul,
+    USART_8_BIT_FIFO                = 0x02000000ul,
+    USART_14_BIT_FIFO               = 0x03000000ul,
     USART_FIFO_SIZE                 =       USART_1_BIT_FIFO
                                         |   USART_4_BIT_FIFO
                                         |   USART_8_BIT_FIFO
                                         |   USART_14_BIT_FIFO,
+
+    USART_TX_INVERTED               = 0x04000000ul,
+    USART_RX_INVERTED               = 0x08000000ul,
+    USART_TX_RX_INVERTED            =       USART_TX_INVERTED
+                                        |   USART_RX_INVERTED,
 };
 
 enum em_usart_irq_mask_t {
@@ -136,10 +141,6 @@ struct vsf_usart_t {
     uint8_t                         *rx_buf;
     usart_cfg_t                     cfg;
     rx_tx_gpio_t                    gpio_reg;
-    //struct {
-    //    uint8_t                     tx_inverted : 1;
-    //    uint8_t                     rx_inverted : 1;
-    //} inverted;
     uint8_t                         is_enabled : 1;
     const m480_usart_t              param;
 };
