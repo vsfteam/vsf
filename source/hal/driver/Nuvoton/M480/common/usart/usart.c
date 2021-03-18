@@ -302,7 +302,7 @@ void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, em_usart_irq_mask_t irq_mask)
 vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     if (!(usart_ptr->is_abled)) {
-        return 0;
+        return VSF_ERR_NOT_READY;
     }
     //todo:
     return VSF_ERR_NONE;
@@ -310,7 +310,7 @@ vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fa
 vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     if (!(usart_ptr->is_abled)) {
-        return 0;
+        return VSF_ERR_NOT_READY;
     }
     //todo:
     return VSF_ERR_NONE;
