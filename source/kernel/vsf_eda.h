@@ -1187,18 +1187,6 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
 vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer);
 
-#       if VSF_KERNEL_TIMER_CFG_ISR == ENABLED
-static inline vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, uint_fast32_t tick)
-{
-    return vsf_callback_timer_add(timer, tick);
-}
-
-static inline vsf_err_t vsf_callback_timer_remove_irq(vsf_callback_timer_t *timer)
-{
-    return vsf_callback_timer_remove(timer);
-}
-#       endif
-
 #       if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
 {
