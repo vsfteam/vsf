@@ -27,8 +27,6 @@
 #include "kernel/vsf_kernel.h"
 #include "./vsf_usbip_dcd.h"
 
-#include <Windows.h>
-
 /*============================ MACROS ========================================*/
 
 #define VSF_USBIP_VERSION                       0x0111

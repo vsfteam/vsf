@@ -25,6 +25,7 @@
     &&  VSF_USBIP_DCD_CFG_BACKEND == VSF_USBIP_DCD_CFG_BACKEND_LWIP
 
 #include "lwip/opt.h"
+#include "lwip/tcpip.h"
 #include "lwip/tcp.h"
 
 /*============================ MACROS ========================================*/
@@ -69,7 +70,7 @@ static uint_fast32_t __vk_usbip_server_lwip_read(vk_usbip_server_lwip_t *backend
         len = pbuf_copy_partial(backend->pbuf_rx, buffer, len, 0);
         size -= len;
         read_len += len;
-        buffer += len;
+        buffer = (uint8_t *)buffer + len;
 
         backend->pbuf_rx = pbuf_free_header(backend->pbuf_rx, len);
     }

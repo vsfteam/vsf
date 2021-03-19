@@ -7567,6 +7567,27 @@
                 <group>
                     <name>driver</name>
                     <group>
+                        <name>dcd</name>
+                        <group>
+                            <name>usbip_dcd</name>
+                            <group>
+                                <name>backend</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_lwip.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\backend\vsf_usbip_dcd_win.c</name>
+                                </file>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\usbip_dcd\vsf_usbip_dcd.h</name>
+                            </file>
+                        </group>
+                    </group>
+                    <group>
                         <name>hcd</name>
                         <group>
                             <name>ohci</name>

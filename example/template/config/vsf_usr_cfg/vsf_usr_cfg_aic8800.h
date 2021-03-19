@@ -46,7 +46,7 @@
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
 #define APP_USE_USBH_DEMO                               ENABLED
-#define APP_USE_USBD_DEMO                               DISABLED
+#define APP_USE_USBD_DEMO                               ENABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
@@ -93,7 +93,9 @@
 #define APP_USE_VSFVM_DEMO                              DISABLED
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
+// lwip demo is not compatible with aic8800 sdk, but VSF_USE_LWIP should be defined
 #define APP_USE_LWIP_DEMO                               DISABLED
+#   define VSF_USE_LWIP                                 ENABLED
 #define APP_USE_EVM_DEMO                                DISABLED
 
 // demo for AIC8800
@@ -205,6 +207,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 
 #if APP_USE_USBD_DEMO == ENABLED
 #   define VSF_USE_USB_DEVICE                           ENABLED
+#       define VSF_USBD_USE_DCD_USBIP                   ENABLED
 #       define VSF_USBD_USE_DCD_DWCOTG                  ENABLED
 #           define USRAPP_USBD_DWCOTG_CFG_ULPI_EN       true
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false
