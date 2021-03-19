@@ -67,6 +67,12 @@
 #   define rtos_trace_notify(...)
 #endif
 
+#ifdef __AIC8800_OSAL_CFG_TRACE_TIMER__
+#   define rtos_trace_timer(...)            rtos_trace(__VA_ARGS__)
+#else
+#   define rtos_trace_timer(...)
+#endif
+
 /*============================ TYPES =========================================*/
 
 dcl_vsf_thread_ex(vsf_rtos_thread_t)
@@ -122,11 +128,12 @@ uint32_t rtos_now(bool isr)
 static void __rtos_timer_on_timer(vsf_callback_timer_t * timer)
 {
     TimerHandle_t xTimer = (TimerHandle_t)timer;
+    rtos_trace_timer("%s: %p on_timer\r\n", __FUNCTION__, timer);
     if (xTimer->pxCallbackFunction != NULL) {
         xTimer->pxCallbackFunction(xTimer);
     }
     if (xTimer->uxAutoReload) {
-        rtos_timer_restart(xTimer, 0, false);
+        rtos_timer_start(xTimer, 0, false);
     }
 }
 
@@ -144,12 +151,15 @@ TimerHandle_t rtos_timer_create(
         xTimer->pvTimerID = pvTimerID;
         xTimer->pxCallbackFunction = pxCallbackFunction;
         xTimer->on_timer = __rtos_timer_on_timer;
+        vsf_callback_timer_init(&xTimer->use_as__vsf_callback_timer_t);
+        rtos_trace_timer("%s: %p %d %s\r\n", __FUNCTION__, xTimer, xTimerPeriodInTicks, uxAutoReload ? "true" : "false");
     }
     return xTimer;
 }
 
 int rtos_timer_delete(TimerHandle_t xTimer, TickType_t xTicksToWait)
 {
+    rtos_trace_timer("%s: %p\r\n", __FUNCTION__, xTimer);
     vsf_callback_timer_remove(&xTimer->use_as__vsf_callback_timer_t);
     vsf_heap_free(xTimer);
     return 0;
@@ -157,22 +167,21 @@ int rtos_timer_delete(TimerHandle_t xTimer, TickType_t xTicksToWait)
 
 int rtos_timer_start(TimerHandle_t xTimer, TickType_t xTicksToWait, bool isr)
 {
-    if (isr) {
-        vsf_callback_timer_add_isr(&xTimer->use_as__vsf_callback_timer_t, (uint_fast32_t)vsf_systimer_ms_to_tick(xTicksToWait));
-        return 0;
-    }
-
+    rtos_trace_timer("%s: %p %d\r\n", __FUNCTION__, xTimer, xTicksToWait);
     vsf_callback_timer_add_ms(&xTimer->use_as__vsf_callback_timer_t, xTimer->xTimerPeriodInTicks);
     return 0;
 }
 
 int rtos_timer_restart(TimerHandle_t xTimer, TickType_t xTicksToWait, bool isr)
 {
+    rtos_trace_timer("%s: %p %d\r\n", __FUNCTION__, xTimer, xTicksToWait);
+    rtos_timer_stop(xTimer, xTicksToWait);
     return rtos_timer_start(xTimer, xTicksToWait, isr);
 }
 
 int rtos_timer_stop(TimerHandle_t xTimer, TickType_t xTicksToWait)
 {
+    rtos_trace_timer("%s: %p %d\r\n", __FUNCTION__, xTimer, xTicksToWait);
     vsf_callback_timer_remove(&xTimer->use_as__vsf_callback_timer_t);
     return 0;
 }
