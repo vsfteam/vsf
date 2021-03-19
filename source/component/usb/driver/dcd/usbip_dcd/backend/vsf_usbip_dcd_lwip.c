@@ -226,6 +226,7 @@ void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
         UNLOCK_TCPIP_CORE();
         VSF_USB_ASSERT(ERR_OK == err);
     }
+    tcp_output(backend->work_pcb);
 
     __vk_usbip_server_done_urb(server, urb);
 }
