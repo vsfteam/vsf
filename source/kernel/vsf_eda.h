@@ -51,6 +51,10 @@ extern "C" {
 
 #define VSF_SYNC_MAX                        0x7FFF
 
+#ifndef VSF_KERNEL_CFG_EDA_USER_BITLEN
+#   define VSF_KERNEL_CFG_EDA_USER_BITLEN   5
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 // SEMAPHORE
@@ -606,7 +610,7 @@ typedef union vsf_eda_feature_t {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
         uint8_t                 is_fsm : 1;
 #endif
-        uint8_t                 user_bits :5;
+        uint8_t                 user_bits : VSF_KERNEL_CFG_EDA_USER_BITLEN;
     };
     uint8_t                     value;
 } vsf_eda_feature_t;
