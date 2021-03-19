@@ -99,6 +99,7 @@ static err_t __vk_usbip_server_lwip_on_recv(void *arg, struct tcp_pcb *tpcb, str
     }
     if (NULL == p) {
         // closed
+        tcp_close(backend->work_pcb);
         __vk_usbip_server_lwip_reset(backend);
         vsf_eda_post_evt(&server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_DISCONNECTED);
         return ERR_OK;
