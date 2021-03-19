@@ -101,6 +101,42 @@ extern "C" {
 #ifndef VSF_HAL_USE_SPI
 #   define VSF_HAL_USE_SPI              ENABLED
 #endif
+#if VSF_HAL_USE_SPI != ENABLED
+#   undef VSF_HAL_USE_SPI0
+#   undef VSF_HAL_USE_SPI1
+#   undef VSF_HAL_USE_SPI2
+#   undef VSF_HAL_USE_SPI3
+#   undef VSF_HAL_USE_SPI4
+#   undef VSF_HAL_USE_SPI5
+#   undef VSF_HAL_USE_SPI6
+#   undef VSF_HAL_USE_SPI7
+#else
+#   ifndef VSF_HAL_USE_SPI0
+#       define VSF_HAL_USE_SPI0       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI1
+#       define VSF_HAL_USE_SPI1       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI2
+#       define VSF_HAL_USE_SPI2       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI3
+#       define VSF_HAL_USE_SPI3       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI4
+#       define VSF_HAL_USE_SPI4       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI5
+#       define VSF_HAL_USE_SPI5       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI6
+#       define VSF_HAL_USE_SPI6       ENABLED
+#   endif
+#   ifndef VSF_HAL_USE_SPI7
+#       define VSF_HAL_USE_SPI7       ENABLED
+#   endif
+#endif
+
 #ifndef VSF_HAL_USE_IIC
 #   define VSF_HAL_USE_IIC              ENABLED
 #endif
