@@ -91,7 +91,7 @@ static err_t __vk_usbip_server_lwip_on_recv(void *arg, struct tcp_pcb *tpcb, str
 {
     vk_usbip_server_lwip_t *backend = (vk_usbip_server_lwip_t *)arg;
     vk_usbip_server_t *server = backend->server;
-    bool is_to_send_evt;
+    bool is_to_send_evt = false;
 
     if (err != ERR_OK) {
         server->err = VSF_ERR_FAIL;
@@ -110,8 +110,8 @@ static err_t __vk_usbip_server_lwip_on_recv(void *arg, struct tcp_pcb *tpcb, str
         __vk_usbip_server_lwip_save_pbuf(backend, p);
         if (backend->mem_rx.size > 0) {
             backend->mem_rx.size -= __vk_usbip_server_lwip_read(backend, backend->mem_rx.buffer, backend->mem_rx.size);
+            is_to_send_evt = 0 == backend->mem_rx.size;
         }
-        is_to_send_evt = 0 == backend->mem_rx.size;
     vsf_unprotect_sched(orig);
 
     if (is_to_send_evt) {
