@@ -74,7 +74,6 @@ def_vsf_thread_ex(vsf_rtos_thread_t,
     def_params(
         void            *arg;
         rtos_task_fct   func;
-        uint32_t        notification;
         char            name[16];
     )
 )
@@ -283,9 +282,10 @@ uint32_t rtos_task_wait_notification(int timeout)
         timeout = vsf_systimer_ms_to_tick(timeout);
     }
     if (0 == timeout) {
+        ret = vsf_eda_get_user_value();
         rtos_trace_notify("%s: %s(%p) %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle->name,
-                            task_handle, task_handle->notification);
-        return task_handle->notification;
+                            task_handle, ret);
+        return ret;
     }
 
     vsf_protect_t orig = vsf_protect_int();
@@ -311,10 +311,10 @@ uint32_t rtos_task_wait_notification(int timeout)
     // private kernel API, can only be used here, so declear here
     extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
     __vsf_teda_cancel_timer(&task_handle->use_as__vsf_teda_t);
-    ret = task_handle->notification;
+    ret = vsf_eda_get_user_value();
     if (task_handle->flag.state.is_sync_got) {
         task_handle->flag.state.is_sync_got = false;
-        task_handle->notification = 0;
+        vsf_eda_set_user_value(0);
     }
     task_handle->flag.state.is_limitted = false;
     vsf_unprotect_int(orig);
@@ -326,9 +326,10 @@ uint32_t rtos_task_wait_notification(int timeout)
 
 void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
+    VSF_ASSERT(!(value & ~((1 << VSF_KERNEL_CFG_EDA_USER_BITLEN) - 1)));
     VSF_ASSERT(task_handle != NULL);
     vsf_protect_t orig = vsf_protect_int();
-        task_handle->notification = value;
+        vsf_eda_set_user_value(value);
         if (!task_handle->flag.state.is_limitted) {
             vsf_unprotect_int(orig);
             return;
@@ -336,22 +337,26 @@ void rtos_task_notify(rtos_task_handle task_handle, uint32_t value, bool isr)
         task_handle->flag.state.is_sync_got = true;
     vsf_unprotect_int(orig);
     rtos_trace_notify("%s: %s(%p) %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle->name,
-                            task_handle, task_handle->notification);
+                            task_handle, value);
     vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
 
 void rtos_task_notify_setbits(rtos_task_handle task_handle, uint32_t value, bool isr)
 {
+    VSF_ASSERT(!(value & ~((1 << VSF_KERNEL_CFG_EDA_USER_BITLEN) - 1)));
     VSF_ASSERT(task_handle != NULL);
+
+    uint8_t notification;
     vsf_protect_t orig = vsf_protect_int();
-        task_handle->notification |= value;
+        notification = vsf_eda_get_user_value() | value;
+        vsf_eda_set_user_value(notification);
         if (!task_handle->flag.state.is_limitted) {
             vsf_unprotect_int(orig);
             return;
         }
         task_handle->flag.state.is_sync_got = true;
     vsf_unprotect_int(orig);
-    rtos_trace_notify("%s: %p %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle, task_handle->notification);
+    rtos_trace_notify("%s: %p %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle, notification);
     vsf_eda_post_evt(&task_handle->use_as__vsf_eda_t, VSF_EVT_SYNC);
 }
 
