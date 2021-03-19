@@ -37,10 +37,6 @@
 struct rwnx_hw hw_env;
 
 /*============================ LOCAL VARIABLES ===============================*/
-
-static char *__wifi_ssid, *__wifi_pass;
-static vsf_eda_t *__eda;
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -96,33 +92,6 @@ static int __wifi_scan_main(int argc, char *argv[])
     return 0;
 }
 
-static RTOS_TASK_FCT(__wifi_connect_task)
-{
-#if PLF_HW_PXP
-    rtos_task_suspend(5);   // wait for AP starting
-#endif
-
-    if (0 == wlan_start_sta((uint8_t *)__wifi_ssid, (uint8_t *)__wifi_pass, 0)) {
-        wlan_connected = 1;
-    }
-    __wifi_ssid = NULL;
-    __wifi_pass = NULL;
-
-#if CONFIG_SLEEP_LEVEL == 1
-    sleep_level_set(PM_LEVEL_LIGHT_SLEEP);
-#elif CONFIG_SLEEP_LEVEL == 2
-    sleep_level_set(PM_LEVEL_DEEP_SLEEP);
-#elif CONFIG_SLEEP_LEVEL == 3
-    sleep_level_set(PM_LEVEL_HIBERNATE);
-#endif
-    user_sleep_allow(1);
-
-    if (__eda != NULL) {
-        vsf_eda_post_evt(__eda, VSF_EVT_USER);
-        __eda = NULL;
-    }
-}
-
 static int __wifi_connect_main(int argc, char *argv[])
 {
     if (argc < 2) {
@@ -131,14 +100,24 @@ static int __wifi_connect_main(int argc, char *argv[])
     }
 
     if (!wlan_connected) {
-        __wifi_ssid = argv[1];
-        __wifi_pass = argc >= 3 ? argv[2] : "";
-        __eda = vsf_eda_get_cur();
+        char *ssid = argv[1], *pass = argc >= 3 ? argv[2] : "";
 
-        // wlan_start_sta can only be called within rtos_task environment
-        rtos_task_create(__wifi_connect_task, "connect_task",
-                    APPLICATION_TASK, 512, NULL, RTOS_TASK_PRIORITY(1), NULL);
-        vsf_thread_wfe(VSF_EVT_USER);
+#if PLF_HW_PXP
+        rtos_task_suspend(5);   // wait for AP starting
+#endif
+
+        if (0 == wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0)) {
+            wlan_connected = 1;
+        }
+
+#if CONFIG_SLEEP_LEVEL == 1
+        sleep_level_set(PM_LEVEL_LIGHT_SLEEP);
+#elif CONFIG_SLEEP_LEVEL == 2
+        sleep_level_set(PM_LEVEL_DEEP_SLEEP);
+#elif CONFIG_SLEEP_LEVEL == 3
+        sleep_level_set(PM_LEVEL_HIBERNATE);
+#endif
+        user_sleep_allow(1);
 
         if (wlan_connected) {
             printf("wifi connected.\r\n");
