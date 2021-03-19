@@ -47,7 +47,7 @@
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
 #define APP_USE_USBH_DEMO                               DISABLED
-#define APP_USE_USBD_DEMO                               DISABLED
+#define APP_USE_USBD_DEMO                               ENABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
@@ -208,7 +208,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 
 #if APP_USE_USBD_DEMO == ENABLED
 #   define VSF_USE_USB_DEVICE                           ENABLED
-#       define VSF_USBD_USE_DCD_USBIP                   DISABLED
+#       define VSF_USBD_USE_DCD_USBIP                   ENABLED
 #       define VSF_USBD_USE_DCD_DWCOTG                  ENABLED
 #           define USRAPP_USBD_DWCOTG_CFG_ULPI_EN       true
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false
