@@ -24,7 +24,6 @@
 #if     VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_USBIP == ENABLED      \
     &&  VSF_USBIP_DCD_CFG_BACKEND == VSF_USBIP_DCD_CFG_BACKEND_LWIP
 
-#include "lwip/opt.h"
 #include "lwip/tcpip.h"
 #include "lwip/tcp.h"
 
@@ -198,7 +197,7 @@ void __vk_usbip_server_backend_send(uint8_t *buff, uint_fast32_t size)
 
     VSF_USB_ASSERT(NULL != backend->work_pcb);
     LOCK_TCPIP_CORE();
-    err = tcp_write(backend->work_pcb, buff, size, 1);
+    err = tcp_write(backend->work_pcb, buff, size, 0);
     err += tcp_output(backend->work_pcb);
     UNLOCK_TCPIP_CORE();
     VSF_USB_ASSERT(ERR_OK == err);
@@ -214,7 +213,7 @@ void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
 
     uint_fast32_t actual_length;
     LOCK_TCPIP_CORE();
-    err = tcp_write(backend->work_pcb, (char *)&urb->rep, 48, 1);
+    err = tcp_write(backend->work_pcb, (char *)&urb->rep, 48, 0);
     UNLOCK_TCPIP_CORE();
     VSF_USB_ASSERT(ERR_OK == err);
     if (urb->is_unlinked) {
@@ -226,7 +225,7 @@ void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
     }
     if (actual_length > 0) {
         LOCK_TCPIP_CORE();
-        err = tcp_write(backend->work_pcb, (char *)urb->dynmem.buffer, actual_length, 1);
+        err = tcp_write(backend->work_pcb, (char *)urb->dynmem.buffer, actual_length, 0);
         UNLOCK_TCPIP_CORE();
         VSF_USB_ASSERT(ERR_OK == err);
     }

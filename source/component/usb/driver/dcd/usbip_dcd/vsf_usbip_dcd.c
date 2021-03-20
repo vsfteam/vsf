@@ -458,7 +458,6 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         switch (server->reply) {
         case USBIP_RET_SUBMIT:
             VSF_USB_ASSERT(VSF_USBIP_SERVER_REP_REPLY == server->rep_state);
-
             break;
         case USBIP_RET_UNLINK:
             break;

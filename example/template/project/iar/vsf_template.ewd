@@ -6693,7 +6693,7 @@
                 </option>
                 <option>
                     <name>JLinkInitialSpeed</name>
-                    <state>1000</state>
+                    <state>500</state>
                 </option>
                 <option>
                     <name>CCDoJlinkMultiTarget</name>
