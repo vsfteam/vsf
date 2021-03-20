@@ -5738,6 +5738,9 @@
                     <name>$PROJ_DIR$\..\..\demo\usbd_demo\usbd_demo_uac.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\usbd_demo\usbd_demo_user.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\usbd_demo\usbd_demo_uvc.c</name>
                 </file>
             </group>

@@ -52,6 +52,7 @@
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
 #   define APP_USE_USBD_UAC_DEMO                        ENABLED
+#   define APP_USE_USBD_USER_DEMO                       ENABLED
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
 #define APP_USE_SDL2_DEMO                               DISABLED
@@ -129,6 +130,7 @@
 #   define VSF_USBD_USE_MSC                             ENABLED
 #   define VSF_USBD_USE_UVC                             ENABLED
 #   define VSF_USBD_USE_UAC                             ENABLED
+#   define VSF_USBD_USE_HID                             ENABLED
 #   define APP_CFG_USBD_VID                             0xA7A8
 #   define APP_CFG_USBD_PID                             0x2348
 
@@ -209,6 +211,9 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #if APP_USE_USBD_DEMO == ENABLED
 #   define VSF_USE_USB_DEVICE                           ENABLED
 #       define VSF_USBD_USE_DCD_USBIP                   ENABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG           DISABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC   DISABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_URB       DISABLED
 #       define VSF_USBD_USE_DCD_DWCOTG                  ENABLED
 #           define USRAPP_USBD_DWCOTG_CFG_ULPI_EN       true
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false
