@@ -141,9 +141,6 @@ extern int rtos_timer_restart(TimerHandle_t xTimer, TickType_t xTicksToWait, boo
 extern int rtos_timer_stop(TimerHandle_t xTimer, TickType_t xTicksToWait);
 extern void * rtos_timer_get_pvTimerID(TimerHandle_t xTimer);
 
-// remove after vendor supports lwip 2.1.2
-extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
-
 #ifdef __cplusplus
 }
 #endif

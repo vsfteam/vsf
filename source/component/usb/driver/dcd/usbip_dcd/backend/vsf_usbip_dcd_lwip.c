@@ -49,6 +49,9 @@ typedef struct vk_usbip_server_lwip_t {
 
 extern vsf_err_t __vk_usbip_server_done_urb(vk_usbip_server_t *server, vk_usbip_urb_t *urb);
 
+// extern pbuf_free_header, which is maybe not implemented in older lwip
+extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 

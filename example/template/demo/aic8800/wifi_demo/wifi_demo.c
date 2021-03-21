@@ -29,6 +29,8 @@
 #include "wlan_if.h"
 #include "sleep_api.h"
 
+#include "./iperf/lwiperf.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -129,10 +131,24 @@ static int __wifi_connect_main(int argc, char *argv[])
     return 0;
 }
 
+static int __iperf_main(int argc, char *argv[])
+{
+    ip_addr_t perf_server_ip;
+    IP_ADDR4(&perf_server_ip, 192, 168, 3, 4);
+    while (1) {
+        LOCK_TCPIP_CORE();
+        lwiperf_start_tcp_server(&perf_server_ip, 9527, NULL, NULL);
+        UNLOCK_TCPIP_CORE();
+
+        vsf_thread_delay_ms(2000);
+    }
+}
+
 int fhost_application_init(void)
 {
     busybox_bind("/sbin/wifi_scan", __wifi_scan_main);
     busybox_bind("/sbin/wifi_connect", __wifi_connect_main);
+    busybox_bind("/sbin/iperf", __iperf_main);
     return 0;
 }
 
