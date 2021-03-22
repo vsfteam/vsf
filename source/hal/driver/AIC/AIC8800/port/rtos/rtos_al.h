@@ -117,6 +117,7 @@ extern int rtos_semaphore_create(rtos_semaphore *semaphore, int max_count, int i
 extern void rtos_semaphore_delete(rtos_semaphore semaphore);
 extern int rtos_semaphore_wait(rtos_semaphore semaphore, int timeout);
 extern int rtos_semaphore_signal(rtos_semaphore semaphore, bool isr);
+extern int rtos_semaphore_get_count(rtos_semaphore semaphore);
 
 extern int rtos_mutex_create(rtos_mutex *mutex);
 extern void rtos_mutex_delete(rtos_mutex mutex);
