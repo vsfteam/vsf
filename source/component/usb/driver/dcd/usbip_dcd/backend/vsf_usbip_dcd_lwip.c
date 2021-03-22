@@ -248,12 +248,10 @@ void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
     VSF_USB_ASSERT(NULL != backend->work_pcb);
     VSF_USB_ASSERT(0 == backend->to_send_len);
 
-    if (urb->is_unlinked) {
+    if (urb->is_unlinked || !urb->req.direction) {
         actual_length = 0;
-    } else if (urb->req.direction) {
-        actual_length = be32_to_cpu(urb->rep.actual_length);
     } else {
-        actual_length = 0;
+        actual_length = be32_to_cpu(urb->rep.actual_length);
     }
 
     LOCK_TCPIP_CORE();
