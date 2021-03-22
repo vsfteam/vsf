@@ -137,7 +137,7 @@ static int __iperf_main(int argc, char *argv[])
     IP_ADDR4(&perf_server_ip, 192, 168, 3, 4);
     while (1) {
         LOCK_TCPIP_CORE();
-        lwiperf_start_tcp_server(&perf_server_ip, 9527, NULL, NULL);
+        lwiperf_start_tcp_server(&perf_server_ip, 5001, NULL, NULL);
         UNLOCK_TCPIP_CORE();
 
         vsf_thread_delay_ms(2000);
