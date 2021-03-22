@@ -4532,8 +4532,6 @@
                     <state>CFG_DBG</state>
                     <state>CFG_HS_IPERF</state>
                     <state>LWIP_NO_STDINT_H=1</state>
-                    <state>MEMP_MEM_MALLOC=1</state>
-                    <state>BUFFER_SIZE_UP=4096</state>
                     <state>__vsf_linux_ctype=_ctype_</state>
                 </option>
                 <option>
