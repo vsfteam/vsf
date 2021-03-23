@@ -305,9 +305,9 @@ static void __SDL_CopyWithFormat(
     uint8_t dst_gloss  = dst_fmt->Gloss;
     uint8_t dst_bloss  = dst_fmt->Bloss;
     uint8_t dst_aloss  = dst_fmt->Aloss;
-    uint32_t dst_rmask  = dst_fmt->Rmask;
-    uint32_t dst_gmask  = dst_fmt->Gmask;
-    uint32_t dst_bmask  = dst_fmt->Bmask;
+//    uint32_t dst_rmask  = dst_fmt->Rmask;
+//    uint32_t dst_gmask  = dst_fmt->Gmask;
+//    uint32_t dst_bmask  = dst_fmt->Bmask;
     uint32_t dst_amask  = dst_fmt->Amask;
 
     uint8_t src_rshift  = src_fmt->Rshift;
