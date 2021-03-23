@@ -5518,15 +5518,6 @@
                 </group>
                 <group>
                     <name>wifi_demo</name>
-                    <group>
-                        <name>iperf</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\demo\aic8800\wifi_demo\iperf\lwiperf.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\demo\aic8800\wifi_demo\iperf\lwiperf.h</name>
-                        </file>
-                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\demo\aic8800\wifi_demo\wifi_demo.c</name>
                     </file>
