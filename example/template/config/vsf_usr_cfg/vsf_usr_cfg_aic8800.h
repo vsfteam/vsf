@@ -46,7 +46,8 @@
 #define APP_USE_LINUX_DEMO                              ENABLED
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
-#define APP_USE_USBH_DEMO                               DISABLED
+#define APP_USE_USBH_DEMO                               ENABLED
+// Actually, usbd used usbip_dcd, no conflicts with hardware usb host
 #define APP_USE_USBD_DEMO                               ENABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
@@ -55,7 +56,7 @@
 #   define APP_USE_USBD_USER_DEMO                       ENABLED
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              DISABLED
-#define APP_USE_SDL2_DEMO                               DISABLED
+#define APP_USE_SDL2_DEMO                               ENABLED
 // if using dl1x5, only RGB565 is supported
 #   define APP_SDL2_DEMO_CFG_COLOR_RGB565
 #   define APP_SDL2_DEMO_CFG_WIDTH                      256
@@ -78,7 +79,7 @@
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
 #define APP_USE_NNOM_DEMO                               DISABLED
-#define APP_USE_LVGL_DEMO                               DISABLED
+#define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
 // if using dl1x5(DL1X5 chips from DisplayLink), color_depth should be 16,
@@ -89,7 +90,7 @@
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (16 * 1024)
 // make sure 0x158000 - 0x15FFFF ram is available
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x00158000
-#define APP_USE_BTSTACK_DEMO                            DISABLED
+#define APP_USE_BTSTACK_DEMO                            ENABLED
 // DO NOT use bthci, use on-chip bluetooth
 #   define VSF_USBH_USE_BTHCI                           DISABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
@@ -102,7 +103,7 @@
 
 // demo for AIC8800
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
-#define AIC8800_APP_USE_BT_DEMO                         DISABLED
+#define AIC8800_APP_USE_BT_DEMO                         ENABLED
 
 
 // component configure

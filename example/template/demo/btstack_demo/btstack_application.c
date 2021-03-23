@@ -51,10 +51,10 @@ static void __btstack_packet_handler(uint8_t packet_type, uint16_t channel, uint
     case BTSTACK_EVENT_STATE:
         if (btstack_event_state_get_state(packet) == HCI_STATE_WORKING) {
 #if APP_USE_LINUX_DEMO != ENABLED
-            vsf_trace_info("Starting inquiry scan..\n");
+            vsf_trace_info("Starting inquiry scan.." VSF_TRACE_CFG_LINEEND);
             gap_inquiry_start(5);
 #else
-            vsf_trace_info("btstack started...\n");
+            vsf_trace_info("btstack started...", VSF_TRACE_CFG_LINEEND);
 #endif
         }
         break;
@@ -76,7 +76,7 @@ static void __btstack_packet_handler(uint8_t packet_type, uint16_t channel, uint
             name_buffer[name_len] = 0;
             vsf_trace_info(", name '%s'", name_buffer);
         }
-        vsf_trace_info("\n");
+        vsf_trace_info(VSF_TRACE_CFG_LINEEND);
         break;
     case GAP_EVENT_INQUIRY_COMPLETE:
         VSF_ASSERT(__eda != NULL);
@@ -100,14 +100,14 @@ int btstack_main(int argc, const char * argv[])
 int btstack_scan_main(int argc, char *argv[])
 {
     if (HCI_STATE_WORKING == hci_get_state()) {
-        vsf_trace_info("Starting inquiry scan..\n");
+        vsf_trace_info("Starting inquiry scan.." VSF_TRACE_CFG_LINEEND);
         gap_inquiry_start(5);
 
         __eda = vsf_eda_get_cur();
         vsf_thread_wfe(VSF_EVT_USER);
         __eda = NULL;
     } else {
-        vsf_trace_info("bluetooth is not available..\n");
+        vsf_trace_info("bluetooth is not available.." VSF_TRACE_CFG_LINEEND);
     }
     return 0;
 }

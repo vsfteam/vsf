@@ -325,7 +325,7 @@ static void __SDL_CopyWithFormat(
 
     uint32_t color;
     uint8_t a, r, g, b;
-    void *dst_tmp, *src_tmp;
+    uint8_t *dst_tmp, *src_tmp;
     for (uint_fast16_t i = 0; i < h; i++) {
         dst_tmp = pdst;
         src_tmp = psrc;
