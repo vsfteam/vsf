@@ -4530,7 +4530,7 @@
                     <state>CFG_RSSI_DATAPKT</state>
                     <state>CFG_BAND5G</state>
                     <state>CFG_DBG</state>
-                    <state>CFG_HS_IPERF</state>
+                    <state>CFG_IPERF</state>
                     <state>LWIP_NO_STDINT_H=1</state>
                     <state>__vsf_linux_ctype=_ctype_</state>
                 </option>
@@ -5132,7 +5132,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$PROJ_DIR$\target\AIC8800\aic8800_ram_debug.icf</state>
+                    <state>$PROJ_DIR$\target\AIC8800\aic8800_flash.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>

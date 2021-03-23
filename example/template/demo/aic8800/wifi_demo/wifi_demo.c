@@ -24,6 +24,8 @@
 #include <unistd.h>
 
 #include "fhost.h"
+#include "fhost_iperf.h"
+
 #include "rwnx_defs.h"
 #include "rwnx_msg_tx.h"
 #include "wlan_if.h"
@@ -131,17 +133,15 @@ static int __wifi_connect_main(int argc, char *argv[])
     return 0;
 }
 
+static rtos_task_handle __iperf_task_handle;
+struct fhost_iperf_settings __iperf_settings = {
+        .flags.is_server        = 1,
+        .port                   = 5001,
+    };
 static int __iperf_main(int argc, char *argv[])
 {
-    ip_addr_t perf_server_ip;
-    IP_ADDR4(&perf_server_ip, 192, 168, 3, 4);
-    while (1) {
-        LOCK_TCPIP_CORE();
-        lwiperf_start_tcp_server(&perf_server_ip, 5001, NULL, NULL);
-        UNLOCK_TCPIP_CORE();
-
-        vsf_thread_delay_ms(2000);
-    }
+    fhost_iperf_start(&__iperf_settings, &__iperf_task_handle);
+    return 0;
 }
 
 int fhost_application_init(void)
