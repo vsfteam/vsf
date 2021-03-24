@@ -69,8 +69,8 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-declare_simple_class(vsf_json_enumerator_t)
-declare_simple_class(vsf_json_constructor_t)
+dcl_simple_class(vsf_json_enumerator_t)
+dcl_simple_class(vsf_json_constructor_t)
 
 enum vsf_json_type_t {
     VSF_JSON_TYPE_INVALID,

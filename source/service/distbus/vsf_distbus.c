@@ -32,9 +32,6 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-extern vsf_err_t vsf_distbus_connect(vsf_distbus_t *distbus)
-{
-    return VSF_ERR_NONE;
-}
+
 
 #endif      // VSF_USE_DISTBUS
