@@ -23,7 +23,6 @@
 
 #define __VSF_JSON_CLASS_IMPLEMENT
 #include "./vsf_json.h"
-#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -518,6 +518,7 @@
     <ClInclude Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service.h" />
     <ClInclude Include="..\..\..\..\source\osa_service\vsf_osa_service_cfg.h" />
+    <ClInclude Include="..\..\..\..\source\service\distbus\vsf_distbus.h" />
     <ClInclude Include="..\..\..\..\source\service\dynarr\vsf_dynarr.h" />
     <ClInclude Include="..\..\..\..\source\service\dynstack\vsf_dynstack.h" />
     <ClInclude Include="..\..\..\..\source\service\fifo\vsf_fifo.h" />
@@ -1182,6 +1183,7 @@
     <ClCompile Include="..\..\..\..\source\osa_hal\vsf_osa_hal.c" />
     <ClCompile Include="..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.c" />
     <ClCompile Include="..\..\..\..\source\osa_service\vsf_osa_service.c" />
+    <ClCompile Include="..\..\..\..\source\service\distbus\vsf_distbus.c" />
     <ClCompile Include="..\..\..\..\source\service\dynarr\vsf_dynarr.c" />
     <ClCompile Include="..\..\..\..\source\service\dynstack\vsf_dynstack.c" />
     <ClCompile Include="..\..\..\..\source\service\fifo\vsf_fifo.c" />

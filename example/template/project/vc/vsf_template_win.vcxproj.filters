@@ -958,6 +958,9 @@
     <Filter Include="vsf\component\3rd-party\nnom\raw\src\backends">
       <UniqueIdentifier>{e2e4eaa2-6b58-4631-bcb0-403d959e5493}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\service\distbus">
+      <UniqueIdentifier>{3b469b99-d1a4-4bd4-a5c0-3e99d72b6b3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -2870,6 +2873,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jsimddct.h">
       <Filter>vsf\component\3rd-party\libjpeg-turbo\raw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\service\distbus\vsf_distbus.h">
+      <Filter>vsf\service\distbus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -4810,6 +4816,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\gato\raw\render\text.c">
       <Filter>vsf\component\3rd-party\gato\raw\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\service\distbus\vsf_distbus.c">
+      <Filter>vsf\service\distbus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
