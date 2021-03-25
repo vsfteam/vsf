@@ -139,6 +139,11 @@ static uint_fast32_t __vsf_heap_calc_unaligned_size(void *buffer, uint_fast32_t 
     return unaligned_size;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe177
+#endif
+// __vsf_heap_mcb_set_next is reserved for future use
 static void __vsf_heap_mcb_set_next(vsf_heap_mcb_t *mcb, vsf_heap_mcb_t *mcb_next)
 {
     uint_fast32_t margin_size = (uint8_t *)mcb_next - (uint8_t *)mcb;

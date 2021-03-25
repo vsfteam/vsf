@@ -72,7 +72,7 @@ static int __l_timer_step(lua_State *L)
 
 static int __l_timer_sleep(lua_State *L)
 {
-    usleep(luaL_checknumber(L, 1) * 1000000);
+    usleep((int)luaL_checknumber(L, 1) * 1000000);
     return 0;
 }
 

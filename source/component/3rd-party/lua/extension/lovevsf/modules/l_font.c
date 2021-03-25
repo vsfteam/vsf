@@ -34,7 +34,7 @@
 int __l_font_new(lua_State *L)
 {
     const char *filename = luaL_checkstring(L, 1);
-    int ptsize = luaL_optnumber(L, 2, 8);
+    int ptsize = (int)luaL_optnumber(L, 2, 8);
 
     love_font_t *font = luaO_newinst(L, LOVE_CLASS(font));
 

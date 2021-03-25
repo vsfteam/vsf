@@ -1518,7 +1518,12 @@ int tcsetattr(int fd, int optional_actions, const struct termios *termios)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 void usleep(int usec)
 {
+#   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
     vsf_teda_set_timer_us(usec);
+#   else
+    // us sleep is not available in non tickless mode
+    VSF_LINUX_ASSERT(false);
+#   endif
     vsf_thread_wfe(VSF_EVT_TIMER);
 }
 

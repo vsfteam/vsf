@@ -279,6 +279,13 @@ static void __btstack_chipset_aic8800_set_bd_addr_command(bd_addr_t addr, uint8_
     reverse_bd_addr(addr, &hci_cmd_buffer[3]);
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe177
+#endif
+// actually, btstack_chipset_t doesn't have set_ble_addr_command
+//  but aic8800 need this to set ble command
+//  TODO: how to add it to btstack?
 static void __btstack_chipset_aic8800_set_ble_addr_command(bd_addr_t addr, uint8_t *hci_cmd_buffer)
 {
     hci_cmd_buffer[0] = 0x32;

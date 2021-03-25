@@ -5,8 +5,10 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../sys/types.h"
+#   include "../time.h"
 #else
 #   include <sys/types.h>
+#   include <time.h>
 #endif
 
 #ifdef __cplusplus

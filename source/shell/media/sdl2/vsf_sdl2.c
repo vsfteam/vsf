@@ -167,6 +167,12 @@ static void __vsf_sdl2_fast_memcpy8(uint8_t *pdst, uint8_t *psrc, uint_fast32_t 
 {
     __vsf_sdl2_fast_copy(pdst, psrc, num)
 }
+
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe177
+#endif
+// __vsf_sdl2_fast_memcpy16 and __vsf_sdl2_fast_memcpy32 are reserved for future use
 static void __vsf_sdl2_fast_memcpy16(uint16_t *pdst, uint16_t *psrc, uint_fast32_t num)
 {
     __vsf_sdl2_fast_copy(pdst, psrc, num)

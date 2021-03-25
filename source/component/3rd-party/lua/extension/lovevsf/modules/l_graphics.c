@@ -57,21 +57,21 @@ static SDL_Color __l_graphics_getColorArg(lua_State *L, SDL_Color def)
             lua_rawgeti(L, 1, i);
         }
 
-        def.r = luaL_checknumber(L, -4);
-        def.g = luaL_checknumber(L, -3);
-        def.b = luaL_checknumber(L, -2);
-        def.a = luaL_checknumber(L, -1);
+        def.r = (uint8_t)luaL_checknumber(L, -4);
+        def.g = (uint8_t)luaL_checknumber(L, -3);
+        def.b = (uint8_t)luaL_checknumber(L, -2);
+        def.a = (uint8_t)luaL_checknumber(L, -1);
 
         lua_pop(L, 4);
         return def;
     }
 
     argc = lua_gettop(L);
-    def.r = luaL_checknumber(L, 1);
-    def.g = luaL_checknumber(L, 2);
-    def.b = luaL_checknumber(L, 3);
+    def.r = (uint8_t)luaL_checknumber(L, 1);
+    def.g = (uint8_t)luaL_checknumber(L, 2);
+    def.b = (uint8_t)luaL_checknumber(L, 3);
     if (argc >= 4) {
-        def.a = luaL_checknumber(L, 4);
+        def.a = (uint8_t)luaL_checknumber(L, 4);
     } else {
         def.a = 0xFF;
     }
@@ -154,8 +154,8 @@ static int __l_graphics_present(lua_State *L)
 static int __l_graphics_print(lua_State *L)
 {
     const char *str = luaL_tolstring(L, 1, NULL);
-    int x = luaL_checknumber(L, 2);
-    int y = luaL_checknumber(L, 3);
+    int x = (int)luaL_checknumber(L, 2);
+    int y = (int)luaL_checknumber(L, 3);
 
     lua_getglobal(L, "love");
     lua_getfield(L, -1, "graphics");

@@ -122,6 +122,11 @@ static ALWAYS_INLINE FT_FILE * ft_fopen(const char *filename, const char *mode)
     return (FT_FILE *)vk_memfs_open(&ft_root.use_as__vk_memfs_file_t, filename);
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
 {
     uint64_t new_pos;
