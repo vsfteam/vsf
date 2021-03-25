@@ -32,6 +32,15 @@
 #include "sleep_api.h"
 
 /*============================ MACROS ========================================*/
+
+#if __VSF_HAL_SWI_NUM > 0
+#   define MFUNC_IN_U8_DEC_VALUE            (__VSF_HAL_SWI_NUM)
+#   include "utilities/preprocessor/mf_u8_dec2str.h"
+#   define __FHOST_IPC_IRQ_PRIO             MFUNC_OUT_DEC_STR
+#else
+#   define __FHOST_IPC_IRQ_PRIO             0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -155,7 +164,13 @@ void aic8800_wifi_start(void)
 #if PLF_WIFI_STACK
     rwnx_ipc_init(&hw_env, &ipc_shared_env);
     net_init();
-    fhost_init();
+
+    {
+        fhost_user_cfg_t cfg = {
+            .ipc_irq_prio       = VSF_MCONNECT(vsf_arch_prio_, __FHOST_IPC_IRQ_PRIO),
+        };
+        fhost_init(&cfg);
+    }
 #endif
 }
 

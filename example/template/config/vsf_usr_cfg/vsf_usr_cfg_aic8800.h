@@ -100,6 +100,8 @@
 #define APP_USE_LWIP_DEMO                               DISABLED
 #   define VSF_USE_LWIP                                 ENABLED
 #define APP_USE_EVM_DEMO                                DISABLED
+#define APP_USE_LUA_DEMO                                DISABLED
+#define APP_USE_COREMARK_DEMO                           ENABLED
 
 // demo for AIC8800
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
@@ -109,7 +111,7 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                0x14000
+#   define VSF_HEAP_SIZE                                0x13000
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED

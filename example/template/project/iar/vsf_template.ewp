@@ -4528,9 +4528,9 @@
                     <state>CFG_PMIC_ITF_ASDMA</state>
                     <state>CFG_WIFI_STACK</state>
                     <state>CFG_RSSI_DATAPKT</state>
-                    <state>CFG_BAND5G</state>
                     <state>CFG_DBG</state>
                     <state>CFG_IPERF</state>
+                    <state>CFG_WIFI_ROM_VER=2</state>
                     <state>LWIP_NO_STDINT_H=1</state>
                     <state>__vsf_linux_ctype=_ctype_</state>
                 </option>
@@ -4710,6 +4710,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\ecma\zephyr</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -5891,6 +5893,39 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src\l2cap_signaling.c</name>
                             </file>
                         </group>
+                    </group>
+                </group>
+                <group>
+                    <name>coremark</name>
+                    <group>
+                        <name>port</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port\core_portme.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port\core_portme.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>raw</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\core_list_join.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\core_main.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\core_matrix.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\core_state.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\core_util.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw\coremark.h</name>
+                        </file>
                     </group>
                 </group>
                 <group>
@@ -9259,6 +9294,12 @@
                                     <name>lib</name>
                                     <file>
                                         <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\lib\armgcc_4_8\libwifi.a</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>macif</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\macif\rom_patch.c</name>
                                     </file>
                                 </group>
                             </group>
