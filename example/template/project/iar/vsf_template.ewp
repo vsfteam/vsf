@@ -6077,9 +6077,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jccoefct.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jccolext.c</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jccolor.c</name>
                         </file>
                         <file>
@@ -6155,12 +6152,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdcoefct.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdcol565.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdcolext.c</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdcolor.c</name>
                         </file>
                         <file>
@@ -6201,12 +6192,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdmerge.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdmrg565.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdmrgext.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jdphuff.c</name>
@@ -6294,9 +6279,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jsimddct.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jstdhuff.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jutils.c</name>
