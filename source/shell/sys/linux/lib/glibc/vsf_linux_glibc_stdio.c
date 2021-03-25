@@ -324,4 +324,17 @@ void perror(const char *str)
 }
 #endif
 
+// TODO: implement tmpnam and tmpfile
+FILE * tmpfile(void)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+char * tmpnam(char *str)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO

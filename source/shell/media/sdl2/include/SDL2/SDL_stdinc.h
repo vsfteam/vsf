@@ -61,10 +61,17 @@ extern "C" {
 #define SDL_strlen                          strlen
 #define SDL_strcmp                          strcmp
 #define SDL_strcasecmp                      strcasecmp
+#define SDL_strlcpy                         strlcpy
 #define SDL_strrchr                         strrchr
+#define SDL_strchr                          strchr
 
 // ctype
 #define SDL_toupper                         toupper
+
+// cmath
+#define SDL_ceil                            ceil
+#define SDL_ceilf                           ceilf
+#define SDL_ceill                           ceill
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -72,7 +79,10 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+// extern APIs in math
+double ceil(double x);
+float ceilf(float x);
+long double ceill(long double x);
 
 #ifdef __cplusplus
 }

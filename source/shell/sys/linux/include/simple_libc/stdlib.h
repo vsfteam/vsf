@@ -48,6 +48,7 @@ char * itoa(int num, char *str, int radix);
 int atoi(const char * str);
 long int atol(const char *str);
 long long int atoll(const char *str);
+double atof(const char *str);
 long strtol(const char *str, char **endptr, int base);
 unsigned long strtoul(const char *str, char **endptr, int base);
 long long strtoll(const char *str, char **endptr, int base);

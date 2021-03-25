@@ -63,6 +63,9 @@ extern "C" {
 #define perror              __vsf_linux_perror
 #define setvbuf             __vsf_linux_setvbuf
 
+#define tmpfile             __vsf_linux_tmpfile
+#define tmpnam              __vsf_linux_tmpnam
+
 #define stdin               __vsf_linux_stdin
 #define stdout              __vsf_linux_stdout
 #define stderr              __vsf_linux_stderr
@@ -144,10 +147,8 @@ int sscanf(const char *str, const char *format, ...);
 int remove(const char *filename);
 int rename(const char *oldname, const char *newname);
 
-#ifdef __WIN__
 FILE * tmpfile(void);
 char * tmpnam(char *str);
-#endif
 
 #ifdef __cplusplus
 }
