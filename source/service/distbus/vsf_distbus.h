@@ -101,7 +101,6 @@ def_simple_class(vsf_distbus_t) {
     )
     private_member(
         vsf_slist_t                         service_list;
-        vsf_distbus_transact_t              transacts[0];
     )
 };
 
