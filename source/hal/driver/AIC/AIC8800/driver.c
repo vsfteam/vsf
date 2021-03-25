@@ -23,6 +23,7 @@
 
 #include "time_api.h"
 #include "stdio_uart.h"
+#include "sysctrl_api.h"
 
 #include "rtos_al.h"
 
@@ -51,11 +52,14 @@ int __low_level_init(void)
 bool vsf_driver_init(void)
 {
     SystemInit();
+    sysctrl_clock_cfg(CLK_CFG_D480S240P120F80);
     SystemCoreClockUpdate();
 
     stdio_uart_init();
     dbg_init();
-    dbg("\r\nhost_wb start\r\n");
+    dbg("\r\n    dsp_clock: %dM, sys_clock: %dM, pclk: %dM, flash_clock: %dM\r\n",
+            DSPSysCoreClock / 1000000, SystemCoreClock / 1000000,
+            PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
 
     aic_time_init(0, 0);
 
