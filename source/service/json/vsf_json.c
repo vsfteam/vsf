@@ -240,6 +240,11 @@ char *vsf_json_get(const char *json, const char *key)
     return (char *)json;
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 int vsf_json_get_string(const char *json, char *result, int len)
 {
     char ch;

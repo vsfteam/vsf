@@ -197,6 +197,11 @@ static void __vsf_linux_libusb_process_cb(vsf_linux_libusb_dev_t *ldev, vk_usbh_
     }
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 static void * __vsf_libusb_libusb_core_thread(void *param)
 {
     vsf_linux_libusb_dev_t *ldev;

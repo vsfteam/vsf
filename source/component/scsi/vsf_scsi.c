@@ -102,6 +102,11 @@ vsf_err_t vk_scsi_execute_stream(vk_scsi_t *pthis, uint8_t *cbd, vsf_stream_t *s
 }
 #endif
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 uint_fast8_t vk_scsi_get_command_len(uint8_t *cbd)
 {
     scsi_group_code_t group_code = (scsi_group_code_t)(cbd[0] & 0xE0);

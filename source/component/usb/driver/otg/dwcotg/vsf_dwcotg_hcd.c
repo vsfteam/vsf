@@ -30,6 +30,11 @@
 #include "component/usb/host/vsf_usbh.h"
 #include "./vsf_dwcotg_hcd.h"
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB

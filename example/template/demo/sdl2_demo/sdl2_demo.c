@@ -40,6 +40,11 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 #if APP_USE_LINUX_DEMO == ENABLED
 int sdl2_main(int argc, char *argv[])
 {

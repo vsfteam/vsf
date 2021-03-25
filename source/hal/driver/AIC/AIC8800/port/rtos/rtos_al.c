@@ -554,6 +554,11 @@ bool rtos_queue_is_empty(rtos_queue queue)
     return 0 == vsf_eda_queue_get_cnt(&queue->use_as__vsf_eda_queue_t);
 }
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 int rtos_init(void)
 {
 // library from vendor depends on <sys/timer.h>,

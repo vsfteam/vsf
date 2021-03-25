@@ -37,6 +37,11 @@
 #   include <string.h>
 #endif
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_LINUX_CFG_PRINT_BUFF_SIZE

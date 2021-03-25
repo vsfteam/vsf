@@ -26,6 +26,11 @@
 #include "component/vsf_component.h"
 #include "./include/SDL2/SDL.h"
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM != ENABLED

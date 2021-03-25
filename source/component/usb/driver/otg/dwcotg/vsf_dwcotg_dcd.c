@@ -24,6 +24,11 @@
 #define __VSF_DWCOTG_DCD_CLASS_IMPLEMENT
 #include "./vsf_dwcotg_dcd.h"
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

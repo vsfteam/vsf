@@ -5,6 +5,11 @@ Please read the "vsf_swi_template.h" header file for usage
 #include "hal/driver/driver.h"
 #include "hal/driver/common/swi/vsf_swi_template.h"
 
+#if __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
+#endif
+
 #if !defined(__VSF_HAL_SWI_NUM)
 //! when there is no defined __VSF_HAL_SWI_NUM, use the maximum available value
 #   define __VSF_DEV_SWI_NUM                VSF_DEV_SWI_NUM

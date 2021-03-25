@@ -85,6 +85,9 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 #if __IS_COMPILER_LLVM__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wvisibility"
+#elif __IS_COMPILER_IAR__
+//! statement is unreachable
+#   pragma diag_suppress=pe111
 #endif
 
 int getitimer(int which, struct itimerval *curr_value)
