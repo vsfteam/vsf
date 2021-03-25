@@ -98,23 +98,30 @@ static err_t __vk_usbip_server_lwip_on_sent(void *arg, struct tcp_pcb *tpcb, u16
     vk_usbip_server_lwip_t *backend = (vk_usbip_server_lwip_t *)arg;
     vk_usbip_urb_t *urb;
 
+    vsf_trace_error("%s: %p, %d\r\n", __FUNCTION__, tpcb, len);
     backend->sent_len += len;
-    vsf_dlist_peek_head(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
-    if (urb != NULL) {
-        u16_t urb_len = 48 + (urb->req.direction ? be32_to_cpu(urb->rep.actual_length) : 0);
-        VSF_USB_ASSERT(backend->sent_len <= urb_len);
-        if (backend->sent_len == urb_len) {
-            backend->sent_len = 0;
-            vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
-            __vk_usbip_server_done_urb(backend->server, urb);
+
+    while (1) {
+        vsf_dlist_peek_head(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
+        if (urb != NULL) {
+            u16_t urb_len = 48 + (urb->req.direction ? be32_to_cpu(urb->rep.actual_length) : 0);
+            if (backend->sent_len >= urb_len) {
+                backend->sent_len -= urb_len;
+                vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
+                vsf_trace_error("%s: done_urb\r\n", __FUNCTION__, urb);
+                __vk_usbip_server_done_urb(backend->server, urb);
+                continue;
+            }
+        } else if (backend->to_send_len > 0) {
+            VSF_USB_ASSERT(backend->sent_len <= backend->to_send_len);
+            if (backend->sent_len == backend->to_send_len) {
+                backend->sent_len = 0;
+                backend->to_send_len = 0;
+                vsf_trace_error("%s: done_send\r\n", __FUNCTION__);
+                vsf_eda_post_evt(&backend->server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_SEND_DONE);
+            }
         }
-    } else {
-        VSF_USB_ASSERT(backend->sent_len <= backend->to_send_len);
-        if (backend->sent_len == backend->to_send_len) {
-            backend->sent_len = 0;
-            backend->to_send_len = 0;
-            vsf_eda_post_evt(&backend->server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_SEND_DONE);
-        }
+        break;
     }
     return ERR_OK;
 }
@@ -238,6 +245,7 @@ void __vk_usbip_server_backend_send(uint8_t *buff, uint_fast32_t size)
         err += tcp_output(backend->work_pcb);
     UNLOCK_TCPIP_CORE();
     VSF_USB_ASSERT(ERR_OK == err);
+    vsf_trace_error("%s: %p, %d\r\n", __FUNCTION__, backend->work_pcb, size);
 }
 
 void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
@@ -263,6 +271,7 @@ void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
         err += tcp_output(backend->work_pcb);
     UNLOCK_TCPIP_CORE();
     VSF_USB_ASSERT(ERR_OK == err);
+    vsf_trace_error("%s: %p, %d, %d\r\n", __FUNCTION__, backend->work_pcb, 48 + actual_length, urb);
 }
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_DCD_USBIP && VSF_USBIP_DCD_CFG_BACKEND_LWIP
