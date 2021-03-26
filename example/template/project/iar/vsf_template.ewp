@@ -6063,15 +6063,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\cdjpeg.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\cjpeg.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\cmyk.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\djpeg.c</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jaricom.c</name>
                         </file>
                         <file>
@@ -6127,9 +6118,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jcsample.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jcstest.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jctrans.c</name>
@@ -6273,9 +6261,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jpeglib.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jpegtran.c</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\jquant1.c</name>
                         </file>
                         <file>
@@ -6306,9 +6291,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\rdgif.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\rdjpgcom.c</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\rdppm.c</name>
                         </file>
                         <file>
@@ -6316,21 +6298,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\rdtarga.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\tjbench.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\tjexample.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\tjunittest.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\tjutil.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\tjutil.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\transupp.c</name>
@@ -6343,9 +6310,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\wrgif.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\wrjpgcom.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw\wrppm.c</name>
@@ -6418,9 +6382,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw\pngstruct.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw\pngtest.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw\pngtrans.c</name>
