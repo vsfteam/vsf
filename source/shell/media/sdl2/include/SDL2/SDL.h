@@ -99,6 +99,7 @@ extern "C" {
 #define SDL_SetColorKey                 __vsf_sdl2_set_color_key
 #define SDL_FillRect                    __vsf_sdl2_fill_rect
 #define SDL_BlitSurface                 __vsf_sdl2_blit_surface
+#define SDL_ConvertSurfaceFormat        __vsf_sdl2_convert_surface_format
 
 #define SDL_CreateRenderer              __vsf_sdl2_create_renderer
 #define SDL_DestroyRenderer             __vsf_sdl2_destroy_renderer
@@ -889,6 +890,7 @@ extern int SDL_SetSurfaceBlendMode(SDL_Surface * surface, SDL_BlendMode blendMod
 extern int SDL_SetColorKey(SDL_Surface * surface, int flag, uint32_t key);
 extern int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color);
 extern int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * dst, SDL_Rect * dstrect);
+extern SDL_Surface * SDL_ConvertSurfaceFormat(SDL_Surface * src, uint32_t format, uint32_t flags);
 
 extern SDL_Renderer * SDL_CreateRenderer(SDL_Window * window, int index, uint32_t flags);
 extern void SDL_DestroyRenderer(SDL_Renderer * renderer);

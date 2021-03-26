@@ -158,6 +158,23 @@ struct {
             .Bloss          = 3,
         },
     },
+    {
+        .color              = SDL_PIXELFORMAT_RGB24,
+        .format             = {
+            .format         = SDL_PIXELFORMAT_RGB24,
+            .BitsPerPixel   = 24,
+            .BytesPerPixel  = 3,
+            .Rmask          = 0x00FF0000,
+            .Gmask          = 0x0000FF00,
+            .Bmask          = 0x000000FF,
+            .Rshift         = 16,
+            .Gshift         = 8,
+            .Bshift         = 0,
+            .Rloss          = 0,
+            .Gloss          = 0,
+            .Bloss          = 0,
+        },
+    },
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -344,6 +361,7 @@ static void __SDL_CopyWithFormat(
             switch (src_pixel_size) {
             case 1: color = *(uint8_t *)src_tmp;    src_tmp += 1;   break;
             case 2: color = *(uint16_t *)src_tmp;   src_tmp += 2;   break;
+            case 3: color = *(uint32_t *)src_tmp;   src_tmp += 3;   break;
             case 4: color = *(uint32_t *)src_tmp;   src_tmp += 4;   break;
             default:VSF_SDL2_ASSERT(false);
             }
@@ -361,6 +379,9 @@ static void __SDL_CopyWithFormat(
             switch (dst_pixel_size) {
             case 1: *(uint8_t *)dst_tmp = color;    dst_tmp += 1;   break;
             case 2: *(uint16_t *)dst_tmp = color;   dst_tmp += 2;   break;
+            case 3: dst_tmp[0] = color & 0x0000FF;
+                    dst_tmp[1] = color & 0x00FF00;
+                    dst_tmp[2] = color & 0xFF0000;  dst_tmp += 3;   break;
             case 4: *(uint32_t *)dst_tmp = color;   dst_tmp += 4;   break;
             default:VSF_SDL2_ASSERT(false);
             }
@@ -783,6 +804,16 @@ int SDL_BlitSurface(SDL_Surface * src, const SDL_Rect * srcrect, SDL_Surface * d
                 (uint8_t *)src->pixels + src_pixel_size * (src_real_area.y * src_area.w + src_real_area.x), src->pitch,
                 dst->format, src->format);
     return 0;
+}
+
+SDL_Surface * SDL_ConvertSurfaceFormat(SDL_Surface * src, uint32_t format, uint32_t flags)
+{
+    uint_fast8_t depth = vsf_disp_get_pixel_format_bitsize(format);
+    SDL_Surface * surface_new = SDL_CreateRGBSurfaceWithFormat(flags, src->w, src->h, depth, format);
+    if (surface_new != NULL) {
+        SDL_BlitSurface(src, NULL, surface_new, NULL);
+    }
+    return surface_new;
 }
 
 SDL_Renderer * SDL_CreateRenderer(SDL_Window *window, int index, uint32_t flags)
