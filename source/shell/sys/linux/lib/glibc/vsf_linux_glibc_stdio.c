@@ -337,4 +337,10 @@ char * tmpnam(char *str)
     return NULL;
 }
 
+int rename(const char *old_filename, const char *new_filename)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO

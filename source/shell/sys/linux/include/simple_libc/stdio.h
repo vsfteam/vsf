@@ -62,6 +62,7 @@ extern "C" {
 #define fscanf              __vsf_linux_fscanf
 #define perror              __vsf_linux_perror
 #define setvbuf             __vsf_linux_setvbuf
+#define rename              __vsf_linux_rename
 
 #define tmpfile             __vsf_linux_tmpfile
 #define tmpnam              __vsf_linux_tmpnam
@@ -86,11 +87,6 @@ extern FILE *stdin, *stdout, *stderr;
 #define fpos_t              uintmax_t
 
 void perror(const char *str);
-
-#define _IOFBF              0x0000
-#define _IOLBF              0x0040
-#define _IONBF              0x0004
-int setvbuf(FILE *stream, char *buffer, int mode, size_t size);
 
 int putchar(int ch);
 int getchar(void);
@@ -129,7 +125,12 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *f);
 int fflush(FILE *f);
 
 void setbuf(FILE *f, char *buf);
-int setvbuf(FILE *f, char *buf, int type, unsigned size);
+#define _IOFBF              0x0000
+#define _IOLBF              0x0040
+#define _IONBF              0x0004
+int setvbuf(FILE *f, char *buffer, int mode, size_t size);
+
+int rename(const char *old_filename, const char *new_filename);
 
 int ferror(FILE *f);
 void clearerr(FILE *f);
