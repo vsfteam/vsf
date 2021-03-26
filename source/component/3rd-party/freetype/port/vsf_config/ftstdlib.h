@@ -117,6 +117,8 @@ static ALWAYS_INLINE int ft_fclose(FT_FILE *f)
     return 0;
 }
 
+// TODO: seems buf in ft_fopen, vk_memfs_open returns vk_memfs_file_t,
+//  can not be converted to FT_FILE
 static ALWAYS_INLINE FT_FILE * ft_fopen(const char *filename, const char *mode)
 {
     return (FT_FILE *)vk_memfs_open(&ft_root.use_as__vk_memfs_file_t, filename);

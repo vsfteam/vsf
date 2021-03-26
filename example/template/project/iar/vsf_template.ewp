@@ -7092,6 +7092,21 @@
                         <configuration>vsf_template_mt071</configuration>
                     </excluded>
                     <group>
+                        <name>extension</name>
+                        <group>
+                            <name>lv_lib_freetype</name>
+                            <group>
+                                <name>raw</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\extension\lv_lib_freetype\raw\lv_freetype.h</name>
+                                </file>
+                            </group>
+                        </group>
+                    </group>
+                    <group>
                         <name>port</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\port\vsf_lvgl_port.c</name>

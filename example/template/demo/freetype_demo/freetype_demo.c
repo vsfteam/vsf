@@ -108,6 +108,13 @@ static FT_FILE __ft_root_dir[] = {
         .d.child_size   = sizeof(FT_FILE),
     },
 #endif
+#if     (APP_USE_TGUI_DEMO != ENABLED || VSF_TGUI_CFG_SV_FONTS != ENABLED)      \
+    ||  (APP_USE_XBOOT_XUI_DEMO != ENABLED)
+    // resources files are not used, put a dummy entry to avoid compile error
+    {
+        0
+    },
+#endif
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -124,12 +131,14 @@ FT_FILE ft_root         = {
 
 void freetype_demo_init(void)
 {
-#if (APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS) || APP_USE_XBOOT_XUI_DEMO == ENABLED
+#ifdef __WIN__
+    // read resources and load int ft_root
+#   if (APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS) || APP_USE_XBOOT_XUI_DEMO == ENABLED
     FILE* f;
     char path[256];
-#endif
+#   endif
 
-#if APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS == ENABLED
+#   if APP_USE_TGUI_DEMO == ENABLED && VSF_TGUI_CFG_SV_FONTS == ENABLED
     for (int i = 0; i < dimof(__ft_font_dir); i++) {
         strcpy(path, APP_CFG_TGUI_RES_DIR "font/");
         strcat(path, __ft_font_dir[i].name);
@@ -152,9 +161,9 @@ void freetype_demo_init(void)
             printf("fail to load font %s\r\n", path);
         }
     }
-#endif
+#   endif
 
-#if APP_USE_XBOOT_XUI_DEMO == ENABLED
+#   if APP_USE_XBOOT_XUI_DEMO == ENABLED
     for (int i = 0; i < dimof(__ft_xboot_fonts_dir); i++) {
         strcpy(path, APP_CFG_XBOOT_RES_DIR "font/");
         strcat(path, __ft_xboot_fonts_dir[i].name);
@@ -177,6 +186,7 @@ void freetype_demo_init(void)
             printf("fail to load font %s\r\n", path);
         }
     }
+#   endif
 #endif
 }
 
