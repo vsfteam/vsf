@@ -31,7 +31,6 @@ int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
 char * strdup(const char *str);
 char * strcpy(char *dest, const char *src);
-size_t strlcpy(char *dest, const char *src, size_t n);
 char * strncpy(char *dest, const char *src, size_t n);
 char * strcat(char *dest, const char *src);
 char * strncat(char *dest, const char *str, size_t n);
@@ -60,6 +59,13 @@ static inline int strncasecmp(char *s1, char *s2, size_t n)
 {
     return strnicmp(s1, s2, n);
 }
+// strlcpy is not implemented in __WIN__
+static inline size_t strlcpy(char *dest, const char *src, size_t n)
+{
+    strncpy(dest, src, n);
+    dest[n] = '\0';
+    return strlen(src);
+}
 
 const char * strstr(const char *str1, const char *str2);
 const char * strchr(const char *str, int c);
@@ -73,7 +79,9 @@ void * memcpy(void *dest, const void *src, size_t n);
 char * strstr(const char *str1, const char *str2);
 char * strchr(const char *str, int c);
 char * strrchr(const char *str, int c);
+size_t strlcpy(char *dest, const char *src, size_t n);
 #endif
+
 void *memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *str1, const void *str2, size_t n);
 const void *memchr(const void *buf, int ch, size_t count);
