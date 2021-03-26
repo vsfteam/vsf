@@ -82,6 +82,8 @@
 #define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES         4
 // if using dl1x5(DL1X5 chips from DisplayLink), color_depth should be 16,
 //  and hor_res/ver_res should smaller than the hardware resolution
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                16
@@ -107,6 +109,10 @@
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
 #define AIC8800_APP_USE_BT_DEMO                         ENABLED
 
+
+#if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+#   define APP_USE_FREETYPE_DEMO                        ENABLED
+#endif
 
 // component configure
 #define VSF_USE_HEAP                                    ENABLED

@@ -4534,6 +4534,7 @@
                     <state>__AIC8800__</state>
                     <state>__OOC_CPP__</state>
                     <state>LV_CONF_INCLUDE_SIMPLE</state>
+                    <state>FT2_BUILD_LIBRARY</state>
                     <state>CFG_HW_PLATFORM=2</state>
                     <state>CFG_RF_MODE=0</state>
                     <state>CFG_PMIC</state>
@@ -5652,7 +5653,6 @@
                     <configuration>vsf_template_m484</configuration>
                     <configuration>vsf_template_gd32e103</configuration>
                     <configuration>vsf_template_mt071</configuration>
-                    <configuration>vsf_template_aic8800</configuration>
                 </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\freetype_demo\freetype_demo.c</name>
@@ -5682,7 +5682,6 @@
                     <configuration>vsf_template_m484</configuration>
                     <configuration>vsf_template_gd32e103</configuration>
                     <configuration>vsf_template_mt071</configuration>
-                    <configuration>vsf_template_aic8800</configuration>
                 </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\lua_demo\love_demo.c</name>
@@ -6052,7 +6051,6 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -6493,7 +6491,6 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -6778,7 +6775,6 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -6859,7 +6855,6 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -8233,7 +8228,6 @@
                         <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>raw</name>
@@ -11981,7 +11975,6 @@
                             <configuration>vsf_template_m484</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
-                            <configuration>vsf_template_aic8800</configuration>
                         </excluded>
                         <group>
                             <name>SDL_image</name>
