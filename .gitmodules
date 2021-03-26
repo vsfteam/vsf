@@ -46,3 +46,6 @@
 [submodule "CMSIS"]
 	path = source/utilities/compiler/arm/3rd-party/CMSIS
 	url = ../CMSIS_5
+[submodule "evm"]
+	path = source/component/3rd-party/evm/raw
+	url = ../evm
