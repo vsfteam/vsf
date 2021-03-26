@@ -1130,16 +1130,16 @@
                 <option>
                     <name>GRuntimeLibSelect</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>GRuntimeLibSelectSlave</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>2</state>
                 </option>
                 <option>
                     <name>RTDescription</name>
-                    <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
+                    <state>Use the full configuration of the C/C++ runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
                 </option>
                 <option>
                     <name>OGProductVersion</name>
@@ -1193,7 +1193,7 @@
                 </option>
                 <option>
                     <name>RTConfigPath2</name>
-                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</state>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</state>
                 </option>
                 <option>
                     <name>GBECoreSlave</name>
@@ -1441,6 +1441,9 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\vsfvm\raw</state>
@@ -1453,6 +1456,16 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lwip\raw\src\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger_rtt\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\oo</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\lovevsf</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -5655,7 +5668,6 @@
                 <name>lua_demo</name>
                 <excluded>
                     <configuration>vsf_template_m484</configuration>
-                    <configuration>vsf_template_f1c100s</configuration>
                     <configuration>vsf_template_gd32e103</configuration>
                     <configuration>vsf_template_mt071</configuration>
                     <configuration>vsf_template_aic8800</configuration>
@@ -5923,7 +5935,6 @@
                     <name>coremark</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                     </excluded>
@@ -6027,7 +6038,6 @@
                     <name>libjpeg-turbo</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
@@ -6349,7 +6359,6 @@
                     <name>libpng</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
@@ -6434,7 +6443,6 @@
                     <name>lua</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
@@ -7809,7 +7817,6 @@
                     <name>zlib</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
-                        <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
@@ -11558,7 +11565,6 @@
                         <name>3rd-party</name>
                         <excluded>
                             <configuration>vsf_template_m484</configuration>
-                            <configuration>vsf_template_f1c100s</configuration>
                             <configuration>vsf_template_gd32e103</configuration>
                             <configuration>vsf_template_mt071</configuration>
                             <configuration>vsf_template_aic8800</configuration>
