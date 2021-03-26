@@ -5647,6 +5647,18 @@
                 </file>
             </group>
             <group>
+                <name>freetype_demo</name>
+                <excluded>
+                    <configuration>vsf_template_m484</configuration>
+                    <configuration>vsf_template_gd32e103</configuration>
+                    <configuration>vsf_template_mt071</configuration>
+                    <configuration>vsf_template_aic8800</configuration>
+                </excluded>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\freetype_demo\freetype_demo.c</name>
+                </file>
+            </group>
+            <group>
                 <name>hal_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\usart_demo.c</name>

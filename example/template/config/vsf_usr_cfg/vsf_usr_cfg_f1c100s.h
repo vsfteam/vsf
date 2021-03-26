@@ -58,6 +58,8 @@
 #define APP_USE_LVGL_DEMO                               ENABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE                   ENABLED
+#   define APP_LVGL_DEMO_CFG_FREETYPE_MAX_FACES         4
 #   define APP_LVGL_DEMO_CFG_COLOR_DEPTH                32
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    640
 #   define APP_LVGL_DEMO_CFG_VER_RES                    480
@@ -69,6 +71,10 @@
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 
+
+#if APP_USE_TGUI_DEMO == ENABLED || APP_USE_XBOOT_XUI_DEMO == ENABLED || APP_LVGL_DEMO_CFG_FREETYPE == ENABLED
+#   define APP_USE_FREETYPE_DEMO                        ENABLED
+#endif
 
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
