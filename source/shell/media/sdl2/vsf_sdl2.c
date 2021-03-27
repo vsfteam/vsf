@@ -591,10 +591,9 @@ SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uin
         // TODO: initialize pixels according to format of disp
 
         SDL_Surface *surface = &window->surface;
-        surface->__format.format = window->format;
-        surface->__format.BitsPerPixel = pixel_bit_size;
-        surface->__format.BytesPerPixel = pixel_byte_size;
-        surface->format = &surface->__format;
+        surface->format = __SDL_GetFormatFromColor(window->format);
+        // default windows formats MUST be supported, because here is no masks to generate format
+        VSF_SDL2_ASSERT(surface->format != NULL);
         surface->w = w;
         surface->h = h;
         surface->pitch = w * pixel_byte_size;
@@ -964,6 +963,19 @@ int SDL_UpdateTexture(SDL_Texture *texture, const SDL_Rect *rect, const void *pi
                 (uint8_t *)texture->pixels + pixel_size * (area.y * texture->w + area.x), pixel_size * texture->w,
                 (uint8_t *)pixels, pitch);
     return 0;
+}
+
+
+
+uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    uint32_t color =    ((r >> format->Rloss) << format->Rshift)
+                    |   ((g >> format->Gloss) << format->Gshift)
+                    |   ((b >> format->Bloss) << format->Bshift);
+    if (format->Amask != 0) {
+        color |= (a >> format->Aloss) << format->Ashift;
+    }
+    return color;
 }
 
 

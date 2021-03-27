@@ -121,7 +121,6 @@ int love_main(int argc, char *argv[])
         return -1;
     }
 
-    ((vk_disp_param_t *)&usrapp_ui_common.disp->param)->color = VSF_DISP_COLOR_ARGB8888;
     vsf_sdl2_init(usrapp_ui_common.disp);
 
     // TODO: process on_exit to call lua_close(L);

@@ -139,9 +139,11 @@ static int __l_graphics_setColor(lua_State *L)
 static int __l_graphics_clear(lua_State *L)
 {
     SDL_Color bg_color = __l_graphics_getColorArg(L, __l_graphics.bg_color);
+    uint32_t actual_color = SDL_MapRGBA(__l_graphics.sdl.surface->format,
+                            bg_color.r, bg_color.g, bg_color.b, bg_color.a);
     SDL_Rect rect = { 0 };
     SDL_GetWindowSize(__l_graphics.sdl.window, &rect.w, &rect.h);
-    SDL_FillRect(__l_graphics.sdl.surface, &rect, bg_color.value);
+    SDL_FillRect(__l_graphics.sdl.surface, &rect, actual_color);
     return 0;
 }
 
