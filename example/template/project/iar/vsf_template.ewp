@@ -4535,6 +4535,7 @@
                     <state>__OOC_CPP__</state>
                     <state>LV_CONF_INCLUDE_SIMPLE</state>
                     <state>FT2_BUILD_LIBRARY</state>
+                    <state>EVM_LANG_ENABLE_REPL</state>
                     <state>CFG_HW_PLATFORM=2</state>
                     <state>CFG_RF_MODE=0</state>
                     <state>CFG_PMIC</state>
@@ -4673,7 +4674,6 @@
                     <name>CCIncludePath2</name>
                     <state>$PROJ_DIR$\..\..\config</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
-                    <state>$PROJ_DIR$\..\..\demo\evm_demo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\rtos</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al</state>
@@ -4726,7 +4726,6 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\modules\ecma\zephyr</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\oo</state>
@@ -5632,19 +5631,9 @@
                     <configuration>vsf_template_f1c100s</configuration>
                     <configuration>vsf_template_gd32e103</configuration>
                     <configuration>vsf_template_mt071</configuration>
-                    <configuration>vsf_template_aic8800</configuration>
                 </excluded>
                 <file>
-                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_board.h</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_demo.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_main.h</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\demo\evm_demo\evm_module.c</name>
                 </file>
             </group>
             <group>
@@ -5987,10 +5976,12 @@
                         <configuration>vsf_template_f1c100s</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
-                        <configuration>vsf_template_aic8800</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
+                        <excluded>
+                            <configuration>vsf_template_aic8800</configuration>
+                        </excluded>
                         <group>
                             <name>bluetooth</name>
                             <file>
@@ -6013,7 +6004,7 @@
                     <group>
                         <name>port</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\evm_library_patch.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port\evm_main.c</name>
                         </file>
                     </group>
                     <group>
@@ -6027,19 +6018,19 @@
                                     <configuration>vsf_template_aic8800</configuration>
                                 </excluded>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m3\libejs.a</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libecma.a</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m3\libepy.a</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m3\libeqml.a</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m3\libejs.a</name>
                                 </file>
                             </group>
                             <group>
                                 <name>cortex-m4</name>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm-none-eabi-gcc\cortex-m4\libejs.a</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libecma.a</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\lib\arm\cortex-m4\libejs.a</name>
                                 </file>
                             </group>
                         </group>

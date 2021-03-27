@@ -101,7 +101,7 @@
 // lwip demo is not compatible with aic8800 sdk, but VSF_USE_LWIP should be defined
 #define APP_USE_LWIP_DEMO                               DISABLED
 #   define VSF_USE_LWIP                                 ENABLED
-#define APP_USE_EVM_DEMO                                DISABLED
+#define APP_USE_EVM_DEMO                                ENABLED
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 
@@ -117,7 +117,7 @@
 // component configure
 #define VSF_USE_HEAP                                    ENABLED
 #   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
-#   define VSF_HEAP_SIZE                                0x1A000
+#   define VSF_HEAP_SIZE                                0x18000
 
 #define VSF_USE_VIDEO                                   ENABLED
 #define VSF_USE_AUDIO                                   ENABLED

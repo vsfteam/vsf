@@ -248,8 +248,8 @@ int vsf_linux_create_fhs(void)
     busybox_bind("/sbin/socket", socket_main);
 #endif
 #if APP_USE_EVM_DEMO == ENABLED
-    extern int evm_main(int argc, char *argv[]);
-    busybox_bind("/sbin/evm", evm_main);
+    extern int evm_demo_main(int argc, char *argv[]);
+    busybox_bind("/sbin/evm", evm_demo_main);
 #endif
 #if APP_USE_LUA_DEMO == ENABLED
     extern int lua_main(int argc, char* argv[]);
