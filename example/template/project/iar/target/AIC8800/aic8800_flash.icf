@@ -171,6 +171,12 @@ define region ipc_shared_region = mem:[from __ipc_shared_memory_start__ to __ipc
 define block ipc_shared_block { readwrite section SHAREDRAMIPC };
 place in ipc_shared_region { block ipc_shared_block };
 
+define symbol __shared_memory_start__        = 0x00158000;
+define symbol __shared_memory_end__          = 0x0015FFFF;
+define region shared_region = mem:[from __shared_memory_start__ to __shared_memory_end__];
+define block shared_block { readwrite section SHAREDRAM };
+place in shared_region { block shared_block };
+
 define symbol __host_rxbuf_memory_start__    = 0x00198000;
 define symbol __host_rxbuf_memory_end__      = 0x0019FFFF;
 define region host_rxbuf_region = mem:[from __host_rxbuf_memory_start__ to __host_rxbuf_memory_end__];
