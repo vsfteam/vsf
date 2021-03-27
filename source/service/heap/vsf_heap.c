@@ -435,12 +435,17 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
     VSF_SERVICE_ASSERT(!((uintptr_t)buffer & (alignment - 1)));
 
     mcb = __vsf_heap_get_mcb((uint8_t *)buffer);
+#if VSF_HEAP_CFG_MCB_MAGIC_EN == ENABLED
+    VSF_SERVICE_ASSERT(mcb->magic == VSF_HEAP_MCB_MAGIC);
+#endif
 
     memory_size = (uint_fast32_t)__vsf_mcb_get_size(mcb);
     memory_size -= (uint8_t *)buffer - (uint8_t *)mcb;
 
     if (memory_size >= size) {
+        vsf_protect_t state = __vsf_heap_protect();
         __vsf_heap_mcb_truncate(mcb, (uintptr_t)buffer + size);
+        __vsf_heap_unprotect(state);
         return buffer;
     } else {
         vsf_heap_mcb_t *mcb_next = __vsf_heap_mcb_get_next(mcb);
@@ -462,9 +467,9 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
             mcb->linear.next += mcb_next->linear.next;
             mcb_next = __vsf_heap_mcb_get_next(mcb_next);
             mcb_next->linear.prev = mcb->linear.next;
-            __vsf_heap_unprotect(state);
 
             __vsf_heap_mcb_truncate(mcb, (uintptr_t)buffer + size);
+            __vsf_heap_unprotect(state);
             return buffer;
         }
     }
