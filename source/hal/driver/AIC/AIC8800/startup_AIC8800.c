@@ -260,7 +260,7 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
 
     // Image Info
     (pFunc)0x474D4946,      // FIMG, Image header
-    (pFunc)0x08080000,      // Image end, use 512K as default
+    (pFunc)0x081FC000,      // Image end, max is 2M - 16K
     (pFunc)0xFFFFFFFF,
     (pFunc)0xFFFFFFFF,
 };
