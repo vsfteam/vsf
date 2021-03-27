@@ -85,7 +85,7 @@ while (i < 2) {
 
 #if APP_USE_EVM_DEMO == ENABLED
 static const char __evm_main_js[] = STR(
-  print("1234\r\n");
+  print('hello,evm')
 );
 static vk_fakefat32_file_t __evm_root[3] = {
     {
