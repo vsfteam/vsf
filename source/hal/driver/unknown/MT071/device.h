@@ -35,8 +35,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./vendor/Include/mt071x.h"
-#include "./vendor/Include/usb_regs.h"
+#include "./common.h"
 #include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/

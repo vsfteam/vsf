@@ -21,9 +21,15 @@
 /* \note __common.h should only be included by device.h */
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "./vendor/Include/M480.h"
 #include "hal/arch/vsf_arch.h"
+
+// CMSIS headers which will not be included in core_xxx.h
+//  and arm_math.h CAN ONLY be included after core_xxx.h
+#include "arm_math.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

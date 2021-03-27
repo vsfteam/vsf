@@ -19,9 +19,14 @@
 #define __HAL_DRIVER_MT071_COMMON_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "./vendor/Include/mt071x.h"
 #include "./vendor/Include/usb_regs.h"
+
+// CMSIS headers which will not be included in core_xxx.h
+//  and arm_math.h CAN ONLY be included after core_xxx.h
+#include "arm_math.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

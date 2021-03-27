@@ -84,9 +84,6 @@
 #include VSF_UTILITIES_REQ___CMSIS_HEADER_FILE__FROM_USR
 #endif
 
-// CMSIS headers which will not be included in core_xxx.h
-#include "arm_math.h"
-
 /*========================== Multiple-Entry End ==============================*/
 
 
