@@ -504,8 +504,16 @@ int SDL_GetDesktopDisplayMode(int display_index, SDL_DisplayMode *mode)
 
     if (mode != NULL) {
         mode->format = vsf_disp_get_pixel_format(__vsf_sdl2.disp);
+#ifdef VSF_SDL_CFG_DISPLAY_HEIGHT
+        mode->h = VSF_SDL_CFG_DISPLAY_HEIGHT;
+#else
         mode->h = __vsf_sdl2.disp->param.height;
+#endif
+#ifdef VSF_SDL_CFG_DISPLAY_WIDTH
+        mode->w = VSF_SDL_CFG_DISPLAY_WIDTH;
+#else
         mode->w = __vsf_sdl2.disp->param.width;
+#endif
     }
     return 0;
 }
@@ -563,7 +571,15 @@ SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uin
 {
     uint_fast8_t pixel_bit_size = vsf_disp_get_pixel_bitsize(__vsf_sdl2.disp);
     uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
+
+#ifdef VSF_SDL_CFG_WINDOW_PTR
+    static bool __is_allocated = false;
+    VSF_SDL2_ASSERT(!__is_allocated);
+    SDL_Window *window = __is_allocated ? NULL : (SDL_Window *)VSF_SDL_CFG_WINDOW_PTR;
+    __is_allocated = true;
+#else
     SDL_Window *window = vsf_heap_malloc(sizeof(struct SDL_Window) + pixel_byte_size * w * h);
+#endif
     if (window != NULL) {
         window->title   = title;
         window->area.x  = x;
