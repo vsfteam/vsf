@@ -591,7 +591,7 @@ SDL_Window * SDL_CreateWindow(const char *title, int x, int y, int w, int h, uin
         // TODO: initialize pixels according to format of disp
 
         SDL_Surface *surface = &window->surface;
-        surface->format = __SDL_GetFormatFromColor(window->format);
+        surface->format = (SDL_PixelFormat *)__SDL_GetFormatFromColor(window->format);
         // default windows formats MUST be supported, because here is no masks to generate format
         VSF_SDL2_ASSERT(surface->format != NULL);
         surface->w = w;
