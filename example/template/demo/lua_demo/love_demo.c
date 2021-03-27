@@ -37,7 +37,7 @@
 
 static const char __config_love[] = __STR(
 LOVE_CFG = {}
-LOVE_CFG.DEFAULT_FONT = "/winfs/ui/font/DejaVuSans.ttf"
+LOVE_CFG.DEFAULT_FONT = "/memfs/font/Roboto-Regular.ttf"
 LOVE_CFG.DEFAULT_FONT_SIZE = 16
 );
 

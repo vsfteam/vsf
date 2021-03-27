@@ -20,7 +20,7 @@
 #define VSF_FS_INHERIT
 #include "vsf.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED && USRAPP_CFG_FAKEFAT32 == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -81,6 +81,28 @@ while (i < 2) {\r\n\
 #   endif
 #endif
 
+#if USRAPP_FAKEFAT32_CFG_FONT == ENABLED
+static const uint8_t __roboto_regular_ttf[] = {
+#   include "./Roboto-Regular.inc"
+};
+static vk_fakefat32_file_t __fakefat32_font[3] = {
+    {
+        .name               = ".",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+    },
+    {
+        .name               = "..",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+    },
+    {
+        .name               = "Roboto-Regular.ttf",
+        .size               = sizeof(__roboto_regular_ttf),
+        .attr               = VSF_FILE_ATTR_READ,
+        .f.buff             = (uint8_t *)__roboto_regular_ttf,
+    },
+};
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     __IS_COMPILER_GCC__
@@ -90,6 +112,7 @@ while (i < 2) {\r\n\
 
 vk_fakefat32_file_t fakefat32_root[ 3
                                 +   (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
+                                +   (USRAPP_FAKEFAT32_CFG_FONT == ENABLED ? 1 : 0)
                                 ] = {
     {
         .name               = "FAKEFAT32",
@@ -114,6 +137,14 @@ vk_fakefat32_file_t fakefat32_root[ 3
         .size               = sizeof(__test_dart),
         .attr               = VSF_FILE_ATTR_READ,
         .f.buff             = (uint8_t *)__test_dart,
+    },
+#endif
+#if USRAPP_FAKEFAT32_CFG_FONT == ENABLED
+    {
+        .name               = "font",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+        .d.child            = (vk_memfs_file_t *)__fakefat32_font,
+        .d.child_num        = dimof(__fakefat32_font),
     },
 #endif
 };

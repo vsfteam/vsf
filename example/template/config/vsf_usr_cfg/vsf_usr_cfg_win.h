@@ -184,6 +184,7 @@
 #endif
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
+#   define USRAPP_FAKEFAT32_CFG_FONT                    ENABLED
 
 
 #if __IS_COMPILER_LLVM__

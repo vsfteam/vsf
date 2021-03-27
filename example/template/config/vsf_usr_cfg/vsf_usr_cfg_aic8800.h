@@ -192,6 +192,7 @@
 #endif
 
 #define USRAPP_CFG_FAKEFAT32                            ENABLED
+#   define USRAPP_FAKEFAT32_CFG_FONT                    ENABLED
 
 // VSF_HAL_USE_DEBUG_STREAM for hardware debug uart
 // VSF_DEBUGGER_CFG_CONSOLE for debug console from debugger
@@ -261,6 +262,12 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #       define VSF_USBH_BTHCI_CFG_ACL_IN_NUM            1
 #       define VSF_USBH_BTHCI_CFG_ACL_OUT_NUM           1
 #   endif
+#endif
+
+#if APP_USE_SDL2_DEMO == ENABLED
+#   define VSF_SDL_CFG_WINDOW_PTR                       0x00100000
+#   define VSF_SDL_CFG_DISPLAY_HEIGHT                   320
+#   define VSF_SDL_CFG_DISPLAY_WIDTH                    480
 #endif
 
 #define VSF_LINUX_CFG_STACKSIZE                         (4 * 1024)
