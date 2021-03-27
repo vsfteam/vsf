@@ -156,7 +156,7 @@ if (!isempty(IRAM_region))
   define block CSTACK     with alignment = 8, size = __ICFEDIT_size_cstack__     { };
   define block PROC_STACK with alignment = 8, size = __ICFEDIT_size_proc_stack__ { };
   define block HEAP       with alignment = 8, size = __ICFEDIT_size_heap__       { };
-  place in IRAM_region  { readwrite, block CSTACK, block PROC_STACK, block HEAP };
+  place in IRAM_region  { readwrite, block HEAP };
 }
 
 if (!isempty(ERAM_region))
@@ -171,10 +171,12 @@ define region ipc_shared_region = mem:[from __ipc_shared_memory_start__ to __ipc
 define block ipc_shared_block { readwrite section SHAREDRAMIPC };
 place in ipc_shared_region { block ipc_shared_block };
 
-define symbol __shared_memory_start__        = 0x00158000;
+/* 320KB from 0x00100000 is used as gram */
+/* 64KB from 0x00150000 is used as sharedmen and stacks */
+define symbol __shared_memory_start__        = 0x00150000;
 define symbol __shared_memory_end__          = 0x0015FFFF;
 define region shared_region = mem:[from __shared_memory_start__ to __shared_memory_end__];
-define block shared_block { readwrite section SHAREDRAM };
+define block shared_block { readwrite section SHAREDRAM, block CSTACK, block PROC_STACK };
 place in shared_region { block shared_block };
 
 define symbol __host_rxbuf_memory_start__    = 0x00198000;
