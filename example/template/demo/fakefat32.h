@@ -18,12 +18,21 @@
 #ifndef __FAKEFAT32_H__
 #define __FAKEFAT32_H__
 
+/*============================ INCLUDES ======================================*/
+
 #include "vsf_usr_cfg.h"
 
 #if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FAKEFAT32_MAL == ENABLED
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#ifndef APP_USE_VSFVM_DEMO
+#   define APP_USE_VSFVM_DEMO                   DISABLED
+#endif
+#ifndef USRAPP_FAKEFAT32_CFG_FONT
+#   define USRAPP_FAKEFAT32_CFG_FONT            DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
