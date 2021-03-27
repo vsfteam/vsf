@@ -35,13 +35,13 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const char __config_love[] = __STR(
+static const char __config_love[] = STR(
 LOVE_CFG = {}
 LOVE_CFG.DEFAULT_FONT = "/memfs/font/Roboto-Regular.ttf"
 LOVE_CFG.DEFAULT_FONT_SIZE = 16
 );
 
-static const char __boot_love[] = __STR(
+static const char __boot_love[] = STR(
 function love.nogame()
 
   function love.load()

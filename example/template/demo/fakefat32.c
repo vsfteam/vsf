@@ -41,46 +41,68 @@ static uint8_t __control = 0;
 
 #if APP_USE_VSFVM_DEMO == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-static const char __test_dart[] = "\
-var i = 0;\r\n\
-\r\n\
-thread1(cnt) {\r\n\
-  var i = 0;\r\n\
-  while (i < cnt) {\r\n\
-    delay_ms(500);\r\n\
-    print(\"thread1 loop: \", i, \"\\r\\n\");\r\n\
-    i = i + 1;\r\n\
-  }\r\n\
-}\r\n\
-\r\n\
-thread(thread1, 5);\r\n\
-\r\n\
-while (i < 2) {\r\n\
-  delay_ms(1000);\r\n\
-  print(\"thread main loop: \", i, \"\\r\\n\");\r\n\
-  i = i + 1;\r\n\
-}\r\n\
-";
+static const char __test_dart[] = STR(
+var i = 0;
+
+thread1(cnt) {
+  var i = 0;
+  while (i < cnt) {
+    delay_ms(500);
+    print("thread1 loop: ", i, "\r\n");
+    i = i + 1;
+  }
+}
+
+thread(thread1, 5);
+
+while (i < 2) {
+  delay_ms(1000);
+  print("thread main loop: ", i, "\r\n");
+  i = i + 1;
+}
+);
 #   else
-static const char __test_dart[] = "\
-var i = 0;\r\n\
-\r\n\
-thread1(cnt) {\r\n\
-  var i = 0;\r\n\
-  while (i < cnt) {\r\n\
-    print(\"thread1 loop: \", i, \"\\r\\n\");\r\n\
-    i = i + 1;\r\n\
-  }\r\n\
-}\r\n\
-\r\n\
-thread(thread1, 5);\r\n\
-\r\n\
-while (i < 2) {\r\n\
-  print(\"thread main loop: \", i, \"\\r\\n\");\r\n\
-  i = i + 1;\r\n\
-}\r\n\
-";
+static const char __test_dart[] = STR(
+var i = 0;
+
+thread1(cnt) {
+  var i = 0;
+  while (i < cnt) {
+    print("thread1 loop: ", i, "\r\n");
+    i = i + 1;
+  }
+}
+
+thread(thread1, 5);
+
+while (i < 2) {
+  print("thread main loop: ", i, "\r\n");
+  i = i + 1;
+}
+);
 #   endif
+#endif
+
+#if APP_USE_EVM_DEMO == ENABLED
+static const char __evm_main_js[] = STR(
+  print("1234\r\n");
+);
+static vk_fakefat32_file_t __evm_root[3] = {
+    {
+        .name               = ".",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+    },
+    {
+        .name               = "..",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+    },
+    {
+        .name               = "main.js",
+        .size               = sizeof(__evm_main_js),
+        .attr               = VSF_FILE_ATTR_READ,
+        .f.buff             = (uint8_t *)__evm_main_js,
+    },
+};
 #endif
 
 #if USRAPP_FAKEFAT32_CFG_FONT == ENABLED
@@ -115,6 +137,7 @@ static vk_fakefat32_file_t __fakefat32_font[3] = {
 vk_fakefat32_file_t fakefat32_root[ 3
                                 +   (APP_USE_VSFVM_DEMO == ENABLED ? 1 : 0)
                                 +   (USRAPP_FAKEFAT32_CFG_FONT == ENABLED ? 1 : 0)
+                                +   (APP_USE_EVM_DEMO == ENABLED ? 1 : 0)
                                 ] = {
     {
         .name               = "FAKEFAT32",
@@ -147,6 +170,14 @@ vk_fakefat32_file_t fakefat32_root[ 3
         .attr               = VSF_FILE_ATTR_DIRECTORY,
         .d.child            = (vk_memfs_file_t *)__fakefat32_font,
         .d.child_num        = dimof(__fakefat32_font),
+    },
+#endif
+#if APP_USE_EVM_DEMO == ENABLED
+    {
+        .name               = "evm",
+        .attr               = VSF_FILE_ATTR_DIRECTORY,
+        .d.child            = (vk_memfs_file_t *)__evm_root,
+        .d.child_num        = dimof(__evm_root),
     },
 #endif
 };

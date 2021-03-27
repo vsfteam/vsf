@@ -4535,7 +4535,6 @@
                     <state>__OOC_CPP__</state>
                     <state>LV_CONF_INCLUDE_SIMPLE</state>
                     <state>FT2_BUILD_LIBRARY</state>
-                    <state>EVM_LANG_ENABLE_REPL</state>
                     <state>CFG_HW_PLATFORM=2</state>
                     <state>CFG_RF_MODE=0</state>
                     <state>CFG_PMIC</state>

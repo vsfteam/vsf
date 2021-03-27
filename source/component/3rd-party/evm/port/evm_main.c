@@ -100,36 +100,17 @@ char * evm_open(evm_t *e, char *filename)
     return buffer;
 }
 
+#ifndef EVM_ROOT_PATH
+#   define EVM_ROOT_PATH            "/memfs/evm"
+#endif
 const char * vm_load(evm_t *e, char *path, int type)
 {
-    static const char *__modules_paths[] = {
-        "/",
-        "/evm_modules"
-    };
+    char filename[EVM_FILE_NAME_LEN];
+    const char *format = (type == EVM_LOAD_MAIN) ? "%s/%s" : "%s/modules/%s";
 
-    int file_name_len = strlen(path) + 1;
-    char *buffer = NULL;
-    if (type == EVM_LOAD_MAIN) {
-        char *module_name = evm_malloc(file_name_len);
-        if (!module_name ) { return NULL; }
-        sprintf(module_name, "%s", path);
-        sprintf(e->file_name, "%s", path);
-        buffer = evm_open(e, module_name);
-        evm_free(module_name);
-    } else {
-        for(int i = 0; i < dimof(__modules_paths); i++) {
-            int len = strlen(__modules_paths[i]) + 1 + file_name_len;
-            char *modules_path = evm_malloc(len);
-            sprintf(modules_path, "%s/%s", __modules_paths[i], path);
-            sprintf(e->file_name, "%s", path);
-            buffer = evm_open(e, modules_path);
-            evm_free(modules_path);
-            if (buffer != NULL) {
-                break;
-            }
-        }
-    }
-    return buffer;
+    snprintf(filename, sizeof(filename), format, EVM_ROOT_PATH, path);
+    strcpy(e->file_name, filename);
+    return evm_open(e, filename);
 }
 
 void * vm_malloc(int size)
