@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "evm_module.h"
 #include "ecma.h"
@@ -61,7 +63,7 @@ int fs_size(void *handle)
     FILE *file = (void *)handle;
     fseek(file, 0, SEEK_END);
     int size = ftell(file);
-    rewind (file);
+    rewind(file);
     return size;
 }
 
