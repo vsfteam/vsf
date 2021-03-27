@@ -764,7 +764,7 @@ int SDL_SetColorKey(SDL_Surface * surface, int flag, uint32_t key)
 
 int SDL_FillRect(SDL_Surface * surface, const SDL_Rect * rect, uint32_t color)
 {
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
+    uint_fast8_t pixel_size = surface->format->BytesPerPixel;
     SDL_Rect surface_rect = {
         .w      = surface->w,
         .h      = surface->h,
@@ -852,8 +852,8 @@ void SDL_DestroyRenderer(SDL_Renderer *renderer)
 int SDL_RenderClear(SDL_Renderer *renderer)
 {
     VSF_SDL2_ASSERT(renderer != NULL);
-    uint_fast8_t pixel_size = vsf_disp_get_pixel_bytesize(__vsf_sdl2.disp);
     SDL_Window *window = renderer->window;
+    uint_fast8_t pixel_size = vsf_disp_get_pixel_format_bytesize(window->format);
 
     // TODO: set to default color instead of 0
     memset(window->pixels, 0, pixel_size * window->area.w * window->area.h);
