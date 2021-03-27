@@ -977,11 +977,17 @@ int SDL_UpdateTexture(SDL_Texture *texture, const SDL_Rect *rect, const void *pi
 
 
 
-uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+uint32_t SDL_MapRGB(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b)
 {
     uint32_t color =    ((r >> format->Rloss) << format->Rshift)
                     |   ((g >> format->Gloss) << format->Gshift)
                     |   ((b >> format->Bloss) << format->Bshift);
+    return color;
+}
+
+uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    uint32_t color = SDL_MapRGB(format, r, g, b);
     if (format->Amask != 0) {
         color |= (a >> format->Aloss) << format->Ashift;
     }

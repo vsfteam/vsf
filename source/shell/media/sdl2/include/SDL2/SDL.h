@@ -113,6 +113,7 @@ extern "C" {
 #define SDL_DestroyTexture              __vsf_sdl2_destroy_texture
 
 #define SDL_MapRGBA                     __vsf_sdl2_map_rgba
+#define SDL_MapRGB                      __vsf_sdl2_map_rgb
 
 #define SDL_CreateSemaphore             __vsf_sdl2_create_sem
 #define SDL_DestroySemaphore            __vsf_sdl2_destroy_sem
@@ -906,6 +907,7 @@ extern void SDL_DestroyTexture(SDL_Texture * texture);
 extern int SDL_UpdateTexture(SDL_Texture * texture, const SDL_Rect * rect, const void * pixels, int pitch);
 
 extern uint32_t SDL_MapRGBA(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+extern uint32_t SDL_MapRGB(const SDL_PixelFormat * format, uint8_t r, uint8_t g, uint8_t b);
 
 extern SDL_sem * SDL_CreateSemaphore(uint32_t initial_value);
 extern void SDL_DestroySemaphore(SDL_sem * sem);
