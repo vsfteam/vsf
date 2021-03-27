@@ -451,7 +451,9 @@ void * vsf_heap_realloc_aligned(void *buffer, uint_fast32_t size, uint_fast32_t 
             __vsf_heap_unprotect(state);
 
             void *new_buffer = vsf_heap_malloc_aligned(size, alignment);
-            memcpy(new_buffer, buffer, memory_size);
+            if (new_buffer != NULL) {
+                memcpy(new_buffer, buffer, memory_size);
+            }
             __vsf_heap_mcb_free(mcb);
             return new_buffer;
         } else {
