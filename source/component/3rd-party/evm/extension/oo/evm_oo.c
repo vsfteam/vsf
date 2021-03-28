@@ -58,7 +58,7 @@ static void __evm_instance_create(evm_t *e, evm_val_t *obj, const evm_class_t *c
                         break;
                     case EVM_CLASS_VTT_INSTANCE:
                         if (vt->v.c != NULL) {
-                            vale = *evm_instance_create(e, vt->v.c);
+                            val = *evm_instance_create(e, vt->v.c);
                             break;
                         }
                     case EVM_CLASS_VTT_STRUCT:

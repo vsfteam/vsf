@@ -5972,11 +5972,11 @@
                 </option>
                 <option>
                     <name>MacOverride</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>MacFile</name>
-                    <state></state>
+                    <state>$TOOLKIT_DIR$\config\flashloader\AICSemi\FlashAIC8800MBW.mac</state>
                 </option>
                 <option>
                     <name>MemOverride</name>
@@ -6032,7 +6032,7 @@
                 </option>
                 <option>
                     <name>UseFlashLoader</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CLowLevel</name>
@@ -6052,7 +6052,7 @@
                 </option>
                 <option>
                     <name>FlashLoadersV3</name>
-                    <state>$TOOLKIT_DIR$\config\flashloader\</state>
+                    <state>$TOOLKIT_DIR$\config\flashloader\AICSemi\FlashAIC8800MBW.board</state>
                 </option>
                 <option>
                     <name>OCImagesSuppressCheck1</name>
@@ -6080,7 +6080,7 @@
                 </option>
                 <option>
                     <name>OverrideDefFlashBoard</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>OCImagesOffset1</name>
