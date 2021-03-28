@@ -24,6 +24,8 @@
 
 #if VSF_EVM_USE_USBH == ENABLED
 
+#include "evm_oo.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,9 +34,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const evm_class_t evm_usbh_dev;
+
 /*============================ PROTOTYPES ====================================*/
 
-extern evm_val_t evm_class_usbh(evm_t * e);
+extern evm_val_t evm_module_usbh(evm_t *e);
 
 #ifdef __cplusplus
 }

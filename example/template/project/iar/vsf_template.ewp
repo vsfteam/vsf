@@ -4725,6 +4725,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\raw\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\oo</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\oo</state>
@@ -5978,16 +5979,25 @@
                     </excluded>
                     <group>
                         <name>extension</name>
-                        <excluded>
-                            <configuration>vsf_template_aic8800</configuration>
-                        </excluded>
                         <group>
                             <name>bluetooth</name>
+                            <excluded>
+                                <configuration>vsf_template_aic8800</configuration>
+                            </excluded>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\bluetooth\evm_module_bluetooth.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>oo</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.h</name>
                             </file>
                         </group>
                         <group>
