@@ -92,7 +92,7 @@ struct evm_class_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern evm_val_t * evm_instance_create(evm_t * e, const evm_class_t *c);
+extern evm_val_t * evm_instance_create(evm_t *e, const evm_class_t *c);
 
 #ifdef __cplusplus
 }

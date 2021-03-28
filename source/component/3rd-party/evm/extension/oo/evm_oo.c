@@ -41,7 +41,7 @@ static uint32_t __evm_class_get_vt_len(const evm_class_t *c)
     return vt_len;
 }
 
-static void __evm_instance_create(evm_t * e, evm_val_t *obj, const evm_class_t *c)
+static void __evm_instance_create(evm_t *e, evm_val_t *obj, const evm_class_t *c)
 {
     if (c != NULL) {
         const evm_class_vt_t *vt = c->vt;
@@ -57,6 +57,10 @@ static void __evm_instance_create(evm_t * e, evm_val_t *obj, const evm_class_t *
                         val = evm_mk_number(vt->v.num_int);
                         break;
                     case EVM_CLASS_VTT_INSTANCE:
+                        if (vt->v.c != NULL) {
+                            vale = *evm_instance_create(e, vt->v.c);
+                            break;
+                        }
                     case EVM_CLASS_VTT_STRUCT:
                         val = EVM_VAL_UNDEFINED;
                         break;
@@ -69,7 +73,7 @@ static void __evm_instance_create(evm_t * e, evm_val_t *obj, const evm_class_t *
     __evm_instance_create(e, obj, c->parent);
 }
 
-evm_val_t * evm_instance_create(evm_t * e, const evm_class_t *c)
+evm_val_t * evm_instance_create(evm_t *e, const evm_class_t *c)
 {
     evm_val_t *obj = evm_object_create(e, GC_OBJECT, __evm_class_get_vt_len(c), 0);
     if (obj != NULL) {
