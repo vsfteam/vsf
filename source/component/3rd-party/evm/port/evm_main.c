@@ -1,6 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+// vsf configurations will be check, so include vsf.h here
+//  if user want to remove dependency on vsf, remove modules in evm_module_init,
+//  and include stdlib.h/stdio.h/string.h
+#include "vsf.h"
+//#include <stdlib.h>
+//#include <stdio.h>
+//#include <string.h>
 
 #include "evm_module.h"
 #include "ecma.h"
@@ -129,9 +133,23 @@ void vm_free(void *mem)
     }
 }
 
+// evm_module_init here will try to add all modules supported by vsf,
+//  re-write it if necessary
+WEAK(evm_module_init)
 evm_err_t evm_module_init(evm_t *env)
 {
-    return ec_ok;
+    evm_err_t err = ec_ok;
+
+#if VSF_EVM_USE_USBH == ENABLED && VSF_USE_LINUX == ENABLED
+    extern evm_err_t evm_module_usbh(evm_t *e);
+    err = evm_module_usbh(env);
+    if (err != ec_ok) {
+        evm_print("Failed to create usbh module\r\n");
+        return err;
+    }
+#endif
+
+    return err;
 }
 
 int evm_main(void)
