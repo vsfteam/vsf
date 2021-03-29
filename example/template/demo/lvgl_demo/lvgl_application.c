@@ -236,7 +236,7 @@ static void __lvgl_input_on_gamepad(vk_input_type_t type, vk_gamepad_evt_t *game
 static bool lv_btn_is_down(lv_obj_t *obj)
 {
     lv_btn_state_t state = lv_btn_get_state(obj);
-    return state == LV_BTN_STATE_TGL_REL;
+    return state == LV_BTN_STATE_RELEASED;
 }
 
 static void lvgl_demo_event_cb(lv_obj_t *obj, lv_event_t event)
@@ -280,7 +280,8 @@ static lv_obj_t * lvgl_demo_create_btn(lv_obj_t *cont, lv_coord_t x, lv_coord_t 
     if (obj != NULL) {
         lv_obj_set_pos(obj, x, y);
         lv_obj_set_size(obj, w, h);
-        lv_btn_set_toggle(obj, true);
+        // TODO: toggle button
+//        lv_btn_set_toggle(obj, true);
         lv_obj_set_event_cb(obj, lvgl_demo_event_cb);
         obj->user_data = cont->user_data;
     }
