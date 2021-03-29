@@ -163,8 +163,7 @@ static evm_val_t * __evm_module_usbh_endpoint_object_create(evm_t *e, struct lib
     evm_val_t *obj = evm_object_create(e, GC_OBJECT, 1, 0);
     if (obj != NULL) {
         // "descriptor"
-        evm_val_t *desc_obj;
-        evm_struct_create(e, desc_obj, ep_desc, 1,
+        evm_val_t *desc_obj = evm_struct_create(e, ep_desc, 1,
             bLength, bDescriptorType, bEndpointAddress, bmAttributes, wMaxPacketSize,
             bInterval, bRefresh, bSynchAddress
         );
@@ -186,8 +185,7 @@ static evm_val_t * __evm_module_usbh_alt_object_create(evm_t *e, struct libusb_i
     evm_val_t *obj = evm_object_create(e, GC_OBJECT, 2, 0);
     if (obj != NULL) {
         // "descriptor"
-        evm_val_t *desc_obj;
-        evm_struct_create(e, desc_obj, alt_desc, 1,
+        evm_val_t *desc_obj = evm_struct_create(e, alt_desc, 1,
             bLength, bDescriptorType, bInterfaceNumber, bAlternateSetting, bNumEndpoints,
             bInterfaceClass, bInterfaceSubClass, bInterfaceProtocol, iInterface
         );
@@ -216,8 +214,7 @@ static evm_val_t * __evm_module_usbh_alt_object_create(evm_t *e, struct libusb_i
 
 static evm_val_t * __evm_module_usbh_config_desc_object_create(evm_t *e, struct libusb_config_descriptor *cfg_desc)
 {
-    evm_val_t *desc_obj;
-    evm_struct_create(e, desc_obj, cfg_desc, 1,
+    evm_val_t *desc_obj = evm_struct_create(e, cfg_desc, 1,
         bLength, bDescriptorType, wTotalLength, bNumInterfaces, bConfigurationValue,
         iConfiguration, bmAttributes, bMaxPower
     );
@@ -243,8 +240,7 @@ static evm_val_t * __evm_module_usbh_device_object_create(evm_t *e, libusb_devic
         // "deviceDescriptor"
         struct libusb_device_descriptor dev_desc;
         if (LIBUSB_SUCCESS == libusb_get_device_descriptor(dev, &dev_desc)) {
-            evm_val_t *desc_obj;
-            evm_struct_create(e, desc_obj, &dev_desc, 0,
+            evm_val_t *desc_obj = evm_struct_create(e, &dev_desc, 0,
                 bLength, bDescriptorType, bcdUSB, bDeviceClass, bDeviceSubClass, bDeviceProtocol,
                 bMaxPacketSize0, idVendor, idProduct, bcdDevice, iManufacturer, iProduct,
                 iSerialNumber, bNumConfigurations

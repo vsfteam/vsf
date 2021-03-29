@@ -41,25 +41,26 @@ extern "C" {
 
 #define __evm_struct_foreach(__macro, __e, __pobj, __ptr, __x, ...)             \
     VSF_MCAT2(__evm_struct_foreach_, VSF_IS_EMPTY(__VA_ARGS__))                 \
-        (__macro, __e, __pobj, __ptr, __x, __VA_ARGS__)
+        (__macro, (__e), (__pobj), (__ptr), __x, __VA_ARGS__)
 #define __evm_struct_foreach_0(__macro, __e, __pobj, __ptr, __x, ...)           \
-    __macro(__e, __pobj, __ptr, __x)                                            \
-    __VSF_MOBSTRUCT(__evm_struct_foreach_i)()(__macro, __e, __pobj, __ptr, __VA_ARGS__)
+    __macro((__e), (__pobj), (__ptr), __x)                                      \
+    __VSF_MOBSTRUCT(__evm_struct_foreach_i)()(__macro, (__e), (__pobj), (__ptr), __VA_ARGS__)
 #define __evm_struct_foreach_1(__macro, __e, __pobj, __ptr, __x, ...)           \
-    __macro(__e, __pobj, __ptr, __x)
+    __macro((__e), (__pobj), (__ptr), __x)
 #define __evm_struct_foreach_i()                __evm_struct_foreach
 #define evm_struct_foreach(__macro, __e, __pobj, __ptr, ...)                    \
-    __VSF_MEXPAND(__evm_struct_foreach(__macro, __e, __pobj, __ptr, __VA_ARGS__))
+    __VSF_MEXPAND(__evm_struct_foreach(__macro, (__e), (__pobj), (__ptr), __VA_ARGS__))
 
 #define __evm_struct_append(__e, __pobj, __ptr, __member)                       \
     evm_prop_set_value((__e), (__pobj), STR(__member), evm_mk_number((__ptr)->__member));
-#define evm_struct_create(__e, __pobj, __ptr, __more, ...)                      \
-    do {                                                                        \
-        __pobj = evm_object_create((__e), GC_OBJECT, __PLOOC_VA_NUM_ARGS(__VA_ARGS__) + (__more), 0);\
+#define evm_struct_create(__e, __ptr, __more, ...)                              \
+    ({                                                                          \
+        evm_val_t * __pobj = evm_object_create((__e), GC_OBJECT, __PLOOC_VA_NUM_ARGS(__VA_ARGS__) + (__more), 0);\
         if (__pobj != NULL) {                                                   \
             evm_struct_foreach(__evm_struct_append, (__e), (__pobj), (__ptr), __VA_ARGS__)\
         }                                                                       \
-    } while (0)
+        __pobj;                                                                 \
+    })
 
 /*============================ TYPES =========================================*/
 
