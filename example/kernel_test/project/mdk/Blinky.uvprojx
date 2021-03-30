@@ -1488,6 +1488,9 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -3997,6 +4000,9 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -5531,6 +5537,9 @@
               <FilePath>..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -7906,6 +7915,9 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -10043,6 +10055,9 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -11679,6 +11694,9 @@
               <FilePath>..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>
@@ -13371,13 +13389,29 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
+        </Group>
       </Groups>
     </Target>
   </Targets>
 
   <RTE>
     <apis/>
-    <components/>
+    <components>
+      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
+        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
+        <targetInfos>
+          <targetInfo name="Test_Lib"/>
+          <targetInfo name="demo_armv6-m"/>
+          <targetInfo name="demo_armv7-m"/>
+          <targetInfo name="demo_armv7-m_ac5"/>
+          <targetInfo name="template_armv6-m"/>
+          <targetInfo name="template_armv7-m_ac6"/>
+          <targetInfo name="vsf_stdio_lib"/>
+        </targetInfos>
+      </component>
+    </components>
     <files>
       <file attr="config" category="header" name="CMSIS\Config\RTE_Device.h" version="1.0.0">
         <instance index="0" removed="1">RTE\Device\CMSDK_CM0\RTE_Device.h</instance>
