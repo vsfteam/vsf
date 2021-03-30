@@ -445,7 +445,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
+          <Filename>..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../../vsf/kernel/vsf_kernel_bsp.c\192</Expression>
         </Bp>
@@ -461,7 +461,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\116</Expression>
         </Bp>
@@ -477,7 +477,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\93</Expression>
         </Bp>
@@ -493,7 +493,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\84</Expression>
         </Bp>
@@ -509,7 +509,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
+          <Filename>..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -1461,7 +1461,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\..\vsf\hal\driver\arm\mps2\common\__common.c</Filename>
+          <Filename>..\..\..\vsf\hal\driver\arm\mps2\common\__common.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\demo\../../../vsf/hal/driver/arm/mps2/common/__common.c\127</Expression>
         </Bp>
@@ -1767,7 +1767,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>&lt;1&gt;..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</Filename>
+          <Filename>..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
