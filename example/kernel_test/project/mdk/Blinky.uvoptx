@@ -445,7 +445,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
+          <Filename>C:\Work\personal\vsf\vsf\example\vsf\kernel\vsf_kernel_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../../vsf/kernel/vsf_kernel_bsp.c\192</Expression>
         </Bp>
@@ -461,7 +461,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>..\..\source\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\116</Expression>
         </Bp>
@@ -477,7 +477,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>..\..\source\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\93</Expression>
         </Bp>
@@ -493,7 +493,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\usrapp\template\main_thread_simple.c</Filename>
+          <Filename>..\..\source\main_thread_simple.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\template\../../usrapp/template/main_thread_simple.c\84</Expression>
         </Bp>
@@ -509,7 +509,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\vsf\kernel\vsf_kernel_bsp.c</Filename>
+          <Filename>C:\Work\personal\vsf\vsf\example\vsf\kernel\vsf_kernel_bsp.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -1461,7 +1461,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\vsf\hal\driver\arm\mps2\common\__common.c</Filename>
+          <Filename>C:\Work\personal\vsf\vsf\example\vsf\hal\driver\arm\mps2\common\__common.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\demo\../../../vsf/hal/driver/arm/mps2/common/__common.c\127</Expression>
         </Bp>
@@ -1767,7 +1767,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</Filename>
+          <Filename>C:\Work\personal\vsf\vsf\example\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -1931,7 +1931,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1943,7 +1943,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\user_retarget.c</PathWithFileName>
+      <PathWithFileName>..\..\source\user_retarget.c</PathWithFileName>
       <FilenameWithoutPath>user_retarget.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1967,7 +1967,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\ooc_demo\class_demo.c</PathWithFileName>
+      <PathWithFileName>..\..\source\ooc_demo\class_demo.c</PathWithFileName>
       <FilenameWithoutPath>class_demo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1979,7 +1979,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\ooc_demo\class_simple_demo.c</PathWithFileName>
+      <PathWithFileName>..\..\source\ooc_demo\class_simple_demo.c</PathWithFileName>
       <FilenameWithoutPath>class_simple_demo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1991,7 +1991,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main_fsm_simple.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main_fsm_simple.c</PathWithFileName>
       <FilenameWithoutPath>main_fsm_simple.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2003,7 +2003,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\systimer_test.c</PathWithFileName>
+      <PathWithFileName>..\..\source\systimer_test.c</PathWithFileName>
       <FilenameWithoutPath>systimer_test.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2015,7 +2015,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\vsf_usr_cfg.h</PathWithFileName>
+      <PathWithFileName>..\..\source\vsf_usr_cfg.h</PathWithFileName>
       <FilenameWithoutPath>vsf_usr_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2027,7 +2027,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main_task_simple.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main_task_simple.c</PathWithFileName>
       <FilenameWithoutPath>main_task_simple.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2051,7 +2051,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main_cross_task_example.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main_cross_task_example.c</PathWithFileName>
       <FilenameWithoutPath>main_cross_task_example.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2063,7 +2063,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main_thread_simple.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main_thread_simple.c</PathWithFileName>
       <FilenameWithoutPath>main_thread_simple.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2075,7 +2075,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\lib\vsf_kernel_armv6m_full_size.a</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\lib\vsf_kernel_armv6m_full_size.a</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel_armv6m_full_size.a</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2087,7 +2087,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\lib\vsf_kernel_armv7em_full_size.a</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\lib\vsf_kernel_armv7em_full_size.a</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel_armv7em_full_size.a</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2099,7 +2099,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\lib\vsf_kernel_armv7m_full_size.a</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\lib\vsf_kernel_armv7m_full_size.a</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel_armv7m_full_size.a</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2111,7 +2111,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main_pt_simple.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main_pt_simple.c</PathWithFileName>
       <FilenameWithoutPath>main_pt_simple.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2123,7 +2123,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\main_eda_simple.c</PathWithFileName>
+      <PathWithFileName>..\..\source\main_eda_simple.c</PathWithFileName>
       <FilenameWithoutPath>main_eda_simple.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2143,7 +2143,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\arch\arm\cortex-m\cortex_m_generic.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\arch\arm\cortex-m\cortex_m_generic.c</PathWithFileName>
       <FilenameWithoutPath>cortex_m_generic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2155,7 +2155,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\systick.c</PathWithFileName>
       <FilenameWithoutPath>systick.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2167,7 +2167,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\arch\arm\cortex-m\SysTick\systick_internal.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\arch\arm\cortex-m\SysTick\systick_internal.c</PathWithFileName>
       <FilenameWithoutPath>systick_internal.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2179,7 +2179,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\arch\vsf_arch_abstraction.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\arch\vsf_arch_abstraction.c</PathWithFileName>
       <FilenameWithoutPath>vsf_arch_abstraction.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2191,7 +2191,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\arch\__vsf_arch_interface.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\arch\__vsf_arch_interface.h</PathWithFileName>
       <FilenameWithoutPath>__vsf_arch_interface.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2211,7 +2211,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\vsf_hal.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\vsf_hal.c</PathWithFileName>
       <FilenameWithoutPath>vsf_hal.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2231,7 +2231,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_eda.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_eda.c</PathWithFileName>
       <FilenameWithoutPath>vsf_eda.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2243,7 +2243,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_os.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_os.c</PathWithFileName>
       <FilenameWithoutPath>vsf_os.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2255,7 +2255,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_evtq_array.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_evtq_array.c</PathWithFileName>
       <FilenameWithoutPath>vsf_evtq_array.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2267,7 +2267,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_evtq_list.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_evtq_list.c</PathWithFileName>
       <FilenameWithoutPath>vsf_evtq_list.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2279,7 +2279,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_kernel.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_kernel.h</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2291,7 +2291,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_kernel_common.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_kernel_common.h</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel_common.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2303,7 +2303,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_eda.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_eda.h</PathWithFileName>
       <FilenameWithoutPath>vsf_eda.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2315,7 +2315,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_evtq.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_evtq.h</PathWithFileName>
       <FilenameWithoutPath>vsf_evtq.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2327,7 +2327,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_kernel_cfg.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_kernel_cfg.h</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2339,7 +2339,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_os.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_os.h</PathWithFileName>
       <FilenameWithoutPath>vsf_os.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2351,7 +2351,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_kernel_bsp.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_kernel_bsp.c</PathWithFileName>
       <FilenameWithoutPath>vsf_kernel_bsp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2363,7 +2363,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\vsf_eda_slist_queue.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\vsf_eda_slist_queue.c</PathWithFileName>
       <FilenameWithoutPath>vsf_eda_slist_queue.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2383,7 +2383,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\task\vsf_thread.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\task\vsf_thread.c</PathWithFileName>
       <FilenameWithoutPath>vsf_thread.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2395,7 +2395,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\task\vsf_pt.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\task\vsf_pt.h</PathWithFileName>
       <FilenameWithoutPath>vsf_pt.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2407,7 +2407,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\task\vsf_task.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\task\vsf_task.h</PathWithFileName>
       <FilenameWithoutPath>vsf_task.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2419,7 +2419,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\task\vsf_fsm.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\task\vsf_fsm.h</PathWithFileName>
       <FilenameWithoutPath>vsf_fsm.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2431,7 +2431,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\task\vsf_thread.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\task\vsf_thread.h</PathWithFileName>
       <FilenameWithoutPath>vsf_thread.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2443,7 +2443,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\task\__vsf_task_common.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\task\__vsf_task_common.h</PathWithFileName>
       <FilenameWithoutPath>__vsf_task_common.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2463,7 +2463,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\template\vsf_list.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\template\vsf_list.c</PathWithFileName>
       <FilenameWithoutPath>vsf_list.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2475,7 +2475,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\template\template.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\template\template.h</PathWithFileName>
       <FilenameWithoutPath>template.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2487,7 +2487,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\template\vsf_bitmap.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\template\vsf_bitmap.h</PathWithFileName>
       <FilenameWithoutPath>vsf_bitmap.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2499,7 +2499,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\template\vsf_list.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\template\vsf_list.h</PathWithFileName>
       <FilenameWithoutPath>vsf_list.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2511,7 +2511,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\template\vsf_bitmap.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\template\vsf_bitmap.c</PathWithFileName>
       <FilenameWithoutPath>vsf_bitmap.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2523,7 +2523,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\template\vsf_queue.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\template\vsf_queue.c</PathWithFileName>
       <FilenameWithoutPath>vsf_queue.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2543,7 +2543,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc.h</PathWithFileName>
       <FilenameWithoutPath>plooc.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2555,7 +2555,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class.h</PathWithFileName>
       <FilenameWithoutPath>plooc_class.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2567,7 +2567,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_black_box.h</PathWithFileName>
       <FilenameWithoutPath>plooc_class_black_box.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2579,7 +2579,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_simple.h</PathWithFileName>
       <FilenameWithoutPath>plooc_class_simple.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2591,7 +2591,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_simple_c90.h</PathWithFileName>
       <FilenameWithoutPath>plooc_class_simple_c90.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2603,7 +2603,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\plooc_class_strict.h</PathWithFileName>
       <FilenameWithoutPath>plooc_class_strict.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2615,7 +2615,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\3rd-party\PLOOC\raw\README.md</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\3rd-party\PLOOC\raw\README.md</PathWithFileName>
       <FilenameWithoutPath>README.md</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2635,7 +2635,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\ooc_class.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\ooc_class.h</PathWithFileName>
       <FilenameWithoutPath>ooc_class.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2647,7 +2647,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\communicate.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\communicate.h</PathWithFileName>
       <FilenameWithoutPath>communicate.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2659,7 +2659,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\compiler\arm\arm_compiler.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\compiler\arm\arm_compiler.h</PathWithFileName>
       <FilenameWithoutPath>arm_compiler.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2671,7 +2671,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\compiler\arm\retarget_io.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\compiler\arm\retarget_io.c</PathWithFileName>
       <FilenameWithoutPath>retarget_io.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2683,7 +2683,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\language_extension\code_region.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\language_extension\code_region.c</PathWithFileName>
       <FilenameWithoutPath>code_region.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2695,7 +2695,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\compiler\arm\vsf_stdio_lib_armv6_m_abv.a</PathWithFileName>
       <FilenameWithoutPath>vsf_stdio_lib_armv6_m_abv.a</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2707,7 +2707,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\utilities\language_extension\delegate.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\utilities\language_extension\delegate.c</PathWithFileName>
       <FilenameWithoutPath>delegate.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2727,7 +2727,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\shell\simple\vsf_simple.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\shell\simple\vsf_simple.h</PathWithFileName>
       <FilenameWithoutPath>vsf_simple.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2739,7 +2739,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\shell\simple\vsf_simple_task.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\shell\simple\vsf_simple_task.c</PathWithFileName>
       <FilenameWithoutPath>vsf_simple_task.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2751,7 +2751,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.c</PathWithFileName>
       <FilenameWithoutPath>vsf_simple_bmpevt.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2763,7 +2763,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\shell\simple\vsf_simple_bmpevt.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\shell\simple\vsf_simple_bmpevt.h</PathWithFileName>
       <FilenameWithoutPath>vsf_simple_bmpevt.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2783,7 +2783,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\interface\vsf_interface_io.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\interface\vsf_interface_io.h</PathWithFileName>
       <FilenameWithoutPath>vsf_interface_io.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2795,7 +2795,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\interface\vsf_interface_pm.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\interface\vsf_interface_pm.h</PathWithFileName>
       <FilenameWithoutPath>vsf_interface_pm.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2815,7 +2815,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\shell\vsf_shell.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\shell\vsf_shell.h</PathWithFileName>
       <FilenameWithoutPath>vsf_shell.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2827,7 +2827,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\kernel\shell\vsf_shell.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\kernel\shell\vsf_shell.c</PathWithFileName>
       <FilenameWithoutPath>vsf_shell.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2847,7 +2847,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\service\pool\vsf_pool.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\service\pool\vsf_pool.c</PathWithFileName>
       <FilenameWithoutPath>vsf_pool.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2859,7 +2859,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\service\pool\vsf_pool.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\service\pool\vsf_pool.h</PathWithFileName>
       <FilenameWithoutPath>vsf_pool.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2879,7 +2879,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\service\vsf_service.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\service\vsf_service.c</PathWithFileName>
       <FilenameWithoutPath>vsf_service.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2891,7 +2891,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\service\vsf_service.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\service\vsf_service.h</PathWithFileName>
       <FilenameWithoutPath>vsf_service.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2911,7 +2911,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\service\heap\vsf_heap.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\service\heap\vsf_heap.c</PathWithFileName>
       <FilenameWithoutPath>vsf_heap.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2923,7 +2923,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\service\heap\vsf_heap.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\service\heap\vsf_heap.h</PathWithFileName>
       <FilenameWithoutPath>vsf_heap.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2943,7 +2943,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\device.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\device.h</PathWithFileName>
       <FilenameWithoutPath>device.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2955,7 +2955,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\driver.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\driver.c</PathWithFileName>
       <FilenameWithoutPath>driver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2967,7 +2967,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\driver.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\driver.h</PathWithFileName>
       <FilenameWithoutPath>driver.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2979,7 +2979,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM7\startup_ARMCM7.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM7\startup_ARMCM7.c</PathWithFileName>
       <FilenameWithoutPath>startup_ARMCM7.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -2999,7 +2999,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\common\__common.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\common\__common.h</PathWithFileName>
       <FilenameWithoutPath>__common.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3011,7 +3011,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\common\__common.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\common\__common.c</PathWithFileName>
       <FilenameWithoutPath>__common.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3031,7 +3031,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\device.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\device.h</PathWithFileName>
       <FilenameWithoutPath>device.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3043,7 +3043,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\driver.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\driver.c</PathWithFileName>
       <FilenameWithoutPath>driver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3055,7 +3055,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\driver.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\driver.h</PathWithFileName>
       <FilenameWithoutPath>driver.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3067,7 +3067,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\hal\driver\arm\mps2\CMSDK_CM0\startup_ARMCM0.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\hal\driver\arm\mps2\CMSDK_CM0\startup_ARMCM0.c</PathWithFileName>
       <FilenameWithoutPath>startup_ARMCM0.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3087,7 +3087,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\usrapp\template\c90_cfg\vsf_usr_cfg.h</PathWithFileName>
+      <PathWithFileName>..\..\source\c90_cfg\vsf_usr_cfg.h</PathWithFileName>
       <FilenameWithoutPath>vsf_usr_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3107,7 +3107,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.c</PathWithFileName>
       <FilenameWithoutPath>vsf_msg_tree.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3119,7 +3119,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\osa_service\msg_tree\vsf_msg_tree.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\osa_service\msg_tree\vsf_msg_tree.h</PathWithFileName>
       <FilenameWithoutPath>vsf_msg_tree.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3139,7 +3139,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\osa_hal\vsf_osa_hal.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\osa_hal\vsf_osa_hal.c</PathWithFileName>
       <FilenameWithoutPath>vsf_osa_hal.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3151,7 +3151,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\osa_hal\vsf_osa_hal.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\osa_hal\vsf_osa_hal.h</PathWithFileName>
       <FilenameWithoutPath>vsf_osa_hal.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -3163,7 +3163,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\vsf\osa_hal\vsf_osa_hal_cfg.h</PathWithFileName>
+      <PathWithFileName>..\..\..\..\source\osa_hal\vsf_osa_hal_cfg.h</PathWithFileName>
       <FilenameWithoutPath>vsf_osa_hal_cfg.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
