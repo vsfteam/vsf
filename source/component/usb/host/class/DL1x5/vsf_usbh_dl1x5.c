@@ -52,6 +52,9 @@
 #ifndef VSF_USBH_DL1X5_CFG_CLS
 #   define VSF_USBH_DL1X5_CFG_CLS                       ENABLED
 #endif
+#ifndef VSF_USBH_DL1X5_CFG_READ_EDID
+#   define VSF_USBH_DL1X5_CFG_READ_EDID                 ENABLED
+#endif
 
 #ifndef VSF_USBH_DL1X5_CFG_CMD_BUFFER_SIZE
 //  use minimal buffer size for single maximal write_raw16 command
@@ -109,7 +112,11 @@ typedef struct vk_usbh_dl1x5_t {
     uint8_t cmd_buf[VSF_USBH_DL1X5_CFG_CMD_BUFFER_SIZE + 2];
 
     vk_usbh_dl1x5_callback_t callback;
-    vsf_teda_t teda;
+#if VSF_USBH_DL1X5_CFG_READ_EDID == ENABLED
+    vsf_teda_t task;
+#else
+    vsf_eda_t task;
+#endif
 
 #ifdef __VSF_DL1X5_USE_DISP
     implement(vk_disp_t)
@@ -219,6 +226,7 @@ static vsf_err_t __vk_usbh_dl1x5_get_status(vk_usbh_dl1x5_t *dl1x5)
     return vk_usbh_control_msg(dl1x5->usbh, dl1x5->dev, &req);
 }
 
+#if VSF_USBH_DL1X5_CFG_READ_EDID == ENABLED
 static vsf_err_t __vk_usbh_dl1x5_read_edid(vk_usbh_dl1x5_t *dl1x5)
 {
     VSF_USB_ASSERT((dl1x5 != NULL) && (dl1x5->usbh != NULL) && (dl1x5->dev != NULL));
@@ -231,27 +239,6 @@ static vsf_err_t __vk_usbh_dl1x5_read_edid(vk_usbh_dl1x5_t *dl1x5)
     };
     vk_usbh_urb_set_buffer(&dl1x5->dev->ep0.urb, &dl1x5->cmd_buf, 1 + 128);
     return vk_usbh_control_msg(dl1x5->usbh, dl1x5->dev, &req);
-}
-
-static vsf_err_t __vk_usbh_dl1x5_set_channel(vk_usbh_dl1x5_t *dl1x5, const char *seq, uint8_t size)
-{
-    VSF_USB_ASSERT((dl1x5 != NULL) && (dl1x5->usbh != NULL) && (dl1x5->dev != NULL));
-    struct usb_ctrlrequest_t req = {
-        .bRequestType    =  USB_TYPE_VENDOR | USB_DIR_OUT,
-        .bRequest        =  USB_DL1X5_REQ_SET_CHANNEL,
-        .wValue          =  0,
-        .wIndex          =  0,
-        .wLength         =  size,
-    };
-    memcpy(dl1x5->cmd_buf, seq, size);
-    vk_usbh_urb_set_buffer(&dl1x5->dev->ep0.urb, &dl1x5->cmd_buf, size);
-    return vk_usbh_control_msg(dl1x5->usbh, dl1x5->dev, &req);
-}
-
-static void __vk_usbh_dl1x5_on_eda_terminate(vsf_eda_t *eda)
-{
-    vk_usbh_dl1x5_t *dl1x5 = container_of(eda, vk_usbh_dl1x5_t, teda);
-    vsf_usbh_free(dl1x5);
 }
 
 static bool __vga_parse_edid(edid_t *edid, vga_timing_t *timing)
@@ -304,6 +291,28 @@ static bool __vga_parse_edid(edid_t *edid, vga_timing_t *timing)
     timing->v.back_porch        = blanking - timing->v.front_porch - timing->v.sync;
     timing->v.sync_positive     = detailed_timing->v_sync_positive;
     return true;
+}
+#endif
+
+static vsf_err_t __vk_usbh_dl1x5_set_channel(vk_usbh_dl1x5_t *dl1x5, const char *seq, uint8_t size)
+{
+    VSF_USB_ASSERT((dl1x5 != NULL) && (dl1x5->usbh != NULL) && (dl1x5->dev != NULL));
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_VENDOR | USB_DIR_OUT,
+        .bRequest        =  USB_DL1X5_REQ_SET_CHANNEL,
+        .wValue          =  0,
+        .wIndex          =  0,
+        .wLength         =  size,
+    };
+    memcpy(dl1x5->cmd_buf, seq, size);
+    vk_usbh_urb_set_buffer(&dl1x5->dev->ep0.urb, &dl1x5->cmd_buf, size);
+    return vk_usbh_control_msg(dl1x5->usbh, dl1x5->dev, &req);
+}
+
+static void __vk_usbh_dl1x5_on_eda_terminate(vsf_eda_t *eda)
+{
+    vk_usbh_dl1x5_t *dl1x5 = container_of(eda, vk_usbh_dl1x5_t, task);
+    vsf_usbh_free(dl1x5);
 }
 
 static void __dl1x5_write_vcmd(vk_usbh_dl1x5_t *dl1x5, uint_fast8_t cmd)
@@ -389,7 +398,7 @@ static uint16_t __dl1x5_lfsr16(uint16_t val)
 
 static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_dl1x5_t *dl1x5 = container_of(eda, vk_usbh_dl1x5_t, teda);
+    vk_usbh_dl1x5_t *dl1x5 = container_of(eda, vk_usbh_dl1x5_t, task);
     vk_usbh_dev_t *dev = dl1x5->dev;
 
     switch (evt) {
@@ -422,7 +431,7 @@ static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 case DL1X5_STATE_GET_STATUS:
                     vsf_trace_debug("DL1X5: status = 0x%08X" VSF_TRACE_CFG_LINEEND,
                             get_unaligned_le32(dl1x5->cmd_buf));
-
+#if VSF_USBH_DL1X5_CFG_READ_EDID == ENABLED
                     __vk_usbh_dl1x5_read_edid(dl1x5);
                     dl1x5->state = DL1X5_STATE_READ_EDID;
                     break;
@@ -430,11 +439,14 @@ static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     if (    (dl1x5->cmd_buf[0] != 0)
                         ||  !__vga_parse_edid((edid_t *)&dl1x5->cmd_buf[1], &dl1x5->timing)) {
                         vsf_teda_set_timer_ms(1000);
-                    } else {
-                        vsf_dl1x5_on_new_dev(dl1x5, (edid_t *)&dl1x5->cmd_buf[1]);
-                        __vk_usbh_dl1x5_set_channel(dl1x5, (const char *)__dl1x5_std_channel_seq, sizeof(__dl1x5_std_channel_seq));
-                        dl1x5->state = DL1X5_STATE_SET_STD_CHANNEL;
+                        break;
                     }
+                    vsf_dl1x5_on_new_dev(dl1x5, (edid_t *)&dl1x5->cmd_buf[1]);
+#else
+                    vsf_dl1x5_on_new_dev(dl1x5, NULL);
+#endif
+                    __vk_usbh_dl1x5_set_channel(dl1x5, (const char *)__dl1x5_std_channel_seq, sizeof(__dl1x5_std_channel_seq));
+                    dl1x5->state = DL1X5_STATE_SET_STD_CHANNEL;
                     break;
                 case DL1X5_STATE_SET_STD_CHANNEL: {
                         vga_timing_t *timing = &dl1x5->timing;
@@ -559,6 +571,7 @@ static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             }
         }
         break;
+#if VSF_USBH_DL1X5_CFG_READ_EDID == ENABLED
     case VSF_EVT_TIMER:
         switch (dl1x5->state) {
         case DL1X5_STATE_READ_EDID:
@@ -566,6 +579,7 @@ static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
         break;
+#endif
     }
 }
 
@@ -601,9 +615,13 @@ static void *__vk_usbh_dl1x5_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     dl1x5->dev = dev;
     dl1x5->ifs = ifs;
 
-    dl1x5->teda.fn.evthandler = __vk_usbh_dl1x5_evthandler;
-    dl1x5->teda.on_terminate = __vk_usbh_dl1x5_on_eda_terminate;
-    vsf_teda_init(&dl1x5->teda);
+    dl1x5->task.fn.evthandler = __vk_usbh_dl1x5_evthandler;
+    dl1x5->task.on_terminate = __vk_usbh_dl1x5_on_eda_terminate;
+#if VSF_USBH_DL1X5_CFG_READ_EDID == ENABLED
+    vsf_teda_init(&dl1x5->task);
+#else
+    vsf_eda_init(&dl1x5->task);
+#endif
     return dl1x5;
 }
 
@@ -614,7 +632,7 @@ static void __vk_usbh_dl1x5_disconnect(vk_usbh_t *usbh,
     VSF_USB_ASSERT(dl1x5 != NULL);
 
     vk_usbh_free_urb(usbh, &dl1x5->urb_out);
-    vsf_eda_fini(&dl1x5->teda.use_as__vsf_eda_t);
+    vsf_eda_fini((vsf_eda_t *)&dl1x5->task);
 }
 
 vga_timing_t * vk_usbh_dl1x5_get_timing(void *dev)
@@ -640,7 +658,7 @@ vsf_err_t vk_usbh_dl1x5_commit(void *dev)
     dl1x5->is_busy = true;
     __dl1x5_write_vcmd(dl1x5, DL1X5_CMD_NULL);
     vk_usbh_urb_set_buffer(&dl1x5->urb_out, &dl1x5->cmd_buf, dl1x5->cmd_pos);
-    return vk_usbh_submit_urb_ex(dl1x5->usbh, &dl1x5->urb_out, 0, &dl1x5->teda.use_as__vsf_eda_t);
+    return vk_usbh_submit_urb_ex(dl1x5->usbh, &dl1x5->urb_out, 0, (vsf_eda_t *)&dl1x5->task);
 }
 
 bool vk_usbh_dl1x5_fill_color(void *dev, uint_fast32_t gram_pixel_addr,

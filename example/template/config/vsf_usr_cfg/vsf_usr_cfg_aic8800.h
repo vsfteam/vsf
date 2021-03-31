@@ -245,6 +245,9 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   define VSF_USBH_CFG_ENABLE_ROOT_HUB                 DISABLED
 #   define VSF_USBH_USE_DL1X5                           ENABLED
 #       define VSF_DISP_USE_DL1X5                       ENABLED
+//  enable VSF_USBH_DL1X5_CFG_READ_EDID only if EDID is not available,
+//  rewrite vsf_dl1x5_on_new_dev to specify VGA timings
+//#           define VSF_USBH_DL1X5_CFG_READ_EDID         DISABLED
 #   define VSF_USBH_USE_HUB                             ENABLED
 #endif
 
