@@ -208,6 +208,9 @@ included by vsf_usr_cfg.h)"
 #   define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED      ENABLED
 #endif
 #ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
+/*! \note VSF_OS_CFG_ADD_EVTQ_TO_IDLE is disabled by default, because
+          tasks in idle evtq does not support dynamic priority feature
+*/
 #   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                      DISABLED
 #endif
 
