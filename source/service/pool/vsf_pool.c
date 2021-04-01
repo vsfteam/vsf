@@ -54,7 +54,7 @@
 #endif
 
 #if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
-#   warning ******** VSF_POOL_CFG_FEED_ON_HEAP is enabled, if vsf_pool_alloc will be called in interrupt\
+#   warning ******** VSF_POOL_CFG_FEED_ON_HEAP is enabled, if vsf_pool_alloc will be called in interrupt,\
 VSF_HEAP_CFG_PROTECT_LEVEL MUST be set to interrupt, and interrupt lantancy will be increased ********
 #endif
 
@@ -150,7 +150,7 @@ void vsf_pool_init( vsf_pool_t *obj_ptr,
 #   endif
 #endif
 
-#if VSF_POOL_CFG_FEED_ON_HEAP   == ENABLED
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
     vsf_this.statistic.item_size = item_size;
     if (0 == align) {
         align = sizeof(uint_fast8_t);

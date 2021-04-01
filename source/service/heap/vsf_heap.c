@@ -61,7 +61,8 @@
 #   if      VSF_USE_KERNEL == ENABLED                                           \
         &&  defined(__VSF_OS_CFG_EVTQ_LIST)                                     \
         &&  VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
-#       warning ******** evtq_list is used with VSF_POOL_CFG_FEED_ON_HEAP enabled, so set heap protection level to interrupt ********
+#       warning ******** evtq_list is used with VSF_POOL_CFG_FEED_ON_HEAP enabled,\
+so set heap protection level to interrupt, and interrupt lantancy will be increased ********
 #       define VSF_HEAP_CFG_PROTECT_LEVEL   interrupt
 #   else
 #       define VSF_HEAP_CFG_PROTECT_LEVEL   scheduler
