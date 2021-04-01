@@ -32,6 +32,12 @@ extern "C" {
 
 #define RTOS_TASK_FCT(__NAME)               void __NAME(void *param)
 
+#if 1
+// IMPORTANT: DO NOT think you can fix the priority,
+//  the library provided by vendor use a hardcoded one like below
+//  fix the priority in rtos_task_create
+#   define RTOS_TASK_PRIORITY(__PRIO)       (__PRIO)
+#else
 // __PRIO start from 1, and rtos_task MUST support priority promotion,
 //  which is required by mutex if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY is enabled
 #if     VSF_OS_CFG_ADD_EVTQ_TO_IDLE != ENABLED                                  \
@@ -39,6 +45,7 @@ extern "C" {
 #   define RTOS_TASK_PRIORITY(__PRIO)       ((__PRIO) - 1)
 #else
 #   define RTOS_TASK_PRIORITY(__PRIO)       (__PRIO)
+#endif
 #endif
 
 #define pdTRUE                              true

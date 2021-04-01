@@ -210,6 +210,14 @@ int rtos_task_create(   rtos_task_fct func,
                         rtos_prio prio,
                         rtos_task_handle * const task_handle)
 {
+    // fix priority dymanically, because the library from the vendor use hardcoded priorities
+    // priority promotion MUST be supported, which is required by mutex if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY is enabled
+#if     VSF_OS_CFG_ADD_EVTQ_TO_IDLE != ENABLED                                  \
+    ||  VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY != ENABLED
+    rtos_prio real_prio = prio - 1;
+#else
+    rtos_prio real_prio = prio;
+#endif
     // default alignment is ok for cortex-m4
     vsf_rtos_thread_t *thread = vsf_heap_malloc(sizeof(vsf_rtos_thread_t) + (stack_depth << 2));
     if (NULL == thread) {
@@ -227,7 +235,7 @@ int rtos_task_create(   rtos_task_fct func,
     rtos_trace_task("%s: %s(%p)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, name, thread);
     init_vsf_thread_ex( vsf_rtos_thread_t,
                         thread,
-                        prio,
+                        real_prio,
                         (uint64_t *)&thread[1], // no need to align to 64-bit
                         (stack_depth << 2));
 
