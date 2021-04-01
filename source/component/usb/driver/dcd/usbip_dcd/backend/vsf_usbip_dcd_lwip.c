@@ -93,6 +93,7 @@ static void __vk_usbip_server_lwip_reset(vk_usbip_server_lwip_t *backend)
         pbuf_free(backend->pbuf_rx);
         backend->pbuf_rx = NULL;
     }
+    // TODO: free urb_list?
 }
 
 static err_t __vk_usbip_server_lwip_on_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
@@ -158,6 +159,15 @@ static err_t __vk_usbip_server_lwip_on_recv(void *arg, struct tcp_pcb *tpcb, str
     return ERR_OK;
 }
 
+static void __vk_usbip_server_lwip_on_err(void *arg, err_t err)
+{
+    vk_usbip_server_lwip_t *backend = (vk_usbip_server_lwip_t *)arg;
+    vk_usbip_server_t *server = backend->server;
+
+    __vk_usbip_server_lwip_reset(backend);
+    vsf_eda_post_evt(&server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_DISCONNECTED);
+}
+
 static err_t __vk_usbip_server_lwip_on_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
     vk_usbip_server_lwip_t *backend = (vk_usbip_server_lwip_t *)arg;
@@ -173,6 +183,7 @@ static err_t __vk_usbip_server_lwip_on_accept(void *arg, struct tcp_pcb *newpcb,
     tcp_accepted(newpcb);
     tcp_recv(newpcb, __vk_usbip_server_lwip_on_recv);
     tcp_sent(newpcb, __vk_usbip_server_lwip_on_sent);
+    tcp_err(newpcb, __vk_usbip_server_lwip_on_err);
     vsf_eda_post_evt(&server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_CONNECTED);
     return ERR_OK;
 }
@@ -260,7 +271,9 @@ void __vk_usbip_server_backend_recv(uint8_t *buff, uint_fast32_t size)
 {
     vk_usbip_server_lwip_t *backend = &__vk_usbip_server_lwip;
 
-    VSF_USB_ASSERT(NULL != backend->work_pcb);
+    if (NULL == backend->work_pcb) {
+        return;
+    }
     VSF_USB_ASSERT(0 == backend->mem_rx.size);
 
     vsf_protect_t orig = vsf_protect_sched();
