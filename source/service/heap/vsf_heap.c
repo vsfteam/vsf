@@ -22,7 +22,7 @@
 #include "utilities/vsf_utilities.h"
 #include "hal/arch/vsf_arch.h"
 
-// rule breaker
+// rule breaker, but need kernel configurations to determine VSF_HEAP_CFG_PROTECT_LEVEL
 #include "kernel/vsf_kernel.h"
 
 #if VSF_USE_HEAP == ENABLED
@@ -53,8 +53,18 @@
 #endif
 
 
-// heap protection uses scheduler protection only
-#define VSF_HEAP_CFG_PROTECT_LEVEL          scheduler
+// heap protection uses scheduler protection by default
+#ifndef VSF_HEAP_CFG_PROTECT_LEVEL
+#   if      VSF_USE_KERNEL == ENABLED                                           \
+        &&  defined(__VSF_OS_CFG_EVTQ_LIST)                                     \
+        &&  (   !defined(VSF_OS_CFG_EVTQ_POOL_SIZE)                             \
+            ||  VSF_OS_CFG_EVTQ_POOL_SIZE <= 0)
+#       warning ******** evtq_list is used without VSF_OS_CFG_EVTQ_POOL_SIZE configured, so heap protection level is set to interrupt ********
+#       define VSF_HEAP_CFG_PROTECT_LEVEL   interrupt
+#   else
+#       define VSF_HEAP_CFG_PROTECT_LEVEL   scheduler
+#   endif
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
