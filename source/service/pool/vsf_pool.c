@@ -53,6 +53,11 @@
 #   define VSF_POOL_CFG_SUPPORT_USER_ITEM_INIT      ENABLED
 #endif
 
+#if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
+#   warning ******** VSF_POOL_CFG_FEED_ON_HEAP is enabled, if vsf_pool_alloc will be called in interrupt\
+VSF_HEAP_CFG_PROTECT_LEVEL MUST be set to interrupt, and interrupt lantancy will be increased ********
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 //! \name protected class __vsf_pool_node_t

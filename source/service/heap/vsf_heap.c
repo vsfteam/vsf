@@ -25,6 +25,9 @@
 // rule breaker, but need kernel configurations to determine VSF_HEAP_CFG_PROTECT_LEVEL
 #include "kernel/vsf_kernel.h"
 
+// need pool configurations to determine VSF_HEAP_CFG_PROTECT_LEVEL
+#include "../pool/vsf_pool.h"
+
 #if VSF_USE_HEAP == ENABLED
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
@@ -57,9 +60,8 @@
 #ifndef VSF_HEAP_CFG_PROTECT_LEVEL
 #   if      VSF_USE_KERNEL == ENABLED                                           \
         &&  defined(__VSF_OS_CFG_EVTQ_LIST)                                     \
-        &&  (   !defined(VSF_OS_CFG_EVTQ_POOL_SIZE)                             \
-            ||  VSF_OS_CFG_EVTQ_POOL_SIZE <= 0)
-#       warning ******** evtq_list is used without VSF_OS_CFG_EVTQ_POOL_SIZE configured, so heap protection level is set to interrupt ********
+        &&  VSF_POOL_CFG_FEED_ON_HEAP == ENABLED
+#       warning ******** evtq_list is used with VSF_POOL_CFG_FEED_ON_HEAP enabled, so set heap protection level to interrupt ********
 #       define VSF_HEAP_CFG_PROTECT_LEVEL   interrupt
 #   else
 #       define VSF_HEAP_CFG_PROTECT_LEVEL   scheduler
