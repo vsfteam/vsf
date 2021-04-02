@@ -49,6 +49,14 @@ struct rwnx_hw hw_env;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY != ENABLED
+#   error current demo need VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY, if it's not supported\
+    please make sure wlan_start_sta is called in task with priority higher than(>) vsf_prio_2
+#endif
+extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *this_ptr, vsf_prio_t priority);
+extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *this_ptr);
+
 /*============================ IMPLEMENTATION ================================*/
 
 static int __wifi_scan_main(int argc, char *argv[])
