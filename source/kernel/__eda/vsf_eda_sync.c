@@ -194,6 +194,15 @@ vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda)
         ((vsf_sync_owner_t *)this_ptr)->eda_owner = NULL;
         if (eda->cur_priority != eda->priority) {
             __vsf_eda_set_priority(eda, (vsf_prio_t)eda->priority);
+        } else if (eda->flag.state.is_new_prio) {
+            vsf_evtq_t *evtq;
+            // assert new_priority is a priority boost
+            VSF_KERNEL_ASSERT(eda->new_priority > eda->priority);
+            eda->flag.state.is_new_prio = false;
+
+            evtq = __vsf_os_evtq_get((vsf_prio_t)eda->priority);
+            VSF_KERNEL_ASSERT(evtq != NULL);
+            __vsf_os_evtq_set_priority(evtq, eda->priority);
         }
     }
 #endif
