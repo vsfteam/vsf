@@ -89,6 +89,9 @@ static void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_
 #endif
         } else {
             pthis->eda_rx = NULL;
+#if VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED == ENABLED
+            pthis->rx_notified = true;
+#endif
         }
 
         eda->flag.state.is_sync_got = true;
@@ -117,6 +120,9 @@ vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *pthis, uint_fast16_t max)
     if (NULL == pthis->region) {
         pthis->region = (vsf_protect_region_t *)&vsf_protect_region_sched;
     }
+#endif
+#if VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED == ENABLED
+    pthis->rx_notified = false;
 #endif
     return vsf_eda_sync_init(&pthis->use_as__vsf_sync_t, 0, max);
 }
@@ -231,10 +237,17 @@ vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, vsf_evt_
     // vsf_eda_sync_get_reason is protected by scheduler, maybe not fit to eda_queue protect level
     vsf_sync_reason_t reason = __vsf_eda_sync_get_reason(sync, evt, false);
     if (VSF_SYNC_GET == reason) {
-        pthis->op.dequeue(pthis, node);
-        sync->cur_union.cur_value--;
-        __vsf_eda_queue_notify(pthis, true, origlevel);
-        return reason;
+        if (sync->cur_union.cur_value > 0) {
+            pthis->op.dequeue(pthis, node);
+            sync->cur_union.cur_value--;
+#if VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED == ENABLED
+            pthis->rx_notified = false;
+#endif
+            __vsf_eda_queue_notify(pthis, true, origlevel);
+            return reason;
+        }
+        // this happens when queue is read by other task with 0 timeout after VSF_SYNC_GET is sent to here
+        reason = VSF_SYNC_PENDING;
     } else if (VSF_SYNC_TIMEOUT == reason) {
         pthis->eda_rx = NULL;
     }
@@ -250,6 +263,17 @@ uint_fast16_t vsf_eda_queue_get_cnt(vsf_eda_queue_t *pthis)
     cnt = pthis->cur_union.cur_value;
     __vsf_eda_queue_unprotect(origlevel);
     return cnt;
+}
+
+SECTION(".text.vsf.kernel.vsf_eda_queue_cancel")
+void vsf_eda_queue_cancel(vsf_eda_queue_t *pthis)
+{
+    vsf_eda_sync_cancel(&pthis->use_as__vsf_sync_t);
+    if (pthis->eda_rx != NULL) {
+        vsf_eda_t *eda = pthis->eda_rx;
+        pthis->eda_rx = NULL;
+        __vsf_eda_post_evt_ex(eda, VSF_EVT_SYNC_CANCEL, true);
+    }
 }
 
 #endif      // __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE

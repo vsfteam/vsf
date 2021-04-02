@@ -944,6 +944,9 @@ def_simple_class(vsf_eda_queue_t) {
 
     protected_member(
         vsf_eda_t               *eda_rx;
+#if VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED == ENABLED
+        bool                    rx_notified;
+#endif
     )
 };
 //! @}
@@ -1294,6 +1297,9 @@ extern vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *this_ptr
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_get_cnt")
 extern uint_fast16_t vsf_eda_queue_get_cnt(vsf_eda_queue_t *this_ptr);
+
+SECTION(".text.vsf.kernel.vsf_eda_queue_cancel")
+void vsf_eda_queue_cancel(vsf_eda_queue_t *this_ptr);
 
 // vsf_eda_queue_send/recv_isr can be called in isr ONLY if eda_queue is in protect_region_interrupt
 static inline vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node)
