@@ -251,6 +251,12 @@ rtos_task_handle rtos_get_task_handle(void)
     return container_of(thread, vsf_rtos_thread_t, use_as__vsf_thread_t);
 }
 
+char * rtos_get_task_name(void)
+{
+    rtos_task_handle cur_task_handle = rtos_get_task_handle();
+    return cur_task_handle->name;
+}
+
 void rtos_task_delete(rtos_task_handle task_handle)
 {
     rtos_task_handle cur_task_handle = rtos_get_task_handle();
@@ -486,7 +492,14 @@ int rtos_queue_create(int elt_size, int nb_elt, rtos_queue *queue)
 
 void rtos_queue_delete(rtos_queue queue)
 {
-    vsf_heap_free(queue);
+    rtos_trace_queue("%s: %p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, queue);
+    vsf_eda_queue_cancel(&queue->use_as__vsf_eda_queue_t);
+    // CANNOT free now, is there is task notified and not claimed
+    if (queue->rx_notified != 0) {
+        queue->node_size = 0;
+    } else {
+        vsf_heap_free(queue);
+    }
 }
 
 int rtos_queue_write(rtos_queue queue, void *msg, int timeout, bool isr)
@@ -543,6 +556,10 @@ int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
         while (1) {
             reason = vsf_eda_queue_recv_get_reason(&queue->use_as__vsf_eda_queue_t,
                                 vsf_thread_wait(), msg);
+            if (0 == queue->node_size) {
+                vsf_heap_free(queue);
+                return -1;
+            }
             if (VSF_SYNC_PENDING == reason) {
                 continue;
             }
