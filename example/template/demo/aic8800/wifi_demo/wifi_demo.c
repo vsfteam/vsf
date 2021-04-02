@@ -122,11 +122,11 @@ static int __wifi_connect_main(int argc, char *argv[])
         vsf_eda_t *eda_cur = vsf_eda_get_cur();
         vsf_prio_t prio = __vsf_eda_get_cur_priority(eda_cur);
         if (prio < vsf_prio_3) {
-            __vsf_eda_set_priority(vsf_eda_get_cur(), vsf_prio_3);
+            __vsf_eda_set_priority(eda_cur, vsf_prio_3);
         }
         int ret = wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0);
         if (prio < vsf_prio_3) {
-            __vsf_eda_set_priority(vsf_eda_get_cur(), prio);
+            __vsf_eda_set_priority(eda_cur, prio);
         }
         wlan_connected = 0 == ret ? 1 : 0;
 
