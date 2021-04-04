@@ -276,7 +276,6 @@ void __vk_usbip_server_backend_close(void)
 void __vk_usbip_server_backend_recv(uint8_t *buff, uint_fast32_t size)
 {
     vk_usbip_server_lwip_t *backend = &__vk_usbip_server_lwip;
-
     if (NULL == backend->work_pcb) {
         return;
     }
@@ -297,7 +296,9 @@ void __vk_usbip_server_backend_recv(uint8_t *buff, uint_fast32_t size)
 void __vk_usbip_server_backend_send(uint8_t *buff, uint_fast32_t size)
 {
     vk_usbip_server_lwip_t *backend = &__vk_usbip_server_lwip;
-    VSF_USB_ASSERT(NULL != backend->work_pcb);
+    if (NULL == backend->work_pcb) {
+        return;
+    }
     VSF_USB_ASSERT(vsf_dlist_is_empty(&backend->urb_list));
     VSF_USB_ASSERT(0 == backend->to_send_len);
 
@@ -308,7 +309,9 @@ void __vk_usbip_server_backend_send(uint8_t *buff, uint_fast32_t size)
 void __vk_usbip_server_backend_send_urb(vk_usbip_urb_t *urb)
 {
     vk_usbip_server_lwip_t *backend = &__vk_usbip_server_lwip;
-    VSF_USB_ASSERT(NULL != backend->work_pcb);
+    if (NULL == backend->work_pcb) {
+        return;
+    }
     VSF_USB_ASSERT(0 == backend->to_send_len);
 
     vsf_eda_post_msg((vsf_eda_t *)backend->thread, urb);
