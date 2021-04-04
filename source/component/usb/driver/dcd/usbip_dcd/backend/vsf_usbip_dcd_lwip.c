@@ -89,11 +89,17 @@ static void __vk_usbip_server_lwip_reset(vk_usbip_server_lwip_t *backend)
 {
     backend->work_pcb = NULL;
     backend->mem_rx.size = 0;
+    backend->sent_len = 0;
     if (backend->pbuf_rx != NULL) {
         pbuf_free(backend->pbuf_rx);
         backend->pbuf_rx = NULL;
     }
-    // TODO: free urb_list?
+
+    vk_usbip_urb_t *urb;
+    while (!vsf_dlist_is_empty(&backend->urb_list)) {
+        vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
+        __vk_usbip_server_done_urb(backend->server, urb);
+    }
 }
 
 static err_t __vk_usbip_server_lwip_on_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
