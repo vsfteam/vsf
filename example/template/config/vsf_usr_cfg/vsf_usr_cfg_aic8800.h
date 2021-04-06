@@ -33,6 +33,12 @@
 #define VSF_SYSTIMER_FREQ                               (260UL * 1000 * 1000)
 // lwip APIs are protected by a mutex, so priority boost SHOULD be supported
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
+// enable VSF_EDA_QUEUE_CFG_REGION and VSF_EDA_QUEUE_CFG_SUPPORT_ISR
+#define VSF_EDA_QUEUE_CFG_REGION                        ENABLED
+#define VSF_EDA_QUEUE_CFG_SUPPORT_ISR                   ENABLED
+// TODO: check the atomic integrality of is_evt_comming used by pt and fsm
+#define VSF_KERNEL_CFG_EDA_SUPPORT_PT                   DISABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                  DISABLED
 
 // Use unused interrupt as SWI
 #define VSF_DEV_SWI_NUM                                 4

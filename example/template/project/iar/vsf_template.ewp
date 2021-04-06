@@ -7477,6 +7477,39 @@
                                 </file>
                             </group>
                             <group>
+                                <name>lv_themes</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_empty.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_empty.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_template.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_template.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>lv_widgets</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_arc.c</name>
@@ -7681,39 +7714,6 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_widgets\lv_win.h</name>
-                                </file>
-                            </group>
-                            <group>
-                                <name>lv_themes</name>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.c</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_empty.c</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_empty.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.c</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_material.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.c</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_mono.h</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_template.c</name>
-                                </file>
-                                <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_themes\lv_theme_template.h</name>
                                 </file>
                             </group>
                             <file>
