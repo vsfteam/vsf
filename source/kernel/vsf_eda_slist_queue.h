@@ -39,7 +39,7 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE == ENABLED
 
 #   define vsf_msg_queue_t              vsf_eda_slist_queue_t
 #   define vsf_eda_msg_queue_init(__queue, __max)                               \

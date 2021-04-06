@@ -235,6 +235,7 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
     }
 }
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
 SECTION(".text.vsf.kernel.__vsf_call_fsm")
 fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param, size_t local_size)
 {
@@ -252,6 +253,7 @@ fsm_rt_t __vsf_call_fsm(vsf_fsm_entry_t entry, uintptr_t param, size_t local_siz
 }
 #endif
 
+#endif
 #endif
 
 /*EOF*/

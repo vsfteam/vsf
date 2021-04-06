@@ -160,18 +160,14 @@ vsf_err_t vsf_eda_sync_init(vsf_sync_t *this_ptr, uint_fast16_t cur, uint_fast16
     return VSF_ERR_NONE;
 }
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC_ISR == ENABLED
+#if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
 vsf_err_t vsf_eda_sync_increase_isr(vsf_sync_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
-#   if defined(__VSF_KERNEL_TASK_TEDA)
-    return vsf_eda_post_msg(&__vsf_eda.teda.use_as__vsf_eda_t, this_ptr);
-#   elif defined(__VSF_KERNEL_TASK_EDA)
-    return vsf_eda_post_msg(&__vsf_eda.eda, this_ptr);
-#   endif
+    return vsf_eda_post_msg((vsf_eda_t *)&__vsf_eda.task, this_ptr);
 }
-#endif          // VSF_KERNEL_CFG_SUPPORT_SYNC_ISR
+#endif          // VSF_SYNC_CFG_SUPPORT_ISR
 
 SECTION(".text.vsf.kernel.vsf_sync")
 vsf_err_t vsf_eda_sync_increase_ex(vsf_sync_t *this_ptr, vsf_eda_t *eda)

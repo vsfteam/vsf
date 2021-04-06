@@ -69,7 +69,7 @@ extern "C" {
             __PLOOC_EVAL(__vsf_eda_sem_init, __VA_ARGS__)((__psem), __VA_ARGS__)
 #define vsf_eda_sem_post(__psem)            vsf_eda_sync_increase((__psem))
 #define vsf_eda_sem_pend(__psem, __timeout) vsf_eda_sync_decrease((__psem), (__timeout))
-#if VSF_KERNEL_CFG_SUPPORT_SYNC_ISR == ENABLED
+#if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 #   define vsf_eda_sem_post_isr(__psem)     vsf_eda_sync_increase_isr((__psem))
 #endif
 
@@ -108,7 +108,7 @@ extern "C" {
 #define vsf_eda_trig_reset(__pevt)          vsf_eda_sync_force_reset((__pevt))
 #define vsf_eda_trig_wait(__pevt, __timeout)                                    \
             vsf_eda_sync_decrease((__pevt), (__timeout))
-#if VSF_KERNEL_CFG_SUPPORT_SYNC_ISR == ENABLED
+#if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 #   define vsf_eda_trig_set_isr(__pevt)     vsf_eda_sync_increase_isr((__pevt))
 #endif
 
@@ -581,6 +581,14 @@ enum {
     VSF_EVT_USER                = VSF_EVT_SYSTEM + 10,
 };
 
+// events for kernel task
+enum {
+    VSF_KERNEL_EVT_CALLBACK_TIMER       = VSF_EVT_USER + 0,
+    VSF_KERNEL_EVT_CALLBACK_TIMER_ADD   = VSF_EVT_USER + 1,
+    VSF_KERNEL_EVT_QUEUE_SEND_NOTIFY    = VSF_EVT_USER + 2,
+    VSF_KERNEL_EVT_QUEUE_RECV_NOTIFY    = VSF_EVT_USER + 3,
+};
+
 dcl_simple_class(vsf_eda_t)
 dcl_simple_class(vsf_teda_t)
 dcl_simple_class(vsf_sync_t)
@@ -692,7 +700,6 @@ typedef struct vsf_eda_cfg_t {
 //! \name eda
 //! @{
 def_simple_class(vsf_eda_t) {
-
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     protected_member(
         vsf_eda_on_terminate_t  on_terminate;
@@ -759,7 +766,7 @@ def_simple_class(vsf_teda_t)  {
 };
 //! @}
 
-#if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 //! \name callback_timer
 //! @{
 def_simple_class(vsf_callback_timer_t) {
@@ -895,7 +902,7 @@ def_simple_class(vsf_bmpevt_t) {
 };
 //! @}
 
-#if __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE == ENABLED
 typedef struct vsf_eda_queue_op_t {
     bool (*enqueue)(vsf_eda_queue_t *this_ptr, void *node);
     bool (*dequeue)(vsf_eda_queue_t *this_ptr, void **node);
@@ -1173,14 +1180,7 @@ extern vsf_err_t vsf_teda_cancel_timer(void);
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer_ex")
 extern vsf_err_t vsf_teda_cancel_timer_ex(vsf_teda_t *this_ptr);
 
-#   if VSF_KERNEL_TIMER_CFG_ISR == ENABLED
-static inline vsf_err_t vsf_teda_cancel_timer_ex_isr(vsf_teda_t *pthis)
-{
-    return vsf_teda_cancel_timer_ex(pthis);
-}
-#   endif
-
-#   if VSF_KERNEL_CFG_CALLBACK_TIMER == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_init")
 void vsf_callback_timer_init(vsf_callback_timer_t *timer);
 
@@ -1189,6 +1189,14 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
 vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer);
+
+#       if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
+SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
+vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, uint_fast32_t tick);
+
+SECTION(".text.vsf.kernel.vsf_callback_timer_remove_isr")
+vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer);
+#       endif
 
 #       if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
@@ -1221,7 +1229,7 @@ SECTION(".text.vsf.kernel.vsf_sync")
 extern vsf_err_t vsf_eda_sync_init(vsf_sync_t *this_ptr, uint_fast16_t cur_value,
         uint_fast16_t max_value);
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC_ISR == ENABLED
+#if VSF_SYNC_CFG_SUPPORT_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_sync")
 vsf_err_t vsf_eda_sync_increase_isr(vsf_sync_t *this_ptr);
 #endif
@@ -1273,7 +1281,7 @@ SECTION(".text.vsf.kernel.vsf_eda_bmpevt_poll")
 extern vsf_sync_reason_t vsf_eda_bmpevt_poll(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender, vsf_evt_t evt);
 #endif
 
-#if __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE == ENABLED
+#if VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_queue_init")
 extern vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *this_ptr, uint_fast16_t max);
 
@@ -1299,20 +1307,17 @@ SECTION(".text.vsf.kernel.vsf_eda_queue_get_cnt")
 extern uint_fast16_t vsf_eda_queue_get_cnt(vsf_eda_queue_t *this_ptr);
 
 SECTION(".text.vsf.kernel.vsf_eda_queue_cancel")
-void vsf_eda_queue_cancel(vsf_eda_queue_t *this_ptr);
+extern void vsf_eda_queue_cancel(vsf_eda_queue_t *this_ptr);
 
-// vsf_eda_queue_send/recv_isr can be called in isr ONLY if eda_queue is in protect_region_interrupt
-static inline vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node)
-{
-    return vsf_eda_queue_send(pthis, node, 0);
-}
+#   if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+SECTION(".text.vsf.kernel.vsf_eda_queue_send_isr")
+extern vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node);
 
-static inline vsf_err_t vsf_eda_queue_recv_isr(vsf_eda_queue_t *pthis, void **node)
-{
-    return vsf_eda_queue_recv(pthis, node, 0);
-}
+SECTION(".text.vsf.kernel.vsf_eda_queue_recv_isr")
+extern vsf_err_t vsf_eda_queue_recv_isr(vsf_eda_queue_t *pthis, void **node);
+#   endif
 
-#endif      // __VSF_KERNEL_CFG_SUPPORT_GENERIC_QUEUE
+#endif      // VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE
 
 
 #endif      // VSF_KERNEL_CFG_SUPPORT_SYNC

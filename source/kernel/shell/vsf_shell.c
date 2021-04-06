@@ -51,7 +51,7 @@ const struct {
             uint8_t    is_support_sync                 : 1;
             uint8_t    is_support_bmpevt               : 1;
             uint8_t    is_support_premption            : 1;
-            uint8_t    is_support_msg_queue            : 1;
+            uint8_t    is_support_slist_queue          : 1;
             uint8_t                                    : 4;     //!< reserved
         };
         uint8_t IPC;
@@ -83,13 +83,13 @@ const struct {
     .is_support_teda =              (VSF_KERNEL_CFG_EDA_SUPPORT_TIMER ? (true) : false),
     .is_support_thread =            (VSF_KERNEL_CFG_SUPPORT_THREAD ? (true) : false),
     .is_support_simple_shell =      (VSF_KERNEL_USE_SIMPLE_SHELL ? (true) : false),
-    .is_support_callback_timer =    (VSF_KERNEL_CFG_CALLBACK_TIMER ? true : false),
+    .is_support_callback_timer =    (VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER ? true : false),
 
 
     .is_support_sync =              (VSF_KERNEL_CFG_SUPPORT_SYNC ? (true) : false),
     .is_support_bmpevt =            (VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT ? (true) : false),
     .is_support_premption =         (VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED ? (true) : false),
-    .is_support_msg_queue =         (VSF_KERNEL_CFG_SUPPORT_MSG_QUEUE ? (true) : false),
+    .is_support_slist_queue =       (VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE ? (true) : false),
     
     .is_support_dynamic_priority =  (VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY ? (true) : false),
     .is_support_on_terminate =      (VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE ? true : false),
