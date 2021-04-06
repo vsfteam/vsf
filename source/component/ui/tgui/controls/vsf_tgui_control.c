@@ -46,9 +46,9 @@ declare_class(vsf_tgui_t)
 
 
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-#   if VSF_KERNEL_CFG_CALLBACK_TIMER != ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER != ENABLED
 #       error To use TGUI TIMER, you have to enable callback timer in kernel \
-by setting macro VSF_KERNEL_CFG_CALLBACK_TIMER to ENABLED
+by setting macro VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER to ENABLED
 #   endif
 #endif
 /*============================ MACROS ========================================*/
