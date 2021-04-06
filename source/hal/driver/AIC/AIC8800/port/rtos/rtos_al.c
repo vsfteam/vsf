@@ -29,12 +29,19 @@
 
 /*============================ MACROS ========================================*/
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
-#   error "VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required"
+#if VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE != ENABLED
+#   error VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE is required for rtos_queue
+#endif
+#if VSF_EDA_QUEUE_CFG_SUPPORT_ISR != ENABLED
+#   error VSF_EDA_QUEUE_CFG_SUPPORT_ISR is required
 #endif
 
-#if VSF_KERNEL_TIMER_CFG_ISR != ENABLED
-#   error "VSF_KERNEL_TIMER_CFG_ISR is required"
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE is required
+#endif
+
+#if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR != ENABLED
+#   error VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR is required
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -160,15 +167,20 @@ TimerHandle_t rtos_timer_create(
 int rtos_timer_delete(TimerHandle_t xTimer, TickType_t xTicksToWait)
 {
     rtos_trace_timer("%s: %p\r\n", __FUNCTION__, xTimer);
-    vsf_callback_timer_remove(&xTimer->use_as__vsf_callback_timer_t);
+    rtos_timer_stop(xTimer, 0);
     vsf_heap_free(xTimer);
     return 0;
 }
 
 int rtos_timer_start(TimerHandle_t xTimer, TickType_t xTicksToWait, bool isr)
 {
+    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(xTimer->xTimerPeriodInTicks);
     rtos_trace_timer("%s: %p %d\r\n", __FUNCTION__, xTimer, xTicksToWait);
-    vsf_callback_timer_add_ms(&xTimer->use_as__vsf_callback_timer_t, xTimer->xTimerPeriodInTicks);
+    if (isr) {
+        vsf_callback_timer_add_isr(&xTimer->use_as__vsf_callback_timer_t, tick);
+    } else {
+        vsf_callback_timer_add(&xTimer->use_as__vsf_callback_timer_t, tick);
+    }
     return 0;
 }
 
@@ -182,6 +194,7 @@ int rtos_timer_restart(TimerHandle_t xTimer, TickType_t xTicksToWait, bool isr)
 int rtos_timer_stop(TimerHandle_t xTimer, TickType_t xTicksToWait)
 {
     rtos_trace_timer("%s: %p %d\r\n", __FUNCTION__, xTimer, xTicksToWait);
+    // vsf_callback_timer_remove is identical to vsf_callback_timer_remove_isr
     vsf_callback_timer_remove(&xTimer->use_as__vsf_callback_timer_t);
     return 0;
 }
@@ -492,7 +505,9 @@ int rtos_queue_create(int elt_size, int nb_elt, rtos_queue *queue)
 
         q->op.dequeue = __rtos_queue_dequeue;
         q->op.enqueue = __rtos_queue_enqueue;
+#if VSF_EDA_QUEUE_CFG_REGION == ENABLED
         q->region = (vsf_protect_region_t *)&vsf_protect_region_int;
+#endif
         vsf_eda_queue_init(&q->use_as__vsf_eda_queue_t, nb_elt);
         *queue = q;
         rtos_trace_queue("%s: %p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, q);
@@ -552,6 +567,10 @@ int rtos_queue_read(rtos_queue queue, void *msg, int timeout, bool isr)
         VSF_ASSERT(0 == timeout);
 
         err = vsf_eda_queue_recv_isr(&queue->use_as__vsf_eda_queue_t, msg);
+        if (VSF_ERR_NONE == err) {
+            rtos_trace_queue("%s: %p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, queue);
+            rtos_trace_queue_buffer(msg, queue->node_size);
+        }
         return (VSF_ERR_NONE == err) ? 0 : -1;
     }
 
