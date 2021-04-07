@@ -21,7 +21,24 @@
 /*============================ INCLUDES ======================================*/
 
 #include "service/vsf_service_cfg.h"
+#if VSF_USE_HEAP == ENABLED
+
 #include "utilities/vsf_utilities.h"
+
+/*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
+ *!        definition and there is NO ANY OTHER module-interface-header file
+ *!        included in this file
+ */
+
+#if     defined(__VSF_HEAP_CLASS_IMPLEMENT)
+#   define __PLOOC_CLASS_IMPLEMENT__
+#   undef __VSF_HEAP_CLASS_IMPLEMENT
+#elif   defined(__VSF_HEAP_CLASS_INHERIT__)
+#   define __PLOOC_CLASS_INHERIT__
+#   undef __VSF_HEAP_CLASS_INHERIT__
+#endif
+
+#include "utilities/ooc_class.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,13 +46,18 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if VSF_USE_HEAP == ENABLED
-
 #ifndef VSF_HEAP_SIZE
 #   define VSF_HEAP_SIZE    (128 * 1024)
 #endif
 
 /*============================ TYPES =========================================*/
+
+dcl_simple_class(vsf_heap_t)
+def_simple_class(vsf_heap_t) {
+    protected_member(
+        vsf_dlist_t * (*get_freelist)(uint_fast32_t size);
+    )
+};
 
 declare_interface(i_heap_t)
 
@@ -43,7 +65,7 @@ declare_interface(i_heap_t)
 //! @{
 def_interface(i_heap_t)
     void (*Init)            (void);
-    void (*Add)             (uint8_t *heap, uint_fast32_t size);
+    void (*AddBuffer)       (uint8_t *buffer, uint_fast32_t size);
     void (*AddMemory)       (vsf_mem_t mem);
     void *(*MallocAligned)  (uint_fast32_t size, uint_fast32_t alignment);
     void *(*Malloc)         (uint_fast32_t size);
@@ -59,13 +81,19 @@ extern const i_heap_t VSF_HEAP;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_heap_init(void);
+// heap class
+extern void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32_t size);
+extern void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast32_t alignment);
+extern void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t size, uint_fast32_t alignment);
+extern void __vsf_heap_free(vsf_heap_t *heap, void *buffer);
 
-/*!\note: vsf_heap_add and vsf_heap_add_memory cannot add misaligned memory spaces.
+// default heap
+extern void vsf_heap_init(void);
+/*!\note: vsf_heap_add_buffer and vsf_heap_add_memory cannot add misaligned memory spaces.
  *!\when a user needs to add memory space, the space provided each time must be aligned
  *!\according to the alignment defined by VSF_HEAP_CFG_MCB_ALIGN_BIT(4 if undefined).
 */
-extern void vsf_heap_add(uint8_t *heap, uint_fast32_t size);
+extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
 extern void * vsf_heap_malloc_aligned(uint_fast32_t size, uint_fast32_t alignment);
 extern void * vsf_heap_malloc(uint_fast32_t size);
