@@ -96,8 +96,9 @@
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    480
 #   define APP_LVGL_DEMO_CFG_VER_RES                    320
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (16 * 1024)
-// make sure 0x158000 - 0x15FFFF ram is available
+// double 16K 16-bit pixels buffer at 0x00100000
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR           0x00100000
+#   define APP_LVGL_DEMO_CFG_DOUBLE_BUFFER              ENABLED
 #define APP_USE_BTSTACK_DEMO                            ENABLED
 // DO NOT use bthci, use on-chip bluetooth
 #   define VSF_USBH_USE_BTHCI                           DISABLED

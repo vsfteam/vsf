@@ -283,7 +283,11 @@ int VSF_USER_ENTRY(void)
 
     lv_disp_buf_init(   &usrapp_ui_common.lvgl.disp_buf,
                         usrapp_ui_common.lvgl.color,
+#if APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED
+                        usrapp_ui_common.lvgl.color + APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE,
+#else
                         NULL,
+#endif
                         APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE);
     lv_disp_drv_init(&disp_drv);
 

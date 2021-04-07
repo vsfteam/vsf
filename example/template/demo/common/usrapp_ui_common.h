@@ -91,6 +91,8 @@ typedef struct usrapp_ui_common_t {
 // if APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR is defined, use defined buffer
 #ifdef APP_LVGL_DEMO_CFG_PIXEL_BUFFER_PTR
         lv_color_t *color;
+#elif APP_LVGL_DEMO_CFG_DOUBLE_BUFFER == ENABLED
+        lv_color_t color[APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE * 2];
 #else
         lv_color_t color[APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE];
 #endif
