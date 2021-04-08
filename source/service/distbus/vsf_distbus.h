@@ -23,8 +23,6 @@
 
 #if VSF_USE_DISTBUS == ENABLED
 
-#include "../simple_stream/vsf_simple_stream.h"
-
 #include "utilities/vsf_utilities.h"
 
 #if     defined(__VSF_DISTBUS_CLASS_IMPLEMENT)
@@ -50,26 +48,28 @@ extern "C" {
 
 dcl_simple_class(vsf_distbus_t)
 dcl_simple_class(vsf_distbus_service_t)
+dcl_simple_class(vsf_distbus_trans_t)
 
-// transact is single package
-dcl_simple_class(vsf_distbus_transact_t)
-typedef vsf_err_t (*vsf_distbus_transact_handler_t)(
-                                            vsf_distbus_t *bus,
+typedef bool (*vsf_distbus_transhandler_t)( vsf_distbus_t *bus,
                                             vsf_distbus_service_t *service,
-                                            vsf_distbus_transact_t *transact);
-typedef struct vsf_distbus_transact_header_t {
+                                            vsf_distbus_trans_t *trans);
+typedef struct vsf_distbus_transheader_t {
     uint32_t                                datalen;
-    uint32_t                                hash;
+    uint32_t                                hash_header;
+    uint32_t                                hash_data;
     uint16_t                                addr;
     uint16_t                                flag;
-} vsf_distbus_transact_header_t;
-def_simple_class(vsf_distbus_transact_t) {
+} vsf_distbus_transheader_t;
+def_simple_class(vsf_distbus_trans_t) {
     private_member(
-        uint32_t                            pos;
+        union {
+            uint32_t                        pos;
+            vsf_slist_node_t                node;
+        };
     )
     public_member(
         uint32_t                            buffer_size;
-        vsf_distbus_transact_header_t       header[0];
+        vsf_distbus_transheader_t           header[0];
     )
 };
 
@@ -78,9 +78,7 @@ typedef struct vsf_distbus_service_info_t {
     uint16_t                                type;
     uint8_t                                 addr_range;
     uint8_t                                 flag;
-    union {
-        vsf_distbus_transact_handler_t      transact_handler;
-    } handler;
+    vsf_distbus_transhandler_t              handler;
 } vsf_distbus_service_info_t;
 
 def_simple_class(vsf_distbus_service_t) {
@@ -94,12 +92,16 @@ def_simple_class(vsf_distbus_service_t) {
     )
 };
 
+typedef struct vsf_distbuf_drv_t {
+    uint_fast32_t (*send)(uint8_t *buffer, uint_fast32_t size);
+    uint_fast32_t (*recv)(uint8_t *buffer, uint_fast32_t size, void (*)(uint8_t *buffer, uint_fast32_t size));
+} vsf_distbuf_drv_t;
+
 def_simple_class(vsf_distbus_t) {
-    public_member(
-        vsf_stream_t                        *stream_rx;
-        vsf_stream_t                        *stream_tx;
-    )
     private_member(
+        const vsf_distbuf_drv_t             *drv;
+        vsf_distbus_trans_t                 *trans_rx;
+        vsf_distbus_trans_t                 *trans_tx;
         vsf_slist_t                         service_list;
     )
 };
@@ -108,11 +110,13 @@ def_simple_class(vsf_distbus_t) {
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef __VSF_DISTBUS_CLASS_INHERIT__
-extern vsf_distbus_transact_t * vsf_distbus_alloc_transact(vsf_distbus_t *distbus, uint_fast32_t mtu);
-extern void vsf_distbus_free_transact(vsf_distbus_t *distbus, vsf_distbus_transact_t *trans);
+extern vsf_distbus_trans_t * vsf_distbus_alloc_trans(vsf_distbus_t *distbus, uint_fast32_t size);
+extern void vsf_distbus_free_trans(vsf_distbus_t *distbus, vsf_distbus_trans_t *trans);
 // after transact is sent, it will be freed automatically
-extern vsf_err_t vsf_distbus_send_transact(vsf_distbus_t *distbus, vsf_distbus_transact_t *trans);
+extern vsf_err_t vsf_distbus_send_trans(vsf_distbus_t *distbus, vsf_distbus_trans_t *trans);
 #endif
+
+extern vsf_err_t vsf_distbuf_init(vsf_distbus_t *distbus, const vsf_distbuf_drv_t *drv);
 
 #ifdef __cplusplus
 }
