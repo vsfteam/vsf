@@ -449,18 +449,25 @@ bool __vsf_eda_return(uintptr_t return_value)
         VSF_KERNEL_ASSERT(frame != NULL);
         this_ptr->flag.feature = frame->state.feature;
         vsf_eda_free_frame(frame);
-        frame = this_ptr->fn.frame;
+        if (this_ptr->flag.feature.is_use_frame) {
+            frame = this_ptr->fn.frame;
+        } else {
+            goto do_return;
+        }
     }
 
     if (frame != NULL) {
-        __vsf_eda_frame_t *frame_caller = __vsf_eda_peek_frame((vsf_slist_t *)frame);
-        if (    (NULL == frame_caller)                      //!< top frame
-            &&  !frame->state.feature.is_use_frame) {       //!< not force frame
+        {
+            __vsf_eda_frame_t *frame_caller = __vsf_eda_peek_frame((vsf_slist_t *)frame);
+            if (    (NULL == frame_caller)                      //!< top frame
+                &&  !frame->state.feature.is_use_frame) {       //!< not force frame
 
-            this_ptr->flag.feature = frame->state.feature;
-            vsf_eda_free_frame(frame);
+                this_ptr->flag.feature = frame->state.feature;
+                vsf_eda_free_frame(frame);
+            }
         }
 
+    do_return:
 #   if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
         if (this_ptr->flag.feature.is_stack_owner) {
             extern void __vsf_eda_return_to_thread(vsf_eda_t *eda);
