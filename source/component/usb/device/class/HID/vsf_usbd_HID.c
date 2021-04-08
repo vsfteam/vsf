@@ -316,7 +316,7 @@ static vsf_err_t __vk_usbd_hid_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     if (    (USB_HID_REQ_SET_REPORT == request->bRequest)
         ||  (USB_HID_REQ_GET_REPORT == request->bRequest)) {
 
-        uint_fast8_t type = request->wValue >> 8, id = request->wValue;
+        uint_fast8_t type = request->wValue >> 8, id = request->wValue & 0xFF;
         vk_usbd_hid_report_t *report = __vk_usbd_hid_find_report(hid, type, id);
 
         if ((NULL == report) || (type != report->type)) {
