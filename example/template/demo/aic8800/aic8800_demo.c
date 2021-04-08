@@ -31,16 +31,16 @@
 
 void aic8800_demo_init(void)
 {
-#   if AIC8800_APP_USE_WIFI_DEMO == ENABLED
+#if AIC8800_APP_USE_WIFI_DEMO == ENABLED
     extern void aic8800_wifi_start(void);
     aic8800_wifi_start();
-#   endif
-#   if AIC8800_APP_USE_BT_DEMO == ENABLED
+#endif
+#if AIC8800_APP_USE_BT_DEMO == ENABLED
     extern vsf_err_t aic8800_bt_start(void);
     aic8800_bt_start();
-#   endif
+#endif
 }
 
-#endif      // APP_USE_LINUX_DEMO
+#endif      // __AIC8800__
 
 /* EOF */
