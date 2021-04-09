@@ -341,7 +341,7 @@ vsf_arch_prio_t vsf_enable_interrupt(void)
  *----------------------------------------------------------------------------*/
 
 WEAK(vsf_arch_sleep)
-void vsf_arch_sleep(uint32_t mode)
+void vsf_arch_sleep(uint_fast32_t mode)
 {
     UNUSED_PARAM(mode);
     __WFE();
