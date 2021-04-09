@@ -414,8 +414,8 @@ vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb)
     vsf_err_t ret;
     __vsf_eda_frame_state_t state   = {
         .feature                    = {
-            .is_fsm                 = false,
-            .is_stack_owner         = true,
+            .is_subcall_has_return_value    = false,
+            .is_stack_owner                 = true,
         }
     };
     ret = __vsf_eda_call_eda_ex(   (uintptr_t)__vsf_thread_evthandler,
@@ -486,8 +486,8 @@ vsf_err_t vk_thread_call_eda(   uintptr_t eda_handler,
                                 uintptr_t local_buff)
 {
     __vsf_eda_frame_state_t state   = {
-        .feature.is_fsm             = false,
-        .local_size                 = local_size,
+        .feature.is_subcall_has_return_value    = false,
+        .local_size                             = local_size,
     };
     return __vsf_thread_call_eda_ex(eda_handler, param, state, local_buff_size, local_buff);
 }
@@ -501,8 +501,8 @@ vsf_err_t vk_thread_call_thread(vsf_thread_cb_t *thread_cb,
 
     __vsf_eda_frame_state_t state   = {
         .feature                    = {
-            .is_fsm                 = false,
-            .is_stack_owner         = true,
+            .is_subcall_has_return_value    = false,
+            .is_stack_owner                 = true,
         },
     };
     VSF_KERNEL_ASSERT(    (NULL != cfg->entry)

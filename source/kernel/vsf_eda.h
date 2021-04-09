@@ -616,7 +616,7 @@ typedef union vsf_eda_feature_t {
         uint8_t                 is_stack_owner : 1;
 #endif
 #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        uint8_t                 is_fsm : 1;
+        uint8_t                 is_subcall_has_return_value : 1;
 #endif
         uint8_t                 user_bits : VSF_KERNEL_CFG_EDA_USER_BITLEN;
     };

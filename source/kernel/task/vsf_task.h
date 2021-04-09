@@ -138,7 +138,7 @@ extern "C" {
                 .fn.fsm_entry = (vsf_task_entry_t)vsf_task_func(__name),        \
                 .priority = (__pri),                                            \
                 .target = (uintptr_t)&((__task)->param),                        \
-                .feature.is_fsm = true,                                         \
+                .feature.is_subcall_has_return_value = true,                    \
                 __VA_ARGS__                                                     \
             };                                                                  \
             prepare_vsf_task(__name, &((__task)->param));                       \

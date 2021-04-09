@@ -218,7 +218,7 @@ void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
         VSF_KERNEL_ASSERT(frame != NULL);
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
-        if (this_ptr->flag.feature.is_fsm) {
+        if (this_ptr->flag.feature.is_subcall_has_return_value) {
             __vsf_eda_fsm_evthandler(this_ptr, evt);
         } else {
             if (    ((uintptr_t)NULL == frame->ptr.target)     //!< no param
@@ -639,8 +639,8 @@ vsf_err_t __vsf_eda_call_eda_prepare(   uintptr_t evthandler,
                                         size_t local_size)
 {
     __vsf_eda_frame_state_t state   = {
-        .feature.is_fsm             = 0,
-        .local_size                 = local_size,
+        .feature.is_subcall_has_return_value    = false,
+        .local_size                             = local_size,
     };
     return __vsf_eda_call_eda_ex_prepare(evthandler, param, state, true);
 }
@@ -675,7 +675,7 @@ SECTION(".text.vsf.kernel.__vsf_eda_go_to_ex")
 vsf_err_t __vsf_eda_go_to_ex(uintptr_t evthandler, uintptr_t param)
 {
     __vsf_eda_frame_state_t state   = {
-        .feature.is_fsm             = false,
+        .feature.is_subcall_has_return_value    = false,
     };
     return __vsf_eda_call_eda_ex(evthandler, param, state, false);
 }
@@ -686,8 +686,8 @@ vsf_err_t __vsf_eda_call_eda(   uintptr_t evthandler,
                                 size_t local_size)
 {
     __vsf_eda_frame_state_t state   = {
-        .feature.is_fsm             = false,
-        .local_size                 = local_size,
+        .feature.is_subcall_has_return_value    = false,
+        .local_size                             = local_size,
     };
     return __vsf_eda_call_eda_ex(evthandler, param, state, true);
 }
@@ -702,8 +702,8 @@ fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry,
 
     fsm_rt_t fsm_return_state = this_ptr->fsm_return_state;
     __vsf_eda_frame_state_t state   = {
-        .feature.is_fsm             = true,
-        .local_size                 = local_size,
+        .feature.is_subcall_has_return_value    = true,
+        .local_size                             = local_size,
     };
     switch(fsm_return_state) {
         case fsm_rt_on_going:
@@ -859,7 +859,7 @@ vsf_err_t vsf_eda_start(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg_ptr)
     this_ptr->fn.evthandler = cfg_ptr->fn.evthandler;
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-    if (cfg_ptr->feature.is_fsm || cfg_ptr->target) {
+    if (cfg_ptr->feature.is_subcall_has_return_value || cfg_ptr->target) {
         //! override the is_use_frame flag
         cfg_ptr->feature.is_use_frame = true;
     }
