@@ -846,37 +846,42 @@ vsf_err_t __vsf_eda_init(vsf_eda_t *this_ptr, vsf_prio_t priority, vsf_eda_featu
 #endif
 
 SECTION(".text.vsf.kernel.vsf_eda_start")
-vsf_err_t vsf_eda_start(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg)
+vsf_err_t vsf_eda_start(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg_ptr)
 {
     VSF_KERNEL_ASSERT(  NULL != this_ptr
-                    &&  NULL != cfg
-                    &&  (uintptr_t)NULL != cfg->fn.func);
+                    &&  NULL != cfg_ptr
+                    &&  (uintptr_t)NULL != cfg_ptr->fn.func);
 
-    this_ptr->fn.evthandler = cfg->fn.evthandler;
+    this_ptr->fn.evthandler = cfg_ptr->fn.evthandler;
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-    if (!cfg->feature.is_use_frame) {
-        return vsf_eda_init(this_ptr, cfg->priority, cfg->feature);
+    if (cfg_ptr->feature.is_fsm || cfg_ptr->target) {
+        //! override the is_use_frame flag
+        cfg_ptr->feature.is_use_frame = true;
     }
 
-    __vsf_eda_frame_t *frame = vsf_eda_new_frame(cfg->local_size);
+    if (!cfg_ptr->feature.is_use_frame) {
+        return vsf_eda_init(this_ptr, cfg_ptr->priority, cfg_ptr->feature);
+    }
+
+    __vsf_eda_frame_t *frame = vsf_eda_new_frame(cfg_ptr->local_size);
     if (NULL == frame) {
         VSF_KERNEL_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
     //frame->flag = 0;                  //!< clear all flags (Done with memset)
 
-    frame->fn.fsm_entry = cfg->fn.fsm_entry;
-    frame->ptr.target = cfg->target;
-    frame->state.feature = cfg->feature;
+    frame->fn.fsm_entry = cfg_ptr->fn.fsm_entry;
+    frame->ptr.target = cfg_ptr->target;
+    frame->state.feature = cfg_ptr->feature;
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    this_ptr->on_terminate = cfg->on_terminate;
+    this_ptr->on_terminate = cfg_ptr->on_terminate;
 #endif
 
 
-    __vsf_eda_init_member(this_ptr, cfg->priority, cfg->feature);
+    __vsf_eda_init_member(this_ptr, cfg_ptr->priority, cfg_ptr->feature);
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     this_ptr->fn.frame = frame;
 #endif
