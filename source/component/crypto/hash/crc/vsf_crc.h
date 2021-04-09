@@ -24,6 +24,9 @@
 
 #if VSF_HASH_USE_CRC == ENABLED
 
+// for stdint.h
+#include "utilities/vsf_utilities.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
