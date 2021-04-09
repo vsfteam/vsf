@@ -139,7 +139,6 @@ extern "C" {
                 .priority = (__pri),                                            \
                 .target = (uintptr_t)&((__task)->param),                        \
                 .feature.is_fsm = true,                                         \
-                .feature.is_use_frame = true,                                   \
                 __VA_ARGS__                                                     \
             };                                                                  \
             prepare_vsf_task(__name, &((__task)->param));                       \
@@ -153,7 +152,6 @@ extern "C" {
                 .fn.evthandler = (vsf_task_entry_t)vsf_task_func(__name),       \
                 .priority = (__pri),                                            \
                 .target = NULL,                                                 \
-                .feature.is_use_frame = true,                                   \
                 __VA_ARGS__                                                     \
             };                                                                  \
             prepare_vsf_task(__name, &((__task)->param));                       \

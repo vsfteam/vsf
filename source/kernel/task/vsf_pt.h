@@ -215,7 +215,6 @@ extern "C" {
             vsf_eda_cfg_t VSF_MACRO_SAFE_NAME(cfg) = {                          \
                 .fn.evthandler = (vsf_pt_entry_t)__vsf_pt_func(__name),         \
                 .priority = (__pri),                                            \
-                .feature.is_use_frame = true,                                   \
                 .target = (uintptr_t)&((__pt)->param),                          \
                 __VA_ARGS__                                                     \
             };                                                                  \
