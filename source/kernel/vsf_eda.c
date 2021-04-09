@@ -457,17 +457,19 @@ bool __vsf_eda_return(uintptr_t return_value)
     }
 
     if (frame != NULL) {
+        /*! \note automatically free a frame if the top eda doesn't set 
+         *!       is_use_frame 
+         */
         {
             __vsf_eda_frame_t *frame_caller = __vsf_eda_peek_frame((vsf_slist_t *)frame);
             if (    (NULL == frame_caller)                      //!< top frame
                 &&  !frame->state.feature.is_use_frame) {       //!< not force frame
-
                 this_ptr->flag.feature = frame->state.feature;
                 vsf_eda_free_frame(frame);
             }
         }
 
-    do_return:
+do_return:
 #   if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
         if (this_ptr->flag.feature.is_stack_owner) {
 #       if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
@@ -832,7 +834,9 @@ static void __vsf_eda_init_member(
 }
 
 SECTION(".text.vsf.kernel.eda")
-vsf_err_t __vsf_eda_init(vsf_eda_t *this_ptr, vsf_prio_t priority, vsf_eda_feature_t feature)
+vsf_err_t __vsf_eda_init(   vsf_eda_t *this_ptr, 
+                            vsf_prio_t priority, 
+                            vsf_eda_feature_t feature)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     __vsf_eda_init_member(this_ptr, priority, feature);
