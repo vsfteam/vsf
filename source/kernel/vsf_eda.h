@@ -610,6 +610,14 @@ typedef void (*vsf_param_eda_evthandler_t)(uintptr_t target, vsf_evt_t evt);
 typedef union vsf_eda_feature_t {
     struct {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+    /*! \note  is_use_frame is used by vsf_peda and sub-call
+     *!        since both vsf_peda and sub-call will share most of the functions
+     *!        used for frame push and pop operation, it has little gain to 
+     *!        only disable sub-call feature but keep vsf_peda. Hence, to reduce
+     *!        complexity, we only use VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL to
+     *!        enable or disable the is_use_frame bit and frame related 
+     *!        functions.
+     */     
         uint8_t                 is_use_frame : 1;
 #endif
 #if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
