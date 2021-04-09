@@ -1102,7 +1102,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_eda_queue_t *queue = vsf_eda_get_cur_msg();
             VSF_KERNEL_ASSERT(queue != NULL);
 
-            SECTION(".text.vsf.kernel.vsf_queue")
+            SECTION(".text.vsf.kernel.vsf_eda_queue")
             void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_t orig);
 
             vsf_protect_t origlevel = vsf_protect_sched();
@@ -1113,7 +1113,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_eda_queue_t *queue = vsf_eda_get_cur_msg();
             VSF_KERNEL_ASSERT(queue != NULL);
 
-            SECTION(".text.vsf.kernel.vsf_queue")
+            SECTION(".text.vsf.kernel.vsf_eda_queue")
             void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_t orig);
 
             vsf_protect_t origlevel = vsf_protect_sched();
