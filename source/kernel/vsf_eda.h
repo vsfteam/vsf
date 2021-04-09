@@ -615,7 +615,7 @@ typedef union vsf_eda_feature_t {
 #if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
         uint8_t                 is_stack_owner : 1;
 #endif
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
         uint8_t                 is_fsm : 1;
 #endif
         uint8_t                 user_bits : VSF_KERNEL_CFG_EDA_USER_BITLEN;
