@@ -470,8 +470,12 @@ bool __vsf_eda_return(uintptr_t return_value)
     do_return:
 #   if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
         if (this_ptr->flag.feature.is_stack_owner) {
+#       if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
             extern void __vsf_eda_return_to_thread(vsf_eda_t *eda);
             __vsf_eda_return_to_thread(this_ptr);
+#       else
+            VSF_KERNEL_ASSERT(false);
+#       endif
         } else {
             __vsf_dispatch_evt(this_ptr, VSF_EVT_RETURN);
         }
