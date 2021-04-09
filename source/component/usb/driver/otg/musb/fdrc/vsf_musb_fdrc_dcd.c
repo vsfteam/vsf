@@ -134,7 +134,7 @@ void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
 
     VSF_USB_ASSERT(MUSB_FDRC_USBD_EP0_WAIT_SETUP == usbd->ep0_state);
     usbd->has_data_stage = false;
-    if (!(buffer[0] & 0x80)) {
+    if (!(buffer[0] & 0x80) && ((buffer[6] != 0) || (buffer[7] != 0))) {
         usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_OUT;
     }
 }
