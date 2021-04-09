@@ -21,12 +21,13 @@
 /*============================ INCLUDES ======================================*/
 #include "./kernel/vsf_kernel_cfg.h"
 
-#if VSF_USE_KERNEL == ENABLED
 #include "service/vsf_service.h"
 #include "../vsf_eda.h"
 #include "./vsf_pt.h"
 #include "./vsf_thread.h"
 #include "./vsf_fsm.h"
+
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED
 
 #ifdef __cplusplus
 extern "C" {

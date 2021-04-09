@@ -19,7 +19,9 @@
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
-
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK != ENABLED
+#   error this example requires VSF_KERNEL_CFG_EDA_SUPPORT_TASK to be ENABLED
+#endif
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

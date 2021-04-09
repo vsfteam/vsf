@@ -77,6 +77,7 @@
 
 #define VSF_USE_TRACE                               DISABLED
 #define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM       ENABLED
+//#define VSF_KERNEL_CFG_EDA_SUPPORT_TASK             DISABLED
 //#define VSF_POOL_LOCK()             
 //#define VSF_POOL_UNLOCK()
 /*============================ TYPES =========================================*/

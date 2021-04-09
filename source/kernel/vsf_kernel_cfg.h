@@ -139,6 +139,10 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   define VSF_KERNEL_USE_SIMPLE_SHELL                      ENABLED
 #endif
 
+#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_TASK     
+#   define VSF_KERNEL_CFG_EDA_SUPPORT_TASK                  ENABLED
+#endif
+
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_PT
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_PT                    ENABLED
 #endif

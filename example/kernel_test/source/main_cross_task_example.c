@@ -19,6 +19,10 @@
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK != ENABLED
+#   error this example requires VSF_KERNEL_CFG_EDA_SUPPORT_TASK to be ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 dcl_vsf_pt(user_pt_task_t)
@@ -39,7 +43,7 @@ def_vsf_pt(user_pt_called_by_thread_t,
         uint32_t cnt;
     ));
 
-#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED  
 def_vsf_task(user_sub_task_t,
     def_params(      
         uint32_t cnt;

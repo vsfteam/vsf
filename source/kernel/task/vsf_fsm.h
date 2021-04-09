@@ -46,9 +46,10 @@
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM        DISABLED
 #endif
 
-#if     VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                               \
+#if     VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                  \
     &&  VSF_USE_KERNEL == ENABLED                                               \
-    &&  VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM == ENABLED                        \
+    &&  VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED
 
 #ifdef __cplusplus
 extern "C" {
