@@ -136,7 +136,7 @@ extern "C" {
 #define vsf_eda_call_pt(__name, __target)                                       \
             __vsf_pt_call_sub(vsf_pt_func(__name), (__target))
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define __vsf_pt_call_fsm(__name, __target, ...)                             \
             __vsf_eda_call_fsm( (vsf_fsm_entry_t)(__name),                      \
                                 (uintptr_t)(__target),                          \

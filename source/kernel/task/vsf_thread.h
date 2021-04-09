@@ -344,7 +344,7 @@ extern "C" {
 
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 
 #   define vsf_thread_call_fsm(__name, __target, ...)                           \
                 vk_thread_call_fsm(  (vsf_fsm_entry_t)(__name),                 \

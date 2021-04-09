@@ -24,7 +24,7 @@
 declare_vsf_task(user_task_t)
 declare_vsf_task(user_sub_task_t)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 def_vsf_task(user_sub_task_t,
     def_params(
         uint32_t cnt;
@@ -35,7 +35,7 @@ def_vsf_task(user_task_t,
     def_params(
         vsf_sem_t *sem_ptr;
         uint32_t cnt;
-    #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+    #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         vsf_task(user_sub_task_t) print_task;
     #endif
     ));
@@ -69,7 +69,7 @@ def_vsf_thread(user_thread_a_t, 1024,
 static NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 implement_vsf_task(user_sub_task_t) 
 {
     vsf_task_begin();
@@ -97,7 +97,7 @@ implement_vsf_task(user_task_t)
         case WAIT_FOR_SEM:    
             
             vsf_task_wait_until(vsf_sem_pend(vsf_this.sem_ptr));                       //!< wait for semaphore forever  
-        #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+        #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
             prepare_vsf_task(user_sub_task_t, &vsf_this.print_task);
             vsf_this.print_task.cnt = vsf_this.cnt;                                     //!< passing parameter
         #endif
@@ -105,7 +105,7 @@ implement_vsf_task(user_task_t)
             break;
             
         case CALL_SUB_TO_PRINT:
-        #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+        #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
             if (fsm_rt_cpl == vsf_task_call_task(user_sub_task_t, 
                                             &vsf_this.print_task)) {
                 //! task complete

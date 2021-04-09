@@ -95,7 +95,7 @@ extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *this_ptr);
 extern vsf_prio_t __vsf_os_evtq_get_priority(vsf_evtq_t *this_ptr);
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
 static void __vsf_eda_fsm_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 #endif
@@ -208,7 +208,7 @@ void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if      VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                           \
+#   if      VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                           \
         ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
     this_ptr->flag.state.is_evt_incoming = false;
 #   endif
@@ -217,7 +217,7 @@ void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
         __vsf_eda_frame_t *frame = this_ptr->fn.frame;
         VSF_KERNEL_ASSERT(frame != NULL);
 
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         if (this_ptr->flag.feature.is_subcall_has_return_value) {
             __vsf_eda_fsm_evthandler(this_ptr, evt);
         } else {
@@ -390,7 +390,7 @@ void vsf_eda_polling_state_set(vsf_eda_t *this_ptr, bool state)
 {
     VSF_KERNEL_ASSERT( NULL != this_ptr );
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED  \
-    &&  (   VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED \
+    &&  (   VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED \
         ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
     if (state) {
         this_ptr->flag.state.is_evt_incoming = true;
@@ -692,7 +692,7 @@ vsf_err_t __vsf_eda_call_eda(   uintptr_t evthandler,
     return __vsf_eda_call_eda_ex(evthandler, param, state, true);
 }
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
 fsm_rt_t __vsf_eda_call_fsm(vsf_fsm_entry_t entry,
                             uintptr_t param,
@@ -765,7 +765,7 @@ static void __vsf_eda_fsm_evthandler(vsf_eda_t *this_ptr, vsf_evt_t evt)
     }
 }
 
-#endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
+#endif      // VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 
 
@@ -826,7 +826,7 @@ static void __vsf_eda_init_member(
 
     this_ptr->flag.value = 0;
     this_ptr->flag.feature = feature;
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
     this_ptr->fsm_return_state = fsm_rt_on_going;
 #endif
 
@@ -953,7 +953,7 @@ vsf_err_t vsf_eda_post_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
-    &&  (   VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                           \
+    &&  (   VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                           \
         ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
     if (this_ptr->flag.state.is_evt_incoming && evt == VSF_EVT_YIELD) {
         return VSF_ERR_NONE;

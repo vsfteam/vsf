@@ -167,7 +167,7 @@ implement_vsf_task(timer_example_t)
         vsf_teda_set_timer_ms(delay);
         break;
 	}
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
     return fsm_rt_wait_for_evt;
 #endif
     vsf_task_end();

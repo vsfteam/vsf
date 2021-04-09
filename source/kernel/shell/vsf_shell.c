@@ -94,7 +94,7 @@ const struct {
     .is_support_dynamic_priority =  (VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY ? (true) : false),
     .is_support_on_terminate =      (VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE ? true : false),
     .is_support_sub_call =          (VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL ? (true) : false),
-    .is_support_fsm =               (VSF_KERNEL_CFG_EDA_SUPPORT_FSM ? (true) : false),
+    .is_support_fsm =               (VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE ? (true) : false),
 
     .Major =                        1,
     .Minor =                        0x20,

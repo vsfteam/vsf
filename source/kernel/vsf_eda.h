@@ -615,7 +615,7 @@ typedef union vsf_eda_feature_t {
 #if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
         uint8_t                 is_stack_owner : 1;
 #endif
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         uint8_t                 is_subcall_has_return_value : 1;
 #endif
         uint8_t                 user_bits : VSF_KERNEL_CFG_EDA_USER_BITLEN;
@@ -645,7 +645,7 @@ typedef union __vsf_eda_state_t {
         uint8_t                 is_timed : 1;
 #endif
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if      VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED                           \
+#   if      VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                           \
         ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
         uint8_t                 is_evt_incoming : 1;
 #   endif
@@ -743,7 +743,7 @@ def_simple_class(vsf_eda_t) {
         uintptr_t               evt_pending;
 #   endif
 
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         /* value holder for enum fsm_rt_t */
         int8_t                  fsm_return_state;
 #   endif
@@ -1140,12 +1140,12 @@ extern vsf_err_t vsf_eda_target_set(uintptr_t param);
 SECTION(".text.vsf.kernel.vsf_eda_target_get")
 extern uintptr_t vsf_eda_target_get(void);
 
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if     VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 SECTION(".text.vsf.kernel.eda_fsm")
 extern fsm_rt_t __vsf_eda_call_fsm( vsf_fsm_entry_t entry,
                                     uintptr_t param,
                                     size_t local_size);
-#   endif      // VSF_KERNEL_CFG_EDA_SUPPORT_FSM
+#   endif      // VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
 
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 

@@ -517,7 +517,7 @@ vsf_err_t vk_thread_call_thread(vsf_thread_cb_t *thread_cb,
                                     (uintptr_t)thread_cb, state, 0, (uintptr_t)NULL);
 }
 
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 SECTION(".text.vsf.kernel.vk_thread_call_fsm")
 fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t local_size)
 {

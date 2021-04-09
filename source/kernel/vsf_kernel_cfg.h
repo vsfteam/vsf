@@ -90,17 +90,28 @@
 #ifndef VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL              ENABLED
 #endif
-#ifndef VSF_KERNEL_CFG_EDA_SUPPORT_FSM
-#   define VSF_KERNEL_CFG_EDA_SUPPORT_FSM                   ENABLED
+
+/*! \note VSF_KERNEL_CFG_EDA_SUPPORT_FSM is deprecated. It will be removed
+ *!       soon. Please do not use it.
+ *!       TODO: Remove VSF_KERNEL_CFG_EDA_SUPPORT_FSM in the future
+ */
+
+#if defined(VSF_KERNEL_CFG_EDA_SUPPORT_FSM)
+#   define VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE                          \
+                VSF_KERNEL_CFG_EDA_SUPPORT_FSM
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#ifndef VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE
+#   define VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE      ENABLED
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
-#       warning "Since VSF_KERNEL_CFG_EDA_SUPPORT_FSM is ENABLED \
+#       warning "Since VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE is ENABLED \
 and it requires VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL also be set to \
 ENABLED, to allow the compilation continue, \
 VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is forced to ENABLED. If this is \
-not what you want, please disable VSF_KERNEL_CFG_EDA_SUPPORT_FSM."
+not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #       undef VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL
 #       define VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL          ENABLED
 #   endif

@@ -24,7 +24,7 @@ dcl_vsf_pt(user_pt_task_t)
 dcl_vsf_pt(user_pt_sub_t)
 dcl_vsf_pt(user_pt_called_by_thread_t)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 dcl_vsf_task(user_sub_task_t)
 #endif
 
@@ -38,7 +38,7 @@ def_vsf_pt(user_pt_called_by_thread_t,
         uint32_t cnt;
     ));
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 def_vsf_task(user_sub_task_t,
     def_params(
         uint32_t cnt;
@@ -61,11 +61,11 @@ def_vsf_pt(user_pt_task_t,
         uint32_t cnt;
 
         vsf_pt(user_pt_sub_t)       print_task;
-    #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+    #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         vsf_task(user_sub_task_t)   progress_task;
     #endif
     #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
-        &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+        &&  VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         vsf_thread(user_thread_b_t) thread_task;
     #endif
     ));
@@ -141,7 +141,7 @@ private imp_vsf_pt(user_pt_sub_t)
 
 #define RESET_FSM()     do {vsf_task_state = 0;} while(0)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 private imp_vsf_task(user_sub_task_t)
 {
     vsf_task_begin();
@@ -194,7 +194,7 @@ private imp_vsf_pt(user_pt_task_t)
         vsf_trace_info("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
     #endif
 
-    #if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+    #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         prepare_vsf_task(user_sub_task_t,&vsf_this.progress_task);
         do {
             fsm_rt_t ret;
@@ -207,7 +207,7 @@ private imp_vsf_pt(user_pt_task_t)
     #endif
 
     #if     VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED                            \
-        &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+        &&  VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         vsf_pt_call_thread(user_thread_b_t, &(vsf_this.thread_task));
     #endif
 

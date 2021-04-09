@@ -34,13 +34,13 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
-    &&  VSF_KERNEL_CFG_EDA_SUPPORT_FSM == DISABLED
+    &&  VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == DISABLED
 // remove warnings until fixed
 //#warning \
  Although VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is enabled, but\
- VSF_KERNEL_CFG_EDA_SUPPORT_FSM is disabled, hence vsf_task will be treated as\
+ VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE is disabled, hence vsf_task will be treated as\
  VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is disabled. If this is not what you wanted,\
- please set VSF_KERNEL_CFG_EDA_SUPPORT_FSM to ENABLED.
+ please set VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE to ENABLED.
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -51,7 +51,7 @@ extern "C" {
 #define __vsf_task(__name)          task_cb_##__name
 #define vsf_task(__name)            __vsf_task(__name)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define __implement_vsf_task(__name)                                         \
         fsm_rt_t vsf_task_func(__name)( uintptr_t local,                        \
                                         vsf_evt_t evt)                          \
@@ -88,7 +88,7 @@ extern "C" {
 #   define vsf_task_start           vsf_eda_start
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define __def_vsf_task(__name,...)                                           \
         struct task_cb_##__name {                                               \
             uint8_t fsm_state;                                                  \
@@ -131,7 +131,7 @@ extern "C" {
 
 #define prp_vsf_task(__name, __task)        prepare_vsf_task(__name, __task)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define __init_vsf_task(__name, __task, __pri, ...)                          \
         do {                                                                    \
             vsf_eda_cfg_t VSF_MACRO_SAFE_NAME(cfg) = {                          \
@@ -164,7 +164,7 @@ extern "C" {
             __init_vsf_task(__name, (__task), (__pri), __VA_ARGS__)
 
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #define vsf_task_call_fsm(__name, __target, ...)                                \
             __vsf_eda_call_fsm( (vsf_task_entry_t)(__name),                     \
                                 (uintptr_t)(__target), (0, ##__VA_ARGS__))
@@ -174,7 +174,7 @@ extern "C" {
                                 (uintptr_t)(__target), (0, ##__VA_ARGS__))
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define vsf_task_call_sub(__name, __target, ...)                             \
             if (VSF_ERR_NONE != __vsf_eda_call_eda(                             \
                     (vsf_task_entry_t)(__name),                                 \
@@ -229,7 +229,7 @@ extern "C" {
  *        vsf_task_wait_until( vsf_delay(...) ) ;
  *
  */
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 #   define vsf_task_wait_until(...)                                             \
             __VA_ARGS__ {} else {                                               \
                 return fsm_rt_wait_for_evt;                                     \
@@ -250,7 +250,7 @@ typedef vsf_teda_t  vsf_task_t;
 typedef vsf_eda_t  vsf_task_t;
 #   endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_FSM == ENABLED
+#if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
 typedef vsf_fsm_entry_t         vsf_task_entry_t;
 #else
 typedef vsf_eda_evthandler_t    vsf_task_entry_t;
