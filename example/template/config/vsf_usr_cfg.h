@@ -50,6 +50,8 @@
 #define VSF_USE_FIFO                                    ENABLED
 #define VSF_USE_JSON                                    ENABLED
 #define VSF_USE_DISTBUS                                 ENABLED
+#define VSF_USE_HASH                                    ENABLED
+#define VSF_HASH_USE_CRC                                ENABLED
 
 #if APP_USE_USBH_DEMO == ENABLED
 #   define VSF_USE_USB_HOST                             ENABLED
