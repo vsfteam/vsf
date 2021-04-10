@@ -50,6 +50,7 @@ static void __vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
     reg->Common.IntrUSBE = MUSB_INTRUSBE_RESET;
     usbd->ep_buf_ptr = 0;
     usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+    usbd->flag_int.is_status_notified = true;
 }
 
 vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
@@ -61,7 +62,7 @@ vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
     usbd->param->op->GetInfo(&info);
     usbd->reg = info.regbase;
     usbd->ep_num = info.ep_num;
-    usbd->is_dma = info.is_dma;
+    usbd->flag.is_dma = info.is_dma;
 
     usbd->callback.evt_handler = cfg->evt_handler;
     usbd->callback.param = cfg->param;
@@ -131,10 +132,8 @@ uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd)
 void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
 {
     vk_musb_fdrc_usbd_ep_transaction_read_buffer(usbd, 0, buffer, 8);
-
-    VSF_USB_ASSERT(MUSB_FDRC_USBD_EP0_WAIT_SETUP == usbd->ep0_state);
-    usbd->has_data_stage = false;
-    if (!(buffer[0] & 0x80) && ((buffer[6] != 0) || (buffer[7] != 0))) {
+    usbd->flag.has_data_stage = (buffer[6] != 0) || (buffer[7] != 0);
+    if ((buffer[0] & 0x80) && usbd->flag.has_data_stage) {
         usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_OUT;
     }
 }
@@ -143,7 +142,7 @@ void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
 {
     vk_musb_fdrc_reg_t *reg = usbd->reg;
 
-    if (usbd->has_data_stage) {
+    if (usbd->flag.has_data_stage) {
         uint_fast8_t ep_orig = vk_musb_fdrc_set_ep(reg, 0);
         reg->EP0.CSR0 |= MUSBD_CSR0_DATAEND | MUSBD_CSR0_SERVICEDRXPKGRDY;
         vk_musb_fdrc_set_ep(reg, ep_orig);
@@ -153,7 +152,7 @@ void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
 
 uint_fast8_t vk_musb_fdrc_usbd_ep_get_feature(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, uint_fast8_t feature)
 {
-    return usbd->is_dma ? USB_DC_FEATURE_TRANSFER : 0;
+    return usbd->flag.is_dma ? USB_DC_FEATURE_TRANSFER : 0;
 }
 
 vsf_err_t vk_musb_fdrc_usbd_ep_add(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
@@ -440,27 +439,35 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
 
         if (csr1 & MUSBD_CSR0_SENTSTALL) {
             reg->EP0.CSR0 &= ~MUSBD_CSR0_SENTSTALL;
-            vk_musb_fdrc_set_ep(reg, ep_orig);
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
         }
 
         if (csr1 & MUSBD_CSR0_SETUPEND) {
             reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDSETUPEND;
-            vk_musb_fdrc_set_ep(reg, ep_orig);
 
-            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
-            usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+            if (!usbd->flag_int.is_status_notified) {
+                usbd->flag_int.is_status_notified = true;
+                __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+            }
         }
+        vk_musb_fdrc_set_ep(reg, ep_orig);
 
         if (csr1 & MUSBD_CSR0_RXPKTRDY) {
             switch (usbd->ep0_state) {
             case MUSB_FDRC_USBD_EP0_WAIT_SETUP:
+                if (!usbd->flag_int.is_status_notified) {
+                    // setup notified, but not processed yet.
+                    //  actually, here is on_data_out
+                    // TODO: is it possible that here is on_status?
+                    goto on_data_out;
+                }
             on_setup:
+                usbd->flag_int.is_status_notified = false;
                 __vk_musb_fdrc_usbd_notify(usbd, USB_ON_SETUP, 0);
                 break;
             case MUSB_FDRC_USBD_EP0_DATA_OUT:
-                usbd->has_data_stage = true;
-
+            on_data_out:
                 orig = vsf_protect_int();
                 if (usbd->out_mask & 1) {
                     usbd->out_mask &= ~1;
@@ -472,8 +479,11 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                 }
                 break;
             case MUSB_FDRC_USBD_EP0_STATUS:
-                __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
-                usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+                if (!usbd->flag_int.is_status_notified) {
+                    usbd->flag_int.is_status_notified = true;
+                    __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
+                    usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+                }
                 goto on_setup;
             default:
                 VSF_USB_ASSERT(false);
@@ -482,7 +492,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
         // MUSBD_CSR0_TXPKTRDY is cleared by hardare
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
-            usbd->has_data_stage = true;
+            usbd->ep0_state = MUSB_FDRC_USBD_EP0_DUMMY;
             __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
         }
     }
