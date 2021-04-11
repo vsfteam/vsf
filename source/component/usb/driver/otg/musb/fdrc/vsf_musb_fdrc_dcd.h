@@ -52,7 +52,7 @@ typedef struct vk_musb_fdrc_dcd_param_t {
 dcl_simple_class(vk_musb_fdrc_dcd_t)
 
 typedef enum vk_musb_fdrc_dcd_ep0state_t {
-    MUSB_FDRC_USBD_EP0_DUMMY,
+    MUSB_FDRC_USBD_EP0_IDLE,
     MUSB_FDRC_USBD_EP0_WAIT_SETUP,
     MUSB_FDRC_USBD_EP0_DATA_IN,
     MUSB_FDRC_USBD_EP0_DATA_OUT,
@@ -73,24 +73,11 @@ def_simple_class(vk_musb_fdrc_dcd_t) {
         } callback;
         uint16_t ep_buf_ptr;
         uint16_t out_mask;
+        uint16_t control_size;
         vk_musb_fdrc_dcd_ep0state_t ep0_state;
         uint8_t ep_num;
-
-        // flags processed in usbd_interrupt
-        union {
-            struct {
-                uint8_t is_status_notified : 1;
-            };
-            uint8_t value;
-        } flag_int;
-        // flags processed in non-interrupt
-        union {
-            struct {
-                uint8_t is_dma : 1;
-                uint8_t has_data_stage : 1;
-            };
-            uint8_t value;
-        } flag;
+        bool is_dma;
+        bool is_status_notified;
     )
 };
 
