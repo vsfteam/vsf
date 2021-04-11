@@ -53,6 +53,9 @@
 #   ifndef VSF_SYNC_CFG_SUPPORT_ISR
 #       define VSF_SYNC_CFG_SUPPORT_ISR                     DISABLED
 #   endif
+#   ifndef VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE
+#       define VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE           DISABLED
+#   endif
 #endif
 
 
@@ -77,11 +80,6 @@
 #       warning "VSF_KERNEL_CFG_EDA_SUPPORT_TIMER MUST be enabled to use callback_timer"
 #       undef VSF_KERNEL_CFG_EDA_SUPPORT_TIMER
 #       define VSF_KERNEL_CFG_EDA_SUPPORT_TIMER             ENABLED
-#   endif
-#endif
-#if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
-#   ifndef VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR
-#       define VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR           ENABLED
 #   endif
 #endif
 
@@ -186,11 +184,6 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #ifndef VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE
 #   define VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE                 ENABLED
 #endif
-#if VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE == ENABLED
-#   ifndef VSF_EDA_QUEUE_CFG_SUPPORT_ISR
-#       define VSF_EDA_QUEUE_CFG_SUPPORT_ISR                ENABLED
-#   endif
-#endif
 
 
 #ifndef VSF_USR_SWI_NUM
@@ -294,6 +287,16 @@ VSF_OS_CFG_ADD_EVTQ_TO_IDLE"
 #endif
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+#   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+#       ifndef VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR
+#           define VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR       ENABLED
+#       endif
+#   endif
+#   if VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE == ENABLED
+#       ifndef VSF_EDA_QUEUE_CFG_SUPPORT_ISR
+#           define VSF_EDA_QUEUE_CFG_SUPPORT_ISR            ENABLED
+#       endif
+#   endif
 #   ifndef VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE
 #       define VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE           ENABLED
 #   endif
