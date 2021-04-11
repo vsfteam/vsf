@@ -638,9 +638,8 @@ vsf_err_t __vsf_eda_call_eda_prepare(   uintptr_t evthandler,
                                         uintptr_t param,
                                         size_t local_size)
 {
-    __vsf_eda_frame_state_t state   = {
-        .feature.is_subcall_has_return_value    = false,
-        .local_size                             = local_size,
+    __vsf_eda_frame_state_t state       = {
+        .local_size                     = local_size,
     };
     return __vsf_eda_call_eda_ex_prepare(evthandler, param, state, true);
 }
@@ -674,9 +673,7 @@ vsf_err_t __vsf_eda_call_eda_ex(uintptr_t func,
 SECTION(".text.vsf.kernel.__vsf_eda_go_to_ex")
 vsf_err_t __vsf_eda_go_to_ex(uintptr_t evthandler, uintptr_t param)
 {
-    __vsf_eda_frame_state_t state   = {
-        .feature.is_subcall_has_return_value    = false,
-    };
+    __vsf_eda_frame_state_t state = { 0 };
     return __vsf_eda_call_eda_ex(evthandler, param, state, false);
 }
 
@@ -686,8 +683,7 @@ vsf_err_t __vsf_eda_call_eda(   uintptr_t evthandler,
                                 size_t local_size)
 {
     __vsf_eda_frame_state_t state   = {
-        .feature.is_subcall_has_return_value    = false,
-        .local_size                             = local_size,
+        .local_size             = local_size,
     };
     return __vsf_eda_call_eda_ex(evthandler, param, state, true);
 }
@@ -859,7 +855,11 @@ vsf_err_t vsf_eda_start(vsf_eda_t *this_ptr, vsf_eda_cfg_t *cfg_ptr)
     this_ptr->fn.evthandler = cfg_ptr->fn.evthandler;
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-    if (cfg_ptr->feature.is_subcall_has_return_value || cfg_ptr->target) {
+    if (    cfg_ptr->target
+#   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
+        ||  cfg_ptr->feature.is_subcall_has_return_value
+#   endif
+    ) {
         //! override the is_use_frame flag
         cfg_ptr->feature.is_use_frame = true;
     }
