@@ -323,8 +323,8 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_read_buffer(vk_musb_fdrc_dcd_t *usbd,
             usbd->control_size -= size;
 
             if (!usbd->control_size || (size < 64)) {
-                reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY | MUSBD_CSR0_DATAEND;
                 usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
+                reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY | MUSBD_CSR0_DATAEND;
             } else {
                 reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
             }
@@ -366,16 +366,13 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_set_data_size(vk_musb_fdrc_dcd_t *usb
             VSF_USB_ASSERT(usbd->control_size >= size);
             usbd->control_size -= size;
 
-            uint_fast8_t ep0_int_en = reg->Common.IntrTx1E & 1;
-            reg->Common.IntrTx1E &= ~1;
-                usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
-                if (!usbd->control_size || (size < 64)) {
-                    reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY | MUSBD_CSR0_DATAEND;
-                    usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
-                } else {
-                    reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
-                }
-            reg->Common.IntrTx1E |= ep0_int_en;
+            usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
+            if (!usbd->control_size || (size < 64)) {
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
+                reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY | MUSBD_CSR0_DATAEND;
+            } else {
+                reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
+            }
         } else {
             reg->EPN.TxCSR1 |= MUSBD_TXCSR1_TXPKTRDY;
         }
