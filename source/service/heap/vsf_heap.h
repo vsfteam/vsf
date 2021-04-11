@@ -47,6 +47,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HEAP_SIZE
+#   warning VSF_HEAP_SIZE is not defined, use 128K as default
 #   define VSF_HEAP_SIZE    (128 * 1024)
 #endif
 
