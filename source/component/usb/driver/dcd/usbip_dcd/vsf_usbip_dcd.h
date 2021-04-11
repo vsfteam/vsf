@@ -345,9 +345,6 @@ typedef struct vk_usbip_urb_t {
     } state;
 } vk_usbip_urb_t;
 
-dcl_vsf_pool(vk_usbip_urb_poll)
-def_vsf_pool(vk_usbip_urb_poll, vk_usbip_urb_t)
-
 typedef struct vk_usbip_server_t {
     vk_usbip_dcd_t *usbd;
     vsf_teda_t teda;
@@ -402,9 +399,7 @@ typedef struct vk_usbip_server_t {
     } rep;
 
     vk_usbip_rep_dev_t dev;
-    vsf_pool(vk_usbip_urb_poll) urb_pool;
     vsf_dlist_t urb_list;
-    vsf_dlist_t urb_free_list;
     vk_usbip_urb_t *cur_urb;
 } vk_usbip_server_t;
 #endif

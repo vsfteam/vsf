@@ -324,7 +324,7 @@ __implement_vsf_pool_tag(__name)
                       __VSF_POOL)   /* the address of the pool */               \
                                     /* the address of the code region obj_ptr */\
             do {                                                                \
-                vsf_pool(__name) *this_ptr = (__VSF_POOL);                       \
+                vsf_pool(__name) *this_ptr = (__VSF_POOL);                      \
                 vsf_pool_cfg_t cfg = {                                          \
                     (const uint8_t *)#__NAME,
 

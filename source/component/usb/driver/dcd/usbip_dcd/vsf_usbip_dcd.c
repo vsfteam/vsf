@@ -48,8 +48,6 @@ static vk_usbip_server_t __vk_usbip_server;
 
 /*============================ IMPLEMENTATION ================================*/
 
-imp_vsf_pool(vk_usbip_urb_poll, vk_usbip_urb_t)
-
 static void __vk_usbip_usbd_notify(vk_usbip_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {
     if (usbd->callback.evt_handler != NULL) {
@@ -193,11 +191,12 @@ vsf_err_t __vk_usbip_server_done_urb(vk_usbip_server_t *server, vk_usbip_urb_t *
         __vk_usbip_server_trace_urb_done(urb);
     }
 
-    vsf_protect_t orig = vsf_protect_int();
-        vsf_dlist_add_to_tail(vk_usbip_urb_t, urb_node_ep, &server->urb_free_list, urb);
-    vsf_unprotect_int(orig);
-
     vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep_by_urb(server->usbd, urb);
+    if (urb->dynmem.buffer != NULL) {
+        vsf_heap_free(urb->dynmem.buffer);
+    }
+    vsf_heap_free(urb);
+
     return __vk_usbip_server_commit_urb(server, dcd_ep);
 }
 
@@ -232,7 +231,7 @@ static vsf_err_t __vk_usbip_server_submit_urb(vk_usbip_server_t *server, vk_usbi
 
 static void __vk_usbip_server_control_msg(vk_usbip_server_t *server, struct usb_ctrlrequest_t *req, uint8_t *buffer)
 {
-    vk_usbip_urb_t *urb = VSF_POOL_ALLOC(vk_usbip_urb_poll, &server->urb_pool);
+    vk_usbip_urb_t *urb = vsf_heap_malloc(sizeof(vk_usbip_urb_t));
     VSF_USB_ASSERT(urb != NULL);
 
     memset(urb, 0, sizeof(*urb));
@@ -268,23 +267,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        VSF_POOL_PREPARE(vk_usbip_urb_poll, &server->urb_pool);
         __vk_usbip_server_backend_init(server);
-        // fall through
-    case VSF_EVT_TIMER:
-        do {
-            orig = vsf_protect_int();
-                vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &server->urb_free_list, urb);
-            vsf_unprotect_int(orig);
-            if (urb != NULL) {
-                vsf_dlist_remove(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
-                if (urb->dynmem.buffer != NULL) {
-                    vsf_heap_free(urb->dynmem.buffer);
-                }
-                VSF_POOL_FREE(vk_usbip_urb_poll, &__vk_usbip_server.urb_pool, urb);
-            }
-        } while (urb != NULL);
-        vsf_teda_set_timer_ms(100);
         break;
     case VSF_USBIP_SERVER_EVT_BACKEND_INIT_DONE:
         if (server->err != VSF_ERR_NONE) {
@@ -343,7 +326,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 switch (server->command) {
                 case USBIP_CMD_SUBMIT:
                     __vk_usbip_server_trace("recv USBIP_CMD_SUBMIT" VSF_TRACE_CFG_LINEEND);
-                    urb = VSF_POOL_ALLOC(vk_usbip_urb_poll, &server->urb_pool);
+                    urb = vsf_heap_malloc(sizeof(vk_usbip_urb_t));
                     VSF_USB_ASSERT(urb != NULL);
 
                     memset(urb, 0, sizeof(*urb));
@@ -573,7 +556,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             desc.header = (struct usb_descriptor_header_t *)((uint8_t *)desc.header + desc.header->bLength);
                         }
 
-                        VSF_POOL_FREE(vk_usbip_urb_poll, &server->urb_pool, urb);
+                        vsf_heap_free(urb);
                         server->rep_state = VSF_USBIP_SERVER_REP_DONE;
                         __vk_usbip_server_backend_send((uint8_t *)dev, sizeof(*dev) - sizeof(dev->ifs) + dev->bNumInterfaces * sizeof(dev->ifs[0]));
                     }
