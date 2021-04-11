@@ -36,8 +36,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
     &&  VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == DISABLED
-// remove warnings until fixed
-//#warning \
+#warning \
  Although VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is enabled, but\
  VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE is disabled, hence vsf_task will be treated as\
  VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is disabled. If this is not what you wanted,\

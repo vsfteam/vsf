@@ -207,12 +207,13 @@ void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
     vsf_eda_trace(this_ptr, evt);
 #endif
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if      VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                           \
-        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
-    this_ptr->flag.state.is_evt_incoming = false;
+#   if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
+    vsf_protect_t origlevel = vsf_protect_int();
+        this_ptr->is_evt_incoming = false;
+    vsf_unprotect_int(origlevel);
 #   endif
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     if (this_ptr->flag.feature.is_use_frame) {
         __vsf_eda_frame_t *frame = this_ptr->fn.frame;
         VSF_KERNEL_ASSERT(frame != NULL);
@@ -389,11 +390,11 @@ SECTION(".text.vsf.kernel.vsf_eda_polling_state_set")
 void vsf_eda_polling_state_set(vsf_eda_t *this_ptr, bool state)
 {
     VSF_KERNEL_ASSERT( NULL != this_ptr );
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED  \
-    &&  (   VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED \
-        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
+#if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
     if (state) {
-        this_ptr->flag.state.is_evt_incoming = true;
+        vsf_protect_t origlevel = vsf_protect_int();
+            this_ptr->is_evt_incoming = true;
+        vsf_unprotect_int(origlevel);
     }
 #endif
     this_ptr->flag.feature.user_bits = state ? 1 : 0;
@@ -952,13 +953,14 @@ SECTION(".text.vsf.kernel.eda")
 vsf_err_t vsf_eda_post_evt(vsf_eda_t *this_ptr, vsf_evt_t evt)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                          \
-    &&  (   VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                           \
-        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
-    if (this_ptr->flag.state.is_evt_incoming && evt == VSF_EVT_YIELD) {
+#if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
+    vsf_protect_t origlevel = vsf_protect_int();
+    if (this_ptr->is_evt_incoming && evt == VSF_EVT_YIELD) {
+        vsf_unprotect_int(origlevel);
         return VSF_ERR_NONE;
     }
-    this_ptr->flag.state.is_evt_incoming = true;
+    this_ptr->is_evt_incoming = true;
+    vsf_unprotect_int(origlevel);
 #endif
 
     return vsf_evtq_post_evt(this_ptr, evt);

@@ -195,10 +195,10 @@ static void __vsf_teda_timer_enqueue(vsf_teda_t *this_ptr, vsf_timer_tick_t due)
 
     vsf_timq_insert(&__vsf_eda.timer.timq, this_ptr);
     this_ptr->use_as__vsf_eda_t.flag.state.is_timed = true;
-#if     VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED                      \
-    &&  (   VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                       \
-        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED)
-    this_ptr->use_as__vsf_eda_t.flag.state.is_evt_incoming = true;
+#if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
+    vsf_protect_t origlevel = vsf_protect_int();
+        this_ptr->use_as__vsf_eda_t.is_evt_incoming = true;
+    vsf_unprotect_int(origlevel);
 #endif
 }
 

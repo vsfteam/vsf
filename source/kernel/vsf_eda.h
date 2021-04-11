@@ -652,12 +652,6 @@ typedef union __vsf_eda_state_t {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         uint8_t                 is_timed : 1;
 #endif
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-#   if      VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED                           \
-        ||  VSF_KERNEL_CFG_EDA_SUPPORT_PT == ENABLED
-        uint8_t                 is_evt_incoming : 1;
-#   endif
-#endif
     };
     uint8_t                     value;
 } __vsf_eda_state_t;
@@ -754,6 +748,9 @@ def_simple_class(vsf_eda_t) {
 #   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
         /* value holder for enum fsm_rt_t */
         int8_t                  fsm_return_state;
+#   endif
+#   if VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT == ENABLED
+        bool                    is_evt_incoming;
 #   endif
         __vsf_eda_flag_t        flag;
     )

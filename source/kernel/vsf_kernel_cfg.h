@@ -149,6 +149,10 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM            ENABLED
 #endif
 
+#ifndef VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT
+#   define VSF_KERNEL_OPT_AVOID_UNNECESSARY_YIELD_EVT       ENABLED
+#endif
+
 
 
 #define VSF_OS_CFG_MAIN_MODE_NONE                           0
