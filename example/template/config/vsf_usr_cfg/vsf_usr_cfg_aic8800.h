@@ -40,9 +40,6 @@
 // enable VSF_EDA_QUEUE_CFG_REGION and VSF_EDA_QUEUE_CFG_SUPPORT_ISR
 #define VSF_EDA_QUEUE_CFG_REGION                        ENABLED
 #define VSF_EDA_QUEUE_CFG_SUPPORT_ISR                   ENABLED
-// TODO: check the atomic integrality of is_evt_comming used by pt and fsm
-#define VSF_KERNEL_CFG_EDA_SUPPORT_PT                   DISABLED
-#define VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE     DISABLED
 
 // Use unused interrupt as SWI
 #define VSF_DEV_SWI_NUM                                 4
