@@ -1,0 +1,133 @@
+ .../template/config/vsf_usr_cfg/vsf_usr_cfg_win.h  |  2 +-
+ .../template/project/vc/vsf_template_win.vcxproj   | 12 +++++--
+ .../project/vc/vsf_template_win.vcxproj.filters    | 39 ++++++++++++++++++++++
+ 3 files changed, 49 insertions(+), 4 deletions(-)
+
+diff --git a/example/template/config/vsf_usr_cfg/vsf_usr_cfg_win.h b/example/template/config/vsf_usr_cfg/vsf_usr_cfg_win.h
+index 2600e55d..325950dc 100644
+--- a/example/template/config/vsf_usr_cfg/vsf_usr_cfg_win.h
++++ b/example/template/config/vsf_usr_cfg/vsf_usr_cfg_win.h
+@@ -93,7 +93,7 @@
+ #define APP_USE_SOCKET_DEMO                             ENABLED
+ #define APP_USE_GATO_DEMO                               ENABLED
+ #define APP_USE_NUKLEAR_DEMO                            ENABLED
+-#define APP_USE_EVM_DEMO                                DISABLED
++#define APP_USE_EVM_DEMO                                ENABLED
+ #   define VSF_EVM_USE_BLUETOOTH                        DISABLED
+ #define APP_USE_LUA_DEMO                                ENABLED
+ #define APP_USE_COREMARK_DEMO                           ENABLED
+diff --git a/example/template/project/vc/vsf_template_win.vcxproj b/example/template/project/vc/vsf_template_win.vcxproj
+index ae646efd..ff438532 100644
+--- a/example/template/project/vc/vsf_template_win.vcxproj
++++ b/example/template/project/vc/vsf_template_win.vcxproj
+@@ -44,6 +44,8 @@
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\l2cap_signaling.h" />
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\coremark\port\core_portme.h" />
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\coremark\raw\coremark.h" />
++    <ClInclude Include="..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.h" />
++    <ClInclude Include="..\..\..\..\source\component\3rd-party\evm\extension\usbh\evm_module_usbh.h" />
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\ft2build.h" />
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\vsf_config\ftconfig.h" />
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\freetype\port\vsf_config\ftheader.h" />
+@@ -697,6 +699,9 @@
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\coremark\raw\core_matrix.c" />
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\coremark\raw\core_state.c" />
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\coremark\raw\core_util.c" />
++    <ClCompile Include="..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.c" />
++    <ClCompile Include="..\..\..\..\source\component\3rd-party\evm\extension\usbh\evm_module_usbh.c" />
++    <ClCompile Include="..\..\..\..\source\component\3rd-party\evm\port\evm_main.c" />
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\builds\windows\ftdebug.c" />
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\autofit\autofit.c" />
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\base\ftbase.c" />
+@@ -1278,6 +1283,7 @@
+     <ClCompile Include="..\..\demo\common\usrapp_usbd_common.c" />
+     <ClCompile Include="..\..\demo\common\usrapp_usbh_common.c" />
+     <ClCompile Include="..\..\demo\cpp_demo\cpp_demo.cpp" />
++    <ClCompile Include="..\..\demo\evm_demo\evm_demo.c" />
+     <ClCompile Include="..\..\demo\fakefat32.c" />
+     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
+     <ClCompile Include="..\..\demo\gato_demo\gato_application.c" />
+@@ -1378,7 +1384,7 @@
+       <SDLCheck>true</SDLCheck>
+       <PreprocessorDefinitions>__CPU_X86__;__WIN__;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LV_CONF_INCLUDE_SIMPLE;HAS_STD_MALLOC;HAS_AWTK_CONFIG;FT2_BUILD_LIBRARY;PREDEF_STANDARD_C_1999;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <ConformanceMode>true</ConformanceMode>
+-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\lwip;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\..\..\source;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include;$(ProjectDir)..\..\..\..\source\shell\sys\linux\include\simple_libc;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include\SDL2;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\include;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf;$(ProjectDir)..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include;$(ProjectDir)..\..\..\..\source\shell\sys\xboot\include\arch;$(ProjectDir)..\..\config;$(ProjectDir)..\..\config\lwip;$(ProjectDir)lib\awtk\include;$(ProjectDir)lib\awtk\include\ext_widgets;$(ProjectDir)lib\npcap\Include;$(ProjectDir)lib\libwdi;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\raw\inc;$(ProjectDir)..\..\..\..\source\component\3rd-party\nnom\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\lvgl\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\src;$(ProjectDir)..\..\..\..\source\component\3rd-party\btstack\raw\chipset;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\freetype\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\vsfvm\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\zlib-1.2.11;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\jpeg-9c;$(ProjectDir)..\..\..\..\source\component\3rd-party\xboot\raw\src\external\libpng-1.6.37;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\raw\src\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\lwip\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\gato\raw\include;$(ProjectDir)..\..\..\..\source\component\3rd-party\nuklear\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\coremark\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libpng\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\lua\extension\lovevsf;$(ProjectDir)..\..\..\..\source\component\3rd-party\zlib\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw;$(ProjectDir)..\..\..\..\source\component\3rd-party\evm\port;$(ProjectDir)..\..\..\..\source\component\3rd-party\evm\extension\oo;$(ProjectDir)..\..\..\..\source\component\3rd-party\evm\raw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <AdditionalOptions>-fms-extensions %(AdditionalOptions)</AdditionalOptions>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+       <ExceptionHandling>false</ExceptionHandling>
+@@ -1388,8 +1394,8 @@
+     <Link>
+       <SubSystem>Console</SubSystem>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+-      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;$(ProjectDir)\lib\libwdi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;libwdi.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalLibraryDirectories>$(ProjectDir)\lib\libusb;$(ProjectDir)\lib\libusb-win32;$(ProjectDir)\lib\SDL2\lib\x86;$(ProjectDir)\lib\npcap\Lib;$(ProjectDir)\lib\libwdi;$(ProjectDir)\..\..\..\..\source\component\3rd-party\evm\raw\lib\x86\linux32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>SDL2.lib;SDL2main.lib;wpcap.lib;libusb-1.0.lib;libusb0.lib;libwdi.lib;libejs.a;%(AdditionalDependencies)</AdditionalDependencies>
+       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+       <RandomizedBaseAddress>false</RandomizedBaseAddress>
+     </Link>
+diff --git a/example/template/project/vc/vsf_template_win.vcxproj.filters b/example/template/project/vc/vsf_template_win.vcxproj.filters
+index f322fd50..350bb59a 100644
+--- a/example/template/project/vc/vsf_template_win.vcxproj.filters
++++ b/example/template/project/vc/vsf_template_win.vcxproj.filters
+@@ -961,6 +961,27 @@
+     <Filter Include="vsf\component\3rd-party\lvgl\raw\src\lv_widgets">
+       <UniqueIdentifier>{a71ed2e5-41c7-4134-aa7b-b4284a9ec1df}</UniqueIdentifier>
+     </Filter>
++    <Filter Include="usrapp\demo\evm_demo">
++      <UniqueIdentifier>{a06fe387-f64a-4d3c-853c-2794325be1a8}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="vsf\component\3rd-party\evm">
++      <UniqueIdentifier>{2d057437-ee2f-4e11-8193-699a780f672b}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="vsf\component\3rd-party\evm\extension">
++      <UniqueIdentifier>{fffe9d94-a0a4-4d81-a953-3d4161ee359a}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="vsf\component\3rd-party\evm\extension\oo">
++      <UniqueIdentifier>{ef2c1405-46c6-441c-b165-a3c1aae24735}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="vsf\component\3rd-party\evm\extension\usbh">
++      <UniqueIdentifier>{2b301aeb-93bd-41df-9c72-93be05ef2e84}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="vsf\component\3rd-party\evm\port">
++      <UniqueIdentifier>{47f09096-f208-4a52-831a-dcf2308bd0b2}</UniqueIdentifier>
++    </Filter>
++    <Filter Include="vsf\component\3rd-party\evm\raw">
++      <UniqueIdentifier>{ef50e5f4-80c2-4f98-a923-b9c1d7eaff96}</UniqueIdentifier>
++    </Filter>
+   </ItemGroup>
+   <ItemGroup>
+     <ClInclude Include="..\..\..\..\source\vsf.h">
+@@ -2883,6 +2904,12 @@
+     <ClInclude Include="..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.h">
+       <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
+     </ClInclude>
++    <ClInclude Include="..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.h">
++      <Filter>vsf\component\3rd-party\evm\extension\oo</Filter>
++    </ClInclude>
++    <ClInclude Include="..\..\..\..\source\component\3rd-party\evm\extension\usbh\evm_module_usbh.h">
++      <Filter>vsf\component\3rd-party\evm\extension\usbh</Filter>
++    </ClInclude>
+   </ItemGroup>
+   <ItemGroup>
+     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
+@@ -4883,6 +4910,18 @@
+     <ClCompile Include="..\..\..\..\source\component\3rd-party\lvgl\raw\lvgl\src\lv_draw\lv_img_decoder.c">
+       <Filter>vsf\component\3rd-party\lvgl\raw\src\lv_draw</Filter>
+     </ClCompile>
++    <ClCompile Include="..\..\demo\evm_demo\evm_demo.c">
++      <Filter>usrapp\demo\evm_demo</Filter>
++    </ClCompile>
++    <ClCompile Include="..\..\..\..\source\component\3rd-party\evm\extension\oo\evm_oo.c">
++      <Filter>vsf\component\3rd-party\evm\extension\oo</Filter>
++    </ClCompile>
++    <ClCompile Include="..\..\..\..\source\component\3rd-party\evm\extension\usbh\evm_module_usbh.c">
++      <Filter>vsf\component\3rd-party\evm\extension\usbh</Filter>
++    </ClCompile>
++    <ClCompile Include="..\..\..\..\source\component\3rd-party\evm\port\evm_main.c">
++      <Filter>vsf\component\3rd-party\evm\port</Filter>
++    </ClCompile>
+   </ItemGroup>
+   <ItemGroup>
+     <Library Include="lib\awtk\awtk_vsf.lib">
