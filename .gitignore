@@ -1,19 +1,28 @@
-example/dfu/project/iar/.metadata
+# private user configurations files(mdk will generate user configuration files)
+*.SimonQian
+
+# for visual studio
+.vs
+*.user
+
+# for iar
+.metadata
+*.ewt
+*.dep
+
+# for mdk
+
+# for projects
 example/dfu/project/iar/settings
 example/dfu/project/iar/dfu_demo
-example/dfu/project/iar/dfu_demo.dep
-example/dfu/project/vc/.vs
 example/dfu/project/vc/dfu_demo
-example/dfu/project/vc/dfu_demo.vcxproj.user
 
 example/spl/project/iar/.metadata
 example/spl/project/iar/settings
 example/spl/project/iar/spl
-example/spl/project/iar/spl.dep
 
 example/template/project/mdk/lib
 example/template/project/mdk/Out
-example/template/project/iar/.metadata
 example/template/project/iar/settings
 example/template/project/iar/vsf_template_f1c100s
 example/template/project/iar/vsf_template_m484
@@ -21,5 +30,4 @@ example/template/project/iar/vsf_template_gd32e103
 example/template/project/iar/vsf_template_mt071
 example/template/project/iar/vsf_template_aic8800
 example/template/project/iar/vsf_template.dep
-example/template/project/vc/.vs
 example/template/project/vc/vsf_template_win
