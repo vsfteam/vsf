@@ -170,7 +170,15 @@ vsf_evt_t __vsf_yield(void)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (vsf_eda_is_stack_owner(eda)) {
         __vsf_eda_yield();
-        vsf_thread_wait();          //!< wait for any evt
+        result = vsf_thread_wait();          //!< wait for VSF_EVT_YIELD
+        
+        /*! \note in thread mode, we assume that user application won't expect
+         *!       events other than VSF_EVT_YIELD received after calling 
+         *!       __vsf_yield() funciton.
+         *!       This assumption does NOT apply to other task type, e.g. eda,
+         *!       peda, vsf_task, pt and vsf_fsm.
+         */
+        VSF_KERNEL_ASSERT(VSF_EVT_YIELD == result);
     } else
 #endif
     {
