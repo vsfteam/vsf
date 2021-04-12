@@ -139,7 +139,7 @@ vsf_evt_t vsf_thread_wait(void)
 #    ifdef VSF_ARCH_LIMIT_NO_SET_STACK
     __vsf_arch_irq_request_send(pthis->rep);
     __vsf_arch_irq_request_pend(&pthis->req);
-    cur_evt = pthis->evt;
+    curevt = pthis->evt;
 #    else
     jmp_buf pos;
 
