@@ -31,3 +31,10 @@ example/template/project/iar/vsf_template_mt071
 example/template/project/iar/vsf_template_aic8800
 example/template/project/iar/vsf_template.dep
 example/template/project/vc/vsf_template_win
+*.o
+*.d
+*.lst
+*.hex
+*.iex
+*.scvd
+*.map
