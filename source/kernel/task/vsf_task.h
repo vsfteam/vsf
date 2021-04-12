@@ -75,7 +75,7 @@ extern "C" {
             vsf_task(__name) *this_ptr = &(obj_ptr->param);
 
 #   define vsf_task_begin()
-#   define vsf_task_end()           } vsf_eda_yield();
+#   define vsf_task_end()           } __vsf_eda_yield();
 
 #   define vsf_task_state  (this_ptr->fsm_state)
 #endif

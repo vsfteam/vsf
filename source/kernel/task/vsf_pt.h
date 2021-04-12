@@ -79,7 +79,7 @@ extern "C" {
 #define vsf_pt_wait_for_evt(__evt)  __vsf_pt_wfe_common(__vsf_pt_state(), __evt)
 #define vsf_pt_wfe(__evt)           vsf_pt_wait_for_evt(__evt)
 
-#define vsf_pt_yield()              vsf_pt_entry(vsf_eda_yield();)
+#define vsf_pt_yield()              vsf_pt_entry(__vsf_eda_yield();)
 
 #if VSF_KERNEL_CFG_EDA_FAST_SUB_CALL == ENABLED
 #   define vsf_pt_raw_next()        __vsf_pt_raw_next_common(__vsf_pt_state())

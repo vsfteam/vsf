@@ -159,7 +159,10 @@ vsf_evt_t vsf_thread_wait(void)
 SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt")
 void vsf_thread_wait_for_evt(vsf_evt_t evt)
 {
-    while(evt != vsf_thread_wait());
+    vsf_evt_t rcv_evt = vsf_thread_wait();
+    /*! \note make sure there is no message ignored */
+    VSF_KERNEL_ASSERT( rcv_evt == evt);
+    //while(evt != vsf_thread_wait());
 }
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
@@ -530,7 +533,7 @@ fsm_rt_t vk_thread_call_fsm(vsf_fsm_entry_t eda_handler, uintptr_t param, size_t
     while (1) {
         ret = __vsf_eda_call_fsm(eda_handler, param, local_size);
         if (fsm_rt_on_going == ret) {
-            vsf_eda_yield();
+            __vsf_eda_yield();
         } else {
             break;
         }
@@ -579,6 +582,14 @@ void vsf_thread_delay(uint_fast32_t tick)
 SECTION(".text.vsf.kernel.vsf_thread_set_priority")
 vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
 {
+/* TODO: add proper header file to include the declaration of 
+ *       __vsf_eda_get_cur_priority()
+ *       __vsf_eda_set_priority()
+ *       
+ */
+    extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *);
+    extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *, vsf_prio_t );
+    
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     vsf_prio_t orig_prio = __vsf_eda_get_cur_priority(&thread_obj->use_as__vsf_eda_t);
 
@@ -587,8 +598,11 @@ vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
         thread_obj->priority = priority;
 
         // post and wait event, after new event is received, thread is on evtq with new priority
-        vsf_eda_post_evt(&thread_obj->use_as__vsf_eda_t, VSF_EVT_USER);
-        vsf_thread_wfe(VSF_EVT_USER);
+        //vsf_eda_post_evt(&thread_obj->use_as__vsf_eda_t, VSF_EVT_USER);
+        //vsf_thread_wfe(VSF_EVT_USER);
+        __vsf_eda_yield();
+        vsf_evt_t evt = vsf_thread_wait();
+        VSF_KERNEL_ASSERT(evt == VSF_EVT_YIELD);
     }
     return orig_prio;
 }
@@ -607,6 +621,10 @@ static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32
     else if (err < 0) { return VSF_SYNC_FAIL; }
     else if (time_out != 0) {
         do {
+            /*! \note there is a VSF_ASSERT() in __vsf_eda_sync_get_reason, which 
+             *!       validated the evt value. Hence, there is no need to assert
+             *!       the evt value here.
+             */
             reason = vsf_eda_sync_get_reason(sync, vsf_thread_wait());
         } while (reason == VSF_SYNC_PENDING);
         return reason;

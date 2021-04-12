@@ -1092,8 +1092,8 @@ SECTION(".text.vsf.kernel.vsf_eda_get_return_value")
 extern uintptr_t vsf_eda_get_return_value(void);
 #endif
 
-SECTION(".text.vsf.kernel.vsf_eda_yield")
-extern void vsf_eda_yield(void);
+SECTION(".text.vsf.kernel.__vsf_eda_yield")
+extern void __vsf_eda_yield(void);
 
 #if defined(__VSF_EDA_CLASS_INHERIT__) || defined(__VSF_EDA_CLASS_IMPLEMENT)
 /* vsf_eda_fini() enables you to kill other eda tasks.

@@ -111,7 +111,7 @@ imp_vsf_peda(example_peda)
                 vsf_peda_arg(example_peda) local = {.level = vsf_local.level - 1};
                 if (VSF_ERR_NONE != vsf_call_peda(example_peda, &vsf_this, &local)) {
                     //! try again
-                    vsf_eda_yield();
+                    __vsf_eda_yield();
                 }
             }
 

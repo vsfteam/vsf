@@ -57,10 +57,10 @@ extern "C" {
 #       define mem_nonsharable(...)            __VA_ARGS__
 #endif
 
-#define vsf_yield(__pevt)                                                       \
+#define vsf_yield()                                                             \
             for (   vsf_evt_t result = VSF_EVT_INVALID;                         \
                     result == VSF_EVT_INVALID;)                                 \
-                if ((result =__vsf_yield(__pevt), result == VSF_EVT_YIELD))
+                if ((result =__vsf_yield(), result == VSF_EVT_YIELD))
 
 /*----------------------------------------------------------------------------*
  * Delay                                                                      *

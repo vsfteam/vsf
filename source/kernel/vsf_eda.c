@@ -492,8 +492,8 @@ do_return:
     return true;
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_yield")
-void vsf_eda_yield(void)
+SECTION(".text.vsf.kernel.__vsf_eda_yield")
+void __vsf_eda_yield(void)
 {
     vsf_eda_t *this_ptr = vsf_eda_get_cur();
     vsf_eda_post_evt(this_ptr, VSF_EVT_YIELD);
@@ -757,7 +757,7 @@ static void __vsf_eda_fsm_evthandler(vsf_eda_t *this_ptr, vsf_evt_t evt)
             //! delay, wait_for, mutex_pend, sem_pend and etc...
             return ;
         case fsm_rt_yield:
-            vsf_eda_yield();
+            __vsf_eda_yield();
             return;
     }
 }

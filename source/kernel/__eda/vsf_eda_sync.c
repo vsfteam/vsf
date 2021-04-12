@@ -98,7 +98,9 @@ static vsf_eda_t *__vsf_eda_sync_get_eda_pending(vsf_sync_t *sync)
 #endif
 
 SECTION(".text.vsf.kernel.vsf_sync")
-static vsf_sync_reason_t __vsf_eda_sync_get_reason(vsf_sync_t *sync, vsf_evt_t evt, bool dequeue_eda)
+static vsf_sync_reason_t __vsf_eda_sync_get_reason( vsf_sync_t *sync, 
+                                                    vsf_evt_t evt, 
+                                                    bool dequeue_eda)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     vsf_sync_reason_t reason = VSF_SYNC_FAIL;
