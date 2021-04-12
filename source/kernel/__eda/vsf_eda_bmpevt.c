@@ -332,7 +332,7 @@ vsf_err_t vsf_eda_bmpevt_set(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
 }
 
 SECTION(".text.vsf.kernel.vsf_eda_bmpevt_pend")
-vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender, int_fast32_t timeout)
+vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender, vsf_timeout_tick_t timeout)
 {
     vsf_protect_t orig;
     vsf_eda_t *eda;

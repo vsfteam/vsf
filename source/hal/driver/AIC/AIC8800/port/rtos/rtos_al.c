@@ -312,11 +312,9 @@ int rtos_task_init_notification(rtos_task_handle task)
 
 uint32_t rtos_task_wait_notification(int timeout)
 {
-    uint32_t ret;
     rtos_task_handle task_handle = rtos_get_task_handle();
-    if (timeout > 0) {
-        timeout = vsf_systimer_ms_to_tick(timeout);
-    }
+    uint32_t ret;
+
     if (0 == timeout) {
         ret = vsf_eda_get_user_value();
         rtos_trace_notify("%s: %s(%p) %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle->name,
@@ -329,8 +327,9 @@ uint32_t rtos_task_wait_notification(int timeout)
         task_handle->flag.state.is_limitted = true;
 
         // private kernel API, can only be used here, so declear here
-        extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, int_fast32_t timeout);
-        __vsf_eda_set_timeout(&task_handle->use_as__vsf_eda_t, timeout);
+        extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timer_tick_t timeout);
+        vsf_timeout_tick_t timeout_tick = (timeout > 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
+        __vsf_eda_set_timeout(&task_handle->use_as__vsf_eda_t, timeout_tick);
     vsf_unprotect_int(orig);
 
     while (1) {

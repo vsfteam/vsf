@@ -210,7 +210,7 @@ void vsf_callback_timer_init(vsf_callback_timer_t *timer)
 }
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_add")
-vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, uint_fast32_t tick)
+vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_timer_tick_t tick)
 {
     vsf_protect_t origlevel;
 #   if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
@@ -261,7 +261,7 @@ vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer)
 
 #    if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
-vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, uint_fast32_t tick)
+vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_timer_tick_t tick)
 {
     VSF_KERNEL_ASSERT(timer != NULL);
     if (timer->due != 0) {
@@ -305,7 +305,7 @@ vsf_err_t vsf_teda_start(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg)
 }
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
-vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, uint_fast32_t tick)
+vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, vsf_timer_tick_t tick)
 {
     vsf_protect_t origlevel;
     vsf_err_t err;
@@ -331,7 +331,7 @@ vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, uint_fast32_t tick)
 #endif
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
-vsf_err_t vsf_teda_set_timer(uint_fast32_t tick)
+vsf_err_t vsf_teda_set_timer(vsf_timer_tick_t tick)
 {
     return vsf_teda_set_timer_ex((vsf_teda_t *)vsf_eda_get_cur(), tick);
 }

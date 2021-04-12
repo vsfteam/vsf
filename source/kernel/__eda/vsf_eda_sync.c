@@ -42,7 +42,7 @@ extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
  *-----------------------------------------------------------------------------*/
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, int_fast32_t timeout)
+vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout)
 {
     eda = __vsf_eda_get_valid_eda(eda);
 
@@ -62,7 +62,7 @@ vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, int_fast32_t timeout)
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-static void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, int_fast32_t timeout)
+static void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout)
 {
     eda = __vsf_eda_get_valid_eda(eda);
     VSF_KERNEL_ASSERT(eda != NULL);
@@ -251,7 +251,7 @@ void vsf_eda_sync_force_reset(vsf_sync_t *this_ptr)
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *this_ptr, int_fast32_t timeout, vsf_eda_t *eda)
+vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *this_ptr, vsf_timeout_tick_t timeout, vsf_eda_t *eda)
 {
     vsf_protect_t origlevel;
 
@@ -305,7 +305,7 @@ vsf_err_t vsf_eda_sync_decrease_ex(vsf_sync_t *this_ptr, int_fast32_t timeout, v
 }
 
 SECTION(".text.vsf.kernel.vsf_sync")
-vsf_err_t vsf_eda_sync_decrease(vsf_sync_t *this_ptr, int_fast32_t timeout)
+vsf_err_t vsf_eda_sync_decrease(vsf_sync_t *this_ptr, vsf_timeout_tick_t timeout)
 {
     return vsf_eda_sync_decrease_ex(this_ptr, timeout, NULL);
 }
