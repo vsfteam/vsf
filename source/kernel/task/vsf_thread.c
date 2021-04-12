@@ -575,6 +575,25 @@ void vsf_thread_delay(uint_fast32_t tick)
 }
 #endif
 
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+SECTION(".text.vsf.kernel.vsf_thread_set_priority")
+vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
+{
+    vsf_thread_t *thread_obj = vsf_thread_get_cur();
+    vsf_prio_t orig_prio = __vsf_eda_get_cur_priority(&thread_obj->use_as__vsf_eda_t);
+
+    if (orig_prio != priority) {
+        __vsf_eda_set_priority(&thread_obj->use_as__vsf_eda_t, priority);
+        thread_obj->priority = priority;
+
+        // post and wait event, after new event is received, thread is on evtq with new priority
+        vsf_eda_post_evt(&thread_obj->use_as__vsf_eda_t, VSF_EVT_USER);
+        vsf_thread_wfe(VSF_EVT_USER);
+    }
+    return orig_prio;
+}
+#endif
+
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 
 SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")

@@ -125,17 +125,10 @@ static int __wifi_connect_main(int argc, char *argv[])
         rtos_task_suspend(5);   // wait for AP starting
 #endif
 
-        // wlan_start_sta MUST be called with higher priority than internal wpa.
-        //  as test, wpa thead can be boosted to vsf_prio_2, so use vsf_prio_3 here
-        vsf_eda_t *eda_cur = vsf_eda_get_cur();
-        vsf_prio_t prio = __vsf_eda_get_cur_priority(eda_cur);
-        if (prio < vsf_prio_3) {
-            __vsf_eda_set_priority(eda_cur, vsf_prio_3);
-        }
+        // wlan_start_sta MUST be called with higher priority than internal wpa(vsf_prio_0).
+        vsf_prio_t prio = vsf_thread_set_priority(vsf_prio_1);
         int ret = wlan_start_sta((uint8_t *)ssid, (uint8_t *)pass, 0);
-        if (prio < vsf_prio_3) {
-            __vsf_eda_set_priority(eda_cur, prio);
-        }
+        vsf_thread_set_priority(prio);
         wlan_connected = 0 == ret ? 1 : 0;
 
 #if CONFIG_SLEEP_LEVEL == 1

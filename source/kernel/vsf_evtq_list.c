@@ -67,6 +67,10 @@ static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *this_ptr, vsf_prio_t prior
         vsf_dlist_queue_enqueue(vsf_eda_t, rdy_node,
                 &evtq->rdy_list,
                 this_ptr);
+
+        if (this_ptr->evt_list.head.next != NULL) {
+            __vsf_os_evtq_activate(evtq);
+        }
     }
     this_ptr->cur_priority = priority;
     return VSF_ERR_NONE;

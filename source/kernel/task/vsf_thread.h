@@ -513,6 +513,11 @@ SECTION(".text.vsf.kernel.vsf_thread_delay")
 extern void vsf_thread_delay(uint_fast32_t tick);
 #endif
 
+#if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+SECTION(".text.vsf.kernel.vsf_thread_set_priority")
+extern vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority);
+#endif
+
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_mutex")
 extern vsf_sync_reason_t vsf_thread_mutex_enter(vsf_mutex_t *mtx, int_fast32_t timeout);
