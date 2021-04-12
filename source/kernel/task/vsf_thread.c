@@ -582,14 +582,9 @@ void vsf_thread_delay(uint_fast32_t tick)
 SECTION(".text.vsf.kernel.vsf_thread_set_priority")
 vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
 {
-/* TODO: add proper header file to include the declaration of 
- *       __vsf_eda_get_cur_priority()
- *       __vsf_eda_set_priority()
- *       
- */
     extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *);
     extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *, vsf_prio_t );
-    
+
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     vsf_prio_t orig_prio = __vsf_eda_get_cur_priority(&thread_obj->use_as__vsf_eda_t);
 
@@ -598,11 +593,8 @@ vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
         thread_obj->priority = priority;
 
         // post and wait event, after new event is received, thread is on evtq with new priority
-        //vsf_eda_post_evt(&thread_obj->use_as__vsf_eda_t, VSF_EVT_USER);
-        //vsf_thread_wfe(VSF_EVT_USER);
         __vsf_eda_yield();
-        vsf_evt_t evt = vsf_thread_wait();
-        VSF_KERNEL_ASSERT(evt == VSF_EVT_YIELD);
+        vsf_thread_wfe(VSF_EVT_YIELD);
     }
     return orig_prio;
 }
@@ -621,7 +613,7 @@ static vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, int_fast32
     else if (err < 0) { return VSF_SYNC_FAIL; }
     else if (time_out != 0) {
         do {
-            /*! \note there is a VSF_ASSERT() in __vsf_eda_sync_get_reason, which 
+            /*! \note there is a VSF_ASSERT() in __vsf_eda_sync_get_reason, which
              *!       validated the evt value. Hence, there is no need to assert
              *!       the evt value here.
              */
@@ -675,12 +667,12 @@ vsf_sync_reason_t vsf_thread_bmpevt_pend(
     vsf_evt_t evt;
 
     err = vsf_eda_bmpevt_pend(bmpevt, pender, timeout);
-    if (!err) { return VSF_SYNC_GET; 
-    } else if (err < 0) { return VSF_SYNC_FAIL; 
+    if (!err) { return VSF_SYNC_GET;
+    } else if (err < 0) { return VSF_SYNC_FAIL;
     } else if (timeout != 0) {
         while (1) {
             evt = vsf_thread_wait();
-            /*! \note there is a VSF_ASSERT() in vsf_eda_bmpevt_poll, which 
+            /*! \note there is a VSF_ASSERT() in vsf_eda_bmpevt_poll, which
              *!       validated the evt value. Hence, there is no need to assert
              *!       the evt value here.
              */
