@@ -657,11 +657,15 @@ vsf_sync_reason_t vsf_thread_bmpevt_pend(
     vsf_evt_t evt;
 
     err = vsf_eda_bmpevt_pend(bmpevt, pender, timeout);
-    if (!err) { return VSF_SYNC_GET; }
-    else if (err < 0) { return VSF_SYNC_FAIL; }
-    else if (timeout != 0) {
+    if (!err) { return VSF_SYNC_GET; 
+    } else if (err < 0) { return VSF_SYNC_FAIL; 
+    } else if (timeout != 0) {
         while (1) {
             evt = vsf_thread_wait();
+            /*! \note there is a VSF_ASSERT() in vsf_eda_bmpevt_poll, which 
+             *!       validated the evt value. Hence, there is no need to assert
+             *!       the evt value here.
+             */
             reason = vsf_eda_bmpevt_poll(bmpevt, pender, evt);
             if (reason != VSF_SYNC_PENDING) {
                 return reason;
