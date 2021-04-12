@@ -245,7 +245,7 @@ int rtos_task_create(   rtos_task_fct func,
     strncpy(thread->name, name, sizeof(thread->name) - 1);
     thread->name[sizeof(thread->name) - 1] = '\0';
 
-    rtos_trace_task("%s: %s(%p)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, name, thread);
+    rtos_trace_task("%s: %s(%p) vsf_prio_%d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, name, thread, real_prio);
     init_vsf_thread_ex( vsf_rtos_thread_t,
                         thread,
                         real_prio,
@@ -312,31 +312,31 @@ int rtos_task_init_notification(rtos_task_handle task)
 
 uint32_t rtos_task_wait_notification(int timeout)
 {
-    rtos_task_handle task_handle = rtos_get_task_handle();
+    // rtos_task_wait maybe called in user thread, not rtos_task
+    vsf_eda_t *eda = vsf_eda_get_cur();
     uint32_t ret;
 
     if (0 == timeout) {
         ret = vsf_eda_get_user_value();
-        rtos_trace_notify("%s: %s(%p) %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle->name,
-                            task_handle, ret);
+        rtos_trace_notify("%s: %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
         return ret;
     }
 
     vsf_protect_t orig = vsf_protect_int();
-        task_handle->flag.state.is_sync_got = false;
-        task_handle->flag.state.is_limitted = true;
+        eda->flag.state.is_sync_got = false;
+        eda->flag.state.is_limitted = true;
 
         // private kernel API, can only be used here, so declear here
         extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timer_tick_t timeout);
         vsf_timeout_tick_t timeout_tick = (timeout > 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
-        __vsf_eda_set_timeout(&task_handle->use_as__vsf_eda_t, timeout_tick);
+        __vsf_eda_set_timeout(eda, timeout_tick);
     vsf_unprotect_int(orig);
 
     while (1) {
         vsf_evt_t evt = vsf_thread_wait();
 
         orig = vsf_protect_int();
-        if ((evt != VSF_EVT_SYNC) && task_handle->flag.state.is_sync_got) {
+        if ((evt != VSF_EVT_SYNC) && eda->flag.state.is_sync_got) {
             vsf_unprotect_int(orig);
             continue;
         }
@@ -345,17 +345,16 @@ uint32_t rtos_task_wait_notification(int timeout)
 
     // private kernel API, can only be used here, so declear here
     extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
-    __vsf_teda_cancel_timer(&task_handle->use_as__vsf_teda_t);
+    __vsf_teda_cancel_timer((vsf_teda_t *)eda);
     ret = vsf_eda_get_user_value();
-    if (task_handle->flag.state.is_sync_got) {
-        task_handle->flag.state.is_sync_got = false;
+    if (eda->flag.state.is_sync_got) {
+        eda->flag.state.is_sync_got = false;
         vsf_eda_set_user_value(0);
     }
-    task_handle->flag.state.is_limitted = false;
+    eda->flag.state.is_limitted = false;
     vsf_unprotect_int(orig);
 
-    rtos_trace_notify("%s: %s(%p) %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, task_handle->name,
-                            task_handle, ret);
+    rtos_trace_notify("%s: %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
     return ret;
 }
 
