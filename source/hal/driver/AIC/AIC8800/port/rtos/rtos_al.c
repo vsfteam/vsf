@@ -316,13 +316,15 @@ uint32_t rtos_task_wait_notification(int timeout)
     vsf_eda_t *eda = vsf_eda_get_cur();
     uint32_t ret;
 
-    if (0 == timeout) {
-        ret = vsf_eda_get_user_value();
-        rtos_trace_notify("%s: %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
-        return ret;
-    }
-
     vsf_protect_t orig = vsf_protect_int();
+        if (0 == timeout) {
+            ret = vsf_eda_get_user_value();
+            vsf_unprotect_int(orig);
+
+            rtos_trace_notify("%s: %08X" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ret);
+            return ret;
+        }
+
         eda->flag.state.is_sync_got = false;
         eda->flag.state.is_limitted = true;
 
