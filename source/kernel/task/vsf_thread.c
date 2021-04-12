@@ -88,7 +88,6 @@ void __vsf_eda_return_to_thread(vsf_eda_t *eda)
     if (cb->ret != NULL) {
         longjmp(*(cb->pos), VSF_EVT_RETURN);
     } else {
-        extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
         __vsf_dispatch_evt(eda, VSF_EVT_RETURN);
     }
 }
@@ -582,9 +581,6 @@ void vsf_thread_delay(uint_fast32_t tick)
 SECTION(".text.vsf.kernel.vsf_thread_set_priority")
 vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
 {
-    extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *);
-    extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *, vsf_prio_t );
-
     vsf_thread_t *thread_obj = vsf_thread_get_cur();
     vsf_prio_t orig_prio = __vsf_eda_get_cur_priority(&thread_obj->use_as__vsf_eda_t);
 

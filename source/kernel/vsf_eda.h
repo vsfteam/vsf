@@ -616,12 +616,12 @@ typedef union vsf_eda_feature_t {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
     /*! \note  is_use_frame is used by vsf_peda and sub-call
      *!        since both vsf_peda and sub-call will share most of the functions
-     *!        used for frame push and pop operation, it has little gain to 
+     *!        used for frame push and pop operation, it has little gain to
      *!        only disable sub-call feature but keep vsf_peda. Hence, to reduce
      *!        complexity, we only use VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL to
-     *!        enable or disable the is_use_frame bit and frame related 
+     *!        enable or disable the is_use_frame bit and frame related
      *!        functions.
-     */     
+     */
         uint8_t                 is_use_frame : 1;
 #endif
 #if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
@@ -1104,6 +1104,21 @@ extern void __vsf_eda_yield(void);
  */
 SECTION(".text.vsf.kernel.eda")
 extern vsf_err_t vsf_eda_fini(vsf_eda_t *this_ptr);
+
+SECTION(".text.vsf.kernel.eda")
+extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
+
+SECTION(".text.vsf.kernel.eda")
+void __vsf_eda_on_terminate(vsf_eda_t *this_ptr);
+
+#   if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
+SECTION(".text.vsf.kernel.__vsf_eda_get_cur_priority")
+extern vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *this_ptr);
+
+SECTION(".text.vsf.kernel.__vsf_eda_set_priority")
+extern vsf_err_t __vsf_eda_set_priority(vsf_eda_t *this_ptr, vsf_prio_t prio);
+#   endif
+
 #endif
 
 SECTION(".text.vsf.kernel.vsf_eda_set_user_value")

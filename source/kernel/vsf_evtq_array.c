@@ -38,12 +38,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".text.vsf.kernel.eda")
-extern void vsf_eda_on_terminate(vsf_eda_t *this_ptr);
-
-SECTION(".text.vsf.kernel.eda")
-extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
-
 extern vsf_evtq_t *__vsf_os_evtq_get(vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *this_ptr);
 extern vsf_err_t __vsf_os_evtq_init(vsf_evtq_t *this_ptr);
@@ -63,7 +57,7 @@ static bool __vsf_eda_terminate(vsf_eda_t *this_ptr)
 
     terminate = !this_ptr->evt_cnt;
     if (terminate) {
-        vsf_eda_on_terminate(this_ptr);
+        __vsf_eda_on_terminate(this_ptr);
     }
     return terminate;
 }

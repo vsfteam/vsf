@@ -37,12 +37,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".text.vsf.kernel.eda")
-extern void vsf_eda_on_terminate(vsf_eda_t *this_ptr);
-
-SECTION(".text.vsf.kernel.eda")
-extern void __vsf_dispatch_evt(vsf_eda_t *this_ptr, vsf_evt_t evt);
-
 extern vsf_evtq_t * __vsf_os_evtq_get(vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_set_priority(vsf_evtq_t *this_ptr, vsf_prio_t priority);
 extern vsf_err_t __vsf_os_evtq_activate(vsf_evtq_t *this_ptr);
@@ -76,12 +70,14 @@ static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *this_ptr, vsf_prio_t prior
     return VSF_ERR_NONE;
 }
 
+SECTION(".text.vsf.kernel.__vsf_eda_get_cur_priority")
 vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     return (vsf_prio_t)(this_ptr->flag.state.is_new_prio ? this_ptr->new_priority : this_ptr->cur_priority);
 }
 
+SECTION(".text.vsf.kernel.__vsf_eda_set_priority")
 vsf_err_t __vsf_eda_set_priority(vsf_eda_t *this_ptr, vsf_prio_t priority)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
@@ -140,7 +136,7 @@ void vsf_evtq_on_eda_fini(vsf_eda_t *this_ptr)
         __vsf_os_free_evt_node(node);
     }
 
-    vsf_eda_on_terminate(this_ptr);
+    __vsf_eda_on_terminate(this_ptr);
 }
 
 vsf_err_t vsf_evtq_init(vsf_evtq_t *this_ptr)
