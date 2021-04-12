@@ -1,6 +1,14 @@
 # private user configurations files(mdk will generate user configuration files)
 *.SimonQian
 
+#basic compiler output
+*.o
+*.hex
+*.map
+
+# for llvm
+*.d
+
 # for visual studio
 .vs
 *.user
@@ -11,6 +19,9 @@
 *.dep
 
 # for mdk
+*.lst
+*.iex
+*.scvd
 
 # for projects
 example/dfu/project/iar/settings
@@ -31,10 +42,3 @@ example/template/project/iar/vsf_template_mt071
 example/template/project/iar/vsf_template_aic8800
 example/template/project/iar/vsf_template.dep
 example/template/project/vc/vsf_template_win
-*.o
-*.d
-*.lst
-*.hex
-*.iex
-*.scvd
-*.map
