@@ -135,6 +135,7 @@ void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
     vk_musb_fdrc_read_fifo(reg, 0, buffer, 8);
     reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
     usbd->control_size = buffer[6] + (buffer[7] << 8);
+    usbd->is_control_in = !!(buffer[0] & 0x80);
 }
 
 void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
@@ -462,8 +463,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
             case MUSB_FDRC_USBD_EP0_WAIT_SETUP:
                 if (!usbd->is_status_notified) {
                     // setup notified, but not processed yet.
-                    //  actually, here is on_data_out
-                    // TODO: is it possible that here is on_status?
+                    //  next possible interrupt is data out
                     goto on_data_out;
                 }
             on_setup:
@@ -485,6 +485,12 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
             case MUSB_FDRC_USBD_EP0_STATUS:
                 if (!usbd->is_status_notified) {
                     usbd->is_status_notified = true;
+
+                    if (usbd->is_control_in) {
+                        // notify last USB_ON_IN
+                        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
+                    }
+
                     __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
                     usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
                 }
