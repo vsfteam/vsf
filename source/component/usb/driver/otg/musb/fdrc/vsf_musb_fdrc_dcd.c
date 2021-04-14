@@ -136,6 +136,7 @@ void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
     reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
     usbd->control_size = buffer[6] + (buffer[7] << 8);
     usbd->is_control_in = !!(buffer[0] & 0x80);
+    usbd->is_last_control_in = false;
 }
 
 void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
@@ -369,6 +370,7 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_set_data_size(vk_musb_fdrc_dcd_t *usb
 
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
             if (!usbd->control_size || (size < 64)) {
+                usbd->is_last_control_in = true;
                 reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY | MUSBD_CSR0_DATAEND;
             } else {
                 reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
@@ -498,10 +500,10 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
 
             __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
-            if (usbd->control_size > 0) {
-                usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
-            } else {
+            if (usbd->is_last_control_in) {
                 __vk_musb_fdrc_usbd_notify_status(usbd);
+            } else {
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
             }
         }
     }
