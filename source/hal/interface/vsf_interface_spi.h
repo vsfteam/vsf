@@ -157,9 +157,6 @@ end_def_interface(i_spi_t)
 //! @}
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern const i_spi_t VSF_SPI[SPI_COUNT];
-
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t        vsf_spi_init(               vsf_spi_t *spi_ptr,
@@ -173,12 +170,19 @@ extern void             vsf_spi_irq_enable(         vsf_spi_t *spi_ptr,
 extern void             vsf_spi_irq_disable(        vsf_spi_t *spi_ptr,
                                                     em_spi_irq_mask_t irq_mask);
 
+extern void             vsf_spi_cs_active(          vsf_spi_t *spi_ptr,
+                                                    uint_fast8_t index);
+extern void             vsf_spi_cs_inactive(        vsf_spi_t *spi_ptr,
+                                                    uint_fast8_t index);
+
 extern spi_status_t     vsf_spi_status(             vsf_spi_t *spi_ptr);
 
-extern uint_fast16_t    vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
+extern void             vsf_spi_fifo_transfer(      vsf_spi_t *spi_ptr,
                                                     void *out_buffer_ptr,
+                                                    uint_fast32_t* out_count_ptr,
                                                     void *in_buffer_ptr,
-                                                    uint_fast16_t count);
+                                                    uint_fast32_t* in_count_ptr);
+
 extern bool             vsf_spi_fifo_flush(         vsf_spi_t *spi_ptr);
 
 extern vsf_err_t        vsf_spi_request_transfer(   vsf_spi_t *spi_ptr,
@@ -186,6 +190,7 @@ extern vsf_err_t        vsf_spi_request_transfer(   vsf_spi_t *spi_ptr,
                                                     void *in_buffer_ptr,
                                                     uint_fast32_t count);
 extern vsf_err_t        vsf_spi_cancel_transfer(    vsf_spi_t *spi_ptr);
-extern intalu_t         vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
+extern int_fast32_t     vsf_spi_get_transfered_count(vsf_spi_t *spi_ptr);
 
 #endif
+

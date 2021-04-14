@@ -32,6 +32,7 @@
 #       include "../common/usb/usb.h"
 #       include "../common/pm/pm.h"
 #       include "../common/usart/usart.h"
+#       include "../common/spi/spi.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

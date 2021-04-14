@@ -96,6 +96,16 @@
 #define PIO_PORTH
 */
 
+// SPI0/SPI1/SPI2
+#define SPI_MAX_PORT                0x02
+#define SPI_PORT_MASK               0x07
+#define SPI0_DMA_TX_CHANNEL         0
+#define SPI0_DMA_RX_CHANNEL         1
+#define SPI1_DMA_TX_CHANNEL         2
+#define SPI1_DMA_RX_CHANNEL         3
+#define SPI2_DMA_TX_CHANNEL         4
+#define SPI2_DMA_RX_CHANNEL         5
+
 #define USB_HC_COUNT                1
 #define USB_HC_OHCI_COUNT           1
 
