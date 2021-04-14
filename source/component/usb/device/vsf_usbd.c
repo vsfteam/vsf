@@ -37,9 +37,59 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_USBD_CFG_TRACE == ENABLED
+#   define __vsf_usbd_trace(...)                    vsf_trace_debug(__VA_ARGS__)
+#   define __vsf_usbd_trace_buffer(__ptr, __size)   vsf_trace_buffer(VSF_TRACE_DEBUG, (__ptr), (__size), VSF_TRACE_DF_NEWLINE)
+#else
+#   define __vsf_usbd_trace(...)
+#   define __vsf_usbd_trace_buffer(__ptr, __size)
+#endif
+
+#if VSF_USBD_CFG_TRACE_SETUP == ENABLED
+#   define __vsf_usbd_trace_setup(__req)                                        \
+        do {                                                                    \
+            __vsf_usbd_trace("%d: usbd_setup: ", vsf_systimer_get_ms());        \
+            __vsf_usbd_trace_buffer((__req), 8);                                \
+        } while (0)
+#else
+#   define __vsf_usbd_trace_setup(__req)
+#endif
+
+#if VSF_USBD_CFG_TRACE_EVT == ENABLED
+#   define __vsf_usbd_trace_evt(__evt, __value)                                 \
+        do {                                                                    \
+            __vsf_usbd_trace("%d: usbd_evt: %s %d" VSF_TRACE_CFG_LINEEND,       \
+                vsf_systimer_get_ms(), __vsf_usbd_trace_evts[(__evt)], (__value));\
+        } while (0)
+#else
+#   define __vsf_usbd_trace_evt(__evt, __value)
+#endif
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_USBD_CFG_TRACE == ENABLED && VSF_USBD_CFG_TRACE_EVT == ENABLED
+static const char * __vsf_usbd_trace_evts[] = {
+    "USB_ON_ATTACH",
+    "USB_ON_DETACH",
+    "USB_ON_RESET",
+    "USB_ON_SETUP",
+    "USB_ON_ERROR",
+    "USB_ON_SUSPEND",
+    "USB_ON_RESUME",
+    "USB_ON_SOF",
+    "USB_ON_IN",
+    "USB_ON_NAK",
+    "USB_ON_OUT",
+    "USB_ON_STATUS",
+    "USB_ON_UNDERFLOW",
+    "USB_ON_OVERFLOW",
+    "USB_USR_EVT",
+};
+#endif
+
 /*============================ PROTOTYPES ====================================*/
 
 static void __vk_usbd_hal_evthandler(void *, usb_evt_t, uint_fast8_t);
@@ -669,6 +719,7 @@ static void __vk_usbd_hal_evthandler(void *p, usb_evt_t evt, uint_fast8_t value)
 #if VSF_USBD_CFG_USE_EDA == ENABLED
 {
     vk_usbd_dev_t *dev = p;
+    __vsf_usbd_trace_evt(evt, value);
     vsf_eda_post_evt(&dev->eda, (vsf_evt_t)(VSF_EVT_USER + (evt | (value << 8))));
 }
 
@@ -689,6 +740,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
 #else
 {
     vk_usbd_dev_t *dev = p;
+    __vsf_usbd_trace_evt(evt, value);
 #endif
     VSF_USBD_DRV_PREPARE(dev);
 
@@ -752,6 +804,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
             vk_usbd_trans_t *trans = &ctrl_handler->trans;
 
             vk_usbd_drv_get_setup(request);
+            __vsf_usbd_trace_setup(request);
             if (    VSF_ERR_NONE != vsf_usbd_notify_user(dev, evt, request)
 #if VSF_USBD_CFG_RAW_MODE != ENABLED
                 ||  (VSF_ERR_NONE != __vk_usbd_ctrl_prepare(dev))
