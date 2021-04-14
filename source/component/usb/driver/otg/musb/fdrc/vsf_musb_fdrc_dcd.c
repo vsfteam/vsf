@@ -369,7 +369,6 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_set_data_size(vk_musb_fdrc_dcd_t *usb
 
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_DATA_IN;
             if (!usbd->control_size || (size < 64)) {
-                usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
                 reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY | MUSBD_CSR0_DATAEND;
             } else {
                 reg->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
@@ -402,6 +401,15 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transfer_send(vk_musb_fdrc_dcd_t *usbd, uint_fast
 {
     VSF_USB_ASSERT(false);
     return VSF_ERR_NOT_SUPPORT;
+}
+
+static void __vk_musb_fdrc_usbd_notify_status(vk_musb_fdrc_dcd_t *usbd)
+{
+    if (!usbd->is_status_notified) {
+        usbd->is_status_notified = true;
+        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
+        usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
+    }
 }
 
 void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
@@ -450,12 +458,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
 
         if (csr1 & MUSBD_CSR0_SETUPEND) {
             reg->EP0.CSR0 |= MUSBD_CSR0_SERVICEDSETUPEND;
-
-            if (!usbd->is_status_notified) {
-                usbd->is_status_notified = true;
-                __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
-                usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
-            }
+            __vk_musb_fdrc_usbd_notify_status(usbd);
         }
         vk_musb_fdrc_set_ep(reg, ep_orig);
 
@@ -484,17 +487,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                 }
                 break;
             case MUSB_FDRC_USBD_EP0_STATUS:
-                if (!usbd->is_status_notified) {
-                    usbd->is_status_notified = true;
-
-                    if (usbd->is_control_in) {
-                        // notify last USB_ON_IN
-                        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
-                    }
-
-                    __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
-                    usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
-                }
+                __vk_musb_fdrc_usbd_notify_status(usbd);
                 goto on_setup;
             default:
                 VSF_USB_ASSERT(false);
@@ -503,8 +496,13 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
         // MUSBD_CSR0_TXPKTRDY is cleared by hardare
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
-            usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+
             __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
+            if (usbd->control_size > 0) {
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+            } else {
+                __vk_musb_fdrc_usbd_notify_status(usbd);
+            }
         }
     }
 
