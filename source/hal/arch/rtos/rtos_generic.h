@@ -92,7 +92,7 @@ typedef enum vsf_arch_prio_t {
 #endif
 
 // rtos_model contains:
-//  1. vsf_systimer_cnt_t if sys timer is enabled
+//  1. vsf_systimer_tick_t if sys timer is enabled
 //  2. vsf_arch_set_stack if thread is enabled
 //  3. irq_request implementation
 //  4. irq_thread implementation

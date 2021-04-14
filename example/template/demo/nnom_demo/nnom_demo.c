@@ -67,7 +67,7 @@ void print_img(int8_t * buf)
 
 void ai_demo_mnist(uint_fast8_t index)
 {
-    vsf_timer_tick_t tick, time;
+    vsf_systimer_tick_t tick, time;
     uint32_t predic_label;
     float prob;
 

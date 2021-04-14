@@ -32,7 +32,7 @@
 struct __vsf_mcs51_t {
     uint8_t ie;
     vsf_arch_prio_t base_prio;
-    vsf_systimer_cnt_t systimer_reload;
+    vsf_systimer_tick_t systimer_reload;
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
     uint8_t tf0 : 1;
 #endif
@@ -69,10 +69,10 @@ bool vsf_arch_low_level_init(void)
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
+vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
-    vsf_systimer_cnt_t value = ((uint32_t)TH0 << 8) + TL0;
-    vsf_systimer_cnt_t reload = __vsf_mcs51.systimer_reload;
+    vsf_systimer_tick_t value = ((uint32_t)TH0 << 8) + TL0;
+    vsf_systimer_tick_t reload = __vsf_mcs51.systimer_reload;
 
     if (value >= reload) {
         value -= reload;
@@ -144,7 +144,7 @@ void vsf_systimer_low_level_int_enable(void)
 #endif
 }
 
-void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
+void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
     __vsf_mcs51.systimer_reload = 0x10000 - tick_cnt;
 }

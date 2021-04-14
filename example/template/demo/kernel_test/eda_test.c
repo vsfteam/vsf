@@ -47,7 +47,7 @@ def_vsf_peda_ctx(example_peda,
     end_def_params()
 
     def_locals(
-        vsf_systimer_cnt_t time;
+        vsf_systimer_tick_t time;
     )
     end_def_locals()
 )

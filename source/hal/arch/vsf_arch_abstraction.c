@@ -118,10 +118,10 @@ void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 typedef struct __systimer_t {
-    vsf_systimer_cnt_t tick;
-    vsf_systimer_cnt_t unit;
-    vsf_systimer_cnt_t max_tick_per_round;
-    vsf_systimer_cnt_t reload;
+    vsf_systimer_tick_t tick;
+    vsf_systimer_tick_t unit;
+    vsf_systimer_tick_t max_tick_per_round;
+    vsf_systimer_tick_t reload;
     //uint32_t           tick_freq;
 } __systimer_t;
 #endif
@@ -129,8 +129,8 @@ typedef struct __systimer_t {
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-extern void vsf_systimer_evthandler(vsf_systimer_cnt_t tick);
-extern bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick);
+extern void vsf_systimer_evthandler(vsf_systimer_tick_t tick);
+extern bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick);
 
 #   if  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
@@ -480,7 +480,7 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 #   ifndef WEAK_VSF_SYSTIMER_EVTHANDLER
 WEAK(vsf_systimer_evthandler)
-void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
+void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
     UNUSED_PARAM(tick);
     VSF_ARCH_ASSERT(false);
@@ -489,7 +489,7 @@ void vsf_systimer_evthandler(vsf_systimer_cnt_t tick)
 
 #   ifndef WEAK_ON_ARCH_SYSTIMER_TICK_EVT
 WEAK(on_arch_systimer_tick_evt)
-bool on_arch_systimer_tick_evt(vsf_systimer_cnt_t tick)
+bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 {
     UNUSED_PARAM(tick);
     return true;
@@ -519,28 +519,28 @@ uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 
 
 WEAK(vsf_systimer_us_to_tick)
-vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
-    return ((vsf_systimer_cnt_t)
-                (vsf_systimer_cnt_t)time_us * 
-                (vsf_systimer_cnt_t)__systimer.unit);
+    return ((vsf_systimer_tick_t)
+                (vsf_systimer_tick_t)time_us * 
+                (vsf_systimer_tick_t)__systimer.unit);
 }
 
 WEAK(vsf_systimer_ms_to_tick)
-vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     return ((uintmax_t)((uintmax_t)time_ms * 
                         (uintmax_t)__systimer.unit * 1000ul));
 }
 
 WEAK(vsf_systimer_tick_to_us)
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     return (uint_fast32_t)(tick / __systimer.unit);
 }
 
 WEAK(vsf_systimer_tick_to_ms)
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return vsf_systimer_tick_to_us(tick) / 1000;
 }
@@ -551,16 +551,16 @@ uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
  * System Timer : Implement with Normal Timer (Count down or Count up)        *
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-static vsf_systimer_cnt_t __vsf_systimer_update(void)
+static vsf_systimer_tick_t __vsf_systimer_update(void)
 {
-    vsf_systimer_cnt_t tick;
+    vsf_systimer_tick_t tick;
 
     tick = vsf_systimer_get();
     __systimer.tick = tick;
     return tick;
 }
 
-static bool __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
+static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 {
     if (0 == tick_cnt) {
         return false;
@@ -584,7 +584,7 @@ static bool __vsf_systimer_set_target(vsf_systimer_cnt_t tick_cnt)
  */
 void vsf_systimer_ovf_evt_hanlder(void)
 {
-    vsf_systimer_cnt_t tick;
+    vsf_systimer_tick_t tick;
     vsf_systimer_low_level_int_disable();
     __vsf_systimer_update();
     tick = __systimer.tick;
@@ -632,9 +632,9 @@ void vsf_systimer_set_idle(void)
 }
 
 WEAK(vsf_systimer_get)
-vsf_systimer_cnt_t vsf_systimer_get(void)
+vsf_systimer_tick_t vsf_systimer_get(void)
 {
-    vsf_systimer_cnt_t ticks = 0;
+    vsf_systimer_tick_t ticks = 0;
     bool auto_update = false;
     {
         vsf_arch_prio_t gint_state = vsf_disable_interrupt();
@@ -666,17 +666,17 @@ vsf_err_t vsf_systimer_start(void)
 
 
 WEAK(vsf_systimer_set)
-bool vsf_systimer_set(vsf_systimer_cnt_t due)
+bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     bool result = false;
-    //vsf_systimer_cnt_t unit = __vsf_cm.systimer.unit;
-    vsf_systimer_cnt_t max_tick_per_round = __systimer.max_tick_per_round;
+    //vsf_systimer_tick_t unit = __vsf_cm.systimer.unit;
+    vsf_systimer_tick_t max_tick_per_round = __systimer.max_tick_per_round;
 
     {
         vsf_arch_prio_t gint_state = vsf_disable_interrupt();
-        vsf_systimer_cnt_t current = __vsf_systimer_update();
+        vsf_systimer_tick_t current = __vsf_systimer_update();
         //vsf_systick_disable();
-        vsf_systimer_cnt_t tick_cnt;
+        vsf_systimer_tick_t tick_cnt;
 //        vsf_trace_debug("systimer_set: %lld %lld %c\r\n",
 //                    current, due, due > current ? '*' : ' ');
         /*
@@ -698,7 +698,7 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
 }
 
 WEAK(vsf_systimer_is_due)
-bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     return (__systimer.tick >= due);
 }
@@ -720,7 +720,7 @@ bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
 /*! \brief systimer timeout event handler which is called by request response
  *!        service.
  */
-void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick)
+void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick)
 {
     if (on_arch_systimer_tick_evt(tick)) {
         vsf_systimer_evthandler(tick);

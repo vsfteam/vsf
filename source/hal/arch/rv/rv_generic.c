@@ -35,7 +35,7 @@ struct __vsf_rv_t {
     } pendsv;
 
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-    vsf_systimer_cnt_t reload;
+    vsf_systimer_tick_t reload;
 #endif
 };
 typedef struct __vsf_rv_t __vsf_rv_t;
@@ -74,7 +74,7 @@ bool vsf_arch_low_level_init(void)
  *----------------------------------------------------------------------------*/
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
+vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
     return SYSTICK.COUNTER;
 }
@@ -116,7 +116,7 @@ void vsf_systimer_low_level_int_enable(void)
     eclic_enable_interrupt(SYSTICK_IRQ);
 }
 
-void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
+void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
     __vsf_rv.reload = tick_cnt;
     SYSTICK.COMPARE = tick_cnt;

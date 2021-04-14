@@ -86,7 +86,7 @@ def_class(__vk_tgui_slider_t,
 
     private_member(
         vsf_tgui_timer_t    tSlideTimer;
-        vsf_timer_tick_t    tOldTimeTick;
+        vsf_systimer_tick_t tOldTimeTick;
     )
 
 )

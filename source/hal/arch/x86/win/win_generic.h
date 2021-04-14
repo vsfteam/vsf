@@ -120,7 +120,7 @@ typedef unsigned long       ULONG_PTR, *PULONG_PTR;
 #endif
 typedef ULONG_PTR           DWORD_PTR, *PDWORD_PTR;
 
-typedef uint64_t vsf_systimer_cnt_t;
+typedef uint64_t vsf_systimer_tick_t;
 
 typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID = -1,
@@ -202,7 +202,7 @@ extern void __vsf_arch_irq_start(vsf_arch_irq_thread_t *irq_thread);
 extern void __vsf_arch_irq_end(vsf_arch_irq_thread_t *irq_thread, bool is_terminate);
 
 // for trace only
-extern vsf_systimer_cnt_t __vsf_systimer_get(void);
+extern vsf_systimer_tick_t __vsf_systimer_get(void);
 
 static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {

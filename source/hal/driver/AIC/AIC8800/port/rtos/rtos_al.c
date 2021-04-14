@@ -174,7 +174,7 @@ int rtos_timer_delete(TimerHandle_t xTimer, TickType_t xTicksToWait)
 
 int rtos_timer_start(TimerHandle_t xTimer, TickType_t xTicksToWait, bool isr)
 {
-    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(xTimer->xTimerPeriodInTicks);
+    vsf_systimer_tick_t tick = vsf_systimer_ms_to_tick(xTimer->xTimerPeriodInTicks);
     rtos_trace_timer("%s: %p %d\r\n", __FUNCTION__, xTimer, xTicksToWait);
     if (isr) {
         vsf_callback_timer_add_isr(&xTimer->use_as__vsf_callback_timer_t, tick);
@@ -329,7 +329,7 @@ uint32_t rtos_task_wait_notification(int timeout)
         eda->flag.state.is_limitted = true;
 
         // private kernel API, can only be used here, so declear here
-        extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timer_tick_t timeout);
+        extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_systimer_tick_t timeout);
         vsf_timeout_tick_t timeout_tick = (timeout > 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
         __vsf_eda_set_timeout(eda, timeout_tick);
     vsf_unprotect_int(orig);

@@ -82,7 +82,7 @@ volatile ee_s32 seed5_volatile = 0;
 */
 
 /** Define Host specific (POSIX), or target specific global time variables. */
-static vsf_timer_tick_t start_time_val, stop_time_val;
+static vsf_systimer_tick_t start_time_val, stop_time_val;
 
 /* Function: start_time
         This function will be called right before starting the timed portion of
@@ -122,7 +122,7 @@ stop_time(void)
 CORE_TICKS
 get_time(void)
 {
-    return vsf_timer_get_duration(start_time_val, stop_time_val);
+    return vsf_systimer_get_duration(start_time_val, stop_time_val);
 }
 /* Function: time_in_secs
         Convert the value returned by get_time to seconds.

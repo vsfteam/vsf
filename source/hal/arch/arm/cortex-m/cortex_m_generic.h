@@ -72,7 +72,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-typedef uint64_t vsf_systimer_cnt_t;
+typedef uint64_t vsf_systimer_tick_t;
 
 #define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
             __vsf_arch_prio_index_##__N = (__N),

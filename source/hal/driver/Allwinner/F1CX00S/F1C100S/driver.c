@@ -173,8 +173,8 @@ bool vsf_driver_poll(void)
 #if VSF_HAL_DRV_CFG_SYSTIMER_POLL_MODE_EN == ENABLED
     if (TIMER_BASE->IRQ_STA & 1) {
         TIMER_BASE->IRQ_STA = 1;
-        extern void vsf_timer_on_tick(void);
-        vsf_timer_on_tick();
+        extern void vsf_systimer_on_tick(void);
+        vsf_systimer_on_tick();
     }
 #endif
 

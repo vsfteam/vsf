@@ -244,7 +244,7 @@ uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp)
 {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     vk_input_timestamp_t cur = vsf_systimer_get_tick();
-    uint_fast32_t duration = *timestamp > 0 ? vsf_timer_get_duration(*timestamp, cur) : 0;
+    uint_fast32_t duration = *timestamp > 0 ? vsf_systimer_get_duration(*timestamp, cur) : 0;
     *timestamp = cur;
     return duration;
 #else

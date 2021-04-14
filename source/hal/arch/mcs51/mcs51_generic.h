@@ -54,7 +54,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-typedef uint32_t vsf_systimer_cnt_t;
+typedef uint32_t vsf_systimer_tick_t;
 typedef  int32_t vsf_systimer_cnt_signed_t;
 
 #define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \

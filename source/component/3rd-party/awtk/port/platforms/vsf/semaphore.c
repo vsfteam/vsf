@@ -23,7 +23,7 @@ tk_semaphore_t* tk_semaphore_create(uint32_t value, const char* name) {
 }
 
 ret_t tk_semaphore_wait(tk_semaphore_t* semaphore, uint32_t timeout_ms) {
-  vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(timeout_ms);
+  vsf_systimer_tick_t tick = vsf_systimer_ms_to_tick(timeout_ms);
   vsf_sync_reason_t reason;
   return_value_if_fail(semaphore != NULL, RET_BAD_PARAMS);
 

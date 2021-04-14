@@ -84,7 +84,7 @@ typedef struct {
     vsf_tgui_region_t request_region;
     vsf_tgui_region_t current_region;
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
-    vsf_systimer_cnt_t start_cnt;
+    vsf_systimer_tick_t start_cnt;
     uint16_t refresh_cnt;
     uint16_t fps;
 #endif

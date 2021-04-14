@@ -89,10 +89,10 @@ extern bool vsf_systimer_low_level_disable(void);
 extern void vsf_systimer_low_level_enable(void);
 extern void vsf_systimer_low_level_int_disable(void);
 extern void vsf_systimer_low_level_int_enable(void);
-extern void vsf_systimer_set_reload_value( vsf_systimer_cnt_t tick_cnt);
+extern void vsf_systimer_set_reload_value( vsf_systimer_tick_t tick_cnt);
 extern void vsf_systimer_reset_counter_value(void);
 extern void vsf_systimer_clear_int_pending_bit(void);
-extern vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void);
+extern vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void);
 
 /*-------------------------------------------*
  * APIs to be used by target arch            *
@@ -116,18 +116,18 @@ extern void vsf_systimer_ovf_evt_hanlder(void);
  * APIs to be implemented by target arch     *
  *-------------------------------------------*/
 extern vsf_err_t vsf_systimer_init(void);
-extern bool vsf_systimer_is_due(vsf_systimer_cnt_t due);
+extern bool vsf_systimer_is_due(vsf_systimer_tick_t due);
 
 extern vsf_err_t vsf_systimer_start(void);
 extern void vsf_systimer_set_idle(void);
 
-extern vsf_systimer_cnt_t vsf_systimer_get(void);
-extern bool vsf_systimer_set(vsf_systimer_cnt_t due);
+extern vsf_systimer_tick_t vsf_systimer_get(void);
+extern bool vsf_systimer_set(vsf_systimer_tick_t due);
 
-extern vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
-extern vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
-extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick);
-extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
+extern vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us);
+extern vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms);
+extern uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick);
+extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick);
 
 /*-------------------------------------------*
  * APIs to be used by target arch            *
@@ -135,7 +135,7 @@ extern uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick);
 /*! \brief systimer timeout event handler which is called by request response
  *!        service.
  */
-extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_cnt_t tick);
+extern void vsf_systimer_timeout_evt_hanlder(vsf_systimer_tick_t tick);
 extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 #   endif

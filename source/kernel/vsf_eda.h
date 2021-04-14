@@ -551,7 +551,6 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-typedef vsf_systimer_cnt_t                  vsf_timer_tick_t;
 #   ifndef VSF_KERNEL_TIMEOUT_T
 #       define VSF_KERNEL_TIMEOUT_TICK_T    int_fast64_t
 #   endif
@@ -770,7 +769,7 @@ def_simple_class(vsf_teda_t)  {
     )
     private_member(
         vsf_dlist_node_t        timer_node;
-        vsf_timer_tick_t        due;
+        vsf_systimer_tick_t     due;
     )
 };
 //! @}
@@ -784,7 +783,7 @@ def_simple_class(vsf_callback_timer_t) {
     )
     private_member(
         vsf_dlist_node_t        timer_node;
-        vsf_timer_tick_t        due;
+        vsf_systimer_tick_t     due;
     )
 };
 //! @}
@@ -1028,17 +1027,17 @@ typedef struct vsf_kernel_cfg_t {
 
 #   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICK
 SECTION(".text.vsf.kernel.teda")
-extern void vsf_timer_on_tick(void);
+extern void vsf_systimer_on_tick(void);
 #   endif
 
 SECTION(".text.vsf.kernel.teda")
-extern vsf_timer_tick_t vsf_systimer_get_tick(void);
+extern vsf_systimer_tick_t vsf_systimer_get_tick(void);
 
-SECTION(".text.vsf.kernel.vsf_timer_get_duration")
-extern uint_fast32_t vsf_timer_get_duration(vsf_timer_tick_t from_time, vsf_timer_tick_t to_time);
+SECTION(".text.vsf.kernel.vsf_systimer_get_duration")
+extern uint_fast32_t vsf_systimer_get_duration(vsf_systimer_tick_t from_time, vsf_systimer_tick_t to_time);
 
-SECTION(".text.vsf.kernel.vsf_timer_get_elapsed")
-extern uint_fast32_t vsf_timer_get_elapsed(vsf_timer_tick_t from_time);
+SECTION(".text.vsf.kernel.vsf_systimer_get_elapsed")
+extern uint_fast32_t vsf_systimer_get_elapsed(vsf_systimer_tick_t from_time);
 
 #endif
 
@@ -1179,21 +1178,21 @@ SECTION(".text.vsf.kernel.vsf_teda_start")
 extern vsf_err_t vsf_teda_start(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer")
-extern vsf_err_t vsf_teda_set_timer(vsf_timer_tick_t tick);
+extern vsf_err_t vsf_teda_set_timer(vsf_systimer_tick_t tick);
 
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
-vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, vsf_timer_tick_t tick);
+vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t tick);
 
 #   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
 {
-    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
+    vsf_systimer_tick_t tick = vsf_systimer_ms_to_tick(ms);
     return vsf_teda_set_timer((uint_fast32_t)tick);
 }
 
 static inline vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
 {
-    vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
+    vsf_systimer_tick_t tick = vsf_systimer_us_to_tick(us);
     return vsf_teda_set_timer((uint_fast32_t)tick);
 }
 #   endif
@@ -1209,14 +1208,14 @@ SECTION(".text.vsf.kernel.vsf_callback_timer_init")
 void vsf_callback_timer_init(vsf_callback_timer_t *timer);
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_add")
-vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_timer_tick_t tick);
+vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
 vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer);
 
 #       if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
 SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
-vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_timer_tick_t tick);
+vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
 
 SECTION(".text.vsf.kernel.vsf_callback_timer_remove_isr")
 vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer);
@@ -1225,13 +1224,13 @@ vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer);
 #       if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
 {
-    vsf_systimer_cnt_t tick = vsf_systimer_ms_to_tick(ms);
+    vsf_systimer_tick_t tick = vsf_systimer_ms_to_tick(ms);
     return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
 }
 
 static inline vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, uint_fast32_t us)
 {
-    vsf_systimer_cnt_t tick = vsf_systimer_us_to_tick(us);
+    vsf_systimer_tick_t tick = vsf_systimer_us_to_tick(us);
     return vsf_callback_timer_add(timer, (uint_fast32_t)tick);
 }
 #       endif

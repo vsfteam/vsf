@@ -216,7 +216,7 @@ void sys_sem_signal(sys_sem_t *sem)
 
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t timeout)
 {
-    vsf_timer_tick_t pre = vsf_systimer_get_tick();
+    vsf_systimer_tick_t pre = vsf_systimer_get_tick();
     vsf_sync_reason_t reason = vsf_thread_sem_pend(sem, vsf_systimer_ms_to_tick(timeout));
     if (VSF_SYNC_GET == reason) {
         pre = vsf_systimer_get_tick() - pre;
@@ -355,7 +355,7 @@ u32_t sys_arch_mbox_tryfetch(sys_mbox_t *mbox, void **msg)
 
 u32_t sys_arch_mbox_fetch(sys_mbox_t *mbox, void **msg, u32_t timeout)
 {
-    vsf_timer_tick_t start = vsf_systimer_get_tick();
+    vsf_systimer_tick_t start = vsf_systimer_get_tick();
     u32_t duration;
     vsf_sync_reason_t reason;
 

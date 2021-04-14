@@ -55,7 +55,7 @@ typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t timer_request;
     HANDLE timer;
-    vsf_systimer_cnt_t start_tick;
+    vsf_systimer_tick_t start_tick;
 } vsf_arch_systimer_ctx_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -138,7 +138,7 @@ static void __vsf_systimer_thread(void *arg)
 
         __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
 
-            vsf_systimer_cnt_t tick = vsf_systimer_get();
+            vsf_systimer_tick_t tick = vsf_systimer_get();
             vsf_systimer_timeout_evt_hanlder(tick);
 
         __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
@@ -171,14 +171,14 @@ void vsf_systimer_set_idle(void)
 {
 }
 
-vsf_systimer_cnt_t vsf_systimer_get(void)
+vsf_systimer_tick_t vsf_systimer_get(void)
 {
     LARGE_INTEGER li;
     GetSystemTimeAsFileTime((LPFILETIME)&li);
-    return (vsf_systimer_cnt_t)li.QuadPart - __vsf_arch_systimer.start_tick;
+    return (vsf_systimer_tick_t)li.QuadPart - __vsf_arch_systimer.start_tick;
 }
 
-bool vsf_systimer_set(vsf_systimer_cnt_t due)
+bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     LARGE_INTEGER li = {
         .QuadPart = __vsf_arch_systimer.start_tick + due,
@@ -191,27 +191,27 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
     return true;
 }
 
-bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     return (vsf_systimer_get() >= due);
 }
 
-vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
-    return (vsf_systimer_cnt_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    return (vsf_systimer_tick_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
 }
 
-vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    return (vsf_systimer_cnt_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    return (vsf_systimer_tick_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     return tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;
 }

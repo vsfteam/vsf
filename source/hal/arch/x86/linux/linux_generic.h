@@ -77,7 +77,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // unit is us
-typedef uint64_t vsf_systimer_cnt_t;
+typedef uint64_t vsf_systimer_tick_t;
 
 typedef enum vsf_arch_prio_t {
     VSF_ARCH_PRIO_INVALID = -1,

@@ -269,7 +269,7 @@ static void __vsf_systimer_on_notify(union sigval s)
 
     __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
 
-        vsf_systimer_cnt_t tick = vsf_systimer_get();
+        vsf_systimer_tick_t tick = vsf_systimer_get();
         vsf_systimer_timeout_evt_hanlder(tick);
 
     __vsf_arch_irq_end(&ctx->use_as__vsf_arch_irq_thread_t, false);
@@ -322,14 +322,14 @@ void vsf_systimer_set_idle(void)
 {
 }
 
-vsf_systimer_cnt_t vsf_systimer_get(void)
+vsf_systimer_tick_t vsf_systimer_get(void)
 {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
 }
 
-bool vsf_systimer_set(vsf_systimer_cnt_t due)
+bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     __vsf_arch.systimer.ts.tv_sec = due / 1000000;
     __vsf_arch.systimer.ts.tv_nsec = (due % 1000000) * 1000;
@@ -337,27 +337,27 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
     return true;
 }
 
-bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     return (vsf_systimer_get() >= due);
 }
 
-vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
-    return (vsf_systimer_cnt_t)time_us;
+    return (vsf_systimer_tick_t)time_us;
 }
 
-vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    return (vsf_systimer_cnt_t)(time_ms * 1000);
+    return (vsf_systimer_tick_t)(time_ms * 1000);
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     return tick;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return tick / 1000;
 }

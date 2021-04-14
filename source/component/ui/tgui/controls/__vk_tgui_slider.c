@@ -93,8 +93,8 @@ bool vk_tgui_slider_is_working(__vk_tgui_slider_t *ptSlider)
 int_fast16_t vk_tgui_slider_on_timer_event_handler(__vk_tgui_slider_t *ptSlider)
 {
     VSF_TGUI_ASSERT(NULL != ptSlider);
-    vsf_timer_tick_t tCurrentTime = vsf_systimer_get_ms();
-    vsf_timer_tick_t tElapsed = tCurrentTime - ptSlider->tOldTimeTick + ptSlider->tPosition.iResidual;
+    vsf_systimer_tick_t tCurrentTime = vsf_systimer_get_ms();
+    vsf_systimer_tick_t tElapsed = tCurrentTime - ptSlider->tOldTimeTick + ptSlider->tPosition.iResidual;
     ptSlider->tOldTimeTick = tCurrentTime;
 
     uint_fast32_t wStep = tElapsed * ptSlider->hwSpeed;

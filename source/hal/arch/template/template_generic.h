@@ -52,7 +52,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-typedef uint64_t vsf_systimer_cnt_t;
+typedef uint64_t vsf_systimer_tick_t;
 #endif
 
 #if VSF_ARCH_PRI_NUM > 0

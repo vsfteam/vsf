@@ -75,7 +75,7 @@ bool vsf_arch_low_level_init(void)
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
-vsf_systimer_cnt_t vsf_systimer_get_tick_elapsed(void)
+vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
     return SYSTICK_RVR - vsf_systick_get_count();
 }
@@ -117,7 +117,7 @@ void vsf_systimer_low_level_int_enable(void)
     vsf_systick_int_enable();
 }
 
-void vsf_systimer_set_reload_value(vsf_systimer_cnt_t tick_cnt)
+void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
     vsf_systick_set_reload((uint32_t)tick_cnt);
 }

@@ -145,7 +145,7 @@ typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t timer_request;
     HANDLE timer;
-    vsf_systimer_cnt_t start_tick;
+    vsf_systimer_tick_t start_tick;
 } vsf_arch_systimer_ctx_t;
 
 typedef struct vsf_x86_t {
@@ -793,7 +793,7 @@ static void __vsf_systimer_thread(void *arg)
 
         __vsf_arch_irq_start(&ctx->use_as__vsf_arch_irq_thread_t);
 
-            vsf_systimer_cnt_t tick = vsf_systimer_get();
+            vsf_systimer_tick_t tick = vsf_systimer_get();
             vsf_arch_trace_systimer("systimer triggered: %lld\r\n", tick);
             vsf_systimer_timeout_evt_hanlder(tick);
 
@@ -837,23 +837,23 @@ void vsf_systimer_set_idle(void)
     vsf_arch_trace_function("%s exited" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
 }
 
-vsf_systimer_cnt_t __vsf_systimer_get(void)
+vsf_systimer_tick_t __vsf_systimer_get(void)
 {
     LARGE_INTEGER li;
     GetSystemTimeAsFileTime((LPFILETIME)&li);
 
-    return (vsf_systimer_cnt_t)li.QuadPart - __vsf_x86.systimer.start_tick;
+    return (vsf_systimer_tick_t)li.QuadPart - __vsf_x86.systimer.start_tick;
 }
 
-vsf_systimer_cnt_t vsf_systimer_get(void)
+vsf_systimer_tick_t vsf_systimer_get(void)
 {
     vsf_arch_trace_function("%s(void)" VSF_TRACE_CFG_LINEEND, __FUNCTION__);
-    vsf_systimer_cnt_t ret = __vsf_systimer_get();
+    vsf_systimer_tick_t ret = __vsf_systimer_get();
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
     return ret;
 }
 
-bool vsf_systimer_set(vsf_systimer_cnt_t due)
+bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     vsf_arch_trace_function("%s(%d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
 
@@ -871,7 +871,7 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
     return true;
 }
 
-bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     vsf_arch_trace_function("%s(due: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)due);
     bool ret = vsf_systimer_get() >= due;
@@ -879,23 +879,23 @@ bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
     return ret;
 }
 
-vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     vsf_arch_trace_function("%s(time_us: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_us);
-    vsf_systimer_cnt_t ret = (vsf_systimer_cnt_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
+    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((uint64_t)time_us * VSF_ARCH_SYSTIMER_FREQ) / 1000000UL);
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
     return ret;
 }
 
-vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     vsf_arch_trace_function("%s(time_ms: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, time_ms);
-    vsf_systimer_cnt_t ret = (vsf_systimer_cnt_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
+    vsf_systimer_tick_t ret = (vsf_systimer_tick_t)(((uint64_t)time_ms * VSF_ARCH_SYSTIMER_FREQ) / 1000UL);
     vsf_arch_trace_function("%s exited with %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)ret);
     return ret;
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
     uint_fast32_t ret = tick * 1000000ul / VSF_ARCH_SYSTIMER_FREQ;
@@ -903,7 +903,7 @@ uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
     return ret;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     vsf_arch_trace_function("%s(tick: %d)" VSF_TRACE_CFG_LINEEND, __FUNCTION__, (int)tick);
     uint_fast32_t ret = tick * 1000ul / VSF_ARCH_SYSTIMER_FREQ;

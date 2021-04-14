@@ -63,14 +63,14 @@ typedef struct vsf_local_t {
         vsf_timer_queue_t   timq;
 #   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 #       ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-        vsf_timer_tick_t    pre_tick;
+        vsf_systimer_tick_t pre_tick;
 #       endif
         // TODO: use vsf_atomic_t instead
 //        vsf_atomic_t        processing;
         bool                processing;
         vsf_arch_prio_t     arch_prio;
 #   else
-        vsf_timer_tick_t    cur_tick;
+        vsf_systimer_tick_t cur_tick;
 #   endif
     } timer;
 #endif
@@ -1010,7 +1010,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_TIMER:
         origlevel = vsf_protect_sched();
         vsf_timq_peek(&__vsf_eda.timer.timq, teda);
-        while ((teda != NULL) && __vsf_timer_is_due(teda->due)) {
+        while ((teda != NULL) && __vsf_systimer_is_due(teda->due)) {
             vsf_timq_dequeue(&__vsf_eda.timer.timq, teda);
 
             teda->use_as__vsf_eda_t.flag.state.is_timed = false;
@@ -1023,7 +1023,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
                 origlevel = __vsf_callback_timer_protect();
                 vsf_callback_timq_peek(&__vsf_eda.timer.callback_timq, timer);
-                while ((timer != NULL) && __vsf_timer_is_due(timer->due)) {
+                while ((timer != NULL) && __vsf_systimer_is_due(timer->due)) {
                     vsf_callback_timq_dequeue(&__vsf_eda.timer.callback_timq, timer);
                     __vsf_callback_timer_unprotect(origlevel);
 
@@ -1049,7 +1049,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         }
 #if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
         __vsf_eda.timer.processing = false;
-        __vsf_timer_update(true);
+        __vsf_systimer_update(true);
 #endif
         vsf_unprotect_sched(origlevel);
         break;
@@ -1085,7 +1085,7 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_callback_timer_t *timer = vsf_eda_get_cur_msg();
             VSF_KERNEL_ASSERT(timer != NULL);
 
-            vsf_timer_tick_t now = vsf_systimer_get_tick();
+            vsf_systimer_tick_t now = vsf_systimer_get_tick();
 
             if (now >= timer->due) {
                 timer->due = 0;
@@ -1142,7 +1142,7 @@ vsf_err_t vsf_kernel_start(void)
     vsf_err_t err;
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    __vsf_timer_init();
+    __vsf_systimer_init();
 #   endif
 
     __vsf_eda.task.fn.evthandler = __vsf_kernel_evthandler;
@@ -1150,7 +1150,7 @@ vsf_err_t vsf_kernel_start(void)
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
     if (VSF_ERR_NONE == err) {
-        __vsf_timer_start();
+        __vsf_systimer_start();
     }
 #   endif
     return err;

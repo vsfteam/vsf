@@ -53,8 +53,8 @@ extern "C" {
 
 // TODO: real tick type is TickType_t from freertos configuration
 //  but freertos headers are not available here to avoid namespace pollution
-//typedef TickType_t                  vsf_systimer_cnt_t;
-typedef uint32_t                    vsf_systimer_cnt_t;
+//typedef TickType_t                  vsf_systimer_tick_t;
+typedef uint32_t                    vsf_systimer_tick_t;
 typedef bool                        vsf_gint_state_t;
 
 dcl_simple_class(vsf_arch_irq_thread_t)

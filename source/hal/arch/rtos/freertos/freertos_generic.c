@@ -65,7 +65,7 @@
 typedef struct __vsf_freertos_t {
     struct {
         TimerHandle_t               handle;
-        vsf_systimer_cnt_t          due;
+        vsf_systimer_tick_t         due;
     } timer;
     struct {
         BaseType_t                  stack[VSF_ARCH_FREERTOS_CFG_IRQ_DEPTH];
@@ -311,7 +311,7 @@ vsf_arch_prio_t __vsf_arch_model_get_current_priority(void)
 
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_REQUEST_RESPONSE
 
-vsf_systimer_cnt_t vsf_systimer_get(void)
+vsf_systimer_tick_t vsf_systimer_get(void)
 {
     return xTaskGetTickCount();
 }
@@ -327,9 +327,9 @@ static void __vsf_systimer_callback(TimerHandle_t xTimer)
  */
 vsf_err_t vsf_systimer_init(void)
 {
-    // if assert here, modify vsf_systimer_cnt_t in freerots_generic.h to fit TickType_t
-    VSF_ARCH_ASSERT(sizeof(vsf_systimer_cnt_t) == sizeof(TickType_t));
-    __vsf_freertos.timer.handle = xTimerCreate("vsf_timer", 1, pdFALSE,
+    // if assert here, modify vsf_systimer_tick_t in freerots_generic.h to fit TickType_t
+    VSF_ARCH_ASSERT(sizeof(vsf_systimer_tick_t) == sizeof(TickType_t));
+    __vsf_freertos.timer.handle = xTimerCreate("vsf_systimer", 1, pdFALSE,
             NULL, __vsf_systimer_callback);
     return VSF_ERR_NONE;
 }
@@ -344,12 +344,12 @@ void vsf_systimer_set_idle(void)
 
 }
 
-bool vsf_systimer_set(vsf_systimer_cnt_t due)
+bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
-    vsf_systimer_cnt_t cur = vsf_systimer_get();
+    vsf_systimer_tick_t cur = vsf_systimer_get();
 
     if (due > cur) {
-        vsf_systimer_cnt_t diff = due - cur;
+        vsf_systimer_tick_t diff = due - cur;
         BaseType_t ret = xTimerChangePeriod(__vsf_freertos.timer.handle, diff, 0);
         VSF_ARCH_ASSERT(pdPASS == ret);
         return true;
@@ -357,34 +357,34 @@ bool vsf_systimer_set(vsf_systimer_cnt_t due)
     return false;
 }
 
-bool vsf_systimer_is_due(vsf_systimer_cnt_t due)
+bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     return vsf_systimer_get() >= due;
 }
 
-vsf_systimer_cnt_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
+vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     // not supported by freertos
     VSF_ARCH_ASSERT(false);
     return 0;
 }
 
-vsf_systimer_cnt_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
+vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
-    vsf_systimer_cnt_t tick = pdMS_TO_TICKS(time_ms);
+    vsf_systimer_tick_t tick = pdMS_TO_TICKS(time_ms);
     // if assert here, try increase configTICK_RATE_HZ in freertos configuration
     VSF_ARCH_ASSERT(tick != 0);
     return tick;
 }
 
-uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     // not supported by freertos
     VSF_ARCH_ASSERT(false);
     return 0;
 }
 
-uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_cnt_t tick)
+uint_fast32_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return tick * portTICK_PERIOD_MS;
 }
