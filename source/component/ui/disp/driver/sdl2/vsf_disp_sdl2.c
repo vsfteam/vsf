@@ -144,18 +144,18 @@ static void __vk_disp_sdl2_flush_thread(void *arg)
 
     __vsf_arch_irq_set_background(irq_thread);
 
-    while (1) {
+    do {
+        __vsf_arch_irq_start(irq_thread);
+            vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
+        __vsf_arch_irq_end(irq_thread, false);
+
         __vsf_arch_irq_request_pend(&disp_sdl2->flush_request);
         __vk_disp_sdl2_screen_update(disp_sdl2);
 
         if (disp_sdl2->flush_delay_ms > 0) {
             __vsf_arch_irq_sleep(disp_sdl2->flush_delay_ms);
         }
-
-        __vsf_arch_irq_start(irq_thread);
-            vk_disp_on_ready(&disp_sdl2->use_as__vk_disp_t);
-        __vsf_arch_irq_end(irq_thread, false);
-    }
+    } while (1);
 }
 
 static uint_fast16_t __vk_disp_sdl2_keycode_remap(SDL_Keycode keycode)
