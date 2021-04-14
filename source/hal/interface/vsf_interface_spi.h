@@ -77,6 +77,7 @@ enum em_spi_irq_mask_t {
     SPI_IRQ_MASK_TX_FIFO_EMPTY,
 };
 //! @}
+ */
 
 /* spi_status_t should implement peripheral_status_t */
 typedef struct spi_status_t spi_status_t;
@@ -84,7 +85,13 @@ typedef struct spi_status_t spi_status_t;
 /* spi_capability_t should implement peripheral_capability_t */
 typedef struct spi_capability_t spi_capability_t;
 
+typedef enum em_spi_irq_mask_t em_spi_irq_mask_t;
+
 typedef struct vsf_spi_t vsf_spi_t;
+
+typedef void vsf_spi_isr_handler_t(void *target_ptr,
+                                   vsf_spi_t *spi_ptr,
+                                   em_spi_irq_mask_t irq_mask);
 
 typedef struct vsf_spi_isr_t {
     vsf_spi_isr_handler_t       *handler_fn;
