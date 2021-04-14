@@ -444,6 +444,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
 
         if (csr1 & MUSBD_CSR0_SENTSTALL) {
             reg->EP0.CSR0 &= ~MUSBD_CSR0_SENTSTALL;
+            usbd->is_status_notified = true;
             usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
         }
 
