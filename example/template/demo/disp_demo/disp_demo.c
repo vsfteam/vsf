@@ -51,6 +51,95 @@ static NO_INIT vsf_teda_t __disp_task;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if __M484__
+
+#define GPIO_PIN_DATA(port, pin) (*((volatile uint32_t *)((GPIO_PIN_DATA_BASE+(0x40*(port))) + ((pin)<<2)))) /*!< Pin Data Input/Output \hideinitializer */
+#define PB13                     GPIO_PIN_DATA(1, 13) /*!< Specify PB.13 Pin Data Input/Output \hideinitializer */
+#define PB10                     GPIO_PIN_DATA(1, 10) /*!< Specify PB.13 Pin Data Input/Output \hideinitializer */
+#define PB11                     GPIO_PIN_DATA(1, 11) /*!< Specify PB.13 Pin Data Input/Output \hideinitializer */
+
+#ifdef WEAK_VK_DISP_MIPI_LCD_IO_INIT
+void vk_disp_mipi_lcd_io_init(vk_disp_mipi_lcd_t *disp_mipi_lcd)
+{
+    SYS->GPB_MFPH = SYS->GPB_MFPH & ~(  SYS_GPB_MFPH_PB10MFP_Msk
+                                      | SYS_GPB_MFPH_PB12MFP_Msk
+                                      | SYS_GPB_MFPH_PB13MFP_Msk
+                                      | SYS_GPB_MFPH_PB14MFP_Msk
+                                      | SYS_GPB_MFPH_PB15MFP_Msk )
+
+                                      | (0x04UL << SYS_GPB_MFPH_PB12MFP_Pos)
+                                      | (0x00UL << SYS_GPB_MFPH_PB13MFP_Pos) //| (0x04UL << SYS_GPB_MFPH_PB13MFP_Pos)
+                                      | (0x00UL << SYS_GPB_MFPH_PB10MFP_Pos)
+                                      | (0x04UL << SYS_GPB_MFPH_PB14MFP_Pos)
+                                      | (0x04UL << SYS_GPB_MFPH_PB15MFP_Pos);
+    PB->SMTEN  |= GPIO_SMTEN_SMTEN15_Msk;
+    PB->SLEWCTL = (PB->SLEWCTL & 0x00FFFFFF) | 0x55100000;
+    PB->MODE = PB->MODE & ~(0x03 << 26) | (0x01 << 26);                // force MOSI as GPIO
+    PB->MODE = PB->MODE & ~(0x03 << 20) | (0x01 << 20);                // PB10
+
+
+    SYS->GPB_MFPH = SYS->GPB_MFPH & ~(  SYS_GPB_MFPH_PB10MFP_Msk
+                                      | SYS_GPB_MFPH_PB12MFP_Msk
+                                      | SYS_GPB_MFPH_PB13MFP_Msk
+                                      | SYS_GPB_MFPH_PB14MFP_Msk
+                                      | SYS_GPB_MFPH_PB15MFP_Msk )
+
+                                      | (0x04UL << SYS_GPB_MFPH_PB12MFP_Pos)
+                                      | (0x00UL << SYS_GPB_MFPH_PB13MFP_Pos) //| (0x04UL << SYS_GPB_MFPH_PB13MFP_Pos)
+                                      | (0x00UL << SYS_GPB_MFPH_PB10MFP_Pos)
+                                      | (0x04UL << SYS_GPB_MFPH_PB14MFP_Pos)
+                                      | (0x04UL << SYS_GPB_MFPH_PB15MFP_Pos);
+    PB->SMTEN  |= GPIO_SMTEN_SMTEN15_Msk;
+    PB->SLEWCTL = (PB->SLEWCTL & 0x00FFFFFF) | 0x55100000;
+    PB->MODE = PB->MODE & ~(0x03 << 26) | (0x01 << 26);                // force MOSI as GPIO
+    PB->MODE = PB->MODE & ~(0x03 << 20) | (0x01 << 20);                // PB10
+
+    // PB10 PB11 as gpio
+    SYS->GPB_MFPH = SYS->GPB_MFPH & ~(  SYS_GPB_MFPH_PB9MFP_Msk
+                                      | SYS_GPB_MFPH_PB10MFP_Msk
+                                      | SYS_GPB_MFPH_PB11MFP_Msk)
+                                      | (0x00UL << SYS_GPB_MFPH_PB9MFP_Pos)
+                                      | (0x00UL << SYS_GPB_MFPH_PB10MFP_Pos)
+                                      | (0x00UL << SYS_GPB_MFPH_PB11MFP_Pos);
+    // high speed
+    PB->SLEWCTL = (PB->SLEWCTL & ~(GPIO_SLEWCTL_HSREN9_Msk | GPIO_SLEWCTL_HSREN10_Msk | GPIO_SLEWCTL_HSREN11_Msk))
+                    | (0x1UL << GPIO_SLEWCTL_HSREN9_Pos)
+                    | (0x1UL << GPIO_SLEWCTL_HSREN10_Pos)
+                    | (0x1UL << GPIO_SLEWCTL_HSREN11_Pos) ;
+
+    // input or ouput
+    PB->MODE = PB->MODE & ~(GPIO_MODE_MODE10_Msk | GPIO_MODE_MODE11_Msk)
+                | (0x01 << GPIO_MODE_MODE9_Pos)  // output
+                | (0x01 << GPIO_MODE_MODE10_Pos)  // output
+                | (0x00 << GPIO_MODE_MODE11_Pos); // input
+}
+#endif
+
+#if VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+void vk_disp_mipi_lcd_hw_reset(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool level)
+{
+    if (level) {
+        PB10 = 1;
+    } else {
+        PB10 = 0;
+    }
+}
+#endif
+
+void vk_disp_mipi_lcd_dcx_set(vk_disp_mipi_lcd_t *disp_mipi_lcd, bool state)
+{
+    PB13 = state;
+}
+
+void vk_disp_mipi_te_line_interrupt_enable_once(vk_disp_mipi_lcd_t *disp_mipi_lcd)
+{
+    while (PB11 != 0);
+    while (PB11 == 0);
+
+    vk_disp_mipi_tearing_effect_line_ready(disp_mipi_lcd);
+}
+#endif
+
 static void __disp_demo_fps_dump(void)
 {
 #if APP_DISP_DEMO_FPS_OUTPUT == ENABLED

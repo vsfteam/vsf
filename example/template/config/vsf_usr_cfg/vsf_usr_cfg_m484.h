@@ -27,33 +27,37 @@
 #define VSF_SYSTIMER_FREQ                               (192000000ul)
 
 // Application configure
-#define APP_USE_LINUX_DEMO                              ENABLED
-#   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
-#   define APP_USE_LINUX_MOUNT_FILE_DEMO                ENABLED
-#define APP_USE_USBH_DEMO                               ENABLED
-#define APP_USE_USBD_DEMO                               ENABLED
+#define APP_USE_LINUX_DEMO                              DISABLED
+#   define APP_USE_LINUX_LIBUSB_DEMO                    DISABLED
+#   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
+#define APP_USE_USBH_DEMO                               DISABLED
+#define APP_USE_USBD_DEMO                               DISABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
 #   define APP_USE_USBD_UVC_DEMO                        ENABLED
-#define APP_USE_SCSI_DEMO                               ENABLED
+#define APP_USE_SCSI_DEMO                               DISABLED
 //  todo: implement audio driver for m484
 #define APP_USE_AUDIO_DEMO                              DISABLED
 //  current tgui demo depends on VSF_DISP_USE_SDL2, which is only available on __WIN__
 #define APP_USE_TGUI_DEMO                               DISABLED
 //  current M484 hardware has no display
 #define APP_USE_SDL2_DEMO                               DISABLED
+#define APP_USE_DISP_DEMO                               ENABLED
 //  TODO: need test for c++ support
-#define APP_USE_CPP_DEMO                                ENABLED
+//#define APP_USE_CPP_DEMO                                ENABLED
 #if APP_USE_CPP_DEMO == ENABLED
 #   define __VSF_WORKAROUND_IAR_CPP__
 #endif
+
+#define APP_USE_HAL_DEMO                                ENABLED
+#define APP_USE_HAL_SPI_DEMO                            DISABLED
 
 // 3rd-party demos
 //  awtk is LGPL, not convenient to implement in MCU
 #define APP_USE_AWTK_DEMO                               DISABLED
 // nnom minst demo seems to be broken
 #define APP_USE_NNOM_DEMO                               DISABLED
-#define APP_USE_LVGL_DEMO                               ENABLED
+#define APP_USE_LVGL_DEMO                               DISABLED
 #   define APP_LVGL_DEMO_USE_TOUCHSCREEN                ENABLED
 #   define APP_LVGL_DEMO_CFG_TOUCH_REMAP                ENABLED
 // if using dl1x5(DL1X5 chips from DisplayLink), color_depth should be 16,
@@ -62,11 +66,11 @@
 #   define APP_LVGL_DEMO_CFG_HOR_RES                    320
 #   define APP_LVGL_DEMO_CFG_VER_RES                    240
 #   define APP_LVGL_DEMO_CFG_PIXEL_BUFFER_SIZE          (4 * 1024)
-#define APP_USE_BTSTACK_DEMO                            ENABLED
+#define APP_USE_BTSTACK_DEMO                            DISABLED
 #define APP_USE_VSFVM_DEMO                              DISABLED
 // select one for tcpip stack
 #define APP_USE_VSFIP_DEMO                              DISABLED
-#define APP_USE_LWIP_DEMO                               ENABLED
+#define APP_USE_LWIP_DEMO                               DISABLED
 #define APP_USE_EVM_DEMO                                DISABLED
 
 // component configure
@@ -184,6 +188,18 @@
 #define VSF_LINUX_CFG_STACKSIZE                         4096
 #define VSF_TRACE_CFG_COLOR_EN                          DISABLED
 #define VSH_HAS_COLOR                                   0
+
+#define VSF_DISP_USE_MIPI_LCD                           ENABLED
+#   define WEAK_VK_DISP_MIPI_TE_LINE_ISR_ENABLE_ONCE
+#   define WEAK_VK_DISP_MIPI_LCD_IO_INIT
+#   define VK_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET      ENABLED
+
+#   define APP_DISP_DEMO_HEIGHT                         320
+#   define APP_DISP_DEMO_WIDTH                          480
+#   define APP_DISP_DEMO_COLOR                          VSF_DISP_COLOR_RGB565
+#   define APP_DISP_DEMO_SEQ                            VSF_DISP_MIPI_LCD_ST7796S
+
+#define VSF_USE_UI                                      ENABLED
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
