@@ -1280,6 +1280,7 @@
     <ClCompile Include="..\..\demo\common\usrapp_usbd_common.c" />
     <ClCompile Include="..\..\demo\common\usrapp_usbh_common.c" />
     <ClCompile Include="..\..\demo\cpp_demo\cpp_demo.cpp" />
+    <ClCompile Include="..\..\demo\disp_demo\disp_demo.c" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
     <ClCompile Include="..\..\demo\gato_demo\gato_application.c" />

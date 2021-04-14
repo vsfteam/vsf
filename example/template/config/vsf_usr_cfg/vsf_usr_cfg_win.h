@@ -51,6 +51,7 @@
 #define APP_USE_TGUI_DEMO                               ENABLED
 #define APP_USE_TGUI_DESIGNER_DEMO                      DISABLED
 #define APP_USE_SDL2_DEMO                               ENABLED
+#define APP_USE_DISP_DEMO                               ENABLED
 #define APP_USE_KERNEL_TEST                             ENABLED
 #define APP_USE_JSON_DEMO                               ENABLED
 #define APP_USE_HAL_DEMO                                ENABLED

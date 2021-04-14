@@ -205,6 +205,10 @@ int vsf_linux_create_fhs(void)
     busybox_bind("/sbin/cpp_test", cpp_main);
 #endif
 
+#if APP_USE_DISP_DEMO == ENABLED
+    extern int disp_main(int argc, char *argv[]);
+    busybox_bind("/sbin/disp", disp_main);
+#endif
 #if APP_USE_SDL2_DEMO == ENABLED
     extern int sdl2_main(int argc, char *argv[]);
     busybox_bind("/sbin/sdl2", sdl2_main);

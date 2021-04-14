@@ -964,6 +964,9 @@
     <Filter Include="vsf\component\usb\driver\dcd\distbus_dcd">
       <UniqueIdentifier>{1db0d307-e539-4a31-8a26-9940a27d11d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\disp_demo">
+      <UniqueIdentifier>{5109e45f-fcf2-478c-a788-0d2efb5fb7a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -4891,6 +4894,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.c">
       <Filter>vsf\component\usb\driver\dcd\distbus_dcd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\disp_demo\disp_demo.c">
+      <Filter>usrapp\demo\disp_demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
