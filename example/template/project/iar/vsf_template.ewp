@@ -5625,6 +5625,12 @@
                 </file>
             </group>
             <group>
+                <name>disp</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\disp_demo\disp_demo.c</name>
+                </file>
+            </group>
+            <group>
                 <name>evm_demo</name>
                 <excluded>
                     <configuration>vsf_template_m484</configuration>
@@ -7734,6 +7740,7 @@
                 <group>
                     <name>lwip</name>
                     <excluded>
+                        <configuration>vsf_template_m484</configuration>
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
@@ -8706,6 +8713,15 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\fb\vsf_disp_fb.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>mipi_lcd</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_lcd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\ui\disp\driver\mipi_lcd\vsf_disp_mipi_lcd.h</name>
                             </file>
                         </group>
                         <group>
@@ -11023,6 +11039,15 @@
                         <group>
                             <name>common</name>
                             <group>
+                                <name>dma</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\dma\dma.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\dma\dma.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>io</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\io\io.c</name>
@@ -11044,6 +11069,15 @@
                                 </file>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\pm\pm_lv0.c</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>spi</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\spi\spi.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Nuvoton\M480\common\spi\spi.h</name>
                                 </file>
                             </group>
                             <group>
