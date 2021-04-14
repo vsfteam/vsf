@@ -20,8 +20,7 @@
 #include "./usrapp_ui_common.h"
 
 #if     VSF_USE_UI == ENABLED                                                   \
-    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED || VSF_DISP_USE_DL1X5 == ENABLED)\
-    &&  (VSF_USE_SDL2 == ENABLED || VSF_USE_TINY_GUI == ENABLED || VSF_USE_AWTK == ENABLED || VSF_USE_LVGL == ENABLED)
+    &&  (VSF_DISP_USE_SDL2 == ENABLED || VSF_DISP_USE_FB == ENABLED || VSF_DISP_USE_DL1X5 == ENABLED || VSF_DISP_USE_MIPI_LCD == ENABLED)
 
 #include "hal/vsf_hal.h"
 
@@ -102,6 +101,20 @@ usrapp_ui_common_t usrapp_ui_common = {
             .num                = APP_DISP_FB_NUM,
             .pixel_byte_size    = vsf_disp_get_pixel_format_bytesize(APP_DISP_FB_COLOR),
         },
+    },
+#elif VSF_DISP_USE_MIPI_LCD == ENABLED
+    .disp                       = &usrapp_ui_common.disp_mipi_lcd.use_as__vk_disp_t,
+    .disp_mipi_lcd              = {
+        .param                  = {
+            .height             = APP_DISP_DEMO_HEIGHT,
+            .width              = APP_DISP_DEMO_WIDTH,
+            .drv                = &vk_disp_drv_mipi_lcd,
+            .color              = APP_DISP_DEMO_COLOR,
+        },
+        .spi                    = &vsf_spi0,
+        .init_seq               = (const uint8_t [])APP_DISP_DEMO_SEQ,
+        .init_seq_len           = sizeof((const uint8_t [])APP_DISP_DEMO_SEQ),
+
     },
 #else
     .disp                       = NULL,
