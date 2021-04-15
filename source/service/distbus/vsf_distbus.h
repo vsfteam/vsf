@@ -48,19 +48,20 @@ extern "C" {
 
 dcl_simple_class(vsf_distbus_t)
 dcl_simple_class(vsf_distbus_service_t)
-dcl_simple_class(vsf_distbus_trans_t)
+dcl_simple_class(vsf_distbus_msg_t)
 
-typedef bool (*vsf_distbus_transhandler_t)( vsf_distbus_t *bus,
+// returns true to hold msg
+typedef bool (*vsf_distbus_msghandler_t)(   vsf_distbus_t *bus,
                                             vsf_distbus_service_t *service,
-                                            vsf_distbus_trans_t *trans);
-typedef struct vsf_distbus_transheader_t {
+                                            vsf_distbus_msg_t *msg);
+typedef struct vsf_distbus_msgheader_t {
     uint32_t                                datalen;
     uint32_t                                hash_header;
     uint32_t                                hash_data;
     uint16_t                                addr;
     uint16_t                                flag;
-} vsf_distbus_transheader_t;
-def_simple_class(vsf_distbus_trans_t) {
+} vsf_distbus_msgheader_t;
+def_simple_class(vsf_distbus_msg_t) {
     private_member(
         union {
             uint32_t                        pos;
@@ -69,7 +70,7 @@ def_simple_class(vsf_distbus_trans_t) {
     )
     public_member(
         uint32_t                            buffer_size;
-        vsf_distbus_transheader_t           header[0];
+        vsf_distbus_msgheader_t             header;
     )
 };
 
@@ -78,30 +79,49 @@ typedef struct vsf_distbus_service_info_t {
     uint16_t                                type;
     uint8_t                                 addr_range;
     uint8_t                                 flag;
-    vsf_distbus_transhandler_t              handler;
+    vsf_distbus_msghandler_t                handler;
 } vsf_distbus_service_info_t;
 
 def_simple_class(vsf_distbus_service_t) {
     private_member(
-        vsf_slist_node_t                    service_node;
+        vsf_slist_node_t                    node;
     )
     public_member(
         uint16_t                            addr_start;
-        uint16_t                            addr_end;
         const vsf_distbus_service_info_t    *info;
     )
 };
 
-typedef struct vsf_distbuf_drv_t {
-    uint_fast32_t (*send)(uint8_t *buffer, uint_fast32_t size);
-    uint_fast32_t (*recv)(uint8_t *buffer, uint_fast32_t size, void (*)(uint8_t *buffer, uint_fast32_t size));
-} vsf_distbuf_drv_t;
+typedef struct vsf_distbus_bus_op_t {
+    // returns true if sent
+    bool (*send)(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p));
+    // returns true if received
+    bool (*recv)(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p));
+} vsf_distbus_bus_op_t;
+
+typedef struct vsf_distbus_mem_op_t {
+    // dynamic allocation of message SHOULD be implemented as pool, becasue maybe
+    //  it will be called in interrupt
+    void * (*alloc_msg)(uint_fast32_t size);
+    void (*free_msg)(void *msg);
+} vsf_distbus_mem_op_t;
+
+typedef void (*vsf_distbus_on_error_t)(vsf_distbus_t *distbus);
+typedef struct vsf_distbus_op_t {
+    vsf_distbus_bus_op_t                    bus;
+    vsf_distbus_mem_op_t                    mem;
+    vsf_distbus_on_error_t                  on_error;
+} vsf_distbus_op_t;
 
 def_simple_class(vsf_distbus_t) {
+    public_member(
+        const vsf_distbus_op_t              op;
+    )
     private_member(
-        const vsf_distbuf_drv_t             *drv;
-        vsf_distbus_trans_t                 *trans_rx;
-        vsf_distbus_trans_t                 *trans_tx;
+        uint32_t                            mtu;
+        vsf_distbus_msg_t                   *msg_rx;
+        vsf_distbus_msg_t                   *msg_tx;
+        vsf_slist_t                         msg_tx_list;
         vsf_slist_t                         service_list;
     )
 };
@@ -110,13 +130,15 @@ def_simple_class(vsf_distbus_t) {
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef __VSF_DISTBUS_CLASS_INHERIT__
-extern vsf_distbus_trans_t * vsf_distbus_alloc_trans(vsf_distbus_t *distbus, uint_fast32_t size);
-extern void vsf_distbus_free_trans(vsf_distbus_t *distbus, vsf_distbus_trans_t *trans);
-// after transact is sent, it will be freed automatically
-extern vsf_err_t vsf_distbus_send_trans(vsf_distbus_t *distbus, vsf_distbus_trans_t *trans);
+// size is data size of message(excluding header)
+extern vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size);
+// if user hold msg by returning trun in vsf_distbus_msghandler_t, user MUST free msg manually
+extern void vsf_distbus_free_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *msg);
+// after message is sent, it will be freed automatically
+extern void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
 #endif
 
-extern vsf_err_t vsf_distbuf_init(vsf_distbus_t *distbus, const vsf_distbuf_drv_t *drv);
+extern vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus);
 
 #ifdef __cplusplus
 }
