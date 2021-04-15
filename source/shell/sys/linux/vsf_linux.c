@@ -978,8 +978,9 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *execeptfds, stru
     VSF_LINUX_ASSERT(false);
     return -1;
 }
+#endif
 
-// conflicts with remove in ucrt
+// conflicts with remove in ucrt, so make sure remove is defined to __vsf_linux_remove
 int remove(const char * pathname)
 {
     char fullpath[MAX_PATH];
@@ -991,7 +992,6 @@ int remove(const char * pathname)
     VSF_LINUX_ASSERT(false);
     return -1;
 }
-#endif
 
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
