@@ -1,0 +1,17 @@
+ zconf.h    |  3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/zconf.h b/zconf.h
+index 5e1d68a..c7524b0 100644
+--- a/zconf.h
++++ b/zconf.h
+@@ -8,6 +8,9 @@
+ #ifndef ZCONF_H
+ #define ZCONF_H
+ 
++#undef _WIN32
++#define HAVE_UNISTD_H
++
+ /*
+  * If you *really* need a unique prefix for all types and library functions,
+  * compile with -DZ_PREFIX. The "standard" zlib should be compiled without it.

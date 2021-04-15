@@ -2,7 +2,8 @@
  source/component/3rd-party/coremark/raw/core_main.c | 2 +-
  source/component/3rd-party/lua/raw/lua.c | 2 +-
  source/component/3rd-party/zlib/raw/inftrees.c | 10 +++-------
- 4 file changed, 7 insertions(+), 11 deletions(-)
+ source/component/3rd-party/zlib/raw/zconf.h | 3 +++
+ 5 file changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/source/component/3rd-party/btstack/raw/src/l2cap.c b/source/component/3rd-party/btstack/raw/src/l2cap.c
 index fe9f5ca8e..edac99c75 100644
@@ -76,3 +77,18 @@ index 2ea08fc..8685887 100644
  {
      unsigned len;               /* a code's length in bits */
      unsigned sym;               /* index of code symbols */
+
+diff --git source/component/3rd-party/zlib/raw/zconf.h source/component/3rd-party/zlib/raw/zconf.h
+index 5e1d68a..c7524b0 100644
+--- source/component/3rd-party/zlib/raw/zconf.h
++++ source/component/3rd-party/zlib/raw/zconf.h
+@@ -8,6 +8,9 @@
+ #ifndef ZCONF_H
+ #define ZCONF_H
+ 
++#undef _WIN32
++#define HAVE_UNISTD_H
++
+ /*
+  * If you *really* need a unique prefix for all types and library functions,
+  * compile with -DZ_PREFIX. The "standard" zlib should be compiled without it.
