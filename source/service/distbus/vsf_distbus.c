@@ -53,10 +53,13 @@ void vsf_distbus_free_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *msg)
     distbus->op.mem.free_msg(msg);
 }
 
-static uint_fast16_t __vsf_distbus_hash(void *buffer, uint_fast32_t size)
+static uint16_t __vsf_distbus_hash(uint8_t *buffer, uint_fast32_t size)
 {
-    // TODO: add hash
-    return 0;
+    uint16_t hash = 0;
+    for (uint_fast32_t i = 0; i < size; i++) {
+        hash += *buffer++;
+    }
+    return hash;
 }
 
 static bool __vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *msg)
@@ -86,9 +89,9 @@ void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *service
     VSF_SERVICE_ASSERT((distbus != NULL) && (service != NULL) && (msg != NULL));
 
     msg->header.addr += service->addr_start;
-    msg->header.hash_data = __vsf_distbus_hash(&msg[1], msg->header.datalen);
+    msg->header.hash_data = __vsf_distbus_hash((uint8_t *)&msg[1], msg->header.datalen);
     msg->header.hash_header = 0;
-    msg->header.hash_header = __vsf_distbus_hash(&msg->header, sizeof(msg->header));
+    msg->header.hash_header = __vsf_distbus_hash((uint8_t *)&msg->header, sizeof(msg->header));
 
     bool is_to_send_now;
     vsf_protect_t orig = vsf_protect_int();
