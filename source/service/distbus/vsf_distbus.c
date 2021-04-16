@@ -121,14 +121,7 @@ static void __vsf_distbus_on_recv(void *p)
         uint_fast16_t hash = msg->header.hash_header;
         msg->header.hash_header = 0;
         if (hash != __vsf_distbus_hash((uint8_t *)&msg->header, sizeof(msg->header))) {
-        on_hash_error:
-            if (distbus->op.on_error != NULL) {
-                distbus->op.on_error(distbus);
-            }
-
-            vsf_distbus_free_msg(distbus, msg);
-            distbus->msg_rx = NULL;
-            return;
+            goto on_hash_error;
         }
 
         msg->pos = sizeof(msg->header);
@@ -137,7 +130,14 @@ static void __vsf_distbus_on_recv(void *p)
         }
     } else if (sizeof(msg->header) == msg->pos) {
         if (msg->header.hash_data != __vsf_distbus_hash((uint8_t *)&msg->header + msg->pos, msg->header.datalen)) {
-            goto on_hash_error;
+        on_hash_error:
+            if (distbus->op.on_error != NULL) {
+                distbus->op.on_error(distbus);
+            }
+
+            vsf_distbus_free_msg(distbus, msg);
+            distbus->msg_rx = NULL;
+            return;
         }
 
         __vsf_slist_foreach_unsafe(vsf_distbus_service_t, node, &distbus->service_list) {
