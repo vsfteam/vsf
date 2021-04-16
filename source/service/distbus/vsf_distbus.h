@@ -38,11 +38,6 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#define VSF_DISTBUS_SERVICE_TYPE_ROLE       0x8000
-#define VSF_DISTBUS_SERVICE_TYPE_MASTER     VSF_DISTBUS_SERVICE_TYPE_ROLE
-#define VSF_DISTBUS_SERVICE_TYPE_SLAVE      0x0000
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -131,7 +126,7 @@ def_simple_class(vsf_distbus_t) {
 
 #ifdef __VSF_DISTBUS_CLASS_INHERIT__
 // size is data size of message(excluding header)
-extern vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size);
+extern vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size, uint8_t **buf);
 // if user hold msg by returning trun in vsf_distbus_msghandler_t, user MUST free msg manually
 extern void vsf_distbus_free_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *msg);
 // after message is sent, it will be freed automatically
@@ -139,6 +134,7 @@ extern void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *
 #endif
 
 extern vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus);
+extern void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_service_t *service);
 
 #ifdef __cplusplus
 }

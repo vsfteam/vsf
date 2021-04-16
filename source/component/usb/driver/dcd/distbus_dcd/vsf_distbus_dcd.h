@@ -60,9 +60,11 @@ enum {
     VSF_DISTBUS_DCD_CMD_EP_ADD,
     VSF_DISTBUS_DCD_CMD_EP_SET_STALL,
     VSF_DISTBUS_DCD_CMD_EP_CLEAR_STALL,
-    VSF_DISTBUS_DCD_CMD_ENABLE_OUT,
-    VSF_DISTBUS_DCD_CMD_SET_DATA_SIZE,
-    VSF_DISTBUS_DCD_CMD_WRITE_BUFFER,
+    VSF_DISTBUS_DCD_CMD_EP_ENABLE_OUT,
+    VSF_DISTBUS_DCD_CMD_EP_SET_DATA_SIZE,
+    VSF_DISTBUS_DCD_CMD_EP_WRITE_BUFFER,
+    VSF_DISTBUS_DCD_CMD_TRANSFER_SEND,
+    VSF_DISTBUS_DCD_CMD_TRANSFER_RECV,
     VSF_DISTBUS_DCD_CMD_ON_EVT,
 
     VSF_DISTBUS_DCD_ADDR_RANGE,
@@ -85,9 +87,12 @@ typedef struct vk_distbus_dcd_ep_t {
 def_simple_class(vk_distbus_dcd_t) {
     public_member(
         vsf_distbus_t               *distbus;
+        uint16_t                    distbus_addr;
     )
 
     private_member(
+        vsf_distbus_service_t       service;
+
         struct {
             usb_dc_evthandler_t     evthandler;
             void                    *param;

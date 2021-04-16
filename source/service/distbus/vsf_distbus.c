@@ -36,13 +36,16 @@ static void __vsf_distbus_on_sent(void *p);
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size)
+vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size, uint8_t **buf)
 {
     VSF_SERVICE_ASSERT((distbus != NULL) && (size > 0));
     size += sizeof(vsf_distbus_msg_t);
     vsf_distbus_msg_t *msg = distbus->op.mem.alloc_msg(size);
     if (msg != NULL) {
         msg->buffer_size = size;
+        if (buf != NULL) {
+            *buf = (uint8_t *)&msg->header + sizeof(msg->header);
+        }
     }
     return msg;
 }
@@ -142,8 +145,9 @@ static void __vsf_distbus_on_recv(void *p)
 
         __vsf_slist_foreach_unsafe(vsf_distbus_service_t, node, &distbus->service_list) {
             if ((msg->header.addr >= _->addr_start) && (msg->header.addr < (_->addr_start + _->info->addr_range))) {
+                msg->header.addr -= _->addr_start;
                 if (_->info->handler(distbus, _, msg)) {
-                    msg = vsf_distbus_alloc_msg(distbus, distbus->mtu);
+                    msg = vsf_distbus_alloc_msg(distbus, distbus->mtu, NULL);
                     VSF_SERVICE_ASSERT(msg != NULL);
                     distbus->msg_rx = msg;
                 }
@@ -176,7 +180,7 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
         distbus->mtu += _->info->mtu;
     }
 
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, distbus->mtu);
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, distbus->mtu, NULL);
     VSF_SERVICE_ASSERT(msg != NULL);
 
     distbus->msg_rx = msg;
@@ -185,6 +189,13 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
         __vsf_distbus_on_recv(distbus);
     }
     return VSF_ERR_NONE;
+}
+
+void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_service_t *service)
+{
+    if (!vsf_slist_is_in(vsf_distbus_service_t, node, &distbus->service_list, service)) {
+        vsf_slist_append(vsf_distbus_service_t, node, &distbus->service_list, service);
+    }
 }
 
 #endif      // VSF_USE_DISTBUS
