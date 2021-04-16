@@ -57,7 +57,7 @@ typedef struct m480_usbd_hs_t {
 #endif
 
     struct {
-        usb_dc_evt_handler_t evt_handler;
+        usb_dc_evthandler_t evthandler;
         void *param;
     } callback;
     const m480_usbd_hs_const_t *param;

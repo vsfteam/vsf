@@ -56,7 +56,7 @@ vsf_err_t m480_ohci_init(m480_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
         m480_enable_usbphy(hc_cfg->phy, M480_USBPHY_HOST);
     m480_reg_lock(state);
 
-    hc->callback.irq_handler = cfg->irq_handler;
+    hc->callback.irqhandler = cfg->irqhandler;
     hc->callback.param = cfg->param;
 
     if (cfg->priority >= 0) {
@@ -77,7 +77,7 @@ void m480_ohci_get_info(m480_ohci_t *hc, usb_hc_ip_info_t *info)
 
 void m480_ohci_irq(m480_ohci_t *hc)
 {
-    if (hc->callback.irq_handler != NULL) {
-        hc->callback.irq_handler(hc->callback.param);
+    if (hc->callback.irqhandler != NULL) {
+        hc->callback.irqhandler(hc->callback.param);
     }
 }

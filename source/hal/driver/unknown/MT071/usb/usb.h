@@ -64,7 +64,7 @@ typedef struct mt071_usb_t {
     bool is_host;
 #endif
     struct {
-        usb_ip_irq_handler_t irq_handler;
+        usb_ip_irqhandler_t irqhandler;
         void *param;
     } callback;
     const mt071_usb_const_t *param;

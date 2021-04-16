@@ -39,7 +39,7 @@ typedef struct nuc500_ohci_const_t {
 
 typedef struct nuc500_ohci_t {
     struct {
-        void (*irq_handler)(void *param);
+        void (*irqhandler)(void *param);
         void *param;
     } callback;
 

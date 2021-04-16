@@ -37,8 +37,8 @@ static void __esp32s2_usb_irqhandler(void *param)
 {
     esp32s2_usb_t *usb = param;
     __vsf_arch_irq_enter();
-        if (usb->callback.irq_handler != NULL) {
-            usb->callback.irq_handler(usb->callback.param);
+        if (usb->callback.irqhandler != NULL) {
+            usb->callback.irqhandler(usb->callback.param);
         }
     __vsf_arch_irq_leave();
 }
@@ -67,9 +67,9 @@ void __esp32s2_usb_phy_init(bool use_external_phy)
     usb_hal_init(&hal);
 }
 
-vsf_err_t __esp32s2_usb_init(esp32s2_usb_t *usb, vsf_arch_prio_t priority, usb_ip_irq_handler_t handler, void *param)
+vsf_err_t __esp32s2_usb_init(esp32s2_usb_t *usb, vsf_arch_prio_t priority, usb_ip_irqhandler_t handler, void *param)
 {
-    usb->callback.irq_handler = handler;
+    usb->callback.irqhandler = handler;
     usb->callback.param = param;
     esp_intr_alloc(usb->param->intr_source, ESP_INTR_FLAG_LOWMED, (intr_handler_t)__esp32s2_usb_irqhandler, usb, (intr_handle_t *)&usb->intr_handle);
     return VSF_ERR_NONE;

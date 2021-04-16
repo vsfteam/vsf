@@ -68,7 +68,7 @@ def_simple_class(vk_musb_fdrc_dcd_t) {
     private_member(
         void *reg;
         struct {
-            usb_dc_evt_handler_t evt_handler;
+            usb_dc_evthandler_t evthandler;
             void *param;
         } callback;
         uint16_t ep_buf_ptr;

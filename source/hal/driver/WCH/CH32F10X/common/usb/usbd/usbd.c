@@ -312,7 +312,7 @@ vsf_err_t ch32f10x_usbd_init(ch32f10x_usbd_t *usbd, usb_dc_cfg_t *cfg)
 {
     ch32f10x_usbd_reg_t *reg = __ch32f10x_usbd_get_reg(usbd);
 
-    usbd->callback.evt_handler = cfg->evt_handler;
+    usbd->callback.evthandler = cfg->evthandler;
     usbd->callback.param = cfg->param;
 
     switch (CH32F10X_SYS_FREQ_HZ) {
@@ -667,8 +667,8 @@ vsf_err_t ch32f10x_usbd_ep_transfer_send(ch32f10x_usbd_t *usbd, uint_fast8_t ep,
 
 static void ch32f10x_usbd_notify(ch32f10x_usbd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {
-    if (usbd->callback.evt_handler != NULL) {
-        usbd->callback.evt_handler(usbd->callback.param, evt, value);
+    if (usbd->callback.evthandler != NULL) {
+        usbd->callback.evthandler(usbd->callback.param, evt, value);
     }
 }
 

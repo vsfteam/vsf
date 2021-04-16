@@ -53,8 +53,8 @@ vsf_err_t __mt071_usb_init_interrupt(mt071_usb_t *usb, vsf_arch_prio_t priority)
 
 void __mt071_usb_irq(mt071_usb_t *usb)
 {
-    if (usb->callback.irq_handler != NULL) {
-        usb->callback.irq_handler(usb->callback.param);
+    if (usb->callback.irqhandler != NULL) {
+        usb->callback.irqhandler(usb->callback.param);
     }
 }
 

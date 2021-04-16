@@ -61,7 +61,7 @@ typedef struct ch32f10x_usbd_const_t ch32f10x_usbd_const_t;
 
 struct ch32f10x_usbd_t {
     struct {
-        usb_dc_evt_handler_t evt_handler;
+        usb_dc_evthandler_t evthandler;
         void *param;
     } callback;
 #ifdef USB_DC_HAS_CONST

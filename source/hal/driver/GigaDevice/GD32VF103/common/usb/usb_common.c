@@ -65,7 +65,7 @@ vsf_err_t gd32vf103_usb_init(gd32vf103_usb_t *usb, vsf_arch_prio_t priority)
 
 void gd32vf103_usb_irq(gd32vf103_usb_t *usb)
 {
-    if (usb->callback.irq_handler != NULL) {
-        usb->callback.irq_handler(usb->callback.param);
+    if (usb->callback.irqhandler != NULL) {
+        usb->callback.irqhandler(usb->callback.param);
     }
 }

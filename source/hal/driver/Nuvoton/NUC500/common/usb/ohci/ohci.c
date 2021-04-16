@@ -41,7 +41,7 @@ vsf_err_t nuc500_ohci_init(nuc500_ohci_t *hc, usb_hc_ip_cfg_t *cfg)
     SYS->GPB_MFPH = (SYS->GPB_MFPH & ~(SYS_GPB_MFPH_PB12MFP_Msk | SYS_GPB_MFPH_PB13MFP_Msk))
                 |   (0x2 << SYS_GPB_MFPH_PB12MFP_Pos) | (0x2 << SYS_GPB_MFPH_PB13MFP_Pos);
 
-    hc->callback.irq_handler = cfg->irq_handler;
+    hc->callback.irqhandler = cfg->irqhandler;
     hc->callback.param = cfg->param;
 
     if (cfg->priority >= 0) {
@@ -62,7 +62,7 @@ void nuc500_ohci_get_info(nuc500_ohci_t *hc, usb_hc_ip_info_t *info)
 
 void nuc500_ohci_irq(nuc500_ohci_t *hc)
 {
-    if (hc->callback.irq_handler != NULL) {
-        hc->callback.irq_handler(hc->callback.param);
+    if (hc->callback.irqhandler != NULL) {
+        hc->callback.irqhandler(hc->callback.param);
     }
 }

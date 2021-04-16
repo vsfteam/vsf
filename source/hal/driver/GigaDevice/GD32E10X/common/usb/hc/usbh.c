@@ -40,7 +40,7 @@ extern void __gd32e10x_usb_irq(gd32e10x_usb_t *usb);
 vsf_err_t gd32e10x_usbh_init(gd32e10x_usb_t *hc, usb_hc_ip_cfg_t *cfg)
 {
     hc->is_host = true;
-    hc->callback.irq_handler = cfg->irq_handler;
+    hc->callback.irqhandler = cfg->irqhandler;
     hc->callback.param = cfg->param;
     return __gd32e10x_usb_init(hc, cfg->priority);
 }

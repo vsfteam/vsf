@@ -37,8 +37,8 @@ aic8800_usb_t USB_OTG##__N##_IP = {                                             
 ROOT ISR(USB_OTG##__N##_IRQHandler)                                             \
 {                                                                               \
     aic8800_usb_t *usb = &USB_OTG##__N##_IP;                                    \
-    if (usb->callback.irq_handler != NULL) {                                    \
-        usb->callback.irq_handler(usb->callback.param);                         \
+    if (usb->callback.irqhandler != NULL) {                                     \
+        usb->callback.irqhandler(usb->callback.param);                          \
     }                                                                           \
 }
 

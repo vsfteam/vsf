@@ -82,7 +82,7 @@ def_simple_class(vk_dwcotg_dcd_t) {
     private_member(
         implement(vk_dwcotg_t)
         struct {
-            usb_dc_evt_handler_t evt_handler;
+            usb_dc_evthandler_t evthandler;
             void *param;
         } callback;
         uint8_t setup[8];

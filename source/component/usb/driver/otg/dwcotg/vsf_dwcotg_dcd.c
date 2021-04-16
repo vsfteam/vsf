@@ -87,7 +87,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     global_regs = dwcotg_dcd->reg.global_regs;
     dev_global_regs = dwcotg_dcd->reg.dev.global_regs;
 
-    dwcotg_dcd->callback.evt_handler = cfg->evt_handler;
+    dwcotg_dcd->callback.evthandler = cfg->evthandler;
     dwcotg_dcd->callback.param = cfg->param;
 
     if (param->dma_en) {
@@ -98,7 +98,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     {
         usb_dc_ip_cfg_t ip_cfg = {
             .priority       = cfg->priority,
-            .irq_handler    = (usb_ip_irq_handler_t)vk_dwcotg_dcd_irq,
+            .irqhandler     = (usb_ip_irqhandler_t)vk_dwcotg_dcd_irq,
             .param          = dwcotg_dcd,
         };
         dwcotg_dcd->param->op->Init(&ip_cfg);
@@ -589,8 +589,8 @@ vsf_err_t vk_dwcotg_dcd_ep_transfer_send(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8
 
 static void __vk_dwcotg_dcd_notify(vk_dwcotg_dcd_t *dwcotg_dcd, usb_evt_t evt, uint_fast8_t value)
 {
-    if (dwcotg_dcd->callback.evt_handler != NULL) {
-        dwcotg_dcd->callback.evt_handler(dwcotg_dcd->callback.param, evt, value);
+    if (dwcotg_dcd->callback.evthandler != NULL) {
+        dwcotg_dcd->callback.evthandler(dwcotg_dcd->callback.param, evt, value);
     }
 }
 

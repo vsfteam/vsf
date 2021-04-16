@@ -49,7 +49,7 @@ struct f1cx00s_usb_dcd_t {
 
     struct {
 #if VSF_USE_USB_DEVICE == ENABLED
-        usb_dc_evt_handler_t evthandler;
+        usb_dc_evthandler_t evthandler;
 #endif
         void *param;
     } callback;
@@ -118,7 +118,7 @@ vsf_err_t f1cx00s_usbd_init(f1cx00s_usb_dcd_t *usbd, usb_dc_cfg_t *cfg)
 {
     uint_fast32_t reg_tmp;
 
-    usbd->callback.evthandler = cfg->evt_handler;
+    usbd->callback.evthandler = cfg->evthandler;
     usbd->callback.param = cfg->param;
 
     __f1cx00s_usb_register_irq(usbd->otg, (void (*)(void *))f1cx00s_usbd_irq, usbd);

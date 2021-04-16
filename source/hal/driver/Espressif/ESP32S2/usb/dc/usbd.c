@@ -36,7 +36,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t __esp32s2_usb_init(esp32s2_usb_t *usb, vsf_arch_prio_t priority,
-                usb_ip_irq_handler_t handler, void *param);
+                usb_ip_irqhandler_t handler, void *param);
 extern void __esp32s2_usb_extphy_io_init(void);
 extern void __esp32s2_usb_io_configure(int func, int value);
 extern void __esp32s2_usb_phy_init(bool use_external_phy);
@@ -68,7 +68,7 @@ vsf_err_t esp32s2_usbd_init(esp32s2_usb_t *dc, usb_dc_ip_cfg_t *cfg)
     __esp32s2_usb_phy_init(false);
     __esp32s2_usbd_configure_pins(false);
 
-    return __esp32s2_usb_init(dc, cfg->priority, cfg->irq_handler, cfg->param);
+    return __esp32s2_usb_init(dc, cfg->priority, cfg->irqhandler, cfg->param);
 }
 
 void esp32s2_usbd_fini(esp32s2_usb_t *dc)

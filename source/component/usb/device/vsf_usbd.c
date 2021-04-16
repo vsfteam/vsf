@@ -704,7 +704,7 @@ static void __vk_usbd_hw_init_reset(vk_usbd_dev_t *dev, bool reset)
     usb_dc_cfg_t cfg = {
         .speed          = dev->speed,
         .priority       = VSF_USBD_CFG_HW_PRIORITY,
-        .evt_handler    = __vk_usbd_hal_evthandler,
+        .evthandler     = __vk_usbd_hal_evthandler,
         .param          = dev,
     };
     if (reset) {

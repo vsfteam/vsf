@@ -36,8 +36,8 @@
 
 static void __vk_musb_fdrc_usbd_notify(vk_musb_fdrc_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {
-    if (usbd->callback.evt_handler != NULL) {
-        usbd->callback.evt_handler(usbd->callback.param, evt, value);
+    if (usbd->callback.evthandler != NULL) {
+        usbd->callback.evthandler(usbd->callback.param, evt, value);
     }
 }
 
@@ -64,13 +64,13 @@ vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
     usbd->ep_num = info.ep_num;
     usbd->is_dma = info.is_dma;
 
-    usbd->callback.evt_handler = cfg->evt_handler;
+    usbd->callback.evthandler = cfg->evthandler;
     usbd->callback.param = cfg->param;
 
     {
         usb_dc_ip_cfg_t ip_cfg = {
             .priority       = cfg->priority,
-            .irq_handler    = (usb_ip_irq_handler_t)vk_musb_fdrc_usbd_irq,
+            .irqhandler     = (usb_ip_irqhandler_t)vk_musb_fdrc_usbd_irq,
             .param          = usbd,
         };
         usbd->param->op->Init(&ip_cfg);

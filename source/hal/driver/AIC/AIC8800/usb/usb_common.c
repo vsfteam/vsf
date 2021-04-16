@@ -37,9 +37,9 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority, usb_ip_irq_handler_t handler, void *param)
+vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority, usb_ip_irqhandler_t handler, void *param)
 {
-    usb->callback.irq_handler = handler;
+    usb->callback.irqhandler = handler;
     usb->callback.param = param;
 
 #if PLF_PMIC && PLF_PMIC_VER_LITE

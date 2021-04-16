@@ -429,7 +429,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             {
                 usb_hc_ip_cfg_t cfg = {
                     .priority       = param->priority,
-                    .irq_handler    = __vk_dwcotg_hcd_interrupt,
+                    .irqhandler     = __vk_dwcotg_hcd_interrupt,
                     .param          = dwcotg_hcd,
                 };
                 // interrupt is disabled after init

@@ -305,8 +305,8 @@ typedef enum  {
     USB_DC_ERR_SOF_TO,
 } usb_dc_err_t;
 
-typedef void (*usb_ip_irq_handler_t)(   void *param);
-typedef void (*usb_dc_evt_handler_t)(   void *param,
+typedef void (*usb_ip_irqhandler_t)(    void *param);
+typedef void (*usb_dc_evthandler_t)(    void *param,
                                         usb_evt_t evt,
                                         uint_fast8_t value);
 
@@ -315,7 +315,7 @@ typedef uint8_t usb_dc_speed_t;
 //! @{
 typedef struct usb_dc_cfg_t {
     vsf_arch_prio_t         priority;       //!< interrupt priority
-    usb_dc_evt_handler_t    evt_handler;    //!< evt_handler function
+    usb_dc_evthandler_t     evthandler;     //!< evthandler function
     void                    *param;         //!< dcd related parameters
 
     usb_dc_speed_t          speed;          //!< speed
@@ -397,7 +397,7 @@ end_def_interface(i_usb_dc_t)
 //! @{
 typedef struct usb_dc_ip_cfg_t {
     vsf_arch_prio_t         priority;       //!< interrupt priority
-    usb_ip_irq_handler_t    irq_handler;    //!< irq_handler function
+    usb_ip_irqhandler_t     irqhandler;     //!< irqhandler function
     void                    *param;         //!< dcd related parameters
 } usb_dc_ip_cfg_t;
 //! @}
@@ -435,7 +435,7 @@ end_def_interface(i_usb_dc_ip_t)
 //! @{
 typedef struct usb_hc_ip_cfg_t {
     vsf_arch_prio_t         priority;       //!< interrupt priority
-    usb_ip_irq_handler_t    irq_handler;    //!< irq_handler function
+    usb_ip_irqhandler_t     irqhandler;     //!< irqhandler function
     void                    *param;         //!< hcd related parameters
 } usb_hc_ip_cfg_t;
 //! @}

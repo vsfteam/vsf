@@ -50,8 +50,8 @@ static vk_usbip_server_t __vk_usbip_server;
 
 static void __vk_usbip_usbd_notify(vk_usbip_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {
-    if (usbd->callback.evt_handler != NULL) {
-        usbd->callback.evt_handler(usbd->callback.param, evt, value);
+    if (usbd->callback.evthandler != NULL) {
+        usbd->callback.evthandler(usbd->callback.param, evt, value);
     }
 }
 
@@ -608,7 +608,7 @@ vsf_err_t vk_usbip_usbd_init(vk_usbip_dcd_t *usbd, usb_dc_cfg_t *cfg)
 
     usbd->is_connected = false;
     usbd->frame_number = 0;
-    usbd->callback.evt_handler = cfg->evt_handler;
+    usbd->callback.evthandler = cfg->evthandler;
     usbd->callback.param = cfg->param;
     return __vk_usbip_server_init(&__vk_usbip_server, usbd, cfg);
 }

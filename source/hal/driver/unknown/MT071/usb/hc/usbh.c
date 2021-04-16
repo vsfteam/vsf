@@ -40,7 +40,7 @@ vsf_err_t mt071_usbh_init(mt071_usb_t *hc, usb_hc_ip_cfg_t *cfg)
     // hc->is_host only exists when both host and device modes are enabled
     hc->is_host = true;
 #endif
-    hc->callback.irq_handler = cfg->irq_handler;
+    hc->callback.irqhandler = cfg->irqhandler;
     hc->callback.param = cfg->param;
 
     // TODO: use pm to config clock

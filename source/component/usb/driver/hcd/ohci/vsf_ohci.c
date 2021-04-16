@@ -1122,7 +1122,7 @@ static vsf_err_t __ohci_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_h
         {
             usb_hc_ip_cfg_t cfg = {
                 .priority       = ohci_param->priority,
-                .irq_handler    = __ohci_interrupt,
+                .irqhandler     = __ohci_interrupt,
                 .param          = ohci,
             };
             ohci_param->op->Init(&cfg);

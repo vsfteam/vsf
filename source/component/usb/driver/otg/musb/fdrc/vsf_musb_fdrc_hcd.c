@@ -486,7 +486,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         {
             usb_hc_ip_cfg_t cfg = {
                 .priority       = param->priority,
-                .irq_handler    = __vk_musb_fdrc_hcd_interrupt,
+                .irqhandler     = __vk_musb_fdrc_hcd_interrupt,
                 .param          = musb,
             };
             param->op->Init(&cfg);

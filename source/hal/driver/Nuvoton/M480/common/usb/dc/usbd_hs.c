@@ -126,7 +126,7 @@ vsf_err_t m480_usbd_hs_init(m480_usbd_hs_t *usbd_hs, usb_dc_cfg_t *cfg)
 {
     HSUSBD_T *reg = m480_usbd_hs_get_reg(usbd_hs);
 
-    usbd_hs->callback.evt_handler = cfg->evt_handler;
+    usbd_hs->callback.evthandler = cfg->evthandler;
     usbd_hs->callback.param = cfg->param;
 
     m480_enable_usbphy(M480_USBPHY_HS, M480_USBPHY_DEV);
@@ -611,8 +611,8 @@ vsf_err_t m480_usbd_hs_ep_transfer_send(m480_usbd_hs_t *usbd_hs, uint_fast8_t ep
 
 static void m480_usbd_hs_notify(m480_usbd_hs_t *usbd_hs, usb_evt_t evt, uint_fast8_t value)
 {
-    if (usbd_hs->callback.evt_handler != NULL) {
-        usbd_hs->callback.evt_handler(usbd_hs->callback.param, evt, value);
+    if (usbd_hs->callback.evthandler != NULL) {
+        usbd_hs->callback.evthandler(usbd_hs->callback.param, evt, value);
     }
 }
 

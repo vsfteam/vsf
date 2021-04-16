@@ -40,7 +40,7 @@ extern void gd32vf103_usb_irq(gd32vf103_usb_t *usb);
 vsf_err_t gd32vf103_usbd_init(gd32vf103_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 {
     dc->is_host = false;
-    dc->callback.irq_handler = cfg->irq_handler;
+    dc->callback.irqhandler = cfg->irqhandler;
     dc->callback.param = cfg->param;
     return gd32vf103_usb_init(dc, cfg->priority);
 }

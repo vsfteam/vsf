@@ -55,7 +55,7 @@ typedef struct esp32s2_usb_t {
     // should be intr_handle_t intr_handle, but to avoid namespace pollution
     void * intr_handle;
     struct {
-        usb_ip_irq_handler_t irq_handler;
+        usb_ip_irqhandler_t irqhandler;
         void *param;
     } callback;
     const esp32s2_usb_const_t *param;

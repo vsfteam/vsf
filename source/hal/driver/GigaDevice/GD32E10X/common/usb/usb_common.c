@@ -54,8 +54,8 @@ vsf_err_t __gd32e10x_usb_init(gd32e10x_usb_t *usb, vsf_arch_prio_t priority)
 
 void __gd32e10x_usb_irq(gd32e10x_usb_t *usb)
 {
-    if (usb->callback.irq_handler != NULL) {
-        usb->callback.irq_handler(usb->callback.param);
+    if (usb->callback.irqhandler != NULL) {
+        usb->callback.irqhandler(usb->callback.param);
     }
 }
 

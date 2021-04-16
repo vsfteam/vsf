@@ -164,7 +164,7 @@ def_simple_class(vk_usbip_dcd_t) {
 
     private_member(
         struct {
-            usb_dc_evt_handler_t evt_handler;
+            usb_dc_evthandler_t evthandler;
             void *param;
         } callback;
 
