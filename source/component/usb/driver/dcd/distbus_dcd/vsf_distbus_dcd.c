@@ -38,7 +38,7 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static bool __vk_distbus_usbd_evthandler(vsf_distbus_t *bus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+static bool __vk_distbus_usbd_msghandler(vsf_distbus_t *bus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -47,7 +47,7 @@ static const vsf_distbus_service_info_t __vk_distbus_usbd_info = {
     .mtu                = 8 + VSF_DISTBUS_DCD_CFG_MTU,
     .type               = 0,
     .addr_range         = VSF_DISTBUS_DCD_ADDR_RANGE,
-    .handler            = __vk_distbus_usbd_evthandler,
+    .handler            = __vk_distbus_usbd_msghandler,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -72,7 +72,7 @@ static vk_distbus_dcd_ep_t * __vk_distbus_usbd_get_ep(vk_distbus_dcd_t *usbd, ui
     return &dcd_ep[ep];
 }
 
-static bool __vk_distbus_usbd_evthandler(vsf_distbus_t *bus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
+static bool __vk_distbus_usbd_msghandler(vsf_distbus_t *bus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vk_distbus_dcd_t *usbd = container_of(service, vk_distbus_dcd_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
@@ -92,7 +92,7 @@ static bool __vk_distbus_usbd_evthandler(vsf_distbus_t *bus, vsf_distbus_service
             case USB_ON_SETUP:
                 memcpy(&usbd->setup, &data[2], 8);
                 break;
-            case USB_ON_IN: {
+            case USB_ON_OUT: {
                     vk_distbus_dcd_ep_t *dcd_ep = __vk_distbus_usbd_get_ep(usbd, value);
                     VSF_USB_ASSERT(NULL == dcd_ep->msg);
                     dcd_ep->msg = msg;
@@ -194,12 +194,15 @@ void vk_distbus_usbd_wakeup(vk_distbus_dcd_t *usbd)
 void vk_distbus_usbd_set_address(vk_distbus_dcd_t *usbd, uint_fast8_t addr)
 {
     usbd->address = addr;
-    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usbd->distbus, 0, NULL);
+
+    uint8_t *data;
+    vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usbd->distbus, 1, &data);
     if (NULL == msg) {
         VSF_USB_ASSERT(false);
     }
 
     msg->header.addr = VSF_DISTBUS_DCD_CMD_SET_ADDRESS;
+    data[0] = addr;
     vsf_distbus_send_msg(usbd->distbus, &usbd->service, msg);
 }
 
@@ -314,15 +317,15 @@ uint_fast32_t vk_distbus_usbd_ep_get_data_size(vk_distbus_dcd_t *usbd, uint_fast
     vk_distbus_dcd_ep_t *dcd_ep = __vk_distbus_usbd_get_ep(usbd, ep);
     vsf_distbus_msg_t *msg = dcd_ep->msg;
     VSF_USB_ASSERT(msg != NULL);
-    return msg->header.datalen;
+    return msg->header.datalen - 2;
 }
 
 vsf_err_t vk_distbus_usbd_ep_transaction_read_buffer(vk_distbus_dcd_t *usbd, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size)
 {
     vk_distbus_dcd_ep_t *dcd_ep = __vk_distbus_usbd_get_ep(usbd, ep);
     vsf_distbus_msg_t *msg = dcd_ep->msg;
-    VSF_USB_ASSERT((msg != NULL) && (msg->header.datalen == (size + 1)));
-    memcpy(buffer, &msg->header + sizeof(msg->header) + 1, size);
+    VSF_USB_ASSERT((msg != NULL) && (msg->header.datalen == (size + 2)));
+    memcpy(buffer, &msg->header + sizeof(msg->header) + 2, size);
 
     vsf_distbus_free_msg(usbd->distbus, dcd_ep->msg);
     dcd_ep->msg = NULL;

@@ -967,6 +967,12 @@
     <Filter Include="usrapp\demo\disp_demo">
       <UniqueIdentifier>{5109e45f-fcf2-478c-a788-0d2efb5fb7a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\distbus_demo">
+      <UniqueIdentifier>{5c71fe87-369c-41fe-bd8d-7b6e16827958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="usrapp\demo\distbus_demo\bus">
+      <UniqueIdentifier>{3494a736-be68-4321-ab4d-ad6707f8d9fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -4897,6 +4903,15 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\disp_demo\disp_demo.c">
       <Filter>usrapp\demo\disp_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\distbus_demo\distbus_demo.c">
+      <Filter>usrapp\demo\distbus_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\distbus_demo\bus\distbus_lwip.c">
+      <Filter>usrapp\demo\distbus_demo\bus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\distbus_demo\bus\distbus_usart.c">
+      <Filter>usrapp\demo\distbus_demo\bus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

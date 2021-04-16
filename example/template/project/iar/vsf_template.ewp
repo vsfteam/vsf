@@ -5631,6 +5631,21 @@
                 </file>
             </group>
             <group>
+                <name>distbus_demo</name>
+                <group>
+                    <name>bus</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\demo\distbus_demo\bus\distbus_lwip.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\demo\distbus_demo\bus\distbus_usart.c</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\distbus_demo\distbus_demo.c</name>
+                </file>
+            </group>
+            <group>
                 <name>evm_demo</name>
                 <excluded>
                     <configuration>vsf_template_m484</configuration>

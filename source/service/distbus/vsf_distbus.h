@@ -88,6 +88,7 @@ def_simple_class(vsf_distbus_service_t) {
 };
 
 typedef struct vsf_distbus_bus_op_t {
+    void (*init)(void);
     // returns true if sent
     bool (*send)(uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p));
     // returns true if received

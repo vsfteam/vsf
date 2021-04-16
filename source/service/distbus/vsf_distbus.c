@@ -180,6 +180,10 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
         distbus->mtu += _->info->mtu;
     }
 
+    if (distbus->op.bus.init != NULL) {
+        distbus->op.bus.init();
+    }
+
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(distbus, distbus->mtu, NULL);
     VSF_SERVICE_ASSERT(msg != NULL);
 
