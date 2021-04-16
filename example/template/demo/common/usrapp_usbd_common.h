@@ -25,7 +25,8 @@
 #if     VSF_USE_USB_DEVICE == ENABLED                                           \
     &&  (   VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                               \
         ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED                                  \
-        ||  VSF_USBD_USE_DCD_USBIP == ENABLED)
+        ||  VSF_USBD_USE_DCD_USBIP == ENABLED                                   \
+        ||  VSF_USBD_USE_DCD_DISTBUS == ENABLED)
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -53,13 +54,17 @@ typedef struct usrapp_usbd_common_t {
 #if VSF_USBD_USE_DCD_DWCOTG == ENABLED
     vk_dwcotg_dcd_t dwcotg_dcd;
 #endif
+#if VSF_USBD_USE_DCD_DISTBUS == ENABLED
+    vk_distbus_dcd_t distbus_dcd;
+#endif
 } usrapp_usbd_common_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if     VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                                   \
     ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED                                      \
-    ||  VSF_USBD_USE_DCD_USBIP == ENABLED
+    ||  VSF_USBD_USE_DCD_USBIP == ENABLED                                       \
+    ||  VSF_USBD_USE_DCD_DISTBUS == ENABLED
 extern const i_usb_dc_t VSF_USB_DC0;
 #endif
 

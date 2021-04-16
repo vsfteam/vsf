@@ -600,17 +600,37 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
 
 /*============================ INCLUDES ======================================*/
 
-#include "./class/CDC/vsf_usbd_CDC.h"
-#include "./class/CDC/vsf_usbd_CDCACM.h"
-#include "./class/HID/vsf_usbd_HID.h"
-#include "./class/UVC/vsf_usbd_UVC.h"
-#include "./class/UAC/vsf_usbd_UAC.h"
-#include "./class/MSC/vsf_usbd_MSC.h"
+#if VSF_USBD_USE_CDC == ENABLED
+#   include "./class/CDC/vsf_usbd_CDC.h"
+#   if VSF_USBD_USE_CDCACM == ENABLED
+#       include "./class/CDC/vsf_usbd_CDCACM.h"
+#   endif
+#endif
+#if VSF_USBD_USE_HID == ENABLED
+#   include "./class/HID/vsf_usbd_HID.h"
+#endif
+#if VSF_USBD_USE_UVC == ENABLED
+#   include "./class/UVC/vsf_usbd_UVC.h"
+#endif
+#if VSF_USBD_USE_UAC == ENABLED
+#   include "./class/UAC/vsf_usbd_UAC.h"
+#endif
+#if VSF_USBD_USE_MSC == ENABLED
+#   include "./class/MSC/vsf_usbd_MSC.h"
+#endif
 
-
-#include "../driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
-#include "../driver/otg/dwcotg/vsf_dwcotg_dcd.h"
-#include "../driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
+#if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
+#   include "../driver/otg/musb/fdrc/vsf_musb_fdrc_dcd.h"
+#endif
+#if VSF_USBD_USE_DCD_DWCOTG == ENABLED
+#   include "../driver/otg/dwcotg/vsf_dwcotg_dcd.h"
+#endif
+#if VSF_USBD_USE_DCD_USBIP == ENABLED
+#   include "../driver/dcd/usbip_dcd/vsf_usbip_dcd.h"
+#endif
+#if VSF_USBD_USE_DCD_DISTBUS == ENABLED
+#   include "../driver/dcd/distbus_dcd/vsf_distbus_dcd.h"
+#endif
 
 #if defined(VSF_USBD_CFG_DRV_LV0_OO) && defined(VSF_USBD_CFG_DRV_LV0_OO_OBJ_HEADER)
 #   include VSF_USBD_CFG_DRV_LV0_OO_OBJ_HEADER
