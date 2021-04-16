@@ -153,7 +153,7 @@ void vsf_systimer_on_tick(void)
     vsf_protect_t orig = vsf_protect_int();
         __vsf_eda.timer.cur_tick++;
     vsf_unprotect_int(orig);
-    vsf_eda_post_evt(&__vsf_eda.teda.use_as__vsf_eda_t, VSF_EVT_TIMER);
+    vsf_eda_post_evt((vsf_eda_t *)&__vsf_eda.task, VSF_EVT_TIMER);
 }
 
 SECTION(".text.vsf.kernel.teda")
