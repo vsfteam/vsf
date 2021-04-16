@@ -136,6 +136,7 @@ static vsf_err_t __vsf_spi_init(vsf_spi_t *spi_ptr, spi_cfg_t *cfg_ptr)
     reg = spi_ptr->reg;
     VSF_HAL_ASSERT(reg != NULL);
 
+    // TODO: use pm module
     clock_source = __vsf_spi_get_clock(spi_ptr);
     VSF_HAL_ASSERT(clock_source > 0);
     VSF_HAL_ASSERT(cfg_ptr->clock_hz > 0);
@@ -390,6 +391,11 @@ static vsf_err_t __vsf_spi_dma_request(vsf_spi_t *spi_ptr)
         .count = current_size,
     };
 
+
+    // TODO: when spi send and recevice are not enabled at then same time,
+    //       A problem is encountered: RX completed early error before TX.
+    //       In StdDriver Library, SPI_TRIGGER_TX_PDMA/SPI_TRIGGER_RX_PDMA
+    //       can be triggered individually.
     spi_ptr->reg->PDMACTL &= ~(SPI_PDMACTL_RXPDMAEN_Msk | SPI_PDMACTL_TXPDMAEN_Msk);
 
     m484_dma_channel_config(rx_dma->channel, &rx_channel_cfg);

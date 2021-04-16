@@ -24,7 +24,6 @@
 #include "../../__device.h"
 
 #if VSF_HAL_USE_SPI == ENABLED
-#include "hal/interface/vsf_interface_spi.h"
 
 /*============================ MACROS ========================================*/
 #define SPI_CTL_MODE_MASK           (  SPI_CTL_SLAVE_Msk  | SPI_CTL_CLKPOL_Msk  \
@@ -38,21 +37,13 @@
 #define SPI_SSCTL_POS               21
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-struct spi_status_t {
-    union {
-        inherit(peripheral_status_t)
-        uint32_t                value;
-    };
-};
-
 enum em_spi_irq_mask_t {
     SPI_IRQ_MASK_TX_CPL = 1 << 0,
     SPI_IRQ_MASK_CPL    = 1 << 1,   // SPI completed recepiton and transmission
 };
 
-enum em_spi_mode_mask_t {
+enum em_spi_mode_t {
     // CTL: [1 << 0 ~ 1 << 20]
-
     SPI_MASTER          = 0x00,
     SPI_SLAVE           = SPI_CTL_SLAVE_Msk,
 
@@ -108,6 +99,18 @@ enum em_spi_mode_mask_t {
     SPI_SLAVE_SELECTION_ACTIVE_HIGH   = 1 << (SPI_SSCTL_SSACTPOL_Pos + SPI_SSCTL_POS),
 };
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/interface/vsf_interface_spi.h"
+
+/*============================ TYPES =========================================*/
+struct spi_status_t {
+    union {
+        inherit(peripheral_status_t)
+        uint32_t                value;
+    };
+};
+
 typedef struct vsf_spi_dma_t {
     uint8_t  channel;
     uint8_t  per_index;
@@ -128,9 +131,8 @@ struct vsf_spi_t {
     vsf_spi_dma_t tx_dma;
     vsf_spi_dma_t rx_dma;
 };
+
 /*============================ GLOBAL VARIABLES ==============================*/
-
-
 /*============================ PROTOTYPES ====================================*/
 
 #if SPI_MAX_PORT >= 0 && VSF_HAL_USE_SPI0 == ENABLED && (SPI_PORT_MASK & (1 << 0))
