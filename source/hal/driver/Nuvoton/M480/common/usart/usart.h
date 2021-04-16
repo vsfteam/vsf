@@ -30,7 +30,6 @@
 #include "../io/io.h"
 #include "../pm/pm.h"
 
-#include "hal/interface/vsf_interface_usart.h"
 /*============================ MACROS ========================================*/
 
 /* select from { HXT, LXT, PLL, HIRC} */
@@ -105,6 +104,11 @@ enum em_usart_irq_mask_t {
     USART_IRQ_MASK_TX_ERR           = BIT(5),
     USART_IRQ_MASK_ERR              = USART_IRQ_MASK_RX_ERR | USART_IRQ_MASK_TX_ERR,
 };
+
+/*============================ INCLUDES ======================================*/
+#include "hal/interface/vsf_interface_usart.h"
+
+/*============================ TYPES =========================================*/
 
 typedef struct m480_usart_t {
     UART_T                          *usart;
