@@ -290,7 +290,7 @@ __implement_vsf_pool_tag(__name)
                                     /* the address of the code region obj_ptr */\
             do {                                                                \
                 vsf_pool_cfg_t cfg = {                                          \
-                    .pool_name_str = #__NAME,                                   \
+                    .pool_name_str = (const uint8_t *)#__NAME,                  \
                 };                                                              \
                 __NAME##_pool_init((__VSF_POOL), &cfg);                         \
                 static NO_INIT vsf_pool_item(__NAME) __buffer[__SIZE];          \
@@ -307,7 +307,7 @@ __implement_vsf_pool_tag(__name)
                                     /* the address of the code region obj_ptr */\
             do {                                                                \
                 vsf_pool_cfg_t cfg = {                                          \
-                    .pool_name_str = #__NAME,                                   \
+                    .pool_name_str = (const uint8_t *)#__NAME,                  \
                     __VA_ARGS__                                                 \
                 };                                                              \
                 __NAME##_pool_init((__VSF_POOL), &cfg);                         \
@@ -357,7 +357,7 @@ __implement_vsf_pool_tag(__name)
                                     /* the address of the code region obj_ptr */\
             do {                                                                \
                 vsf_pool_cfg_t cfg = {                                          \
-                    .pool_name_str = #__NAME,                                   \
+                    .pool_name_str = (const uint8_t *)#__NAME,                  \
                 };                                                              \
                 __NAME##_pool_init_ex((__VSF_POOL), (__ALIGN), &cfg);           \
                 static NO_INIT vsf_pool_item(__NAME)                            \
@@ -377,7 +377,7 @@ __implement_vsf_pool_tag(__name)
                                     /* the address of the code region obj_ptr */\
             do {                                                                \
                 vsf_pool_cfg_t cfg = {                                          \
-                    .pool_name_str = #__NAME,                                   \
+                    .pool_name_str = (const uint8_t *)#__NAME,                  \
                     __VA_ARGS__                                                 \
                 };                                                              \
                 __NAME##_pool_init_ex((__VSF_POOL), (__ALIGN), &cfg);           \
