@@ -23,14 +23,14 @@
 
 /*============================ INCLUDES ======================================*/
 
-// for uint32_t
+// for uint32_t of SystemCoreClock
 #include <stdint.h>
 
 /*============================ MACROS ========================================*/
 
 //extern uint32_t SystemCoreClock;
-// seems systick runs at 260MHz instead of SystemCoreClock
-#define VSF_SYSTIMER_FREQ                               (260UL * 1000 * 1000)
+// seems systick runs at 240MHz instead of SystemCoreClock
+#define VSF_SYSTIMER_FREQ                               (240UL * 1000 * 1000)
 // lwip APIs are protected by a mutex, so priority boost SHOULD be supported
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 // configure pool and heap to avoid heap allocating in interrupt
