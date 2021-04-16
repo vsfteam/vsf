@@ -8865,6 +8865,15 @@
                     <group>
                         <name>dcd</name>
                         <group>
+                            <name>distbus_dcd</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\usb\driver\dcd\distbus_dcd\vsf_distbus_dcd.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>usbip_dcd</name>
                             <group>
                                 <name>backend</name>
@@ -11878,6 +11887,15 @@
         </group>
         <group>
             <name>service</name>
+            <group>
+                <name>distbus</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\service\distbus\vsf_distbus.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\service\distbus\vsf_distbus.h</name>
+                </file>
+            </group>
             <group>
                 <name>dynarr</name>
                 <file>
