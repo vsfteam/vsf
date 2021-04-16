@@ -29,6 +29,11 @@
 #include "./vsf_distbus_dcd.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_DISTBUS_DCD_CFG_MTU
+#   define VSF_DISTBUS_DCD_CFG_MTU          512
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -39,8 +44,7 @@ static bool __vk_distbus_usbd_evthandler(vsf_distbus_t *bus, vsf_distbus_service
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vsf_distbus_service_info_t __vk_distbus_usbd_info = {
-    // TODO: fix MTU
-    .mtu                = 16,
+    .mtu                = 8 + VSF_DISTBUS_DCD_CFG_MTU,
     .type               = 0,
     .addr_range         = VSF_DISTBUS_DCD_ADDR_RANGE,
     .handler            = __vk_distbus_usbd_evthandler,

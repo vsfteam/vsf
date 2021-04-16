@@ -79,7 +79,6 @@ typedef struct vk_distbus_dcd_ep_t {
     uint8_t                         zlp : 1;
     uint8_t                         pending : 1;
     uint8_t                         ep;
-    uint32_t                        transfer_size;
 
     vsf_distbus_msg_t               *msg;
 } vk_distbus_dcd_ep_t;
