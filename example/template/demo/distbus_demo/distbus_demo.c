@@ -22,8 +22,7 @@
 
 #include "../common/usrapp_common.h"
 
-#if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \
-    &&  APP_USE_DISTBUS_DEMO == ENABLED
+#if VSF_USE_DISTBUS == ENABLED && APP_USE_DISTBUS_DEMO == ENABLED
 
 /*============================ MACROS ========================================*/
 

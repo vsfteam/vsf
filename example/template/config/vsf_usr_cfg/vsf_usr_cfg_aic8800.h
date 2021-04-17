@@ -229,7 +229,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #   endif
 #endif
 
-#if APP_USE_USBD_DEMO == ENABLED
+#if     APP_USE_USBD_DEMO == ENABLED                                            \
+    ||  (APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED)
 #   define VSF_USE_USB_DEVICE                           ENABLED
 #   if      APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
 #       define VSF_USBD_USE_DCD_DISTBUS                 ENABLED
