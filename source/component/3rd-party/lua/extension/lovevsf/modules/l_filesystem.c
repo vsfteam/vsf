@@ -164,6 +164,7 @@ int LOVE_MODULE_INIT(filesystem)(lua_State *L)
         {"read",                __l_filesystem_read                 },
         {"getWorkingDirectory", __l_filesystem_getWorkingDirectory  },
         {"getDirectoryItems",   __l_filesystem_getDirectoryItems    },
+        {"load",                __l_filesystem_load                 },
         {0,                     0                                   },
     };
     luaL_newlib(L, lib_reg);
