@@ -34,6 +34,12 @@
     ||  VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                                   \
     ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED
 const usrapp_usbd_common_const_t usrapp_usbd_common_const = {
+#if VSF_USBD_USE_DCD_USBIP == ENABLED
+    .usbip_dcd_param        = {
+        // use default usbip port
+        .port               = 0,
+    },
+#endif
 #if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
     .musb_fdrc_dcd_param    = {
         .op                 = &VSF_USB_DC0_IP,
