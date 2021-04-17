@@ -265,6 +265,10 @@ int vsf_linux_create_fhs(void)
     extern int coremark_main(int argc, char *argv[]);
     busybox_bind("/sbin/coremark", coremark_main);
 #endif
+#if APP_USE_DISTBUS_DEMO == ENABLED
+    extern int distbus_main(int argc, char *argv[]);
+    busybox_bind("/sbin/distbus", distbus_main);
+#endif
 #ifdef __AIC8800__
     extern void aic8800_demo_init(void);
     aic8800_demo_init();

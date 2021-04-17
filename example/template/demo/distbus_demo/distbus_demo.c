@@ -23,7 +23,7 @@
 #include "../common/usrapp_common.h"
 
 #if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \
-    &&  VSF_USBD_USE_DCD_DISTBUS == ENABLED && APP_USE_DISTBUS_DEMO == ENABLED
+    &&  APP_USE_DISTBUS_DEMO == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -101,7 +101,7 @@ static void __user_distbus_free_msg(void *msg)
 }
 
 #if APP_USE_LINUX_DEMO == ENABLED
-int distbus_dcd_server_main(int argc, char *argv[])
+int distbus_main(int argc, char *argv[])
 {
 #else
 int VSF_USER_ENTRY(void)
