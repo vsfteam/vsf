@@ -867,6 +867,11 @@ __vsf_component_peda_ifs_entry(__vk_fakefat32_mal_fini, vk_mal_fini)
     vsf_peda_end();
 }
 
+#if __IS_COMPILER_IAR__
+//! transfer of control bypasses initialization of: result
+#   pragma diag_suppress=pe546
+#endif
+
 __vsf_component_peda_ifs_entry(__vk_fakefat32_mal_read, vk_mal_read)
 {
     vsf_peda_begin();

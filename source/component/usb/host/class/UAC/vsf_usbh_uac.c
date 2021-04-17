@@ -585,7 +585,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
 #else
                     vk_usbh_urb_prepare(&uac_stream->urb[0], uac->dev, parser_vs_alt->desc_ep);
 #endif
-                    uac_stream->urb_mask = ~((1UL << VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM) - 1);
+                    uac_stream->urb_mask = (uint8_t)(~((1UL << VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM) - 1));
                     uac_stream->is_in = uac_stream->urb[0].pipe.dir_in1out0;
                     __vk_usbh_uac_parse_stream_format(uac_stream, (uint8_t *)desc_ifs + desc_ifs->bLength);
                     break;

@@ -188,10 +188,11 @@ vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_
             return reason;
 #endif
         } else {
+            vsf_unprotect_sched(origlevel);
+
             // TODO: re-send again?
             VSF_KERNEL_ASSERT(false);
         }
-        vsf_unprotect_sched(origlevel);
     }
     return reason;
 }
