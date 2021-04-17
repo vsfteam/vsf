@@ -230,7 +230,6 @@ void vk_distbus_usbd_get_setup(vk_distbus_dcd_t *usbd, uint8_t *buffer)
 
 void vk_distbus_usbd_status_stage(vk_distbus_dcd_t *usbd, bool is_in)
 {
-    vk_distbus_dcd_ep_t *dcd_ep = is_in ? &usbd->ep_out[0] : &usbd->ep_in[0];
     uint8_t *data;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usbd->distbus, 1, &data);
     if (NULL == msg) {
