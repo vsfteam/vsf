@@ -973,6 +973,9 @@
     <Filter Include="usrapp\demo\distbus_demo\bus">
       <UniqueIdentifier>{3494a736-be68-4321-ab4d-ad6707f8d9fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="usrapp\demo\distbus_demo\app">
+      <UniqueIdentifier>{9e0a303d-c725-41f6-ba6a-d0cb174c5f87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -4912,6 +4915,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\distbus_demo\bus\distbus_usart.c">
       <Filter>usrapp\demo\distbus_demo\bus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\distbus_demo\app\distbus_usbd.c">
+      <Filter>usrapp\demo\distbus_demo\app</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

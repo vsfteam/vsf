@@ -171,6 +171,8 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
     VSF_SERVICE_ASSERT(distbus->op.bus.recv != NULL);
     VSF_SERVICE_ASSERT(distbus->op.bus.send != NULL);
 
+    distbus->cur_addr = 0;
+
     vsf_slist_init(&distbus->msg_tx_list);
     distbus->msg_tx = distbus->msg_rx = NULL;
 
@@ -198,6 +200,9 @@ vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus)
 void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_service_t *service)
 {
     if (!vsf_slist_is_in(vsf_distbus_service_t, node, &distbus->service_list, service)) {
+        service->addr_start = distbus->cur_addr;
+        distbus->cur_addr += service->info->addr_range;
+
         vsf_slist_append(vsf_distbus_service_t, node, &distbus->service_list, service);
     }
 }

@@ -5633,6 +5633,12 @@
             <group>
                 <name>distbus_demo</name>
                 <group>
+                    <name>app</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\demo\distbus_demo\app\distbus_usbd.c</name>
+                    </file>
+                </group>
+                <group>
                     <name>bus</name>
                     <file>
                         <name>$PROJ_DIR$\..\..\demo\distbus_demo\bus\distbus_lwip.c</name>

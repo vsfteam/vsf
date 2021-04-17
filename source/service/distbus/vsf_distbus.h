@@ -119,6 +119,7 @@ def_simple_class(vsf_distbus_t) {
         vsf_distbus_msg_t                   *msg_tx;
         vsf_slist_t                         msg_tx_list;
         vsf_slist_t                         service_list;
+        uint16_t                            cur_addr;
     )
 };
 
