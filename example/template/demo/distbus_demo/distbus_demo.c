@@ -45,10 +45,10 @@ typedef struct __user_distbus_msg_t {
 dcl_vsf_pool(__user_distbus_msg_pool)
 def_vsf_pool(__user_distbus_msg_pool, __user_distbus_msg_t)
 
-typedef struct __user_t {
+typedef struct __user_distbus_t {
     vsf_distbus_t                           distbus;
     vsf_pool(__user_distbus_msg_pool)       msg_pool;
-} __user_t;
+} __user_distbus_t;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -63,7 +63,7 @@ extern bool __user_distbus_recv(uint8_t *buffer, uint_fast32_t size, void *p, vo
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __user_t __user = {
+static __user_distbus_t __user  = {
     .distbus                    = {
         .op                     = {
             .mem                = {
@@ -91,6 +91,7 @@ static void __user_distbus_on_error(vsf_distbus_t *distbus)
 
 static void * __user_distbus_alloc_msg(uint_fast32_t size)
 {
+    VSF_ASSERT(size <= APP_DISTBUS_DEMO_CFG_MTU);
     return VSF_POOL_ALLOC(__user_distbus_msg_pool, &__user.msg_pool);
 }
 

@@ -198,7 +198,6 @@ static void __vk_usbip_server_backend_thread(void *param)
 {
     vk_usbip_server_lwip_t *backend = (vk_usbip_server_lwip_t *)param;
     vk_usbip_server_t *server = backend->server;
-    err_t err;
 
     LOCK_TCPIP_CORE();
         if (    (NULL == (backend->listener_pcb = tcp_new()))
@@ -218,6 +217,7 @@ static void __vk_usbip_server_backend_thread(void *param)
     vsf_eda_post_evt(&server->teda.use_as__vsf_eda_t, VSF_USBIP_SERVER_EVT_BACKEND_INIT_DONE);
 
     vsf_evt_t evt;
+    err_t err;
     while (1) {
         evt = vsf_thread_wait();
         if (backend->is_to_exit) {
@@ -263,7 +263,7 @@ void __vk_usbip_server_backend_init(vk_usbip_server_t *server)
 
     memset(backend, 0, sizeof(*backend));
     backend->server = server;
-    backend->thread = sys_thread_new("usbip_lwip", __vk_usbip_server_backend_thread, &__vk_usbip_server_lwip, 1024, TCPIP_THREAD_PRIO);
+    backend->thread = sys_thread_new("usbip_lwip", __vk_usbip_server_backend_thread, backend, 1024, TCPIP_THREAD_PRIO);
 }
 
 void __vk_usbip_server_backend_close(void)
