@@ -30,6 +30,9 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if     VSF_USBD_USE_DCD_USBIP == ENABLED                                       \
+    ||  VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED                                   \
+    ||  VSF_USBD_USE_DCD_DWCOTG == ENABLED
 const usrapp_usbd_common_const_t usrapp_usbd_common_const = {
 #if VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
     .musb_fdrc_dcd_param    = {
@@ -55,6 +58,7 @@ const usrapp_usbd_common_const_t usrapp_usbd_common_const = {
     },
 #endif
 };
+#endif
 
 usrapp_usbd_common_t usrapp_usbd_common = {
 #if VSF_USBD_USE_DCD_USBIP == ENABLED
@@ -67,7 +71,7 @@ usrapp_usbd_common_t usrapp_usbd_common = {
     .dwcotg_dcd.param       = &usrapp_usbd_common_const.dwcotg_dcd_param,
 #endif
 #if VSF_USBD_USE_DCD_DISTBUS == ENABLED
-    // TODO: initialize distbus_dcd
+    .distbus_dcd.distbus    = NULL,
 #endif
 };
 

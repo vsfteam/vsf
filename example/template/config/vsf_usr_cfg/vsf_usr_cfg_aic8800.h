@@ -54,7 +54,7 @@
 #   define APP_USE_LINUX_LIBUSB_DEMO                    ENABLED
 #   define APP_USE_LINUX_MOUNT_FILE_DEMO                DISABLED
 #define APP_USE_USBH_DEMO                               ENABLED
-// Actually, usbd used usbip_dcd, no conflicts with hardware usb host
+// Actually, usbd use usbip_dcd or distbus_dcd, no conflicts with hardware usb host
 #define APP_USE_USBD_DEMO                               ENABLED
 #   define APP_USE_USBD_CDC_DEMO                        ENABLED
 #   define APP_USE_USBD_MSC_DEMO                        ENABLED
@@ -112,6 +112,9 @@
 #define APP_USE_EVM_DEMO                                ENABLED
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
+//#define APP_USE_DISTBUS_DEMO                            ENABLED
+//#   define APP_USE_DISTBUS_USBD_MASTER_DEMO             ENABLED
+//#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
 
 // demo for AIC8800
 #define AIC8800_APP_USE_WIFI_DEMO                       ENABLED
@@ -228,6 +231,9 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 
 #if APP_USE_USBD_DEMO == ENABLED
 #   define VSF_USE_USB_DEVICE                           ENABLED
+#   if APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
+#       define VSF_USBD_USE_DCD_DISTBUS                 ENABLED
+#   else
 #       define VSF_USBD_USE_DCD_USBIP                   ENABLED
 #           define VSF_USBIP_SERVER_CFG_DEBUG           DISABLED
 #           define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC   DISABLED
@@ -237,6 +243,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false
 #           define USRAPP_USBD_DWCOTG_CFG_VBUS_EN       false
 #           define USRAPP_USBD_DWCOTG_CFG_DMA_EN        false
+#   endif
 #       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
 #       define USRAPP_CFG_USBD_SPEED                    USB_SPEED_HIGH

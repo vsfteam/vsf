@@ -110,16 +110,18 @@ static bool __vk_distbus_usbd_msghandler(vsf_distbus_t *bus, vsf_distbus_service
     return retain_msg;
 }
 
+void vk_distbus_usbd_register_service(vk_distbus_dcd_t *usbd)
+{
+    usbd->service.info = &__vk_distbus_usbd_info;
+    vsf_distbus_register_service(usbd->distbus, &usbd->service);
+}
+
 vsf_err_t vk_distbus_usbd_init(vk_distbus_dcd_t *usbd, usb_dc_cfg_t *cfg)
 {
     VSF_USB_ASSERT((usbd != NULL) && (cfg != NULL));
 
     usbd->callback.param = cfg->param;
     usbd->callback.evthandler = cfg->evthandler;
-
-    usbd->service.addr_start = usbd->distbus_addr;
-    usbd->service.info = &__vk_distbus_usbd_info;
-    vsf_distbus_register_service(usbd->distbus, &usbd->service);
 
     uint8_t *data;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usbd->distbus, 1, &data);

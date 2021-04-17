@@ -22,7 +22,7 @@
 
 #if     VSF_USE_USB_DEVICE == ENABLED && VSF_USE_DISTBUS == ENABLED             \
     &&  VSF_USBD_USE_DCD_DISTBUS == ENABLED && APP_USE_DISTBUS_DEMO == ENABLED  \
-    &&  APP_USE_DISTBUS_USBD_DEMO == ENABLED
+    &&  APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED
 
 #include "../../common/usrapp_common.h"
 

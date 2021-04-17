@@ -63,7 +63,7 @@ extern bool __user_distbus_recv(uint8_t *buffer, uint_fast32_t size, void *p, vo
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static __user_distbus_t __user  = {
+static __user_distbus_t __user_dustbus = {
     .distbus                    = {
         .op                     = {
             .mem                = {
@@ -92,12 +92,12 @@ static void __user_distbus_on_error(vsf_distbus_t *distbus)
 static void * __user_distbus_alloc_msg(uint_fast32_t size)
 {
     VSF_ASSERT(size <= APP_DISTBUS_DEMO_CFG_MTU);
-    return VSF_POOL_ALLOC(__user_distbus_msg_pool, &__user.msg_pool);
+    return VSF_POOL_ALLOC(__user_distbus_msg_pool, &__user_dustbus.msg_pool);
 }
 
 static void __user_distbus_free_msg(void *msg)
 {
-    VSF_POOL_FREE(__user_distbus_msg_pool, &__user.msg_pool, msg);
+    VSF_POOL_FREE(__user_distbus_msg_pool, &__user_dustbus.msg_pool, msg);
 }
 
 #if APP_USE_LINUX_DEMO == ENABLED
@@ -114,12 +114,15 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
-    VSF_POOL_INIT(__user_distbus_msg_pool, &__user.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);
-    vsf_distbus_init(&__user.distbus);
+    VSF_POOL_INIT(__user_distbus_msg_pool, &__user_dustbus.msg_pool, APP_DISTBUS_DEMO_CFG_POOL_NUM);
+    vsf_distbus_init(&__user_dustbus.distbus);
 
-#if APP_USE_DISTBUS_USBD_DEMO == ENABLED
+#if     APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED
     extern void __user_distbus_usbd_service_init(vsf_distbus_t *distbus);
-    __user_distbus_usbd_service_init£¨&__user.distbus);
+    __user_distbus_usbd_service_init(&__user_dustbus.distbus);
+#elif   APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
+    usrapp_usbd_common.distbus_dcd.distbus = &__user_dustbus.distbus;
+    vk_distbus_usbd_register_service(&usrapp_usbd_common.distbus_dcd);
 #endif
 
 #if APP_USE_LINUX_DEMO != ENABLED

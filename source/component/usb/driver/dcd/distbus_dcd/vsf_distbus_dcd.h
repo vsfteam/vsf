@@ -86,7 +86,6 @@ typedef struct vk_distbus_dcd_ep_t {
 def_simple_class(vk_distbus_dcd_t) {
     public_member(
         vsf_distbus_t               *distbus;
-        uint16_t                    distbus_addr;
     )
 
     private_member(
@@ -115,6 +114,8 @@ def_simple_class(vk_distbus_dcd_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void vk_distbus_usbd_register_service(vk_distbus_dcd_t *usbd);
 
 extern vsf_err_t vk_distbus_usbd_init(vk_distbus_dcd_t *usbd, usb_dc_cfg_t *cfg);
 extern void vk_distbus_usbd_fini(vk_distbus_dcd_t *usbd);
