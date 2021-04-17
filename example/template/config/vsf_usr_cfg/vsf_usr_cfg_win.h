@@ -58,6 +58,9 @@
 #   define APP_USE_HAL_USART_DEMO                       ENABLED
 #define APP_USE_STREAM_HAL_DEMO                         ENABLED
 #   define APP_USE_STREAM_USART_DEMO                    ENABLED
+//#define APP_USE_DISTBUS_DEMO                            ENABLED
+//#   define APP_USE_DISTBUS_USBD_MASTER_DEMO             ENABLED
+//#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
 
 #define APP_USE_CPP_DEMO                                DISABLED
 #define VSF_LINUX_USE_SIMPLE_LIBC                       ENABLED
@@ -207,10 +210,14 @@
 #define VSF_SYSTIMER_FREQ                               (0ul)
 
 #define VSF_USE_USB_DEVICE                              ENABLED
-#   define VSF_USBD_USE_DCD_USBIP                       ENABLED
-#       define VSF_USBIP_SERVER_CFG_DEBUG               ENABLED
-#       define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC       DISABLED
-#       define VSF_USBIP_SERVER_CFG_DEBUG_URB           ENABLED
+#   if APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
+#       define VSF_USBD_USE_DCD_DISTBUS                 ENABLED
+#   else
+#       define VSF_USBD_USE_DCD_USBIP                   ENABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG           ENABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC   DISABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_URB       ENABLED
+#   endif
 #   ifdef __VSF_X86_WIN_SINGLE_PRIORITY
 #       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0

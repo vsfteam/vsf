@@ -113,7 +113,7 @@
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 //#define APP_USE_DISTBUS_DEMO                            ENABLED
-//#   define APP_USE_DISTBUS_USBD_MASTER_DEMO             ENABLED
+//#   define APP_USE_DISTBUS_USBD_SLAVE_DEMO              ENABLED
 //#   define APP_DISTBUS_DEMO_CFG_LWIP                    ENABLED
 
 // demo for AIC8800
@@ -231,18 +231,19 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 
 #if APP_USE_USBD_DEMO == ENABLED
 #   define VSF_USE_USB_DEVICE                           ENABLED
-#   if APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
+#   if      APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_MASTER_DEMO == ENABLED
 #       define VSF_USBD_USE_DCD_DISTBUS                 ENABLED
-#   else
-#       define VSF_USBD_USE_DCD_USBIP                   ENABLED
-#           define VSF_USBIP_SERVER_CFG_DEBUG           DISABLED
-#           define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC   DISABLED
-#           define VSF_USBIP_SERVER_CFG_DEBUG_URB       DISABLED
+#   elif    APP_USE_DISTBUS_DEMO == ENABLED && APP_USE_DISTBUS_USBD_SLAVE_DEMO == ENABLED
 #       define VSF_USBD_USE_DCD_DWCOTG                  ENABLED
 #           define USRAPP_USBD_DWCOTG_CFG_ULPI_EN       true
 #           define USRAPP_USBD_DWCOTG_CFG_UTMI_EN       false
 #           define USRAPP_USBD_DWCOTG_CFG_VBUS_EN       false
 #           define USRAPP_USBD_DWCOTG_CFG_DMA_EN        false
+#   else
+#       define VSF_USBD_USE_DCD_USBIP                   ENABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG           DISABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_TRAFFIC   DISABLED
+#           define VSF_USBIP_SERVER_CFG_DEBUG_URB       DISABLED
 #   endif
 #       define VSF_USBD_CFG_EDA_PRIORITY                vsf_prio_0
 #       define VSF_USBD_CFG_HW_PRIORITY                 vsf_arch_prio_0
