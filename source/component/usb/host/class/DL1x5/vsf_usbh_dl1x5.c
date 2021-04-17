@@ -337,7 +337,16 @@ static void __dl1x5_write_vreg_be16(vk_usbh_dl1x5_t *dl1x5, uint_fast8_t reg, ui
 
 static void __dl1x5_write_vreg_le16(vk_usbh_dl1x5_t *dl1x5, uint_fast8_t reg, uint_fast16_t val)
 {
+#if   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wself-assign"
+#endif
+
     val = cpu_to_le16(val);
+
+#if   __IS_COMPILER_LLVM__
+#   pragma clang diagnostic pop
+#endif
     __dl1x5_write_vreg(dl1x5, reg, val & 0xFF);
     __dl1x5_write_vreg(dl1x5, reg + 1, val >> 8);
 }
