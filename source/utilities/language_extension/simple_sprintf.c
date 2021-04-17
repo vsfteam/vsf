@@ -136,24 +136,26 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 // TODO: support %llx etc
                 print_integer:
                     if (flags.is_signed) {
-                        if (flags.is_halfword) {
-                            arg.integer = va_arg(ap, short);
-                        } else if (1 == flags.long_cnt) {
+                        if (1 == flags.long_cnt) {
                             arg.integer = va_arg(ap, long);
                         } else if (2 == flags.long_cnt) {
                             arg.integer = va_arg(ap, long long);
                         } else {
                             arg.integer = va_arg(ap, int);
                         }
-                    } else {
                         if (flags.is_halfword) {
-                            arg.uinteger = va_arg(ap, unsigned short);
-                        } else if (1 == flags.long_cnt) {
+                            arg.integer = (short)arg.integer;
+                        }
+                    } else {
+                        if (1 == flags.long_cnt) {
                             arg.uinteger = va_arg(ap, unsigned long);
                         } else if (2 == flags.long_cnt) {
                             arg.uinteger = va_arg(ap, unsigned long long);
                         } else {
                             arg.uinteger = va_arg(ap, unsigned int);
+                        }
+                        if (flags.is_halfword) {
+                            arg.integer = (unsigned short)arg.integer;
                         }
                     }
 
