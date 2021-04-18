@@ -39,6 +39,8 @@
 typedef struct __user_distbus_usbd_service_t {
     vsf_distbus_service_t   service;
     vsf_distbus_msg_t       *msg[32];
+    bool                    is_set_address;
+    uint8_t                 address;
 } __user_distbus_usbd_service_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -87,12 +89,28 @@ static void __user_usbd_evthandler(void *param, usb_evt_t evt, uint_fast8_t valu
             vsf_distbus_free_msg(distbus, msg);
             __user_distbus_usbd_service.msg[16 + (value & 0x0F)] = NULL;
         }
+    } else if (USB_ON_RESET == evt) {
+        // do reset on USB_ON_RESET, this can not wait
+        usb_dc_cfg_t cfg = {
+            .speed          = data[0],
+            .priority       = VSF_USBD_CFG_HW_PRIORITY,
+            .evthandler     = __user_usbd_evthandler,
+            .param          = distbus,
+        };
+        __user_distbus_usbd_service.is_set_address = false;
+        VSF_USB_DC0.Reset(&cfg);
     }
 
     if (USB_ON_SETUP == evt) {
         msg = vsf_distbus_alloc_msg(distbus, 2 + 8, &data);
         if (msg != NULL) {
+            struct usb_ctrlrequest_t *request = (struct usb_ctrlrequest_t *)&data[2];
             VSF_USB_DC0.GetSetup(&data[2]);
+            if ((0x00 == request->bRequestType) && (USB_REQ_SET_ADDRESS == request->bRequest)) {
+                // set address can not delay
+                __user_distbus_usbd_service.is_set_address = true;
+                __user_distbus_usbd_service.address = (uint8_t)request->wValue;
+            }
         }
     } else {
         msg = vsf_distbus_alloc_msg(distbus, 2, &data);
@@ -126,21 +144,15 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
                 .evthandler     = __user_usbd_evthandler,
                 .param          = distbus,
             };
+            __user_distbus_usbd_service.is_set_address = false;
             VSF_USB_DC0.Init(&cfg);
         }
         break;
     case VSF_DISTBUS_DCD_CMD_FINI:
         VSF_USB_DC0.Fini();
         break;
-    case VSF_DISTBUS_DCD_CMD_RESET: {
-            usb_dc_cfg_t cfg = {
-                .speed          = data[0],
-                .priority       = VSF_USBD_CFG_HW_PRIORITY,
-                .evthandler     = __user_usbd_evthandler,
-                .param          = distbus,
-            };
-            VSF_USB_DC0.Reset(&cfg);
-        }
+    case VSF_DISTBUS_DCD_CMD_RESET:
+        // reset can not wait
         break;
     case VSF_DISTBUS_DCD_CMD_CONNECT:
         VSF_USB_DC0.Connect();
@@ -152,10 +164,15 @@ static bool __user_distbus_usbd_service_msghandler(vsf_distbus_t *distbus,
         VSF_USB_DC0.Wakeup();
         break;
     case VSF_DISTBUS_DCD_CMD_SET_ADDRESS:
-        VSF_USB_DC0.SetAddress(data[0]);
+        // can not wait till now to set address
+//        VSF_USB_DC0.SetAddress(data[0]);
         break;
     case VSF_DISTBUS_DCD_CMD_STATUS_STAGE:
         VSF_USB_DC0.StatusStage(data[0]);
+        if (__user_distbus_usbd_service.is_set_address) {
+            __user_distbus_usbd_service.is_set_address = false;
+            VSF_USB_DC0.SetAddress(__user_distbus_usbd_service.address);
+        }
         break;
     case VSF_DISTBUS_DCD_CMD_EP_ADD:
         size = get_unaligned_le16(&data[2]);
